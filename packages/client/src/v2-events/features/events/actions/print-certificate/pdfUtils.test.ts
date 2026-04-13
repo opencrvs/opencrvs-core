@@ -246,7 +246,7 @@ describe('SVG compiler', () => {
       )
     })
   })
-  describe('$filter', () => {
+  describe('$join', () => {
     // Uses the tennis club event's `applicant.address` field (ADDRESS type) with real
     // mock admin area UUIDs so stringifyDeclaration can resolve district/province names.
     // Ibombo (62a0ccb4) is a district under Central province (a45b982a).
@@ -302,9 +302,9 @@ describe('SVG compiler', () => {
 
     it('joins all values when all location levels are present', () => {
       // Ibombo is a district under Central province → district + province present
-      // (domestic country code 'FAR' has no intl message in test env, resolves to '' and is dropped by $filter)
+      // (domestic country code 'FAR' has no intl message in test env, resolves to '' and is dropped by $join)
       expectRenderWithAddress(
-        '<svg><text>{{$filter ", " ($lookup $declaration "applicant.address.district") ($lookup $declaration "applicant.address.province") ($lookup $declaration "applicant.address.country")}}</text></svg>',
+        '<svg><text>{{$join ", " ($lookup $declaration "applicant.address.district") ($lookup $declaration "applicant.address.province") ($lookup $declaration "applicant.address.country")}}</text></svg>',
         {
           addressType: AddressType.DOMESTIC,
           administrativeArea: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
@@ -317,7 +317,7 @@ describe('SVG compiler', () => {
     it('omits district when absent, producing no leading comma', () => {
       // Central is a province with no parent → only province, no district key
       expectRenderWithAddress(
-        '<svg><text>{{$filter ", " ($lookup $declaration "applicant.address.district") ($lookup $declaration "applicant.address.province") ($lookup $declaration "applicant.address.country")}}</text></svg>',
+        '<svg><text>{{$join ", " ($lookup $declaration "applicant.address.district") ($lookup $declaration "applicant.address.province") ($lookup $declaration "applicant.address.country")}}</text></svg>',
         {
           addressType: AddressType.DOMESTIC,
           administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
@@ -331,7 +331,7 @@ describe('SVG compiler', () => {
       // International address: streetLevelDetails.state is set, province is absent
       // country code is resolved to its full English name via intl
       expectRenderWithAddress(
-        '<svg><text>{{$filter ", " ($or ($lookup $declaration "applicant.address.streetLevelDetails.state") ($lookup $declaration "applicant.address.province")) ($lookup $declaration "applicant.address.country")}}</text></svg>',
+        '<svg><text>{{$join ", " ($or ($lookup $declaration "applicant.address.streetLevelDetails.state") ($lookup $declaration "applicant.address.province")) ($lookup $declaration "applicant.address.country")}}</text></svg>',
         {
           addressType: AddressType.INTERNATIONAL,
           country: 'USA',
@@ -344,7 +344,7 @@ describe('SVG compiler', () => {
     it('combined with $or: falls back to province when state is absent (domestic address)', () => {
       // Domestic address at province level: no state, province = Central
       expectRenderWithAddress(
-        '<svg><text>{{$filter ", " ($or ($lookup $declaration "applicant.address.streetLevelDetails.state") ($lookup $declaration "applicant.address.province")) ($lookup $declaration "applicant.address.country")}}</text></svg>',
+        '<svg><text>{{$join ", " ($or ($lookup $declaration "applicant.address.streetLevelDetails.state") ($lookup $declaration "applicant.address.province")) ($lookup $declaration "applicant.address.country")}}</text></svg>',
         {
           addressType: AddressType.DOMESTIC,
           administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
@@ -357,7 +357,7 @@ describe('SVG compiler', () => {
     it('combined with $or: renders only country when both state and province are absent', () => {
       // International address with no state set — only country remains
       expectRenderWithAddress(
-        '<svg><text>{{$filter ", " ($or ($lookup $declaration "applicant.address.streetLevelDetails.state") ($lookup $declaration "applicant.address.province")) ($lookup $declaration "applicant.address.country")}}</text></svg>',
+        '<svg><text>{{$join ", " ($or ($lookup $declaration "applicant.address.streetLevelDetails.state") ($lookup $declaration "applicant.address.province")) ($lookup $declaration "applicant.address.country")}}</text></svg>',
         {
           addressType: AddressType.INTERNATIONAL,
           country: 'USA',

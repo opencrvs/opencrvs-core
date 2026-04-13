@@ -536,7 +536,7 @@ export function compileSvg({
   )
 
   /**
-   * Handlebars helper: $filter
+   * Handlebars helper: $join
    *
    * Joins provided values with the given separator, filtering out any empty or falsy values.
    * Useful for rendering location hierarchies where some admin levels may be absent
@@ -546,11 +546,11 @@ export function compileSvg({
    * @param values - One or more values to filter and join
    * @returns The non-empty values joined by separator
    *
-   * @example {{ $filter ", " district province country }} // "Ibombo, Central, Farajaland"
-   * @example {{ $filter ", " "" province country }}      // "Central, Farajaland" (empty district omitted)
-   * @example {{ $filter ", " "" "" country }}            // "Farajaland" (both empty omitted)
+   * @example {{ $join ", " district province country }} // "Ibombo, Central, Farajaland"
+   * @example {{ $join ", " "" province country }}      // "Central, Farajaland" (empty district omitted)
+   * @example {{ $join ", " "" "" country }}            // "Farajaland" (both empty omitted)
    */
-  Handlebars.registerHelper('$filter', function (
+  Handlebars.registerHelper('$join', function (
     ...args: [...(string | undefined | null)[], Handlebars.HelperOptions]
   ) {
     const separator = args[0] as string
