@@ -111,13 +111,6 @@ const handlers = [
       return HttpResponse.json(payload)
     }
   ),
-  http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
-    return HttpResponse.json({
-      primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902',
-      role: 'REGISTRATION_AGENT',
-      signature: 'signature.png'
-    })
-  }),
   // token exchange for `event.actions.register.confirm` and `event.actions.register.reject`
   // query params such as `subject_token`, `subject_token_type` omitted for simplicity
   http.post(`${env.AUTH_URL}/token`, () =>
