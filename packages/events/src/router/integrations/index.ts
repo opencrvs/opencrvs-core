@@ -161,7 +161,7 @@ export const integrationsRouter = router({
       return {
         id: systemClient.id as UUID,
         status: systemClient.status,
-        scope: systemClient.scopes as string[]
+        scope: systemClient.scopes as EncodedScope[]
       }
     }),
 
