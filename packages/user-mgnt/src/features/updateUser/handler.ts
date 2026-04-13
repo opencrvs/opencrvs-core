@@ -16,7 +16,8 @@ import {
   personNameFromV1ToV2,
   findScope,
   getScopes,
-  hasScope
+  hasScope,
+  EncodedScope
 } from '@opencrvs/commons'
 import { recordUserAuditEvent } from '@user-mgnt/utils/userAudit'
 import {
@@ -58,7 +59,12 @@ export default async function updateUser(
   existingUser.role = user.role
 
   if (existingUser.primaryOfficeId !== user.primaryOfficeId) {
-    if (hasScope(request.auth.credentials?.scope ?? [], 'config.update-all')) {
+    if (
+      hasScope(
+        (request.auth.credentials?.scope as EncodedScope[]) ?? [],
+        'config.update-all'
+      )
+    ) {
       existingUser.primaryOfficeId = user.primaryOfficeId
     } else {
       throw new Error('Location can not be changed by this user')

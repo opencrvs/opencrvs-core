@@ -378,12 +378,11 @@ export type BulkResponse = estypes.BulkResponse
 export async function indexEventsInBulk(
   batch: EventDocument[],
   configs: EventConfig[],
-
+  locationHierarchyCache: Map<string, string[]> = new Map<string, string[]>(),
   indexNameOverrides?: Map<string, string>
 ) {
   const esClient = getOrCreateClient()
 
-  const locationHierarchyCache = new Map<string, string[]>()
   const hiearchyResolutionStarted = new Date()
 
   const indexedDocs = await Promise.all(
