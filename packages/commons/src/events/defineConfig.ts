@@ -55,7 +55,8 @@ function warnOnConfigurationIssues(config: EventConfig) {
     console.warn(
       `
        ************** WARNING **************
-       The 'review' field is deprecated in OpenCRVS v2.0 and is no longer used.
+       The 'review' field for 'ActionType.REGISTER' config is deprecated in OpenCRVS v2.0 and is no longer used.
+       Instead, the 'review' from `ActionType.DECLARE` is used for registering.
        ************** WARNING **************
       `
     )
