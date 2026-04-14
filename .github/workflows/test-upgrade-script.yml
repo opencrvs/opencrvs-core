@@ -47,11 +47,12 @@ jobs:
           node packages/toolkit/dist/cli.js upgrade opencrvs-farajaland
       - name: Test compilation
         run: |
-          cd packages/toolkit
-          yarn link @opencrvs/toolkit
-          cd ../../opencrvs-farajaland
+          cd opencrvs-farajaland
+          yarn install --frozen-lockfile
+
           # remove some unneeded files
           rm -rf src/api/notification/testData.ts
-          yarn link @opencrvs/toolkit
-          yarn install --frozen-lockfile
+
+          rm -rf node_modules/@opencrvs/toolkit
+          mv ../../packages/toolkit node_modules/@opencrvs/toolkit
           yarn test:compilation
