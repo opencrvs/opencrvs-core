@@ -6,7 +6,7 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-name: Test upgrade script
+name: Test v1.9 -> v2.0 upgrade script
 
 on:
   pull_request:
@@ -31,7 +31,8 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
-      - uses: nick-fields/retry@v3
+      - name: Install core dependencies
+        uses: nick-fields/retry@v3
         with:
           timeout_minutes: 10
           max_attempts: 3
@@ -42,7 +43,7 @@ jobs:
       - name: Checkout the correct opencrvs-farajaland branch
         run: |
           git clone -b ${{ env.FARAJALAND_BRANCH }} https://github.com/opencrvs/opencrvs-farajaland.git
-      - name: Install dependencies
+      - name: Install opencrvs-farajaland dependencies
         working-directory: opencrvs-farajaland
         run: yarn install
       - name: Link toolkit
@@ -51,6 +52,7 @@ jobs:
           cd ../../opencrvs-farajaland && yarn link @opencrvs/toolkit
       - name: Run upgrade script
         run: |
+          cd opencrvs-farajaland
           ./node_modules/@opencrvs/toolkit/dist/cli.js upgrade
           rm -rf src/api/notification/testData.ts
       - name: Test compilation
