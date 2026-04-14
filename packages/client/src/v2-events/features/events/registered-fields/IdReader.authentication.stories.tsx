@@ -14,9 +14,11 @@ import React from 'react'
 import { fn } from '@storybook/test'
 import styled from 'styled-components'
 import {
+  field,
   FieldConfig,
   FieldType,
   FieldValue,
+  not,
   TestUserRole
 } from '@opencrvs/commons/client'
 import { Stack, Text } from '@opencrvs/components'
@@ -29,7 +31,7 @@ interface Args {
 }
 
 const meta: Meta<Args> = {
-  title: 'Inputs/IdReader/Authentication States',
+  title: 'ID Authentication',
   argTypes: {},
   decorators: [
     (Story) => (
@@ -131,12 +133,32 @@ const idReaderWithValidationError: FieldConfig = {
   required: true
 }
 
+const idReaderWithFetchFailureError: FieldConfig = {
+  ...idReaderWithAuth,
+  id: 'storybook.id-reader.fetch-failed',
+  required: true,
+  validation: [
+    {
+      message: {
+        id: 'storybook.id-reader.fetch-failed.error',
+        defaultMessage:
+          'Failed to fetch authenticated details. Please try again.',
+        description: 'Validation error when authenticated details are missing'
+      },
+      validator: not(
+        field('storybook.id-reader.fetch-failed').get('data').isFalsy()
+      )
+    }
+  ]
+}
+
 const fetchLoader: FieldConfig = {
   id: 'storybook.verify-nid-fetch-loader',
   type: FieldType.LOADER,
+  variant: 'highlighted',
   label: {
     id: 'storybook.verify-nid-fetch-loader.label',
-    defaultMessage: "Fetching individual's information...",
+    defaultMessage: 'ID Reader',
     description: 'Label for ID fetch loading indicator'
   },
   configuration: {
@@ -232,12 +254,26 @@ export const Default: StoryObj<Args> = {
         paragraph('Required field'),
         requiredIdReaderWithAuth,
 
-        paragraph('Validation error'),
-        idReaderWithValidationError
+        paragraph('Required error'),
+        idReaderWithValidationError,
+
+        paragraph('Loading'),
+        fetchLoader,
+
+        paragraph('Success'),
+        authenticationStatusField,
+
+        paragraph('Failed to fetch'),
+        idReaderWithFetchFailureError
       ]}
-      fieldsToShowValidationErrors={[idReaderWithValidationError]}
+      fieldsToShowValidationErrors={[
+        idReaderWithValidationError,
+        idReaderWithFetchFailureError
+      ]}
       initialValues={{
-        'storybook.id-reader.required': { data: {} }
+        'storybook.id-reader.required': { data: {} },
+        'storybook.id-reader.fetch-failed': { data: null },
+        'storybook.verification-status': 'authenticated'
       }}
       validateAllFields={true}
       onChange={onChange}

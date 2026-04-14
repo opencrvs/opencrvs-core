@@ -874,10 +874,12 @@ export const GeneratedInputField = React.memo(
 
     if (isLoaderFieldType(field)) {
       return (
-        <Loader.Input
-          configuration={field.config.configuration}
-          id={field.config.id}
-        />
+        <InputField {...inputFieldProps} variant={field.config.variant}>
+          <Loader.Input
+            configuration={field.config.configuration}
+            id={field.config.id}
+          />
+        </InputField>
       )
     }
     if (isCustomFieldType(field)) {

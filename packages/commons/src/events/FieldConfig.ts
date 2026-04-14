@@ -956,8 +956,16 @@ const CustomField = BaseField.extend({
 
 export type CustomField = z.infer<typeof CustomField>
 
+const FieldStyleVariant = z.enum(['default', 'highlighted'])
+
 const LoaderField = BaseField.extend({
   type: z.literal(FieldType.LOADER),
+  variant: FieldStyleVariant.default('default').optional(),
+  hideLabel: z
+    .boolean()
+    .default(true)
+    .optional()
+    .describe('Loader field does not show a label by default'),
   configuration: z.object({
     text: TranslationConfig.describe('Display text above the loading spinner')
   })

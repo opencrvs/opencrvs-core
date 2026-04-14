@@ -33,7 +33,7 @@ function LoaderInput({
         flexDirection="column-reverse"
         id={id}
         loadingText={intl.formatMessage(configuration.text)}
-        marginPercent={5}
+        marginPercent={0}
       />
     </Container>
   )
