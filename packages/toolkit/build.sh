@@ -62,4 +62,8 @@ else
   find dist -type f -exec sed -i 's|@opencrvs/commons|../commons|g' {} +
 fi
 
+# Build CLI
+npx esbuild src/cli.ts --bundle --format=cjs --outdir=./dist --allow-overwrite --packages=external --banner:js="#!/usr/bin/env node"
+chmod +x ./dist/cli.js
+
 echo "Build completed successfully."

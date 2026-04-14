@@ -4,7 +4,7 @@
   "description": "OpenCRVS toolkit for building country configurations",
   "license": "MPL-2.0",
   "bin": {
-    "opencrvs-upgrade": "./dist/migrations/v2.0/index.js"
+    "opencrvs": "./dist/cli.js"
   },
   "exports": {
     "./lib": "./dist/lib.js",
