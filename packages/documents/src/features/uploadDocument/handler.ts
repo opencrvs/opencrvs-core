@@ -75,9 +75,9 @@ export async function fileUploadHandler(
 
   const extension = file.hapi.filename.split('.').pop()
   const filename = `${transactionId}.${extension}`
-  const filePath = (
-    path ? joinUrlPaths(path, filename) : filename
-  ) as DocumentPath
+  const filePath = (path
+    ? joinUrlPaths(path, filename)
+    : filename) as DocumentPath
 
   await minioClient.putObject(MINIO_BUCKET, filePath, file, {
     'created-by': userId,
@@ -100,7 +100,7 @@ export async function fileExistsHandler(
     filePath = filePath.slice(MINIO_BUCKET.length + 1)
   }
 
-  const documentPath = DocumentPath.parse(filePath)
+  let documentPath = DocumentPath.parse(filePath)
 
   let stat
 
