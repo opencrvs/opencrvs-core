@@ -10681,7 +10681,8 @@ components:
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
-              default: false
+              description: Loader field does not show a label by default
+              default: true
               type: boolean
             uncorrectable:
               description: Indicates whether the field can be modified during record
@@ -10737,6 +10738,12 @@ components:
             type:
               type: string
               const: LOADER
+            variant:
+              default: default
+              type: string
+              enum:
+                - default
+                - highlighted
             configuration:
               type: object
               properties:
