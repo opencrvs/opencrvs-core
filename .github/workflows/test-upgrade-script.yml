@@ -49,7 +49,7 @@ jobs:
           cd ..
       - name: Install dependencies
         working-directory: opencrvs-farajaland
-        run: yarn install --frozen-lockfile
+        run: yarn install
       - name: Run upgrade script
         run: |
           node packages/toolkit/dist/cli.js upgrade opencrvs-farajaland
