@@ -44,10 +44,8 @@ jobs:
           git clone -b ${{ env.FARAJALAND_BRANCH }} https://github.com/opencrvs/opencrvs-farajaland.git
       - name: Link toolkit
         run: |
-          cd packages/toolkit
-          yarn link
-          cd ../../opencrvs-farajaland
-          yarn link @opencrvs/toolkit
+          cd packages/toolkit && yarn link
+          cd ../../opencrvs-farajaland && yarn link @opencrvs/toolkit
       - name: Install dependencies
         working-directory: opencrvs-farajaland
         run: yarn install --frozen-lockfile
