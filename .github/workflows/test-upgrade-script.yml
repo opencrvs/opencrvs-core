@@ -46,6 +46,7 @@ jobs:
         run: |
           cd packages/toolkit && yarn link
           cd ../../opencrvs-farajaland && yarn link @opencrvs/toolkit
+          cd ..
       - name: Install dependencies
         working-directory: opencrvs-farajaland
         run: yarn install --frozen-lockfile
