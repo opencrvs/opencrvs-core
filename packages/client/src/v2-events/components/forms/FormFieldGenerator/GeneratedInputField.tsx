@@ -816,6 +816,8 @@ export const GeneratedInputField = React.memo(
         <VerificationStatus.Input
           configuration={field.config.configuration}
           id={field.config.id}
+          label={inputFieldProps.label}
+          required={inputFieldProps.required}
           value={field.value}
           onReset={() => {
             if (Array.isArray(fieldDefinition.parent)) {

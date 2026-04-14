@@ -188,9 +188,10 @@ const authenticationStatusConfiguration = {
 const authenticationStatusField: FieldConfig = {
   id: 'storybook.verification-status',
   type: FieldType.VERIFICATION_STATUS,
+  required: true,
   label: {
     id: 'storybook.verification-status.label',
-    defaultMessage: 'Verification status',
+    defaultMessage: 'ID Reader',
     description: 'Authentication status label'
   },
   configuration: authenticationStatusConfiguration
@@ -276,45 +277,6 @@ export const Default: StoryObj<Args> = {
         'storybook.verification-status': 'authenticated'
       }}
       validateAllFields={true}
-      onChange={onChange}
-    />
-  ),
-  args: {
-    onChange: onChangeSpy
-  }
-}
-
-export const LoadingFetching: StoryObj<Args> = {
-  render: ({ onChange }) => (
-    <AuthenticationStateStory fields={[fetchLoader]} onChange={onChange} />
-  ),
-  args: {
-    onChange: onChangeSpy
-  }
-}
-
-export const SuccessAuthenticated: StoryObj<Args> = {
-  render: ({ onChange }) => (
-    <AuthenticationStateStory
-      fields={[authenticationStatusField]}
-      initialValues={{
-        'storybook.verification-status': 'authenticated'
-      }}
-      onChange={onChange}
-    />
-  ),
-  args: {
-    onChange: onChangeSpy
-  }
-}
-
-export const FailureFetchingAuthenticatedDetails: StoryObj<Args> = {
-  render: ({ onChange }) => (
-    <AuthenticationStateStory
-      fields={[authenticationStatusField]}
-      initialValues={{
-        'storybook.verification-status': 'failed'
-      }}
       onChange={onChange}
     />
   ),

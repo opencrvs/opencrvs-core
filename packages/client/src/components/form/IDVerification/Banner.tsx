@@ -16,7 +16,6 @@ import { messages } from '@client/i18n/messages/views/id-verification'
 import { useModal } from '@client/hooks/useModal'
 import { buttonMessages } from '@client/i18n/messages'
 import { VerificationPill } from './VerificationPill'
-import { StatusIcon } from './StatusIcon'
 
 const ConfirmationModal: React.FC<{
   close: (result: boolean) => void
@@ -79,10 +78,9 @@ export const IDVerificationBanner = ({
   }
   if (type === 'authenticated') {
     return (
-      <Banner.Container>
-        <Banner.Header type="active">
+      <Banner.Container variant="active">
+        <Banner.Header>
           <VerificationPill type={type} />
-          <StatusIcon type={type} />
         </Banner.Header>
         <Banner.Body>
           <Text variant="reg16" element="span">
@@ -99,10 +97,9 @@ export const IDVerificationBanner = ({
     )
   } else if (type === 'verified') {
     return (
-      <Banner.Container>
-        <Banner.Header type="default">
+      <Banner.Container variant="default">
+        <Banner.Header>
           <VerificationPill type={type} />
-          <StatusIcon type={type} />
         </Banner.Header>
         <Banner.Body>
           <Text variant="reg16" element="span">
@@ -119,10 +116,9 @@ export const IDVerificationBanner = ({
     )
   } else if (type === 'failed') {
     return (
-      <Banner.Container>
-        <Banner.Header type="inactive">
+      <Banner.Container variant="inactive">
+        <Banner.Header>
           <VerificationPill type={type} />
-          <StatusIcon type={type} />
         </Banner.Header>
         <Banner.Body>
           <Text variant="reg16" element="span">
@@ -139,10 +135,9 @@ export const IDVerificationBanner = ({
     )
   } else if (type === 'failedFetchIdDetails') {
     return (
-      <Banner.Container>
-        <Banner.Header type="inactive">
+      <Banner.Container variant="inactive">
+        <Banner.Header>
           <VerificationPill type={type} />
-          <StatusIcon type={type} />
         </Banner.Header>
         <Banner.Body>
           <Text variant="reg16" element="span">
