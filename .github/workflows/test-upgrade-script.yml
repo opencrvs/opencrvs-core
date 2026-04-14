@@ -54,6 +54,6 @@ jobs:
       - name: Test compilation
         working-directory: opencrvs-farajaland
         run: |
-          yarn install --frozen-lockfile
           yarn link @opencrvs/toolkit
+          yarn install --frozen-lockfile
           yarn test:compilation
