@@ -42,19 +42,19 @@ jobs:
       - name: Checkout the correct opencrvs-farajaland branch
         run: |
           git clone -b ${{ env.FARAJALAND_BRANCH }} https://github.com/opencrvs/opencrvs-farajaland.git
-      - name: Run upgrade script
-        run: |
-          node packages/toolkit/dist/cli.js upgrade opencrvs-farajaland
-          # remove some unneeded files
-          rm -rf opencrvs-farajaland/src/api/notification/testData.ts
-      - name: Install dependencies
-        working-directory: opencrvs-farajaland
-        run: yarn install --frozen-lockfile
       - name: Link toolkit
         run: |
           cd packages/toolkit
           yarn link
           cd ../../opencrvs-farajaland
           yarn link @opencrvs/toolkit
+      - name: Install dependencies
+        working-directory: opencrvs-farajaland
+        run: yarn install --frozen-lockfile
+      - name: Run upgrade script
+        run: |
+          node packages/toolkit/dist/cli.js upgrade opencrvs-farajaland
+          # remove some unneeded files
+          rm -rf opencrvs-farajaland/src/api/notification/testData.ts
       - name: Test compilation
         run: yarn test:compilation
