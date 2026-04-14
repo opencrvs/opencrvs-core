@@ -37,7 +37,9 @@ jobs:
           max_attempts: 3
           command: yarn install --frozen-lockfile
       - name: Build toolkit
-        run: yarn build:all
+        run: |
+          yarn build:all
+          yarn link @opencrvs/toolkit
         working-directory: packages/toolkit
       - name: Checkout the correct opencrvs-farajaland branch
         run: |
@@ -50,7 +52,8 @@ jobs:
         with:
           node-version-file: opencrvs-farajaland/.nvmrc
       - name: Test compilation
+        working-directory: opencrvs-farajaland
         run: |
-          cd opencrvs-farajaland
           yarn install --frozen-lockfile
+          yarn link @opencrvs/toolkit
           yarn test:compilation
