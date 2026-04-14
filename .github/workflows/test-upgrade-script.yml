@@ -9,13 +9,13 @@
 name: Test upgrade script
 
 on:
+  pull_request:
   workflow_dispatch:
     inputs:
       farajaland:
         description: Farajaland branch name
         default: release-v1.9.13
         required: true
-  pull_request:
 
 jobs:
   test-upgrade-script:
