@@ -51,8 +51,7 @@ jobs:
           cd ../../opencrvs-farajaland && yarn link @opencrvs/toolkit
       - name: Run upgrade script
         run: |
-          node packages/toolkit/dist/cli.js upgrade opencrvs-farajaland
-          # remove some unneeded files
-          rm -rf opencrvs-farajaland/src/api/notification/testData.ts
+          ./node_modules/@opencrvs/toolkit/dist/cli.js upgrade
+          rm -rf src/api/notification/testData.ts
       - name: Test compilation
         run: yarn test:compilation
