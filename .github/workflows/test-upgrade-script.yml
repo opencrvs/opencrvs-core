@@ -6,7 +6,7 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-name: Test v1.9 -> v2.0 upgrade script
+name: Test v1.9 -> v2.0 Upgrade Script
 
 on:
   pull_request:
@@ -50,10 +50,11 @@ jobs:
         run: |
           cd packages/toolkit && yarn link
           cd ../../opencrvs-farajaland && yarn link @opencrvs/toolkit
-      - name: Run upgrade script
+      - name: Run upgrade script on opencrvs-farajaland
         run: |
           cd opencrvs-farajaland
           ./node_modules/@opencrvs/toolkit/dist/cli.js upgrade
           rm -rf src/api/notification/testData.ts
-      - name: Test compilation
+      - name: Test opencrvs-farajaland compilation
         run: yarn test:compilation
+        working-directory: opencrvs-farajaland
