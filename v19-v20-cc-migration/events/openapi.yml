@@ -2447,6 +2447,10 @@ components:
                             $scope:
                               type: string
                               enum:
+                                - organisation.read-locations
+                                - user.read
+                                - user.create
+                                - user.edit
                                 - record.search
                                 - record.create
                                 - record.read
@@ -2462,6 +2466,21 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
+                                - bypassratelimit
+                                - record.reindex
+                                - user.data-seeding
+                                - integration.create
+                                - record.import
+                                - config.update-all
+                                - attachment.upload
+                                - profile.electronic-signature
+                                - user.read-only-my-audit
+                                - performance.read
+                                - performance.read-dashboards
+                                - performance.vital-statistics-export
+                                - record.confirm-registration
+                                - record.reject-registration
+                                - workqueue
                             $option:
                               type: string
                               enum:
@@ -2471,6 +2490,8 @@ components:
                                 - declaredBy
                                 - registeredIn
                                 - registeredBy
+                                - accessLevel
+                                - ids
                           required:
                             - $scope
                             - $option
@@ -6877,6 +6898,10 @@ components:
                             $scope:
                               type: string
                               enum:
+                                - organisation.read-locations
+                                - user.read
+                                - user.create
+                                - user.edit
                                 - record.search
                                 - record.create
                                 - record.read
@@ -6892,6 +6917,21 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
+                                - bypassratelimit
+                                - record.reindex
+                                - user.data-seeding
+                                - integration.create
+                                - record.import
+                                - config.update-all
+                                - attachment.upload
+                                - profile.electronic-signature
+                                - user.read-only-my-audit
+                                - performance.read
+                                - performance.read-dashboards
+                                - performance.vital-statistics-export
+                                - record.confirm-registration
+                                - record.reject-registration
+                                - workqueue
                             $option:
                               type: string
                               enum:
@@ -6901,6 +6941,8 @@ components:
                                 - declaredBy
                                 - registeredIn
                                 - registeredBy
+                                - accessLevel
+                                - ids
                           required:
                             - $scope
                             - $option
@@ -7253,6 +7295,10 @@ components:
                             $scope:
                               type: string
                               enum:
+                                - organisation.read-locations
+                                - user.read
+                                - user.create
+                                - user.edit
                                 - record.search
                                 - record.create
                                 - record.read
@@ -7268,6 +7314,21 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
+                                - bypassratelimit
+                                - record.reindex
+                                - user.data-seeding
+                                - integration.create
+                                - record.import
+                                - config.update-all
+                                - attachment.upload
+                                - profile.electronic-signature
+                                - user.read-only-my-audit
+                                - performance.read
+                                - performance.read-dashboards
+                                - performance.vital-statistics-export
+                                - record.confirm-registration
+                                - record.reject-registration
+                                - workqueue
                             $option:
                               type: string
                               enum:
@@ -7277,6 +7338,8 @@ components:
                                 - declaredBy
                                 - registeredIn
                                 - registeredBy
+                                - accessLevel
+                                - ids
                           required:
                             - $scope
                             - $option
@@ -7467,6 +7530,10 @@ components:
                             $scope:
                               type: string
                               enum:
+                                - organisation.read-locations
+                                - user.read
+                                - user.create
+                                - user.edit
                                 - record.search
                                 - record.create
                                 - record.read
@@ -7482,6 +7549,21 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
+                                - bypassratelimit
+                                - record.reindex
+                                - user.data-seeding
+                                - integration.create
+                                - record.import
+                                - config.update-all
+                                - attachment.upload
+                                - profile.electronic-signature
+                                - user.read-only-my-audit
+                                - performance.read
+                                - performance.read-dashboards
+                                - performance.vital-statistics-export
+                                - record.confirm-registration
+                                - record.reject-registration
+                                - workqueue
                             $option:
                               type: string
                               enum:
@@ -7491,6 +7573,8 @@ components:
                                 - declaredBy
                                 - registeredIn
                                 - registeredBy
+                                - accessLevel
+                                - ids
                           required:
                             - $scope
                             - $option
@@ -7680,6 +7764,10 @@ components:
                             $scope:
                               type: string
                               enum:
+                                - organisation.read-locations
+                                - user.read
+                                - user.create
+                                - user.edit
                                 - record.search
                                 - record.create
                                 - record.read
@@ -7695,6 +7783,21 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
+                                - bypassratelimit
+                                - record.reindex
+                                - user.data-seeding
+                                - integration.create
+                                - record.import
+                                - config.update-all
+                                - attachment.upload
+                                - profile.electronic-signature
+                                - user.read-only-my-audit
+                                - performance.read
+                                - performance.read-dashboards
+                                - performance.vital-statistics-export
+                                - record.confirm-registration
+                                - record.reject-registration
+                                - workqueue
                             $option:
                               type: string
                               enum:
@@ -7704,6 +7807,8 @@ components:
                                 - declaredBy
                                 - registeredIn
                                 - registeredBy
+                                - accessLevel
+                                - ids
                           required:
                             - $scope
                             - $option
