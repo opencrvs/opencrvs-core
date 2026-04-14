@@ -9,15 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import styled from 'styled-components'
 import { useIntl } from 'react-intl'
-import { Box, Loader as LoaderUI } from '@opencrvs/components'
+import { Loader as LoaderUI } from '@opencrvs/components'
 import { LoaderField } from '@opencrvs/commons/client'
-
-const Container = styled(Box)`
-  border: none;
-  background-color: ${({ theme }) => theme.colors.background};
-`
 
 function LoaderInput({
   id,
@@ -28,14 +22,11 @@ function LoaderInput({
 }) {
   const intl = useIntl()
   return (
-    <Container>
-      <LoaderUI
-        flexDirection="column-reverse"
-        id={id}
-        loadingText={intl.formatMessage(configuration.text)}
-        marginPercent={0}
-      />
-    </Container>
+    <LoaderUI
+      flexDirection="column-reverse"
+      id={id}
+      loadingText={intl.formatMessage(configuration.text)}
+    />
   )
 }
 
