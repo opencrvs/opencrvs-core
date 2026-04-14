@@ -67,11 +67,11 @@ const authMethod = {
     description: 'Label for authentication option'
   },
   configuration: {
-    icon: 'Globe',
+    icon: 'Fingerprint',
     url: 'https://fake-auth-service.opencrvs.org',
     text: {
       id: 'storybook.id-reader.authentication.button.label',
-      defaultMessage: 'Authenticate online',
+      defaultMessage: 'Authenticate with National ID system',
       description: 'Authentication button label'
     }
   }
@@ -85,7 +85,7 @@ const idReaderWithAuth: FieldConfig = {
     defaultMessage: 'ID Reader',
     description: 'ID Reader label'
   },
-  methods: [qrMethod, authMethod],
+  methods: [authMethod, qrMethod],
   helperText: {
     id: 'storybook.id-reader.helperText',
     defaultMessage:
@@ -108,17 +108,6 @@ function paragraph(text: string): FieldConfig {
     },
     configuration: {}
   }
-}
-
-const idReaderWithoutAuth: FieldConfig = {
-  id: 'storybook.id-reader',
-  type: FieldType.ID_READER,
-  label: {
-    id: 'storybook.id-reader.label',
-    defaultMessage: 'ID Reader',
-    description: 'ID Reader label'
-  },
-  methods: [qrMethod]
 }
 
 const requiredIdReaderWithAuth: FieldConfig = {
@@ -197,22 +186,6 @@ const authenticationStatusField: FieldConfig = {
   configuration: authenticationStatusConfiguration
 }
 
-const offlineNotice: FieldConfig = {
-  id: 'storybook.id-reader.offline-notice',
-  type: FieldType.PARAGRAPH,
-  label: {
-    id: 'storybook.id-reader.offline-notice.label',
-    defaultMessage:
-      'Authentication is unavailable while offline. Reconnect to continue.',
-    description: 'Offline guidance shown for authentication flow'
-  },
-  configuration: {
-    styles: {
-      hint: true
-    }
-  }
-}
-
 const onChangeSpy = fn()
 
 function AuthenticationStateStory({
@@ -285,12 +258,45 @@ export const Default: StoryObj<Args> = {
   }
 }
 
+function OfflineBrowserMock({ children }: { children: React.ReactNode }) {
+  React.useEffect(() => {
+    const originalDescriptor = Object.getOwnPropertyDescriptor(
+      window.navigator,
+      'onLine'
+    )
+
+    Object.defineProperty(window.navigator, 'onLine', {
+      configurable: true,
+      get: () => false
+    })
+
+    window.dispatchEvent(new Event('offline'))
+
+    return () => {
+      if (originalDescriptor) {
+        Object.defineProperty(window.navigator, 'onLine', originalDescriptor)
+      } else {
+        Object.defineProperty(window.navigator, 'onLine', {
+          configurable: true,
+          get: () => true
+        })
+      }
+
+      window.dispatchEvent(new Event('online'))
+    }
+  }, [])
+
+  return <>{children}</>
+}
+
 export const Offline: StoryObj<Args> = {
   render: ({ onChange }) => (
-    <AuthenticationStateStory
-      fields={[offlineNotice, idReaderWithoutAuth]}
-      onChange={onChange}
-    />
+    <OfflineBrowserMock>
+      <AuthenticationStateStory
+        fields={[idReaderWithAuth]}
+        onChange={onChange}
+      />
+    </OfflineBrowserMock>
   ),
   args: {
     onChange: onChangeSpy
