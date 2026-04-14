@@ -42,14 +42,13 @@ jobs:
       - name: Checkout the correct opencrvs-farajaland branch
         run: |
           git clone -b ${{ env.FARAJALAND_BRANCH }} https://github.com/opencrvs/opencrvs-farajaland.git
+      - name: Install dependencies
+        working-directory: opencrvs-farajaland
+        run: yarn install
       - name: Link toolkit
         run: |
           cd packages/toolkit && yarn link
           cd ../../opencrvs-farajaland && yarn link @opencrvs/toolkit
-          cd ..
-      - name: Install dependencies
-        working-directory: opencrvs-farajaland
-        run: yarn install
       - name: Run upgrade script
         run: |
           node packages/toolkit/dist/cli.js upgrade opencrvs-farajaland
