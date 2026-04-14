@@ -18,6 +18,8 @@ import { main as removePendingCertificationFlag } from './remove-pending-certifi
 import { main as renameLocationParentId } from './rename-location-parent-id'
 import { main as renameApiPaths } from './rename-api-paths'
 import { main as convertConfigFilesToTs } from './convert-config-files-to-ts'
+import { main as migrateScopes } from './migrate-scopes'
+import { main as removeDeprecatedImports } from './remove-deprecated-imports'
 
 let cwd: string | undefined
 
@@ -34,15 +36,16 @@ export function getCwd() {
  * @param ccwd - The country config working directory.
  */
 export async function runUpgrade(ccwd: string | undefined) {
-  console.log('Country config working directory:', ccwd)
-
+  if (ccwd) {
+    console.log('Country config working directory:', ccwd)
+    cwd = ccwd
+  }
   if (!ccwd) {
     console.log(
       'Will use current working directory as country config working directory.'
     )
+    cwd = process.cwd()
   }
-
-  cwd = ccwd || process.cwd()
 
   await removeReviewFromRegisterAction()
   await makeBuiltInValidateActionsCustom()
@@ -54,4 +57,7 @@ export async function runUpgrade(ccwd: string | undefined) {
   await renameLocationParentId()
   await renameApiPaths()
   await convertConfigFilesToTs()
+  await migrateScopes()
+  // TODO CIHAN: switch to "remove all unused imports"?
+  await removeDeprecatedImports()
 }
