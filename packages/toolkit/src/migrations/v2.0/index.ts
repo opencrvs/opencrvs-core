@@ -20,9 +20,7 @@ import { main as renameLocationParentId } from './rename-location-parent-id'
 import { main as renameApiPaths } from './rename-api-paths'
 import { main as convertConfigFilesToTs } from './convert-config-files-to-ts'
 
-console.log('Upgrading from v1.9 to v2.0')
-
-async function run() {
+export async function runUpgrade() {
   await removeReviewFromRegisterAction()
   await makeBuiltInValidateActionsCustom()
   await removeDeleteActions()
@@ -34,8 +32,3 @@ async function run() {
   await renameApiPaths()
   await convertConfigFilesToTs()
 }
-
-run().catch((err) => {
-  console.error('Migration failed:', err)
-  process.exit(1)
-})

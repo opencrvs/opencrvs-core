@@ -1,0 +1,36 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+name: Test upgrade script
+
+on:
+  workflow_dispatch:
+    inputs:
+      farajaland:
+        description: Farajaland branch name
+        default: release-v1.9.13
+        required: true
+  pull_request:
+
+jobs:
+  test-upgrade-script:
+    runs-on: ubuntu-24.04
+    needs:
+      - publish
+    steps:
+      - name: Checkout the correct opencrvs-farajaland branch
+        run: |
+          git clone -b ${{ github.event.inputs.farajaland }} https://github.com/opencrvs/opencrvs-farajaland.git
+      - name: Upgrade toolkit to PR version
+        run: |
+          cd opencrvs-farajaland
+          # Get the PR commit SHA (first 8 characters)
+          PR_SHA=${{ github.event.pull_request.head.sha || github.sha }}
+          PR_SHA_SHORT=$(echo $PR_SHA | cut -c1-8)
+          # Update @opencrvs/toolkit version in package.json
+          npm install "@opencrvs/toolkit@1.9.11-rc.$PR_SHA_SHORT"
