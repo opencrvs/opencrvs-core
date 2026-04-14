@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { main as removeReviewFromRegisterAction } from './remove-review-from-register-action'
 import { main as makeBuiltInValidateActionsCustom } from './make-built-in-validate-actions-custom'
 import { main as removeDeleteActions } from './remove-delete-actions'
@@ -20,7 +19,31 @@ import { main as renameLocationParentId } from './rename-location-parent-id'
 import { main as renameApiPaths } from './rename-api-paths'
 import { main as convertConfigFilesToTs } from './convert-config-files-to-ts'
 
-export async function runUpgrade() {
+let cwd: string | undefined
+
+export function getCwd() {
+  if (!cwd) {
+    throw new Error('Country config working directory not set.')
+  }
+
+  return cwd
+}
+
+/**
+ * Run the upgrade process for a given country config directory.
+ * @param ccwd - The country config working directory.
+ */
+export async function runUpgrade(ccwd: string | undefined) {
+  console.log('Country config working directory:', ccwd)
+
+  if (!ccwd) {
+    console.log(
+      'Will use current working directory as country config working directory.'
+    )
+  }
+
+  cwd = ccwd || process.cwd()
+
   await removeReviewFromRegisterAction()
   await makeBuiltInValidateActionsCustom()
   await removeDeleteActions()

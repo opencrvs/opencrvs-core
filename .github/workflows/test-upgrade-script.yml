@@ -20,17 +20,30 @@ on:
 jobs:
   test-upgrade-script:
     runs-on: ubuntu-24.04
-    needs:
-      - publish
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+      - uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          command: yarn install --frozen-lockfile
+      - name: Build toolkit
+        run: yarn build
+        working-directory: packages/toolkit
       - name: Checkout the correct opencrvs-farajaland branch
         run: |
           git clone -b ${{ github.event.inputs.farajaland }} https://github.com/opencrvs/opencrvs-farajaland.git
-      - name: Upgrade toolkit to PR version
+      - name: TODO
         run: |
-          cd opencrvs-farajaland
-          # Get the PR commit SHA (first 8 characters)
-          PR_SHA=${{ github.event.pull_request.head.sha || github.sha }}
-          PR_SHA_SHORT=$(echo $PR_SHA | cut -c1-8)
-          # Update @opencrvs/toolkit version in package.json
-          npm install "@opencrvs/toolkit@1.9.11-rc.$PR_SHA_SHORT"
+          echo "TODO: Implement upgrade script"
+          ls -a
+          cd packages/toolkit
+          ls -a
+          ls -a dist

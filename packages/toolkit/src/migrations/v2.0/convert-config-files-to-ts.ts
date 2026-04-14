@@ -58,6 +58,7 @@ import {
   PropertyAssignment
 } from 'ts-morph'
 import nodePath from 'path'
+import { getCwd } from '.'
 
 // ─── Schema-valid keys per config type ───────────────────────────────────────
 
@@ -669,8 +670,8 @@ function resolveConfigChain(
 // ─── Entry point ─────────────────────────────────────────────────────────────
 
 export async function main() {
-  const srcDir = nodePath.join(process.cwd(), 'src')
-  const relCwd = (fp: string) => nodePath.relative(process.cwd(), fp)
+  const srcDir = nodePath.join(getCwd(), 'src')
+  const relCwd = (fp: string) => nodePath.relative(getCwd(), fp)
 
   // ── Phase 1: Convert JS config files to TypeScript ────────────────────────
   console.log('Phase 1: Converting JS config files to TypeScript...\n')
@@ -777,7 +778,7 @@ export async function main() {
 
                 node.replaceWithText(resolvedValue)
                 console.log(
-                  `  Inlined applicationConfig.${accessPath.join('.')} → ${resolvedValue} in ${nodePath.relative(process.cwd(), sf.getFilePath())}`
+                  `  Inlined applicationConfig.${accessPath.join('.')} → ${resolvedValue} in ${nodePath.relative(getCwd(), sf.getFilePath())}`
                 )
                 filesToSaveAfterInlining.add(sf)
                 madeReplacement = true
@@ -791,7 +792,7 @@ export async function main() {
         for (const sf of Array.from(filesToSaveAfterInlining)) {
           await sf.save()
           console.log(
-            `  Saved (inlined): ${nodePath.relative(process.cwd(), sf.getFilePath())}`
+            `  Saved (inlined): ${nodePath.relative(getCwd(), sf.getFilePath())}`
           )
         }
 

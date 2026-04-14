@@ -30,6 +30,7 @@
 
 import { Project, SyntaxKind, ObjectLiteralExpression, Node } from 'ts-morph'
 import path from 'path'
+import { getCwd } from '.'
 
 // ─── Path rename table ────────────────────────────────────────────────────────
 // Add new renames here as further API paths are changed between versions.
@@ -128,7 +129,7 @@ function processFile(filePath: string, project: Project): number {
   if (!sourceFile) return 0
 
   let renamedCount = 0
-  const relPath = path.relative(process.cwd(), filePath)
+  const relPath = path.relative(getCwd(), filePath)
 
   // Collect candidates first to avoid iterating a mutating tree
   const candidates = sourceFile.getDescendantsOfKind(
@@ -151,7 +152,7 @@ function processFile(filePath: string, project: Project): number {
 // ─── Entry point ─────────────────────────────────────────────────────────────
 
 async function main() {
-  const srcDir = path.join(process.cwd(), 'src')
+  const srcDir = path.join(getCwd(), 'src')
   console.log(`Scanning for Hapi route configs in: ${srcDir}\n`)
   console.log('Active path renames:')
   for (const [from, to] of Object.entries(PATH_RENAMES)) {
@@ -194,7 +195,7 @@ async function main() {
   for (const filePath of modifiedFiles) {
     const sourceFile = project.getSourceFileOrThrow(filePath)
     await sourceFile.save()
-    console.log(`  Saved: ${path.relative(process.cwd(), filePath)}`)
+    console.log(`  Saved: ${path.relative(getCwd(), filePath)}`)
   }
 
   console.log(`\nDone. Renamed ${totalRenamed} route path(s).`)

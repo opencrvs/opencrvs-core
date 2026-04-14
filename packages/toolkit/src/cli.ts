@@ -75,7 +75,8 @@ Subcommands:
 async function handleUpgrade() {
   console.log('Initiating upgrade...')
   try {
-    await runUpgrade()
+    const pathToCountryconfig: string | undefined = args[1]
+    await runUpgrade(pathToCountryconfig)
     console.log('Upgrade completed successfully!')
   } catch (error) {
     console.error('Upgrade failed:', error)

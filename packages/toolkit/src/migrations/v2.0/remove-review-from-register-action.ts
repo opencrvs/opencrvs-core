@@ -26,6 +26,7 @@
 
 import { Project, SyntaxKind, ObjectLiteralExpression, Node } from 'ts-morph'
 import path from 'path'
+import { getCwd } from '.'
 
 const DEFINE_CONFIG_NAME = 'defineConfig'
 const ACTIONS_PROPERTY_NAME = 'actions'
@@ -136,7 +137,7 @@ function processFile(filePath: string, project: Project): number {
       if (wasRemoved) {
         removedCount++
         console.log(
-          `  [${path.relative(process.cwd(), filePath)}] Removed 'review' from REGISTER action`
+          `  [${path.relative(getCwd(), filePath)}] Removed 'review' from REGISTER action`
         )
       }
     }
@@ -146,7 +147,7 @@ function processFile(filePath: string, project: Project): number {
 }
 
 async function main() {
-  const srcDir = path.join(process.cwd(), 'src')
+  const srcDir = path.join(getCwd(), 'src')
   console.log(`Scanning for defineConfig calls in: ${srcDir}\n`)
 
   const project = new Project({
@@ -189,7 +190,7 @@ async function main() {
   for (const filePath of modifiedFiles) {
     const sourceFile = project.getSourceFileOrThrow(filePath)
     await sourceFile.save()
-    console.log(`  Saved: ${path.relative(process.cwd(), filePath)}`)
+    console.log(`  Saved: ${path.relative(getCwd(), filePath)}`)
   }
 
   console.log(

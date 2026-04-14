@@ -35,6 +35,7 @@ import {
   PropertyAssignment
 } from 'ts-morph'
 import path from 'path'
+import { getCwd } from '.'
 
 const FIELD_TYPE_ENUM_NAME = 'FieldType'
 const PARAGRAPH_MEMBER_NAME = 'PARAGRAPH'
@@ -85,7 +86,9 @@ function getFontVariantProperty(
   return fontVariantProperty
 }
 
-function transformParagraphField(obj: ObjectLiteralExpression): TransformResult {
+function transformParagraphField(
+  obj: ObjectLiteralExpression
+): TransformResult {
   const typeProperty = obj.getProperty(TYPE_PROPERTY_NAME)
   if (!typeProperty || !Node.isPropertyAssignment(typeProperty)) return null
 
@@ -134,12 +137,12 @@ function processFile(filePath: string, project: Project): number {
     if (result === 'converted-to-heading') {
       changedCount++
       console.log(
-        `  [${path.relative(process.cwd(), filePath)}] Converted PARAGRAPH with heading fontVariant to HEADING`
+        `  [${path.relative(getCwd(), filePath)}] Converted PARAGRAPH with heading fontVariant to HEADING`
       )
     } else if (result === 'removed-font-variant') {
       changedCount++
       console.log(
-        `  [${path.relative(process.cwd(), filePath)}] Removed non-heading fontVariant from PARAGRAPH`
+        `  [${path.relative(getCwd(), filePath)}] Removed non-heading fontVariant from PARAGRAPH`
       )
     }
   }
@@ -148,7 +151,7 @@ function processFile(filePath: string, project: Project): number {
 }
 
 async function main() {
-  const srcDir = path.join(process.cwd(), 'src')
+  const srcDir = path.join(getCwd(), 'src')
   console.log(`Scanning for FieldType.PARAGRAPH fields in: ${srcDir}\n`)
 
   const project = new Project({
@@ -188,7 +191,7 @@ async function main() {
   for (const filePath of modifiedFiles) {
     const sourceFile = project.getSourceFileOrThrow(filePath)
     await sourceFile.save()
-    console.log(`  Saved: ${path.relative(process.cwd(), filePath)}`)
+    console.log(`  Saved: ${path.relative(getCwd(), filePath)}`)
   }
 
   console.log(`\nDone. Processed ${totalChanged} FieldType.PARAGRAPH field(s).`)

@@ -32,6 +32,7 @@
 
 import { Project, SyntaxKind, Node, Type } from 'ts-morph'
 import path from 'path'
+import { getCwd } from '.'
 
 const OLD_PROPERTY_NAME = 'parentId'
 const NEW_PROPERTY_NAME = 'administrativeAreaId'
@@ -137,7 +138,7 @@ function processFile(filePath: string, project: Project): number {
     renamedCount++
 
     console.log(
-      `  [${path.relative(process.cwd(), filePath)}] Renamed Location.${OLD_PROPERTY_NAME} → Location.${NEW_PROPERTY_NAME}`
+      `  [${path.relative(getCwd(), filePath)}] Renamed Location.${OLD_PROPERTY_NAME} → Location.${NEW_PROPERTY_NAME}`
     )
   }
 
@@ -147,7 +148,7 @@ function processFile(filePath: string, project: Project): number {
 // ─── Entry point ─────────────────────────────────────────────────────────────
 
 async function main() {
-  const srcDir = path.join(process.cwd(), 'src')
+  const srcDir = path.join(getCwd(), 'src')
   console.log(
     `Scanning for Location.${OLD_PROPERTY_NAME} references in: ${srcDir}\n`
   )
@@ -189,7 +190,7 @@ async function main() {
   for (const filePath of modifiedFiles) {
     const sourceFile = project.getSourceFileOrThrow(filePath)
     await sourceFile.save()
-    console.log(`  Saved: ${path.relative(process.cwd(), filePath)}`)
+    console.log(`  Saved: ${path.relative(getCwd(), filePath)}`)
   }
 
   console.log(

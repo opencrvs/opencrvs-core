@@ -32,6 +32,7 @@
 
 import { Project, SyntaxKind, ObjectLiteralExpression, Node } from 'ts-morph'
 import path from 'path'
+import { getCwd } from '.'
 
 const DEFINE_WORKQUEUES_NAME = 'defineWorkqueues'
 const QUERY_PROPERTY_NAME = 'query'
@@ -100,10 +101,7 @@ function migrateClause(clause: ObjectLiteralExpression): boolean {
   }
 
   const statusTypeProperty = statusInit.getProperty(TYPE_PROPERTY_NAME)
-  if (
-    !statusTypeProperty ||
-    !Node.isPropertyAssignment(statusTypeProperty)
-  ) {
+  if (!statusTypeProperty || !Node.isPropertyAssignment(statusTypeProperty)) {
     return false
   }
 
@@ -256,7 +254,7 @@ function processFile(filePath: string, project: Project): number {
       if (changed > 0) {
         migratedCount += changed
         console.log(
-          `  [${path.relative(process.cwd(), filePath)}] Migrated ${changed} clause(s): VALIDATED status → flags.anyOf`
+          `  [${path.relative(getCwd(), filePath)}] Migrated ${changed} clause(s): VALIDATED status → flags.anyOf`
         )
       }
     }
@@ -268,7 +266,7 @@ function processFile(filePath: string, project: Project): number {
 // ─── Entry point ─────────────────────────────────────────────────────────────
 
 async function main() {
-  const srcDir = path.join(process.cwd(), 'src')
+  const srcDir = path.join(getCwd(), 'src')
   console.log(`Scanning for defineWorkqueues calls in: ${srcDir}\n`)
 
   const project = new Project({
@@ -308,7 +306,7 @@ async function main() {
   for (const filePath of modifiedFiles) {
     const sourceFile = project.getSourceFileOrThrow(filePath)
     await sourceFile.save()
-    console.log(`  Saved: ${path.relative(process.cwd(), filePath)}`)
+    console.log(`  Saved: ${path.relative(getCwd(), filePath)}`)
   }
 
   console.log(
