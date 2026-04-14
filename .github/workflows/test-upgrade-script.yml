@@ -42,10 +42,10 @@ jobs:
       - name: Checkout the correct opencrvs-farajaland branch
         run: |
           git clone -b ${{ env.FARAJALAND_BRANCH }} https://github.com/opencrvs/opencrvs-farajaland.git
-      - name: TODO
+      - name: Run upgrade script
         run: |
-          echo "TODO: Implement upgrade script"
-          ls -a
-          cd packages/toolkit
-          ls -a
-          ls -a dist
+          node packages/toolkit/dist/cli.js upgrade opencrvs-farajaland
+      - name: Test compilation
+        run: |
+          cd opencrvs-farajaland
+          yarn test:compilation
