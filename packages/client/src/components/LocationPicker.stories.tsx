@@ -40,10 +40,3 @@ export const WithSelectedLocation: Story = {
     selectedLocationId: V2_DEFAULT_MOCK_LOCATIONS[0].id
   }
 }
-
-export const WithSelectedAdministrativeArea: Story = {
-  args: {
-    onChangeLocation: noop,
-    selectedLocationId: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS[0].id
-  }
-}
