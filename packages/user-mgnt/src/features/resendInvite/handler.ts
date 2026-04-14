@@ -16,7 +16,8 @@ import {
   generateRandomPassword,
   generateSaltedHash
 } from '@user-mgnt/utils/hash'
-import { hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
+import { statuses } from '@user-mgnt/utils/userUtils'
+import { env } from '@user-mgnt/environment'
 import { sendCredentialsNotification } from '@user-mgnt/features/createUser/service'
 
 interface IResendInvitePayload {
@@ -36,7 +37,9 @@ export default async function resendInvite(
     throw unauthorized()
   }
 
-  randomPassword = generateRandomPassword(hasDemoScope(request))
+  // DEFAULT_USER_PASSWORD allows QA/dev environments to set a predictable password
+  // for manually created users when SMS/email delivery is unavailable.
+  randomPassword = env.DEFAULT_USER_PASSWORD ?? generateRandomPassword()
   const { hash, salt } = generateSaltedHash(randomPassword)
 
   user.passwordHash = hash

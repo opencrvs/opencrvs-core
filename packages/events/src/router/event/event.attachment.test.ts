@@ -10,7 +10,7 @@
  */
 
 import { http, HttpResponse } from 'msw'
-import { SCOPES, TokenUserType } from '@opencrvs/commons'
+import { encodeScope, TokenUserType } from '@opencrvs/commons'
 import { server } from '@events/server'
 import { env } from '@events/environment'
 import { mswServer } from '@events/tests/msw'
@@ -72,7 +72,7 @@ describe('POST /attachments', () => {
 
     const token = createTestToken({
       userId: user.id,
-      scopes: [SCOPES.RECORD_READ],
+      scopes: [encodeScope({ type: 'record.read' })],
       userType: TokenUserType.enum.user,
       role: user.role
     })
@@ -90,7 +90,7 @@ describe('POST /attachments', () => {
 
   test('successfully uploads a file when token has attachment.upload scope', async () => {
     const { user } = await setupTestCase()
-    const expectedFileUrl = '/ocrvs/test-event/abc123.jpg'
+    const expectedFileUrl = 'test-event/abc123.jpg'
 
     mswServer.use(
       http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () =>
@@ -107,7 +107,7 @@ describe('POST /attachments', () => {
 
     const token = createTestToken({
       userId: user.id,
-      scopes: [SCOPES.ATTACHMENT_UPLOAD],
+      scopes: [encodeScope({ type: 'attachment.upload' })],
       userType: TokenUserType.enum.user,
       role: user.role
     })
@@ -140,7 +140,7 @@ describe('POST /attachments', () => {
 
     const token = createTestToken({
       userId: user.id,
-      scopes: [SCOPES.ATTACHMENT_UPLOAD],
+      scopes: [encodeScope({ type: 'attachment.upload' })],
       userType: TokenUserType.enum.user,
       role: user.role
     })

@@ -17,8 +17,6 @@ import { useSelector } from 'react-redux'
 import { AppBar, Button, Frame, Icon, Stack } from '@opencrvs/components'
 import { Plus } from '@opencrvs/components/src/icons'
 import {
-  ACTION_SCOPE_MAP,
-  ActionType,
   canUserCreateEvent,
   getAcceptedScopesByType
 } from '@opencrvs/commons/client'
@@ -39,13 +37,9 @@ export function DesktopCenter() {
   const scopes = useSelector(getScope) ?? []
 
   const eventConfigurations = useEventConfigurations()
-  const acceptedScopes = getAcceptedScopesByType({
-    acceptedScopes: ACTION_SCOPE_MAP[ActionType.CREATE],
-    scopes
-  })
 
   const mayCreateEvents = eventConfigurations.some(({ id }) =>
-    canUserCreateEvent(acceptedScopes, id)
+    canUserCreateEvent(scopes, id)
   )
 
   return (

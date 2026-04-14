@@ -12,18 +12,14 @@
 import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
 import {
+  DocumentPath,
   FullDocumentPath,
   joinUrlPaths,
   joinValues
 } from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
 import { fetchFileFromUrl } from '@client/utils/imageUtils'
-import {
-  cacheFile,
-  getFullDocumentPath,
-  getUnsignedFileUrl,
-  removeCached
-} from '@client/v2-events/cache'
+import { cacheFile, removeCached } from '@client/v2-events/cache'
 import { queryClient } from '@client/v2-events/trpc'
 
 interface UploadFileParams {
@@ -99,7 +95,7 @@ async function deleteFile({ filename }: { filename: string }): Promise<void> {
 const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
-async function getPresignedUrl(filePath: FullDocumentPath) {
+async function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
   const url = joinUrlPaths('/api/presigned-url', filePath)
 
   const response = await fetch(url, {
@@ -113,15 +109,13 @@ async function getPresignedUrl(filePath: FullDocumentPath) {
   return res
 }
 
-export async function precacheFile(path: FullDocumentPath) {
+export async function precacheFile(path: DocumentPath | FullDocumentPath) {
   const presignedUrl = (await getPresignedUrl(path)).presignedURL
 
   const file = await fetchFileFromUrl(presignedUrl, path)
 
   if (file) {
-    const url = getUnsignedFileUrl(path)
-
-    await cacheFile({ url, file })
+    await cacheFile({ url: path, file })
   }
 }
 
@@ -151,7 +145,7 @@ interface Options {
   onSuccess?: (data: {
     originalFilename: string
     type: string
-    path: FullDocumentPath
+    path: DocumentPath
     id: string
   }) => void
 }
@@ -168,13 +162,12 @@ export function useFileUpload(
     onMutate: async ({ file, meta }: UploadFileParams) => {
       const extension = file.name.split('.').pop()
       const temporaryFilename = `${meta.transactionId}.${extension}`
-      const filePathWithDirectory = joinValues(
+      const filePath = joinValues(
         [path.replace(/\/$/, ''), temporaryFilename],
         '/'
-      )
-      const fullPath = getFullDocumentPath(filePathWithDirectory)
-      const url = getUnsignedFileUrl(fullPath)
-      await cacheFile({ url, file })
+      ) as DocumentPath
+
+      await cacheFile({ url: filePath, file })
 
       // NOTE: In the long run, client should not reverse-engineer the file path.
       // It should be read from the server response.
@@ -182,7 +175,7 @@ export function useFileUpload(
         ...file,
         originalFilename: file.name,
         type: file.type,
-        path: fullPath,
+        path: filePath,
         id: meta.referenceId
       })
     }
@@ -192,7 +185,7 @@ export function useFileUpload(
     mutationFn: deleteFile,
     mutationKey: [DELETE_MUTATION_KEY, uniqueIdentifier],
     onSuccess: (data, { filename }) => {
-      void removeCached(filename)
+      void removeCached(filename as DocumentPath)
     }
   })
 

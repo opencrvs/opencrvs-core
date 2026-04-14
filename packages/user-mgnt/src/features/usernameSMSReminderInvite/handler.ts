@@ -58,8 +58,7 @@ export default async function usernameReminderHandler(
     if (systemAdminUser) {
       recordUserAuditEvent(request.headers.authorization, {
         operation: 'user.username_reminder_by_admin',
-        requestData: { subjectId: userId },
-        responseSummary: {}
+        requestData: { subjectId: userId }
       })
     }
   } catch (err) {

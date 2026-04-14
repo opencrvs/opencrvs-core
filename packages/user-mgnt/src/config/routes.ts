@@ -45,7 +45,6 @@ import verifySecurityAnswer, {
   verifySecurityRequestSchema,
   verifySecurityResponseSchema
 } from '@user-mgnt/features/verifySecurityAnswer/handler'
-
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
   responseSchema as resVerifyUserSchema
@@ -60,24 +59,30 @@ import usernameReminderHandler, {
 import changePhoneHandler, {
   changePhoneRequestSchema
 } from '@user-mgnt/features/changePhone/handler'
-import * as Joi from 'joi'
-import { countUsersByLocationHandler } from '@user-mgnt/features/countUsersByLocation/handler'
-import {
-  createSearchHandler,
-  removeSearchHandler,
-  createSearchrequestSchema,
-  removeSearchrequestSchema
-} from '@user-mgnt/features/userSearchRecord/handler'
 import resetPasswordInviteHandler, {
   requestSchema as resetPasswordRequestSchema
 } from '@user-mgnt/features/resetPassword/handler'
-
 import changeEmailHandler, {
   changeEmailRequestSchema
 } from '@user-mgnt/features/changeEmail/handler'
-
-import { SCOPES } from '@opencrvs/commons/authentication'
+import { encodeScope, SystemScopeType } from '@opencrvs/commons'
 import mongoose from 'mongoose'
+
+// Helper function to generate all possible scopes for a given system scope type
+function getAllowedScopes(systemScopeType: SystemScopeType) {
+  return [
+    encodeScope({ type: systemScopeType }),
+    encodeScope({ type: systemScopeType, options: { accessLevel: 'all' } }),
+    encodeScope({
+      type: systemScopeType,
+      options: { accessLevel: 'location' }
+    }),
+    encodeScope({
+      type: systemScopeType,
+      options: { accessLevel: 'administrativeArea' }
+    })
+  ]
+}
 
 export const getRoutes = () => {
   return [
@@ -244,11 +249,7 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Retrieves a user mobile number',
         auth: {
-          scope: [
-            SCOPES.USER_READ,
-            SCOPES.USER_READ_MY_JURISDICTION,
-            SCOPES.USER_READ_MY_OFFICE
-          ]
+          scope: getAllowedScopes('user.read')
         },
         validate: {
           payload: userIdSchema
@@ -265,10 +266,8 @@ export const getRoutes = () => {
       options: {
         auth: {
           scope: [
-            SCOPES.ORGANISATION_READ_LOCATIONS,
-            SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-            SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION,
-            SCOPES.USER_DATA_SEEDING
+            ...getAllowedScopes('organisation.read-locations'),
+            encodeScope({ type: 'user.data-seeding' })
           ]
         },
         validate: {
@@ -298,9 +297,8 @@ export const getRoutes = () => {
         description: 'Creates a new user',
         auth: {
           scope: [
-            SCOPES.USER_CREATE,
-            SCOPES.USER_CREATE_MY_JURISDICTION,
-            SCOPES.USER_DATA_SEEDING
+            ...getAllowedScopes('user.create'),
+            encodeScope({ type: 'user.data-seeding' })
           ]
         }
       }
@@ -314,9 +312,8 @@ export const getRoutes = () => {
         description: 'Updates an existing user',
         auth: {
           scope: [
-            SCOPES.USER_UPDATE,
-            SCOPES.USER_UPDATE_MY_JURISDICTION,
-            SCOPES.USER_DATA_SEEDING
+            ...getAllowedScopes('user.edit'),
+            encodeScope({ type: 'user.data-seeding' })
           ]
         }
       }
@@ -359,9 +356,8 @@ export const getRoutes = () => {
       options: {
         auth: {
           scope: [
-            SCOPES.USER_UPDATE,
-            SCOPES.USER_UPDATE_MY_JURISDICTION,
-            SCOPES.USER_DATA_SEEDING
+            ...getAllowedScopes('user.edit'),
+            encodeScope({ type: 'user.data-seeding' })
           ]
         },
         validate: {
@@ -372,53 +368,11 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/searches',
-      handler: createSearchHandler,
-      options: {
-        auth: {
-          scope: [
-            SCOPES.SEARCH_BIRTH,
-            SCOPES.SEARCH_DEATH,
-            SCOPES.SEARCH_MARRIAGE,
-            SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
-            SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-            SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
-          ]
-        },
-        validate: {
-          payload: createSearchrequestSchema
-        },
-        tags: ['api']
-      }
-    },
-    {
-      method: 'DELETE',
-      path: '/searches',
-      handler: removeSearchHandler,
-      options: {
-        auth: {
-          scope: [
-            SCOPES.SEARCH_BIRTH,
-            SCOPES.SEARCH_DEATH,
-            SCOPES.SEARCH_MARRIAGE,
-            SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
-            SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-            SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
-          ]
-        },
-        validate: {
-          payload: removeSearchrequestSchema
-        },
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
       path: '/resendInvite',
       handler: resendInviteHandler,
       options: {
         auth: {
-          scope: [SCOPES.USER_UPDATE, SCOPES.USER_UPDATE_MY_JURISDICTION]
+          scope: getAllowedScopes('user.edit')
         },
         validate: {
           payload: resendInviteRequestSchema
@@ -433,7 +387,7 @@ export const getRoutes = () => {
       handler: usernameReminderHandler,
       options: {
         auth: {
-          scope: [SCOPES.USER_UPDATE, SCOPES.USER_UPDATE_MY_JURISDICTION]
+          scope: getAllowedScopes('user.edit')
         },
         validate: {
           payload: usernameReminderRequestSchema
@@ -448,36 +402,13 @@ export const getRoutes = () => {
       handler: resetPasswordInviteHandler,
       options: {
         auth: {
-          scope: [SCOPES.USER_UPDATE, SCOPES.USER_UPDATE_MY_JURISDICTION]
+          scope: getAllowedScopes('user.edit')
         },
         validate: {
           payload: resetPasswordRequestSchema
         },
         description:
           'Reset password via sms for given userid and make the corresponding user pending'
-      }
-    },
-
-    {
-      method: 'POST',
-      path: '/countUsersByLocation',
-      handler: countUsersByLocationHandler,
-      options: {
-        tags: ['api'],
-        description: 'Gets count of users group by office ids',
-        auth: {
-          scope: [
-            SCOPES.USER_READ,
-            SCOPES.USER_READ_MY_JURISDICTION,
-            SCOPES.USER_READ_MY_OFFICE,
-            SCOPES.PERFORMANCE_READ
-          ]
-        },
-        validate: {
-          payload: Joi.object({
-            locationId: Joi.string()
-          })
-        }
       }
     }
   ] satisfies Hapi.ServerRoute[]

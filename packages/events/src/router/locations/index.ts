@@ -10,7 +10,7 @@
  */
 
 import * as z from 'zod/v4'
-import { Location, SCOPES, UUID } from '@opencrvs/commons'
+import { Location, UUID } from '@opencrvs/commons'
 import { router, userAndSystemProcedure } from '@events/router/trpc'
 import {
   getLocationById,
@@ -18,7 +18,7 @@ import {
   getLocations,
   setLocations
 } from '@events/service/locations/locations'
-import { requiresAnyOfScopes } from '../middleware'
+import { allowedWithAnyOfScopes } from '../middleware'
 
 export const locationRouter = router({
   list: userAndSystemProcedure
@@ -52,9 +52,7 @@ export const locationRouter = router({
       })
     ),
   set: userAndSystemProcedure
-    .use(
-      requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING, SCOPES.CONFIG_UPDATE_ALL])
-    )
+    .use(allowedWithAnyOfScopes(['user.data-seeding', 'config.update-all']))
     .input(z.array(Location).min(1))
     .output(z.void())
     .mutation(async ({ input }) => {

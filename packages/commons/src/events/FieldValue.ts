@@ -96,9 +96,6 @@ export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
 export const NumberFieldValue = z.number()
 export type NumberFieldValue = z.infer<typeof NumberFieldValue>
 
-export const SignatureFieldValue = z.string()
-export type SignatureFieldValue = z.infer<typeof SignatureFieldValue>
-
 export const ButtonFieldValue = z.number()
 export type ButtonFieldValue = z.infer<typeof ButtonFieldValue>
 export const VerificationStatusValue = z.enum([

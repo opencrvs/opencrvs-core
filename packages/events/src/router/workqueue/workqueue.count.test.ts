@@ -66,6 +66,7 @@ test('Slugs in response matches input', async () => {
       }
     })
   ])
+
   const input: WorkqueueCountInput = [
     {
       slug: 'recent',
@@ -96,6 +97,7 @@ test('Slugs in response matches input', async () => {
       }
     }
   ]
+
   const counts = await client.workqueue.count(input)
   const response_slugs = Object.keys(counts)
   const input_slugs = input.map(({ slug }) => slug)

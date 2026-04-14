@@ -33,7 +33,15 @@ V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
   - `'legalStatuses.DECLARED.createdByRole': { type: 'anyOf', terms: ['MY_ROLE_ID', 'MY_OTHER_ROLE_ID'] }`
   - `'legalStatuses.REGISTERD.createdByRole': { type: 'anyOf', terms: ['MY_ROLE_ID', 'MY_OTHER_ROLE_ID'] }`
 
+#### Inherent flags
+
+- The inherent flag `InherentFlags.PENDING_CERTIFICATION` has been removed. Similar logic can be implemented in the country config with a custom flag, [see example](https://github.com/opencrvs/opencrvs-countryconfig/blob/81db21f4cf9ccbba90cb2c6e48648c9b258dc905/src/form/v2/birth/index.ts#L95-L102).
+
 ### New features
+
+#### Autocomplete Input
+
+A select component enhanced with suggestions. The list of suggestions are fetched from the database reference_data schema in countryconfig.
 
 #### HTTP Input
 

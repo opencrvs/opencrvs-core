@@ -81,7 +81,7 @@ import {
   AutocompleteValue,
   DateValue
 } from './FieldValue'
-import { FullDocumentPath } from '../documents'
+import { DocumentPath } from '../documents'
 import {
   AddressFieldValue,
   FileFieldValue,
@@ -373,7 +373,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
-        path: '' as FullDocumentPath,
+        path: '' as DocumentPath,
         originalFilename: '',
         type: ''
       } satisfies FileFieldValue

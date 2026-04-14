@@ -10,13 +10,7 @@
  */
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
-import {
-  findScope,
-  getScopes,
-  hasScope,
-  logger,
-  SCOPES
-} from '@opencrvs/commons'
+import { findScope, getScopes, hasScope, logger } from '@opencrvs/commons'
 import { recordUserAuditEvent } from '@user-mgnt/utils/userAudit'
 import {
   generateUsername,
@@ -27,7 +21,8 @@ import {
   generateRandomPassword,
   generateSaltedHash
 } from '@user-mgnt/utils/hash'
-import { hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
+import { statuses } from '@user-mgnt/utils/userUtils'
+import { env } from '@user-mgnt/environment'
 import * as _ from 'lodash'
 import uuid from 'uuid/v4'
 
@@ -36,12 +31,12 @@ export default async function createUser(
   h: Hapi.ResponseToolkit
 ) {
   const user = request.payload as IUser & { password?: string }
-
   const scopes = getScopes(request.headers.authorization)
   const creatableRoleIds = findScope(scopes, 'user.create')?.options?.role
+
   const isDataSeeder = hasScope(
     request.headers.authorization,
-    SCOPES.USER_DATA_SEEDING
+    'user.data-seeding'
   )
 
   // If the allowed roles exist and the payload user's role is not included, block unless data seeder
@@ -59,7 +54,10 @@ export default async function createUser(
   try {
     user.status = user.status ?? statuses.PENDING
 
-    password = user.password ?? generateRandomPassword(hasDemoScope(request))
+    // DEFAULT_USER_PASSWORD allows QA/dev environments to set a predictable password
+    // for manually created users when SMS/email delivery is unavailable.
+    password =
+      user.password ?? env.DEFAULT_USER_PASSWORD ?? generateRandomPassword()
 
     const { hash, salt } = generateSaltedHash(password)
     user.salt = salt
@@ -106,8 +104,7 @@ export default async function createUser(
       subjectId: userModelObject.id,
       role: user.role,
       primaryOfficeId: user.primaryOfficeId
-    },
-    responseSummary: {}
+    }
   })
 
   const createdUser = userModelObject.toObject()

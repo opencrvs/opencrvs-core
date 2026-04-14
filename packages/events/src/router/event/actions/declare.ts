@@ -83,12 +83,9 @@ export function declareActionProcedures() {
           requestData: {
             eventId: input.eventId,
             actionType: ActionType.DECLARE,
-            transactionId: input.transactionId
-          },
-          responseSummary: {
-            eventId: declaredEvent.id,
             eventType: declaredEvent.type,
-            trackingId: declaredEvent.trackingId
+            trackingId: declaredEvent.trackingId,
+            transactionId: input.transactionId
           }
         })
 

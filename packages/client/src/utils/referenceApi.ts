@@ -124,7 +124,7 @@ export interface IApplicationConfigResponse {
 }
 
 async function loadConfig(): Promise<IApplicationConfigResponse> {
-  const url = '/api/config/config'
+  const url = '/api/config'
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -168,7 +168,7 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
 async function loadConfigAnonymousUser(): Promise<
   Partial<IApplicationConfigResponse>
 > {
-  const url = '/api/config/publicConfig'
+  const url = '/api/publicConfig'
   const res = await fetch(url, {
     method: 'GET'
   })
@@ -180,7 +180,7 @@ async function loadConfigAnonymousUser(): Promise<
 }
 
 async function loadForms(): Promise<LoadFormsResponse> {
-  const url = '/api/config/forms'
+  const url = '/api/forms'
 
   const res = await fetch(url, {
     method: 'GET',
@@ -205,7 +205,6 @@ async function loadForms(): Promise<LoadFormsResponse> {
     forms: { ...response }
   }
 }
-
 
 const countryconfigBase: string = '/api/countryconfig'
 

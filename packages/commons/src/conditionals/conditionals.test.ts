@@ -24,12 +24,11 @@ import {
   status
 } from './conditionals'
 import { formatISO } from 'date-fns'
-import { SCOPES } from '../scopes'
 import { ActionType } from '../events/ActionType'
 import { ActionStatus, EventState } from '../events/ActionDocument'
 import { field } from '../events/field'
 import { event } from '../events/event'
-import { TokenUserType } from '../authentication'
+import { EncodedScope, TokenUserType } from '../authentication'
 import { UUID } from '../uuid'
 import { EventStatus, InherentFlags } from '../client'
 
@@ -1011,7 +1010,7 @@ describe('"field" conditionals', () => {
 describe('"user" conditionals', () => {
   const userParams = {
     $user: {
-      scope: ['record.register', 'record.registration-correct'],
+      scope: ['type=test-scope-1', 'type=test-scope-2'] as EncodedScope[],
       role: 'LOCAL_REGISTRAR',
       exp: '1739881718',
       algorithm: 'RS256',
@@ -1028,13 +1027,8 @@ describe('"user" conditionals', () => {
   }
 
   it('validates "user.hasScope" conditional', () => {
-    expect(validate(user.hasScope(SCOPES.BYPASSRATELIMIT), userParams)).toBe(
-      false
-    )
-
-    expect(validate(user.hasScope(SCOPES.RECORD_REGISTER), userParams)).toBe(
-      true
-    )
+    expect(validate(user.hasScope('type=test-scope-0'), userParams)).toBe(false)
+    expect(validate(user.hasScope('type=test-scope-1'), userParams)).toBe(true)
   })
 
   it('validates "user.isOnline" conditional', () => {

@@ -34,11 +34,35 @@ import { useTRPC } from '@client/v2-events/trpc'
 import { Link } from '@opencrvs/components'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@client/v2-events/routes'
-import { getAcceptedScopesByType, UUID } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  AuditLogEntry,
+  AuditLogParams,
+  EventActionAuditLog,
+  EventCustomActionAuditLog,
+  getAcceptedScopesByType,
+  getActionConfig,
+  getEventConfigById,
+  UUID
+} from '@opencrvs/commons/client'
+
+/** Audit log entries that carry a full event response summary (eventId, trackingId). */
+type EventActionLikeAuditLogParams = (
+  | EventActionAuditLog
+  | EventCustomActionAuditLog
+) &
+  Pick<AuditLogParams, 'clientId' | 'clientType'>
 import { useSelector } from 'react-redux'
 import { getScope } from '@client/profile/profileSelectors'
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 
 const DEFAULT_LIST_SIZE = 10
+
+const OPERATIONS_TO_HIDE = [
+  'event.search',
+  'event.actions.assign.request',
+  'event.actions.unassign.request'
+]
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -58,20 +82,6 @@ const RecentActionsHolder = styled.div`
 const AuditContent = styled.div`
   color: ${({ theme }) => theme.colors.grey600};
 `
-
-const BoldContent = styled.div`
-  color: ${({ theme }) => theme.colors.grey600};
-  ${({ theme }) => theme.fonts.bold14};
-`
-
-type AuditEntry = {
-  id: string
-  clientId: string
-  operation: string
-  requestData: Record<string, unknown> | null
-  responseSummary: Record<string, unknown> | null
-  createdAt: string
-}
 
 interface IBaseProp {
   userId: string
@@ -102,10 +112,12 @@ type State = {
   sortedColumn: SORTED_COLUMN
   currentPageNumber: number
   showModal: boolean
-  actionDetailsData: AuditEntry | null
+  actionDetailsData: AuditLogEntry | null
 }
 
 function UserAuditHistoryComponent(props: Props) {
+  const eventConfigurations = useEventConfigurations()
+
   const scopes = useSelector(getScope) ?? []
   const hasRecordRead =
     getAcceptedScopesByType({
@@ -132,6 +144,7 @@ function UserAuditHistoryComponent(props: Props) {
       timeStart: state.timeStart.toISOString(),
       timeEnd: state.timeEnd.toISOString(),
       skip: (state.currentPageNumber - 1) * DEFAULT_LIST_SIZE,
+      excludeOperations: OPERATIONS_TO_HIDE,
       count: DEFAULT_LIST_SIZE
     })
   )
@@ -188,7 +201,7 @@ function UserAuditHistoryComponent(props: Props) {
     ]
   }
 
-  const toggleActionDetails = (actionItem: AuditEntry | null) => {
+  const toggleActionDetails = (actionItem: AuditLogEntry | null) => {
     setState((prevState) => ({
       ...prevState,
       actionDetailsData: actionItem,
@@ -196,28 +209,61 @@ function UserAuditHistoryComponent(props: Props) {
     }))
   }
 
-  function getTrackingId(entry: AuditEntry): string {
-    const trackingId =
-      (entry.responseSummary?.trackingId as string | undefined) ??
-      (entry.requestData?.transactionId as string | undefined)
-    return trackingId || '-'
+  function getTrackingIdAndEventId(entry: AuditLogEntry) {
+    if (entry.operation === 'event.create') {
+      return {
+        trackingId: entry.responseSummary.trackingId || '-',
+        eventId: UUID.safeParse(entry.responseSummary.eventId)?.data
+      }
+    }
+    if (entry.operation === 'event.get') {
+      return {
+        trackingId: entry.responseSummary.trackingId || '-',
+        eventId: UUID.safeParse(entry.requestData.eventId)?.data
+      }
+    }
+    if (isEventActionEntry(entry)) {
+      return {
+        trackingId: entry.requestData.trackingId || '-',
+        eventId: UUID.safeParse(entry.requestData.eventId)?.data
+      }
+    }
+    return {
+      trackingId: '-'
+    }
   }
 
-  function getEventId(entry: AuditEntry): string | undefined {
-    return (
-      (entry.responseSummary?.eventId as string | undefined) ??
-      (entry.requestData?.eventId as string | undefined)
-    )
+  function isEventActionEntry(
+    entry: AuditLogEntry
+  ): entry is EventActionLikeAuditLogParams & { createdAt: string } {
+    return entry.operation.startsWith('event.actions.')
   }
 
-  function getActionMessage(entry: AuditEntry) {
+  function getActionMessage(entry: AuditLogEntry) {
+    if (entry.operation === 'event.actions.custom.request') {
+      const eventConfig = getEventConfigById(
+        eventConfigurations,
+        entry.requestData.eventType
+      )
+
+      const actionConfig = getActionConfig({
+        eventConfiguration: eventConfig,
+        actionType: ActionType.CUSTOM,
+        customActionType: entry.requestData.customAction
+      })
+      if (actionConfig?.type === ActionType.CUSTOM) {
+        return props.intl.formatMessage(actionConfig.auditHistoryLabel)
+      }
+      // This will not be needed once getActionConfig() returns typed config
+      return entry.requestData.customAction
+    }
     const actionDescriptor = getUserAuditDescription(entry.operation)
     return actionDescriptor
       ? props.intl.formatMessage(actionDescriptor)
       : entry.operation
   }
 
-  function getAuditData(results: AuditEntry[]) {
+  function getAuditData(results: AuditLogEntry[]) {
     return orderBy(
       results.map((entry) => ({
         actionDescription: (
@@ -227,8 +273,7 @@ function UserAuditHistoryComponent(props: Props) {
         ),
         actionDescriptionString: getActionMessage(entry),
         trackingId: (() => {
-          const trackingId = getTrackingId(entry)
-          const eventId = UUID.safeParse(getEventId(entry))?.data
+          const { trackingId, eventId } = getTrackingIdAndEventId(entry)
           if (trackingId === '-' || !eventId) return trackingId
           if (!hasRecordRead) return trackingId
           return (
@@ -291,7 +336,7 @@ function UserAuditHistoryComponent(props: Props) {
         <TableDiv>
           <Table
             columns={getAuditColumns()}
-            content={getAuditData(data.results as AuditEntry[])}
+            content={getAuditData(data.results as AuditLogEntry[])}
             noResultText={intl.formatMessage(messages.noAuditFound)}
             fixedWidth={1088}
             isLoading={isLoading}
