@@ -13,7 +13,6 @@ import * as z from 'zod/v4'
 import * as qs from 'qs'
 import { UUID } from './uuid'
 import { getScopes } from './authentication'
-import { Role } from './roles'
 
 export const JurisdictionFilter = z
   .enum(['administrativeArea', 'location', 'all'])
@@ -546,8 +545,4 @@ export function canUserCreateEvent(
  */
 export function defineScopes(scopes: Scope[]) {
   return scopes.map((scope) => Scope.parse(scope)).map(encodeScope)
-}
-
-export function defineRoles(roles: Role[]) {
-  return roles
 }

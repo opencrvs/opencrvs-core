@@ -24,3 +24,12 @@ export type Roles = Array<{
   labels: Array<{ language: string; label: string }>
   scopes: EncodedScope[]
 }>
+
+/**
+ * Helper for defining user roles. Should be used in country config.
+ *
+ * @param roles Array of roles in object format.
+ */
+export function defineRoles(roles: Role[]) {
+  return roles
+}

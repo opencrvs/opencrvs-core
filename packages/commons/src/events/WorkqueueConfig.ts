@@ -109,16 +109,18 @@ function warnOnConfigurationIssues(
     console.warn(
       `
        ************** WARNING **************
-       Workqueue "actions" are deprecated.
-       Use "triggers" instead.
+       'actions' property is deprecated, but used on workqueue: '${workqueue.slug}'.
+       Use 'action' property instead!
        ************** WARNING **************
       `
     )
   }
 }
 
+/** This is used for v1.9 to v2.0 migration to show specific migration errors. */
 type WorkqueueConfigInputWithV19Compat = WorkqueueConfigInput & {
-  actions?: unknown[]
+  /** @deprecated use 'action' property instead */
+  actions?: unknown
 }
 
 export function defineWorkqueues(
