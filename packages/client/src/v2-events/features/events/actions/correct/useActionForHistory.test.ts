@@ -12,7 +12,6 @@
 import addDays from 'date-fns/addDays'
 import {
   ActionDocument,
-  ActionStatus,
   ActionType,
   ActionTypes,
   createPrng,

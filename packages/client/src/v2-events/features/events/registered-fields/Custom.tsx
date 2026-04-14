@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { Icon, Pill, Spinner } from '@opencrvs/components'
+import { Pill, Spinner } from '@opencrvs/components'
 import { CustomFieldValue } from '@opencrvs/commons/client'
 
 interface InputProps {
@@ -63,7 +63,6 @@ function Loader(
       }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     loadModules()
   }, [props.component, props.src])
 

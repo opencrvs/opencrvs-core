@@ -9,10 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { flatten, uniq } from 'lodash'
-import { EventDocument, EventIndex } from '@opencrvs/commons/client'
+import { EventDocument } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
-import { findUserIdsFromDocument, findUserIdsFromIndex } from './utils'
+import { findUserIdsFromDocument } from './utils'
 
 async function cacheUsers(userIds: string[]) {
   const { queryFn, ...options } =
@@ -29,12 +28,5 @@ export async function cacheUsersFromEventDocument(
   eventDocument: EventDocument
 ) {
   const userIds = findUserIdsFromDocument(eventDocument)
-  await cacheUsers(userIds)
-}
-
-async function cacheUsersFromEventIndices(eventIndices: EventIndex[]) {
-  const userIds = uniq(
-    flatten(eventIndices.map((eventIndex) => findUserIdsFromIndex(eventIndex)))
-  )
   await cacheUsers(userIds)
 }
