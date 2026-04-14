@@ -47,21 +47,6 @@ function warnOnConfigurationIssues(config: EventConfig) {
       `
     )
   }
-
-  const registerAction = config.actions.find(
-    (action) => action.type === 'REGISTER'
-  )
-
-  if (registerAction && 'review' in registerAction) {
-    console.warn(
-      `
-       ************** WARNING **************
-       The 'review' field for 'ActionType.REGISTER' config is deprecated in OpenCRVS v2.0 and is no longer used.
-       Instead, the 'review' from 'ActionType.DECLARE' is used for registering.
-       ************** WARNING **************
-      `
-    )
-  }
 }
 
 export const defineConfig = (config: EventConfigInput) => {
