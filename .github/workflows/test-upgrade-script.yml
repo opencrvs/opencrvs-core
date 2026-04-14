@@ -47,10 +47,6 @@ jobs:
       - name: Run upgrade script
         run: |
           node packages/toolkit/dist/cli.js upgrade opencrvs-farajaland
-      - name: Use Node.js from opencrvs-farajaland/.nvmrc
-        uses: actions/setup-node@v6
-        with:
-          node-version-file: opencrvs-farajaland/.nvmrc
       - name: Test compilation
         working-directory: opencrvs-farajaland
         run: |
