@@ -12,8 +12,8 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
-      farajaland-branch:
-        description: Farajaland branch name
+      countryconfig-branch:
+        description: countryconfig branch name
         default: release-v1.9.13
         required: true
 
@@ -21,7 +21,7 @@ jobs:
   test-upgrade-script:
     runs-on: ubuntu-24.04
     env:
-      FARAJALAND_BRANCH: ${{ github.event.inputs.farajaland-branch || 'release-v1.9.13' }}
+      COUNTRYCONFIG_BRANCH: ${{ github.event.inputs.countryconfig-branch || 'release-v1.9.13' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -40,21 +40,21 @@ jobs:
       - name: Build toolkit
         run: yarn build:all
         working-directory: packages/toolkit
-      - name: Checkout the correct opencrvs-farajaland branch
+      - name: Checkout the correct opencrvs-countryconfig branch
         run: |
-          git clone -b ${{ env.FARAJALAND_BRANCH }} https://github.com/opencrvs/opencrvs-farajaland.git
-      - name: Install opencrvs-farajaland dependencies
-        working-directory: opencrvs-farajaland
+          git clone -b ${{ env.COUNTRYCONFIG_BRANCH }} https://github.com/opencrvs/opencrvs-countryconfig.git
+      - name: Install opencrvs-countryconfig dependencies
+        working-directory: opencrvs-countryconfig
         run: yarn install
       - name: Link toolkit
         run: |
           cd packages/toolkit && yarn link
-          cd ../../opencrvs-farajaland && yarn link @opencrvs/toolkit
-      - name: Run upgrade script on opencrvs-farajaland
+          cd ../../opencrvs-countryconfig && yarn link @opencrvs/toolkit
+      - name: Run upgrade script on opencrvs-countryconfig
         run: |
-          cd opencrvs-farajaland
+          cd opencrvs-countryconfig
           ./node_modules/@opencrvs/toolkit/dist/cli.js upgrade
           rm -rf src/api/notification/testData.ts
-      - name: Test opencrvs-farajaland compilation
+      - name: Test opencrvs-countryconfig compilation
         run: yarn test:compilation
-        working-directory: opencrvs-farajaland
+        working-directory: opencrvs-countryconfig
