@@ -25,14 +25,27 @@ const DefaultInputWrapper = styled.div``
 const HighlightedInputWrapper = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.primary};
   border-radius: 4px;
-  padding: 16px;
+  padding-bottom: 16px;
 
   label {
     background-color: ${({ theme }) => theme.colors.primaryLighter};
     border-bottom: ${({ theme }) => `1px solid ${theme.colors.primary}`};
     padding: 12px 16px;
-    margin: -16px -16px 16px -16px;
-    width: calc(100% + 32px);
+  }
+
+  ${InputDescriptor} {
+    padding: 16px;
+    padding-bottom: 0;
+  }
+
+  ${ComponentWrapper} {
+    display: block;
+    padding: 16px;
+    padding-bottom: 0;
+  }
+
+  ${InputError} {
+    padding: 8px 16px;
   }
 `
 

@@ -92,6 +92,22 @@ const idReaderWithAuth: FieldConfig = {
   }
 }
 
+function paragraph(text: string): FieldConfig {
+  return {
+    id: 'storybook.paragraph.' + text.toLowerCase().replace(/\s+/g, '-'),
+    type: FieldType.PARAGRAPH,
+    label: {
+      id:
+        'storybook.paragraph.' +
+        text.toLowerCase().replace(/\s+/g, '-') +
+        '.label',
+      defaultMessage: text,
+      description: ''
+    },
+    configuration: {}
+  }
+}
+
 const idReaderWithoutAuth: FieldConfig = {
   id: 'storybook.id-reader',
   type: FieldType.ID_READER,
@@ -101,6 +117,18 @@ const idReaderWithoutAuth: FieldConfig = {
     description: 'ID Reader label'
   },
   methods: [qrMethod]
+}
+
+const requiredIdReaderWithAuth: FieldConfig = {
+  ...idReaderWithAuth,
+  id: 'storybook.id-reader.required',
+  required: true
+}
+
+const idReaderWithValidationError: FieldConfig = {
+  ...idReaderWithAuth,
+  id: 'storybook.id-reader.validation-error',
+  required: true
 }
 
 const fetchLoader: FieldConfig = {
@@ -166,24 +194,25 @@ const onChangeSpy = fn()
 
 function AuthenticationStateStory({
   fields,
-  title,
   initialValues,
+  fieldsToShowValidationErrors,
+  validateAllFields,
   onChange
 }: {
   fields: FieldConfig[]
-  title: string
   initialValues?: Record<string, FieldValue>
+  fieldsToShowValidationErrors?: FieldConfig[]
+  validateAllFields?: boolean
   onChange: (data: unknown) => void
 }) {
   return (
     <Stack direction="column" gap={4}>
-      <Text element="h2" variant="h2">
-        {title}
-      </Text>
       <StyledFormFieldGenerator
         fields={fields}
+        fieldsToShowValidationErrors={fieldsToShowValidationErrors}
         id="id-reader-authentication-states"
         initialValues={initialValues}
+        validateAllFields={validateAllFields}
         validatorContext={getTestValidatorContext(
           TestUserRole.enum.LOCAL_REGISTRAR
         )}
@@ -196,8 +225,21 @@ function AuthenticationStateStory({
 export const Default: StoryObj<Args> = {
   render: ({ onChange }) => (
     <AuthenticationStateStory
-      fields={[idReaderWithAuth]}
-      title="Default"
+      fields={[
+        paragraph('Default'),
+        idReaderWithAuth,
+
+        paragraph('Required field'),
+        requiredIdReaderWithAuth,
+
+        paragraph('Validation error'),
+        idReaderWithValidationError
+      ]}
+      fieldsToShowValidationErrors={[idReaderWithValidationError]}
+      initialValues={{
+        'storybook.id-reader.required': { data: {} }
+      }}
+      validateAllFields={true}
       onChange={onChange}
     />
   ),
@@ -208,11 +250,7 @@ export const Default: StoryObj<Args> = {
 
 export const LoadingFetching: StoryObj<Args> = {
   render: ({ onChange }) => (
-    <AuthenticationStateStory
-      fields={[fetchLoader]}
-      title="Loading/Fetching"
-      onChange={onChange}
-    />
+    <AuthenticationStateStory fields={[fetchLoader]} onChange={onChange} />
   ),
   args: {
     onChange: onChangeSpy
@@ -226,7 +264,6 @@ export const SuccessAuthenticated: StoryObj<Args> = {
       initialValues={{
         'storybook.verification-status': 'authenticated'
       }}
-      title="Success"
       onChange={onChange}
     />
   ),
@@ -242,7 +279,6 @@ export const FailureFetchingAuthenticatedDetails: StoryObj<Args> = {
       initialValues={{
         'storybook.verification-status': 'failed'
       }}
-      title="Failure on fetching authenticated details"
       onChange={onChange}
     />
   ),
@@ -255,7 +291,6 @@ export const Offline: StoryObj<Args> = {
   render: ({ onChange }) => (
     <AuthenticationStateStory
       fields={[offlineNotice, idReaderWithoutAuth]}
-      title="Offline"
       onChange={onChange}
     />
   ),

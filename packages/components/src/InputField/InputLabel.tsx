@@ -11,7 +11,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import ReactTooltip from 'react-tooltip'
-import { InputDescriptor } from './InputDescriptor'
 
 export type IInputLabel = {
   inputDescriptor?: string
