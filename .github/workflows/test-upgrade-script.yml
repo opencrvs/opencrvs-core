@@ -57,6 +57,4 @@ jobs:
           cd ../../opencrvs-farajaland
           yarn link @opencrvs/toolkit
       - name: Test compilation
-        run: |
-          cd opencrvs-farajaland
-          yarn test:compilation
+        run: yarn test:compilation
