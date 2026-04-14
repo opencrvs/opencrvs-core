@@ -64,7 +64,6 @@ export const handlers = {
     http.get('/api/ping', () => {
       return HttpResponse.json({
         auth: true,
-        search: true,
         'user-mgnt': true,
         metrics: true,
         notification: true,
@@ -120,7 +119,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -140,7 +139,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -160,7 +159,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -180,7 +179,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -200,7 +199,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -222,13 +221,12 @@ export const handlers = {
                 'record.declaration-archive',
                 'record.declaration-reinstate',
                 'record.registration-request-correction',
-                'record.registration-print&issue-certified-copies',
                 'performance.read',
                 'performance.read-dashboards',
                 'organisation.read-locations:my-office',
                 'search.birth',
                 'search.death',
-                'search.marriage',
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -253,16 +251,13 @@ export const handlers = {
                 'record.register',
                 'record.registration-correct',
                 'record.unassign-others',
-                'record.registration-print&issue-certified-copies',
-                'record.confirm-registration',
-                'record.reject-registration',
                 'performance.read',
                 'performance.read-dashboards',
                 'profile.electronic-signature',
                 'organisation.read-locations:my-office',
                 'search.birth',
                 'search.death',
-                'search.marriage',
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -280,7 +275,7 @@ export const handlers = {
                 'organisation.read-locations:my-jurisdiction',
                 'performance.read',
                 'performance.read-dashboards',
-                'performance.vital-statistics-export',
+                'performance.vital-statistics-export'
               ],
               __typename: 'UserRole'
             },
@@ -300,7 +295,7 @@ export const handlers = {
                 'performance.read',
                 'performance.read-dashboards',
                 'performance.vital-statistics-export',
-                'config.update:all',
+                'config.update:all'
               ],
               __typename: 'UserRole'
             },
@@ -315,7 +310,7 @@ export const handlers = {
               scopes: [
                 'performance.read',
                 'performance.read-dashboards',
-                'performance.vital-statistics-export',
+                'performance.vital-statistics-export'
               ],
               __typename: 'UserRole'
             },
@@ -339,9 +334,6 @@ export const handlers = {
                 'record.register',
                 'record.registration-correct',
                 'record.unassign-others',
-                'record.registration-print&issue-certified-copies',
-                'record.confirm-registration',
-                'record.reject-registration',
                 'performance.read',
                 'performance.read-dashboards',
                 'performance.vital-statistics-export',
@@ -350,7 +342,7 @@ export const handlers = {
                 'user.read:my-office',
                 'search.birth',
                 'search.death',
-                'search.marriage',
+                'search.marriage'
               ],
               __typename: 'UserRole'
             }
@@ -610,7 +602,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -630,7 +622,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -650,7 +642,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -670,7 +662,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -690,7 +682,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -712,13 +704,12 @@ export const handlers = {
                 'record.declaration-archive',
                 'record.declaration-reinstate',
                 'record.registration-request-correction',
-                'record.registration-print&issue-certified-copies',
                 'performance.read',
                 'performance.read-dashboards',
                 'organisation.read-locations:my-office',
                 'search.birth',
                 'search.death',
-                'search.marriage',
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -743,9 +734,6 @@ export const handlers = {
                 'record.register',
                 'record.registration-correct',
                 'record.unassign-others',
-                'record.registration-print&issue-certified-copies',
-                'record.confirm-registration',
-                'record.reject-registration',
                 'performance.read',
                 'performance.read-dashboards',
                 'profile.electronic-signature',
@@ -753,7 +741,7 @@ export const handlers = {
                 'user.read:my-office',
                 'search.birth',
                 'search.death',
-                'search.marriage',
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -771,7 +759,7 @@ export const handlers = {
                 'organisation.read-locations:my-jurisdiction',
                 'performance.read',
                 'performance.read-dashboards',
-                'performance.vital-statistics-export',
+                'performance.vital-statistics-export'
               ],
               __typename: 'UserRole'
             },
@@ -791,7 +779,7 @@ export const handlers = {
                 'performance.read',
                 'performance.read-dashboards',
                 'performance.vital-statistics-export',
-                'config.update:all',
+                'config.update:all'
               ],
               __typename: 'UserRole'
             },
@@ -806,7 +794,7 @@ export const handlers = {
               scopes: [
                 'performance.read',
                 'performance.read-dashboards',
-                'performance.vital-statistics-export',
+                'performance.vital-statistics-export'
               ],
               __typename: 'UserRole'
             },
@@ -830,9 +818,6 @@ export const handlers = {
                 'record.register',
                 'record.registration-correct',
                 'record.unassign-others',
-                'record.registration-print&issue-certified-copies',
-                'record.confirm-registration',
-                'record.reject-registration',
                 'performance.read',
                 'performance.read-dashboards',
                 'performance.vital-statistics-export',
@@ -841,7 +826,7 @@ export const handlers = {
                 'user.read:my-office',
                 'search.birth',
                 'search.death',
-                'search.marriage',
+                'search.marriage'
               ],
               __typename: 'UserRole'
             }

@@ -8,12 +8,19 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createPrng, generateUuid, Location, SCOPES } from '@opencrvs/commons'
+import {
+  createPrng,
+  generateUuid,
+  Location,
+  encodeScope
+} from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+
+const scope = encodeScope({ type: 'user.data-seeding' })
 
 test('Returns single location in right format', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+  const client = createTestClient(user, [scope])
 
   const initialLocations = await client.locations.list()
 
@@ -38,7 +45,7 @@ test('Returns single location in right format', async () => {
 
 test('Returns multiple locations', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+  const client = createTestClient(user, [scope])
 
   const initialLocations = await client.locations.list()
 

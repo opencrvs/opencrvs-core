@@ -18,7 +18,8 @@ const IGNORED_EVENT_TYPES = [
   'tennis-club-membership',
   'library-membership',
   'child-onboarding',
-  'digital-identity'
+  'digital-identity',
+  'event-with-optional-address'
 ]
 
 function warnOnConfigurationIssues(config: EventConfig) {
@@ -56,7 +57,7 @@ function warnOnConfigurationIssues(config: EventConfig) {
       `
        ************** WARNING **************
        The 'review' field for 'ActionType.REGISTER' config is deprecated in OpenCRVS v2.0 and is no longer used.
-       Instead, the 'review' from `ActionType.DECLARE` is used for registering.
+       Instead, the 'review' from 'ActionType.DECLARE' is used for registering.
        ************** WARNING **************
       `
     )

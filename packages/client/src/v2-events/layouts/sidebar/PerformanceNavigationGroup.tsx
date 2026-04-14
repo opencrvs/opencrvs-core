@@ -12,7 +12,6 @@
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { SCOPES } from '@opencrvs/commons/client'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
@@ -34,7 +33,7 @@ export function PerformanceNavigationGroup({
   const { hasScope } = usePermissions()
   return (
     <>
-      {hasScope(SCOPES.PERFORMANCE_READ_DASHBOARDS) && (
+      {hasScope('performance.read-dashboards') && (
         <NavigationGroup>
           {
             <>
