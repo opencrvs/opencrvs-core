@@ -9,12 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { Fragment } from 'react'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { Header } from '@client/components/Header/Header'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { constantsMessages } from '@client/i18n/messages'
-import { Navigation } from '@client/components/interface/Navigation'
-import { IntlShape, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import {
   Content,
@@ -54,44 +51,7 @@ const NoRecord = styled.div<{ isFullPage?: boolean }>`
   margin-top: 20px;
 `
 
-/**
- *
- * Wrapper component that adds Frame around the page if withFrame is true.
- * Created only for minimising impact of possible regression during v2 regression test period.
- */
-function WithFrame({
-  children,
-  isHidden,
-  intl
-}: {
-  children: React.ReactNode
-  isHidden: boolean
-  intl: IntlShape
-}) {
-  if (isHidden) {
-    return <>{children}</>
-  }
-
-  return (
-    <Frame
-      header={
-        <Header title={intl.formatMessage(navigationMessages.organisation)} />
-      }
-      skipToContentText={intl.formatMessage(
-        constantsMessages.skipToMainContent
-      )}
-      navigation={<Navigation />}
-    >
-      {children}
-    </Frame>
-  )
-}
-
-export function AdministrativeLevels({
-  hideNavigation
-}: {
-  hideNavigation?: boolean
-}) {
+export function AdministrativeLevels() {
   const intl = useIntl()
   const { locationId } = useParams<IRouteProps>()
   const { canAccessOffice } = usePermissions()
@@ -176,72 +136,70 @@ export function AdministrativeLevels({
   }
 
   return (
-    <WithFrame isHidden={!!hideNavigation} intl={intl}>
-      <Content
-        title={intl.formatMessage(navigationMessages.organisation)}
-        showTitleOnMobile={false}
-      >
-        <Fragment key={'.0'}>
-          <BreadCrumb
-            items={dataLocations.breadCrumb}
-            onSelect={onClickBreadCrumb}
-          />
-          <Divider />
-          <ListViewSimplified bottomBorder rowHeight={'small'}>
-            {dataLocations.childLocations.length > 0 ? (
-              dataLocations.childLocations
-                ?.slice(
-                  (currentPageNumber - 1) * DEFAULT_PAGINATION_LIST_SIZE,
-                  currentPageNumber * DEFAULT_PAGINATION_LIST_SIZE
-                )
-                .map((level: Location | AdministrativeArea, index: number) => (
-                  <ListViewItemSimplified
-                    key={index}
-                    label={
-                      AdministrativeArea.safeParse(level).success ? (
-                        <Link
-                          onClick={(e) => {
-                            setCurrentPageNumber(1)
-                            changeLevelAction(e, level.id)
-                          }}
-                        >
-                          {level.name}
-                        </Link>
-                      ) : (
-                        <Link
-                          disabled={!canAccessOffice(level)}
-                          onClick={() =>
-                            navigate({
-                              pathname: routes.TEAM_USER_LIST,
-                              search: stringify({
-                                locationId: level.id
-                              })
+    <Content
+      title={intl.formatMessage(navigationMessages.organisation)}
+      showTitleOnMobile={false}
+    >
+      <Fragment key={'.0'}>
+        <BreadCrumb
+          items={dataLocations.breadCrumb}
+          onSelect={onClickBreadCrumb}
+        />
+        <Divider />
+        <ListViewSimplified bottomBorder rowHeight={'small'}>
+          {dataLocations.childLocations.length > 0 ? (
+            dataLocations.childLocations
+              ?.slice(
+                (currentPageNumber - 1) * DEFAULT_PAGINATION_LIST_SIZE,
+                currentPageNumber * DEFAULT_PAGINATION_LIST_SIZE
+              )
+              .map((level: Location | AdministrativeArea, index: number) => (
+                <ListViewItemSimplified
+                  key={index}
+                  label={
+                    AdministrativeArea.safeParse(level).success ? (
+                      <Link
+                        onClick={(e) => {
+                          setCurrentPageNumber(1)
+                          changeLevelAction(e, level.id)
+                        }}
+                      >
+                        {level.name}
+                      </Link>
+                    ) : (
+                      <Link
+                        disabled={!canAccessOffice(level)}
+                        onClick={() =>
+                          navigate({
+                            pathname: routes.TEAM_USER_LIST,
+                            search: stringify({
+                              locationId: level.id
                             })
-                          }
-                        >
-                          {level.name}
-                        </Link>
-                      )
-                    }
-                  />
-                ))
-            ) : (
-              <NoRecord id="no-record">
-                {intl.formatMessage(constantsMessages.noResults)}
-              </NoRecord>
-            )}
-          </ListViewSimplified>
-        </Fragment>
-        {totalNumber > DEFAULT_PAGINATION_LIST_SIZE && (
-          <Pagination
-            currentPage={currentPageNumber}
-            totalPages={Math.ceil(totalNumber / DEFAULT_PAGINATION_LIST_SIZE)}
-            onPageChange={(currentPage: number) =>
-              setCurrentPageNumber(currentPage)
-            }
-          />
-        )}
-      </Content>
-    </WithFrame>
+                          })
+                        }
+                      >
+                        {level.name}
+                      </Link>
+                    )
+                  }
+                />
+              ))
+          ) : (
+            <NoRecord id="no-record">
+              {intl.formatMessage(constantsMessages.noResults)}
+            </NoRecord>
+          )}
+        </ListViewSimplified>
+      </Fragment>
+      {totalNumber > DEFAULT_PAGINATION_LIST_SIZE && (
+        <Pagination
+          currentPage={currentPageNumber}
+          totalPages={Math.ceil(totalNumber / DEFAULT_PAGINATION_LIST_SIZE)}
+          onPageChange={(currentPage: number) =>
+            setCurrentPageNumber(currentPage)
+          }
+        />
+      )}
+    </Content>
   )
 }

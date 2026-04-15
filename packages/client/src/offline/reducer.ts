@@ -36,7 +36,6 @@ import { isOfflineDataLoaded } from './selectors'
 import { merge } from 'lodash'
 import { isNavigatorOnline } from '@client/utils'
 import { ISerializedForm } from '@client/forms'
-import { initConditionals } from '@client/forms/conditionals'
 import { initHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import {
   Action as NotificationAction,
@@ -233,11 +232,6 @@ const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
 const CONTENT_CMD = Cmd.run(() => referenceApi.loadContent(), {
   successActionCreator: actions.contentLoaded,
   failActionCreator: actions.contentFailed
-})
-
-const CONDITIONALS_CMD = Cmd.run(() => initConditionals(), {
-  successActionCreator: actions.conditionalsLoaded,
-  failActionCreator: actions.conditionalsFailed
 })
 
 const HANDLEBARS_CMD = Cmd.run(() => initHandlebarHelpers(), {
@@ -535,10 +529,7 @@ function reducer(
         )
       )
 
-      const offices = filterLocations(
-        action.payload,
-        'CRVS_OFFICE'
-      )
+      const offices = filterLocations(action.payload, 'CRVS_OFFICE')
       const activeOffices = Object.fromEntries(
         Object.entries(offices).filter(
           ([, office]) => office.status === 'active'

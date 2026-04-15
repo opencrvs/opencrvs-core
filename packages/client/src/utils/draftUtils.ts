@@ -8,19 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  IDeclaration,
-  IPrintableDeclaration,
-  SUBMISSION_STATUS
-} from '@client/declarations'
-import { EventType, History, RegStatus } from '@client/utils/gateway'
+import { IDeclaration } from '@client/declarations'
+import { EventType } from '@client/utils/gateway'
 import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
   GQLEventSearchSet,
   GQLMarriageEventSearchSet
 } from '@client/utils/gateway-deprecated-do-not-use'
-import { includes } from 'lodash'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { getLocalisedName } from './data-formatting'
 import { IntlShape } from 'react-intl'
@@ -224,7 +219,6 @@ function getEvent(eventType: string | undefined) {
   }
 }
 
-
 export const transformSearchQueryDataToDraft = (
   data: GQLEventSearchSet
 ): IDeclaration => {
@@ -264,23 +258,4 @@ export const transformSearchQueryDataToDraft = (
   }
 
   return declaration
-}
-
-export function isDeclarationInReadyToReviewStatus(
-  submissionStatus: string | undefined
-) {
-  return !includes(
-    [SUBMISSION_STATUS.DRAFT, SUBMISSION_STATUS.REJECTED, undefined],
-    submissionStatus
-  )
-}
-
-function getRegisteringOfficeId(
-  declaration?: IPrintableDeclaration
-): string | null {
-  const registeringHistory = (
-    declaration?.data?.history as unknown as History[]
-  )?.find((h) => !h.action && h.regStatus === RegStatus.Registered)
-
-  return registeringHistory?.office?.id || null
 }
