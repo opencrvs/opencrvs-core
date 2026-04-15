@@ -78,7 +78,7 @@
     "graphql": "^15.0.0",
     "graphql-tag": "^2.12.6",
     "graphql-tools": "^4.0.7",
-    "handlebars": "^4.7.6",
+    "handlebars": "^4.7.9",
     "history": "^4.7.2",
     "html-to-pdfmake": "^2.5.13",
     "idb-keyval": "^6.2.2",

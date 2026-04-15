@@ -59,6 +59,19 @@
   },
   "resolutions": {
     "@types/react": "18.3.1",
-    "fast-xml-parser": "4.4.1"
+    "fast-xml-parser": "4.5.6",
+    "axios": "1.15.0",
+    "form-data": "4.0.5",
+    "sha.js": "2.4.12",
+    "handlebars": "4.7.9",
+    "mongoose": "6.13.9"
+  },
+  "overrides": {
+    "fast-xml-parser": "4.5.6",
+    "axios": "1.15.0",
+    "form-data": "4.0.5",
+    "sha.js": "2.4.12",
+    "handlebars": "4.7.9",
+    "mongoose": "6.13.9"
   }
 }
