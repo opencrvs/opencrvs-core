@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { matchMutation, QueryFilters } from '@tanstack/react-query'
+import { matchMutation } from '@tanstack/react-query'
 import {
   DecorateQueryProcedure,
   inferInput,
@@ -36,13 +36,9 @@ function getQueryData<T extends DecorateQueryProcedure<any>>(
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getQueriesData<T extends DecorateQueryProcedure<any>>(
-  query: T,
-  additionalFilters: QueryFilters = {}
-) {
+function getQueriesData<T extends DecorateQueryProcedure<any>>(query: T) {
   return queryClient.getQueriesData<inferOutput<T>>({
-    queryKey: query.queryKey(),
-    ...additionalFilters
+    queryKey: query.queryKey()
   })
 }
 
