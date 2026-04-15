@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IDeclaration } from '@client/declarations'
 import {
   BULLET_LIST,
   BUTTON,
@@ -17,9 +16,7 @@ import {
   DependencyInfo,
   DOCUMENT_UPLOADER_WITH_OPTION,
   FETCH_BUTTON,
-  FIELD_WITH_DYNAMIC_DEFINITIONS,
   HIDDEN,
-  HTTP,
   IButtonFormField,
   ICheckboxOption,
   ID_READER,
@@ -37,7 +34,6 @@ import {
   IFormSection,
   IFormSectionData,
   IFormSectionGroup,
-  IHttpFormField,
   Ii18nButtonFormField,
   Ii18nFormField,
   Ii18nHiddenFormField,
@@ -50,7 +46,6 @@ import {
   InitialValue,
   IQuery,
   IRadioGroupFormField,
-  IRadioGroupWithNestedFieldsFormField,
   IRadioOption,
   ISelectFormFieldWithDynamicOptions,
   ISelectFormFieldWithOptions,
@@ -62,7 +57,6 @@ import {
   RADIO_GROUP,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   ReaderType,
-  ResourceType,
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS
 } from '@client/forms'
@@ -79,34 +73,14 @@ import {
   OFFLINE_LOCATIONS_KEY
 } from '@client/offline/reducer'
 import { UserDetails } from '@client/utils/userUtils'
-import {
-  isAValidDateFormat,
-  isDateNotInFuture,
-  Validation
-} from '@client/utils/validate'
+import { Validation } from '@client/utils/validate'
 import * as SupportedIcons from '@opencrvs/components/lib/Icon/all-icons'
 import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/Radio'
 import { callingCountries } from 'country-data'
-import differenceInDays from 'date-fns/differenceInDays'
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
 import { memoize } from 'lodash'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { Conditional } from './conditionals'
-
-const VIEW_TYPE = {
-  FORM: 'form',
-  REVIEW: 'review',
-  PREVIEW: 'preview',
-  HIDDEN: 'hidden'
-}
-
-const REGISTRATION_TARGET_DAYS = 30
-
-interface IRange {
-  start: number
-  end?: number
-  value: string
-}
 
 const internationaliseOptions = (
   intl: IntlShape,
@@ -335,60 +309,6 @@ export const getFieldValidation = (
   return validator
 }
 
-function getNextSectionIds(
-  sections: IFormSection[],
-  fromSection: IFormSection,
-  fromSectionGroup: IFormSectionGroup,
-  declaration: IDeclaration,
-  isCorrection: boolean,
-  userDetails?: UserDetails | null
-): { [key: string]: string } | null {
-  const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
-    fromSection,
-    declaration.data[fromSection.id] || {},
-    declaration.data,
-    userDetails
-  )
-  const currentGroupIndex = visibleGroups.findIndex(
-    (group: IFormSectionGroup) => group.id === fromSectionGroup.id
-  )
-
-  if (currentGroupIndex === visibleGroups.length - 1) {
-    const visibleSections = sections
-      .filter((section) => (isCorrection ? section.id !== 'documents' : true))
-      .filter(
-        (section) =>
-          section.viewType !== VIEW_TYPE.HIDDEN &&
-          getVisibleSectionGroupsBasedOnConditions(
-            section,
-            declaration.data[fromSection.id] || {},
-            declaration.data,
-            userDetails
-          ).length > 0
-      )
-
-    const currentIndex = visibleSections.findIndex(
-      (section: IFormSection) => section.id === fromSection.id
-    )
-    if (currentIndex === visibleSections.length - 1) {
-      return null
-    }
-
-    return {
-      sectionId: visibleSections[currentIndex + 1].id,
-      groupId: visibleSections[currentIndex + 1].groups[0].id
-    }
-  }
-  return {
-    sectionId: fromSection.id,
-    groupId: visibleGroups[currentGroupIndex + 1].id
-  }
-}
-
-const getVisibleGroupFields = (group: IFormSectionGroup) => {
-  return group.fields.filter((field) => !field.hidden)
-}
-
 const getFieldOptionsSlow = (
   _sectionName: string,
   field:
@@ -517,9 +437,6 @@ const getNestedValue = (obj: Record<string, unknown>, key: string) => {
   return key.split('.').reduce((res: INested, k) => res[k] || '', obj)
 }
 
-const betweenRange = (range: IRange, check: number) =>
-  range.end ? check >= range.start && check <= range.end : check >= range.start
-
 export const getFieldOptionsByValueMapper = (
   field: IDynamicListFormField,
   values: IFormSectionData | IFormData,
@@ -546,48 +463,6 @@ export const getFieldOptionsByValueMapper = (
     items = field.dynamicItems.items[mappedValue]
   }
   return items
-}
-
-const diffDoB = (doB: string) => {
-  if (!isAValidDateFormat(doB) || !isDateNotInFuture(doB))
-    return 'withinTargetdays'
-  const todaysDate = new Date()
-  const birthDate = new Date(doB)
-  const diffInDays = differenceInDays(todaysDate, birthDate)
-
-  const ranges: IRange[] = [
-    { start: 0, end: REGISTRATION_TARGET_DAYS, value: 'withinTargetdays' },
-    {
-      start: REGISTRATION_TARGET_DAYS + 1,
-      end: 5 * 365,
-      value: 'between46daysTo5yrs'
-    },
-    { start: 5 * 365 + 1, value: 'after5yrs' }
-  ]
-  const valueWithinRange = ranges.find((range) =>
-    betweenRange(range, diffInDays)
-  )
-  return valueWithinRange ? valueWithinRange.value : ''
-}
-
-function isCityLocation(
-  locations: { [key: string]: ILocation },
-  locationId: string
-): boolean {
-  const selectedLocation = locations[locationId]
-  if (selectedLocation) {
-    if (selectedLocation.jurisdictionType === 'CITYCORPORATION') {
-      return true
-    } else {
-      return false
-    }
-  } else {
-    return false
-  }
-}
-
-function isDefaultCountry(countryCode: string): boolean {
-  return countryCode === window.config.COUNTRY.toUpperCase()
 }
 
 interface IVars {
@@ -713,20 +588,6 @@ export const getVisibleOptions = (
   })
 }
 
-const getSectionFields = (
-  section: IFormSection,
-  values?: IFormSectionData,
-  draftData?: IFormData
-) => {
-  let fields: IFormField[] = []
-  getVisibleSectionGroupsBasedOnConditions(
-    section,
-    values || {},
-    draftData
-  ).forEach((group) => (fields = fields.concat(group.fields)))
-  return fields
-}
-
 export const hasFormError = (
   fields: IFormField[],
   values: IFormSectionData,
@@ -777,46 +638,6 @@ export const convertToMSISDN = (phone: string, alpha3CountryCode: string) => {
   }
 }
 
-export const isRadioGroupWithNestedField = (
-  field: IFormField
-): field is IRadioGroupWithNestedFieldsFormField => {
-  return field.type === RADIO_GROUP_WITH_NESTED_FIELDS
-}
-
-const isDynamicField = (field: IFormField): field is IDynamicFormField => {
-  return field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
-}
-
-const isDateField = (
-  field: IFormField,
-  sectionData: IFormSectionData
-): field is IDateFormField => {
-  if (isDynamicField(field)) {
-    return getFieldType(field, sectionData) === DATE
-  }
-
-  return field.type === DATE
-}
-
-export const serializeFieldValue = (
-  field: IFormField,
-  fieldValue: IFormFieldValue,
-  sectionData: IFormSectionData
-) => {
-  if (isDateField(field, sectionData)) {
-    return fieldValue?.toString()
-  }
-
-  return fieldValue
-}
-
-export const getSelectedRadioOptionWithNestedFields = (
-  field: IRadioGroupWithNestedFieldsFormField,
-  sectionData: IFormSectionData
-): string | undefined => {
-  return (sectionData[field.name] as IFormSectionData).value as string
-}
-
 export function getSelectedOption(
   value: string,
   options: ISelectOption[]
@@ -833,32 +654,12 @@ export function isFieldButton(field: IFormField): field is IButtonFormField {
   return field.type === BUTTON
 }
 
-export function isFieldIDReader(field: IFormField): field is IDReaderFormField {
+function isFieldIDReader(field: IFormField): field is IDReaderFormField {
   return field.type === ID_READER
 }
 
 function isFieldLoader(field: IFormField): field is ILoaderFormField {
   return field.type === LOADER
-}
-
-export function isReaderQR(reader: ReaderType): reader is QrReaderType {
-  return reader.type === 'QR'
-}
-
-export function isReaderLinkButton(
-  reader: ReaderType
-): reader is ILinkButtonFormField {
-  return reader.type === LINK_BUTTON
-}
-
-export function isFieldHttp(field: IFormField): field is IHttpFormField {
-  return field.type === HTTP
-}
-
-export function isFieldLinkButton(
-  field: IFormField
-): field is ILinkButtonFormField {
-  return field.type === LINK_BUTTON
 }
 
 function isInitialValueDependencyInfo(

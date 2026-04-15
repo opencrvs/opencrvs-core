@@ -65,7 +65,7 @@ export type IAdvancedSearchParamState = {
   bookmarkName?: string
 }
 
-export const advancedSearchInitialState: IAdvancedSearchParamState = {
+const advancedSearchInitialState: IAdvancedSearchParamState = {
   event: '',
   registrationStatuses: undefined,
   dateOfEvent: '',

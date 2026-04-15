@@ -28,7 +28,6 @@ import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { ROUTES } from '@client/v2-events/routes'
 import { getUsersFullName } from '@client/v2-events/utils'
-import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { getAddressNameV2, UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { Location, User, UUID } from '@opencrvs/commons/client'
@@ -54,7 +53,7 @@ import { parse } from 'qs'
 import { stringify } from 'querystring'
 import React, { useCallback, useMemo, useState } from 'react'
 import { useIntl } from 'react-intl'
-import { connect, useSelector } from 'react-redux'
+import { connect } from 'react-redux'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import styled, { withTheme } from 'styled-components'
 import { useOnlineStatus } from '../../../../utils'
@@ -147,7 +146,6 @@ interface SearchParams {
 }
 
 type UserListProps = {
-  hideNavigation?: boolean
   theme: ITheme
   userDetails: UserDetails | null
 }
@@ -182,7 +180,7 @@ export const Status = (statusProps: { status: string }) => {
   }
 }
 
-function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
+function UserListComponent({ userDetails }: UserListProps) {
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -538,20 +536,6 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
     [searchedLocation, navigate]
   )
 
-  function onChangeLocation() {
-    if (searchedLocation) {
-      navigate(routes.TEAM_SEARCH, {
-        state: {
-          selectedLocation: {
-            id: searchedLocation.id,
-            searchableText: searchedLocation?.name,
-            displayLabel: searchedLocation?.name
-          }
-        }
-      })
-    }
-  }
-
   const LocationButton = (locationId: UUID) => {
     const buttons: React.ReactElement[] = []
     if (canAccessMultipleLocations) {
@@ -751,14 +735,7 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
   }
 
   return (
-    <SysAdminContentWrapper
-      changeTeamLocation={
-        canAccessMultipleLocations ? onChangeLocation : undefined
-      }
-      isCertificatesConfigPage={true}
-      hideBackground={true}
-      isHidden={hideNavigation}
-    >
+    <>
       {isOnline ? (
         <Content
           title={
@@ -887,7 +864,7 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
           {intl.formatMessage(messages.resetPasswordError)}
         </Toast>
       )}
-    </SysAdminContentWrapper>
+    </>
   )
 }
 

@@ -11,7 +11,7 @@
 import decode from 'jwt-decode'
 import { Nominal } from './nominal'
 import * as z from 'zod/v4'
-import { ScopeType, decodeScope, Scope } from './scopes'
+import { ScopeType, decodeScope, Scope, EncodedScope } from './scopes'
 import { UUID } from './uuid'
 export * from './scopes'
 
@@ -53,7 +53,7 @@ export interface ITokenPayload {
   sub: string
   exp: string
   algorithm: string
-  scope: string[]
+  scope: EncodedScope[]
   role?: string
   userType: TokenUserType
   eventId?: UUID
@@ -69,7 +69,7 @@ export function setBearerForToken(token: string) {
   return token.startsWith(bearer) ? token : `${bearer} ${token}`
 }
 
-export function getScopes(token: string): string[] {
+export function getScopes(token: string): EncodedScope[] {
   const authHeader = { Authorization: setBearerForToken(token) }
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
 

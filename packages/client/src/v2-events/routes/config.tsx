@@ -305,7 +305,7 @@ export const routesConfig = {
       path: ROUTES.V2.SETTINGS.USER.VIEW.path,
       element: (
         <WorkqueueLayout>
-          <UserAudit hideNavigation={true} />
+          <UserAudit />
         </WorkqueueLayout>
       )
     },
@@ -354,7 +354,7 @@ export const routesConfig = {
       element: (
         <ProtectedRoute scopes={['config.update-all']}>
           <WorkqueueLayout>
-            <SystemList hideNavigation={true} />
+            <SystemList />
           </WorkqueueLayout>
         </ProtectedRoute>
       )
@@ -364,7 +364,7 @@ export const routesConfig = {
       element: (
         <ProtectedRoute scopes={['config.update-all']}>
           <WorkqueueLayout>
-            <AllUserEmail hideNavigation={true} />
+            <AllUserEmail />
           </WorkqueueLayout>
         </ProtectedRoute>
       )

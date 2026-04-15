@@ -16,7 +16,7 @@ import {
 } from '@client/i18n/utils'
 import * as offlineActions from '@client/offline/actions'
 import { ILocation } from '@client/offline/reducer'
-import { IRoleMessagesLoadedAction } from '@client/user/userReducer'
+
 import { Cmd, Loop, LoopReducer, loop } from 'redux-loop'
 
 export interface IntlMessages {
@@ -94,12 +94,7 @@ const getNextMessages = (
 export const intlReducer: LoopReducer<IntlState, any> = (
   state: IntlState = initialState,
   action: actions.Action | offlineActions.Action
-):
-  | IntlState
-  | Loop<
-      IntlState,
-      actions.Action | offlineActions.Action | IRoleMessagesLoadedAction
-    > => {
+): IntlState | Loop<IntlState, actions.Action | offlineActions.Action> => {
   switch (action.type) {
     case actions.CHANGE_LANGUAGE:
       const messages = getNextMessages(action.payload.language, state.languages)

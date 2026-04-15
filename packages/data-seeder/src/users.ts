@@ -17,7 +17,8 @@ import {
   EventConfig,
   hasScope,
   joinUrl,
-  parseConfigurableScope
+  parseConfigurableScope,
+  EncodedScope
 } from '@opencrvs/commons'
 import { fromZodError } from 'zod-validation-error'
 import { createClient } from '@opencrvs/toolkit/api'
@@ -32,7 +33,7 @@ const RoleSchema = (eventIds: string[]) =>
         id: z.string()
       }),
       scopes: z.array(
-        z.string().superRefine((scope, ctx) => {
+        EncodedScope.superRefine((scope, ctx) => {
           const parsedConfigurableScope = parseConfigurableScope(scope)
           const parsedV2Scopes = decodeScope(scope)
 
