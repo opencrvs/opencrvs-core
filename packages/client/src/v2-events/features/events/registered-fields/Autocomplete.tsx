@@ -108,7 +108,7 @@ function MenuList<T extends string | number>({
   )
 }
 
-export function DropdownIndicator<T>(
+function DropdownIndicator<T>(
   props: DropdownIndicatorProps<Option<T>, false, GroupBase<Option<T>>>
 ) {
   return (
@@ -134,7 +134,7 @@ function BaseAsyncSelect(
   return <AsyncSelect {...props} />
 }
 
-export const StyledAsyncSelect = styled(BaseAsyncSelect)<StyledProps>`
+const StyledAsyncSelect = styled(BaseAsyncSelect)<StyledProps>`
   width: 100%;
   ${({ theme }) => theme.fonts.reg19};
   background: ${({ theme }) => theme.colors.white};
