@@ -631,14 +631,19 @@ export function addFontsToSvg(
   const style = document.createElement('style')
   style.innerHTML = Object.entries(fonts)
     .flatMap(([font, families]) =>
-      Object.entries(families).map(
-        ([family, url]) => `
+      Object.entries(families).map(([family, url]) => {
+        const lower = family.toLowerCase()
+
+        const fontWeight = lower.includes('bold') ? 'bold' : 'normal'
+        const fontStyle = lower.includes('italic') ? 'italic' : 'normal'
+        return `
 @font-face {
-font-family: "${font}";
-font-weight: ${family};
-src: url("${url}") format("truetype");
+  font-family: "${font}";
+  font-weight: ${fontWeight};
+  font-style: ${fontStyle};
+  src: url("${url}") format("truetype");
 }`
-      )
+      })
     )
     .join('')
   svg.prepend(style)
