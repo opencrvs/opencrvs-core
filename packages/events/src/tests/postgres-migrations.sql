@@ -842,3 +842,4 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.users TO events_app;
 -- PostgreSQL database dump complete
 --
 
+
