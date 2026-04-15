@@ -16,11 +16,10 @@ import {
   getDeclarationFields,
   areConditionsMet,
   getMixedPath,
-  Flag,
   EventIndex,
   EventDocument
 } from '@opencrvs/commons/client'
-import { FieldValue, FieldConfig, FieldType } from '@opencrvs/commons/client'
+import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'

@@ -20,11 +20,7 @@ import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavig
 import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavigation'
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
-import {
-  ActionDocument,
-  joinValues,
-  WorkqueueConfig
-} from '@opencrvs/commons/client'
+import { WorkqueueConfig } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { storage } from '@client/storage'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
@@ -84,7 +80,7 @@ function Workqueues({
   ))
 }
 
-export function SidebarComponent({
+function SidebarComponent({
   menuCollapse,
   navigationWidth,
   isMobileView = false
