@@ -324,7 +324,7 @@ describe('mapFieldToDefaultValue', () => {
     })
   })
 
-  it.only('resolves administrativeArea via locationLevel district for ADDRESS field', () => {
+  it('resolves administrativeArea via locationLevel district for ADDRESS field', () => {
     const result = mapFieldToDefaultValue(AddressField, mockContext)
     expect(result).toMatchObject({ administrativeArea: DISTRICT_ID })
   })
