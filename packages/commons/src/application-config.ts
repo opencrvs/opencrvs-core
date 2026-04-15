@@ -11,20 +11,7 @@
 
 import * as z from 'zod/v4'
 import { FieldConfig } from './events/FieldConfig'
-
-const ApplicationTranslationConfig = z.object({
-  id: z
-    .string()
-    .describe(
-      'The identifier of the translation referred in translation CSV files'
-    ),
-  defaultMessage: z.string().describe('Default translation message'),
-  description: z
-    .string()
-    .describe(
-      'Describe the translation for a translator to be able to identify it.'
-    )
-})
+import { TranslationConfig } from './events/TranslationConfig'
 
 export const SearchCriteria = z.enum([
   'TRACKING_ID',
@@ -49,7 +36,7 @@ export const ApplicationConfig = z.object({
   ADMIN_STRUCTURE: z.array(
     z.object({
       id: z.string(),
-      label: ApplicationTranslationConfig
+      label: TranslationConfig
     })
   ),
   PHONE_NUMBER_PATTERN: z.string().or(z.instanceof(RegExp)),
@@ -108,7 +95,7 @@ export const ClientConfig = z.object({
   DASHBOARDS: z.array(
     z.object({
       id: z.string(),
-      title: ApplicationTranslationConfig,
+      title: TranslationConfig,
       url: z.string()
     })
   ),

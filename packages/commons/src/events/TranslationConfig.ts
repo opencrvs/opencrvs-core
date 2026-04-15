@@ -44,6 +44,5 @@ export const TranslationConfig: ExplicitTypeToReduceDeclarationSize = z
       )
   })
   .meta({
-    description: 'Translation configuration',
-    id: 'TranslationConfig'
+    description: 'Translation configuration'
   })
