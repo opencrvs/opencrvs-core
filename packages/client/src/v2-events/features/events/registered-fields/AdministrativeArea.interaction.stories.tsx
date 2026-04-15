@@ -73,7 +73,7 @@ const fields = [
 
 const declaration = {
   'applicant.address': {
-    country: 'FAR',
+    country: 'BGD',
     addressType: AddressType.DOMESTIC,
     administrativeArea: '1d4e5f6a-7b8c-4912-8efa-345678901234'
   }
