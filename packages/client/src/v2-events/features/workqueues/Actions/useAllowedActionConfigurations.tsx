@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useMemo } from 'react'
-import { ActionType, EventIndex } from '@opencrvs/commons/client'
+import { EventIndex } from '@opencrvs/commons/client'
 import { ActionMenuItem } from './utils'
 import { useGetActionMenuActionConfigurations } from './useGetActionConfiguration'
 
@@ -28,9 +28,5 @@ export function useAllowedActionConfigurations(
     [actions]
   )
 
-  const hasOnlyAssignmentActions = visibleActions.every(
-    ({ type }) => type === ActionType.ASSIGN || type === ActionType.UNASSIGN
-  )
-
-  return [modals, hasOnlyAssignmentActions ? [] : visibleActions]
+  return [modals, visibleActions]
 }
