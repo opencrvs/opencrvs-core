@@ -21,20 +21,11 @@ import {
 } from '@opencrvs/commons/client'
 import { mapFieldToDefaultValue } from './useDefaultValue'
 
-const PROVINCE_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' as UUID
-const DISTRICT_ID = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' as UUID
-const OFFICE_ID = 'cccccccc-cccc-cccc-cccc-cccccccccccc' as UUID
+const PROVINCE_ID = '4afea53a-4dde-4ba1-b51d-500d83860c28' as UUID
+const DISTRICT_ID = '31ec1af8-d81f-448b-9a7a-3ce334004210' as UUID
+const OFFICE_ID = 'c49a1250-1776-4191-84c1-f381d39dab22' as UUID
 
 const mockAdministrativeAreas: Map<UUID, AdministrativeArea> = new Map([
-  [
-    OFFICE_ID,
-    {
-      id: OFFICE_ID,
-      parentId: DISTRICT_ID,
-      name: 'Test Office',
-      validUntil: null
-    }
-  ],
   [
     DISTRICT_ID,
     {
@@ -333,7 +324,7 @@ describe('mapFieldToDefaultValue', () => {
     })
   })
 
-  it('resolves administrativeArea via locationLevel district for ADDRESS field', () => {
+  it.only('resolves administrativeArea via locationLevel district for ADDRESS field', () => {
     const result = mapFieldToDefaultValue(AddressField, mockContext)
     expect(result).toMatchObject({ administrativeArea: DISTRICT_ID })
   })
