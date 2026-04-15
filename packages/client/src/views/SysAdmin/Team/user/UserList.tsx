@@ -573,7 +573,6 @@ function UserListComponent({ userDetails }: UserListProps) {
     return buttons
   }
 
-  console.log('toggleActivation', toggleActivation)
   const RenderUserList = useCallback(
     function RenderUserList({
       users,
