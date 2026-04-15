@@ -12,7 +12,6 @@
 import format from 'date-fns/format'
 import * as React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useField } from 'formik'
 import {
   DateField as DateFieldType,
   DatetimeValue,

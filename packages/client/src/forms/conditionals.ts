@@ -9,8 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { referenceApi } from '@client/utils/referenceApi'
-
 /**
  * Conditionals allow controlling for example the visibility of form fields based on an JavaScript expression.
  */
@@ -18,16 +16,6 @@ export interface Conditional {
   description?: string
   action: string
   expression: string
-}
-
-export let conditionals: Record<string, Conditional>
-
-export async function initConditionals() {
-  const countryConfigConditionals = await referenceApi.importConditionals()
-  conditionals = {
-    ...builtInConditionals,
-    ...countryConfigConditionals
-  }
 }
 
 interface BuiltInConditionals {
