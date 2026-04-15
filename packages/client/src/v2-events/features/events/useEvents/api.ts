@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { matchMutation } from '@tanstack/react-query'
+import { matchMutation, QueryFilters } from '@tanstack/react-query'
 import {
   DecorateQueryProcedure,
   inferInput,
@@ -36,9 +36,13 @@ function getQueryData<T extends DecorateQueryProcedure<any>>(
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getQueriesData<T extends DecorateQueryProcedure<any>>(query: T) {
+export function getQueriesData<T extends DecorateQueryProcedure<any>>(
+  query: T,
+  additionalFilters: QueryFilters = {}
+) {
   return queryClient.getQueriesData<inferOutput<T>>({
-    queryKey: query.queryKey()
+    queryKey: query.queryKey(),
+    ...additionalFilters
   })
 }
 
@@ -246,13 +250,11 @@ export async function refetchAllSearchQueries() {
    * Invalidate search queries
    */
   await Promise.all(
-    getQueriesData(trpcOptionsProxy.event.search).map(
-      async ([queryKey, eventIndices]) => {
-        return queryClient.refetchQueries({
-          queryKey
-        })
-      }
-    )
+    getQueriesData(trpcOptionsProxy.event.search).map(async ([queryKey]) => {
+      return queryClient.refetchQueries({
+        queryKey
+      })
+    })
   )
 }
 

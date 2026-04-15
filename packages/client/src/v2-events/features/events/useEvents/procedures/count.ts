@@ -12,14 +12,45 @@
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
 import { WorkqueueCountInput } from '@opencrvs/commons/client'
-import { useTRPC } from '@client/v2-events/trpc'
+import { useTRPC, trpcOptionsProxy, queryClient } from '@client/v2-events/trpc'
+import { refetchWorkqueueSearchQueries } from '../api'
+import { setQueryDefaults } from './utils'
+
+setQueryDefaults(trpcOptionsProxy.workqueue.count, {
+  queryFn: async (...params) => {
+    const { queryKey } = params[0]
+    const [, { input }] = queryKey
+
+    const { queryFn } = trpcOptionsProxy.workqueue.count.queryOptions(input)
+    if (!queryFn) {
+      throw new Error('queryFn is not defined for workqueue.count')
+    }
+
+    const previousCounts =
+      queryClient.getQueryData<Record<string, number>>(queryKey)
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const response = await queryFn(params[0] as any)
+
+    if (previousCounts) {
+      const changedSlugs = Object.keys(response).filter(
+        (slug) => previousCounts[slug] !== response[slug]
+      )
+      await Promise.all(changedSlugs.map(refetchWorkqueueSearchQueries))
+    }
+
+    return response
+  }
+})
 
 export function useGetEventCountsByWorkqueue() {
   const trpc = useTRPC()
   return {
     useQuery: (query: WorkqueueCountInput) => {
+      const { queryFn: _queryFn, ...options } =
+        trpc.workqueue.count.queryOptions(query)
       return useQuery({
-        ...trpc.workqueue.count.queryOptions(query),
+        ...options,
         queryKey: trpc.workqueue.count.queryKey(query),
         refetchOnMount: 'always',
         staleTime: 0,
@@ -27,8 +58,10 @@ export function useGetEventCountsByWorkqueue() {
       })
     },
     useSuspenseQuery: (queries: WorkqueueCountInput) => {
+      const { queryFn: _queryFn, ...options } =
+        trpc.workqueue.count.queryOptions(queries)
       return useSuspenseQuery({
-        ...trpc.workqueue.count.queryOptions(queries),
+        ...options,
         queryKey: trpc.workqueue.count.queryKey(queries),
         refetchOnMount: 'always',
         staleTime: 0,

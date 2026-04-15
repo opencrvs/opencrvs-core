@@ -602,8 +602,8 @@ export const DraftPaginationOffline: Story = {
 //   2. MSW search handler returns 3 events on the first call.
 //   3. The play function manually invalidates the count cache – simulating
 //      what the 20-second polling would do – and MSW now returns updatedCount (4).
-//   4. The useEffect in the Workqueues (sidebar) component detects the change
-//      and calls refetchWorkqueueSearchQueries('recent').
+//   4. The setQueryDefaults interceptor in count.ts detects the change and
+//      calls refetchWorkqueueSearchQueries('recent').
 //   5. MSW search handler now returns 4 events.
 //   6. The list shows 4 rows without any user interaction.
 // ---------------------------------------------------------------------------
