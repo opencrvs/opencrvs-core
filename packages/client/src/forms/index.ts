@@ -53,8 +53,6 @@ export const CHECKBOX = 'CHECKBOX'
 export const DATE = 'DATE'
 export const DATE_RANGE_PICKER = 'DATE_RANGE_PICKER'
 export const TEXTAREA = 'TEXTAREA'
-export const SUBSECTION_HEADER = 'SUBSECTION_HEADER'
-export const FIELD_GROUP_TITLE = 'FIELD_GROUP_TITLE'
 export const BULLET_LIST = 'BULLET_LIST'
 export const PARAGRAPH = 'PARAGRAPH'
 const DOCUMENTS = 'DOCUMENTS'
@@ -71,7 +69,6 @@ export const FETCH_BUTTON = 'FETCH_BUTTON'
 export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
 export const TIME = 'TIME'
 export const DIVIDER = 'DIVIDER'
-export const HEADING3 = 'HEADING3'
 export const SIGNATURE = 'SIGNATURE'
 export const HTTP = 'HTTP'
 export const BUTTON = 'BUTTON'
@@ -600,14 +597,8 @@ interface ITextareaFormField extends IFormFieldBase {
   type: typeof TEXTAREA
   maxLength?: number
 }
-interface ISubsectionFormField extends IFormFieldBase {
-  type: typeof SUBSECTION_HEADER
-}
 interface IDividerFormField extends IFormFieldBase {
   type: typeof DIVIDER
-}
-interface IFieldGroupTitleField extends IFormFieldBase {
-  type: typeof FIELD_GROUP_TITLE
 }
 interface IDocumentsFormField extends IFormFieldBase {
   type: typeof DOCUMENTS
@@ -793,8 +784,6 @@ export type IFormField =
   | ICheckboxFormField
   | IDateFormField
   | ITextareaFormField
-  | ISubsectionFormField
-  | IFieldGroupTitleField
   | IDocumentsFormField
   | IListFormField
   | IParagraphFormField
@@ -1165,12 +1154,6 @@ interface Ii18nTextareaFormField extends Ii18nFormFieldBase {
   type: typeof TEXTAREA
   maxLength?: number
 }
-interface Ii18nSubsectionFormField extends Ii18nFormFieldBase {
-  type: typeof SUBSECTION_HEADER
-}
-interface Ii18nFieldGroupTitleField extends Ii18nFormFieldBase {
-  type: typeof FIELD_GROUP_TITLE
-}
 interface Ii18nDocumentsFormField extends Ii18nFormFieldBase {
   type: typeof DOCUMENTS
 }
@@ -1234,10 +1217,6 @@ interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
 
 interface I18nDividerField extends Ii18nFormFieldBase {
   type: typeof DIVIDER
-}
-
-interface I18nHeading3Field extends Ii18nFormFieldBase {
-  type: typeof HEADING3
 }
 
 interface Ii18nTimeFormField extends Ii18nFormFieldBase {
@@ -1323,8 +1302,6 @@ export type Ii18nFormField =
   | Ii18nCheckboxFormField
   | Ii18nDateFormField
   | Ii18nTextareaFormField
-  | Ii18nSubsectionFormField
-  | Ii18nFieldGroupTitleField
   | Ii18nDocumentsFormField
   | Ii18nListFormField
   | Ii18nParagraphFormField
@@ -1338,7 +1315,6 @@ export type Ii18nFormField =
   | Ii18nDateRangePickerFormField
   | Ii18nTimeFormField
   | I18nDividerField
-  | I18nHeading3Field
   | Ii18nSignatureField
   | Ii18nHttpFormField
   | Ii18nButtonFormField
