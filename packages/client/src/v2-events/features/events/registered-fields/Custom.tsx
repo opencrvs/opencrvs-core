@@ -63,8 +63,7 @@ function Loader(
       }
     }
 
-     
-    loadModules()
+    void loadModules()
   }, [props.component, props.src])
 
   if (loading) {
