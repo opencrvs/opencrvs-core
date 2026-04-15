@@ -10,16 +10,6 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-export enum QUESTION_KEYS {
-  BIRTH_TOWN,
-  HIGH_SCHOOL,
-  MOTHER_NAME,
-  FAVORITE_TEACHER,
-  FAVORITE_MOVIE,
-  FAVORITE_SONG,
-  FAVORITE_FOOD,
-  FIRST_CHILD_NAME
-}
 interface IUserMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   accountTitle: MessageDescriptor
