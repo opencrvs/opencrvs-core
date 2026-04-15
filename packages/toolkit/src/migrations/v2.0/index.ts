@@ -58,6 +58,5 @@ export async function runUpgrade(ccwd: string | undefined) {
   await renameApiPaths()
   await convertConfigFilesToTs()
   await migrateScopes()
-  // TODO CIHAN: switch to "remove all unused imports"?
   await removeDeprecatedImports()
 }
