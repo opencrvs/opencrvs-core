@@ -11,11 +11,8 @@
 
 import { AvatarSmall } from '@client/components/Avatar'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
-import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
-import { Navigation } from '@client/components/interface/Navigation'
-import { ProfileMenu } from '@client/components/ProfileMenu'
 import { usePermissions } from '@client/hooks/useAuthorization'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import { messages as sysMessages } from '@client/i18n/messages/views/sysAdmin'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 import { messages as userSetupMessages } from '@client/i18n/messages/views/userSetup'
@@ -29,10 +26,9 @@ import { ROUTES } from '@client/v2-events/routes'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
 import { User } from '@opencrvs/commons/client'
-import { AppBar, Link } from '@opencrvs/components/lib'
+import { Link } from '@opencrvs/components/lib'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
@@ -41,11 +37,10 @@ import { Toast } from '@opencrvs/components/lib/Toast'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { stringify } from 'qs'
 import React, { useState } from 'react'
-import { IntlShape, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import styled from 'styled-components'
-import { ProfileState } from '../../profile/profileReducer'
 import { UserAuditHistory } from './UserAuditHistory'
 
 const UserAvatar = styled(AvatarSmall)`
@@ -54,87 +49,7 @@ const UserAvatar = styled(AvatarSmall)`
   }
 `
 
-/**
- *
- * Wrapper component that adds Frame around the page if withFrame is true.
- * Created only for minimising impact of possible regression during v2 regression test period.
- */
-function WithFrame({
-  children,
-  isHidden,
-  userDetails,
-  user,
-  scope,
-  getMenuItems,
-  canEditUser,
-  intl
-}: {
-  children: React.ReactNode
-  isHidden: boolean
-  userDetails: ProfileState['userDetails']
-  user: User | undefined
-  scope: string[] | null
-  getMenuItems: (
-    userId: string,
-    status: string
-  ) => {
-    label: string
-    handler: () => void
-  }[]
-  canEditUser: (user: User) => boolean
-  intl: IntlShape
-}) {
-  if (isHidden) {
-    return <>{children}</>
-  }
-
-  return (
-    <Frame
-      header={
-        <AppBar
-          mobileTitle={
-            user?.name ? getUsersFullName(user.name, intl.locale) : ''
-          }
-          desktopLeft={<HistoryNavigator />}
-          desktopRight={<ProfileMenu key="profileMenu" />}
-          mobileLeft={<HistoryNavigator hideForward />}
-          mobileRight={
-            userDetails &&
-            scope &&
-            user && (
-              <>
-                <Status status={user.status || 'pending'} />
-                <ToggleMenu
-                  id={`sub-page-header-munu-button`}
-                  toggleButton={
-                    <Icon
-                      name="DotsThreeVertical"
-                      color="primary"
-                      size="large"
-                    />
-                  }
-                  menuItems={getMenuItems(
-                    user.id as string,
-                    user.status as string
-                  )}
-                  hide={!canEditUser(user)}
-                />
-              </>
-            )
-          }
-        />
-      }
-      skipToContentText={intl.formatMessage(
-        constantsMessages.skipToMainContent
-      )}
-      navigation={<Navigation />}
-    >
-      {children}
-    </Frame>
-  )
-}
-
-export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
+export const UserAudit = () => {
   const intl = useIntl()
   const navigate = useNavigate()
   const { userId } = useParams()
@@ -259,15 +174,7 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
   const userName = user ? getUsersFullName(user.name, intl.locale) : ''
 
   return (
-    <WithFrame
-      isHidden={!!hideNavigation}
-      userDetails={userDetails}
-      user={user}
-      scope={scope}
-      getMenuItems={getMenuItems}
-      canEditUser={canEditUser}
-      intl={intl}
-    >
+    <>
       {loading ? (
         <Loader id="user_loader" marginPercent={35} />
       ) : error || !user ? (
@@ -489,6 +396,6 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
           )}{' '}
         </Content>
       )}
-    </WithFrame>
+    </>
   )
 }

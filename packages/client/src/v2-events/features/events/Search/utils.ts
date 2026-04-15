@@ -34,7 +34,6 @@ import {
   METADATA_FIELD_PREFIX,
   ValidatorContext,
   getAcceptedScopesByType,
-  RecordScopeV2,
   scopeUsesFullOptions
 } from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@opencrvs/commons/client'

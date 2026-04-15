@@ -8,9 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Header } from '@client/components/Header/Header'
-import { Navigation } from '@client/components/interface/Navigation'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
@@ -32,12 +30,11 @@ import {
 } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content } from '@opencrvs/components/lib/Content'
-import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Text } from '@opencrvs/components/lib/Text'
 import React, { useCallback, useState } from 'react'
-import { FormattedMessage, IntlShape, useIntl } from 'react-intl'
+import { FormattedMessage, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import {
   useIntegrations,
@@ -98,48 +95,7 @@ interface DeleteConfirmState {
   integration: IntegrationItem | null
 }
 
-/**
- * Wrapper component that adds Frame around the page if withFrame is true.
- * Created only for minimising impact of possible regression during v2 regression test period.
- */
-function WithFrame({
-  children,
-  isHidden,
-  intl,
-  toggleModal
-}: {
-  children: React.ReactNode
-  isHidden: boolean
-  intl: IntlShape
-  toggleModal: () => void
-}) {
-  if (isHidden) {
-    return <>{children}</>
-  }
-
-  return (
-    <Frame
-      header={
-        <Header
-          mobileRight={[
-            {
-              icon: () => <Icon name="Plus" />,
-              handler: toggleModal
-            }
-          ]}
-        />
-      }
-      navigation={<Navigation loadWorkqueueStatuses={false} />}
-      skipToContentText={intl.formatMessage(
-        constantsMessages.skipToMainContent
-      )}
-    >
-      {children}
-    </Frame>
-  )
-}
-
-export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
+export function SystemList() {
   const intl = useIntl()
   const [showModal, setShowModal] = React.useState(false)
   const [newClientName, setNewClientName] = useState(EMPTY_STRING)
@@ -327,11 +283,7 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
   }
 
   return (
-    <WithFrame
-      isHidden={!!hideNavigation}
-      intl={intl}
-      toggleModal={toggleModal}
-    >
+    <>
       <Content
         title={intl.formatMessage(integrationMessages.pageTitle)}
         topActionButtons={[
@@ -838,6 +790,6 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
           {toastMessage.message}
         </Toast>
       )}
-    </WithFrame>
+    </>
   )
 }

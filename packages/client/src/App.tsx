@@ -12,11 +12,8 @@
 import { NotificationComponent } from '@client/components/Notification'
 import { Page } from '@client/components/Page'
 import { ProtectedPage } from '@client/components/ProtectedPage'
-import { ProtectedRoute } from '@client/components/ProtectedRoute'
 import ScrollToTop from '@client/components/ScrollToTop'
 import { SessionExpireConfirmation } from '@client/components/SessionExpireConfirmation'
-import * as routes from '@client/navigation/routes'
-import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { getTheme } from '@opencrvs/components'
 import * as React from 'react'
 import { Provider } from 'react-redux'
@@ -35,7 +32,6 @@ import { ApolloProvider } from './utils/ApolloProvider'
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { AppStore } from './store'
 import { routesConfig as v2RoutesConfig } from './v2-events/routes/config'
-import { TRPCProvider } from './v2-events/trpc'
 import { ReloadModal } from './views/Modals/ReloadModal'
 
 // Injecting global styles for the body tag - used only once
@@ -91,17 +87,7 @@ export const routesConfig = [
       createRedirect('/registration-home/readyToIssue/*', '/'),
       createRedirect('/registration-home/print/*', '/'),
       createRedirect('/registration-home/readyForReview/*', '/'),
-      createRedirect('/events', '/events/create'),
-      {
-        path: routes.TEAM_SEARCH,
-        element: (
-          <TRPCProvider>
-            <ProtectedRoute scopes={['user.read']}>
-              <TeamSearch />
-            </ProtectedRoute>
-          </TRPCProvider>
-        )
-      }
+      createRedirect('/events', '/events/create')
     ]
   }
 ]

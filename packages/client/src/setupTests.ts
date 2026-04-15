@@ -90,7 +90,6 @@ import {
   getItem,
   setItem
 } from './tests/util'
-import { DASHBOARD } from './navigation/routes'
 
 vi.doMock('@client/forms/user/fieldDefinitions/createUser', () => ({
   createUserForm: mockOfflineData.userForms

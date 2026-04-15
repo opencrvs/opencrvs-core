@@ -23,7 +23,6 @@ import {
   FieldConfig,
   FieldType,
   DocumentPath,
-  generateTranslationConfig,
   TENNIS_CLUB_DECLARATION_FORM
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
@@ -128,29 +127,6 @@ export const ChangeModalInteraction: StoryObj<typeof Review.Body> = {
   },
   render: function Component(args) {
     const [modal, openModal] = useModal()
-
-    async function handleDeclaration() {
-      await openModal<boolean | null>((close) => {
-        return (
-          <Review.ActionModal.Accept
-            action="Declare"
-            close={close}
-            copy={{
-              supportingCopy: generateTranslationConfig('description'),
-              title: generateTranslationConfig('title'),
-              onConfirm: generateTranslationConfig('onConfirm')
-            }}
-            eventType={'Tennis club membership'}
-          />
-        )
-      })
-    }
-
-    async function handleRejection() {
-      await openModal<RejectionState | null>((close) => (
-        <Review.ActionModal.Reject close={close} />
-      ))
-    }
 
     async function handleEdit() {
       await openModal<boolean | null>((close) => (

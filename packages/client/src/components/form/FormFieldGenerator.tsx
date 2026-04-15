@@ -88,8 +88,6 @@ import {
   InitialValue,
   DependencyInfo,
   Ii18nButtonFormField,
-  LINK_BUTTON,
-  ID_READER,
   ID_VERIFICATION_BANNER,
   IDocumentUploaderWithOptionsFormField,
   ILocationSearchInputFormField,
@@ -133,18 +131,10 @@ import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
 import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
 import { UserDetails } from '@client/utils/userUtils'
-import {
-  BulletList,
-  Divider,
-  IdReader,
-  InputLabel,
-  Stack
-} from '@opencrvs/components'
+import { BulletList, Divider, InputLabel, Stack } from '@opencrvs/components'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
 import { ButtonField } from '@client/components/form/Button'
 import { getListOfLocations } from '@client/utils/validate'
-import { LinkButtonField } from '@client/components/form/LinkButton'
-import { ReaderGenerator } from './ReaderGenerator'
 import { IDVerificationBanner } from './IDVerification/Banner'
 import { FormLoader } from './FormLoader'
 
@@ -274,28 +264,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             }
             options={fieldDefinition.options}
           />
-        </InputField>
-      )
-    }
-
-    if (fieldDefinition.type === ID_READER) {
-      return (
-        <InputField {...inputFieldProps}>
-          <IdReader
-            dividerLabel={fieldDefinition.dividerLabel}
-            manualInputInstructionLabel={
-              fieldDefinition.manualInputInstructionLabel
-            }
-          >
-            <ReaderGenerator
-              readers={fieldDefinition.readers}
-              form={values}
-              field={fieldDefinition}
-              draft={draftData}
-              fields={fields}
-              setFieldValue={setFieldValue}
-            />
-          </IdReader>
         </InputField>
       )
     }
@@ -667,19 +635,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
 
-    if (fieldDefinition.type === LINK_BUTTON) {
-      return (
-        <LinkButtonField
-          form={values}
-          draft={draftData}
-          fieldDefinition={fieldDefinition}
-          fields={fields}
-          setFieldValue={setFieldValue}
-          isDisabled={disabled}
-        />
-      )
-    }
-
     if (fieldDefinition.type === HIDDEN) {
       const { error, touched, ...allowedInputProps } = inputProps
 
@@ -860,7 +815,7 @@ interface ITouchedNestedFields {
   }
 }
 
-export class FormSectionComponent extends React.Component<Props> {
+class FormSectionComponent extends React.Component<Props> {
   componentDidUpdate(prevProps: Props) {
     const userChangedForm = !isEqual(this.props.values, prevProps.values)
     const sectionChanged = prevProps.id !== this.props.id

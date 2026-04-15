@@ -27,7 +27,6 @@ import {
   getOrThrow,
   getAcceptedActions,
   getUUID,
-  UUID,
   PrintCertificateAction,
   TokenUserType,
   User,
