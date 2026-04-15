@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-enum AUDIT_ACTION {
+export enum AUDIT_ACTION {
   DEACTIVATE = 'DEACTIVATE',
   REACTIVATE = 'REACTIVATE'
 }
