@@ -11,12 +11,7 @@
 import { ISerializedForm } from '@client/forms'
 import { Conditional } from '@client/forms/conditionals'
 import { ILanguage } from '@client/i18n/reducer'
-import {
-  AdminStructure,
-  CRVSOffice,
-  Facility,
-  ILocation
-} from '@client/offline/reducer'
+import { AdminStructure, CRVSOffice, Facility } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { EventType } from '@client/utils/gateway'
 import { cacheFile } from '@client/v2-events/cache'
@@ -31,17 +26,6 @@ export interface ILocationDataResponse {
 export interface IFacilitiesDataResponse {
   [facilityId: string]: Facility
 }
-
-export const SearchCriteria = {
-  TRACKING_ID: 'TRACKING_ID',
-  REGISTRATION_NUMBER: 'REGISTRATION_NUMBER',
-  NATIONAL_ID: 'NATIONAL_ID',
-  NAME: 'NAME',
-  PHONE_NUMBER: 'PHONE_NUMBER',
-  EMAIL: 'EMAIL'
-} as const
-
-type SearchCriteriaType = keyof typeof SearchCriteria
 
 export interface IOfficesDataResponse {
   [facilityId: string]: CRVSOffice
@@ -102,11 +86,6 @@ export interface ICertificateData extends ICertificateConfigData {
   svg: string
 }
 
-interface ICurrency {
-  isoCode: string
-  languagesAndCountry: string[]
-}
-
 export interface AdminStructureItem {
   id: string
   label: TranslationConfig
@@ -124,7 +103,7 @@ export interface IApplicationConfigResponse {
 }
 
 async function loadConfig(): Promise<IApplicationConfigResponse> {
-  const url = '/api/config/config'
+  const url = '/api/config'
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -168,7 +147,7 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
 async function loadConfigAnonymousUser(): Promise<
   Partial<IApplicationConfigResponse>
 > {
-  const url = '/api/config/publicConfig'
+  const url = '/api/publicConfig'
   const res = await fetch(url, {
     method: 'GET'
   })
@@ -180,7 +159,7 @@ async function loadConfigAnonymousUser(): Promise<
 }
 
 async function loadForms(): Promise<LoadFormsResponse> {
-  const url = '/api/config/forms'
+  const url = '/api/forms'
 
   const res = await fetch(url, {
     method: 'GET',
@@ -206,10 +185,9 @@ async function loadForms(): Promise<LoadFormsResponse> {
   }
 }
 
-
 const countryconfigBase: string = '/api/countryconfig'
 
-export type LoadConditionalsResponse = Record<string, Conditional>
+type LoadConditionalsResponse = Record<string, Conditional>
 async function importConditionals(): Promise<LoadConditionalsResponse> {
   // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
   const { conditionals } = await import(
@@ -262,42 +240,6 @@ async function loadContent(): Promise<IContentResponse> {
 
 async function loadLocations(): Promise<ILocationDataResponse> {
   return {}
-}
-
-function generateLocationResource(fhirLocation: fhir.Location): ILocation {
-  return {
-    id: fhirLocation.id as string,
-    name: fhirLocation.name as string,
-    statisticalId:
-      fhirLocation.identifier
-        ?.find(
-          (id) => id.system === 'http://opencrvs.org/specs/id/statistical-code'
-        )
-        ?.value?.replace('ADMIN_STRUCTURE_', '') ?? '',
-    alias:
-      fhirLocation.alias && fhirLocation.alias[0] ? fhirLocation.alias[0] : '',
-    status: fhirLocation.status as string,
-    physicalType:
-      fhirLocation.physicalType &&
-      fhirLocation.physicalType.coding &&
-      fhirLocation.physicalType.coding[0].display
-        ? fhirLocation.physicalType.coding[0].display
-        : '',
-    jurisdictionType:
-      fhirLocation.identifier?.find(
-        (id) => id.system === 'http://opencrvs.org/specs/id/jurisdiction-type'
-      )?.value ?? '',
-    type:
-      fhirLocation.type &&
-      fhirLocation.type.coding &&
-      fhirLocation.type.coding[0].code
-        ? fhirLocation.type.coding[0].code
-        : '',
-    partOf:
-      fhirLocation.partOf && fhirLocation.partOf.reference
-        ? fhirLocation.partOf.reference
-        : ''
-  }
 }
 
 async function loadFacilities(): Promise<IFacilitiesDataResponse> {

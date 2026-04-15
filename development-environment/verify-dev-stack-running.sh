@@ -22,20 +22,8 @@ echo "wait-on gateway microservice" && wait-on -l tcp:7070
 echo
 echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
 echo
-echo "wait-on workflow microservice" && wait-on -l tcp:5050
-echo
-echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
-echo
-echo "wait-on search microservice" && wait-on -l tcp:9090
-echo
-echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
-echo
 echo "wait-on metrics microservice" && wait-on -l tcp:1050
 echo
 echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
 echo
 echo "wait-on user-mgnt microservice" && wait-on -l tcp:3030
-echo
-echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
-echo
-echo "wait-on application config microservice" && wait-on -l tcp:2021

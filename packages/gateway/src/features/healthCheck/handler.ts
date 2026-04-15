@@ -36,7 +36,6 @@ enum Services {
   METRICS = 'metrics',
   NOTIFICATION = 'notification',
   COUNTRY_CONFIG = 'countryconfig',
-  SEARCH = 'search',
   GATEWAY = 'gateway'
 }
 

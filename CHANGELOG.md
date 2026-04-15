@@ -4,6 +4,10 @@
 
 ### Breaking changes
 
+#### Scheduler service removed
+
+The `scheduler` package and its Docker service have been removed. The service ran two nightly cron jobs (`refreshPerformanceData`, `runVSExport`) that called endpoints on the metrics service which have since been deprecated. No replacement is needed.
+
 #### FieldType.PARAGRAPH configuration
 
 - `FieldType.PARAGRAPH` field no longer takes in a fontVariant style configuration. If a fontVariant is required, please use the new `FieldType.HEADING` field instead.
@@ -32,6 +36,10 @@ V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
 - Add support for querying by the declaring or registering user's role to workqueue `query`
   - `'legalStatuses.DECLARED.createdByRole': { type: 'anyOf', terms: ['MY_ROLE_ID', 'MY_OTHER_ROLE_ID'] }`
   - `'legalStatuses.REGISTERD.createdByRole': { type: 'anyOf', terms: ['MY_ROLE_ID', 'MY_OTHER_ROLE_ID'] }`
+
+#### Inherent flags
+
+- The inherent flag `InherentFlags.PENDING_CERTIFICATION` has been removed. Similar logic can be implemented in the country config with a custom flag, [see example](https://github.com/opencrvs/opencrvs-countryconfig/blob/81db21f4cf9ccbba90cb2c6e48648c9b258dc905/src/form/v2/birth/index.ts#L95-L102).
 
 ### New features
 

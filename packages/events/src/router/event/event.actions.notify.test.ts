@@ -16,7 +16,6 @@ import {
   generateUuid,
   getAcceptedActions,
   getUUID,
-  SCOPES,
   TENNIS_CLUB_MEMBERSHIP,
   createPrng,
   AddressType,
@@ -286,7 +285,7 @@ describe('event.actions.notify', () => {
       const { user, generator, rng } = await setupTestCase()
 
       const dataSeedingClient = createTestClient(user, [
-        SCOPES.USER_DATA_SEEDING
+        encodeScope({ type: 'user.data-seeding' })
       ])
 
       const administrativeAreaId = generateUuid(rng)

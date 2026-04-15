@@ -10,17 +10,19 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { UserAuditRecordInput } from '@opencrvs/commons/events'
 import * as z from 'zod/v4'
+import {
+  AuditLogEntrySchema,
+  UserAuditRecordInput
+} from '@opencrvs/commons/events'
 import {
   logger,
   personNameFromV1ToV2,
-  SCOPES,
   User,
   UserInput,
   UserOrSystem
 } from '@opencrvs/commons'
-import { requiresAnyOfScopes } from '@events/router/middleware'
+import { allowedWithAnyOfScopes } from '@events/router/middleware'
 import {
   router,
   userAndSystemProcedure,
@@ -57,17 +59,8 @@ const UserAuditListQuery = z.object({
   skip: z.number().optional().default(0),
   count: z.number().optional().default(10),
   timeStart: z.string().optional(),
-  timeEnd: z.string().optional()
-})
-
-const AuditLogEntry = z.object({
-  id: z.string(),
-  clientId: z.string(),
-  clientType: z.string(),
-  operation: z.string(),
-  requestData: z.record(z.string(), z.unknown()).nullable(),
-  responseSummary: z.record(z.string(), z.unknown()).nullable(),
-  createdAt: z.string()
+  timeEnd: z.string().optional(),
+  excludeOperations: z.array(z.string()).optional().default([])
 })
 
 const auditRouter = router({
@@ -82,16 +75,23 @@ const auditRouter = router({
     }),
   list: userOnlyProcedure
     .input(UserAuditListQuery)
-    .output(z.object({ results: z.array(AuditLogEntry), total: z.number() }))
+    .output(
+      z.object({ results: z.array(AuditLogEntrySchema), total: z.number() })
+    )
     .use(userCanReadOtherUser)
     .query(async ({ input }) => {
-      return queryUserAuditLog({
+      const { results, total } = await queryUserAuditLog({
         subjectId: input.userId,
         skip: input.skip,
         count: input.count,
         timeStart: input.timeStart,
-        timeEnd: input.timeEnd
+        timeEnd: input.timeEnd,
+        excludeOperations: input.excludeOperations
       })
+      return {
+        results: results.map((r) => AuditLogEntrySchema.parse(r)),
+        total
+      }
     })
 })
 
@@ -119,12 +119,7 @@ export const userRouter = router({
       return users[0]
     }),
   create: userAndSystemProcedure
-    .use(
-      requiresAnyOfScopes([
-        SCOPES.USER_CREATE,
-        SCOPES.USER_CREATE_MY_JURISDICTION
-      ])
-    )
+    .use(allowedWithAnyOfScopes(['user.create']))
     .input(UserInput)
     .output(User)
     .mutation(async ({ input, ctx }) => {
@@ -153,12 +148,7 @@ export const userRouter = router({
       return createUser(input, ctx.token)
     }),
   update: userAndSystemProcedure
-    .use(
-      requiresAnyOfScopes([
-        SCOPES.USER_UPDATE,
-        SCOPES.USER_UPDATE_MY_JURISDICTION
-      ])
-    )
+    .use(allowedWithAnyOfScopes(['user.edit']))
     .input(UserInput.and(z.object({ id: z.string() })))
     .output(User)
     .mutation(async ({ input, ctx }) => {

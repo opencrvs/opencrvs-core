@@ -27,7 +27,11 @@ import {
 import { logger, UUID, IUserName } from '@opencrvs/commons'
 import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
-import { TokenUserType } from '@opencrvs/commons/authentication'
+import {
+  EncodedScope,
+  encodeScope,
+  TokenUserType
+} from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
@@ -64,7 +68,7 @@ export interface IAuthentication {
 export interface ISystemAuthentication {
   systemId: string
   status: string
-  scope: string[]
+  scope: EncodedScope[]
 }
 
 export class UserInfoNotFoundError extends Error {}
@@ -118,11 +122,10 @@ export async function authenticateSystem(
 
 export async function createToken(
   userId: string,
-  scope: string[],
+  scope: EncodedScope[],
   audience: string[],
   issuer: string,
   role?: string | number | undefined,
-  temporary = false,
   userType: TokenUserType = TokenUserType.enum.user,
   expiresInSeconds?: number
 ): Promise<string> {
@@ -131,7 +134,7 @@ export async function createToken(
     algorithm: 'RS256',
     expiresIn:
       expiresInSeconds ??
-      (temporary
+      (userType === TokenUserType.enum.system
         ? env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS
         : env.CONFIG_TOKEN_EXPIRY_SECONDS),
     audience,
@@ -157,8 +160,8 @@ export async function createTokenForActionConfirmation(
   return sign(
     {
       scope: [
-        'record.confirm-registration',
-        'record.reject-registration',
+        encodeScope({ type: 'record.confirm-registration' }),
+        encodeScope({ type: 'record.reject-registration' }),
         userRejectScope
       ].filter(Boolean),
       eventId: 'eventId' in input ? input.eventId : undefined,
@@ -176,12 +179,9 @@ export async function createTokenForActionConfirmation(
         'opencrvs:user-mgnt-user',
         'opencrvs:auth-user',
         'opencrvs:notification-user',
-        'opencrvs:workflow-user',
-        'opencrvs:search-user',
         'opencrvs:metrics-user',
         'opencrvs:countryconfig-user',
         'opencrvs:webhooks-user',
-        'opencrvs:config-user',
         'opencrvs:documents-user',
         'opencrvs:notification-api-user'
       ],
@@ -223,12 +223,12 @@ export async function generateAndSendVerificationCode(
   email?: string,
   role?: string | number
 ) {
-  const isDemoUser = scope.indexOf('demo') > -1 || env.QA_ENV
+  const isTwoFADisabled = !env.TWO_FA_ENABLED
   logger.info(
-    `Is demo user: ${isDemoUser}. Scopes: ${scope.join(', ')} Role: ${role}`
+    `2FA disabled: ${isTwoFADisabled}. Scopes: ${scope.join(', ')} Role: ${role}`
   )
   let verificationCode
-  if (isDemoUser) {
+  if (isTwoFADisabled) {
     verificationCode = '000000'
     await storeVerificationCode(nonce, verificationCode)
   } else {
@@ -255,7 +255,9 @@ const tokenPayload = t.type({
   userType: t.string
 })
 
-export type ITokenPayload = t.TypeOf<typeof tokenPayload>
+export type ITokenPayload = t.TypeOf<typeof tokenPayload> & {
+  scope: EncodedScope[]
+}
 
 function safeVerifyJwt(token: string) {
   return tryCatch(

@@ -32,13 +32,11 @@ import {
   showSubmitFormErrorToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
-import { ApolloClient } from '@apollo/client'
 import { withApollo, WithApolloClient } from '@apollo/client/react/hoc'
 import { getOfflineData } from '@client/offline/selectors'
 import { User } from '@opencrvs/commons/client'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getUsersFullName } from '@client/v2-events/utils'
-import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 
 const { useState, useEffect } = React
 
@@ -58,13 +56,6 @@ interface ToggleUserActivationModalProps
   userId: string
   show: boolean
   onClose: () => void
-}
-
-interface IUserAuditVariables {
-  userId: string
-  action: string
-  reason: string
-  comment: string
 }
 
 const Subtitle = styled.h2`

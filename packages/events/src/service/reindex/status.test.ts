@@ -16,8 +16,8 @@ import {
   ActionType,
   generateEventDocument,
   getUUID,
-  SCOPES,
-  TokenUserType
+  TokenUserType,
+  encodeScope
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -55,7 +55,7 @@ const singleEventConfigHandler = http.get(
 
 const reindexToken = createTestToken({
   userId: 'reindex-system',
-  scopes: [SCOPES.RECORD_REINDEX],
+  scopes: [encodeScope({ type: 'record.reindex' })],
   role: 'TEST_SYSTEM_ROLE',
   userType: TokenUserType.enum.system
 })
@@ -120,13 +120,13 @@ beforeEach(async () => {
 
 test('returns empty array when no reindex has run', async () => {
   const client = createSystemTestClient('reindex-system', [
-    SCOPES.RECORD_REINDEX
+    encodeScope({ type: 'record.reindex' })
   ])
   const result = await client.event.reindex.status()
   expect(result).toEqual([])
 })
 
-test('returns 403 without RECORD_REINDEX scope', async () => {
+test('returns 403 without record.reindex scope', async () => {
   const client = createSystemTestClient('reindex-system', [])
   await expect(client.event.reindex.status()).rejects.toMatchObject(
     new TRPCError({ code: 'FORBIDDEN' })
@@ -137,7 +137,7 @@ test('returns completed status after successful reindex', async () => {
   await runReindex(reindexToken)
 
   const client = createSystemTestClient('reindex-system', [
-    SCOPES.RECORD_REINDEX
+    encodeScope({ type: 'record.reindex' })
   ])
   const result = await client.event.reindex.status()
 
@@ -155,7 +155,7 @@ test('returns failed status after failed reindex', async () => {
   })
 
   const client = createSystemTestClient('reindex-system', [
-    SCOPES.RECORD_REINDEX
+    encodeScope({ type: 'record.reindex' })
   ])
   const result = await client.event.reindex.status()
 
@@ -170,7 +170,7 @@ test('returns results ordered newest-first', async () => {
   await runReindex(reindexToken)
 
   const client = createSystemTestClient('reindex-system', [
-    SCOPES.RECORD_REINDEX
+    encodeScope({ type: 'record.reindex' })
   ])
   const result = await client.event.reindex.status()
 
@@ -184,7 +184,7 @@ test('limit parameter is respected', async () => {
   await runReindex(reindexToken)
 
   const client = createSystemTestClient('reindex-system', [
-    SCOPES.RECORD_REINDEX
+    encodeScope({ type: 'record.reindex' })
   ])
   const result = await client.event.reindex.status({ limit: 2 })
 
@@ -193,7 +193,7 @@ test('limit parameter is respected', async () => {
 
 test('running reindex appears with running status', async () => {
   const client = createSystemTestClient('reindex-system', [
-    SCOPES.RECORD_REINDEX
+    encodeScope({ type: 'record.reindex' })
   ])
 
   // Start reindex without awaiting it to observe the intermediate state

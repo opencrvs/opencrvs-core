@@ -32,7 +32,7 @@ import {
   TestUserRole,
   UUID
 } from '@opencrvs/commons/events'
-import { encodeScope, SCOPES } from '@opencrvs/commons'
+import { encodeScope } from '@opencrvs/commons'
 import {
   createSystemTestClient,
   createTestClient,
@@ -1054,7 +1054,7 @@ describe('placeOfEvent location hierarchy handling', () => {
           event: [TENNIS_CLUB_MEMBERSHIP]
         }
       }),
-      SCOPES.RECORD_REINDEX
+      encodeScope({ type: 'record.reindex' })
     ])
     esClient = getOrCreateClient()
 
@@ -1304,7 +1304,7 @@ describe('placeOfEvent location hierarchy handling', () => {
 
     // Step 4: Perform reindexing
     const sysClient = createSystemTestClient('test-system', [
-      SCOPES.RECORD_REINDEX
+      encodeScope({ type: 'record.reindex' })
     ])
 
     await sysClient.event.reindex.trigger()

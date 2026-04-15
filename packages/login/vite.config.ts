@@ -116,11 +116,6 @@ export default defineConfig(({ mode }): any => {
           changeOrigin: true,
           rewrite: (path: string) => path.replace(/^\/api\/auth/, '')
         },
-        '/api/config/': {
-          target: 'http://localhost:2021',
-          changeOrigin: true,
-          rewrite: (path: string) => path.replace(/^\/api\/config/, '')
-        },
         '/api/': {
           target: 'http://localhost:7070',
           changeOrigin: true,

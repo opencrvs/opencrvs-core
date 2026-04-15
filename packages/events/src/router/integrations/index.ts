@@ -12,13 +12,13 @@
 import { randomUUID } from 'crypto'
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
-import { SCOPES, UUID } from '@opencrvs/commons'
+import { EncodedScope, UUID } from '@opencrvs/commons'
 import {
   publicProcedure,
   router,
   userAndSystemProcedure
 } from '@events/router/trpc'
-import { requiresAnyOfScopes } from '@events/router/middleware'
+import { allowedWithAnyOfScopes } from '@events/router/middleware'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import {
   createSystemClient,
@@ -66,7 +66,7 @@ const AuthenticateSystemInput = z.object({
 const AuthenticateSystemOutput = z.object({
   id: UUID,
   status: z.string(),
-  scope: z.array(z.string())
+  scope: z.array(EncodedScope)
 })
 
 const IntegrationIdInput = z.object({
@@ -111,7 +111,7 @@ export const integrationsRouter = router({
     })
     .input(CreateIntegrationInput)
     .output(CreateIntegrationOutput)
-    .use(requiresAnyOfScopes([SCOPES.INTEGRATION_CREATE]))
+    .use(allowedWithAnyOfScopes(['integration.create']))
     .mutation(async ({ input, ctx }) => {
       const clientSecret = randomUUID()
       const shaSecret = randomUUID()
@@ -176,7 +176,7 @@ export const integrationsRouter = router({
     })
     .input(ListIntegrationsInput)
     .output(ListIntegrationsOutput)
-    .use(requiresAnyOfScopes([SCOPES.INTEGRATION_CREATE]))
+    .use(allowedWithAnyOfScopes(['integration.create']))
     .query(async ({ input }) => {
       const rows = await listSystemClients(input ?? undefined)
 
@@ -193,7 +193,7 @@ export const integrationsRouter = router({
   get: userAndSystemProcedure
     .input(IntegrationIdInput)
     .output(GetIntegrationOutput)
-    .use(requiresAnyOfScopes([SCOPES.INTEGRATION_CREATE]))
+    .use(allowedWithAnyOfScopes(['integration.create']))
     .query(async ({ input }) => {
       const row = await getSystemClientById(input.id)
       return {
@@ -210,7 +210,7 @@ export const integrationsRouter = router({
   deactivate: userAndSystemProcedure
     .input(IntegrationIdInput)
     .output(ToggleStatusOutput)
-    .use(requiresAnyOfScopes([SCOPES.INTEGRATION_CREATE]))
+    .use(allowedWithAnyOfScopes(['integration.create']))
     .mutation(async ({ input, ctx }) => {
       const row = await updateSystemClientStatus(input.id, 'disabled')
 
@@ -228,7 +228,7 @@ export const integrationsRouter = router({
   activate: userAndSystemProcedure
     .input(IntegrationIdInput)
     .output(ToggleStatusOutput)
-    .use(requiresAnyOfScopes([SCOPES.INTEGRATION_CREATE]))
+    .use(allowedWithAnyOfScopes(['integration.create']))
     .mutation(async ({ input, ctx }) => {
       const row = await updateSystemClientStatus(input.id, 'active')
 
@@ -246,7 +246,7 @@ export const integrationsRouter = router({
   delete: userAndSystemProcedure
     .input(IntegrationIdInput)
     .output(DeleteOutput)
-    .use(requiresAnyOfScopes([SCOPES.INTEGRATION_CREATE]))
+    .use(allowedWithAnyOfScopes(['integration.create']))
     .mutation(async ({ input, ctx }) => {
       const row = await deleteSystemClient(input.id)
 
@@ -264,7 +264,7 @@ export const integrationsRouter = router({
   refreshSecret: userAndSystemProcedure
     .input(IntegrationIdInput)
     .output(RefreshSecretOutput)
-    .use(requiresAnyOfScopes([SCOPES.INTEGRATION_CREATE]))
+    .use(allowedWithAnyOfScopes(['integration.create']))
     .mutation(async ({ input, ctx }) => {
       const clientSecret = randomUUID()
       const { hash: secretHash, salt } = await generateSaltedHash(clientSecret)

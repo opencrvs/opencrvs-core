@@ -104,7 +104,10 @@ const fields = [
       max: 60,
       prefix: generateTranslationConfig('Years'),
       postfix: generateTranslationConfig('Old')
-    }
+    },
+    helperText: generateTranslationConfig(
+      'For applicants under 18, parental consent is required.'
+    )
   },
 
   {

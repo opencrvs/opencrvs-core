@@ -27,7 +27,11 @@ export const env = cleanEnv(process.env, {
   CERT_PRIVATE_KEY_PATH: str({ devDefault: '../../.secrets/private-key.pem' }),
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
   SENTRY_DSN: str({ default: undefined }),
-  QA_ENV: bool({ default: false }),
+  TWO_FA_ENABLED: bool({
+    devDefault: false,
+    default: true,
+    desc: 'Enable two-factor authentication. When disabled, verification codes are set to 000000.'
+  }),
 
   CONFIG_TOKEN_EXPIRY_SECONDS: num({ default: 604800 }), // 1 week
   CONFIG_SMS_CODE_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes

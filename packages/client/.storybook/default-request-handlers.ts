@@ -27,7 +27,8 @@ import {
   tennisClubMembershipEvent,
   footballClubMembershipEvent,
   libraryMembershipEvent,
-  TestUserRole
+  TestUserRole,
+  AuditLogEntry
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import {
@@ -63,12 +64,10 @@ export const handlers = {
     http.get('/api/ping', () => {
       return HttpResponse.json({
         auth: true,
-        search: true,
         'user-mgnt': true,
         metrics: true,
         notification: true,
-        countryconfig: true,
-        workflow: true
+        countryconfig: true
       })
     })
   ],
@@ -120,8 +119,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -141,8 +139,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -162,8 +159,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -183,8 +179,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -204,8 +199,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -227,14 +221,12 @@ export const handlers = {
                 'record.declaration-archive',
                 'record.declaration-reinstate',
                 'record.registration-request-correction',
-                'record.registration-print&issue-certified-copies',
                 'performance.read',
                 'performance.read-dashboards',
                 'organisation.read-locations:my-office',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -259,17 +251,13 @@ export const handlers = {
                 'record.register',
                 'record.registration-correct',
                 'record.unassign-others',
-                'record.registration-print&issue-certified-copies',
-                'record.confirm-registration',
-                'record.reject-registration',
                 'performance.read',
                 'performance.read-dashboards',
                 'profile.electronic-signature',
                 'organisation.read-locations:my-office',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -287,8 +275,7 @@ export const handlers = {
                 'organisation.read-locations:my-jurisdiction',
                 'performance.read',
                 'performance.read-dashboards',
-                'performance.vital-statistics-export',
-                'demo'
+                'performance.vital-statistics-export'
               ],
               __typename: 'UserRole'
             },
@@ -308,8 +295,7 @@ export const handlers = {
                 'performance.read',
                 'performance.read-dashboards',
                 'performance.vital-statistics-export',
-                'config.update:all',
-                'demo'
+                'config.update:all'
               ],
               __typename: 'UserRole'
             },
@@ -324,8 +310,7 @@ export const handlers = {
               scopes: [
                 'performance.read',
                 'performance.read-dashboards',
-                'performance.vital-statistics-export',
-                'demo'
+                'performance.vital-statistics-export'
               ],
               __typename: 'UserRole'
             },
@@ -349,9 +334,6 @@ export const handlers = {
                 'record.register',
                 'record.registration-correct',
                 'record.unassign-others',
-                'record.registration-print&issue-certified-copies',
-                'record.confirm-registration',
-                'record.reject-registration',
                 'performance.read',
                 'performance.read-dashboards',
                 'performance.vital-statistics-export',
@@ -360,8 +342,7 @@ export const handlers = {
                 'user.read:my-office',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             }
@@ -621,8 +602,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -642,8 +622,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -663,8 +642,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -684,8 +662,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -705,8 +682,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -728,14 +704,12 @@ export const handlers = {
                 'record.declaration-archive',
                 'record.declaration-reinstate',
                 'record.registration-request-correction',
-                'record.registration-print&issue-certified-copies',
                 'performance.read',
                 'performance.read-dashboards',
                 'organisation.read-locations:my-office',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -760,9 +734,6 @@ export const handlers = {
                 'record.register',
                 'record.registration-correct',
                 'record.unassign-others',
-                'record.registration-print&issue-certified-copies',
-                'record.confirm-registration',
-                'record.reject-registration',
                 'performance.read',
                 'performance.read-dashboards',
                 'profile.electronic-signature',
@@ -770,8 +741,7 @@ export const handlers = {
                 'user.read:my-office',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -789,8 +759,7 @@ export const handlers = {
                 'organisation.read-locations:my-jurisdiction',
                 'performance.read',
                 'performance.read-dashboards',
-                'performance.vital-statistics-export',
-                'demo'
+                'performance.vital-statistics-export'
               ],
               __typename: 'UserRole'
             },
@@ -810,8 +779,7 @@ export const handlers = {
                 'performance.read',
                 'performance.read-dashboards',
                 'performance.vital-statistics-export',
-                'config.update:all',
-                'demo'
+                'config.update:all'
               ],
               __typename: 'UserRole'
             },
@@ -826,8 +794,7 @@ export const handlers = {
               scopes: [
                 'performance.read',
                 'performance.read-dashboards',
-                'performance.vital-statistics-export',
-                'demo'
+                'performance.vital-statistics-export'
               ],
               __typename: 'UserRole'
             },
@@ -851,9 +818,6 @@ export const handlers = {
                 'record.register',
                 'record.registration-correct',
                 'record.unassign-others',
-                'record.registration-print&issue-certified-copies',
-                'record.confirm-registration',
-                'record.reject-registration',
                 'performance.read',
                 'performance.read-dashboards',
                 'performance.vital-statistics-export',
@@ -862,8 +826,7 @@ export const handlers = {
                 'user.read:my-office',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             }
@@ -1130,83 +1093,71 @@ export const handlers = {
     tRPCMsw.user.audit.list.query((input) => {
       const skip = input.skip ?? 0
       const count = input.count ?? 10
-      const allResults = [
+      const allResults: AuditLogEntry[] = [
         {
           id: '1',
           clientId: input.userId,
-          clientType: 'user',
+          clientType: 'user' as const,
           operation: 'user.logged_out',
           requestData: { subjectId: input.userId },
-          responseSummary: {},
           createdAt: '2025-10-03T10:46:49.362Z'
         },
         {
           id: '2',
           clientId: input.userId,
-          clientType: 'user',
+          clientType: 'user' as const,
           operation: 'user.logged_in',
           requestData: { subjectId: input.userId },
-          responseSummary: {},
           createdAt: '2025-10-03T10:44:55.012Z'
         },
         {
           id: '3',
           clientId: input.userId,
-          clientType: 'user',
+          clientType: 'user' as const,
           operation: 'event.actions.assign.request',
           requestData: {
             eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
             actionType: 'ASSIGN',
-            transactionId: 'BSK4XRC'
-          },
-          responseSummary: {
-            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
             eventType: 'birth',
-            trackingId: 'BSK4XRC'
+            trackingId: 'BSK4XRC',
+            transactionId: 'a2407b61b7fe-ea2d18f5-d6e7-4d18-a323'
           },
           createdAt: '2025-10-03T10:43:16.704Z'
         },
         {
           id: '4',
           clientId: input.userId,
-          clientType: 'user',
+          clientType: 'user' as const,
           operation: 'event.actions.declare.request',
           requestData: {
             eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
             actionType: 'DECLARE',
-            transactionId: 'MOX89J'
-          },
-          responseSummary: {
-            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
             eventType: 'birth',
-            trackingId: 'MOX89J'
+            trackingId: 'MOX89J',
+            transactionId: 'a2407b61b7fe-ea2d18f5-d6e7-4d18-a323'
           },
           createdAt: '2025-10-03T09:24:25.604Z'
         },
         {
           id: '5',
           clientId: input.userId,
-          clientType: 'user',
+          clientType: 'user' as const,
           operation: 'event.actions.register.request',
           requestData: {
             eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
             actionType: 'REGISTER',
-            transactionId: 'MOX89J'
-          },
-          responseSummary: {
-            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
             eventType: 'birth',
-            trackingId: 'MOX89J'
+            trackingId: 'MOX89J',
+            transactionId: 'a2407b61b7fe-ea2d18f5-d6e7-4d18-a323'
           },
           createdAt: '2025-10-03T09:23:45.604Z'
         },
         {
           id: '6',
           clientId: input.userId,
-          clientType: 'user',
+          clientType: 'user' as const,
           operation: 'user.logged_in',
           requestData: { subjectId: input.userId },
-          responseSummary: {},
           createdAt: '2025-10-03T09:22:10.128Z'
         }
       ]
@@ -1316,11 +1267,11 @@ export const handlers = {
         link: [
           {
             relation: 'self',
-            url: 'http://config:2021/location?type=CRVS_OFFICE&_count=0'
+            url: 'http://localhost:7070/location?type=CRVS_OFFICE&_count=0'
           },
           {
             relation: 'next',
-            url: 'http://config:2021/location?type=CRVS_OFFICE&_count=0&_getpagesoffset=0'
+            url: 'http://localhost:7070/location?type=CRVS_OFFICE&_count=0&_getpagesoffset=0'
           }
         ],
         entry: [
@@ -1401,7 +1352,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/92ab695b-9362-4682-a861-ddce87a3a905/_history/f11c3af0-b945-4082-8902-c66e4f9b43da',
+              'http://localhost:7070/location/92ab695b-9362-4682-a861-ddce87a3a905/_history/f11c3af0-b945-4082-8902-c66e4f9b43da',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1441,7 +1392,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/6c0bde80-100b-446d-9a6e-8587761bf4c4/_history/19cdc852-1360-4e03-90dc-82155581d927',
+              'http://localhost:7070/location/6c0bde80-100b-446d-9a6e-8587761bf4c4/_history/19cdc852-1360-4e03-90dc-82155581d927',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1478,7 +1429,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/028d2c85-ca31-426d-b5d1-2cef545a4902/_history/eadfd8c3-d869-4394-8d74-b1fc4ea620a3',
+              'http://localhost:7070/location/028d2c85-ca31-426d-b5d1-2cef545a4902/_history/eadfd8c3-d869-4394-8d74-b1fc4ea620a3',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1518,7 +1469,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/27614343-3709-41a7-bf2e-e81356322980/_history/af06e089-462b-4a55-8396-a6d9056d39b0',
+              'http://localhost:7070/location/27614343-3709-41a7-bf2e-e81356322980/_history/af06e089-462b-4a55-8396-a6d9056d39b0',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1555,7 +1506,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/8b1f31e3-f119-4844-9566-2cba2fa55b9a/_history/f164ccd8-4a7f-4b7e-9b39-99407f330825',
+              'http://localhost:7070/location/8b1f31e3-f119-4844-9566-2cba2fa55b9a/_history/f164ccd8-4a7f-4b7e-9b39-99407f330825',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1592,7 +1543,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/c5545f76-1888-49e1-8147-71f3c316f6dd/_history/88ff674b-987e-4ada-aec7-f59a4d7ae6f5',
+              'http://localhost:7070/location/c5545f76-1888-49e1-8147-71f3c316f6dd/_history/88ff674b-987e-4ada-aec7-f59a4d7ae6f5',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1629,7 +1580,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/a83da9a2-16af-416c-ab44-cf4f60b5603a/_history/76072e03-8c51-43f3-a02a-f7ed2ac6407f',
+              'http://localhost:7070/location/a83da9a2-16af-416c-ab44-cf4f60b5603a/_history/76072e03-8c51-43f3-a02a-f7ed2ac6407f',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1666,7 +1617,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/eaeb093d-e548-4848-b7d6-bc8fd029a8c1/_history/ebfbd22d-cbbe-4486-9624-c94e899ab3b3',
+              'http://localhost:7070/location/eaeb093d-e548-4848-b7d6-bc8fd029a8c1/_history/ebfbd22d-cbbe-4486-9624-c94e899ab3b3',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1703,7 +1654,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/72e3de8d-cb9c-4f92-833e-d6889eac1d72/_history/b697a197-49e2-4aea-aa2a-5dab80195f7a',
+              'http://localhost:7070/location/72e3de8d-cb9c-4f92-833e-d6889eac1d72/_history/b697a197-49e2-4aea-aa2a-5dab80195f7a',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1740,7 +1691,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/6510890e-610d-4805-94da-82164ceadc42/_history/cef5fa77-229c-4260-8b34-930ab82a9d40',
+              'http://localhost:7070/location/6510890e-610d-4805-94da-82164ceadc42/_history/cef5fa77-229c-4260-8b34-930ab82a9d40',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1777,7 +1728,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/9f764b20-ad33-4714-a572-a7731b24b183/_history/44fbdc19-0de1-4953-b453-2470b8467229',
+              'http://localhost:7070/location/9f764b20-ad33-4714-a572-a7731b24b183/_history/44fbdc19-0de1-4953-b453-2470b8467229',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1814,7 +1765,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/79738b3f-f31a-40d1-8b55-63e08ceb213c/_history/39e25b27-fd98-4e12-8186-502ada7a6f93',
+              'http://localhost:7070/location/79738b3f-f31a-40d1-8b55-63e08ceb213c/_history/39e25b27-fd98-4e12-8186-502ada7a6f93',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1851,7 +1802,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/9ec401ec-0de1-4bec-96bc-a2846a61419a/_history/22705052-e7d5-4b52-b519-1120fd3a3ed3',
+              'http://localhost:7070/location/9ec401ec-0de1-4bec-96bc-a2846a61419a/_history/22705052-e7d5-4b52-b519-1120fd3a3ed3',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1888,7 +1839,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/db07dc32-2280-4705-8b5f-54044b29f8b2/_history/d88c3572-ad7f-42d9-a0ed-eff8019744eb',
+              'http://localhost:7070/location/db07dc32-2280-4705-8b5f-54044b29f8b2/_history/d88c3572-ad7f-42d9-a0ed-eff8019744eb',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1925,7 +1876,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/8eefa8d1-c13d-4a56-9965-bdc73b263432/_history/366ddcd7-2174-487b-8469-fc7289051421',
+              'http://localhost:7070/location/8eefa8d1-c13d-4a56-9965-bdc73b263432/_history/366ddcd7-2174-487b-8469-fc7289051421',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1962,7 +1913,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/97151a9d-3223-449f-8115-f4361fc1a6f2/_history/3128d669-3a4b-441e-8667-054da265e503',
+              'http://localhost:7070/location/97151a9d-3223-449f-8115-f4361fc1a6f2/_history/3128d669-3a4b-441e-8667-054da265e503',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1999,7 +1950,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/e8d52f39-6792-4f61-b247-9a1177fe074c/_history/93cf6fea-ac50-45e5-8314-292b299bb165',
+              'http://localhost:7070/location/e8d52f39-6792-4f61-b247-9a1177fe074c/_history/93cf6fea-ac50-45e5-8314-292b299bb165',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -2221,7 +2172,7 @@ export const handlers = {
       })
     }),
 
-    http.get('/api/config/config', () => {
+    http.get('/api/config', () => {
       return HttpResponse.json({
         config: mockOfflineData.config,
         certificates: [
@@ -2326,7 +2277,7 @@ export const handlers = {
     })
   ],
   forms: [
-    http.get('/api/config/forms', () => {
+    http.get('/api/forms', () => {
       return HttpResponse.json(forms.forms)
     })
   ],

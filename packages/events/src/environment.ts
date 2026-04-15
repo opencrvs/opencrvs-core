@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { cleanEnv, str, url } from 'envalid'
+import { cleanEnv, str, url, bool } from 'envalid'
 
 /**
  * When defining variables aim to be consistent with existing values.
@@ -28,5 +28,9 @@ export const env = cleanEnv(process.env, {
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030' }),
   AUTH_URL: url({ devDefault: 'http://localhost:4040' }),
-  CONFIG_URL: url({ devDefault: 'http://localhost:2021' })
+  TWO_FA_ENABLED: bool({
+    devDefault: false,
+    default: true,
+    desc: 'Enable two-factor authentication. When disabled, verification codes are set to 000000.'
+  })
 })
