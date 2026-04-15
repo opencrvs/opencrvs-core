@@ -24,7 +24,7 @@ import {
   useNavigationHistory
 } from '@client/v2-events/components/NavigationStack'
 import { getToken } from '@client/utils/authUtils'
-import { useDashboardIds } from '@client/hooks/useDashboardIds'
+import { useDashboards } from '@client/hooks/useDashboards'
 
 const StyledIFrame = styled(IframeResizer)`
   width: 100%;
@@ -63,7 +63,7 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
 
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const allowedDashboardIds = useDashboardIds()
+  const allowedDashboardIds = useDashboards()
   const { eventId, slug, eventType, workqueue, ...rest } = Object.fromEntries(
     searchParams.entries()
   )

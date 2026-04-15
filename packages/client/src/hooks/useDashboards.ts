@@ -10,22 +10,23 @@
  */
 import { getScope } from '@client/profile/profileSelectors'
 import {
-  DashboardScope,
-  parseConfigurableScope
+  getAcceptedScopesByType,
+  getScopeOptionValue
 } from '@opencrvs/commons/client'
 import { useSelector } from 'react-redux'
 
-export function useDashboardIds() {
+export function useDashboards() {
   const userScopes = useSelector(getScope)
   if (!userScopes) return []
 
-  return userScopes?.reduce((acc, scope) => {
-    const parsed = parseConfigurableScope(scope)
-    const configurableScopes = DashboardScope.safeParse(parsed)
-    if (configurableScopes.success) {
-      const data = configurableScopes.data
-      acc.push(...data.options.id)
-    }
-    return acc
-  }, [] as string[])
+  const dashboardScopes = getAcceptedScopesByType({
+    acceptedScopes: ['dashboard.view'],
+    scopes: userScopes ?? []
+  })
+
+  const availableDashboards = dashboardScopes.flatMap((s) =>
+    getScopeOptionValue(s, 'ids')
+  )
+
+  return availableDashboards
 }

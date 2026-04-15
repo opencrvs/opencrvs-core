@@ -121,19 +121,19 @@ const AccessLevelOptions = z.object({
   accessLevel: JurisdictionFilter.optional()
 })
 
-const WorkqueueOptions = z.object({
+const WorkqueueDashboardOptions = z.object({
   ids: z
     .preprocess(
       (val) => (val === undefined ? undefined : [val].flat()),
       z.array(z.string())
     )
-    .describe('Must contain a list of workqueue ids.')
+    .describe('Must contain a list of workqueue or dashboard ids.')
 })
 
 const AllScopeOptions = z.object({
   ...AllRecordScopeOptions.shape,
   ...AccessLevelOptions.shape,
-  ...WorkqueueOptions.shape
+  ...WorkqueueDashboardOptions.shape
 })
 
 type AllScopeOptions = z.infer<typeof AllScopeOptions>
@@ -292,7 +292,14 @@ export const Scope = z.discriminatedUnion('type', [
   z.object({ type: PlainScopeType }),
   ...RecordScopeV2.options,
   z.object({ type: SystemScopeType, options: AccessLevelOptions.optional() }),
-  z.object({ type: z.literal('workqueue'), options: WorkqueueOptions })
+  z.object({
+    type: z.literal('workqueue'),
+    options: WorkqueueDashboardOptions
+  }),
+  z.object({
+    type: z.literal('dashboard.view'),
+    options: WorkqueueDashboardOptions
+  })
 ])
 
 export type Scope = z.infer<typeof Scope>
@@ -301,7 +308,8 @@ export const ScopeType = z.enum([
   ...SystemScopeType.options,
   ...RecordScopeTypeV2.options,
   ...PlainScopeType.options,
-  'workqueue'
+  'workqueue',
+  'dashboard.view'
 ])
 export type ScopeType = z.infer<typeof ScopeType>
 
