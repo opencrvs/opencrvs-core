@@ -46,7 +46,7 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 #### Certificate template helpers
 
 - Added `$join` Handlebars helper for certificate SVG templates. Joins values with a separator while filtering out empty or undefined values — useful for address hierarchies where some levels may be absent (e.g. `{{$join ", " district province country}}`).
-- ADDRESS field certificate variables now include an `administrativeArea` convenience field: admin levels joined most-specific-first with country for domestic addresses (e.g. `"Ibombo, Central, Farajaland"`), or just country for international addresses. Use as `{{$lookup $declaration "field.address.administrativeArea"}}`.
+- ADDRESS field certificate variables now include an `administrativeHierarchy` convenience field: admin levels joined most-specific-first with country for domestic addresses (e.g. `"Ibombo, Central, Farajaland"`), or just country for international addresses. Use as `{{$lookup $declaration "field.address.administrativeHierarchy"}}`.
 
 #### Jurisdiction
 

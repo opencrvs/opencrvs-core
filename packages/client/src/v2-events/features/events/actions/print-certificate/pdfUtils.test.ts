@@ -367,8 +367,8 @@ describe('SVG compiler', () => {
       )
     })
   })
-  describe('administrativeArea', () => {
-    // administrativeArea is a computed convenience field on ADDRESS certificate variables.
+  describe('administrativeHierarchy', () => {
+    // administrativeHierarchy is a computed convenience field on ADDRESS certificate variables.
     // DOMESTIC: admin levels joined most-specific-first, then country.
     // INTERNATIONAL: country only (streetLevelDetails is country-specific and not assumed).
     //
@@ -376,7 +376,7 @@ describe('SVG compiler', () => {
     // window.config.COUNTRY === 'FAR', which is set at runtime in dev and prod but
     // not in the test environment. So in tests, SelectCountry.stringify('FAR') returns ''
     // and gets filtered out. In dev/prod, it resolves to "Farajaland" and is included.
-    function expectAdministrativeArea(
+    function expectAdministrativeHierarchy(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       addressValue: Record<string, any>,
       output: string
@@ -387,7 +387,7 @@ describe('SVG compiler', () => {
 
       const result = compileSvg({
         templateString:
-          '<svg><text>{{$lookup $declaration "applicant.address.administrativeArea"}}</text></svg>',
+          '<svg><text>{{$lookup $declaration "applicant.address.administrativeHierarchy"}}</text></svg>',
         $metadata: {
           ...metadata,
           createdBy: registrar.v2.id,
@@ -428,7 +428,7 @@ describe('SVG compiler', () => {
     it('domestic: district + province (most-specific-first, country filtered when unresolved)', () => {
       // Ibombo (district) under Central (province) — FAR not in countries list in test env → filtered
       // In dev/prod: "Ibombo, Central, Farajaland"
-      expectAdministrativeArea(
+      expectAdministrativeHierarchy(
         {
           addressType: AddressType.DOMESTIC,
           administrativeArea: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
@@ -441,7 +441,7 @@ describe('SVG compiler', () => {
     it('domestic: province only when no district present', () => {
       // Central has no parent → only province level resolved; FAR filtered in test env
       // In dev/prod: "Central, Farajaland"
-      expectAdministrativeArea(
+      expectAdministrativeHierarchy(
         {
           addressType: AddressType.DOMESTIC,
           administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
@@ -453,7 +453,7 @@ describe('SVG compiler', () => {
 
     it('international: country only (streetLevelDetails is country-specific, not assumed)', () => {
       // USA resolves to full English name via intl; state is ignored regardless
-      expectAdministrativeArea(
+      expectAdministrativeHierarchy(
         {
           addressType: AddressType.INTERNATIONAL,
           country: 'USA',
