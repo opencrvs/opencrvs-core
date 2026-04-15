@@ -2523,6 +2523,7 @@ export const handlers = {
                 signature: null,
                 primaryOffice: {
                   id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
+                  name: 'Ibombo District Office',
                   __typename: 'Location'
                 },
                 role: {
@@ -2556,6 +2557,7 @@ export const handlers = {
                 signature: null,
                 primaryOffice: {
                   id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
+                  name: 'Ibombo District Office',
                   __typename: 'Location'
                 },
                 role: {
@@ -2589,6 +2591,7 @@ export const handlers = {
                 signature: null,
                 primaryOffice: {
                   id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
+                  name: 'Ibombo District Office',
                   __typename: 'Location'
                 },
                 role: {
@@ -2622,6 +2625,7 @@ export const handlers = {
                 signature: null,
                 primaryOffice: {
                   id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
+                  name: 'Ibombo District Office',
                   __typename: 'Location'
                 },
                 role: {
