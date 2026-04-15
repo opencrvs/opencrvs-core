@@ -35,7 +35,7 @@ export function computeInitialValues(
       // Recurse cumulatively — sub-fields see accumulated top-level state
       const subValues = computeInitialValues(
         field.fields,
-        (values[field.id] as EventState) ?? {},
+        (values[field.id] as EventState | undefined) ?? {},
         { validator: context.validator, form: formContext },
         getDefaultValue
       )
