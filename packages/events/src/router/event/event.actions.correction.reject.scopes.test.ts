@@ -32,6 +32,7 @@ import { getEventIndexName } from '@events/storage/elasticsearch'
 
 test(
   'Check scopes against event.actions.correction.reject',
+  
   async () => {
     await createIndex(
       getEventIndexName('tennis-club-membership_premium'),

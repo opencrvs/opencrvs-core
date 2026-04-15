@@ -26,7 +26,10 @@ function getEventsClient(token: string) {
   })
 }
 
-export async function resolveLocationChildren(locationId: UUID, token: string) {
+export async function resolveLocationChildren(
+  locationId: UUID,
+  token: string
+) {
   const client = getEventsClient(token)
   const locations = await client.locations.list.query()
   return locations

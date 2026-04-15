@@ -56,8 +56,7 @@ export default async function createUser(
 
     // DEFAULT_USER_PASSWORD allows QA/dev environments to set a predictable password
     // for manually created users when SMS/email delivery is unavailable.
-    password =
-      user.password ?? env.DEFAULT_USER_PASSWORD ?? generateRandomPassword()
+    password = user.password ?? env.DEFAULT_USER_PASSWORD ?? generateRandomPassword()
 
     const { hash, salt } = generateSaltedHash(password)
     user.salt = salt

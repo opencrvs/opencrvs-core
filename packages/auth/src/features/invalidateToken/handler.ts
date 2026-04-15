@@ -28,7 +28,7 @@ export default async function invalidateTokenHandler(
   if (userId) {
     recordUserAuditEvent(token, {
       operation: 'user.logged_out',
-      requestData: { subjectId: userId }
+      requestData: { subjectId: userId },
     })
   }
 

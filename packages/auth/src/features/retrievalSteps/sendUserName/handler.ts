@@ -62,7 +62,7 @@ export default async function sendUserNameHandler(
     operation: 'user.username_reminder',
     requestData: {
       subjectId: retrievalStepInformation.userId
-    }
+    },
   })
 
   await deleteRetrievalStepInformation(payload.nonce)
