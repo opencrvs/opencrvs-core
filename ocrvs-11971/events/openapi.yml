@@ -734,6 +734,8 @@ paths:
                 properties:
                   clientId:
                     type: string
+                    format: uuid
+                    pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
                   shaSecret:
                     type: string
                   clientSecret:
@@ -774,6 +776,8 @@ paths:
                   properties:
                     id:
                       type: string
+                      format: uuid
+                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
                     name:
                       type: string
                     scopes:
@@ -12880,6 +12884,8 @@ components:
                   createdBy:
                     description: Identifier of the user who created the action.
                     type: string
+                    format: uuid
+                    pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
                   createdByRole:
                     description: Role of the user who created the action.
                     type: string
@@ -13012,6 +13018,8 @@ components:
         createdBy:
           description: Identifier of the user who created the action.
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         createdByRole:
           description: Role of the user who created the action.
           type: string
@@ -13108,6 +13116,8 @@ components:
         createdBy:
           description: Identifier of the user who created the action.
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         createdByRole:
           description: Role of the user who created the action.
           type: string
@@ -13215,6 +13225,8 @@ components:
         createdBy:
           description: Identifier of the user who created the action.
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         createdByRole:
           description: Role of the user who created the action.
           type: string
@@ -13333,6 +13345,8 @@ components:
         createdBy:
           description: Identifier of the user who created the action.
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         createdByRole:
           description: Role of the user who created the action.
           type: string
@@ -13429,6 +13443,8 @@ components:
         createdBy:
           description: Identifier of the user who created the action.
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         createdByRole:
           description: Role of the user who created the action.
           type: string
@@ -13535,6 +13551,8 @@ components:
         createdBy:
           description: Identifier of the user who created the action.
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         createdByRole:
           description: Role of the user who created the action.
           type: string
@@ -13642,6 +13660,8 @@ components:
         createdBy:
           description: Identifier of the user who created the action.
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         createdByRole:
           description: Role of the user who created the action.
           type: string
@@ -13738,6 +13758,8 @@ components:
         createdBy:
           description: Identifier of the user who created the action.
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         createdByRole:
           description: Role of the user who created the action.
           type: string
@@ -13838,6 +13860,8 @@ components:
         createdBy:
           description: Identifier of the user who created the action.
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         createdByRole:
           description: Role of the user who created the action.
           type: string
@@ -13934,6 +13958,8 @@ components:
         createdBy:
           description: Identifier of the user who created the action.
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         createdByRole:
           description: Role of the user who created the action.
           type: string
@@ -13997,6 +14023,8 @@ components:
         assignedTo:
           description: Identifier of the user to whom the action is assigned.
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
       required:
         - id
         - transactionId
@@ -14034,6 +14062,8 @@ components:
         createdBy:
           description: Identifier of the user who created the action.
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         createdByRole:
           description: Role of the user who created the action.
           type: string
@@ -14130,6 +14160,8 @@ components:
         createdBy:
           description: Identifier of the user who created the action.
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         createdByRole:
           description: Role of the user who created the action.
           type: string
@@ -14229,6 +14261,8 @@ components:
         createdBy:
           description: Identifier of the user who created the action.
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         createdByRole:
           description: Role of the user who created the action.
           type: string
@@ -14339,6 +14373,8 @@ components:
         createdBy:
           description: Identifier of the user who created the action.
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         createdByRole:
           description: Role of the user who created the action.
           type: string
@@ -14435,6 +14471,8 @@ components:
         createdBy:
           description: Identifier of the user who created the action.
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         createdByRole:
           description: Role of the user who created the action.
           type: string
@@ -14539,6 +14577,8 @@ components:
         createdBy:
           description: Identifier of the user who created the action.
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         createdByRole:
           description: Role of the user who created the action.
           type: string
@@ -14635,6 +14675,8 @@ components:
         createdBy:
           description: Identifier of the user who created the action.
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         createdByRole:
           description: Role of the user who created the action.
           type: string
@@ -14739,6 +14781,8 @@ components:
         createdBy:
           description: Identifier of the user who created the action.
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         createdByRole:
           description: Role of the user who created the action.
           type: string
@@ -14847,6 +14891,8 @@ components:
                     createdBy:
                       description: ID of the user who created the action request.
                       type: string
+                      format: uuid
+                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
                     createdAtLocation:
                       description: Location of the user who created the action request.
                       anyOf:
@@ -14893,6 +14939,8 @@ components:
                     createdBy:
                       description: ID of the user who created the action request.
                       type: string
+                      format: uuid
+                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
                     createdAtLocation:
                       description: Location of the user who created the action request.
                       anyOf:
@@ -14953,6 +15001,8 @@ components:
         createdBy:
           description: ID of the user who created the event.
           type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         createdByUserType:
           description: Whether the user is a normal user or a system.
           anyOf:
@@ -14998,11 +15048,15 @@ components:
           description: ID of the user currently assigned to the event.
           anyOf:
             - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
             - type: "null"
         updatedBy:
           description: ID of the user who last changed the status.
           anyOf:
             - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
             - type: "null"
         trackingId:
           description: System-generated tracking ID used by informants or registrars to
