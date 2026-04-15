@@ -26,6 +26,7 @@ const HighlightedInputWrapper = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.primary};
   border-radius: 4px;
   padding-bottom: 16px;
+  overflow: hidden;
 
   label {
     background-color: ${({ theme }) => theme.colors.primaryLighter};
