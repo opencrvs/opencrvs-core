@@ -31,7 +31,9 @@ import {
   userAndSystemProcedure,
   userOnlyProcedure
 } from '@events/router/trpc'
-import { getRoles } from '@events/service/config/config'
+import { getApplicationConfig, getRoles } from '@events/service/config/config'
+import { getFieldErrors } from '@events/router/middleware/validate'
+import { throwWhenNotEmpty } from '@events/router/middleware/validate/utils'
 import { generateHash } from '@events/service/auth/hash'
 import {
   getUserByMobileOrEmail,
@@ -331,6 +333,9 @@ export const userRouter = router({
           throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
         }
       }
+      const { ADDITIONAL_USER_FIELDS } = await getApplicationConfig()
+      throwWhenNotEmpty(getFieldErrors(ADDITIONAL_USER_FIELDS, input.data, {}))
+
       const user = await createUser(input, ctx.token)
       await writeAuditLog({
         ...input,
@@ -383,6 +388,9 @@ export const userRouter = router({
           throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
         }
       }
+      const { ADDITIONAL_USER_FIELDS } = await getApplicationConfig()
+      throwWhenNotEmpty(getFieldErrors(ADDITIONAL_USER_FIELDS, input.data, {}))
+
       const user = await updateUser(input, ctx.token)
       await writeAuditLog({
         operation: 'user.edit_user',

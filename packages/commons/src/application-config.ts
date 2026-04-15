@@ -10,9 +10,9 @@
  */
 
 import * as z from 'zod/v4'
-import type { FieldConfig } from './events/FieldConfig'
+import { FieldConfig } from './events/FieldConfig'
 
-const TranslationConfig = z.object({
+const ApplicationTranslationConfig = z.object({
   id: z
     .string()
     .describe(
@@ -49,14 +49,18 @@ export const ApplicationConfig = z.object({
   ADMIN_STRUCTURE: z.array(
     z.object({
       id: z.string(),
-      label: TranslationConfig
+      label: ApplicationTranslationConfig
     })
   ),
   PHONE_NUMBER_PATTERN: z.string().or(z.instanceof(RegExp)),
   USER_NOTIFICATION_DELIVERY_METHOD: z.string(),
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: z.string(),
   SEARCH_DEFAULT_CRITERIA: SearchCriteria.optional().default('TRACKING_ID'),
-  ADDITIONAL_USER_FIELDS: z.array(z.custom<FieldConfig>()).optional().default([])
+  ADDITIONAL_USER_FIELDS: z
+    .array(FieldConfig)
+    .optional()
+    .default([])
+    .describe('Additional fields to be added to the user profile')
 })
 
 export type ApplicationConfig = z.infer<typeof ApplicationConfig>
@@ -104,7 +108,7 @@ export const ClientConfig = z.object({
   DASHBOARDS: z.array(
     z.object({
       id: z.string(),
-      title: TranslationConfig,
+      title: ApplicationTranslationConfig,
       url: z.string()
     })
   ),

@@ -126,7 +126,9 @@ export async function getUser(
       : undefined,
     primaryOfficeId: user.officeId,
     administrativeAreaId: user.administrativeAreaId ?? undefined,
-    fullHonorificName: user.fullHonorificName ?? undefined
+    fullHonorificName: user.fullHonorificName ?? undefined,
+    // TODO - remove this cast when we have a proper type for the user data coming from postgres
+    data: (user as unknown as { data?: User['data'] }).data ?? {}
   }
 
   return result
@@ -190,7 +192,9 @@ export async function searchUsers(
     device: user.device ? user.device : undefined,
     fullHonorificName: user.fullHonorificName
       ? user.fullHonorificName
-      : undefined
+      : undefined,
+    // TODO - remove this cast when we have a proper type for the user data coming from postgres
+    data: (user as unknown as { data?: User['data'] }).data ?? {}
   }))
 }
 
