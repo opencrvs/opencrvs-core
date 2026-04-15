@@ -133,11 +133,14 @@ export function mapFieldToDefaultValue(
     case FieldType.RADIO_GROUP:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
+    case FieldType.ALPHA_HIDDEN:
     case FieldType.OFFICE:
     case FieldType.NUMBER:
     case FieldType.NUMBER_WITH_UNIT:
     case FieldType.EMAIL:
     case FieldType.AGE:
+    case FieldType._EXPERIMENTAL_CUSTOM:
+    case FieldType.USER_ROLE:
     case FieldType.CHECKBOX:
     case FieldType.DATE_RANGE:
     case FieldType.SELECT_DATE_RANGE:
