@@ -14,7 +14,7 @@ import { Outlet, RouteObject } from 'react-router-dom'
 
 import { useSelector } from 'react-redux'
 import { onlineManager } from '@tanstack/react-query'
-import { ActionType, SCOPES } from '@opencrvs/commons/client'
+import { ActionType } from '@opencrvs/commons/client'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
@@ -324,7 +324,7 @@ export const routesConfig = {
     {
       path: ROUTES.V2.DASHBOARD.path,
       element: (
-        <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
+        <ProtectedRoute scopes={['performance.read-dashboards']}>
           <PerformanceDashboard />
         </ProtectedRoute>
       )
@@ -336,13 +336,7 @@ export const routesConfig = {
     {
       path: ROUTES.V2.path + V1_LEGACY_ROUTES.TEAM_USER_LIST,
       element: (
-        <ProtectedRoute
-          scopes={[
-            SCOPES.ORGANISATION_READ_LOCATIONS,
-            SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-            SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
-          ]}
-        >
+        <ProtectedRoute scopes={['organisation.read-locations']}>
           <TeamPage />
         </ProtectedRoute>
       )
@@ -350,13 +344,7 @@ export const routesConfig = {
     {
       path: ROUTES.V2.path + V1_LEGACY_ROUTES.ORGANISATIONS_INDEX,
       element: (
-        <ProtectedRoute
-          scopes={[
-            SCOPES.ORGANISATION_READ_LOCATIONS,
-            SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-            SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
-          ]}
-        >
+        <ProtectedRoute scopes={['organisation.read-locations']}>
           <OrganisationPage />
         </ProtectedRoute>
       )
@@ -364,7 +352,7 @@ export const routesConfig = {
     {
       path: ROUTES.V2.path + V1_LEGACY_ROUTES.SYSTEM_LIST,
       element: (
-        <ProtectedRoute scopes={[SCOPES.CONFIG_UPDATE_ALL]}>
+        <ProtectedRoute scopes={['config.update-all']}>
           <WorkqueueLayout>
             <SystemList hideNavigation={true} />
           </WorkqueueLayout>
@@ -374,7 +362,7 @@ export const routesConfig = {
     {
       path: ROUTES.V2.path + V1_LEGACY_ROUTES.ALL_USER_EMAIL,
       element: (
-        <ProtectedRoute scopes={[SCOPES.CONFIG_UPDATE_ALL]}>
+        <ProtectedRoute scopes={['config.update-all']}>
           <WorkqueueLayout>
             <AllUserEmail hideNavigation={true} />
           </WorkqueueLayout>

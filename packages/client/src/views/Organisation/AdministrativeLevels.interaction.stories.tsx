@@ -11,7 +11,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { userEvent, within, expect } from '@storybook/test'
 import { TestUserRole } from '@opencrvs/commons/client'
-import { ROUTES, routesConfig } from '@client/v2-events/routes'
+import { routesConfig } from '@client/v2-events/routes'
 import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
 import { OrganisationPage } from '@client/v2-events/features/organisation/Organisation'

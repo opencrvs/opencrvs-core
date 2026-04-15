@@ -50,7 +50,6 @@ export default async function authenticateHandler(
     WEB_USER_JWT_AUDIENCES,
     JWT_ISSUER,
     role,
-    false,
     TokenUserType.enum.user
   )
 
@@ -59,8 +58,7 @@ export default async function authenticateHandler(
 
   recordUserAuditEvent(response.token, {
     operation: 'user.logged_in',
-    requestData: { subjectId: userId },
-    responseSummary: {}
+    requestData: { subjectId: userId }
   })
 
   return response

@@ -63,7 +63,6 @@ export default async function sendUserNameHandler(
     requestData: {
       subjectId: retrievalStepInformation.userId
     },
-    responseSummary: {}
   })
 
   await deleteRetrievalStepInformation(payload.nonce)

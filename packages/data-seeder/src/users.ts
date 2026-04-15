@@ -12,11 +12,16 @@ import fetch from 'node-fetch'
 import { env } from './environment'
 import { z } from 'zod'
 import { raise } from './utils'
-import { decodeScope, EventConfig, joinUrl } from '@opencrvs/commons'
-import { parseLiteralScope } from '@opencrvs/commons/authentication'
+import {
+  decodeScope,
+  EventConfig,
+  hasScope,
+  joinUrl,
+  parseConfigurableScope,
+  EncodedScope
+} from '@opencrvs/commons'
 import { fromZodError } from 'zod-validation-error'
 import { createClient } from '@opencrvs/toolkit/api'
-import { parseConfigurableScope } from '@opencrvs/toolkit/scopes'
 
 const RoleSchema = (eventIds: string[]) =>
   z.array(
@@ -28,16 +33,11 @@ const RoleSchema = (eventIds: string[]) =>
         id: z.string()
       }),
       scopes: z.array(
-        z.string().superRefine((scope, ctx) => {
-          const parsedLiteralScope = parseLiteralScope(scope)
+        EncodedScope.superRefine((scope, ctx) => {
           const parsedConfigurableScope = parseConfigurableScope(scope)
           const parsedV2Scopes = decodeScope(scope)
 
-          if (
-            !parsedLiteralScope &&
-            !parsedConfigurableScope &&
-            !parsedV2Scopes
-          ) {
+          if (!parsedConfigurableScope && !parsedV2Scopes) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: `Invalid scope: "${scope}"`
@@ -46,9 +46,13 @@ const RoleSchema = (eventIds: string[]) =>
           }
 
           if (parsedV2Scopes?.type) {
+            if (!('options' in parsedV2Scopes)) {
+              return
+            }
+
             const options = parsedV2Scopes.options
 
-            if (options?.event && Array.isArray(options.event)) {
+            if (options && 'event' in options && Array.isArray(options.event)) {
               const invalidEventIds = options.event.filter(
                 (id) => !eventIds.includes(id)
               )
@@ -96,6 +100,7 @@ async function getUsers(token: string) {
       Authorization: `Bearer ${token}`
     }
   })
+
   if (!res.ok) {
     raise(`Expected to get the users from ${url}`)
   }
@@ -125,14 +130,18 @@ async function getUsers(token: string) {
     })
   ])
 
-  if (!rolesResponse.ok) raise(`Error fetching roles: ${rolesResponse.status}`)
-  if (!eventsResponse.ok)
+  if (!rolesResponse.ok) {
+    raise(`Error fetching roles: ${rolesResponse.status}`)
+  }
+
+  if (!eventsResponse.ok) {
     raise(`Error fetching events: ${eventsResponse.status}`)
+  }
 
   const eventsConfig = (await eventsResponse.json()) as EventConfig[]
   const eventIds = eventsConfig.map((event) => event.id)
-
-  const parsedRoles = RoleSchema(eventIds).safeParse(await rolesResponse.json())
+  const rolesRes = await rolesResponse.json()
+  const parsedRoles = RoleSchema(eventIds).safeParse(rolesRes)
 
   if (!parsedRoles.success) {
     raise(
@@ -143,16 +152,17 @@ async function getUsers(token: string) {
   }
 
   const allRoles = parsedRoles.data
-
   let isConfigUpdateAllScopeAvailable = false
-  const configScope = 'config.update:all' as const
 
   for (const userRole of userRoles) {
     const currRole = allRoles.find((role) => role.id === userRole)
-    if (!currRole)
+    if (!currRole) {
       raise(`Role with id ${userRole} is not found in roles.ts file`)
-    if (currRole.scopes.includes(configScope))
+    }
+
+    if (hasScope(currRole.scopes, 'config.update-all')) {
       isConfigUpdateAllScopeAvailable = true
+    }
   }
 
   const seen = new Set<string>()
@@ -171,7 +181,9 @@ async function getUsers(token: string) {
   }
 
   if (!isConfigUpdateAllScopeAvailable) {
-    raise(`At least one user with ${configScope} scope must be created`)
+    raise(
+      `At least one user with 'type=config.update-all' scope must be created`
+    )
   }
   return parsedUsers.data
 }

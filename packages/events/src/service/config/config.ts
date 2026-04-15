@@ -38,7 +38,9 @@ export async function getEventConfigurations(token: TokenWithBearer) {
   })
 
   if (!res.ok) {
-    throw new Error('Failed to fetch events config')
+    throw new Error(
+      `Failed to fetch events config: ${res.status} ${res.statusText}.`
+    )
   }
 
   return array(EventConfig).parse(await res.json())

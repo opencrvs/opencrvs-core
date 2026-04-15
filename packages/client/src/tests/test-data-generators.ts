@@ -14,7 +14,6 @@ import {
   eventPayloadGenerator,
   generateUuid,
   JurisdictionFilter,
-  SCOPES,
   TestUserRole,
   TokenUserType,
   User,
@@ -59,19 +58,19 @@ export function testDataGenerator(rngSeed?: number) {
        */
 
       fieldAgent:
-        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ3b3JrcXVldWVbaWQ9YWxsLWV2ZW50c3xhc3NpZ25lZC10by15b3V8cmVjZW50fHJlcXVpcmVzLXVwZGF0ZXN8c2VudC1mb3ItcmV2aWV3XSIsInR5cGU9cmVjb3JkLnNlYXJjaCIsInR5cGU9cmVjb3JkLmNyZWF0ZSIsInR5cGU9cmVjb3JkLnJlYWQiLCJ0eXBlPXJlY29yZC5ub3RpZnkiLCJ0eXBlPXJlY29yZC5kZWNsYXJlIiwidHlwZT1yZWNvcmQuZWRpdCJdLCJ1c2VyVHlwZSI6InVzZXIiLCJyb2xlIjoiRklFTERfQUdFTlQiLCJpYXQiOjE0ODcwNzY3MDgsImF1ZCI6Im9wZW5jcnZzOmdhdGV3YXktdXNlciIsImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6IjY3ZWY3ZjgzZDZhOWNiOTJlOWVkYWE5OSJ9.BMRNFHy1UgKn9KS4_XcEeKhAZPK32F-075t4Pg_kgp9jjixOchNJwWenWslLoH4uyF5lAGyU6L4HmlrvmY3v4K44-SpfEUkVaw7d7As874XaxLTDcozBmr8bDV5SaZAbeo0um-UHBWCSeVpmhsc4yasrBoSqq2RpuKTasYylA_K8yFtlTFvwneeaONwsh7OYvP2pV286O85fY_D-mRcFyWiO2T7dlRRRdmwj3uG1mpS4aqAZhFESwzrj_GJBAJx5gziGOGuPvKyiBe6ZKULTq4PtT37NHXF4vq40SA8nYtBL3igRhrS9bgWsy5apnCWJpI7NcqvA56YloFEAN2Uh4tCTNYVPrrt52VXlIFaFHbkpg4xgJqa-0G3WcyO12AeWxBraCbbZVRw-reZscneoZ9IE-BGwJiGWOmjDCcBjo_jzOwG7XGzakUfJ8rM3m4NTJWG8otBv26Mn4forVHFyWh9ULaAoHog-PDpnHLOKsXdnr35cyLx6N2xxxctyMPNpLu5QaPjWjLvO0rA3Csy2B_sC2me7jL16wDyfK-QrFPE__8uSsl89onOl50PyBb7crzrPb6Jk-xJ_xKRmRG-YSIVS7ADXPr9GzgxJQwbtO9nG-fjHwzKD3vuW9816EKAEg6nfIa-oVlGPfAvUUTtrR7hFAKWXEc5H8VwZPHPfr3k',
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXdvcmtxdWV1ZSZpZHM9YWxsLWV2ZW50cyxhc3NpZ25lZC10by15b3UscmVjZW50LHJlcXVpcmVzLXVwZGF0ZXMsc2VudC1mb3ItcmV2aWV3IiwidHlwZT1yZWNvcmQuc2VhcmNoIiwidHlwZT1yZWNvcmQuY3JlYXRlIiwidHlwZT1yZWNvcmQucmVhZCIsInR5cGU9cmVjb3JkLm5vdGlmeSIsInR5cGU9cmVjb3JkLmRlY2xhcmUiLCJ0eXBlPXJlY29yZC5lZGl0Il0sInVzZXJUeXBlIjoidXNlciIsInJvbGUiOiJGSUVMRF9BR0VOVCIsImlhdCI6MTQ4NzA3NjcwOCwiYXVkIjoib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiNjdlZjdmODNkNmE5Y2I5MmU5ZWRhYTk5In0.B3B1UkwTGclqKdH6ExbN366P-5DlxpPlNb5IJjabo7PP7HohuJ5rJK0DALH5QqYYhOlPs1o_K52IL7xY-Mtds7t7Bz4uJCMdJS0lr9LJgjSdkKLrEIRABpLEKVULIr-xEz8fZutIBRqjkxkf9d2Omrfkv8me1iV2ZsR160uo770hP4Wf5qnAc_0YUkyVPT9e_9d--owcsgb3jAYciJTgBGngFNnOw5n8IDQf0azzM8igk-OydWxqNz7MQ3IU5QlsDpT1td5c6TuPWaTtF3V2htP8L8tdGhkmf8lHdlNySkvfCqF6U3h7_Joy0Nq7olF0WvI-NMA5NqXMx0cdm-YTxgVieywfPbhKLHiGYPlnCRcTsepL43WxlSsGgzkx46bey5pgV1NHS0GdpEYO-DJmRjDBYKY_TMWWjhzgc1y0EI02lSCE5DPUn1k8auM7mSTF418Vi0Bq4QhlrKkIXozOM0Ov0J03Gem9Xom-jir7qPoNm6bhoz0W4ReRNUt_QPuT50AaTg_VKsxrfomYlv2-4uBt2Vu4nmos0wIVdlhdSsjwD-O14q6lKnJm62yS64ucDBYAizWgQrLbOI4uECXdqsfWP99q9ylMi3gmd-YjxWEUzqeitkYXRCLcDiC8bMsQG2zYjaZa6zR69JZgnJlMOJ2Jmr592rCwkhEdOqOE71M',
       localRegistrar:
-        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJwZXJmb3JtYW5jZS5yZWFkIiwicGVyZm9ybWFuY2UucmVhZC1kYXNoYm9hcmRzIiwicHJvZmlsZS5lbGVjdHJvbmljLXNpZ25hdHVyZSIsIm9yZ2FuaXNhdGlvbi5yZWFkLWxvY2F0aW9uczpteS1vZmZpY2UiLCJ3b3JrcXVldWVbaWQ9YWxsLWV2ZW50c3xhc3NpZ25lZC10by15b3V8cmVjZW50fHJlcXVpcmVzLWNvbXBsZXRpb258cmVxdWlyZXMtdXBkYXRlc3xpbi1yZXZpZXctYWxsfGluLWV4dGVybmFsLXZhbGlkYXRpb258cmVhZHktdG8tcHJpbnR8cmVhZHktdG8taXNzdWVdIiwidXNlci5yZWFkOm9ubHktbXktYXVkaXQiLCJ0eXBlPXJlY29yZC5zZWFyY2giLCJ0eXBlPXJlY29yZC5jcmVhdGUiLCJ0eXBlPXJlY29yZC5yZWFkJmV2ZW50PWJpcnRoLGRlYXRoLHRlbm5pcy1jbHViLW1lbWJlcnNoaXAsY2hpbGQtb25ib2FyZGluZyxsaWJyYXJ5LW1lbWJlcnNoaXAiLCJ0eXBlPXJlY29yZC5kZWNsYXJlIiwidHlwZT1yZWNvcmQucmVqZWN0IiwidHlwZT1yZWNvcmQuYXJjaGl2ZSIsInR5cGU9cmVjb3JkLnJlZ2lzdGVyIiwidHlwZT1yZWNvcmQuZWRpdCIsInR5cGU9cmVjb3JkLnByaW50LWNlcnRpZmllZC1jb3BpZXMiLCJ0eXBlPXJlY29yZC5jb3JyZWN0IiwidHlwZT1yZWNvcmQudW5hc3NpZ24tb3RoZXJzIiwidHlwZT1yZWNvcmQucmV2aWV3LWR1cGxpY2F0ZXMiLCJ0eXBlPXJlY29yZC5jdXN0b20tYWN0aW9uJmV2ZW50PXRlbm5pcy1jbHViLW1lbWJlcnNoaXAmY3VzdG9tQWN0aW9uVHlwZXM9QXBwcm92ZSJdLCJ1c2VyVHlwZSI6InVzZXIiLCJyb2xlIjoiTE9DQUxfUkVHSVNUUkFSIiwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2ODIxYzE3NWRjZTRkNzg4NmQ0ZTgyMTAifQ.J3u-ELQE66OT_A-jQnAGFxTtb-5lSHJOice7okz6DvUZig9fhhw5aqJa68F4GF30GW3nyU35VwOIBjPozyVrMU_Fq_BhP__hdEB4UQV-BiTFJ1beF_ohCcv4Ukp-3Z2eE4FLSsw2CEX9wOEP2tV-IsNK0jqsHgNKQgGhF34UupEFri7hPhrwfM6JiDVb4UOgSZrJGYrj2JfEfAWaGqHd4tYw_K8XNF3siMylvvqzgOubfnuHRgIMATYJ3HbzDJMntTbGoP9-aV7_O32D9TZHOixF-dzQReHpF41OiPK1ue-svVsGC3zcdNnhE-gJ84rmVVal_xahEVxz62nolyAPJU8F46JlyVM72JtT93vnT3gJDZYBT2jpgpZFofyS-6WcvW6QLLPk8YL3py0nwcCq5HV2DCqv7ySnlOSY_2q7HwiJ-p0bNRMlA7Q6cMqoJhFA8YZonXmcoLeeTqx_n2fF0NzH1GRg71DUR5N_jvBFKt6LrHojDGiyfSehsBlrcJXqYCAYj1wGHN6XOM9P445T5VQCdNzcq1Uz7nyMrV_ZjJtTdXp6lEEtsQQbR8Q9g_x_vzlfHWZbEhd2gasrFMf-eL_3Yq9_ae7-YeAZRyGOEQgKEi9D_f2pjvajQ9h0jJZir9PngQUd8EMWRjJSImpYu1FgObj9LTxrtDcszD8zbi0',
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXBlcmZvcm1hbmNlLnJlYWQiLCJ0eXBlPXBlcmZvcm1hbmNlLnJlYWQtZGFzaGJvYXJkcyIsInR5cGU9cHJvZmlsZS5lbGVjdHJvbmljLXNpZ25hdHVyZSIsInR5cGU9b3JnYW5pc2F0aW9uLnJlYWQtbG9jYXRpb25zJmFjY2Vzc0xldmVsPWxvY2F0aW9uIiwidHlwZT13b3JrcXVldWUmaWRzPWFsbC1ldmVudHMsYXNzaWduZWQtdG8teW91LHJlY2VudCxyZXF1aXJlcy1jb21wbGV0aW9uLHJlcXVpcmVzLXVwZGF0ZXMsaW4tcmV2aWV3LWFsbCxpbi1leHRlcm5hbC12YWxpZGF0aW9uLHJlYWR5LXRvLXByaW50LHJlYWR5LXRvLWlzc3VlIiwidHlwZT11c2VyLnJlYWQtb25seS1teS1hdWRpdCIsInR5cGU9cmVjb3JkLnNlYXJjaCIsInR5cGU9cmVjb3JkLmNyZWF0ZSIsInR5cGU9cmVjb3JkLnJlYWQmZXZlbnQ9YmlydGgsZGVhdGgsdGVubmlzLWNsdWItbWVtYmVyc2hpcCxjaGlsZC1vbmJvYXJkaW5nLGxpYnJhcnktbWVtYmVyc2hpcCIsInR5cGU9cmVjb3JkLmRlY2xhcmUiLCJ0eXBlPXJlY29yZC5yZWplY3QiLCJ0eXBlPXJlY29yZC5hcmNoaXZlIiwidHlwZT1yZWNvcmQucmVnaXN0ZXIiLCJ0eXBlPXJlY29yZC5lZGl0IiwidHlwZT1yZWNvcmQucHJpbnQtY2VydGlmaWVkLWNvcGllcyIsInR5cGU9cmVjb3JkLmNvcnJlY3QiLCJ0eXBlPXJlY29yZC51bmFzc2lnbi1vdGhlcnMiLCJ0eXBlPXJlY29yZC5yZXZpZXctZHVwbGljYXRlcyIsInR5cGU9cmVjb3JkLmN1c3RvbS1hY3Rpb24mZXZlbnQ9dGVubmlzLWNsdWItbWVtYmVyc2hpcCZjdXN0b21BY3Rpb25UeXBlcz1BcHByb3ZlIl0sInVzZXJUeXBlIjoidXNlciIsInJvbGUiOiJMT0NBTF9SRUdJU1RSQVIiLCJpYXQiOjE0ODcwNzY3MDgsImF1ZCI6Im9wZW5jcnZzOmdhdGV3YXktdXNlciIsImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6IjY4MjFjMTc1ZGNlNGQ3ODg2ZDRlODIxMCJ9.BRKkgwJfIRgnRIoRxSKYxuCRwDRcjYXpeKZldtYzJ56e8uYax2cmHtr58ZrURDjBIrWs1e7CB8e_-yLl1M--OQKtNK-vvp6LOqlUURnmbQ9viOGKU8yMMd8SAT03FF3BemM2nYrasUC2gimfR7btjTwvixL4Nx1XX1e690_EyO1KeVwx4rjH7tj0FL-m5bl-S3mOcy0CN69vSt2yZAYx9yTyk8-vzq6AqEn-ZRBZpWnSK6_ky6Ragz5I2uyk8gBA8vTgdA9_xJFvImX3UIrJAir4eaYNu9r1NiXNHkQ1cFSpqw4-NXoM5YShdGzYmlW727XsnUGgO4L6fGeXCBbVDXZUafqWl9cU3D_vGNMxvK9nnAtnxtMzWB-NZqaDO_lt2D7-cucecuMDO5030b3x5kr9LQFDlEmWip016mxV15IPlBQv7ixTJ8Uot8Iw0doKAiEyW93dEtlWZ1XUqsWTbMa6JjH8lit2wx2tK5rfvpDr1UXVcQUiTIdMC4NIMnGQPGhJv8VUunQH-YJxTIhzDUkj26tmkE2Ko46M5zLBWuG9gHqDS_E4p3glRmZFhuxdPvsk46uCopXhdo2n_SlcP9lEHxCT6en3RCR27EymNDoJPwlTPXAmgUC_obq6wNF7XmGCzt5udzrFcEFAtL2jXoW3l_tjiXYiD1Z1PauBki0',
       registrationAgent:
-        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJwZXJmb3JtYW5jZS5yZWFkIiwicGVyZm9ybWFuY2UucmVhZC1kYXNoYm9hcmRzIiwib3JnYW5pc2F0aW9uLnJlYWQtbG9jYXRpb25zOm15LW9mZmljZSIsInVzZXIucmVhZDpvbmx5LW15LWF1ZGl0Iiwid29ya3F1ZXVlW2lkPWFsbC1ldmVudHN8YXNzaWduZWQtdG8teW91fHJlY2VudHxyZXF1aXJlcy1jb21wbGV0aW9ufHJlcXVpcmVzLXVwZGF0ZXN8aW4tcmV2aWV3fHNlbnQtZm9yLWFwcHJvdmFsfGluLWV4dGVybmFsLXZhbGlkYXRpb258cmVhZHktdG8tcHJpbnR8cmVhZHktdG8taXNzdWVdIiwidHlwZT1yZWNvcmQuc2VhcmNoIiwidHlwZT1yZWNvcmQuY3JlYXRlJmV2ZW50PWJpcnRoLGRlYXRoLHRlbm5pcy1jbHViLW1lbWJlcnNoaXAsY2hpbGQtb25ib2FyZGluZyIsInR5cGU9cmVjb3JkLnJlYWQiLCJ0eXBlPXJlY29yZC5kZWNsYXJlIiwidHlwZT1yZWNvcmQucmVqZWN0IiwidHlwZT1yZWNvcmQuZWRpdCIsInR5cGU9cmVjb3JkLmFyY2hpdmUiLCJ0eXBlPXJlY29yZC5wcmludC1jZXJ0aWZpZWQtY29waWVzIiwidHlwZT1yZWNvcmQucmVxdWVzdC1jb3JyZWN0aW9uIl0sInVzZXJUeXBlIjoidXNlciIsInJvbGUiOiJSRUdJU1RSQVRJT05fQUdFTlQiLCJpYXQiOjE0ODcwNzY3MDgsImF1ZCI6Im9wZW5jcnZzOmdhdGV3YXktdXNlciIsImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6IjY3ZWY3ZjgzZDZhOWNiOTJlOWVkYWFhMSJ9.a8K-PeY69dpmSEpKLdHmvSHv_2nYiJeiHln-EfH6eA0NxQVUbe6uiGIAV3jq3B89-IGWumuBC4Ufmw9cz4-MGPfZMM7YjPp_PtguELdrX_0V7CNZhVMPLvbOFEImXvBc78AAEbUZpBw1yjt61JF6gcStRAiW_ibcUuNgpm7VNak7BCCODoRoiPDDUbyPs60oE-0Xd72ONJ0i3SMk-KdQo4Ih2dvURh886E36Uwcje9Ht2rDReaM5p_Zrco0HlRRkJkJ4nYPtWojwloSEeetkE4Y5FjcinlAk75SZw_bkcM1butZWLlB7s3I-VipvS4K1cicDXIkagEXegJVFfnWRuh0O4IEd6W7gSmrbe3uhT3bMMRiMD7UNBE35QHyco3xGV30fN8iWwaCAv8UD7vsK1dXfM3tiC3G0hJWvJlE4gHJbeEaARpan-JkCSxEHFBIKtQyhGXAt1GgsnYEaBxYzr9iVr20SxShzBdXd_vJI-DcsacLYRZkYxtf-PdRjJ6b3TmCqCNo9XpTyiNi0eoUvOA_Gti6-r_7_dh-ayA124b3r07ZuC10EZwhC_wML3DdztQ8qmQN9IvuAC3rEGcuTNI2wChRdrYLQH5rRuGOZmtATdV4HhWFob_F4cBVjfY9oRRqdS9bfNlj0aARDV4122FU93BWi_F4TIOTLGflRRhs',
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXBlcmZvcm1hbmNlLnJlYWQiLCJ0eXBlPXBlcmZvcm1hbmNlLnJlYWQtZGFzaGJvYXJkcyIsInR5cGU9b3JnYW5pc2F0aW9uLnJlYWQtbG9jYXRpb25zJmFjY2Vzc0xldmVsPWxvY2F0aW9uIiwidHlwZT11c2VyLnJlYWQtb25seS1teS1hdWRpdCIsInR5cGU9d29ya3F1ZXVlJmlkcz1hbGwtZXZlbnRzLGFzc2lnbmVkLXRvLXlvdSxyZWNlbnQscmVxdWlyZXMtY29tcGxldGlvbixyZXF1aXJlcy11cGRhdGVzLGluLXJldmlldyxzZW50LWZvci1hcHByb3ZhbCxpbi1leHRlcm5hbC12YWxpZGF0aW9uLHJlYWR5LXRvLXByaW50LHJlYWR5LXRvLWlzc3VlIiwidHlwZT1yZWNvcmQuc2VhcmNoIiwidHlwZT1yZWNvcmQuY3JlYXRlJmV2ZW50PWJpcnRoLGRlYXRoLHRlbm5pcy1jbHViLW1lbWJlcnNoaXAsY2hpbGQtb25ib2FyZGluZyIsInR5cGU9cmVjb3JkLnJlYWQiLCJ0eXBlPXJlY29yZC5kZWNsYXJlIiwidHlwZT1yZWNvcmQucmVqZWN0IiwidHlwZT1yZWNvcmQuZWRpdCIsInR5cGU9cmVjb3JkLmFyY2hpdmUiLCJ0eXBlPXJlY29yZC5wcmludC1jZXJ0aWZpZWQtY29waWVzIiwidHlwZT1yZWNvcmQucmVxdWVzdC1jb3JyZWN0aW9uIl0sInVzZXJUeXBlIjoidXNlciIsInJvbGUiOiJSRUdJU1RSQVRJT05fQUdFTlQiLCJpYXQiOjE0ODcwNzY3MDgsImF1ZCI6Im9wZW5jcnZzOmdhdGV3YXktdXNlciIsImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6IjY3ZWY3ZjgzZDZhOWNiOTJlOWVkYWFhMSJ9.CO6h6rQk3t9zEO5z8OflU9NHRCO2bG-G7B9Ct21lZRUeD7c8ElTzJCqvymxVGXOx49VQd1awEm47wXSeJJKzdU0osVkgJybwBv4ItReeqsCemFd9lw4TnBytWABOZuqCkHZ2cwm8vKkEd9yR2sJSTVOvbOPYZkOyToABKPiDlTfH_SxjEUMFXBhK-GfgYyb_i97tLJBQc_ijV8JuTqcv4Kqb8ey8JkZe4Yp6-fHy922bhRWaH6HoI74BE_WKKs-s9FeoeQwtfwbFbVHtwSfEOTVFCWoMeOeXLLNZCaW0B7Qf8HmucQSov9IRtzWVnTDkvjvTQar9IRhsgpNtkd9jZs2_ob1t5LJyuND9eu-GQ1NLEyyWeKy_kLrLSoBiFdTVt0sEhPKAcFvMVhsog3pDwWuBTccbVreXie6PeQ7pr1skY1cjaji0IylO-A27QTzKkKZYkD6dnzGmF8btUBZYYWfOVCRkHvR2cYM-U1tfPGP045kiA_YAES_erbys0ClDMZ4HsmPVRkIrTvGw1Jp0f0QLpNF9b5hujM1Cnjp5Zhcy26c_l5M7qgQrvYmJiDizjLZYRalyeVJoz2IHC7_fTzQ7i3AHMAz8800_DKKnC0VbB_Oo5CcT_ipAfx8IBj52nEdJiMB-j5FNfj43fqzfcBjyKjZiT-c1H0cbHMe2a1k',
       localSystemAdmin:
-        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ1c2VyLnJlYWQ6bXktb2ZmaWNlIiwidXNlci5yZWFkOm15LWp1cmlzZGljdGlvbiIsInVzZXIudXBkYXRlOm15LWp1cmlzZGljdGlvbiIsIm9yZ2FuaXNhdGlvbi5yZWFkLWxvY2F0aW9uczpteS1qdXJpc2RpY3Rpb24iLCJwZXJmb3JtYW5jZS5yZWFkIiwicGVyZm9ybWFuY2UucmVhZC1kYXNoYm9hcmRzIiwicGVyZm9ybWFuY2Uudml0YWwtc3RhdGlzdGljcy1leHBvcnQiLCJvcmdhbmlzYXRpb24ucmVhZC1sb2NhdGlvbnM6bXktb2ZmaWNlIiwidXNlci5jcmVhdGVbcm9sZT1GSUVMRF9BR0VOVHxQT0xJQ0VfT0ZGSUNFUnxTT0NJQUxfV09SS0VSfEhFQUxUSENBUkVfV09SS0VSfExPQ0FMX0xFQURFUnxSRUdJU1RSQVRJT05fQUdFTlR8TE9DQUxfUkVHSVNUUkFSXSIsInVzZXIuZWRpdFtyb2xlPUZJRUxEX0FHRU5UfFBPTElDRV9PRkZJQ0VSfFNPQ0lBTF9XT1JLRVJ8SEVBTFRIQ0FSRV9XT1JLRVJ8TE9DQUxfTEVBREVSfFJFR0lTVFJBVElPTl9BR0VOVHxMT0NBTF9SRUdJU1RSQVJdIl0sInVzZXJUeXBlIjoidXNlciIsInJvbGUiOiJMT0NBTF9TWVNURU1fQURNSU4iLCJpYXQiOjE0ODcwNzY3MDgsImF1ZCI6Im9wZW5jcnZzOmdhdGV3YXktdXNlciIsImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6IjY4Y2JkMjZmYzY0NzYxNTY1NDY5NTkxZCJ9.O-wogl0fSIAJJ1wd1o8fqo-NfucnEKr1dKbYgSdhnCljZk-0K0bYIQOpz6TqKOinAxFhRcy2hRpf2MS7Q-mBlW43pF_Rzcm7piz3Q14V8ZKgeY7XEdvtcbPvf004PnSd7gGqLLwmYM7WX4X9ok1_d5AS2p70z7oYb0XsrrJ1cE_hv5teNWZyjnUn3JIN2o4BBZYSCQ0IlNwC5uCL1givHiHGq3j6rmses-4QAhCPHXPLjWSoa272OEzQdIqEgZj4sZcNeAxMgFfU0BxUR5huviaXP-e7iPk_zbogCKFHG6wmr__FUTGL0QR4sOBXy52Rf1bExdu44CNXmagSofwsvkUYD5QPfxTtp6nJ3VXNUrhz_Ga66fV_m8EMcd_Hpqytfb1lo_5kkhuQRwgfiBRXcXXCEDkeYWPLnZtsrnSHmIl-LHHKpNEiIGP4phAo9uwM6cGEGAt9ewFTyHWvJ22PETyBocIXiGh0kCjZKI9tpV8QcGDKt7y4b_CQHI0Zd-A7ST3xZUsztavF_zH77DnU-vweEBp-EhEQ1zRwtEr3neWXeKbZBQz0gqbeq6zGl87S1ZflPTMOdbkYd7NlR0NiGy4CCysBlLxeo9Dgv_4uXXJcFgJOvGD5RDhKo-CA4Fcq64D_YXjhWmuC-5-pmxf5TpAb323upY4NqWlZ3cxh_6Y',
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXVzZXIucmVhZCZhY2Nlc3NMZXZlbD1hZG1pbmlzdHJhdGl2ZUFyZWEiLCJ0eXBlPXVzZXIuZWRpdCZhY2Nlc3NMZXZlbD1hZG1pbmlzdHJhdGl2ZUFyZWEiLCJ0eXBlPW9yZ2FuaXNhdGlvbi5yZWFkLWxvY2F0aW9ucyZhY2Nlc3NMZXZlbD1hZG1pbmlzdHJhdGl2ZUFyZWEiLCJ0eXBlPXBlcmZvcm1hbmNlLnJlYWQiLCJ0eXBlPXBlcmZvcm1hbmNlLnJlYWQtZGFzaGJvYXJkcyIsInR5cGU9cGVyZm9ybWFuY2Uudml0YWwtc3RhdGlzdGljcy1leHBvcnQiLCJ1c2VyLmNyZWF0ZVtyb2xlPUZJRUxEX0FHRU5UfFBPTElDRV9PRkZJQ0VSfFNPQ0lBTF9XT1JLRVJ8SEVBTFRIQ0FSRV9XT1JLRVJ8TE9DQUxfTEVBREVSfFJFR0lTVFJBVElPTl9BR0VOVHxMT0NBTF9SRUdJU1RSQVJdIiwidXNlci5lZGl0W3JvbGU9RklFTERfQUdFTlR8UE9MSUNFX09GRklDRVJ8U09DSUFMX1dPUktFUnxIRUFMVEhDQVJFX1dPUktFUnxMT0NBTF9MRUFERVJ8UkVHSVNUUkFUSU9OX0FHRU5UfExPQ0FMX1JFR0lTVFJBUl0iXSwidXNlclR5cGUiOiJ1c2VyIiwicm9sZSI6IkxPQ0FMX1NZU1RFTV9BRE1JTiIsImlhdCI6MTQ4NzA3NjcwOCwiYXVkIjoib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiNjhjYmQyNmZjNjQ3NjE1NjU0Njk1OTFkIn0.L_bLhr6doxuWYkteh5DgCUO6xnDBxYvH8jlVSXtDA168HYKbYTs13nuAX0V-dfrDqXLzqQSk8QGFwbKbEj1JwsB2iBAR0-3duYB7QKPq7jPDVkHY-W2Kep9Hzx8kATifGfy2fC1RPrLTeqYwYOS6yYsCBOqBsIl0rPqPKNyQC_SJ989stU5tzo2bxe45S41KuML4pUPJA8o74oAlLW_J9z0SQmOnhoGeBo9fWYEjuD_invsKZMORcK_J9fbdAb5_KEvby_cw2bxCOckgUa_euaAUqIeQHvRmJQvVV3deWayPDvk8if_z47ObE7Ul5ugXQQJr4dUsja4hsjm9xxYX9GNN2zqJQ0MqskEvYCgNo-FBuGonirJI1ekas6uWMaUU9isvkJNRmkpDunrGnBhxNxRtaVy-0FIMfXx1veTPL1KCzCNb2Q4jWaFJRfG08HKF0oM_w7gpgXKjH4uw4jWTwnsnx3P3DzfSV0cRlSzNE2dQxtI6TrTSHQ_6dwsVIw24y3wZR65AMoNhJQaYmxtNpTeQ6SSvS0eQnLB5CvpIqtXEb-s_K-H8YD3qKRgRSZJmndrue3mp4vg_glS10DBPv_ri_LP-nvlfJCWtsnc6H-3zBFC3OuG1lhvQXpf7b-iExL3vT90sK2GEkln63rTSF5m54CmrWc1233Ry1L5rqIw',
       nationalSystemAdmin:
-        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJjb25maWcudXBkYXRlOmFsbCIsIm9yZ2FuaXNhdGlvbi5yZWFkLWxvY2F0aW9uczphbGwiLCJ1c2VyLmNyZWF0ZTphbGwiLCJ1c2VyLnVwZGF0ZTphbGwiLCJ1c2VyLnJlYWQ6YWxsIiwicGVyZm9ybWFuY2UucmVhZCIsInBlcmZvcm1hbmNlLnJlYWQtZGFzaGJvYXJkcyIsInBlcmZvcm1hbmNlLnZpdGFsLXN0YXRpc3RpY3MtZXhwb3J0IiwicmVjb3JkLnJlaW5kZXgiLCJ1c2VyLmNyZWF0ZVtyb2xlPUZJRUxEX0FHRU5UfEhPU1BJVEFMX0NMRVJLfENPTU1VTklUWV9MRUFERVJ8UkVHSVNUUkFUSU9OX0FHRU5UfExPQ0FMX1JFR0lTVFJBUnxOQVRJT05BTF9SRUdJU1RSQVJ8TE9DQUxfU1lTVEVNX0FETUlOfE5BVElPTkFMX1NZU1RFTV9BRE1JTnxQRVJGT1JNQU5DRV9NQU5BR0VSXSIsInVzZXIuZWRpdFtyb2xlPUZJRUxEX0FHRU5UfEhPU1BJVEFMX0NMRVJLfENPTU1VTklUWV9MRUFERVJ8UkVHSVNUUkFUSU9OX0FHRU5UfExPQ0FMX1JFR0lTVFJBUnxOQVRJT05BTF9SRUdJU1RSQVJ8TE9DQUxfU1lTVEVNX0FETUlOfE5BVElPTkFMX1NZU1RFTV9BRE1JTnxQRVJGT1JNQU5DRV9NQU5BR0VSXSJdLCJ1c2VyVHlwZSI6InVzZXIiLCJyb2xlIjoiTkFUSU9OQUxfU1lTVEVNX0FETUlOIiwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2OGRmOTUyOWY4ZjNhNzMwMDdhNDQyN2MifQ.WGLo5JF0PlPhZoYFhn8lg1dt-iaDSUQFGUDolQsQHwuY_AEZpFIKjaKL-GYJMLpuHPahk8wK7OTjQJZ54lH5EUvL8jqRfIMvQTRK6IHi_jvMHJQbXIvS434za-rY99_vsBnWIhTvqawIbKkOG89FBwdF6OVI5SxNV39ltjPChrN4-Ke-8QjZjJyUfxLanh4NMfsd3ohnpH5q3QtJMfDTl8iJ7-cJ3lwpI29gVtiXyULfbCWGXMPjwutCKNyNGA-hIMzvFHsFFw23EzdwnIqLBNzjMwFjeB3RwWBPexC6dctKuHY8ooRL-oWSxran0rOUwNr3Y0VKIl5C1EoMkBkkwHgy7awLPYstZGP6aC-B4pdQp9t5dx8omB6OozG0WD2oJJx7uH8pbghTsLdnQr1STF0gpL4qGWIE5RQ-eFCVQAQlXDPrVCDBEkK5ip8_OEag7uoPdJEybmTUVitMpTcYEdXQzJ2GFIkShXH4nkHeF60JHyviPFM2ClWD_DLLCr1v6fWLSFgMjfakK_YtOzLRSIAnwcGRk1RwR_H9-YSI-fVxM39suMZ78o5iXQiifuFjZWLF9FBwwVDuM0XAf7gD_zGx9uHSOw2I88CUtZpmPfvsesUW7TmHWX_VkSztH1XQt9BkUrPZvS6sarFZeswYQiT7EgZ5KqMcsXhlk9tVQo8',
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPWNvbmZpZy51cGRhdGUtYWxsIiwidHlwZT1vcmdhbmlzYXRpb24ucmVhZC1sb2NhdGlvbnMiLCJ0eXBlPXVzZXIuY3JlYXRlIiwidHlwZT11c2VyLmVkaXQiLCJ0eXBlPXVzZXIucmVhZCIsInR5cGU9cGVyZm9ybWFuY2UucmVhZCIsInR5cGU9cGVyZm9ybWFuY2UucmVhZC1kYXNoYm9hcmRzIiwidHlwZT1wZXJmb3JtYW5jZS52aXRhbC1zdGF0aXN0aWNzLWV4cG9ydCIsInR5cGU9cmVjb3JkLnJlaW5kZXgiLCJ1c2VyLmNyZWF0ZVtyb2xlPUZJRUxEX0FHRU5UfEhPU1BJVEFMX0NMRVJLfENPTU1VTklUWV9MRUFERVJ8UkVHSVNUUkFUSU9OX0FHRU5UfExPQ0FMX1JFR0lTVFJBUnxOQVRJT05BTF9SRUdJU1RSQVJ8TE9DQUxfU1lTVEVNX0FETUlOfE5BVElPTkFMX1NZU1RFTV9BRE1JTnxQRVJGT1JNQU5DRV9NQU5BR0VSXSIsInVzZXIuZWRpdFtyb2xlPUZJRUxEX0FHRU5UfEhPU1BJVEFMX0NMRVJLfENPTU1VTklUWV9MRUFERVJ8UkVHSVNUUkFUSU9OX0FHRU5UfExPQ0FMX1JFR0lTVFJBUnxOQVRJT05BTF9SRUdJU1RSQVJ8TE9DQUxfU1lTVEVNX0FETUlOfE5BVElPTkFMX1NZU1RFTV9BRE1JTnxQRVJGT1JNQU5DRV9NQU5BR0VSXSJdLCJ1c2VyVHlwZSI6InVzZXIiLCJyb2xlIjoiTkFUSU9OQUxfU1lTVEVNX0FETUlOIiwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2OGRmOTUyOWY4ZjNhNzMwMDdhNDQyN2MifQ.VZ57j4Bft8mOWqEdB1jgySbHNCx_Gl9HoADOtRN_FXQla938EHtwY9-4pC5TwAqeH589HMtp5wJz5X5zY4_CenXLZGP3ti0Cv9pO7XswBPfPKipjvR6qvhn5yjBVU_YvHNtfbqb1jYmPv7_K1yEsV1C3KUR3kLNr8AzMFXm9pJTZAuilJdbnv8sM4JI-omyW00u5aPJ2klE6yPetB5poNcDC9yIQbVcnzsSbE6iApviGG5mzexdVVeKt9iQitM0rtSlo1NTWwQDgFyrgEOO9a3CCAx9pVDgv1kshkM7bk_RXkLcwel8VaANOOsaDKAF6MaPEzO4WkH2IsBUbIse8Q2L5Qf41km_rFc-96ws6S_Dm1CaPjtuAKjb58bZGQYDNby_L4jdOxdDeyC9S9tn43OXmF7bLIBiQLnuX7NqFqtIk5zmGC2NVUuoWL0WIvTH5RsFmylerKR7nEmZ-9UnbGaYp1-QykmD50K85eRK_KqA400ZooX5QITraHfShZ1sXFf8UIJPkHVZsR9bJpw3MwrG5cyVdtLk-GLX4kYDGyL4aqAANxzf89wifGCYDV3gyoy0sdqDYYC4Tu__17yIvW0sq9JrEi9sa4nQzdf_0vhFWSGzVZNhp52EZFhISsbJWzwB4W5yx2hthbO4vUyqBlimm73jzcpqOa8f6SDP2D_k',
       communityLeader:
-        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJzZWFyY2guYmlydGgiLCJzZWFyY2guZGVhdGgiLCJzZWFyY2gubWFycmlhZ2UiLCJ3b3JrcXVldWVbaWQ9YWxsLWV2ZW50c3xhc3NpZ25lZC10by15b3V8cmVjZW50fHJlcXVpcmVzLXVwZGF0ZXN8c2VudC1mb3ItcmV2aWV3XSIsInR5cGU9cmVjb3JkLnNlYXJjaCIsInR5cGU9cmVjb3JkLmNyZWF0ZSZldmVudD1iaXJ0aCxkZWF0aCx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwLGNoaWxkLW9uYm9hcmRpbmcmcGxhY2VPZkV2ZW50PWxvY2F0aW9uIiwidHlwZT1yZWNvcmQucmVhZCIsInR5cGU9cmVjb3JkLmRlY2xhcmUiLCJ0eXBlPXJlY29yZC5lZGl0Il0sInVzZXJUeXBlIjoidXNlciIsInJvbGUiOiJDT01NVU5JVFlfTEVBREVSIiwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2OWFiYzEyM2RlZjQ1Njc4OTBhYmNkZWYifQ.MZYTYpg7hqo9XTvpf4A8CFD5JOqOSbskg924xjDpDqDsXTPV1oscKoDbzzsGXSz7krslAXq0EDVt826dvAH7X3_mpMEApC6Ksb0aRX3z7CyCFrp5viF5hmzoMlArZX8BTKwj9CSNuHoVFLRSMIm9muIsh98I8gO10xhG4Ny6PLmZbIlvNPZLJUXiP-QLlnBR67zvVsVtpgav8VlBLfZujQvvw8m4ZlDyV2SDmVd9rTd9KTIgDlDLWJyGdSPwOCnu8M220Q-lWmBbWeRevhNMY08RCODBsX3K1hToLRvjseVh9VeDnTMa18IIiOOcNDzRGUdLzCEtQrw-8yMp7UgKqZfoolZ0VNk9OZREpr3B7LTFGMntrGneY_rrZmMd38JTACvVHwVf4pF9n9L9g-Lyy0xjNdL5XBXkNnCWlWvLA4KWKOLpmX47EmLsFA5sVSWP6zTOuzeCzrxPB_v3Okb8bVGgFg7cVbatqvbyo5wqHUhLia3L_rwfNGJJ6a5a7ZPKaS4Hskaj55M2IfexZsGWtTnbCDHDxFEAPEUflPfkscXeXBPuUoAQlNI6Cggv7qVsMydoM04dyBmZIIxB1kep7lTdda3XTfS-1TGgodUTK_49WmyBTLDuuLfEWH5HbBKqnN4BRnAMzDxoIiIfkLrKDVz-jYtfTace_d73j_H44I8',
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXdvcmtxdWV1ZSZpZHM9YWxsLWV2ZW50cyxhc3NpZ25lZC10by15b3UscmVjZW50LHJlcXVpcmVzLXVwZGF0ZXMsc2VudC1mb3ItcmV2aWV3IiwidHlwZT1yZWNvcmQuc2VhcmNoIiwidHlwZT1yZWNvcmQuY3JlYXRlJmV2ZW50PWJpcnRoLGRlYXRoLHRlbm5pcy1jbHViLW1lbWJlcnNoaXAsY2hpbGQtb25ib2FyZGluZyZwbGFjZU9mRXZlbnQ9bG9jYXRpb24iLCJ0eXBlPXJlY29yZC5yZWFkIiwidHlwZT1yZWNvcmQuZGVjbGFyZSIsInR5cGU9cmVjb3JkLmVkaXQiXSwidXNlclR5cGUiOiJ1c2VyIiwicm9sZSI6IkNPTU1VTklUWV9MRUFERVIiLCJpYXQiOjE0ODcwNzY3MDgsImF1ZCI6Im9wZW5jcnZzOmdhdGV3YXktdXNlciIsImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6IjY5YWJjMTIzZGVmNDU2Nzg5MGFiY2RlZiJ9.gdmBdxoF1S9ec62pemDRkCBR7MWwhzyyQcnLSgeinSquWSraSvSdtiRPUGqQoMs3dZXxBkoyBSH-_fFmq3_i8Ax4u6m6QQfFRToFf_LBxZTOA_kH9Gg89ooJKzzlmRXn-woQIFBrQKfXXCbZvCS8YAjG1VJzhkYD_pd-EFy0dsEuWNVNTOLwfUMhfc3MBSgUS1lbCpJU6UnkBzn222d8t1J8O5yrIwn8_-evIpQdjYEOGVrcziStiSU1L0QD39fL-hQgdBoARQRZN13CLuP-d6nRhmxoKL6_rC1io27Gb1QKkLfodWokvB-M1aoOAjHg_yMRxV4dbhtF0x511uYsitAx1_HqA8uoNPhLDvbMbWSZ74t9hUHTJP7sfoumrNg5t5JnZHvLO3GCo1fLjbR62AW-9rbcGeB8oxglbWoFUPfd_I8HEnVq24n0w_z_kZkOC2qcf9CMIPY9EWkCq7XCGJOXedz3BJqw-nsyMZIJQni_ASfpizcLvDcocxN8AfwGLtDpRNdgU7xHlE7IsLf4nbV8bofgHg2o4VovXZNvHGNIWKG6XC3Pr4eNO_OtWT33BGux1LwlDubA4d1x42HGNDCqfAyxnZ2rKnzEdn-PYYDcYxE8gXOTD8vt7qSZe68cgjmp_NKAjqbEOsQs0CCOkLxfURHqxrARA8jFXaWw7Tw',
       provincialRegistrar:
-        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJwZXJmb3JtYW5jZS5yZWFkIiwicGVyZm9ybWFuY2UucmVhZC1kYXNoYm9hcmRzIiwicHJvZmlsZS5lbGVjdHJvbmljLXNpZ25hdHVyZSIsIm9yZ2FuaXNhdGlvbi5yZWFkLWxvY2F0aW9uczpteS1vZmZpY2UiLCJ3b3JrcXVldWVbaWQ9YWxsLWV2ZW50c3xhc3NpZ25lZC10by15b3V8cmVjZW50fHJlcXVpcmVzLWNvbXBsZXRpb258cmVxdWlyZXMtdXBkYXRlc3xpbi1yZXZpZXctYWxsfGluLWV4dGVybmFsLXZhbGlkYXRpb258cmVhZHktdG8tcHJpbnR8cmVhZHktdG8taXNzdWVdIiwidXNlci5yZWFkOm9ubHktbXktYXVkaXQiLCJ0eXBlPXJlY29yZC5zZWFyY2giLCJ0eXBlPXJlY29yZC5jcmVhdGUmZXZlbnQ9YmlydGgsZGVhdGgsdGVubmlzLWNsdWItbWVtYmVyc2hpcCxjaGlsZC1vbmJvYXJkaW5nJnBsYWNlT2ZFdmVudD1hZG1pbmlzdHJhdGl2ZUFyZWEiLCJ0eXBlPXJlY29yZC5yZWFkIiwidHlwZT1yZWNvcmQuZGVjbGFyZSIsInR5cGU9cmVjb3JkLnJlamVjdCIsInR5cGU9cmVjb3JkLmFyY2hpdmUiLCJ0eXBlPXJlY29yZC5yZWdpc3RlciIsInR5cGU9cmVjb3JkLmVkaXQiLCJ0eXBlPXJlY29yZC5wcmludC1jZXJ0aWZpZWQtY29waWVzIiwidHlwZT1yZWNvcmQuY29ycmVjdCIsInR5cGU9cmVjb3JkLnVuYXNzaWduLW90aGVycyIsInR5cGU9cmVjb3JkLnJldmlldy1kdXBsaWNhdGVzIl0sInVzZXJUeXBlIjoidXNlciIsInJvbGUiOiJQUk9WSU5DSUFMX1JFR0lTVFJBUiIsImlhdCI6MTQ4NzA3NjcwOCwiYXVkIjoib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiNjlkZWY0NTZhYmM3ODkwMTIzYWJjZGVmIn0.iD1zypnIVWaazBQAE_zs1wJhjJfFV2KDBmaG0Kkf4rj_st7N7KM0BRBKzL-19oh2ZCNPNKnRvAXtWkWUpuaWhS8hGmEZrtvKCHdgQa4vgaHHOkhf-LxxvbN8lecw_CxBIxcEhvx-UEzMt7fO8uo83szt6gl7IjCP8BH5TxK5N_LNbsAm4QBUtxjC8FJd5cMGc3neV7vixyce3YEP7jcb75ZQwzfFkj24rUWJodun6iBujvJ_VSYYNagYBDCTd8KIM_1jMDAQrR8-ouRYYBm_9ZjyUuOR5LRbI--BSFSCGNP7jC_sT77ZAtBg8DUSFrOROrPT3cg1D_PpdZN0TCVMZ5AU_nyJWaRO6N8y6W-SNJd93hkWT7wSTV3lRWFsmxAHBY_h2E-U73xyupMFR9RRXxYUYA6QY1ENQmSY7Ok5A6oUc8lR71l2F-VQKPyW8Ct3LgVt13qvSsdazeG76j0B_azRbczkIf3nk_dhwJBi4Kc4uWjRs9Q_OB3__2alTT4_wgfpWZVNtcoUmYdU49DiMEWAZmunUxruJK9Py6YU0lpQ7VhlymIOs4oJmWnRN7adD0lC3BrlOg7Ykoajw4TRKLJZp3SYWN8cv3MtfwwQsMwW0qru9lJ9XtSqtKY9aow8U161d4sLqvNk0ONDllEIWFgUukU6NpZ0IawVwOPMlHc'
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXBlcmZvcm1hbmNlLnJlYWQiLCJ0eXBlPXBlcmZvcm1hbmNlLnJlYWQtZGFzaGJvYXJkcyIsInR5cGU9cHJvZmlsZS5lbGVjdHJvbmljLXNpZ25hdHVyZSIsInR5cGU9b3JnYW5pc2F0aW9uLnJlYWQtbG9jYXRpb25zJmFjY2Vzc0xldmVsPWxvY2F0aW9uIiwidHlwZT13b3JrcXVldWUmaWRzPWFsbC1ldmVudHMsYXNzaWduZWQtdG8teW91LHJlY2VudCxyZXF1aXJlcy1jb21wbGV0aW9uLHJlcXVpcmVzLXVwZGF0ZXMsaW4tcmV2aWV3LWFsbCxpbi1leHRlcm5hbC12YWxpZGF0aW9uLHJlYWR5LXRvLXByaW50LHJlYWR5LXRvLWlzc3VlIiwidHlwZT11c2VyLnJlYWQtb25seS1teS1hdWRpdCIsInR5cGU9cmVjb3JkLnNlYXJjaCIsInR5cGU9cmVjb3JkLmNyZWF0ZSZldmVudD1iaXJ0aCxkZWF0aCx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwLGNoaWxkLW9uYm9hcmRpbmcmcGxhY2VPZkV2ZW50PWFkbWluaXN0cmF0aXZlQXJlYSIsInR5cGU9cmVjb3JkLnJlYWQiLCJ0eXBlPXJlY29yZC5kZWNsYXJlIiwidHlwZT1yZWNvcmQucmVqZWN0IiwidHlwZT1yZWNvcmQuYXJjaGl2ZSIsInR5cGU9cmVjb3JkLnJlZ2lzdGVyIiwidHlwZT1yZWNvcmQuZWRpdCIsInR5cGU9cmVjb3JkLnByaW50LWNlcnRpZmllZC1jb3BpZXMiLCJ0eXBlPXJlY29yZC5jb3JyZWN0IiwidHlwZT1yZWNvcmQudW5hc3NpZ24tb3RoZXJzIiwidHlwZT1yZWNvcmQucmV2aWV3LWR1cGxpY2F0ZXMiXSwidXNlclR5cGUiOiJ1c2VyIiwicm9sZSI6IlBST1ZJTkNJQUxfUkVHSVNUUkFSIiwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2OWRlZjQ1NmFiYzc4OTAxMjNhYmNkZWYifQ.hL30RQN9Lujxy8KzOjGxij-AkFHAdt7LRuU0WHjPjbp3wVmzzqOj0eqCSJOZoTolcP6LC9thvmqVCEAb9u58Zpp48laRUdzWO2qwbi6mi03IAkdw4MraoOrFpEDZ_lxdBSYxEKyJXX6_l0KzNX_UbI9ndH-Eo1YMxzdJQLjKlU7d79lNrWGlDz5WeKvurXScQiuvx6hF19ryuwQXWIOkB-cLVTFIdsAzoffUhGXA4cndFUN6_oYipusUkqTbjLMm7AoXfExMHhBGXU41JicaAQjXKsbLYyDtDvCig-KRKqtJg0aKOAgJUBa2VJ3AHUvvrOI1G8FH2_SZ64QY8bzolO-FijSq3NO-L3acBN2WjRR1tUhwTU_joSV8D4cfRUfqOOMgMkXGufGvK1fWvmUP94zcKMzLMUnRu3RQS79WEVpETRyn574aql7MYxBl9RRvbGzO7hOr0rS5xPtvIpm6_T3Ul_9Zt33K9tuUHbUdx_gktcK57Mv3tYcG5zBRtt_pAwXQFEY_JesVLTprE9l1otop1CbSPFS4DtCLF1C1T8cJdQmBT2kacjijG4Xumy8YvPyNVmOg2jJ_5lj36lexMw1nX4xLc3vNdsARB-yLFSGtQx49_AZiRF_Q14LNNR6dkYH6u2zGYnNpKaoyU910OeFBj8SvvWVK1Mr6H3tzt48'
     },
     id: userIds,
     fieldAgent: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
@@ -495,18 +494,32 @@ export function testDataGenerator(rngSeed?: number) {
        * except for workque scope that has an extra workqueue: all-events
        */
       localRegistrar: [
-        SCOPES.PERFORMANCE_READ,
-        SCOPES.PERFORMANCE_READ_DASHBOARDS,
-        SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
-        SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-        'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
-        SCOPES.USER_READ_ONLY_MY_AUDIT,
+        encodeScope({ type: 'performance.read' }),
+        encodeScope({ type: 'performance.read-dashboards' }),
+        encodeScope({ type: 'profile.electronic-signature' }),
         encodeScope({
-          type: 'record.search'
+          type: 'organisation.read-locations',
+          options: { accessLevel: 'location' }
         }),
         encodeScope({
-          type: 'record.create'
+          type: 'workqueue',
+          options: {
+            ids: [
+              'all-events',
+              'assigned-to-you',
+              'recent',
+              'requires-completion',
+              'requires-updates',
+              'in-review-all',
+              'in-external-validation',
+              'ready-to-print',
+              'ready-to-issue'
+            ]
+          }
         }),
+        encodeScope({ type: 'user.read-only-my-audit' }),
+        encodeScope({ type: 'record.search' }),
+        encodeScope({ type: 'record.create' }),
         encodeScope({
           type: 'record.read',
           options: {
@@ -519,33 +532,15 @@ export function testDataGenerator(rngSeed?: number) {
             ]
           }
         }),
-        encodeScope({
-          type: 'record.declare'
-        }),
-        encodeScope({
-          type: 'record.reject'
-        }),
-        encodeScope({
-          type: 'record.archive'
-        }),
-        encodeScope({
-          type: 'record.register'
-        }),
-        encodeScope({
-          type: 'record.edit'
-        }),
-        encodeScope({
-          type: 'record.print-certified-copies'
-        }),
-        encodeScope({
-          type: 'record.correct'
-        }),
-        encodeScope({
-          type: 'record.unassign-others'
-        }),
-        encodeScope({
-          type: 'record.review-duplicates'
-        }),
+        encodeScope({ type: 'record.declare' }),
+        encodeScope({ type: 'record.reject' }),
+        encodeScope({ type: 'record.archive' }),
+        encodeScope({ type: 'record.register' }),
+        encodeScope({ type: 'record.edit' }),
+        encodeScope({ type: 'record.print-certified-copies' }),
+        encodeScope({ type: 'record.correct' }),
+        encodeScope({ type: 'record.unassign-others' }),
+        encodeScope({ type: 'record.review-duplicates' }),
         encodeScope({
           type: 'record.custom-action',
           options: {
@@ -555,11 +550,30 @@ export function testDataGenerator(rngSeed?: number) {
         })
       ],
       registrationAgent: [
-        SCOPES.PERFORMANCE_READ,
-        SCOPES.PERFORMANCE_READ_DASHBOARDS,
-        SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-        SCOPES.USER_READ_ONLY_MY_AUDIT,
-        'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]',
+        encodeScope({ type: 'performance.read' }),
+        encodeScope({ type: 'performance.read-dashboards' }),
+        encodeScope({
+          type: 'organisation.read-locations',
+          options: { accessLevel: 'location' }
+        }),
+        encodeScope({ type: 'user.read-only-my-audit' }),
+        encodeScope({
+          type: 'workqueue',
+          options: {
+            ids: [
+              'all-events',
+              'assigned-to-you',
+              'recent',
+              'requires-completion',
+              'requires-updates',
+              'in-review',
+              'sent-for-approval',
+              'in-external-validation',
+              'ready-to-print',
+              'ready-to-issue'
+            ]
+          }
+        }),
         encodeScope({
           type: 'record.search'
         }),
@@ -574,58 +588,50 @@ export function testDataGenerator(rngSeed?: number) {
             ]
           }
         }),
-        encodeScope({
-          type: 'record.read'
-        }),
-        encodeScope({
-          type: 'record.declare'
-        }),
-        encodeScope({
-          type: 'record.reject'
-        }),
-        encodeScope({
-          type: 'record.edit'
-        }),
-        encodeScope({
-          type: 'record.archive'
-        }),
-        encodeScope({
-          type: 'record.print-certified-copies'
-        }),
-        encodeScope({
-          type: 'record.request-correction'
-        })
+        encodeScope({ type: 'record.read' }),
+        encodeScope({ type: 'record.declare' }),
+        encodeScope({ type: 'record.reject' }),
+        encodeScope({ type: 'record.edit' }),
+        encodeScope({ type: 'record.archive' }),
+        encodeScope({ type: 'record.print-certified-copies' }),
+        encodeScope({ type: 'record.request-correction' })
       ],
       fieldAgent: [
-        'workqueue[id=all-events|assigned-to-you|recent|requires-updates|sent-for-review]',
         encodeScope({
-          type: 'record.search'
+          type: 'workqueue',
+          options: {
+            ids: [
+              'all-events',
+              'assigned-to-you',
+              'recent',
+              'requires-updates',
+              'sent-for-review'
+            ]
+          }
         }),
-        encodeScope({
-          type: 'record.create'
-        }),
-        encodeScope({
-          type: 'record.read'
-        }),
-        encodeScope({
-          type: 'record.notify'
-        }),
-        encodeScope({
-          type: 'record.declare'
-        }),
-        encodeScope({
-          type: 'record.edit'
-        })
+        encodeScope({ type: 'record.search' }),
+        encodeScope({ type: 'record.create' }),
+        encodeScope({ type: 'record.read' }),
+        encodeScope({ type: 'record.notify' }),
+        encodeScope({ type: 'record.declare' }),
+        encodeScope({ type: 'record.edit' })
       ],
       localSystemAdmin: [
-        SCOPES.USER_READ_MY_OFFICE,
-        SCOPES.USER_READ_MY_JURISDICTION,
-        SCOPES.USER_UPDATE_MY_JURISDICTION,
-        SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION,
-        SCOPES.PERFORMANCE_READ,
-        SCOPES.PERFORMANCE_READ_DASHBOARDS,
-        SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS,
-        SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+        encodeScope({
+          type: 'user.read',
+          options: { accessLevel: 'administrativeArea' }
+        }),
+        encodeScope({
+          type: 'user.edit',
+          options: { accessLevel: 'administrativeArea' }
+        }),
+        encodeScope({
+          type: 'organisation.read-locations',
+          options: { accessLevel: 'administrativeArea' }
+        }),
+        encodeScope({ type: 'performance.read' }),
+        encodeScope({ type: 'performance.read-dashboards' }),
+        encodeScope({ type: 'performance.vital-statistics-export' }),
         'user.create[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]',
         'user.edit[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]'
       ],
@@ -634,13 +640,19 @@ export function testDataGenerator(rngSeed?: number) {
        * record.create has placeOfEvent: 'location' so the field is fully locked.
        */
       communityLeader: [
-        SCOPES.SEARCH_BIRTH,
-        SCOPES.SEARCH_DEATH,
-        SCOPES.SEARCH_MARRIAGE,
-        'workqueue[id=all-events|assigned-to-you|recent|requires-updates|sent-for-review]',
         encodeScope({
-          type: 'record.search'
+          type: 'workqueue',
+          options: {
+            ids: [
+              'all-events',
+              'assigned-to-you',
+              'recent',
+              'requires-updates',
+              'sent-for-review'
+            ]
+          }
         }),
+        encodeScope({ type: 'record.search' }),
         encodeScope({
           type: 'record.create',
           options: {
@@ -653,30 +665,40 @@ export function testDataGenerator(rngSeed?: number) {
             placeOfEvent: JurisdictionFilter.enum.location
           }
         }),
-        encodeScope({
-          type: 'record.read'
-        }),
-        encodeScope({
-          type: 'record.declare'
-        }),
-        encodeScope({
-          type: 'record.edit'
-        })
+        encodeScope({ type: 'record.read' }),
+        encodeScope({ type: 'record.declare' }),
+        encodeScope({ type: 'record.edit' })
       ],
       /**
        * PROVINCIAL_REGISTRAR: jurisdiction locked to their administrative area (province).
        * record.create has placeOfEvent: 'administrativeArea' so province is locked but districts are selectable.
        */
       provincialRegistrar: [
-        SCOPES.PERFORMANCE_READ,
-        SCOPES.PERFORMANCE_READ_DASHBOARDS,
-        SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
-        SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-        'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
-        SCOPES.USER_READ_ONLY_MY_AUDIT,
+        encodeScope({ type: 'performance.read' }),
+        encodeScope({ type: 'performance.read-dashboards' }),
+        encodeScope({ type: 'profile.electronic-signature' }),
         encodeScope({
-          type: 'record.search'
+          type: 'organisation.read-locations',
+          options: { accessLevel: 'location' }
         }),
+        encodeScope({
+          type: 'workqueue',
+          options: {
+            ids: [
+              'all-events',
+              'assigned-to-you',
+              'recent',
+              'requires-completion',
+              'requires-updates',
+              'in-review-all',
+              'in-external-validation',
+              'ready-to-print',
+              'ready-to-issue'
+            ]
+          }
+        }),
+        encodeScope({ type: 'user.read-only-my-audit' }),
+        encodeScope({ type: 'record.search' }),
         encodeScope({
           type: 'record.create',
           options: {
@@ -689,48 +711,27 @@ export function testDataGenerator(rngSeed?: number) {
             placeOfEvent: JurisdictionFilter.enum.administrativeArea
           }
         }),
-        encodeScope({
-          type: 'record.read'
-        }),
-        encodeScope({
-          type: 'record.declare'
-        }),
-
-        encodeScope({
-          type: 'record.reject'
-        }),
-        encodeScope({
-          type: 'record.archive'
-        }),
-        encodeScope({
-          type: 'record.register'
-        }),
-        encodeScope({
-          type: 'record.edit'
-        }),
-        encodeScope({
-          type: 'record.print-certified-copies'
-        }),
-        encodeScope({
-          type: 'record.correct'
-        }),
-        encodeScope({
-          type: 'record.unassign-others'
-        }),
-        encodeScope({
-          type: 'record.review-duplicates'
-        })
+        encodeScope({ type: 'record.read' }),
+        encodeScope({ type: 'record.declare' }),
+        encodeScope({ type: 'record.reject' }),
+        encodeScope({ type: 'record.archive' }),
+        encodeScope({ type: 'record.register' }),
+        encodeScope({ type: 'record.edit' }),
+        encodeScope({ type: 'record.print-certified-copies' }),
+        encodeScope({ type: 'record.correct' }),
+        encodeScope({ type: 'record.unassign-others' }),
+        encodeScope({ type: 'record.review-duplicates' })
       ],
       nationalSystemAdmin: [
-        SCOPES.CONFIG_UPDATE_ALL,
-        SCOPES.ORGANISATION_READ_LOCATIONS,
-        SCOPES.USER_CREATE,
-        SCOPES.USER_UPDATE,
-        SCOPES.USER_READ,
-        SCOPES.PERFORMANCE_READ,
-        SCOPES.PERFORMANCE_READ_DASHBOARDS,
-        SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS,
-        SCOPES.RECORD_REINDEX,
+        encodeScope({ type: 'config.update-all' }),
+        encodeScope({ type: 'organisation.read-locations' }),
+        encodeScope({ type: 'user.create' }),
+        encodeScope({ type: 'user.edit' }),
+        encodeScope({ type: 'user.read' }),
+        encodeScope({ type: 'performance.read' }),
+        encodeScope({ type: 'performance.read-dashboards' }),
+        encodeScope({ type: 'performance.vital-statistics-export' }),
+        encodeScope({ type: 'record.reindex' }),
         'user.create[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]',
         'user.edit[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]'
       ]

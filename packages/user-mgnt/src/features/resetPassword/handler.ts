@@ -16,7 +16,8 @@ import {
   generateRandomPassword,
   generateSaltedHash
 } from '@user-mgnt/utils/hash'
-import { getUserId, hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
+import { env } from '@user-mgnt/environment'
+import { getUserId, statuses } from '@user-mgnt/utils/userUtils'
 import { COUNTRY_CONFIG_URL } from '@user-mgnt/constants'
 import {
   triggerUserEventNotification,
@@ -52,10 +53,11 @@ export default async function resetPasswordInviteHandler(
   recordUserAuditEvent(request.headers.authorization, {
     operation: 'user.password_reset_by_admin',
     requestData: { subjectId: userId },
-    responseSummary: {}
   })
 
-  randomPassword = generateRandomPassword(hasDemoScope(request))
+  // DEFAULT_USER_PASSWORD allows QA/dev environments to set a predictable password
+  // for manually created users when SMS/email delivery is unavailable.
+  randomPassword = env.DEFAULT_USER_PASSWORD ?? generateRandomPassword()
   const { hash, salt } = generateSaltedHash(randomPassword)
 
   user.passwordHash = hash

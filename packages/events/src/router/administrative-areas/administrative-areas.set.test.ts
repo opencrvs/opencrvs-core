@@ -12,9 +12,11 @@ import {
   AdministrativeArea,
   createPrng,
   generateUuid,
-  SCOPES
+  encodeScope
 } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+
+const scope = encodeScope({ type: 'user.data-seeding' })
 
 test('prevents access when required scope is missing', async () => {
   const { user } = await setupTestCase()
@@ -26,9 +28,9 @@ test('prevents access when required scope is missing', async () => {
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
-test('Allows setting administrative areas with USER_DATA_SEEDING scope', async () => {
+test('Allows setting administrative areas with data seeding scope', async () => {
   const { user, generator } = await setupTestCase()
-  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+  const dataSeedingClient = createTestClient(user, [scope])
 
   const administrativeAreaRng = createPrng(8423123)
   await expect(
@@ -40,7 +42,7 @@ test('Allows setting administrative areas with USER_DATA_SEEDING scope', async (
 
 test('Prevents sending empty payload', async () => {
   const { user } = await setupTestCase()
-  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+  const dataSeedingClient = createTestClient(user, [scope])
 
   await expect(
     dataSeedingClient.administrativeAreas.set([])
@@ -49,7 +51,7 @@ test('Prevents sending empty payload', async () => {
 
 test('Creates single administrative area', async () => {
   const { user } = await setupTestCase()
-  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+  const dataSeedingClient = createTestClient(user, [scope])
 
   const initialAdministrativeAreas =
     await dataSeedingClient.administrativeAreas.list()
@@ -78,7 +80,7 @@ test('Creates single administrative area', async () => {
 test('Creates multiple administrative areas under parent administrative area', async () => {
   const { user, generator, rng } = await setupTestCase()
 
-  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+  const dataSeedingClient = createTestClient(user, [scope])
 
   const initialAdministrativeAreas =
     await dataSeedingClient.administrativeAreas.list()
@@ -106,7 +108,7 @@ test('Creates multiple administrative areas under parent administrative area', a
 
 test('updates externalId on existing administrative area when re-seeded with a value', async () => {
   const { user } = await setupTestCase()
-  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+  const dataSeedingClient = createTestClient(user, [scope])
 
   const areaId = generateUuid()
 
@@ -138,7 +140,7 @@ test('updates externalId on existing administrative area when re-seeded with a v
 
 test('seeding administrative areas is additive, not destructive', async () => {
   const { user, generator } = await setupTestCase()
-  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+  const dataSeedingClient = createTestClient(user, [scope])
 
   const initialAdministrativeAreas =
     await dataSeedingClient.administrativeAreas.list()

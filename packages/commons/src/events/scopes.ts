@@ -15,7 +15,12 @@ import {
   ActionType,
   DisplayableAction
 } from './ActionType'
-import { getAcceptedScopesByType, RecordScopeTypeV2 } from '../scopes'
+import {
+  EncodedScope,
+  getAcceptedScopesByType,
+  RecordScopeTypeV2,
+  RecordScopeV2
+} from '../scopes'
 import {
   EventIndexWithAdministrativeHierarchy,
   userCanAccessEventWithScopes
@@ -86,7 +91,7 @@ export function getAssignmentStatus(
  * (hardcoded, non-configurable) and V2 scopes, which validate event type, jurisdiction,
  * and user context via {@link userCanAccessEventWithScopes}.
  *
- * @param {string[]} scopes - The raw encoded scope strings the user possesses (from JWT).
+ * @param {EncodedScope[]} scopes - The raw encoded scope strings the user possesses (from JWT).
  * @param {DisplayableAction} action - The action to check authorization for.
  * @param {EventIndexWithAdministrativeHierarchy} event - The event with resolved administrative hierarchy.
  * @param {UserContext} currentUser - The current user's context used for V2 scope validation.
@@ -98,7 +103,7 @@ export function isActionInScope({
   event,
   currentUser
 }: {
-  scopes: string[]
+  scopes: EncodedScope[]
   action: DisplayableAction
   event: EventIndexWithAdministrativeHierarchy
   currentUser: UserContext
@@ -114,7 +119,7 @@ export function isActionInScope({
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_OTHERS
 
   const acceptedScopes = isUnassigningOthers
-    ? (['record.unassign-others'] as RecordScopeTypeV2[])
+    ? ['record.unassign-others' as const]
     : ACTION_SCOPE_MAP[action]
 
   // 'null' means that the action is always allowed
@@ -132,14 +137,18 @@ export function isActionInScope({
     scopes
   })
 
-  const canAccess = userCanAccessEventWithScopes(event, matchingScopes, {
-    id: currentUser.id,
-    primaryOfficeId: currentUser.primaryOfficeId,
-    administrativeAreaId: currentUser.administrativeAreaId ?? null,
-    role: currentUser.role,
-    signature: currentUser.signature,
-    type: currentUser.type
-  })
+  const canAccess = userCanAccessEventWithScopes(
+    event,
+    matchingScopes as RecordScopeV2[],
+    {
+      id: currentUser.id,
+      primaryOfficeId: currentUser.primaryOfficeId,
+      administrativeAreaId: currentUser.administrativeAreaId ?? null,
+      role: currentUser.role,
+      signature: currentUser.signature,
+      type: currentUser.type
+    }
+  )
 
   return canAccess
 }

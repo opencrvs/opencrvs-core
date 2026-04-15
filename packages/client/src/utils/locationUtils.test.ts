@@ -232,7 +232,7 @@ describe('isLocationUnderJurisdiction', () => {
 })
 
 describe('createSearchOptions', () => {
-  it('creates search options for locations and administrative areas', () => {
+  it('creates search options for locations', () => {
     const options = createSearchOptions({
       locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
       administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
@@ -241,7 +241,7 @@ describe('createSearchOptions', () => {
     expect(options).toMatchSnapshot()
   })
 
-  it('filters search options for both locations and administrative areas', () => {
+  it('filters search options for locations', () => {
     const options = createSearchOptions({
       locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
       administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
