@@ -10,7 +10,7 @@
  */
 
 import * as z from 'zod/v4'
-import { FieldConfig } from './events/FieldConfig'
+import type { FieldConfig } from './events/FieldConfig'
 
 const TranslationConfig = z.object({
   id: z
@@ -56,7 +56,7 @@ export const ApplicationConfig = z.object({
   USER_NOTIFICATION_DELIVERY_METHOD: z.string(),
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: z.string(),
   SEARCH_DEFAULT_CRITERIA: SearchCriteria.optional().default('TRACKING_ID'),
-  ADDITIONAL_USER_FIELDS: z.array(FieldConfig).optional().default([])
+  ADDITIONAL_USER_FIELDS: z.array(z.custom<FieldConfig>()).optional().default([])
 })
 
 export type ApplicationConfig = z.infer<typeof ApplicationConfig>
