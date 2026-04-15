@@ -128,6 +128,8 @@ export function generateLocations(
 }
 
 /**
+ * @deprecated
+ *
  * Given locations and administrative areas maps, creates searchable options to be used in location search inputs.
  */
 export function createSearchOptions({
@@ -166,28 +168,7 @@ export function createSearchOptions({
     }
   })
 
-  const administrativeAreaOptions: SearchLocation[] =
-    administrativeAreasArr.map((administrativeArea) => {
-      // 3a. For administrative areas, get the full administrative area hierarchy for display label. e.g. 'District, Province'
-      const parentHierarchy = getAdministrativeAreaHierarchy(
-        administrativeArea.parentId,
-        administrativeAreas
-      )
-
-      return {
-        id: administrativeArea.id,
-        searchableText: administrativeArea.name,
-        displayLabel: joinValues(
-          [
-            administrativeArea.name,
-            ...parentHierarchy.map((area) => area.name)
-          ],
-          ', '
-        )
-      }
-    })
-
-  return [...locationOptions, ...administrativeAreaOptions]
+  return locationOptions
 }
 
 export function getJurisidictionType(
