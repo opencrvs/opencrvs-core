@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useIntl, defineMessages, IntlShape } from 'react-intl'
+import { useIntl, defineMessages } from 'react-intl'
 import { personNameFromV1ToV2 } from '@opencrvs/commons/client'
 import { ActionType, TokenUserType } from '@opencrvs/commons/client'
 import { getUsersFullName } from '@client/v2-events/utils'
@@ -29,7 +29,6 @@ const messages = defineMessages({
     description: 'Name for system initiated actions in the event history'
   }
 })
-
 
 export function useUserDetails() {
   const intl = useIntl()
@@ -66,7 +65,7 @@ export function useUserDetails() {
     const system = systems.find(
       (s) => s.id === createdBy || s.legacyId === createdBy
     )
-    if(system) {
+    if (system) {
       return {
         type: 'integration',
         name: system.name,
@@ -74,14 +73,13 @@ export function useUserDetails() {
       } as const
     }
 
-    if(!user) {
+    if (!user) {
       return {
         type: 'user',
         name: 'Missing user',
         role
       } as const
     }
-
 
     return {
       type: 'user',
@@ -93,4 +91,3 @@ export function useUserDetails() {
 
   return { getUserDetails }
 }
-
