@@ -14,7 +14,7 @@ on:
     inputs:
       countryconfig-branch:
         description: countryconfig branch name
-        default: release-v1.9.12
+        default: release-v1.9.11
         required: true
       ref:
         description: Commit SHA / branch / tag to checkout (optional)
@@ -24,7 +24,7 @@ jobs:
   test-upgrade-script:
     runs-on: ubuntu-24.04
     env:
-      COUNTRYCONFIG_BRANCH: ${{ github.event.inputs.countryconfig-branch || 'release-v1.9.12' }}
+      COUNTRYCONFIG_BRANCH: ${{ github.event.inputs.countryconfig-branch || 'release-v1.9.11' }}
     steps:
       - name: Checkout opencrvs-core repository
         uses: actions/checkout@v6
