@@ -8,12 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { hasScope } from '@gateway/features/user/utils'
 import { redis } from '@gateway/utils/redis'
 import { Lifecycle, ReqRefDefaults } from '@hapi/hapi'
-import { SCOPES } from '@opencrvs/commons/authentication'
 import { get } from 'lodash'
 import { DISABLE_RATE_LIMIT } from './constants'
+import { hasScope } from '@opencrvs/commons'
 
 /**
  * Custom RateLimitError. This is being caught in Apollo & Hapi (`onPreResponse` in createServer)
@@ -91,10 +90,8 @@ export const rateLimitedRoute =
   ) =>
   (...args: A) => {
     if (
-      hasScope(
-        { Authorization: args[0].headers.authorization },
-        SCOPES.BYPASSRATELIMIT
-      )
+      args[0].headers.authorization &&
+      hasScope(args[0].headers.authorization, 'bypassratelimit')
     ) {
       return fn(...args)
     }

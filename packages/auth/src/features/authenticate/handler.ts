@@ -23,7 +23,14 @@ import {
 import { forbidden, unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import { getUserRoleScopeMapping } from '@auth/features/scopes/service'
+import { env } from '@auth/environment'
+import {
+  EncodedScope,
+  fetchJSON,
+  joinUrl,
+  logger,
+  Roles
+} from '@opencrvs/commons'
 
 interface IAuthPayload {
   username: string
@@ -36,6 +43,21 @@ interface IAuthResponse {
   email?: string
   status: string
   token?: string
+}
+
+async function getUserRoleScopeMapping() {
+  const roles = await fetchJSON<Roles>(
+    joinUrl(env.COUNTRY_CONFIG_URL_INTERNAL, '/config/roles')
+  )
+
+  logger.info(
+    'Country config implements the new /roles response format. Custom scopes apply'
+  )
+
+  return roles.reduce<Record<string, EncodedScope[]>>((acc, { id, scopes }) => {
+    acc[id] = scopes
+    return acc
+  }, {})
 }
 
 export default async function authenticateHandler(

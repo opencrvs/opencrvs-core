@@ -17,26 +17,27 @@ import { Db, MongoClient } from 'mongodb'
  * 2. Remove WEBHOOK type systems (deprecated)
  *
  * Scope mapping from type:
- * - HEALTH: ['notification-api', 'record.create', 'record.notify']
- * - NATIONAL_ID: ['nationalId']
- * - RECORD_SEARCH: ['recordsearch']
- * - IMPORT_EXPORT: ['record.import', 'record.export', 'recordsearch', 'user.data-seeding', 'record.reindex']
+ * - HEALTH: ['record.notify', 'record.create']
+ * - NATIONAL_ID: [] (deprecated - will be removed)
+ * - RECORD_SEARCH: ['record.search']
+ * - IMPORT_EXPORT: ['record.import', 'record.export', 'record.search', 'user.data-seeding', 'record.reindex']
  * - REINDEX: ['record.reindex']
- * - WEBHOOK: (deprecated - will be removed)
+ * - WEBHOOK: [] (deprecated - will be removed)
  */
 
 const DEFAULT_SCOPES_BY_TYPE: Record<string, string[]> = {
-  HEALTH: ['notification-api', 'record.create', 'record.notify'],
-  NATIONAL_ID: ['nationalId'],
-  RECORD_SEARCH: ['recordsearch'],
+  HEALTH: ['type=record.notify', 'type=record.create'],
+  NATIONAL_ID: [],
+  WEBHOOK: [],
+  RECORD_SEARCH: ['type=record.search'],
   IMPORT_EXPORT: [
-    'record.import',
-    'record.export',
-    'recordsearch',
-    'user.data-seeding',
-    'record.reindex'
+    'type=record.import',
+    'type=record.export',
+    'type=record.search',
+    'type=user.data-seeding',
+    'type=record.reindex'
   ],
-  REINDEX: ['record.reindex']
+  REINDEX: ['type=record.reindex']
 }
 
 export const up = async (db: Db, client: MongoClient) => {

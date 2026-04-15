@@ -88,6 +88,7 @@ async function reindexSearch(
   onBatchProcessed?: (count: number) => Promise<void>
 ) {
   const configurations = await getInMemoryEventConfigurations(token)
+  const locationHierarchyCache = new Map<string, string[]>()
   const indexNameOverrides = new Map(
     configurations.map((config) => [
       config.id,
@@ -109,7 +110,12 @@ async function reindexSearch(
 
     await Promise.all([
       withRetry(() =>
-        indexEventsInBulk(batch, configurations, indexNameOverrides)
+        indexEventsInBulk(
+          batch,
+          configurations,
+          locationHierarchyCache,
+          indexNameOverrides
+        )
       ),
       withRetry(() => reindexBatchToCountryConfig(token, batch))
     ])
@@ -169,17 +175,23 @@ export async function runReindex(token: TokenWithBearer) {
       return indexNameWithTimestamp
     })
   )
-
-  let processedCount = 0
+  const startSecond = Math.floor(Date.now() / 1000)
+  const processedCounts: number[] = []
+  let totalProcessed = 0
   const objStream = Readable.from(streamEventDocuments())
   const searchIndexingStream = await reindexSearch(
     timestamp,
     token,
     async (batchSize) => {
-      processedCount += batchSize
-      await updateReindexingProgress(runId, processedCount)
+      const currentSecond = Math.floor(Date.now() / 1000) - startSecond
+      const processedThisSecond = processedCounts[currentSecond] || 0
+      processedCounts[currentSecond] = processedThisSecond + batchSize
+      totalProcessed += batchSize
+      const perSecond =
+        processedCounts.slice(-6, -1).reduce((m, x) => m + x, 0) / 5
+      await updateReindexingProgress(runId, totalProcessed)
       logger.info(
-        `Reindex total records processed: ${processedCount}. Per second: ${Math.round(processedCount / ((new Date().valueOf() - start.valueOf()) / 1000))}`
+        `Reindex total records processed: ${totalProcessed}. Per second: ${Math.round(perSecond)}`
       )
     }
   )

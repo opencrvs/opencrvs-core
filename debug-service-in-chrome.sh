@@ -11,12 +11,10 @@
 # Define an array with service names and ports
 SERVICES=(
   "auth:4040"
-  "workflow:5050"
   "events:5555"
   "gateway:7070"
   "metrics:1050"
   "notification:2020"
-  "search:9090"
   "user-mgnt:3030"
   "webhooks:2525"
   "countryconfig:3040",
@@ -103,4 +101,4 @@ echo -e "${ROYAL_BLUE}5. Add breakpoints and debug your Node.js application.${RE
 echo -e "${ROYAL_BLUE}6. If you don't see your service listed as a remote target, click on 'Configure', check if 'localhost:9229' exists. If not, add it, then run the script again.${RESET}"
 echo -e "${ROYAL_BLUE}For more details on debugging Node.js applications, click here: ${PURPLE}\033[4mhttps://nodejs.org/en/learn/getting-started/debugging${RESET}${ROYAL_BLUE}.${RESET}"
 echo -e "${PURPLE}====================================================${RESET}"
-echo -e "${RED}Note: If you previously ran this script for a different service (e.g., 'workflow'), try to run another service (e.g., 'auth') and it's still the previous one showing up in the remote target, ensure you stop the previous service and refresh Chrome DevTools.${RESET}"
+echo -e "${RED}Note: If you previously ran this script for a different service (e.g., 'gateway'), try to run another service (e.g., 'auth') and it's still the previous one showing up in the remote target, ensure you stop the previous service and refresh Chrome DevTools.${RESET}"

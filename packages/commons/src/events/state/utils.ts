@@ -90,6 +90,7 @@ function getDeclarationActionCreationMetadata(
 const updateActions = ActionTypes.extract([
   ActionType.CREATE,
   ActionType.NOTIFY,
+  ActionType.EDIT,
   ActionType.DECLARE,
   ActionType.REGISTER,
   ActionType.REJECT,

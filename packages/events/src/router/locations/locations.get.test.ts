@@ -8,12 +8,19 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createPrng, generateUuid, Location, SCOPES } from '@opencrvs/commons'
+import {
+  createPrng,
+  generateUuid,
+  Location,
+  encodeScope
+} from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+
+const scope = encodeScope({ type: 'user.data-seeding' })
 
 test('Returns a single location by id', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+  const client = createTestClient(user, [scope])
 
   const location: Location = {
     id: generateUuid(),
@@ -31,7 +38,7 @@ test('Returns a single location by id', async () => {
 
 test('Returns the correct location when multiple exist', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+  const client = createTestClient(user, [scope])
 
   const locationA: Location = {
     id: generateUuid(createPrng(1)),
@@ -57,14 +64,14 @@ test('Returns the correct location when multiple exist', async () => {
 
 test('Throws when location is not found', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+  const client = createTestClient(user, [scope])
 
   await expect(client.locations.get({ id: generateUuid() })).rejects.toThrow()
 })
 
 test('Is accessible without elevated scopes', async () => {
   const { user } = await setupTestCase()
-  const seeder = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+  const seeder = createTestClient(user, [scope])
   const reader = createTestClient(user, [])
 
   const location: Location = {

@@ -14,8 +14,7 @@ import {
   ActionType,
   createPrng,
   encodeScope,
-  generateEventDocument,
-  SCOPES
+  generateEventDocument
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { createSystemTestClient, setupTestCase } from '@events/tests/utils'
@@ -36,7 +35,9 @@ describe('bulkImport', () => {
 
   test('allows access with import scope', async () => {
     const { user } = await setupTestCase()
-    const client = createSystemTestClient('test-system', [SCOPES.RECORD_IMPORT])
+    const client = createSystemTestClient('test-system', [
+      encodeScope({ type: 'record.import' })
+    ])
 
     await expect(
       client.event.bulkImport([
@@ -54,8 +55,8 @@ describe('bulkImport', () => {
   test('importing events indexes them into Elasticsearch at the next refresh', async () => {
     const { user } = await setupTestCase()
     const client = createSystemTestClient('test-system', [
-      SCOPES.RECORD_IMPORT,
-      SCOPES.RECORD_READ,
+      encodeScope({ type: 'record.import' }),
+      encodeScope({ type: 'record.read' }),
       encodeScope({
         type: 'record.search',
         options: {
