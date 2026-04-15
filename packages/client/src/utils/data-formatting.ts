@@ -8,37 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { getDefaultLanguage } from '@client/i18n/utils'
+
 import type { GQLComment } from '@client/utils/gateway-deprecated-do-not-use'
 import { HumanName } from './gateway'
 import { constantsMessages } from '@client/i18n/messages'
 import { IntlShape } from 'react-intl'
-
-interface INamesMap {
-  [key: string]: string
-}
-
-function generateName(name: HumanName) {
-  return [name.firstNames, name.middleName, name.familyName]
-    .filter(Boolean)
-    .join(' ')
-    .trim()
-}
-
-export const createNamesMap = (names: (HumanName | null)[]): INamesMap =>
-  names
-    .filter((name): name is HumanName => Boolean(name))
-    .reduce((prevNamesMap: INamesMap, name) => {
-      if (!name.use) {
-        prevNamesMap['default'] = generateName(name)
-        return prevNamesMap
-      }
-
-      prevNamesMap[name.use] = generateName(name)
-      prevNamesMap[name.use] =
-        prevNamesMap[name.use] || prevNamesMap[getDefaultLanguage()]
-      return prevNamesMap
-    }, {})
 
 export const extractCommentFragmentValue = (
   comments: GQLComment[],
@@ -78,10 +52,6 @@ export const mergeArraysRemovingEmptyStrings = (
     else output.push(strArrayA[i])
   }
   return output
-}
-
-export function getPercentage(total: number, current: number) {
-  return current === 0 || total === 0 ? 0 : (current / total) * 100
 }
 
 export function getLocalisedName(

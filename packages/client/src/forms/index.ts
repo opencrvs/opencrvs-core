@@ -80,7 +80,7 @@ export const ID_READER = 'ID_READER'
 export const ID_VERIFICATION_BANNER = 'ID_VERIFICATION_BANNER'
 export const LOADER = 'LOADER'
 
-export enum SubmissionAction {
+enum SubmissionAction {
   SUBMIT_FOR_REVIEW = 'submit for review',
   APPROVE_DECLARATION = 'approve',
   REGISTER_DECLARATION = 'register',
@@ -95,15 +95,10 @@ export enum SubmissionAction {
   REQUEST_CORRECTION = 'request correction'
 }
 
-export enum DownloadAction {
+enum DownloadAction {
   LOAD_REVIEW_DECLARATION = 'load declaration data for review',
   LOAD_CERTIFICATE_DECLARATION = 'load declaration data for certificate collection',
   LOAD_REQUESTED_CORRECTION_DECLARATION = 'load declaration data for which is requested correction'
-}
-
-export enum AddressCases {
-  PRIMARY_ADDRESS = 'PRIMARY_ADDRESS',
-  SECONDARY_ADDRESS = 'SECONDARY_ADDRESS'
 }
 
 export type Action = SubmissionAction | DownloadAction
@@ -299,7 +294,7 @@ interface IInformant {
   nestedFields: IInformantOtherInformantType
 }
 
-export interface IContactPoint {
+interface IContactPoint {
   value: string
   nestedFields: IContactPointPhone
 }
@@ -513,7 +508,7 @@ export interface ISelectFormFieldWithDynamicOptions extends IFormFieldBase {
   dynamicOptions: IDynamicOptions
 }
 
-export interface IFormFieldWithDynamicDefinitions extends IFormFieldBase {
+interface IFormFieldWithDynamicDefinitions extends IFormFieldBase {
   type: typeof FIELD_WITH_DYNAMIC_DEFINITIONS
   dynamicDefinitions: IDynamicFormFieldDefinitions
 }
@@ -539,7 +534,7 @@ export interface IRadioGroupFormField extends IFormFieldBase {
   flexDirection?: FLEX_DIRECTION
 }
 
-export interface IRadioGroupWithNestedFieldsFormField
+interface IRadioGroupWithNestedFieldsFormField
   extends Omit<IRadioGroupFormField, 'type'> {
   type: typeof RADIO_GROUP_WITH_NESTED_FIELDS
   nestedFields: INestedInputFields
@@ -964,7 +959,7 @@ enum CertificateSection {
   User = 'user'
 }
 
-export enum CorrectionSection {
+enum CorrectionSection {
   Corrector = 'corrector',
   Reason = 'reason',
   SupportingDocuments = 'supportingDocuments',
@@ -1277,7 +1272,7 @@ export interface Ii18nButtonFormField extends Ii18nFormFieldBase {
   }
 }
 
-export interface Ii18nLinkButtonFormField extends Ii18nFormFieldBase {
+interface Ii18nLinkButtonFormField extends Ii18nFormFieldBase {
   type: typeof LINK_BUTTON
   icon?: {
     desktop: IconProps['name']
@@ -1354,7 +1349,3 @@ export interface IFormSectionData {
 export interface IFormData {
   [key: string]: IFormSectionData
 }
-
-type PaymentType = 'MANUAL'
-
-type PaymentOutcomeType = 'COMPLETED' | 'ERROR' | 'PARTIAL'
