@@ -3213,6 +3213,7 @@ components:
                                 - record.confirm-registration
                                 - record.reject-registration
                                 - workqueue
+                                - dashboard.view
                             $option:
                               type: string
                               enum:
@@ -7664,6 +7665,7 @@ components:
                                 - record.confirm-registration
                                 - record.reject-registration
                                 - workqueue
+                                - dashboard.view
                             $option:
                               type: string
                               enum:
@@ -8061,6 +8063,7 @@ components:
                                 - record.confirm-registration
                                 - record.reject-registration
                                 - workqueue
+                                - dashboard.view
                             $option:
                               type: string
                               enum:
@@ -8296,6 +8299,7 @@ components:
                                 - record.confirm-registration
                                 - record.reject-registration
                                 - workqueue
+                                - dashboard.view
                             $option:
                               type: string
                               enum:
@@ -8530,6 +8534,7 @@ components:
                                 - record.confirm-registration
                                 - record.reject-registration
                                 - workqueue
+                                - dashboard.view
                             $option:
                               type: string
                               enum:
