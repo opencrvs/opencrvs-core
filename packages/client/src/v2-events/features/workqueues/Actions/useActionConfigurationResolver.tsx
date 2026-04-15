@@ -116,7 +116,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
 /**
  * Given event and action type, determines if the action should be enabled and visible for the user.
  */
-export function useResolveActionConditionals(
+function useResolveActionConditionals(
   event: EventIndex,
   actionType: WorkqueueActionType | ActionMenuActionType,
   isDeclareDraftOpen: boolean
