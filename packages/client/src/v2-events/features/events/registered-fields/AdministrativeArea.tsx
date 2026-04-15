@@ -150,6 +150,7 @@ function AdministrativeAreaInput({
     <SearchableSelect
       {...inputProps}
       data-testid={'location__' + inputProps.id}
+      disabled={inputProps.disabled || hasOnlyOneOption}
       options={options}
       value={selectedLocation}
       onChange={(opt) => {
