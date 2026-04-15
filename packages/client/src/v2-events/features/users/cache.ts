@@ -17,7 +17,11 @@ async function cacheUsers(userIds: string[]) {
   const { queryFn, ...options } =
     trpcOptionsProxy.user.list.queryOptions(userIds)
 
-  await queryClient.fetchQuery(options)
+  const users = await queryClient.fetchQuery(options)
+
+  for (const user of users) {
+    queryClient.setQueryData(trpcOptionsProxy.user.get.queryKey(user.id), user)
+  }
 }
 
 export async function cacheUsersFromEventDocument(

@@ -30,7 +30,7 @@ import {
   DEFAULT_DATE_OF_EVENT_PROPERTY,
   ActionDocument,
   Location,
-  UserOrSystemSummary,
+  UserOrSystem,
   UUID,
   AdministrativeArea,
   getActionAnnotationFields,
@@ -69,12 +69,12 @@ function omitFieldValuesFromDeclaration(
   }, {})
 }
 
-function findUserById(userId: string, users: UserOrSystemSummary[]) {
+function findUserById(userId: string, users: UserOrSystem[]) {
   const user = users.find((u) => u.id === userId)
 
-  if (!user || user.type === 'system') {
+  if (!user) {
     return {
-      name: user ? user.name : '',
+      name: '',
       signature: '',
       fullHonorificName: ''
     }
@@ -104,7 +104,7 @@ export const stringifyEventMetadata = ({
   intl: IntlShape
   locations: Map<UUID, Location>
   administrativeAreas: Map<UUID, AdministrativeArea>
-  users: UserOrSystemSummary[]
+  users: UserOrSystem[]
   adminLevels: AdminStructureItem[]
 }) => {
   return {
@@ -255,7 +255,7 @@ export function compileSvg({
   $declaration: EventState
   locations: Map<UUID, Location>
   administrativeAreas: Map<UUID, AdministrativeArea>
-  users: UserOrSystemSummary[]
+  users: UserOrSystem[]
   /**
    * Indicates whether certificate is reviewed or actually printed
    * in V1 "preview" was used. In V2, "review" is used to remain consistent with action terminology (review of print action rather than preview of certificate).
