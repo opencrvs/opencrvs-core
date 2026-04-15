@@ -2462,7 +2462,6 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
-                                - demo
                                 - bypassratelimit
                                 - record.reindex
                                 - user.data-seeding
@@ -6914,7 +6913,6 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
-                                - demo
                                 - bypassratelimit
                                 - record.reindex
                                 - user.data-seeding
@@ -7312,7 +7310,6 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
-                                - demo
                                 - bypassratelimit
                                 - record.reindex
                                 - user.data-seeding
@@ -7548,7 +7545,6 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
-                                - demo
                                 - bypassratelimit
                                 - record.reindex
                                 - user.data-seeding
@@ -7783,7 +7779,6 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
-                                - demo
                                 - bypassratelimit
                                 - record.reindex
                                 - user.data-seeding
