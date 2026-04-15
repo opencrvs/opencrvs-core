@@ -20,7 +20,6 @@ export const SECURITY_PIN_EXPIRED_AT = 'locked_time'
 export const ALLOWED_IMAGE_TYPE = ['image/jpeg', 'image/jpg', 'image/png']
 export const ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE = ['image/svg+xml']
 
-export const ADVANCED_SEARCH_TEXT = 'advanced-search'
 export const NATIONAL_ID = 'NATIONAL_ID'
 
 export const BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER'

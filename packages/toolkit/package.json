@@ -3,6 +3,9 @@
   "version": "1.9.11",
   "description": "OpenCRVS toolkit for building country configurations",
   "license": "MPL-2.0",
+  "bin": {
+    "opencrvs": "./dist/cli.js"
+  },
   "exports": {
     "./lib": "./dist/lib.js",
     "./api": "./dist/api/index.js",

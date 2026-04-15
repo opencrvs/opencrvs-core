@@ -54,11 +54,6 @@ export const getCountryLogoFile = createSelector(
   (data) => data.config.COUNTRY_LOGO.file
 )
 
-const getAdminStructureLocations = createSelector(
-  getOfflineData,
-  (data) => data.locations
-)
-
 export const selectCountryBackground = () => {
   const countryBackground = window.config.REGISTER_BACKGROUND
   if (countryBackground?.backgroundImage) {
