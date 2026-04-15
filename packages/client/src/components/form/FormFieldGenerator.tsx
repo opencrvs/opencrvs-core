@@ -70,7 +70,6 @@ import {
   IFormData,
   FETCH_BUTTON,
   ILoaderButton,
-  FIELD_GROUP_TITLE,
   IFormSection,
   SIMPLE_DOCUMENT_UPLOADER,
   IAttachmentValue,
@@ -82,8 +81,6 @@ import {
   IDateRangePickerValue,
   TIME,
   DIVIDER,
-  HEADING3,
-  SUBSECTION_HEADER,
   HIDDEN,
   SIGNATURE,
   BUTTON,
@@ -143,7 +140,6 @@ import {
   InputLabel,
   Stack
 } from '@opencrvs/components'
-import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
 import { ButtonField } from '@client/components/form/Button'
 import { getListOfLocations } from '@client/utils/validate'
@@ -542,19 +538,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     }
     if (fieldDefinition.type === DIVIDER) {
       return <Divider />
-    }
-    if (fieldDefinition.type === HEADING3) {
-      return <Heading3>{fieldDefinition.label}</Heading3>
-    }
-    if (fieldDefinition.type === SUBSECTION_HEADER) {
-      return (
-        <>
-          <Heading2>{fieldDefinition.label}</Heading2>
-        </>
-      )
-    }
-    if (fieldDefinition.type === FIELD_GROUP_TITLE) {
-      return <Heading3>{fieldDefinition.label}</Heading3>
     }
     if (fieldDefinition.type === PARAGRAPH) {
       const label = fieldDefinition.label as unknown as MessageDescriptor & {
