@@ -566,6 +566,13 @@
   resolved "https://registry.yarnpkg.com/@open-draft/until/-/until-2.1.0.tgz#0acf32f470af2ceaf47f095cdecd40d68666efda"
   integrity sha512-U69T3ItWHvLwGg5eJ0n3I62nWuE6ilHlmz7zM0npLBRvPRd7e6NYmg54vvRtP5mZG7kZqZCFVdsTWo7BPtBujg==
 
+"@opencrvs/mosip@2.0.0-rc.2":
+  version "2.0.0-rc.2"
+  resolved "https://registry.yarnpkg.com/@opencrvs/mosip/-/mosip-2.0.0-rc.2.tgz#0fc21fa8b566f8574fecaa7970cb40087b463de2"
+  integrity sha512-GI7SRd5Jqu1oH/Z7MfEpvpcLtFCbEMEXWblQG8xGt/sxlQP9fUKRLoBuBRWewK6tnYgQmH0ypq0o0bEu0Xk9oA==
+  dependencies:
+    zod "^4.1.12"
+
 "@opencrvs/toolkit@1.9.10-rc.9afdb31":
   version "1.9.10-rc.9afdb31"
   resolved "https://registry.yarnpkg.com/@opencrvs/toolkit/-/toolkit-1.9.10-rc.9afdb31.tgz#7f4f1e2fca5a18899de87169d769b066b18e46f2"
