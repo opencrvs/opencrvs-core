@@ -10,20 +10,7 @@
  */
 
 import * as z from 'zod/v4'
-
-const TranslationConfig = z.object({
-  id: z
-    .string()
-    .describe(
-      'The identifier of the translation referred in translation CSV files'
-    ),
-  defaultMessage: z.string().describe('Default translation message'),
-  description: z
-    .string()
-    .describe(
-      'Describe the translation for a translator to be able to identify it.'
-    )
-})
+import { TranslationConfig } from './events/TranslationConfig'
 
 export const SearchCriteria = z.enum([
   'TRACKING_ID',
