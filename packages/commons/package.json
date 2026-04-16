@@ -89,7 +89,7 @@
     "uuid": "^9.0.0",
     "wireit": "^0.14.12",
     "zod": "^4.2",
-    "zod-openapi": "^5.4.3"
+    "zod-openapi": "^5.4.6"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.9",
