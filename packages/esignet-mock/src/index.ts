@@ -164,7 +164,6 @@ const authorizeSchema = {
       "scope",
       "acr_values",
       "claims",
-      "state",
       "redirect_uri",
     ],
     properties: {
@@ -185,20 +184,11 @@ app.get("/authorize", {
     const htmlFilePath = path.join(__dirname, "./mock-authorizer/index.html");
     const html = readFileSync(htmlFilePath, "utf-8");
 
-    const modifiedHtml = html
-      .replace(/{{client_id}}/g, request.query.client_id)
-      .replace(/{{response_type}}/g, request.query.response_type)
-      .replace(/{{scope}}/g, request.query.scope)
-      .replace(/{{acr_values}}/g, request.query.acr_values)
-      .replace(/{{claims}}/g, request.query.claims)
-      .replace(/{{state}}/g, request.query.state)
-      .replace(/{{redirect_uri}}/g, request.query.redirect_uri);
-
     /** See `packages/mosip-api/src/esignet-api.ts` for `redirect_uri: redirectUri?.split("?")[0] ?? redirectUri` to understand the matching of this */
     /** @see VALID_REDIRECT_URIS for explanation */
     VALID_REDIRECT_URIS.push(request.query.redirect_uri.split("?")[0]);
 
-    return reply.type("text/html").send(modifiedHtml);
+    return reply.type("text/html").send(html);
   },
 });
 
