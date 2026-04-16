@@ -265,7 +265,7 @@ export async function refetchWorkqueueSearchQueries(slug: string) {
   })
   await Promise.all(
     queries.map(async (query) =>
-      queryClient.refetchQueries({ queryKey: query.queryKey, exact: true })
+      queryClient.invalidateQueries({ queryKey: query.queryKey, exact: true })
     )
   )
 }
