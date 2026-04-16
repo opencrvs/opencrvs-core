@@ -13,7 +13,7 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
 import { WorkqueueCountInput } from '@opencrvs/commons/client'
 import { useTRPC, trpcOptionsProxy, queryClient } from '@client/v2-events/trpc'
-import { refetchWorkqueueSearchQueries } from '../api'
+import { invalidateWorkqueueSearchQueries } from '../api'
 import { setQueryDefaults } from './utils'
 
 setQueryDefaults(trpcOptionsProxy.workqueue.count, {
@@ -36,7 +36,7 @@ setQueryDefaults(trpcOptionsProxy.workqueue.count, {
       const changedSlugs = Object.keys(response).filter(
         (slug) => previousCounts[slug] !== response[slug]
       )
-      await Promise.all(changedSlugs.map(refetchWorkqueueSearchQueries))
+      await Promise.all(changedSlugs.map(invalidateWorkqueueSearchQueries))
     }
 
     return response

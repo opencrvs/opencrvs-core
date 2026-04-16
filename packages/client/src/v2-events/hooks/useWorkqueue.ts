@@ -61,7 +61,7 @@ export const useWorkqueue = (workqueueSlug: string) => {
       return {
         useSuspenseQuery: () =>
           searchEvent.useSuspenseQuery(searchInput, {
-            // Tag with workqueueSlug in meta so refetchWorkqueueSearchQueries()
+            // Tag with workqueueSlug in meta so invalidateWorkqueueSearchQueries()
             // can target this query without extending the cache key.
             meta: { workqueueSlug },
             refetchInterval: 20000

@@ -255,10 +255,14 @@ export async function refetchAllSearchQueries() {
 }
 
 /**
- * Refetch search queries for a specific workqueue identified by its slug.
+ * Invalidate search queries for a specific workqueue identified by its slug.
  * Queries are tagged with { workqueueSlug } in meta by useWorkqueue → getResult.
+ *
+ * For active observers (workqueue page mounted) this triggers an immediate
+ * background refetch. For inactive queries it marks them stale so the next
+ * mount fetches fresh data — no unnecessary network requests are fired.
  */
-export async function refetchWorkqueueSearchQueries(slug: string) {
+export async function invalidateWorkqueueSearchQueries(slug: string) {
   const queries = queryClient.getQueryCache().findAll({
     queryKey: trpcOptionsProxy.event.search.queryKey(),
     predicate: (query) => query.meta?.workqueueSlug === slug
