@@ -12501,9 +12501,13 @@ components:
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/Exact"
         createdAtLocation:
-          $ref: "#/components/schemas/Within"
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
         updatedAtLocation:
-          $ref: "#/components/schemas/Within"
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
         assignedTo:
           $ref: "#/components/schemas/Exact"
         createdByUserType:
