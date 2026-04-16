@@ -22,16 +22,10 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
-import {
-  ACTION_SCOPE_MAP,
-  ActionType,
-  canUserCreateEvent,
-  getAcceptedScopesByType
-} from '@opencrvs/commons/client'
+import { canUserCreateEvent } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
-
 import { createTemporaryId } from '@client/v2-events/utils'
-import { getScope } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { useEventConfigurations } from './useEventConfiguration'
 import { useEventFormData } from './useEventFormData'
 import { useEventFormNavigation } from './useEventFormNavigation'
@@ -86,14 +80,10 @@ function EventSelector() {
   const clearForm = useEventFormData((state) => state.clear)
   const clearAnnotation = useActionAnnotation((state) => state.clear)
   const createEvent = events.createEvent()
-
-  const acceptedScopes = getAcceptedScopesByType({
-    acceptedScopes: ACTION_SCOPE_MAP[ActionType.CREATE],
-    scopes
-  })
+  const user = useSelector(getUserDetails)
 
   const allowedEventConfigurations = eventConfigurations.filter(({ id }) =>
-    canUserCreateEvent(acceptedScopes, id)
+    canUserCreateEvent(scopes, id)
   )
 
   function handleContinue() {
@@ -111,7 +101,8 @@ function EventSelector() {
 
     createEvent.mutate({
       type: eventType,
-      transactionId
+      transactionId,
+      createdAtLocation: user?.primaryOfficeId
     })
 
     clearForm()

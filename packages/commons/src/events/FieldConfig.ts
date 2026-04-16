@@ -15,16 +15,16 @@ import { TranslationConfig } from './TranslationConfig'
 import { FieldType } from './FieldType'
 import {
   CheckboxFieldValue,
-  DateValue,
+  PlainDate,
   NumberFieldValue,
   NonEmptyTextValue,
   TextValue,
   DateRangeFieldValue,
-  SignatureFieldValue,
   SelectDateRangeValue,
   TimeValue,
   ButtonFieldValue,
-  VerificationStatusValue
+  VerificationStatusValue,
+  FieldValue
 } from './FieldValue'
 import {
   CustomFieldValue,
@@ -36,11 +36,11 @@ import {
   NumberWithUnitFieldValue,
   QrReaderFieldValue
 } from './CompositeFieldValue'
-
 import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
 import { SearchQuery } from './EventIndex'
 import { SerializedNowDateTime } from './serializers/date/serializer'
+import { JurisdictionReference } from '../users/userReferences'
 
 const FieldId = z
   .string()
@@ -67,6 +67,7 @@ export const FieldReference = z
     $$subfield: z
       .array(z.string())
       .optional()
+      .default([])
       .describe(
         'If the FieldValue is an object, subfield can be used to refer to e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
       )
@@ -230,7 +231,7 @@ const SignatureField = BaseField.extend({
   signaturePromptLabel: TranslationConfig.describe(
     'Title of the signature modal'
   ),
-  defaultValue: SignatureFieldValue.optional(),
+  defaultValue: FieldValue.optional(),
   configuration: z
     .object({
       maxFileSize: z
@@ -263,7 +264,7 @@ export type EmailField = z.infer<typeof EmailField>
 
 const DateField = BaseField.extend({
   type: z.literal(FieldType.DATE),
-  defaultValue: SerializedNowDateTime.or(DateValue)
+  defaultValue: SerializedNowDateTime.or(PlainDate)
     .optional()
     .describe('Default date value(yyyy-MM-dd)'),
   configuration: z
@@ -342,9 +343,6 @@ const ParagraphConfiguration = z
   .object({
     styles: z
       .object({
-        fontVariant: HtmlFontVariant.optional().describe(
-          'Font variant to use for the paragraph text'
-        ),
         hint: z
           .boolean()
           .optional()
@@ -358,6 +356,27 @@ const ParagraphConfiguration = z
   .default({})
 
 export type ParagraphConfiguration = z.infer<typeof ParagraphConfiguration>
+
+const HeadingFontVariant = HtmlFontVariant.exclude(['h1', 'h2'])
+
+type HeadingFontVariant = z.infer<typeof HeadingFontVariant>
+
+const HeadingConfiguration = z
+  .object({
+    styles: z
+      .object({
+        fontVariant: HeadingFontVariant.optional().describe(
+          'Font variant to use for the paragraph text'
+        ),
+        textAlign: ParagraphTextAlign.optional().describe(
+          'Text alignment for the paragraph'
+        )
+      })
+      .optional()
+  })
+  .default({})
+
+export type HeadingConfiguration = z.infer<typeof HeadingConfiguration>
 
 const ImageConfiguration = z.object({
   alt: z.string().optional().describe('Alternative text for the image'),
@@ -389,6 +408,14 @@ const Paragraph = BaseField.extend({
 }).describe('A read-only HTML <p> paragraph')
 
 export type Paragraph = z.infer<typeof Paragraph>
+
+const Heading = BaseField.extend({
+  type: z.literal(FieldType.HEADING),
+  defaultValue: NonEmptyTextValue.optional(),
+  configuration: HeadingConfiguration
+}).describe('A read-only heading component for form pages')
+
+export type Heading = z.infer<typeof Heading>
 
 const PageHeader = BaseField.extend({
   type: z.literal(FieldType.PAGE_HEADER),
@@ -599,28 +626,29 @@ const Country = BaseField.extend({
 
 export type Country = z.infer<typeof Country>
 
+const AllowedLocations = JurisdictionReference.optional().describe(
+  'Limits which location options are selectable depending on user jurisdiction and location.'
+)
+
 export const AdministrativeAreas = z.enum([
   'ADMIN_STRUCTURE',
   'HEALTH_FACILITY',
   'CRVS_OFFICE'
 ])
 
-const AdministrativeAreaConfiguration = z
-  .object({
-    partOf: z
-      .object({
-        $declaration: z.string()
-      })
-      .optional()
-      .describe('Parent location'),
-    type: AdministrativeAreas
-  })
-  .describe('Administrative area options')
-
 const AdministrativeAreaField = BaseField.extend({
   type: z.literal(FieldType.ADMINISTRATIVE_AREA),
   defaultValue: NonEmptyTextValue.optional(),
-  configuration: AdministrativeAreaConfiguration
+  configuration: z
+    .object({
+      partOf: z
+        .object({ $declaration: z.string() })
+        .optional()
+        .describe('Parent location'),
+      type: AdministrativeAreas,
+      allowedLocations: AllowedLocations
+    })
+    .describe('Administrative area options')
 }).describe('Administrative area input field e.g. facility, office')
 
 export type AdministrativeAreaField = z.infer<typeof AdministrativeAreaField>
@@ -629,7 +657,11 @@ const LocationInput = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
   defaultValue: NonEmptyTextValue.optional(),
   configuration: z.object({
-    searchableResource: z.array(z.enum(['locations', 'facilities', 'offices']))
+    locationTypes: z
+      .array(z.string())
+      .optional()
+      .describe('Types of the locations that are available for selection.'),
+    allowedLocations: AllowedLocations
   })
 }).describe('Input field for a location')
 
@@ -661,16 +693,24 @@ const FileUploadWithOptions = BaseField.extend({
 
 export type FileUploadWithOptions = z.infer<typeof FileUploadWithOptions>
 
+/**
+ * @deprecated Use FieldType.LOCATION with locationTypes: ['HEALTH_FACILITY']
+ */
 const Facility = BaseField.extend({
   type: z.literal(FieldType.FACILITY),
-  defaultValue: NonEmptyTextValue.optional()
+  defaultValue: NonEmptyTextValue.optional(),
+  configuration: z.object({ allowedLocations: AllowedLocations }).optional()
 }).describe('Input field for a facility')
 
 export type Facility = z.infer<typeof Facility>
 
+/**
+ * @deprecated Use FieldType.LOCATION with locationTypes: ['CRVS_OFFICE']
+ */
 const Office = BaseField.extend({
   type: z.literal(FieldType.OFFICE),
-  defaultValue: NonEmptyTextValue.optional()
+  defaultValue: NonEmptyTextValue.optional(),
+  configuration: z.object({ allowedLocations: AllowedLocations }).optional()
 }).describe('Input field for an office')
 
 export type Office = z.infer<typeof Office>
@@ -699,7 +739,8 @@ const Address = BaseField.extend({
             parent: FieldReference.optional()
           })
         )
-        .optional()
+        .optional(),
+      allowedLocations: AllowedLocations
     })
     .optional(),
   defaultValue: DefaultAddressFieldValue.optional()
@@ -936,6 +977,15 @@ const HiddenField = BaseField.extend({
 
 export type HiddenField = z.infer<typeof HiddenField>
 
+const UserRoleField = BaseField.extend({
+  type: z.literal(FieldType.USER_ROLE),
+  defaultValue: TextValue.optional()
+}).describe(
+  'A select dropdown that is automatically populated with available user roles'
+)
+
+export type UserRoleField = z.infer<typeof UserRoleField>
+
 export const FieldConfig = z
   .discriminatedUnion('type', [
     Address,
@@ -950,6 +1000,7 @@ export const FieldConfig = z
     SelectDateRangeField,
     ImageViewField,
     Paragraph,
+    Heading,
     RadioGroup,
     BulletList,
     PageHeader,
@@ -980,7 +1031,8 @@ export const FieldConfig = z
     LoaderField,
     SearchField,
     CustomField,
-    HiddenField
+    HiddenField,
+    UserRoleField
   ])
   .meta({
     description: 'Form field configuration',
@@ -1005,10 +1057,6 @@ export type FieldPropsWithoutReferenceValue<T extends FieldType> = Omit<
 >
 
 export type SelectOption = z.infer<typeof SelectOption>
-
-export type AdministrativeAreaConfiguration = z.infer<
-  typeof AdministrativeAreaConfiguration
->
 
 /**
  * Union of file-related fields. Using common type should help with compiler to know where to add new cases.

@@ -26,9 +26,7 @@ import * as validators from '@opencrvs/client/src/utils/validate'
 import { IFont } from '@opencrvs/components/lib/fonts'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import * as mutations from './register/mappings/mutation'
-import * as graphQLQueries from './register/legacy'
 import * as queries from './register/mappings/query'
-import * as responseTransformers from './register/legacy/response-transformers'
 import { UserDetails } from '@client/utils/userUtils'
 import { Conditional } from './conditionals'
 import * as labels from '@client/forms/certificate/fieldDefinitions/label'
@@ -55,8 +53,6 @@ export const CHECKBOX = 'CHECKBOX'
 export const DATE = 'DATE'
 export const DATE_RANGE_PICKER = 'DATE_RANGE_PICKER'
 export const TEXTAREA = 'TEXTAREA'
-export const SUBSECTION_HEADER = 'SUBSECTION_HEADER'
-export const FIELD_GROUP_TITLE = 'FIELD_GROUP_TITLE'
 export const BULLET_LIST = 'BULLET_LIST'
 export const PARAGRAPH = 'PARAGRAPH'
 const DOCUMENTS = 'DOCUMENTS'
@@ -73,7 +69,6 @@ export const FETCH_BUTTON = 'FETCH_BUTTON'
 export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
 export const TIME = 'TIME'
 export const DIVIDER = 'DIVIDER'
-export const HEADING3 = 'HEADING3'
 export const SIGNATURE = 'SIGNATURE'
 export const HTTP = 'HTTP'
 export const BUTTON = 'BUTTON'
@@ -82,7 +77,7 @@ export const ID_READER = 'ID_READER'
 export const ID_VERIFICATION_BANNER = 'ID_VERIFICATION_BANNER'
 export const LOADER = 'LOADER'
 
-export enum SubmissionAction {
+enum SubmissionAction {
   SUBMIT_FOR_REVIEW = 'submit for review',
   APPROVE_DECLARATION = 'approve',
   REGISTER_DECLARATION = 'register',
@@ -97,21 +92,16 @@ export enum SubmissionAction {
   REQUEST_CORRECTION = 'request correction'
 }
 
-export enum DownloadAction {
+enum DownloadAction {
   LOAD_REVIEW_DECLARATION = 'load declaration data for review',
   LOAD_CERTIFICATE_DECLARATION = 'load declaration data for certificate collection',
   LOAD_REQUESTED_CORRECTION_DECLARATION = 'load declaration data for which is requested correction'
 }
 
-export enum AddressCases {
-  PRIMARY_ADDRESS = 'PRIMARY_ADDRESS',
-  SECONDARY_ADDRESS = 'SECONDARY_ADDRESS'
-}
-
 export type Action = SubmissionAction | DownloadAction
 export interface ISelectOption {
   value: SelectComponentOption['value']
-  label: MessageDescriptor
+  label: MessageDescriptor | string
   isDefault?: boolean
 }
 export interface IRadioOption {
@@ -168,7 +158,7 @@ export type IDynamicValueMapper = (key: string) => string
 
 type IDynamicFieldTypeMapper = (key: string) => string
 
-export const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
+const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
   switch (key) {
     case NATIONAL_ID:
       return BIG_NUMBER
@@ -181,7 +171,7 @@ export const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
   }
 }
 
-export interface ISerializedDynamicFormFieldDefinitions {
+interface ISerializedDynamicFormFieldDefinitions {
   label?: {
     dependency: string
     labelMapper: Operation<typeof labels>
@@ -211,7 +201,7 @@ export interface ISerializedDynamicFormFieldDefinitions {
   }>
 }
 
-export interface IDynamicFormFieldDefinitions {
+interface IDynamicFormFieldDefinitions {
   label?: IDynamicFieldLabel
   helperText?: IDynamicFieldHelperText
   tooltip?: IDynamicFieldTooltip
@@ -301,7 +291,7 @@ interface IInformant {
   nestedFields: IInformantOtherInformantType
 }
 
-export interface IContactPoint {
+interface IContactPoint {
   value: string
   nestedFields: IContactPointPhone
 }
@@ -404,10 +394,6 @@ type SerializedSelectFormFieldWithOptions = Omit<
   optionCondition?: string
 }
 
-type ILoaderButtonWithSerializedQueryMap = Omit<ILoaderButton, 'queryMap'> & {
-  queryMap: ISerializedQueryMap
-}
-
 type SerializedRadioGroupWithNestedFields = Omit<
   IRadioGroupWithNestedFieldsFormField,
   'nestedFields'
@@ -421,7 +407,7 @@ type IMapping = {
   template?: ITemplateDescriptor
 }
 
-export type SerializedFormField = UnionOmit<
+type SerializedFormField = UnionOmit<
   | Exclude<
       IFormField,
       | IFormFieldWithDynamicDefinitions
@@ -431,7 +417,6 @@ export type SerializedFormField = UnionOmit<
     >
   | SerializedSelectFormFieldWithOptions
   | SerializedFormFieldWithDynamicDefinitions
-  | ILoaderButtonWithSerializedQueryMap
   | SerializedRadioGroupWithNestedFields,
   'validator' | 'mapping'
 > & {
@@ -520,7 +505,7 @@ export interface ISelectFormFieldWithDynamicOptions extends IFormFieldBase {
   dynamicOptions: IDynamicOptions
 }
 
-export interface IFormFieldWithDynamicDefinitions extends IFormFieldBase {
+interface IFormFieldWithDynamicDefinitions extends IFormFieldBase {
   type: typeof FIELD_WITH_DYNAMIC_DEFINITIONS
   dynamicDefinitions: IDynamicFormFieldDefinitions
 }
@@ -546,7 +531,7 @@ export interface IRadioGroupFormField extends IFormFieldBase {
   flexDirection?: FLEX_DIRECTION
 }
 
-export interface IRadioGroupWithNestedFieldsFormField
+interface IRadioGroupWithNestedFieldsFormField
   extends Omit<IRadioGroupFormField, 'type'> {
   type: typeof RADIO_GROUP_WITH_NESTED_FIELDS
   nestedFields: INestedInputFields
@@ -607,14 +592,8 @@ interface ITextareaFormField extends IFormFieldBase {
   type: typeof TEXTAREA
   maxLength?: number
 }
-interface ISubsectionFormField extends IFormFieldBase {
-  type: typeof SUBSECTION_HEADER
-}
 interface IDividerFormField extends IFormFieldBase {
   type: typeof DIVIDER
-}
-interface IFieldGroupTitleField extends IFormFieldBase {
-  type: typeof FIELD_GROUP_TITLE
 }
 interface IDocumentsFormField extends IFormFieldBase {
   type: typeof DOCUMENTS
@@ -682,12 +661,6 @@ export interface IQuery {
   responseTransformer: (response: ApolloQueryResult<GQLQuery>) => void
 }
 
-export interface ISerializedQueryMap {
-  [key: string]: Omit<IQuery, 'responseTransformer' | 'query'> & {
-    responseTransformer: Operation<typeof responseTransformers>
-    query: Operation<typeof graphQLQueries>
-  }
-}
 export interface IQueryMap {
   [key: string]: IQuery
 }
@@ -806,8 +779,6 @@ export type IFormField =
   | ICheckboxFormField
   | IDateFormField
   | ITextareaFormField
-  | ISubsectionFormField
-  | IFieldGroupTitleField
   | IDocumentsFormField
   | IListFormField
   | IParagraphFormField
@@ -866,7 +837,7 @@ type ValidationDefaultOperationKeys = Exclude<
   ValidationFactoryOperationKeys
 >
 
-export type ValidationFactoryOperation<
+type ValidationFactoryOperation<
   T extends ValidationFactoryOperationKeys = ValidationFactoryOperationKeys
 > = {
   operation: T
@@ -879,7 +850,7 @@ type ValidationDefaultOperation<
   operation: T
 }
 
-export type IValidatorDescriptor =
+type IValidatorDescriptor =
   | ValidationFactoryOperation
   | ValidationDefaultOperation
 
@@ -895,7 +866,7 @@ type QueryDefaultOperationKeys = Exclude<
   QueryFactoryOperationKeys
 >
 
-export type QueryFactoryOperation<
+type QueryFactoryOperation<
   T extends QueryFactoryOperationKeys = QueryFactoryOperationKeys
 > = {
   operation: T
@@ -911,14 +882,11 @@ type QueryDefaultOperation<
   operation: T
 }
 
-export type IQueryDescriptor = QueryFactoryOperation | QueryDefaultOperation
+type IQueryDescriptor = QueryFactoryOperation | QueryDefaultOperation
 
 type ISimpleTemplateDescriptor = { fieldName: string }
-export type IQueryTemplateDescriptor = ISimpleTemplateDescriptor &
-  IQueryDescriptor
-export type ITemplateDescriptor =
-  | IQueryTemplateDescriptor
-  | ISimpleTemplateDescriptor
+type IQueryTemplateDescriptor = ISimpleTemplateDescriptor & IQueryDescriptor
+type ITemplateDescriptor = IQueryTemplateDescriptor | ISimpleTemplateDescriptor
 // Mutations
 
 type MutationFactoryOperationKeys = FilterType<
@@ -931,7 +899,7 @@ type MutationDefaultOperationKeys = Exclude<
   MutationFactoryOperationKeys
 >
 
-export type MutationFactoryOperation<
+type MutationFactoryOperation<
   T extends MutationFactoryOperationKeys = MutationFactoryOperationKeys
 > = {
   operation: T
@@ -947,9 +915,7 @@ type MutationDefaultOperation<
   operation: T
 }
 
-export type IMutationDescriptor =
-  | MutationFactoryOperation
-  | MutationDefaultOperation
+type IMutationDescriptor = MutationFactoryOperation | MutationDefaultOperation
 
 // Initial type as it's always used as an object.
 // @todo should be stricter than this
@@ -961,13 +927,13 @@ type IFormSectionMapping = {
   template?: [string, IFormSectionQueryMapFunction][]
 }
 
-export type IFormSectionMutationMapFunction = (
+type IFormSectionMutationMapFunction = (
   transFormedData: TransformedData,
   draftData: IFormData,
   sectionId: string
 ) => void
 
-export type IFormSectionQueryMapFunction = (
+type IFormSectionQueryMapFunction = (
   transFormedData: IFormData,
   queryData: any,
   sectionId: string,
@@ -977,16 +943,12 @@ export type IFormSectionQueryMapFunction = (
   userDetails?: UserDetails // user for template user mappings
 ) => void
 
-export enum UserSection {
-  User = 'user',
-  Preview = 'preview'
-}
-
 enum CertificateSection {
-  Collector = 'collector'
+  Collector = 'collector',
+  User = 'user'
 }
 
-export enum CorrectionSection {
+enum CorrectionSection {
   Corrector = 'corrector',
   Reason = 'reason',
   SupportingDocuments = 'supportingDocuments',
@@ -1009,7 +971,6 @@ enum RegistrationSection {
 export type Section =
   | ReviewSection
   | PaymentSection
-  | UserSection
   | CertificateSection
   | CorrectionSection
   | RegistrationSection
@@ -1188,12 +1149,6 @@ interface Ii18nTextareaFormField extends Ii18nFormFieldBase {
   type: typeof TEXTAREA
   maxLength?: number
 }
-interface Ii18nSubsectionFormField extends Ii18nFormFieldBase {
-  type: typeof SUBSECTION_HEADER
-}
-interface Ii18nFieldGroupTitleField extends Ii18nFormFieldBase {
-  type: typeof FIELD_GROUP_TITLE
-}
 interface Ii18nDocumentsFormField extends Ii18nFormFieldBase {
   type: typeof DOCUMENTS
 }
@@ -1259,10 +1214,6 @@ interface I18nDividerField extends Ii18nFormFieldBase {
   type: typeof DIVIDER
 }
 
-interface I18nHeading3Field extends Ii18nFormFieldBase {
-  type: typeof HEADING3
-}
-
 interface Ii18nTimeFormField extends Ii18nFormFieldBase {
   type: typeof TIME
   ignorePlaceHolder?: boolean
@@ -1300,7 +1251,7 @@ export interface Ii18nButtonFormField extends Ii18nFormFieldBase {
   }
 }
 
-export interface Ii18nLinkButtonFormField extends Ii18nFormFieldBase {
+interface Ii18nLinkButtonFormField extends Ii18nFormFieldBase {
   type: typeof LINK_BUTTON
   icon?: {
     desktop: IconProps['name']
@@ -1346,8 +1297,6 @@ export type Ii18nFormField =
   | Ii18nCheckboxFormField
   | Ii18nDateFormField
   | Ii18nTextareaFormField
-  | Ii18nSubsectionFormField
-  | Ii18nFieldGroupTitleField
   | Ii18nDocumentsFormField
   | Ii18nListFormField
   | Ii18nParagraphFormField
@@ -1361,7 +1310,6 @@ export type Ii18nFormField =
   | Ii18nDateRangePickerFormField
   | Ii18nTimeFormField
   | I18nDividerField
-  | I18nHeading3Field
   | Ii18nSignatureField
   | Ii18nHttpFormField
   | Ii18nButtonFormField
@@ -1376,57 +1324,4 @@ export interface IFormSectionData {
 
 export interface IFormData {
   [key: string]: IFormSectionData
-}
-
-type PaymentType = 'MANUAL'
-
-type PaymentOutcomeType = 'COMPLETED' | 'ERROR' | 'PARTIAL'
-
-type Payment = {
-  paymentId?: string
-  type: PaymentType
-  amount: string
-  outcome: PaymentOutcomeType
-  date: number
-}
-
-interface ICertificate {
-  collector?: IFormSectionData
-  hasShowedVerifiedDocument?: boolean
-  payments?: Payment[]
-  certificateTemplateId?: string
-}
-
-export function modifyFormField(
-  form: IForm,
-  sectionId: string,
-  groupId: string,
-  fieldName: string,
-  modifyFn: (field: IFormField) => IFormField
-) {
-  return {
-    ...form,
-    sections: form.sections.map((section) => {
-      if (section.id === sectionId) {
-        return {
-          ...section,
-          groups: section.groups.map((group) => {
-            if (group.id === groupId) {
-              return {
-                ...group,
-                fields: group.fields.map((field) => {
-                  if (field.name === fieldName) {
-                    return modifyFn(field)
-                  }
-                  return field
-                })
-              }
-            }
-            return group
-          })
-        }
-      }
-      return section
-    })
-  }
 }

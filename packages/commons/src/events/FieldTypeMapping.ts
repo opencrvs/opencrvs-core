@@ -55,12 +55,14 @@ import {
   AgeField,
   CustomField,
   HiddenField,
-  ImageViewField
+  ImageViewField,
+  Heading,
+  UserRoleField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
   CheckboxFieldValue,
-  DateValue,
+  PlainDate,
   EmailValue,
   FieldValue,
   FieldUpdateValueSchema,
@@ -74,9 +76,10 @@ import {
   ButtonFieldValue,
   VerificationStatusValue,
   AgeValue,
-  FieldUpdateValue
+  FieldUpdateValue,
+  DateValue
 } from './FieldValue'
-import { FullDocumentPath } from '../documents'
+import { DocumentPath } from '../documents'
 import {
   AddressFieldValue,
   FileFieldValue,
@@ -99,6 +102,7 @@ import {
   getDynamicAddressFieldValue
 } from './DynamicFieldValue'
 import { ActionType } from './ActionType'
+import { EventConfig } from './EventConfig'
 
 /**
  * FieldTypeMapping.ts should include functions that map field types to different formats dynamically.
@@ -132,7 +136,7 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
 
   switch (field.type) {
     case FieldType.DATE:
-      schema = DateValue
+      schema = PlainDate
       break
     case FieldType.AGE:
       schema = AgeValue
@@ -159,6 +163,7 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
+    case FieldType.HEADING:
     case FieldType.IMAGE_VIEW:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
@@ -169,6 +174,7 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.ID:
     case FieldType.LOADER:
     case FieldType.ALPHA_HIDDEN:
+    case FieldType.USER_ROLE:
       schema = field.required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
@@ -230,6 +236,80 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
   return field.required ? schema : schema.nullish()
 }
 
+type FieldTypeValueMap = {
+  [FieldType.DATE]: z.infer<typeof DateValue>
+  [FieldType.AGE]: z.infer<typeof AgeValue>
+  [FieldType.TIME]: z.infer<typeof TimeValue>
+  [FieldType.EMAIL]: z.infer<typeof EmailValue>
+  [FieldType.DATE_RANGE]: z.infer<typeof DateRangeFieldValue>
+  [FieldType.SELECT_DATE_RANGE]: z.infer<typeof SelectDateRangeValue>
+  [FieldType.TEXT]: z.infer<typeof TextValue>
+  [FieldType.TEXTAREA]: z.infer<typeof TextValue>
+  [FieldType.DIVIDER]: z.infer<typeof TextValue>
+  [FieldType.BULLET_LIST]: z.infer<typeof TextValue>
+  [FieldType.PAGE_HEADER]: z.infer<typeof TextValue>
+  [FieldType.LOCATION]: z.infer<typeof TextValue>
+  [FieldType.SELECT]: z.infer<typeof TextValue>
+  [FieldType.COUNTRY]: z.infer<typeof TextValue>
+  [FieldType.RADIO_GROUP]: z.infer<typeof TextValue>
+  [FieldType.PARAGRAPH]: z.infer<typeof TextValue>
+  [FieldType.HEADING]: z.infer<typeof TextValue>
+  [FieldType.IMAGE_VIEW]: z.infer<typeof TextValue>
+  [FieldType.ADMINISTRATIVE_AREA]: z.infer<typeof TextValue>
+  [FieldType.FACILITY]: z.infer<typeof TextValue>
+  [FieldType.OFFICE]: z.infer<typeof TextValue>
+  [FieldType.PHONE]: z.infer<typeof TextValue>
+  [FieldType.LINK_BUTTON]: z.infer<typeof TextValue>
+  [FieldType.VERIFICATION_STATUS]: z.infer<typeof TextValue>
+  [FieldType.ID]: z.infer<typeof TextValue>
+  [FieldType.LOADER]: z.infer<typeof TextValue>
+  [FieldType.ALPHA_HIDDEN]: z.infer<typeof TextValue>
+  [FieldType.USER_ROLE]: z.infer<typeof TextValue>
+  [FieldType.NUMBER]: z.infer<typeof NumberFieldValue>
+  [FieldType.NUMBER_WITH_UNIT]: z.infer<typeof NumberWithUnitFieldValue>
+  [FieldType.CHECKBOX]: z.infer<typeof CheckboxFieldValue>
+  [FieldType.SIGNATURE]: z.infer<typeof FileFieldValue>
+  [FieldType.FILE]: z.infer<typeof FileFieldValue>
+  [FieldType.FILE_WITH_OPTIONS]: z.infer<typeof FileFieldWithOptionValue>
+  [FieldType.ADDRESS]: z.infer<DynamicAddressFieldValue>
+  [FieldType.DATA]: z.infer<typeof DataFieldValue>
+  [FieldType.NAME]: z.infer<DynamicNameValue>
+  [FieldType.BUTTON]: z.infer<typeof ButtonFieldValue>
+  [FieldType.ALPHA_PRINT_BUTTON]: z.infer<typeof TextValue>
+  [FieldType.HTTP]: z.infer<typeof HttpFieldUpdateValue>
+  [FieldType.SEARCH]: z.infer<typeof HttpFieldUpdateValue>
+  [FieldType.QUERY_PARAM_READER]: z.infer<
+    typeof QueryParamReaderFieldUpdateValue
+  >
+  [FieldType.QR_READER]: z.infer<typeof QrReaderFieldValue>
+  [FieldType.ID_READER]: z.infer<typeof IdReaderFieldValue>
+  [FieldType._EXPERIMENTAL_CUSTOM]: z.infer<typeof CustomFieldValue>
+}
+
+export type FieldTypeToFieldValue<T extends FieldType> = FieldTypeValueMap[T]
+
+type UnionToIntersection<U> = (
+  U extends unknown ? (x: U) => void : never
+) extends (x: infer I) => void
+  ? I
+  : never
+
+type ExtractFieldMap<T> = T extends {
+  declaration: { pages: readonly (infer Page)[] }
+}
+  ? Page extends { fields: readonly (infer Field)[] }
+    ? Field extends {
+        id: infer Id extends string
+        type: infer Type extends FieldType
+      }
+      ? Record<Id, FieldTypeToFieldValue<Type>>
+      : never
+    : never
+  : never
+
+export type EventConfigToDeclarationFormType<T extends EventConfig> =
+  UnionToIntersection<ExtractFieldMap<T>>
+
 /**
  * Maps complex or nested field types, such as Address fields, to their corresponding empty values.
  */
@@ -245,6 +325,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
+    case FieldType.HEADING:
     case FieldType.IMAGE_VIEW:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
@@ -273,6 +354,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.ID_READER:
     case FieldType.LOADER:
     case FieldType.ALPHA_HIDDEN:
+    case FieldType.USER_ROLE:
       return null
     case FieldType.ADDRESS:
       return {
@@ -284,7 +366,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
-        path: '' as FullDocumentPath,
+        path: '' as DocumentPath,
         originalFilename: '',
         type: ''
       } satisfies FileFieldValue
@@ -301,6 +383,13 @@ export const isParagraphFieldType = (field: {
   value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: Paragraph } => {
   return field.config.type === FieldType.PARAGRAPH
+}
+
+export const isHeadingFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: string; config: Heading } => {
+  return field.config.type === FieldType.HEADING
 }
 
 export const isImageViewFieldType = (field: {
@@ -501,6 +590,7 @@ export const isAdministrativeAreaFieldType = (field: {
   return field.config.type === FieldType.ADMINISTRATIVE_AREA
 }
 
+/** @deprecated Moving on, we should only use FieldType.LOCATION. */
 export const isFacilityFieldType = (field: {
   config: FieldConfig
   value: FieldValue | FieldUpdateValue
@@ -508,6 +598,7 @@ export const isFacilityFieldType = (field: {
   return field.config.type === FieldType.FACILITY
 }
 
+/** @deprecated Moving on, we should only use FieldType.LOCATION. */
 export const isOfficeFieldType = (field: {
   config: FieldConfig
   value: FieldValue | FieldUpdateValue
@@ -605,6 +696,13 @@ export const isCustomFieldType = (field: {
   return field.config.type === FieldType._EXPERIMENTAL_CUSTOM
 }
 
+export const isUserRoleFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: string; config: UserRoleField } => {
+  return field.config.type === FieldType.USER_ROLE
+}
+
 export const isHiddenFieldType = (field: {
   config: FieldConfig
   value: FieldValue | FieldUpdateValue
@@ -617,6 +715,7 @@ export type NonInteractiveFieldType =
   | PageHeader
   | ImageViewField
   | Paragraph
+  | Heading
   | BulletList
   | DataField
   | AlphaPrintButton
@@ -634,6 +733,7 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.DIVIDER ||
     field.type === FieldType.PAGE_HEADER ||
     field.type === FieldType.PARAGRAPH ||
+    field.type === FieldType.HEADING ||
     field.type === FieldType.BULLET_LIST ||
     field.type === FieldType.DATA ||
     field.type === FieldType.ALPHA_PRINT_BUTTON ||

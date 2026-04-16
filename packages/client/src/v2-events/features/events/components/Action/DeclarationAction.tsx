@@ -39,7 +39,11 @@ import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Act
 import { useToastAndRedirect } from '@client/v2-events/features/events/useToastAndRedirect'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
-import { AvailableActionTypes, getPreviousDeclarationActionType } from './utils'
+import {
+  AvailableActionTypes,
+  getAnnotationForActionType,
+  getPreviousDeclarationActionType
+} from './utils'
 
 /**
  *
@@ -57,7 +61,7 @@ function useActionGuard(
 ) {
   const eventState = getCurrentEventState(event, configuration)
   const availableActions = getAvailableActionsForEvent(eventState)
-  const { isActionAllowed } = useUserAllowedActions(event.type)
+  const { isActionAllowed } = useUserAllowedActions(eventState)
   const { redirectToEventOverviewPage } = useToastAndRedirect()
   // If the action is not available for the event, redirect to the overview page
   if (!availableActions.includes(actionType)) {
@@ -228,21 +232,7 @@ function DeclarationActionComponent({
       return {}
     }
 
-    const prevActionAnnotation = getActionAnnotation({
-      event,
-      actionType: previousActionType
-    })
-
-    // If we found annotation data from the previous action, use that.
-    if (Object.keys(prevActionAnnotation).length) {
-      return prevActionAnnotation
-    }
-
-    // As a fallback, lets see if there is a notify action annotation and use that.
-    return getActionAnnotation({
-      event,
-      actionType: ActionType.NOTIFY
-    })
+    return getAnnotationForActionType({ event, actionType: previousActionType })
   }, [event, actionType])
 
   useEffect(() => {

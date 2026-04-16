@@ -77,7 +77,7 @@ const handlers = [
       return HttpResponse.json(filenames)
     }
   ),
-  http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+  http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
     return HttpResponse.json([
       tennisClubMembershipEventWithCustomAction,
       {
@@ -112,7 +112,7 @@ const handlers = [
     return HttpResponse.json({
       primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902',
       role: 'REGISTRATION_AGENT',
-      signature: '/ocrvs/signature.png'
+      signature: 'signature.png'
     })
   }),
   // token exchange for `event.actions.register.confirm` and `event.actions.register.reject`

@@ -21,10 +21,6 @@ import {
   isFieldValueWithoutTemplates,
   compositeFieldTypes,
   SystemVariables,
-  Scope,
-  ActionScopes,
-  ConfigurableActionScopes,
-  parseConfigurableScope,
   WorkqueueConfigWithoutQuery,
   joinValues,
   UUID,
@@ -34,7 +30,13 @@ import {
   TextField,
   DefaultAddressFieldValue,
   AdministrativeArea,
-  ActionType
+  ActionType,
+  flattenEntries,
+  EventMetadataDateFieldId,
+  getAcceptedScopesByType,
+  decodeScope,
+  RecordScopeTypeV2,
+  EncodedScope
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name'], language: string) {
@@ -51,8 +53,8 @@ export function getUsersFullName(name: UserOrSystem['name'], language: string) {
 type AllKeys<T> = T extends T ? keyof T : never
 
 /**
- * @returns unique ids of users are referenced in the ActionDocument array.
  * Used for fetching user data in bulk.
+ * @returns unique ids of users which are referenced in the ActionDocument array.
  */
 export const getUserIdsFromActions = (actions: ActionDocument[]) => {
   const userIdFields = [
@@ -67,18 +69,44 @@ export const getUserIdsFromActions = (actions: ActionDocument[]) => {
   return uniq(userIds)
 }
 
+function eventMetadataObjectFromEntries(entries: [string, unknown][]) {
+  const result: Record<string, unknown> = {}
+  for (const [key, value] of entries) {
+    result[`event.${key}`] = value
+  }
+  return result
+}
+
 export function flattenEventIndex(event: EventIndex) {
   const { declaration, trackingId, status, ...rest } = event
   return {
-    ...rest,
     ...declaration,
-    'event.trackingId': trackingId,
-    'event.status': status,
+    ...eventMetadataObjectFromEntries(
+      flattenEntries({ trackingId, status, ...rest })
+    ),
     'event.registrationNumber':
       rest.legalStatuses.REGISTERED?.registrationNumber,
     'event.registeredAt': rest.legalStatuses.REGISTERED?.createdAtLocation,
     'event.registeredBy': rest.legalStatuses.REGISTERED?.createdBy
   }
+}
+
+export function convertDateFieldsToUnixTimestamps(
+  eventIndex: Record<string, unknown>
+) {
+  return Object.fromEntries(
+    Object.entries(eventIndex).map(([key, value]) => {
+      if (
+        EventMetadataDateFieldId.options.includes(
+          key as EventMetadataDateFieldId
+        ) &&
+        typeof value === 'string'
+      ) {
+        return [key, new Date(value).getTime()]
+      }
+      return [key, value]
+    })
+  )
 }
 
 export type RequireKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
@@ -225,28 +253,6 @@ export function replacePlaceholders({
   )
 }
 
-export const AssignmentStatus = {
-  ASSIGNED_TO_SELF: 'ASSIGNED_TO_SELF',
-  ASSIGNED_TO_OTHERS: 'ASSIGNED_TO_OTHERS',
-  UNASSIGNED: 'UNASSIGNED'
-} as const
-
-export type AssignmentStatus =
-  (typeof AssignmentStatus)[keyof typeof AssignmentStatus]
-
-export function getAssignmentStatus(
-  eventState: EventIndex,
-  userId: string
-): AssignmentStatus {
-  if (!eventState.assignedTo) {
-    return AssignmentStatus.UNASSIGNED
-  }
-
-  return eventState.assignedTo == userId
-    ? AssignmentStatus.ASSIGNED_TO_SELF
-    : AssignmentStatus.ASSIGNED_TO_OTHERS
-}
-
 export function filterEmptyValues(
   obj: Record<string, unknown>
 ): Record<string, unknown> {
@@ -271,19 +277,25 @@ export enum CoreWorkqueues {
   DRAFT = 'draft'
 }
 
-export function hasOutboxWorkqueue(scopes: Scope[]) {
-  const hasLiteralActionScopes = scopes.some(
-    (scope) => ActionScopes.safeParse(scope).success
-  )
-  const parsedScopes = scopes.map(parseConfigurableScope)
-  const hasConfigurableActionScopes = parsedScopes.some(
-    (scope) => ConfigurableActionScopes.safeParse(scope).success
-  )
-  return hasLiteralActionScopes || hasConfigurableActionScopes
+export function hasOutboxWorkqueue(scopes: EncodedScope[]) {
+  const hasRecordScope = scopes.some((s) => {
+    const scope = decodeScope(s)
+    return (
+      scope &&
+      RecordScopeTypeV2.options.includes(scope.type as RecordScopeTypeV2)
+    )
+  })
+
+  return hasRecordScope
 }
 
-export function hasDraftWorkqueue(scopes: Scope[]) {
-  return scopes.some((scope) => scope.startsWith('record.declare'))
+export function hasDraftWorkqueue(scopes: EncodedScope[]) {
+  return (
+    getAcceptedScopesByType({
+      acceptedScopes: ['record.create'],
+      scopes
+    }).length > 0
+  )
 }
 
 export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {

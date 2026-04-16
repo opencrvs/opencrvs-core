@@ -20,6 +20,7 @@ import {
   ActionType,
   EventState,
   generateTransactionId,
+  getCurrentEventState,
   RequestedCorrectionAction,
   ValidatorContext
 } from '@opencrvs/commons/client'
@@ -41,6 +42,7 @@ import { useActionAnnotation } from '@client/v2-events/features/events/useAction
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { CorrectionDetails } from '@client/v2-events/features/events/actions/correct/request/Summary/CorrectionDetails'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
+import { useEventConfiguration } from '../../../useEventConfiguration'
 
 const reviewCorrectionMessages = defineMessages({
   actionModalCancel: {
@@ -107,8 +109,14 @@ const Row = styled.div<{
 `
 
 const StyledTextArea = styled(TextArea)`
-  height: 100px;
-  width: 420px;
+  height: 120px;
+  width: 540px;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    height: 100px;
+    width: 420px;
+  }
+
   @media (max-width: 480px) {
     width: 100%;
   }
@@ -138,6 +146,16 @@ function ApproveModal({
     <Dialog
       actions={[
         <StyledButton
+          key="cancel_correction_approval"
+          id="cancel_correction_approval"
+          type="tertiary"
+          onClick={() => {
+            close(true)
+          }}
+        >
+          {intl.formatMessage(reviewCorrectionMessages.actionModalCancel)}
+        </StyledButton>,
+        <StyledButton
           key="confirm_correction"
           id="confirm_correction"
           type="positive"
@@ -151,6 +169,7 @@ function ApproveModal({
       ]}
       isOpen={true}
       title={intl.formatMessage(reviewCorrectionMessages.approveCorrection)}
+      variant="large"
       onClose={() => close(true)}
     >
       <Stack>
@@ -175,6 +194,17 @@ function RejectModal({
     <Dialog
       actions={[
         <StyledButton
+          key="cancel_correction_rejection"
+          id="cancel_correction_rejection"
+          size="large"
+          type="tertiary"
+          onClick={() => {
+            close(true)
+          }}
+        >
+          {intl.formatMessage(reviewCorrectionMessages.actionModalCancel)}
+        </StyledButton>,
+        <StyledButton
           key="reject_correction"
           disabled={!message}
           id="reject_correction"
@@ -190,6 +220,7 @@ function RejectModal({
       ]}
       isOpen={true}
       title={intl.formatMessage(reviewCorrectionMessages.rejectCorrection)}
+      variant="large"
       onClose={() => close(true)}
     >
       <Stack>
@@ -243,7 +274,9 @@ export function ReviewCorrection({
 
   const events = useEvents()
   const event = events.getEvent.getFromCache(eventId)
-  const { isActionAllowed } = useUserAllowedActions(event.type)
+  const { eventConfiguration } = useEventConfiguration(event.type)
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
+  const { isActionAllowed } = useUserAllowedActions(eventIndex)
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
 

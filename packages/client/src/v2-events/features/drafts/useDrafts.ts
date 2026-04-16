@@ -12,20 +12,14 @@
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import {
-  ActionDocument,
-  deepDropNulls,
-  Draft,
-  UUID
-} from '@opencrvs/commons/client'
+import { deepDropNulls, Draft, UUID } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 import {
   clearPendingDraftCreationRequests,
   findLocalEventDocument,
   refetchDraftsList,
   refetchAllSearchQueries,
-  setDraftData,
-  updateLocalEventIndex
+  setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
 import {
   createEventActionMutationFn,
@@ -65,7 +59,9 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
       .filter((event) => !findLocalEventDocument(event.eventId))
       .map(async (draft) =>
         queryClient.prefetchQuery({
-          queryKey: trpcOptionsProxy.event.get.queryKey({ eventId: draft.eventId }),
+          queryKey: trpcOptionsProxy.event.get.queryKey({
+            eventId: draft.eventId
+          }),
           queryFn: trpcOptionsProxy.event.get.queryOptions({
             eventId: draft.eventId
           }).queryFn
@@ -193,7 +189,6 @@ export function useDrafts() {
       ...options,
       ...additionalOptions,
       // First use data from browser cache, then fetch from the server if online
-      networkMode: 'offlineFirst',
       queryKey: trpc.event.draft.list.queryKey(),
       select: (currentDraftState) => {
         const locallyStoredDrafts =

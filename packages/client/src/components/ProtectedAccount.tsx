@@ -14,6 +14,7 @@ import { CreatePassword } from '@client/views/UserSetup/CreatePassword'
 import { SecurityQuestion } from '@client/views/UserSetup/SecurityQuestionView'
 import { UserSetupReview } from '@client/views/UserSetup/SetupReviewPage'
 import { SetupConfirmationPage } from '@client/views/UserSetup/SetupConfirmationPage'
+import { TRPCProvider } from '@client/v2-events/trpc'
 
 export enum ProtectedAccoutStep {
   LANDING,
@@ -54,9 +55,17 @@ export const ProtectedAccount = () => {
     case ProtectedAccoutStep.SECURITY_QUESTION:
       return <SecurityQuestion goToStep={goToStep} setupData={setupData} />
     case ProtectedAccoutStep.REVIEW:
-      return <UserSetupReview goToStep={goToStep} setupData={setupData} />
+      return (
+        <TRPCProvider>
+          <UserSetupReview goToStep={goToStep} setupData={setupData} />
+        </TRPCProvider>
+      )
     case ProtectedAccoutStep.CONFIRMATION:
-      return <SetupConfirmationPage />
+      return (
+        <TRPCProvider>
+          <SetupConfirmationPage />
+        </TRPCProvider>
+      )
     default:
       return null
   }

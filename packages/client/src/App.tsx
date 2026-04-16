@@ -12,13 +12,8 @@
 import { NotificationComponent } from '@client/components/Notification'
 import { Page } from '@client/components/Page'
 import { ProtectedPage } from '@client/components/ProtectedPage'
-import { ProtectedRoute } from '@client/components/ProtectedRoute'
 import ScrollToTop from '@client/components/ScrollToTop'
 import { SessionExpireConfirmation } from '@client/components/SessionExpireConfirmation'
-import * as routes from '@client/navigation/routes'
-import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
-import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
-import { SCOPES } from '@opencrvs/commons/client'
 import { getTheme } from '@opencrvs/components'
 import * as React from 'react'
 import { Provider } from 'react-redux'
@@ -34,12 +29,9 @@ import { StyledErrorBoundary } from './components/StyledErrorBoundary'
 import { I18nContainer } from './i18n/components/I18nContainer'
 import { useApolloClient } from './utils/apolloClient'
 import { ApolloProvider } from './utils/ApolloProvider'
-
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
-import { config } from './config'
 import { AppStore } from './store'
 import { routesConfig as v2RoutesConfig } from './v2-events/routes/config'
-import { TRPCProvider } from './v2-events/trpc'
 import { ReloadModal } from './views/Modals/ReloadModal'
 
 // Injecting global styles for the body tag - used only once
@@ -64,13 +56,6 @@ function createRedirect(from: string, to: string) {
     }
   }
 }
-
-// By default we now load V2 events in the '/' route. This is a temporary flag
-// to turn off V2 events in case IET wants to switch back to V1 events.
-// This will be removed after a few releases when V2 events will be finalized.
-const turnOffV2Events =
-  typeof config.FEATURES.V2_EVENTS === 'boolean' &&
-  config.FEATURES.V2_EVENTS === false
 
 export const routesConfig = [
   {
@@ -102,53 +87,7 @@ export const routesConfig = [
       createRedirect('/registration-home/readyToIssue/*', '/'),
       createRedirect('/registration-home/print/*', '/'),
       createRedirect('/registration-home/readyForReview/*', '/'),
-      createRedirect('/events', '/events/create'),
-      {
-        path: routes.TEAM_SEARCH,
-        element: (
-          <ProtectedRoute
-            scopes={[
-              SCOPES.USER_READ,
-              SCOPES.USER_READ_MY_OFFICE,
-              SCOPES.USER_READ_MY_JURISDICTION
-            ]}
-          >
-            <TeamSearch />
-          </ProtectedRoute>
-        )
-      },
-      {
-        path: routes.CREATE_USER_ON_LOCATION,
-        element: (
-          <TRPCProvider>
-            <CreateNewUser />
-          </TRPCProvider>
-        )
-      },
-      {
-        path: routes.CREATE_USER_SECTION,
-        element: (
-          <TRPCProvider>
-            <CreateNewUser />
-          </TRPCProvider>
-        )
-      },
-      {
-        path: routes.REVIEW_USER_FORM,
-        element: (
-          <TRPCProvider>
-            <CreateNewUser />
-          </TRPCProvider>
-        )
-      },
-      {
-        path: routes.REVIEW_USER_DETAILS,
-        element: (
-          <TRPCProvider>
-            <CreateNewUser />
-          </TRPCProvider>
-        )
-      }
+      createRedirect('/events', '/events/create')
     ]
   }
 ]
@@ -158,6 +97,7 @@ interface IAppProps {
   store: AppStore
   router: ReturnType<typeof createBrowserRouter>
 }
+
 export function App({ client, store, router }: IAppProps) {
   const { client: apolloClient } = useApolloClient(store)
 

@@ -10,7 +10,7 @@
  */
 
 import { http, HttpResponse } from 'msw'
-import { encodeScope, SCOPES, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons'
+import { encodeScope, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -33,10 +33,12 @@ describe('audit log', () => {
         })
       ])
 
-      const event = await client.event.create({
+      const createEventInput = {
         ...generator.event.create(),
         createdAtLocation: locations[0].id
-      })
+      }
+
+      const event = await client.event.create(createEventInput)
 
       const db = getClient()
       const logs = await db
@@ -48,9 +50,13 @@ describe('audit log', () => {
       expect(logs).toHaveLength(1)
       expect(logs[0].operation).toBe('event.create')
       expect(logs[0].clientType).toBe('system')
+      expect(logs[0].requestData).toMatchObject({
+        createdAtLocation: locations[0].id,
+        transactionId: createEventInput.transactionId,
+        type: event.type
+      })
       expect(logs[0].responseSummary).toMatchObject({
         eventId: event.id,
-        eventType: event.type,
         trackingId: event.trackingId
       })
     })
@@ -89,7 +95,6 @@ describe('audit log', () => {
       expect(logs[0].operation).toBe('event.get')
       expect(logs[0].requestData).toMatchObject({ eventId: event.id })
       expect(logs[0].responseSummary).toMatchObject({
-        eventId: event.id,
         eventType: event.type,
         trackingId: event.trackingId
       })
@@ -107,7 +112,10 @@ describe('audit log', () => {
           type: 'record.create',
           options: { event: [TENNIS_CLUB_MEMBERSHIP] }
         }),
-        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
+        encodeScope({
+          type: 'record.notify',
+          options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+        })
       ])
 
       const event = await client.event.create({
@@ -115,7 +123,7 @@ describe('audit log', () => {
         createdAtLocation: locations[0].id
       })
 
-      const result = await client.event.actions.notify.request({
+      await client.event.actions.notify.request({
         ...generator.event.actions.notify(event.id),
         createdAtLocation: locations[0].id
       })
@@ -131,18 +139,16 @@ describe('audit log', () => {
       expect(logs).toHaveLength(1)
       expect(logs[0].operation).toBe('event.actions.notify.request')
       expect(logs[0].clientType).toBe('system')
-      expect(logs[0].responseSummary).toMatchObject({
-        eventId: result.id,
-        eventType: result.type,
-        trackingId: result.trackingId
-      })
+      expect(logs[0].responseSummary).toBeNull()
     })
   })
 
   describe('event.search', () => {
     test('writes an audit log entry when a system client searches for events', async () => {
       const systemId = 'test-system'
-      const client = createSystemTestClient(systemId, [SCOPES.RECORDSEARCH])
+      const client = createSystemTestClient(systemId, [
+        encodeScope({ type: 'record.search' })
+      ])
 
       const searchInput = {
         query: {
@@ -169,7 +175,7 @@ describe('audit log', () => {
       })
     })
 
-    test('writes an audit log entry when a human user searches for events', async () => {
+    test('does not write any audit log entry when a human user searches for events', async () => {
       const { user } = await setupTestCase()
       const client = createTestClient(user, [
         encodeScope({ type: 'record.search' })
@@ -181,7 +187,7 @@ describe('audit log', () => {
         }
       }
 
-      const result = await client.event.search(searchInput)
+      await client.event.search(searchInput)
 
       const db = getClient()
       const logs = await db
@@ -190,38 +196,20 @@ describe('audit log', () => {
         .where('clientId', '=', user.id)
         .execute()
 
-      expect(logs).toHaveLength(1)
-      expect(logs[0].operation).toBe('event.search')
-      expect(logs[0].clientType).toBe('user')
-      expect(logs[0].responseSummary).toMatchObject({
-        total: result.total,
-        eventIds: result.results.map((r) => r.id)
-      })
+      expect(logs).toHaveLength(0)
     })
   })
 
   describe('integrations.create', () => {
     test('writes an audit log entry when a system client creates an integration', async () => {
-      const systemId = 'test-system'
+      const systemId = '00000000-0000-0000-0000-000000000099'
       const client = createSystemTestClient(systemId, [
-        SCOPES.INTEGRATION_CREATE
+        encodeScope({ type: 'integration.create' })
       ])
-
-      mswServer.use(
-        http.post(`${env.USER_MANAGEMENT_URL}/registerSystem`, () =>
-          HttpResponse.json({
-            system: {
-              clientId: 'new-client-id',
-              shaSecret: 'sha-secret'
-            },
-            clientSecret: 'client-secret'
-          })
-        )
-      )
 
       const result = await client.integrations.create({
         name: 'My Integration',
-        scopes: [SCOPES.RECORD_IMPORT]
+        scopes: [encodeScope({ type: 'record.import' })]
       })
 
       const db = getClient()
@@ -235,7 +223,7 @@ describe('audit log', () => {
       expect(logs[0].operation).toBe('integrations.create')
       expect(logs[0].requestData).toMatchObject({
         name: 'My Integration',
-        scopes: [SCOPES.RECORD_IMPORT]
+        scopes: [encodeScope({ type: 'record.import' })]
       })
       expect(logs[0].responseSummary).toMatchObject({
         clientId: result.clientId
@@ -243,26 +231,14 @@ describe('audit log', () => {
     })
 
     test('does not include credentials in audit log response summary', async () => {
-      const systemId = 'test-system'
+      const systemId = '00000000-0000-0000-0000-000000000099'
       const client = createSystemTestClient(systemId, [
-        SCOPES.INTEGRATION_CREATE
+        encodeScope({ type: 'integration.create' })
       ])
-
-      mswServer.use(
-        http.post(`${env.USER_MANAGEMENT_URL}/registerSystem`, () =>
-          HttpResponse.json({
-            system: {
-              clientId: 'new-client-id',
-              shaSecret: 'sha-secret'
-            },
-            clientSecret: 'client-secret'
-          })
-        )
-      )
 
       await client.integrations.create({
         name: 'My Integration',
-        scopes: [SCOPES.RECORD_IMPORT]
+        scopes: [encodeScope({ type: 'record.import' })]
       })
 
       const db = getClient()
@@ -280,7 +256,7 @@ describe('audit log', () => {
   describe('attachments.upload', () => {
     test('writes an audit log entry when a system client uploads an attachment', async () => {
       const systemId = 'test-system'
-      const expectedFileUrl = '/ocrvs/test-event/abc123.jpg'
+      const expectedFileUrl = 'test-event/abc123.jpg'
 
       mswServer.use(
         http.post(`${env.DOCUMENTS_URL}/files`, () => {
@@ -289,7 +265,7 @@ describe('audit log', () => {
       )
 
       const client = createSystemTestClient(systemId, [
-        SCOPES.ATTACHMENT_UPLOAD
+        encodeScope({ type: 'attachment.upload' })
       ])
 
       const formData = new FormData()
@@ -313,7 +289,9 @@ describe('audit log', () => {
       expect(logs).toHaveLength(1)
       expect(logs[0].operation).toBe('attachments.upload')
       expect(logs[0].clientType).toBe('system')
-      expect(logs[0].responseSummary).toMatchObject({ fileUrl: expectedFileUrl })
+      expect(logs[0].responseSummary).toMatchObject({
+        fileUrl: expectedFileUrl
+      })
     })
   })
 })

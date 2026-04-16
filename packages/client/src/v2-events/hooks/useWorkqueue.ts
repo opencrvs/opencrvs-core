@@ -13,7 +13,6 @@ import { useSelector } from 'react-redux'
 import { useCallback } from 'react'
 import {
   deserializeQuery,
-  User,
   UserOrSystem,
   WorkqueueConfig
 } from '@opencrvs/commons/client'
@@ -66,7 +65,6 @@ export const useWorkqueue = (workqueueSlug: string) => {
               sort: [{ field: 'updatedAt', direction: 'desc' }]
             },
             {
-              networkMode: 'offlineFirst',
               refetchInterval: 20000
             }
           ),

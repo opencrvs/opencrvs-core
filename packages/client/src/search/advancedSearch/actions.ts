@@ -18,11 +18,4 @@ type ModifyAdvancedSearchParamAction = {
   payload: Partial<IAdvancedSearchParamState>
 }
 
-export const setAdvancedSearchParam = (
-  paramsToUpdate: Partial<IAdvancedSearchParamState>
-): ModifyAdvancedSearchParamAction => ({
-  type: SET_ADVANCED_SEARCH_PARAM,
-  payload: paramsToUpdate
-})
-
 export type AdvancedSearchParamActions = ModifyAdvancedSearchParamAction

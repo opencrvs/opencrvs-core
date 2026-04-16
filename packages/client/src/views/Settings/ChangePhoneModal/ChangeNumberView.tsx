@@ -18,37 +18,29 @@ import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { useIntl } from 'react-intl'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { isAValidPhoneNumberFormat } from '@client/utils/validate'
-import { convertToMSISDN } from '@client/forms/utils'
-import { GET_USER_BY_MOBILE } from '@client/views/Settings/queries'
-import { useDispatch, useSelector } from 'react-redux'
-import { sendVerifyCode } from '@client/profile/profileActions'
-import { getUserDetails } from '@client/profile/profileSelectors'
 import { errorMessages } from '@client/i18n/messages/errors'
-import { getLanguage } from '@client/i18n/selectors'
-import { useLazyQuery } from '@apollo/client'
-import { GetUserByMobileQuery } from '@client/utils/gateway'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { TriggerEvent } from '@opencrvs/commons/client'
+import { convertToMSISDN } from '@client/forms/utils'
+import { useCurrentUser } from '@client/v2-events/hooks/useCurrentUser'
 
 interface IProps {
   show: boolean
-  onSuccess: (phoneNumber: string) => void
+  onSuccess: (phoneNumber: string, nonce: string) => void
   onClose: () => void
 }
 
 export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
-  const [fetchUserDetailsByMobile] =
-    useLazyQuery<GetUserByMobileQuery>(GET_USER_BY_MOBILE)
   const intl = useIntl()
   const [phoneNumber, setPhoneNumber] = React.useState(EMPTY_STRING)
   const [unknownError, setUnknownError] = React.useState(false)
   const [isInvalidPhoneNumber, setIsInvalidPhoneNumber] = React.useState(false)
-  const userDetails = useSelector(getUserDetails)
-  const language = useSelector(getLanguage)
+  const { currentUser } = useCurrentUser()
   const [
     showDuplicateMobileErrorNotification,
     setShowDuplicateMobileErrorNotification
   ] = React.useState(false)
-  const dispatch = useDispatch()
+  const { sendVerifyCode } = useUsers()
   const onChangePhoneNumber = (event: React.ChangeEvent<HTMLInputElement>) => {
     const phoneNumber = event.target.value
     setPhoneNumber(phoneNumber)
@@ -57,6 +49,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
       setShowDuplicateMobileErrorNotification(false)
     }
   }
+
   const restoreState = () => {
     setPhoneNumber(EMPTY_STRING)
     setIsInvalidPhoneNumber(false)
@@ -70,38 +63,27 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
     setUnknownError((prevValue) => !prevValue)
   }
   const continueButtonHandler = async (phoneNumber: string) => {
-    const formattedNumber = convertToMSISDN(phoneNumber, window.config.COUNTRY)
-    const { data: userData, error } = await fetchUserDetailsByMobile({
-      variables: { mobile: formattedNumber }
-    })
-    if (error) {
-      setUnknownError(true)
-      return
-    }
-    const mobileNumberExist = userData?.getUserByMobile
-
-    if (!mobileNumberExist) {
-      const notificationEvent = TriggerEvent.CHANGE_PHONE_NUMBER
-
-      dispatch(
-        sendVerifyCode(
-          [
-            {
-              use: language,
-              family: String(userDetails?.name?.[0].familyName),
-              given: [String(userDetails?.name?.[0].firstNames)]
-            }
-          ],
-          notificationEvent,
-          convertToMSISDN(phoneNumber, window.config.COUNTRY),
-          String(userDetails?.email)
-        )
-      )
-      onSuccess(phoneNumber)
-    } else {
-      toggleDuplicateMobileErrorNotification()
-      setUnknownError(false)
-    }
+    if (!currentUser) return
+    sendVerifyCode.mutate(
+      {
+        notificationEvent: TriggerEvent.CHANGE_PHONE_NUMBER
+      },
+      {
+        onSuccess: (data) => {
+          onSuccess(phoneNumber, data.nonce)
+        },
+        onError: (error) => {
+          if (
+            error.message.includes('409') ||
+            error.message.includes('duplicate')
+          ) {
+            setShowDuplicateMobileErrorNotification(true)
+          } else {
+            setUnknownError(true)
+          }
+        }
+      }
+    )
   }
   React.useEffect(() => {
     if (!show) {
@@ -122,7 +104,11 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
           id="continue-button"
           key="continue"
           onClick={() => {
-            continueButtonHandler(phoneNumber)
+            const internationalFormat = convertToMSISDN(
+              phoneNumber,
+              window.config.COUNTRY
+            )
+            continueButtonHandler(internationalFormat)
           }}
           disabled={!Boolean(phoneNumber.length) || isInvalidPhoneNumber}
         >

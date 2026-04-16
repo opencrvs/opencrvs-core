@@ -71,6 +71,7 @@ export function Pages() {
         {modal}
         <PagesComponent
           actionType={ActionType.EDIT}
+          attachmentPath={`events/${eventId}/`}
           eventConfig={configuration}
           form={formValues}
           formPages={declarationPages}

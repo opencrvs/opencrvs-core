@@ -10,7 +10,11 @@
  */
 
 import { defineConditional } from '../conditionals/conditionals'
-import { createEventFieldConfig } from '../event-config/event-configuration'
+import {
+  createEventFieldConfig,
+  NonSearchableEventMetadataTimeFieldIdInput,
+  AdvancedSearchConfig
+} from '../event-config/event-configuration'
 import { ActionType } from './ActionType'
 import { EventFieldIdInput } from './AdvancedSearchConfig'
 import {
@@ -25,7 +29,15 @@ import {
  * event('status') // → returns search config
  * event.hasAction('CLICKED') // → returns conditional
  */
-function eventFn(fieldId: EventFieldIdInput) {
+function eventFn(fieldId: EventFieldIdInput): AdvancedSearchConfig
+function eventFn(fieldId: NonSearchableEventMetadataTimeFieldIdInput): {
+  $$event: NonSearchableEventMetadataTimeFieldIdInput
+}
+function eventFn(
+  fieldId: EventFieldIdInput | NonSearchableEventMetadataTimeFieldIdInput
+):
+  | AdvancedSearchConfig
+  | { $$event: NonSearchableEventMetadataTimeFieldIdInput } {
   return createEventFieldConfig(fieldId)
 }
 

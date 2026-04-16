@@ -70,7 +70,6 @@ import {
   IFormData,
   FETCH_BUTTON,
   ILoaderButton,
-  FIELD_GROUP_TITLE,
   IFormSection,
   SIMPLE_DOCUMENT_UPLOADER,
   IAttachmentValue,
@@ -82,8 +81,6 @@ import {
   IDateRangePickerValue,
   TIME,
   DIVIDER,
-  HEADING3,
-  SUBSECTION_HEADER,
   HIDDEN,
   SIGNATURE,
   BUTTON,
@@ -91,8 +88,6 @@ import {
   InitialValue,
   DependencyInfo,
   Ii18nButtonFormField,
-  LINK_BUTTON,
-  ID_READER,
   ID_VERIFICATION_BANNER,
   IDocumentUploaderWithOptionsFormField,
   ILocationSearchInputFormField,
@@ -136,19 +131,10 @@ import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
 import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
 import { UserDetails } from '@client/utils/userUtils'
-import {
-  BulletList,
-  Divider,
-  IdReader,
-  InputLabel,
-  Stack
-} from '@opencrvs/components'
-import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
+import { BulletList, Divider, InputLabel, Stack } from '@opencrvs/components'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
 import { ButtonField } from '@client/components/form/Button'
 import { getListOfLocations } from '@client/utils/validate'
-import { LinkButtonField } from '@client/components/form/LinkButton'
-import { ReaderGenerator } from './ReaderGenerator'
 import { IDVerificationBanner } from './IDVerification/Banner'
 import { FormLoader } from './FormLoader'
 
@@ -278,28 +264,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             }
             options={fieldDefinition.options}
           />
-        </InputField>
-      )
-    }
-
-    if (fieldDefinition.type === ID_READER) {
-      return (
-        <InputField {...inputFieldProps}>
-          <IdReader
-            dividerLabel={fieldDefinition.dividerLabel}
-            manualInputInstructionLabel={
-              fieldDefinition.manualInputInstructionLabel
-            }
-          >
-            <ReaderGenerator
-              readers={fieldDefinition.readers}
-              form={values}
-              field={fieldDefinition}
-              draft={draftData}
-              fields={fields}
-              setFieldValue={setFieldValue}
-            />
-          </IdReader>
         </InputField>
       )
     }
@@ -543,19 +507,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     if (fieldDefinition.type === DIVIDER) {
       return <Divider />
     }
-    if (fieldDefinition.type === HEADING3) {
-      return <Heading3>{fieldDefinition.label}</Heading3>
-    }
-    if (fieldDefinition.type === SUBSECTION_HEADER) {
-      return (
-        <>
-          <Heading2>{fieldDefinition.label}</Heading2>
-        </>
-      )
-    }
-    if (fieldDefinition.type === FIELD_GROUP_TITLE) {
-      return <Heading3>{fieldDefinition.label}</Heading3>
-    }
     if (fieldDefinition.type === PARAGRAPH) {
       const label = fieldDefinition.label as unknown as MessageDescriptor & {
         values: Record<string, string>
@@ -684,19 +635,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
 
-    if (fieldDefinition.type === LINK_BUTTON) {
-      return (
-        <LinkButtonField
-          form={values}
-          draft={draftData}
-          fieldDefinition={fieldDefinition}
-          fields={fields}
-          setFieldValue={setFieldValue}
-          isDisabled={disabled}
-        />
-      )
-    }
-
     if (fieldDefinition.type === HIDDEN) {
       const { error, touched, ...allowedInputProps } = inputProps
 
@@ -798,8 +736,8 @@ GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 const mapFieldsToValues = (
   fields: IFormField[],
   ...evalParams: [IFormSectionData, IOfflineData, IFormData, UserDetails | null]
-) =>
-  fields.reduce((memo, field) => {
+) => {
+  return fields.reduce((memo, field) => {
     let fieldInitialValue = handleInitialValue(
       field.initialValue as InitialValue,
       ...evalParams
@@ -834,6 +772,7 @@ const mapFieldsToValues = (
 
     return { ...memo, [field.name]: fieldInitialValue }
   }, {})
+}
 
 type ISetTouchedFunction = (touched: FormikTouched<FormikValues>) => void
 interface IFormSectionProps {
@@ -876,7 +815,7 @@ interface ITouchedNestedFields {
   }
 }
 
-export class FormSectionComponent extends React.Component<Props> {
+class FormSectionComponent extends React.Component<Props> {
   componentDidUpdate(prevProps: Props) {
     const userChangedForm = !isEqual(this.props.values, prevProps.values)
     const sectionChanged = prevProps.id !== this.props.id

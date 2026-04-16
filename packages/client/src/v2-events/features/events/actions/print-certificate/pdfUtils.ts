@@ -114,7 +114,6 @@ export const stringifyEventMetadata = ({
       administrativeAreas
     }),
     assignedTo: findUserById(metadata.assignedTo ?? '', users),
-    // @TODO: DATE_OF_EVENT config needs to be defined some other way and bake it in.
     dateOfEvent: metadata.dateOfEvent
       ? DateField.toCertificateVariables(metadata.dateOfEvent, {
           intl,
@@ -212,13 +211,8 @@ export const stringifyEventMetadata = ({
             createdByRole: metadata.legalStatuses.REGISTERED.createdByRole,
             registrationNumber:
               metadata.legalStatuses.REGISTERED.registrationNumber,
-            createdBySignature: metadata.legalStatuses.REGISTERED
-              .createdBySignature
-              ? new URL(
-                  metadata.legalStatuses.REGISTERED.createdBySignature,
-                  window.config.MINIO_BASE_URL
-                ).href
-              : undefined
+            createdBySignature:
+              metadata.legalStatuses.REGISTERED.createdBySignature
           }
         : null
     },

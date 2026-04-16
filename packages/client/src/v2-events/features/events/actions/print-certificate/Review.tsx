@@ -27,10 +27,10 @@ import {
   getOrThrow,
   getAcceptedActions,
   getUUID,
-  UUID,
   PrintCertificateAction,
   TokenUserType,
-  User
+  User,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import {
   Box,
@@ -164,6 +164,8 @@ export function Review() {
 
   const { getEvent, onlineActions } = useEvents()
   const fullEvent = getEvent.getFromCache(eventId)
+  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const fullEventIndex = getCurrentEventState(fullEvent, eventConfiguration)
   const validatorContext = useValidatorContext(fullEvent)
   const actions = getAcceptedActions(fullEvent)
 
@@ -182,9 +184,8 @@ export function Review() {
     (template) => template.id === templateId
   )
 
-  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
   const formConfig = getPrintForm(eventConfiguration)
-  const { isActionAllowed } = useUserAllowedActions(fullEvent.type)
+  const { isActionAllowed } = useUserAllowedActions(fullEventIndex)
   const userDetails = useSelector(getUserDetails)
   const { isPending } = onlineActions.printCertificate
 
@@ -212,7 +213,7 @@ export function Review() {
     annotation,
     originalActionId: null,
     createdBySignature: userFromUsersList.signature,
-    createdAtLocation: userDetails.primaryOffice.id as UUID,
+    createdAtLocation: userDetails.primaryOfficeId,
     content: {
       templateId: certificateConfig?.id
     }

@@ -14,7 +14,8 @@ import {
   ActionStatus,
   ActionType,
   DraftInput,
-  FullDocumentPath,
+  encodeScope,
+  DocumentPath,
   getUUID
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
@@ -39,7 +40,12 @@ test('prevents forbidden access if missing required scope', async () => {
 test('allows access with required scope', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   await expect(
@@ -63,13 +69,13 @@ test('stored events can be deleted', async () => {
   const event = await client.event.create(generator.event.create())
 
   // at this point event should exist
-  await expect(client.event.get({eventId: event.id})).resolves.toBeDefined()
+  await expect(client.event.get({ eventId: event.id })).resolves.toBeDefined()
 
   const removedEvent = await client.event.delete({ eventId: event.id })
   expect(removedEvent.id).toBe(event.id)
 
   // now event should be removed
-  await expect(client.event.get({eventId: event.id})).rejects.toThrow(
+  await expect(client.event.get({ eventId: event.id })).rejects.toThrow(
     `Event not found with ID: ${event.id}`
   )
 })
@@ -113,7 +119,7 @@ describe('check unreferenced draft attachments are deleted while final action su
           'applicant.image': {
             type: 'image/png',
             originalFilename: `${n}-abcd.png`,
-            path: `/ocrvs/${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png` as FullDocumentPath
+            path: `${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png` as DocumentPath
           }
         },
         transactionId: getUUID(),
@@ -128,7 +134,7 @@ describe('check unreferenced draft attachments are deleted while final action su
           'applicant.image': {
             type: 'image/png',
             originalFilename: `${n}-abcd.png`,
-            path: `/ocrvs/${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png` as FullDocumentPath
+            path: `${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png` as DocumentPath
           }
         },
         transactionId: getUUID(),
@@ -146,7 +152,7 @@ describe('check unreferenced draft attachments are deleted while final action su
     // declaring final action submission
     await client.event.actions.declare.request(getDeclaration(6))
 
-    const updatedEvent = await client.event.get({eventId: event.id})
+    const updatedEvent = await client.event.get({ eventId: event.id })
 
     // since declare action has been submitted 5 times
     expect(updatedEvent.actions).toEqual([

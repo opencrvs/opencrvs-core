@@ -25,6 +25,14 @@ jest.mock('@opencrvs/commons', () => {
   }
 })
 
+jest.mock('@auth/features/authenticate/service', () => {
+  const actual = jest.requireActual('@auth/features/authenticate/service')
+  return {
+    ...actual,
+    recordUserAuditEvent: jest.fn().mockResolvedValue(undefined)
+  }
+})
+
 describe('username reminder', () => {
   let server: AuthServer
 

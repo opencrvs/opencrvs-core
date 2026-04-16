@@ -76,6 +76,96 @@ const defaultEvent = {
   )
 }
 
+const actionDefaults = {
+  createdAt: generateRandomDatetime(
+    createPrng(73),
+    new Date('2024-03-01'),
+    new Date('2024-04-01')
+  ),
+  createdBy: refData.user.id.localRegistrar,
+  createdByRole: TestUserRole.enum.LOCAL_REGISTRAR,
+  createdAtLocation: refData.user.localRegistrar().v2.primaryOfficeId,
+  transactionId: getUUID()
+} satisfies Partial<ActionDocument>
+
+const duplicateEvent = {
+  ...tennisClubMembershipEventDocument,
+  actions: [
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.CREATE,
+      defaults: actionDefaults
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.ASSIGN,
+      defaults: {
+        ...actionDefaults,
+        assignedTo: refData.user.id.localRegistrar
+      }
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: actionDefaults
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DUPLICATE_DETECTED,
+      defaults: {
+        ...actionDefaults,
+        content: {
+          duplicates: [{ id: getUUID(), trackingId: '0R1G1NAL' }]
+        }
+      }
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.ASSIGN,
+      defaults: {
+        ...actionDefaults,
+        assignedTo: refData.user.id.localRegistrar
+      }
+    })
+  ]
+}
+
+export const WithDuplicateDetectedActionModal: Story = {
+  parameters: {
+    offline: {
+      events: [duplicateEvent]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({
+        eventId: duplicateEvent.id
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [
+                getCurrentEventState(duplicateEvent, tennisClubMembershipEvent)
+              ],
+              total: 1
+            }
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(
+      await canvas.findByRole('button', {
+        name: 'Flagged as potential duplicate'
+      })
+    )
+  }
+}
+
 export const Overview: Story = {
   parameters: {
     offline: {
@@ -651,59 +741,6 @@ export const WithVariousUserRoles: Story = {
   }
 }
 
-const actionDefaults = {
-  createdAt: generateRandomDatetime(
-    createPrng(73),
-    new Date('2024-03-01'),
-    new Date('2024-04-01')
-  ),
-  createdBy: refData.user.id.localRegistrar,
-  createdByRole: TestUserRole.enum.LOCAL_REGISTRAR,
-  createdAtLocation: refData.user.localRegistrar().v2.primaryOfficeId,
-  transactionId: getUUID()
-} satisfies Partial<ActionDocument>
-
-const duplicateEvent = {
-  ...tennisClubMembershipEventDocument,
-  actions: [
-    generateActionDocument({
-      configuration: tennisClubMembershipEvent,
-      action: ActionType.CREATE,
-      defaults: actionDefaults
-    }),
-    generateActionDocument({
-      configuration: tennisClubMembershipEvent,
-      action: ActionType.ASSIGN,
-      defaults: {
-        ...actionDefaults,
-        assignedTo: refData.user.id.localRegistrar
-      }
-    }),
-    generateActionDocument({
-      configuration: tennisClubMembershipEvent,
-      action: ActionType.DECLARE,
-      defaults: actionDefaults
-    }),
-    generateActionDocument({
-      configuration: tennisClubMembershipEvent,
-      action: ActionType.DUPLICATE_DETECTED,
-      defaults: {
-        ...actionDefaults,
-        content: {
-          duplicates: [{ id: getUUID(), trackingId: '0R1G1NAL' }]
-        }
-      }
-    }),
-    generateActionDocument({
-      configuration: tennisClubMembershipEvent,
-      action: ActionType.ASSIGN,
-      defaults: {
-        ...actionDefaults,
-        assignedTo: refData.user.id.localRegistrar
-      }
-    })
-  ]
-}
 export const WithDuplicateDetectedAction: Story = {
   parameters: {
     offline: {
@@ -732,44 +769,7 @@ export const WithDuplicateDetectedAction: Story = {
   }
 }
 
-export const WithDuplicateDetectedActionModal: Story = {
-  parameters: {
-    offline: {
-      events: [duplicateEvent]
-    },
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({
-        eventId: duplicateEvent.id
-      })
-    },
-    msw: {
-      handlers: {
-        events: [
-          tRPCMsw.event.search.query(() => {
-            return {
-              results: [
-                getCurrentEventState(duplicateEvent, tennisClubMembershipEvent)
-              ],
-              total: 1
-            }
-          })
-        ]
-      }
-    }
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(
-      await canvas.findByRole('button', {
-        name: 'Flagged as potential duplicate'
-      })
-    )
-  }
-}
-
 const rng = createPrng(33123)
-const validateActionUuid = generateUuid(rng)
 
 const annotationUpdateOnValidateEvent = {
   id: getUUID(),

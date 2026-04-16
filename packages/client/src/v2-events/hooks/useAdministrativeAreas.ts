@@ -45,8 +45,9 @@ export function useAdministrativeAreas() {
         // via `setQueryDefaults`. Passing it again would override caching/persistence.
         // The `...rest` spread carries over things like staleTime, gcTime, enabled, etc.
         // Then we re-attach the queryKey explicitly so React Query can identify this cache.
+
         const { queryFn, ...rest } =
-          trpcOptionsProxy.administrativeAreas.list.queryOptions()
+        trpcOptionsProxy.administrativeAreas.list.queryOptions()
 
         const administrativeAreas = useSuspenseQuery({
           ...rest,

@@ -205,7 +205,7 @@ export function TRPCProvider({
       persistOptions={{
         persister: createIDBPersister(storeIdentifier),
         buster: 'persisted-indexed-db',
-        maxAge: undefined,
+        maxAge: Infinity,
         dehydrateOptions: {
           shouldDehydrateMutation: (mutation) => {
             if (mutation.state.status === 'error') {
@@ -237,4 +237,11 @@ export function TRPCProvider({
       </TRPCProviderRaw>
     </PersistQueryClientProvider>
   )
+}
+
+export function hasConflict(error: unknown) {
+  if (error instanceof TRPCClientError) {
+    return error.data.code === 'CONFLICT'
+  }
+  return false
 }

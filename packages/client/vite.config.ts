@@ -23,6 +23,21 @@ dns.setDefaultResultOrder('ipv4first')
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, 'env')
 
+  const loginRedirectPlugin = () => ({
+    name: 'login-redirect',
+    configureServer(server: import('vite').ViteDevServer) {
+      server.middlewares.use((req, res, next) => {
+        if (req.url?.startsWith('/login')) {
+          const suffix = req.url.replace(/^\/login/, '') || '/'
+          res.writeHead(302, { Location: `http://localhost:3020${suffix}` })
+          res.end()
+          return
+        }
+        next()
+      })
+    }
+  })
+
   const noTreeshakingForEvalPlugin = () => {
     return {
       name: 'no-treeshaking-for-eval',
@@ -50,7 +65,7 @@ export default defineConfig(({ mode }) => {
       strategies: 'injectManifest',
       injectManifest: {
         globDirectory: 'build/',
-        globPatterns: ['**/*.{json,ico,ttf,html,js}'],
+        globPatterns: ['**/*.{json,ico,ttf,html,js,map}'],
         globIgnores: ['**/config.js'],
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
         swDest: 'build/src-sw.js'
@@ -97,6 +112,7 @@ export default defineConfig(({ mode }) => {
       }
     },
     plugins: [
+      loginRedirectPlugin(),
       htmlPlugin(),
       react({
         babel: {
@@ -138,6 +154,11 @@ export default defineConfig(({ mode }) => {
           target: 'http://localhost:3040',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/countryconfig/, '')
+        },
+        '/api/auth/': {
+          target: 'http://localhost:4040',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/auth/, '')
         },
         '/api/': {
           target: 'http://localhost:7070',

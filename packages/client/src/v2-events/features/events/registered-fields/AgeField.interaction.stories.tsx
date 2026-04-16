@@ -11,7 +11,7 @@
 
 import type { Meta, StoryObj } from '@storybook/react'
 import { expect, fireEvent, fn } from '@storybook/test'
-import { userEvent, waitFor, within } from '@storybook/testing-library'
+import { userEvent, within } from '@storybook/testing-library'
 import React, { Suspense } from 'react'
 import styled from 'styled-components'
 import { AgeField, field, FieldType } from '@opencrvs/commons/client'
@@ -51,7 +51,7 @@ const fields = [
       description: 'The title for the age input'
     },
     configuration: {
-      asOfDate: { $$field: 'storybook.dateOfBirth' }
+      asOfDate: { $$field: 'storybook.dateOfBirth', $$subfield: [] }
     },
     validation: [
       {

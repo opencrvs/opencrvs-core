@@ -33,9 +33,10 @@ import {
   AdvancedSearchConfigWithFieldsResolved,
   METADATA_FIELD_PREFIX,
   ValidatorContext,
-  getAcceptedScopesByType
+  getAcceptedScopesByType,
+  scopeUsesFullOptions
 } from '@opencrvs/commons/client'
-import { findScope, getAllUniqueFields } from '@opencrvs/commons/client'
+import { getAllUniqueFields } from '@opencrvs/commons/client'
 import { getScope } from '@client/profile/profileSelectors'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import {
@@ -76,7 +77,7 @@ const defaultSearchFieldGenerator: Record<
       id: 'advancedSearch.registeredAtLocation.helperText'
     },
     configuration: {
-      searchableResource: ['locations', 'offices']
+      locationTypes: ['ADMIN_STRUCTURE', 'CRVS_OFFICE']
     }
   }),
   'event.legalStatuses.REGISTERED.acceptedAt': (_) => ({
@@ -769,12 +770,17 @@ export function checkScopeForEventSearch(eventId: string) {
     scopes: scopes ?? []
   })
 
-  const isEventSearchAllowed = searchScopes.some(
-    (scope) =>
+  const isEventSearchAllowed = searchScopes.some((scope) => {
+    if (!scopeUsesFullOptions(scope)) {
+      return false
+    }
+
+    // Unless specified, event search is allowed for all events
+    return (
       scope.options?.event?.includes(eventId) ||
-      // Unless specified, event search is allowed for all events
       scope.options?.event === undefined
-  )
+    )
+  })
 
   return isEventSearchAllowed
 }

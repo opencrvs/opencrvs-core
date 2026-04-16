@@ -35,14 +35,14 @@ import { storeReloadModalVisibility } from '@client/reload/reducer'
 import { APPLICATION_VERSION } from './constants'
 import { storage } from '../storage'
 
-export let client: ApolloClient<NormalizedCacheObject>
+let client: ApolloClient<NormalizedCacheObject>
 
 export const createClient = (
   store: Store<IStoreState, AnyAction>,
   restoredCache?: InMemoryCache
 ) => {
   const httpLink = createHttpLink({
-    uri: new URL('graphql', window.config.API_GATEWAY_URL).toString()
+    uri: '/api/graphql'
   })
 
   const authLink = setContext((_, { headers }) => {

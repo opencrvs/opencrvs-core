@@ -13,10 +13,7 @@ import React from 'react'
 import { LocationPicker } from './LocationPicker'
 import { TRPCProvider } from '../v2-events/trpc'
 import { noop } from 'lodash'
-import {
-  V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS,
-  V2_DEFAULT_MOCK_LOCATIONS
-} from '../tests/v2-events/administrative-hierarchy-mock'
+import { V2_DEFAULT_MOCK_LOCATIONS } from '../tests/v2-events/administrative-hierarchy-mock'
 
 const meta: Meta<typeof LocationPicker> = {
   title: 'LocationPicker',
@@ -38,12 +35,5 @@ export const WithSelectedLocation: Story = {
   args: {
     onChangeLocation: noop,
     selectedLocationId: V2_DEFAULT_MOCK_LOCATIONS[0].id
-  }
-}
-
-export const WithSelectedAdministrativeArea: Story = {
-  args: {
-    onChangeLocation: noop,
-    selectedLocationId: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS[0].id
   }
 }

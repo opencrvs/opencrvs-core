@@ -18,7 +18,7 @@ import {
   getJurisidictionType,
   getLocationNameMapOfFacility,
   createSearchOptions,
-  isOfficeUnderJurisdiction
+  isLocationUnderJurisdiction
 } from '@client/utils/locationUtils'
 import { createIntl } from 'react-intl'
 import { ILanguage } from '@client/i18n/reducer'
@@ -188,42 +188,42 @@ describe('locationUtil tests', () => {
   })
 })
 
-describe('isOfficeUnderJurisdiction', () => {
-  it('returns true if the other office is under jurisdiction of the given office', () => {
-    const officeId = UUID.parse(
+describe('isLocationUnderJurisdiction', () => {
+  it('returns true if the other location is under jurisdiction of the given location', () => {
+    const locationId = UUID.parse(
       V2_DEFAULT_MOCK_LOCATIONS.find(
         (l) => l.name === 'Central Provincial Office'
       )?.id
     )
-    const otherOfficeId = UUID.parse(
+    const otherLocationId = UUID.parse(
       V2_DEFAULT_MOCK_LOCATIONS.find((l) => l.name === 'Ibombo District Office')
         ?.id
     )
 
     expect(
-      isOfficeUnderJurisdiction({
-        officeId,
-        otherOfficeId,
+      isLocationUnderJurisdiction({
+        locationId,
+        otherLocationId,
         locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
         administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
       })
     ).toEqual(true)
   })
 
-  it('returns false if the given other office is not under the jurisdiction of the given office', () => {
-    const officeId = UUID.parse(
+  it('returns false if the given other location is not under the jurisdiction of the given location', () => {
+    const locationId = UUID.parse(
       V2_DEFAULT_MOCK_LOCATIONS.find((l) => l.name === 'Isango District Office')
         ?.id
     )
-    const otherOfficeId = UUID.parse(
+    const otherLocationId = UUID.parse(
       V2_DEFAULT_MOCK_LOCATIONS.find((l) => l.name === 'Ibombo District Office')
         ?.id
     )
 
     expect(
-      isOfficeUnderJurisdiction({
-        officeId,
-        otherOfficeId,
+      isLocationUnderJurisdiction({
+        locationId,
+        otherLocationId,
         locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
         administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
       })
@@ -232,7 +232,7 @@ describe('isOfficeUnderJurisdiction', () => {
 })
 
 describe('createSearchOptions', () => {
-  it('creates search options for locations and administrative areas', () => {
+  it('creates search options for locations', () => {
     const options = createSearchOptions({
       locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
       administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
@@ -241,7 +241,7 @@ describe('createSearchOptions', () => {
     expect(options).toMatchSnapshot()
   })
 
-  it('filters search options for both locations and administrative areas', () => {
+  it('filters search options for locations', () => {
     const options = createSearchOptions({
       locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
       administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,

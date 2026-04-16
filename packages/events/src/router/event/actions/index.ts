@@ -34,19 +34,14 @@ import {
   CustomActionInput,
   EditActionInput
 } from '@opencrvs/commons/events'
-import {
-  EventActionAuditLog
-} from '@opencrvs/commons/events'
+import { EventActionAuditLog } from '@opencrvs/commons/events'
 import {
   TokenUserType,
   TokenWithBearer
 } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
-import {
-  requiresAnyOfScopes,
-  setBearerForToken
-} from '@events/router/middleware'
-import { userAndSystemProcedure } from '@events/router/trpc'
+import { setBearerForToken } from '@events/router/middleware'
+import { userAndSystemProcedure, userOnlyProcedure } from '@events/router/trpc'
 
 import {
   getEventById,
@@ -176,6 +171,12 @@ const AUDIT_LOG_OPERATION_MAP: Partial<
   Record<keyof typeof ACTION_PROCEDURE_CONFIG, EventActionAuditLog['operation']>
 > = {
   [ActionType.NOTIFY]: 'event.actions.notify.request',
+  [ActionType.DECLARE]: 'event.actions.declare.request',
+  [ActionType.REGISTER]: 'event.actions.register.request',
+  [ActionType.REJECT]: 'event.actions.reject.request',
+  [ActionType.ARCHIVE]: 'event.actions.archive.request',
+  [ActionType.PRINT_CERTIFICATE]: 'event.actions.print_certificate.request',
+  [ActionType.EDIT]: 'event.actions.edit.request',
   [ActionType.REQUEST_CORRECTION]: 'event.actions.correction.request.request',
   [ActionType.APPROVE_CORRECTION]: 'event.actions.correction.approve.request',
   [ActionType.REJECT_CORRECTION]: 'event.actions.correction.reject.request'
@@ -329,6 +330,16 @@ export type AsyncActionConfirmationResponseSchema = z.infer<
 >
 
 /**
+ * To prevent accidental access granting, we want to make sure that system users can only access events with scopes that explicitly allow system user access, even if the scope options would match the system user's context.
+ */
+const SYSTEM_USER_ALLOWED_ACTIONS = [
+  ActionType.NOTIFY,
+  ActionType.REJECT_CORRECTION,
+  ActionType.APPROVE_CORRECTION,
+  ActionType.REQUEST_CORRECTION
+] as const
+
+/**
  * Most actions share a similar model, where the action is first requested, and then either synchronously or asynchronously
  * accepted or rejected, via the notify API. The notify APIs are HTTP APIs served by the countryconfig.
  *
@@ -352,19 +363,19 @@ export function getDefaultActionProcedures(
     )
   }
 
-  const requireScopesForRequestMiddleware = requiresAnyOfScopes(
-    [],
-    ACTION_SCOPE_MAP[actionType]
-  )
-
   const meta = 'meta' in actionConfig ? actionConfig.meta : {}
 
+  const userTypeBasedProcedure = SYSTEM_USER_ALLOWED_ACTIONS.some(
+    (act) => act === actionType
+  )
+    ? userAndSystemProcedure
+    : userOnlyProcedure
+
   return {
-    request: userAndSystemProcedure
+    request: userTypeBasedProcedure
       .meta(meta)
-      .use(requireScopesForRequestMiddleware)
+      .use(middleware.canAccessEventWithScopes(ACTION_SCOPE_MAP[actionType]))
       .input(actionConfig.inputSchema.strict())
-      .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)
       .use(middleware.detectDuplicate)
@@ -403,11 +414,12 @@ export function getDefaultActionProcedures(
             clientId: user.id,
             clientType: user.type,
             operation: auditOperation,
-            requestData: { eventId, actionType, transactionId: input.transactionId },
-            responseSummary: {
-              eventId: result.id,
+            requestData: {
+              eventId,
+              actionType,
               eventType: result.type,
-              trackingId: result.trackingId
+              trackingId: result.trackingId,
+              transactionId: input.transactionId
             }
           })
         }

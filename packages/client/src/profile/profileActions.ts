@@ -9,10 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ApolloQueryResult } from '@apollo/client'
-import { FetchUserQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
-import { TriggerEvent } from '@opencrvs/commons/client'
+import { TriggerEvent, User } from '@opencrvs/commons/client'
 
 export const CHECK_AUTH = 'PROFILE/CHECK_AUTH' as const
 export const REDIRECT_TO_AUTHENTICATION =
@@ -42,7 +40,7 @@ type CheckAuthAction = {
 
 type SetUserDetailsAction = {
   type: typeof SET_USER_DETAILS
-  payload: ApolloQueryResult<FetchUserQuery>
+  payload: User
 }
 
 type ModifyUserDetailsAction = {
@@ -93,9 +91,7 @@ export const checkAuth = (): CheckAuthAction => ({
   type: CHECK_AUTH
 })
 
-export const setUserDetails = (
-  payload: ApolloQueryResult<FetchUserQuery>
-): SetUserDetailsAction => ({
+export const setUserDetails = (payload: User): SetUserDetailsAction => ({
   type: SET_USER_DETAILS,
   payload
 })
@@ -105,7 +101,7 @@ export const userDetailsAvailable = (payload: UserDetails) => ({
   payload
 })
 
-export type UserDetailsAvailable = ReturnType<typeof userDetailsAvailable>
+type UserDetailsAvailable = ReturnType<typeof userDetailsAvailable>
 
 export const modifyUserDetails = (
   payload: Partial<UserDetails>
@@ -140,29 +136,6 @@ export const redirectToAuthentication = (
     redirectBack
   }
 })
-
-export const sendVerifyCode = (
-  userFullName: {
-    use: string
-    family: string
-    given: string[]
-  }[],
-  notificationEvent:
-    | typeof TriggerEvent.CHANGE_PHONE_NUMBER
-    | typeof TriggerEvent.CHANGE_EMAIL_ADDRESS,
-  phoneNumber?: string,
-  email?: string
-): SendVerifyCode => {
-  return {
-    type: SEND_VERIFY_CODE,
-    payload: {
-      userFullName,
-      notificationEvent,
-      phoneNumber,
-      email
-    }
-  }
-}
 
 export const SendVerifyCodeSuccess = (payload: {
   userId: string

@@ -15,7 +15,7 @@ import {
   verifyToken
 } from '@auth/features/authenticate/service'
 import { pipe } from 'fp-ts/lib/function'
-import { UUID } from '@opencrvs/commons'
+import { decodeScope, EncodedScope, UUID } from '@opencrvs/commons'
 import { getParam } from './utils'
 
 export const SUBJECT_TOKEN_TYPE =
@@ -57,8 +57,14 @@ export async function tokenExchangeHandler(
 
   const { sub, userType } = decodedOrError.right
 
-  const rejectScopeOfUserAssignedRole = decodedOrError.right.scope.find((s) =>
-    s.startsWith('record.declared.reject')
+  const rejectScopeOfUserAssignedRole = decodedOrError.right.scope.find(
+    (s: EncodedScope) => {
+      const v2Scope = decodeScope(s)
+
+      const isV2RejectScope = v2Scope?.type === 'record.reject'
+
+      return s.startsWith('record.declared.reject') || isV2RejectScope
+    }
   )
 
   // @TODO: If in the future we have a fine grained access control for records, check here that the subject actually has access to the record requested

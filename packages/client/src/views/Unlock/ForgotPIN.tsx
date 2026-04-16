@@ -8,36 +8,35 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, {
-  ChangeEvent,
-  FocusEventHandler,
-  useCallback,
-  useState
-} from 'react'
-import styled from 'styled-components'
-import { useDispatch, useSelector } from 'react-redux'
-import { storage } from '@client/storage'
+import { AvatarLarge } from '@client/components/Avatar'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
-import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
-import { redirectToAuthentication } from '@client/profile/profileActions'
-import { Button } from '@opencrvs/components/lib/Button'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { PasswordInput } from '@opencrvs/components/lib/PasswordInput'
-import { injectIntl, useIntl, WrappedComponentProps } from 'react-intl'
 import {
   buttonMessages,
   constantsMessages,
   errorMessages,
   userMessages
 } from '@client/i18n/messages'
-import { userQueries } from '@client/user/queries'
-import { AvatarLarge } from '@client/components/Avatar'
-import { getUserName } from '@client/utils/userUtils'
 import { getLanguage } from '@client/i18n/selectors'
-import { Box, Link, Stack, Toast } from '@opencrvs/components'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import { redirectToAuthentication } from '@client/profile/profileActions'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { storage } from '@client/storage'
+import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
+import { getUserName } from '@client/utils/userUtils'
 import { BackgroundWrapper } from '@client/views/common/Common'
+import { Box, Link, Stack, Toast } from '@opencrvs/components'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { InputField } from '@opencrvs/components/lib/InputField'
+import { PasswordInput } from '@opencrvs/components/lib/PasswordInput'
+import React, {
+  ChangeEvent,
+  FocusEventHandler,
+  useCallback,
+  useState
+} from 'react'
+import { injectIntl, useIntl, WrappedComponentProps } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
+import styled from 'styled-components'
 
 interface IForgotPINProps {
   goBack: () => void
@@ -106,9 +105,7 @@ export function ForgotPIN(props: IForgotPINProps) {
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       e.preventDefault()
       logout()
-      window.location.assign(
-        window.config.LOGIN_URL + `/forgotten-item?lang=${language}`
-      )
+      window.location.assign(`/login/forgotten-item?lang=${language}`)
     },
     [language, logout]
   )
@@ -125,21 +122,18 @@ export function ForgotPIN(props: IForgotPINProps) {
 
       setVerifyingPassword(true)
 
-      const id = (userDetails && userDetails.userMgntUserID) || ''
+      const id = (userDetails && userDetails.id) || ''
       try {
-        const { data } = await userQueries.verifyPasswordById(id, password)
-
-        if (data && data.verifyPasswordById) {
-          setVerifyingPassword(false)
-          setError('')
-          props.onVerifyPassword()
-        }
+        throw new Error('Password verification is currently not implemented')
+        // setVerifyingPassword(false)
+        // setError('')
+        // props.onVerifyPassword()
       } catch (e) {
         setVerifyingPassword(false)
         setError(intl.formatMessage(errorMessages.passwordSubmissionError))
       }
     },
-    [password, userDetails, intl, props]
+    [password, userDetails, intl]
   )
 
   const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {

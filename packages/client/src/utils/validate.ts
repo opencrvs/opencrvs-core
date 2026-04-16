@@ -12,8 +12,7 @@ import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@client/i18n/messages'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
-  REGEXP_DECIMAL_POINT_NUMBER,
-  NATIONAL_ID
+  REGEXP_DECIMAL_POINT_NUMBER
 } from '@client/utils/constants'
 import { validate as validateEmail } from 'email-validator'
 import XRegExp from 'xregexp'
@@ -647,30 +646,6 @@ export const oneOf = (
   }
 }
 
-export const isAValidNIDNumberFormat = (value: string): boolean => {
-  const pattern = window.config.NID_NUMBER_PATTERN
-  return new RegExp(pattern).test(value)
-}
-
-export const validIDNumber =
-  (typeOfID: string): Validation =>
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  (value: any) => {
-    value = (value && value.toString()) || ''
-
-    const cast = value as string
-    const trimmedValue = cast === undefined || cast === null ? '' : cast.trim()
-    if (typeOfID === NATIONAL_ID) {
-      if (isAValidNIDNumberFormat(trimmedValue) || !trimmedValue) {
-        return undefined
-      }
-
-      return {
-        message: messages.validNationalId
-      }
-    }
-    return undefined
-  }
 export const duplicateIDNumber =
   (fieldToDuplicateCheck: string): Validation =>
   (value: IFormFieldValue, drafts) => {

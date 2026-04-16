@@ -146,7 +146,6 @@ const Component = ({
           {intl.formatMessage(messages.draftsSaved)}
         </Toast>
       )}
-
       {submitFormSuccessToast && (
         <Toast
           id="submissionSuccessToast"
@@ -158,7 +157,6 @@ const Component = ({
             : intl.formatMessage(messages.userFormSuccess)}
         </Toast>
       )}
-
       {submitFormErrorToast && (
         <Toast
           id="submissionErrorToast"

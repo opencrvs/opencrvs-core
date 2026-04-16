@@ -27,7 +27,8 @@ import {
   TestUserRole,
   AddressType,
   deepMerge,
-  encodeScope
+  encodeScope,
+  getDeclarationFields
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -38,6 +39,8 @@ import {
   TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
+import { createIndex } from '@events/service/indexing/indexing'
+import { getEventIndexName } from '@events/storage/elasticsearch'
 import { mswServer } from '../../tests/msw'
 import { env } from '../../environment'
 
@@ -93,7 +96,7 @@ describe('Adding actions', () => {
     )
     await client.event.actions.register.request(generatedRegistration)
 
-    const updatedEvent = await client.event.get({eventId: originalEvent.id})
+    const updatedEvent = await client.event.get({ eventId: originalEvent.id })
 
     expect(updatedEvent.actions).toEqual([
       expect.objectContaining({ type: ActionType.CREATE }),
@@ -123,8 +126,7 @@ describe('Adding actions', () => {
     updatedEvent.actions.forEach((action) => {
       expect(action.createdAtLocation).toBe(user.primaryOfficeId)
       expect(action.createdByRole).toBe(user.role)
-      expect(action.createdBySignature).toBe(user.signature)
-
+      expect(action.createdBySignature).toMatchSnapshot()
       const actionsWithoutAnnotatation = [
         ActionType.CREATE,
         ActionType.READ,
@@ -160,7 +162,7 @@ describe('Action drafts', () => {
         'applicant.image': {
           type: 'image/png',
           originalFilename: 'abcd.png',
-          path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+          path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
         }
       },
       transactionId: getUUID(),
@@ -172,7 +174,7 @@ describe('Action drafts', () => {
 
     const draftEvents = await client.event.draft.list()
 
-    const event = await client.event.get({eventId: originalEvent.id})
+    const event = await client.event.get({ eventId: originalEvent.id })
     // this triggers READ action
     expect(event.actions.at(-1)?.type).toBe(ActionType.READ)
 
@@ -194,7 +196,7 @@ describe('Action drafts', () => {
         'applicant.image': {
           type: 'image/png',
           originalFilename: 'abcd.png',
-          path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+          path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
         }
       },
       transactionId: getUUID(),
@@ -259,6 +261,13 @@ const multiFileConfig = {
   advancedSearch: []
 } satisfies EventConfig
 
+beforeEach(async () => {
+  return createIndex(
+    getEventIndexName(multiFileConfig.id),
+    getDeclarationFields(tennisClubMembershipEvent)
+  )
+})
+
 describe('Action updates', () => {
   const deleteFileMock = vi.fn()
   const fileExistsMock = vi.fn()
@@ -268,7 +277,7 @@ describe('Action updates', () => {
     fileExistsMock.mockClear()
 
     mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
         return HttpResponse.json([multiFileConfig, tennisClubMembershipEvent])
       }),
       http.head(`${env.DOCUMENTS_URL}/files/:filePath*`, (req) => {
@@ -294,19 +303,19 @@ describe('Action updates', () => {
     'documents.singleFile': {
       type: 'image/svg+xml',
       originalFilename: 'tree.svg',
-      path: '/ocrvs/tree.svg'
+      path: 'tree.svg'
     },
     'documents.multiFile': [
       {
         type: 'image/svg+xml',
         originalFilename: 'multi-file-1.svg',
-        path: '/ocrvs/fish.svg',
+        path: 'fish.svg',
         option: 'multifile1'
       },
       {
         type: 'image/svg+xml',
         originalFilename: 'multi-file-2.svg',
-        path: '/ocrvs/mountain.svg',
+        path: 'mountain.svg',
         option: 'multifile2'
       }
     ]
@@ -342,7 +351,7 @@ describe('Action updates', () => {
       transactionId: getUUID()
     })
 
-    const event = await client.event.get({eventId: originalEvent.id})
+    const event = await client.event.get({ eventId: originalEvent.id })
     const eventState = getCurrentEventState(event, tennisClubMembershipEvent)
     expect(eventState.declaration).toMatchSnapshot()
   })
@@ -519,7 +528,7 @@ describe('Action updates', () => {
     expect(eventAfterDeclare.declaration['documents.singleFile']).toBeDefined()
     expect(eventAfterDeclare.declaration['documents.multiFile']).toHaveLength(2)
 
-    expect(fileExistsMock.mock.calls[0]).toEqual(['ocrvs/tree.svg'])
+    expect(fileExistsMock.mock.calls[0]).toEqual(['tree.svg'])
 
     await client.event.actions.register.request({
       eventId: originalEvent.id,
@@ -586,7 +595,7 @@ test('PRINT_CERTIFICATE action can include a valid content.templateId property i
   )
   expect(result).toBeDefined()
 
-  const updatedEvent = await client.event.get({eventId: originalEvent.id})
+  const updatedEvent = await client.event.get({ eventId: originalEvent.id })
   const printAction = updatedEvent.actions.find(
     (action) => action.type === ActionType.PRINT_CERTIFICATE
   ) as PrintCertificateAction
@@ -732,7 +741,7 @@ describe('Conditionals based on user role', () => {
       })
     })
 
-    expect(users).toHaveLength(7)
+    expect(users).toHaveLength(9)
     for (const u of users) {
       const userClient = createTestClient(u)
 

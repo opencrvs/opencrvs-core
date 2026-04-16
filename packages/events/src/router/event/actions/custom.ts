@@ -15,7 +15,6 @@ import {
   EventDocument,
   CustomActionInput
 } from '@opencrvs/commons/events'
-import { getScopes, parseConfigurableScope } from '@opencrvs/commons'
 import * as middleware from '@events/router/middleware'
 import { userAndSystemProcedure } from '@events/router/trpc'
 import { getEventById } from '@events/service/events/events'
@@ -24,47 +23,14 @@ import {
   getDefaultActionProcedures
 } from '@events/router/event/actions'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
-
-function allowCustomAction(
-  token: string,
-  eventType: string,
-  customActionType: string
-) {
-  const userScopes = getScopes(token)
-  const parsedScopes = userScopes
-    .map(parseConfigurableScope)
-    .filter((s) => s !== undefined)
-
-  const allowedScope = parsedScopes.find(
-    (s) =>
-      s.type === 'record.custom-action' &&
-      s.options.customActionType.includes(customActionType) &&
-      s.options.event.includes(eventType)
-  )
-
-  return Boolean(allowedScope)
-}
+import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 
 export function customActionProcedures() {
   return {
     ...getDefaultActionProcedures(ActionType.CUSTOM),
     request: userAndSystemProcedure
       .input(CustomActionInput)
-      .use(async ({ ctx, input, next }) => {
-        try {
-          const event = await getEventById(input.eventId)
-          if (
-            !allowCustomAction(ctx.token, event.type, input.customActionType)
-          ) {
-            throw new TRPCError({ code: 'FORBIDDEN' })
-          }
-
-          return await next()
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (_e) {
-          throw new TRPCError({ code: 'FORBIDDEN' })
-        }
-      })
+      .use(middleware.canAccessEventWithScopes(['record.custom-action']))
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)
       .output(EventDocument)
@@ -108,7 +74,7 @@ export function customActionProcedures() {
           })
         }
 
-        return defaultRequestHandler(
+        const result = await defaultRequestHandler(
           input,
           user,
           token,
@@ -116,6 +82,22 @@ export function customActionProcedures() {
           config,
           CustomActionInput
         )
+
+        await writeAuditLog({
+          clientId: user.id,
+          clientType: user.type,
+          operation: 'event.actions.custom.request',
+          requestData: {
+            eventId: input.eventId,
+            actionType: ActionType.CUSTOM,
+            eventType: result.type,
+            trackingId: result.trackingId,
+            transactionId: input.transactionId,
+            customAction: input.customActionType
+          }
+        })
+
+        return result
       })
   }
 }

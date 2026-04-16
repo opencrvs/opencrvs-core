@@ -43,6 +43,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { EventOverviewProvider } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
 
 const Tab = styled.button`
   border: none;
@@ -92,6 +93,9 @@ function EventOverviewTabs() {
   const location = useLocation()
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT)
   const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
+  const { canAccessEventWithScopes } = useCanAccessEventWithScopes(eventId, [
+    'record.read'
+  ])
 
   const isActive = (pattern: string) => {
     return !!matchPath({ path: pattern, end: true }, location.pathname)
@@ -107,16 +111,23 @@ function EventOverviewTabs() {
       >
         {intl.formatMessage(messages.summary)}
       </Tab>
-      <Tab
-        className={isActive(ROUTES.V2.EVENTS.EVENT.RECORD.path) ? 'active' : ''}
-        onClick={() => {
-          navigate(
-            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
-          )
-        }}
-      >
-        {intl.formatMessage(messages.record)}
-      </Tab>
+      {canAccessEventWithScopes() && (
+        <Tab
+          className={
+            isActive(ROUTES.V2.EVENTS.EVENT.RECORD.path) ? 'active' : ''
+          }
+          onClick={() => {
+            navigate(
+              ROUTES.V2.EVENTS.EVENT.RECORD.buildPath(
+                { eventId },
+                { workqueue }
+              )
+            )
+          }}
+        >
+          {intl.formatMessage(messages.record)}
+        </Tab>
+      )}
       <Tab
         className={isActive(ROUTES.V2.EVENTS.EVENT.AUDIT.path) ? 'active' : ''}
         onClick={() => {

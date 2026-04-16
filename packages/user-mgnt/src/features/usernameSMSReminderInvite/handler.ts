@@ -12,7 +12,6 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import User, { IUserModel } from '@user-mgnt/model/user'
 import { unauthorized } from '@hapi/boom'
-import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 import {
   logger,
   triggerUserEventNotification,
@@ -20,6 +19,7 @@ import {
 } from '@opencrvs/commons'
 import { getUserId } from '@user-mgnt/utils/userUtils'
 import { COUNTRY_CONFIG_URL } from '@user-mgnt/constants'
+import { recordUserAuditEvent } from '@user-mgnt/utils/userAudit'
 
 interface IResendUsernameSMSPayload {
   userId: string
@@ -36,10 +36,6 @@ export default async function usernameReminderHandler(
   if (!user) {
     throw unauthorized()
   }
-  const remoteAddress =
-    request.headers['x-real-ip'] || request.info.remoteAddress
-  const userAgent =
-    request.headers['x-real-user-agent'] || request.headers['user-agent']
 
   try {
     await triggerUserEventNotification({
@@ -56,19 +52,15 @@ export default async function usernameReminderHandler(
       authHeader: { Authorization: request.headers.authorization }
     })
 
-    const subjectPractitionerId = user.practitionerId
-
     const systemAdminUser: IUserModel | null = await User.findById(
       getUserId({ Authorization: request.headers.authorization })
     )
-    await postUserActionToMetrics(
-      'USERNAME_REMINDER_BY_ADMIN',
-      request.headers.authorization,
-      remoteAddress,
-      userAgent,
-      systemAdminUser?.practitionerId,
-      subjectPractitionerId
-    )
+    if (systemAdminUser) {
+      recordUserAuditEvent(request.headers.authorization, {
+        operation: 'user.username_reminder_by_admin',
+        requestData: { subjectId: userId },
+      })
+    }
   } catch (err) {
     logger.error(err)
   }

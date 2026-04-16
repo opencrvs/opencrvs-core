@@ -189,6 +189,11 @@ const reviewMessages = defineMessages({
     id: 'rejectModal.markAsDuplicate',
     defaultMessage: 'Mark as a duplicate',
     description: 'The label for mark as duplicate checkbox of reject modal'
+  },
+  annotationsTitle: {
+    id: 'review.annotations.title',
+    defaultMessage: 'Annotations',
+    description: 'Title for the annotations accordion section in review'
   }
 })
 
@@ -310,6 +315,13 @@ function FormReview({
             (!isCorrection || hasCorrectableFields) &&
             !isReviewCorrection
 
+          const hasMandatoryFields = page.fields.some(
+            (field) => !!field.required
+          )
+          const hasAnyCompletedField = page.fields.some(
+            (field) => form[field.id] != null && form[field.id] !== ''
+          )
+
           return (
             <DeclarationDataContainer
               key={'Section_' + page.title.defaultMessage}
@@ -327,54 +339,68 @@ function FormReview({
                     </Link>
                   )
                 }
-                expand={true}
+                expand={hasMandatoryFields || hasAnyCompletedField}
                 label={intl.formatMessage(page.title)}
                 labelForHideAction="Hide"
                 labelForShowAction="Show"
                 name={'Accordion_' + page.id}
               >
                 <ListReview id={'Section_' + page.id}>
-                  {displayedFields.map(
-                    ({
+                  {displayedFields.map((field) => {
+                    const {
                       id,
+                      type,
                       label,
                       errorDisplay,
                       valueDisplay,
                       uncorrectable
-                    }) => {
-                      const shouldHideEditLink =
-                        readonlyMode ||
-                        (isCorrection && uncorrectable) ||
-                        isReviewCorrection
+                    } = field
+                    const shouldHideEditLink =
+                      readonlyMode ||
+                      (isCorrection && uncorrectable) ||
+                      isReviewCorrection
 
-                      return (
-                        <ListReview.Row
-                          key={id}
-                          actions={
-                            !shouldHideEditLink && (
-                              <Link
-                                data-testid={`change-button-${id}`}
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  onEdit({
-                                    pageId: page.id,
-                                    fieldId: id
-                                  })
-                                }}
-                              >
-                                {intl.formatMessage(
-                                  reviewMessages.changeButton
-                                )}
-                              </Link>
-                            )
-                          }
-                          id={id}
-                          label={intl.formatMessage(label)}
-                          value={errorDisplay || valueDisplay}
-                        />
-                      )
-                    }
-                  )}
+                    const showSectionHeading = type === FieldType.HEADING
+
+                    return (
+                      <>
+                        {showSectionHeading ? (
+                          <ListReview.Header
+                            fontVariant={
+                              field.configuration.styles?.fontVariant
+                            }
+                            label={intl.formatMessage(label)}
+                            value={null}
+                          />
+                        ) : (
+                          <ListReview.Row
+                            key={id}
+                            actions={
+                              !shouldHideEditLink && (
+                                <Link
+                                  data-testid={`change-button-${id}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    onEdit({
+                                      pageId: page.id,
+                                      fieldId: id
+                                    })
+                                  }}
+                                >
+                                  {intl.formatMessage(
+                                    reviewMessages.changeButton
+                                  )}
+                                </Link>
+                              )
+                            }
+                            id={id}
+                            label={intl.formatMessage(label)}
+                            value={errorDisplay || valueDisplay}
+                          />
+                        )}
+                      </>
+                    )
+                  })}
                 </ListReview>
               </Accordion>
             </DeclarationDataContainer>
@@ -428,6 +454,7 @@ function ReviewComponent({
   isReviewCorrection?: boolean
   banner?: React.ReactNode
 }) {
+  const intl = useIntl()
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
   const previousForm = previousFormValues ?? {}
 
@@ -440,8 +467,16 @@ function ReviewComponent({
     )
     .map(({ id }) => id)
 
-  const hasReviewFieldsToUpdate =
-    annotation && onAnnotationChange && reviewFields && reviewFields.length > 0
+  const hasAnnotationFieldsToShow =
+    annotation !== undefined && reviewFields && reviewFields.length > 0
+
+  const displayedAnnotationFields = hasAnnotationFieldsToShow
+    ? reviewFields.filter(
+        (field) =>
+          !FieldTypesToHideInReview.some((t) => t === field.type) &&
+          isFieldDisplayedOnReview(field, annotation, validatorContext)
+      )
+    : []
 
   return (
     <Row>
@@ -463,20 +498,63 @@ function ReviewComponent({
             onEdit={onEdit}
           />
 
-          {hasReviewFieldsToUpdate && (
-            <FormData>
-              <ReviewContainter>
-                <FormFieldGenerator
-                  fields={reviewFields}
-                  id={'review'}
-                  initialValues={annotation}
-                  readonlyMode={readonlyMode}
-                  validatorContext={validatorContext}
-                  onChange={onAnnotationChange}
-                />
-              </ReviewContainter>
-            </FormData>
+          {/* edit annotation fields  */}
+          {hasAnnotationFieldsToShow && onAnnotationChange && (
+            <ReviewContainter>
+              <DeclarationDataContainer>
+                <Accordion
+                  expand={true}
+                  label={intl.formatMessage(reviewMessages.annotationsTitle)}
+                  labelForHideAction="Hide"
+                  labelForShowAction="Show"
+                  name="annotation"
+                >
+                  <FormFieldGenerator
+                    fields={reviewFields}
+                    id={'review'}
+                    initialValues={annotation}
+                    readonlyMode={readonlyMode}
+                    validatorContext={validatorContext}
+                    onChange={onAnnotationChange}
+                  />
+                </Accordion>
+              </DeclarationDataContainer>
+            </ReviewContainter>
           )}
+
+          {/* show annotation fields */}
+          {hasAnnotationFieldsToShow &&
+            readonlyMode &&
+            displayedAnnotationFields.length > 0 && (
+              <ReviewContainter>
+                <DeclarationDataContainer>
+                  <Accordion
+                    expand={true}
+                    label={intl.formatMessage(reviewMessages.annotationsTitle)}
+                    labelForHideAction="Hide"
+                    labelForShowAction="Show"
+                    name="annotation"
+                  >
+                    <ListReview id="annotation">
+                      {displayedAnnotationFields.map((field) => (
+                        <ListReview.Row
+                          key={field.id}
+                          actions={null}
+                          id={field.id}
+                          label={intl.formatMessage(field.label)}
+                          value={
+                            <Output
+                              field={field}
+                              value={annotation[field.id]}
+                            />
+                          }
+                        />
+                      ))}
+                    </ListReview>
+                  </Accordion>
+                </DeclarationDataContainer>
+              </ReviewContainter>
+            )}
         </Card>
         {children}
       </LeftColumn>

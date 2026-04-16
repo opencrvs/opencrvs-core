@@ -12,19 +12,15 @@
 export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:auth-user',
   'opencrvs:user-mgnt-user',
-  'opencrvs:hearth-user',
   'opencrvs:gateway-user',
   'opencrvs:events-user',
   'opencrvs:notification-user',
-  'opencrvs:workflow-user',
-  'opencrvs:search-user',
   'opencrvs:metrics-user',
   'opencrvs:countryconfig-user',
   'opencrvs:webhooks-user',
-  'opencrvs:config-user',
   'opencrvs:documents-user'
 ]
-export const NOTIFICATION_API_USER_AUDIENCE = 'opencrvs:notification-api-user'
+
 export const JWT_ISSUER = 'opencrvs:auth-service'
 export const INVALID_TOKEN_NAMESPACE = 'invalidToken'
 export const DEFAULT_TIMEOUT = 600000

@@ -25,7 +25,6 @@ import {
   TestUserRole,
   user,
   not,
-  EventDocument,
   FieldConditional,
   ValidatorContext
 } from '@opencrvs/commons/client'

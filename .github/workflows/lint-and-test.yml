@@ -171,6 +171,10 @@ jobs:
         run: |
           cd packages/components && yarn build
 
+      - name: Build events router types
+        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/events')
+        run: cd packages/events && node_modules/.bin/tsc -p tsconfig.router.json
+
       # TODO: should run parallel to unit tests as can take as much as unit tests
       - name: Run linting
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-lint != 'true'
@@ -321,6 +325,9 @@ jobs:
 
       - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
+
+      - name: Build events router types
+        run: cd packages/events && node_modules/.bin/tsc -p tsconfig.router.json
 
       - name: Compile
         run: cd packages/client && yarn test:compilation

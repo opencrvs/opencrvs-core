@@ -68,7 +68,7 @@ export const actionLabels = {
     id: 'event.birth.action.register.label'
   },
   [ActionType.MARK_AS_DUPLICATE]: {
-    defaultMessage: 'Review',
+    defaultMessage: 'Review potential duplicates',
     description: 'Label for review potential duplicate button in dropdown menu',
     id: 'event.birth.action.mark-as-duplicate.label'
   },
@@ -84,7 +84,7 @@ export const actionLabels = {
     id: 'event.birth.action.delete.label'
   },
   [ActionType.REQUEST_CORRECTION]: {
-    defaultMessage: 'Correct record',
+    defaultMessage: 'Correct',
     description: 'Label for request correction button in dropdown menu',
     id: 'event.birth.action.request-correction.label'
   },
@@ -102,15 +102,15 @@ export const actionIcons: Record<
   [ActionType.ASSIGN]: 'PushPin',
   [ActionType.UNASSIGN]: 'ArrowCircleDown',
   [ActionType.ARCHIVE]: 'Archive',
-  [ActionType.MARK_AS_DUPLICATE]: 'PencilLine',
+  [ActionType.MARK_AS_DUPLICATE]: 'Files',
   [ActionType.DELETE]: 'Trash',
-  [ActionType.DECLARE]: 'PencilLine',
+  [ActionType.DECLARE]: 'PaperPlaneTilt',
   [ActionType.EDIT]: 'PencilLine',
   [ActionType.REJECT]: 'FileX',
-  [ActionType.REGISTER]: 'PencilLine',
+  [ActionType.REGISTER]: 'PenNib',
   [ActionType.PRINT_CERTIFICATE]: 'Printer',
-  [ActionType.REQUEST_CORRECTION]: 'NotePencil',
-  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: 'NotePencil',
+  [ActionType.REQUEST_CORRECTION]: 'PencilCircle',
+  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: 'FileSearch',
   [ActionType.READ]: 'Eye'
 }
 

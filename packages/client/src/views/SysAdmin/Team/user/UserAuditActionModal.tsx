@@ -18,8 +18,6 @@ import {
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/sysAdmin'
-import { createNamesMap } from '@client/utils/data-formatting'
-import { LANG_EN } from '@client/utils/constants'
 import { IUserAuditForm } from '@client/user/user-audit'
 import { IStoreState } from '@client/store'
 import { connect, useSelector } from 'react-redux'
@@ -28,21 +26,17 @@ import styled from 'styled-components'
 import { IFormSectionData } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import { GET_USER, USER_AUDIT_ACTION } from '@client/user/queries'
 import { Dispatch } from 'redux'
 import {
   showUserAuditSuccessToast,
   showSubmitFormErrorToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
-import {
-  ApolloClient,
-  InternalRefetchQueriesInclude,
-  useQuery
-} from '@apollo/client'
 import { withApollo, WithApolloClient } from '@apollo/client/react/hoc'
 import { getOfflineData } from '@client/offline/selectors'
-import { GetUserQuery, GetUserQueryVariables } from '@client/utils/gateway'
+import { User } from '@opencrvs/commons/client'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { getUsersFullName } from '@client/v2-events/utils'
 
 const { useState, useEffect } = React
 
@@ -61,15 +55,7 @@ interface ToggleUserActivationModalProps
     DispatchProps {
   userId: string
   show: boolean
-  onConfirmRefetchQueries?: InternalRefetchQueriesInclude
   onClose: () => void
-}
-
-interface IUserAuditVariables {
-  userId: string
-  action: string
-  reason: string
-  comment: string
 }
 
 const Subtitle = styled.h2`
@@ -104,13 +90,11 @@ function UserAuditActionModalComponent(
   const [formError, setFormError] = useState<string | null>(null)
   const [isErrorVisible, makeErrorVisible] = useState<boolean>(false)
   const config = useSelector(getOfflineData)
-  const { data } = useQuery<GetUserQuery, GetUserQueryVariables>(GET_USER, {
-    variables: { userId },
-    fetchPolicy: 'cache-first'
-  })
-  const user = data?.getUser ?? null
+  const { getUser } = useUsers()
+  const { data: userData } = getUser.useQuery(userId)
+  const user = userData?.type === 'user' ? (userData as User) : null
 
-  let name = ''
+  const name = user ? getUsersFullName(user.name, intl.locale) : ''
   let modalTitle = ''
   let modalSubtitle = ''
   const actions = [
@@ -119,17 +103,17 @@ function UserAuditActionModalComponent(
     </TertiaryButton>
   ]
 
-  if (user) {
-    name =
-      (createNamesMap(user.name)[intl.locale] as string) ||
-      (createNamesMap(user.name)[LANG_EN] as string)
-  }
-
   useEffect(() => {
     if (!props.form?.fields) return
 
     if (
-      hasFormError(props.form.fields, formValues, config, { formValues }, user)
+      hasFormError(
+        props.form.fields,
+        formValues,
+        config,
+        { formValues },
+        user as unknown as User | null
+      )
     ) {
       if (user && user.status === 'active') {
         const auditAction = 'deactivating'
@@ -148,7 +132,6 @@ function UserAuditActionModalComponent(
       makeErrorVisible(false)
       setFormValues({})
     }
-
     function injectAuditActionToFormValues() {
       const action =
         user && user.status && isValidAuditStatus(user.status)
@@ -156,7 +139,6 @@ function UserAuditActionModalComponent(
           : AUDIT_ACTION.DEACTIVATE
       setFormValues({ action })
     }
-
     if (!props.show) {
       cleanUpFormState()
     } else {
@@ -175,24 +157,10 @@ function UserAuditActionModalComponent(
     }
     makeErrorVisible(true)
     if (!formError) {
-      const userId = user?.id ?? ''
-      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-      ;(props.client as ApolloClient<any>)
-        .mutate({
-          mutation: USER_AUDIT_ACTION,
-          variables: {
-            userId,
-            ...(formValues as {
-              reason: string
-              comment: string
-              action: AUDIT_ACTION
-            })
-          } as IUserAuditVariables,
-          refetchQueries: props.onConfirmRefetchQueries
-        })
-        .then(() =>
+      Promise.reject(new Error('@TODO!'))
+        .then(() => {
           props.showSuccessToast(name, formValues.action as AUDIT_ACTION)
-        )
+        })
         .catch(() => props.showErrorToast())
       onClose()
     }
@@ -200,7 +168,11 @@ function UserAuditActionModalComponent(
 
   if (user && user.status === 'active') {
     actions.push(
-      <DangerButton id="deactivate-action" onClick={handleConfirm}>
+      <DangerButton
+        key="deactivate-action"
+        id="deactivate-action"
+        onClick={handleConfirm}
+      >
         {intl.formatMessage(buttonMessages.deactivate)}
       </DangerButton>
     )
@@ -213,7 +185,11 @@ function UserAuditActionModalComponent(
 
   if (user && user.status === 'deactivated') {
     actions.push(
-      <SuccessButton id="reactivate-action" onClick={handleConfirm}>
+      <SuccessButton
+        key="reactivate-action"
+        id="reactivate-action"
+        onClick={handleConfirm}
+      >
         {intl.formatMessage(buttonMessages.reactivate)}
       </SuccessButton>
     )

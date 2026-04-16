@@ -23,8 +23,9 @@ import {
   FieldConfig,
   EventState,
   generateTranslationConfig,
-  user,
-  UUID
+  UUID,
+  DocumentPath,
+  PlainDate
 } from '@opencrvs/commons/client'
 
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -105,7 +106,10 @@ const fields = [
       max: 60,
       prefix: generateTranslationConfig('Years'),
       postfix: generateTranslationConfig('Old')
-    }
+    },
+    helperText: generateTranslationConfig(
+      'For applicants under 18, parental consent is required.'
+    )
   },
 
   {
@@ -127,7 +131,7 @@ const fields = [
     type: FieldType.FILE,
     label: generateTranslationConfig('Applicant Photo'),
     defaultValue: {
-      path: '/uploads/photo.png',
+      path: 'uploads/photo.png' as DocumentPath,
       type: 'image/png',
       originalFilename: 'profile.png'
     },
@@ -146,7 +150,11 @@ const fields = [
     signaturePromptLabel: generateTranslationConfig(
       'Please sign inside the box'
     ),
-    defaultValue: 'Signed by Applicant',
+    defaultValue: {
+      path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath,
+      type: 'image/png',
+      originalFilename: 'signature-review____signature-1773128010978.png'
+    },
     configuration: { maxFileSize: 1024, acceptedFileTypes: ['image/png'] }
   },
 
@@ -218,8 +226,8 @@ const fields = [
       ]
     },
     defaultValue: {
-      country: 'Bangladesh',
-      administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+      country: 'FAR',
+      administrativeArea: '1d4e5f6a-7b8c-4912-8efa-345678901234' as UUID,
       addressType: 'DOMESTIC'
     }
   },
@@ -240,7 +248,7 @@ const fields = [
     ],
     defaultValue: [
       {
-        path: '/uploads/nid.png',
+        path: 'uploads/nid.png' as DocumentPath,
         type: 'image/png',
         originalFilename: 'nid.png',
         option: 'nidCopy'
@@ -280,7 +288,7 @@ const fields = [
     id: 'membership.startDate',
     type: FieldType.DATE,
     label: generateTranslationConfig('Start Date'),
-    defaultValue: '2025-01-01',
+    defaultValue: PlainDate.parse('2025-01-01'),
     configuration: {
       notice: generateTranslationConfig(
         'Membership will be active from this date'
@@ -302,7 +310,10 @@ const fields = [
     id: 'membership.duration',
     type: FieldType.DATE_RANGE,
     label: generateTranslationConfig('Membership Duration'),
-    defaultValue: { start: '2025-01-01', end: '2025-12-31' },
+    defaultValue: {
+      start: PlainDate.parse('2025-01-01'),
+      end: PlainDate.parse('2025-12-31')
+    },
     configuration: {
       notice: generateTranslationConfig('Select the full membership duration')
     }
@@ -321,16 +332,22 @@ const fields = [
 
   {
     id: 'membership.facility',
-    type: FieldType.FACILITY,
+    type: FieldType.LOCATION,
     label: generateTranslationConfig('Facility'),
-    defaultValue: 'Gym Hall'
+    defaultValue: 'Gym Hall',
+    configuration: {
+      locationTypes: ['HEALTH_FACILITY']
+    }
   },
 
   {
     id: 'membership.office',
-    type: FieldType.OFFICE,
+    type: FieldType.LOCATION,
     label: generateTranslationConfig('Membership Office'),
-    defaultValue: 'Head Office'
+    defaultValue: 'Head Office',
+    configuration: {
+      locationTypes: ['CRVS_OFFICE']
+    }
   },
 
   {
@@ -339,7 +356,7 @@ const fields = [
     label: generateTranslationConfig('API Membership Check'),
     defaultValue: { loading: false, data: null, error: null },
     configuration: {
-      trigger: { $$field: 'membership.type' },
+      trigger: { $$field: 'membership.type', $$subfield: [] },
       url: '/api/membership/check',
       method: 'GET',
       headers: { Authorization: 'Bearer token' },
@@ -355,7 +372,7 @@ const fields = [
     label: generateTranslationConfig('Club Rules'),
     defaultValue: 'All members must follow club guidelines and regulations.',
     configuration: {
-      styles: { fontVariant: 'reg12', hint: true }
+      styles: { hint: true }
     }
   },
 
@@ -405,11 +422,15 @@ const declaration = {
   'applicant.age': 30,
   'applicant.bio': 'Short biography about the applicant...',
   'applicant.photo': {
-    path: '/uploads/photo.png',
+    path: 'uploads/photo.png' as DocumentPath,
     type: 'image/png',
     originalFilename: 'profile.png'
   },
-  'applicant.signature': 'Signed by Applicant',
+  'applicant.signature': {
+    path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath,
+    type: 'image/png',
+    originalFilename: 'signature-review____signature-1773128010978.png'
+  },
   'applicant.email': 'applicant@example.com',
   'applicant.phone': '+8801712345678',
   'applicant.password': 'StrongPassword123!',
@@ -417,13 +438,13 @@ const declaration = {
   'applicant.country': 'BGD',
   'applicant.region': 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
   'applicant.address': {
-    country: 'BGD',
+    country: 'FAR',
     addressType: 'DOMESTIC',
-    administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a'
+    administrativeArea: '62a0ccb4-880d-4f30-8882-f256007dfff9'
   },
   'applicant.documents': [
     {
-      path: '/uploads/nid.png',
+      path: 'uploads/nid.png' as DocumentPath,
       type: 'image/png',
       originalFilename: 'nid.png',
       option: 'nidCopy'
@@ -431,11 +452,11 @@ const declaration = {
   ],
   'membership.type': 'standard',
   'membership.level': 'silver',
-  'membership.startDate': '2025-01-01',
+  'membership.startDate': PlainDate.parse('2025-01-01'),
   'membership.startTime': '09:00',
   'membership.duration': {
-    start: '2025-01-01',
-    end: '2025-12-31'
+    start: PlainDate.parse('2025-01-01'),
+    end: PlainDate.parse('2025-12-31')
   },
   'membership.trainingPeriod': 'last30Days',
   'membership.facility': 'Gym Hall',
@@ -526,7 +547,7 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
             id="my-form"
             initialValues={{
               ...declaration,
-              'membership.duration': '2025-12-31'
+              'membership.duration': PlainDate.parse('2025-12-31')
             }}
             // Setting 'membership.duration' to a single date value allows us to demonstrate the enabled field
             // scenario. The original defaultValue is a range (ex: `{ start: '2025-01-01', end: '2025-12-31' }`), which
@@ -597,7 +618,7 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
             id="my-form"
             initialValues={{
               ...declaration,
-              'membership.duration': '2025-12-31',
+              'membership.duration': PlainDate.parse('2025-12-31'),
               'applicant.age': 30
             }}
             validatorContext={getTestValidatorContext()}

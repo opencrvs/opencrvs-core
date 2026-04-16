@@ -21,20 +21,19 @@ import { useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import { useModal } from '@client/hooks/useModal'
 import styled from 'styled-components'
-import { ActionType, EventIndex, getOrThrow } from '@opencrvs/commons/client'
 import {
+  ActionType,
   AssignmentStatus,
+  EventIndex,
   getAssignmentStatus,
-  getUsersFullName
-} from '../utils'
+  getOrThrow
+} from '@opencrvs/commons/client'
+import { getUsersFullName } from '../utils'
 import { useAuthentication } from '@client/utils/userUtils'
 import { useEvents } from '../features/events/useEvents/useEvents'
 import { useUsers } from '../hooks/useUsers'
 import { AssignModal } from './AssignModal'
-import {
-  useResolveAssignmentActionConditionals,
-  useResolveActionConditionals
-} from '../features/workqueues/Actions/useActionConfigurationResolver'
+import { useResolveAssignmentActionConditionals } from '../features/workqueues/Actions/useActionConfigurationResolver'
 
 interface DownloadButtonProps {
   id?: string
@@ -201,14 +200,7 @@ export function DownloadButton({
         ) : (
           <AvatarSmall
             key={user?.avatar || 'default'}
-            avatar={
-              user?.avatar
-                ? {
-                    data: user.avatar,
-                    type: 'image/jpeg' // This is never used internally
-                  }
-                : undefined
-            }
+            avatar={user?.avatar || undefined}
             name={user && getUsersFullName(user.name, intl.locale)}
           />
         )}

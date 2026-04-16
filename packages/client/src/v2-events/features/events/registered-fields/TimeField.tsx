@@ -12,7 +12,6 @@
 import format from 'date-fns/format'
 import * as React from 'react'
 import { defineMessages, IntlShape, useIntl } from 'react-intl'
-import { useField } from 'formik'
 import {
   TimeField as TimeFieldComponent,
   ITimeFieldProps as TimeFieldProps
