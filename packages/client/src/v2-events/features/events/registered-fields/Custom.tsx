@@ -63,8 +63,7 @@ function Loader(
       }
     }
 
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    loadModules()
+    void loadModules()
   }, [props.component, props.src])
 
   if (loading) {

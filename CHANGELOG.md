@@ -4,6 +4,10 @@
 
 ### Breaking changes
 
+#### Scheduler service removed
+
+The `scheduler` package and its Docker service have been removed. The service ran two nightly cron jobs (`refreshPerformanceData`, `runVSExport`) that called endpoints on the metrics service which have since been deprecated. No replacement is needed.
+
 #### FieldType.PARAGRAPH configuration
 
 - `FieldType.PARAGRAPH` field no longer takes in a fontVariant style configuration. If a fontVariant is required, please use the new `FieldType.HEADING` field instead.

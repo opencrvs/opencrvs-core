@@ -83,7 +83,7 @@ export const LoginConfig = z.object({
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: z.string(),
   PHONE_NUMBER_PATTERN: z.string().or(z.instanceof(RegExp)),
   LOGIN_BACKGROUND: BackgroundConfig,
-  SENTRY: z.string()
+  SENTRY: z.string().optional()
 })
 
 export type LoginConfig = z.infer<typeof LoginConfig>
@@ -97,7 +97,7 @@ export const defineLoginConfig = (
 export const ClientConfig = z.object({
   COUNTRY: z.string(),
   LANGUAGES: z.array(z.string()),
-  SENTRY: z.string(),
+  SENTRY: z.string().optional(),
   REGISTER_BACKGROUND: BackgroundConfig,
   DASHBOARDS: z.array(
     z.object({
