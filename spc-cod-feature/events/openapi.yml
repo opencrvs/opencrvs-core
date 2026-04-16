@@ -915,9 +915,13 @@ components:
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/Exact"
         createdAtLocation:
-          $ref: "#/components/schemas/Within"
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
         updatedAtLocation:
-          $ref: "#/components/schemas/Within"
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
         assignedTo:
           $ref: "#/components/schemas/Exact"
         createdByUserType:
@@ -15925,9 +15929,13 @@ components:
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/ExactOutput"
         createdAtLocation:
-          $ref: "#/components/schemas/WithinOutput"
+          anyOf:
+            - $ref: "#/components/schemas/WithinOutput"
+            - $ref: "#/components/schemas/ExactOutput"
         updatedAtLocation:
-          $ref: "#/components/schemas/WithinOutput"
+          anyOf:
+            - $ref: "#/components/schemas/WithinOutput"
+            - $ref: "#/components/schemas/ExactOutput"
         assignedTo:
           $ref: "#/components/schemas/ExactOutput"
         createdByUserType:
