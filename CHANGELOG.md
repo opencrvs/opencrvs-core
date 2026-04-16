@@ -41,7 +41,7 @@ V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
 
 #### Autocomplete Input
 
-A select component enhanced with suggestions. The list of suggestions are fetched from the database reference_data schema in countryconfig.
+A select component enhanced with suggestions based on user search input. Works in conjunction with a countryconfig endpoint that returns suggestions based on user input. The list of suggestions are fetched from a table in the reference_data schema in events database.
 
 #### HTTP Input
 

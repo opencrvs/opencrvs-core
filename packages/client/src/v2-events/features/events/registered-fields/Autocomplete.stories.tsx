@@ -66,7 +66,7 @@ export const ICD: StoryObj<typeof FormFieldGenerator> = {
             label: {
               id: 'storybook.icd10.label',
               defaultMessage:
-                'Type to search from a preconfigured list of 50 types of cancers',
+                'Type to search from a preconfigured list of 50 types of cancers. Select the condition that most directly led to death, or choose "Other" to enter a diagnosis not listed',
               description: 'The title for the icd10 input'
             },
             required: true,
@@ -77,9 +77,7 @@ export const ICD: StoryObj<typeof FormFieldGenerator> = {
             },
             configuration: {
               url: '/api/causes-of-death?terms=',
-              defaultOptions: [
-                { label: 'Enter symptom manually', value: 'OTHER' }
-              ]
+              defaultOptions: [{ label: 'Other', value: 'OTHER' }]
             }
           },
           {

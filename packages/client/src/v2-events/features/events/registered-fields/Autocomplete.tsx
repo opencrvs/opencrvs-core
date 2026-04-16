@@ -266,6 +266,13 @@ function debouncePromise<Args extends any[], R>(
     })
 }
 
+/**
+ *
+ * An autocomplete component using react-select and react-window for virtualization.
+ * Works in conjunction with a countryconfig endpoint that returns suggestions based on user input.
+ * The list of suggestions are fetched from the reference_data schema in events database.
+ *
+ */
 function AutocompleteInput(props: AutocompleteProps) {
   const { id, onChange, value, configuration, error, touched } = props
 
