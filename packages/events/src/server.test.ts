@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { join } from 'path'
 import { readFileSync } from 'fs'
 import { generateKeyPairSync } from 'crypto'
+import { join } from 'path'
 import superjson from 'superjson'
 import {
   createTRPCClient,
   httpBatchLink,
   HTTPHeaders,
-  httpLink
+  httpLink,
+  TRPCClientError
 } from '@trpc/client'
-import { http, HttpResponse } from 'msw'
 import { TRPCError } from '@trpc/server'
 import * as jwt from 'jsonwebtoken'
 import {
@@ -30,26 +30,35 @@ import {
   getTokenPayload,
   getUUID,
   TENNIS_CLUB_MEMBERSHIP,
-  TokenUserType,
-  TestUserRole
+  TestUserRole,
+  TokenUserType
 } from '@opencrvs/commons'
 import { AppRouter } from './router'
 import { server } from './server'
-import { mswServer } from './tests/msw'
-import { InternalRouter } from './router/internalRouter'
 import { createTestToken, setupTestCase } from './tests/utils'
-
+import { InternalRouter } from './router/internalRouter'
 /**
- * This test suite verifies that the server starts up correctly and handles basic dependencies.
+ * Server-level integration tests.
  *
- * Compared to route based testing (e.g. event.create.test.ts), this test suite focuses on the server's ability to handle requests rather than mocking the context.
+ * These verify startup, transport-level auth, and upstream error handling.
+ * They do NOT mock the tRPC context — for route-level logic, see event.create.test.ts.
  */
 
 let serverInstance: ReturnType<typeof server>
 let url: string
+
 let appClient: ReturnType<typeof createTRPCClient<AppRouter>>
 let internalServiceClient: ReturnType<typeof createTRPCClient<InternalRouter>>
 const cert = readFileSync(join(process.cwd(), 'src/tests/cert.key'))
+
+function forgeUnsignedToken(payload: object) {
+  const header = Buffer.from(
+    JSON.stringify({ alg: 'none', typ: 'JWT' })
+  ).toString('base64url')
+  const body = Buffer.from(JSON.stringify(payload)).toString('base64url')
+
+  return `${header}.${body}.`
+}
 
 function createValidAppToken(payload: Record<string, unknown> = {}) {
   return jwt.sign(
@@ -97,7 +106,6 @@ beforeAll(() => {
         })
       ]
     })
-
     internalServiceClient = createTRPCClient<InternalRouter>({
       links: [
         httpLink({
@@ -116,141 +124,21 @@ beforeAll(() => {
   })
 })
 
-afterAll(() => {
-  serverInstance.close()
-})
+afterAll(() => serverInstance.close())
 
-async function createEvent(token: string) {
-  const authorization = `Bearer ${token}`
+// ─── helpers ────────────────────────────────────────────────────────────────
 
-  const res = await appClient.event.create.mutate(
-    {
-      transactionId: getUUID(),
-      type: TENNIS_CLUB_MEMBERSHIP
-    },
-    {
-      context: {
-        headers: {
-          authorization
-        }
-      }
-    }
+function createEvent(token: string) {
+  return appClient.event.create.mutate(
+    { transactionId: getUUID(), type: TENNIS_CLUB_MEMBERSHIP },
+    { context: { headers: { authorization: token } } }
   )
-
-  return res
 }
 
-function forgeUnsignedToken(payload: object) {
-  const header = Buffer.from(
-    JSON.stringify({ alg: 'none', typ: 'JWT' })
-  ).toString('base64url')
-  const body = Buffer.from(JSON.stringify(payload)).toString('base64url')
+// ─── server lifecycle ────────────────────────────────────────────────────────
 
-  return `${header}.${body}.`
-}
-
-test('Server starts up and returns an event based on context dependency values', async () => {
-  const { locations } = await setupTestCase()
-  expect(serverInstance).toBeDefined()
-  expect(url).toBeDefined()
-
-  const userId = getTokenPayload(BearerTokenByUserType.localRegistrar).sub
-
-  const mockUserResponse = {
-    primaryOfficeId: locations[0].id,
-    role: TestUserRole.enum.LOCAL_REGISTRAR,
-    signature: {
-      data: 'my-signature.png'
-    }
-  }
-
-  const eventId = getUUID()
-  const mockEvent = {
-    id: eventId,
-    type: TENNIS_CLUB_MEMBERSHIP,
-    trackingId: 'TRK-MOCK-001',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    actions: [
-      {
-        id: getUUID(),
-        type: ActionType.CREATE,
-        transactionId: getUUID(),
-        createdBy: userId,
-        createdByUserType: TokenUserType.enum.user,
-        createdByRole: TestUserRole.enum.LOCAL_REGISTRAR,
-        createdBySignature: 'my-signature.png',
-        createdAtLocation: mockUserResponse.primaryOfficeId,
-        status: ActionStatus.Accepted,
-        declaration: {},
-        annotation: null,
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: getUUID(),
-        type: ActionType.ASSIGN,
-        transactionId: getUUID(),
-        createdBy: userId,
-        createdByUserType: TokenUserType.enum.user,
-        createdByRole: TestUserRole.enum.LOCAL_REGISTRAR,
-        createdAtLocation: mockUserResponse.primaryOfficeId,
-        status: ActionStatus.Accepted,
-        declaration: {},
-        annotation: null,
-        createdAt: new Date().toISOString(),
-        assignedTo: userId
-      }
-    ]
-  }
-
-  mswServer.use(
-    http.post(`${url}/event.create`, () =>
-      HttpResponse.json([{ result: { data: superjson.serialize(mockEvent) } }])
-    )
-  )
-
-  const response = await appClient.event.create.mutate(
-    {
-      transactionId: getUUID(),
-      type: TENNIS_CLUB_MEMBERSHIP
-    },
-    {
-      context: {
-        headers: {
-          authorization: `Bearer ${createValidAppToken()}`
-        }
-      }
-    }
-  )
-
-  expect(response.actions.length).toEqual(2)
-  const [createAction] = response.actions
-
-  expect(createAction.type).toEqual(ActionType.CREATE)
-  expect(createAction.createdBy).toEqual(userId)
-  expect(createAction.createdBySignature).toEqual('my-signature.png')
-  expect(createAction.createdAtLocation).toEqual(
-    mockUserResponse.primaryOfficeId
-  )
-  expect(createAction.status).toEqual(ActionStatus.Accepted)
-})
-
-test('Server will accept requests after error', async () => {
+test('starts up and correctly deserializes a valid upstream response', async () => {
   const { user } = await setupTestCase()
-  expect(serverInstance).toBeDefined()
-  expect(url).toBeDefined()
-
-  const tokenWithoutCreateScope = createTestToken({
-    userId: user.id,
-    scopes: [],
-    userType: TokenUserType.enum.user,
-    role: user.role
-  })
-
-  await expect(createEvent(tokenWithoutCreateScope)).rejects.toMatchObject({
-    data: { code: 'UNAUTHORIZED' }
-  })
-
   const tokenWithCreateScope = createTestToken({
     userId: user.id,
     scopes: [encodeScope({ type: 'record.create' })],
@@ -258,45 +146,83 @@ test('Server will accept requests after error', async () => {
     role: user.role
   })
 
-  await expect(createEvent(tokenWithCreateScope)).resolves.toBeDefined()
+  const response = await createEvent(tokenWithCreateScope)
+  expect(response.actions).toHaveLength(2)
+  const [action] = response.actions
+  expect(action.type).toBe(ActionType.CREATE)
+  expect(action.createdBy).toBe(user.id)
+  expect(action.createdAtLocation).toBe(user.primaryOfficeId)
+  expect(action.status).toBe(ActionStatus.Accepted)
 })
 
-test('Throws when dependency payload returns malformed data', async () => {
-  expect(serverInstance).toBeDefined()
-  expect(url).toBeDefined()
+test('continues accepting requests after a failed one', async () => {
+  const { user, generator } = await setupTestCase()
 
-  mswServer.use(
-    http.post(`${url}/event.create`, () =>
-      HttpResponse.json([
-        {
-          error: {
-            json: {
-              message: 'Authentication failed',
-              code: -32001,
-              data: {
-                code: 'UNAUTHORIZED',
-                httpStatus: 401,
-                path: 'event.create'
-              }
-            }
-          }
-        }
-      ])
-    )
-  )
-
-  await expect(createEvent(createValidAppToken())).rejects.toMatchObject({
-    data: { code: 'UNAUTHORIZED' }
+  const tokenWithoutScope = createTestToken({
+    userId: user.id,
+    scopes: [],
+    userType: TokenUserType.enum.user,
+    role: user.role
   })
+
+  await expect(
+    appClient.event.create.mutate(generator.event.create(), {
+      context: { headers: { authorization: tokenWithoutScope } }
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+
+  const tokenWithScope = createTestToken({
+    userId: user.id,
+    scopes: [encodeScope({ type: 'record.create' })],
+    userType: TokenUserType.enum.user,
+    role: user.role
+  })
+
+  await expect(
+    appClient.event.create.mutate(generator.event.create(), {
+      context: { headers: { authorization: tokenWithScope } }
+    })
+  ).resolves.toBeDefined()
 })
 
-test('Throws with malformed token', async () => {
-  expect(serverInstance).toBeDefined()
-  expect(url).toBeDefined()
+// ─── auth failures ───────────────────────────────────────────────────────────
 
+test('rejects requests with no authorization header', async () => {
+  await expect(
+    appClient.event.create.mutate(
+      { transactionId: getUUID(), type: TENNIS_CLUB_MEMBERSHIP },
+      { context: { headers: {} } }
+    )
+  ).rejects.toThrow(
+    new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'Authorization token is missing'
+    })
+  )
+})
+
+test('rejects requests with a malformed token', async () => {
   await expect(createEvent('bad-token')).rejects.toMatchObject({
     data: { code: 'UNAUTHORIZED' }
   })
+})
+
+test('rejects requests where token lacks required scope', async () => {
+  const { user } = await setupTestCase()
+
+  const tokenWithoutScope = createTestToken({
+    userId: user.id,
+    scopes: [],
+    userType: TokenUserType.enum.user,
+    role: user.role
+  })
+
+  await expect(
+    appClient.event.create.mutate(
+      { transactionId: getUUID(), type: TENNIS_CLUB_MEMBERSHIP },
+      { context: { headers: { authorization: tokenWithoutScope } } }
+    )
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
 test('Throws with unsigned forged token', async () => {
@@ -309,30 +235,6 @@ test('Throws with unsigned forged token', async () => {
   await expect(createEvent(forgedToken)).rejects.toMatchObject({
     data: { code: 'UNAUTHORIZED' }
   })
-})
-
-test('UNAUTHORIZED error is thrown when authorization header is missing', async () => {
-  expect(serverInstance).toBeDefined()
-  expect(url).toBeDefined()
-
-  await expect(
-    appClient.event.create.mutate(
-      {
-        transactionId: getUUID(),
-        type: TENNIS_CLUB_MEMBERSHIP
-      },
-      {
-        context: {
-          headers: {}
-        }
-      }
-    )
-  ).rejects.toThrow(
-    new TRPCError({
-      code: 'UNAUTHORIZED',
-      message: 'Authorization token is missing'
-    })
-  )
 })
 
 test('UNAUTHORIZED error is thrown when internal request is made without token', async () => {
@@ -359,7 +261,7 @@ test('UNAUTHORIZED error is thrown when request is made with valid APP token', a
   ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
 })
 
-test('UNAUTHORIZED error is thrown when internal request is made with token is not signed with matching key', async () => {
+test('UNAUTHORIZED error is thrown when internal request is made with token is not signed by the correct issuer', async () => {
   expect(serverInstance).toBeDefined()
   expect(url).toBeDefined()
 
@@ -406,4 +308,59 @@ test('API response is returned when internal request is made with valid token', 
   })
 
   expect(response).toEqual(`pong: ping`)
+})
+
+test('UNAUTHORIZED error is thrown when internal request is made with token is not signed with matching key', async () => {
+  expect(serverInstance).toBeDefined()
+  expect(url).toBeDefined()
+  const { privateKey } = generateKeyPairSync('rsa', { modulusLength: 2048 })
+  const wrongPrivateKey = privateKey.export({ type: 'pkcs8', format: 'pem' })
+  const forgedInternalServiceToken = jwt.sign({}, wrongPrivateKey, {
+    subject: 'opencrvs:auth-service',
+    algorithm: 'RS256',
+    expiresIn: '1h',
+    audience: ['opencrvs:events-user'],
+    issuer: 'opencrvs:auth-service'
+  })
+  await expect(
+    internalServiceClient.user.ping.query('ping', {
+      context: {
+        headers: {
+          authorization: `Bearer ${forgedInternalServiceToken}`
+        }
+      }
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+})
+test('API response is returned when internal request is made with valid token', async () => {
+  expect(serverInstance).toBeDefined()
+  expect(url).toBeDefined()
+  const internalServiceToken = jwt.sign({}, cert, {
+    subject: 'opencrvs:auth-service',
+    algorithm: 'RS256',
+    expiresIn: '1h',
+    audience: ['opencrvs:events-user'],
+    issuer: 'opencrvs:auth-service'
+  })
+  const response = await internalServiceClient.user.ping.query('ping', {
+    context: {
+      headers: {
+        authorization: `Bearer ${internalServiceToken}`
+      }
+    }
+  })
+  expect(response).toEqual(`pong: ping`)
+})
+// ─── upstream failures ───────────────────────────────────────────────────────
+
+describe('upstream error handling', () => {
+  beforeAll(() => {
+    // server is unreachable, e.g. due to network issues or the upstream service being down
+    serverInstance.close()
+  })
+  test('propagates a TRPC error returned by the upstream service', async () => {
+    await expect(
+      createEvent(BearerTokenByUserType.localRegistrar)
+    ).rejects.toMatchObject(new TRPCClientError('fetch failed'))
+  })
 })
