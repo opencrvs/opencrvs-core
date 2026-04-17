@@ -78,7 +78,7 @@
     "elastic-apm-node": "^3.29.0",
     "jest": "29.7.0",
     "jwt-decode": "^3.0.0",
-    "lodash": "^4.17.10",
+    "lodash": "^4.18.1",
     "node-fetch": "^2.6.7",
     "object-hash": "^3.0.0",
     "pino": "^7.0.0",

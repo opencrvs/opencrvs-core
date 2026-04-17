@@ -34,7 +34,7 @@
     "file-type": "^16.5.3",
     "influx": "^5.0.7",
     "is-svg": "^4.3.2",
-    "lodash-es": "^4.17.21",
+    "lodash-es": "^4.18.1",
     "migrate-mongo": "^12.0.0",
     "minio": "^7.0.33",
     "mongoose": "^6.11.3",
