@@ -250,7 +250,10 @@ export function omitHiddenPaginatedFields<T extends EventState | ActionUpdate>(
     .flatMap((p) => p.fields)
 
   const valuesExceptHiddenPage = omitBy(values, (_, fieldId) => {
-    return hiddenFields.some((f) => f.id === fieldId)
+    return (
+      hiddenFields.some((f) => f.id === fieldId) &&
+      !visibleFields.some((f) => f.id === fieldId)
+    )
   })
 
   return omitHiddenFields(
