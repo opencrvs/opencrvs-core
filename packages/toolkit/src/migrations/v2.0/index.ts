@@ -20,6 +20,7 @@ import { main as renameApiPaths } from './rename-api-paths'
 import { main as convertConfigFilesToTs } from './convert-config-files-to-ts'
 import { main as migrateScopes } from './migrate-scopes'
 import { main as removeDeprecatedImports } from './remove-deprecated-imports'
+import { main as migrateWorkqueueConfigs } from './migrate-workqueue-configs'
 
 let cwd: string | undefined
 
@@ -47,6 +48,7 @@ export async function runUpgrade(ccwd: string | undefined) {
     cwd = process.cwd()
   }
 
+  await migrateWorkqueueConfigs()
   await removeReviewFromRegisterAction()
   await makeBuiltInValidateActionsCustom()
   await removeDeleteActions()
