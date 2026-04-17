@@ -23,15 +23,18 @@ export type IUserName = {
   given: string[]
 }
 
+export const FamilyName = z.array(
+  z.object({
+    use: z.string(),
+    given: z.array(z.string()),
+    family: z.string()
+  })
+)
+export type FamilyName = z.infer<typeof FamilyName>
+
 export const User = z.object({
   id: z.string(),
-  name: z.array(
-    z.object({
-      use: z.string(),
-      given: z.array(z.string()),
-      family: z.string()
-    })
-  ),
+  name: FamilyName,
   role: z.string(),
   avatar: DocumentPath.optional(),
   signature: DocumentPath.nullish().describe(
@@ -49,13 +52,7 @@ export const User = z.object({
 export type User = z.infer<typeof User>
 
 export const UserInput = z.object({
-  name: z.array(
-    z.object({
-      use: z.string(),
-      given: z.array(z.string()),
-      family: z.string()
-    })
-  ),
+  name: FamilyName,
   // @TODO: Separate from "create user from client"
   username: z.string().optional(),
   email: z.string(),

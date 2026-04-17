@@ -44,6 +44,7 @@ import {
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
 import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
+import { getUserById } from '@events/storage/postgres/events/users'
 import { findUserOrSystem } from '../../../service/users/api'
 import { getInMemoryEventConfigurations } from '../../../service/config/config'
 import { getEventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
@@ -88,6 +89,46 @@ export function allowedWithAnyOfScopes(scopes: ScopeType[]) {
   }
 
   return fn
+}
+
+export const enforceOfficeUpdatePermission: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext,
+  { id: string; primaryOfficeId?: string }
+> = async (opts) => {
+  const { token } = opts.ctx
+  const { input, ctx } = opts
+
+  const existingUser = await getUserById(UUID.parse(input.id))
+
+  if (!existingUser) {
+    throw new Error(`No user found by given id: ${input.id}`)
+  }
+
+  let officeId = existingUser.officeId
+
+  if (
+    input.primaryOfficeId !== undefined &&
+    input.primaryOfficeId !== existingUser.officeId
+  ) {
+    if (hasScope(token, 'config.update-all')) {
+      officeId = input.primaryOfficeId as UUID
+    } else {
+      throw new TRPCError({
+        code: 'FORBIDDEN',
+        message: 'Location cannot be changed by this user'
+      })
+    }
+  }
+
+  return opts.next({
+    input: { ...input, primaryOfficeId: officeId },
+    ctx: {
+      ...ctx
+    }
+  })
 }
 
 export const EventIdParam = z.object({

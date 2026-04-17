@@ -145,7 +145,7 @@ export function seeder() {
       rng?: () => number
     }
   ) => {
-    const id = (user.id ?? getUUID()) as UUID
+    const id = user.id ?? (user.rng ? generateUuid(user.rng) : getUUID())
     await createUserWithCredentials(
       {
         id,

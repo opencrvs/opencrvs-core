@@ -14,9 +14,11 @@ import { TRPCError } from '@trpc/server'
 import * as z from 'zod/v4'
 import {
   AuditLogEntrySchema,
-  UserAuditRecordInput
+  UserAuditRecordInput,
+  UUID
 } from '@opencrvs/commons/events'
 import {
+  FamilyName,
   isBase64FileString,
   logger,
   personNameFromV1ToV2,
@@ -24,7 +26,10 @@ import {
   UserInput,
   UserOrSystem
 } from '@opencrvs/commons'
-import { allowedWithAnyOfScopes } from '@events/router/middleware'
+import {
+  allowedWithAnyOfScopes,
+  enforceOfficeUpdatePermission
+} from '@events/router/middleware'
 import {
   publicProcedure,
   router,
@@ -36,11 +41,9 @@ import { generateHash } from '@events/service/auth/hash'
 import {
   getUserByMobileOrEmail,
   getUserByUsername,
-  getUserCredentialsByUserId,
   updatePasswordHash,
   updateUserById,
-  deleteSuperUser,
-  SecurityQuestion
+  deleteSuperUser
 } from '@events/storage/postgres/events/users'
 import { getUserActions } from '@events/service/events/user/actions'
 import {
@@ -49,7 +52,10 @@ import {
 } from '@events/storage/postgres/events/auditLog'
 import {
   activateUser,
+  checkSecurityQuestionMatch,
   createUser,
+  getCredentials,
+  getSecurityQuestionsForUser,
   getUser,
   searchUsers,
   updateUser
@@ -131,13 +137,7 @@ const VerifyUserOutput = z.object({
   mobile: z.string().optional(),
   email: z.string().optional(),
   status: z.string(),
-  name: z.array(
-    z.object({
-      use: z.string(),
-      given: z.array(z.string()),
-      family: z.string()
-    })
-  ),
+  name: FamilyName,
   securityQuestionKey: z.string(),
   scope: z.array(z.string())
 })
@@ -153,13 +153,7 @@ export const userRouter = router({
     .output(
       z.object({
         id: z.string(),
-        name: z.array(
-          z.object({
-            use: z.string(),
-            given: z.array(z.string()),
-            family: z.string()
-          })
-        ),
+        name: FamilyName,
         mobile: z.string().optional(),
         email: z.string().optional(),
         status: z.string(),
@@ -203,42 +197,14 @@ export const userRouter = router({
     )
     .output(z.object({ matched: z.boolean(), questionKey: z.string() }))
     .mutation(async ({ input }) => {
-      const record = await getUserCredentialsByUserId(input.userId)
+      const record = await getCredentials(input.userId)
 
-      if (!record) {
-        throw new TRPCError({ code: 'UNAUTHORIZED' })
-      }
-
-      const questions = record.securityQuestions as SecurityQuestion[]
-
-      if (!Array.isArray(questions) || questions.length === 0) {
-        throw new TRPCError({
-          code: 'CONFLICT',
-          message: "User doesn't have security questions"
-        })
-      }
-
-      const matched = (
-        await Promise.all(
-          questions.map(async (q) => {
-            if (q.questionKey !== input.questionKey) {
-              return false
-            }
-            const hash = await generateHash(
-              input.answer.toLowerCase(),
-              record.salt
-            )
-            return hash === q.answerHash
-          })
-        )
-      ).some(Boolean)
-
-      const questionKey = matched
-        ? input.questionKey
-        : (questions.find((q) => q.questionKey !== input.questionKey)
-            ?.questionKey ?? input.questionKey)
-
-      return { matched, questionKey }
+      const questions = getSecurityQuestionsForUser(record)
+      return checkSecurityQuestionMatch({
+        questions,
+        input,
+        salt: record.salt
+      })
     }),
   verifyUser: publicProcedure
     .input(
@@ -257,14 +223,7 @@ export const userRouter = router({
         throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
 
-      const questions = user.securityQuestions as SecurityQuestion[]
-
-      if (!Array.isArray(questions) || questions.length === 0) {
-        throw new TRPCError({
-          code: 'CONFLICT',
-          message: "User doesn't have security questions"
-        })
-      }
+      const questions = getSecurityQuestionsForUser(user)
 
       const securityQuestionKey =
         questions[Math.floor(Math.random() * questions.length)].questionKey
@@ -349,6 +308,7 @@ export const userRouter = router({
   update: userAndSystemProcedure
     .use(allowedWithAnyOfScopes(['user.edit']))
     .input(UserInput.and(z.object({ id: z.string() })))
+    .use(enforceOfficeUpdatePermission)
     .output(User)
     .mutation(async ({ input, ctx }) => {
       if (input.mobile) {
@@ -399,7 +359,15 @@ export const userRouter = router({
   search: userAndSystemProcedure
     .input(UserSearch)
     .output(z.array(UserOrSystem))
-    .query(async ({ input }) => searchUsers(input)),
+    .query(async ({ input }) =>
+      searchUsers({
+        ...input,
+        primaryOfficeId: input.primaryOfficeId
+          ? UUID.parse(input.primaryOfficeId)
+          : undefined,
+        locationId: input.locationId ? UUID.parse(input.locationId) : undefined
+      })
+    ),
   actions: userOnlyProcedure
     .input(UserActionsQuery)
     .use(userCanReadOtherUser)
@@ -407,9 +375,9 @@ export const userRouter = router({
       return getUserActions(input)
     }),
   roles: router({
-    list: userOnlyProcedure.query(async ({ ctx }) => getRoles(ctx.token))
+    list: userOnlyProcedure.query(async () => getRoles())
   }),
-  changePassword: publicProcedure
+  changePassword: userOnlyProcedure
     .input(
       z.object({
         userId: z.string(),
@@ -417,38 +385,29 @@ export const userRouter = router({
         password: z.string()
       })
     )
-    .mutation(async ({ input }) => {
-      const record = await getUserCredentialsByUserId(input.userId)
-
-      if (!record) {
-        logger.error(`No user details found by given userid: ${input.userId}`)
-        // Don't return a 404 as this gives away that this user account exists
-        throw new TRPCError({ code: 'UNAUTHORIZED' })
+    .mutation(async ({ input, ctx }) => {
+      if (input.userId !== ctx.user.id) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: "Not allowed to change another user's password"
+        })
       }
+      const record = await getCredentials(ctx.user.id)
 
       if (input.existingPassword) {
-        if (record.status !== 'active') {
-          logger.error(
-            `User is not in active state for given userid: ${input.userId}`
-          )
-          // Don't return a 404 as this gives away that this user account exists
-          throw new TRPCError({ code: 'UNAUTHORIZED' })
-        }
         const existingHash = await generateHash(
           input.existingPassword,
           record.salt
         )
         if (existingHash !== record.passwordHash) {
-          logger.error(
-            `Password didn't match for given userid: ${input.userId}`
-          )
+          logger.error(`Password didn't match for given userid: ${ctx.user.id}`)
           // Don't return a 404 as this gives away that this user account exists
           throw new TRPCError({ code: 'UNAUTHORIZED' })
         }
       }
 
       const newHash = await generateHash(input.password, record.salt)
-      await updatePasswordHash(input.userId, newHash)
+      await updatePasswordHash(UUID.parse(ctx.user.id), newHash)
     }),
   sendVerifyCode: userOnlyProcedure
     .input(
@@ -510,7 +469,7 @@ export const userRouter = router({
         })
       }
 
-      const [user] = await getUsersById([input.userId])
+      const [user] = await getUsersById([ctx.user.id])
 
       if (!isUser(user)) {
         logger.error(`Failed to change phone number: Subject is a system user`)
@@ -522,14 +481,14 @@ export const userRouter = router({
 
       if (user.status !== 'active') {
         logger.error(
-          `User is not in active state for given userid: ${input.userId}`
+          `User is not in active state for given userid: ${ctx.user.id}`
         )
         throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
 
       if (!user.email) {
         logger.error(
-          `Failed to change phone number for user ${input.userId}: User has no email address to send verification code to`
+          `Failed to change phone number for user ${ctx.user.id}: User has no email address to send verification code to`
         )
         throw new TRPCError({
           code: 'BAD_REQUEST',
@@ -538,7 +497,7 @@ export const userRouter = router({
       }
 
       const userWithDuplicateNumber = await searchUsers({
-        email: user.email,
+        mobile: input.phoneNumber,
         count: 1,
         skip: 0,
         sortOrder: 'asc'
@@ -557,10 +516,12 @@ export const userRouter = router({
         })
       }
 
-      await updateUserById(input.userId, { mobile: input.phoneNumber })
+      await updateUserById(UUID.parse(ctx.user.id), {
+        mobile: input.phoneNumber
+      })
       await writeAuditLog({
         operation: 'user.phone_number_changed',
-        requestData: { subjectId: input.userId },
+        requestData: { subjectId: ctx.user.id },
         responseSummary: { phoneNumber: input.phoneNumber },
         clientId: ctx.user.id,
         clientType: ctx.user.type
@@ -591,10 +552,10 @@ export const userRouter = router({
         })
       }
 
-      const subject = await getUser(input.userId)
+      const subject = await getUser(ctx.user.id)
       if (subject.status !== 'active') {
         logger.error(
-          `User is not in active state for given userid: ${input.userId}`
+          `User is not in active state for given userid: ${ctx.user.id}`
         )
         throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
@@ -617,10 +578,10 @@ export const userRouter = router({
         })
       }
 
-      await updateUserById(input.userId, { email: input.email })
+      await updateUserById(UUID.parse(ctx.user.id), { email: input.email })
       await writeAuditLog({
         operation: 'user.email_address_changed',
-        requestData: { subjectId: input.userId },
+        requestData: { subjectId: ctx.user.id },
         responseSummary: { email: input.email },
         clientId: ctx.user.id,
         clientType: ctx.user.type
@@ -643,17 +604,17 @@ export const userRouter = router({
           message: "Not allowed to change another user's avatar"
         })
       }
-      const subject = await getUser(input.userId)
+      const subject = await getUser(ctx.user.id)
       if (subject.status !== 'active') {
         logger.error(
-          `User is not in active state for given userid: ${input.userId}`
+          `User is not in active state for given userid: ${ctx.user.id}`
         )
         throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
       const profileImagePath = isBase64FileString(input.avatar.data)
         ? await uploadBase64File(input.avatar.data, ctx.token)
         : input.avatar.data
-      await updateUserById(input.userId, { profileImagePath })
+      await updateUserById(UUID.parse(ctx.user.id), { profileImagePath })
     }),
   activate: userOnlyProcedure
     .input(

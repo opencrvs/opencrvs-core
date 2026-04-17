@@ -108,6 +108,11 @@ export async function uploadBase64File(
     },
     body: JSON.stringify({ fileData: base64data })
   })
+  if (!res.ok) {
+    throw new Error(
+      `Base64 File upload failed: ${res.status} ${res.statusText}`
+    )
+  }
   const result = (await res.json()) as { refUrl: string }
   return result.refUrl
 }

@@ -47,12 +47,12 @@ export default async function changePasswordHandler(
   await changePassword(retrievalStepInformation.userId, payload.newPassword)
 
   if (request.headers.authorization) {
-    recordUserAuditEvent(request.headers.authorization, {
+    void recordUserAuditEvent(request.headers.authorization, {
       operation: 'user.password_changed',
       requestData: { subjectId: retrievalStepInformation.userId }
     })
   } else {
-    recordAnonymousUserAuditEvent({
+    void recordAnonymousUserAuditEvent({
       operation: 'user.password_reset',
       requestData: { subjectId: retrievalStepInformation.userId }
     })

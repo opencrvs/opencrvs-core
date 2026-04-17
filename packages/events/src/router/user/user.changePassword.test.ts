@@ -10,63 +10,43 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { sql } from 'kysely'
 import { getUUID } from '@opencrvs/commons'
-import { t } from '@events/router/trpc'
-import { appRouter } from '@events/router/router'
-import { setupTestCase } from '@events/tests/utils'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { generateHash, generateSaltedHash } from '@events/service/auth/hash'
 
-const { createCallerFactory } = t
-const publicCaller = createCallerFactory(appRouter)({})
-
 test('returns UNAUTHORIZED when user not found', async () => {
+  const userId = getUUID()
+  const client = createTestClient({
+    id: userId,
+    role: 'REGISTRATION_AGENT',
+    primaryOfficeId: getUUID(),
+    name: []
+  })
   await expect(
-    publicCaller.user.changePassword({
-      userId: getUUID(),
+    client.user.changePassword({
+      userId: userId,
       password: 'newpassword'
     })
   ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
 })
 
 test('updates the password hash without existingPassword (reset flow)', async () => {
-  const { eventsDb, locations } = await setupTestCase()
-
-  const userId = getUUID()
+  const { eventsDb, user } = await setupTestCase()
+  const client = createTestClient(user)
   const { hash: initialHash, salt } = await generateSaltedHash('oldpassword')
 
   await eventsDb
-    .insertInto('users')
-    .values({
-      id: userId,
-      mobile: '+447700900001',
-      role: 'REGISTRATION_AGENT',
-      status: 'active',
-      officeId: locations[0].id
-    })
+    .updateTable('userCredentials')
+    .set({ passwordHash: initialHash, salt })
+    .where('userId', '=', user.id)
     .execute()
 
-  await eventsDb
-    .insertInto('userCredentials')
-    .values({
-      userId,
-      username: 'testuser',
-      passwordHash: initialHash,
-      salt,
-      securityQuestions:
-        sql`cast (${JSON.stringify([])} as jsonb)` as unknown as Record<
-          string,
-          unknown
-        >
-    })
-    .execute()
-
-  await publicCaller.user.changePassword({ userId, password: 'newpassword' })
+  await client.user.changePassword({ userId: user.id, password: 'newpassword' })
 
   const updated = await eventsDb
     .selectFrom('userCredentials')
     .select(['passwordHash', 'salt'])
-    .where('userId', '=', userId)
+    .where('userId', '=', user.id)
     .executeTakeFirstOrThrow()
 
   const expectedHash = await generateHash('newpassword', updated.salt)
@@ -76,39 +56,18 @@ test('updates the password hash without existingPassword (reset flow)', async ()
 })
 
 test('updates the password when existingPassword matches (change flow)', async () => {
-  const { eventsDb, locations } = await setupTestCase()
-
-  const userId = getUUID()
+  const { eventsDb, user } = await setupTestCase()
+  const client = createTestClient(user)
   const { hash, salt } = await generateSaltedHash('oldpassword')
 
   await eventsDb
-    .insertInto('users')
-    .values({
-      id: userId,
-      mobile: '+447700900002',
-      role: 'REGISTRATION_AGENT',
-      status: 'active',
-      officeId: locations[0].id
-    })
+    .updateTable('userCredentials')
+    .set({ passwordHash: hash, salt })
+    .where('userId', '=', user.id)
     .execute()
 
-  await eventsDb
-    .insertInto('userCredentials')
-    .values({
-      userId,
-      username: 'changeuser',
-      passwordHash: hash,
-      salt,
-      securityQuestions:
-        sql`cast (${JSON.stringify([])} as jsonb)` as unknown as Record<
-          string,
-          unknown
-        >
-    })
-    .execute()
-
-  await publicCaller.user.changePassword({
-    userId,
+  await client.user.changePassword({
+    userId: user.id,
     existingPassword: 'oldpassword',
     password: 'newpassword'
   })
@@ -116,7 +75,7 @@ test('updates the password when existingPassword matches (change flow)', async (
   const updated = await eventsDb
     .selectFrom('userCredentials')
     .select(['passwordHash'])
-    .where('userId', '=', userId)
+    .where('userId', '=', user.id)
     .executeTakeFirstOrThrow()
 
   const expectedHash = await generateHash('newpassword', salt)
@@ -124,40 +83,19 @@ test('updates the password when existingPassword matches (change flow)', async (
 })
 
 test('returns UNAUTHORIZED when existingPassword does not match', async () => {
-  const { eventsDb, locations } = await setupTestCase()
-
-  const userId = getUUID()
+  const { eventsDb, user } = await setupTestCase()
+  const client = createTestClient(user)
   const { hash, salt } = await generateSaltedHash('correctpassword')
 
   await eventsDb
-    .insertInto('users')
-    .values({
-      id: userId,
-      mobile: '+447700900003',
-      role: 'REGISTRATION_AGENT',
-      status: 'active',
-      officeId: locations[0].id
-    })
-    .execute()
-
-  await eventsDb
-    .insertInto('userCredentials')
-    .values({
-      userId,
-      username: 'wrongpass',
-      passwordHash: hash,
-      salt,
-      securityQuestions:
-        sql`cast (${JSON.stringify([])} as jsonb)` as unknown as Record<
-          string,
-          unknown
-        >
-    })
+    .updateTable('userCredentials')
+    .set({ passwordHash: hash, salt })
+    .where('userId', '=', user.id)
     .execute()
 
   await expect(
-    publicCaller.user.changePassword({
-      userId,
+    client.user.changePassword({
+      userId: user.id,
       existingPassword: 'wrongpassword',
       password: 'newpassword'
     })
@@ -165,40 +103,25 @@ test('returns UNAUTHORIZED when existingPassword does not match', async () => {
 })
 
 test('returns UNAUTHORIZED when user is not active and existingPassword is provided', async () => {
-  const { eventsDb, locations } = await setupTestCase()
-
-  const userId = getUUID()
+  const { eventsDb, user } = await setupTestCase()
+  const client = createTestClient(user)
   const { hash, salt } = await generateSaltedHash('password')
 
   await eventsDb
-    .insertInto('users')
-    .values({
-      id: userId,
-      mobile: '+447700900004',
-      role: 'REGISTRATION_AGENT',
-      status: 'deactivated',
-      officeId: locations[0].id
-    })
+    .updateTable('users')
+    .set({ status: 'deactivated' })
+    .where('id', '=', user.id)
     .execute()
 
   await eventsDb
-    .insertInto('userCredentials')
-    .values({
-      userId,
-      username: 'inactiveuser',
-      passwordHash: hash,
-      salt,
-      securityQuestions:
-        sql`cast (${JSON.stringify([])} as jsonb)` as unknown as Record<
-          string,
-          unknown
-        >
-    })
+    .updateTable('userCredentials')
+    .set({ passwordHash: hash, salt })
+    .where('userId', '=', user.id)
     .execute()
 
   await expect(
-    publicCaller.user.changePassword({
-      userId,
+    client.user.changePassword({
+      userId: user.id,
       existingPassword: 'password',
       password: 'newpassword'
     })
