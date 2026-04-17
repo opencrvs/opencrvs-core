@@ -55,6 +55,7 @@ import {
   AgeField,
   CustomField,
   HiddenField,
+  AutocompleteField,
   ImageViewField,
   Heading,
   UserRoleField
@@ -77,6 +78,7 @@ import {
   VerificationStatusValue,
   AgeValue,
   FieldUpdateValue,
+  AutocompleteValue,
   DateValue
 } from './FieldValue'
 import { DocumentPath } from '../documents'
@@ -215,6 +217,9 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.ALPHA_PRINT_BUTTON:
       schema = TextValue
       break
+    case FieldType.AUTOCOMPLETE:
+      schema = AutocompleteValue
+      break
     case FieldType.HTTP:
     case FieldType.SEARCH:
       schema = HttpFieldUpdateValue
@@ -254,6 +259,7 @@ type FieldTypeValueMap = {
   [FieldType.RADIO_GROUP]: z.infer<typeof TextValue>
   [FieldType.PARAGRAPH]: z.infer<typeof TextValue>
   [FieldType.HEADING]: z.infer<typeof TextValue>
+  [FieldType.AUTOCOMPLETE]: z.infer<typeof AutocompleteValue>
   [FieldType.IMAGE_VIEW]: z.infer<typeof TextValue>
   [FieldType.ADMINISTRATIVE_AREA]: z.infer<typeof TextValue>
   [FieldType.FACILITY]: z.infer<typeof TextValue>
@@ -345,6 +351,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.BUTTON:
     case FieldType.ALPHA_PRINT_BUTTON:
     case FieldType.HTTP:
+    case FieldType.AUTOCOMPLETE:
     case FieldType.SEARCH:
     case FieldType.LINK_BUTTON:
     case FieldType.QUERY_PARAM_READER:
@@ -634,6 +641,13 @@ export const isHttpFieldType = (field: {
   return field.config.type === FieldType.HTTP
 }
 
+export const isAutocompleteFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: undefined; config: AutocompleteField } => {
+  return field.config.type === FieldType.AUTOCOMPLETE
+}
+
 export const isSearchFieldType = (field: {
   config: FieldConfig
   value: FieldValue | FieldUpdateValue
@@ -723,6 +737,7 @@ export type NonInteractiveFieldType =
   | LinkButtonField
   | QueryParamReaderField
   | LoaderField
+  | AutocompleteField
 
 export type InteractiveFieldType = Exclude<FieldConfig, NonInteractiveFieldType>
 
