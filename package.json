@@ -65,7 +65,23 @@
     "sha.js": "2.4.12",
     "handlebars": "4.7.9",
     "mongoose": "6.13.9",
-    "js-yaml": "4.1.0"
+    "js-yaml": "4.1.0",
+    "h3": "1.15.6",
+    "defu": "6.1.5",
+    "minimatch": "9.0.7",
+    "msgpackr": "1.11.0",
+    "ws": "8.18.0",
+    "rollup": "4.59.0",
+    "path-to-regexp": "0.1.13",
+    "cross-spawn": "7.0.6",
+    "flatted": "3.4.2",
+    "picomatch": "2.3.2",
+    "underscore": "1.13.8",
+    "@remix-run/router": "1.23.2",
+    "validator": "13.15.22",
+    "tar": "7.5.11",
+    "@trpc/server": "11.8.0",
+    "@apollo/server": "4.13.0"
   },
   "overrides": {
     "fast-xml-parser": "4.5.6",
@@ -74,6 +90,22 @@
     "sha.js": "2.4.12",
     "handlebars": "4.7.9",
     "mongoose": "6.13.9",
-    "js-yaml": "4.1.0"
+    "js-yaml": "4.1.0",
+    "h3": "1.15.6",
+    "defu": "6.1.5",
+    "minimatch": "9.0.7",
+    "msgpackr": "1.11.0",
+    "ws": "8.18.0",
+    "rollup": "4.59.0",
+    "path-to-regexp": "0.1.13",
+    "cross-spawn": "7.0.6",
+    "flatted": "3.4.2",
+    "picomatch": "2.3.2",
+    "underscore": "1.13.8",
+    "@remix-run/router": "1.23.2",
+    "validator": "13.15.22",
+    "tar": "7.5.11",
+    "@trpc/server": "11.8.0",
+    "@apollo/server": "4.13.0"
   }
 }
