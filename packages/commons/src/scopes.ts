@@ -56,7 +56,6 @@ export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
 /** Plain scopes are scopes that dont have any options available. */
 const PlainScopeType = z.enum([
   // Misc. system scopes
-  'demo',
   'bypassratelimit',
   'record.reindex',
   'user.data-seeding',

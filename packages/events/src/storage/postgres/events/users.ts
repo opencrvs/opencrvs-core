@@ -16,7 +16,7 @@ import { NewUsers } from './schema/app/Users'
 import Schema from './schema/Database'
 import { NewUserCredentials } from './schema/app/UserCredentials'
 
-interface SecurityQuestion {
+export interface SecurityQuestion {
   questionKey: string
   answerHash: string
 }
@@ -49,9 +49,7 @@ export async function getUserByMobileOrEmail(
     .executeTakeFirst()
 }
 
-export type { SecurityQuestion }
-
-export async function getUserById(userId: string) {
+export async function getUserById(userId: UUID) {
   const db = getClient()
   return db
     .selectFrom('users')
@@ -73,7 +71,7 @@ export async function getUserById(userId: string) {
       'locations.administrativeAreaId',
       'userCredentials.username'
     ])
-    .where('users.id', '=', userId as UUID)
+    .where('users.id', '=', userId)
     .executeTakeFirst()
 }
 
@@ -97,7 +95,7 @@ export async function getUserByUsername(username: string) {
     .executeTakeFirst()
 }
 
-export async function getUserCredentialsByUserId(userId: string) {
+export async function getUserCredentialsByUserId(userId: UUID) {
   const db = getClient()
   return db
     .selectFrom('users')
@@ -109,16 +107,16 @@ export async function getUserCredentialsByUserId(userId: string) {
       'userCredentials.passwordHash',
       'userCredentials.securityQuestions'
     ])
-    .where('users.id', '=', userId as UUID)
+    .where('users.id', '=', userId)
     .executeTakeFirst()
 }
 
-export async function updatePasswordHash(userId: string, passwordHash: string) {
+export async function updatePasswordHash(userId: UUID, passwordHash: string) {
   const db = getClient()
   return db
     .updateTable('userCredentials')
     .set({ passwordHash })
-    .where('userId', '=', userId as UUID)
+    .where('userId', '=', userId)
     .execute()
 }
 
@@ -174,7 +172,7 @@ export async function deleteSuperUser(username: string): Promise<void> {
     if (user.administrativeAreaId) {
       await trx
         .deleteFrom('administrativeAreas')
-        .where('id', '=', user.administrativeAreaId as UUID)
+        .where('id', '=', user.administrativeAreaId)
         .execute()
     }
   })
@@ -184,6 +182,9 @@ export async function createUserWithCredentials(
   user: NewUsers,
   cred: Omit<NewUserCredentials, 'userId'>
 ): Promise<UUID> {
+  if (user.email) {
+    user.email = user.email.toLowerCase()
+  }
   const db = getClient()
   return db.transaction().execute(async (trx) => {
     const userId = await createUserInTrx(user, trx)
@@ -207,18 +208,15 @@ export async function searchUsersWithInput(input: SearchUsersPayload) {
       'users.mobile',
       'users.device',
       'users.status',
-      'users.officeId',
       'userCredentials.username',
       'users.signaturePath',
       'users.role',
       'users.officeId',
-      'users.status',
       'users.profileImagePath',
       'users.fullHonorificName'
     ])
     .orderBy('users.firstname', 'asc')
 
-  // 🔍 Dynamic filters
   if (input.username) {
     query = query.where(
       'userCredentials.username',
@@ -232,7 +230,11 @@ export async function searchUsersWithInput(input: SearchUsersPayload) {
   }
 
   if (input.email) {
-    query = query.where('users.email', 'ilike', `%${input.email}%`)
+    query = query.where(
+      'users.email',
+      'ilike',
+      `%${input.email.toLowerCase()}%`
+    )
   }
 
   if (input.status) {
@@ -240,11 +242,11 @@ export async function searchUsersWithInput(input: SearchUsersPayload) {
   }
 
   if (input.primaryOfficeId) {
-    query = query.where('users.officeId', '=', input.primaryOfficeId as UUID)
+    query = query.where('users.officeId', '=', input.primaryOfficeId)
   }
 
   if (input.locationId) {
-    query = query.where('locations.id', '=', input.locationId as UUID)
+    query = query.where('locations.id', '=', input.locationId)
   }
 
   const result = await query
@@ -268,51 +270,78 @@ export async function checkUsername(username: string) {
   return !!user
 }
 
-export async function updateUserById(
-  userId: string,
-  fields: Partial<{
-    firstname: string | null
-    surname: string | null
-    fullHonorificName: string | null
-    email: string | null
-    mobile: string | null
-    device: string | null
-    role: string
-    status: string
-    officeId: UUID
-    signaturePath: string | null
-    profileImagePath: string | null
-  }>
-) {
+type UpdateUserFields = Partial<{
+  firstname: string | null
+  surname: string | null
+  fullHonorificName: string | null
+  email: string | null
+  mobile: string | null
+  device: string | null
+  role: string
+  status: string
+  officeId: UUID
+  signaturePath: string | null
+  profileImagePath: string | null
+}>
+
+export async function updateUserById(userId: UUID, fields: UpdateUserFields) {
   const db = getClient()
-  return db
-    .updateTable('users')
-    .set(fields)
-    .where('id', '=', userId as UUID)
-    .execute()
+  if (fields.email) {
+    fields.email = fields.email.toLowerCase()
+  }
+  return db.updateTable('users').set(fields).where('id', '=', userId).execute()
 }
 
-export async function updateUsernameById(userId: string, username: string) {
+export async function updateUsernameById(userId: UUID, username: string) {
   const db = getClient()
   return db
     .updateTable('userCredentials')
     .set({ username })
-    .where('userId', '=', userId as UUID)
+    .where('userId', '=', userId)
+    .execute()
+}
+
+export async function getUsersByIds(userIds: UUID[]) {
+  if (userIds.length === 0) {
+    return []
+  }
+  const db = getClient()
+  return db
+    .selectFrom('users')
+    .innerJoin('userCredentials', 'userCredentials.userId', 'users.id')
+    .leftJoin('locations', 'locations.id', 'users.officeId')
+    .select([
+      'users.id',
+      'users.firstname',
+      'users.surname',
+      'users.fullHonorificName',
+      'users.mobile',
+      'users.email',
+      'users.device',
+      'users.role',
+      'users.status',
+      'users.officeId',
+      'users.signaturePath',
+      'users.profileImagePath',
+      'locations.administrativeAreaId',
+      'userCredentials.username'
+    ])
+    .where('users.id', 'in', userIds)
     .execute()
 }
 
 export async function activateUserWithCredentials(
-  userId: string,
+  userId: UUID,
   passwordHash: string,
   salt: string,
-  securityQuestions: Array<{ questionKey: string; answerHash: string }>
+  securityQuestions: SecurityQuestion[]
 ): Promise<void> {
   const db = getClient()
   await db.transaction().execute(async (trx) => {
     const user = await trx
       .selectFrom('users')
       .select(['users.id', 'users.status'])
-      .where('users.id', '=', userId as UUID)
+      .where('users.id', '=', userId)
       .executeTakeFirst()
 
     if (!user) {
@@ -330,13 +359,13 @@ export async function activateUserWithCredentials(
         salt,
         securityQuestions: sql`cast (${JSON.stringify(securityQuestions)} as jsonb)`
       })
-      .where('userId', '=', userId as UUID)
+      .where('userId', '=', userId)
       .execute()
 
     await trx
       .updateTable('users')
       .set({ status: 'active' })
-      .where('id', '=', userId as UUID)
+      .where('id', '=', userId)
       .execute()
   })
 }
