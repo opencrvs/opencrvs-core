@@ -21,7 +21,7 @@
   "dependencies": {
     "@elastic/elasticsearch": "8.16.2",
     "@opencrvs/commons": "^1.9.0",
-    "@trpc/server": "11.4.3",
+    "@trpc/server": "^11.8.0",
     "@types/bcryptjs": "^2.4.2",
     "@types/luxon": "^3.6.2",
     "@types/pg": "^8.15.4",
@@ -76,7 +76,7 @@
     "ts-node": "^6.1.1",
     "typescript": "5.6.3",
     "vite-tsconfig-paths": "^3.5.0",
-    "vitest": "^2.1.5",
+    "vitest": "2.1.9",
     "yaml": "^2.7.1"
   },
   "exports": {

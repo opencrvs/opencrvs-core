@@ -135,7 +135,9 @@ function deserializeQueryExpression(
     ? serializeLocationField(expression.updatedAtLocation, user)
     : undefined
 
-  const updatedByUserRole = expression.updatedByUserRole? userDeserializer(expression.updatedByUserRole.term, user) : undefined
+  const updatedByUserRole = expression.updatedByUserRole
+    ? userDeserializer(expression.updatedByUserRole.term, user)
+    : undefined
 
   const declaredLocation = expression[
     'legalStatuses.DECLARED.createdAtLocation'
@@ -173,10 +175,13 @@ function deserializeQueryExpression(
         ? { ...expression.updatedBy, term: updatedBy }
         : undefined,
 
-    updatedByUserRole: expression.updatedByUserRole && isDefined(updatedByUserRole)? {
-      ...expression.updatedByUserRole,
-      term: updatedByUserRole
-    } : undefined,  
+    updatedByUserRole:
+      expression.updatedByUserRole && isDefined(updatedByUserRole)
+        ? {
+            ...expression.updatedByUserRole,
+            term: updatedByUserRole
+          }
+        : undefined,
     createdAtLocation:
       expression.createdAtLocation && isDefined(createdAtLocation)
         ? deserializeExpression(expression.createdAtLocation, user)
