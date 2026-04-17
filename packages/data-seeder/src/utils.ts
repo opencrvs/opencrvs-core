@@ -12,7 +12,7 @@ import { inspect } from 'util'
 
 export function raise(...params: Parameters<typeof console.error>): never {
   // eslint-disable-next-line no-console
-  console.error(...params)
+  console.log(...params)
   process.exit(1)
 }
 

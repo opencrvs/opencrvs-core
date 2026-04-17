@@ -10,7 +10,7 @@
  */
 import { env } from './environment'
 import fetch from 'node-fetch'
-import { seedLocations } from './locations'
+// import { seedLocations } from './locations'
 import { seedUsers } from './users'
 import { parseGQLResponse, raise } from './utils'
 import { print } from 'graphql'
@@ -136,7 +136,7 @@ async function main() {
 
   // eslint-disable-next-line no-console
   console.log('Seeding locations')
-  await seedLocations(token)
+  // await seedLocations(token)
 
   // eslint-disable-next-line no-console
   console.log('Seeding users')

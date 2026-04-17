@@ -21,6 +21,7 @@ import { main as convertConfigFilesToTs } from './convert-config-files-to-ts'
 import { main as migrateScopes } from './migrate-scopes'
 import { main as removeDeprecatedImports } from './remove-deprecated-imports'
 import { main as migrateWorkqueueConfigs } from './migrate-workqueue-configs'
+import { main as removeDemoScope } from './remove-demo-scope'
 
 let cwd: string | undefined
 
@@ -61,4 +62,5 @@ export async function runUpgrade(ccwd: string | undefined) {
   await convertConfigFilesToTs()
   await migrateScopes()
   await removeDeprecatedImports()
+  await removeDemoScope()
 }
