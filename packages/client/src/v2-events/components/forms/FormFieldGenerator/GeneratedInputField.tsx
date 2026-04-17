@@ -69,6 +69,7 @@ import {
   isHiddenFieldType,
   EventConfig,
   isImageViewFieldType,
+  isAutocompleteFieldType,
   isUserRoleFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
@@ -113,6 +114,7 @@ import { Loader } from '@client/v2-events/features/events/registered-fields/Load
 import { NumberWithUnit } from '@client/v2-events/features/events/registered-fields/NumberWithUnit'
 import { Custom } from '@client/v2-events/features/events/registered-fields/Custom'
 import { Hidden } from '@client/v2-events/features/events/registered-fields/Hidden'
+import { Autocomplete } from '@client/v2-events/features/events/registered-fields/Autocomplete'
 import {
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
@@ -777,6 +779,18 @@ export const GeneratedInputField = React.memo(
           }
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
+      )
+    }
+    if (isAutocompleteFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <Autocomplete.Input
+            {...field.config}
+            key={fieldDefinition.id}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
       )
     }
     if (isSearchFieldType(field)) {

@@ -51,6 +51,7 @@ import {
   isAgeFieldType,
   FieldUpdateValue,
   isCustomFieldType,
+  isAutocompleteFieldType,
   isImageViewFieldType,
   isHeadingFieldType,
   isUserRoleFieldType
@@ -76,6 +77,7 @@ import {
   getRegisteredFieldByFieldConfig,
   VerificationStatus,
   AgeField,
+  Autocomplete,
   ImageView,
   UserRole
 } from '@client/v2-events/features/events/registered-fields'
@@ -163,6 +165,10 @@ export function ValueOutput({
 
   if (isNumberWithUnitFieldType(field)) {
     return <NumberWithUnit.Output {...field} />
+  }
+
+  if (isAutocompleteFieldType(field)) {
+    return <Autocomplete.Output {...field} />
   }
 
   if (isSignatureFieldType(field)) {

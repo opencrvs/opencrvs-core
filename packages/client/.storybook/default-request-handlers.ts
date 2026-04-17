@@ -2516,5 +2516,230 @@ export const handlers = {
         email: 'kalushabwalya1.7@gmail.com'
       })
     })
+  ],
+  referenceData: [
+    http.get('/api/causes-of-death?terms=', (input) => {
+      const params = new URL(input.request.url).searchParams
+      const terms = params.get('terms') ?? ''
+
+      const codes: { id: string; label: string }[] = [
+        {
+          id: '0dbf0d5f-db5c-4b1d-b743-ba929a56a2ba',
+          label: 'gastric cancer resection'
+        },
+        {
+          id: 'ca0b3fc5-3ee2-440a-a2bf-19bd933fb761',
+          label: 'METASTATIC LIVER CANCER'
+        },
+        {
+          id: '7ca7cfe5-8b24-4c2e-b866-a762bc188f8c',
+          label: 'METASTATIC LUNG CANCER'
+        },
+        {
+          id: '7ce24d60-49a9-4440-adc5-f52619bb18f6',
+          label: 'mouth floor cancer in situ'
+        },
+        {
+          id: 'dd35c351-c953-4889-b177-761304a57e17',
+          label: 'breast cancer'
+        },
+        {
+          id: '87fcf3f4-bdd0-48a0-8715-165a972ae495',
+          label: 'breast cancer excision'
+        },
+        {
+          id: 'bd1b5787-07c9-4815-bcc5-a030d783d7d9',
+          label: 'breast cancer resected'
+        },
+        {
+          id: 'f4b19888-b333-4206-b2c4-5fce65a8dbee',
+          label: 'OVARIAN CANCER'
+        },
+        {
+          id: '87eb4ff1-c4f3-4048-af73-3b0eab7e4c6f',
+          label: 'OVARY CANCER'
+        },
+        {
+          id: 'e7de7e6c-42d0-43cc-8e68-4ce6eed7c8ae',
+          label: 'PANCREAS cancer'
+        },
+        {
+          id: '1a73994f-8d9c-4ef0-a1dc-47c02cb0fcf7',
+          label: 'PANCREATIC CANCER'
+        },
+        {
+          id: '8228c3aa-1104-475b-b0aa-b1405167ee87',
+          label: 'pancreatic cancer resection'
+        },
+        {
+          id: 'c9f6dc3b-776b-4376-abb5-2ad8b37c7676',
+          label: 'PRIMARY BONE CANCER'
+        },
+        {
+          id: '79f6b4eb-ede4-4d2e-87cb-d88bf738f2cd',
+          label: 'Primary Cancer of Liver'
+        },
+        {
+          id: '9280d25d-4f4e-47f0-b396-15f1f5cae39c',
+          label: 'PRIMARY CANCER UNKNOWN'
+        },
+        {
+          id: '32029500-c50f-4321-85cf-2c1220c36804',
+          label: 'PRIMARY LIVER CANCER'
+        },
+        {
+          id: '6f237398-ecfe-44fb-a153-bd30c07a01fa',
+          label: 'PRIMARY LUNG CANCER'
+        },
+        {
+          id: '3a472a4f-ce87-4e25-ab87-d4bf5f6608cb',
+          label: 'primary site liver cell cancer'
+        },
+        {
+          id: 'cbdd09a0-a1a5-4473-9765-cc3ad240ace9',
+          label: 'prostatic cancer orchidectomy'
+        },
+        {
+          id: '5f0c4350-8c2e-4486-bd17-7d974f3656d1',
+          label: 'prostatic cancer resection'
+        },
+        {
+          id: 'bb48cb78-8f62-4090-883b-5721c68ab0be',
+          label: 'prostatic cancer surgery'
+        },
+        {
+          id: '7726a44e-f883-424f-990d-59afbed44ff9',
+          label: 'renal cell cancer'
+        },
+        {
+          id: '34ede4b9-9f0d-4b69-ba21-2a51642e26e3',
+          label: 'right colonic cancer resection'
+        },
+        {
+          id: 'c69fa317-f1f9-411a-a6eb-5c7eda7346a5',
+          label: 'right upper lobe lung cancer resection'
+        },
+        {
+          id: 'efe8f2c5-52ee-4455-88ff-808fede3a88d',
+          label: 'SCAPULA CANCER'
+        },
+        {
+          id: 'd0067d2e-7536-49b6-bc14-08a9c80a5434',
+          label: 'secondary cancer excision'
+        },
+        {
+          id: '748178df-999b-43f6-ad3a-2983d5fd7635',
+          label: 'secondary chest cancer biopsy'
+        },
+        {
+          id: '4657f48d-123d-4256-a96e-cc7a7e1376be',
+          label: 'secondary lung cancer surgery'
+        },
+        {
+          id: 'cdeae772-23b4-4248-94b0-8cde3c920ad8',
+          label: 'skin cancer'
+        },
+        {
+          id: '12af172e-cbd5-4869-8426-3d7cddb1c177',
+          label: 'tongue cancer resected'
+        },
+        {
+          id: 'b3d42cdc-0fd7-452a-b799-574a4e8e517b',
+          label: 'bile duct cancer resection'
+        },
+        {
+          id: 'f908c474-8cba-40eb-ba2f-0344de538f9b',
+          label: 'acetabular cancer'
+        },
+        {
+          id: 'b70004fb-4e79-41c8-9b5d-5f741e39693e',
+          label: 'gallbladder squamous cell cancer'
+        },
+        {
+          id: '5cb63038-7409-4b19-8236-87c39b58fb97',
+          label: 'Cancer cachexia'
+        },
+        {
+          id: '77c5d208-fa46-4350-8149-ff1ee8b277fd',
+          label: 'CANCER CHEMOTHERAPY'
+        },
+        {
+          id: 'c135e551-b8c7-491d-a7c1-0c32d99f63fb',
+          label: 'cancer of intestine'
+        },
+        {
+          id: '1f1e9e7d-20c9-4d64-a375-3cbdac28e16a',
+          label: 'CANCER OF PANCREAS'
+        },
+        {
+          id: '89b38241-6292-4819-9512-11959a1e16d0',
+          label: 'cancer of stomach'
+        },
+        {
+          id: 'a92183b4-0502-429a-9e17-5992f2c845b4',
+          label: 'temporal bone cancer'
+        },
+        {
+          id: '2e20e136-96e2-4361-a5b8-05e46b80e71c',
+          label: 'clavicle cancer'
+        },
+        {
+          id: '18af4133-b38b-4cc3-987e-7fad9c852373',
+          label: 'BONY CANCER'
+        },
+        {
+          id: 'f9056345-3c03-4f90-8efa-ff52b1d9b073',
+          label: 'urinary tract cancer'
+        },
+        {
+          id: '12481dd4-d537-4098-9496-e69fa9fdc2cd',
+          label: 'uterine cancer radiation'
+        },
+        {
+          id: '2049d693-1722-472a-b688-e561fc901a67',
+          label: 'uteropelvic junction cancer'
+        },
+        {
+          id: '9a308780-4b08-43fc-a039-1713dbb397e1',
+          label: 'ADENOCANCER'
+        },
+        {
+          id: '72476874-1547-4471-bde0-d8e8eff0a277',
+          label: 'areola cancer'
+        },
+        {
+          id: '920178b4-ca94-4539-8350-dd1bd22b6533',
+          label: 'laryngeal squamous cell cancer'
+        },
+        {
+          id: '5f33b84b-b931-4c60-8c54-d829fa87919a',
+          label: 'breats cancer'
+        },
+        {
+          id: 'd4af37ee-a0c3-4bfa-91ff-86754b41236c',
+          label: 'BONE CANCER'
+        },
+        {
+          id: '35c759bb-c57f-4cde-8d62-2cb74ea3a1c5',
+          label: 'ankle bone cancer'
+        }
+      ]
+
+      const search = (
+        input: string,
+        codes: { id: string; label: string }[]
+      ) => {
+        const words = input.toLowerCase().trim().split(/\s+/)
+
+        return codes.filter((item) => {
+          const label = item.label.toLowerCase()
+          return words.every((word) => label.includes(word))
+        })
+      }
+
+      return HttpResponse.json({
+        results: search(terms, codes)
+      })
+    })
   ]
 }

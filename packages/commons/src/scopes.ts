@@ -13,6 +13,7 @@ import * as z from 'zod/v4'
 import * as qs from 'qs'
 import { UUID } from './uuid'
 import { getScopes } from './authentication'
+import { Role } from './roles'
 
 export const JurisdictionFilter = z
   .enum(['administrativeArea', 'location', 'all'])
@@ -121,19 +122,19 @@ const AccessLevelOptions = z.object({
   accessLevel: JurisdictionFilter.optional()
 })
 
-const WorkqueueOptions = z.object({
+const WorkqueueOrDashboardOptions = z.object({
   ids: z
     .preprocess(
       (val) => (val === undefined ? undefined : [val].flat()),
       z.array(z.string())
     )
-    .describe('Must contain a list of workqueue ids.')
+    .describe('Must contain a list of workqueue or dashboard ids.')
 })
 
 const AllScopeOptions = z.object({
   ...AllRecordScopeOptions.shape,
   ...AccessLevelOptions.shape,
-  ...WorkqueueOptions.shape
+  ...WorkqueueOrDashboardOptions.shape
 })
 
 type AllScopeOptions = z.infer<typeof AllScopeOptions>
@@ -292,7 +293,14 @@ export const Scope = z.discriminatedUnion('type', [
   z.object({ type: PlainScopeType }),
   ...RecordScopeV2.options,
   z.object({ type: SystemScopeType, options: AccessLevelOptions.optional() }),
-  z.object({ type: z.literal('workqueue'), options: WorkqueueOptions })
+  z.object({
+    type: z.literal('workqueue'),
+    options: WorkqueueOrDashboardOptions
+  }),
+  z.object({
+    type: z.literal('dashboard.view'),
+    options: WorkqueueOrDashboardOptions
+  })
 ])
 
 export type Scope = z.infer<typeof Scope>
@@ -301,7 +309,8 @@ export const ScopeType = z.enum([
   ...SystemScopeType.options,
   ...RecordScopeTypeV2.options,
   ...PlainScopeType.options,
-  'workqueue'
+  'workqueue',
+  'dashboard.view'
 ])
 export type ScopeType = z.infer<typeof ScopeType>
 
@@ -545,4 +554,13 @@ export function canUserCreateEvent(
  */
 export function defineScopes(scopes: Scope[]) {
   return scopes.map((scope) => Scope.parse(scope)).map(encodeScope)
+}
+
+/**
+ * Helper for defining user roles. Should be used in country config.
+ *
+ * @param roles Array of roles in object format.
+ */
+export function defineRoles(roles: Role[]) {
+  return roles
 }
