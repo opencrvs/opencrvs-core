@@ -301,8 +301,13 @@ export async function updateUsernameById(userId: UUID, username: string) {
     .execute()
 }
 
-export async function getUsersByIds(userIds: UUID[]) {
-  if (userIds.length === 0) {
+export async function getUsersByIds(userIds: string[]) {
+  const uuids = userIds
+    .map((id) => UUID.safeParse(id))
+    .filter((p) => p.success)
+    .map((p) => p.data)
+
+  if (uuids.length === 0) {
     return []
   }
   const db = getClient()
@@ -326,7 +331,7 @@ export async function getUsersByIds(userIds: UUID[]) {
       'locations.administrativeAreaId',
       'userCredentials.username'
     ])
-    .where('users.id', 'in', userIds)
+    .where('users.id', 'in', uuids)
     .execute()
 }
 
