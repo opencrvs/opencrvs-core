@@ -17,6 +17,8 @@ import { print } from 'graphql'
 import gql from 'graphql-tag'
 import decode from 'jwt-decode'
 
+// misc change
+
 async function getToken(): Promise<string> {
   const authUrl = new URL('authenticate-super-user', env.AUTH_HOST).toString()
   const res = await fetch(authUrl, {
