@@ -9,15 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useState } from 'react'
-import { IntlShape, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 import { Content } from '@opencrvs/components/lib/Content'
 import { messages } from '@client/i18n/messages/views/config'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { Navigation } from '@client/components/interface/Navigation'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { AppBar } from '@opencrvs/components/lib/AppBar'
-import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
-import { ProfileMenu } from '@client/components/ProfileMenu'
 import {
   InputField,
   TextArea,
@@ -38,45 +33,7 @@ const Form = styled.form`
   }
 `
 
-/**
- *
- * Wrapper component that adds Frame around the page if withFrame is true.
- * Created only for minimising impact of possible regression during v2 regression test period.
- */
-function WithFrame({
-  children,
-  isHidden,
-  intl
-}: {
-  children: React.ReactNode
-  isHidden: boolean
-  intl: IntlShape
-}) {
-  if (isHidden) {
-    return <>{children}</>
-  }
-
-  return (
-    <Frame
-      header={
-        <AppBar
-          desktopLeft={<HistoryNavigator />}
-          desktopRight={<ProfileMenu key="profileMenu" />}
-          mobileLeft={<HistoryNavigator hideForward />}
-          mobileTitle={intl.formatMessage(messages.emailAllUsersTitle)}
-        />
-      }
-      navigation={<Navigation />}
-      skipToContentText={intl.formatMessage(
-        constantsMessages.skipToMainContent
-      )}
-    >
-      {children}
-    </Frame>
-  )
-}
-
-const AllUserEmail = ({ hideNavigation }: { hideNavigation?: boolean }) => {
+const AllUserEmail = () => {
   const intl = useIntl()
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
@@ -116,51 +73,49 @@ const AllUserEmail = ({ hideNavigation }: { hideNavigation?: boolean }) => {
 
   return (
     <>
-      <WithFrame isHidden={!!hideNavigation} intl={intl}>
-        <Content
-          title={intl.formatMessage(messages.emailAllUsersTitle)}
-          titleColor="copy"
-          subtitle={intl.formatMessage(messages.emailAllUsersSubtitle)}
+      <Content
+        title={intl.formatMessage(messages.emailAllUsersTitle)}
+        titleColor="copy"
+        subtitle={intl.formatMessage(messages.emailAllUsersSubtitle)}
+      >
+        <Form
+          onSubmit={(e) => {
+            e.preventDefault()
+            setConfirmationModalOpen(true)
+          }}
         >
-          <Form
-            onSubmit={(e) => {
-              e.preventDefault()
-              setConfirmationModalOpen(true)
-            }}
+          <InputField
+            id="subject"
+            label={intl.formatMessage(constantsMessages.emailSubject)}
+            touched={false}
+            required={true}
+            hideAsterisk
           >
-            <InputField
-              id="subject"
-              label={intl.formatMessage(constantsMessages.emailSubject)}
-              touched={false}
-              required={true}
-              hideAsterisk
-            >
-              <TextInput
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-              />
-            </InputField>
-            <InputField
-              id="body"
-              label={intl.formatMessage(constantsMessages.emailBody)}
-              touched={false}
-              required={true}
-              hideAsterisk
-            >
-              <TextArea
-                value={body}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                  setBody(e.target.value)
-                }
-              />
-            </InputField>
-            <Button type="primary" disabled={!subject || !body}>
-              <Icon name="PaperPlaneTilt" size="medium" />
-              {intl.formatMessage(buttonMessages.send)}
-            </Button>
-          </Form>
-        </Content>
-      </WithFrame>
+            <TextInput
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+            />
+          </InputField>
+          <InputField
+            id="body"
+            label={intl.formatMessage(constantsMessages.emailBody)}
+            touched={false}
+            required={true}
+            hideAsterisk
+          >
+            <TextArea
+              value={body}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                setBody(e.target.value)
+              }
+            />
+          </InputField>
+          <Button type="primary" disabled={!subject || !body}>
+            <Icon name="PaperPlaneTilt" size="medium" />
+            {intl.formatMessage(buttonMessages.send)}
+          </Button>
+        </Form>
+      </Content>
       <ResponsiveModal
         title={intl.formatMessage(messages.emailAllUsersModalTitle)}
         show={isConfirmationModalOpen}

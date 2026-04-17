@@ -8,14 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ILocation, AdminStructure } from '@client/offline/reducer'
+import { ILocation } from '@client/offline/reducer'
 import { ISearchLocation as SearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { IntlShape, MessageDescriptor } from 'react-intl'
-import { locationMessages, countryMessages } from '@client/i18n/messages'
+import { locationMessages } from '@client/i18n/messages'
 import { countries } from '@client/utils/countries'
 import { lookup } from 'country-data'
 import { getDefaultLanguage } from '@client/i18n/utils'
-import { camelCase } from 'lodash'
 import {
   AdministrativeArea,
   joinValues,
@@ -128,6 +127,8 @@ export function generateLocations(
 }
 
 /**
+ * @deprecated
+ *
  * Given locations and administrative areas maps, creates searchable options to be used in location search inputs.
  */
 export function createSearchOptions({
@@ -166,28 +167,7 @@ export function createSearchOptions({
     }
   })
 
-  const administrativeAreaOptions: SearchLocation[] =
-    administrativeAreasArr.map((administrativeArea) => {
-      // 3a. For administrative areas, get the full administrative area hierarchy for display label. e.g. 'District, Province'
-      const parentHierarchy = getAdministrativeAreaHierarchy(
-        administrativeArea.parentId,
-        administrativeAreas
-      )
-
-      return {
-        id: administrativeArea.id,
-        searchableText: administrativeArea.name,
-        displayLabel: joinValues(
-          [
-            administrativeArea.name,
-            ...parentHierarchy.map((area) => area.name)
-          ],
-          ', '
-        )
-      }
-    })
-
-  return [...locationOptions, ...administrativeAreaOptions]
+  return locationOptions
 }
 
 export function getJurisidictionType(
@@ -236,39 +216,6 @@ function getLocalizedLocationName(intl: IntlShape, location: ILocation) {
   } else {
     return location.alias?.toString()
   }
-}
-
-type LocationHierarchy = {
-  state?: string
-  district?: string
-  locationLevel3?: string
-  locationLevel4?: string
-  locationLevel5?: string
-  country?: string
-}
-
-const camelCasedJurisdictionType = (
-  jurisdictionType: AdminStructure['jurisdictionType']
-) => camelCase(jurisdictionType) as keyof LocationHierarchy
-
-export function getLocationHierarchy(
-  locationId: string,
-  locations: Record<string, AdminStructure | undefined>,
-  hierarchy: LocationHierarchy = {
-    country: countries.find(({ value }) => value === window.config.COUNTRY)
-      ?.label.defaultMessage as string
-  }
-): LocationHierarchy {
-  const parentLocation = locations[locationId]
-  if (!parentLocation) {
-    return hierarchy
-  }
-  const { id, jurisdictionType, partOf } = parentLocation
-
-  return getLocationHierarchy(partOf.split('/').at(1)!, locations, {
-    ...hierarchy,
-    [camelCasedJurisdictionType(jurisdictionType)]: id
-  })
 }
 
 /**
