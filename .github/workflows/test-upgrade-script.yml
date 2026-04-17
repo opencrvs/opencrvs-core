@@ -57,7 +57,8 @@ jobs:
       - name: Run upgrade script on opencrvs-countryconfig
         run: |
           cd opencrvs-countryconfig
-          yarn opencrvs upgrade
+          ./node_modules/@opencrvs/toolkit/dist/cli.js upgrade
+          # remove unused files
           rm -rf src/api/notification/testData.ts
       - name: Test opencrvs-countryconfig compilation
         run: yarn test:compilation
