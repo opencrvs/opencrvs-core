@@ -43,6 +43,7 @@ type UserAPIResult = {
   name: IUserName[]
   username: string
   email: string
+  emailForNotification: string
   mobile: string
   role: string
   fullHonorificName?: string

@@ -34,15 +34,6 @@ services:
     ports:
       - '5555:5555'
 
-  webhooks:
-    volumes:
-      - '.secrets/public-key.pem:/secrets/public-key.pem'
-    environment:
-      - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
-      - HOST=0.0.0.0
-    ports:
-      - '2525:2525'
-
   notification:
     volumes:
       - '.secrets/public-key.pem:/secrets/public-key.pem'

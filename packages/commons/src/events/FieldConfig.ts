@@ -773,22 +773,42 @@ const DataField = BaseField.extend({
 
 export type DataField = z.infer<typeof DataField>
 
+const ButtonSize = z.enum(['small', 'medium', 'large'])
+const ButtonType = z.enum([
+  'primary',
+  'secondary',
+  'tertiary',
+  'positive',
+  'negative',
+  'secondaryNegative',
+  'icon',
+  'iconPrimary'
+])
+const TextColor = z.enum(['primary', 'copy'])
+const TextVariant = z.enum(['bold14', 'reg14'])
+
+const ButtonConfiguration = z.object({
+  icon: z
+    .string()
+    .optional()
+    .describe('Icon for the button. You can find icons from OpenCRVS UI-Kit.'),
+  loading: z
+    .boolean()
+    .optional()
+    .describe('Whether the button is in a loading state and shows a spinner'),
+  buttonSize: ButtonSize.optional().describe('Size of the button.'),
+  buttonType: ButtonType.optional().describe('Type of the button.'),
+  textColor: TextColor.optional().describe('Color of the text.'),
+  textVariant: TextVariant.optional().describe('Variant of the text.'),
+  text: TranslationConfig.describe('Text to display on the button')
+})
+
+export type ButtonConfiguration = z.infer<typeof ButtonConfiguration>
+
 const ButtonField = BaseField.extend({
   type: z.literal(FieldType.BUTTON),
   defaultValue: ButtonFieldValue.optional(),
-  configuration: z.object({
-    icon: z
-      .string()
-      .optional()
-      .describe(
-        'Icon for the button. You can find icons from OpenCRVS UI-Kit.'
-      ),
-    loading: z
-      .boolean()
-      .optional()
-      .describe('Whether the button is in a loading state and shows a spinner'),
-    text: TranslationConfig.describe('Text to display on the button')
-  })
+  configuration: ButtonConfiguration
 }).describe('Generic button without any built-in functionality')
 
 export type ButtonField = z.infer<typeof ButtonField>
@@ -834,6 +854,27 @@ const HttpField = BaseField.extend({
 }).describe('HTTP request function triggered by a button click or other event')
 
 export type HttpField = z.infer<typeof HttpField>
+
+const AutocompleteField = BaseField.extend({
+  type: z.literal(FieldType.AUTOCOMPLETE),
+  configuration: z.object({
+    url: z
+      .string()
+      .describe('URL to fetch autocomplete suggestions from')
+      .optional(),
+    method: z.enum(['GET', 'POST']).default('GET').optional(),
+    defaultOptions: z
+      .array(
+        z.object({
+          label: z.string(),
+          value: z.string()
+        })
+      )
+      .optional()
+  })
+}).describe('Autocomplete input field')
+
+export type AutocompleteField = z.infer<typeof AutocompleteField>
 
 const SearchField = HttpField.extend({
   type: z.literal(FieldType.SEARCH),
@@ -1023,6 +1064,7 @@ export const FieldConfig = z
     ButtonField,
     AlphaPrintButton,
     HttpField,
+    AutocompleteField,
     LinkButtonField,
     VerificationStatus,
     QrReaderField,
