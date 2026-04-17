@@ -223,7 +223,7 @@ interface UserFormState {
   clear: () => void
 }
 
-const useUserFormState = create<UserFormState>()((set, get) => ({
+export const useUserFormState = create<UserFormState>()((set, get) => ({
   getUserForm: (initialValues?: EventState) =>
     get().userForm || deepDropNulls(initialValues ?? {}),
   setUserForm: (data: EventState) => {
@@ -387,12 +387,11 @@ const ReviewUserComponent = () => {
       // Additional field values are spread at the top level because FormFieldGenerator
       // looks up values by field ID as a flat key (e.g. formState['user.staffId']).
       // The nesting into data: {} only happens when building the UserInput payload.
-      ...user.data
+      ...(user.data ?? {})
     })
   }, [isNewUser, existingUserQuery.data, setUserForm, getUserForm])
 
   const formState = getUserForm()
-
   const createUserMutation = createUser()
   const updateUserMutation = updateUser()
   const eventConfig = getUserEditConfig(selectedRole, additionalFields)

@@ -45,7 +45,7 @@ export const User = z.object({
   mobile: z.string().optional(),
   email: z.string().optional(),
   status: z.enum(['active', 'deactivated', 'pending']),
-  data: z.record(z.string(), FieldValue).optional().default({})
+  data: z.record(z.string(), FieldValue).optional()
 })
 export type User = z.infer<typeof User>
 
