@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
+import { TRPCError } from '@trpc/server'
 import {
   DocumentPath,
   IUserName,
@@ -17,9 +18,6 @@ import {
   User,
   UserInput,
   UserOrSystem,
-  findScope,
-  getScopes,
-  hasScope,
   isUUID,
   logger,
   personNameFromV1ToV2,
@@ -32,12 +30,15 @@ import {
 } from '@events/storage/postgres/events/system-clients'
 import {
   getUserById,
+  getUsersByIds,
   createUserWithCredentials,
   searchUsersWithInput,
   activateUserWithCredentials,
   updateUserById,
   updateUsernameById,
-  checkUsername
+  checkUsername,
+  getUserCredentialsByUserId,
+  SecurityQuestion
 } from '@events/storage/postgres/events/users'
 import { generateSaltedHash, generateHash } from '@events/service/auth/hash'
 
@@ -46,8 +47,8 @@ export type SearchUsersPayload = {
   mobile?: string
   email?: string
   status?: string
-  primaryOfficeId?: string
-  locationId?: string
+  primaryOfficeId?: UUID
+  locationId?: UUID
   count: number
   skip: number
   sortOrder: 'asc' | 'desc'
@@ -97,16 +98,10 @@ async function generateUsername(
   return proposedUsername
 }
 
-export async function getUser(
-  userId: string
-): Promise<User & { username: string }> {
-  const user = await getUserById(userId)
+type DbUser = NonNullable<Awaited<ReturnType<typeof getUserById>>>
 
-  if (!user) {
-    throw new Error(`User not found: ${userId}`)
-  }
-
-  const result = {
+function mapDbUserToUser(user: DbUser): User & { username: string } {
+  return {
     type: TokenUserType.enum.user,
     id: user.id,
     name: [
@@ -128,8 +123,18 @@ export async function getUser(
     administrativeAreaId: user.administrativeAreaId ?? undefined,
     fullHonorificName: user.fullHonorificName ?? undefined
   }
+}
 
-  return result
+export async function getUser(
+  userId: string
+): Promise<User & { username: string }> {
+  const user = await getUserById(UUID.parse(userId))
+
+  if (!user) {
+    throw new Error(`User not found: ${userId}`)
+  }
+
+  return mapDbUserToUser(user)
 }
 
 export async function findUserOrSystem(
@@ -200,32 +205,18 @@ export async function updateUser(
   input: CreateUserPayload & { id: string },
   token: string
 ): Promise<User> {
-  const existingUser = await getUserById(input.id)
+  const existingUser = await getUserById(UUID.parse(input.id))
 
   if (!existingUser) {
     throw new Error(`No user found by given id: ${input.id}`)
   }
 
-  const scopes = getScopes(token)
-  const editableRoleIds = findScope(scopes, 'user.edit')?.options.role
-  if (Array.isArray(editableRoleIds) && !editableRoleIds.includes(input.role)) {
-    throw new Error('Unauthorized to edit user with this role')
-  }
-
-  let officeId = existingUser.officeId
-  if (input.primaryOfficeId !== existingUser.officeId) {
-    if (hasScope(token, 'config.update-all')) {
-      officeId = input.primaryOfficeId as UUID
-    } else {
-      throw new Error('Location can not be changed by this user')
-    }
-  }
-
+  // TODO: update FamilyName to single firstname and surname fields
   const englishName = input.name.find((n) => n.use === 'en') ?? input.name[0]
   const oldUsername = existingUser.username
   const newUsername = await generateUsername(input.name, existingUser.username)
 
-  await updateUserById(input.id, {
+  await updateUserById(UUID.parse(input.id), {
     firstname: englishName.given[0],
     surname: englishName.family,
     fullHonorificName: input.fullHonorificName,
@@ -233,14 +224,14 @@ export async function updateUser(
     mobile: input.mobile,
     device: input.device,
     role: input.role,
-    officeId,
+    officeId: UUID.parse(input.primaryOfficeId),
     signaturePath: input.signature
       ? input.signature.path
       : existingUser.signaturePath
   })
 
   if (newUsername !== oldUsername) {
-    await updateUsernameById(input.id, newUsername)
+    await updateUsernameById(UUID.parse(input.id), newUsername)
     await triggerUserEventNotification({
       event: 'user-updated',
       payload: {
@@ -317,7 +308,7 @@ export async function createUser(input: CreateUserPayload, _token: string) {
     fullHonorificName: input.fullHonorificName,
     role: input.role,
     device: input.device,
-    officeId: input.primaryOfficeId as UUID,
+    officeId: UUID.parse(input.primaryOfficeId),
     mobile: input.mobile,
     status: input.status ?? 'pending'
   }
@@ -360,7 +351,8 @@ export async function activateUser(input: {
     }))
   )
 
-  await activateUserWithCredentials(input.userId, hash, salt, securityQuestions)
+  const userId = UUID.parse(input.userId)
+  await activateUserWithCredentials(userId, hash, salt, securityQuestions)
 }
 
 /**
@@ -374,11 +366,102 @@ export async function activateUser(input: {
  * @returns Array of found users. If no users are found for some ids, we leave them out of the result.
  */
 export const getUsersById = async (ids: string[]): Promise<UserOrSystem[]> => {
-  const users = await Promise.all(ids.map(async (id) => findUserOrSystem(id)))
+  if (ids.length === 0) {
+    return []
+  }
 
-  return users.filter((user) => user !== undefined)
+  const dbUsers = await getUsersByIds(ids.map((id) => UUID.parse(id)))
+  const foundUserIds = new Set(dbUsers.map((u) => u.id))
+
+  const mappedUsers: UserOrSystem[] = dbUsers.map(mapDbUserToUser)
+
+  const remainingIds = ids.filter((id) => !foundUserIds.has(UUID.parse(id)))
+  const systems = await Promise.all(
+    remainingIds.map(async (id) => {
+      try {
+        const system = isUUID(id)
+          ? await getSystemClientById(id)
+          : await getSystemByLegacyId(id)
+        return {
+          type: TokenUserType.enum.system,
+          id,
+          legacyId: system.legacyId ? system.legacyId : undefined,
+          name: system.name
+        } satisfies UserOrSystem
+      } catch {
+        return undefined
+      }
+    })
+  )
+
+  return [...mappedUsers, ...systems.filter((s) => s !== undefined)]
 }
 
 export function isUser(userOrSystem: UserOrSystem): userOrSystem is User {
   return userOrSystem.type === TokenUserType.enum.user
+}
+
+export const getCredentials = async (userId: string) => {
+  const credentials = await getUserCredentialsByUserId(UUID.parse(userId))
+
+  if (!credentials) {
+    logger.error(`No user details found by given userid: ${userId}`)
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
+
+  if (credentials.status !== 'active') {
+    logger.error(`User is not in active state for given userid: ${userId}`)
+    // Don't return a 404 as this gives away that this user account exists
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
+
+  return credentials
+}
+
+export const getSecurityQuestionsForUser = <
+  T extends { securityQuestions: unknown }
+>(
+  record: T
+): SecurityQuestion[] => {
+  if (
+    !Array.isArray(record.securityQuestions) ||
+    record.securityQuestions.length === 0
+  ) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: "User doesn't have security questions"
+    })
+  }
+  return record.securityQuestions
+}
+
+export async function checkSecurityQuestionMatch({
+  questions,
+  input,
+  salt
+}: {
+  questions: { questionKey: string; answerHash: string }[]
+  input: { questionKey: string; answer: string }
+  salt: string
+}) {
+  const target = questions.find((q) => q.questionKey === input.questionKey)
+
+  if (!target) {
+    return {
+      matched: false,
+      questionKey: questions[0]?.questionKey ?? input.questionKey
+    }
+  }
+
+  const hash = await generateHash(input.answer.toLowerCase(), salt)
+  const matched = hash === target.answerHash
+
+  const fallback = questions.find(
+    (q) => q.questionKey !== input.questionKey
+  )?.questionKey
+
+  return {
+    matched,
+    questionKey: matched ? input.questionKey : (fallback ?? input.questionKey)
+  }
 }
