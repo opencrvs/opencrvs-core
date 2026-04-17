@@ -370,12 +370,12 @@ export const getUsersById = async (ids: string[]): Promise<UserOrSystem[]> => {
     return []
   }
 
-  const dbUsers = await getUsersByIds(ids.map((id) => UUID.parse(id)))
+  const dbUsers = await getUsersByIds(ids)
   const foundUserIds = new Set(dbUsers.map((u) => u.id))
 
   const mappedUsers: UserOrSystem[] = dbUsers.map(mapDbUserToUser)
 
-  const remainingIds = ids.filter((id) => !foundUserIds.has(UUID.parse(id)))
+  const remainingIds = ids.filter((id) => !foundUserIds.has(id as UUID))
   const systems = await Promise.all(
     remainingIds.map(async (id) => {
       try {

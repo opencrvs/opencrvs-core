@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { afterEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, describe, expect, test, vi, type Mock } from 'vitest'
 import { TRPCError } from '@trpc/server'
 import { hasScope } from '@opencrvs/commons'
 import { getUserById } from '@events/storage/postgres/events/users'
@@ -35,8 +35,8 @@ afterEach(() => {
 })
 
 describe('enforceOfficeUpdatePermission', () => {
-  const mockedGetUserById = getUserById as unknown as vi.Mock
-  const mockedHasScope = hasScope as unknown as vi.Mock
+  const mockedGetUserById = getUserById as unknown as Mock
+  const mockedHasScope = hasScope as unknown as Mock
   const existingUserId = '11111111-1111-4111-8111-111111111111'
   const existingOfficeId = '22222222-2222-4222-8222-222222222222'
   const otherOfficeId = '33333333-3333-4333-8333-333333333333'
@@ -45,23 +45,25 @@ describe('enforceOfficeUpdatePermission', () => {
     mockedGetUserById.mockResolvedValue({ officeId: existingOfficeId })
     mockedHasScope.mockReturnValue(false)
 
-    const next = vi.fn(async ({ input, ctx }) => ({ input, ctx }))
+    const next = vi.fn(({ input, ctx }) => ({ input, ctx }))
 
     const result = await enforceOfficeUpdatePermission({
       ctx: { token: 'Bearer token' },
       input: { id: existingUserId },
       next
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any)
 
     expect(next).toHaveBeenCalled()
-    expect(result.input.primaryOfficeId).toBe(existingOfficeId)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((result as any).input.primaryOfficeId).toBe(existingOfficeId)
   })
 
   test('forbids office change without config.update-all scope', async () => {
     mockedGetUserById.mockResolvedValue({ officeId: existingOfficeId })
     mockedHasScope.mockReturnValue(false)
 
-    const next = vi.fn(async ({ input, ctx }) => ({ input, ctx }))
+    const next = vi.fn(({ input, ctx }) => ({ input, ctx }))
 
     await expect(
       enforceOfficeUpdatePermission({
@@ -71,6 +73,7 @@ describe('enforceOfficeUpdatePermission', () => {
           primaryOfficeId: otherOfficeId
         },
         next
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any)
     ).rejects.toBeInstanceOf(TRPCError)
     expect(next).not.toHaveBeenCalled()
