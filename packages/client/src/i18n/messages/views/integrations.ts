@@ -26,7 +26,7 @@ const messagesToDefine = {
   pageIntroduction: {
     id: 'integrations.pageIntroduction',
     defaultMessage:
-      'For each new client that needs to integrate with OpenCRVS you can create unique client IDs. A number of integration use cases are currently supported, based on both API and webhook technologies.',
+      'For each new client that needs to integrate with OpenCRVS you can create unique client IDs. A number of integration use cases are currently supported, based on API technologies.',
     description: 'Label for the text integration page intorduction'
   },
   copy: {
@@ -90,25 +90,6 @@ const messagesToDefine = {
     defaultMessage: 'Label',
     description: 'Label'
   },
-  webhookPermissionsDescription: {
-    id: 'integrations.webhookPermissionsDescription',
-    defaultMessage:
-      'Select the data you wish to be contained within the webhook payload',
-    description: 'Webhook description above permissions'
-  },
-  webhookDescription: {
-    id: 'integrations.webhookDescription',
-    defaultMessage:
-      'Select the data you wish to be contained within the webhook payload',
-    description: 'label for webhook client'
-  },
-
-  PIIDataLabel: {
-    id: 'integrations.webhook.PII',
-    defaultMessage: 'Include PII data',
-    description: 'Label for PII'
-  },
-
   birth: {
     id: 'integrations.birth',
     defaultMessage: 'Birth',
@@ -337,8 +318,7 @@ const messagesToDefine = {
   createdOn: {
     id: 'integrations.createdOn',
     defaultMessage: 'Created {date}',
-    description:
-      'Label showing when an integration was created (no user info)'
+    description: 'Label showing when an integration was created (no user info)'
   },
   clientDetails: {
     id: 'integrations.clientDetails',
