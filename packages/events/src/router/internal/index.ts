@@ -19,7 +19,7 @@ export const internalUserRouter = internalRouter({
   ping: internalProcedure
     .input(z.string())
     .output(z.string())
-    .query(async ({ input }) => {
+    .query(({ input }) => {
       return `pong: ${input}`
     })
 })

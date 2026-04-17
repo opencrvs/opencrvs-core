@@ -193,7 +193,7 @@ export async function createContext({ req }: { req: IncomingMessage }) {
 /**
  * Context for internal service calls between services, authenticated with a service token. Does not include user details, as the token is not associated with a user.
  */
-export async function createInternalContext({ req }: { req: IncomingMessage }) {
+export function createInternalContext({ req }: { req: IncomingMessage }) {
   const normalizedHeaders = normalizeHeaders(req.headers)
 
   try {

@@ -72,19 +72,17 @@ export const internalProcedure = t.procedure.use(async (opts) => {
     })
   }
 
-  const verifiedToken = token ? verifyInternalServiceToken(token) : null
-
-  if (!verifiedToken) {
-    logger.error('No token provided for internal request')
+  try {
+    verifyInternalServiceToken(token)
+    return opts.next({
+      ctx: {
+        ...opts.ctx,
+        token
+      }
+    })
+  } catch {
     throw new TRPCError({ code: 'UNAUTHORIZED' })
   }
-
-  return opts.next({
-    ctx: {
-      ...opts.ctx,
-      token
-    }
-  })
 })
 
 const authedProcedure = t.procedure.use(async (opts) => {
