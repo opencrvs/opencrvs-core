@@ -1729,6 +1729,7 @@ components:
                                 - record.confirm-registration
                                 - record.reject-registration
                                 - workqueue
+                                - dashboard.view
                             $option:
                               type: string
                               enum:
@@ -6179,6 +6180,7 @@ components:
                                 - record.confirm-registration
                                 - record.reject-registration
                                 - workqueue
+                                - dashboard.view
                             $option:
                               type: string
                               enum:
@@ -6577,6 +6579,7 @@ components:
                                 - record.confirm-registration
                                 - record.reject-registration
                                 - workqueue
+                                - dashboard.view
                             $option:
                               type: string
                               enum:
@@ -6812,6 +6815,7 @@ components:
                                 - record.confirm-registration
                                 - record.reject-registration
                                 - workqueue
+                                - dashboard.view
                             $option:
                               type: string
                               enum:
@@ -7046,6 +7050,7 @@ components:
                                 - record.confirm-registration
                                 - record.reject-registration
                                 - workqueue
+                                - dashboard.view
                             $option:
                               type: string
                               enum:
@@ -7463,6 +7468,28 @@ components:
                           type: string
                       additionalProperties: false
                     - {}
+                    - type: object
+                      properties:
+                        label:
+                          type: string
+                        value:
+                          type: string
+                      required:
+                        - label
+                        - value
+                      additionalProperties: false
+                    - anyOf:
+                        - type: object
+                          properties:
+                            label:
+                              type: string
+                            value:
+                              type: string
+                          required:
+                            - label
+                            - value
+                          additionalProperties: false
+                        - type: "null"
                 - anyOf:
                     - type: object
                       properties:
@@ -7710,6 +7737,28 @@ components:
                                     type: string
                                 additionalProperties: false
                               - {}
+                              - type: object
+                                properties:
+                                  label:
+                                    type: string
+                                  value:
+                                    type: string
+                                required:
+                                  - label
+                                  - value
+                                additionalProperties: false
+                              - anyOf:
+                                  - type: object
+                                    properties:
+                                      label:
+                                        type: string
+                                      value:
+                                        type: string
+                                    required:
+                                      - label
+                                      - value
+                                    additionalProperties: false
+                                  - type: "null"
                       required:
                         - data
                       additionalProperties: false
@@ -8530,6 +8579,37 @@ components:
                 loading:
                   description: Whether the button is in a loading state and shows a spinner
                   type: boolean
+                buttonSize:
+                  description: Size of the button.
+                  type: string
+                  enum:
+                    - small
+                    - medium
+                    - large
+                buttonType:
+                  description: Type of the button.
+                  type: string
+                  enum:
+                    - primary
+                    - secondary
+                    - tertiary
+                    - positive
+                    - negative
+                    - secondaryNegative
+                    - icon
+                    - iconPrimary
+                textColor:
+                  description: Color of the text.
+                  type: string
+                  enum:
+                    - primary
+                    - copy
+                textVariant:
+                  description: Variant of the text.
+                  type: string
+                  enum:
+                    - bold14
+                    - reg14
                 text:
                   description: Text to display on the button
                   $ref: "#/components/schemas/TranslationConfig"
@@ -8971,6 +9051,189 @@ components:
             - configuration
           additionalProperties: false
           description: HTTP request function triggered by a button click or other event
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier of the field.
+            label:
+              description: Human-readable label of the field.
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              description: Reference to the parent field or fields. When a parent field
+                changes, this field is reset.
+              anyOf:
+                - type: object
+                  properties:
+                    $$field:
+                      type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      default: []
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                    - $$subfield
+                  additionalProperties: false
+                  description: Reference to a field by its ID
+                - type: array
+                  items:
+                    type: object
+                    properties:
+                      $$field:
+                        type: string
+                        description: Unique identifier for the field
+                      $$subfield:
+                        default: []
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                      - $$subfield
+                    additionalProperties: false
+                    description: Reference to a field by its ID
+            required:
+              description: Indicates whether the field is mandatory.
+              default: false
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+                  additionalProperties: false
+            conditionals:
+              description: Conditions determining when the field is shown or enabled. By
+                default, the field is always shown and enabled.
+              default: []
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+            secured:
+              description: Indicates whether the field is secured. Secured fields are not
+                indexed for search and are only visible when explicitly
+                assigned.
+              default: false
+              type: boolean
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              description: Additional validation rules applied to the field.
+              default: []
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+                additionalProperties: false
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              default: false
+              type: boolean
+            uncorrectable:
+              description: Indicates whether the field can be modified during record
+                correction.
+              default: false
+              type: boolean
+            value:
+              description: Reference to the source field or fields. When a value is defined,
+                it is copied from the parent field when changed. If multiple
+                references are provided, the first truthy value is used.
+              anyOf:
+                - type: object
+                  properties:
+                    $$field:
+                      type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      default: []
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                    - $$subfield
+                  additionalProperties: false
+                  description: Reference to a field by its ID
+                - type: array
+                  items:
+                    type: object
+                    properties:
+                      $$field:
+                        type: string
+                        description: Unique identifier for the field
+                      $$subfield:
+                        default: []
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                      - $$subfield
+                    additionalProperties: false
+                    description: Reference to a field by its ID
+            analytics:
+              description: Indicates whether the field is included in analytics. When enabled,
+                its value becomes available in the analytics dashboard.
+              default: false
+              type: boolean
+            type:
+              type: string
+              const: AUTOCOMPLETE
+            configuration:
+              type: object
+              properties:
+                url:
+                  type: string
+                  description: URL to fetch autocomplete suggestions from
+                method:
+                  default: GET
+                  type: string
+                  enum:
+                    - GET
+                    - POST
+                defaultOptions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      label:
+                        type: string
+                      value:
+                        type: string
+                    required:
+                      - label
+                      - value
+                    additionalProperties: false
+              additionalProperties: false
+          required:
+            - id
+            - label
+            - type
+            - configuration
+          additionalProperties: false
+          description: Autocomplete input field
         - type: object
           properties:
             id:
@@ -12394,6 +12657,7 @@ components:
                             - SIGNATURE
                             - DATA
                             - BUTTON
+                            - AUTOCOMPLETE
                             - SEARCH
                             - ALPHA_PRINT_BUTTON
                             - HTTP
@@ -12633,6 +12897,7 @@ components:
                             - SIGNATURE
                             - DATA
                             - BUTTON
+                            - AUTOCOMPLETE
                             - SEARCH
                             - ALPHA_PRINT_BUTTON
                             - HTTP
@@ -15286,6 +15551,28 @@ components:
                         type: string
                     additionalProperties: false
                   - {}
+                  - type: object
+                    properties:
+                      label:
+                        type: string
+                      value:
+                        type: string
+                    required:
+                      - label
+                      - value
+                    additionalProperties: false
+                  - anyOf:
+                      - type: object
+                        properties:
+                          label:
+                            type: string
+                          value:
+                            type: string
+                        required:
+                          - label
+                          - value
+                        additionalProperties: false
+                      - type: "null"
               - anyOf:
                   - type: object
                     properties:
@@ -15533,6 +15820,28 @@ components:
                                   type: string
                               additionalProperties: false
                             - {}
+                            - type: object
+                              properties:
+                                label:
+                                  type: string
+                                value:
+                                  type: string
+                              required:
+                                - label
+                                - value
+                              additionalProperties: false
+                            - anyOf:
+                                - type: object
+                                  properties:
+                                    label:
+                                      type: string
+                                    value:
+                                      type: string
+                                  required:
+                                    - label
+                                    - value
+                                  additionalProperties: false
+                                - type: "null"
                     required:
                       - data
                     additionalProperties: false
