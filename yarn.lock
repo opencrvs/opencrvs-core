@@ -80,21 +80,6 @@
     tslib "^2.3.0"
     zen-observable-ts "^1.2.5"
 
-"@apollo/datasource-rest@^6.3.0":
-  version "6.3.0"
-  resolved "https://registry.npmjs.org/@apollo/datasource-rest/-/datasource-rest-6.3.0.tgz"
-  integrity sha512-5YpAXY2VvkYySmaDl8G8Yt8qjOO89cqx7r+uchFjKGacS72L8nKxrLIzltjhQkLpyjwMLFLi2UDSCSMht+qGQA==
-  dependencies:
-    "@apollo/utils.fetcher" "^3.0.0"
-    "@apollo/utils.keyvaluecache" "^3.1.0"
-    "@apollo/utils.logger" "^3.0.0"
-    "@apollo/utils.withrequired" "^3.0.0"
-    "@types/http-cache-semantics" "^4.0.1"
-    http-cache-semantics "^4.1.1"
-    lodash.clonedeep "^4.5.0"
-    lodash.isplainobject "^4.0.6"
-    node-fetch "^2.6.7"
-
 "@apollo/protobufjs@1.2.7":
   version "1.2.7"
   resolved "https://registry.npmjs.org/@apollo/protobufjs/-/protobufjs-1.2.7.tgz"
@@ -123,7 +108,7 @@
     "@apollo/utils.keyvaluecache" "^2.1.0"
     "@apollo/utils.logger" "^2.0.0"
 
-"@apollo/server@4.13.0", "@apollo/server@^4.13.0":
+"@apollo/server@4.13.0":
   version "4.13.0"
   resolved "https://registry.yarnpkg.com/@apollo/server/-/server-4.13.0.tgz#765e5ad6aaf3c901a678c3d9d63e354a12075e7c"
   integrity sha512-t4GzaRiYIcPwYy40db6QjZzgvTr9ztDKBddykUXmBb2SVjswMKXbkaJ5nPeHqmT3awr9PAaZdCZdZhRj55I/8A==
@@ -179,11 +164,6 @@
   resolved "https://registry.npmjs.org/@apollo/utils.fetcher/-/utils.fetcher-2.0.1.tgz"
   integrity sha512-jvvon885hEyWXd4H6zpWeN3tl88QcWnHp5gWF5OPF34uhvoR+DFqcNxs9vrRaBBSY3qda3Qe0bdud7tz2zGx1A==
 
-"@apollo/utils.fetcher@^3.0.0":
-  version "3.1.0"
-  resolved "https://registry.npmjs.org/@apollo/utils.fetcher/-/utils.fetcher-3.1.0.tgz"
-  integrity sha512-Z3QAyrsQkvrdTuHAFwWDNd+0l50guwoQUoaDQssLOjkmnmVuvXlJykqlEJolio+4rFwBnWdoY1ByFdKaQEcm7A==
-
 "@apollo/utils.isnodelike@^2.0.0", "@apollo/utils.isnodelike@^2.0.1":
   version "2.0.1"
   resolved "https://registry.npmjs.org/@apollo/utils.isnodelike/-/utils.isnodelike-2.0.1.tgz"
@@ -197,23 +177,10 @@
     "@apollo/utils.logger" "^2.0.1"
     lru-cache "^7.14.1"
 
-"@apollo/utils.keyvaluecache@^3.1.0":
-  version "3.1.0"
-  resolved "https://registry.npmjs.org/@apollo/utils.keyvaluecache/-/utils.keyvaluecache-3.1.0.tgz"
-  integrity sha512-MM/DKIqpQQbuNG1gNPAlGc45THdWkroTmN8o/J09merFwf/LlZ7+lAfcHFDXIYIknwKmUjJrOMS3OxYbjrz2hA==
-  dependencies:
-    "@apollo/utils.logger" "^3.0.0"
-    lru-cache "^10.0.0"
-
 "@apollo/utils.logger@^2.0.0", "@apollo/utils.logger@^2.0.1":
   version "2.0.1"
   resolved "https://registry.npmjs.org/@apollo/utils.logger/-/utils.logger-2.0.1.tgz"
   integrity sha512-YuplwLHaHf1oviidB7MxnCXAdHp3IqYV8n0momZ3JfLniae92eYqMIx+j5qJFX6WKJPs6q7bczmV4lXIsTu5Pg==
-
-"@apollo/utils.logger@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.npmjs.org/@apollo/utils.logger/-/utils.logger-3.0.0.tgz"
-  integrity sha512-M8V8JOTH0F2qEi+ktPfw4RL7MvUycDfKp7aEap2eWXfL5SqWHN6jTLbj5f5fj1cceHpyaUSOZlvlaaryaxZAmg==
 
 "@apollo/utils.printwithreducedwhitespace@^2.0.1":
   version "2.0.1"
@@ -254,11 +221,6 @@
   resolved "https://registry.npmjs.org/@apollo/utils.withrequired/-/utils.withrequired-2.0.1.tgz"
   integrity sha512-YBDiuAX9i1lLc6GeTy1m7DGLFn/gMnvXqlalOIMjM7DeOgIacEjjfwPqb0M1CQ2v11HhR15d1NmxJoRCfrNqcA==
 
-"@apollo/utils.withrequired@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.npmjs.org/@apollo/utils.withrequired/-/utils.withrequired-3.0.0.tgz"
-  integrity sha512-aaxeavfJ+RHboh7c2ofO5HHtQobGX4AgUujXP4CXpREHp9fQ9jPi6K9T1jrAKe7HIipoP0OJ1gd6JamSkFIpvA==
-
 "@ardatan/relay-compiler@12.0.0":
   version "12.0.0"
   resolved "https://registry.npmjs.org/@ardatan/relay-compiler/-/relay-compiler-12.0.0.tgz"
@@ -288,11 +250,6 @@
   integrity sha512-xhlTqH0m31mnsG0tIP4ETgfSB6gXDaYYsUWTrlUV93fFQPI9dd8hE0Ot6MHLCtqgB32hwJAC3YZMWlXZw7AleA==
   dependencies:
     node-fetch "^2.6.1"
-
-"@as-integrations/hapi@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.npmjs.org/@as-integrations/hapi/-/hapi-2.0.1.tgz"
-  integrity sha512-FpPmT0tKbRBvQ+xt7pT8lCmShpylE2fU46SBa764IbWOcnOyZv7Cw9KujAcM5gW/NLeFI/xjADLabOTonwQghg==
 
 "@aw-web-design/x-default-browser@1.4.126":
   version "1.4.126"
@@ -9651,11 +9608,6 @@
   dependencies:
     "@types/jsdom" "*"
     "@types/pdfmake" "*"
-
-"@types/http-cache-semantics@^4.0.1":
-  version "4.0.4"
-  resolved "https://registry.npmjs.org/@types/http-cache-semantics/-/http-cache-semantics-4.0.4.tgz"
-  integrity sha512-1m0bIFVc7eJWyve9S0RnuRgcQqF/Xd5QsUZAZeQFr1Q3/p9JWoQQEqmVy+DPTNpGXwhgIetAoYF8JSc33q29QA==
 
 "@types/http-errors@*":
   version "2.0.3"
@@ -20760,11 +20712,6 @@ lower-case@^2.0.2:
   integrity sha512-7fm3l3NAF9WfN6W3JOmf5drwpVqX78JtoGJ3A6W0a6ZnldM41w2fV5D490psKFTpMds8TJse/eHLFFsNHHjHgg==
   dependencies:
     tslib "^2.0.3"
-
-lru-cache@^10.0.0:
-  version "10.4.3"
-  resolved "https://registry.npmjs.org/lru-cache/-/lru-cache-10.4.3.tgz"
-  integrity sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==
 
 lru-cache@^10.0.1:
   version "10.2.2"
