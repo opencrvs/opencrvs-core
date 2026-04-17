@@ -12,8 +12,7 @@ import { ILanguage } from '@client/i18n/reducer'
 import type {
   AdminStructure,
   CRVSOffice,
-  Facility,
-  IForms
+  Facility
 } from '@client/offline/reducer'
 import {
   CertificateConfiguration,
@@ -114,7 +113,6 @@ const offices: Record<string, CRVSOffice> = {
 }
 
 export const mockOfflineData = {
-  forms: forms.forms as IForms,
   userForms: forms.userForm,
   facilities,
   activeFacilities: facilities,
@@ -552,8 +550,4 @@ export const mockOfflineLocationsWithHierarchy: {
       partOf: 'Location/0'
     }
   }
-}
-export const mockOfflineDataWithLocationHierarchy = {
-  ...mockOfflineData,
-  ...mockOfflineLocationsWithHierarchy
 }
