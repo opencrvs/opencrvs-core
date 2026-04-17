@@ -16,6 +16,7 @@ import {
   DisplayableAction
 } from './ActionType'
 import {
+  EncodedScope,
   getAcceptedScopesByType,
   RecordScopeTypeV2,
   RecordScopeV2
@@ -90,7 +91,7 @@ export function getAssignmentStatus(
  * (hardcoded, non-configurable) and V2 scopes, which validate event type, jurisdiction,
  * and user context via {@link userCanAccessEventWithScopes}.
  *
- * @param {string[]} scopes - The raw encoded scope strings the user possesses (from JWT).
+ * @param {EncodedScope[]} scopes - The raw encoded scope strings the user possesses (from JWT).
  * @param {DisplayableAction} action - The action to check authorization for.
  * @param {EventIndexWithAdministrativeHierarchy} event - The event with resolved administrative hierarchy.
  * @param {UserContext} currentUser - The current user's context used for V2 scope validation.
@@ -102,7 +103,7 @@ export function isActionInScope({
   event,
   currentUser
 }: {
-  scopes: string[]
+  scopes: EncodedScope[]
   action: DisplayableAction
   event: EventIndexWithAdministrativeHierarchy
   currentUser: UserContext

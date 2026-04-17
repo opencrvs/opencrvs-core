@@ -634,7 +634,7 @@ export function validateFieldInput({
   })
 
   // We have overridden the standard error messages
-  return (rawError.error?.issues.map((issue) => issue.message) ??
+  return (rawError.error?.issues.map((issue: $ZodIssue) => issue.message) ??
     []) as unknown as {
     message: TranslationConfig
   }[]

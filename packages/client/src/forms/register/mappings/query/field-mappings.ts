@@ -28,7 +28,6 @@ import {
   TransformedData,
   IFormSectionData,
   ISelectFormFieldWithOptions,
-  AddressCases,
   CHECKBOX,
   IQuestionnaireQuestion,
   SELECT_WITH_DYNAMIC_OPTIONS,
@@ -40,18 +39,12 @@ import {
   formatPlainDate,
   isValidPlainDate
 } from '@client/utils/date-formatting'
-import {
-  IOfflineData,
-  OFFLINE_FACILITIES_KEY,
-  OFFLINE_LOCATIONS_KEY
-} from '@client/offline/reducer'
+import { IOfflineData, OFFLINE_FACILITIES_KEY } from '@client/offline/reducer'
 import { mergeArraysRemovingEmptyStrings } from '@client/utils/data-formatting'
-import { countries } from '@client/utils/countries'
 import { MessageDescriptor } from 'react-intl'
 import { getSelectedOption, getFieldOptions } from '@client/forms/utils'
 import {
   countryAlpha3toAlpha2,
-  getLocationHierarchy,
   getLocationNameMapOfFacility
 } from '@client/utils/locationUtils'
 
@@ -747,247 +740,6 @@ export const dateFormatTransformer =
     }
   }
 
-enum FHIRPropLocationLevel {
-  city,
-  district,
-  state,
-  country,
-  postalCode
-}
-
-const setAddressPropFromFHIRProp = (
-  transformedData: IFormData,
-  addressFromQuery: Address,
-  fhirProp: keyof typeof FHIRPropLocationLevel,
-  sectionId: string,
-  fieldName: string,
-  offlineData?: IOfflineData
-) => {
-  const value = addressFromQuery[fhirProp] || ''
-
-  if (fhirProp === 'country') {
-    transformedData[sectionId][fieldName] =
-      (countries.find(({ value }) => value === addressFromQuery?.[fhirProp])
-        ?.label as MessageDescriptor as IFormData) || ''
-  } else if (
-    addressFromQuery?.['country'] === window.config.COUNTRY &&
-    !fieldName.includes('international')
-  ) {
-    if (offlineData?.[OFFLINE_LOCATIONS_KEY][value]) {
-      transformedData[sectionId][fieldName] =
-        offlineData[OFFLINE_LOCATIONS_KEY][value].name
-      transformedData[sectionId][`${fieldName}Id`] = value
-    } else {
-      transformedData[sectionId][fieldName] = value
-    }
-  } else if (
-    addressFromQuery?.['country'] !== window.config.COUNTRY &&
-    fieldName.includes('international')
-  ) {
-    transformedData[sectionId][fieldName] = value
-  }
-}
-
-export const addressFHIRPropertyTemplateTransformer =
-  (addressCase: AddressCases, fhirProp: keyof typeof FHIRPropLocationLevel) =>
-  (
-    transformedData: IFormData,
-    queryData: QueryData,
-    sectionId: SectionId,
-    field: IFormField,
-    _?: IFormField,
-    offlineData?: IOfflineData
-  ) => {
-    if (!transformedData[sectionId]) {
-      transformedData[sectionId] = {}
-    }
-
-    const address = queryData[sectionId]?.address
-    const addressFromQuery: Address = (address || []).find(
-      (addr: { type: AddressCases }) => addr.type === addressCase
-    )
-
-    if (addressFromQuery) {
-      setAddressPropFromFHIRProp(
-        transformedData,
-        addressFromQuery,
-        fhirProp,
-        sectionId,
-        field.name,
-        offlineData
-      )
-    }
-  }
-
-enum FHIRAddressLineLocationLevel {
-  locationLevel3 = 'locationLevel3',
-  locationLevel4 = 'locationLevel4',
-  locationLevel5 = 'locationLevel5'
-}
-
-export const addressLineTemplateTransformer =
-  (
-    addressCase: AddressCases,
-    lineNumber: number,
-    transformedFieldName: string,
-    _location: '' | FHIRAddressLineLocationLevel
-  ) =>
-  (
-    transformedData: IFormData,
-    queryData: QueryData,
-    sectionId: SectionId,
-    _field: IFormField,
-    _?: IFormField,
-    offlineData?: IOfflineData
-  ) => {
-    if (!transformedData[sectionId]) {
-      transformedData[sectionId] = {}
-    }
-    const address = queryData[sectionId]?.address
-    const addressFromQuery: Address | undefined = (address || []).find(
-      (addr: { type: AddressCases }) => addr.type === addressCase
-    )
-    if (addressFromQuery?.line) {
-      const idOrValue = addressFromQuery.line[lineNumber] || ''
-      if (offlineData?.[OFFLINE_LOCATIONS_KEY][idOrValue]) {
-        transformedData[sectionId][transformedFieldName] =
-          offlineData[OFFLINE_LOCATIONS_KEY][idOrValue].name
-        transformedData[sectionId][`${transformedFieldName}Id`] = idOrValue
-      } else {
-        transformedData[sectionId][transformedFieldName] = idOrValue
-      }
-    }
-  }
-
-export const eventLocationAddressLineTemplateTransformer =
-  (
-    lineNumber: number,
-    transformedFieldName: string,
-    location: '' | FHIRAddressLineLocationLevel
-  ) =>
-  (
-    transformedData: IFormData,
-    queryData: QueryData,
-    sectionId: SectionId,
-    _field: IFormField,
-    _?: IFormField,
-    offlineData?: IOfflineData
-  ) => {
-    if (!transformedData[sectionId]) {
-      transformedData[sectionId] = {}
-    }
-
-    if (
-      queryData.eventLocation?.type &&
-      queryData.eventLocation?.type === 'HEALTH_FACILITY'
-    ) {
-      if (!offlineData || !location) {
-        return
-      }
-      const facility =
-        offlineData[OFFLINE_FACILITIES_KEY][queryData.eventLocation.id]
-
-      if (!facility) {
-        return
-      }
-      const locationHierarchy = getLocationHierarchy(
-        facility.partOf.split('/').at(1)!,
-        offlineData.locations
-      )
-      const locationId = locationHierarchy[location]
-      if (locationId && offlineData[OFFLINE_LOCATIONS_KEY][locationId]) {
-        transformedData[sectionId][transformedFieldName] =
-          offlineData[OFFLINE_LOCATIONS_KEY][locationId].name
-        transformedData[sectionId][`${transformedFieldName}Id`] = locationId
-      }
-      return
-    }
-
-    const addressFromQuery = queryData.eventLocation?.address
-
-    if (addressFromQuery?.line) {
-      const idOrValue = addressFromQuery.line[lineNumber] || ''
-      if (offlineData?.[OFFLINE_LOCATIONS_KEY][idOrValue]) {
-        transformedData[sectionId][transformedFieldName] =
-          offlineData[OFFLINE_LOCATIONS_KEY][idOrValue].name
-        transformedData[sectionId][`${transformedFieldName}Id`] = idOrValue
-      } else {
-        transformedData[sectionId][transformedFieldName] = idOrValue
-      }
-    }
-  }
-
-enum SupportedFacilityFHIRProp {
-  locationLevel3 = 'locationLevel3',
-  locationLevel4 = 'locationLevel4',
-  locationLevel5 = 'locationLevel5',
-  locationLevel6 = 'locationLevel6',
-  district = 'district',
-  state = 'state',
-  country = 'country'
-}
-
-export const eventLocationAddressFHIRPropertyTemplateTransformer =
-  (fhirProp: keyof typeof FHIRPropLocationLevel) =>
-  (
-    transformedData: IFormData,
-    queryData: QueryData,
-    sectionId: SectionId,
-    field: IFormField,
-    _?: IFormField,
-    offlineData?: IOfflineData
-  ) => {
-    if (!transformedData[sectionId]) {
-      transformedData[sectionId] = {}
-    }
-    const addressFromQuery = queryData.eventLocation?.address
-    if (
-      queryData.eventLocation?.type &&
-      queryData.eventLocation?.type === 'HEALTH_FACILITY' &&
-      queryData.eventLocation?.id &&
-      fhirProp in SupportedFacilityFHIRProp &&
-      !field.name.includes('international')
-    ) {
-      if (!offlineData) {
-        return
-      }
-      const facility =
-        offlineData[OFFLINE_FACILITIES_KEY][queryData.eventLocation.id]
-
-      if (!facility) {
-        return
-      }
-      const locationHierarchy = getLocationHierarchy(
-        facility.partOf.split('/').at(1)!,
-        offlineData.locations
-      )
-      const locationId =
-        locationHierarchy[fhirProp as keyof typeof locationHierarchy]
-      if (locationId && offlineData[OFFLINE_LOCATIONS_KEY][locationId]) {
-        transformedData[sectionId][field.name] =
-          offlineData[OFFLINE_LOCATIONS_KEY][locationId].name
-        transformedData[sectionId][`${field.name}Id`] = locationId
-      }
-    } else if (
-      queryData.eventLocation?.type &&
-      queryData.eventLocation?.type === 'HEALTH_FACILITY' &&
-      !(fhirProp in SupportedFacilityFHIRProp)
-    ) {
-      return
-    } else if (addressFromQuery) {
-      if (addressFromQuery) {
-        setAddressPropFromFHIRProp(
-          transformedData,
-          addressFromQuery,
-          fhirProp,
-          sectionId,
-          field.name,
-          offlineData
-        )
-      }
-    }
-  }
-
 export const selectTransformer = (
   transformedData: IFormData,
   queryData: QueryData,
@@ -1134,16 +886,19 @@ export function questionnaireToTemplateFieldTransformer(
         offlineCountryConfig
       )
 
-      const option =  options
-        .find((option) => option.value === selectedQuestion.value)
+      const option = options.find(
+        (option) => option.value === selectedQuestion.value
+      )
 
-      if(!option) {
+      if (!option) {
         transformedData[sectionId][field.name] = selectedQuestion.value
         break
       }
 
-      const label = typeof option.label === 'string' ? option.label :
-        option.label.defaultMessage?.toString() || selectedQuestion.value
+      const label =
+        typeof option.label === 'string'
+          ? option.label
+          : option.label.defaultMessage?.toString() || selectedQuestion.value
 
       transformedData[sectionId][field.name] = label
       break
@@ -1159,16 +914,19 @@ export function questionnaireToTemplateFieldTransformer(
         offlineCountryConfig
       )
 
-      const option =  options
-        .find((option) => option.value === selectedQuestion.value)
+      const option = options.find(
+        (option) => option.value === selectedQuestion.value
+      )
 
-      if(!option) {
+      if (!option) {
         transformedData[sectionId][field.name] = selectedQuestion.value
         break
       }
 
-      const label = typeof option.label === 'string' ? option.label :
-        option.label.defaultMessage?.toString() || selectedQuestion.value
+      const label =
+        typeof option.label === 'string'
+          ? option.label
+          : option.label.defaultMessage?.toString() || selectedQuestion.value
 
       transformedData[sectionId][field.name] = label
       break
