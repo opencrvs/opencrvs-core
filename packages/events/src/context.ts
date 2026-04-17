@@ -32,9 +32,12 @@ export const TrpcContext = z.object({
   token: TokenWithBearer,
   user: z.union([SystemContext, UserContext])
 })
-
 export type TrpcContext = z.infer<typeof TrpcContext>
 
+export const InternalTrpcContext = z.object({
+  token: TokenWithBearer
+})
+export type InternalTrpcContext = z.infer<typeof InternalTrpcContext>
 /**
  * Internal user, used to bootstrap the system and then deactivate.
  */
@@ -58,7 +61,7 @@ const TokenClaims = z.object({
 })
 type TokenClaims = z.infer<typeof TokenClaims>
 
-function verifyToken(token: TokenWithBearer): TokenClaims {
+function verifyAppToken(token: TokenWithBearer): TokenClaims {
   const jwtToken = token.split(' ')[1]
 
   const verified = jwt.verify(jwtToken, tokenPublicKey, {
@@ -68,6 +71,17 @@ function verifyToken(token: TokenWithBearer): TokenClaims {
   })
 
   return TokenClaims.parse(verified)
+}
+
+export function verifyInternalServiceToken(token: TokenWithBearer) {
+  const jwtToken = token.split(' ')[1]
+
+  return jwt.verify(jwtToken, tokenPublicKey, {
+    subject: 'opencrvs:auth-service',
+    algorithms: ['RS256'],
+    issuer: 'opencrvs:auth-service',
+    audience: ['opencrvs:events-user']
+  })
 }
 
 export type TrpcUserContext = SystemContext | UserContext | SuperAdminContext
@@ -103,7 +117,7 @@ async function resolveUserDetails(
   let userType: TokenUserType
 
   try {
-    const claims = verifyToken(token)
+    const claims = verifyAppToken(token)
     userId = claims.sub
     userType = claims.userType
   } catch {
@@ -173,5 +187,24 @@ export async function createContext({ req }: { req: IncomingMessage }) {
   return {
     token,
     user: token && (await resolveUserDetails(token).catch(() => undefined))
+  }
+}
+
+/**
+ * Context for internal service calls between services, authenticated with a service token. Does not include user details, as the token is not associated with a user.
+ */
+export async function createInternalContext({ req }: { req: IncomingMessage }) {
+  const normalizedHeaders = normalizeHeaders(req.headers)
+
+  try {
+    const token = TokenWithBearer.parse(normalizedHeaders.authorization)
+
+    verifyInternalServiceToken(token)
+
+    return {
+      token
+    }
+  } catch {
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
   }
 }

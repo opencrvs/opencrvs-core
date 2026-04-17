@@ -142,6 +142,20 @@ export async function createToken(
   })
 }
 
+/**
+ * @returns token for internal service authentication, which has no scopes and a short expiry time.
+ * Used for authenticating internal requests between services.
+ */
+export async function createInternalServiceToken() {
+  return sign({}, cert, {
+    subject: 'opencrvs:auth-service',
+    algorithm: 'RS256',
+    expiresIn: env.CONFIG_TOKEN_EXPIRY_SECONDS,
+    audience: ['opencrvs:events-user'],
+    issuer: JWT_ISSUER
+  })
+}
+
 type ActionConfirmationInput = {
   eventId: UUID
   actionId: UUID

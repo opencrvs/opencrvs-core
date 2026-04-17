@@ -8,5 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import path from 'path'
-process.env.CERT_PUBLIC_KEY_PATH = path.resolve(__dirname, 'cert.public.key')
+
+import * as z from 'zod/v4'
+import { internalProcedure, internalRouter } from '@events/router/trpc'
+
+/**
+ * Intermediary route for having an endpoint to test with. Will be removed once we merge the user management changes.
+ */
+export const internalUserRouter = internalRouter({
+  ping: internalProcedure
+    .input(z.string())
+    .output(z.string())
+    .query(async ({ input }) => {
+      return `pong: ${input}`
+    })
+})
