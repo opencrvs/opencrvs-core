@@ -92,7 +92,12 @@ export const ClientConfig = z.object({
     z.object({
       id: z.string(),
       title: TranslationConfig,
-      url: z.string()
+      url: z.string(),
+      context: z
+        .object({
+          auth: z.literal('REQUEST_AUTH_TOKEN')
+        })
+        .optional()
     })
   ),
   FEATURES: z
