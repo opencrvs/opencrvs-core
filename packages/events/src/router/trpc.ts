@@ -74,7 +74,7 @@ export const internalProcedure = t.procedure.use(async (opts) => {
 
   try {
     verifyInternalServiceToken(token)
-    return opts.next({
+    return await opts.next({
       ctx: {
         ...opts.ctx,
         token
