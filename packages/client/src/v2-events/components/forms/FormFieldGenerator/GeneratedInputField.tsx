@@ -830,6 +830,8 @@ export const GeneratedInputField = React.memo(
         <VerificationStatus.Input
           configuration={field.config.configuration}
           id={field.config.id}
+          label={inputFieldProps.label}
+          required={inputFieldProps.required}
           value={field.value}
           onReset={() => {
             if (Array.isArray(fieldDefinition.parent)) {
@@ -867,11 +869,13 @@ export const GeneratedInputField = React.memo(
 
     if (isIdReaderFieldType(field)) {
       return (
-        <IdReader.Input
-          id={field.config.id}
-          methods={field.config.methods}
-          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
-        />
+        <InputField variant="highlighted" {...inputFieldProps}>
+          <IdReader.Input
+            id={field.config.id}
+            methods={field.config.methods}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
       )
     }
 
@@ -886,10 +890,12 @@ export const GeneratedInputField = React.memo(
 
     if (isLoaderFieldType(field)) {
       return (
-        <Loader.Input
-          configuration={field.config.configuration}
-          id={field.config.id}
-        />
+        <InputField {...inputFieldProps} variant={field.config.variant}>
+          <Loader.Input
+            configuration={field.config.configuration}
+            id={field.config.id}
+          />
+        </InputField>
       )
     }
     if (isCustomFieldType(field)) {

@@ -8,19 +8,5 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineConfig } from 'vitest/config'
-import tsconfigPaths from 'vite-tsconfig-paths'
-export default defineConfig({
-  plugins: [tsconfigPaths()],
-  test: {
-    coverage: {
-      provider: 'v8', // or 'istanbul'
-      reporter: ['text', 'json', 'json-summary']
-    },
-    globals: true,
-    testTimeout: 60000,
-    hookTimeout: 60000,
-    setupFiles: ['./src/tests/env-setup.ts', './src/tests/setup.ts'],
-    globalSetup: ['./src/tests/global-setup.ts']
-  }
-})
+import path from 'path'
+process.env.CERT_PUBLIC_KEY_PATH = path.resolve(__dirname, 'cert.public.key')

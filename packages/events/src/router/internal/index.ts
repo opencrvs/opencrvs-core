@@ -8,19 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineConfig } from 'vitest/config'
-import tsconfigPaths from 'vite-tsconfig-paths'
-export default defineConfig({
-  plugins: [tsconfigPaths()],
-  test: {
-    coverage: {
-      provider: 'v8', // or 'istanbul'
-      reporter: ['text', 'json', 'json-summary']
-    },
-    globals: true,
-    testTimeout: 60000,
-    hookTimeout: 60000,
-    setupFiles: ['./src/tests/env-setup.ts', './src/tests/setup.ts'],
-    globalSetup: ['./src/tests/global-setup.ts']
-  }
+
+import * as z from 'zod/v4'
+import { internalProcedure, internalRouter } from '@events/router/trpc'
+
+/**
+ * Intermediary route for having an endpoint to test with. Will be removed once we merge the user management changes.
+ */
+export const internalUserRouter = internalRouter({
+  ping: internalProcedure
+    .input(z.string())
+    .output(z.string())
+    .query(({ input }) => {
+      return `pong: ${input}`
+    })
 })
