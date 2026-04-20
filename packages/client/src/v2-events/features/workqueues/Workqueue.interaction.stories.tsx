@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import superjson from 'superjson'
@@ -30,7 +31,12 @@ import {
   tennisClubMembershipEvent,
   TestUserRole
 } from '@opencrvs/commons/client'
-import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
+import {
+  AppRouter,
+  TRPCProvider,
+  queryClient,
+  trpcOptionsProxy
+} from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { formattedDuration } from '@client/utils/date-formatting'
@@ -581,5 +587,129 @@ export const DraftPaginationOffline: Story = {
       'Tennis club membership application'
     )
     await expect(secondPageRows).toHaveLength(5)
+  }
+}
+
+// ---------------------------------------------------------------------------
+// WorkqueueAutoRefreshOnCountChange
+//
+// Regression test for opencrvs/opencrvs-core#12103:
+// When the workqueue.count poll returns a higher number than before, the
+// workqueue list must auto-refresh without a manual browser reload.
+//
+// How it works:
+//   1. MSW count handler returns initialCount (3) on the first call.
+//   2. MSW search handler returns 3 events on the first call.
+//   3. The play function manually invalidates the count cache – simulating
+//      what the 20-second polling would do – and MSW now returns updatedCount (4).
+//   4. The setQueryDefaults interceptor in count.ts detects the change and
+//      calls invalidateWorkqueueSearchQueries('recent').
+//   5. MSW search handler now returns 4 events.
+//   6. The list shows 4 rows without any user interaction.
+// ---------------------------------------------------------------------------
+
+let autoRefreshDataChanged = false
+
+const autoRefreshInitialCount = 3
+const autoRefreshUpdatedCount = 4
+
+const autoRefreshInitialEvents = queryData.slice(0, autoRefreshInitialCount)
+const autoRefreshNewEvent = eventQueryDataGenerator(undefined, 7777)
+const autoRefreshUpdatedEvents = [
+  autoRefreshNewEvent,
+  ...autoRefreshInitialEvents
+]
+
+export const WorkqueueAutoRefreshOnCountChange: Story = {
+  beforeEach: () => {
+    autoRefreshDataChanged = false
+  },
+  parameters: {
+    userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() =>
+            generateWorkqueues('recent')
+          ),
+          tRPCMsw.workqueue.count.query((input) => {
+            const count = autoRefreshDataChanged
+              ? autoRefreshUpdatedCount
+              : autoRefreshInitialCount
+            return input.reduce(
+              (acc, { slug }) => ({ ...acc, [slug]: count }),
+              {} as Record<string, number>
+            )
+          })
+        ],
+        event: [
+          tRPCMsw.event.search.query(() => ({
+            results: autoRefreshDataChanged
+              ? autoRefreshUpdatedEvents
+              : autoRefreshInitialEvents,
+            total: autoRefreshDataChanged
+              ? autoRefreshUpdatedCount
+              : autoRefreshInitialCount
+          }))
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Initial workqueue renders 3 events', async () => {
+      await canvas.findByText('Farajaland CRVS', {}, { timeout: 5000 })
+      await waitFor(async () => {
+        const rows = canvasElement.querySelectorAll('div[id^="row_"]')
+        await expect(rows).toHaveLength(autoRefreshInitialCount)
+      })
+    })
+
+    await step('Sidebar shows initial count of 3', async () => {
+      const sidebarItem = await canvas.findByTestId(
+        'navigation_workqueue_recent'
+      )
+      await expect(sidebarItem).toHaveTextContent(
+        String(autoRefreshInitialCount)
+      )
+    })
+
+    await step(
+      'After count changes workqueue list auto-refreshes to 4 rows',
+      async () => {
+        autoRefreshDataChanged = true
+
+        // Force an immediate count refetch – this is what the 20-second polling
+        // interval does naturally. The useEffect in Workqueues detects the
+        // change and triggers invalidateWorkqueueSearchQueries('recent').
+        await queryClient.invalidateQueries({
+          queryKey: trpcOptionsProxy.workqueue.count.queryKey()
+        })
+
+        // The list must update automatically – no user interaction required.
+        await waitFor(
+          async () => {
+            const rows = canvasElement.querySelectorAll('div[id^="row_"]')
+            await expect(rows).toHaveLength(autoRefreshUpdatedCount)
+          },
+          { timeout: 5000 }
+        )
+      }
+    )
+
+    await step('Sidebar reflects the updated count of 4', async () => {
+      const sidebarItem = await canvas.findByTestId(
+        'navigation_workqueue_recent'
+      )
+      await expect(sidebarItem).toHaveTextContent(
+        String(autoRefreshUpdatedCount)
+      )
+    })
   }
 }
