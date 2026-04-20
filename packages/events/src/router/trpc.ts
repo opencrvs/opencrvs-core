@@ -65,13 +65,6 @@ export const internalRouter = tInternal.router
 
 export const internalProcedure = tInternal.procedure.use(async (opts) => {
   const { token } = opts.ctx
-  if (!token) {
-    throw new TRPCError({
-      code: 'UNAUTHORIZED',
-      message: 'Authorization token is missing'
-    })
-  }
-
   try {
     verifyInternalServiceToken(token)
     return await opts.next({
