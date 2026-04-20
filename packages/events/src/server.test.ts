@@ -313,7 +313,7 @@ test('UNAUTHORIZED error is thrown when request is made with valid APP token', a
   ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
 })
 
-test('UNAUTHORIZED error is thrown when internal request is made with token is not signed by the correct issuer', async () => {
+test('UNAUTHORIZED error is thrown when internal request is made with token is not signed with matching key', async () => {
   expect(serverInstance).toBeDefined()
   expect(url).toBeDefined()
 

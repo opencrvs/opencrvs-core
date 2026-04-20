@@ -40,7 +40,7 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
   createContext
 }
 
-// NOTEE: This will not work without both trailing and leading slashes.
+// NOTE: This will not work without both trailing and leading slashes.
 const INTERNAL_TRPC_ROUTER_PREFIX = '/internal/'
 
 const internalTrpcConfig: Parameters<typeof createHTTPHandler>[0] = {

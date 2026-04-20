@@ -63,7 +63,7 @@ export const router = t.router
 
 export const internalRouter = tInternal.router
 
-export const internalProcedure = t.procedure.use(async (opts) => {
+export const internalProcedure = tInternal.procedure.use(async (opts) => {
   const { token } = opts.ctx
   if (!token) {
     throw new TRPCError({
