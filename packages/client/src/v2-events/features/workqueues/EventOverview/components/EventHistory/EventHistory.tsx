@@ -29,7 +29,6 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import * as routes from '@client/navigation/routes'
-import { formatUrl } from '@client/navigation'
 import { useEventOverviewContext } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import {
