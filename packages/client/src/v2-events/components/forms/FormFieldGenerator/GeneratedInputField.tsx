@@ -460,28 +460,19 @@ export const GeneratedInputField = <T extends FieldConfig>(
   }
 
   if (isParagraphFieldType(field)) {
-    // @todo: is this even needed?
-    const message = intl.formatMessage(fieldDefinition.label, {
-      [fieldDefinition.id]: field.value
-    })
-
     return (
       <Paragraph.Input
         configuration={field.config.configuration}
-        message={message}
+        message={intl.formatMessage(fieldDefinition.label)}
       />
     )
   }
 
   if (isHeadingFieldType(field)) {
-    const message = intl.formatMessage(fieldDefinition.label, {
-      [fieldDefinition.id]: field.value
-    })
-
     return (
       <Heading.Input
         configuration={field.config.configuration}
-        message={message}
+        message={intl.formatMessage(fieldDefinition.label)}
       />
     )
   }
