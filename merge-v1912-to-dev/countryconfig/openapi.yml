@@ -4802,9 +4802,6 @@ components:
             type:
               type: string
               const: PARAGRAPH
-            defaultValue:
-              type: string
-              minLength: 1
             configuration:
               default: {}
               type: object
@@ -4983,9 +4980,6 @@ components:
             type:
               type: string
               const: HEADING
-            defaultValue:
-              type: string
-              minLength: 1
             configuration:
               default: {}
               type: object
@@ -5393,8 +5387,6 @@ components:
             type:
               type: string
               const: BULLET_LIST
-            defaultValue:
-              type: string
             items:
               type: array
               items:
@@ -5578,9 +5570,6 @@ components:
             type:
               type: string
               const: PAGE_HEADER
-            defaultValue:
-              type: string
-              minLength: 1
           required:
             - id
             - label
