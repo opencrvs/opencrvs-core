@@ -10,8 +10,8 @@
  */
 
 import { Draft, DraftInput, UUID } from '@opencrvs/commons'
+import { UserContext } from '@opencrvs/commons'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
-import { UserContext } from '@events/context'
 
 export const createDraft = async (
   input: DraftInput,

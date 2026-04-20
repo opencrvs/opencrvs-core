@@ -28,34 +28,6 @@ CREATE SCHEMA app;
 ALTER SCHEMA app OWNER TO events_migrator;
 
 --
--- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
-
-
---
--- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: 
---
-
-COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
-
-
---
--- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
-
-
---
--- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
---
-
-COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
-
-
---
 -- Name: action_status; Type: TYPE; Schema: app; Owner: events_migrator
 --
 
@@ -408,13 +380,13 @@ CREATE TABLE app.users (
     role text NOT NULL,
     status text NOT NULL,
     email text,
-    device text,
     mobile text,
     signature_path text,
     profile_image_path text,
     office_id uuid NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    device text,
     CONSTRAINT email_or_mobile_not_null CHECK (((email IS NOT NULL) OR (mobile IS NOT NULL)))
 );
 
@@ -658,7 +630,28 @@ CREATE INDEX idx_audit_log_operation ON app.audit_log USING btree (operation);
 -- Name: idx_audit_log_transaction_id; Type: INDEX; Schema: app; Owner: events_migrator
 --
 
-CREATE UNIQUE INDEX idx_audit_log_transaction_id ON app.audit_log USING btree (transaction_id);
+CREATE INDEX idx_audit_log_transaction_id ON app.audit_log USING btree (transaction_id);
+
+
+--
+-- Name: idx_drafts_event_id; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_drafts_event_id ON app.event_action_drafts USING btree (event_id);
+
+
+--
+-- Name: idx_event_actions_event_id; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_event_actions_event_id ON app.event_actions USING btree (event_id);
+
+
+--
+-- Name: idx_event_actions_original_action_id; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_event_actions_original_action_id ON app.event_actions USING btree (original_action_id);
 
 
 --

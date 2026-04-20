@@ -40,11 +40,12 @@ import {
   UUID
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import { t } from '@events/router/trpc'
+import { SystemContext, UserContext } from '@opencrvs/commons'
+import { t, tInternal } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
-import { SystemContext, UserContext } from '@events/context'
 import { getClient } from '@events/storage/postgres/events'
 import { EventNotFoundError } from '@events/service/events/events'
+import { internalRouter } from '@events/router/internalRouter'
 import { getLocations } from '../service/locations/locations'
 import { NewEventActions } from '../storage/postgres/events/schema/app/EventActions'
 import {
@@ -222,6 +223,17 @@ export function createTestToken({
   return `Bearer ${token}`
 }
 
+export function createInternalServiceToken(): TokenWithBearer {
+  const token = jwt.sign({}, readFileSync(join(__dirname, './cert.key')), {
+    subject: 'opencrvs:auth-service',
+    algorithm: 'RS256',
+    expiresIn: '604800',
+    audience: ['opencrvs:events-user'],
+    issuer: 'opencrvs:auth-service'
+  })
+  return `Bearer ${token}`
+}
+
 function createTokenExchangeTestToken(
   userId: string,
   eventId: string,
@@ -291,6 +303,16 @@ export function createTestClient(
     },
     token
   })
+  return caller
+}
+
+export function createInternalTestClient() {
+  const createCaller = tInternal.createCallerFactory(internalRouter)
+  const token = createInternalServiceToken()
+  const caller = createCaller({
+    token
+  })
+
   return caller
 }
 

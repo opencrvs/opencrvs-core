@@ -8,26 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createTRPCClient, httpBatchLink } from '@trpc/client'
-import superjson from 'superjson'
-import { env } from '@auth/environment'
-import { AppRouter } from '@opencrvs/events/src/router'
-
-const eventsClient = createTRPCClient<AppRouter>({
-  links: [
-    httpBatchLink({
-      url: env.EVENTS_URL,
-      transformer: superjson
-    })
-  ]
-})
+import { internalClient } from '@auth/features/authenticate/service'
 
 export async function changePassword(
   userId: string,
   password: string,
   existingPassword?: string
 ) {
-  await eventsClient.user.changePassword.mutate({
+  await internalClient.user.changePassword.mutate({
     userId,
     password,
     existingPassword

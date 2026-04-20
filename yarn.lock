@@ -6416,13 +6416,13 @@
   resolved "https://registry.npmjs.org/@open-draft/until/-/until-2.1.0.tgz"
   integrity sha512-U69T3ItWHvLwGg5eJ0n3I62nWuE6ilHlmz7zM0npLBRvPRd7e6NYmg54vvRtP5mZG7kZqZCFVdsTWo7BPtBujg==
 
-"@opencrvs/toolkit@1.9.11-rc.e463195":
-  version "1.9.11-rc.e463195"
-  resolved "https://registry.yarnpkg.com/@opencrvs/toolkit/-/toolkit-1.9.11-rc.e463195.tgz#cf703471af9569db2ff26b7ecefdbd1dc958177e"
-  integrity sha512-oRTf98rp2hmNnsL3fPX67QSwHpc5qpoG+zjG1MlRm9oJNBYMFgIon0EUlqg7cGJ05OpILqSXOgTJqmENNfjHnQ==
+"@opencrvs/toolkit@1.9.11-rc.e397893":
+  version "1.9.11-rc.e397893"
+  resolved "https://registry.yarnpkg.com/@opencrvs/toolkit/-/toolkit-1.9.11-rc.e397893.tgz#5646184c360cd6a7c4ee30324ef4343c508fbc26"
+  integrity sha512-+Hat8G3WzBWVnmdTXhrTvXPPix+/zyWzK0fk2oEqapf8FwAFdYpXAsq8Z8pKuyYFWzg/HffYGKKavpm5f3FPgg==
   dependencies:
     "@trpc/client" "11.4.3"
-    "@trpc/server" "11.4.3"
+    "@trpc/server" "^11.8.0"
     ajv "^8.17.1"
     ajv-formats "^3.0.1"
     date-fns "^2.28.0"
@@ -6431,9 +6431,10 @@
     object-hash "^3.0.0"
     qs "6.14.0"
     superjson "1.9.0-0"
+    ts-morph "^27.0.2"
     uuid "^9.0.0"
-    zod "^4.1.12"
-    zod-openapi "^5.4.3"
+    zod "^4.2.1"
+    zod-openapi "^5.4.6"
 
 "@opentelemetry/api@1.x":
   version "1.9.0"
@@ -9061,7 +9062,7 @@
   resolved "https://registry.yarnpkg.com/@trpc/client/-/client-11.16.0.tgz#fd3844118aeabaf4b4cb025155603b08169bd9d1"
   integrity sha512-TxIzm7OoK3baKZ0XCbuMUbI3GhgjcbKHIc4nWVKaRpCRnbSh0T31BT6fTPYwtnA/Nur8pBCGqC2B4J5hEPiPFQ==
 
-"@trpc/server@11.4.3", "@trpc/server@11.8.0", "@trpc/server@^11.8.0":
+"@trpc/server@11.8.0", "@trpc/server@^11.8.0":
   version "11.8.0"
   resolved "https://registry.yarnpkg.com/@trpc/server/-/server-11.8.0.tgz#2f6b37e79a6774628be0a050c8ef8b4e55385222"
   integrity sha512-DphyQnLuyX2nwJCQGWQ9zYz4hZGvRhSBqDhQ0SH3tDhQ3PU4u68xofA0pJ741Ir4InEAFD+TtJVLAQy+wVOkiQ==
@@ -29269,7 +29270,7 @@ zod-form-data@3.0.1:
   dependencies:
     "@rvf/set-get" "^7.0.0"
 
-zod-openapi@^5.4.3, zod-openapi@^5.4.6:
+zod-openapi@^5.4.6:
   version "5.4.6"
   resolved "https://registry.yarnpkg.com/zod-openapi/-/zod-openapi-5.4.6.tgz#000bedda0843c2ff1af3d7236e8d52d831115de4"
   integrity sha512-P2jsOOBAq/6hCwUsMCjUATZ8szkMsV5VAwZENfyxp2Hc/XPJQpVwAgevWZc65xZauCwWB9LAn7zYeiCJFAEL+A==
@@ -29284,7 +29285,7 @@ zod@^3.24.4:
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.25.76.tgz#26841c3f6fd22a6a2760e7ccb719179768471e34"
   integrity sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==
 
-zod@^4.1.12, zod@^4.2, zod@^4.2.1:
+zod@^4.2, zod@^4.2.1:
   version "4.3.6"
   resolved "https://registry.yarnpkg.com/zod/-/zod-4.3.6.tgz#89c56e0aa7d2b05107d894412227087885ab112a"
   integrity sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==

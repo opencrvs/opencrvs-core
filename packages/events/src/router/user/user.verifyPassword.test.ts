@@ -12,17 +12,14 @@
 import { TRPCError } from '@trpc/server'
 import { sql } from 'kysely'
 import { getUUID } from '@opencrvs/commons'
-import { t } from '@events/router/trpc'
-import { appRouter } from '@events/router/router'
-import { setupTestCase } from '@events/tests/utils'
+import { createInternalTestClient, setupTestCase } from '@events/tests/utils'
 import { generateSaltedHash } from '@events/service/auth/hash'
 
-const { createCallerFactory } = t
-const publicCaller = createCallerFactory(appRouter)({})
+const caller = createInternalTestClient()
 
 test('returns UNAUTHORIZED when user not found', async () => {
   await expect(
-    publicCaller.user.verifyPassword({
+    caller.user.verifyPassword({
       username: 'nonexistent',
       password: 'somepassword'
     })
@@ -62,7 +59,7 @@ test('returns UNAUTHORIZED when password does not match', async () => {
     .execute()
 
   await expect(
-    publicCaller.user.verifyPassword({
+    caller.user.verifyPassword({
       username: 'wrongpassuser',
       password: 'wrongpassword'
     })
@@ -104,7 +101,7 @@ test('returns user info when credentials are valid', async () => {
     })
     .execute()
 
-  const result = await publicCaller.user.verifyPassword({
+  const result = await caller.user.verifyPassword({
     username: 'johndoe',
     password: 'mypassword'
   })

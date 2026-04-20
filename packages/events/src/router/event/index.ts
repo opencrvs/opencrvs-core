@@ -30,6 +30,7 @@ import {
   MarkNotDuplicateActionInput,
   ActionDocument
 } from '@opencrvs/commons/events'
+import { UserContext } from '@opencrvs/commons'
 import * as middleware from '@events/router/middleware'
 import { EventIdParam } from '@events/router/middleware'
 import {
@@ -63,7 +64,6 @@ import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicat
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
 import { cleanupUnreferencedFiles } from '@events/service/files'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
-import { UserContext } from '../../context'
 import { getDuplicateEvents } from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'

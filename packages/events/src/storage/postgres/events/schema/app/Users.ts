@@ -25,8 +25,6 @@ export default interface UsersTable {
 
   mobile: ColumnType<string | null, string | null, string | null>
 
-  device: ColumnType<string | null, string | null, string | null>
-
   signaturePath: ColumnType<string | null, string | null, string | null>
 
   profileImagePath: ColumnType<string | null, string | null, string | null>
@@ -36,6 +34,8 @@ export default interface UsersTable {
   createdAt: ColumnType<string, string | undefined, string>
 
   updatedAt: ColumnType<string, string | undefined, string>
+
+  device: ColumnType<string | null, string | null, string | null>
 }
 
 export type Users = Selectable<UsersTable>
