@@ -15,6 +15,7 @@ import { TRPCError } from '@trpc/server'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { http, HttpResponse, HttpResponseResolver } from 'msw'
 import { setupServer } from 'msw/node'
+import { Provider } from 'react-redux'
 import superjson, { serialize } from 'superjson'
 import { vi } from 'vitest'
 import {
@@ -29,6 +30,8 @@ import {
 } from '@opencrvs/commons/client'
 import { AppRouter, queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { storage } from '@client/storage'
+import { createTestStore } from '@client/tests/util'
+import { checkAuth } from '@client/profile/profileActions'
 import { useEvents } from './useEvents'
 
 const serverSpy = vi.fn()
@@ -111,7 +114,9 @@ const server = setupServer(
 
   tRPCMsw.event.config.get.query(() => {
     return [tennisClubMembershipEvent]
-  })
+  }),
+
+  tRPCMsw.administrativeAreas.list.query(() => [])
 )
 
 beforeAll(() => server.listen())
@@ -128,13 +133,25 @@ interface TestContext {
     ReturnType<typeof useEvents>['actions']['declare'],
     {}
   >
+  wrapper: ({ children }: PropsWithChildren) => React.JSX.Element
 }
 
-function wrapper({ children }: PropsWithChildren) {
-  return <TRPCProvider waitForClientRestored={false}>{children}</TRPCProvider>
+function makeWrapper(
+  store: Awaited<ReturnType<typeof createTestStore>>['store']
+) {
+  return function wrapper({ children }: PropsWithChildren) {
+    return (
+      <Provider store={store}>
+        <TRPCProvider waitForClientRestored={false}>{children}</TRPCProvider>
+      </Provider>
+    )
+  }
 }
 
 beforeEach<TestContext>(async (testContext) => {
+  const { store } = await createTestStore()
+  store.dispatch(checkAuth())
+  const wrapper = makeWrapper(store)
   queryClient.clear()
   serverSpy.mockClear()
   await storage.removeItem('events')
@@ -159,15 +176,17 @@ beforeEach<TestContext>(async (testContext) => {
   testContext.eventsHook = eventsHook
   testContext.declareHook = declareHookHook
   testContext.createEventHook = createHook
+  testContext.wrapper = wrapper
 })
 
 describe('events that have unsynced actions', () => {
   test<TestContext>('creating a record first stores it locally with a temporary id', async ({
-    createEventHook
+    createEventHook,
+    wrapper
   }) => {
     server.use(http.post('/api/events/event.create', errorHandler))
 
-    // eslint-disable-next-line @typescript-eslint/await-thenable
+     
     await createEventHook.result.current.mutate({
       type: TENNIS_CLUB_MEMBERSHIP,
       transactionId: '_TEST_TRANSACTION_'
@@ -185,7 +204,8 @@ describe('events that have unsynced actions', () => {
   })
 
   test<TestContext>('temporary id is replaced with the real id when the event is synced to the backend', async ({
-    createEventHook
+    createEventHook,
+    wrapper
   }) => {
     await createEventHook.result.current.mutateAsync({
       type: TENNIS_CLUB_MEMBERSHIP,
