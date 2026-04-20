@@ -29,14 +29,33 @@ import {
 import { partition } from 'lodash'
 import React from 'react'
 import superjson from 'superjson'
+import { useDispatch } from 'react-redux'
 import { getUUID } from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
 import { storage } from '@client/storage'
+import { APPLICATION_VERSION } from '@client/utils/constants'
+import { storeReloadModalVisibility } from '@client/reload/reducer'
+import type { AppStore } from '@client/store'
 
 const { TRPCProvider: TRPCProviderRaw, useTRPC } =
   createTRPCContext<AppRouter>()
 
 export { AppRouter, useTRPC }
+
+type TrpcFetch = NonNullable<Parameters<typeof httpLink>[0]['fetch']>
+
+let dispatch: AppStore['dispatch'] | undefined
+
+async function versionCheckFetch(
+  ...args: Parameters<TrpcFetch>
+): ReturnType<TrpcFetch> {
+  const response = await window.fetch(args[0], args[1] as RequestInit)
+  const gatewayVersion = response.headers.get('X-version')
+  if (dispatch && gatewayVersion && gatewayVersion !== APPLICATION_VERSION) {
+    dispatch(storeReloadModalVisibility(true))
+  }
+  return response
+}
 
 function getTrpcClient() {
   // In storybook tests, we use httpLink as msw-trpc does not support httpBatchLink
@@ -49,6 +68,7 @@ function getTrpcClient() {
         httpLink({
           url: '/api/events',
           transformer: superjson,
+          fetch: versionCheckFetch,
           headers() {
             return {
               authorization: `Bearer ${getToken()}`
@@ -67,6 +87,7 @@ function getTrpcClient() {
         url: '/api/events',
         transformer: superjson,
         methodOverride: 'POST',
+        fetch: versionCheckFetch,
         headers() {
           return {
             authorization: `Bearer ${getToken()}`
@@ -197,6 +218,7 @@ export function TRPCProvider({
   storeIdentifier?: string
   waitForClientRestored?: boolean
 }) {
+  dispatch = useDispatch<AppStore['dispatch']>()
   const [queriesRestored, setQueriesRestored] = React.useState(false)
 
   return (
