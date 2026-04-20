@@ -160,11 +160,11 @@ function AdministrativeAreaInput({
   )
 }
 
-function AdministrativeAreaOutput({ value }: { value: Stringifiable }) {
+function AdministrativeAreaOutput({ value }: { value: Stringifiable | undefined }) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
-  const administrativeAreaId = UUID.safeParse(value.toString()).data
+  const administrativeAreaId = UUID.safeParse(value?.toString()).data
 
   const administrativeArea =
     administrativeAreaId && administrativeAreas.get(administrativeAreaId)
