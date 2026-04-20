@@ -2,6 +2,9 @@
 
 ## 1.9.13
 
+### Breaking changes
+- Redundant `defaultValue` removed from BULLET_LIST, FORM_HEADER and PARAGRAPH field types.
+
 ### Bug fixes
 
 - The work queue list now automatically refreshes after a new event is created, without requiring a manual page reload. Previously the sidebar count updated immediately but the list itself stayed stale. [#12103](https://github.com/opencrvs/opencrvs-core/issues/12103)
