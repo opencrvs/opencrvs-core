@@ -153,7 +153,11 @@ function User({ action }: { action: EventHistoryActionDocument }) {
       font="bold14"
       id="profile-link"
       onClick={() =>
-        navigate(formatUrl(routes.USER_PROFILE, { userId: user.id }))
+        navigate(
+          ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
+            userId: String(user.id)
+          })
+        )
       }
     >
       <UserAvatar
