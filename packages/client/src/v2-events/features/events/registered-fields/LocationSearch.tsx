@@ -46,43 +46,52 @@ function useAvailableLocations(
   const userDetails = useSelector(getUserDetails)
   const userLocationId = userDetails?.primaryOfficeId
 
-  // If the jurisdiction filter is only for users current location, we return the location as a single option.
+  const allOptions = useMemo(
+    () =>
+      Array.from(locations.values()).filter(
+        (location) =>
+          location.locationType &&
+          (locationTypes ? locationTypes.includes(location.locationType) : true)
+      ),
+    [locationTypes, locations]
+  )
+
+  const filteredByAdminArea = useMemo(
+    () =>
+      userLocationId
+        ? allOptions.filter((o) =>
+            isLocationUnderJurisdiction({
+              locationId: userLocationId,
+              otherLocationId: o.id,
+              locations,
+              administrativeAreas
+            })
+          )
+        : allOptions,
+    [allOptions, userLocationId, locations, administrativeAreas]
+  )
+
+  // If the jurisdiction filter is only for the user's own location, return their office
+  // only if it matches the required locationTypes. A user whose office is a CRVS_OFFICE
+  // should not appear as an option in a HEALTH_FACILITY field — return nothing instead,
+  // since their 'location' scope does not extend to other locations of the correct type.
   if (
     jurisdictionFilter === JurisdictionFilter.enum.location &&
     userLocationId
   ) {
-    const location = locations.get(UUID.parse(userLocationId))
-    return location ? [location] : []
+    const userOffice = locations.get(UUID.parse(userLocationId))
+    const officeMatchesType =
+      userOffice?.locationType &&
+      (locationTypes ? locationTypes.includes(userOffice.locationType) : true)
+
+    return officeMatchesType ? [userOffice] : []
   }
 
-  const options = useMemo(() => {
-    return Array.from(locations.values()).filter(
-      (location) =>
-        location.locationType &&
-        (locationTypes ? locationTypes.includes(location.locationType) : true)
-    )
-  }, [locationTypes, locations])
-
-  // If jurisdiction filter is administrative area, we filter the options to only include locations that are under the user's admin area jurisdiction.
-  if (
-    jurisdictionFilter === JurisdictionFilter.enum.administrativeArea &&
-    userLocationId
-  ) {
-    return useMemo(
-      () =>
-        options.filter((o) =>
-          isLocationUnderJurisdiction({
-            locationId: userLocationId,
-            otherLocationId: o.id,
-            locations,
-            administrativeAreas
-          })
-        ),
-      [options, userLocationId, locations, administrativeAreas]
-    )
+  if (jurisdictionFilter === JurisdictionFilter.enum.administrativeArea) {
+    return filteredByAdminArea
   }
 
-  return options
+  return allOptions
 }
 
 function LocationSearchInput({
