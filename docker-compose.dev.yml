@@ -26,15 +26,13 @@ services:
       - HOST=0.0.0.0
     ports:
       - '3030:3030'
-
-  webhooks:
+  events:
     volumes:
       - '.secrets/public-key.pem:/secrets/public-key.pem'
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
-      - HOST=0.0.0.0
     ports:
-      - '2525:2525'
+      - '5555:5555'
 
   notification:
     volumes:

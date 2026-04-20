@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@apollo/datasource-rest": "^6.3.0",
-    "@apollo/server": "^4.11.2",
+    "@apollo/server": "^4.13.0",
     "@as-integrations/hapi": "^2.0.1",
     "@elastic/elasticsearch": "8.13.1",
     "@hapi/h2o2": "^9.1.0",
@@ -56,8 +56,7 @@
     "tsconfig-paths": "^3.13.0",
     "uuid": "^3.2.1",
     "uuid-validate": "^0.0.3",
-    "winston": "^3.0.0",
-    "zod": "^4.1.12"
+    "winston": "^3.0.0"
   },
   "devDependencies": {
     "@hapi/lab": "^24.0.0",

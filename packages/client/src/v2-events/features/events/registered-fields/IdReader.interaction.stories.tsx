@@ -133,6 +133,7 @@ const fields = [
     id: `storybook.verify-nid-http-fetch-loader`,
     type: FieldType.LOADER,
     parent: field(`storybook.verify-nid-http-fetch`),
+    hideLabel: true,
     conditionals: [
       {
         type: ConditionalType.SHOW,

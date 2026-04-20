@@ -13,6 +13,7 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 import { LinkButtonField } from '@opencrvs/commons/client'
 import { Button, Icon } from '@opencrvs/components'
+import { useOnlineStatus } from '@client/utils'
 import { throwIfUnsupportedIcon } from './Button'
 
 export function getCleanRedirectURI() {
@@ -46,16 +47,18 @@ function LinkButtonInput({
 }) {
   const intl = useIntl()
   const url = setRedirectURI(configuration.url)
+  const isOnline = useOnlineStatus()
+  const isDisabled = disabled || !isOnline
 
   return (
     <Button
       fullWidth
-      disabled={disabled}
+      disabled={isDisabled}
       element="a"
       href={url}
       id={id}
       size="large"
-      type="secondary"
+      type="primary"
     >
       {configuration.icon && (
         <Icon

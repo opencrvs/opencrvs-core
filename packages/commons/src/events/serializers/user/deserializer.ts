@@ -9,12 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { QueryExpression, QueryType } from '../../../events'
-import { User } from '../../../users/User'
+import { Exact, QueryExpression, QueryType, Within } from '../../../events'
 import {
   CountryConfigQueryType,
+  SerializableExact,
+  SerializableWithin,
   SerializedQueryExpression
 } from '../../../events/CountryConfigQueryInput'
+import { User } from '../../../users/User'
 import { SerializedUserField } from './serializer'
 
 /**
@@ -70,6 +72,45 @@ function userDeserializer(
 function isDefined<T>(value: T | undefined): value is T {
   return value !== undefined
 }
+
+function serializeLocationField<
+  T extends SerializableWithin | SerializableExact
+>(expression: T, user: User) {
+  if (expression.type === 'exact') {
+    return userDeserializer(expression.term, user)
+  }
+  if (expression.type === 'within') {
+    return userDeserializer(expression.location, user)
+  }
+  return undefined
+}
+
+function deserializeExpression<
+  T extends SerializableWithin | SerializableExact
+>(expression: T, user: User) {
+  if (expression.type === 'exact') {
+    const term = userDeserializer(expression.term, user)
+    if (!term) {
+      return undefined
+    }
+    return {
+      ...expression,
+      term
+    } satisfies Exact
+  }
+  if (expression.type === 'within') {
+    const location = userDeserializer(expression.location, user)
+    if (!location) {
+      return undefined
+    }
+    return {
+      ...expression,
+      location
+    } satisfies Within
+  }
+  return undefined
+}
+
 function deserializeQueryExpression(
   expression: SerializedQueryExpression,
   user: User
@@ -87,14 +128,16 @@ function deserializeQueryExpression(
     : undefined
 
   const createdAtLocation = expression.createdAtLocation
-    ? userDeserializer(expression.createdAtLocation.location, user)
+    ? serializeLocationField(expression.createdAtLocation, user)
     : undefined
 
   const updatedAtLocation = expression.updatedAtLocation
-    ? userDeserializer(expression.updatedAtLocation.location, user)
+    ? serializeLocationField(expression.updatedAtLocation, user)
     : undefined
 
-  const updatedByUserRole = expression.updatedByUserRole? userDeserializer(expression.updatedByUserRole.term, user) : undefined
+  const updatedByUserRole = expression.updatedByUserRole
+    ? userDeserializer(expression.updatedByUserRole.term, user)
+    : undefined
 
   const declaredLocation = expression[
     'legalStatuses.DECLARED.createdAtLocation'
@@ -132,18 +175,21 @@ function deserializeQueryExpression(
         ? { ...expression.updatedBy, term: updatedBy }
         : undefined,
 
-    updatedByUserRole: expression.updatedByUserRole && isDefined(updatedByUserRole)? {
-      ...expression.updatedByUserRole,
-      term: updatedByUserRole
-    } : undefined,  
+    updatedByUserRole:
+      expression.updatedByUserRole && isDefined(updatedByUserRole)
+        ? {
+            ...expression.updatedByUserRole,
+            term: updatedByUserRole
+          }
+        : undefined,
     createdAtLocation:
       expression.createdAtLocation && isDefined(createdAtLocation)
-        ? { ...expression.createdAtLocation, location: createdAtLocation }
+        ? deserializeExpression(expression.createdAtLocation, user)
         : undefined,
 
     updatedAtLocation:
       expression.updatedAtLocation && isDefined(updatedAtLocation)
-        ? { ...expression.updatedAtLocation, location: updatedAtLocation }
+        ? deserializeExpression(expression.updatedAtLocation, user)
         : undefined,
 
     ['legalStatuses.DECLARED.createdAtLocation']:

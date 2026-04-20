@@ -8,8 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ISerializedForm } from '@client/forms'
-import { Conditional } from '@client/forms/conditionals'
+
 import { ILanguage } from '@client/i18n/reducer'
 import { AdminStructure, CRVSOffice, Facility } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
@@ -19,6 +18,12 @@ import { ApplicationConfig, TranslationConfig } from '@opencrvs/commons/client'
 import { IntlShape } from 'react-intl'
 import { fetchFileFromUrl } from './imageUtils'
 import { last } from 'lodash'
+
+interface Conditional {
+  description?: string
+  action: string
+  expression: string
+}
 
 export interface ILocationDataResponse {
   [locationId: string]: AdminStructure
@@ -44,15 +49,6 @@ export type CertificateConfiguration = Partial<{
 
 export interface IContentResponse {
   languages: ILanguage[]
-}
-
-export interface LoadFormsResponse {
-  forms: {
-    version: string
-    birth: ISerializedForm
-    death: ISerializedForm
-    marriage: ISerializedForm
-  }
 }
 
 interface ICountryLogo {
@@ -158,33 +154,6 @@ async function loadConfigAnonymousUser(): Promise<
   return await res.json()
 }
 
-async function loadForms(): Promise<LoadFormsResponse> {
-  const url = '/api/forms'
-
-  const res = await fetch(url, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    }
-  })
-  if (res.status === 422) {
-    const err = new Error((await res.json()).message, {
-      cause: 'VALIDATION_ERROR'
-    })
-    throw err
-  }
-
-  if (res && !res.ok) {
-    throw new Error(res.statusText)
-  }
-
-  const response = await res.json()
-
-  return {
-    forms: { ...response }
-  }
-}
-
 const countryconfigBase: string = '/api/countryconfig'
 
 type LoadConditionalsResponse = Record<string, Conditional>
@@ -251,7 +220,6 @@ export const referenceApi = {
   loadFacilities,
   loadContent,
   loadConfig,
-  loadForms,
   importConditionals,
   importHandlebarHelpers,
   loadConfigAnonymousUser

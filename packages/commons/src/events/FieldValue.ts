@@ -56,6 +56,14 @@ export const AgeValue = z.object({
 export type AgeValue = z.infer<typeof AgeValue>
 export const AgeUpdateValue = AgeValue.optional().nullable()
 
+export const AutocompleteValue = z.object({
+  label: z.string(),
+  value: z.string()
+})
+export type AutocompleteValue = z.infer<typeof AutocompleteValue>
+export const AutocompleteUpdateValue = AutocompleteValue.optional().nullable()
+export type AutocompleteUpdateValue = z.infer<typeof AutocompleteUpdateValue>
+
 export const TimeValue = z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)
 export type TimeValue = z.infer<typeof TimeValue>
 
@@ -122,7 +130,9 @@ const LeafFieldValues = z.union([
   IdReaderFieldValue,
   NumberWithUnitFieldValue,
   NumberWithUnitFieldUpdateValue,
-  CustomFieldValue
+  CustomFieldValue,
+  AutocompleteValue,
+  AutocompleteUpdateValue
 ])
 type LeafFieldValues = z.infer<typeof LeafFieldValues>
 
@@ -247,6 +257,7 @@ export type FieldUpdateValue =
   | z.infer<typeof QueryParamReaderFieldUpdateValue>
   | z.infer<typeof CustomFieldValue>
   | z.infer<typeof HiddenFieldValue>
+  | z.infer<typeof AutocompleteUpdateValue>
 
 // All schemas are tagged using .describe() so we can identify them later
 // inside safeUnion(). The tag name should match PRIORITY_ORDER.
@@ -269,7 +280,8 @@ export const FieldUpdateValue: z.ZodType<FieldUpdateValue> = safeUnion([
   HttpFieldUpdateValue.describe('HttpFieldUpdateValue'),
   QueryParamReaderFieldUpdateValue.describe('QueryParamReaderFieldUpdateValue'),
   CustomFieldValue.describe('CustomFieldValue'),
-  HiddenFieldValue.describe('HiddenFieldValue')
+  HiddenFieldValue.describe('HiddenFieldValue'),
+  AutocompleteUpdateValue.describe('AutocompleteUpdateValue')
 ])
 
 /**
@@ -316,5 +328,6 @@ export type FieldUpdateValueSchema =
   | typeof DateValue
   | typeof EmailValue
   | typeof CustomFieldValue
+  | typeof AutocompleteValue
   | z.ZodString
   | z.ZodBoolean

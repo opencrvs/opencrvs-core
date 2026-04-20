@@ -78,6 +78,7 @@ import {
   isCustomFieldType,
   isHiddenFieldType,
   isImageViewFieldType,
+  isAutocompleteFieldType,
   isUserRoleFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
@@ -123,6 +124,7 @@ import { Loader } from '@client/v2-events/features/events/registered-fields/Load
 import { NumberWithUnit } from '@client/v2-events/features/events/registered-fields/NumberWithUnit'
 import { Custom } from '@client/v2-events/features/events/registered-fields/Custom'
 import { Hidden } from '@client/v2-events/features/events/registered-fields/Hidden'
+import { Autocomplete } from '@client/v2-events/features/events/registered-fields/Autocomplete'
 import {
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
@@ -879,6 +881,20 @@ export const GeneratedInputField = <T extends FieldConfig>(
       />
     )
   }
+
+  if (isAutocompleteFieldType(field)) {
+    return (
+      <InputField {...inputFieldProps}>
+        <Autocomplete.Input
+          {...field.config}
+          key={fieldDefinition.id}
+          value={field.value}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      </InputField>
+    )
+  }
+
   if (isSearchFieldType(field)) {
     const {
       label: inputLabel,
@@ -953,11 +969,13 @@ export const GeneratedInputField = <T extends FieldConfig>(
 
   if (isIdReaderFieldType(field)) {
     return (
-      <IdReader.Input
-        id={field.config.id}
-        methods={field.config.methods}
-        onChange={(val) => onFieldValueChange(name, val)}
-      />
+      <InputField variant="highlighted" {...inputFieldProps}>
+        <IdReader.Input
+          id={field.config.id}
+          methods={field.config.methods}
+          onChange={(val) => onFieldValueChange(name, val)}
+        />
+      </InputField>
     )
   }
 
@@ -972,10 +990,12 @@ export const GeneratedInputField = <T extends FieldConfig>(
 
   if (isLoaderFieldType(field)) {
     return (
-      <Loader.Input
-        configuration={field.config.configuration}
-        id={field.config.id}
-      />
+      <InputField {...inputFieldProps} variant={field.config.variant}>
+        <Loader.Input
+          configuration={field.config.configuration}
+          id={field.config.id}
+        />
+      </InputField>
     )
   }
 

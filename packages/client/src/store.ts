@@ -24,11 +24,6 @@ import {
 } from '@client/notification/reducer'
 import { IOfflineDataState, offlineDataReducer } from '@client/offline/reducer'
 import { profileReducer, ProfileState } from '@client/profile/profileReducer'
-
-import {
-  advancedSearchParamReducer,
-  IAdvancedSearchParamState
-} from '@client/search/advancedSearch/reducer'
 import { IUserFormState, userFormReducer } from '@client/user/userReducer'
 import * as Sentry from '@sentry/react'
 import createSentryMiddleware from 'redux-sentry-middleware'
@@ -45,7 +40,6 @@ export interface IStoreState {
   notification: NotificationState
   offline: IOfflineDataState
   userForm: IUserFormState
-  advancedSearch: IAdvancedSearchParamState
   reloadModalVisibility: IReloadModalVisibilityState
 }
 
@@ -62,7 +56,6 @@ export const createStore = (): { store: AppStore } => {
     notification: notificationReducer,
     offline: offlineDataReducer,
     userForm: userFormReducer,
-    advancedSearch: advancedSearchParamReducer,
     reloadModalVisibility: reloadModalVisibilityReducer
   })
   // @ts-ignore

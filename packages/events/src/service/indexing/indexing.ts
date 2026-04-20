@@ -111,7 +111,6 @@ function mapFieldTypeToElasticsearch(
     case FieldType.DATE:
       return { type: 'date' }
     case FieldType.DATE_RANGE:
-    case FieldType.TEXT:
     case FieldType.TEXTAREA:
     case FieldType.PARAGRAPH:
     case FieldType.HEADING:
@@ -120,6 +119,8 @@ function mapFieldTypeToElasticsearch(
     case FieldType.TIME:
     case FieldType.ALPHA_HIDDEN:
       return { type: 'text' }
+    case FieldType.TEXT:
+      return { type: 'keyword' }
     case FieldType.NUMBER_WITH_UNIT:
       return {
         type: 'object',
@@ -132,6 +133,14 @@ function mapFieldTypeToElasticsearch(
       return {
         type: 'keyword',
         normalizer: 'lowercase'
+      }
+    case FieldType.AUTOCOMPLETE:
+      return {
+        type: 'object',
+        properties: {
+          label: { type: 'keyword' },
+          value: { type: 'keyword' }
+        }
       }
     case FieldType.DIVIDER:
     case FieldType.RADIO_GROUP:
