@@ -269,13 +269,18 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
   fields: FieldConfig[],
   formValues: T,
   validatorContext: ValidatorContext,
-  includeHiddenFieldsWithNullValues: boolean = false
+  includeHiddenFieldsWithNullValues: boolean = false,
+  declarationContext?: EventState
 ): Partial<T> {
   const base = cloneDeep(formValues)
 
   // The omitting is done recursively until the object does not change.
   // This is because the previously removed fields might affect the visibility of other fields.
   function fn(prevVisibilityContext: Partial<T>): Partial<T> {
+    const visibilityForm = declarationContext
+      ? { ...declarationContext, ...prevVisibilityContext }
+      : prevVisibilityContext
+
     const cleaned = omitBy<Partial<T>>(base, (value, fieldId) => {
       const fieldConfig = fields.filter((f) => f.id === fieldId)
 
@@ -284,7 +289,7 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
       }
 
       const isHidden = fieldConfig.every(
-        (f) => !isFieldVisible(f, prevVisibilityContext, validatorContext)
+        (f) => !isFieldVisible(f, visibilityForm, validatorContext)
       )
 
       if (!isHidden) {
@@ -405,8 +410,10 @@ export function omitHiddenAnnotationFields(
 
   return omitHiddenFields(
     annotationFields,
-    { ...declaration, ...annotation } satisfies ActionUpdate,
-    context
+    annotation,
+    context,
+    false,
+    declaration
   )
 }
 
