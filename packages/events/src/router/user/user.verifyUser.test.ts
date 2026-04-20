@@ -13,24 +13,21 @@ import { TRPCError } from '@trpc/server'
 import { http, HttpResponse } from 'msw'
 import { sql } from 'kysely'
 import { getUUID } from '@opencrvs/commons'
-import { t } from '@events/router/trpc'
-import { appRouter } from '@events/router/router'
-import { setupTestCase } from '@events/tests/utils'
+import { createInternalTestClient, setupTestCase } from '@events/tests/utils'
 import { env } from '@events/environment'
 import { mswServer } from '../../tests/msw'
 
-const { createCallerFactory } = t
-const publicCaller = createCallerFactory(appRouter)({})
+const caller = createInternalTestClient()
 
 test('returns UNAUTHORIZED when user not found by mobile', async () => {
   await expect(
-    publicCaller.user.verifyUser({ mobile: '+447700900000' })
+    caller.user.verifyUser({ mobile: '+447700900000' })
   ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
 })
 
 test('returns UNAUTHORIZED when user not found by email', async () => {
   await expect(
-    publicCaller.user.verifyUser({ email: 'notfound@example.com' })
+    caller.user.verifyUser({ email: 'notfound@example.com' })
   ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
 })
 
@@ -65,7 +62,7 @@ test('returns CONFLICT when user has no security questions', async () => {
     .execute()
 
   await expect(
-    publicCaller.user.verifyUser({ mobile: '+447700900001' })
+    caller.user.verifyUser({ mobile: '+447700900001' })
   ).rejects.toMatchObject(
     new TRPCError({
       code: 'CONFLICT',
@@ -114,7 +111,7 @@ test('returns user info and a valid security question key on success (mobile)', 
     })
     .execute()
 
-  const result = await publicCaller.user.verifyUser({ mobile: '+447700900002' })
+  const result = await caller.user.verifyUser({ mobile: '+447700900002' })
 
   expect(result).toMatchObject({
     id: userId,
@@ -164,7 +161,7 @@ test('looks up user by email (case-insensitive)', async () => {
     })
     .execute()
 
-  const result = await publicCaller.user.verifyUser({
+  const result = await caller.user.verifyUser({
     email: 'LOOKUP@example.com'
   })
 

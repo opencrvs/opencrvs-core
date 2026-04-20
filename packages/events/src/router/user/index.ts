@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-/* eslint-disable max-lines */
 import { TRPCError } from '@trpc/server'
 import * as z from 'zod/v4'
 import {
@@ -18,7 +17,6 @@ import {
   UUID
 } from '@opencrvs/commons/events'
 import {
-  FamilyName,
   isBase64FileString,
   logger,
   personNameFromV1ToV2,
@@ -31,7 +29,6 @@ import {
   enforceOfficeUpdatePermission
 } from '@events/router/middleware'
 import {
-  publicProcedure,
   router,
   userAndSystemProcedure,
   userOnlyProcedure
@@ -39,8 +36,6 @@ import {
 import { getRoles } from '@events/service/config/config'
 import { generateHash } from '@events/service/auth/hash'
 import {
-  getUserByMobileOrEmail,
-  getUserByUsername,
   updatePasswordHash,
   updateUserById,
   deleteSuperUser
@@ -52,10 +47,8 @@ import {
 } from '@events/storage/postgres/events/auditLog'
 import {
   activateUser,
-  checkSecurityQuestionMatch,
   createUser,
   getCredentials,
-  getSecurityQuestionsForUser,
   getUser,
   searchUsers,
   updateUser
@@ -80,15 +73,6 @@ const UserAuditListQuery = z.object({
 })
 
 const auditRouter = router({
-  anonymousRecord: publicProcedure
-    .input(UserAuditRecordInput)
-    .mutation(async ({ input, ctx }) => {
-      await writeAuditLog({
-        ...input,
-        clientId: ctx.user?.id ?? input.requestData.subjectId,
-        clientType: ctx.user?.type ?? 'user'
-      })
-    }),
   record: userAndSystemProcedure
     .input(UserAuditRecordInput)
     .mutation(async ({ input, ctx }) => {
@@ -131,123 +115,7 @@ const UserSearch = z.object({
   sortOrder: z.enum(['asc', 'desc'])
 })
 
-const VerifyUserOutput = z.object({
-  id: z.string(),
-  username: z.string(),
-  mobile: z.string().optional(),
-  email: z.string().optional(),
-  status: z.string(),
-  name: FamilyName,
-  securityQuestionKey: z.string(),
-  scope: z.array(z.string())
-})
-
 export const userRouter = router({
-  verifyPassword: publicProcedure
-    .input(
-      z.object({
-        username: z.string(),
-        password: z.string()
-      })
-    )
-    .output(
-      z.object({
-        id: z.string(),
-        name: FamilyName,
-        mobile: z.string().optional(),
-        email: z.string().optional(),
-        status: z.string(),
-        role: z.string()
-      })
-    )
-    .mutation(async ({ input }) => {
-      const user = await getUserByUsername(input.username)
-
-      if (!user) {
-        throw new TRPCError({ code: 'UNAUTHORIZED' })
-      }
-
-      const hash = await generateHash(input.password, user.salt)
-      if (hash !== user.passwordHash) {
-        throw new TRPCError({ code: 'UNAUTHORIZED' })
-      }
-
-      return {
-        id: user.id,
-        name: [
-          {
-            use: 'en',
-            given: [user.firstname ?? ''],
-            family: user.surname ?? ''
-          }
-        ],
-        mobile: user.mobile ?? undefined,
-        email: user.email ?? undefined,
-        status: user.status,
-        role: user.role
-      }
-    }),
-  verifySecurityAnswer: publicProcedure
-    .input(
-      z.object({
-        userId: z.string(),
-        questionKey: z.string(),
-        answer: z.string()
-      })
-    )
-    .output(z.object({ matched: z.boolean(), questionKey: z.string() }))
-    .mutation(async ({ input }) => {
-      const record = await getCredentials(input.userId)
-
-      const questions = getSecurityQuestionsForUser(record)
-      return checkSecurityQuestionMatch({
-        questions,
-        input,
-        salt: record.salt
-      })
-    }),
-  verifyUser: publicProcedure
-    .input(
-      z
-        .object({ mobile: z.string().optional(), email: z.string().optional() })
-        .refine((d) => d.mobile || d.email, 'mobile or email required')
-    )
-    .output(VerifyUserOutput)
-    .mutation(async ({ input }) => {
-      const user = await getUserByMobileOrEmail(
-        input.mobile ? { mobile: input.mobile } : { email: input.email ?? '' }
-      )
-
-      if (!user) {
-        // Don't reveal whether the account exists
-        throw new TRPCError({ code: 'UNAUTHORIZED' })
-      }
-
-      const questions = getSecurityQuestionsForUser(user)
-
-      const securityQuestionKey =
-        questions[Math.floor(Math.random() * questions.length)].questionKey
-
-      const roles = await getRoles()
-      const scope = roles.find((r) => r.id === user.role)?.scopes ?? []
-
-      return {
-        id: user.id,
-        username: user.username,
-        mobile: user.mobile ?? undefined,
-        email: user.email ?? undefined,
-        status: user.status,
-        name: [
-          {
-            use: 'en',
-            given: [user.firstname ?? ''],
-            family: user.surname ?? ''
-          }
-        ],
-        securityQuestionKey,
-        scope
-      }
-    }),
   get: userOnlyProcedure
     .input(z.string())
     .output(UserOrSystem)

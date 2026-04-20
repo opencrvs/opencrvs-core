@@ -14,7 +14,12 @@ import { promisify } from 'util'
 import * as jwt from 'jsonwebtoken'
 import { redis } from '@auth/database'
 import * as t from 'io-ts'
-import { createTRPCClient, httpBatchLink, HTTPHeaders } from '@trpc/client'
+import {
+  createTRPCClient,
+  httpBatchLink,
+  HTTPHeaders,
+  httpLink
+} from '@trpc/client'
 import superjson from 'superjson'
 import {
   NotificationEvent,
@@ -33,7 +38,7 @@ import {
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
-import { AppRouter } from '@opencrvs/events/src/router'
+import { AppRouter, InternalRouter } from '@opencrvs/events/src/router'
 
 const cert = readFileSync(env.CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(env.CERT_PUBLIC_KEY_PATH)
@@ -44,6 +49,34 @@ const sign = promisify<
   jwt.SignOptions,
   string
 >(jwt.sign)
+
+/**
+ * @returns token for internal service authentication, which has no scopes and a short expiry time.
+ * Used for authenticating internal requests between services.
+ */
+/** @knipignore */
+export async function createInternalServiceToken() {
+  return sign({}, cert, {
+    subject: 'opencrvs:auth-service',
+    algorithm: 'RS256',
+    expiresIn: env.CONFIG_TOKEN_EXPIRY_SECONDS,
+    audience: ['opencrvs:events-user'],
+    issuer: JWT_ISSUER
+  })
+}
+
+export const internalClient = createTRPCClient<InternalRouter>({
+  links: [
+    httpLink({
+      url: new URL('/internal', env.EVENTS_URL).href,
+      transformer: superjson,
+      async headers() {
+        const token = await createInternalServiceToken()
+        return { authorization: `Bearer ${token}` }
+      }
+    })
+  ]
+})
 
 const eventsClient = createTRPCClient<AppRouter>({
   links: [
@@ -83,7 +116,7 @@ export async function authenticate(
   username: string,
   password: string
 ): Promise<IAuthentication> {
-  const body = await eventsClient.user.verifyPassword.mutate({
+  const body = await internalClient.user.verifyPassword.mutate({
     username,
     password
   })
@@ -132,21 +165,6 @@ export async function createToken(
         : env.CONFIG_TOKEN_EXPIRY_SECONDS),
     audience,
     issuer
-  })
-}
-
-/**
- * @returns token for internal service authentication, which has no scopes and a short expiry time.
- * Used for authenticating internal requests between services.
- */
-/** @knipignore */
-export async function createInternalServiceToken() {
-  return sign({}, cert, {
-    subject: 'opencrvs:auth-service',
-    algorithm: 'RS256',
-    expiresIn: env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
-    audience: ['opencrvs:events-user'],
-    issuer: JWT_ISSUER
   })
 }
 
@@ -304,7 +322,7 @@ export async function recordAnonymousUserAuditEvent(
   input: UserAuditLog
 ): Promise<void> {
   try {
-    await eventsClient.user.audit.anonymousRecord.mutate(input)
+    await internalClient.user.audit.record.mutate(input)
   } catch (err) {
     logger.error('Failed to record anonymous user audit event', err)
   }

@@ -8,12 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createTRPCClient, httpBatchLink } from '@trpc/client'
-import superjson from 'superjson'
-import { env } from '@auth/environment'
 import { redis } from '@auth/database'
 import { IUserName } from '@opencrvs/commons'
-import { AppRouter } from '@opencrvs/events/src/router'
+import { internalClient } from '@auth/features/authenticate/service'
 
 export const RETRIEVAL_FLOW_USER_NAME = 'username'
 export const RETRIEVAL_FLOW_PASSWORD = 'password'
@@ -24,17 +21,8 @@ export enum RetrievalSteps {
   SECURITY_Q_VERIFIED = 'SECURITY_Q_VERIFIED'
 }
 
-const eventsClient = createTRPCClient<AppRouter>({
-  links: [
-    httpBatchLink({
-      url: env.EVENTS_URL,
-      transformer: superjson
-    })
-  ]
-})
-
 export async function verifyUser(mobile?: string, email?: string) {
-  const result = await eventsClient.user.verifyUser.mutate(
+  const result = await internalClient.user.verifyUser.mutate(
     mobile ? { mobile } : { email: email! }
   )
 
