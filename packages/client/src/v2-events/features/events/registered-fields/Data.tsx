@@ -23,9 +23,7 @@ import {
   StaticDataEntry,
   EventConfig,
   getDeclarationFields,
-  FieldValue,
   DataEntry,
-  TranslationConfig,
   FieldReference
 } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -146,51 +144,61 @@ function DataInput({
   const { subtitle, data } = configuration
   const title = label.defaultMessage ? intl.formatMessage(label) : ''
 
-  const fields = data.map((entry) => {
-    if ('fieldId' in entry) {
-      const config = allKnownFields.find((f) => f.id === entry.fieldId)
+  const fields = data
+    .map((entry) => {
+      if ('fieldId' in entry) {
+        const configs = allKnownFields.filter((f) => f.id === entry.fieldId)
 
-      if (!config) {
-        throw new Error(
-          `Configuration for field: '${entry.fieldId}' in DATA not found`
+        if (configs.length === 0) {
+          throw new Error(
+            `Configuration for field: '${entry.fieldId}' in DATA not found`
+          )
+        }
+        const visibleConfigs = configs.filter((f) =>
+          isFieldVisible(f, formData, validatorContext)
         )
+
+        // We don't want to display fields that are conditionally hidden in the original form configuration
+        if (visibleConfigs.length === 0) {
+          return null
+        }
+
+        return {
+          value: formData[entry.fieldId],
+          config: visibleConfigs[0]
+        }
       }
 
-      return {
-        value: formData[entry.fieldId],
-        config
+      const value = entry.value
+
+      if (isFieldReference(value)) {
+        const resolvedValue =
+          value.$$subfield.length > 0
+            ? get(formData[value.$$field], value.$$subfield)
+            : formData[value.$$field]
+
+        return getFieldFromDataEntry({
+          intl,
+          formData,
+          entry: {
+            label: entry.label,
+            value: resolvedValue ? String(resolvedValue) : '',
+            id: entry.id
+          }
+        })
       }
-    }
-
-    const value = entry.value
-
-    if (isFieldReference(value)) {
-      const resolvedValue =
-        value.$$subfield.length > 0
-          ? get(formData[value.$$field], value.$$subfield)
-          : formData[value.$$field]
 
       return getFieldFromDataEntry({
         intl,
         formData,
         entry: {
           label: entry.label,
-          value: resolvedValue ? String(resolvedValue) : '',
+          value,
           id: entry.id
         }
       })
-    }
-
-    return getFieldFromDataEntry({
-      intl,
-      formData,
-      entry: {
-        label: entry.label,
-        value,
-        id: entry.id
-      }
     })
-  })
+    .filter((f) => f !== null)
 
   // When we first render the field, let's save the values of the fields to the form data.
   // This is done because we want to send the values to the backend, so that they can be displayed in the Output later.
@@ -218,19 +226,14 @@ function DataInput({
       {title && <label>{title}</label>}
       {subtitle && <Subtitle>{intl.formatMessage(subtitle)}</Subtitle>}
       <dl>
-        {fields
-          // We don't want to display fields that are conditionally hidden in the original form configuration
-          .filter(({ config }) =>
-            isFieldVisible(config, formData, validatorContext)
-          )
-          .map(({ config, value }) => (
-            <React.Fragment key={config.id}>
-              <dt>{intl.formatMessage(config.label)}</dt>
-              <dd>
-                <Output field={config} value={value} />
-              </dd>
-            </React.Fragment>
-          ))}
+        {fields.map(({ config, value }) => (
+          <React.Fragment key={config.id}>
+            <dt>{intl.formatMessage(config.label)}</dt>
+            <dd>
+              <Output field={config} value={value} />
+            </dd>
+          </React.Fragment>
+        ))}
       </dl>
     </Container>
   )
