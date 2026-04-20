@@ -186,11 +186,12 @@ describe('events that have unsynced actions', () => {
   }) => {
     server.use(http.post('/api/events/event.create', errorHandler))
 
-     
-    await createEventHook.result.current.mutate({
-      type: TENNIS_CLUB_MEMBERSHIP,
-      transactionId: '_TEST_TRANSACTION_'
-    })
+    await Promise.resolve(
+      createEventHook.result.current.mutate({
+        type: TENNIS_CLUB_MEMBERSHIP,
+        transactionId: '_TEST_TRANSACTION_'
+      })
+    )
 
     const getHook = renderHook(
       () => useEvents().getEvent.useFindEventFromCache('_TEST_TRANSACTION_'),
