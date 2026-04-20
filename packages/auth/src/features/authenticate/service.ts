@@ -151,7 +151,7 @@ export async function createInternalServiceToken() {
   return sign({}, cert, {
     subject: 'opencrvs:auth-service',
     algorithm: 'RS256',
-    expiresIn: env.CONFIG_TOKEN_EXPIRY_SECONDS,
+    expiresIn: env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
     audience: ['opencrvs:events-user'],
     issuer: JWT_ISSUER
   })
