@@ -87,8 +87,7 @@ const CreatePinComponent = ({
     } else {
       allUserData.push({
         userID: currentUserID,
-        userPIN: hash,
-        declarations: []
+        userPIN: hash
       })
     }
     await storage.setItem('USER_DATA', JSON.stringify(allUserData))

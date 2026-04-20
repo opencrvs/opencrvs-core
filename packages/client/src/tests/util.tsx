@@ -110,12 +110,6 @@ interface ITestView {
   intl: IntlShape
 }
 
-export function createShallowRenderedComponent(
-  node: React.ReactElement<ITestView>
-) {
-  return shallow(node)
-}
-
 export const resizeWindow = (width: number, height: number) => {
   const resizeEvent = document.createEvent('Event')
   resizeEvent.initEvent('resize', true, true)
