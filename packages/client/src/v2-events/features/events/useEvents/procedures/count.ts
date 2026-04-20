@@ -29,8 +29,7 @@ setQueryDefaults(trpcOptionsProxy.workqueue.count, {
     const previousCounts =
       queryClient.getQueryData<Record<string, number>>(queryKey)
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response = await queryFn(params[0] as any)
+    const response = await queryFn(params[0])
 
     if (previousCounts) {
       const changedSlugs = Object.keys(response).filter(
