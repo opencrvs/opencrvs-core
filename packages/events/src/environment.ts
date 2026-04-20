@@ -16,6 +16,7 @@ import { cleanEnv, str, url, bool } from 'envalid'
  * Define URLs without trailing slashes, include the protocol.
  */
 export const env = cleanEnv(process.env, {
+  CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
   EVENTS_MONGO_URL: url({ devDefault: 'mongodb://localhost/events' }),
   EVENTS_POSTGRES_URL: url({
     devDefault: 'postgres://events_app:app_password@localhost:5432/events'
