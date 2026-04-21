@@ -15,6 +15,7 @@ type CloseModal<ResultType> = (result: ResultType) => void
 type ModalFactory<ResultType> = (close: CloseModal<ResultType>) => ReactNode
 
 export function useModal() {
+  'use memo'
   const [modalNode, setModalNode] = useState<ReactNode>(null)
 
   async function openModal<ModalResult>(

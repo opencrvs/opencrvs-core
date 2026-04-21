@@ -25,6 +25,7 @@ interface QrReaderInputProps {
 }
 
 function QrReaderInput(props: QrReaderInputProps) {
+  'use memo'
   const intl = useIntl()
   return (
     <QrReaderUI

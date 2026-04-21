@@ -24,6 +24,7 @@ interface AgeInputProps extends Omit<TextInputProps, 'min' | 'onChange'> {
 const AGE_MAX_CHARACTERS = 3
 
 function AgeInput({ asOfDateRef, value, ...props }: AgeInputProps) {
+  'use memo'
   const [inputValue, setInputValue] = React.useState(
     value && isNaN(value) ? undefined : value
   )

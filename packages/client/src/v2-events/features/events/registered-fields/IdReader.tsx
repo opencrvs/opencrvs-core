@@ -86,6 +86,7 @@ function IdReaderInput({
   methods: IdReaderField['methods']
   onChange: (data: IdReaderFieldValue) => void
 }) {
+  'use memo'
   const intl = useIntl()
   const validatorContext = useValidatorContext()
 

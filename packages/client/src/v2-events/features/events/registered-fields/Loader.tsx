@@ -26,6 +26,7 @@ function LoaderInput({
   id: string
   configuration: LoaderField['configuration']
 }) {
+  'use memo'
   const intl = useIntl()
   return (
     <Container>

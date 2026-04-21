@@ -105,6 +105,7 @@ function ClearModal({
   close: (result: boolean) => void
   configuration: SearchField['configuration']
 }) {
+  'use memo'
   const intl = useIntl()
 
   return (
@@ -202,6 +203,7 @@ function Postfix({
   hasData?: boolean
   clearData: () => void
 }) {
+  'use memo'
   const intl = useIntl()
 
   if (hasData) {
@@ -267,6 +269,7 @@ function SearchInput({
   label?: string
   helperText?: TranslationConfig
 }) {
+  'use memo'
   const intl = useIntl()
 
   const [modal, openModal] = useModal()

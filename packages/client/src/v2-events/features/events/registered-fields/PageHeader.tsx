@@ -13,6 +13,7 @@ import React from 'react'
 import { SubHeader } from '@opencrvs/components'
 
 function PageHeaderInput({ children }: { children: React.ReactNode }) {
+  'use memo'
   return <SubHeader>{children}</SubHeader>
 }
 

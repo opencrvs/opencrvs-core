@@ -24,6 +24,7 @@ function CheckboxInput({
   onChange: (val: boolean) => void
   disabled?: boolean
 }) {
+  'use memo'
   const intl = useIntl()
   const inputValue = !!value ? 'true' : 'false'
 
@@ -49,6 +50,7 @@ function CheckboxOutput({
   value?: boolean
   required?: boolean
 }) {
+  'use memo'
   const intl = useIntl()
   return value === true
     ? intl.formatMessage(buttonMessages.yes)

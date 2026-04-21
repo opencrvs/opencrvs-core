@@ -32,6 +32,7 @@ function SelectInput({
   name,
   ...props
 }: SelectInputProps) {
+  'use memo'
   const intl = useIntlWithFormData()
   const selectedOption = options.find((option) => option.value === value)
   const formattedOptions = options.map((option) => ({
@@ -68,6 +69,7 @@ function SelectOutput({
   value: string | undefined
   options: SelectOption[]
 }) {
+  'use memo'
   const intl = useIntlWithFormData()
   const selectedOption = options.find((option) => option.value === value)
 

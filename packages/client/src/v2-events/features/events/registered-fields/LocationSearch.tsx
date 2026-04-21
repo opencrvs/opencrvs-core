@@ -43,6 +43,7 @@ const resourceTypeMap: Record<
 function useAdministrativeAreas(
   searchableResource: ('locations' | 'facilities' | 'offices')[]
 ) {
+  'use memo'
   const { getLocations } = useLocations()
   const [allLocations] = getLocations.useSuspenseQuery({})
 
@@ -81,6 +82,7 @@ function LocationSearchInput({
   onBlur?: (e: React.FocusEvent<HTMLElement>) => void
   disabled?: boolean
 }) {
+  'use memo'
   const locationList = useAdministrativeAreas(searchableResource)
   const selectedLocation = locationList.find(
     (location) => location.id === value
@@ -154,6 +156,7 @@ function toCertificateVariables(
 }
 
 function LocationSearchOutput({ value }: { value: Stringifiable }) {
+  'use memo'
   const intl = useIntl()
   const { getLocations } = useLocations()
   const { config } = useSelector(getOfflineData)

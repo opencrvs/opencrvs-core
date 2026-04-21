@@ -44,6 +44,7 @@ function LinkButtonInput({
   configuration: LinkButtonField['configuration']
   disabled?: boolean
 }) {
+  'use memo'
   const intl = useIntl()
   const url = setRedirectURI(configuration.url)
 

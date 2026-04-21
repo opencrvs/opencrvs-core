@@ -25,6 +25,7 @@ interface NumberInputProps
 }
 
 function NumberInput({ value, disabled, ...props }: NumberInputProps) {
+  'use memo'
   const [inputValue, setInputValue] = React.useState(
     value && isNaN(value) ? undefined : value
   )

@@ -108,6 +108,7 @@ export interface Props {
 }
 
 function HttpInput({ parentValue, configuration, form, onChange }: Props) {
+  'use memo'
   const systemVariables = useSystemVariables()
   const firstRunRef = useRef(true)
   const prevParentRef = useRef<FieldValue | undefined>(undefined)

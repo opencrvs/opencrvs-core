@@ -16,6 +16,7 @@ import { useUserDetails } from './useUserDetails'
  * Exposes template variables such as `$user` for components to replace field values or other templates
  */
 export function useSystemVariables() {
+  'use memo'
   const user = useUserDetails()
 
   const variables = {

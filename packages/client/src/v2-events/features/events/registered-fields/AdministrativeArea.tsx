@@ -24,6 +24,7 @@ function useAdministrativeArea(
   searchableLocationType: LocationType,
   parentId?: string | null
 ) {
+  'use memo'
   const { getLocations } = useLocations()
   const [allLocations] = getLocations.useSuspenseQuery({})
 
@@ -67,6 +68,7 @@ function AdministrativeAreaInput({
   onChange,
   ...inputProps
 }: AdministrativeAreaInputProps) {
+  'use memo'
   const options = useAdministrativeArea(
     LocationType.enum.ADMIN_STRUCTURE,
     partOf
@@ -91,6 +93,7 @@ function AdministrativeAreaInput({
 }
 
 function AdministrativeAreaOutput({ value }: { value: Stringifiable }) {
+  'use memo'
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
 
