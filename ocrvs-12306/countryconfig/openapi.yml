@@ -2303,6 +2303,166 @@ components:
               type: boolean
             type:
               type: string
+              const: FIELD_GROUP
+            fields:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConfig"
+          required:
+            - id
+            - label
+            - type
+            - fields
+          additionalProperties: false
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier of the field.
+            label:
+              description: Human-readable label of the field.
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              description: Reference to the parent field or fields. When a parent field
+                changes, this field is reset.
+              anyOf:
+                - type: object
+                  properties:
+                    $$field:
+                      type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      default: []
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                    - $$subfield
+                  additionalProperties: false
+                  description: Reference to a field by its ID
+                - type: array
+                  items:
+                    type: object
+                    properties:
+                      $$field:
+                        type: string
+                        description: Unique identifier for the field
+                      $$subfield:
+                        default: []
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                      - $$subfield
+                    additionalProperties: false
+                    description: Reference to a field by its ID
+            required:
+              description: Indicates whether the field is mandatory.
+              default: false
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+                  additionalProperties: false
+            conditionals:
+              description: Conditions determining when the field is shown or enabled. By
+                default, the field is always shown and enabled.
+              default: []
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+            secured:
+              description: Indicates whether the field is secured. Secured fields are not
+                indexed for search and are only visible when explicitly
+                assigned.
+              default: false
+              type: boolean
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              description: Additional validation rules applied to the field.
+              default: []
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+                additionalProperties: false
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              default: false
+              type: boolean
+            uncorrectable:
+              description: Indicates whether the field can be modified during record
+                correction.
+              default: false
+              type: boolean
+            value:
+              description: Reference to the source field or fields. When a value is defined,
+                it is copied from the parent field when changed. If multiple
+                references are provided, the first truthy value is used.
+              anyOf:
+                - type: object
+                  properties:
+                    $$field:
+                      type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      default: []
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                    - $$subfield
+                  additionalProperties: false
+                  description: Reference to a field by its ID
+                - type: array
+                  items:
+                    type: object
+                    properties:
+                      $$field:
+                        type: string
+                        description: Unique identifier for the field
+                      $$subfield:
+                        default: []
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                      - $$subfield
+                    additionalProperties: false
+                    description: Reference to a field by its ID
+            analytics:
+              description: Indicates whether the field is included in analytics. When enabled,
+                its value becomes available in the analytics dashboard.
+              default: false
+              type: boolean
+            type:
+              type: string
               const: ADDRESS
             configuration:
               type: object
@@ -2312,14 +2472,122 @@ components:
                 fields:
                   type: array
                   items:
-                    type: string
-                    enum:
-                      - country
-                      - administrativeArea
-                administrativeLevels:
-                  type: array
-                  items:
-                    type: string
+                    anyOf:
+                      - type: object
+                        properties:
+                          id:
+                            type: string
+                            description: Unique identifier of the field.
+                          type:
+                            type: string
+                            const: COUNTRY
+                          label:
+                            description: Human-readable label of the field.
+                            $ref: "#/components/schemas/TranslationConfig"
+                          conditionals:
+                            description: Conditions determining when the field is shown or enabled. By
+                              default, the field is always shown and enabled.
+                            default: []
+                            type: array
+                            items:
+                              $ref: "#/components/schemas/FieldConditional"
+                          required:
+                            description: Indicates whether the field is mandatory.
+                            default: false
+                            anyOf:
+                              - type: boolean
+                              - type: object
+                                properties:
+                                  message:
+                                    description: Custom required validation message
+                                    $ref: "#/components/schemas/TranslationConfig"
+                                required:
+                                  - message
+                                additionalProperties: false
+                          optionOverrides:
+                            description: Conditionals for specific countries. Countries not listed are
+                              always shown and enabled.
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                value:
+                                  type: string
+                                  description: The value of the option
+                                conditionals:
+                                  default: []
+                                  type: array
+                                  items:
+                                    oneOf:
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            const: SHOW
+                                          conditional:
+                                            $ref: "#/components/schemas/Conditional"
+                                        required:
+                                          - type
+                                          - conditional
+                                        additionalProperties: false
+                                        description: If 'SHOW' conditional is defined, the component is shown to the
+                                          user only if the condition is met
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            const: ENABLE
+                                          conditional:
+                                            $ref: "#/components/schemas/Conditional"
+                                        required:
+                                          - type
+                                          - conditional
+                                        additionalProperties: false
+                                        description: If 'ENABLE' conditional is defined, the component is enabled only
+                                          if the condition is met
+                                    type: object
+                              required:
+                                - value
+                              additionalProperties: false
+                        required:
+                          - id
+                          - type
+                        additionalProperties: false
+                      - type: object
+                        properties:
+                          id:
+                            type: string
+                            description: Unique identifier of the field.
+                          type:
+                            type: string
+                            const: ADMINISTRATIVE_AREA
+                          label:
+                            description: Human-readable label of the field.
+                            $ref: "#/components/schemas/TranslationConfig"
+                          conditionals:
+                            description: Conditions determining when the field is shown or enabled. By
+                              default, the field is always shown and enabled.
+                            default: []
+                            type: array
+                            items:
+                              $ref: "#/components/schemas/FieldConditional"
+                          required:
+                            description: Indicates whether the field is mandatory.
+                            default: false
+                            anyOf:
+                              - type: boolean
+                              - type: object
+                                properties:
+                                  message:
+                                    description: Custom required validation message
+                                    $ref: "#/components/schemas/TranslationConfig"
+                                required:
+                                  - message
+                                additionalProperties: false
+                        required:
+                          - id
+                          - type
+                        additionalProperties: false
                 streetAddressForm:
                   type: array
                   items:
@@ -3042,6 +3310,38 @@ components:
                       - type: string
                       - $ref: "#/components/schemas/TranslationConfig"
                     description: The label of the option
+                  conditionals:
+                    default: []
+                    type: array
+                    items:
+                      oneOf:
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              const: SHOW
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          additionalProperties: false
+                          description: If 'SHOW' conditional is defined, the component is shown to the
+                            user only if the condition is met
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              const: ENABLE
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          additionalProperties: false
+                          description: If 'ENABLE' conditional is defined, the component is enabled only
+                            if the condition is met
+                      type: object
                 required:
                   - value
                   - label
@@ -4502,9 +4802,6 @@ components:
             type:
               type: string
               const: PARAGRAPH
-            defaultValue:
-              type: string
-              minLength: 1
             configuration:
               default: {}
               type: object
@@ -4683,9 +4980,6 @@ components:
             type:
               type: string
               const: HEADING
-            defaultValue:
-              type: string
-              minLength: 1
             configuration:
               default: {}
               type: object
@@ -4886,6 +5180,38 @@ components:
                       - type: string
                       - $ref: "#/components/schemas/TranslationConfig"
                     description: The label of the option
+                  conditionals:
+                    default: []
+                    type: array
+                    items:
+                      oneOf:
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              const: SHOW
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          additionalProperties: false
+                          description: If 'SHOW' conditional is defined, the component is shown to the
+                            user only if the condition is met
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              const: ENABLE
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          additionalProperties: false
+                          description: If 'ENABLE' conditional is defined, the component is enabled only
+                            if the condition is met
+                      type: object
                 required:
                   - value
                   - label
@@ -5061,8 +5387,6 @@ components:
             type:
               type: string
               const: BULLET_LIST
-            defaultValue:
-              type: string
             items:
               type: array
               items:
@@ -5246,9 +5570,6 @@ components:
             type:
               type: string
               const: PAGE_HEADER
-            defaultValue:
-              type: string
-              minLength: 1
           required:
             - id
             - label
@@ -5420,6 +5741,38 @@ components:
                       - type: string
                       - $ref: "#/components/schemas/TranslationConfig"
                     description: The label of the option
+                  conditionals:
+                    default: []
+                    type: array
+                    items:
+                      oneOf:
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              const: SHOW
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          additionalProperties: false
+                          description: If 'SHOW' conditional is defined, the component is shown to the
+                            user only if the condition is met
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              const: ENABLE
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          additionalProperties: false
+                          description: If 'ENABLE' conditional is defined, the component is enabled only
+                            if the condition is met
+                      type: object
                 required:
                   - value
                   - label
@@ -6646,6 +6999,51 @@ components:
             defaultValue:
               type: string
               minLength: 1
+            optionOverrides:
+              description: Conditionals for specific countries. Countries not listed are
+                always shown and enabled.
+              type: array
+              items:
+                type: object
+                properties:
+                  value:
+                    type: string
+                    description: The value of the option
+                  conditionals:
+                    default: []
+                    type: array
+                    items:
+                      oneOf:
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              const: SHOW
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          additionalProperties: false
+                          description: If 'SHOW' conditional is defined, the component is shown to the
+                            user only if the condition is met
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              const: ENABLE
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          additionalProperties: false
+                          description: If 'ENABLE' conditional is defined, the component is enabled only
+                            if the condition is met
+                      type: object
+                required:
+                  - value
+                additionalProperties: false
           required:
             - id
             - label
@@ -6803,8 +7201,31 @@ components:
               type: string
               const: ADMINISTRATIVE_AREA
             defaultValue:
-              type: string
-              minLength: 1
+              anyOf:
+                - type: string
+                  minLength: 1
+                - type: object
+                  properties:
+                    $userField:
+                      type: string
+                      enum:
+                        - id
+                        - name
+                        - role
+                        - fullHonorificName
+                        - device
+                        - firstname
+                        - middlename
+                        - surname
+                        - signature
+                        - avatar
+                        - primaryOfficeId
+                        - administrativeAreaId
+                    $location:
+                      type: string
+                  required:
+                    - $userField
+                  additionalProperties: false
             configuration:
               type: object
               properties:
@@ -6812,10 +7233,19 @@ components:
                   description: Parent location
                   type: object
                   properties:
-                    $declaration:
+                    $$field:
                       type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      default: []
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      type: array
+                      items:
+                        type: string
                   required:
-                    - $declaration
+                    - $$field
+                    - $$subfield
                   additionalProperties: false
                 type:
                   type: string
@@ -7212,8 +7642,31 @@ components:
               type: string
               const: LOCATION
             defaultValue:
-              type: string
-              minLength: 1
+              anyOf:
+                - type: string
+                  minLength: 1
+                - type: object
+                  properties:
+                    $userField:
+                      type: string
+                      enum:
+                        - id
+                        - name
+                        - role
+                        - fullHonorificName
+                        - device
+                        - firstname
+                        - middlename
+                        - surname
+                        - signature
+                        - avatar
+                        - primaryOfficeId
+                        - administrativeAreaId
+                    $location:
+                      type: string
+                  required:
+                    - $userField
+                  additionalProperties: false
             configuration:
               type: object
               properties:
@@ -8459,6 +8912,269 @@ components:
                         - data
                       additionalProperties: false
                     - type: "null"
+                - type: object
+                  propertyNames:
+                    type: string
+                  additionalProperties:
+                    anyOf:
+                      - oneOf:
+                          - type: object
+                            properties:
+                              country:
+                                type: string
+                              streetLevelDetails:
+                                type: object
+                                propertyNames:
+                                  type: string
+                                additionalProperties:
+                                  type: string
+                              addressType:
+                                type: string
+                                const: DOMESTIC
+                              administrativeArea:
+                                type: string
+                                format: uuid
+                                pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                            required:
+                              - country
+                              - addressType
+                              - administrativeArea
+                            additionalProperties: false
+                          - type: object
+                            properties:
+                              country:
+                                type: string
+                              streetLevelDetails:
+                                type: object
+                                propertyNames:
+                                  type: string
+                                additionalProperties:
+                                  type: string
+                              addressType:
+                                type: string
+                                const: INTERNATIONAL
+                            required:
+                              - country
+                              - addressType
+                            additionalProperties: false
+                        type: object
+                      - type: string
+                      - type: string
+                        format: date
+                        pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+                        description: Date in the format YYYY-MM-DD
+                      - type: object
+                        properties:
+                          age:
+                            type: number
+                          asOfDateRef:
+                            type: string
+                        required:
+                          - age
+                          - asOfDateRef
+                        additionalProperties: false
+                      - type: string
+                        pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+                      - anyOf:
+                          - type: object
+                            properties:
+                              start:
+                                type: string
+                                format: date
+                                pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+                                description: Date in the format YYYY-MM-DD
+                              end:
+                                type: string
+                                format: date
+                                pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+                                description: Date in the format YYYY-MM-DD
+                            required:
+                              - start
+                              - end
+                            additionalProperties: false
+                          - type: string
+                            format: date
+                            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+                            description: Date in the format YYYY-MM-DD
+                        description: Date range with start and end dates in the format YYYY-MM-DD.
+                          Inclusive start, exclusive end.
+                      - type: string
+                        enum:
+                          - last7Days
+                          - last30Days
+                          - last90Days
+                          - last365Days
+                      - type: boolean
+                      - type: number
+                      - type: object
+                        properties:
+                          path:
+                            type: string
+                            description: A relative path within the S3 bucket, never starting with /. e.g.
+                              document-id.jpg or directory/document-id.jpg. The
+                              document service constructs the full /bucket/path
+                              internally.
+                          originalFilename:
+                            type: string
+                          type:
+                            type: string
+                        required:
+                          - path
+                          - originalFilename
+                          - type
+                        additionalProperties: false
+                      - type: array
+                        items:
+                          type: object
+                          properties:
+                            path:
+                              type: string
+                              description: A relative path within the S3 bucket, never starting with /. e.g.
+                                document-id.jpg or directory/document-id.jpg.
+                                The document service constructs the full
+                                /bucket/path internally.
+                            originalFilename:
+                              type: string
+                            type:
+                              type: string
+                            option:
+                              type: string
+                          required:
+                            - path
+                            - originalFilename
+                            - type
+                            - option
+                          additionalProperties: false
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                        required:
+                          - firstname
+                          - surname
+                        additionalProperties: false
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  firstname:
+                                    anyOf:
+                                      - type: string
+                                      - type: "null"
+                                  surname:
+                                    anyOf:
+                                      - type: string
+                                      - type: "null"
+                                  middlename:
+                                    anyOf:
+                                      - type: string
+                                      - type: "null"
+                                additionalProperties: false
+                              - type: "null"
+                          - not: {}
+                      - type: number
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                          error:
+                            anyOf:
+                              - type: object
+                                properties:
+                                  statusCode:
+                                    type: number
+                                  message:
+                                    type: string
+                                required:
+                                  - statusCode
+                                  - message
+                                additionalProperties: false
+                              - type: "null"
+                          data: {}
+                        required:
+                          - loading
+                          - data
+                        additionalProperties: false
+                      - type: string
+                        enum:
+                          - verified
+                          - authenticated
+                          - failed
+                          - pending
+                      - anyOf:
+                          - type: object
+                            properties:
+                              data:
+                                type: object
+                                propertyNames:
+                                  type: string
+                                additionalProperties:
+                                  type: string
+                              updatedAt:
+                                type: string
+                                format: date-time
+                                pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                            required:
+                              - data
+                              - updatedAt
+                            additionalProperties: false
+                          - type: "null"
+                      - type: object
+                        properties:
+                          data: {}
+                        required:
+                          - data
+                        additionalProperties: false
+                      - type: object
+                        properties:
+                          data: {}
+                        required:
+                          - data
+                        additionalProperties: false
+                      - type: object
+                        properties:
+                          numericValue:
+                            type: number
+                          unit:
+                            type: string
+                        required:
+                          - numericValue
+                          - unit
+                        additionalProperties: false
+                      - type: object
+                        properties:
+                          numericValue:
+                            type: number
+                          unit:
+                            type: string
+                        additionalProperties: false
+                      - {}
+                      - type: object
+                        properties:
+                          label:
+                            type: string
+                          value:
+                            type: string
+                        required:
+                          - label
+                          - value
+                        additionalProperties: false
+                      - anyOf:
+                          - type: object
+                            properties:
+                              label:
+                                type: string
+                              value:
+                                type: string
+                            required:
+                              - label
+                              - value
+                            additionalProperties: false
+                          - type: "null"
             configuration:
               default:
                 maxFileSize: 5242880
@@ -8823,6 +9539,38 @@ components:
                       - type: string
                       - $ref: "#/components/schemas/TranslationConfig"
                     description: The label of the option
+                  conditionals:
+                    default: []
+                    type: array
+                    items:
+                      oneOf:
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              const: SHOW
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          additionalProperties: false
+                          description: If 'SHOW' conditional is defined, the component is shown to the
+                            user only if the condition is met
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              const: ENABLE
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          additionalProperties: false
+                          description: If 'ENABLE' conditional is defined, the component is enabled only
+                            if the condition is met
+                      type: object
                 required:
                   - value
                   - label
@@ -10891,7 +11639,8 @@ components:
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
-              default: false
+              description: Loader field does not show a label by default
+              default: true
               type: boolean
             uncorrectable:
               description: Indicates whether the field can be modified during record
@@ -10947,6 +11696,12 @@ components:
             type:
               type: string
               const: LOADER
+            variant:
+              default: default
+              type: string
+              enum:
+                - default
+                - highlighted
             configuration:
               type: object
               properties:
@@ -13678,6 +14433,7 @@ components:
                             - HEADING
                             - PAGE_HEADER
                             - RADIO_GROUP
+                            - FIELD_GROUP
                             - FILE
                             - FILE_WITH_OPTIONS
                             - BULLET_LIST
@@ -13729,6 +14485,38 @@ components:
                                   - type: string
                                   - $ref: "#/components/schemas/TranslationConfig"
                                 description: The label of the option
+                              conditionals:
+                                default: []
+                                type: array
+                                items:
+                                  oneOf:
+                                    - type: object
+                                      properties:
+                                        type:
+                                          type: string
+                                          const: SHOW
+                                        conditional:
+                                          $ref: "#/components/schemas/Conditional"
+                                      required:
+                                        - type
+                                        - conditional
+                                      additionalProperties: false
+                                      description: If 'SHOW' conditional is defined, the component is shown to the
+                                        user only if the condition is met
+                                    - type: object
+                                      properties:
+                                        type:
+                                          type: string
+                                          const: ENABLE
+                                        conditional:
+                                          $ref: "#/components/schemas/Conditional"
+                                      required:
+                                        - type
+                                        - conditional
+                                      additionalProperties: false
+                                      description: If 'ENABLE' conditional is defined, the component is enabled only
+                                        if the condition is met
+                                  type: object
                             required:
                               - value
                               - label
@@ -13935,6 +14723,7 @@ components:
                             - HEADING
                             - PAGE_HEADER
                             - RADIO_GROUP
+                            - FIELD_GROUP
                             - FILE
                             - FILE_WITH_OPTIONS
                             - BULLET_LIST
@@ -13986,6 +14775,38 @@ components:
                                   - type: string
                                   - $ref: "#/components/schemas/TranslationConfig"
                                 description: The label of the option
+                              conditionals:
+                                default: []
+                                type: array
+                                items:
+                                  oneOf:
+                                    - type: object
+                                      properties:
+                                        type:
+                                          type: string
+                                          const: SHOW
+                                        conditional:
+                                          $ref: "#/components/schemas/Conditional"
+                                      required:
+                                        - type
+                                        - conditional
+                                      additionalProperties: false
+                                      description: If 'SHOW' conditional is defined, the component is shown to the
+                                        user only if the condition is met
+                                    - type: object
+                                      properties:
+                                        type:
+                                          type: string
+                                          const: ENABLE
+                                        conditional:
+                                          $ref: "#/components/schemas/Conditional"
+                                      required:
+                                        - type
+                                        - conditional
+                                      additionalProperties: false
+                                      description: If 'ENABLE' conditional is defined, the component is enabled only
+                                        if the condition is met
+                                  type: object
                             required:
                               - value
                               - label
