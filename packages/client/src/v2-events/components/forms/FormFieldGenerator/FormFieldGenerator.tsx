@@ -90,6 +90,7 @@ export const FormFieldGenerator = forwardRef<
     },
     ref
   ) => {
+    'use memo'
     const formikRef = useRef<FormikProps<EventState>>(null)
 
     useImperativeHandle(ref, () => ({
@@ -115,13 +116,10 @@ export const FormFieldGenerator = forwardRef<
               administrativeArea: true,
               streetLevelDetails: (
                 field.configuration?.streetAddressForm ?? []
-              ).reduce(
-                (acc, streetField) => {
-                  acc[streetField.id] = true
-                  return acc
-                },
-                {} as Record<string, boolean>
-              )
+              ).reduce((acc, streetField) => {
+                acc[streetField.id] = true
+                return acc
+              }, {} as Record<string, boolean>)
             }
           }
           return true

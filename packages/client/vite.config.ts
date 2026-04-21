@@ -102,6 +102,13 @@ export default defineConfig(({ mode }) => {
         babel: {
           plugins: [
             [
+              'babel-plugin-react-compiler',
+              {
+                compilationMode: 'annotation',
+                target: '18'
+              }
+            ],
+            [
               'babel-plugin-styled-components',
               {
                 displayName: true,
