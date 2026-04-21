@@ -55,7 +55,7 @@ function isTextField(field: FieldConfig): field is TextField {
  *
  * @returns Resolves template variables in the default value and returns the resolved value.
  */
-export function replacePlaceholders({
+function replacePlaceholders({
   field,
   currentValue,
   defaultValue,
