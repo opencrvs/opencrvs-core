@@ -105,6 +105,7 @@ export default defineConfig(({ mode }) => {
               'babel-plugin-react-compiler',
               {
                 compilationMode: 'annotation',
+                runtimeModule: 'react-compiler-runtime',
                 target: '18'
               }
             ],
