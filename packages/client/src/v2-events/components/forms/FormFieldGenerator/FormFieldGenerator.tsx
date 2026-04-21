@@ -203,6 +203,7 @@ export const FormFieldGenerator = forwardRef<
         {(formikProps) => {
           return (
             <FormSectionComponent
+              key={id}
               className={className}
               eventConfig={eventConfig}
               fields={fields}
@@ -213,7 +214,6 @@ export const FormFieldGenerator = forwardRef<
               id={id}
               isCorrection={isCorrection}
               readonlyMode={readonlyMode}
-              resetForm={formikProps.resetForm}
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
               touched={formikProps.touched}

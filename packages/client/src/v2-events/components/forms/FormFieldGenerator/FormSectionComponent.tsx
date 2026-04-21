@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect } from 'react'
 import { FormikProps } from 'formik'
 import { cloneDeep, set, get, omit, unset, isNil } from 'lodash'
 import {
@@ -74,7 +74,7 @@ type AllProps = {
  */
 type UsedFormikProps = Pick<
   FormikProps<EventState>,
-  'values' | 'setTouched' | 'setValues' | 'touched' | 'resetForm'
+  'values' | 'setTouched' | 'setValues' | 'touched'
 >
 
 function focusElementByHash() {
@@ -196,13 +196,11 @@ export function FormSectionComponent({
   eventConfig,
   setValues,
   setTouched,
-  resetForm,
   isCorrection = false,
   validatorContext
 }: AllProps) {
   // Conditionals need to be able to react to whether the user is online or not
   useOnlineStatus()
-  const prevIdRef = useRef(id)
 
   const getDefaultValue = useDefaultValue()
   const { cacheHiddenFieldValue, popHiddenFieldValue } = useEventFormData()
@@ -386,15 +384,6 @@ export function FormSectionComponent({
   useEffect(() => {
     focusElementByHash()
   }, [])
-
-  useEffect(() => {
-    const sectionChanged = prevIdRef.current !== id
-
-    if (sectionChanged) {
-      resetForm()
-    }
-    prevIdRef.current = id
-  }, [id, resetForm])
 
   return (
     <section className={className}>
