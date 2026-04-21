@@ -197,6 +197,7 @@ export function FormSectionComponent({
   isCorrection = false,
   validatorContext
 }: AllProps) {
+  'use memo'
   // Conditionals need to be able to react to whether the user is online or not
   useOnlineStatus()
   const prevIdRef = useRef(id)

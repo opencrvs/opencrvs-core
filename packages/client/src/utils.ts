@@ -38,6 +38,7 @@ const ONLINE = 'online'
 const OFFLINE = 'offline'
 
 export function useOnlineStatus() {
+  'use memo'
   const [isOnline, setOnline] = useState(isNavigatorOnline())
 
   useEffect(() => {

@@ -194,6 +194,7 @@ function resolveOptions(
 export const GeneratedInputField = <T extends FieldConfig>(
   props: GeneratedInputFieldProps<T>
 ) => {
+  'use memo'
   const {
     fieldDefinition,
     eventConfig,

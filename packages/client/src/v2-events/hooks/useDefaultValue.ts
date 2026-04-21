@@ -165,6 +165,7 @@ export function mapFieldToDefaultValue(
 }
 
 export function useDefaultValue() {
+  'use memo'
   const systemVariables = useSystemVariables()
   const { config } = useSelector(getOfflineData)
   const { getLocations } = useLocations()
