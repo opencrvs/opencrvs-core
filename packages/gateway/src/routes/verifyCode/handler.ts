@@ -201,7 +201,7 @@ export default async function sendVerifyCodeHandler(
 ) {
   const payload = request.payload as ISendVerifyCodePayload
   const { userFullName, phoneNumber, notificationEvent, email } = payload
-  const token = request.headers.authorization.replace('Bearer ', '') as string
+  const token = (request.headers.authorization as string).replace('Bearer ', '')
   const decodedOrError = verifyToken(token)
   if (decodedOrError._tag === 'Left') {
     return unauthorized()

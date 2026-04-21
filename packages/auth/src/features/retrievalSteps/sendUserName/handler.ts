@@ -55,14 +55,14 @@ export default async function sendUserNameHandler(
       username: retrievalStepInformation.username
     },
     countryConfigUrl: env.COUNTRY_CONFIG_URL_INTERNAL,
-    authHeader: { Authorization: request.headers.authorization }
+    authHeader: { Authorization: request.headers.authorization as string }
   })
 
-  await recordUserAuditEvent(request.headers.authorization, {
+  await recordUserAuditEvent(request.headers.authorization as string, {
     operation: 'user.username_reminder',
     requestData: {
       subjectId: retrievalStepInformation.userId
-    },
+    }
   })
 
   await deleteRetrievalStepInformation(payload.nonce)

@@ -43,16 +43,16 @@ export default async function resetPasswordInviteHandler(
   }
 
   const systemAdminUser = await User.findById(
-    getUserId({ Authorization: request.headers.authorization })
+    getUserId({ Authorization: request.headers.authorization as string })
   )
 
   if (!systemAdminUser) {
     return h.response().code(400)
   }
 
-  recordUserAuditEvent(request.headers.authorization, {
+  recordUserAuditEvent(request.headers.authorization as string, {
     operation: 'user.password_reset_by_admin',
-    requestData: { subjectId: userId },
+    requestData: { subjectId: userId }
   })
 
   // DEFAULT_USER_PASSWORD allows QA/dev environments to set a predictable password
@@ -83,7 +83,7 @@ export default async function resetPasswordInviteHandler(
       },
       countryConfigUrl: COUNTRY_CONFIG_URL,
       authHeader: {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization as string
       }
     })
   } catch (err) {
