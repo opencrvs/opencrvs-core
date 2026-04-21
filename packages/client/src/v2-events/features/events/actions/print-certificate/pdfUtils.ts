@@ -35,8 +35,7 @@ import {
   AdministrativeArea,
   getActionAnnotationFields,
   FieldUpdateValue,
-  FieldConfig,
-  DocumentPath
+  FieldConfig
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'

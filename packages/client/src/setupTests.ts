@@ -90,7 +90,6 @@ import {
   getItem,
   setItem
 } from './tests/util'
-import { DASHBOARD } from './navigation/routes'
 
 vi.doMock('@client/forms/user/fieldDefinitions/createUser', () => ({
   createUserForm: mockOfflineData.userForms
@@ -195,7 +194,6 @@ vi.doMock(
         }),
       loadConfig: () => Promise.resolve(mockConfigResponse),
       loadConfigAnonymousUser: () => Promise.resolve(mockConfigResponse),
-      loadForms: () => Promise.resolve({ forms: mockOfflineData.forms }),
       importConditionals: () => Promise.resolve({}),
       importHandlebarHelpers: () => Promise.resolve({})
     }
@@ -239,8 +237,7 @@ beforeEach(() => {
   const userData: IUserData[] = [
     {
       userID: userDetails.id,
-      userPIN: '$2a$10$xQBLcbPgGQNu9p6zVchWuu6pmCrQIjcb6k2W1PIVUxVTE/PumWM82',
-      declarations: []
+      userPIN: '$2a$10$xQBLcbPgGQNu9p6zVchWuu6pmCrQIjcb6k2W1PIVUxVTE/PumWM82'
     }
   ]
 

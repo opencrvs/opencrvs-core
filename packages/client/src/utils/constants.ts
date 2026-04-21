@@ -11,20 +11,10 @@
 export const EMPTY_STRING = ''
 export const LANG_EN = 'en'
 
-export const REGEXP_BLOCK_ALPHA_NUMERIC_DOT = '^[0-9A-Z.]+$'
-export const REGEXP_NUMBER_INPUT_NON_NUMERIC = '[eE+-]'
-export const REGEXP_DECIMAL_POINT_NUMBER = '\\.'
-
 export const SECURITY_PIN_EXPIRED_AT = 'locked_time'
 
 export const ALLOWED_IMAGE_TYPE = ['image/jpeg', 'image/jpg', 'image/png']
 export const ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE = ['image/svg+xml']
-
-export const ADVANCED_SEARCH_TEXT = 'advanced-search'
-export const NATIONAL_ID = 'NATIONAL_ID'
-
-export const BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER'
-export const DEATH_REGISTRATION_NUMBER = 'DEATH_REGISTRATION_NUMBER'
 
 export const REFRESH_TOKEN_CHECK_MILLIS = 4 * 60 * 1000 // 4 minutes
 export const TOKEN_EXPIRE_MILLIS = 10 * 60 * 1000 // 10 minutes

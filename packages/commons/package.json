@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/commons",
-  "version": "1.9.11",
+  "version": "1.9.12",
   "description": "OpenCRVS common modules and utils",
   "license": "MPL-2.0",
   "main": "./build/dist/common/index.js",
@@ -88,8 +88,8 @@
     "typescript": "5.6.3",
     "uuid": "^9.0.0",
     "wireit": "^0.14.12",
-    "zod": "^4.1.12",
-    "zod-openapi": "^5.4.3"
+    "zod": "^4.2.1",
+    "zod-openapi": "^5.4.6"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.9",

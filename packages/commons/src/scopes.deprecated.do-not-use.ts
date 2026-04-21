@@ -10,7 +10,13 @@
  */
 
 import * as z from 'zod/v4'
-import { encodeScope, RecordScopeTypeV2, RecordScopeV2, Scope } from './scopes'
+import {
+  EncodedScope,
+  encodeScope,
+  RecordScopeTypeV2,
+  RecordScopeV2,
+  Scope
+} from './scopes'
 
 /**
  * @deprecated - will be removed in v2.1.
@@ -235,76 +241,80 @@ export function parseConfigurableScope(scope: string) {
 /**
  * @deprecated - These are v1.8 legacy literal scopes which are no longer supported on v2.0. However, they are automatically migrated to v2.0 scopes.
  * */
-const MigratedLegacyScope = z.enum([
-  'bypassratelimit',
-  'record.reindex',
-  'record.import',
-  'attachment.upload',
-  'user.data-seeding',
-  'integration.create',
-  'performance.vital-statistics-export',
-  'profile.electronic-signature',
-  'performance.read',
-  'performance.read-dashboards',
-  'config.update-all',
-  'organisation.read-locations',
-  'organisation.read-locations:my-office',
-  'organisation.read-locations:my-jurisdiction',
-  'user.create:all',
-  'user.read:all',
-  'user.update:all',
-  'user.read:my-office',
-  'user.read:my-jurisdiction',
-  'user.read:only-my-audit',
-  'user.create:my-jurisdiction',
-  'user.update:my-jurisdiction'
-])
+export const SCOPES = {
+  BYPASSRATELIMIT: 'bypassratelimit',
+  RECORD_REINDEX: 'record.reindex',
+  RECORD_IMPORT: 'record.import',
+  ATTACHMENT_UPLOAD: 'attachment.upload',
+  USER_DATA_SEEDING: 'user.data-seeding',
+  INTEGRATION_CREATE: 'integration.create',
+  PERFORMANCE_EXPORT_VITAL_STATISTICS: 'performance.vital-statistics-export',
+  PROFILE_ELECTRONIC_SIGNATURE: 'profile.electronic-signature',
+  PERFORMANCE_READ: 'performance.read',
+  PERFORMANCE_READ_DASHBOARDS: 'performance.read-dashboards',
+  CONFIG_UPDATE_ALL: 'config.update-all',
+  ORGANISATION_READ_LOCATIONS: 'organisation.read-locations',
+  ORGANISATION_READ_LOCATIONS_MY_OFFICE:
+    'organisation.read-locations:my-office',
+  ORGANISATION_READ_LOCATIONS_MY_JURISDICTION:
+    'organisation.read-locations:my-jurisdiction',
+  USER_CREATE: 'user.create:all',
+  USER_READ: 'user.read:all',
+  USER_UPDATE: 'user.update:all',
+  USER_READ_MY_OFFICE: 'user.read:my-office',
+  USER_READ_MY_JURISDICTION: 'user.read:my-jurisdiction',
+  USER_READ_ONLY_MY_AUDIT: 'user.read:only-my-audit',
+  USER_CREATE_MY_JURISDICTION: 'user.create:my-jurisdiction',
+  USER_UPDATE_MY_JURISDICTION: 'user.update:my-jurisdiction'
+} as const
 
 const literalScopeToV2ScopeMap: Record<
-  z.infer<typeof MigratedLegacyScope>,
+  (typeof SCOPES)[keyof typeof SCOPES],
   Scope
 > = {
-  bypassratelimit: { type: 'bypassratelimit' },
-  'record.reindex': { type: 'record.reindex' },
-  'record.import': { type: 'record.import' },
-  'attachment.upload': { type: 'attachment.upload' },
-  'user.data-seeding': { type: 'user.data-seeding' },
-  'integration.create': { type: 'integration.create' },
-  'performance.vital-statistics-export': {
+  [SCOPES.BYPASSRATELIMIT]: { type: 'bypassratelimit' },
+  [SCOPES.RECORD_REINDEX]: { type: 'record.reindex' },
+  [SCOPES.RECORD_IMPORT]: { type: 'record.import' },
+  [SCOPES.ATTACHMENT_UPLOAD]: { type: 'attachment.upload' },
+  [SCOPES.USER_DATA_SEEDING]: { type: 'user.data-seeding' },
+  [SCOPES.INTEGRATION_CREATE]: { type: 'integration.create' },
+  [SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS]: {
     type: 'performance.vital-statistics-export'
   },
-  'profile.electronic-signature': { type: 'profile.electronic-signature' },
-  'performance.read': { type: 'performance.read' },
-  'performance.read-dashboards': { type: 'performance.read-dashboards' },
-  'config.update-all': { type: 'config.update-all' },
-  'organisation.read-locations': {
+  [SCOPES.PROFILE_ELECTRONIC_SIGNATURE]: {
+    type: 'profile.electronic-signature'
+  },
+  [SCOPES.PERFORMANCE_READ]: { type: 'performance.read' },
+  [SCOPES.PERFORMANCE_READ_DASHBOARDS]: { type: 'performance.read-dashboards' },
+  [SCOPES.CONFIG_UPDATE_ALL]: { type: 'config.update-all' },
+  [SCOPES.ORGANISATION_READ_LOCATIONS]: {
     type: 'organisation.read-locations'
   },
-  'organisation.read-locations:my-office': {
+  [SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE]: {
     type: 'organisation.read-locations',
     options: { accessLevel: 'location' }
   },
-  'organisation.read-locations:my-jurisdiction': {
+  [SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION]: {
     type: 'organisation.read-locations',
     options: { accessLevel: 'administrativeArea' }
   },
-  'user.create:all': { type: 'user.create' },
-  'user.create:my-jurisdiction': {
+  [SCOPES.USER_CREATE]: { type: 'user.create' },
+  [SCOPES.USER_CREATE_MY_JURISDICTION]: {
     type: 'user.create',
     options: { accessLevel: 'administrativeArea' }
   },
-  'user.read:all': { type: 'user.read' },
-  'user.read:my-office': {
+  [SCOPES.USER_READ]: { type: 'user.read' },
+  [SCOPES.USER_READ_MY_OFFICE]: {
     type: 'user.read',
     options: { accessLevel: 'location' }
   },
-  'user.read:my-jurisdiction': {
+  [SCOPES.USER_READ_MY_JURISDICTION]: {
     type: 'user.read',
     options: { accessLevel: 'administrativeArea' }
   },
-  'user.read:only-my-audit': { type: 'user.read-only-my-audit' },
-  'user.update:all': { type: 'user.edit' },
-  'user.update:my-jurisdiction': {
+  [SCOPES.USER_READ_ONLY_MY_AUDIT]: { type: 'user.read-only-my-audit' },
+  [SCOPES.USER_UPDATE]: { type: 'user.edit' },
+  [SCOPES.USER_UPDATE_MY_JURISDICTION]: {
     type: 'user.edit',
     options: { accessLevel: 'administrativeArea' }
   }
@@ -314,13 +324,13 @@ const literalScopeToV2ScopeMap: Record<
  * @deprecated - will be removed in v2.1.
  */
 export function parseLiteralScope(scope: string) {
-  const maybeLiteralScope = MigratedLegacyScope.safeParse(scope)
-
-  if (maybeLiteralScope.success) {
-    return literalScopeToV2ScopeMap[maybeLiteralScope.data]
+  if (scope in literalScopeToV2ScopeMap) {
+    return literalScopeToV2ScopeMap[
+      scope as keyof typeof literalScopeToV2ScopeMap
+    ]
   }
 
-  return
+  return undefined
 }
 
 /**
@@ -359,7 +369,7 @@ const v1ToV2ConfigScopeTypeMap: Record<string, string> = {
  * @param v1Scope e.g. 'record.declared.reject[event=birth|death|tennis-club-membership]',
  * @returns corresponding V2 compatible scope string based on v1 input.
  */
-export const legacyScopeToV2Scope = (v1Scope: string) => {
+export const legacyScopeToV2Scope = (v1Scope: string): EncodedScope => {
   const configurableV1Scope = parseConfigurableScope(v1Scope)
   const literalV1Scope = parseLiteralScope(v1Scope)
 
@@ -409,9 +419,6 @@ export const legacyScopeToV2Scope = (v1Scope: string) => {
         }
       })
     }
-    if (!configurableV1Scope.type.startsWith('record.')) {
-      return v1Scope
-    }
 
     return encodeScope({
       type: type as RecordScopeTypeV2,
@@ -445,5 +452,5 @@ export function migrateLegacyScopesToV2(scopes: string[]): string[] {
         return null
       }
     })
-    .filter((scope): scope is string => !!scope)
+    .filter((scope): scope is EncodedScope => !!scope)
 }

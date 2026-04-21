@@ -20,7 +20,7 @@ import { App, routesConfig } from '@client/App'
 import { offlineDataReady } from '@client/offline/actions'
 import { AppStore, createStore, IStoreState } from '@client/store'
 import { getSchema } from '@client/tests/graphql-schema-mock'
-import { EventType, FetchUserQuery, Status } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
 import { TestUserRole, TokenUserType, UUID } from '@opencrvs/commons/client'
@@ -42,7 +42,6 @@ import { IntlShape } from 'react-intl'
 import { Provider } from 'react-redux'
 import { ThemeProvider } from 'styled-components'
 import { waitForElement } from './wait-for-element'
-import * as actions from '@client/profile/profileActions'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { vi } from 'vitest'
 import { mockOfflineData, validImageB64String } from './mock-offline-data'
@@ -109,12 +108,6 @@ export async function createTestApp(
 
 interface ITestView {
   intl: IntlShape
-}
-
-export function createShallowRenderedComponent(
-  node: React.ReactElement<ITestView>
-) {
-  return shallow(node)
 }
 
 export const resizeWindow = (width: number, height: number) => {
@@ -264,24 +257,6 @@ export const mockRegistrarUserResponse = {
       __typename: 'User'
     }
   }
-}
-
-function appendStringToKeys(
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  obj: Record<string, any>,
-  appendString: string
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-): Record<string, any> {
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  const newObj: Record<string, any> = {}
-
-  for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      newObj[key + appendString] = obj[key]
-    }
-  }
-
-  return newObj
 }
 
 const mockFetchCertificatesTemplatesDefinition = [
@@ -495,36 +470,6 @@ export {
   mockOfflineLocationsWithHierarchy
 } from './mock-offline-data'
 
-export function fetchUserMock(officeId: string): FetchUserQuery {
-  return {
-    getUser: {
-      id: '123',
-      userMgntUserID: '123',
-      primaryOffice: {
-        id: officeId
-      },
-      name: [
-        {
-          use: 'en',
-          firstNames: 'Mohammad',
-          familyName: 'Ashraful'
-        }
-      ],
-      status: Status.Active,
-      practitionerId: '4651d1cc-6072-4e34-bf20-b583f421a9f1',
-      creationDate: '1701241360173',
-      role: {
-        id: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
-        label: {
-          id: 'userRoles.localSystemAdmin',
-          defaultMessage: 'Local System Admin',
-          description: 'Label for local system admin'
-        }
-      }
-    }
-  }
-}
-
 export function generateToken({
   scope,
   userType,
@@ -553,15 +498,5 @@ export function generateToken({
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
     audience: 'opencrvs:gateway-user'
-  })
-}
-
-export function setScopes(scope: string[], store: AppStore) {
-  const token = generateToken({ scope })
-
-  window.history.replaceState({}, '', '?token=' + token)
-
-  return store.dispatch({
-    type: actions.CHECK_AUTH
   })
 }

@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ApolloCache, NormalizedCacheObject } from '@apollo/client'
-import { IDeclaration } from '@client/declarations'
 import isBefore from 'date-fns/isBefore'
 import endOfMonth from 'date-fns/endOfMonth'
 import subMonths from 'date-fns/subMonths'
@@ -43,52 +42,6 @@ export const clearOldCacheEntries = (
 
     const timeStart = new Date(timeStartString)
     return isBefore(timeStart, evictBeforeThisDate)
-  })
-
-  for (const toEvictKey of cacheKeysToEvict) {
-    // eslint-disable-next-line no-console
-    console.debug('[Clear Apollo cache]', 'Evicting', toEvictKey)
-    cache.evict({ id: 'ROOT_QUERY', fieldName: toEvictKey })
-  }
-
-  // Purge all items in cache that don't get referenced from anywhere anymore
-  cache.gc()
-}
-
-/**
- * Removes view record cache entries that aren't referenced anymore
- */
-export const clearUnusedViewRecordCacheEntries = (
-  cache: ApolloCache<NormalizedCacheObject>,
-  currentDeclarations: Pick<IDeclaration, 'id' | 'duplicates'>[]
-) => {
-  const cacheState = cache.extract()
-  const cacheEntries = cacheState['ROOT_QUERY']
-  if (!cacheEntries) {
-    return
-  }
-
-  const toBePreservedDuplicateIds = new Set(
-    currentDeclarations.flatMap((declaration) =>
-      (declaration.duplicates ?? []).map((duplicate) => duplicate.compositionId)
-    )
-  )
-
-  const cacheKeysToEvict = Object.keys(cacheEntries).filter((key) => {
-    // Finds the record id from the cache key
-    // fetchRegistrationForViewing({"id":"0c121971-4e90-4682-be5e-cff39cc897d6"})@persist
-    const recordId =
-      /^fetchRegistrationForViewing\({"id":"(.+)"}\)@persist$/g.exec(key)?.[1]
-
-    if (!recordId) {
-      return false
-    }
-
-    if (toBePreservedDuplicateIds.has(recordId)) {
-      return false
-    }
-
-    return true
   })
 
   for (const toEvictKey of cacheKeysToEvict) {

@@ -20,7 +20,10 @@ import { ConditionalParameters, JSONSchema } from './conditionals'
 import { ActionUpdate, EventState } from '../events/ActionDocument'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
-import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
+import {
+  mapFieldTypeToZod,
+  isFieldGroupFieldType
+} from '../events/FieldTypeMapping'
 import {
   PlainDate,
   FieldUpdateValue,
@@ -30,14 +33,17 @@ import {
 import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
 import { UUID } from '../uuid'
-import { ageToDate } from '../events/utils'
 import {
-  ActionConfig,
-  ActionType,
-  EventIndex,
-  EventDocument,
-  EventConfig
-} from '../client'
+  ageToDate,
+  buildFormState,
+  flattenFormState,
+  FormState
+} from '../events/utils'
+import { ActionConfig } from '../events/ActionConfig'
+import { ActionType } from '../events/ActionType'
+import { EventConfig } from '../events/EventConfig'
+import { EventDocument } from '../events/EventDocument'
+import { EventIndex } from '../events/EventIndex'
 
 const ajv = new Ajv({
   $data: true,
@@ -634,7 +640,7 @@ export function validateFieldInput({
   })
 
   // We have overridden the standard error messages
-  return (rawError.error?.issues.map((issue) => issue.message) ??
+  return (rawError.error?.issues.map((issue: $ZodIssue) => issue.message) ??
     []) as unknown as {
     message: TranslationConfig
   }[]
@@ -668,23 +674,22 @@ export function runStructuralValidations({
 }
 
 export function runFieldValidations({
-  field,
-  values,
+  field: config,
+  form,
+  value,
   context
 }: {
   field: FieldConfig
-  values: ActionUpdate
+  value: FieldUpdateValue
+  form: ActionUpdate
   context: ValidatorContext
-}) {
-  if (
-    !isFieldVisible(field, values, context) ||
-    isFieldEmptyAndNotRequired(field, values)
-  ) {
+}): FormState<Array<{ message: TranslationConfig }>> {
+  const field = { config, value }
+  if (!isFieldVisible(field.config, form, context)) {
     return []
   }
-
   const conditionalParameters = {
-    $form: values,
+    $form: form,
     $now: formatISO(new Date(), { representation: 'date' }),
     /**
      * In real use cases, there can be hundreds of thousands of locations.
@@ -697,13 +702,40 @@ export function runFieldValidations({
     $user: context.user
   }
 
+  if (isFieldGroupFieldType(field)) {
+    const subfieldErrors: FormState<Array<{ message: TranslationConfig }>> =
+      buildFormState(field.config.fields, (subfield) =>
+        runFieldValidations({
+          field: subfield,
+          value: field.value?.[subfield.id],
+          form,
+          context
+        })
+      )
+
+    if (flattenFormState(subfieldErrors).length !== 0) {
+      return subfieldErrors
+    }
+
+    // run group validations only when subfields do not contain any errors
+    return runCustomFieldValidations({
+      field: field.config,
+      conditionalParameters
+    })
+  }
+
+  // FIELD_GROUP does not need the "required" property
+  if (isFieldEmptyAndNotRequired(field.config, form)) {
+    return []
+  }
+
   const fieldValidationResult = validateFieldInput({
-    field,
-    value: values[field.id]
+    field: field.config,
+    value
   })
 
   const customValidationResults = runCustomFieldValidations({
-    field,
+    field: field.config,
     conditionalParameters
   })
 

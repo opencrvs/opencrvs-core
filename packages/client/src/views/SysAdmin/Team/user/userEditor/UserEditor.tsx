@@ -227,7 +227,7 @@ export const CreateNewUser = () => {
   return <div />
 }
 
-export const EditUserComponent = () => {
+const EditUserComponent = () => {
   const intl = useIntl()
   const navigate = useNavigate()
   const { pageId, userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.EDIT)
@@ -278,7 +278,7 @@ export const EditUserComponent = () => {
         showReviewButton={false}
         actionType={ActionType.DECLARE}
         eventConfig={eventConfig}
-        form={formState}
+        formData={formState}
         formPages={formConfig.pages}
         pageId={pageId || eventConfig.declaration.pages[0].id}
         setFormData={(data) => {
@@ -307,11 +307,10 @@ export const EditUserComponent = () => {
 
 export const EditUser = withSuspense(EditUserComponent)
 
-export const ReviewUserComponent = () => {
+const ReviewUserComponent = () => {
   const intl = useIntl()
   const navigate = useNavigate()
-  const { getUserForm, getTouchedFields, setUserForm, clear } =
-    useUserFormState()
+  const { getUserForm, setUserForm, clear } = useUserFormState()
   const { userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.REVIEW)
   const isNewUser = userId === NEW_USER
   const { getUser, createUser, updateUser } = useUsers()

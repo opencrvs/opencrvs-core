@@ -64,7 +64,6 @@ services:
       - AUTH_URL=http://auth:4040
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - NOTIFICATION_URL=http://notification:2020/
-      - WEBHOOKS_URL=http://webhooks:2525/
       - CHECK_INVALID_TOKEN=true
       - DOCUMENTS_URL=http://documents:9050
   events:
@@ -102,18 +101,6 @@ services:
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
       - DOCUMENTS_URL=http://documents:9050
   # END User facing services
-  scheduler:
-    image: ghcr.io/opencrvs/ocrvs-scheduler:${VERSION}
-    #platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./packages/scheduler/Dockerfile
-    depends_on:
-      - base
-    environment:
-      - NODE_ENV=development
-      - METRICS_URL=http://metrics:1050
-      - OPENHIM_MONGO_URL=mongodb://mongo1/openhim-dev
   auth:
     image: ghcr.io/opencrvs/ocrvs-auth:${VERSION}
     #platform: linux/amd64
@@ -146,22 +133,6 @@ services:
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - DOCUMENTS_URL=http://documents:9050
       - EVENTS_URL=http://events:5555/
-  webhooks:
-    image: ghcr.io/opencrvs/ocrvs-webhooks:${VERSION}
-    #platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./packages/webhooks/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - base
-    environment:
-      - REDIS_HOST=redis
-      - MONGO_URL=mongodb://mongo1/webhooks
-      - AUTH_URL=http://auth:4040
-      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
-      - HOST=0.0.0.0
-      - CHECK_INVALID_TOKEN=true
   notification:
     image: ghcr.io/opencrvs/ocrvs-notification:${VERSION}
     #platform: linux/amd64

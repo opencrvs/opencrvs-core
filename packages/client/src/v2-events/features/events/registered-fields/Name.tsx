@@ -16,7 +16,9 @@ import {
   EventConfig,
   FieldConfig,
   FieldType,
+  FormState,
   getValidatorsForField,
+  IndexMap,
   joinValues,
   NameField,
   NameFieldValue,
@@ -28,20 +30,33 @@ import { mergeWithoutNullsOrUndefined } from '@client/v2-events/utils'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 
 interface Props {
-  id: string
-  eventConfig?: EventConfig
-  onChange: (newValue: NameFieldValue) => void
   configuration?: NameField['configuration']
-  validation: FieldConfig['validation']
-  value?: NameFieldValue
   disabled?: boolean
+  eventConfig?: EventConfig
+  id: string
+  name: string
+  onBlur: (formikFieldId: string, newTouched: FormState<boolean>) => void
+  onChange: (newValue: NameFieldValue) => void
+  touched: IndexMap<FormState<boolean>> | undefined
+  validation: FieldConfig['validation']
   validatorContext: ValidatorContext
+  value?: NameFieldValue
 }
 
-const defailtNameFieldValue: NameFieldValue = {
-  firstname: '',
-  middlename: '',
-  surname: ''
+function defaultNameFieldValue(
+  config: NonNullable<NameField['configuration']>['name'] | undefined
+): NameFieldValue {
+  if (config?.middlename) {
+    return {
+      firstname: '',
+      middlename: '',
+      surname: ''
+    }
+  }
+  return {
+    firstname: '',
+    surname: ''
+  }
 }
 
 function FocusNameInputsOnHash({
@@ -117,16 +132,20 @@ function FocusNameInputsOnHash({
   return null
 }
 
-function NameInput(props: Props) {
-  const {
-    id,
-    onChange,
-    disabled,
-    value = {},
-    eventConfig,
-    configuration,
-    validatorContext
-  } = props
+function NameInput({
+  id,
+  name,
+  onChange,
+  onBlur,
+  touched = {},
+  disabled,
+  value,
+  eventConfig,
+  configuration,
+  validatorContext,
+  ...props
+}: Props) {
+  value ??= defaultNameFieldValue(configuration?.name)
 
   const { maxLength, order } = configuration || {}
 
@@ -219,13 +238,21 @@ function NameInput(props: Props) {
       <FormFieldGenerator
         eventConfig={eventConfig}
         fields={fields}
+        formTouched={touched}
+        formValues={value}
         id={id}
-        initialValues={{ ...value }}
-        parentId={id}
         validatorContext={validatorContext}
-        onChange={(values) => {
-          onChange(mergeWithoutNullsOrUndefined(defailtNameFieldValue, values))
-        }}
+        onFormChange={(values) =>
+          onChange(
+            mergeWithoutNullsOrUndefined(
+              defaultNameFieldValue(configuration?.name),
+              values
+            )
+          )
+        }
+        onTouchedChange={(newTouched) =>
+          onBlur(name, { ...touched, ...newTouched })
+        }
       />
       <FocusNameInputsOnHash id={id} value={value} />
     </>

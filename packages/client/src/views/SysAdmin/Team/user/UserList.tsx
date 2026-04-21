@@ -28,10 +28,8 @@ import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { ROUTES } from '@client/v2-events/routes'
 import { getUsersFullName } from '@client/v2-events/utils'
-import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { getAddressNameV2, UserStatus } from '@client/views/SysAdmin/Team/utils'
-import { FieldType, Location, User, UUID } from '@opencrvs/commons/client'
+import { Location, User, UUID } from '@opencrvs/commons/client'
 import { Link } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
@@ -147,7 +145,6 @@ interface SearchParams {
 }
 
 type UserListProps = {
-  hideNavigation?: boolean
   theme: ITheme
   userDetails: UserDetails | null
 }
@@ -182,7 +179,7 @@ export const Status = (statusProps: { status: string }) => {
   }
 }
 
-function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
+function UserListComponent({ userDetails }: UserListProps) {
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -538,20 +535,6 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
     [searchedLocation, navigate]
   )
 
-  function onChangeLocation() {
-    if (searchedLocation) {
-      navigate(routes.TEAM_SEARCH, {
-        state: {
-          selectedLocation: {
-            id: searchedLocation.id,
-            searchableText: searchedLocation?.name,
-            displayLabel: searchedLocation?.name
-          }
-        }
-      })
-    }
-  }
-
   const LocationButton = (locationId: UUID) => {
     const buttons: React.ReactElement[] = []
     if (canAccessMultipleLocations) {
@@ -629,13 +612,13 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
               }
             />
           )}
-          {toggleActivation.selectedUser?.id ? (
+          {/* {toggleActivation.selectedUser?.id ? (
             <UserAuditActionModal
               show={toggleActivation.modalVisible}
               userId={toggleActivation.selectedUser.id}
               onClose={() => toggleUserActivationModal()}
             />
-          ) : null}
+          ) : null} */}
 
           <ResponsiveModal
             id="username-reminder-modal"
@@ -727,9 +710,9 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
       currentPageNumber,
       generateUserContents,
       intl,
-      toggleActivation.modalVisible,
-      toggleActivation.selectedUser,
-      toggleUserActivationModal,
+      // toggleActivation.modalVisible,
+      // toggleActivation.selectedUser,
+      // toggleUserActivationModal,
       toggleUsernameReminder.modalVisible,
       toggleUsernameReminder.selectedUser,
       toggleUsernameReminderModal,
@@ -751,14 +734,7 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
   }
 
   return (
-    <SysAdminContentWrapper
-      changeTeamLocation={
-        canAccessMultipleLocations ? onChangeLocation : undefined
-      }
-      isCertificatesConfigPage={true}
-      hideBackground={true}
-      isHidden={hideNavigation}
-    >
+    <>
       {isOnline ? (
         <Content
           title={
@@ -887,7 +863,7 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
           {intl.formatMessage(messages.resetPasswordError)}
         </Toast>
       )}
-    </SysAdminContentWrapper>
+    </>
   )
 }
 

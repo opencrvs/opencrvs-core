@@ -231,8 +231,9 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         Cmd.run(
           (getState: () => IStoreState) => {
             const redirectToURL = getState().login.redirectToURL
+            // Strip leading slash from redirectToURL to avoid double slash e.g. /register//events/...
             const fullURL = redirectToURL
-              ? `/register/${redirectToURL}?token=${action.payload.token}&lang=${
+              ? `/register/${redirectToURL.replace(/^\//, '')}?token=${action.payload.token}&lang=${
                   getState().i18n.language
                 }`
               : `/register?token=${action.payload.token}&lang=${

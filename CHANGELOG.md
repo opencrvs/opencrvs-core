@@ -4,6 +4,10 @@
 
 ### Breaking changes
 
+#### Scheduler service removed
+
+The `scheduler` package and its Docker service have been removed. The service ran two nightly cron jobs (`refreshPerformanceData`, `runVSExport`) that called endpoints on the metrics service which have since been deprecated. No replacement is needed.
+
 #### FieldType.PARAGRAPH configuration
 
 - `FieldType.PARAGRAPH` field no longer takes in a fontVariant style configuration. If a fontVariant is required, please use the new `FieldType.HEADING` field instead.
@@ -33,11 +37,19 @@ V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
   - `'legalStatuses.DECLARED.createdByRole': { type: 'anyOf', terms: ['MY_ROLE_ID', 'MY_OTHER_ROLE_ID'] }`
   - `'legalStatuses.REGISTERD.createdByRole': { type: 'anyOf', terms: ['MY_ROLE_ID', 'MY_OTHER_ROLE_ID'] }`
 
+#### Dashboard configurations
+
+- Added the `dashboard.view` scope which supports the `ids` parameter (e.g. `options: { ids: ['registrations', 'completeness', 'registry'] }`). When `ids` is specified, users are able to access the listed dashboards. For the timebeing, the pre-existing `performance.read-dashboards` is also required, but that will be deprecated in the future [#11599](https://github.com/opencrvs/opencrvs-core/issues/11599)
+
 #### Inherent flags
 
 - The inherent flag `InherentFlags.PENDING_CERTIFICATION` has been removed. Similar logic can be implemented in the country config with a custom flag, [see example](https://github.com/opencrvs/opencrvs-countryconfig/blob/81db21f4cf9ccbba90cb2c6e48648c9b258dc905/src/form/v2/birth/index.ts#L95-L102).
 
 ### New features
+
+#### Autocomplete Input
+
+A select component enhanced with suggestions based on user search input. Works in conjunction with a countryconfig endpoint that returns suggestions based on user input. The list of suggestions are fetched from a table in the reference_data schema in events database.
 
 #### HTTP Input
 
@@ -62,6 +74,77 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - Added OAuth2 support for `application/x-www-form-urlencoded` content type in auth-service access token endpoints, maintaining backwards compatibility with query parameters. [#11590](https://github.com/opencrvs/opencrvs-core/pull/11590)
 - Change reindex call to make operation non-destructive. Create endpoint to track progress of reindex. [#11877](https://github.com/opencrvs/opencrvs-core/issues/11877)
 - Fixed vulnerabilities on CSP HTTP Header for login page [#12094](https://github.com/opencrvs/opencrvs-core/issues/12094)
+
+## 1.9.12
+
+### Infrastructure
+
+- Introduced `CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS` environment variable for the auth service to control the expiry of action confirmation tokens. Defaults to `604800` seconds (7 days).
+
+### Improvements
+
+- More expressive `ADDRESS` field configuration
+
+The `fields` array in `ADDRESS` field configuration now accepts a field-override object, giving you per-level control over `required`, `conditionals`, and `label`. Only `id` and `type` are required — all other properties are optional and fall back to sensible defaults: labels default to the value from the country's admin structure configuration, and the country field falls back to a built-in "Country" label.
+
+Previously only a fixed set of string values (`'country'` / `'administrativeArea'`) were accepted. The separate `administrativeLevels` array has been removed in favor of this unified `fields` array.
+
+```ts
+{
+  id: 'applicant.address',
+  type: FieldType.ADDRESS,
+  configuration: {
+    fields: [
+      { id: 'country', type: FieldType.COUNTRY },           // uses default label
+      {
+        id: 'province',
+        type: FieldType.ADMINISTRATIVE_AREA,
+        required: true,
+        label: { id: 'custom.province', defaultMessage: 'Province', description: '' } // optional override
+      },
+      {
+        id: 'district',
+        type: FieldType.ADMINISTRATIVE_AREA,
+        required: false,
+        conditionals: [{ type: ConditionalType.SHOW, conditional: ... }]
+      }
+    ]
+  }
+}
+```
+
+> [!IMPORTANT]
+> The `id` of the object must match the administrative hierarchy id defined in `applicationConfig`.
+
+- The `ADMINISTRATIVE_AREA` field's `configuration.partOf` now uses the standard typed `FieldReference` (produced by `field(...)`) instead of the previous ad-hoc `{ $declaration: string }` shape, and its `defaultValue` now accepts `user(...)` references in addition to plain strings.
+
+### New features
+
+- Support for conditional actions "ENABLE" and "SHOW" in SELECT field options to allow the options to be hidden/disabled conditionally.
+- `COUNTRY` field now supports `optionOverrides` to conditionally hide or disable specific country options using "SHOW" and "ENABLE" conditionals. It can be used independently in a COUNTRY field or in a nested Address subfield.
+- A composite field type (`FIELD_GROUP`) that groups related child fields into a single unit with a shared label, conditionals, and validation.
+
+**Structure:**
+
+```typescript
+{
+  id: 'person.address',
+  type: fieldtype.field_group,
+  fields: [
+    { id: 'country', type: FieldType.COUNTRY },
+    { id: 'province', type: FieldType.ADMINISTRATIVE_AREA, parent: field('person.address').get('country') },
+    { id: 'district', type: FieldType.ADMINISTRATIVE_AREA, parent: field('person.address').get('province') }
+  ]
+}
+```
+
+N.B. Support for `DISPLAY_ON_REVIEW` conditionals in nested fields has not been implemented yet.
+
+### Bug fixes
+
+- Allow nested address fields to use the outer form values in conditionals.
+- Skip hidden fields when generating default values. Note: `defaultValue` only applies on the first mount of a form page — after that the field's value takes precedence, even if the `defaultValue` changes across field versions. [#11476](https://github.com/opencrvs/opencrvs-core/issues/11476)
+- Review page field conditionals have no access to form data, only review page form data. [#11410](https://github.com/opencrvs/opencrvs-core/issues/11410)
 
 ## 1.9.11
 

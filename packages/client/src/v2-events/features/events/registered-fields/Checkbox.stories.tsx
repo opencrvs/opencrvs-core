@@ -10,7 +10,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fn, within } from '@storybook/test'
+import { expect, within } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { noop } from 'lodash'
@@ -18,14 +18,16 @@ import {
   FieldType,
   TENNIS_CLUB_DECLARATION_FORM
 } from '@opencrvs/commons/client'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormFieldGenerator,
+  FormFieldGeneratorPropsWithoutRef
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { Review } from '@client/v2-events/features/events/components/Review'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
-const meta: Meta<typeof FormFieldGenerator> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/Checkbox',
-  args: { onChange: fn() },
   decorators: [
     (Story, context) => (
       <TRPCProvider>
@@ -42,7 +44,9 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
 
-export const CheckboxInput: StoryObj<typeof FormFieldGenerator> = {
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
+
+export const CheckboxInput: Story = {
   name: 'Checkbox input',
   parameters: {
     layout: 'centered'
@@ -64,9 +68,6 @@ export const CheckboxInput: StoryObj<typeof FormFieldGenerator> = {
           }
         ]}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   }
