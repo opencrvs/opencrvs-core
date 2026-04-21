@@ -23,7 +23,7 @@ export function OrganisationPage() {
   const intl = useIntl()
   return (
     <WorkqueueLayout title={intl.formatMessage(organisationsTitle)}>
-      <AdministrativeLevels hideNavigation={true} />
+      <AdministrativeLevels />
     </WorkqueueLayout>
   )
 }

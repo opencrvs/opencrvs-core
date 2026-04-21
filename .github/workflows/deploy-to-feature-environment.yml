@@ -30,12 +30,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Validate branch name and check for skip-e2e label
   check_skip_e2e_label:
     runs-on: ubuntu-24.04
     outputs:
       skip_e2e: ${{ steps.set_skip_flag.outputs.SKIP_E2E }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
+
+      - name: Validate branch name
+        id: validate
+        uses: ./.github/actions/validate-branch
+        with:
+          pattern: '^[a-z][a-z0-9\/\-]{1,44}$'
 
       - name: Check for skip-e2e label
         id: set_skip_flag
@@ -72,7 +79,7 @@ jobs:
       e2e_branch: ${{ steps.get_e2e_branch.outputs.branch }}
       chart_branch: ${{ steps.get_chart_branch.outputs.branch }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Get input data (when manually triggered)
         env:
@@ -175,7 +182,7 @@ jobs:
 
       - name: Slugify the branch name
         id: slugify_bname
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             function slugify(str) {
@@ -207,7 +214,7 @@ jobs:
       run_id: ${{ steps.dispatch_e2e.outputs.run_id }}
       deployment_link: ${{ steps.print-links.outputs.deployment_link }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       - name: Check trigger-build status and exit on non-success
         run: |
           if [ ${{ needs.trigger-build.outputs.build_status }} == 'success' ]; then
@@ -266,7 +273,7 @@ jobs:
 
       - name: Trigger E2E Workflow
         id: dispatch_e2e
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           # TODO: Replace with fine-grained e2e token
           github-token: ${{ secrets.E2E_WORKFLOWS_TOKEN }}
@@ -331,7 +338,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Wait for Environment Deployment (Deploy Job)
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.E2E_WORKFLOWS_TOKEN }}
           script: |
@@ -383,7 +390,7 @@ jobs:
               }
             }
       - name: Update github comment on PR
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.CORE_ISSUES_PR_TOKEN }}
           script: |
@@ -411,7 +418,7 @@ jobs:
             }
 
       - name: Wait for E2E Workflow Completion
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.E2E_WORKFLOWS_TOKEN }}
           script: |

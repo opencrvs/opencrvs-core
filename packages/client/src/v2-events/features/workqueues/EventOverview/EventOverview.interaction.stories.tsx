@@ -12,7 +12,7 @@ import { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { expect, fn, userEvent, waitFor, within } from '@storybook/test'
+import { expect, within, userEvent } from '@storybook/test'
 import {
   tennisClubMembershipEvent,
   generateEventDraftDocument,
@@ -89,7 +89,7 @@ export const WithConfigurableSummaryFieldHavingEventMetadataValue: Story = {
     },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
     },
@@ -115,10 +115,11 @@ export const WithConfigurableSummaryFieldHavingEventMetadataValue: Story = {
     }
   },
   play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
     await step(
       'Check the registration date embedded in text is shown in the summary',
       async () => {
-        const canvas = within(canvasElement)
         const registrationDateField =
           await canvas.findByText('Registration date')
         await expect(registrationDateField).toBeInTheDocument()
@@ -128,5 +129,22 @@ export const WithConfigurableSummaryFieldHavingEventMetadataValue: Story = {
         await expect(registrationDateValue).toBeInTheDocument()
       }
     )
+
+    await step('Can navigate to user profile from Audit history', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Audit' })
+      )
+
+      const userButtons = await canvas.findAllByRole('button', {
+        name: 'Kennedy Mweene'
+      })
+      await userEvent.click(userButtons[0])
+
+      await expect(
+        await canvas.findByText('Assigned registration office')
+      ).toBeInTheDocument()
+
+      await expect(await canvas.findByText('Logged out')).toBeInTheDocument()
+    })
   }
 }

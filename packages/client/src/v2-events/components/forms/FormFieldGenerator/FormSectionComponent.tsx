@@ -11,7 +11,7 @@
 
 import React, { useEffect, useRef } from 'react'
 import { FormikProps } from 'formik'
-import { cloneDeep, set, get, compact, omit, unset, isNil } from 'lodash'
+import { cloneDeep, set, get, omit, unset, isNil } from 'lodash'
 import {
   EventState,
   EventConfig,
@@ -37,7 +37,7 @@ import {
 import { useOnlineStatus } from '@client/utils'
 import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { makeFormikFieldIdsOpenCRVSCompatible } from './utils'
+import { makeFormikFieldIdsOpenCRVSCompatible, resolveSyncedFieldValue } from './utils'
 import { FormItem, GeneratedInputField } from './GeneratedInputField'
 
 type AllProps = {
@@ -47,6 +47,7 @@ type AllProps = {
   fullForm: EventState
   className?: string
   readonlyMode?: boolean
+  attachmentPath: string
   /**
    * Update the form values in the non-formik state.
    */
@@ -194,6 +195,7 @@ export function FormSectionComponent({
   setValues,
   setTouched,
   resetForm,
+  attachmentPath,
   isCorrection = false,
   validatorContext
 }: AllProps) {
@@ -204,7 +206,7 @@ export function FormSectionComponent({
   const getDefaultValue = useDefaultValue()
   const { cacheHiddenFieldValue, popHiddenFieldValue } = useEventFormData()
 
-  const fullFormFields = eventConfig ? findAllFields(eventConfig) : pageFields
+  const fullFormFields = eventConfig ? findAllFields(eventConfig).concat(pageFields) : pageFields
   const listenerFieldsByParentId = getParentsOfListenerFields(fullFormFields)
 
   /** Sets the value for fields that listen to another field via `parent` and `value` properties */
@@ -217,18 +219,12 @@ export function FormSectionComponent({
       makeFormFieldIdFormikCompatible
     )
 
-    const referencesToOtherFields = ([] as FieldReference[]).concat(
-      listenerField.value ?? []
-    )
-
-    const firstNonFalsyValue = compact(
-      referencesToOtherFields.map((reference) =>
-        get(
-          fieldValues,
-          flattenFieldReference(reference).map(makeFormFieldIdFormikCompatible)
-        )
+    const firstNonFalsyValue = resolveSyncedFieldValue(listenerField, (syncRef) =>
+      get(
+        fieldValues,
+        flattenFieldReference(syncRef).map(makeFormFieldIdFormikCompatible)
       )
-    )[0]
+    )
 
     if (firstNonFalsyValue) {
       set(fieldValues, formikCompatibleListenerFieldPath, firstNonFalsyValue)
@@ -415,6 +411,7 @@ export function FormSectionComponent({
           >
             <GeneratedInputField
               allKnownFields={fullFormFields}
+              attachmentPath={attachmentPath}
               disabled={isDisabled}
               eventConfig={eventConfig}
               fieldDefinition={{ ...field, id: formikFieldId }}

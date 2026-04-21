@@ -20,17 +20,11 @@ export interface ICountryLogo {
   file: string
 }
 
-export interface ILoginBackground {
-  backgroundColor: string
-  backgroundImage: string
-  imageFit: string
-}
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   COUNTRY: string
   COUNTRY_LOGO: ICountryLogo
   SENTRY: string
-  LOGIN_BACKGROUND: ILoginBackground
   USER_NOTIFICATION_DELIVERY_METHOD: string
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: string
 }
@@ -44,9 +38,7 @@ export interface IAuthenticationData {
   password: string
 }
 
-export const client = axios.create({
-  baseURL: window.config.AUTH_API_URL
-})
+export const client = axios.create({})
 
 export interface IAuthenticateResponse {
   nonce: string
@@ -117,14 +109,14 @@ export function request<T>(options: AxiosRequestConfig) {
 
 const getApplicationConfig = () => {
   return request<IApplicationConfigResponse>({
-    url: new URL('/publicConfig', window.config.CONFIG_API_URL).toString(),
+    url: '/api/publicConfig',
     method: 'GET'
   })
 }
 
 const authenticate = (data: IAuthenticationData) => {
   return request<IAuthenticateResponse>({
-    url: new URL('authenticate', window.config.AUTH_API_URL).toString(),
+    url: '/api/auth/authenticate',
     method: 'POST',
     data
   })
@@ -136,10 +128,7 @@ const resendAuthenticationCode = (
   retrievalFlow = false
 ) => {
   return request({
-    url: new URL(
-      'resendAuthenticationCode',
-      window.config.AUTH_API_URL
-    ).toString(),
+    url: '/api/auth/resendAuthenticationCode',
     method: 'POST',
     data: { nonce, notificationEvent, retrievalFlow }
   })
@@ -147,7 +136,7 @@ const resendAuthenticationCode = (
 
 const verifyCode = (data: ICodeVerifyData): Promise<IAuthenticateResponse> => {
   return request({
-    url: new URL('verifyCode', window.config.AUTH_API_URL).toString(),
+    url: '/api/auth/verifyCode',
     method: 'POST',
     data
   })
@@ -168,7 +157,7 @@ const verifyUser = (
   verificationDetails: IUserVerificationDetails
 ): Promise<IUserVerifyResponse> => {
   return request({
-    url: new URL('verifyUser', window.config.AUTH_API_URL).toString(),
+    url: '/api/auth/verifyUser',
     method: 'POST',
     data: verificationDetails
   })
@@ -184,7 +173,7 @@ const verifyNumber = (
   code: string
 ): Promise<IVerifyNumberResponse> => {
   return request({
-    url: new URL('verifyNumber', window.config.AUTH_API_URL).toString(),
+    url: '/api/auth/verifyNumber',
     method: 'POST',
     data: { nonce, code }
   })
@@ -203,7 +192,7 @@ const verifySecurityAnswer = (
   answer: string
 ): Promise<IVerifySecurityAnswerResponse> => {
   return request({
-    url: new URL('verifySecurityAnswer', window.config.AUTH_API_URL).toString(),
+    url: '/api/auth/verifySecurityAnswer',
     method: 'POST',
     data: { nonce, answer }
   })
@@ -211,7 +200,7 @@ const verifySecurityAnswer = (
 
 const changePassword = (nonce: string, newPassword: string): Promise<void> => {
   return request({
-    url: new URL('changePassword', window.config.AUTH_API_URL).toString(),
+    url: '/api/auth/changePassword',
     method: 'POST',
     data: { nonce, newPassword }
   })
@@ -219,7 +208,7 @@ const changePassword = (nonce: string, newPassword: string): Promise<void> => {
 
 const sendUserName = (nonce: string): Promise<void> => {
   return request({
-    url: new URL('sendUserName', window.config.AUTH_API_URL).toString(),
+    url: '/api/auth/sendUserName',
     method: 'POST',
     data: { nonce }
   })

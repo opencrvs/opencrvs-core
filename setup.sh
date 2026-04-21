@@ -293,7 +293,7 @@ if [[ $(docker ps -aq) ]] ; then
 fi
 
 echo
-openCRVSPorts=( 3447 9200 27017 6379 8086 4444 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525 2021 3535 3536 9050)
+openCRVSPorts=( 3447 9200 27017 6379 8086 4444 3040 5050 2020 7070 1050 3030 3000 3020 2525 2021 3535 3536 9050)
 for x in "${openCRVSPorts[@]}"
 do
    :
@@ -358,7 +358,7 @@ chmod 775 data/postgres
 
 echo -e "\033[32m:::::::::::::::::::: Building OpenCRVS dependencies ::::::::::::::::::::\033[0m"
 echo
-echo "This can take some time on slow connections.  Docker is downloading Mongo DB, ElasticSearch and Hearth docker images.  These are large files.  Then it will build them."
+echo "This can take some time on slow connections.  Docker is downloading Mongo DB and ElasticSearch docker images.  These are large files.  Then it will build them."
 echo
 if [ $OS == "MAC" ]; then
  export LOCAL_IP=host-gateway

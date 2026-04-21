@@ -16,13 +16,8 @@ export const DEFAULT_TIMEOUT = 600000
 export const HOST = env.HOST
 export const PORT = env.PORT
 export const MONGO_URL = env.MONGO_URL
-export const APPLICATION_CONFIG_URL = env.APPLICATION_CONFIG_URL
 export const COUNTRY_CONFIG_URL = env.COUNTRY_CONFIG_URL
 export const DOCUMENTS_URL = env.DOCUMENTS_URL
 export const CERT_PUBLIC_KEY_PATH = env.CERT_PUBLIC_KEY_PATH
 export const SENTRY_DSN = env.SENTRY_DSN
-export const QA_ENV = env.QA_ENV
-export const RECORD_SEARCH_QUOTA = env.RECORD_SEARCH_QUOTA
-
-export const FHIR_URL = env.FHIR_URL
-export const METRICS_URL = env.METRICS_URL
+export const EVENTS_URL = env.EVENTS_URL

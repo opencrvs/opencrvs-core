@@ -9,22 +9,30 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { UUID } from '@opencrvs/commons'
-import { SavedLocation } from '@opencrvs/commons/types'
-import { APPLICATION_CONFIG_URL } from '@user-mgnt/constants'
-import fetch from 'node-fetch'
+import { createTRPCClient, httpBatchLink } from '@trpc/client'
+import superjson from 'superjson'
+import { env } from '@user-mgnt/environment'
+import { AppRouter } from '@opencrvs/events/src/router'
 
-const FETCH_ALL_LOCATION_CHILDREN = (id: UUID) =>
-  new URL(`/locations/${id}/children`, APPLICATION_CONFIG_URL)
+function getEventsClient(token: string) {
+  return createTRPCClient<AppRouter>({
+    links: [
+      httpBatchLink({
+        url: env.EVENTS_URL,
+        transformer: superjson,
+        headers: { Authorization: token }
+      })
+    ]
+  })
+}
 
-export async function resolveLocationChildren(locationId: UUID) {
-  const response = await fetch(FETCH_ALL_LOCATION_CHILDREN(locationId))
-  if (!response.ok) {
-    throw new Error(
-      "Couldn't fetch the children of the location from config: " +
-        (await response.text())
-    )
-  }
-
-  const locations = (await response.json()) as Array<SavedLocation>
-  return locations.map((location) => location.id)
+export async function resolveLocationChildren(
+  locationId: UUID,
+  token: string
+) {
+  const client = getEventsClient(token)
+  const locations = await client.locations.list.query()
+  return locations
+    .filter((location) => location.administrativeAreaId === locationId)
+    .map((location) => location.id)
 }

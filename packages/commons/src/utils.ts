@@ -10,7 +10,7 @@
  */
 
 import { NameFieldValue } from './events/CompositeFieldValue'
-import * as z from 'zod'
+import * as z from 'zod/v4'
 import * as _ from 'lodash'
 
 export function getOrThrow<T>(x: T, message: string) {

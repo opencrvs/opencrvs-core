@@ -3,9 +3,7 @@
     "baseUrl": "./src",
     "strict": true,
     "paths": {
-      "@events/*": [
-        "./*"
-      ]
+      "@events/*": ["./*"]
     },
     "target": "es6",
     "module": "node16",
@@ -15,12 +13,7 @@
     "skipLibCheck": true,
     "moduleResolution": "node16",
     "rootDir": ".",
-    "lib": [
-      "esnext.asynciterable",
-      "es6",
-      "es2019",
-      "es2021"
-    ],
+    "lib": ["esnext.asynciterable", "es6", "es2019", "es2021"],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,

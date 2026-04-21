@@ -45,7 +45,7 @@ it('renders without crashing', () =>
 
 it("redirects user to SSO if user doesn't have a token", async () => {
   await createTestApp({ waitUntilOfflineCountryConfigLoaded: false })
-  await waitFor(() => assign.mock.calls[0][0].includes(window.config.LOGIN_URL))
+  await waitFor(() => assign.mock.calls[0][0].includes('/login'))
 })
 
 describe('when user has a valid token in url but an expired one in localStorage', () => {
@@ -111,15 +111,11 @@ describe('when user has a valid token in local storage', () => {
     expect(assign.mock.calls).toHaveLength(0)
   })
 
-  it('loads languages, facilities and locations on startup', async () => {
-    const loadFacilities = vi.spyOn(referenceApi, 'loadFacilities')
+  it('loads content on startup', async () => {
     const loadContent = vi.spyOn(referenceApi, 'loadContent')
-    const loadLocations = vi.spyOn(referenceApi, 'loadLocations')
 
     createTestApp()
     await flushPromises()
-    expect(loadFacilities).toHaveBeenCalled()
     expect(loadContent).toHaveBeenCalled()
-    expect(loadLocations).toHaveBeenCalled()
   })
 })

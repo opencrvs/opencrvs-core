@@ -12,7 +12,7 @@ import { storage } from '@login/storage'
 import { useLocation } from 'react-router-dom'
 
 export function getAvailableLanguages() {
-  return window.config.LANGUAGES.split(',')
+  return window.config.LANGUAGES
 }
 
 export function getDefaultLanguage() {

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 export const FieldType = {
   NAME: 'NAME',
@@ -26,7 +26,9 @@ export const FieldType = {
   DATE_RANGE: 'DATE_RANGE', // // Internal use, only for search functionality
   SELECT_DATE_RANGE: 'SELECT_DATE_RANGE', // Internal use, only for search functionality
   TIME: 'TIME',
+  IMAGE_VIEW: 'IMAGE_VIEW',
   PARAGRAPH: 'PARAGRAPH',
+  HEADING: 'HEADING',
   PAGE_HEADER: 'PAGE_HEADER',
   RADIO_GROUP: 'RADIO_GROUP',
   FIELD_GROUP: 'FIELD_GROUP',
@@ -39,11 +41,14 @@ export const FieldType = {
   LOCATION: 'LOCATION',
   DIVIDER: 'DIVIDER',
   ADMINISTRATIVE_AREA: 'ADMINISTRATIVE_AREA',
+  /** @deprecated Use FieldType.LOCATION with locationTypes: ['HEALTH_FACILITY'] */
   FACILITY: 'FACILITY',
+  /** @deprecated Use FieldType.LOCATION with locationTypes: ['CRVS_OFFICE'] */
   OFFICE: 'OFFICE',
   SIGNATURE: 'SIGNATURE',
   DATA: 'DATA',
   BUTTON: 'BUTTON',
+  AUTOCOMPLETE: 'AUTOCOMPLETE',
   SEARCH: 'SEARCH',
   ALPHA_PRINT_BUTTON: 'ALPHA_PRINT_BUTTON',
   HTTP: 'HTTP',
@@ -52,7 +57,20 @@ export const FieldType = {
   QUERY_PARAM_READER: 'QUERY_PARAM_READER',
   QR_READER: 'QR_READER',
   ID_READER: 'ID_READER',
-  LOADER: 'LOADER'
+  LOADER: 'LOADER',
+  ALPHA_HIDDEN: 'ALPHA_HIDDEN',
+  USER_ROLE: 'USER_ROLE',
+  /**
+   * @internal
+   * @experimental
+   *
+   * Internal API used by the OpenCRVS core team for experimentation.
+   *
+   * This component is not part of the public, stable API.
+   * Its shape, behavior, or existence may change at any time or be removed
+   * entirely without notice.
+   */
+  _EXPERIMENTAL_CUSTOM: 'CUSTOM'
 } as const
 
 /**
@@ -84,10 +102,13 @@ export const FieldTypesToHideInReview = [
   FieldType.BULLET_LIST,
   FieldType.DIVIDER,
   FieldType.PAGE_HEADER,
+  FieldType.IMAGE_VIEW,
   FieldType.PARAGRAPH,
   FieldType.ID_READER,
   FieldType.LOADER,
   FieldType.HTTP,
   FieldType.QUERY_PARAM_READER,
-  FieldType.DATA
+  FieldType.DATA,
+  FieldType.ALPHA_PRINT_BUTTON,
+  FieldType.ALPHA_HIDDEN
 ]

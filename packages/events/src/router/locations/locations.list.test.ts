@@ -12,24 +12,26 @@ import {
   createPrng,
   generateUuid,
   Location,
-  LocationType,
-  SCOPES
+  encodeScope
 } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
+const scope = encodeScope({ type: 'user.data-seeding' })
+
 test('Returns single location in right format', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+  const client = createTestClient(user, [scope])
 
   const initialLocations = await client.locations.list()
 
   const setLocationPayload: Location[] = [
     {
       id: generateUuid(),
-      parentId: null,
+      administrativeAreaId: null,
       name: 'Location foobar',
       validUntil: null,
-      locationType: LocationType.enum.ADMIN_STRUCTURE
+      locationType: 'CRVS_OFFICE',
+      externalId: 'abc123xyz456'
     }
   ]
 
@@ -43,7 +45,7 @@ test('Returns single location in right format', async () => {
 
 test('Returns multiple locations', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+  const client = createTestClient(user, [scope])
 
   const initialLocations = await client.locations.list()
 

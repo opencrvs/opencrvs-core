@@ -107,7 +107,7 @@ export const FileInputWithOptionTest: Story = {
             ]}
             id="my-form"
             validatorContext={getTestValidatorContext(
-              TestUserRole.Enum.LOCAL_REGISTRAR
+              TestUserRole.enum.LOCAL_REGISTRAR
             )}
           />
         )
@@ -207,7 +207,7 @@ export const FileInputButton: Story = {
             ]}
             id="my-form"
             validatorContext={getTestValidatorContext(
-              TestUserRole.Enum.LOCAL_REGISTRAR
+              TestUserRole.enum.LOCAL_REGISTRAR
             )}
           />
         )
@@ -327,7 +327,7 @@ export const FileInputButtonMaxImage: Story = {
             ]}
             id="my-form"
             validatorContext={getTestValidatorContext(
-              TestUserRole.Enum.LOCAL_REGISTRAR
+              TestUserRole.enum.LOCAL_REGISTRAR
             )}
           />
         )

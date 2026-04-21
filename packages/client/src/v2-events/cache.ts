@@ -9,40 +9,33 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  FullDocumentPath,
-  FullDocumentUrl,
-  joinValues
-} from '@opencrvs/commons/client'
+import { DocumentPath } from '@opencrvs/commons/client'
 
 /* Must match the one defined src-sw.ts */
 export const CACHE_NAME = 'workbox-runtime'
 
-export function getFullDocumentPath(filename: string): FullDocumentPath {
-  if (filename.startsWith('/' + window.config.MINIO_BUCKET)) {
-    // already a full path
-    return filename as FullDocumentPath
-  }
-
-  return ('/' +
-    joinValues([window.config.MINIO_BUCKET, filename], '/')) as FullDocumentPath
-}
 /**
- * Files are stored in MinIO. Files should be accessed via unsigned URLs, utilizing browser cache and aggressively precaching them.
- * @returns unsigned URL to the file in MinIO. Assumes file has been cached.
+ * Converts a DocumentPath to an absolute URL suitable for use in `src` attributes,
+ * `fetch()` calls, and other URL contexts in the browser.
+ *
+ * DocumentPath is a relative path (e.g. "events/eventId/file.jpg").
+ * Browsers resolve relative URLs against the current page URL, which would be incorrect.
+ * Files are stored in the service worker cache under their absolute path (with a leading "/"),
+ * so rendering must use the same form to get a cache hit from the service worker.
+ *
+ * @see cacheFile — stores files under the same normalized URL format.
  */
-export function getUnsignedFileUrl(path: FullDocumentPath): FullDocumentUrl {
-  return new URL(
-    path,
-    window.config.MINIO_BASE_URL
-  ).toString() as FullDocumentUrl
+export function toFileUrl(path: DocumentPath): string {
+  return path.startsWith('/') ? path : `/${path}`
 }
 
 /**
- * Sets file to **BROWSER** cache with given filename
+ * Sets file to **BROWSER** cache with given filename.
+ * Normalizes url to an absolute path (prepends / if missing).
  * @see CACHE_NAME
  */
 export async function cacheFile({ url, file }: { url: string; file: File }) {
+  const normalizedUrl = url.startsWith('/') ? url : `/${url}`
   const temporaryBlob = new Blob([file], { type: file.type })
   const cacheKeys = await caches.keys()
 
@@ -59,16 +52,18 @@ export async function cacheFile({ url, file }: { url: string; file: File }) {
   const cache = await caches.open(cacheKey)
 
   return cache.put(
-    url,
+    normalizedUrl,
     new Response(temporaryBlob, { headers: { 'Content-Type': file.type } })
   )
 }
 
 /**
  * Removes given file from the **BROWSER** cache.
+ * Normalizes the path to an absolute URL (prepends / if missing).
  * @see CACHE_NAME
  */
-export async function removeCached(filename: string) {
+export async function removeCached(filename: DocumentPath) {
+  const normalizedUrl = filename.startsWith('/') ? filename : `/${filename}`
   const cacheKeys = await caches.keys()
   const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
 
@@ -81,7 +76,7 @@ export async function removeCached(filename: string) {
   }
 
   const cache = await caches.open(cacheKey)
-  return cache.delete(getUnsignedFileUrl(getFullDocumentPath(filename)), {
+  return cache.delete(normalizedUrl, {
     ignoreSearch: true
   })
 }

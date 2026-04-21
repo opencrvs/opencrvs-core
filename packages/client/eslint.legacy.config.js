@@ -29,12 +29,6 @@ module.exports = defineConfig([
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',
-      '@typescript-eslint/no-misused-promises': [
-        'error',
-        {
-          checksVoidReturn: false
-        }
-      ],
       'no-restricted-imports': [
         'error',
         {

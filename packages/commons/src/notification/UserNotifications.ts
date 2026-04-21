@@ -11,7 +11,7 @@
 
 import { joinUrl } from '../url'
 import { NameFieldValue } from '../events'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 export const TriggerEvent = {
   USER_CREATED: 'user-created',
@@ -84,6 +84,22 @@ export type TriggerPayload = {
   [K in TriggerEvent]: z.infer<(typeof TriggerPayload)[K]>
 }
 
+// authHeader is not required for all-user-notification endpoint.
+export async function triggerUserEventNotification(args: {
+  event: typeof TriggerEvent.ALL_USER_NOTIFICATION
+  payload: TriggerPayload[typeof TriggerEvent.ALL_USER_NOTIFICATION]
+  countryConfigUrl: string
+}): Promise<Response>
+
+export async function triggerUserEventNotification<
+  T extends Exclude<TriggerEvent, typeof TriggerEvent.ALL_USER_NOTIFICATION>
+>(args: {
+  event: T
+  payload: TriggerPayload[T]
+  countryConfigUrl: string
+  authHeader: { Authorization: string }
+}): Promise<Response>
+
 export async function triggerUserEventNotification<T extends TriggerEvent>({
   event,
   payload,
@@ -93,8 +109,8 @@ export async function triggerUserEventNotification<T extends TriggerEvent>({
   event: T
   payload: TriggerPayload[T]
   countryConfigUrl: string
-  authHeader: { Authorization: string }
-}) {
+  authHeader?: { Authorization: string }
+}): Promise<Response> {
   return await fetch(joinUrl(countryConfigUrl, `triggers/user/${event}`), {
     method: 'POST',
     body: JSON.stringify(payload),

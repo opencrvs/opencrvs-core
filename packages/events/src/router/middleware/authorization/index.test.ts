@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { SCOPES, TestUserRole } from '@opencrvs/commons'
+import { encodeScope, TestUserRole } from '@opencrvs/commons'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { createTestToken } from '@events/tests/utils'
 import { TrpcContext } from '@events/context'
-import { requiresAnyOfScopes } from '.'
+import { allowedWithAnyOfScopes } from '.'
 
-describe('requiresScopes()', () => {
+describe('allowedWithAnyOfScopes()', () => {
   test('should throw TRPCError with code "FORBIDDEN" if none of the required scopes are present on the token', async () => {
-    const middleware = requiresAnyOfScopes([
-      SCOPES.RECORD_REGISTER,
-      SCOPES.RECORD_CONFIRM_REGISTRATION
+    const middleware = allowedWithAnyOfScopes([
+      'record.notify',
+      'record.reindex'
     ])
 
     // missing all of the required scopes
@@ -27,8 +27,8 @@ describe('requiresScopes()', () => {
       ctx: {
         token: createTestToken({
           userId: 'test-user-id',
-          scopes: ['record.declare[event=birth|death|tennis-club-membership]'],
-          role: TestUserRole.Enum.REGISTRATION_AGENT
+          scopes: [encodeScope({ type: 'record.declare' })],
+          role: TestUserRole.enum.REGISTRATION_AGENT
         })
       },
       next: vi.fn()
@@ -42,9 +42,9 @@ describe('requiresScopes()', () => {
   })
 
   test('should call next if any of the required scopes are present on the token', async () => {
-    const middleware = requiresAnyOfScopes([
-      SCOPES.RECORD_REGISTER,
-      SCOPES.RECORD_CONFIRM_REGISTRATION
+    const middleware = allowedWithAnyOfScopes([
+      'record.notify',
+      'record.reindex'
     ])
 
     // has one of the required scopes
@@ -52,8 +52,8 @@ describe('requiresScopes()', () => {
       ctx: {
         token: createTestToken({
           userId: 'test-user-id',
-          scopes: [SCOPES.RECORD_CONFIRM_REGISTRATION],
-          role: TestUserRole.Enum.REGISTRATION_AGENT
+          scopes: [encodeScope({ type: 'record.reindex' })],
+          role: TestUserRole.enum.REGISTRATION_AGENT
         })
       },
       next: vi.fn()

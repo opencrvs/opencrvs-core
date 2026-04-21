@@ -9,19 +9,23 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { intersection } from 'lodash'
-import {
-  ConfigurableScopeType,
-  findScope,
-  getAuthorizedEventsFromScopes,
-  PrintCertifiedCopiesScope,
-  RecordScopeType,
-  Scope
-} from '../scopes'
+
 import {
   ClientSpecificAction,
   ActionType,
   DisplayableAction
 } from './ActionType'
+import {
+  EncodedScope,
+  getAcceptedScopesByType,
+  RecordScopeTypeV2,
+  RecordScopeV2
+} from '../scopes'
+import {
+  EventIndexWithAdministrativeHierarchy,
+  userCanAccessEventWithScopes
+} from './locations'
+import { UserContext } from '../users/User'
 import { EventIndex } from './EventIndex'
 
 type AlwaysAllowed = null
@@ -31,114 +35,120 @@ export const ACTION_SCOPE_MAP = {
   [ActionType.READ]: ['record.read'],
   [ActionType.CREATE]: ['record.create'],
   [ActionType.NOTIFY]: ['record.notify'],
-  [ActionType.DECLARE]: [
-    'record.declare',
-    'record.declared.validate',
-    'record.register'
-  ],
+  [ActionType.DECLARE]: ['record.declare', 'record.register'],
+  [ActionType.EDIT]: ['record.edit'],
   [ActionType.DELETE]: ['record.declare'],
-  [ActionType.VALIDATE]: ['record.declared.validate', 'record.register'],
   [ActionType.REGISTER]: ['record.register'],
-  [ActionType.PRINT_CERTIFICATE]: ['record.registered.print-certified-copies'],
+  [ActionType.PRINT_CERTIFICATE]: ['record.print-certified-copies'],
   [ActionType.REQUEST_CORRECTION]: [
-    'record.registered.request-correction',
-    'record.registered.correct'
+    'record.request-correction',
+    'record.correct'
   ],
-  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: [
-    'record.registered.correct'
-  ],
-  [ActionType.REJECT_CORRECTION]: ['record.registered.correct'],
-  [ActionType.APPROVE_CORRECTION]: ['record.registered.correct'],
-  [ActionType.MARK_AS_DUPLICATE]: ['record.declared.review-duplicates'],
-  [ActionType.MARK_AS_NOT_DUPLICATE]: ['record.declared.review-duplicates'],
-  [ActionType.ARCHIVE]: ['record.declared.archive'],
-  [ActionType.REJECT]: ['record.declared.reject'],
+  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: ['record.correct'],
+  [ActionType.REJECT_CORRECTION]: ['record.correct'],
+  [ActionType.APPROVE_CORRECTION]: ['record.correct'],
+  [ActionType.MARK_AS_DUPLICATE]: ['record.review-duplicates'],
+  [ActionType.MARK_AS_NOT_DUPLICATE]: ['record.review-duplicates'],
+  [ActionType.ARCHIVE]: ['record.archive'],
+  [ActionType.REJECT]: ['record.reject'],
   [ActionType.ASSIGN]: null,
   [ActionType.UNASSIGN]: null,
-  [ActionType.DUPLICATE_DETECTED]: []
-} satisfies Record<
-  DisplayableAction,
-  (RecordScopeType | PrintCertifiedCopiesScope['type'])[] | AlwaysAllowed
->
+  [ActionType.DUPLICATE_DETECTED]: [],
+  [ActionType.CUSTOM]: []
+} satisfies Record<DisplayableAction, RecordScopeTypeV2[] | AlwaysAllowed>
 
-export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
+export function hasAnyOfScopes(a: string[], b: string[]) {
   return intersection(a, b).length > 0
 }
 
-export function configurableEventScopeAllowed(
-  scopes: Scope[],
-  allowedConfigurableScopes: ConfigurableScopeType[],
-  eventType: string
-) {
-  // Find the scopes that are authorized for the given action
-  const parsedScopes = allowedConfigurableScopes
-    .map((scope) => findScope(scopes, scope))
-    .filter((scope) => scope !== undefined)
+export const AssignmentStatus = {
+  ASSIGNED_TO_SELF: 'ASSIGNED_TO_SELF',
+  ASSIGNED_TO_OTHERS: 'ASSIGNED_TO_OTHERS',
+  UNASSIGNED: 'UNASSIGNED'
+} as const
 
-  // Ensure that the given event type is authorized in the found scopes
-  const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
-  return authorizedEvents.includes(eventType)
+export type AssignmentStatus =
+  (typeof AssignmentStatus)[keyof typeof AssignmentStatus]
+
+export function getAssignmentStatus(
+  eventState: EventIndex | EventIndexWithAdministrativeHierarchy,
+  userId: string
+): AssignmentStatus {
+  if (!eventState.assignedTo) {
+    return AssignmentStatus.UNASSIGNED
+  }
+
+  return eventState.assignedTo == userId
+    ? AssignmentStatus.ASSIGNED_TO_SELF
+    : AssignmentStatus.ASSIGNED_TO_OTHERS
 }
 
 /**
- * Checks if a given action is allowed for the provided scopes and event type.
+ * Checks if a given action is allowed for the provided scopes, event, and user context.
  *
  * This function determines whether the user, with the given set of scopes, is authorized
- * to perform the specified action on an event of the given type. It checks both "plain" scopes
- * (hardcoded, non-configurable) and "configurable" scopes (which may be tied to specific event types).
+ * to perform the specified action on the given event. It checks both legacy V1 scopes
+ * (hardcoded, non-configurable) and V2 scopes, which validate event type, jurisdiction,
+ * and user context via {@link userCanAccessEventWithScopes}.
  *
- * @param {Scope[]} scopes - The list of scopes the user possesses.
+ * @param {EncodedScope[]} scopes - The raw encoded scope strings the user possesses (from JWT).
  * @param {DisplayableAction} action - The action to check authorization for.
- * @param {string} eventType - The type of event for which the action is being checked.
+ * @param {EventIndexWithAdministrativeHierarchy} event - The event with resolved administrative hierarchy.
+ * @param {UserContext} currentUser - The current user's context used for V2 scope validation.
  * @returns {boolean} True if the action is in scope for the user, otherwise false.
  */
-export function isActionInScope(
-  scopes: Scope[],
-  action: DisplayableAction,
-  eventType: string
-) {
-  const allowedConfigurableScopes = ACTION_SCOPE_MAP[action]
+export function isActionInScope({
+  scopes,
+  action,
+  event,
+  currentUser
+}: {
+  scopes: EncodedScope[]
+  action: DisplayableAction
+  event: EventIndexWithAdministrativeHierarchy
+  currentUser: UserContext
+}): boolean {
+  const assignmentStatus = getAssignmentStatus(event, currentUser.id)
+  /**
+   * Anyone can unassign themselves. However, to unassign others, the user must have the 'record.unassign-others' scope.
+   * This is a special case that deviates from the general pattern of scope checks defined in ACTION_SCOPE_MAP.
+   * Therefore, we check for this condition explicitly here.
+   */
+  const isUnassigningOthers =
+    action === ActionType.UNASSIGN &&
+    assignmentStatus === AssignmentStatus.ASSIGNED_TO_OTHERS
+
+  const acceptedScopes = isUnassigningOthers
+    ? ['record.unassign-others' as const]
+    : ACTION_SCOPE_MAP[action]
 
   // 'null' means that the action is always allowed
-  if (allowedConfigurableScopes === null) {
+  if (acceptedScopes === null) {
     return true
   }
 
   // Empty array means that the action is never allowed
-  if (!allowedConfigurableScopes.length) {
+  if (!acceptedScopes.length) {
     return false
   }
 
-  return configurableEventScopeAllowed(
-    scopes,
-    allowedConfigurableScopes,
-    eventType
-  )
-}
-
-/**
- * A shared utility to check if the user can read a record.
- * This will be removed in 1.10 and implemented by scopes.
- *
- * In order for us to limit the usage of 'record.read' scope, we allow users to view records they have created on system-level.
- *
- * @deprecated - Will be removed in 1.10
- */
-export function canUserReadEvent(
-  event: EventIndex | { createdBy: string; type: string },
-  {
-    userId,
+  const matchingScopes = getAcceptedScopesByType({
+    acceptedScopes,
     scopes
-  }: {
-    userId: string
-    scopes: string[]
-  }
-) {
-  const createdByUser = event.createdBy === userId
+  })
 
-  if (createdByUser) {
-    return true
-  }
+  const canAccess = userCanAccessEventWithScopes(
+    event,
+    matchingScopes as RecordScopeV2[],
+    {
+      id: currentUser.id,
+      primaryOfficeId: currentUser.primaryOfficeId,
+      administrativeAreaId: currentUser.administrativeAreaId ?? null,
+      role: currentUser.role,
+      signature: currentUser.signature,
+      type: currentUser.type
+    }
+  )
 
-  return isActionInScope(scopes, ActionType.READ, event.type)
+  return canAccess
 }

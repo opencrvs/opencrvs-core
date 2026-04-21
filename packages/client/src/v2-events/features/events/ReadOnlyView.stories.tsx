@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
+import { expect } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { graphql, HttpResponse } from 'msw'
 import superjson from 'superjson'
 import { within } from '@testing-library/dom'
-import { userEvent, waitFor } from '@storybook/test'
 import {
   ActionType,
   createPrng,
@@ -53,13 +53,11 @@ const eventDocument = generateEventDocument({
   actions: [
     { type: ActionType.CREATE },
     { type: ActionType.DECLARE },
-    { type: ActionType.VALIDATE },
     { type: ActionType.REGISTER }
   ],
   rng
 })
 
-const eventId = eventDocument.id
 const modifiedDraft = generateEventDraftDocument({
   eventId: eventDocument.id,
   actionType: ActionType.REGISTER,
@@ -75,33 +73,22 @@ const modifiedDraft = generateEventDraftDocument({
 export const ViewRecordMenuItemInsideActionMenus: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
-    await step('Finds view record menu item in action menu', async () => {
-      const actionButton = await canvas.findByRole('button', {
-        name: 'Action'
-      })
 
-      await userEvent.click(actionButton)
-    })
+    await canvas.findByText("Applicant's name")
 
-    await step('User is taken to the view record page', async () => {
-      const list = await canvas.findByRole('list')
-      await userEvent.click(within(list).getByText('View'))
+    await expect(
+      await canvas.findByTestId('row-value-applicant.name')
+    ).toHaveTextContent('Riku This value is from a draft')
 
-      await waitFor(async () => {
-        await canvas.findByText("Applicant's name")
-        await canvas.findByText('Riku This value is from a draft')
-        await canvas.findByText(
-          'Member declaration for Riku This value is from a draft'
-        )
-        await canvas.findByText('Tennis club membership application')
-      })
-    })
+    await canvas.findByText(
+      'Member declaration for Riku This value is from a draft'
+    )
   },
   parameters: {
     userRole: TestUserRole.enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({
         eventId: eventDocument.id
       }),
       chromatic: { disableSnapshot: true }
@@ -162,23 +149,42 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.VIEW.buildPath({
-        eventId
+      initialPath: ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({
+        eventId: eventDocument.id
       })
+    },
+    offline: {
+      events: [eventDocument],
+      drafts: [modifiedDraft]
     },
     msw: {
       handlers: {
-        drafts: [
-          tRPCMsw.event.draft.list.query(() => {
-            return []
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues()
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: 7 }
+            }, {})
           })
         ],
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          }),
+        event: [
           tRPCMsw.event.get.query(() => {
             return eventDocument
+          }),
+          tRPCMsw.event.search.query(() => {
+            return {
+              total: 1,
+              results: [
+                getCurrentEventState(eventDocument, tennisClubMembershipEvent)
+              ]
+            }
+          })
+        ],
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [modifiedDraft]
           })
         ],
         user: [
@@ -190,9 +196,9 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
             })
           }),
           tRPCMsw.user.list.query(() => {
-            return [generator.user.fieldAgent().v2]
+            return [generator.user.localRegistrar().v2]
           }),
-          tRPCMsw.user.get.query(() => generator.user.localRegistrar().v2)
+          tRPCMsw.user.get.query((id) => generator.user.localRegistrar().v2)
         ]
       }
     }

@@ -24,7 +24,6 @@ import {
   ChevronRight,
   Cross
 } from '@opencrvs/components/lib/icons'
-import addDays from 'date-fns/addDays'
 import addYears from 'date-fns/addYears'
 import endOfDay from 'date-fns/endOfDay'
 import endOfYear from 'date-fns/endOfYear'

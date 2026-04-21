@@ -48,17 +48,12 @@ jest.mock('@metrics/configApi', () => {
     getApplicationConfig: () =>
       Promise.resolve({
         API_GATEWAY_URL: 'http://localhost:7070/',
-        CONFIG_API_URL: 'http://localhost:2021',
         LOGIN_URL: 'http://localhost:3020',
         AUTH_URL: 'http://localhost:4040',
         MINIO_URL: 'http://localhost:3535',
         RESOURCES_URL: 'http://localhost:3040',
         APPLICATION_NAME: 'Farajaland CRVS',
-        FIELD_AGENT_AUDIT_LOCATIONS: 'DISTRICT',
-        DECLARATION_AUDIT_LOCATIONS: 'DISTRICT',
-        EXTERNAL_VALIDATION_WORKQUEUE: false,
         PHONE_NUMBER_PATTERN: '/^0(7|9)[0-9]{1}[0-9]{7}$/',
-        NID_NUMBER_PATTERN: '/^[0-9]{9}$/',
         CURRENCY: {
           isoCode: 'ZMW',
           languagesAndCountry: ['en-ZM']

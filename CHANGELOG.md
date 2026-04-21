@@ -1,5 +1,75 @@
 # Changelog
 
+## 2.0.0 Release Candidate
+
+### Breaking changes
+
+#### Scheduler service removed
+
+The `scheduler` package and its Docker service have been removed. The service ran two nightly cron jobs (`refreshPerformanceData`, `runVSExport`) that called endpoints on the metrics service which have since been deprecated. No replacement is needed.
+
+#### FieldType.PARAGRAPH configuration
+
+- `FieldType.PARAGRAPH` field no longer takes in a fontVariant style configuration. If a fontVariant is required, please use the new `FieldType.HEADING` field instead.
+
+#### Location APIs
+
+- **Removed following endpoints from gateway:**
+  | Path | Method |
+  |--------------------|--------|
+  | `/location` | `*` |
+  | `/location/{id}` | `*` |
+  | `/locations` | `GET` |
+  | `/locations` | `POST` |
+  | `/locations/{id}` | `*` |
+
+V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
+
+- **events-service location APIs changes**
+  Administrative areas (v1 `locationType: 'ADMIN_STRUCTURE'`) are exposed from a separate endpoint. See the [definition of the administrative hierarchy](/ADMINISTRATIVE-HIERARCHY.md) 2.0.0 onwards.
+
+#### Workqueue configurations
+
+- `actions: [{ type: CtaActionType }]`. is deprecated in favor of `action: { type: CtaActionType }`
+- The `conditionals` option has been removed from workqueue configuration under `action`. This option was previously present but had no effect.
+- The `'DEFAULT'` value is no longer supported in workqueue `action` configuration. Please ensure you specify a valid `CtaActionType` (see [WorkqueueConfig.ts](https://github.com/opencrvs/opencrvs-core/blob/develop/packages/commons/src/events/WorkqueueConfig.ts)).
+- Add support for querying by the declaring or registering user's role to workqueue `query`
+  - `'legalStatuses.DECLARED.createdByRole': { type: 'anyOf', terms: ['MY_ROLE_ID', 'MY_OTHER_ROLE_ID'] }`
+  - `'legalStatuses.REGISTERD.createdByRole': { type: 'anyOf', terms: ['MY_ROLE_ID', 'MY_OTHER_ROLE_ID'] }`
+
+#### Dashboard configurations
+
+- Added the `dashboard.view` scope which supports the `ids` parameter (e.g. `options: { ids: ['registrations', 'completeness', 'registry'] }`). When `ids` is specified, users are able to access the listed dashboards. For the timebeing, the pre-existing `performance.read-dashboards` is also required, but that will be deprecated in the future [#11599](https://github.com/opencrvs/opencrvs-core/issues/11599)
+
+#### Inherent flags
+
+- The inherent flag `InherentFlags.PENDING_CERTIFICATION` has been removed. Similar logic can be implemented in the country config with a custom flag, [see example](https://github.com/opencrvs/opencrvs-countryconfig/blob/81db21f4cf9ccbba90cb2c6e48648c9b258dc905/src/form/v2/birth/index.ts#L95-L102).
+
+### New features
+
+#### Autocomplete Input
+
+A select component enhanced with suggestions based on user search input. Works in conjunction with a countryconfig endpoint that returns suggestions based on user input. The list of suggestions are fetched from a table in the reference_data schema in events database.
+
+#### HTTP Input
+
+HTTP input now accepts `field('..')` references in the HTTP body definition.
+
+#### Jurisdiction
+
+- Elasticsearch now stores location IDs as a full administrative hierarchy, with the leaf representing the actual event location. This enables searching events by any jurisdiction level (district, province, office, health facility etc.).
+- Added configurable placeOfEvent in EventConfig, allowing multiple location fields to be defined, with only one becoming the active place of event per document (based on conditionals), enabling jurisdiction-specific search by event location (e.g., birth location, child’s home address, death location).
+
+### Improvements
+
+- Refactor the tRPC context to allow defining public procedures that don't require authentication.
+- Remove legacy mongo migration status outputs and skip typecheck which reduced the migration service startup time by 66%.
+- The postgres migration files now get restored to their original state (i.e. without the environment variables being replaced) regardless of the migration passing or not
+- Added experimental ALPHA_HIDDEN form field type, allowing configurable default/derived values and conditional inclusion in form submissions.
+- Added OAuth2 support for `application/x-www-form-urlencoded` content type in auth-service access token endpoints, maintaining backwards compatibility with query parameters. [#11590](https://github.com/opencrvs/opencrvs-core/pull/11590)
+- Change reindex call to make operation non-destructive. Create endpoint to track progress of reindex. [#11877](https://github.com/opencrvs/opencrvs-core/issues/11877)
+- Fixed vulnerabilities on CSP HTTP Header for login page [#12094](https://github.com/opencrvs/opencrvs-core/issues/12094)
+
 ## 1.9.13
 
 ### Bug fixes
@@ -329,7 +399,7 @@ field('child.dob').isBefore().days(45).fromNow()
 
 - Toolkit now exports `window().location.get` to country config that can be used as a template variable e.g. in HttpField request body.
 
-## 1.9.1
+## [1.9.1](https://github.com/opencrvs/opencrvs-core/compare/v1.9.0...v1.9.1)
 
 ### Breaking changes
 
@@ -650,6 +720,8 @@ To see Events V2 in action, check out the example configurations in the **countr
 - Add Import/Export system client and `record.export` scope to enable data migrations [#10415](https://github.com/opencrvs/opencrvs-core/issues/10415)
 - Add an Alpha version of configurable "Print" button that will be refactored in a later release - this button can be used to print certificates during declaration/correction flow. [#10039](https://github.com/opencrvs/opencrvs-core/issues/10039)
 - Add bulk import endpoint [#10590](https://github.com/opencrvs/opencrvs-core/pull/10590)
+- Add multi-field search with a single component [#10617](https://github.com/opencrvs/opencrvs-core/issues/10617)
+- Add registration number field to advanced search configuration so that documents can be searched by their `Registration Number`. [#10760](https://github.com/opencrvs/opencrvs-core/issues/10760)
 
 ### Improvements
 

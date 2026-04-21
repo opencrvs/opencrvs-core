@@ -13,11 +13,15 @@ import { initTRPC, TRPCError } from '@trpc/server'
 import superjson from 'superjson'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { logger, TokenUserType } from '@opencrvs/commons'
-import { TrpcContext } from '@events/context'
+import {
+  TrpcContext,
+  InternalTrpcContext,
+  verifyInternalServiceToken
+} from '@events/context'
 import { env } from '@events/environment'
 
 export const t = initTRPC
-  .context<TrpcContext>()
+  .context<Partial<TrpcContext>>()
   .meta<OpenApiMeta>()
   .create({
     transformer: superjson,
@@ -37,19 +41,81 @@ export const t = initTRPC
     }
   })
 
+export const tInternal = initTRPC.context<InternalTrpcContext>().create({
+  transformer: superjson,
+  errorFormatter: ({ shape, error }) => {
+    // If received unhandled error, don't leak the error message or stack trace in the response.
+    // This is a security measure: the message or stack trace could contain internal technical details etc. sensitive information.
+    if (error.code === 'INTERNAL_SERVER_ERROR' && env.isProduction) {
+      return {
+        ...shape,
+        message: 'Internal server error',
+        data: { code: shape.data.code, httpStatus: shape.data.httpStatus }
+      }
+    }
+
+    // Keep all other errors as is.
+    return shape
+  }
+})
+
 export const router = t.router
 
-/**
- * System procedures are available to both system (API key) users and
- * human users depending on the scopes they have
- */
-export const systemProcedure = t.procedure
+export const internalRouter = tInternal.router
+
+export const internalProcedure = tInternal.procedure.use(async (opts) => {
+  const { token } = opts.ctx
+  try {
+    verifyInternalServiceToken(token)
+    return await opts.next({
+      ctx: {
+        ...opts.ctx,
+        token
+      }
+    })
+  } catch {
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
+})
+
+const authedProcedure = t.procedure.use(async (opts) => {
+  const { token, user } = opts.ctx
+  if (!token) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'Authorization token is missing'
+    })
+  }
+  if (!user) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'Authentication failed'
+    })
+  }
+
+  return opts.next({
+    ctx: {
+      ...opts.ctx,
+      token,
+      user
+    }
+  })
+})
+
+/** @knipignore */
+export const publicProcedure = t.procedure
 
 /**
- * Public procedures are only available to human users
+ * Procedures that are available to both system (API key) users and
+ * human users depending on the scopes they have
+ */
+export const userAndSystemProcedure = authedProcedure
+
+/**
+ * Procedures that are only available to human users
  * and will throw an error if a system user tries to access them
  */
-export const publicProcedure = t.procedure.use(async (opts) => {
+export const userOnlyProcedure = authedProcedure.use(async (opts) => {
   const { user } = opts.ctx
 
   if (user.type === TokenUserType.enum.system) {

@@ -22,12 +22,11 @@ import {
   flattenFormState,
   FormState,
   IndexMap,
-  isFieldVisible,
   mapFormState,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
-import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
+import { useFormInitialValues } from '@client/v2-events/hooks/useFormInitialValues'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -60,6 +59,7 @@ export interface FormFieldGeneratorPropsWithoutRef {
    * form validations/conditionals
    */
   formContext?: EventState
+  attachmentPath?: string
   /** Which fields are generated */
   fields: FieldConfig[]
   eventConfig?: EventConfig
@@ -88,6 +88,7 @@ export const FormFieldGenerator = forwardRef<
       formValues,
       className,
       eventConfig,
+      attachmentPath = '',
       readonlyMode,
       id,
       onValidSubmit,
@@ -156,20 +157,13 @@ export const FormFieldGenerator = forwardRef<
       }
     }))
     const intl = useIntl()
-    const getDefaultValues = useDefaultValue()
-    const defaultPageValues = getDefaultValues(
-      fields.filter((field) =>
-        isFieldVisible(field, fullForm, validatorContext)
-      )
-    )
-
-    const formikCompatibleInitialValues = makeFormFieldIdsFormikCompatible({
-      ...defaultPageValues,
-      ...pick(
-        formValues,
-        fields.map((field) => field.id)
-      )
+    const { getInitialValues } = useFormInitialValues()
+    const initialValues = getInitialValues(fields, formValues ?? {}, {
+      validator: validatorContext,
+      form: formContext ?? {}
     })
+    const formikCompatibleInitialValues =
+      makeFormFieldIdsFormikCompatible(initialValues)
     const formikCompatibleInitialTouched = makeFormFieldIdsFormikCompatible(
       pick(
         formTouched,
@@ -204,12 +198,14 @@ export const FormFieldGenerator = forwardRef<
             )
           )
         }
+        validateOnChange={false}
         validateOnMount={true}
         onSubmit={noop}
       >
         {(formikProps) => {
           return (
             <FormSectionComponent
+              attachmentPath={attachmentPath}
               className={className}
               eventConfig={eventConfig}
               fields={fields}

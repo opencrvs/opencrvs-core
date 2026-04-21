@@ -14,19 +14,14 @@ import { graphql, http, HttpResponse } from 'msw'
 import superjson from 'superjson'
 import {
   ActionType,
-  FullDocumentPath,
   generateEventDocument,
   generateEventDraftDocument,
-  tennisClubMembershipEvent,
-  UUID
+  tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
-import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
+import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import {
-  tennisClubMembershipEventIndex,
-  TestImage
-} from '@client/v2-events/features/events/fixtures'
+import { TestImage } from '@client/v2-events/features/events/fixtures'
 
 import { ReviewIndex } from './Review'
 
@@ -416,127 +411,13 @@ export const ReviewShowsFilesFromDraft: Story = {
               presignedURL: `http://localhost:3535/ocrvs/${req.params.filePath}`
             })
           }),
-          http.get('http://localhost:3535/ocrvs/:id', () => {
+          http.get('/:id', () => {
             return new HttpResponse(TestImage.Fish, {
               headers: {
                 'Content-Type': 'image/svg+xml',
                 'Cache-Control': 'no-cache'
               }
             })
-          })
-        ]
-      }
-    }
-  }
-}
-
-export const Notified: Story = {
-  parameters: {
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: notifiedEventDocument.id
-      })
-    },
-    msw: {
-      handlers: {
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.get.query(() => {
-            return notifiedEventDocument
-          })
-        ],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.localRegistrar().v1
-              }
-            })
-          }),
-          tRPCMsw.user.list.query(([id]) => {
-            return [mockUser]
-          }),
-          tRPCMsw.user.get.query((id) => {
-            return mockUser
-          })
-        ]
-      }
-    }
-  }
-}
-
-export const RejectedNotified: Story = {
-  parameters: {
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: rejectedNotifiedEventDocument.id
-      })
-    },
-    msw: {
-      handlers: {
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.get.query(() => {
-            return rejectedNotifiedEventDocument
-          })
-        ],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.localRegistrar().v1
-              }
-            })
-          }),
-          tRPCMsw.user.list.query(([id]) => {
-            return [mockUser]
-          }),
-          tRPCMsw.user.get.query((id) => {
-            return mockUser
-          })
-        ]
-      }
-    }
-  }
-}
-
-export const RejectedDeclared: Story = {
-  parameters: {
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: rejectedDeclaerdEventDocument.id
-      })
-    },
-    msw: {
-      handlers: {
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.get.query(() => {
-            return rejectedDeclaerdEventDocument
-          })
-        ],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.localRegistrar().v1
-              }
-            })
-          }),
-          tRPCMsw.user.list.query(([id]) => {
-            return [mockUser]
-          }),
-          tRPCMsw.user.get.query((id) => {
-            return mockUser
           })
         ]
       }

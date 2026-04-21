@@ -27,10 +27,14 @@ import {
   tennisClubMembershipEvent,
   footballClubMembershipEvent,
   libraryMembershipEvent,
-  LocationType,
-  TestUserRole
+  TestUserRole,
+  AuditLogEntry
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
+import {
+  V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS,
+  V2_DEFAULT_MOCK_LOCATIONS
+} from '@client/tests/v2-events/administrative-hierarchy-mock'
 
 async function ensureCacheExists(cacheName: string) {
   const cacheNames = await caches.keys()
@@ -55,176 +59,15 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-export const V2_DEFAULT_MOCK_LOCATIONS = [
-  {
-    id: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-    name: 'Central',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: null,
-    validUntil: null
-  },
-  {
-    id: 'c599b691-fd2d-45e1-abf4-d185de727fb5' as UUID,
-    name: 'Sulaka',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: null,
-    validUntil: null
-  },
-  {
-    id: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
-    name: 'Pualula',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: null,
-    validUntil: null
-  },
-  {
-    id: '6d1a59df-988c-4021-a846-ccbc021931a7' as UUID,
-    name: 'Chuminga',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: null,
-    validUntil: null
-  },
-  {
-    id: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    name: 'Ibombo',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-    validUntil: null
-  },
-  {
-    // @NOTE: This happens to map to a valid location in events test environment. Updating it will break tests.
-    // @TODO:  Find a way to give out context aware mock values in the future.
-    id: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
-    name: 'Isango',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-    validUntil: null
-  },
-  {
-    id: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
-    name: 'Isamba',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-    validUntil: null
-  },
-  {
-    id: '89a33893-b17d-481d-a26d-6461e7ac1651' as UUID,
-    name: 'Itambo',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-    validUntil: null
-  },
-  {
-    id: 'd42ab2fe-e7ed-470e-8b31-4fb27f9b8250' as UUID,
-    name: 'Ezhi',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-    validUntil: null
-  },
-  {
-    id: '423d000f-101b-47c0-8b86-21a908067cee' as UUID,
-    name: 'Chamakubi Health Post',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: '4d3279be-d026-420c-88f7-f0a4ae986973' as UUID,
-    name: 'Ibombo Rural Health Centre',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: '190902f4-1d77-476a-8947-41145af1db7d' as UUID,
-    name: 'Chikobo Rural Health Centre',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: 'f5ecbd9b-a01e-4a65-910e-70e86ab41b71' as UUID,
-    name: 'Chilochabalenje Health Post',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: 'dbfc178f-7295-4b90-b28d-111c95b03127' as UUID,
-    name: 'Chipeso Rural Health Centre',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: '09862bfe-c7ac-46cd-987b-668681533c80' as UUID,
-    name: 'Chisamba Rural Health Centre',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: '834ce389-e95b-4fb0-96a0-33e9ab323059' as UUID,
-    name: 'Chitanda Rural Health Centre',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: '0431c433-6062-4a4c-aee9-25271aec61ee' as UUID,
-    name: 'Golden Valley Rural Health Centre',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: 'bc84d0b6-7ba7-480d-a339-5d9920d90eb2' as UUID,
-    name: 'Ipongo Rural Health Centre',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: '4cf1f53b-b730-41d2-8649-dff7eeed970d' as UUID,
-    name: 'Itumbwe Health Post',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: '4b3676cb-9355-4942-9eb9-2ce46acaf0e0' as UUID,
-    name: 'Kabangalala Rural Health Centre',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
-    name: 'Ibombo District Office',
-    locationType: LocationType.enum.CRVS_OFFICE,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: '62a0ccb4-4f30-4f30-8882-f256007dff9f' as UUID,
-    name: 'Isamba District Office',
-    locationType: LocationType.enum.CRVS_OFFICE,
-    parentId: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
-    validUntil: null
-  }
-]
-
 export const handlers = {
   ping: [
     http.get('/api/ping', () => {
       return HttpResponse.json({
         auth: true,
-        search: true,
         'user-mgnt': true,
         metrics: true,
         notification: true,
-        countryconfig: true,
-        workflow: true
+        countryconfig: true
       })
     })
   ],
@@ -250,6 +93,9 @@ export const handlers = {
   eventLocations: [
     tRPCMsw.locations.list.query(() => {
       return V2_DEFAULT_MOCK_LOCATIONS
+    }),
+    tRPCMsw.administrativeAreas.list.query(() => {
+      return V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS
     })
   ],
   getUserRoles: [
@@ -273,8 +119,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -294,8 +139,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -315,8 +159,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -336,8 +179,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -357,8 +199,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -380,14 +221,12 @@ export const handlers = {
                 'record.declaration-archive',
                 'record.declaration-reinstate',
                 'record.registration-request-correction',
-                'record.registration-print&issue-certified-copies',
                 'performance.read',
                 'performance.read-dashboards',
                 'organisation.read-locations:my-office',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -412,17 +251,13 @@ export const handlers = {
                 'record.register',
                 'record.registration-correct',
                 'record.unassign-others',
-                'record.registration-print&issue-certified-copies',
-                'record.confirm-registration',
-                'record.reject-registration',
                 'performance.read',
                 'performance.read-dashboards',
                 'profile.electronic-signature',
                 'organisation.read-locations:my-office',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -440,8 +275,7 @@ export const handlers = {
                 'organisation.read-locations:my-jurisdiction',
                 'performance.read',
                 'performance.read-dashboards',
-                'performance.vital-statistics-export',
-                'demo'
+                'performance.vital-statistics-export'
               ],
               __typename: 'UserRole'
             },
@@ -461,8 +295,7 @@ export const handlers = {
                 'performance.read',
                 'performance.read-dashboards',
                 'performance.vital-statistics-export',
-                'config.update:all',
-                'demo'
+                'config.update:all'
               ],
               __typename: 'UserRole'
             },
@@ -477,8 +310,7 @@ export const handlers = {
               scopes: [
                 'performance.read',
                 'performance.read-dashboards',
-                'performance.vital-statistics-export',
-                'demo'
+                'performance.vital-statistics-export'
               ],
               __typename: 'UserRole'
             },
@@ -502,9 +334,6 @@ export const handlers = {
                 'record.register',
                 'record.registration-correct',
                 'record.unassign-others',
-                'record.registration-print&issue-certified-copies',
-                'record.confirm-registration',
-                'record.reject-registration',
                 'performance.read',
                 'performance.read-dashboards',
                 'performance.vital-statistics-export',
@@ -513,8 +342,7 @@ export const handlers = {
                 'user.read:my-office',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             }
@@ -536,6 +364,41 @@ export const handlers = {
     }),
     http.delete('/api/files/:filePath*', async (request) => {
       return HttpResponse.text('OK')
+    }),
+    http.get('/files/:id', async (request) => {
+      const cache = await caches.open(FAKE_CACHE_NAME)
+
+      const response = await cache.match(request.request)
+
+      if (response) {
+        return response
+      }
+
+      const url = new URL(request.request.url)
+
+      const basename = url.pathname.split('/').pop()
+
+      let file: string
+      switch (basename) {
+        case 'tree.svg':
+          file = TestImage.Tree
+          break
+        case 'fish.svg':
+          file = TestImage.Fish
+          break
+        case 'mountain.svg':
+          file = TestImage.Mountain
+          break
+        default:
+          file = TestImage.Box
+      }
+
+      return new HttpResponse(file, {
+        headers: {
+          'Content-Type': 'image/svg+xml',
+          'Cache-Control': 'no-cache'
+        }
+      })
     }),
     http.get('http://localhost:3535/ocrvs/:id', async (request) => {
       const cache = await caches.open(FAKE_CACHE_NAME)
@@ -577,6 +440,39 @@ export const handlers = {
 
       const response = await cache.match(request.request)
 
+      if (response) {
+        return response
+      }
+
+      const url = new URL(request.request.url)
+
+      const basename = url.pathname.split('/').pop()
+
+      let file: string
+      switch (basename) {
+        case 'tree.svg':
+          file = TestImage.Tree
+          break
+        case 'fish.svg':
+          file = TestImage.Fish
+          break
+        case 'mountain.svg':
+          file = TestImage.Mountain
+          break
+        default:
+          file = TestImage.Box
+      }
+
+      return new HttpResponse(file, {
+        headers: {
+          'Content-Type': 'image/svg+xml',
+          'Cache-Control': 'no-cache'
+        }
+      })
+    }),
+    http.get('/:id', async (request) => {
+      const cache = await caches.open(FAKE_CACHE_NAME)
+      const response = await cache.match(request.request)
       if (response) {
         return response
       }
@@ -706,8 +602,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -727,8 +622,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -748,8 +642,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -769,8 +662,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -790,8 +682,7 @@ export const handlers = {
                 'record.declaration-submit-for-review',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -813,14 +704,12 @@ export const handlers = {
                 'record.declaration-archive',
                 'record.declaration-reinstate',
                 'record.registration-request-correction',
-                'record.registration-print&issue-certified-copies',
                 'performance.read',
                 'performance.read-dashboards',
                 'organisation.read-locations:my-office',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -845,9 +734,6 @@ export const handlers = {
                 'record.register',
                 'record.registration-correct',
                 'record.unassign-others',
-                'record.registration-print&issue-certified-copies',
-                'record.confirm-registration',
-                'record.reject-registration',
                 'performance.read',
                 'performance.read-dashboards',
                 'profile.electronic-signature',
@@ -855,8 +741,7 @@ export const handlers = {
                 'user.read:my-office',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             },
@@ -874,8 +759,7 @@ export const handlers = {
                 'organisation.read-locations:my-jurisdiction',
                 'performance.read',
                 'performance.read-dashboards',
-                'performance.vital-statistics-export',
-                'demo'
+                'performance.vital-statistics-export'
               ],
               __typename: 'UserRole'
             },
@@ -895,8 +779,7 @@ export const handlers = {
                 'performance.read',
                 'performance.read-dashboards',
                 'performance.vital-statistics-export',
-                'config.update:all',
-                'demo'
+                'config.update:all'
               ],
               __typename: 'UserRole'
             },
@@ -911,8 +794,7 @@ export const handlers = {
               scopes: [
                 'performance.read',
                 'performance.read-dashboards',
-                'performance.vital-statistics-export',
-                'demo'
+                'performance.vital-statistics-export'
               ],
               __typename: 'UserRole'
             },
@@ -936,9 +818,6 @@ export const handlers = {
                 'record.register',
                 'record.registration-correct',
                 'record.unassign-others',
-                'record.registration-print&issue-certified-copies',
-                'record.confirm-registration',
-                'record.reject-registration',
                 'performance.read',
                 'performance.read-dashboards',
                 'performance.vital-statistics-export',
@@ -947,8 +826,7 @@ export const handlers = {
                 'user.read:my-office',
                 'search.birth',
                 'search.death',
-                'search.marriage',
-                'demo'
+                'search.marriage'
               ],
               __typename: 'UserRole'
             }
@@ -1212,155 +1090,81 @@ export const handlers = {
     })
   ],
   user: [
-    graphql.query('getUserAuditLog', (input) => {
-      const start = input.variables.skip || 0
-      const end = start + (input.variables.count || 10)
-      const total = 11
-      return HttpResponse.json({
-        data: {
-          getUserAuditLog: {
-            total,
-            results: [
-              {
-                time: '2025-10-03T10:46:49.362Z',
-                userAgent: 'undefined',
-                practitionerId: input.variables.userId,
-                ipAddress: '127.0.0.1',
-                action: 'LOGGED_OUT',
-                isV2: null,
-                __typename: 'UserAuditLogItem'
-              },
-              {
-                time: '2025-10-03T10:44:55.012Z',
-                userAgent: 'undefined',
-                practitionerId: input.variables.userId,
-                ipAddress: '127.0.0.1',
-                action: 'LOGGED_IN',
-                isV2: null,
-                __typename: 'UserAuditLogItem'
-              },
-              {
-                time: '2025-10-03T10:44:49.362Z',
-                userAgent: 'undefined',
-                practitionerId: input.variables.userId,
-                ipAddress: '127.0.0.1',
-                action: 'LOGGED_OUT',
-                isV2: null,
-                __typename: 'UserAuditLogItem'
-              },
-              {
-                time: '2025-10-03T10:43:16.704Z',
-                userAgent:
-                  'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)',
-                practitionerId: input.variables.userId,
-                ipAddress: '127.0.0.1',
-                action: 'ASSIGNED',
-                isV2: null,
-                data: {
-                  compositionId: '0458a3ba-3f30-4345-be16-9ec81aa39b89',
-                  trackingId: 'BSK4XRC',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:24:25.604Z',
-                userAgent: '',
-                practitionerId: '68df9529f8f3a73007a44264',
-                ipAddress: '',
-                action: 'VIEWED',
-                isV2: true,
-                data: {
-                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
-                  trackingId: 'MOX89J',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:24:25.604Z',
-                userAgent: '',
-                practitionerId: input.variables.userId,
-                ipAddress: '',
-                action: 'ASSIGNED',
-                isV2: true,
-                data: {
-                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
-                  trackingId: 'MOX89J',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:24:25.604Z',
-                userAgent: '',
-                practitionerId: input.variables.userId,
-                ipAddress: '',
-                action: 'VIEWED',
-                isV2: true,
-                data: {
-                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
-                  trackingId: 'MOX89J',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:24:25.604Z',
-                userAgent: '',
-                practitionerId: input.variables.userId,
-                ipAddress: '',
-                action: 'VIEWED',
-                isV2: true,
-                data: {
-                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
-                  trackingId: 'MOX89J',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:23:45.604Z',
-                userAgent: '',
-                practitionerId: input.variables.userId,
-                ipAddress: '',
-                action: 'VIEWED',
-                isV2: true,
-                data: {
-                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
-                  trackingId: 'MOX89J',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:23:25.604Z',
-                userAgent: '',
-                practitionerId: input.variables.userId,
-                ipAddress: '',
-                action: 'VIEWED',
-                isV2: true,
-                data: {
-                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
-                  trackingId: 'MOX89J',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:22:10.128Z',
-                userAgent: 'undefined',
-                practitionerId: input.variables.userId,
-                ipAddress: '127.0.0.1',
-                action: 'LOGGED_IN',
-                isV2: null,
-                __typename: 'UserAuditLogItem'
-              }
-            ].slice(start, Math.min(end, total)),
-            __typename: 'UserAuditLogResultSet'
-          }
+    tRPCMsw.user.audit.list.query((input) => {
+      const skip = input.skip ?? 0
+      const count = input.count ?? 10
+      const allResults: AuditLogEntry[] = [
+        {
+          id: '1',
+          clientId: input.userId,
+          clientType: 'user' as const,
+          operation: 'user.logged_out',
+          requestData: { subjectId: input.userId },
+          createdAt: '2025-10-03T10:46:49.362Z'
+        },
+        {
+          id: '2',
+          clientId: input.userId,
+          clientType: 'user' as const,
+          operation: 'user.logged_in',
+          requestData: { subjectId: input.userId },
+          createdAt: '2025-10-03T10:44:55.012Z'
+        },
+        {
+          id: '3',
+          clientId: input.userId,
+          clientType: 'user' as const,
+          operation: 'event.actions.assign.request',
+          requestData: {
+            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+            actionType: 'ASSIGN',
+            eventType: 'birth',
+            trackingId: 'BSK4XRC',
+            transactionId: 'a2407b61b7fe-ea2d18f5-d6e7-4d18-a323'
+          },
+          createdAt: '2025-10-03T10:43:16.704Z'
+        },
+        {
+          id: '4',
+          clientId: input.userId,
+          clientType: 'user' as const,
+          operation: 'event.actions.declare.request',
+          requestData: {
+            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+            actionType: 'DECLARE',
+            eventType: 'birth',
+            trackingId: 'MOX89J',
+            transactionId: 'a2407b61b7fe-ea2d18f5-d6e7-4d18-a323'
+          },
+          createdAt: '2025-10-03T09:24:25.604Z'
+        },
+        {
+          id: '5',
+          clientId: input.userId,
+          clientType: 'user' as const,
+          operation: 'event.actions.register.request',
+          requestData: {
+            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+            actionType: 'REGISTER',
+            eventType: 'birth',
+            trackingId: 'MOX89J',
+            transactionId: 'a2407b61b7fe-ea2d18f5-d6e7-4d18-a323'
+          },
+          createdAt: '2025-10-03T09:23:45.604Z'
+        },
+        {
+          id: '6',
+          clientId: input.userId,
+          clientType: 'user' as const,
+          operation: 'user.logged_in',
+          requestData: { subjectId: input.userId },
+          createdAt: '2025-10-03T09:22:10.128Z'
         }
-      })
+      ]
+      return {
+        results: allResults.slice(skip, skip + count),
+        total: allResults.length
+      }
     }),
     graphql.query('fetchUser', (input) => {
       const userId = input.variables.userId
@@ -1372,9 +1176,13 @@ export const handlers = {
       } else if (userId == generator.user.id.registrationAgent) {
         response = generator.user.registrationAgent().v1
       } else if (userId == generator.user.id.localSystemAdmin) {
-        response = generator.user.localSystemAdmin()
+        response = generator.user.localSystemAdmin().v1
       } else if (userId == generator.user.id.nationalSystemAdmin) {
         response = generator.user.nationalSystemAdmin().v1
+      } else if (userId == generator.user.id.provincialRegistrar) {
+        response = generator.user.provincialRegistrar().v1
+      } else if (userId == generator.user.id.communityLeader) {
+        response = generator.user.communityLeader().v1
       } else {
         response = generator.user.localRegistrar().v1
       }
@@ -1395,9 +1203,13 @@ export const handlers = {
       } else if (userId == generator.user.id.registrationAgent) {
         response = generator.user.registrationAgent().v1
       } else if (userId == generator.user.id.localSystemAdmin) {
-        response = generator.user.localSystemAdmin()
+        response = generator.user.localSystemAdmin().v1
       } else if (userId == generator.user.id.nationalSystemAdmin) {
         response = generator.user.nationalSystemAdmin().v1
+      } else if (userId == generator.user.id.provincialRegistrar) {
+        response = generator.user.provincialRegistrar().v1
+      } else if (userId == generator.user.id.communityLeader) {
+        response = generator.user.communityLeader().v1
       } else {
         response = generator.user.localRegistrar().v1
       }
@@ -1413,17 +1225,34 @@ export const handlers = {
 
       return [generator.user.localRegistrar().v2]
     }),
-    tRPCMsw.user.get.query((id) => {
+    tRPCMsw.user.get.query((userId) => {
       const generator = testDataGenerator()
+      let response
 
-      return generator.user.localRegistrar().v2
+      if (userId == generator.user.id.fieldAgent) {
+        response = generator.user.fieldAgent().v2
+      } else if (userId == generator.user.id.registrationAgent) {
+        response = generator.user.registrationAgent().v2
+      } else if (userId == generator.user.id.nationalSystemAdmin) {
+        response = generator.user.nationalSystemAdmin().v2
+      } else if (userId == generator.user.id.provincialRegistrar) {
+        response = generator.user.provincialRegistrar().v2
+      } else if (userId == generator.user.id.communityLeader) {
+        response = generator.user.communityLeader().v2
+      } else if (userId == generator.user.id.localSystemAdmin) {
+        response = generator.user.localSystemAdmin().v2
+      } else {
+        response = generator.user.localRegistrar().v2
+      }
+
+      return response
     })
   ],
   event: [
     tRPCMsw.event.get.query(() => {
       return tennisClubMembershipEventDocument
     }),
-    tRPCMsw.event.search.query((input) => {
+    tRPCMsw.event.search.query(() => {
       return { results: [], total: 0 }
     })
   ],
@@ -1438,18 +1267,18 @@ export const handlers = {
         link: [
           {
             relation: 'self',
-            url: 'http://config:2021/location?type=CRVS_OFFICE&_count=0'
+            url: 'http://localhost:7070/location?type=CRVS_OFFICE&_count=0'
           },
           {
             relation: 'next',
-            url: 'http://config:2021/location?type=CRVS_OFFICE&_count=0&_getpagesoffset=0'
+            url: 'http://localhost:7070/location?type=CRVS_OFFICE&_count=0&_getpagesoffset=0'
           }
         ],
         entry: [
           {
             fullUrl:
               // @NOTE: Addresss component uses both V1 and V2. It should use only V2 api in the long run. Meanwhile, ensure ids match.
-              'http://localhost:2021/location/62a0ccb4-880d-4f30-8882-f256007dfff9/_history/8ae119de-682a-40fa-be03-9de10fc07d53',
+              '/api/config/location/62a0ccb4-880d-4f30-8882-f256007dfff9/_history/8ae119de-682a-40fa-be03-9de10fc07d53',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1523,7 +1352,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/92ab695b-9362-4682-a861-ddce87a3a905/_history/f11c3af0-b945-4082-8902-c66e4f9b43da',
+              'http://localhost:7070/location/92ab695b-9362-4682-a861-ddce87a3a905/_history/f11c3af0-b945-4082-8902-c66e4f9b43da',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1563,7 +1392,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/6c0bde80-100b-446d-9a6e-8587761bf4c4/_history/19cdc852-1360-4e03-90dc-82155581d927',
+              'http://localhost:7070/location/6c0bde80-100b-446d-9a6e-8587761bf4c4/_history/19cdc852-1360-4e03-90dc-82155581d927',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1600,7 +1429,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/028d2c85-ca31-426d-b5d1-2cef545a4902/_history/eadfd8c3-d869-4394-8d74-b1fc4ea620a3',
+              'http://localhost:7070/location/028d2c85-ca31-426d-b5d1-2cef545a4902/_history/eadfd8c3-d869-4394-8d74-b1fc4ea620a3',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1640,7 +1469,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/27614343-3709-41a7-bf2e-e81356322980/_history/af06e089-462b-4a55-8396-a6d9056d39b0',
+              'http://localhost:7070/location/27614343-3709-41a7-bf2e-e81356322980/_history/af06e089-462b-4a55-8396-a6d9056d39b0',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1677,7 +1506,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/8b1f31e3-f119-4844-9566-2cba2fa55b9a/_history/f164ccd8-4a7f-4b7e-9b39-99407f330825',
+              'http://localhost:7070/location/8b1f31e3-f119-4844-9566-2cba2fa55b9a/_history/f164ccd8-4a7f-4b7e-9b39-99407f330825',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1714,7 +1543,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/c5545f76-1888-49e1-8147-71f3c316f6dd/_history/88ff674b-987e-4ada-aec7-f59a4d7ae6f5',
+              'http://localhost:7070/location/c5545f76-1888-49e1-8147-71f3c316f6dd/_history/88ff674b-987e-4ada-aec7-f59a4d7ae6f5',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1751,7 +1580,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/a83da9a2-16af-416c-ab44-cf4f60b5603a/_history/76072e03-8c51-43f3-a02a-f7ed2ac6407f',
+              'http://localhost:7070/location/a83da9a2-16af-416c-ab44-cf4f60b5603a/_history/76072e03-8c51-43f3-a02a-f7ed2ac6407f',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1788,7 +1617,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/eaeb093d-e548-4848-b7d6-bc8fd029a8c1/_history/ebfbd22d-cbbe-4486-9624-c94e899ab3b3',
+              'http://localhost:7070/location/eaeb093d-e548-4848-b7d6-bc8fd029a8c1/_history/ebfbd22d-cbbe-4486-9624-c94e899ab3b3',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1825,7 +1654,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/72e3de8d-cb9c-4f92-833e-d6889eac1d72/_history/b697a197-49e2-4aea-aa2a-5dab80195f7a',
+              'http://localhost:7070/location/72e3de8d-cb9c-4f92-833e-d6889eac1d72/_history/b697a197-49e2-4aea-aa2a-5dab80195f7a',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1862,7 +1691,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/6510890e-610d-4805-94da-82164ceadc42/_history/cef5fa77-229c-4260-8b34-930ab82a9d40',
+              'http://localhost:7070/location/6510890e-610d-4805-94da-82164ceadc42/_history/cef5fa77-229c-4260-8b34-930ab82a9d40',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1899,7 +1728,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/9f764b20-ad33-4714-a572-a7731b24b183/_history/44fbdc19-0de1-4953-b453-2470b8467229',
+              'http://localhost:7070/location/9f764b20-ad33-4714-a572-a7731b24b183/_history/44fbdc19-0de1-4953-b453-2470b8467229',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1936,7 +1765,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/79738b3f-f31a-40d1-8b55-63e08ceb213c/_history/39e25b27-fd98-4e12-8186-502ada7a6f93',
+              'http://localhost:7070/location/79738b3f-f31a-40d1-8b55-63e08ceb213c/_history/39e25b27-fd98-4e12-8186-502ada7a6f93',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1973,7 +1802,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/9ec401ec-0de1-4bec-96bc-a2846a61419a/_history/22705052-e7d5-4b52-b519-1120fd3a3ed3',
+              'http://localhost:7070/location/9ec401ec-0de1-4bec-96bc-a2846a61419a/_history/22705052-e7d5-4b52-b519-1120fd3a3ed3',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -2010,7 +1839,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/db07dc32-2280-4705-8b5f-54044b29f8b2/_history/d88c3572-ad7f-42d9-a0ed-eff8019744eb',
+              'http://localhost:7070/location/db07dc32-2280-4705-8b5f-54044b29f8b2/_history/d88c3572-ad7f-42d9-a0ed-eff8019744eb',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -2047,7 +1876,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/8eefa8d1-c13d-4a56-9965-bdc73b263432/_history/366ddcd7-2174-487b-8469-fc7289051421',
+              'http://localhost:7070/location/8eefa8d1-c13d-4a56-9965-bdc73b263432/_history/366ddcd7-2174-487b-8469-fc7289051421',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -2084,7 +1913,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/97151a9d-3223-449f-8115-f4361fc1a6f2/_history/3128d669-3a4b-441e-8667-054da265e503',
+              'http://localhost:7070/location/97151a9d-3223-449f-8115-f4361fc1a6f2/_history/3128d669-3a4b-441e-8667-054da265e503',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -2121,7 +1950,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://config:2021/location/e8d52f39-6792-4f61-b247-9a1177fe074c/_history/93cf6fea-ac50-45e5-8314-292b299bb165',
+              'http://localhost:7070/location/e8d52f39-6792-4f61-b247-9a1177fe074c/_history/93cf6fea-ac50-45e5-8314-292b299bb165',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -2158,7 +1987,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://localhost:2021/location/465c448a-2c85-45f5-80f0-967e91f51de9/_history/b7990a30-5093-409e-9a61-8cba9906687f',
+              '/api/config/location/465c448a-2c85-45f5-80f0-967e91f51de9/_history/b7990a30-5093-409e-9a61-8cba9906687f',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -2203,7 +2032,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://localhost:2021/location/a45b982a-5c7b-4bd9-8fd8-a42d0994054c/_history/790ef7f2-e2ee-4c48-9e0a-c2f7c3d416bf',
+              '/api/config/location/a45b982a-5c7b-4bd9-8fd8-a42d0994054c/_history/790ef7f2-e2ee-4c48-9e0a-c2f7c3d416bf',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -2285,7 +2114,7 @@ export const handlers = {
     })
   ],
   modules: [
-    http.get('http://localhost:3040/conditionals.js', () => {
+    http.get('/api/countryconfig/conditionals.js', () => {
       const fileContent = `
       const conditionals = {
         isDefaultCountry: {
@@ -2304,16 +2133,8 @@ export const handlers = {
         }
       })
     }),
-    http.get('http://localhost:3040/handlebars.js', () => {
+    http.get('/api/countryconfig/handlebars.js', () => {
       return HttpResponse.text('', { status: 404 })
-    }),
-    http.get('http://localhost:3040/validators.js', () => {
-      return HttpResponse.text('export function noop() {}', {
-        status: 200,
-        headers: {
-          'content-type': 'application/javascript'
-        }
-      })
     })
   ],
   config: [
@@ -2351,10 +2172,8 @@ export const handlers = {
       })
     }),
 
-    http.get('http://localhost:2021/config', () => {
+    http.get('/api/config', () => {
       return HttpResponse.json({
-        systems: [],
-
         config: mockOfflineData.config,
         certificates: [
           {
@@ -2440,7 +2259,7 @@ export const handlers = {
     })
   ],
   localisations: [
-    http.get('http://localhost:3040/content/client', () => {
+    http.get('/api/countryconfig/content/client', () => {
       return HttpResponse.json({
         languages: [
           {
@@ -2458,7 +2277,7 @@ export const handlers = {
     })
   ],
   forms: [
-    http.get('http://localhost:2021/forms', () => {
+    http.get('/api/forms', () => {
       return HttpResponse.json(forms.forms)
     })
   ],
@@ -2484,7 +2303,7 @@ export const handlers = {
     })
   ],
   workqueues: [
-    tRPCMsw.workqueue.count.query((input) => {
+    tRPCMsw.workqueue.count.query((input: { slug: string }[]) => {
       if (input.length === 0) {
         /** Ensure we catch situations where no input is provided before merging anything. */
         throw new Error('No input provided.')
@@ -2499,6 +2318,16 @@ export const handlers = {
     })
   ],
   searchUsers: [
+    tRPCMsw.user.search.query(() => {
+      const generator = testDataGenerator()
+
+      return [
+        generator.user.localSystemAdmin().v2,
+        generator.user.localRegistrar().v2,
+        generator.user.registrationAgent().v2,
+        generator.user.fieldAgent().v2
+      ]
+    }),
     graphql.query('searchUsers', () => {
       const generator = testDataGenerator()
 
@@ -2508,7 +2337,7 @@ export const handlers = {
             totalItems: 4,
             results: [
               {
-                id: generator.user.localSystemAdmin().id as UUID,
+                id: generator.user.localSystemAdmin().v2.id as UUID,
                 name: [
                   {
                     use: 'en',
@@ -2681,7 +2510,7 @@ export const handlers = {
         }
       })
     }),
-    http.post('http://localhost:7070/sendVerifyCode', () => {
+    http.post('/api/gateway/sendVerifyCode', () => {
       const generator = testDataGenerator()
       return HttpResponse.json({
         userId: generator.user.registrationAgent().v2.id,
@@ -2689,6 +2518,231 @@ export const handlers = {
         status: 'Success',
         mobile: '+260734237472',
         email: 'kalushabwalya1.7@gmail.com'
+      })
+    })
+  ],
+  referenceData: [
+    http.get('/api/causes-of-death?terms=', (input) => {
+      const params = new URL(input.request.url).searchParams
+      const terms = params.get('terms') ?? ''
+
+      const codes: { id: string; label: string }[] = [
+        {
+          id: '0dbf0d5f-db5c-4b1d-b743-ba929a56a2ba',
+          label: 'gastric cancer resection'
+        },
+        {
+          id: 'ca0b3fc5-3ee2-440a-a2bf-19bd933fb761',
+          label: 'METASTATIC LIVER CANCER'
+        },
+        {
+          id: '7ca7cfe5-8b24-4c2e-b866-a762bc188f8c',
+          label: 'METASTATIC LUNG CANCER'
+        },
+        {
+          id: '7ce24d60-49a9-4440-adc5-f52619bb18f6',
+          label: 'mouth floor cancer in situ'
+        },
+        {
+          id: 'dd35c351-c953-4889-b177-761304a57e17',
+          label: 'breast cancer'
+        },
+        {
+          id: '87fcf3f4-bdd0-48a0-8715-165a972ae495',
+          label: 'breast cancer excision'
+        },
+        {
+          id: 'bd1b5787-07c9-4815-bcc5-a030d783d7d9',
+          label: 'breast cancer resected'
+        },
+        {
+          id: 'f4b19888-b333-4206-b2c4-5fce65a8dbee',
+          label: 'OVARIAN CANCER'
+        },
+        {
+          id: '87eb4ff1-c4f3-4048-af73-3b0eab7e4c6f',
+          label: 'OVARY CANCER'
+        },
+        {
+          id: 'e7de7e6c-42d0-43cc-8e68-4ce6eed7c8ae',
+          label: 'PANCREAS cancer'
+        },
+        {
+          id: '1a73994f-8d9c-4ef0-a1dc-47c02cb0fcf7',
+          label: 'PANCREATIC CANCER'
+        },
+        {
+          id: '8228c3aa-1104-475b-b0aa-b1405167ee87',
+          label: 'pancreatic cancer resection'
+        },
+        {
+          id: 'c9f6dc3b-776b-4376-abb5-2ad8b37c7676',
+          label: 'PRIMARY BONE CANCER'
+        },
+        {
+          id: '79f6b4eb-ede4-4d2e-87cb-d88bf738f2cd',
+          label: 'Primary Cancer of Liver'
+        },
+        {
+          id: '9280d25d-4f4e-47f0-b396-15f1f5cae39c',
+          label: 'PRIMARY CANCER UNKNOWN'
+        },
+        {
+          id: '32029500-c50f-4321-85cf-2c1220c36804',
+          label: 'PRIMARY LIVER CANCER'
+        },
+        {
+          id: '6f237398-ecfe-44fb-a153-bd30c07a01fa',
+          label: 'PRIMARY LUNG CANCER'
+        },
+        {
+          id: '3a472a4f-ce87-4e25-ab87-d4bf5f6608cb',
+          label: 'primary site liver cell cancer'
+        },
+        {
+          id: 'cbdd09a0-a1a5-4473-9765-cc3ad240ace9',
+          label: 'prostatic cancer orchidectomy'
+        },
+        {
+          id: '5f0c4350-8c2e-4486-bd17-7d974f3656d1',
+          label: 'prostatic cancer resection'
+        },
+        {
+          id: 'bb48cb78-8f62-4090-883b-5721c68ab0be',
+          label: 'prostatic cancer surgery'
+        },
+        {
+          id: '7726a44e-f883-424f-990d-59afbed44ff9',
+          label: 'renal cell cancer'
+        },
+        {
+          id: '34ede4b9-9f0d-4b69-ba21-2a51642e26e3',
+          label: 'right colonic cancer resection'
+        },
+        {
+          id: 'c69fa317-f1f9-411a-a6eb-5c7eda7346a5',
+          label: 'right upper lobe lung cancer resection'
+        },
+        {
+          id: 'efe8f2c5-52ee-4455-88ff-808fede3a88d',
+          label: 'SCAPULA CANCER'
+        },
+        {
+          id: 'd0067d2e-7536-49b6-bc14-08a9c80a5434',
+          label: 'secondary cancer excision'
+        },
+        {
+          id: '748178df-999b-43f6-ad3a-2983d5fd7635',
+          label: 'secondary chest cancer biopsy'
+        },
+        {
+          id: '4657f48d-123d-4256-a96e-cc7a7e1376be',
+          label: 'secondary lung cancer surgery'
+        },
+        {
+          id: 'cdeae772-23b4-4248-94b0-8cde3c920ad8',
+          label: 'skin cancer'
+        },
+        {
+          id: '12af172e-cbd5-4869-8426-3d7cddb1c177',
+          label: 'tongue cancer resected'
+        },
+        {
+          id: 'b3d42cdc-0fd7-452a-b799-574a4e8e517b',
+          label: 'bile duct cancer resection'
+        },
+        {
+          id: 'f908c474-8cba-40eb-ba2f-0344de538f9b',
+          label: 'acetabular cancer'
+        },
+        {
+          id: 'b70004fb-4e79-41c8-9b5d-5f741e39693e',
+          label: 'gallbladder squamous cell cancer'
+        },
+        {
+          id: '5cb63038-7409-4b19-8236-87c39b58fb97',
+          label: 'Cancer cachexia'
+        },
+        {
+          id: '77c5d208-fa46-4350-8149-ff1ee8b277fd',
+          label: 'CANCER CHEMOTHERAPY'
+        },
+        {
+          id: 'c135e551-b8c7-491d-a7c1-0c32d99f63fb',
+          label: 'cancer of intestine'
+        },
+        {
+          id: '1f1e9e7d-20c9-4d64-a375-3cbdac28e16a',
+          label: 'CANCER OF PANCREAS'
+        },
+        {
+          id: '89b38241-6292-4819-9512-11959a1e16d0',
+          label: 'cancer of stomach'
+        },
+        {
+          id: 'a92183b4-0502-429a-9e17-5992f2c845b4',
+          label: 'temporal bone cancer'
+        },
+        {
+          id: '2e20e136-96e2-4361-a5b8-05e46b80e71c',
+          label: 'clavicle cancer'
+        },
+        {
+          id: '18af4133-b38b-4cc3-987e-7fad9c852373',
+          label: 'BONY CANCER'
+        },
+        {
+          id: 'f9056345-3c03-4f90-8efa-ff52b1d9b073',
+          label: 'urinary tract cancer'
+        },
+        {
+          id: '12481dd4-d537-4098-9496-e69fa9fdc2cd',
+          label: 'uterine cancer radiation'
+        },
+        {
+          id: '2049d693-1722-472a-b688-e561fc901a67',
+          label: 'uteropelvic junction cancer'
+        },
+        {
+          id: '9a308780-4b08-43fc-a039-1713dbb397e1',
+          label: 'ADENOCANCER'
+        },
+        {
+          id: '72476874-1547-4471-bde0-d8e8eff0a277',
+          label: 'areola cancer'
+        },
+        {
+          id: '920178b4-ca94-4539-8350-dd1bd22b6533',
+          label: 'laryngeal squamous cell cancer'
+        },
+        {
+          id: '5f33b84b-b931-4c60-8c54-d829fa87919a',
+          label: 'breats cancer'
+        },
+        {
+          id: 'd4af37ee-a0c3-4bfa-91ff-86754b41236c',
+          label: 'BONE CANCER'
+        },
+        {
+          id: '35c759bb-c57f-4cde-8d62-2cb74ea3a1c5',
+          label: 'ankle bone cancer'
+        }
+      ]
+
+      const search = (
+        input: string,
+        codes: { id: string; label: string }[]
+      ) => {
+        const words = input.toLowerCase().trim().split(/\s+/)
+
+        return codes.filter((item) => {
+          const label = item.label.toLowerCase()
+          return words.every((word) => label.includes(word))
+        })
+      }
+
+      return HttpResponse.json({
+        results: search(terms, codes)
       })
     })
   ]

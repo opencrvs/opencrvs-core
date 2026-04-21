@@ -8,35 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ILanguageState } from '@client/i18n/reducer'
 import {
   AdminStructure,
   CRVSOffice,
   Facility,
-  ILocation,
   IOfflineData
 } from '@client/offline/reducer'
-import { System } from '@client/utils/gateway'
 import {
-  IApplicationConfig,
   IApplicationConfigAnonymous,
   IApplicationConfigResponse,
   IContentResponse,
   IFacilitiesDataResponse,
   ILocationDataResponse,
-  LoadConditionalsResponse,
-  LoadFormsResponse,
   LoadHandlebarHelpersResponse,
-  ICertificateData,
-  LoadValidatorsResponse
+  ICertificateData
 } from '@client/utils/referenceApi'
-import { UserDetails } from '@client/utils/userUtils'
-
-const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
-type GetLocations = {
-  type: typeof GET_LOCATIONS
-  payload: string
-}
+import { ApplicationConfig } from '@opencrvs/commons/client'
 
 export const CONTENT_LOADED = 'OFFLINE/CONTENT_LOADED'
 type ContentLoadedAction = {
@@ -62,24 +49,6 @@ type LocationsFailedAction = {
   payload: Error
 }
 
-export const FORMS_LOADED = 'OFFLINE/FORMS_LOADED'
-export type FormsLoadedAction = {
-  type: typeof FORMS_LOADED
-  payload: LoadFormsResponse
-}
-
-export const CUSTOM_VALIDATORS_LOADED = 'OFFLINE/CUSTOM_VALIDATORS_LOADED'
-export type CustomValidatorsLoadedLoadedAction = {
-  type: typeof CUSTOM_VALIDATORS_LOADED
-  payload: LoadFormsResponse
-}
-
-export const FORMS_FAILED = 'OFFLINE/FORMS_FAILED'
-export type FormsFailedAction = {
-  type: typeof FORMS_FAILED
-  payload: Error
-}
-
 export const FACILITIES_LOADED = 'OFFLINE/FACILITIES_LOADED'
 type FacilitiesLoadedAction = {
   type: typeof FACILITIES_LOADED
@@ -89,18 +58,6 @@ type FacilitiesLoadedAction = {
 export const FACILITIES_FAILED = 'OFFLINE/FACILITIES_FAILED'
 type FacilitiesFailedAction = {
   type: typeof FACILITIES_FAILED
-  payload: Error
-}
-
-const PILOT_LOCATIONS_LOADED = 'OFFLINE/PILOT_LOCATIONS_LOADED'
-type PilotLocationsLoadedAction = {
-  type: typeof PILOT_LOCATIONS_LOADED
-  payload: { [key: string]: ILocation }
-}
-
-const PILOT_LOCATIONS_FAILED = 'OFFLINE/PILOT_LOCATIONS_FAILED'
-type PilotLocationsFailedAction = {
-  type: typeof PILOT_LOCATIONS_FAILED
   payload: Error
 }
 
@@ -116,16 +73,10 @@ type CertificatesLoadedAction = {
   payload: ICertificateData[]
 }
 
-export const CERTIFICATES_LOAD_FAILED = 'OFFLINE/CERTIFICATES_LOAD_FAILED'
-type CertificatesLoadFailedAction = {
-  type: typeof CERTIFICATES_LOAD_FAILED
-  payload: Error
-}
-
 export const UPDATE_OFFLINE_CONFIG = 'OFFLINE/UPDATE_OFFLINE_CONFIG' as const
 type ApplicationConfigUpdatedAction = {
   type: typeof UPDATE_OFFLINE_CONFIG
-  payload: { config: IApplicationConfig }
+  payload: { config: ApplicationConfig }
 }
 
 export const ANONYMOUS_USER_OFFLINE_CONFIG =
@@ -135,23 +86,12 @@ type ApplicationConfigAnonymousUserAction = {
   payload: { anonymousConfig: IApplicationConfigAnonymous }
 }
 
-export const UPDATE_OFFLINE_SYSTEMS = 'OFFLINE/UPDATE_OFFLINE_SYSTEMS' as const
-type UpdateOfflineSystemsAction = {
-  type: typeof UPDATE_OFFLINE_SYSTEMS
-  payload: { systems: System[] }
-}
-
 export const APPLICATION_CONFIG_FAILED = 'OFFLINE/APPLICATION_CONFIG_FAILED'
 type ApplicationConfigFailedAction = {
   type: typeof APPLICATION_CONFIG_FAILED
   payload: Error
 }
 
-const GET_EXISTING_OFFLINE_DATA = 'OFFLINE/SET_OFFLINE_DATA'
-type SetOfflineData = {
-  type: typeof GET_EXISTING_OFFLINE_DATA
-  payload: UserDetails
-}
 export const GET_OFFLINE_DATA_SUCCESS = 'OFFLINE/GET_OFFLINE_DATA_SUCCESS'
 type IGetOfflineDataSuccessAction = {
   type: typeof GET_OFFLINE_DATA_SUCCESS
@@ -161,11 +101,7 @@ const GET_OFFLINE_DATA_FAILED = 'OFFLINE/GET_OFFLINE_DATA_FAILED'
 type IGetOfflineDataFailedAction = {
   type: typeof GET_OFFLINE_DATA_FAILED
 }
-const FORMAT_LOCATIONS = 'OFFLINE/FORMAT_LOCATIONS'
-type IFilterLocationsAction = {
-  type: typeof FORMAT_LOCATIONS
-  payload: ILanguageState
-}
+
 export const READY = 'OFFLINE/READY' as const
 export const UPDATED = 'OFFLINE/UPDATED' as const
 
@@ -181,24 +117,6 @@ export const locationsFailed = (error: Error): LocationsFailedAction => ({
   payload: error
 })
 
-export const formsLoaded = (payload: LoadFormsResponse): FormsLoadedAction => ({
-  type: FORMS_LOADED,
-  payload: payload
-})
-
-export const CustomValidatorsSuccess = (
-  forms: LoadFormsResponse
-): CustomValidatorsLoadedLoadedAction => {
-  return {
-    type: CUSTOM_VALIDATORS_LOADED,
-    payload: forms
-  }
-}
-export const formsFailed = (error: Error): FormsFailedAction => ({
-  type: FORMS_FAILED,
-  payload: error
-})
-
 export const facilitiesFailed = (error: Error): FacilitiesFailedAction => ({
   type: FACILITIES_FAILED,
   payload: error
@@ -209,14 +127,6 @@ export const facilitiesLoaded = (
 ): FacilitiesLoadedAction => ({
   type: FACILITIES_LOADED,
   payload: payload
-})
-
-/*
- * Only called from tests atm
- */
-export const setOfflineData = (userDetails: UserDetails): SetOfflineData => ({
-  type: GET_EXISTING_OFFLINE_DATA,
-  payload: userDetails
 })
 
 export const getOfflineDataSuccess = (
@@ -271,26 +181,9 @@ export const configFailed = (error: Error): ApplicationConfigFailedAction => ({
   payload: error
 })
 
-export const updateOfflineSystems = (payload: {
-  systems: System[]
-}): UpdateOfflineSystemsAction => ({
-  type: UPDATE_OFFLINE_SYSTEMS,
-  payload: payload
-})
-
 export const REFRESH_OFFLINE_DATA = 'OFFLINE/REFRESH_OFFLINE_DATA' as const
 export const refreshOfflineData = () => ({
   type: REFRESH_OFFLINE_DATA
-})
-
-export const validatorsLoaded = (payload: LoadValidatorsResponse) => ({
-  type: 'OFFLINE/VALIDATORS_LOADED' as const,
-  payload: payload
-})
-
-export const validatorsFailed = (error: Error) => ({
-  type: 'OFFLINE/VALIDATORS_FAILED' as const,
-  payload: error
 })
 
 export const handlebarsLoaded = (payload: LoadHandlebarHelpersResponse) => ({
@@ -303,46 +196,22 @@ export const handlebarsFailed = (error: Error) => ({
   payload: error
 })
 
-export const conditionalsLoaded = (payload: LoadConditionalsResponse) => ({
-  type: 'OFFLINE/CONDITIONALS_LOADED' as const,
-  payload: payload
-})
-
-export const conditionalsFailed = (error: Error) => ({
-  type: 'OFFLINE/CONDITIONALS_FAILED' as const,
-  payload: error
-})
-
 export type Action =
-  | GetLocations
   | LocationsFailedAction
   | LocationsLoadedAction
-  | FormsFailedAction
-  | FormsLoadedAction
-  | CustomValidatorsLoadedLoadedAction
-  | SetOfflineData
   | IGetOfflineDataSuccessAction
   | IGetOfflineDataFailedAction
   | FacilitiesLoadedAction
   | FacilitiesFailedAction
-  | PilotLocationsLoadedAction
-  | PilotLocationsFailedAction
   | ContentFailedAction
   | ContentLoadedAction
   | ApplicationConfigLoadedAction
   | CertificatesLoadedAction
-  | CertificatesLoadFailedAction
   | ApplicationConfigAnonymousUserAction
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
-  | UpdateOfflineSystemsAction
-  | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>
   | ReturnType<typeof refreshOfflineData>
-  | ReturnType<typeof validatorsLoaded>
-  | ReturnType<typeof validatorsFailed>
-  | ReturnType<typeof conditionalsLoaded>
-  | ReturnType<typeof conditionalsFailed>
   | ReturnType<typeof handlebarsLoaded>
   | ReturnType<typeof handlebarsFailed>

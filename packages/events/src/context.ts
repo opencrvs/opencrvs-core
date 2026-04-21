@@ -10,47 +10,34 @@
  */
 
 import { IncomingMessage } from 'http'
-import { z } from 'zod'
+import { readFileSync } from 'fs'
+import * as z from 'zod/v4'
 import '@opencrvs/commons/monitoring'
 import { TRPCError } from '@trpc/server'
+import * as jwt from 'jsonwebtoken'
 import {
-  getUserId,
-  getUserTypeFromToken,
   logger,
   REINDEX_USER_ID,
-  SystemRole,
   TokenUserType,
   TokenWithBearer,
-  User,
-  System
+  SystemContext,
+  UserContext
 } from '@opencrvs/commons'
-import { getSystem, getUser } from './service/users/api'
-
-export const UserContext = User.pick({
-  id: true,
-  primaryOfficeId: true,
-  role: true,
-  signature: true,
-  type: true
-})
-export type UserContext = z.infer<typeof UserContext>
-
-export const SystemContext = System.pick({
-  id: true,
-  role: true,
-  type: true,
-  primaryOfficeId: true,
-  signature: true
-})
-type SystemContext = z.infer<typeof SystemContext>
+export { SystemContext, UserContext }
+import { getLegacyUser } from './service/users/api'
+import { getLocationById } from './service/locations/locations'
+import { env } from './environment'
 
 export const TrpcContext = z.object({
   token: TokenWithBearer,
   user: z.union([SystemContext, UserContext])
 })
-
 export type TrpcContext = z.infer<typeof TrpcContext>
 
+export const InternalTrpcContext = z.object({
+  token: TokenWithBearer
+})
+export type InternalTrpcContext = z.infer<typeof InternalTrpcContext>
 /**
  * Internal user, used to bootstrap the system and then deactivate.
  */
@@ -64,6 +51,38 @@ const SuperAdminContext = SystemContext.extend({
   role: z.literal('SUPER_ADMIN')
 })
 type SuperAdminContext = z.infer<typeof SuperAdminContext>
+
+const tokenPublicKey = readFileSync(env.CERT_PUBLIC_KEY_PATH)
+
+const TokenClaims = z.object({
+  sub: z.string(),
+  userType: TokenUserType,
+  scope: z.array(z.string())
+})
+type TokenClaims = z.infer<typeof TokenClaims>
+
+function verifyAppToken(token: TokenWithBearer): TokenClaims {
+  const jwtToken = token.split(' ')[1]
+
+  const verified = jwt.verify(jwtToken, tokenPublicKey, {
+    algorithms: ['RS256'],
+    issuer: 'opencrvs:auth-service',
+    audience: ['opencrvs:gateway-user', 'opencrvs:events-user']
+  })
+
+  return TokenClaims.parse(verified)
+}
+
+export function verifyInternalServiceToken(token: TokenWithBearer) {
+  const jwtToken = token.split(' ')[1]
+
+  return jwt.verify(jwtToken, tokenPublicKey, {
+    subject: 'opencrvs:auth-service',
+    algorithms: ['RS256'],
+    issuer: 'opencrvs:auth-service',
+    audience: ['opencrvs:events-user']
+  })
+}
 
 export type TrpcUserContext = SystemContext | UserContext | SuperAdminContext
 
@@ -94,12 +113,13 @@ function normalizeHeaders(
 async function resolveUserDetails(
   token: TokenWithBearer
 ): Promise<TrpcUserContext> {
-  let userId: string | undefined
+  let userId: string
   let userType: TokenUserType
 
   try {
-    userId = getUserId(token)
-    userType = getUserTypeFromToken(token)
+    const claims = verifyAppToken(token)
+    userId = claims.sub
+    userType = claims.userType
   } catch {
     logger.error('Error while parsing token')
 
@@ -109,46 +129,45 @@ async function resolveUserDetails(
   try {
     if (userId === REINDEX_USER_ID) {
       return SystemContext.parse({
-        type: TokenUserType.Enum.system,
+        type: TokenUserType.enum.system,
         id: userId,
-        primaryOfficeId: undefined,
-        role: SystemRole.enum.REINDEX
+        primaryOfficeId: undefined
       })
     }
 
-    if (userType === TokenUserType.Enum.system) {
-      const { type } = await getSystem(userId, token)
-
+    if (userType === TokenUserType.enum.system) {
       return SystemContext.parse({
         type: userType,
         id: userId,
-        primaryOfficeId: undefined,
-        role: type
+        primaryOfficeId: undefined
       })
     }
 
-    const { primaryOfficeId, role, signature, username } = await getUser(
+    const { primaryOfficeId, role, signature, username } = await getLegacyUser(
       userId,
       token
     )
 
     if (username === SEEDER_SUPER_ADMIN) {
       logger.warn(
-        `User ${username} is used for seeding. Treating it as a ${TokenUserType.Enum.system} user type.`
+        `User ${username} is used for seeding. Treating it as a ${TokenUserType.enum.system} user type.`
       )
 
       return SuperAdminContext.parse({
-        type: TokenUserType.Enum.system,
+        type: TokenUserType.enum.system,
         id: userId,
         primaryOfficeId: undefined,
         role
       })
     }
 
+    // @TODO: We should get this from a single source. Waiting for user migration.
+    const location = await getLocationById(primaryOfficeId)
     return UserContext.parse({
       type: userType,
       id: userId,
       primaryOfficeId,
+      administrativeAreaId: location.administrativeAreaId,
       signature,
       role
     })
@@ -163,18 +182,29 @@ async function resolveUserDetails(
 
 export async function createContext({ req }: { req: IncomingMessage }) {
   const normalizedHeaders = normalizeHeaders(req.headers)
-  let token: TokenWithBearer
+  const token = TokenWithBearer.safeParse(normalizedHeaders.authorization).data
+
+  return {
+    token,
+    user: token && (await resolveUserDetails(token).catch(() => undefined))
+  }
+}
+
+/**
+ * Context for internal service calls between services, authenticated with a service token. Does not include user details, as the token is not associated with a user.
+ */
+export function createInternalContext({ req }: { req: IncomingMessage }) {
+  const normalizedHeaders = normalizeHeaders(req.headers)
 
   try {
-    token = TokenWithBearer.parse(normalizedHeaders.authorization)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (_) {
-    throw new TRPCError({
-      code: 'UNAUTHORIZED',
-      message: 'Authorization token is missing'
-    })
-  }
+    const token = TokenWithBearer.parse(normalizedHeaders.authorization)
 
-  const user = await resolveUserDetails(token)
-  return { token, user }
+    verifyInternalServiceToken(token)
+
+    return {
+      token
+    }
+  } catch {
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
 }

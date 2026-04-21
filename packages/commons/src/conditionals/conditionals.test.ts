@@ -18,16 +18,19 @@ import {
   ConditionalParameters,
   UserConditionalParameters,
   EventConditionalParameters,
-  FormConditionalParameters
+  FormConditionalParameters,
+  EventStateConditionalParameters,
+  flag,
+  status
 } from './conditionals'
 import { formatISO } from 'date-fns'
-import { SCOPES } from '../scopes'
 import { ActionType } from '../events/ActionType'
 import { ActionStatus, EventState } from '../events/ActionDocument'
 import { field } from '../events/field'
 import { event } from '../events/event'
-import { TokenUserType } from '../authentication'
+import { EncodedScope, TokenUserType } from '../authentication'
 import { UUID } from '../uuid'
+import { EventStatus, InherentFlags } from '../client'
 
 /*  eslint-disable max-lines */
 
@@ -1007,7 +1010,7 @@ describe('"field" conditionals', () => {
 describe('"user" conditionals', () => {
   const userParams = {
     $user: {
-      scope: ['record.register', 'record.registration-correct'],
+      scope: ['type=test-scope-1', 'type=test-scope-2'] as EncodedScope[],
       role: 'LOCAL_REGISTRAR',
       exp: '1739881718',
       algorithm: 'RS256',
@@ -1024,13 +1027,8 @@ describe('"user" conditionals', () => {
   }
 
   it('validates "user.hasScope" conditional', () => {
-    expect(validate(user.hasScope(SCOPES.BYPASSRATELIMIT), userParams)).toBe(
-      false
-    )
-
-    expect(validate(user.hasScope(SCOPES.RECORD_REGISTER), userParams)).toBe(
-      true
-    )
+    expect(validate(user.hasScope('type=test-scope-0'), userParams)).toBe(false)
+    expect(validate(user.hasScope('type=test-scope-1'), userParams)).toBe(true)
   })
 
   it('validates "user.isOnline" conditional', () => {
@@ -1041,6 +1039,75 @@ describe('"user" conditionals', () => {
   it('validates "user.hasRole" conditional', () => {
     expect(validate(user.hasRole('LOCAL_REGISTRAR'), userParams)).toBe(true)
     expect(validate(user.hasRole('FAKE_ROLE'), offlineUserParams)).toBe(false)
+  })
+})
+
+describe('"flag" conditionals', () => {
+  it('validates "flag()" conditional', () => {
+    const params = {
+      $flags: [InherentFlags.CORRECTION_REQUESTED],
+      $status: EventStatus.enum.REGISTERED,
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: true
+    } satisfies EventStateConditionalParameters
+
+    expect(validate(flag(InherentFlags.INCOMPLETE), params)).toBe(false)
+    expect(validate(flag(InherentFlags.CORRECTION_REQUESTED), params)).toBe(
+      true
+    )
+  })
+
+  it('validation fails if flags array is empty', () => {
+    const params = {
+      $flags: [],
+      $status: EventStatus.enum.REGISTERED,
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: true
+    } satisfies EventStateConditionalParameters
+
+    expect(validate(flag(InherentFlags.CORRECTION_REQUESTED), params)).toBe(
+      false
+    )
+    expect(
+      validate(not(flag(InherentFlags.CORRECTION_REQUESTED)), params)
+    ).toBe(true)
+  })
+
+  it('validation fails if params dont include flags', () => {
+    const params = {
+      $status: EventStatus.enum.REGISTERED,
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: true
+    }
+
+    // @ts-expect-error testing missing flags param
+    expect(validate(flag(InherentFlags.CORRECTION_REQUESTED), params)).toBe(
+      false
+    )
+  })
+})
+
+describe('"status" conditionals', () => {
+  it('validates "status()" conditional', () => {
+    const params = {
+      $flags: [],
+      $status: EventStatus.enum.REGISTERED,
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: true
+    } satisfies EventStateConditionalParameters
+
+    expect(validate(status('REGISTERED'), params)).toBe(true)
+  })
+
+  it('validation fails if params dont include status', () => {
+    const params = {
+      $flags: [],
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: true
+    }
+
+    // @ts-expect-error testing missing status param
+    expect(validate(status('REGISTERED'), params)).toBe(false)
   })
 })
 
@@ -1061,7 +1128,7 @@ describe('"event" conditionals', () => {
             type: ActionType.DECLARE,
             createdAt: now,
             createdBy: '12345',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdByRole: 'some-role',
             declaration: {},
             createdAtLocation: '123456' as UUID,
@@ -1100,7 +1167,7 @@ describe('"event" conditionals', () => {
             createdAt: now,
             status: ActionStatus.Accepted,
             transactionId: 'tx1',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdBy: 'user1',
             createdByRole: 'role1',
             createdAtLocation: 'loc1' as UUID,
@@ -1113,7 +1180,7 @@ describe('"event" conditionals', () => {
             createdAt: now,
             status: ActionStatus.Accepted,
             transactionId: 'tx2',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdBy: 'user2',
             createdByRole: 'role2',
             createdAtLocation: 'loc2' as UUID,

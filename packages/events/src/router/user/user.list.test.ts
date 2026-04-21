@@ -10,12 +10,13 @@
  */
 
 import { http, HttpResponse, HttpResponseInit } from 'msw'
-import { SystemRole, TokenUserType } from '@opencrvs/commons'
+import { TokenUserType } from '@opencrvs/commons'
 import {
   createTestClient,
   sanitizeForSnapshot,
   setupTestCase
 } from '@events/tests/utils'
+import { createSystemClient } from '@events/storage/postgres/events/system-clients'
 import { mswServer } from '../../tests/msw'
 
 test('Returns empty list when no ids provided', async () => {
@@ -47,20 +48,26 @@ test('Returns user in correct format', async () => {
 
   mswServer.use(
     http.post(`http://localhost:3030/getUser`, () => {
-      return HttpResponse.json(user)
+      return HttpResponse.json({
+        ...user,
+        signature: {
+          data: user.signature
+        }
+      })
     })
   )
   const fetchedUser = await client.user.list([user.id])
 
   expect(fetchedUser).toEqual([
-    {
+    expect.objectContaining({
       id: user.id,
       name: user.name,
       role: user.role,
       signature: user.signature,
       primaryOfficeId: user.primaryOfficeId,
-      type: TokenUserType.enum.user
-    }
+      type: TokenUserType.enum.user,
+      status: user.status
+    })
   ])
 })
 
@@ -102,30 +109,14 @@ test('Returns both normal users and system users', async () => {
 
   const systemUserId = '67bda93bfc07dee78ae55114'
 
-  mswServer.use(
-    http.post(`http://localhost:3030/getSystem`, async ({ request }) => {
-      const body = (await request.clone().json()) as { systemId: string }
-
-      if (body.systemId === systemUserId) {
-        return HttpResponse.json({
-          name: 'My health system integration',
-          createdBy: '',
-          username: '',
-          client_id: 'string',
-          status: '',
-          scope: [''],
-          sha_secret: '',
-          type: SystemRole.enum.HEALTH
-        })
-      }
-
-      return HttpResponse.json(
-        null,
-        // @ts-expect-error - MSW does not have a type for this?
-        { status: 401 }
-      )
-    })
-  )
+  await createSystemClient({
+    name: 'My health system integration',
+    legacyId: systemUserId,
+    createdBy: user.id,
+    salt: 'RANDOM_STRING',
+    secretHash: 'RANDOM_STRING',
+    shaSecret: 'RANDOM_STRING'
+  })
 
   const fetchedUsers = await client.user.list([...userIds, systemUserId])
 
@@ -140,7 +131,12 @@ test('Does not return users or systems which are not found', async () => {
     http.post(`http://localhost:3030/getUser`, async ({ request }) => {
       const body = (await request.clone().json()) as { userId: string }
       if (body.userId === user.id) {
-        return HttpResponse.json(user)
+        return HttpResponse.json({
+          ...user,
+          signature: {
+            data: user.signature
+          }
+        })
       }
 
       return HttpResponse.json(
@@ -153,14 +149,15 @@ test('Does not return users or systems which are not found', async () => {
   const fetchedUser = await client.user.list([user.id, '123-123-123', 'foobar'])
 
   expect(fetchedUser).toEqual([
-    {
+    expect.objectContaining({
       id: user.id,
       name: user.name,
       role: user.role,
       signature: user.signature,
       primaryOfficeId: user.primaryOfficeId,
-      type: TokenUserType.enum.user
-    }
+      type: TokenUserType.enum.user,
+      fullHonorificName: user.fullHonorificName
+    })
   ])
 })
 

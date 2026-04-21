@@ -10,6 +10,7 @@
  */
 
 const eventsConfig = require('../../eslint.events.config.js')
+const typescriptConfig = require('../../eslint.typescript.config.js')
 const { defineConfig } = require('eslint/config')
 
 module.exports = defineConfig([
@@ -24,6 +25,7 @@ module.exports = defineConfig([
     ],
     rules: {
       ...eventsConfig.rules,
+      ...(process.env.CI === 'true' ? typescriptConfig.rules : {}),
       'max-lines': ['warn', 600],
       'no-console': 'warn',
       '@typescript-eslint/ban-ts-comment': 'off',

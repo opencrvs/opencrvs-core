@@ -12,35 +12,42 @@
 import { TRPCError } from '@trpc/server'
 import { MiddlewareFunction } from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
-import z from 'zod'
+import * as z from 'zod/v4'
 import { findLast } from 'lodash'
 import {
   ActionDocument,
   ActionInputWithType,
   ActionType,
   DeleteActionInput,
-  findScope,
   getAssignedUserFromActions,
   getScopes,
-  Scope,
   TokenUserType,
   WorkqueueCountInput,
-  ConfigurableScopeType,
   UUID,
   EventDocument,
-  ConfigurableScopes,
-  getAuthorizedEventsFromScopes,
   getTokenPayload,
-  canUserReadEvent,
+  getCurrentEventState,
+  EventInput,
+  RecordScopeTypeV2,
+  RecordScopeV2,
+  canUserCreateEvent,
+  getEventConfigById,
+  userCanAccessEventWithScopes,
+  getAcceptedScopesFromToken,
+  ScopeType,
+  hasAnyScope,
   hasScope,
-  SCOPES,
-  hasAnyOfScopes
+  getScopeOptionValue,
+  JurisdictionFilter,
+  getAcceptedScopesByType
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
 import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
-import { getUserOrSystem } from '../../../service/users/api'
-import { isLocationUnderJurisdiction } from '../../../storage/postgres/events/locations'
+import { findUserOrSystem } from '../../../service/users/api'
+import { getInMemoryEventConfigurations } from '../../../service/config/config'
+import { getEventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
+import { isLocationUnderAdministrativeArea } from '../../../storage/postgres/administrative-hierarchy/locations'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -52,93 +59,29 @@ export function setBearerForToken(token: string) {
 }
 
 /**
- * Extracts authorized entities from the provided configurable scopes.
- * Currently supports event types, but more options can be added in the future.
+ * Middleware to check if the user has any of the specified allowed scopes.
  *
- * @param scopes - Array of configurable scopes with options
- * @returns Object containing authorized entities (currently events)
- */
-function getAuthorizedEntitiesFromScopes(scopes: ConfigurableScopes[]) {
-  const authorizedEvents = getAuthorizedEventsFromScopes(scopes)
-
-  return {
-    ...(authorizedEvents.length > 0 && { events: authorizedEvents })
-  }
-}
-
-/**
- * Checks if the auth header contains any of the configurable scopes and returns authorized entities.
+ * Checks the given list of scope types against the scopes in the user's JWT token.
+ * If at least one of the provided scopes is found, access is granted and
+ * the middleware passes control to the next step. Otherwise, a TRPCError
+ * with code 'FORBIDDEN' is thrown.
  *
- * @param authHeader - Authorization header containing the token
- * @param configurableScopes - Array of configurable scope types to check against
- * @returns Object containing authorized entities (e.g. events) based on found scopes
- * @throws {TRPCError} If no matching configurable scopes are found
+ * @param {ScopeType[]} scopes - Array of allowed scope types.
+ * @returns {MiddlewareFunction} TRPC-compatible middleware function.
  */
-function getAuthorizedEntities(
-  token: string,
-  configurableScopes: ConfigurableScopeType[]
-) {
-  const userScopes = getScopes(token)
-  const foundScopes = configurableScopes
-    .map((scope) => findScope(userScopes, scope))
-    .filter((scope) => scope !== undefined)
-
-  if (!foundScopes.length) {
-    throw new TRPCError({ code: 'FORBIDDEN' })
-  }
-
-  return getAuthorizedEntitiesFromScopes(foundScopes)
-}
-
-type CtxWithAuthorizedEntities = TrpcContext & {
-  authorizedEntities?: { events?: string[] }
-}
-
-function inScope(token: string, scopes: Scope[]) {
-  const tokenScopes = getScopes(token)
-  return scopes.some((scope) => tokenScopes.includes(scope))
-}
-
-/**
- * Middleware which checks that one of the required scopes (either basic scopes or configurable scopes) are present in the token.
- *
- * @param scopes scopes that are required to access the resource
- * @param configurableScopes scopes that are configurable
- * @returns TRPC compatible middleware function
- */
-export function requiresAnyOfScopes(
-  scopes: Scope[],
-  configurableScopes?: ConfigurableScopeType[]
-) {
+export function allowedWithAnyOfScopes(scopes: ScopeType[]) {
   const fn: MiddlewareFunction<
     TrpcContext,
     OpenApiMeta,
     TrpcContext,
-    CtxWithAuthorizedEntities,
+    TrpcContext,
     unknown
   > = async (opts) => {
     const { token } = opts.ctx
 
     // If the user has any of the allowed plain scopes, allow access
-    if (inScope(token, scopes)) {
+    if (hasAnyScope(token, scopes)) {
       return opts.next()
-    }
-
-    // If the user has any of the allowed configurable scopes, allow the user to continue
-    // and add the authorized entities to the TrpcContext which are checked in later middleware
-    if (configurableScopes) {
-      const authorizedEntities = getAuthorizedEntities(
-        token,
-        configurableScopes
-      )
-
-      return opts.next({
-        ...opts,
-        ctx: {
-          ...opts.ctx,
-          authorizedEntities
-        }
-      })
     }
 
     throw new TRPCError({ code: 'FORBIDDEN' })
@@ -147,51 +90,12 @@ export function requiresAnyOfScopes(
   return fn
 }
 
-/**
- * Middleware function that checks if the event type is authorized for the user.
- *
- * The function accepts either an eventId or event type directly in the input.
- * If an eventId is provided, it fetches the event to determine its type.
- *
- * Authorization is checked against authorized entities in the TrpcContext:
- * - If no authorized entities or events are present, access is allowed
- * - Otherwise, verifies the event type is included in authorized events
- *
- * @param input - Object containing either eventId or type
- * @param next - Next middleware function to be called
- * @param ctx - TrpcContext object containing authorizedEntities
- * @returns Next middleware result
- * @throws {TRPCError} With code 'FORBIDDEN' if event type is not authorized
- */
-export const eventTypeAuthorization: MiddlewareFunction<
-  CtxWithAuthorizedEntities,
-  OpenApiMeta,
-  CtxWithAuthorizedEntities,
-  CtxWithAuthorizedEntities,
-  { eventId: UUID } | { type: string }
-> = async ({ input, next, ctx }) => {
-  let eventType = 'type' in input ? input.type : undefined
-
-  if ('eventId' in input) {
-    const event = await getEventById(input.eventId)
-    eventType = event.type
-  }
-
-  const { authorizedEntities } = ctx
-
-  if (!authorizedEntities || !authorizedEntities.events) {
-    return next()
-  }
-
-  if (!eventType || !authorizedEntities.events.includes(eventType)) {
-    throw new TRPCError({ code: 'FORBIDDEN' })
-  }
-
-  return next()
-}
-
-export const EventIdParam = z.object({ eventId: UUID })
+export const EventIdParam = z.object({
+  eventId: UUID,
+  customActionType: z.string().optional()
+})
 export type EventIdParam = z.infer<typeof EventIdParam>
+
 export const requireAssignment: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
@@ -210,7 +114,7 @@ export const requireAssignment: MiddlewareFunction<
   )
 
   // System users can not perform action on assigned events
-  if (user.type === TokenUserType.Enum.system && assignedTo) {
+  if (user.type === TokenUserType.enum.system && assignedTo) {
     throw new TRPCError({
       code: 'CONFLICT',
       cause: 'System user can not perform action on assigned event'
@@ -218,7 +122,7 @@ export const requireAssignment: MiddlewareFunction<
   }
 
   // Normal users require assignment
-  if (user.type === TokenUserType.Enum.user && user.id !== assignedTo) {
+  if (user.type === TokenUserType.enum.user && user.id !== assignedTo) {
     throw new TRPCError({
       code: 'CONFLICT',
       message: 'You are not assigned to this event'
@@ -249,17 +153,24 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
   WorkqueueCountInput
 > = async ({ next, ctx, input }) => {
   const scopes = getScopes(ctx.token)
-  const workqueueScope = findScope(scopes, 'workqueue')
 
-  if (!workqueueScope) {
+  const workqueueScopes = getAcceptedScopesByType({
+    acceptedScopes: ['workqueue'],
+    scopes
+  })
+
+  if (!workqueueScopes.length) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 
-  const availableWorkqueues = workqueueScope.options.id
+  const availableWorkqueues = workqueueScopes.flatMap((s) =>
+    getScopeOptionValue(s, 'ids')
+  )
 
   if (input.some(({ slug }) => !availableWorkqueues.includes(slug))) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
+
   return next()
 }
 
@@ -276,15 +187,12 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
   TrpcContext,
   AsyncActionConfirmationResponseSchema
 > = async ({ next, ctx, input }) => {
-  const {
-    eventId: grantedEventId,
-    actionId: grantedActionId,
-    scope
-  } = getTokenPayload(ctx.token)
+  const { token } = ctx
+  const { eventId, actionId } = getTokenPayload(token)
 
   const hasConfirmAndRejectScope =
-    scope.includes('record.confirm-registration') &&
-    scope.includes('record.reject-registration')
+    hasScope(token, 'record.confirm-registration') &&
+    hasScope(token, 'record.reject-registration')
 
   if (!hasConfirmAndRejectScope) {
     throw new TRPCError({
@@ -293,7 +201,7 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
     })
   }
 
-  const isActionConfirmationToken = grantedEventId && grantedActionId
+  const isActionConfirmationToken = eventId && actionId
 
   if (!isActionConfirmationToken) {
     throw new TRPCError({
@@ -302,50 +210,140 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
     })
   }
 
-  if (grantedEventId !== input.eventId || grantedActionId !== input.actionId) {
+  if (eventId !== input.eventId || actionId !== input.actionId) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 
   return next()
 }
 
-export const userCanReadEvent: MiddlewareFunction<
-  TrpcContext,
-  OpenApiMeta,
-  TrpcContext,
-  TrpcContext & { event: EventDocument },
-  UUID
-> = async ({ next, ctx, input }) => {
-  const event = await getEventById(input)
+/**
+ * Given scope types, determines whether the user has relevant scopes to access the event based on the current state.
+ *
+ */
+export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
+  const fn: MiddlewareFunction<
+    TrpcContext,
+    OpenApiMeta,
+    TrpcContext,
+    TrpcContext & { eventId: UUID; eventType: string },
+    unknown
+  > = async ({ next, ctx, getRawInput }) => {
+    const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
+    const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
 
-  const createAction = event.actions.find(
-    (action) => action.type === ActionType.CREATE
-  )
+    if (acceptedScopes.length === 0) {
+      throw new TRPCError({ code: 'FORBIDDEN' })
+    }
 
-  if (!createAction) {
-    throw new TRPCError({
-      code: 'INTERNAL_SERVER_ERROR',
-      message: `Event ${event.id} is missing ${ActionType.CREATE} action`
+    // Since determining access requires knowing the event type, we need to parse the input before we can check access.
+    // default .input(...) throws 400, which is something that we want to return only if the user should have access.
+    const rawInput = await getRawInput()
+    const input = EventIdParam.safeParse(rawInput).data
+
+    if (!input) {
+      throw new TRPCError({ code: 'BAD_REQUEST' })
+    }
+
+    const event = await getEventById(input.eventId)
+    const eventConfig = getEventConfigById(eventConfigs, event.type)
+
+    const eventIndex = getCurrentEventState(event, eventConfig)
+    const eventIndexWithLocationHierarchy =
+      await getEventIndexWithAdministrativeHierarchy(eventConfig, eventIndex)
+
+    const hasAccess = userCanAccessEventWithScopes(
+      eventIndexWithLocationHierarchy,
+      acceptedScopes,
+      ctx.user,
+      input.customActionType
+    )
+
+    if (!hasAccess) {
+      throw new EventNotFoundError(input.eventId)
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        acceptedScopes,
+        eventId: input.eventId,
+        eventType: event.type
+      }
     })
   }
 
-  const canRead = canUserReadEvent(
-    {
-      createdBy: createAction.createdBy,
-      type: event.type
-    },
-    {
-      userId: ctx.user.id,
-      scopes: getScopes(ctx.token)
-    }
-  )
+  return fn
+}
 
-  if (canRead) {
-    return next({ ctx: { ...ctx, event } })
+/**
+ * Middleware to check that the user has search scopes and adds them to context.
+ * Search differs from other endpoints, since it targets multiple events. Accepted scopes are later used to filter the search result query.
+ */
+export const canSearchEvents: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext & { acceptedScopes: RecordScopeV2[] },
+  unknown
+> = async (opts) => {
+  const acceptedScopes = getAcceptedScopesFromToken(opts.ctx.token, [
+    'record.search'
+  ])
+
+  if (acceptedScopes.length === 0) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
   }
 
-  // Throw not found to avoid leaking the existence of the event
-  throw new EventNotFoundError(input)
+  return opts.next({
+    ...opts,
+    ctx: {
+      ...opts.ctx,
+      acceptedScopes
+    }
+  })
+}
+
+export const userCanCreateEvent: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext,
+  unknown
+> = async ({ next, ctx, getRawInput }) => {
+  const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
+
+  if (!hasScope(ctx.token, 'record.create')) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
+  // Since determining access requires knowing the event type, we need to parse the input before we can check access.
+  // default .input(...) throws 400, which is something that we want to return only if the user should have access.
+  const rawInput = await getRawInput()
+  const input = EventInput.safeParse(rawInput).data
+
+  if (!input) {
+    throw new TRPCError({ code: 'BAD_REQUEST' })
+  }
+
+  const eventConfig = eventConfigs.find((c) => c.id === input.type)
+
+  if (!eventConfig) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `No configuration found for event type: ${input.type}`
+    })
+  }
+
+  const canCreateEvent = canUserCreateEvent(getScopes(ctx.token), input.type)
+
+  if (!canCreateEvent) {
+    throw new TRPCError({
+      code: 'FORBIDDEN'
+    })
+  }
+
+  return next()
 }
 
 export const userCanReadOtherUser: MiddlewareFunction<
@@ -359,21 +357,14 @@ export const userCanReadOtherUser: MiddlewareFunction<
 
   // Throw early to avoid mistakes in the logic below.
   // There are test cases for each but better safe than sorry.
-  const hasAnyScope = hasAnyOfScopes(
-    [
-      SCOPES.USER_READ,
-      SCOPES.USER_READ_MY_OFFICE,
-      SCOPES.USER_READ_MY_JURISDICTION,
-      SCOPES.USER_READ_ONLY_MY_AUDIT
-    ],
-    getScopes(token)
-  )
+  const hasReadScope = hasScope(token, 'user.read')
+  const hasReadMyAuditScope = hasScope(token, 'user.read-only-my-audit')
 
-  if (!hasAnyScope) {
+  if (!hasReadScope && !hasReadMyAuditScope) {
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
 
-  const otherUser = await getUserOrSystem(input.userId, token)
+  const otherUser = await findUserOrSystem(input.userId, token)
 
   // Don't reveal the existence of the user
   if (!otherUser) {
@@ -381,7 +372,7 @@ export const userCanReadOtherUser: MiddlewareFunction<
   }
 
   // Not supported for system users
-  if (otherUser.type === TokenUserType.Enum.system) {
+  if (otherUser.type === TokenUserType.enum.system) {
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
 
@@ -389,36 +380,44 @@ export const userCanReadOtherUser: MiddlewareFunction<
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
 
-  if (hasScope(token, SCOPES.USER_READ)) {
+  const readScopes = getAcceptedScopesFromToken(token, ['user.read'])
+
+  const accessLevels = readScopes.map((s) =>
+    getScopeOptionValue(s, 'accessLevel')
+  )
+
+  if (accessLevels.includes(JurisdictionFilter.enum.all)) {
     return next()
   }
 
+  const hasLocationAccess =
+    accessLevels.includes(JurisdictionFilter.enum.location) ||
+    accessLevels.includes(JurisdictionFilter.enum.administrativeArea)
+
   if (
-    inScope(token, [
-      SCOPES.USER_READ_MY_OFFICE,
-      SCOPES.USER_READ_MY_JURISDICTION
-    ]) &&
+    hasLocationAccess &&
     userReading.primaryOfficeId === otherUser.primaryOfficeId
   ) {
     return next()
   }
 
-  const isUnderJurisdiction = await isLocationUnderJurisdiction({
-    jurisdictionLocationId: userReading.primaryOfficeId,
-    locationToSearchId: otherUser.primaryOfficeId
-  })
+  // If administrative area is undefined, we consider the user has access to all locations.
+  // This will change once we implement 2.0. user scopes.
+  const isUnderJurisdiction = userReading.administrativeAreaId
+    ? await isLocationUnderAdministrativeArea({
+        administrativeAreaId: userReading.administrativeAreaId,
+        locationId: otherUser.primaryOfficeId
+      })
+    : true
 
   if (
-    hasScope(token, SCOPES.USER_READ_MY_JURISDICTION) &&
+    accessLevels.includes(JurisdictionFilter.enum.administrativeArea) &&
     isUnderJurisdiction
   ) {
     return next()
   }
 
-  if (
-    hasScope(token, SCOPES.USER_READ_ONLY_MY_AUDIT) &&
-    userReading.id === otherUser.id
-  ) {
+  if (hasReadMyAuditScope && userReading.id === otherUser.id) {
     return next()
   }
 

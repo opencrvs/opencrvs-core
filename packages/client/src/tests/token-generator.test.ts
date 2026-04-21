@@ -20,31 +20,43 @@ it('Generates tokens', () => {
       scope: generator.user.scopes.fieldAgent,
       subject: generator.user.id.fieldAgent,
       userType: TokenUserType.enum.user,
-      role: TestUserRole.Enum.FIELD_AGENT
+      role: TestUserRole.enum.FIELD_AGENT
     }),
     registrationAgent: generateToken({
       scope: generator.user.scopes.registrationAgent,
       subject: generator.user.id.registrationAgent,
       userType: TokenUserType.enum.user,
-      role: TestUserRole.Enum.REGISTRATION_AGENT
+      role: TestUserRole.enum.REGISTRATION_AGENT
     }),
     localRegistrar: generateToken({
       scope: generator.user.scopes.localRegistrar,
       subject: generator.user.id.localRegistrar,
       userType: TokenUserType.enum.user,
-      role: TestUserRole.Enum.LOCAL_REGISTRAR
+      role: TestUserRole.enum.LOCAL_REGISTRAR
     }),
     localSystemAdmin: generateToken({
       scope: generator.user.scopes.localSystemAdmin,
       subject: generator.user.id.localSystemAdmin,
       userType: TokenUserType.enum.user,
-      role: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN
+      role: TestUserRole.enum.LOCAL_SYSTEM_ADMIN
     }),
     nationalSystemAdmin: generateToken({
       scope: generator.user.scopes.nationalSystemAdmin,
       subject: generator.user.id.nationalSystemAdmin,
       userType: TokenUserType.enum.user,
-      role: TestUserRole.Enum.NATIONAL_SYSTEM_ADMIN
+      role: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN
+    }),
+    communityLeader: generateToken({
+      scope: generator.user.scopes.communityLeader,
+      subject: generator.user.id.communityLeader,
+      userType: TokenUserType.enum.user,
+      role: TestUserRole.enum.COMMUNITY_LEADER
+    }),
+    provincialRegistrar: generateToken({
+      scope: generator.user.scopes.provincialRegistrar,
+      subject: generator.user.id.provincialRegistrar,
+      userType: TokenUserType.enum.user,
+      role: TestUserRole.enum.PROVINCIAL_REGISTRAR
     })
   }
   expect(token.fieldAgent).toMatchSnapshot('fieldAgent token')
@@ -52,4 +64,6 @@ it('Generates tokens', () => {
   expect(token.localRegistrar).toMatchSnapshot('localRegistrar token')
   expect(token.localSystemAdmin).toMatchSnapshot('localSystemAdmin token')
   expect(token.nationalSystemAdmin).toMatchSnapshot('nationalSystemAdmin token')
+  expect(token.communityLeader).toMatchSnapshot('communityLeader token')
+  expect(token.provincialRegistrar).toMatchSnapshot('provincialRegistrar token')
 })

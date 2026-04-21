@@ -56,14 +56,3 @@ services:
       - './data/influxdb:/var/lib/influxdb'
     logging:
       driver: 'none'
-
-  # Expose dev secrets as a plain volume - these will use docker secrets in staging and prod
-  hearth:
-    volumes:
-      - '.secrets/public-key.pem:/secrets/public-key.pem'
-      - './infrastructure/hearth-plugins/checkDuplicateTask.js:/src/hearth/lib/plugins/checkDuplicateTask.js'
-      - './infrastructure/hearth-queryparam-extensions.json:/src/hearth/config/queryparam-extensions.json'
-    logging:
-      driver: 'none'
-    ports:
-      - '3447:3447'

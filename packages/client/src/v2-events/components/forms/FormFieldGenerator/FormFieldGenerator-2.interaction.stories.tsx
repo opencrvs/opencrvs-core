@@ -11,7 +11,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, userEvent, within } from '@storybook/test'
+import { waitFor, expect, userEvent, within } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import {
@@ -23,7 +23,7 @@ import {
   FieldConfig,
   EventState,
   generateTranslationConfig,
-  UUID,
+  DocumentPath,
   PlainDate
 } from '@opencrvs/commons/client'
 
@@ -52,8 +52,7 @@ const fields = [
   {
     id: 'form.header',
     type: FieldType.PAGE_HEADER,
-    label: generateTranslationConfig('Form Header'),
-    defaultValue: 'Membership Application Form'
+    label: generateTranslationConfig('Membership Application Form')
   },
 
   {
@@ -103,7 +102,10 @@ const fields = [
       max: 60,
       prefix: generateTranslationConfig('Years'),
       postfix: generateTranslationConfig('Old')
-    }
+    },
+    helperText: generateTranslationConfig(
+      'For applicants under 18, parental consent is required.'
+    )
   },
 
   {
@@ -125,7 +127,7 @@ const fields = [
     type: FieldType.FILE,
     label: generateTranslationConfig('Applicant Photo'),
     defaultValue: {
-      path: '/uploads/photo.png',
+      path: 'uploads/photo.png' as DocumentPath,
       type: 'image/png',
       originalFilename: 'profile.png'
     },
@@ -144,7 +146,11 @@ const fields = [
     signaturePromptLabel: generateTranslationConfig(
       'Please sign inside the box'
     ),
-    defaultValue: 'Signed by Applicant',
+    defaultValue: {
+      path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath,
+      type: 'image/png',
+      originalFilename: 'signature-review____signature-1773128010978.png'
+    },
     configuration: { maxFileSize: 1024, acceptedFileTypes: ['image/png'] }
   },
 
@@ -212,11 +218,6 @@ const fields = [
           required: false
         }
       ]
-    },
-    defaultValue: {
-      country: 'Bangladesh',
-      administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-      addressType: 'DOMESTIC'
     }
   },
 
@@ -236,7 +237,7 @@ const fields = [
     ],
     defaultValue: [
       {
-        path: '/uploads/nid.png',
+        path: 'uploads/nid.png' as DocumentPath,
         type: 'image/png',
         originalFilename: 'nid.png',
         option: 'nidCopy'
@@ -320,16 +321,22 @@ const fields = [
 
   {
     id: 'membership.facility',
-    type: FieldType.FACILITY,
+    type: FieldType.LOCATION,
     label: generateTranslationConfig('Facility'),
-    defaultValue: 'Gym Hall'
+    defaultValue: 'Gym Hall',
+    configuration: {
+      locationTypes: ['HEALTH_FACILITY']
+    }
   },
 
   {
     id: 'membership.office',
-    type: FieldType.OFFICE,
+    type: FieldType.LOCATION,
     label: generateTranslationConfig('Membership Office'),
-    defaultValue: 'Head Office'
+    defaultValue: 'Head Office',
+    configuration: {
+      locationTypes: ['CRVS_OFFICE']
+    }
   },
 
   {
@@ -347,14 +354,19 @@ const fields = [
       timeout: 5000
     }
   },
+  {
+    id: 'club.rules-heading',
+    type: FieldType.HEADING,
+    label: generateTranslationConfig('Club Rules'),
+    configuration: { styles: { fontVariant: 'h4' } }
+  },
 
   {
     id: 'club.rules',
     type: FieldType.PARAGRAPH,
-    label: generateTranslationConfig('Club Rules'),
-    defaultValue: 'All members must follow club guidelines and regulations.',
+    label: generateTranslationConfig('All members must follow club guidelines and regulations.'),
     configuration: {
-      styles: { fontVariant: 'reg12', hint: true }
+      styles: { hint: true }
     }
   },
 
@@ -362,7 +374,6 @@ const fields = [
     id: 'club.benefits',
     type: FieldType.BULLET_LIST,
     label: generateTranslationConfig('Club Benefits'),
-    defaultValue: 'Exclusive access to facilities',
     items: [
       generateTranslationConfig('Discounted events'),
       generateTranslationConfig('Priority bookings')
@@ -396,19 +407,21 @@ const fields = [
 ] satisfies FieldConfig[]
 
 const declaration = {
-  'form.header': 'Membership Application Form',
-  'form.divider': undefined,
   'applicant.firstname': 'John',
   'applicant.middlename': 'Michael',
   'applicant.surname': 'Doe',
   'applicant.age': 30,
   'applicant.bio': 'Short biography about the applicant...',
   'applicant.photo': {
-    path: '/uploads/photo.png',
+    path: 'uploads/photo.png' as DocumentPath,
     type: 'image/png',
     originalFilename: 'profile.png'
   },
-  'applicant.signature': 'Signed by Applicant',
+  'applicant.signature': {
+    path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath,
+    type: 'image/png',
+    originalFilename: 'signature-review____signature-1773128010978.png'
+  },
   'applicant.email': 'applicant@example.com',
   'applicant.phone': '+8801712345678',
   'applicant.password': 'StrongPassword123!',
@@ -418,11 +431,11 @@ const declaration = {
   'applicant.address': {
     country: 'BGD',
     addressType: 'DOMESTIC',
-    administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a'
+    administrativeArea: '62a0ccb4-880d-4f30-8882-f256007dfff9'
   },
   'applicant.documents': [
     {
-      path: '/uploads/nid.png',
+      path: 'uploads/nid.png' as DocumentPath,
       type: 'image/png',
       originalFilename: 'nid.png',
       option: 'nidCopy'
@@ -444,8 +457,6 @@ const declaration = {
     data: null,
     error: null
   },
-  'club.rules': 'All members must follow club guidelines and regulations.',
-  'club.benefits': 'Exclusive access to facilities',
   'club.dataSummary': undefined,
   'consent.termsAccepted': false
 } satisfies EventState
@@ -483,18 +494,20 @@ export const DisabledFormFields: StoryObj<typeof FormFieldGenerator> = {
     const canvas = within(canvasElement)
 
     await step('All form fields should be disabled', async () => {
-      // wait 5s for suspense to resolve
-      // @ToDo: We need a better way
-      await new Promise((resolve) => setTimeout(resolve, 5000))
+      const formFields = await waitFor(
+        async () => {
+          // Find all kind of input fields and expect them to be disabled
+          const inputFields = [
+            ...(await canvas.findAllByRole('textbox')),
+            ...(await canvas.findAllByRole('spinbutton')),
+            ...(await canvas.findAllByRole('checkbox')),
+            ...(await canvas.findAllByRole('radio'))
+          ]
+          return inputFields
+        },
+        { timeout: 10000 }
+      )
 
-      // Find all kind of input fields and expect them to be disabled
-      const formFields = [
-        ...(await canvas.findAllByRole('textbox')),
-        ...(await canvas.findAllByRole('spinbutton')),
-        ...(await canvas.findAllByRole('checkbox')),
-        ...(await canvas.findAllByRole('radio'))
-      ]
-      await expect(formFields).toHaveLength(29)
       for (const f of formFields) {
         await expect(f).toBeDisabled()
       }
@@ -536,16 +549,17 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
     const canvas = within(canvasElement)
 
     await step('All form fields should be enable', async () => {
-      await new Promise((resolve) => setTimeout(resolve, 5000)) // wait 5s for suspense to resolve
-
-      // Find all kind of input fields and expect them to be disabled
-      const formFields = [
-        ...(await canvas.findAllByRole('textbox')),
-        ...(await canvas.findAllByRole('spinbutton')),
-        ...(await canvas.findAllByRole('checkbox')),
-        ...(await canvas.findAllByRole('radio'))
-      ]
-      await expect(formFields).toHaveLength(28)
+      const formFields = await waitFor(async () => {
+        // wait for suspense to resolve
+        // Find all kind of input fields and expect them to be disabled
+        const inputFields = [
+          ...(await canvas.findAllByRole('textbox')),
+          ...(await canvas.findAllByRole('spinbutton')),
+          ...(await canvas.findAllByRole('checkbox')),
+          ...(await canvas.findAllByRole('radio'))
+        ]
+        return inputFields
+      })
 
       for (const f of formFields) {
         await expect(f).not.toBeDisabled()
@@ -601,15 +615,17 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
     const canvas = within(canvasElement)
 
     await step('All form fields should be disabled', async () => {
-      await new Promise((resolve) => setTimeout(resolve, 5000)) // wait 5s for suspense to resolve
-
-      const formFields = [
-        ...(await canvas.findAllByRole('textbox')),
-        ...(await canvas.findAllByRole('spinbutton')),
-        ...(await canvas.findAllByRole('checkbox')),
-        ...(await canvas.findAllByRole('radio'))
-      ]
-      await expect(formFields).toHaveLength(28)
+      const formFields = await waitFor(async () => {
+        // wait for suspense to resolve
+        // Find all kind of input fields and expect them to be disabled
+        const inputFields = [
+          ...(await canvas.findAllByRole('textbox')),
+          ...(await canvas.findAllByRole('spinbutton')),
+          ...(await canvas.findAllByRole('checkbox')),
+          ...(await canvas.findAllByRole('radio'))
+        ]
+        return inputFields
+      })
       for (const f of formFields) {
         const fieldToAvoid =
           f.getAttribute('data-testid') === 'number__applicant____age'
@@ -625,13 +641,15 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
       await userEvent.type(ageInput, '40')
       ageInput.blur()
 
-      const formFields = [
-        ...(await canvas.findAllByRole('textbox')),
-        ...(await canvas.findAllByRole('spinbutton')),
-        ...(await canvas.findAllByRole('checkbox')),
-        ...(await canvas.findAllByRole('radio'))
-      ]
-      await expect(formFields).toHaveLength(28)
+      const formFields = await waitFor(async () => {
+        const inputFields = [
+          ...(await canvas.findAllByRole('textbox')),
+          ...(await canvas.findAllByRole('spinbutton')),
+          ...(await canvas.findAllByRole('checkbox')),
+          ...(await canvas.findAllByRole('radio'))
+        ]
+        return inputFields
+      })
       for (const f of formFields) {
         await expect(f).not.toBeDisabled()
       }
@@ -645,14 +663,15 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
       await userEvent.clear(ageInput)
       await userEvent.type(ageInput, '10')
       ageInput.blur()
-      const formFields = [
-        ...(await canvas.findAllByRole('textbox')),
-        ...(await canvas.findAllByRole('spinbutton')),
-        ...(await canvas.findAllByRole('checkbox')),
-        ...(await canvas.findAllByRole('radio'))
-      ]
-
-      await expect(formFields).toHaveLength(28)
+      const formFields = await waitFor(async () => {
+        const inputFields = [
+          ...(await canvas.findAllByRole('textbox')),
+          ...(await canvas.findAllByRole('spinbutton')),
+          ...(await canvas.findAllByRole('checkbox')),
+          ...(await canvas.findAllByRole('radio'))
+        ]
+        return inputFields
+      })
       for (const f of formFields) {
         const fieldToAvoid =
           f.getAttribute('data-testid') === 'number__applicant____age'

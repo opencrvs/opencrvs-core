@@ -35,6 +35,7 @@ import {
   isOfficeFieldType,
   isPageHeaderFieldType,
   isParagraphFieldType,
+  isHeadingFieldType,
   isRadioGroupFieldType,
   isSelectFieldType,
   isSignatureFieldType,
@@ -73,7 +74,12 @@ import {
   flattenFormState,
   ConditionalType,
   isConditionMet,
-  SelectOption
+  SelectOption,
+  isCustomFieldType,
+  isHiddenFieldType,
+  isImageViewFieldType,
+  isAutocompleteFieldType,
+  isUserRoleFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -93,13 +99,16 @@ import {
   Divider,
   PageHeader,
   Paragraph,
+  Heading,
   SelectDateRangeField,
   TimeField,
   Button,
   AlphaPrintButton,
   Http,
   LinkButton,
-  VerificationStatus
+  VerificationStatus,
+  ImageView,
+  UserRole
 } from '@client/v2-events/features/events/registered-fields'
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { Data } from '@client/v2-events/features/events/registered-fields/Data'
@@ -113,6 +122,9 @@ import { QrReader } from '@client/v2-events/features/events/registered-fields/Qr
 import { QueryParamReader } from '@client/v2-events/features/events/registered-fields/QueryParamReader'
 import { Loader } from '@client/v2-events/features/events/registered-fields/Loader'
 import { NumberWithUnit } from '@client/v2-events/features/events/registered-fields/NumberWithUnit'
+import { Custom } from '@client/v2-events/features/events/registered-fields/Custom'
+import { Hidden } from '@client/v2-events/features/events/registered-fields/Hidden'
+import { Autocomplete } from '@client/v2-events/features/events/registered-fields/Autocomplete'
 import {
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
@@ -158,6 +170,7 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   readonlyMode?: boolean
   allKnownFields: FieldConfig[]
   validatorContext: ValidatorContext
+  attachmentPath: string
 }
 
 function resolveOptions(
@@ -205,6 +218,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
     allKnownFields,
     form,
     disabled,
+    attachmentPath,
     readonlyMode
   } = props
   const intl = useIntl()
@@ -436,16 +450,29 @@ export const GeneratedInputField = <T extends FieldConfig>(
     )
   }
 
-  if (isParagraphFieldType(field)) {
-    // @todo: is this even needed?
-    const message = intl.formatMessage(fieldDefinition.label, {
-      [fieldDefinition.id]: field.value
-    })
+  if (isImageViewFieldType(field)) {
+    return (
+      <ImageView.Input
+        configuration={field.config.configuration}
+        value={field.value}
+      />
+    )
+  }
 
+  if (isParagraphFieldType(field)) {
     return (
       <Paragraph.Input
         configuration={field.config.configuration}
-        message={message}
+        message={intl.formatMessage(fieldDefinition.label)}
+      />
+    )
+  }
+
+  if (isHeadingFieldType(field)) {
+    return (
+      <Heading.Input
+        configuration={field.config.configuration}
+        message={intl.formatMessage(fieldDefinition.label)}
       />
     )
   }
@@ -562,6 +589,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
           acceptedFileTypes={field.config.configuration.acceptedFileTypes}
           disabled={disabled}
           error={inputFieldProps.error}
+          filePath={attachmentPath}
           label={uploadedFileNameLabel}
           maxFileSize={field.config.configuration.maxFileSize}
           maxImageSize={field.config.configuration.maxImageSize}
@@ -587,6 +615,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
         <Address.Input
           config={field.config}
           disabled={disabled}
+          eventConfig={eventConfig}
           form={form}
           id={field.config.id}
           name={name}
@@ -677,6 +706,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
         <SignatureField.Input
           {...field.config}
           disabled={disabled}
+          filePath={attachmentPath}
           maxFileSize={field.config.configuration.maxFileSize}
           modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
           name={name}
@@ -697,6 +727,8 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <InputField {...inputFieldProps} htmlFor={name}>
         <AdministrativeArea.Input
           {...inputProps}
+          configuration={field.config.configuration}
+          eventType={eventConfig?.id}
           partOf={typeof partOf === 'string' ? partOf : null}
           value={field.value}
         />
@@ -710,11 +742,8 @@ export const GeneratedInputField = <T extends FieldConfig>(
         <LocationSearch.Input
           {...field.config}
           disabled={disabled}
-          searchableResource={
-            field.config.configuration.searchableResource.length > 0
-              ? field.config.configuration.searchableResource
-              : ['locations']
-          }
+          eventType={eventConfig?.id}
+          locationTypes={field.config.configuration.locationTypes}
           value={field.value}
           onBlur={handleBlur}
           onChange={(val) => onFieldValueChange(name, val)}
@@ -729,7 +758,8 @@ export const GeneratedInputField = <T extends FieldConfig>(
         <LocationSearch.Input
           {...field.config}
           disabled={disabled}
-          searchableResource={['offices']}
+          eventType={eventConfig?.id}
+          locationTypes={['CRVS_OFFICE']}
           value={field.value}
           onBlur={handleBlur}
           onChange={(val) => onFieldValueChange(name, val)}
@@ -744,7 +774,8 @@ export const GeneratedInputField = <T extends FieldConfig>(
         <LocationSearch.Input
           {...field.config}
           disabled={disabled}
-          searchableResource={['facilities']}
+          eventType={eventConfig?.id}
+          locationTypes={['CRVS_OFFICE']}
           value={field.value}
           onBlur={handleBlur}
           onChange={(val) => onFieldValueChange(name, val)}
@@ -752,9 +783,11 @@ export const GeneratedInputField = <T extends FieldConfig>(
       </InputField>
     )
   }
+
   if (isDividerFieldType(field)) {
     return <Divider.Input />
   }
+
   if (isFileFieldWithOptionType(field)) {
     const resolvedOptions = resolveOptions(
       field.config.options,
@@ -767,11 +800,11 @@ export const GeneratedInputField = <T extends FieldConfig>(
           {...inputProps}
           acceptedFileTypes={field.config.configuration.acceptedFileTypes}
           error={inputFieldProps.error}
+          filePath={attachmentPath}
           maxFileSize={field.config.configuration.maxFileSize}
           maxImageSize={field.config.configuration.maxImageSize}
           options={resolvedOptions}
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          value={field.value ?? []}
+          value={field.value}
           onChange={(val) => onFieldValueChange(name, val)}
         />
       </InputField>
@@ -827,11 +860,32 @@ export const GeneratedInputField = <T extends FieldConfig>(
           form
         )}
         form={form}
-        parentValue={form[field.config.configuration.trigger.$$field]}
-        onChange={(val) => onFieldValueChange(name, val)}
+        trigger={
+          field.config.configuration.trigger
+            ? {
+                mode: 'onChange',
+                value: form[field.config.configuration.trigger.$$field]
+              }
+            : { mode: 'onMount' }
+        }
+        onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
       />
     )
   }
+
+  if (isAutocompleteFieldType(field)) {
+    return (
+      <InputField {...inputFieldProps}>
+        <Autocomplete.Input
+          {...field.config}
+          key={fieldDefinition.id}
+          value={field.value}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      </InputField>
+    )
+  }
+
   if (isSearchFieldType(field)) {
     const {
       label: inputLabel,
@@ -869,6 +923,8 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <VerificationStatus.Input
         configuration={field.config.configuration}
         id={field.config.id}
+        label={inputFieldProps.label}
+        required={inputFieldProps.required}
         value={field.value}
         onReset={() => {
           if (Array.isArray(fieldDefinition.parent)) {
@@ -906,11 +962,13 @@ export const GeneratedInputField = <T extends FieldConfig>(
 
   if (isIdReaderFieldType(field)) {
     return (
-      <IdReader.Input
-        id={field.config.id}
-        methods={field.config.methods}
-        onChange={(val) => onFieldValueChange(name, val)}
-      />
+      <InputField variant="highlighted" {...inputFieldProps}>
+        <IdReader.Input
+          id={field.config.id}
+          methods={field.config.methods}
+          onChange={(val) => onFieldValueChange(name, val)}
+        />
+      </InputField>
     )
   }
 
@@ -925,10 +983,48 @@ export const GeneratedInputField = <T extends FieldConfig>(
 
   if (isLoaderFieldType(field)) {
     return (
-      <Loader.Input
-        configuration={field.config.configuration}
-        id={field.config.id}
+      <InputField {...inputFieldProps} variant={field.config.variant}>
+        <Loader.Input
+          configuration={field.config.configuration}
+          id={field.config.id}
+        />
+      </InputField>
+    )
+  }
+
+  if (isCustomFieldType(field)) {
+    return (
+      <InputField {...inputFieldProps}>
+        <Custom.Input
+          {...field.config}
+          configuration={field.config.configuration}
+          disabled={disabled}
+          id={field.config.id}
+          value={field.value}
+          onBlur={handleBlur}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      </InputField>
+    )
+  }
+
+  if (isHiddenFieldType(field)) {
+    return (
+      <Hidden.Input
+        {...inputProps}
+        value={field.value as string | undefined}
       />
+    )
+  }
+
+  if (isUserRoleFieldType(field)) {
+    return (
+      <InputField {...inputFieldProps}>
+        <UserRole.Input
+          {...inputProps}
+          value={field.value}
+        />
+      </InputField>
     )
   }
 

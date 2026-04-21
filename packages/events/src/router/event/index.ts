@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
-import { extendZodWithOpenApi } from 'zod-openapi'
-import { getScopes, getUUID, SCOPES, UUID, findScope } from '@opencrvs/commons'
+import * as z from 'zod/v4'
+import { getUUID } from '@opencrvs/commons'
+import { logger } from '@opencrvs/commons'
 import {
   ActionStatus,
   ActionType,
@@ -32,8 +32,11 @@ import {
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { EventIdParam } from '@events/router/middleware'
-import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
-import { publicProcedure, router, systemProcedure } from '@events/router/trpc'
+import {
+  userOnlyProcedure,
+  router,
+  userAndSystemProcedure
+} from '@events/router/trpc'
 import {
   getEventConfigurationById,
   getInMemoryEventConfigurations
@@ -59,20 +62,70 @@ import {
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
 import { cleanupUnreferencedFiles } from '@events/service/files'
+import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import { UserContext } from '../../context'
 import { getDuplicateEvents } from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
-
-extendZodWithOpenApi(z)
+import { customActionProcedures } from './actions/custom'
 
 export const eventRouter = router({
+  /*
+   * This must be defined before event.get or otherwise the rest route /events/:eventId will catch the request before it reaches this route. This is because "reindex" can be mistaken as an eventId in the get route.
+   */
+  reindex: router({
+    trigger: userAndSystemProcedure
+      .input(
+        z
+          .object({
+            waitForCompletion: z.boolean().default(true)
+          })
+          .optional()
+      )
+      .use(middleware.allowedWithAnyOfScopes(['record.reindex']))
+      .output(z.void())
+      .meta({
+        openapi: {
+          summary:
+            'Triggers reindexing of search, workqueues and notifies country config',
+          method: 'POST',
+          path: '/events/reindex',
+          tags: ['events']
+        }
+      })
+      .mutation(async ({ ctx, input }) => {
+        if (input?.waitForCompletion === false) {
+          void reindex(ctx.token).catch((err) => {
+            logger.error(`Reindex failed ${err.message}`)
+          })
+          return Promise.resolve()
+        }
+        return reindex(ctx.token)
+      }),
+    status: userAndSystemProcedure
+      .meta({
+        openapi: {
+          summary: 'Returns the status of current and past reindexing calls',
+          method: 'GET',
+          path: '/events/reindex',
+          tags: ['events']
+        }
+      })
+      .use(middleware.allowedWithAnyOfScopes(['record.reindex']))
+      .input(
+        z
+          .object({ limit: z.number().int().min(1).max(100).optional() })
+          .optional()
+      )
+      .output(z.array(ReindexingStatusSchema))
+      .query(async ({ input }) => getReindexingStatusHistory(input?.limit))
+  }),
   config: router({
     /**
      * Event configurations are intentionally available to all user types.
      * Some of the dynamic scopes require knowledge of available types.
      */
-    get: publicProcedure
+    get: userAndSystemProcedure
       .meta({
         openapi: {
           summary: 'List event configurations',
@@ -88,7 +141,7 @@ export const eventRouter = router({
         getInMemoryEventConfigurations(options.ctx.token)
       )
   }),
-  create: systemProcedure
+  create: userAndSystemProcedure
     .meta({
       openapi: {
         summary: 'Create event',
@@ -98,9 +151,10 @@ export const eventRouter = router({
         protect: true
       }
     })
-    .use(requiresAnyOfScopes([], ACTION_SCOPE_MAP[ActionType.CREATE]))
+    .use(middleware.userCanCreateEvent)
     .input(EventInput)
-    .use(middleware.eventTypeAuthorization)
+    .use(middleware.requireLocationForSystemUserEventCreate)
+
     .output(EventDocument)
     .mutation(async ({ input, ctx }) => {
       const config = await getEventConfigurationById({
@@ -108,33 +162,60 @@ export const eventRouter = router({
         eventType: input.type
       })
 
-      return createEvent({
+      const result = await createEvent({
         transactionId: input.transactionId,
         eventInput: input,
         user: ctx.user,
+        createdAtLocation: input.createdAtLocation,
         config
       })
-    }),
-  get: publicProcedure
-    .input(UUID)
-    .use(middleware.userCanReadEvent)
-    .query(async ({ ctx }) => {
-      const event = ctx.event
 
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'event.create',
+        requestData: {
+          transactionId: input.transactionId,
+          type: input.type,
+          createdAtLocation: input.createdAtLocation ?? null
+        },
+        responseSummary: {
+          eventId: result.id,
+          trackingId: result.trackingId
+        }
+      })
+
+      return result
+    }),
+  get: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'Fetch full event document',
+        method: 'GET',
+        path: '/events/{eventId}',
+        tags: ['events'],
+        protect: true
+      }
+    })
+    .input(EventIdParam)
+    .output(EventDocument)
+    .use(middleware.canAccessEventWithScopes(['record.read']))
+    .query(async ({ ctx }) => {
+      const { eventId, eventType } = ctx
       const configuration = await getEventConfigurationById({
         token: ctx.token,
-        eventType: event.type
+        eventType
       })
 
       const updatedEvent = await processAction(
         {
           type: ActionType.READ,
-          eventId: event.id,
+          eventId,
           transactionId: getUUID(),
           declaration: {}
         },
         {
-          event,
+          eventId,
           user: ctx.user,
           token: ctx.token,
           status: ActionStatus.Accepted,
@@ -142,20 +223,32 @@ export const eventRouter = router({
         }
       )
 
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'event.get',
+        requestData: { eventId },
+        responseSummary: {
+          eventType: updatedEvent.type,
+          trackingId: updatedEvent.trackingId
+        }
+      })
+
       return updatedEvent
     }),
-  getDuplicates: publicProcedure
-    .use(requiresAnyOfScopes([], ['record.declared.review-duplicates']))
+  getDuplicates: userOnlyProcedure
+    .use(middleware.canAccessEventWithScopes(['record.review-duplicates']))
     .input(EventIdParam)
-    .use(middleware.eventTypeAuthorization)
     .use(middleware.requireAssignment)
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input.eventId)
 
       return getDuplicateEvents(event, ctx)
     }),
-  delete: publicProcedure
-    .use(requiresAnyOfScopes([], ACTION_SCOPE_MAP[ActionType.DELETE]))
+  delete: userOnlyProcedure
+    .use(
+      middleware.canAccessEventWithScopes(ACTION_SCOPE_MAP[ActionType.DELETE])
+    )
     .input(DeleteActionInput)
     .use(middleware.requireAssignment)
     .mutation(async ({ input, ctx }) => {
@@ -171,10 +264,10 @@ export const eventRouter = router({
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
   draft: router({
-    list: publicProcedure
+    list: userOnlyProcedure
       .output(z.array(Draft))
       .query(async (options) => getDraftsByUserId(options.ctx.user.id)),
-    create: publicProcedure
+    create: userOnlyProcedure
       .input(DraftInput)
       .use(middleware.requireAssignment)
       .output(Draft)
@@ -220,27 +313,54 @@ export const eventRouter = router({
   actions: router({
     notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
     declare: router(declareActionProcedures()),
-    validate: router(getDefaultActionProcedures(ActionType.VALIDATE)),
+    edit: router(getDefaultActionProcedures(ActionType.EDIT)),
     reject: router(getDefaultActionProcedures(ActionType.REJECT)),
     archive: router(getDefaultActionProcedures(ActionType.ARCHIVE)),
     register: router(getDefaultActionProcedures(ActionType.REGISTER)),
     printCertificate: router(
       getDefaultActionProcedures(ActionType.PRINT_CERTIFICATE)
     ),
+    custom: router(customActionProcedures()),
     assignment: router({
-      assign: publicProcedure
+      assign: userOnlyProcedure
         .input(AssignActionInput)
         .use(middleware.validateAction)
         .mutation(async ({ ctx, input }) => {
           const { user, token } = ctx
-          return assignRecord({ input, user, token })
+          const result = await assignRecord({ input, user, token })
+          await writeAuditLog({
+            clientId: user.id,
+            clientType: user.type,
+            operation: 'event.actions.assign.request',
+            requestData: {
+              eventId: input.eventId,
+              actionType: ActionType.ASSIGN,
+              eventType: result.type,
+              trackingId: result.trackingId,
+              transactionId: input.transactionId
+            }
+          })
+          return result
         }),
-      unassign: publicProcedure
+      unassign: userOnlyProcedure
         .input(UnassignActionInput)
         .use(middleware.validateAction)
         .mutation(async ({ input, ctx }) => {
           const { user, token } = ctx
-          return unassignRecord({ input, user, token })
+          const result = await unassignRecord({ input, user, token })
+          await writeAuditLog({
+            clientId: user.id,
+            clientType: user.type,
+            operation: 'event.actions.unassign.request',
+            requestData: {
+              eventId: input.eventId,
+              actionType: ActionType.UNASSIGN,
+              eventType: result.type,
+              trackingId: result.trackingId,
+              transactionId: input.transactionId
+            }
+          })
+          return result
         })
     }),
     correction: router({
@@ -253,43 +373,71 @@ export const eventRouter = router({
       reject: router(getDefaultActionProcedures(ActionType.REJECT_CORRECTION))
     }),
     duplicate: router({
-      markAsDuplicate: publicProcedure
+      markAsDuplicate: userOnlyProcedure
         .input(MarkAsDuplicateActionInput)
         .use(middleware.validateAction)
         .mutation(async (options) => {
+          const { user, token } = options.ctx
           const event = await getEventById(options.input.eventId)
           const configuration = await getEventConfigurationById({
-            token: options.ctx.token,
+            token,
             eventType: event.type
           })
-          return markAsDuplicate(
+          const result = await markAsDuplicate(
             event,
             options.input,
-            options.ctx.user,
-            options.ctx.token,
+            user,
+            token,
             configuration
           )
+          await writeAuditLog({
+            clientId: user.id,
+            clientType: user.type,
+            operation: 'event.actions.mark_as_duplicate.request',
+            requestData: {
+              eventId: options.input.eventId,
+              actionType: ActionType.MARK_AS_DUPLICATE,
+              eventType: result.type,
+              trackingId: result.trackingId,
+              transactionId: options.input.transactionId
+            }
+          })
+          return result
         }),
-      markNotDuplicate: publicProcedure
+      markNotDuplicate: userOnlyProcedure
         .input(MarkNotDuplicateActionInput)
         .use(middleware.validateAction)
         .mutation(async (options) => {
+          const { user, token } = options.ctx
           const event = await getEventById(options.input.eventId)
           const configuration = await getEventConfigurationById({
-            token: options.ctx.token,
+            token,
             eventType: event.type
           })
-          return markNotDuplicate(
+          const result = await markNotDuplicate(
             event,
             options.input,
-            options.ctx.user,
-            options.ctx.token,
+            user,
+            token,
             configuration
           )
+          await writeAuditLog({
+            clientId: user.id,
+            clientType: user.type,
+            operation: 'event.actions.mark_as_not_duplicate.request',
+            requestData: {
+              eventId: options.input.eventId,
+              actionType: ActionType.MARK_AS_NOT_DUPLICATE,
+              eventType: result.type,
+              trackingId: result.trackingId,
+              transactionId: options.input.transactionId
+            }
+          })
+          return result
         })
     })
   }),
-  search: systemProcedure
+  search: userAndSystemProcedure
     .meta({
       openapi: {
         summary: 'Search for events',
@@ -298,8 +446,7 @@ export const eventRouter = router({
         path: '/events/search'
       }
     })
-    // @todo: remove legacy scopes once all users are configured with new search scopes
-    .use(requiresAnyOfScopes([SCOPES.RECORDSEARCH], ['search']))
+    .use(middleware.canSearchEvents)
     .input(SearchQuery)
     .output(
       z.object({
@@ -309,78 +456,36 @@ export const eventRouter = router({
     )
     .query(async ({ input, ctx }) => {
       const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
-      const scopes = getScopes(ctx.token)
-      const isRecordSearchSystemClient = scopes.includes(SCOPES.RECORDSEARCH)
-      const allAccessForEveryEventType = Object.fromEntries(
-        eventConfigs.map(({ id }) => [id, 'all' as const])
-      )
 
-      if (isRecordSearchSystemClient) {
-        return findRecordsByQuery(
-          input,
-          eventConfigs,
-          allAccessForEveryEventType,
-          ctx.user.primaryOfficeId
-        )
-      }
-
-      const searchScope = findScope(scopes, 'search')
-
-      // Only to satisfy type checking, as findScope will return undefined if no scope is found
-      if (!searchScope) {
-        throw new Error('No search scope provided')
-      }
-      return findRecordsByQuery(
-        input,
+      const result = await findRecordsByQuery({
+        search: input,
         eventConfigs,
-        searchScope.options,
-        ctx.user.primaryOfficeId
-      )
-    }),
-  bulkImport: systemProcedure
-    .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
-    .meta({
-      openapi: {
-        summary: 'Import multiple full event records',
-        method: 'POST',
-        path: '/events/bulk-import',
-        tags: ['events']
+        user: ctx.user,
+        acceptedScopes: ctx.acceptedScopes
+      })
+
+      if (ctx.user.type === 'system') {
+        await writeAuditLog({
+          clientId: ctx.user.id,
+          clientType: ctx.user.type,
+          operation: 'event.search',
+          requestData: {
+            query: input.query,
+            limit: input.limit,
+            offset: input.offset
+          },
+          responseSummary: {
+            total: result.total,
+            eventIds: result.results.map((r) => r.id)
+          }
+        })
       }
-    })
+
+      return result
+    }),
+  bulkImport: userAndSystemProcedure
+    .use(middleware.allowedWithAnyOfScopes(['record.import']))
     .input(z.array(EventDocument))
     .output(z.any())
-    .mutation(async ({ input, ctx }) => bulkImportEvents(input, ctx.token)),
-  reindex: router({
-    trigger: systemProcedure
-      .input(z.void())
-      .use(requiresAnyOfScopes([SCOPES.RECORD_REINDEX]))
-      .output(z.void())
-      .meta({
-        openapi: {
-          summary:
-            'Triggers reindexing of search, workqueues and notifies country config',
-          method: 'POST',
-          path: '/events/reindex',
-          tags: ['events']
-        }
-      })
-      .mutation(({ ctx }) => reindex(ctx.token)),
-    status: systemProcedure
-      .meta({
-        openapi: {
-          summary: 'Returns the status of current and past reindexing calls',
-          method: 'GET',
-          path: '/events/reindex',
-          tags: ['events']
-        }
-      })
-      .use(requiresAnyOfScopes([SCOPES.RECORD_REINDEX]))
-      .input(
-        z
-          .object({ limit: z.number().int().min(1).max(100).optional() })
-          .optional()
-      )
-      .output(z.array(ReindexingStatusSchema))
-      .query(async ({ input }) => getReindexingStatusHistory(input?.limit))
-  })
+    .mutation(async ({ input, ctx }) => bulkImportEvents(input, ctx.token))
 })

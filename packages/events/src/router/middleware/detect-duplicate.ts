@@ -18,10 +18,9 @@ import {
   DeclarationActionConfig,
   EventDocument,
   getCurrentEventState,
-  RegisterActionInput,
-  ValidateActionInput
+  RegisterActionInput
 } from '@opencrvs/commons/events'
-import { getUUID } from '@opencrvs/commons'
+import { getUUID, TokenUserType } from '@opencrvs/commons'
 import { TrpcContext } from '@events/context'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
@@ -29,12 +28,8 @@ import { processAction, getEventById } from '@events/service/events/events'
 
 function requiresDedupCheck(
   input: ActionInputWithType
-): input is ValidateActionInput | RegisterActionInput {
-  const actionsRequiringCheck: ActionType[] = [
-    ActionType.VALIDATE,
-    ActionType.REGISTER
-  ]
-  return actionsRequiringCheck.includes(input.type)
+): input is RegisterActionInput {
+  return input.type === ActionType.REGISTER
 }
 
 export const detectDuplicate: MiddlewareFunction<
@@ -89,7 +84,8 @@ export const detectDuplicate: MiddlewareFunction<
   const createdByDetails = {
     createdBy: user.id,
     createdByUserType: user.type,
-    createdByRole: user.role,
+    createdByRole:
+      user.type === TokenUserType.enum.user ? user.role : undefined,
     createdAtLocation: user.primaryOfficeId,
     createdBySignature: user.signature
   }
@@ -158,7 +154,7 @@ export const detectDuplicate: MiddlewareFunction<
         }
       },
       {
-        event: storedEvent,
+        eventId: storedEvent.id,
         user,
         token,
         status: ActionStatus.Accepted,

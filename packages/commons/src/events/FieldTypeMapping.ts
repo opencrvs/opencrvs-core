@@ -10,10 +10,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import {
   AddressField,
-  AdministrativeArea,
+  AdministrativeAreaField,
   BulletList,
   Checkbox,
   Country,
@@ -53,7 +53,13 @@ import {
   IdReaderField,
   LoaderField,
   AgeField,
-  FieldGroup
+  FieldGroup,
+  CustomField,
+  HiddenField,
+  AutocompleteField,
+  ImageViewField,
+  Heading,
+  UserRoleField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -72,9 +78,11 @@ import {
   ButtonFieldValue,
   VerificationStatusValue,
   AgeValue,
-  FieldUpdateValue
+  FieldUpdateValue,
+  AutocompleteValue,
+  DateValue
 } from './FieldValue'
-import { FullDocumentPath } from '../documents'
+import { DocumentPath } from '../documents'
 import {
   AddressFieldValue,
   FileFieldValue,
@@ -87,7 +95,8 @@ import {
   QueryParamReaderFieldUpdateValue,
   QrReaderFieldValue,
   IdReaderFieldValue,
-  NameFieldUpdateValue
+  NameFieldUpdateValue,
+  CustomFieldValue
 } from './CompositeFieldValue'
 import {
   getDynamicNameValue,
@@ -96,6 +105,11 @@ import {
   getDynamicAddressFieldValue
 } from './DynamicFieldValue'
 import { ActionType } from './ActionType'
+import { EventConfig } from './EventConfig'
+
+type Mutable<T> = {
+  -readonly [K in keyof T]: T[K];
+};
 
 /**
  * FieldTypeMapping.ts should include functions that map field types to different formats dynamically.
@@ -121,7 +135,7 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
         field.fields.reduce((acc, subfield) => {
           acc[subfield.id] = mapFieldTypeToZod(subfield, actionType)
           return acc
-        }, {} as z.ZodRawShape)
+        }, {} as Mutable<z.ZodRawShape>)
       )
       break
     }
@@ -153,6 +167,8 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
+    case FieldType.HEADING:
+    case FieldType.IMAGE_VIEW:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
@@ -161,6 +177,8 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.VERIFICATION_STATUS:
     case FieldType.ID:
     case FieldType.LOADER:
+    case FieldType.ALPHA_HIDDEN:
+    case FieldType.USER_ROLE:
       schema = field.required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
@@ -201,6 +219,9 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.ALPHA_PRINT_BUTTON:
       schema = TextValue
       break
+    case FieldType.AUTOCOMPLETE:
+      schema = AutocompleteValue
+      break
     case FieldType.HTTP:
     case FieldType.SEARCH:
       schema = HttpFieldUpdateValue
@@ -214,10 +235,89 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.ID_READER:
       schema = IdReaderFieldValue
       break
+    case FieldType._EXPERIMENTAL_CUSTOM:
+      schema = CustomFieldValue
+      break
   }
 
   return field.required ? schema : schema.nullish()
 }
+
+type FieldTypeValueMap = {
+  [FieldType.FIELD_GROUP]: Record<string, FieldValue>
+  [FieldType.DATE]: z.infer<typeof DateValue>
+  [FieldType.AGE]: z.infer<typeof AgeValue>
+  [FieldType.TIME]: z.infer<typeof TimeValue>
+  [FieldType.EMAIL]: z.infer<typeof EmailValue>
+  [FieldType.DATE_RANGE]: z.infer<typeof DateRangeFieldValue>
+  [FieldType.SELECT_DATE_RANGE]: z.infer<typeof SelectDateRangeValue>
+  [FieldType.TEXT]: z.infer<typeof TextValue>
+  [FieldType.TEXTAREA]: z.infer<typeof TextValue>
+  [FieldType.DIVIDER]: z.infer<typeof TextValue>
+  [FieldType.BULLET_LIST]: z.infer<typeof TextValue>
+  [FieldType.PAGE_HEADER]: z.infer<typeof TextValue>
+  [FieldType.LOCATION]: z.infer<typeof TextValue>
+  [FieldType.SELECT]: z.infer<typeof TextValue>
+  [FieldType.COUNTRY]: z.infer<typeof TextValue>
+  [FieldType.RADIO_GROUP]: z.infer<typeof TextValue>
+  [FieldType.PARAGRAPH]: z.infer<typeof TextValue>
+  [FieldType.HEADING]: z.infer<typeof TextValue>
+  [FieldType.AUTOCOMPLETE]: z.infer<typeof AutocompleteValue>
+  [FieldType.IMAGE_VIEW]: z.infer<typeof TextValue>
+  [FieldType.ADMINISTRATIVE_AREA]: z.infer<typeof TextValue>
+  [FieldType.FACILITY]: z.infer<typeof TextValue>
+  [FieldType.OFFICE]: z.infer<typeof TextValue>
+  [FieldType.PHONE]: z.infer<typeof TextValue>
+  [FieldType.LINK_BUTTON]: z.infer<typeof TextValue>
+  [FieldType.VERIFICATION_STATUS]: z.infer<typeof TextValue>
+  [FieldType.ID]: z.infer<typeof TextValue>
+  [FieldType.LOADER]: z.infer<typeof TextValue>
+  [FieldType.ALPHA_HIDDEN]: z.infer<typeof TextValue>
+  [FieldType.USER_ROLE]: z.infer<typeof TextValue>
+  [FieldType.NUMBER]: z.infer<typeof NumberFieldValue>
+  [FieldType.NUMBER_WITH_UNIT]: z.infer<typeof NumberWithUnitFieldValue>
+  [FieldType.CHECKBOX]: z.infer<typeof CheckboxFieldValue>
+  [FieldType.SIGNATURE]: z.infer<typeof FileFieldValue>
+  [FieldType.FILE]: z.infer<typeof FileFieldValue>
+  [FieldType.FILE_WITH_OPTIONS]: z.infer<typeof FileFieldWithOptionValue>
+  [FieldType.ADDRESS]: z.infer<DynamicAddressFieldValue>
+  [FieldType.DATA]: z.infer<typeof DataFieldValue>
+  [FieldType.NAME]: z.infer<DynamicNameValue>
+  [FieldType.BUTTON]: z.infer<typeof ButtonFieldValue>
+  [FieldType.ALPHA_PRINT_BUTTON]: z.infer<typeof TextValue>
+  [FieldType.HTTP]: z.infer<typeof HttpFieldUpdateValue>
+  [FieldType.SEARCH]: z.infer<typeof HttpFieldUpdateValue>
+  [FieldType.QUERY_PARAM_READER]: z.infer<
+    typeof QueryParamReaderFieldUpdateValue
+  >
+  [FieldType.QR_READER]: z.infer<typeof QrReaderFieldValue>
+  [FieldType.ID_READER]: z.infer<typeof IdReaderFieldValue>
+  [FieldType._EXPERIMENTAL_CUSTOM]: z.infer<typeof CustomFieldValue>
+}
+
+export type FieldTypeToFieldValue<T extends FieldType> = FieldTypeValueMap[T]
+
+type UnionToIntersection<U> = (
+  U extends unknown ? (x: U) => void : never
+) extends (x: infer I) => void
+  ? I
+  : never
+
+type ExtractFieldMap<T> = T extends {
+  declaration: { pages: readonly (infer Page)[] }
+}
+  ? Page extends { fields: readonly (infer Field)[] }
+    ? Field extends {
+        id: infer Id extends string
+        type: infer Type extends FieldType
+      }
+      ? Record<Id, FieldTypeToFieldValue<Type>>
+      : never
+    : never
+  : never
+
+export type EventConfigToDeclarationFormType<T extends EventConfig> =
+  UnionToIntersection<ExtractFieldMap<T>>
 
 /**
  * Maps complex or nested field types, such as Address fields, to their corresponding empty values.
@@ -243,6 +343,8 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
+    case FieldType.HEADING:
+    case FieldType.IMAGE_VIEW:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
@@ -261,6 +363,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.BUTTON:
     case FieldType.ALPHA_PRINT_BUTTON:
     case FieldType.HTTP:
+    case FieldType.AUTOCOMPLETE:
     case FieldType.SEARCH:
     case FieldType.LINK_BUTTON:
     case FieldType.QUERY_PARAM_READER:
@@ -269,6 +372,8 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.QR_READER:
     case FieldType.ID_READER:
     case FieldType.LOADER:
+    case FieldType.ALPHA_HIDDEN:
+    case FieldType.USER_ROLE:
       return null
     case FieldType.ADDRESS:
       return {
@@ -280,46 +385,63 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
-        path: '' as FullDocumentPath,
+        path: '' as DocumentPath,
         originalFilename: '',
         type: ''
       } satisfies FileFieldValue
     case FieldType.FILE_WITH_OPTIONS:
       return [] satisfies FileFieldWithOptionValue
+    case FieldType._EXPERIMENTAL_CUSTOM:
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return undefined as any as CustomFieldValue
   }
 }
 
 export const isParagraphFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: Paragraph } => {
   return field.config.type === FieldType.PARAGRAPH
 }
 
+export const isHeadingFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: string; config: Heading } => {
+  return field.config.type === FieldType.HEADING
+}
+
+export const isImageViewFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: string; config: ImageViewField } => {
+  return field.config.type === FieldType.IMAGE_VIEW
+}
+
 export const isDateFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: DateField } => {
   return field.config.type === FieldType.DATE
 }
 
 export const isAgeFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: AgeValue | undefined; config: AgeField } => {
   return field.config.type === FieldType.AGE
 }
 
 export const isTimeFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: TimeField } => {
   return field.config.type === FieldType.TIME
 }
 
 export const isDateRangeFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is {
   value: DateRangeFieldValue
   config: DateRangeField
@@ -329,28 +451,28 @@ export const isDateRangeFieldType = (field: {
 
 export const isSelectDateRangeFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: SelectDateRangeValue; config: SelectDateRangeField } => {
   return field.config.type === FieldType.SELECT_DATE_RANGE
 }
 
 export const isPageHeaderFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: PageHeader } => {
   return field.config.type === FieldType.PAGE_HEADER
 }
 
 export const isTextFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: TextField } => {
   return field.config.type === FieldType.TEXT
 }
 
 export const isNumberFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: number; config: NumberField } => {
   return field.config.type === FieldType.NUMBER
 }
@@ -367,56 +489,56 @@ export const isNumberWithUnitFieldType = (field: {
 
 export const isNameFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: NameFieldValue; config: NameField } => {
   return field.config.type === FieldType.NAME
 }
 
 export const isPhoneFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: PhoneField } => {
   return field.config.type === FieldType.PHONE
 }
 
 export const isIdFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: IdField } => {
   return field.config.type === FieldType.ID
 }
 
 export const isTextAreaFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: TextAreaField } => {
   return field.config.type === FieldType.TEXTAREA
 }
 
 export const isSignatureFieldType = (field: {
   config: FieldConfig
-  value: FieldValue | undefined
+  value: FieldValue | FieldUpdateValue | undefined
 }): field is { value: FileFieldValue | undefined; config: SignatureField } => {
   return field.config.type === FieldType.SIGNATURE
 }
 
 export const isEmailFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: EmailField } => {
   return field.config.type === FieldType.EMAIL
 }
 
 export const isFileFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: FileFieldValue; config: File } => {
   return field.config.type === FieldType.FILE
 }
 
 export const isFileFieldWithOptionType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is {
   value: FileFieldWithOptionValue
   config: FileUploadWithOptions
@@ -426,42 +548,42 @@ export const isFileFieldWithOptionType = (field: {
 
 export const isBulletListFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: BulletList } => {
   return field.config.type === FieldType.BULLET_LIST
 }
 
 export const isSelectFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: SelectField } => {
   return field.config.type === FieldType.SELECT
 }
 
 export const isAddressFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: AddressFieldValue; config: AddressField } => {
   return field.config.type === FieldType.ADDRESS
 }
 
 export const isCountryFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: Country } => {
   return field.config.type === FieldType.COUNTRY
 }
 
 export const isCheckboxFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: boolean; config: Checkbox } => {
   return field.config.type === FieldType.CHECKBOX
 }
 
 export const isRadioGroupFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: RadioGroup } => {
   return field.config.type === FieldType.RADIO_GROUP
 }
@@ -478,84 +600,93 @@ export const isFieldGroupFieldType = (field: {
 
 export const isLocationFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: LocationInput } => {
   return field.config.type === FieldType.LOCATION
 }
 
 export const isDividerFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: Divider } => {
   return field.config.type === FieldType.DIVIDER
 }
 
 export const isAdministrativeAreaFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
-}): field is { value: string; config: AdministrativeArea } => {
+  value: FieldValue | FieldUpdateValue
+}): field is { value: string; config: AdministrativeAreaField } => {
   return field.config.type === FieldType.ADMINISTRATIVE_AREA
 }
 
+/** @deprecated Moving on, we should only use FieldType.LOCATION. */
 export const isFacilityFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: Facility } => {
   return field.config.type === FieldType.FACILITY
 }
 
+/** @deprecated Moving on, we should only use FieldType.LOCATION. */
 export const isOfficeFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: Office } => {
   return field.config.type === FieldType.OFFICE
 }
 
 export const isDataFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: DataFieldValue; config: DataField } => {
   return field.config.type === FieldType.DATA
 }
 
 export const isButtonFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: undefined; config: ButtonField } => {
   return field.config.type === FieldType.BUTTON
 }
 
 export const isPrintButtonFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: undefined; config: AlphaPrintButton } => {
   return field.config.type === FieldType.ALPHA_PRINT_BUTTON
 }
 
 export const isHttpFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: undefined; config: HttpField } => {
   return field.config.type === FieldType.HTTP
 }
 
+export const isAutocompleteFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: undefined; config: AutocompleteField } => {
+  return field.config.type === FieldType.AUTOCOMPLETE
+}
+
 export const isSearchFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: undefined; config: SearchField } => {
   return field.config.type === FieldType.SEARCH
 }
 
 export const isLinkButtonFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: undefined; config: LinkButtonField } => {
   return field.config.type === FieldType.LINK_BUTTON
 }
 
 export const isVerificationStatusType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is {
   value: VerificationStatusValue | undefined
   config: VerificationStatus
@@ -565,7 +696,7 @@ export const isVerificationStatusType = (field: {
 
 export const isQueryParamReaderFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is {
   value: undefined
   config: QueryParamReaderField
@@ -575,29 +706,52 @@ export const isQueryParamReaderFieldType = (field: {
 
 export const isQrReaderFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: undefined; config: QrReaderField } => {
   return field.config.type === FieldType.QR_READER
 }
 
 export const isIdReaderFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: undefined; config: IdReaderField } => {
   return field.config.type === FieldType.ID_READER
 }
 
 export const isLoaderFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: undefined; config: LoaderField } => {
   return field.config.type === FieldType.LOADER
+}
+
+export const isCustomFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: CustomFieldValue; config: CustomField } => {
+  return field.config.type === FieldType._EXPERIMENTAL_CUSTOM
+}
+
+export const isUserRoleFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: string; config: UserRoleField } => {
+  return field.config.type === FieldType.USER_ROLE
+}
+
+export const isHiddenFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: undefined; config: HiddenField } => {
+  return field.config.type === FieldType.ALPHA_HIDDEN
 }
 
 export type NonInteractiveFieldType =
   | Divider
   | PageHeader
+  | ImageViewField
   | Paragraph
+  | Heading
   | BulletList
   | DataField
   | AlphaPrintButton
@@ -605,6 +759,7 @@ export type NonInteractiveFieldType =
   | LinkButtonField
   | QueryParamReaderField
   | LoaderField
+  | AutocompleteField
 
 export type InteractiveFieldType = Exclude<FieldConfig, NonInteractiveFieldType>
 
@@ -615,6 +770,7 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.DIVIDER ||
     field.type === FieldType.PAGE_HEADER ||
     field.type === FieldType.PARAGRAPH ||
+    field.type === FieldType.HEADING ||
     field.type === FieldType.BULLET_LIST ||
     field.type === FieldType.DATA ||
     field.type === FieldType.ALPHA_PRINT_BUTTON ||

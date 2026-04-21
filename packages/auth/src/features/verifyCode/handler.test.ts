@@ -10,11 +10,9 @@
  */
 import { AuthServer } from '@auth/server'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
-import {
-  DEFAULT_ROLES_DEFINITION,
-  SCOPES
-} from '@opencrvs/commons/authentication'
+import { encodeScope } from '@opencrvs/commons'
 import * as fetchMock from 'jest-fetch-mock'
+import { DEFAULT_ROLES_DEFINITION } from '@auth/features/authenticate/handler.test'
 
 jest.mock('@opencrvs/commons', () => {
   const actual = jest.requireActual('@opencrvs/commons')
@@ -32,6 +30,9 @@ describe('authenticate handler receives a request', () => {
 
   beforeEach(async () => {
     server = await createProductionEnvironmentServer()
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
+    const authService = require('../authenticate/service')
+    jest.spyOn(authService, 'recordUserAuditEvent').mockImplementation(() => {})
   })
 
   describe('user management service says credentials are valid', () => {
@@ -88,13 +89,13 @@ describe('authenticate handler receives a request', () => {
       const [, payload] = res.result!.token.split('.')
       const body = JSON.parse(Buffer.from(payload, 'base64').toString())
       expect(body.scope).toEqual([
-        SCOPES.USER_CREATE,
-        SCOPES.USER_READ,
-        SCOPES.USER_UPDATE,
-        SCOPES.ORGANISATION_READ_LOCATIONS,
-        SCOPES.PERFORMANCE_READ,
-        SCOPES.PERFORMANCE_READ_DASHBOARDS,
-        SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
+        encodeScope({ type: 'user.create' }),
+        encodeScope({ type: 'user.read' }),
+        encodeScope({ type: 'user.edit' }),
+        encodeScope({ type: 'organisation.read-locations' }),
+        encodeScope({ type: 'performance.read' }),
+        encodeScope({ type: 'performance.read-dashboards' }),
+        encodeScope({ type: 'performance.vital-statistics-export' })
       ])
       expect(body.sub).toBe('1')
     })

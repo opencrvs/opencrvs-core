@@ -26,15 +26,13 @@ services:
       - HOST=0.0.0.0
     ports:
       - '3030:3030'
-
-  webhooks:
+  events:
     volumes:
       - '.secrets/public-key.pem:/secrets/public-key.pem'
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
-      - HOST=0.0.0.0
     ports:
-      - '2525:2525'
+      - '5555:5555'
 
   notification:
     volumes:
@@ -52,22 +50,6 @@ services:
     ports:
       - '7070:7070'
 
-  workflow:
-    volumes:
-      - '.secrets/public-key.pem:/secrets/public-key.pem'
-    environment:
-      - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
-    ports:
-      - '5050:5050'
-
-  search:
-    volumes:
-      - '.secrets/public-key.pem:/secrets/public-key.pem'
-    environment:
-      - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
-    ports:
-      - '9090:9090'
-
   countryconfig:
     image: opencrvs/ocrvs-farajaland:latest
     volumes:
@@ -76,7 +58,6 @@ services:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
       - MONGO_URL=mongodb://mongo1/user-mgnt
       - NODE_ENV=development
-      - FHIR_URL=http://hearth:3447/fhir
       - AUTH_URL=http://auth:4040
       - CHECK_INVALID_TOKEN=true
     ports:
@@ -97,7 +78,3 @@ services:
   login:
     ports:
       - '3020:3020'
-
-  config:
-    ports:
-      - '2021:2021'

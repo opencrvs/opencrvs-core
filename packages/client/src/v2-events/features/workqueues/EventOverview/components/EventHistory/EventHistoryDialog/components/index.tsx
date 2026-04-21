@@ -9,7 +9,4 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export { DeclarationUpdate } from './DeclarationUpdate'
-export { RequestCorrection } from './RequestCorrection'
-export { PrintCertificate } from './PrintCertificate'
 export { ActionTypeSpecificContent } from './ActionTypeSpecificContent'
