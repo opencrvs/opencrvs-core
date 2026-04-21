@@ -20,15 +20,15 @@ export async function up(pgm) {
   const salt = genSaltSync(10)
   const passwordHash = hashSync(SUPER_USER_PASSWORD, salt)
 
-  const status = rowCount > 0 ? 'completed' : 'pending'
+  const completedAt = rowCount > 0 ? new Date() : null
 
   await pgm.db.query(
-    `INSERT INTO system_setup(token_hash, token_salt, status) VALUES ($1, $2, $3)`,
-    [passwordHash, salt, status]
+    `INSERT INTO system_initialisation(token_hash, token_salt, completed_at) VALUES ($1, $2, $3)`,
+    [passwordHash, salt, completedAt]
   )
 }
 
 export async function down(pgm) {
   // There should be only one record in the system_setup table, but we will delete by id to be safe.
-  await pgm.db.query('DELETE FROM system_setup WHERE id = 1')
+  await pgm.db.query('DELETE FROM system_initialisation WHERE id = 1')
 }

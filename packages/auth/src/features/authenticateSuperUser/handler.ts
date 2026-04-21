@@ -11,13 +11,10 @@
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import {
-  authenticate,
-  createToken,
-  IAuthentication
+  authenticateSuperuser,
+  createInternalServiceToken
 } from '@auth/features/authenticate/service'
 import { unauthorized } from '@hapi/boom'
-import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
-import { logger, encodeScope } from '@opencrvs/commons'
 
 interface IAuthPayload {
   username: string
@@ -29,48 +26,31 @@ export default async function authenticateSuperUserHandler(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IAuthPayload
-  let result: IAuthentication
-  const { username, password } = payload
+
+  const { password } = payload
 
   try {
-    result = await authenticate(username.trim(), password)
+    const isVerified = await authenticateSuperuser(password)
+
+    if (!isVerified) {
+      throw unauthorized()
+    }
+
+    const token = await createInternalServiceToken(
+      'opencrvs:data-seeder-service'
+    )
+    return h.response({
+      token
+    })
   } catch (err) {
     throw unauthorized()
   }
-
-  if (result.status === 'deactivated') {
-    logger.info('Login attempt with a deactivated super user account detected')
-    throw unauthorized()
-  }
-
-  const SUPER_ADMIN_SCOPES = [
-    encodeScope({ type: 'bypassratelimit' }),
-    encodeScope({ type: 'user.data-seeding' }),
-    encodeScope({ type: 'integration.create' }),
-    encodeScope({ type: 'user.create' })
-  ]
-
-  const token = await createToken(
-    result.userId,
-    SUPER_ADMIN_SCOPES,
-    WEB_USER_JWT_AUDIENCES,
-    JWT_ISSUER
-  )
-
-  return h.response({
-    token
-  })
 }
 
 export const requestSchema = Joi.object({
-  username: Joi.string(),
   password: Joi.string()
 })
 
 export const responseSchema = Joi.object({
-  nonce: Joi.string(),
-  mobile: Joi.string().optional(),
-  email: Joi.string().optional(),
-  status: Joi.string(),
   token: Joi.string().optional()
 })

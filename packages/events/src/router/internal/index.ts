@@ -14,7 +14,10 @@ import { TRPCError } from '@trpc/server'
 import {
   FamilyName,
   logger,
+  User,
+  UserOrSystem,
   UserAuditRecordInput,
+  UserInput,
   UUID
 } from '@opencrvs/commons'
 import { internalProcedure, internalRouter } from '@events/router/trpc'
@@ -26,11 +29,14 @@ import {
 import { generateHash } from '@events/service/auth/hash'
 import {
   checkSecurityQuestionMatch,
+  createUser,
   getCredentials,
-  getSecurityQuestionsForUser
+  getSecurityQuestionsForUser,
+  searchUsers
 } from '@events/service/users/api'
 import { getRoles } from '@events/service/config/config'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
+import { UserSearch } from '../user'
 
 const VerifyUserOutput = z.object({
   id: z.string(),
@@ -196,5 +202,63 @@ export const internalUserRouter = internalRouter({
           clientType: 'system'
         })
       })
-  }
+  },
+  create: internalProcedure
+    .input(UserInput)
+    .output(User)
+    .mutation(async ({ input, ctx }) => {
+      if (input.mobile) {
+        const existingWithMobile = await searchUsers({
+          mobile: input.mobile,
+          count: 1,
+          skip: 0,
+          sortOrder: 'asc'
+        })
+        if (existingWithMobile.length > 0) {
+          logger.error(
+            `Phone number ${input.mobile} is already in use by another user`
+          )
+          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_PHONE' })
+        }
+      }
+      if (input.email) {
+        const existingWithEmail = await searchUsers({
+          email: input.email,
+          count: 1,
+          skip: 0,
+          sortOrder: 'asc'
+        })
+        if (existingWithEmail.length > 0) {
+          logger.error(`Email ${input.email} is already in use by another user`)
+          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
+        }
+      }
+      const user = await createUser(input, ctx.token)
+      await writeAuditLog({
+        ...input,
+        clientId: user.id,
+        clientType: user.type,
+        operation: 'user.create_user',
+        requestData: {
+          subjectId: user.id,
+          role: user.role,
+          primaryOfficeId: user.primaryOfficeId
+        }
+      })
+
+      return user
+    }),
+  search: internalProcedure
+    .input(UserSearch)
+    .output(z.array(UserOrSystem))
+    .query(async ({ input }) => {
+      console.log('foobar')
+      return searchUsers({
+        ...input,
+        primaryOfficeId: input.primaryOfficeId
+          ? UUID.parse(input.primaryOfficeId)
+          : undefined,
+        locationId: input.locationId ? UUID.parse(input.locationId) : undefined
+      })
+    })
 })

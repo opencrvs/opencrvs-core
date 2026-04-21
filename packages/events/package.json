@@ -47,6 +47,7 @@
     "zod-openapi": "^5.4.6"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.4.4",
     "@eslint/compat": "^1.2.7",
     "@eslint/eslintrc": "^3.3.1",
     "@testcontainers/elasticsearch": "^10.15.0",

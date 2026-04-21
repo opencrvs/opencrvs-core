@@ -12,6 +12,7 @@ import fetch from 'node-fetch'
 import { env } from './environment'
 import { z } from 'zod'
 import { raise } from './utils'
+
 import {
   decodeScope,
   EventConfig,
@@ -21,7 +22,7 @@ import {
   EncodedScope
 } from '@opencrvs/commons'
 import { fromZodError } from 'zod-validation-error'
-import { createClient } from '@opencrvs/toolkit/api'
+import { createInternalClient } from '.'
 
 const RoleSchema = (eventIds: string[]) =>
   z.array(
@@ -192,20 +193,22 @@ async function userAlreadyExists(
   token: string,
   username: string
 ): Promise<boolean> {
-  const url = new URL('events', env.GATEWAY_HOST).toString()
-  const client = createClient(url, `Bearer ${token}`)
+  const client = createInternalClient(token)
+
+  console.log('searching user', username)
   const res = await client.user.search.query({
     username,
     count: 1,
     skip: 0,
     sortOrder: 'asc'
   })
+
+  console.log('res', res)
   return Boolean(res.length)
 }
 
 async function createUser(token: string, userPayload: any) {
-  const url = new URL('events', env.GATEWAY_HOST).toString()
-  const client = createClient(url, `Bearer ${token}`)
+  const client = createInternalClient(token)
   return client.user.create.mutate(userPayload)
 }
 
@@ -231,9 +234,9 @@ export async function seedUsers(token: string) {
 
     const externalId = officeIdentifier.split('_').at(-1)
 
-    const url = new URL('events', env.GATEWAY_HOST).toString()
-    const client = createClient(url, `Bearer ${token}`)
-    const [primaryOffice] = await client.locations.list.query({
+    const client = createInternalClient(token)
+
+    const [primaryOffice] = await client.initialisation.locations.list.query({
       externalId
     })
 

@@ -12,6 +12,10 @@
 import fetch from 'node-fetch'
 import { UUID } from '@opencrvs/commons'
 import { env } from '@events/environment'
+import {
+  getSystemInitialisation as getSystemInitialisationQuery,
+  completeSystemInitialisation as completeSystemInitialisationQuery
+} from '@events/storage/postgres/system-initialisation'
 
 export async function getAnonymousToken() {
   const res = await fetch(
@@ -59,4 +63,17 @@ export async function getActionConfirmationToken(
     access_token: string
   }
   return accessToken
+}
+
+export async function getSystemInitialisation() {
+  const systemInitialisation = await getSystemInitialisationQuery()
+  if (!systemInitialisation) {
+    throw new Error('System initialisation not found')
+  }
+
+  return systemInitialisation
+}
+
+export async function completeSystemInitialisation() {
+  return await completeSystemInitialisationQuery()
 }

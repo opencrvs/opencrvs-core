@@ -76,7 +76,6 @@ export function verifyInternalServiceToken(token: TokenWithBearer) {
   const jwtToken = token.split(' ')[1]
 
   return jwt.verify(jwtToken, tokenPublicKey, {
-    subject: 'opencrvs:auth-service',
     algorithms: ['RS256'],
     issuer: 'opencrvs:auth-service',
     audience: ['opencrvs:events-user']

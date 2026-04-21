@@ -37,8 +37,7 @@ import { getRoles } from '@events/service/config/config'
 import { generateHash } from '@events/service/auth/hash'
 import {
   updatePasswordHash,
-  updateUserById,
-  deleteSuperUser
+  updateUserById
 } from '@events/storage/postgres/events/users'
 import { getUserActions } from '@events/service/events/user/actions'
 import {
@@ -104,7 +103,7 @@ const auditRouter = router({
     })
 })
 
-const UserSearch = z.object({
+export const UserSearch = z.object({
   username: z.string().optional(),
   mobile: z.string().optional(),
   status: z.string().optional(),
@@ -499,20 +498,6 @@ export const userRouter = router({
     )
     .mutation(async ({ input }) => {
       return activateUser(input)
-    }),
-  deactivateSuperUser: userAndSystemProcedure
-    .use(
-      allowedWithAnyOfScopes([
-        'bypassratelimit',
-        'user.create',
-        'user.data-seeding',
-        'integration.create'
-      ])
-    )
-    .input(z.object({ username: z.string() }))
-    .output(z.void())
-    .mutation(async ({ input }) => {
-      await deleteSuperUser(input.username)
     }),
   audit: auditRouter
 })

@@ -55,12 +55,19 @@ const sign = promisify<
  * Used for authenticating internal requests between services.
  */
 /** @knipignore */
-export async function createInternalServiceToken() {
+
+type InternalServiceSubject =
+  | 'opencrvs:auth-service'
+  | 'opencrvs:data-seeder-service'
+
+export async function createInternalServiceToken(
+  subject: InternalServiceSubject
+) {
   return sign({}, cert, {
-    subject: 'opencrvs:auth-service',
+    subject,
     algorithm: 'RS256',
-    expiresIn: env.CONFIG_TOKEN_EXPIRY_SECONDS,
-    audience: ['opencrvs:events-user'],
+    expiresIn: env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
+    audience: ['opencrvs:events-user', 'opencrvs:countryconfig-user'],
     issuer: JWT_ISSUER
   })
 }
@@ -71,7 +78,7 @@ export const internalClient = createTRPCClient<InternalRouter>({
       url: new URL('/internal', env.EVENTS_URL).href,
       transformer: superjson,
       async headers() {
-        const token = await createInternalServiceToken()
+        const token = await createInternalServiceToken('opencrvs:auth-service')
         return { authorization: `Bearer ${token}` }
       }
     })
@@ -129,6 +136,17 @@ export async function authenticate(
     mobile: body.mobile,
     email: body.email
   }
+}
+
+export async function authenticateSuperuser(
+  password: string
+): Promise<boolean> {
+  const auth =
+    await internalClient.initialisation.superuser.verifyPassword.mutate({
+      password
+    })
+
+  return auth.valid
 }
 
 export async function authenticateSystem(

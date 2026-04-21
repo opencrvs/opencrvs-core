@@ -4,7 +4,7 @@
 
 
 -- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
--- Dumped by pg_dump version 17.6 (Debian 17.6-2.pgdg13+1)
+-- Dumped by pg_dump version 17.6 (Debian 17.6-1.pgdg13+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -26,6 +26,34 @@ CREATE SCHEMA app;
 
 
 ALTER SCHEMA app OWNER TO events_migrator;
+
+--
+-- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
+
+
+--
+-- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
+
 
 --
 -- Name: action_status; Type: TYPE; Schema: app; Owner: events_migrator
@@ -350,6 +378,50 @@ CREATE TABLE app.system_clients (
 ALTER TABLE app.system_clients OWNER TO events_migrator;
 
 --
+-- Name: system_initialisation; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.system_initialisation (
+    id integer NOT NULL,
+    token_hash text NOT NULL,
+    token_salt text NOT NULL,
+    completed_at timestamp with time zone,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE app.system_initialisation OWNER TO events_migrator;
+
+--
+-- Name: TABLE system_initialisation; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON TABLE app.system_initialisation IS 'Single-row table tracking application initialisation state. Populated once during initial migration, and never modified except to mark initialisation as completed.';
+
+
+--
+-- Name: system_initialisation_id_seq; Type: SEQUENCE; Schema: app; Owner: events_migrator
+--
+
+CREATE SEQUENCE app.system_initialisation_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE app.system_initialisation_id_seq OWNER TO events_migrator;
+
+--
+-- Name: system_initialisation_id_seq; Type: SEQUENCE OWNED BY; Schema: app; Owner: events_migrator
+--
+
+ALTER SEQUENCE app.system_initialisation_id_seq OWNED BY app.system_initialisation.id;
+
+
+--
 -- Name: user_credentials; Type: TABLE; Schema: app; Owner: events_migrator
 --
 
@@ -405,6 +477,13 @@ COMMENT ON COLUMN app.users.legacy_id IS 'References the user id from the legacy
 --
 
 ALTER TABLE ONLY app.pgmigrations ALTER COLUMN id SET DEFAULT nextval('app.pgmigrations_id_seq'::regclass);
+
+
+--
+-- Name: system_initialisation id; Type: DEFAULT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.system_initialisation ALTER COLUMN id SET DEFAULT nextval('app.system_initialisation_id_seq'::regclass);
 
 
 --
@@ -541,6 +620,14 @@ ALTER TABLE ONLY app.system_clients
 
 ALTER TABLE ONLY app.system_clients
     ADD CONSTRAINT system_clients_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: system_initialisation system_initialisation_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.system_initialisation
+    ADD CONSTRAINT system_initialisation_pkey PRIMARY KEY (id);
 
 
 --
@@ -816,6 +903,13 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.locations TO events_app;
 --
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.system_clients TO events_app;
+
+
+--
+-- Name: TABLE system_initialisation; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.system_initialisation TO events_app;
 
 
 --
