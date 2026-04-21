@@ -28,6 +28,16 @@ CREATE SCHEMA app;
 ALTER SCHEMA app OWNER TO events_migrator;
 
 --
+--
+
+
+
+--
+--
+
+
+
+--
 -- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -79,6 +89,17 @@ CREATE TYPE app.user_type AS ENUM (
 
 
 ALTER TYPE app.user_type OWNER TO events_migrator;
+
+--
+--
+
+
+
+
+--
+--
+
+
 
 SET default_tablespace = '';
 
@@ -303,6 +324,24 @@ COMMENT ON TABLE app.events IS 'Stores life events associated with individuals, 
 
 
 --
+--
+
+
+
+
+--
+--
+
+
+
+
+--
+--
+
+
+
+
+--
 -- Name: locations; Type: TABLE; Schema: app; Owner: events_migrator
 --
 
@@ -355,6 +394,21 @@ ALTER SEQUENCE app.pgmigrations_id_seq OWNER TO events_migrator;
 
 ALTER SEQUENCE app.pgmigrations_id_seq OWNED BY app.pgmigrations.id;
 
+
+--
+-- Name: pgmigrations_legacy_data_id_seq; Type: SEQUENCE; Schema: app; Owner: postgres
+--
+
+CREATE SEQUENCE app.pgmigrations_legacy_data_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE app.pgmigrations_legacy_data_id_seq OWNER TO postgres;
 
 --
 -- Name: system_clients; Type: TABLE; Schema: app; Owner: events_migrator
@@ -414,6 +468,8 @@ CREATE TABLE app.users (
     office_id uuid NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    device text,
+    data jsonb DEFAULT '{}'::jsonb NOT NULL,
     CONSTRAINT email_or_mobile_not_null CHECK (((email IS NOT NULL) OR (mobile IS NOT NULL)))
 );
 
@@ -657,7 +713,28 @@ CREATE INDEX idx_audit_log_operation ON app.audit_log USING btree (operation);
 -- Name: idx_audit_log_transaction_id; Type: INDEX; Schema: app; Owner: events_migrator
 --
 
-CREATE UNIQUE INDEX idx_audit_log_transaction_id ON app.audit_log USING btree (transaction_id);
+CREATE INDEX idx_audit_log_transaction_id ON app.audit_log USING btree (transaction_id);
+
+
+--
+-- Name: idx_drafts_event_id; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_drafts_event_id ON app.event_action_drafts USING btree (event_id);
+
+
+--
+-- Name: idx_event_actions_event_id; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_event_actions_event_id ON app.event_actions USING btree (event_id);
+
+
+--
+-- Name: idx_event_actions_original_action_id; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_event_actions_original_action_id ON app.event_actions USING btree (original_action_id);
 
 
 --
