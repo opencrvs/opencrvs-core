@@ -80,19 +80,6 @@ function getUserEditConfig(
   selectedRole?: { scopes: EncodedScope[] },
   additionalFields: FieldConfig[] = []
 ): EventConfig {
-  const additionalPage =
-    additionalFields.length > 0
-      ? [
-          {
-            id: 'user.additional',
-            title: messages.additionalDetails,
-            type: PageTypes.enum.FORM,
-            requireCompletionToContinue: true,
-            fields: additionalFields
-          }
-        ]
-      : []
-
   return {
     id: '__user__',
     summary: {
@@ -169,10 +156,10 @@ function getUserEditConfig(
               type: FieldType.TEXT,
               required: false,
               label: messages.userDevice
-            }
+            },
+            ...additionalFields
           ]
         },
-        ...additionalPage,
         {
           id: 'user.signature',
           title: messages.userSignatureAttachmentTitle,
@@ -306,7 +293,7 @@ const EditUserComponent = () => {
         showReviewButton={false}
         actionType={ActionType.DECLARE}
         eventConfig={eventConfig}
-        form={formState as Record<string, FieldValue>}
+        formData={formState as Record<string, FieldValue>}
         formPages={formConfig.pages}
         pageId={pageId || eventConfig.declaration.pages[0].id}
         setFormData={(data) => {
