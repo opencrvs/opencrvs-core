@@ -23,7 +23,6 @@
     "envalid": "^8.0.0",
     "handlebars": "^4.7.9",
     "hapi-auth-jwt2": "10.6.0",
-    "hapi-i18n": "^2.0.0",
     "hapi-pino": "^9.0.0",
     "hapi-sentry": "^3.1.0",
     "joi": "^17.3.0",
