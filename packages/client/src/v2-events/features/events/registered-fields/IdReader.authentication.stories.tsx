@@ -11,7 +11,6 @@
 
 import { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
-import { fn } from '@storybook/test'
 import styled from 'styled-components'
 import {
   field,
@@ -21,16 +20,12 @@ import {
   not,
   TestUserRole
 } from '@opencrvs/commons/client'
-import { Stack, Text } from '@opencrvs/components'
+import { Stack } from '@opencrvs/components'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getTestValidatorContext } from '../../../../../.storybook/decorators'
 
-interface Args {
-  onChange: (data: unknown) => void
-}
-
-const meta: Meta<Args> = {
+const meta: Meta = {
   title: 'ID Authentication',
   argTypes: {},
   decorators: [
@@ -186,40 +181,32 @@ const authenticationStatusField: FieldConfig = {
   configuration: authenticationStatusConfiguration
 }
 
-const onChangeSpy = fn()
-
 function AuthenticationStateStory({
   fields,
   initialValues,
-  fieldsToShowValidationErrors,
-  validateAllFields,
-  onChange
+  initialTouched,
 }: {
   fields: FieldConfig[]
   initialValues?: Record<string, FieldValue>
-  fieldsToShowValidationErrors?: FieldConfig[]
-  validateAllFields?: boolean
-  onChange: (data: unknown) => void
+  initialTouched?: Record<string, boolean>
 }) {
   return (
     <Stack direction="column" gap={4}>
       <StyledFormFieldGenerator
         fields={fields}
-        fieldsToShowValidationErrors={fieldsToShowValidationErrors}
+        formTouched={initialTouched}
+        formValues={initialValues}
         id="id-reader-authentication-states"
-        initialValues={initialValues}
-        validateAllFields={validateAllFields}
         validatorContext={getTestValidatorContext(
           TestUserRole.enum.LOCAL_REGISTRAR
         )}
-        onChange={onChange}
       />
     </Stack>
   )
 }
 
-export const Default: StoryObj<Args> = {
-  render: ({ onChange }) => (
+export const Default: StoryObj = {
+  render: () => (
     <AuthenticationStateStory
       fields={[
         paragraph('Default'),
@@ -240,22 +227,17 @@ export const Default: StoryObj<Args> = {
         paragraph('Failed to fetch'),
         idReaderWithFetchFailureError
       ]}
-      fieldsToShowValidationErrors={[
-        idReaderWithValidationError,
-        idReaderWithFetchFailureError
-      ]}
+      initialTouched={{
+        'storybook.id-reader.validation-error': true,
+        'storybook.id-reader.fetch-failed': true
+      }}
       initialValues={{
         'storybook.id-reader.required': { data: {} },
         'storybook.id-reader.fetch-failed': { data: null },
         'storybook.verification-status': 'authenticated'
       }}
-      validateAllFields={true}
-      onChange={onChange}
     />
-  ),
-  args: {
-    onChange: onChangeSpy
-  }
+  )
 }
 
 function OfflineBrowserMock({ children }: { children: React.ReactNode }) {
@@ -289,16 +271,12 @@ function OfflineBrowserMock({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
-export const Offline: StoryObj<Args> = {
-  render: ({ onChange }) => (
+export const Offline: StoryObj = {
+  render: () => (
     <OfflineBrowserMock>
       <AuthenticationStateStory
         fields={[idReaderWithAuth]}
-        onChange={onChange}
       />
     </OfflineBrowserMock>
-  ),
-  args: {
-    onChange: onChangeSpy
-  }
+  )
 }
