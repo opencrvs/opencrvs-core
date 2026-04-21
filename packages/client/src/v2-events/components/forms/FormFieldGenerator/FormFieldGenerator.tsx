@@ -172,7 +172,7 @@ export const FormFieldGenerator = forwardRef<
 
     return (
       <Formik<EventState>
-        enableReinitialize={true}
+        key={id}
         initialTouched={
           // Our form values are nested but to make the implementation easier,
           // we manually assert the value to be nested only when dealing with
@@ -203,7 +203,6 @@ export const FormFieldGenerator = forwardRef<
         {(formikProps) => {
           return (
             <FormSectionComponent
-              key={id}
               className={className}
               eventConfig={eventConfig}
               fields={fields}
