@@ -15,7 +15,7 @@
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "8.13.1",
+    "@elastic/elasticsearch": "^8.17.0",
     "@hapi/h2o2": "^9.1.0",
     "@hapi/hapi": "^20.0.1",
     "@opencrvs/commons": "^1.9.0",
