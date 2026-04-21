@@ -334,11 +334,10 @@ export function omitHiddenAnnotationFields(
 ) {
   const annotationFields = getActionAnnotationFields(actionConfig)
 
-  return omitHiddenFields(
-    annotationFields,
-    { ...declaration, ...annotation } satisfies ActionUpdate,
-    context
-  )
+  return omitHiddenFields(annotationFields, annotation, {
+    ...context,
+    baseFormState: declaration
+  })
 }
 
 /**
