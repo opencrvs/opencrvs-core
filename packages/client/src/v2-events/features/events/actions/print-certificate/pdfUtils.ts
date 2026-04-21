@@ -276,6 +276,8 @@ export function compileSvg({
   const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
   const resolvedDeclaration = stringifyDeclaration(fieldConfigs, $declaration)
 
+  console.log('resolvedDeclaration :>> ', resolvedDeclaration)
+
   for (const helperName of Object.keys(customHelpers)) {
     /*
      * Note for anyone adding new context variables to handlebar helpers:
@@ -344,6 +346,8 @@ export function compileSvg({
         users,
         adminLevels
       })
+
+      console.log('resolvedMetadata :>>>>>>> ', resolvedMetadata)
 
       if (isEqual($metadata, obj)) {
         return getMixedPath(resolvedMetadata, propertyPath)
