@@ -433,9 +433,7 @@ export const CanSubmitValidlyFilledForm: Story = {
       handlers: {
         event: [
           tRPCMsw.event.actions.declare.request.mutation(async (payload) => {
-            await expect(payload.declaration).not.toHaveProperty(
-              'recommender.name'
-            )
+            await expect(payload.declaration?.['recommender.name']).toBeNull()
             return generateEventDocument({
               configuration: overriddenEventConfig,
               actions: [

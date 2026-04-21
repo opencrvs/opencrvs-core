@@ -307,6 +307,7 @@ export function Review() {
 
         await onlineActions.printCertificate.mutateAsync({
           eventId: fullEvent.id,
+          fullEvent,
           declaration: {},
           annotation,
           content: { templateId },

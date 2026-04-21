@@ -32,7 +32,8 @@ import {
   EventConfig,
   omitHiddenFields,
   EventIndex,
-  isValidIcon
+  isValidIcon,
+  flattenFormState
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { buttonMessages } from '@client/i18n/messages'
@@ -118,11 +119,14 @@ function QuickActionModal({
   }
 
   const errorsOnField = (config.fields ?? []).flatMap((field) =>
-    runFieldValidations({
-      field,
-      values: modalValues,
-      context: validatorContext
-    })
+    flattenFormState(
+      runFieldValidations({
+        field,
+        form: modalValues,
+        value: modalValues[field.id],
+        context: validatorContext
+      })
+    ).flatMap(([, errs]) => errs)
   )
 
   const confirm = () => {
@@ -184,11 +188,11 @@ function QuickActionModal({
         <FormFieldGenerator
           eventConfig={eventConfiguration}
           fields={config.fields ?? []}
-          id={'quick-action-modal-form'}
           // Pass in the complete declaration form values so that read-only declaration data is available for Data components or calculations.
-          initialValues={event.declaration}
+          formContext={event.declaration}
+          id={'quick-action-modal-form'}
           validatorContext={validatorContext}
-          onChange={handleChange}
+          onFormChange={handleChange}
         />
       </Stack>
     </Dialog>

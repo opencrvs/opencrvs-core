@@ -278,7 +278,7 @@ const EditUserComponent = () => {
         showReviewButton={false}
         actionType={ActionType.DECLARE}
         eventConfig={eventConfig}
-        form={formState}
+        formData={formState}
         formPages={formConfig.pages}
         pageId={pageId || eventConfig.declaration.pages[0].id}
         setFormData={(data) => {

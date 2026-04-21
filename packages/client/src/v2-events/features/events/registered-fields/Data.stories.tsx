@@ -12,7 +12,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import styled from 'styled-components'
-import { noop } from 'lodash'
 import {
   FieldType,
   tennisClubMembershipEvent,
@@ -20,10 +19,10 @@ import {
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { FormFieldGeneratorProps } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
+import { FormFieldGeneratorPropsWithoutRef } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
-const meta: Meta<FormFieldGeneratorProps> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/Data',
   component: FormFieldGenerator,
   argTypes: {
@@ -45,7 +44,9 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
 
-export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
+
+export const DataDisplay: Story = {
   name: 'Data display field',
   parameters: {
     layout: 'centered'
@@ -94,8 +95,7 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
             }
           }
         ]}
-        id="my-form"
-        initialValues={{
+        formValues={{
           'applicant.name': {
             firstname: 'Tanya',
             surname: 'McQuaid'
@@ -103,15 +103,13 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
           'applicant.id': '2370934578',
           'applicant.dob': '1975-01-02'
         }}
-        onChange={noop}
+        id="my-form"
       />
     )
   }
 }
 
-export const DataDisplayWithConditionallyHiddenFields: StoryObj<
-  typeof FormFieldGenerator
-> = {
+export const DataDisplayWithConditionallyHiddenFields: Story = {
   parameters: {
     layout: 'centered',
     userRole: TestUserRole.enum.REGISTRATION_AGENT
@@ -155,35 +153,30 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
             }
           }
         ]}
-        id="my-form"
-        initialValues={{
+        formValues={{
           'recommender.none': true,
-          // @ts-ignore
           'recommender.name': {
             firstname: 'John',
             surname: ''
           },
-          // @ts-ignore
           'applicant.name': {
             firstname: 'Rasheed',
             surname: ''
           },
           'applicant.isRecommendedByFieldAgent': true
         }}
-        onChange={noop}
+        id="my-form"
       />
     )
   }
 }
 
-export const DataDisplayWithConditionallyShownFields: StoryObj<
-  typeof FormFieldGenerator
-> = {
+export const DataDisplayWithConditionallyShownFields: Story = {
   parameters: {
     layout: 'centered',
     userRole: TestUserRole.enum.FIELD_AGENT
   },
-  render: (args, context) => {
+  render: (args) => {
     return (
       <StyledFormFieldGenerator
         {...args}
@@ -219,8 +212,7 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
             }
           }
         ]}
-        id="my-form"
-        initialValues={{
+        formValues={{
           'recommender.name': {
             firstname: 'John',
             surname: ''
@@ -232,7 +224,7 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
           'recommender.none': false,
           'applicant.isRecommendedByFieldAgent': true
         }}
-        onChange={noop}
+        id="my-form"
       />
     )
   }
