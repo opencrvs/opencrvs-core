@@ -725,7 +725,10 @@ function toCertificateVariables(
     .reverse()
     .map((level) => (adminLevelHierarchy as Record<string, string>)[level])
 
-  const administrativeHierarchy = [...orderedAdminValues, stringifiedResult.country]
+  const administrativeHierarchy = [
+    ...orderedAdminValues,
+    stringifiedResult.country
+  ]
     .filter(Boolean)
     .join(', ')
 
