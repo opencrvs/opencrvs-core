@@ -13,7 +13,7 @@ import { IntlShape } from 'react-intl'
 import { useSelector } from 'react-redux'
 import {
   EventState,
-  AddressFieldValue,
+  AddressFieldUpdateValue,
   and,
   ConditionalType,
   Country as CountryField,
@@ -45,6 +45,8 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 
 /* eslint-disable max-lines */
+
+type AddressFieldValue = NonNullable<AddressFieldUpdateValue>
 
 interface Props {
   id: string
@@ -309,9 +311,9 @@ function getLeafAdministrativeLevel(
   return undefined
 }
 
-function getAdministrativeArea(value?: AddressFieldValue) {
-  return value?.addressType === AddressType.DOMESTIC
-    ? value.administrativeArea
+function getAdministrativeArea(value: AddressFieldValue) {
+  return value.addressType === AddressType.DOMESTIC
+    ? value.administrativeArea || undefined
     : undefined
 }
 
@@ -402,7 +404,7 @@ function transformNestedValueToParentValue(
     return {
       country,
       addressType: AddressType.DOMESTIC,
-      administrativeArea: leafAdminLevelValue ?? '',
+      administrativeArea: leafAdminLevelValue,
       streetLevelDetails: addressLines
     }
   }
@@ -539,8 +541,7 @@ function AddressInput(props: Props) {
     name,
     value = {
       addressType: AddressType.DOMESTIC,
-      country: '',
-      administrativeArea: ''
+      country: ''
     },
     validatorContext,
     touched = {},

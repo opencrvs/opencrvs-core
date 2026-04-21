@@ -199,12 +199,15 @@ export function mapFieldToDefaultValue(
       }
     }
     case FieldType.ADDRESS: {
-      return {
-        ...field.defaultValue,
-        administrativeArea: resolveSerializedUserField(
+      const resolvedAdministrativeArea =
+        field.defaultValue.administrativeArea &&
+        resolveSerializedUserField(
           field.defaultValue.administrativeArea,
           context
         )
+      return {
+        ...field.defaultValue,
+        administrativeArea: resolvedAdministrativeArea
       }
     }
     case FieldType.DATE: {
