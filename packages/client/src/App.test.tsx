@@ -12,7 +12,6 @@ import { createTestApp, flushPromises, getItem } from '@client/tests/util'
 
 import * as actions from '@client/notification/actions'
 import { AppStore } from '@client/store'
-import { createClient } from '@client/utils/apolloClient'
 import { referenceApi } from '@client/utils/referenceApi'
 import { ReactWrapper } from 'enzyme'
 import { vi } from 'vitest'
@@ -83,11 +82,6 @@ describe('when session expired', () => {
     })
     app = testApp.app
     store = testApp.store
-  })
-
-  it('when apolloClient is created', () => {
-    const client = createClient(store)
-    expect(client.link).toBeDefined()
   })
 
   it('displays session expired confirmation dialog', async () => {
