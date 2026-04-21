@@ -83,6 +83,7 @@ function Input({
   value: VerificationStatusValue | undefined
   onReset: () => void
 }) {
+  'use memo'
   const intl = useIntl()
   const [modal, openModal] = useModal()
   if (!value) {
@@ -179,6 +180,7 @@ function Output({
   configuration: VerificationStatusField['configuration']
   value: VerificationStatusValue
 }) {
+  'use memo'
   const intl = useIntl()
 
   return (

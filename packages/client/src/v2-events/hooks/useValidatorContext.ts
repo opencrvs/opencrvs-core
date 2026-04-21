@@ -34,6 +34,7 @@ function useUser() {
 }
 
 export function useValidatorContext(event?: EventDocument): ValidatorContext {
+  'use memo'
   const leafAdminStructureLocationIds = useSuspenseAdminLeafLevelLocations()
   const user = useUser()
 

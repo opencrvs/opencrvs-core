@@ -59,6 +59,7 @@ export const AlphaPrintButton = {
     value,
     onChange
   }: PrintButtonProps) => {
+    'use memo'
     const intl = useIntl()
     const location = useLocation()
     const parts = location.pathname.split('/')

@@ -25,6 +25,7 @@ function TextInput({
   type,
   ...props
 }: TextInputProps) {
+  'use memo'
   const [inputValue, setInputValue] = React.useState<string>(value ?? '')
 
   React.useEffect(() => {

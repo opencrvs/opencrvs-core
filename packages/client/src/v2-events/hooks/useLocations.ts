@@ -30,6 +30,7 @@ setQueryDefaults(trpcOptionsProxy.locations.list, {
 })
 
 export function useLocations() {
+  'use memo'
   const trpc = useTRPC()
   return {
     getLocations: {

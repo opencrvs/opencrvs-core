@@ -44,6 +44,7 @@ function QueryParamReaderInput({
   configuration: QueryParamReaderField['configuration']
   onChange: (params: QueryParamReaderFieldValue) => void
 }) {
+  'use memo'
   const [searchParams, setSearchParams] = useSearchParams()
   const { pickParams } = configuration
   const onChangeRef = useRef(onChange)

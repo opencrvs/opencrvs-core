@@ -33,6 +33,7 @@ function RadioGroupInput({
   value?: string
   disabled?: boolean
 }) {
+  'use memo'
   const intl = useIntlWithFormData()
 
   const selectedOption = options.find((option) => option.value === value)
@@ -70,6 +71,7 @@ function RadioGroupOutput({
   value: Stringifiable
   options: SelectOption[]
 }) {
+  'use memo'
   const intl = useIntlWithFormData()
   const selectedOption = options.find((option) => option.value === value)
 

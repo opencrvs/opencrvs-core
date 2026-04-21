@@ -66,6 +66,7 @@ function FocusNameInputsOnHash({
   id: string
   value?: { firstname?: string; middlename?: string; surname?: string }
 }) {
+  'use memo'
   const location = useLocation()
 
   useEffect(() => {
@@ -145,6 +146,7 @@ function NameInput({
   validatorContext,
   ...props
 }: Props) {
+  'use memo'
   value ??= defaultNameFieldValue(configuration?.name)
 
   const { maxLength, order } = configuration || {}
@@ -266,6 +268,7 @@ function NameOutput({
   value?: NameFieldValue
   configuration?: NameField
 }) {
+  'use memo'
   const defaultNameOrder = [
     'firstname',
     ...(configuration?.configuration?.name?.middlename ? ['middlename'] : []),

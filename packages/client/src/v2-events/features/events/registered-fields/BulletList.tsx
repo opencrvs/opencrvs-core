@@ -18,6 +18,7 @@ function BulletListInput({
   items,
   configuration
 }: FieldProps<'BULLET_LIST'>) {
+  'use memo'
   const intl = useIntl()
   const formattedItmes = items.map((item: MessageDescriptor) =>
     intl.formatMessage(item)

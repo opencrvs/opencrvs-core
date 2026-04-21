@@ -20,6 +20,7 @@ function ParagraphInput({
   message: string
   configuration: ParagraphConfiguration
 }) {
+  'use memo'
   const fontVariant = configuration.styles?.fontVariant
   const hint = configuration.styles?.hint
 

@@ -43,6 +43,7 @@ function ButtonInput({
   value?: number
   onChange: (amountOfClicks?: number) => void
 }) {
+  'use memo'
   const intl = useIntl()
 
   const handleClick = () => onChange(value + 1)

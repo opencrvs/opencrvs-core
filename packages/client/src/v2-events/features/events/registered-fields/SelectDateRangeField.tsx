@@ -34,6 +34,7 @@ type SelectDateRangeInputProps = Omit<
  * @returns Select with date range value as options.
  */
 function SelectDateRangeFieldInput(props: SelectDateRangeInputProps) {
+  'use memo'
   const { onChange, ...rest } = props
 
   return (

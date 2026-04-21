@@ -20,6 +20,7 @@ function SelectCountryInput(
     options?: SelectInputProps['options']
   }
 ) {
+  'use memo'
   return (
     <Select.Input
       {...props}
@@ -31,6 +32,7 @@ function SelectCountryInput(
 }
 
 function SelectCountryOutput({ value }: { value: string | undefined }) {
+  'use memo'
   const intl = useIntl()
   const selectedCountry = countries.find((country) => country.value === value)
 

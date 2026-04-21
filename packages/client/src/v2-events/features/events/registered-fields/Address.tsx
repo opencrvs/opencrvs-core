@@ -531,6 +531,7 @@ function transformNestedTouchedToParentTouched(
  * change / blur event.
  */
 function AddressInput(props: Props) {
+  'use memo'
   const {
     onBlur,
     onChange,
@@ -612,6 +613,7 @@ function AddressOutput({
   lineSeparator?: React.ReactNode
   configuration: AddressField
 }) {
+  'use memo'
   const validatorContext = useValidatorContext()
   const { getLocations } = useLocations()
   const [adminStructureLocations] = getLocations.useSuspenseQuery({

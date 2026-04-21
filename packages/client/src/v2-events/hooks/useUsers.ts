@@ -106,6 +106,7 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
 })
 
 export function useUsers() {
+  'use memo'
   const trpc = useTRPC()
   return {
     getUser: {

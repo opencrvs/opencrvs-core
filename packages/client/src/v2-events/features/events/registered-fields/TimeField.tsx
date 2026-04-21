@@ -36,6 +36,7 @@ function TimeInput({
   onChange: (newValue: string) => void
   value: string
 }) {
+  'use memo'
   const cleanEmpty = React.useCallback(
     (val: string) => (val === EMPTY_TIME ? '' : val),
     []
@@ -82,6 +83,7 @@ function parseAndFormatTime(intl: IntlShape, value?: string) {
 }
 
 function TimeOutput({ value }: { value?: string }) {
+  'use memo'
   const intl = useIntl()
   return parseAndFormatTime(intl, value)
 }

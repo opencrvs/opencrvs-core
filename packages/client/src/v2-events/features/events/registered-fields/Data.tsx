@@ -139,6 +139,7 @@ function DataInput({
   allKnownFields: FieldConfig[]
   onChange: (value: DataFieldValue) => void
 }) {
+  'use memo'
   const intl = useIntl()
   const validatorContext = useValidatorContext()
   const { subtitle, data } = configuration
@@ -300,6 +301,7 @@ function DataOutput({
   field: DataField
   eventConfig: EventConfig
 }) {
+  'use memo'
   const intl = useIntl()
 
   if (!value) {

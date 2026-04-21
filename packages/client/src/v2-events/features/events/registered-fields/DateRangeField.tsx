@@ -115,6 +115,7 @@ function DateRangeInput({
   onChange: (newValue: string | DateRangeFieldValue) => void
   value?: string | DateRangeFieldValue
 }) {
+  'use memo'
   const intl = useIntl()
   const [dateRange, setDateRange] = useState<DateRangeInternalValue>(
     extractDateValueFromProps(value)
@@ -253,6 +254,7 @@ function DateRangeInput({
 }
 
 function DateRangeOutput({ value }: { value?: DateRangeFieldValue | string }) {
+  'use memo'
   const intl = useIntl()
   const parsed = DateRangeFieldValue.safeParse(value)
 

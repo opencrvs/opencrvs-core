@@ -22,6 +22,7 @@ interface ApplicationConfig {
 }
 
 export const useAppConfig = (): ApplicationConfig => {
+  'use memo'
   return {
     language: useSelector(getLanguage),
     certificateTemplates: useSelector(

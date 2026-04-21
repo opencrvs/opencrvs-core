@@ -40,6 +40,7 @@ function NumberWithUnitInput({
   options,
   ...props
 }: NumberWithUnitInputProps) {
+  'use memo'
   const handleUnitChange = (code: string) => {
     onChange({ ...value, unit: code })
   }
@@ -72,6 +73,7 @@ function NumberWithUnitInput({
 export const NumberWithUnit = {
   Input: NumberWithUnitInput,
   Output: ({ value }: { value?: NumberWithUnitFieldUpdateValue }) => {
+    'use memo'
     if (value?.numericValue === undefined || value.unit === undefined) {
       return null
     }

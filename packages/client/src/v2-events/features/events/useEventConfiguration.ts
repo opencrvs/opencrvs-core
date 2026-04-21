@@ -17,6 +17,7 @@ import { useTRPC } from '@client/v2-events/trpc'
  * @returns a list of event configurations
  */
 export function useEventConfigurations() {
+  'use memo'
   const trpc = useTRPC()
   const config = useSuspenseQuery({
     ...trpc.event.config.get.queryOptions(),
@@ -34,6 +35,7 @@ export function useEventConfigurations() {
 export function useEventConfiguration(eventIdentifier: string): {
   eventConfiguration: EventConfig
 } {
+  'use memo'
   const config = useEventConfigurations()
   const eventConfiguration = config.find(
     (event) => event.id === eventIdentifier

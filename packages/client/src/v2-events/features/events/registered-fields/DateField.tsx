@@ -42,6 +42,7 @@ function DateInput({
   onChange: (newValue: string) => void
   value: string
 }) {
+  'use memo'
   /**
    * Component library returns '--' for empty dates when input has been touched.
    * We limit the behavior to this component, while still allowing partial values. (e.g. '2021-01-')
@@ -76,6 +77,7 @@ function DateInput({
 }
 
 function DateOutput({ value }: { value?: string }) {
+  'use memo'
   const intl = useIntl()
   const parsed = PlainDate.safeParse(value)
 
