@@ -8,19 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  ApolloClient,
-  ApolloLink,
-  ApolloProvider,
-  InMemoryCache,
-  Observable
-} from '@apollo/client'
-import { MockedProvider } from '@apollo/client/testing'
 import { App, routesConfig } from '@client/App'
 import { offlineDataReady } from '@client/offline/actions'
 import { AppStore, createStore, IStoreState } from '@client/store'
-import { getSchema } from '@client/tests/graphql-schema-mock'
-import { EventType, FetchUserQuery, Status } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
 import { TestUserRole, TokenUserType, UUID } from '@opencrvs/commons/client'
@@ -34,7 +25,6 @@ import {
   shallow
 } from 'enzyme'
 import { readFileSync } from 'fs'
-import { graphql, print } from 'graphql'
 import * as jwt from 'jsonwebtoken'
 import { join } from 'path'
 import * as React from 'react'
@@ -42,7 +32,6 @@ import { IntlShape } from 'react-intl'
 import { Provider } from 'react-redux'
 import { ThemeProvider } from 'styled-components'
 import { waitForElement } from './wait-for-element'
-import * as actions from '@client/profile/profileActions'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { vi } from 'vitest'
 import { mockOfflineData, validImageB64String } from './mock-offline-data'
@@ -58,25 +47,6 @@ export const getItem = vi.fn()
 export const setItem = vi.fn()
 
 configure({ adapter: new Adapter() })
-
-function createGraphQLClient() {
-  const schema = getSchema()
-  return new ApolloClient({
-    cache: new InMemoryCache(),
-    link: new ApolloLink((operation) => {
-      return new Observable((observer) => {
-        const { query, operationName, variables } = operation
-
-        graphql(schema, print(query), null, null, variables, operationName)
-          .then((result) => {
-            observer.next(result)
-            observer.complete()
-          })
-          .catch(observer.error.bind(observer))
-      })
-    })
-  })
-}
 
 export function getInitialState(): IStoreState {
   const { store: mockStore } = createStore()
@@ -97,9 +67,7 @@ export async function createTestApp(
   const { store } = await createTestStore()
   const router = createMemoryRouter(routesConfig, { initialEntries })
 
-  const app = mount(
-    <App store={store} router={router} client={createGraphQLClient()} />
-  )
+  const app = mount(<App store={store} router={router} />)
 
   if (config.waitUntilOfflineCountryConfigLoaded) {
     await waitForReady(app)
@@ -109,12 +77,6 @@ export async function createTestApp(
 
 interface ITestView {
   intl: IntlShape
-}
-
-export function createShallowRenderedComponent(
-  node: React.ReactElement<ITestView>
-) {
-  return shallow(node)
 }
 
 export const resizeWindow = (width: number, height: number) => {
@@ -266,24 +228,6 @@ export const mockRegistrarUserResponse = {
   }
 }
 
-function appendStringToKeys(
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  obj: Record<string, any>,
-  appendString: string
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-): Record<string, any> {
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  const newObj: Record<string, any> = {}
-
-  for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      newObj[key + appendString] = obj[key]
-    }
-  }
-
-  return newObj
-}
-
 const mockFetchCertificatesTemplatesDefinition = [
   {
     id: 'birth-certificate',
@@ -419,15 +363,10 @@ export async function createTestComponent(
   node: React.ReactElement<ITestView>,
   {
     store,
-    graphqlMocks,
-    apolloClient,
     initialEntries,
     path = '*'
   }: {
     store: AppStore
-    graphqlMocks?: MockedProvider['props']['mocks']
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    apolloClient?: ApolloClient<any>
     initialEntries?:
       | string[]
       | {
@@ -447,24 +386,6 @@ export async function createTestComponent(
   store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   await flushPromises()
 
-  const withGraphQL = (node: JSX.Element) => {
-    if (apolloClient) {
-      return <ApolloProvider client={apolloClient}>{node}</ApolloProvider>
-    }
-
-    return (
-      <MockedProvider
-        mocks={graphqlMocks}
-        addTypename={false}
-        defaultOptions={{
-          watchQuery: { fetchPolicy: 'no-cache' },
-          query: { fetchPolicy: 'no-cache' }
-        }}
-      >
-        {node}
-      </MockedProvider>
-    )
-  }
   const router = createMemoryRouter(
     [
       {
@@ -476,7 +397,7 @@ export async function createTestComponent(
   )
 
   function PropProxy() {
-    return withGraphQL(
+    return (
       <Provider store={store}>
         <I18nContainer>
           <ThemeProvider theme={getTheme()}>
@@ -494,36 +415,6 @@ export {
   mockOfflineData,
   mockOfflineLocationsWithHierarchy
 } from './mock-offline-data'
-
-export function fetchUserMock(officeId: string): FetchUserQuery {
-  return {
-    getUser: {
-      id: '123',
-      userMgntUserID: '123',
-      primaryOffice: {
-        id: officeId
-      },
-      name: [
-        {
-          use: 'en',
-          firstNames: 'Mohammad',
-          familyName: 'Ashraful'
-        }
-      ],
-      status: Status.Active,
-      practitionerId: '4651d1cc-6072-4e34-bf20-b583f421a9f1',
-      creationDate: '1701241360173',
-      role: {
-        id: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
-        label: {
-          id: 'userRoles.localSystemAdmin',
-          defaultMessage: 'Local System Admin',
-          description: 'Label for local system admin'
-        }
-      }
-    }
-  }
-}
 
 export function generateToken({
   scope,
@@ -553,15 +444,5 @@ export function generateToken({
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
     audience: 'opencrvs:gateway-user'
-  })
-}
-
-export function setScopes(scope: string[], store: AppStore) {
-  const token = generateToken({ scope })
-
-  window.history.replaceState({}, '', '?token=' + token)
-
-  return store.dispatch({
-    type: actions.CHECK_AUTH
   })
 }

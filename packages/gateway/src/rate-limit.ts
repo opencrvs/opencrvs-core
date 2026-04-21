@@ -15,7 +15,7 @@ import { DISABLE_RATE_LIMIT } from './constants'
 import { hasScope } from '@opencrvs/commons'
 
 /**
- * Custom RateLimitError. This is being caught in Apollo & Hapi (`onPreResponse` in createServer)
+ * Custom RateLimitError. This is being caught in Hapi (`onPreResponse` in createServer)
  */
 export class RateLimitError extends Error {
   constructor(message = 'You are being rate limited') {

@@ -12,9 +12,12 @@
 import React, { useEffect } from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
 
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { onlineManager } from '@tanstack/react-query'
 import { ActionType } from '@opencrvs/commons/client'
+import { APPLICATION_VERSION } from '@client/utils/constants'
+import { storeReloadModalVisibility } from '@client/reload/reducer'
+import type { AppStore } from '@client/store'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
@@ -106,6 +109,8 @@ function PrefetchQueries() {
 export const routesConfig = {
   path: ROUTES.V2.path,
   Component: () => {
+    const dispatch = useDispatch<AppStore['dispatch']>()
+
     useEffect(() => {
       let cancelled = false
 
@@ -128,6 +133,11 @@ export const routesConfig = {
 
           await res.json()
 
+          const gatewayVersion = res.headers.get('X-version')
+          if (gatewayVersion && gatewayVersion !== APPLICATION_VERSION) {
+            dispatch(storeReloadModalVisibility(true))
+          }
+
           if (!cancelled) {
             onlineManager.setOnline(true)
           }
@@ -143,7 +153,7 @@ export const routesConfig = {
       return () => {
         cancelled = true
       }
-    }, [])
+    }, [dispatch])
 
     const currentUser = useSelector(getUserDetails)
 
@@ -305,7 +315,7 @@ export const routesConfig = {
       path: ROUTES.V2.SETTINGS.USER.VIEW.path,
       element: (
         <WorkqueueLayout>
-          <UserAudit hideNavigation={true} />
+          <UserAudit />
         </WorkqueueLayout>
       )
     },
@@ -354,7 +364,7 @@ export const routesConfig = {
       element: (
         <ProtectedRoute scopes={['config.update-all']}>
           <WorkqueueLayout>
-            <SystemList hideNavigation={true} />
+            <SystemList />
           </WorkqueueLayout>
         </ProtectedRoute>
       )
@@ -364,7 +374,7 @@ export const routesConfig = {
       element: (
         <ProtectedRoute scopes={['config.update-all']}>
           <WorkqueueLayout>
-            <AllUserEmail hideNavigation={true} />
+            <AllUserEmail />
           </WorkqueueLayout>
         </ProtectedRoute>
       )

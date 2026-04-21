@@ -10,24 +10,25 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
-import { noop } from 'lodash'
-import { FieldType, TestUserRole } from '@opencrvs/commons/client'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { FieldType } from '@opencrvs/commons/client'
+import {
+  FormFieldGenerator,
+  FormFieldGeneratorPropsWithoutRef
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { getTestValidatorContext } from '../../../../../.storybook/decorators'
+import { withValidatorContext } from '../../../../../.storybook/decorators'
 
-const meta: Meta<typeof FormFieldGenerator> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/VerificationStatus',
-  args: { onChange: fn() },
   decorators: [
     (Story) => (
       <TRPCProvider>
         <Story />
       </TRPCProvider>
-    )
+    ),
+    withValidatorContext
   ]
 }
 
@@ -37,13 +38,16 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
 
-export const Status: StoryObj<typeof FormFieldGenerator> = {
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
+
+export const Status: Story = {
   parameters: {
     layout: 'centered'
   },
-  render: function Component() {
+  render: function Component(args) {
     return (
       <StyledFormFieldGenerator
+        {...args}
         fields={[
           {
             id: 'storybook.pending',
@@ -131,17 +135,13 @@ export const Status: StoryObj<typeof FormFieldGenerator> = {
             }
           }
         ]}
-        id="my-form"
-        initialValues={{
+        formValues={{
           'storybook.pending': 'pending',
           'storybook.verified': 'verified',
           'storybook.authenticated': 'authenticated',
           'storybook.failed': 'failed'
         }}
-        validatorContext={getTestValidatorContext(
-          TestUserRole.enum.LOCAL_REGISTRAR
-        )}
-        onChange={noop}
+        id="my-form"
       />
     )
   }

@@ -11,11 +11,7 @@
 import React from 'react'
 import { ReactWrapper } from 'enzyme'
 import { AppStore, createStore } from '@client/store'
-import {
-  createTestComponent,
-  flushPromises,
-  userDetails
-} from '@client/tests/util'
+import { createTestComponent, userDetails } from '@client/tests/util'
 import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { setUserDetails } from '@client/profile/profileActions'

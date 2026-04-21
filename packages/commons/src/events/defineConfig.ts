@@ -49,10 +49,6 @@ function warnOnConfigurationIssues(config: EventConfig) {
   }
 }
 
-/**
- * Builds a validated configuration for an event
- * @param config - Event specific configuration
- */
 export const defineConfig = (config: EventConfigInput) => {
   const input = EventConfig.parse(config)
 

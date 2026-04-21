@@ -23,11 +23,13 @@ import {
   deepDropNulls,
   defineConditional,
   EventConfig,
+  FieldConfig,
+  FieldValue,
+  FileFieldValue,
   FieldType,
   never,
   PageTypes,
   TokenUserType,
-  EventConfigToDeclarationFormType,
   UserInput,
   hasScope,
   EncodedScope
@@ -74,7 +76,10 @@ const SpinnerWrapper = styled.div`
   padding: 20px;
 `
 
-function getUserEditConfig(selectedRole?: { scopes: EncodedScope[] }) {
+function getUserEditConfig(
+  selectedRole?: { scopes: EncodedScope[] },
+  additionalFields: FieldConfig[] = []
+): EventConfig {
   return {
     id: '__user__',
     summary: {
@@ -151,7 +156,8 @@ function getUserEditConfig(selectedRole?: { scopes: EncodedScope[] }) {
               type: FieldType.TEXT,
               required: false,
               label: messages.userDevice
-            }
+            },
+            ...additionalFields
           ]
         },
         {
@@ -181,12 +187,20 @@ function getUserEditConfig(selectedRole?: { scopes: EncodedScope[] }) {
       ]
     },
     actions: []
-  } as const satisfies EventConfig
+  }
 }
 
-type EventState = Partial<
-  EventConfigToDeclarationFormType<ReturnType<typeof getUserEditConfig>>
->
+type EventState = {
+  primaryOfficeId?: string
+  role?: string
+  name?: { firstname: string; surname: string; middlename: string }
+  phoneNumber?: string
+  email?: string
+  fullHonorificName?: string
+  device?: string
+  signature?: FileFieldValue
+  [key: string]: unknown
+}
 
 interface UserFormState {
   userForm?: EventState
@@ -196,7 +210,7 @@ interface UserFormState {
   clear: () => void
 }
 
-const useUserFormState = create<UserFormState>()((set, get) => ({
+export const useUserFormState = create<UserFormState>()((set, get) => ({
   getUserForm: (initialValues?: EventState) =>
     get().userForm || deepDropNulls(initialValues ?? {}),
   setUserForm: (data: EventState) => {
@@ -227,7 +241,7 @@ export const CreateNewUser = () => {
   return <div />
 }
 
-export const EditUserComponent = () => {
+const EditUserComponent = () => {
   const intl = useIntl()
   const navigate = useNavigate()
   const { pageId, userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.EDIT)
@@ -248,7 +262,8 @@ export const EditUserComponent = () => {
     }
   }, [formState, navigate, userId, pageId])
 
-  const eventConfig = getUserEditConfig(selectedRole)
+  const additionalFields = window.config.ADDITIONAL_USER_FIELDS ?? []
+  const eventConfig = getUserEditConfig(selectedRole, additionalFields)
   const formConfig = eventConfig.declaration
 
   const handleClose = () => {
@@ -278,7 +293,7 @@ export const EditUserComponent = () => {
         showReviewButton={false}
         actionType={ActionType.DECLARE}
         eventConfig={eventConfig}
-        form={formState}
+        formData={formState as Record<string, FieldValue>}
         formPages={formConfig.pages}
         pageId={pageId || eventConfig.declaration.pages[0].id}
         setFormData={(data) => {
@@ -307,11 +322,10 @@ export const EditUserComponent = () => {
 
 export const EditUser = withSuspense(EditUserComponent)
 
-export const ReviewUserComponent = () => {
+const ReviewUserComponent = () => {
   const intl = useIntl()
   const navigate = useNavigate()
-  const { getUserForm, getTouchedFields, setUserForm, clear } =
-    useUserFormState()
+  const { getUserForm, setUserForm, clear } = useUserFormState()
   const { userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.REVIEW)
   const isNewUser = userId === NEW_USER
   const { getUser, createUser, updateUser } = useUsers()
@@ -334,6 +348,7 @@ export const ReviewUserComponent = () => {
   }
 
   const existingUserQuery = getUser.useQuery(userId, { enabled: !isNewUser })
+  const additionalFields = window.config.ADDITIONAL_USER_FIELDS ?? []
 
   useEffect(() => {
     if (isNewUser || !existingUserQuery.data) return
@@ -355,15 +370,18 @@ export const ReviewUserComponent = () => {
       signature: user.signature
         ? { path: user.signature, originalFilename: '', type: '' }
         : undefined,
-      device: user.device
+      device: user.device,
+      // Additional field values are spread at the top level because FormFieldGenerator
+      // looks up values by field ID as a flat key (e.g. formState['user.staffId']).
+      // The nesting into data: {} only happens when building the UserInput payload.
+      ...(user.data ?? {})
     })
   }, [isNewUser, existingUserQuery.data, setUserForm, getUserForm])
 
   const formState = getUserForm()
-
   const createUserMutation = createUser()
   const updateUserMutation = updateUser()
-  const eventConfig = getUserEditConfig(selectedRole)
+  const eventConfig = getUserEditConfig(selectedRole, additionalFields)
   const formConfig = eventConfig.declaration
 
   const handleMutationError = (error: unknown) => {
@@ -470,7 +488,7 @@ export const ReviewUserComponent = () => {
         </Toast>
       )}
       <ReviewComponent.Body
-        form={formState}
+        form={formState as Record<string, FieldValue>}
         formConfig={formConfig}
         reviewFields={[]}
         title={intl.formatMessage(messages.userFormReviewTitle)}
@@ -492,8 +510,13 @@ export const ReviewUserComponent = () => {
             fullWidth
             onClick={() => {
               resetErrors()
+              const data: Record<string, FieldValue> = Object.fromEntries(
+                additionalFields.map((f) => [
+                  f.id,
+                  formState[f.id] as FieldValue
+                ])
+              )
               const payload: UserInput = {
-                ...formState,
                 mobile: formState.phoneNumber,
                 email: formState.email!,
                 role: formState.role!,
@@ -505,7 +528,8 @@ export const ReviewUserComponent = () => {
                     given: [formState!.name!.firstname],
                     family: formState!.name!.surname
                   }
-                ]
+                ],
+                data
               }
               createUserMutation.mutate(payload, {
                 onSuccess: () => {
@@ -525,8 +549,13 @@ export const ReviewUserComponent = () => {
             id="submit-edit-user-form"
             onClick={() => {
               resetErrors()
+              const data: Record<string, FieldValue> = Object.fromEntries(
+                additionalFields.map((f) => [
+                  f.id,
+                  formState[f.id] as FieldValue
+                ])
+              )
               const payload: UserInput = {
-                ...formState,
                 mobile: formState.phoneNumber,
                 email: formState.email!,
                 role: formState.role!,
@@ -538,7 +567,8 @@ export const ReviewUserComponent = () => {
                     given: [formState!.name!.firstname],
                     family: formState!.name!.surname
                   }
-                ]
+                ],
+                data
               }
               updateUserMutation.mutate(
                 { ...payload, id: userId },

@@ -11,7 +11,7 @@
 import { defineMessages } from 'react-intl'
 
 /** @knipignore */
-export const formMessageDescriptors = {
+const formMessageDescriptors = {
   addFile: {
     defaultMessage: 'Add file',
     description: 'text for add file button',
