@@ -10,18 +10,20 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn, userEvent, within, expect } from '@storybook/test'
+import { userEvent, within, expect } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { FieldType } from '@opencrvs/commons/client'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormFieldGenerator,
+  FormFieldGeneratorPropsWithoutRef
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { padZero } from '@client/v2-events/utils'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
-const meta: Meta<typeof FormFieldGenerator> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/DateField',
-  args: { onChange: fn() },
   decorators: [
     (Story, context) => (
       <TRPCProvider>
@@ -38,7 +40,9 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
 
-export const DateInput: StoryObj<typeof FormFieldGenerator> = {
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
+
+export const DateInput: Story = {
   parameters: {
     layout: 'centered'
   },
@@ -71,26 +75,20 @@ export const DateInput: StoryObj<typeof FormFieldGenerator> = {
       await userEvent.clear(monthInput)
       await userEvent.clear(yearInput)
 
-      await userEvent.type(
-        await canvas.findByTestId('storybook____date-dd'),
-        '1'
-      )
+      await userEvent.type(dayInput, '1')
 
       await userEvent.click(await canvas.findByText('Date input'))
 
       await canvas.findByText('Invalid date field')
 
-      await userEvent.type(
-        await canvas.findByTestId('storybook____date-dd'),
-        '{backspace}'
-      )
+      await userEvent.type(dayInput, '{backspace}')
+
+      await userEvent.click(await canvas.findByText('Date input'))
 
       await canvas.findByText('Required')
     })
   },
   render: function Component(args) {
-    const [formData, setFormData] = React.useState({})
-
     return (
       <StyledFormFieldGenerator
         {...args}
@@ -111,11 +109,6 @@ export const DateInput: StoryObj<typeof FormFieldGenerator> = {
           }
         ]}
         id="my-form"
-        initialValues={formData}
-        onChange={(data) => {
-          args.onChange(data)
-          setFormData(data)
-        }}
       />
     )
   }

@@ -188,7 +188,7 @@ export async function createTokenForActionConfirmation(
     {
       subject: userId,
       algorithm: 'RS256',
-      expiresIn: '7 days',
+      expiresIn: env.CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS,
       audience: [
         'opencrvs:gateway-user',
         'opencrvs:events-user',

@@ -10,7 +10,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fn, userEvent, within } from '@storybook/test'
+import { expect, userEvent, within } from '@storybook/test'
 import * as selectEvent from 'react-select-event'
 import React from 'react'
 import styled from 'styled-components'
@@ -26,12 +26,10 @@ import {
 
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { noop } from '@client/v2-events'
 import { getTestValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'AdministrativeArea/Interaction',
-  args: { onChange: fn() },
   decorators: [
     (Story) => (
       <TRPCProvider>
@@ -75,7 +73,7 @@ const fields = [
 
 const declaration = {
   'applicant.address': {
-    country: 'FAR',
+    country: 'BGD',
     addressType: AddressType.DOMESTIC,
     administrativeArea: '1d4e5f6a-7b8c-4912-8efa-345678901234'
   }
@@ -94,14 +92,11 @@ export const AdministrativeAreaWithCommunityLeader: StoryObj<
         element: (
           <StyledFormFieldGenerator
             fields={fields}
+            formValues={declaration}
             id="my-form"
-            initialValues={declaration}
             validatorContext={getTestValidatorContext(
               TestUserRole.enum.COMMUNITY_LEADER
             )}
-            onChange={(data) => {
-              meta.args?.onChange?.(data) ?? noop()
-            }}
           />
         )
       },
@@ -158,14 +153,11 @@ export const AdministrativeAreaWithLocalRegistrar: StoryObj<
         element: (
           <StyledFormFieldGenerator
             fields={fields}
+            formValues={declaration}
             id="my-form"
-            initialValues={declaration}
             validatorContext={getTestValidatorContext(
               TestUserRole.enum.LOCAL_REGISTRAR
             )}
-            onChange={(data) => {
-              meta.args?.onChange?.(data) ?? noop()
-            }}
           />
         )
       },
@@ -224,14 +216,11 @@ export const AdministrativeAreaWithProvincialRegistrar: StoryObj<
         element: (
           <StyledFormFieldGenerator
             fields={fields}
+            formValues={declaration}
             id="my-form"
-            initialValues={declaration}
             validatorContext={getTestValidatorContext(
               TestUserRole.enum.PROVINCIAL_REGISTRAR
             )}
-            onChange={(data) => {
-              meta.args?.onChange?.(data) ?? noop()
-            }}
           />
         )
       },

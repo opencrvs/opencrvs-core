@@ -11,7 +11,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { waitFor, expect, fn, userEvent, within } from '@storybook/test'
+import { waitFor, expect, userEvent, within } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import {
@@ -23,19 +23,16 @@ import {
   FieldConfig,
   EventState,
   generateTranslationConfig,
-  UUID,
   DocumentPath,
   PlainDate
 } from '@opencrvs/commons/client'
 
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { noop } from '@client/v2-events'
 import { getTestValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'FormFieldGenerator/Interaction',
-  args: { onChange: fn() },
   decorators: [
     (Story) => (
       <TRPCProvider>
@@ -55,8 +52,7 @@ const fields = [
   {
     id: 'form.header',
     type: FieldType.PAGE_HEADER,
-    label: generateTranslationConfig('Form Header'),
-    defaultValue: 'Membership Application Form'
+    label: generateTranslationConfig('Membership Application Form')
   },
 
   {
@@ -203,7 +199,7 @@ const fields = [
     label: generateTranslationConfig('Region'),
     defaultValue: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
     configuration: {
-      partOf: { $declaration: 'country' },
+      partOf: { $$field: 'country', $$subfield: [] },
       type: 'ADMIN_STRUCTURE'
     }
   },
@@ -214,8 +210,6 @@ const fields = [
     label: generateTranslationConfig('Applicant Address'),
     configuration: {
       lineSeparator: ', ',
-      fields: ['country', 'administrativeArea'],
-      administrativeLevels: ['LEVEL_1', 'LEVEL_2'],
       streetAddressForm: [
         {
           id: 'street',
@@ -224,11 +218,6 @@ const fields = [
           required: false
         }
       ]
-    },
-    defaultValue: {
-      country: 'FAR',
-      administrativeArea: '1d4e5f6a-7b8c-4912-8efa-345678901234' as UUID,
-      addressType: 'DOMESTIC'
     }
   },
 
@@ -365,12 +354,17 @@ const fields = [
       timeout: 5000
     }
   },
+  {
+    id: 'club.rules-heading',
+    type: FieldType.HEADING,
+    label: generateTranslationConfig('Club Rules'),
+    configuration: { styles: { fontVariant: 'h4' } }
+  },
 
   {
     id: 'club.rules',
     type: FieldType.PARAGRAPH,
-    label: generateTranslationConfig('Club Rules'),
-    defaultValue: 'All members must follow club guidelines and regulations.',
+    label: generateTranslationConfig('All members must follow club guidelines and regulations.'),
     configuration: {
       styles: { hint: true }
     }
@@ -380,7 +374,6 @@ const fields = [
     id: 'club.benefits',
     type: FieldType.BULLET_LIST,
     label: generateTranslationConfig('Club Benefits'),
-    defaultValue: 'Exclusive access to facilities',
     items: [
       generateTranslationConfig('Discounted events'),
       generateTranslationConfig('Priority bookings')
@@ -414,8 +407,6 @@ const fields = [
 ] satisfies FieldConfig[]
 
 const declaration = {
-  'form.header': 'Membership Application Form',
-  'form.divider': undefined,
   'applicant.firstname': 'John',
   'applicant.middlename': 'Michael',
   'applicant.surname': 'Doe',
@@ -438,7 +429,7 @@ const declaration = {
   'applicant.country': 'BGD',
   'applicant.region': 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
   'applicant.address': {
-    country: 'FAR',
+    country: 'BGD',
     addressType: 'DOMESTIC',
     administrativeArea: '62a0ccb4-880d-4f30-8882-f256007dfff9'
   },
@@ -466,8 +457,6 @@ const declaration = {
     data: null,
     error: null
   },
-  'club.rules': 'All members must follow club guidelines and regulations.',
-  'club.benefits': 'Exclusive access to facilities',
   'club.dataSummary': undefined,
   'consent.termsAccepted': false
 } satisfies EventState
@@ -492,12 +481,9 @@ export const DisabledFormFields: StoryObj<typeof FormFieldGenerator> = {
                 }
               ]
             }))}
+            formValues={declaration}
             id="my-form"
-            initialValues={declaration}
             validatorContext={getTestValidatorContext()}
-            onChange={(data) => {
-              meta.args?.onChange?.(data) ?? noop()
-            }}
           />
         )
       },
@@ -544,18 +530,15 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
         element: (
           <StyledFormFieldGenerator
             fields={fields}
-            id="my-form"
-            initialValues={{
+            formValues={{
               ...declaration,
               'membership.duration': PlainDate.parse('2025-12-31')
             }}
+            id="my-form"
             // Setting 'membership.duration' to a single date value allows us to demonstrate the enabled field
             // scenario. The original defaultValue is a range (ex: `{ start: '2025-01-01', end: '2025-12-31' }`), which
             // disables the date field component, making it difficult to check if all fields are enabled via looping.
             validatorContext={getTestValidatorContext()}
-            onChange={(data) => {
-              meta.args?.onChange?.(data) ?? noop()
-            }}
           />
         )
       },
@@ -615,16 +598,13 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
                 }
               })
               .filter(Boolean)}
-            id="my-form"
-            initialValues={{
+            formValues={{
               ...declaration,
               'membership.duration': PlainDate.parse('2025-12-31'),
               'applicant.age': 30
             }}
+            id="my-form"
             validatorContext={getTestValidatorContext()}
-            onChange={(data) => {
-              meta.args?.onChange?.(data) ?? noop()
-            }}
           />
         )
       },
