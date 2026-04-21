@@ -20,6 +20,9 @@
       "@opencrvs/commons/events/deduplication": [
         "../commons/src/events/deduplication.ts"
       ],
+      "@opencrvs/commons/scopes.deprecated.do-not-use": [
+        "../commons/src/scopes.deprecated.do-not-use.ts"
+      ],
       "@opencrvs/commons/notification": [
         "../commons/src/notification/index.ts"
       ],
