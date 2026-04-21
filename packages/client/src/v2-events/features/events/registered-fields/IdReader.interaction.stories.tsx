@@ -10,7 +10,7 @@
  */
 
 import { Decorator, Meta, StoryObj } from '@storybook/react'
-import { fn, expect, waitFor } from '@storybook/test'
+import { expect, waitFor } from '@storybook/test'
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import { http, HttpResponse } from 'msw'
@@ -27,7 +27,10 @@ import {
   not
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormFieldGenerator,
+  FormFieldGeneratorPropsWithoutRef
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 interface HTMLMediaElementWithCaptureStream extends HTMLVideoElement {
@@ -66,9 +69,8 @@ function mockCamera(src: string): Decorator {
   }
 }
 
-const meta: Meta<typeof FormFieldGenerator> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/IdReader/Interaction',
-  args: { onChange: fn() },
   decorators: [
     mockCamera('/assets/qr-sample.webm'),
     (Story, context) => (
@@ -86,6 +88,8 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 600px;
   padding: 1rem;
 `
+
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
 
 const fields = [
   {
@@ -256,7 +260,7 @@ const fields = [
   }
 ] as const satisfies FieldConfig[]
 
-export const AuthenticationFlow: StoryObj<typeof FormFieldGenerator> = {
+export const AuthenticationFlow: Story = {
   name: 'Authentication flow',
   parameters: {
     layout: 'centered',
@@ -351,20 +355,11 @@ export const AuthenticationFlow: StoryObj<typeof FormFieldGenerator> = {
       return () => document.removeEventListener('click', handler)
     }, [navigate])
 
-    return (
-      <StyledFormFieldGenerator
-        {...args}
-        fields={fields}
-        id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
-      />
-    )
+    return <StyledFormFieldGenerator {...args} fields={fields} id="my-form" />
   }
 }
 
-export const QrReaderFlow: StoryObj<typeof FormFieldGenerator> = {
+export const QrReaderFlow: Story = {
   name: 'QR Reader flow',
   parameters: {
     layout: 'centered'
@@ -404,15 +399,6 @@ export const QrReaderFlow: StoryObj<typeof FormFieldGenerator> = {
     })
   },
   render: function Component(args) {
-    return (
-      <StyledFormFieldGenerator
-        {...args}
-        fields={fields}
-        id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
-      />
-    )
+    return <StyledFormFieldGenerator {...args} fields={fields} id="my-form" />
   }
 }

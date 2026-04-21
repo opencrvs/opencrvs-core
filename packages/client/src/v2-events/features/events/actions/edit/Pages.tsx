@@ -73,7 +73,7 @@ export function Pages() {
           actionType={ActionType.EDIT}
           attachmentPath={`events/${eventId}/`}
           eventConfig={configuration}
-          form={formValues}
+          formData={formValues}
           formPages={declarationPages}
           pageId={currentPageId}
           setFormData={(data) => setFormValues(data)}

@@ -102,7 +102,7 @@ export function Onboarding() {
         continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
         declaration={eventIndex.declaration}
         eventConfig={configuration}
-        form={annotation}
+        formData={annotation}
         formPages={formPages}
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
