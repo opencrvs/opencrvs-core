@@ -693,8 +693,23 @@ function toCertificateVariables(
   const { streetLevelDetails } = value
 
   const administrativeAreaId = getAdministrativeAreaIdFromAddress(value)
+
+  /*
+   * administrativeHierarchy is a convenience field for certificate templates.
+   * It provides a pre-joined string of the address's administrative context.
+   *
+   * INTERNATIONAL: country only — streetLevelDetails is free-form and
+   * country-specific, so we can't make assumptions about its contents.
+   *
+   * DOMESTIC: configured admin levels (most-specific first) joined with country,
+   * e.g. "Ibombo, Central, Farajaland". Empty levels are filtered out, so a
+   * location with no district produces "Central, Farajaland" without a leading comma.
+   *
+   * Use in SVG templates as: {{$lookup $declaration "field.address.administrativeHierarchy"}}
+   */
   if (value.addressType === AddressType.INTERNATIONAL) {
-    return { ...stringifiedResult, streetLevelDetails }
+    const administrativeHierarchy = stringifiedResult.country ?? ''
+    return { ...stringifiedResult, streetLevelDetails, administrativeHierarchy }
   }
   const appConfigAdminLevels = adminLevels?.map((level) => level.id)
 
@@ -705,10 +720,20 @@ function toCertificateVariables(
     'withNames'
   )
 
+  // Reverse so the most specific level (e.g. district) comes first
+  const orderedAdminValues = [...(appConfigAdminLevels ?? [])]
+    .reverse()
+    .map((level) => (adminLevelHierarchy as Record<string, string>)[level])
+
+  const administrativeHierarchy = [...orderedAdminValues, stringifiedResult.country]
+    .filter(Boolean)
+    .join(', ')
+
   return {
     ...stringifiedResult,
     ...adminLevelHierarchy,
-    streetLevelDetails
+    streetLevelDetails,
+    administrativeHierarchy
   }
 }
 
