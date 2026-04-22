@@ -21,10 +21,8 @@ export enum RetrievalSteps {
   SECURITY_Q_VERIFIED = 'SECURITY_Q_VERIFIED'
 }
 
-export async function verifyUser(mobile?: string, email?: string) {
-  const result = await internalClient.user.verifyUser.mutate(
-    mobile ? { mobile } : { email: email! }
-  )
+export async function verifyUser(input: { mobile?: string; email?: string }) {
+  const result = await internalClient.user.verifyUser.mutate(input)
 
   return {
     userId: result.id,

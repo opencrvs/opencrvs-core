@@ -91,20 +91,22 @@ export function allowedWithAnyOfScopes(scopes: ScopeType[]) {
   return fn
 }
 
-export const enforceOfficeUpdatePermission: MiddlewareFunction<
+export const canUpdateUserLocation: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
   TrpcContext,
   TrpcContext,
-  { id: string; primaryOfficeId?: string }
+  { id: UUID; primaryOfficeId?: string }
 > = async (opts) => {
   const { token } = opts.ctx
   const { input, ctx } = opts
 
   const existingUser = await getUserById(UUID.parse(input.id))
-
   if (!existingUser) {
-    throw new Error(`No user found by given id: ${input.id}`)
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `No user found by given id: ${input.id}`
+    })
   }
 
   let officeId = existingUser.officeId

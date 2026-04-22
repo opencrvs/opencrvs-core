@@ -12,6 +12,7 @@
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { inferInput, inferOutput } from '@trpc/tanstack-react-query'
 import {
+  deepDropNulls,
   System,
   TokenUserType,
   User,
@@ -63,11 +64,11 @@ setQueryDefaults<
       await precacheFile(user.avatar)
     }
 
-    return {
+    return deepDropNulls({
       ...user,
       signature: user.signature ?? undefined,
       avatar: user.avatar
-    }
+    })
   }
 })
 

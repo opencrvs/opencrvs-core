@@ -10,7 +10,7 @@
  */
 
 import { useSelector } from 'react-redux'
-import { User } from '@opencrvs/commons/client'
+import { deepDropNulls, User } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getOfflineData } from '@client/offline/selectors'
 import { getAdminLevelHierarchy } from '../utils'
@@ -32,7 +32,7 @@ export function useCurrentUser() {
   const locations = getLocations.useSuspenseQuery()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
-  const sharedFields = {
+  const sharedFields = deepDropNulls({
     id: user.id,
     name: user.name,
     role: user.role,
@@ -43,7 +43,7 @@ export function useCurrentUser() {
     primaryOfficeId: user.primaryOfficeId,
     administrativeAreaId: user.administrativeAreaId ?? undefined,
     signature: user.signature ?? undefined
-  }
+  })
 
   // @todo: administrativeAreaId should be returned from the API
   if (user.primaryOfficeId) {
