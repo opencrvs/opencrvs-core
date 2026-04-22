@@ -107,9 +107,9 @@ const auditRouter = router({
 const UserSearch = z.object({
   username: z.string().optional(),
   mobile: z.string().optional(),
+  email: z.string().optional(),
   status: z.string().optional(),
   primaryOfficeId: z.string().optional(),
-  locationId: z.string().optional(),
   count: z.number().min(0),
   skip: z.number().min(0),
   sortOrder: z.enum(['asc', 'desc'])
@@ -232,8 +232,7 @@ export const userRouter = router({
         ...input,
         primaryOfficeId: input.primaryOfficeId
           ? UUID.parse(input.primaryOfficeId)
-          : undefined,
-        locationId: input.locationId ? UUID.parse(input.locationId) : undefined
+          : undefined
       })
     ),
   actions: userOnlyProcedure
