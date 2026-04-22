@@ -24,7 +24,6 @@ function makeUpdateInput(user: {
 }) {
   return {
     id: user.id,
-    name: [{ use: 'en', given: ['John'], family: 'Doe' }],
     email: `user-${user.id}@test.example`,
     role: user.role,
     primaryOfficeId: user.primaryOfficeId
@@ -35,9 +34,9 @@ test('throws FORBIDDEN when user.edit scope is missing', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [])
 
-  await expect(
-    client.user.update(makeUpdateInput(user))
-  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+  await expect(client.user.update(makeUpdateInput(user))).rejects.toMatchObject(
+    new TRPCError({ code: 'FORBIDDEN' })
+  )
 })
 
 test('throws FORBIDDEN when trying to change primaryOfficeId without config.update-all scope', async () => {
@@ -55,7 +54,10 @@ test('throws FORBIDDEN when trying to change primaryOfficeId without config.upda
 
 test('allows changing primaryOfficeId when user has config.update-all scope', async () => {
   const { user, locations } = await setupTestCase()
-  const client = createTestClient(user, [USER_EDIT_SCOPE, CONFIG_UPDATE_ALL_SCOPE])
+  const client = createTestClient(user, [
+    USER_EDIT_SCOPE,
+    CONFIG_UPDATE_ALL_SCOPE
+  ])
   const otherOfficeId = locations[1].id
 
   const updatedUser = await client.user.update({
