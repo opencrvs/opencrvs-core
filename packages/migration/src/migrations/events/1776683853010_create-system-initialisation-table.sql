@@ -1,6 +1,6 @@
 -- Up Migration
 CREATE TABLE system_initialisation(
-  id SERIAL PRIMARY KEY,
+  id INTEGER PRIMARY KEY DEFAULT 1 CHECK (id = 1),
   hash  TEXT,
   salt  TEXT,
   completed_at TIMESTAMPTZ,
