@@ -422,7 +422,7 @@ export const QrReaderHidesAfterScan: Story = {
     await runQrScanSteps(canvas, user, step)
 
     await step('ID Reader hidden after successful scan', async () => {
-      await waitFor(() =>
+      await waitFor(async () =>
         expect(canvas.queryByText('Scan QR code')).not.toBeInTheDocument()
       )
     })
