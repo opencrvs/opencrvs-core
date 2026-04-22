@@ -11,7 +11,7 @@
 
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
-import { internalProcedure, internalRouter } from '@events/router/trpc'
+import { initialisationProcedure, internalRouter } from '@events/router/trpc'
 import { generateHash } from '@events/service/auth/hash'
 import {
   completeSystemInitialisation,
@@ -25,7 +25,7 @@ import { listLocationsRoute, setLocationsRoute } from '../locations'
  * These routes are intended to be used only during the initial setup of the system and are protected accordingly.
  */
 export const initialisationRouter = internalRouter({
-  authenticate: internalProcedure
+  authenticate: initialisationProcedure
     .input(z.object({ password: z.string() }))
     .output(z.object({ valid: z.boolean() }))
     .mutation(async ({ input }) => {
@@ -44,7 +44,7 @@ export const initialisationRouter = internalRouter({
 
       return { valid: true }
     }),
-  complete: internalProcedure.mutation(async () => {
+  complete: initialisationProcedure.mutation(async () => {
     const systemInitialisation = await getSystemInitialisation()
 
     if (systemInitialisation.completedAt !== null) {
@@ -56,10 +56,10 @@ export const initialisationRouter = internalRouter({
     await completeSystemInitialisation()
   }),
   administrativeAreas: {
-    set: setAdministrativeAreasRoute(internalProcedure)
+    set: setAdministrativeAreasRoute(initialisationProcedure)
   },
   locations: {
-    set: setLocationsRoute(internalProcedure),
-    list: listLocationsRoute(internalProcedure)
+    set: setLocationsRoute(initialisationProcedure),
+    list: listLocationsRoute(initialisationProcedure)
   }
 })
