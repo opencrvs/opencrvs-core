@@ -37,11 +37,8 @@ export const initialisationRouter = internalRouter({
         })
       }
 
-      const hash = await generateHash(
-        input.password,
-        systemInitialisation.tokenSalt
-      )
-      if (hash !== systemInitialisation.tokenHash) {
+      const hash = await generateHash(input.password, systemInitialisation.salt)
+      if (hash !== systemInitialisation.hash) {
         throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
 

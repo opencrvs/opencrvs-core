@@ -20,8 +20,8 @@ import {
 } from '@events/tests/utils'
 
 test('Returns 403 when accessed with user app token', async () => {
-  const { user } = await setupTestCase()
   await systemInitialisationTestSetup()
+  const { user } = await setupTestCase()
 
   const appToken = createTestToken({
     userId: user.id,
@@ -36,12 +36,12 @@ test('Returns 403 when accessed with user app token', async () => {
 })
 
 test('Returns 403 when accessed with system app token', async () => {
+  await systemInitialisationTestSetup()
   const systemToken = createTestToken({
     userId: 'test-system',
     scopes: TEST_USER_DEFAULT_SCOPES,
     userType: TokenUserType.enum.system
   })
-  await systemInitialisationTestSetup()
 
   const client = createInternalTestClient(systemToken)
 
@@ -51,10 +51,11 @@ test('Returns 403 when accessed with system app token', async () => {
 })
 
 test('Returns 403 when accessed with internal token using invalid subject', async () => {
+  await systemInitialisationTestSetup()
+
   const internalToken = createInternalServiceToken({
     subject: 'invalid-subject'
   })
-  await systemInitialisationTestSetup()
 
   const client = createInternalTestClient(internalToken)
 
@@ -71,7 +72,7 @@ test('Returns 200 when accessed with proper internal token', async () => {
   await expect(client.initialisation.complete()).resolves.toBeUndefined()
 })
 
-test('Returns 409 after initialisation is completed', async () => {
+test('Returns 403 after initialisation is completed', async () => {
   const { db, password } = await systemInitialisationTestSetup()
 
   const client = createInternalTestClient()
@@ -101,7 +102,7 @@ test('Returns 409 after initialisation is completed', async () => {
 
   await expect(client.initialisation.complete()).rejects.toMatchObject(
     new TRPCError({
-      code: 'CONFLICT'
+      code: 'UNAUTHORIZED'
     })
   )
 })

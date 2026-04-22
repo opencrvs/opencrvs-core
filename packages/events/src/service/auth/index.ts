@@ -10,6 +10,7 @@
  */
 
 import fetch from 'node-fetch'
+import * as z from 'zod/v4'
 import { UUID } from '@opencrvs/commons'
 import { env } from '@events/environment'
 import {
@@ -65,13 +66,32 @@ export async function getActionConfirmationToken(
   return accessToken
 }
 
+const SystemInitialisation = z
+  .object({
+    id: z.number(),
+    hash: z.string(),
+    salt: z.string(),
+    completedAt: z.null()
+  })
+  .or(
+    z.object({
+      id: z.number(),
+      hash: z.null(),
+      salt: z.null(),
+      completedAt: z.string()
+    })
+  )
+
 export async function getSystemInitialisation() {
   const systemInitialisation = await getSystemInitialisationQuery()
   if (!systemInitialisation) {
     throw new Error('System initialisation not found')
   }
 
-  return systemInitialisation
+  const parsedSystemInitialisation =
+    SystemInitialisation.parse(systemInitialisation)
+
+  return parsedSystemInitialisation
 }
 
 export async function completeSystemInitialisation() {

@@ -19,6 +19,7 @@ import {
   verifyInternalServiceToken
 } from '@events/context'
 import { env } from '@events/environment'
+import { getSystemInitialisation } from '@events/service/auth'
 
 export const t = initTRPC
   .context<Partial<TrpcContext>>()
@@ -63,20 +64,35 @@ export const router = t.router
 
 export const internalRouter = tInternal.router
 
-export const internalProcedure = tInternal.procedure.use(async (opts) => {
-  const { token } = opts.ctx
-  try {
-    verifyInternalServiceToken(token)
-    return await opts.next({
-      ctx: {
-        ...opts.ctx,
-        token
-      }
-    })
-  } catch {
-    throw new TRPCError({ code: 'UNAUTHORIZED' })
-  }
-})
+/**
+ * Procedure which ensures initialisation is not completed yet.
+ * This is used for all initialisation routes to ensure they can only be accessed before the system has been initialised.
+ */
+export const internalProcedure = tInternal.procedure
+  .use(async (opts) => {
+    const { token } = opts.ctx
+    try {
+      verifyInternalServiceToken(token)
+      return await opts.next({
+        ctx: {
+          ...opts.ctx,
+          token
+        }
+      })
+    } catch {
+      throw new TRPCError({ code: 'UNAUTHORIZED' })
+    }
+  })
+  .use(async (opts) => {
+    const systemInitialisation = await getSystemInitialisation()
+    if (systemInitialisation.completedAt !== null) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED'
+      })
+    }
+
+    return opts.next()
+  })
 
 const authedProcedure = t.procedure.use(async (opts) => {
   const { token, user } = opts.ctx

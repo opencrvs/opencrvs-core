@@ -25,9 +25,19 @@ import {
 } from '@events/tests/utils'
 import { payloadGenerator } from '@events/tests/generators'
 
-test('Returns 403 when accessed with user app token', async () => {
-  const { user } = await setupTestCase()
+test('Returns 403 after initialisation is completed', async () => {
   await systemInitialisationTestSetup()
+  const client = createInternalTestClient()
+  await expect(client.initialisation.complete()).resolves.toBeUndefined()
+
+  await expect(client.initialisation.locations.list()).rejects.toMatchObject(
+    new TRPCError({ code: 'UNAUTHORIZED' })
+  )
+})
+
+test('Returns 403 when accessed with user app token', async () => {
+  await systemInitialisationTestSetup()
+  const { user } = await setupTestCase()
 
   const appToken = createTestToken({
     userId: user.id,
@@ -42,13 +52,13 @@ test('Returns 403 when accessed with user app token', async () => {
 })
 
 test('Returns 403 when accessed with system app token', async () => {
+  await systemInitialisationTestSetup()
+
   const systemToken = createTestToken({
     userId: 'test-system',
     scopes: TEST_USER_DEFAULT_SCOPES,
     userType: TokenUserType.enum.system
   })
-
-  await systemInitialisationTestSetup()
 
   const client = createInternalTestClient(systemToken)
 
@@ -58,10 +68,10 @@ test('Returns 403 when accessed with system app token', async () => {
 })
 
 test('Returns 403 when accessed with internal token using invalid subject', async () => {
+  await systemInitialisationTestSetup()
   const internalToken = createInternalServiceToken({
     subject: 'invalid-subject'
   })
-  await systemInitialisationTestSetup()
 
   const client = createInternalTestClient(internalToken)
 
@@ -71,6 +81,7 @@ test('Returns 403 when accessed with internal token using invalid subject', asyn
 })
 
 test('Returns single location in right format', async () => {
+  await systemInitialisationTestSetup()
   const client = createInternalTestClient()
 
   const initialLocations = await client.initialisation.locations.list()
@@ -95,6 +106,7 @@ test('Returns single location in right format', async () => {
 })
 
 test('Returns multiple locations', async () => {
+  await systemInitialisationTestSetup()
   const client = createInternalTestClient()
 
   const locationRng = createPrng(8451323)

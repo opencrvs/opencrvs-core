@@ -19,9 +19,21 @@ import {
   TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
 
-test('Returns 403 when accessed with user app token', async () => {
-  const { user } = await setupTestCase()
+test('Returns 403 after initialisation is completed', async () => {
   const systemInitialisation = await systemInitialisationTestSetup()
+  const client = createInternalTestClient()
+  await expect(client.initialisation.complete()).resolves.toBeUndefined()
+
+  await expect(
+    client.initialisation.authenticate({
+      password: systemInitialisation.password
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+})
+
+test('Returns 403 when accessed with user app token', async () => {
+  const systemInitialisation = await systemInitialisationTestSetup()
+  const { user } = await setupTestCase()
 
   const appToken = createTestToken({
     userId: user.id,
@@ -38,12 +50,13 @@ test('Returns 403 when accessed with user app token', async () => {
 })
 
 test('Returns 403 when accessed with system app token', async () => {
+  const systemInitialisation = await systemInitialisationTestSetup()
+
   const appToken = createTestToken({
     userId: 'test-system',
     scopes: TEST_USER_DEFAULT_SCOPES,
     userType: TokenUserType.enum.system
   })
-  const systemInitialisation = await systemInitialisationTestSetup()
 
   const client = createInternalTestClient(appToken)
 
@@ -55,10 +68,10 @@ test('Returns 403 when accessed with system app token', async () => {
 })
 
 test('Returns 403 when accessed with internal token using invalid subject', async () => {
+  const systemInitialisation = await systemInitialisationTestSetup()
   const internalToken = createInternalServiceToken({
     subject: 'invalid-subject'
   })
-  const systemInitialisation = await systemInitialisationTestSetup()
 
   const client = createInternalTestClient(internalToken)
 
@@ -117,7 +130,7 @@ test('Returns 403 after initialisation is completed', async () => {
 
   await expect(client.initialisation.complete()).rejects.toMatchObject(
     new TRPCError({
-      code: 'CONFLICT'
+      code: 'UNAUTHORIZED'
     })
   )
 })

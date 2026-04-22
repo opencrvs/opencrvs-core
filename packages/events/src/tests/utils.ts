@@ -958,13 +958,13 @@ export async function systemInitialisationTestSetup() {
   const eventsDb = getClient()
 
   const salt = genSaltSync(10)
-  const passwordHash = hashSync(TEST_SUPER_USER_PASSWORD, salt)
+  const hash = hashSync(TEST_SUPER_USER_PASSWORD, salt)
 
   await eventsDb
     .insertInto('systemInitialisation')
     .values({
-      tokenHash: passwordHash,
-      tokenSalt: salt,
+      hash,
+      salt,
       id: 1
     })
     .execute()

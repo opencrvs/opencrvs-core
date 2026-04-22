@@ -26,6 +26,27 @@ import {
 import { getClient } from '@events/storage/postgres/events'
 import { payloadGenerator } from '@events/tests/generators'
 
+const locationPayload: Location[] = [
+  {
+    id: generateUuid(),
+    administrativeAreaId: null,
+    name: 'New Administrative Area',
+    locationType: 'test-location-type',
+    validUntil: null,
+    externalId: 'abc123xyz456'
+  }
+]
+
+test('Returns 403 after initialisation is completed', async () => {
+  await systemInitialisationTestSetup()
+  const client = createInternalTestClient()
+  await expect(client.initialisation.complete()).resolves.toBeUndefined()
+
+  await expect(
+    client.initialisation.locations.set(locationPayload)
+  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+})
+
 test('Returns 403 when accessed with user app token', async () => {
   const { user } = await setupTestCase()
   await systemInitialisationTestSetup()
@@ -42,25 +63,14 @@ test('Returns 403 when accessed with user app token', async () => {
   )
 })
 
-const locationPayload: Location[] = [
-  {
-    id: generateUuid(),
-    administrativeAreaId: null,
-    name: 'New Administrative Area',
-    locationType: 'test-location-type',
-    validUntil: null,
-    externalId: 'abc123xyz456'
-  }
-]
-
 test('Returns 403 when accessed with system app token', async () => {
+  await systemInitialisationTestSetup()
+
   const systemToken = createTestToken({
     userId: 'test-system',
     scopes: TEST_USER_DEFAULT_SCOPES,
     userType: TokenUserType.enum.system
   })
-
-  await systemInitialisationTestSetup()
 
   const client = createInternalTestClient(systemToken)
 
@@ -70,10 +80,11 @@ test('Returns 403 when accessed with system app token', async () => {
 })
 
 test('Returns 403 when accessed with internal token using invalid subject', async () => {
+  await systemInitialisationTestSetup()
+
   const internalToken = createInternalServiceToken({
     subject: 'invalid-subject'
   })
-  await systemInitialisationTestSetup()
 
   const client = createInternalTestClient(internalToken)
 
@@ -83,6 +94,8 @@ test('Returns 403 when accessed with internal token using invalid subject', asyn
 })
 
 test('Prevents sending empty payload', async () => {
+  await systemInitialisationTestSetup()
+
   const client = createInternalTestClient()
 
   await expect(
@@ -91,6 +104,8 @@ test('Prevents sending empty payload', async () => {
 })
 
 test('Creates single location', async () => {
+  await systemInitialisationTestSetup()
+
   const client = createInternalTestClient()
 
   await client.initialisation.locations.set(locationPayload)
@@ -104,6 +119,8 @@ test('Creates single location', async () => {
 })
 
 test('Creates multiple locations under parent administrative area', async () => {
+  await systemInitialisationTestSetup()
+
   const client = createInternalTestClient()
 
   const rng = createPrng(123123)
@@ -137,6 +154,8 @@ test('Creates multiple locations under parent administrative area', async () => 
 })
 
 test('updates externalId on existing location when re-seeded with a value', async () => {
+  await systemInitialisationTestSetup()
+
   const client = createInternalTestClient()
 
   const locationId = generateUuid()
@@ -184,6 +203,8 @@ test('updates externalId on existing location when re-seeded with a value', asyn
 })
 
 test('seeding locations is additive, not destructive', async () => {
+  await systemInitialisationTestSetup()
+
   const client = createInternalTestClient()
 
   const eventsDb = getClient()
