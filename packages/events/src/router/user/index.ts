@@ -26,7 +26,7 @@ import {
 } from '@opencrvs/commons'
 import {
   allowedWithAnyOfScopes,
-  enforceOfficeUpdatePermission
+  canUpdateUserLocation
 } from '@events/router/middleware'
 import {
   router,
@@ -117,7 +117,7 @@ const UserSearch = z.object({
 
 export const userRouter = router({
   get: userOnlyProcedure
-    .input(z.string())
+    .input(UUID)
     .output(UserOrSystem)
     .query(async ({ input }) => {
       const users = await getUsersById([input])
@@ -175,8 +175,8 @@ export const userRouter = router({
     }),
   update: userAndSystemProcedure
     .use(allowedWithAnyOfScopes(['user.edit']))
-    .input(UserInput.and(z.object({ id: z.string() })))
-    .use(enforceOfficeUpdatePermission)
+    .input(UserInput.and(z.object({ id: UUID })))
+    .use(canUpdateUserLocation)
     .output(User)
     .mutation(async ({ input, ctx }) => {
       if (input.mobile) {
@@ -248,19 +248,13 @@ export const userRouter = router({
   changePassword: userOnlyProcedure
     .input(
       z.object({
-        userId: z.string(),
         existingPassword: z.string().optional(),
         password: z.string()
       })
     )
     .mutation(async ({ input, ctx }) => {
-      if (input.userId !== ctx.user.id) {
-        throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: "Not allowed to change another user's password"
-        })
-      }
-      const record = await getCredentials(ctx.user.id)
+      const userId = UUID.parse(ctx.user.id)
+      const record = await getCredentials(userId)
 
       if (input.existingPassword) {
         const existingHash = await generateHash(
@@ -275,7 +269,13 @@ export const userRouter = router({
       }
 
       const newHash = await generateHash(input.password, record.salt)
-      await updatePasswordHash(UUID.parse(ctx.user.id), newHash)
+      await updatePasswordHash(userId, newHash)
+      void writeAuditLog({
+        clientId: userId,
+        clientType: 'user',
+        operation: 'user.password_changed',
+        requestData: { subjectId: userId }
+      })
     }),
   sendVerifyCode: userOnlyProcedure
     .input(
@@ -312,7 +312,7 @@ export const userRouter = router({
   changePhone: userOnlyProcedure
     .input(
       z.object({
-        userId: z.string(),
+        userId: UUID,
         phoneNumber: z.string(),
         nonce: z.string(),
         verifyCode: z.string()
@@ -337,7 +337,7 @@ export const userRouter = router({
         })
       }
 
-      const [user] = await getUsersById([ctx.user.id])
+      const [user] = await getUsersById([input.userId])
 
       if (!isUser(user)) {
         logger.error(`Failed to change phone number: Subject is a system user`)
@@ -487,7 +487,7 @@ export const userRouter = router({
   activate: userOnlyProcedure
     .input(
       z.object({
-        userId: z.string(),
+        userId: UUID,
         password: z.string(),
         securityQNAs: z.array(
           z.object({
