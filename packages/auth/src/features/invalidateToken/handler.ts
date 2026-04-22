@@ -33,7 +33,7 @@ export default async function invalidateTokenHandler(
   }
 
   try {
-    await invalidateToken(`Bearer ${token}`)
+    await invalidateToken(token)
   } catch (err) {
     throw internal('Failed to invalidate token', err)
   }
