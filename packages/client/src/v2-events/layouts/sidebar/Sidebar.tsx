@@ -43,6 +43,7 @@ import {
 import { hasOutboxWorkqueue, WORKQUEUE_OUTBOX } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { withSuspense } from '../../components/withSuspense'
 import { OrganisationNavigationGroup } from './OrganisationNavigationGroup'
 import { PerformanceNavigationGroup } from './PerformanceNavigationGroup'
@@ -101,6 +102,7 @@ function SidebarComponent({
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const intl = useIntl()
   const scopes = useSelector(getScope)
+  const { getLocation } = useLocations()
 
   const { getOutbox } = useEvents()
   const outbox = getOutbox()
@@ -140,6 +142,9 @@ function SidebarComponent({
         }
       )) ??
     ''
+  const primaryOffice =
+    userDetails?.primaryOfficeId &&
+    getLocation.useQuery(userDetails.primaryOfficeId)?.data?.name
 
   const avatar = <Avatar avatar={userDetails?.avatar} name={name} />
 
@@ -158,7 +163,7 @@ function SidebarComponent({
     <LeftNavigation
       applicationName={offlineCountryConfig.config.APPLICATION_NAME}
       applicationVersion={runningVer}
-      assignedOffice={userDetails?.primaryOffice.name}
+      assignedOffice={primaryOffice}
       avatar={() => avatar}
       isOnline={isOnline}
       name={name}

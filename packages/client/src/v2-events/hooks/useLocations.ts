@@ -65,9 +65,8 @@ export function useLocations() {
     },
     getLocation: {
       useQuery: (id: string) => {
-        const { queryFn, ...options } = trpc.locations.get.queryOptions({ id })
         return useQuery({
-          ...options,
+          ...trpc.locations.get.queryOptions({ id }),
           queryKey: trpc.locations.get.queryKey({ id })
         })
       }
