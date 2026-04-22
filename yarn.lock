@@ -24,6 +24,15 @@
     jsonpointer "^5.0.0"
     leven "^3.1.0"
 
+"@apidevtools/json-schema-ref-parser@^11.7.0":
+  version "11.9.3"
+  resolved "https://registry.yarnpkg.com/@apidevtools/json-schema-ref-parser/-/json-schema-ref-parser-11.9.3.tgz#0e0c9061fc41cf03737d499a4e6a8299fdd2bfa7"
+  integrity sha512-60vepv88RwcJtSHrD6MjIL6Ta3SOYbgfnkHb+ppAVK+o9mXprRtulx7VlRl3lN3bbvysAfCS7WMVfhUYemB0IQ==
+  dependencies:
+    "@jsdevtools/ono" "^7.1.3"
+    "@types/json-schema" "^7.0.15"
+    js-yaml "^4.1.0"
+
 "@apidevtools/json-schema-ref-parser@^9.0.6":
   version "9.1.2"
   resolved "https://registry.npmjs.org/@apidevtools/json-schema-ref-parser/-/json-schema-ref-parser-9.1.2.tgz"
@@ -4602,14 +4611,6 @@
     protobufjs "^7.5.3"
     yargs "^17.7.2"
 
-"@hapi/accept@^6.0.1":
-  version "6.0.2"
-  resolved "https://registry.npmjs.org/@hapi/accept/-/accept-6.0.2.tgz"
-  integrity sha512-xaTLf29Zeph/B32hekmgxLFsEPuX1xQYyZu0gJ4ZCHKU6nXmBRXfBymtWNEK0souOJcX2XHWUaZU6JzccuuMpg==
-  dependencies:
-    "@hapi/boom" "^10.0.1"
-    "@hapi/hoek" "^11.0.2"
-
 "@hapi/accept@^6.0.3":
   version "6.0.3"
   resolved "https://registry.yarnpkg.com/@hapi/accept/-/accept-6.0.3.tgz#eef0800a4f89cd969da8e5d0311dc877c37279ab"
@@ -4646,7 +4647,7 @@
   dependencies:
     "@hapi/hoek" "^11.0.2"
 
-"@hapi/boom@9.x.x", "@hapi/boom@^9.0.0", "@hapi/boom@^9.1.1", "@hapi/boom@^9.1.4":
+"@hapi/boom@9.x.x", "@hapi/boom@^9.0.0", "@hapi/boom@^9.1.1":
   version "9.1.4"
   resolved "https://registry.npmjs.org/@hapi/boom/-/boom-9.1.4.tgz"
   integrity sha512-Ls1oH8jaN1vNsqcaHVYJrKmgMcKsC1wcp8bujvXrHaAqD2iDYq3HoOwsxwo09Cuda5R5nC0o0IxlrlTuvPuzSw==
@@ -4706,14 +4707,6 @@
     "@hapi/boom" "^10.0.1"
     "@hapi/hoek" "^11.0.2"
 
-"@hapi/catbox-memory@^6.0.1":
-  version "6.0.1"
-  resolved "https://registry.npmjs.org/@hapi/catbox-memory/-/catbox-memory-6.0.1.tgz"
-  integrity sha512-sVb+/ZxbZIvaMtJfAbdyY+QJUQg9oKTwamXpEg/5xnfG5WbJLTjvEn4kIGKz9pN3ENNbIL/bIdctmHmqi/AdGA==
-  dependencies:
-    "@hapi/boom" "^10.0.1"
-    "@hapi/hoek" "^11.0.2"
-
 "@hapi/catbox-memory@^6.0.2":
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/@hapi/catbox-memory/-/catbox-memory-6.0.2.tgz#399fa83e85134d45a548eee978e4c3c1523e1a70"
@@ -4731,13 +4724,6 @@
     "@hapi/hoek" "^11.0.2"
     "@hapi/podium" "^5.0.0"
     "@hapi/validate" "^2.0.1"
-
-"@hapi/content@^6.0.0":
-  version "6.0.0"
-  resolved "https://registry.npmjs.org/@hapi/content/-/content-6.0.0.tgz"
-  integrity sha512-CEhs7j+H0iQffKfe5Htdak5LBOz/Qc8TRh51cF+BFv0qnuph3Em4pjGVzJMkI2gfTDdlJKWJISGWS1rK34POGA==
-  dependencies:
-    "@hapi/boom" "^10.0.0"
 
 "@hapi/content@^6.0.1":
   version "6.0.1"
@@ -4804,30 +4790,6 @@
     "@hapi/topo" "^6.0.2"
     "@hapi/validate" "^2.0.1"
 
-"@hapi/hapi@^21.1.0":
-  version "21.3.2"
-  resolved "https://registry.npmjs.org/@hapi/hapi/-/hapi-21.3.2.tgz"
-  integrity sha512-tbm0zmsdUj8iw4NzFV30FST/W4qzh/Lsw6Q5o5gAhOuoirWvxm8a4G3o60bqBw8nXvRNJ8uLtE0RKLlZINxHcQ==
-  dependencies:
-    "@hapi/accept" "^6.0.1"
-    "@hapi/ammo" "^6.0.1"
-    "@hapi/boom" "^10.0.1"
-    "@hapi/bounce" "^3.0.1"
-    "@hapi/call" "^9.0.1"
-    "@hapi/catbox" "^12.1.1"
-    "@hapi/catbox-memory" "^6.0.1"
-    "@hapi/heavy" "^8.0.1"
-    "@hapi/hoek" "^11.0.2"
-    "@hapi/mimos" "^7.0.1"
-    "@hapi/podium" "^5.0.1"
-    "@hapi/shot" "^6.0.1"
-    "@hapi/somever" "^4.1.1"
-    "@hapi/statehood" "^8.1.1"
-    "@hapi/subtext" "^8.1.0"
-    "@hapi/teamwork" "^6.0.0"
-    "@hapi/topo" "^6.0.1"
-    "@hapi/validate" "^2.0.1"
-
 "@hapi/heavy@^8.0.1":
   version "8.0.1"
   resolved "https://registry.npmjs.org/@hapi/heavy/-/heavy-8.0.1.tgz"
@@ -4847,7 +4809,7 @@
   resolved "https://registry.npmjs.org/@hapi/hoek/-/hoek-11.0.2.tgz"
   integrity sha512-aKmlCO57XFZ26wso4rJsW4oTUnrgTFw2jh3io7CAtO9w4UltBNwRXvXIVzzyfkaaLRo3nluP/19msA8vDUUuKw==
 
-"@hapi/hoek@^11.0.7":
+"@hapi/hoek@^11.0.4", "@hapi/hoek@^11.0.7":
   version "11.0.7"
   resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-11.0.7.tgz#56a920793e0a42d10e530da9a64cc0d3919c4002"
   integrity sha512-HV5undWkKzcB4RZUusqOpcgxOaq6VOAH7zhhIr2g3G8NF/MlFO75SjOr2NfuSx0Mh40+1FqCkagKLJRykUWoFQ==
@@ -4912,17 +4874,6 @@
     "@hapi/hoek" "^11.0.2"
     "@hapi/vise" "^5.0.1"
 
-"@hapi/pez@^6.1.0":
-  version "6.1.0"
-  resolved "https://registry.npmjs.org/@hapi/pez/-/pez-6.1.0.tgz"
-  integrity sha512-+FE3sFPYuXCpuVeHQ/Qag1b45clR2o54QoonE/gKHv9gukxQ8oJJZPR7o3/ydDTK6racnCJXxOyT1T93FCJMIg==
-  dependencies:
-    "@hapi/b64" "^6.0.1"
-    "@hapi/boom" "^10.0.1"
-    "@hapi/content" "^6.0.0"
-    "@hapi/hoek" "^11.0.2"
-    "@hapi/nigel" "^5.0.1"
-
 "@hapi/pez@^6.1.1":
   version "6.1.1"
   resolved "https://registry.yarnpkg.com/@hapi/pez/-/pez-6.1.1.tgz#d99a4f62291b1c008179bb534791b8dfc59f7f8d"
@@ -4943,7 +4894,7 @@
     "@hapi/teamwork" "5.x.x"
     "@hapi/validate" "1.x.x"
 
-"@hapi/podium@^5.0.0", "@hapi/podium@^5.0.1":
+"@hapi/podium@^5.0.0":
   version "5.0.1"
   resolved "https://registry.npmjs.org/@hapi/podium/-/podium-5.0.1.tgz"
   integrity sha512-eznFTw6rdBhAijXFIlBOMJJd+lXTvqbrBIS4Iu80r2KTVIo4g+7fLy4NKp/8+UnSt5Ox6mJtAlKBU/Sf5080TQ==
@@ -4959,14 +4910,6 @@
   dependencies:
     "@hapi/hoek" "^11.0.2"
     "@hapi/teamwork" "^6.0.0"
-    "@hapi/validate" "^2.0.1"
-
-"@hapi/shot@^6.0.1":
-  version "6.0.1"
-  resolved "https://registry.npmjs.org/@hapi/shot/-/shot-6.0.1.tgz"
-  integrity sha512-s5ynMKZXYoDd3dqPw5YTvOR/vjHvMTxc388+0qL0jZZP1+uwXuUD32o9DuuuLsmTlyXCWi02BJl1pBpwRuUrNA==
-  dependencies:
-    "@hapi/hoek" "^11.0.2"
     "@hapi/validate" "^2.0.1"
 
 "@hapi/shot@^6.0.2":
@@ -4985,19 +4928,6 @@
     "@hapi/bounce" "^3.0.1"
     "@hapi/hoek" "^11.0.2"
 
-"@hapi/statehood@^8.1.1":
-  version "8.1.1"
-  resolved "https://registry.npmjs.org/@hapi/statehood/-/statehood-8.1.1.tgz"
-  integrity sha512-YbK7PSVUA59NArAW5Np0tKRoIZ5VNYUicOk7uJmWZF6XyH5gGL+k62w77SIJb0AoAJ0QdGQMCQ/WOGL1S3Ydow==
-  dependencies:
-    "@hapi/boom" "^10.0.1"
-    "@hapi/bounce" "^3.0.1"
-    "@hapi/bourne" "^3.0.0"
-    "@hapi/cryptiles" "^6.0.1"
-    "@hapi/hoek" "^11.0.2"
-    "@hapi/iron" "^7.0.1"
-    "@hapi/validate" "^2.0.1"
-
 "@hapi/statehood@^8.2.1":
   version "8.2.1"
   resolved "https://registry.yarnpkg.com/@hapi/statehood/-/statehood-8.2.1.tgz#4435f11f78873f07aa7422a95386ae9802a914e1"
@@ -5010,19 +4940,6 @@
     "@hapi/hoek" "^11.0.2"
     "@hapi/iron" "^7.0.1"
     "@hapi/validate" "^2.0.1"
-
-"@hapi/subtext@^8.1.0":
-  version "8.1.0"
-  resolved "https://registry.npmjs.org/@hapi/subtext/-/subtext-8.1.0.tgz"
-  integrity sha512-PyaN4oSMtqPjjVxLny1k0iYg4+fwGusIhaom9B2StinBclHs7v46mIW706Y+Wo21lcgulGyXbQrmT/w4dus6ww==
-  dependencies:
-    "@hapi/boom" "^10.0.1"
-    "@hapi/bourne" "^3.0.0"
-    "@hapi/content" "^6.0.0"
-    "@hapi/file" "^3.0.0"
-    "@hapi/hoek" "^11.0.2"
-    "@hapi/pez" "^6.1.0"
-    "@hapi/wreck" "^18.0.1"
 
 "@hapi/subtext@^8.1.2":
   version "8.1.2"
@@ -5097,15 +5014,6 @@
     "@hapi/boom" "9.x.x"
     "@hapi/bourne" "2.x.x"
     "@hapi/hoek" "9.x.x"
-
-"@hapi/wreck@^18.0.1":
-  version "18.0.1"
-  resolved "https://registry.npmjs.org/@hapi/wreck/-/wreck-18.0.1.tgz"
-  integrity sha512-OLHER70+rZxvDl75xq3xXOfd3e8XIvz8fWY0dqg92UvhZ29zo24vQgfqgHSYhB5ZiuFpSLeriOisAlxAo/1jWg==
-  dependencies:
-    "@hapi/boom" "^10.0.1"
-    "@hapi/bourne" "^3.0.0"
-    "@hapi/hoek" "^11.0.2"
 
 "@hapi/wreck@^18.1.0":
   version "18.1.0"
@@ -6907,6 +6815,11 @@
   version "7.0.1"
   resolved "https://registry.npmjs.org/@rvf/set-get/-/set-get-7.0.1.tgz"
   integrity sha512-GkTSn9K1GrTYoTUqlUs36k6nJnzjQaFBTTEIqUYmzBcsGsoJM8xG7EAx2WLHWAA4QzFjcwWUSHQ3vM3Fbw50Tg==
+
+"@scarf/scarf@=1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@scarf/scarf/-/scarf-1.4.0.tgz#3bbb984085dbd6d982494538b523be1ce6562972"
+  integrity sha512-xxeapPiUXdZAE3che6f3xogoJPeZgig6omHEy1rIY5WVsB3H2BHNnZH+gHG6x91SCWyQCzWGsuL2Hh3ClO5/qQ==
 
 "@sentry-internal/feedback@7.118.0":
   version "7.118.0"
@@ -9323,14 +9236,6 @@
     "@types/node" "*"
     joi "^17.3.0"
 
-"@types/hapi__inert@^5.2.3":
-  version "5.2.10"
-  resolved "https://registry.npmjs.org/@types/hapi__inert/-/hapi__inert-5.2.10.tgz"
-  integrity sha512-egynajL8fKZvUn1GlUnxd/TjYNKb+a/o6ZFvCJsWyLtC+nU98j6Fa20cAD53UbO4Hx5a3JsDsDTW/NwYN205mQ==
-  dependencies:
-    "@hapi/hapi" "^21.1.0"
-    joi "^17.7.0"
-
 "@types/hapi__mimos@*":
   version "4.1.4"
   resolved "https://registry.npmjs.org/@types/hapi__mimos/-/hapi__mimos-4.1.4.tgz"
@@ -9344,15 +9249,6 @@
   integrity sha512-AhEirOGy2ajtdV9WE/JqPkGeCH8lpgcSEQxn0ZNJkTvxkOv5DfZEXGit3l5J9P1VoQFAAHGNLVGWI5IWCiQf9A==
   dependencies:
     "@types/node" "*"
-
-"@types/hapi__vision@^5.5.3":
-  version "5.5.8"
-  resolved "https://registry.npmjs.org/@types/hapi__vision/-/hapi__vision-5.5.8.tgz"
-  integrity sha512-kDtFpXv1yhlXZ4gLaV//Rri4ZmuhZvxWjLayaToQmv7zeH7ztc9rE50wljMI+KggQtLxIJ0/S5/SK/2Nr0OPiQ==
-  dependencies:
-    "@hapi/hapi" "^21.1.0"
-    "@types/node" "*"
-    joi "^17.7.0"
 
 "@types/history@^4.6.2":
   version "4.7.11"
@@ -16546,11 +16442,6 @@ form-data@4.0.5, form-data@^3.0.0, form-data@^4.0.0, form-data@^4.0.5:
     hasown "^2.0.2"
     mime-types "^2.1.12"
 
-format-util@^1.0.3:
-  version "1.0.5"
-  resolved "https://registry.npmjs.org/format-util/-/format-util-1.0.5.tgz"
-  integrity sha512-varLbTj0e0yVyRpqQhuWV+8hlePAgaoFRhNFj50BNjEIrw1/DphHSObtqwskVCPWNgzwPoQrZAbfa/SBiicNeg==
-
 formik@^2.2.9:
   version "2.4.5"
   resolved "https://registry.npmjs.org/formik/-/formik-2.4.5.tgz"
@@ -17301,7 +17192,7 @@ h3@1.15.1, h3@1.15.6:
     ufo "^1.6.3"
     uncrypto "^0.1.3"
 
-handlebars@*, handlebars@4.7.9, handlebars@4.x.x, handlebars@^4.7.7, handlebars@^4.7.9:
+handlebars@*, handlebars@4.7.9, handlebars@4.x.x, handlebars@^4.7.7, handlebars@^4.7.8, handlebars@^4.7.9:
   version "4.7.9"
   resolved "https://registry.npmjs.org/handlebars/-/handlebars-4.7.9.tgz"
   integrity sha512-4E71E0rpOaQuJR2A3xDZ+GM1HyWYv1clR58tC8emQNeQe3RH7MAzSbat+V0wG78LQBo6m6bzSG/L4pBuCsgnUQ==
@@ -17360,18 +17251,18 @@ hapi-sentry@^3.1.0:
     "@sentry/node" "^6.2.2"
     joi "^17.2.1"
 
-hapi-swagger@^14.5.5:
-  version "14.5.5"
-  resolved "https://registry.npmjs.org/hapi-swagger/-/hapi-swagger-14.5.5.tgz"
-  integrity sha512-qhqmr48+CZrhHDwhg0bHuQ3EW1VWnP71fG8gg5FPAEjF5iIHxIVtRZvioN3dPcBEuk/EqiLoPj/x3va51TbEEA==
+hapi-swagger@^17.3.2:
+  version "17.3.2"
+  resolved "https://registry.yarnpkg.com/hapi-swagger/-/hapi-swagger-17.3.2.tgz#03939044d06cb4cd6602422d0d61fe7631c43f40"
+  integrity sha512-mj1KPBl5UY4rLTLj9CrgNCps29iZ7vKNTEey3Ztm7fZ/DrMdJ7KHdxSucACyaFdPAiEpfJtHvm/5lxJVXVxa4g==
   dependencies:
-    "@hapi/boom" "^9.1.4"
-    "@hapi/hoek" "^9.3.0"
-    handlebars "^4.7.7"
-    http-status "^1.5.2"
-    json-schema-ref-parser "^6.1.0"
+    "@apidevtools/json-schema-ref-parser" "^11.7.0"
+    "@hapi/boom" "^10.0.1"
+    "@hapi/hoek" "^11.0.4"
+    handlebars "^4.7.8"
+    http-status "^1.7.4"
     swagger-parser "^10.0.3"
-    swagger-ui-dist "^4.11.1"
+    swagger-ui-dist "^5.17.14"
 
 hard-rejection@^2.1.0:
   version "2.1.0"
@@ -17677,10 +17568,10 @@ http-proxy-agent@^7.0.0:
     agent-base "^7.1.0"
     debug "^4.3.4"
 
-http-status@^1.5.2:
-  version "1.7.3"
-  resolved "https://registry.npmjs.org/http-status/-/http-status-1.7.3.tgz"
-  integrity sha512-GS8tL1qHT2nBCMJDYMHGkkkKQLNkIAHz37vgO68XKvzv+XyqB4oh/DfmMHdtRzfqSJPj1xKG2TaELZtlCz6BEQ==
+http-status@^1.7.4:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/http-status/-/http-status-1.8.1.tgz#db0fe0fa1097f5f20d67552d9344717e93357d66"
+  integrity sha512-YQF7j8Qf/Rlby0IbRPiWfNZt6aeUv3K0Pi0x3crbMZN+7F8dPn5k4b3n897vpM1Vk8Mg2fhOYc9fktKEQWMy/Q==
 
 https-proxy-agent@^4.0.0:
   version "4.0.0"
@@ -19294,7 +19185,7 @@ joi@^17.11.0:
     "@sideway/formula" "^3.0.1"
     "@sideway/pinpoint" "^2.0.0"
 
-joi@^17.2.1, joi@^17.3.0, joi@^17.7.0:
+joi@^17.2.1, joi@^17.3.0:
   version "17.13.0"
   resolved "https://registry.npmjs.org/joi/-/joi-17.13.0.tgz"
   integrity sha512-9qcrTyoBmFZRNHeVP4edKqIUEgFzq7MHvTNSDuHSqkpOPtiBkgNgcmTSqmiw1kw9tdKaiddvIDv/eCJDxmqWCA==
@@ -19325,7 +19216,7 @@ joycon@^3.1.1:
   resolved "https://registry.npmjs.org/js-tokens/-/js-tokens-4.0.0.tgz"
   integrity sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==
 
-js-yaml@4.1.0, js-yaml@^3.10.0, js-yaml@^3.12.1, js-yaml@^3.13.1, js-yaml@^4.0.0, js-yaml@^4.1.0, "js-yaml@npm:@zkochan/js-yaml@0.0.7":
+js-yaml@4.1.0, js-yaml@^3.10.0, js-yaml@^3.13.1, js-yaml@^4.0.0, js-yaml@^4.1.0, "js-yaml@npm:@zkochan/js-yaml@0.0.7":
   version "4.1.0"
   resolved "https://registry.npmjs.org/js-yaml/-/js-yaml-4.1.0.tgz"
   integrity sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==
@@ -19443,15 +19334,6 @@ json-parse-even-better-errors@^3.0.0:
   version "3.0.2"
   resolved "https://registry.npmjs.org/json-parse-even-better-errors/-/json-parse-even-better-errors-3.0.2.tgz"
   integrity sha512-fi0NG4bPjCHunUJffmLd0gxssIgkNmArMvis4iNah6Owg1MCJjWhEcDLmsK6iGkJq3tHwbDkTlce70/tmXN4cQ==
-
-json-schema-ref-parser@^6.1.0:
-  version "6.1.0"
-  resolved "https://registry.npmjs.org/json-schema-ref-parser/-/json-schema-ref-parser-6.1.0.tgz"
-  integrity sha512-pXe9H1m6IgIpXmE5JSb8epilNTGsmTb2iPohAXpOdhqGFbQjNeHHsZxU+C8w6T81GZxSPFLeUoqDJmzxx5IGuw==
-  dependencies:
-    call-me-maybe "^1.0.1"
-    js-yaml "^3.12.1"
-    ono "^4.0.11"
 
 json-schema-traverse@^0.4.1:
   version "0.4.1"
@@ -21912,13 +21794,6 @@ onetime@^7.0.0:
   integrity sha512-VXJjc87FScF88uafS3JllDgvAm+c/Slfz06lorj2uAY34rlUu0Nt+v8wreiImcrgAjjIHp1rXpTDlLOGw29WwQ==
   dependencies:
     mimic-function "^5.0.0"
-
-ono@^4.0.11:
-  version "4.0.11"
-  resolved "https://registry.npmjs.org/ono/-/ono-4.0.11.tgz"
-  integrity sha512-jQ31cORBFE6td25deYeD80wxKBMj+zBmHTrVxnc6CKhx8gho6ipmWM5zj/oeoqioZ99yqBls9Z/9Nss7J26G2g==
-  dependencies:
-    format-util "^1.0.3"
 
 open@^7.4.2:
   version "7.4.2"
@@ -26036,10 +25911,12 @@ swagger-parser@^10.0.3:
   dependencies:
     "@apidevtools/swagger-parser" "10.0.3"
 
-swagger-ui-dist@^4.11.1:
-  version "4.19.1"
-  resolved "https://registry.npmjs.org/swagger-ui-dist/-/swagger-ui-dist-4.19.1.tgz"
-  integrity sha512-n/gFn+R7G/BXWwl5UZLw6F1YgWOlf3zkwGlsPhTMhNtAAolBGKg0JS5b2RKt5NI6/hSopVaSrki2wTIMUDDy2w==
+swagger-ui-dist@^5.17.14:
+  version "5.32.4"
+  resolved "https://registry.yarnpkg.com/swagger-ui-dist/-/swagger-ui-dist-5.32.4.tgz#e397dd0e24067f9ed6787ec31f6ed902874a9839"
+  integrity sha512-0AADFFQNJzExEN49SrD/34Nn9cxNxVLiydYl2MBwSZFPVXNkVwC/EFAjoezGGqE8oDegiDC+p47t8lKObCinMQ==
+  dependencies:
+    "@scarf/scarf" "=1.4.0"
 
 swap-case@^2.0.2:
   version "2.0.2"
