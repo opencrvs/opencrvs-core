@@ -29,6 +29,7 @@ import {
   canUpdateUserLocation
 } from '@events/router/middleware'
 import {
+  internalProcedure,
   router,
   userAndSystemProcedure,
   userOnlyProcedure
@@ -62,47 +63,6 @@ import {
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
 import { userCanReadOtherUser } from '../middleware'
 
-const UserAuditListQuery = z.object({
-  userId: z.string(),
-  skip: z.number().optional().default(0),
-  count: z.number().optional().default(10),
-  timeStart: z.string().optional(),
-  timeEnd: z.string().optional(),
-  excludeOperations: z.array(z.string()).optional().default([])
-})
-
-const auditRouter = router({
-  record: userAndSystemProcedure
-    .input(UserAuditRecordInput)
-    .mutation(async ({ input, ctx }) => {
-      await writeAuditLog({
-        ...input,
-        clientId: ctx.user.id,
-        clientType: ctx.user.type
-      })
-    }),
-  list: userOnlyProcedure
-    .input(UserAuditListQuery)
-    .output(
-      z.object({ results: z.array(AuditLogEntrySchema), total: z.number() })
-    )
-    .use(userCanReadOtherUser)
-    .query(async ({ input }) => {
-      const { results, total } = await queryUserAuditLog({
-        subjectId: input.userId,
-        skip: input.skip,
-        count: input.count,
-        timeStart: input.timeStart,
-        timeEnd: input.timeEnd,
-        excludeOperations: input.excludeOperations
-      })
-      return {
-        results: results.map((r) => AuditLogEntrySchema.parse(r)),
-        total
-      }
-    })
-})
-
 export const UserSearch = z.object({
   username: z.string().optional(),
   mobile: z.string().optional(),
@@ -114,20 +74,10 @@ export const UserSearch = z.object({
   sortOrder: z.enum(['asc', 'desc'])
 })
 
-export const userRouter = router({
-  get: userOnlyProcedure
-    .input(UUID)
-    .output(UserOrSystem)
-    .query(async ({ input }) => {
-      const users = await getUsersById([input])
-      if (users.length === 0) {
-        throw new TRPCError({ code: 'NOT_FOUND' })
-      }
-
-      return users[0]
-    }),
-  create: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.create']))
+export function createUserRoute(
+  procedure: typeof internalProcedure | typeof userAndSystemProcedure
+) {
+  return procedure
     .input(UserInput)
     .output(User)
     .mutation(async ({ input, ctx }) => {
@@ -171,7 +121,82 @@ export const userRouter = router({
       })
 
       return user
+    })
+}
+
+export function searchUsersRoute(
+  procedure: typeof internalProcedure | typeof userAndSystemProcedure
+) {
+  return procedure
+    .input(UserSearch)
+    .output(z.array(UserOrSystem))
+    .query(async ({ input }) =>
+      searchUsers({
+        ...input,
+        primaryOfficeId: input.primaryOfficeId
+          ? UUID.parse(input.primaryOfficeId)
+          : undefined,
+        locationId: input.locationId ? UUID.parse(input.locationId) : undefined
+      })
+    )
+}
+
+const UserAuditListQuery = z.object({
+  userId: z.string(),
+  skip: z.number().optional().default(0),
+  count: z.number().optional().default(10),
+  timeStart: z.string().optional(),
+  timeEnd: z.string().optional(),
+  excludeOperations: z.array(z.string()).optional().default([])
+})
+
+const auditRouter = router({
+  record: userAndSystemProcedure
+    .input(UserAuditRecordInput)
+    .mutation(async ({ input, ctx }) => {
+      await writeAuditLog({
+        ...input,
+        clientId: ctx.user.id,
+        clientType: ctx.user.type
+      })
     }),
+  list: userOnlyProcedure
+    .input(UserAuditListQuery)
+    .output(
+      z.object({ results: z.array(AuditLogEntrySchema), total: z.number() })
+    )
+    .use(userCanReadOtherUser)
+    .query(async ({ input }) => {
+      const { results, total } = await queryUserAuditLog({
+        subjectId: input.userId,
+        skip: input.skip,
+        count: input.count,
+        timeStart: input.timeStart,
+        timeEnd: input.timeEnd,
+        excludeOperations: input.excludeOperations
+      })
+      return {
+        results: results.map((r) => AuditLogEntrySchema.parse(r)),
+        total
+      }
+    })
+})
+
+export const userRouter = router({
+  get: userOnlyProcedure
+    .input(UUID)
+    .output(UserOrSystem)
+    .query(async ({ input }) => {
+      const users = await getUsersById([input])
+      if (users.length === 0) {
+        throw new TRPCError({ code: 'NOT_FOUND' })
+      }
+
+      return users[0]
+    }),
+  create: createUserRoute(
+    userAndSystemProcedure.use(allowedWithAnyOfScopes(['user.create']))
+  ),
   update: userAndSystemProcedure
     .use(allowedWithAnyOfScopes(['user.edit']))
     .input(UserInput.and(z.object({ id: UUID })))
@@ -223,18 +248,7 @@ export const userRouter = router({
     .input(z.array(z.string()))
     .output(z.array(UserOrSystem))
     .query(async ({ input }) => getUsersById(input)),
-  search: userAndSystemProcedure
-    .input(UserSearch)
-    .output(z.array(UserOrSystem))
-    .query(async ({ input }) =>
-      searchUsers({
-        ...input,
-        primaryOfficeId: input.primaryOfficeId
-          ? UUID.parse(input.primaryOfficeId)
-          : undefined,
-        locationId: input.locationId ? UUID.parse(input.locationId) : undefined
-      })
-    ),
+  search: searchUsersRoute(userAndSystemProcedure),
   actions: userOnlyProcedure
     .input(UserActionsQuery)
     .use(userCanReadOtherUser)

@@ -193,7 +193,7 @@ async function userAlreadyExists(
 ): Promise<boolean> {
   const client = createInternalClient(token)
 
-  const res = await client.user.search.query({
+  const res = await client.initialisation.users.search.query({
     username,
     count: 1,
     skip: 0,
@@ -205,7 +205,7 @@ async function userAlreadyExists(
 
 async function createUser(token: string, userPayload: any) {
   const client = createInternalClient(token)
-  return client.user.create.mutate(userPayload)
+  return client.initialisation.users.create.mutate(userPayload)
 }
 
 export async function seedUsers(token: string) {

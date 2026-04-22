@@ -19,6 +19,7 @@ import {
 } from '@events/service/auth'
 import { setAdministrativeAreasRoute } from '../administrative-areas'
 import { listLocationsRoute, setLocationsRoute } from '../locations'
+import { createUserRoute, searchUsersRoute } from '../user'
 
 /**
  * initialisationRouter contains routes related to the initialisation of the system, such as setting up the initial admin user and creating the first office location.
@@ -61,5 +62,9 @@ export const initialisationRouter = internalRouter({
   locations: {
     set: setLocationsRoute(initialisationProcedure),
     list: listLocationsRoute(initialisationProcedure)
+  },
+  users: {
+    search: searchUsersRoute(initialisationProcedure),
+    create: createUserRoute(initialisationProcedure)
   }
 })
