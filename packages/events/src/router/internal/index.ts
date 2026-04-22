@@ -19,17 +19,16 @@ import {
 } from '@opencrvs/commons'
 import { internalProcedure, internalRouter } from '@events/router/trpc'
 import {
-  getUserByMobileOrEmail,
-  getUserByUsername,
+  getUserCredentialsByUsername,
   updatePasswordHash
 } from '@events/storage/postgres/events/users'
 import { generateHash } from '@events/service/auth/hash'
 import {
   checkSecurityQuestionMatch,
   getCredentials,
-  getSecurityQuestionsForUser
+  getSecurityQuestionsForUser,
+  verifyUser
 } from '@events/service/users/api'
-import { getRoles } from '@events/service/config/config'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 
 const VerifyUserOutput = z.object({
@@ -71,7 +70,7 @@ export const internalUserRouter = internalRouter({
       })
     )
     .mutation(async ({ input }) => {
-      const user = await getUserByUsername(input.username)
+      const user = await getUserCredentialsByUsername(input.username)
 
       if (!user) {
         throw new TRPCError({ code: 'UNAUTHORIZED' })
@@ -100,7 +99,7 @@ export const internalUserRouter = internalRouter({
   verifySecurityAnswer: internalProcedure
     .input(
       z.object({
-        userId: z.string(),
+        userId: UUID,
         questionKey: z.string(),
         answer: z.string()
       })
@@ -124,44 +123,12 @@ export const internalUserRouter = internalRouter({
     )
     .output(VerifyUserOutput)
     .mutation(async ({ input }) => {
-      const user = await getUserByMobileOrEmail(
-        input.mobile ? { mobile: input.mobile } : { email: input.email ?? '' }
-      )
-
-      if (!user) {
-        // Don't reveal whether the account exists
-        throw new TRPCError({ code: 'UNAUTHORIZED' })
-      }
-
-      const questions = getSecurityQuestionsForUser(user)
-
-      const securityQuestionKey =
-        questions[Math.floor(Math.random() * questions.length)].questionKey
-
-      const roles = await getRoles()
-      const scope = roles.find((r) => r.id === user.role)?.scopes ?? []
-
-      return {
-        id: user.id,
-        username: user.username,
-        mobile: user.mobile ?? undefined,
-        email: user.email ?? undefined,
-        status: user.status,
-        name: [
-          {
-            use: 'en',
-            given: [user.firstname ?? ''],
-            family: user.surname ?? ''
-          }
-        ],
-        securityQuestionKey,
-        scope
-      }
+      return verifyUser(input)
     }),
   changePassword: internalProcedure
     .input(
       z.object({
-        userId: z.string(),
+        userId: UUID,
         existingPassword: z.string().optional(),
         password: z.string()
       })
@@ -185,6 +152,12 @@ export const internalUserRouter = internalRouter({
 
       const newHash = await generateHash(input.password, record.salt)
       await updatePasswordHash(UUID.parse(input.userId), newHash)
+      void writeAuditLog({
+        clientId: input.userId,
+        clientType: 'user',
+        operation: 'user.password_reset',
+        requestData: { subjectId: input.userId }
+      })
     }),
   audit: {
     record: internalProcedure

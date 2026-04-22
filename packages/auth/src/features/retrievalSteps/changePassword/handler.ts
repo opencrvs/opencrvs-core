@@ -19,10 +19,6 @@ import {
   RetrievalSteps,
   deleteRetrievalStepInformation
 } from '@auth/features/retrievalSteps/verifyUser/service'
-import {
-  recordAnonymousUserAuditEvent,
-  recordUserAuditEvent
-} from '@auth/features/authenticate/service'
 
 interface IPayload {
   newPassword: string
@@ -45,19 +41,6 @@ export default async function changePasswordHandler(
   }
 
   await changePassword(retrievalStepInformation.userId, payload.newPassword)
-
-  if (request.headers.authorization) {
-    void recordUserAuditEvent(request.headers.authorization, {
-      operation: 'user.password_changed',
-      requestData: { subjectId: retrievalStepInformation.userId }
-    })
-  } else {
-    void recordAnonymousUserAuditEvent({
-      operation: 'user.password_reset',
-      requestData: { subjectId: retrievalStepInformation.userId }
-    })
-  }
-
   await deleteRetrievalStepInformation(payload.nonce)
   return h.response().code(200)
 }

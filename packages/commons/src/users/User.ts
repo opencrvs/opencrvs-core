@@ -23,6 +23,7 @@ export type IUserName = {
   given: string[]
 }
 
+// * @deprecated - This is from 1.9, will be removed in v2.1.
 export const FamilyName = z.array(
   z.object({
     use: z.string(),
@@ -63,7 +64,7 @@ export const UserInput = z.object({
   // @TODO: Separate from "create user from client"
   password: z.string().optional(),
   role: z.string(),
-  primaryOfficeId: z.string(),
+  primaryOfficeId: UUID,
   device: z.string().optional(),
   status: z.enum(['active', 'pending']).optional(),
   signature: FileFieldValue.optional(),
@@ -76,8 +77,8 @@ export const System = z.object({
   id: z.string(),
   name: z.string(),
   type: TokenUserType.extract(['system']),
-  primaryOfficeId: z.undefined().optional(),
-  administrativeAreaId: z.undefined().optional(),
+  primaryOfficeId: UUID.optional(),
+  administrativeAreaId: UUID.optional(),
   signature: z.undefined().optional(),
   avatar: z.undefined().optional(),
   fullHonorificName: z.string().optional(),

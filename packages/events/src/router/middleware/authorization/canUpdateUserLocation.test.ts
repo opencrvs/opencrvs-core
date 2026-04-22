@@ -13,7 +13,7 @@ import { afterEach, describe, expect, test, vi, type Mock } from 'vitest'
 import { TRPCError } from '@trpc/server'
 import { hasScope } from '@opencrvs/commons'
 import { getUserById } from '@events/storage/postgres/events/users'
-import { enforceOfficeUpdatePermission } from './index'
+import { canUpdateUserLocation } from './index'
 
 vi.mock('@events/storage/postgres/events/users', () => ({
   getUserById: vi.fn()
@@ -34,7 +34,7 @@ afterEach(() => {
   vi.clearAllMocks()
 })
 
-describe('enforceOfficeUpdatePermission', () => {
+describe('canUpdateUserLocation', () => {
   const mockedGetUserById = getUserById as unknown as Mock
   const mockedHasScope = hasScope as unknown as Mock
   const existingUserId = '11111111-1111-4111-8111-111111111111'
@@ -47,7 +47,7 @@ describe('enforceOfficeUpdatePermission', () => {
 
     const next = vi.fn(({ input, ctx }) => ({ input, ctx }))
 
-    const result = await enforceOfficeUpdatePermission({
+    const result = await canUpdateUserLocation({
       ctx: { token: 'Bearer token' },
       input: { id: existingUserId },
       next
@@ -66,7 +66,7 @@ describe('enforceOfficeUpdatePermission', () => {
     const next = vi.fn(({ input, ctx }) => ({ input, ctx }))
 
     await expect(
-      enforceOfficeUpdatePermission({
+      canUpdateUserLocation({
         ctx: { token: 'Bearer token' },
         input: {
           id: existingUserId,
