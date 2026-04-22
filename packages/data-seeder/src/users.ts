@@ -145,9 +145,7 @@ async function getUsers(token: string) {
 
   if (!parsedRoles.success) {
     raise(
-      fromZodError(parsedRoles.error, {
-        prefix: `Validation failed for roles returned from ${rolesUrl}`
-      }).message
+      `Validation failed for roles returned from ${rolesUrl}:\n${parsedRoles.error.toString()}`
     )
   }
 

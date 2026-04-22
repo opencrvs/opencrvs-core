@@ -27,7 +27,7 @@
     "build": "rimraf build && tsc --noCheck"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "8.13.1",
+    "@elastic/elasticsearch": "^8.17.0",
     "@opencrvs/commons": "^1.9.0",
     "@types/bcryptjs": "^2.4.2",
     "@types/lodash-es": "^4.17.0",

@@ -20,7 +20,7 @@ export async function deleteDocument(
 ) {
   const documentPath = DocumentPath.parse(request.params.filePath)
 
-  const userId = getUserId(request.headers.authorization)
+  const userId = getUserId(request.headers.authorization as `Bearer ${string}`)
 
   if (!userId)
     return Promise.reject(

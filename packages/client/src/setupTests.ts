@@ -17,8 +17,6 @@ import 'core-js/features/array/flat'
 // eslint-disable-next-line import/no-unassigned-import
 import 'jsdom-worker'
 import { mockOfflineData } from './tests/mock-offline-data'
-// eslint-disable-next-line import/no-unassigned-import
-import './tests/queryMock'
 import { vi } from 'vitest'
 import createFetchMock from 'vitest-fetch-mock'
 

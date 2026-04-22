@@ -31,11 +31,11 @@ export default async function createUser(
   h: Hapi.ResponseToolkit
 ) {
   const user = request.payload as IUser & { password?: string }
-  const scopes = getScopes(request.headers.authorization)
+  const scopes = getScopes(request.headers.authorization as string)
   const creatableRoleIds = findScope(scopes, 'user.create')?.options?.role
 
   const isDataSeeder = hasScope(
-    request.headers.authorization,
+    request.headers.authorization as string,
     'user.data-seeding'
   )
 
@@ -56,7 +56,8 @@ export default async function createUser(
 
     // DEFAULT_USER_PASSWORD allows QA/dev environments to set a predictable password
     // for manually created users when SMS/email delivery is unavailable.
-    password = user.password ?? env.DEFAULT_USER_PASSWORD ?? generateRandomPassword()
+    password =
+      user.password ?? env.DEFAULT_USER_PASSWORD ?? generateRandomPassword()
 
     const { hash, salt } = generateSaltedHash(password)
     user.salt = salt
@@ -91,13 +92,13 @@ export default async function createUser(
     user.username,
     password,
     {
-      Authorization: request.headers.authorization
+      Authorization: request.headers.authorization as string
     },
     user.mobile,
     user.emailForNotification
   )
 
-  recordUserAuditEvent(request.headers.authorization, {
+  recordUserAuditEvent(request.headers.authorization as string, {
     operation: 'user.create_user',
     requestData: {
       subjectId: userModelObject.id,
