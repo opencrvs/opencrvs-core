@@ -33,7 +33,8 @@ import * as F from 'fp-ts'
 import {
   EncodedScope,
   encodeScope,
-  TokenUserType
+  TokenUserType,
+  TokenWithBearer
 } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
@@ -59,7 +60,7 @@ export async function createInternalServiceToken() {
   return sign({}, cert, {
     subject: 'opencrvs:auth-service',
     algorithm: 'RS256',
-    expiresIn: env.CONFIG_TOKEN_EXPIRY_SECONDS,
+    expiresIn: env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
     audience: ['opencrvs:events-user'],
     issuer: JWT_ISSUER
   })
@@ -304,13 +305,12 @@ export function getPublicKey() {
 }
 
 export async function recordUserAuditEvent(
-  token: string,
+  tokenWithBearer: TokenWithBearer,
   input: UserAuditLog
 ): Promise<void> {
-  const authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`
   try {
     await eventsClient.user.audit.record.mutate(input, {
-      context: { headers: { Authorization: authorization } }
+      context: { headers: { Authorization: tokenWithBearer } }
     })
   } catch (err) {
     logger.error('Failed to record user audit event', err)
