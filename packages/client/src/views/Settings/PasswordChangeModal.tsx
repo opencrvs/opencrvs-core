@@ -182,7 +182,6 @@ export function PasswordChangeModal({
     ) {
       changePasswordMutation.mutate(
         {
-          userId: userDetails.id,
           existingPassword: currentPassword,
           password: newPassword
         },

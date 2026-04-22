@@ -24,7 +24,6 @@ test('returns UNAUTHORIZED when user not found', async () => {
   })
   await expect(
     client.user.changePassword({
-      userId: userId,
       password: 'newpassword'
     })
   ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
@@ -41,7 +40,9 @@ test('updates the password hash without existingPassword (reset flow)', async ()
     .where('userId', '=', user.id)
     .execute()
 
-  await client.user.changePassword({ userId: user.id, password: 'newpassword' })
+  await client.user.changePassword({
+    password: 'newpassword'
+  })
 
   const updated = await eventsDb
     .selectFrom('userCredentials')
@@ -67,7 +68,6 @@ test('updates the password when existingPassword matches (change flow)', async (
     .execute()
 
   await client.user.changePassword({
-    userId: user.id,
     existingPassword: 'oldpassword',
     password: 'newpassword'
   })
@@ -95,7 +95,6 @@ test('returns UNAUTHORIZED when existingPassword does not match', async () => {
 
   await expect(
     client.user.changePassword({
-      userId: user.id,
       existingPassword: 'wrongpassword',
       password: 'newpassword'
     })
@@ -121,7 +120,6 @@ test('returns UNAUTHORIZED when user is not active and existingPassword is provi
 
   await expect(
     client.user.changePassword({
-      userId: user.id,
       existingPassword: 'password',
       password: 'newpassword'
     })

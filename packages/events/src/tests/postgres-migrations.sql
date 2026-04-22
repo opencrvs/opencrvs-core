@@ -28,16 +28,6 @@ CREATE SCHEMA app;
 ALTER SCHEMA app OWNER TO events_migrator;
 
 --
---
-
-
-
---
---
-
-
-
---
 -- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -89,17 +79,6 @@ CREATE TYPE app.user_type AS ENUM (
 
 
 ALTER TYPE app.user_type OWNER TO events_migrator;
-
---
---
-
-
-
-
---
---
-
-
 
 SET default_tablespace = '';
 
@@ -321,24 +300,6 @@ ALTER TABLE app.events OWNER TO events_migrator;
 --
 
 COMMENT ON TABLE app.events IS 'Stores life events associated with individuals, identified by tracking_id. Each event includes a type, structured data payload, and a client-supplied transaction_id to ensure idempotency.';
-
-
---
---
-
-
-
-
---
---
-
-
-
-
---
---
-
-
 
 
 --
