@@ -10,9 +10,9 @@ import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely'
 export default interface SystemInitialisationTable {
   id: ColumnType<number, number | undefined, number>
 
-  tokenHash: ColumnType<string, string, string>
+  hash: ColumnType<string | null, string | null, string | null>
 
-  tokenSalt: ColumnType<string, string, string>
+  salt: ColumnType<string | null, string | null, string | null>
 
   completedAt: ColumnType<string | null, string | null, string | null>
 

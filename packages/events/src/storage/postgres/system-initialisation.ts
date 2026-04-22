@@ -26,7 +26,7 @@ export async function completeSystemInitialisation() {
 
   return db
     .updateTable('systemInitialisation')
-    .set({ completedAt: 'NOW()' })
+    .set({ completedAt: 'NOW()', hash: null, salt: null })
     .where('completedAt', 'is', null)
     .execute()
 }

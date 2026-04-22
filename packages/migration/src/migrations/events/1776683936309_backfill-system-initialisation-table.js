@@ -17,18 +17,19 @@ const SUPER_USER_PASSWORD = process.env.SUPER_USER_PASSWORD ?? 'password'
 export async function up(pgm) {
   const { rowCount } = await pgm.db.query('SELECT 1 FROM users LIMIT 1')
 
-  const salt = genSaltSync(10)
-  const passwordHash = hashSync(SUPER_USER_PASSWORD, salt)
-
-  const completedAt = rowCount > 0 ? new Date() : null
+  const isSystemInitialised = rowCount > 0
+  // If system is initialised, we do not persist the super user password hash and salt, as they will not be needed.
+  const salt = isSystemInitialised ? null : genSaltSync(10)
+  const hash = isSystemInitialised ? null : hashSync(SUPER_USER_PASSWORD, salt)
+  const completedAt = isSystemInitialised ? new Date() : null
 
   await pgm.db.query(
-    `INSERT INTO system_initialisation(token_hash, token_salt, completed_at) VALUES ($1, $2, $3)`,
-    [passwordHash, salt, completedAt]
+    `INSERT INTO system_initialisation(hash, salt, completed_at) VALUES ($1, $2, $3)`,
+    [hash, salt, completedAt]
   )
 }
 
 export async function down(pgm) {
-  // There should be only one record in the system_setup table, but we will delete by id to be safe.
+  // There should be only one record in the system_initialisation table, but we will delete by id to be safe.
   await pgm.db.query('DELETE FROM system_initialisation WHERE id = 1')
 }

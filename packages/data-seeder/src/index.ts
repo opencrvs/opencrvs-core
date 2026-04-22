@@ -93,7 +93,7 @@ async function triggerSystemReady(token: string) {
 
 async function deactivateSuperuser(token: string) {
   const client = createInternalClient(token)
-  client.initialisation.superuser.completeInitialisation.mutate()
+  await client.initialisation.complete.mutate()
 }
 
 async function main() {

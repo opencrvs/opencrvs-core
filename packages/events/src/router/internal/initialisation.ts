@@ -20,6 +20,10 @@ import {
 import { setAdministrativeAreasRoute } from '../administrative-areas'
 import { listLocationsRoute, setLocationsRoute } from '../locations'
 
+/**
+ * initialisationRouter contains routes related to the initialisation of the system, such as setting up the initial admin user and creating the first office location.
+ * These routes are intended to be used only during the initial setup of the system and are protected accordingly.
+ */
 export const initialisationRouter = internalRouter({
   authenticate: internalProcedure
     .input(z.object({ password: z.string() }))

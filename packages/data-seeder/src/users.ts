@@ -22,7 +22,7 @@ import {
   EncodedScope
 } from '@opencrvs/commons'
 import { fromZodError } from 'zod-validation-error'
-import { createInternalClient } from '.'
+import { createInternalClient } from './index'
 
 const RoleSchema = (eventIds: string[]) =>
   z.array(
@@ -195,7 +195,6 @@ async function userAlreadyExists(
 ): Promise<boolean> {
   const client = createInternalClient(token)
 
-  console.log('searching user', username)
   const res = await client.user.search.query({
     username,
     count: 1,
@@ -203,7 +202,6 @@ async function userAlreadyExists(
     sortOrder: 'asc'
   })
 
-  console.log('res', res)
   return Boolean(res.length)
 }
 

@@ -35,7 +35,7 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
@@ -49,7 +49,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
@@ -383,10 +383,11 @@ ALTER TABLE app.system_clients OWNER TO events_migrator;
 
 CREATE TABLE app.system_initialisation (
     id integer NOT NULL,
-    token_hash text NOT NULL,
-    token_salt text NOT NULL,
+    hash text,
+    salt text,
     completed_at timestamp with time zone,
-    created_at timestamp with time zone DEFAULT now() NOT NULL
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT completion_tokens_consistent CHECK ((((completed_at IS NULL) AND (hash IS NOT NULL) AND (salt IS NOT NULL)) OR ((completed_at IS NOT NULL) AND (hash IS NULL) AND (salt IS NULL))))
 );
 
 

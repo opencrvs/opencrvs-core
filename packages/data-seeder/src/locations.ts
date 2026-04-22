@@ -15,7 +15,7 @@ import { TypeOf, z } from 'zod'
 import { raise } from './utils'
 import { fromZodError } from 'zod-validation-error'
 import { getUUID } from '@opencrvs/commons'
-import { createInternalClient } from '.'
+import { createInternalClient } from './index'
 
 const LOCATION_TYPES = [
   'ADMIN_STRUCTURE',
