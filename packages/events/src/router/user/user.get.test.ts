@@ -10,14 +10,14 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { TokenUserType } from '@opencrvs/commons'
+import { getUUID, TokenUserType } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { updateUserById } from '@events/storage/postgres/events/users'
 
 test('Throws error if user not found with id', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user)
-  await expect(client.user.get('123-123-123')).rejects.toMatchObject(
+  await expect(client.user.get(getUUID())).rejects.toMatchObject(
     new TRPCError({ code: 'NOT_FOUND' })
   )
 })
