@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@hapi/boom": "^9.1.1",
-    "@hapi/hapi": "^20.0.1",
+    "@hapi/hapi": "^21.0.0",
     "@opencrvs/commons": "^1.9.0",
     "@opencrvs/events": "^1.9.0",
     "@trpc/client": "^11.0.0-rc.532",
@@ -70,7 +70,7 @@
   "lint-staged": {
     "src/**/*.ts": [
       "prettier --write",
-      "eslint -c .eslintrc.js --fix"
+      "eslint -c eslint.config.js --fix"
     ]
   },
   "jest": {

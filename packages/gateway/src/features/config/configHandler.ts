@@ -18,10 +18,11 @@ import { COUNTRY_CONFIG_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 
 function getToken(request: Hapi.Request): string {
-  if (request.headers.authorization.indexOf('Bearer') > -1) {
-    return request.headers.authorization.split(' ')[1]
+  const authorization = request.headers.authorization as string
+  if (authorization.indexOf('Bearer') > -1) {
+    return authorization.split(' ')[1]
   }
-  return request.headers.authorization
+  return authorization
 }
 
 async function getCertificatesConfig(request: Hapi.Request) {

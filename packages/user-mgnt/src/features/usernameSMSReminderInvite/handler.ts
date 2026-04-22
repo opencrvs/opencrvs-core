@@ -49,16 +49,16 @@ export default async function usernameReminderHandler(
         username: user.username
       },
       countryConfigUrl: COUNTRY_CONFIG_URL,
-      authHeader: { Authorization: request.headers.authorization }
+      authHeader: { Authorization: request.headers.authorization as string }
     })
 
     const systemAdminUser: IUserModel | null = await User.findById(
-      getUserId({ Authorization: request.headers.authorization })
+      getUserId({ Authorization: request.headers.authorization as string })
     )
     if (systemAdminUser) {
-      recordUserAuditEvent(request.headers.authorization, {
+      recordUserAuditEvent(request.headers.authorization as string, {
         operation: 'user.username_reminder_by_admin',
-        requestData: { subjectId: userId },
+        requestData: { subjectId: userId }
       })
     }
   } catch (err) {
