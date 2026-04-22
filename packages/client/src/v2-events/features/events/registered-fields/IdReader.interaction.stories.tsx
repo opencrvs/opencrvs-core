@@ -359,6 +359,85 @@ export const AuthenticationFlow: Story = {
   }
 }
 
+const fieldsWithHideAfterScan = fields.map((f) =>
+  f.id === 'storybook.id-reader'
+    ? {
+        ...f,
+        conditionals: [
+          {
+            type: ConditionalType.SHOW,
+            conditional: and(
+              field(`storybook.verify-nid-http-fetch`).get('loading').isFalsy(),
+              field(`storybook.verify-nid-http-fetch`).get('data').isFalsy(),
+              field(`storybook.id-reader`).get('data').isFalsy()
+            )
+          }
+        ]
+      }
+    : f
+) satisfies FieldConfig[]
+
+async function runQrScanSteps(
+  canvas: ReturnType<typeof within>,
+  user: ReturnType<typeof userEvent.setup>,
+  step: (name: string, fn: () => Promise<void>) => Promise<void> | void
+) {
+  await step('Renders ID Reader', async () => {
+    await canvas.findByText('Scan QR code')
+    await canvas.findByText('Authenticate online')
+  })
+
+  await step('No NID field populated', async () => {
+    await expect(canvas.queryByTestId('text__storybook____nid')).toHaveValue('')
+    // warm-up the QR Scanner engine - it takes a bit of time to load
+    await new Promise((r) => setTimeout(r, 100))
+  })
+
+  await step('Click on QR scan button', async () => {
+    const scanButton = await canvas.findByRole('button', {
+      name: 'Scan QR code'
+    })
+    await user.click(scanButton)
+  })
+
+  await step('Wait for QR scanner to load and inject mock QR', async () => {
+    await canvas.findByText('Ensure your camera is clean and functional.')
+  })
+
+  await step('NID field populated', async () => {
+    const nidField = await canvas.findByTestId('text__storybook____nid')
+    await waitFor(async () => expect(nidField).toHaveValue('1234567890'))
+  })
+}
+
+export const QrReaderHidesAfterScan: Story = {
+  name: 'QR Reader hides after successful scan',
+  parameters: {
+    layout: 'centered'
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup({ document: canvasElement.ownerDocument })
+
+    await runQrScanSteps(canvas, user, step)
+
+    await step('ID Reader hidden after successful scan', async () => {
+      await waitFor(() =>
+        expect(canvas.queryByText('Scan QR code')).not.toBeInTheDocument()
+      )
+    })
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={fieldsWithHideAfterScan}
+        id="my-form"
+      />
+    )
+  }
+}
+
 export const QrReaderFlow: Story = {
   name: 'QR Reader flow',
   parameters: {
@@ -367,36 +446,7 @@ export const QrReaderFlow: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
     const user = userEvent.setup({ document: canvasElement.ownerDocument })
-
-    await step('Renders ID Reader', async () => {
-      await canvas.findByText('Scan QR code')
-      await canvas.findByText('Authenticate online')
-    })
-
-    await step('No NID field populated', async () => {
-      await expect(canvas.queryByTestId('text__storybook____nid')).toHaveValue(
-        ''
-      )
-
-      // warm-up the QR Scanner engine - it takes a bit of time to load
-      await new Promise((r) => setTimeout(r, 100))
-    })
-
-    await step('Click on QR scan button', async () => {
-      const linkButton = await canvas.findByRole('button', {
-        name: 'Scan QR code'
-      })
-      await user.click(linkButton)
-    })
-
-    await step('Wait for QR scanner to load and inject mock QR', async () => {
-      await canvas.findByText('Ensure your camera is clean and functional.')
-    })
-
-    await step('NID field populated', async () => {
-      const nidField = await canvas.findByTestId('text__storybook____nid')
-      await waitFor(async () => expect(nidField).toHaveValue('1234567890'))
-    })
+    await runQrScanSteps(canvas, user, step)
   },
   render: function Component(args) {
     return <StyledFormFieldGenerator {...args} fields={fields} id="my-form" />
