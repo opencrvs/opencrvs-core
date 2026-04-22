@@ -10,25 +10,13 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
-import {
-  FieldPropsWithoutReferenceValue,
-  UserRoleField
-} from '@opencrvs/commons/client'
+import { UserRoleField } from '@opencrvs/commons/client'
 import { useRoles, formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { Select } from './Select'
+import { Select, SelectInputProps } from './Select'
 import { StringifierContext } from './RegisteredField'
 
-function UserRoleInput({
-  onChange,
-  value,
-  ...props
-}: Omit<FieldPropsWithoutReferenceValue<'USER_ROLE'>, 'label'> & {
-  onChange: (newValue: string) => void
-  value?: string
-  label?: FieldPropsWithoutReferenceValue<'USER_ROLE'>['label']
-  disabled?: boolean
-}) {
+function UserRoleInput(props: Omit<SelectInputProps, 'options'>) {
   const intl = useIntl()
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
@@ -41,11 +29,7 @@ function UserRoleInput({
   return (
     <Select.Input
       {...props}
-      data-testid={`user-role__${props.id}`}
       options={options}
-      type="SELECT"
-      value={value}
-      onChange={onChange}
     />
   )
 }

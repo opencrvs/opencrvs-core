@@ -95,13 +95,13 @@ export async function userAuditHandler(
         AUDIT_ACTION[auditUserPayload.action] === AUDIT_ACTION.REACTIVATE
           ? ('user.reactivate' as const)
           : ('user.deactivate' as const)
-      recordUserAuditEvent(request.headers.authorization, {
+      recordUserAuditEvent(request.headers.authorization as string, {
         operation,
         requestData: {
           subjectId: auditUserPayload.userId,
           reason: auditUserPayload.reason,
           comment: auditUserPayload.comment
-        },
+        }
       })
     }
     try {

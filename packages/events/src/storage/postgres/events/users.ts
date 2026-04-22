@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Kysely, sql } from 'kysely'
+import { TRPCError } from '@trpc/server'
 import { UUID } from '@opencrvs/commons/events'
 import { getClient } from '@events/storage/postgres/events'
 import { SearchUsersPayload } from '@events/service/users/api'
@@ -54,7 +55,7 @@ export async function getUserById(userId: UUID) {
   return db
     .selectFrom('users')
     .innerJoin('userCredentials', 'userCredentials.userId', 'users.id')
-    .leftJoin('locations', 'locations.id', 'users.officeId')
+    .innerJoin('locations', 'locations.id', 'users.officeId')
     .select([
       'users.id',
       'users.firstname',
@@ -75,7 +76,7 @@ export async function getUserById(userId: UUID) {
     .executeTakeFirst()
 }
 
-export async function getUserByUsername(username: string) {
+export async function getUserCredentialsByUsername(username: string) {
   const db = getClient()
   return db
     .selectFrom('users')
@@ -108,6 +109,7 @@ export async function getUserCredentialsByUserId(userId: UUID) {
       'userCredentials.securityQuestions'
     ])
     .where('users.id', '=', userId)
+    .where('users.status', '=', 'active')
     .executeTakeFirst()
 }
 
@@ -150,7 +152,7 @@ export async function deleteSuperUser(username: string): Promise<void> {
     const user = await trx
       .selectFrom('users')
       .innerJoin('userCredentials', 'userCredentials.userId', 'users.id')
-      .leftJoin('locations', 'locations.id', 'users.officeId')
+      .innerJoin('locations', 'locations.id', 'users.officeId')
       .select(['users.id', 'users.officeId', 'locations.administrativeAreaId'])
       .where('userCredentials.username', '=', username)
       .executeTakeFirst()
@@ -199,7 +201,7 @@ export async function searchUsersWithInput(input: SearchUsersPayload) {
   let query = db
     .selectFrom('users')
     .innerJoin('userCredentials', 'userCredentials.userId', 'users.id')
-    .leftJoin('locations', 'locations.id', 'users.officeId')
+    .innerJoin('locations', 'locations.id', 'users.officeId')
     .select([
       'users.id',
       'users.firstname',
@@ -213,7 +215,8 @@ export async function searchUsersWithInput(input: SearchUsersPayload) {
       'users.role',
       'users.officeId',
       'users.profileImagePath',
-      'users.fullHonorificName'
+      'users.fullHonorificName',
+      'locations.administrativeAreaId'
     ])
     .orderBy('users.firstname', 'asc')
 
@@ -221,7 +224,7 @@ export async function searchUsersWithInput(input: SearchUsersPayload) {
     query = query.where(
       'userCredentials.username',
       'ilike',
-      `%${input.username}%`
+      `%${input.username.toLowerCase()}%`
     )
   }
 
@@ -245,10 +248,6 @@ export async function searchUsersWithInput(input: SearchUsersPayload) {
     query = query.where('users.officeId', '=', input.primaryOfficeId)
   }
 
-  if (input.locationId) {
-    query = query.where('locations.id', '=', input.locationId)
-  }
-
   const result = await query
     .orderBy('users.createdAt', input.sortOrder)
     .limit(input.count)
@@ -258,7 +257,7 @@ export async function searchUsersWithInput(input: SearchUsersPayload) {
   return result
 }
 
-export async function checkUsername(username: string) {
+export async function isUsernameTaken(username: string) {
   const db = getClient()
 
   const query = db
@@ -301,38 +300,54 @@ export async function updateUsernameById(userId: UUID, username: string) {
     .execute()
 }
 
-export async function getUsersByIds(userIds: string[]) {
-  const uuids = userIds
-    .map((id) => UUID.safeParse(id))
-    .filter((p) => p.success)
-    .map((p) => p.data)
-
-  if (uuids.length === 0) {
-    return []
+export async function getUsersAndSystemsByIds(ids: string[]) {
+  if (ids.length === 0) {
+    return { users: [], systems: [] }
   }
+  const legacyIds = ids.filter((id) => !UUID.safeParse(id).success)
+  const uuidIds = ids.filter((id) => UUID.safeParse(id).success) as UUID[]
   const db = getClient()
-  return db
-    .selectFrom('users')
-    .innerJoin('userCredentials', 'userCredentials.userId', 'users.id')
-    .leftJoin('locations', 'locations.id', 'users.officeId')
-    .select([
-      'users.id',
-      'users.firstname',
-      'users.surname',
-      'users.fullHonorificName',
-      'users.mobile',
-      'users.email',
-      'users.device',
-      'users.role',
-      'users.status',
-      'users.officeId',
-      'users.signaturePath',
-      'users.profileImagePath',
-      'locations.administrativeAreaId',
-      'userCredentials.username'
-    ])
-    .where('users.id', 'in', uuids)
+
+  const usersQuery =
+    uuidIds.length > 0
+      ? db
+          .selectFrom('users')
+          .innerJoin('userCredentials', 'userCredentials.userId', 'users.id')
+          .innerJoin('locations', 'locations.id', 'users.officeId')
+          .select([
+            'users.id',
+            'users.firstname',
+            'users.surname',
+            'users.fullHonorificName',
+            'users.mobile',
+            'users.email',
+            'users.device',
+            'users.role',
+            'users.status',
+            'users.officeId',
+            'users.signaturePath',
+            'users.profileImagePath',
+            'locations.administrativeAreaId',
+            'userCredentials.username'
+          ])
+          .where('users.id', 'in', uuidIds)
+          .execute()
+      : Promise.resolve([])
+
+  const systemsQuery = db
+    .selectFrom('systemClients')
+    .select(['id', 'name', 'legacyId'])
+    .where((eb) => {
+      const conditions = [
+        ...(uuidIds.length > 0 ? [eb('id', 'in', uuidIds)] : []),
+        ...(legacyIds.length > 0 ? [eb('legacyId', 'in', legacyIds)] : [])
+      ]
+      return eb.or(conditions)
+    })
     .execute()
+
+  const [users, systems] = await Promise.all([usersQuery, systemsQuery])
+  return { users, systems }
 }
 
 export async function activateUserWithCredentials(
@@ -350,11 +365,17 @@ export async function activateUserWithCredentials(
       .executeTakeFirst()
 
     if (!user) {
-      throw new Error(`User not found: ${userId}`)
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: `User not found with id: ${userId}`
+      })
     }
 
     if (user.status !== 'pending') {
-      throw new Error(`User is not in pending state: ${userId}`)
+      throw new TRPCError({
+        code: 'CONFLICT',
+        message: `User is not in pending state: ${userId}`
+      })
     }
 
     await trx

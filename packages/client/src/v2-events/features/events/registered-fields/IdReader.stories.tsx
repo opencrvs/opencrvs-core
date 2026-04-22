@@ -11,30 +11,24 @@
 
 import { Meta, StoryObj } from '@storybook/react'
 import React, { useEffect, useState } from 'react'
-import { fn } from '@storybook/test'
 import styled from 'styled-components'
 import QRCode from 'qrcode'
 import {
   ConditionalType,
   field,
   FieldType,
-  never,
-  TestUserRole
+  never
 } from '@opencrvs/commons/client'
 import { Stack, Text } from '@opencrvs/components'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-import { getTestValidatorContext } from '../../../../../.storybook/decorators'
+import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const StyledImg = styled.img`
   width: 300px;
 `
 
-interface Args {
-  onChange: (data: unknown) => void
-}
-
-const meta: Meta<Args> = {
+const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/IdReader',
   argTypes: {},
   decorators: [
@@ -42,7 +36,8 @@ const meta: Meta<Args> = {
       <TRPCProvider>
         <Story />
       </TRPCProvider>
-    )
+    ),
+    withValidatorContext
   ]
 }
 
@@ -192,11 +187,9 @@ const fieldsWithQrReaderAndLinkButton = [
   }
 ]
 
-const onChangeSpy = fn()
-
-export const WithQrReader: StoryObj<Args> = {
+export const WithQrReader: StoryObj<typeof FormFieldGenerator> = {
   name: 'With QR Reader',
-  render: ({ onChange }) => {
+  render: (args) => {
     return (
       <Stack direction="column">
         <Text element="h2" variant="h2">
@@ -209,25 +202,19 @@ export const WithQrReader: StoryObj<Args> = {
             })}
           />
           <FormFieldGenerator
+            {...args}
             fields={fieldsWithQrReader}
             id="id-form"
-            validatorContext={getTestValidatorContext(
-              TestUserRole.enum.LOCAL_REGISTRAR
-            )}
-            onChange={onChange}
           />
         </Stack>
       </Stack>
     )
-  },
-  args: {
-    onChange: onChangeSpy
   }
 }
 
-export const WithQrReaderAndLinkButton: StoryObj<Args> = {
+export const WithQrReaderAndLinkButton: StoryObj<typeof FormFieldGenerator> = {
   name: 'With QR Reader & Link Button',
-  render: ({ onChange }) => {
+  render: (args) => {
     return (
       <Stack direction="column">
         <Text element="h2" variant="h2">
@@ -240,18 +227,12 @@ export const WithQrReaderAndLinkButton: StoryObj<Args> = {
             })}
           />
           <FormFieldGenerator
+            {...args}
             fields={fieldsWithQrReaderAndLinkButton}
             id="id-form"
-            validatorContext={getTestValidatorContext(
-              TestUserRole.enum.LOCAL_REGISTRAR
-            )}
-            onChange={onChange}
           />
         </Stack>
       </Stack>
     )
-  },
-  args: {
-    onChange: onChangeSpy
   }
 }

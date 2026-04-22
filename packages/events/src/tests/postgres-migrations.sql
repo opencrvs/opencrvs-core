@@ -28,6 +28,16 @@ CREATE SCHEMA app;
 ALTER SCHEMA app OWNER TO events_migrator;
 
 --
+--
+
+
+
+--
+--
+
+
+
+--
 -- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -35,7 +45,7 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
@@ -49,7 +59,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
@@ -79,6 +89,17 @@ CREATE TYPE app.user_type AS ENUM (
 
 
 ALTER TYPE app.user_type OWNER TO events_migrator;
+
+--
+--
+
+
+
+
+--
+--
+
+
 
 SET default_tablespace = '';
 
@@ -303,6 +324,24 @@ COMMENT ON TABLE app.events IS 'Stores life events associated with individuals, 
 
 
 --
+--
+
+
+
+
+--
+--
+
+
+
+
+--
+--
+
+
+
+
+--
 -- Name: locations; Type: TABLE; Schema: app; Owner: events_migrator
 --
 
@@ -355,6 +394,21 @@ ALTER SEQUENCE app.pgmigrations_id_seq OWNER TO events_migrator;
 
 ALTER SEQUENCE app.pgmigrations_id_seq OWNED BY app.pgmigrations.id;
 
+
+--
+-- Name: pgmigrations_legacy_data_id_seq; Type: SEQUENCE; Schema: app; Owner: postgres
+--
+
+CREATE SEQUENCE app.pgmigrations_legacy_data_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE app.pgmigrations_legacy_data_id_seq OWNER TO postgres;
 
 --
 -- Name: system_clients; Type: TABLE; Schema: app; Owner: events_migrator
@@ -460,6 +514,7 @@ CREATE TABLE app.users (
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     device text,
+    data jsonb DEFAULT '{}'::jsonb NOT NULL,
     CONSTRAINT email_or_mobile_not_null CHECK (((email IS NOT NULL) OR (mobile IS NOT NULL)))
 );
 

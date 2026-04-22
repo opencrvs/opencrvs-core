@@ -57,7 +57,7 @@ export default async function resendInvite(
     user.username,
     randomPassword,
     {
-      Authorization: request.headers.authorization
+      Authorization: request.headers.authorization as string
     },
     user.mobile,
     user.emailForNotification

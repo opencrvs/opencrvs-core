@@ -31,19 +31,6 @@ const SubComponentStack = styled.div`
   }
 `
 
-const messages = {
-  dividerLabel: {
-    id: 'views.idReader.label.or',
-    defaultMessage: 'Or',
-    description: 'Label that shows on the divider'
-  },
-  manualInputInstructionLabel: {
-    id: 'views.idReader.label.manualInput',
-    defaultMessage: 'Complete fields below',
-    description: 'Label that shows below the divider on the id reader component'
-  }
-}
-
 function getQrFieldValue(fields: IdReaderField['methods'], values: EventState) {
   const qrField = fields.find((f) =>
     isQrReaderFieldType({ config: f, value: values[f.id] })
@@ -71,7 +58,7 @@ function IdReaderInput({
         fields={methods}
         id={id}
         validatorContext={validatorContext}
-        onChange={(values) => {
+        onFormChange={(values) => {
           /**
            * Extracts the actual value from nested field definitions (passed as `methods`)
            * to prevent redundant nesting in the resulting form data.

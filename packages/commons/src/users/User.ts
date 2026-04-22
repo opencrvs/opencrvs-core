@@ -13,7 +13,7 @@ import { DocumentPath } from '../documents'
 import * as z from 'zod/v4'
 import { UUID } from '../uuid'
 import { TokenUserType } from '../authentication'
-import { FileFieldValue } from '../events'
+import { FieldValue, FileFieldValue } from '../events'
 
 export const REINDEX_USER_ID = '__ANONYMOUS_REINDEX_USER__'
 
@@ -23,6 +23,7 @@ export type IUserName = {
   given: string[]
 }
 
+// * @deprecated - This is from 1.9, will be removed in v2.1.
 export const FamilyName = z.array(
   z.object({
     use: z.string(),
@@ -47,7 +48,8 @@ export const User = z.object({
   type: TokenUserType.extract(['user']),
   mobile: z.string().optional(),
   email: z.string().optional(),
-  status: z.enum(['active', 'deactivated', 'pending'])
+  status: z.enum(['active', 'deactivated', 'pending']),
+  data: z.record(z.string(), FieldValue).optional()
 })
 export type User = z.infer<typeof User>
 
@@ -62,10 +64,11 @@ export const UserInput = z.object({
   // @TODO: Separate from "create user from client"
   password: z.string().optional(),
   role: z.string(),
-  primaryOfficeId: z.string(),
+  primaryOfficeId: UUID,
   device: z.string().optional(),
   status: z.enum(['active', 'pending']).optional(),
-  signature: FileFieldValue.optional()
+  signature: FileFieldValue.optional(),
+  data: z.record(z.string(), FieldValue).optional().default({})
 })
 
 export type UserInput = z.infer<typeof UserInput>
@@ -74,8 +77,8 @@ export const System = z.object({
   id: z.string(),
   name: z.string(),
   type: TokenUserType.extract(['system']),
-  primaryOfficeId: z.undefined().optional(),
-  administrativeAreaId: z.undefined().optional(),
+  primaryOfficeId: UUID.optional(),
+  administrativeAreaId: UUID.optional(),
   signature: z.undefined().optional(),
   avatar: z.undefined().optional(),
   fullHonorificName: z.string().optional(),

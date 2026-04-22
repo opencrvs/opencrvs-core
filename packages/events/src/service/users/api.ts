@@ -30,17 +30,19 @@ import {
 } from '@events/storage/postgres/events/system-clients'
 import {
   getUserById,
-  getUsersByIds,
+  getUsersAndSystemsByIds,
   createUserWithCredentials,
   searchUsersWithInput,
   activateUserWithCredentials,
   updateUserById,
   updateUsernameById,
-  checkUsername,
+  isUsernameTaken,
   getUserCredentialsByUserId,
-  SecurityQuestion
+  SecurityQuestion,
+  getUserByMobileOrEmail
 } from '@events/storage/postgres/events/users'
 import { generateSaltedHash, generateHash } from '@events/service/auth/hash'
+import { getRoles } from '../config/config'
 
 export type SearchUsersPayload = {
   username?: string
@@ -79,7 +81,7 @@ async function generateUsername(
   }
 
   try {
-    let usernameTaken = await checkUsername(proposedUsername)
+    let usernameTaken = await isUsernameTaken(proposedUsername)
     let i = 1
     const copyProposedName = proposedUsername
     while (usernameTaken) {
@@ -88,7 +90,7 @@ async function generateUsername(
       }
       proposedUsername = copyProposedName + i
       i += 1
-      usernameTaken = await checkUsername(proposedUsername)
+      usernameTaken = await isUsernameTaken(proposedUsername)
     }
   } catch (err) {
     logger.error(`Failed username generation: ${err}`)
@@ -173,58 +175,36 @@ export async function searchUsers(
 ): Promise<User[]> {
   const results = await searchUsersWithInput(payload)
 
-  return results.map((user) => ({
-    type: TokenUserType.enum.user,
-    id: user.id,
-    name: [
-      {
-        use: 'en',
-        given: [user.firstname ?? ''],
-        family: user.surname ?? ''
-      }
-    ],
-    role: user.role,
-    signature: user.signaturePath
-      ? (user.signaturePath as DocumentPath)
-      : undefined,
-    avatar: user.profileImagePath
-      ? (user.profileImagePath as DocumentPath)
-      : undefined,
-    primaryOfficeId: user.officeId,
-    status: user.status as User['status'],
-    device: user.device ? user.device : undefined,
-    fullHonorificName: user.fullHonorificName
-      ? user.fullHonorificName
-      : undefined
-  }))
+  return results.map(mapDbUserToUser)
 }
 
 type CreateUserPayload = z.infer<typeof UserInput>
 
 export async function updateUser(
-  input: CreateUserPayload & { id: string },
+  input: CreateUserPayload & { id: UUID },
   token: string
 ): Promise<User> {
-  const existingUser = await getUserById(UUID.parse(input.id))
+  const existingUser = await getUserById(input.id)
 
   if (!existingUser) {
-    throw new Error(`No user found by given id: ${input.id}`)
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `User not found: ${input.id}`
+    })
   }
 
-  // TODO: update FamilyName to single firstname and surname fields
-  const englishName = input.name.find((n) => n.use === 'en') ?? input.name[0]
   const oldUsername = existingUser.username
   const newUsername = await generateUsername(input.name, existingUser.username)
 
-  await updateUserById(UUID.parse(input.id), {
-    firstname: englishName.given[0],
-    surname: englishName.family,
+  await updateUserById(input.id, {
+    firstname: personNameFromV1ToV2(input.name).firstname,
+    surname: personNameFromV1ToV2(input.name).surname,
     fullHonorificName: input.fullHonorificName,
     email: input.email,
     mobile: input.mobile,
     device: input.device,
     role: input.role,
-    officeId: UUID.parse(input.primaryOfficeId),
+    officeId: input.primaryOfficeId,
     signaturePath: input.signature
       ? input.signature.path
       : existingUser.signaturePath
@@ -293,8 +273,6 @@ async function sendCredentialsNotification(
 }
 
 export async function createUser(input: CreateUserPayload, _token: string) {
-  const englishName = input.name.find((n) => n.use === 'en') ?? input.name[0]
-
   // Hash the provided password, or generate a random placeholder for pending
   // users who will set their own password via the activation flow.
   const password =
@@ -302,13 +280,13 @@ export async function createUser(input: CreateUserPayload, _token: string) {
   const { hash, salt } = await generateSaltedHash(password)
 
   const userPayload = {
-    firstname: englishName.given[0],
-    surname: englishName.family,
+    firstname: personNameFromV1ToV2(input.name).firstname,
+    surname: personNameFromV1ToV2(input.name).surname,
     email: input.email,
     fullHonorificName: input.fullHonorificName,
     role: input.role,
     device: input.device,
-    officeId: UUID.parse(input.primaryOfficeId),
+    officeId: input.primaryOfficeId,
     mobile: input.mobile,
     status: input.status ?? 'pending'
   }
@@ -338,7 +316,7 @@ export async function createUser(input: CreateUserPayload, _token: string) {
 }
 
 export async function activateUser(input: {
-  userId: string
+  userId: UUID
   password: string
   securityQNAs: { questionKey: string; answer: string }[]
 }): Promise<void> {
@@ -366,52 +344,28 @@ export async function activateUser(input: {
  * @returns Array of found users. If no users are found for some ids, we leave them out of the result.
  */
 export const getUsersById = async (ids: string[]): Promise<UserOrSystem[]> => {
-  if (ids.length === 0) {
-    return []
-  }
+  const { users, systems } = await getUsersAndSystemsByIds(ids)
 
-  const dbUsers = await getUsersByIds(ids)
-  const foundUserIds = new Set(dbUsers.map((u) => u.id))
+  const mappedUsers: UserOrSystem[] = users.map(mapDbUserToUser)
+  const mappedSystems: UserOrSystem[] = systems.map((s) => ({
+    type: TokenUserType.enum.system,
+    id: s.id,
+    legacyId: s.legacyId ?? undefined,
+    name: s.name
+  }))
 
-  const mappedUsers: UserOrSystem[] = dbUsers.map(mapDbUserToUser)
-
-  const remainingIds = ids.filter((id) => !foundUserIds.has(id as UUID))
-  const systems = await Promise.all(
-    remainingIds.map(async (id) => {
-      try {
-        const system = isUUID(id)
-          ? await getSystemClientById(id)
-          : await getSystemByLegacyId(id)
-        return {
-          type: TokenUserType.enum.system,
-          id,
-          legacyId: system.legacyId ? system.legacyId : undefined,
-          name: system.name
-        } satisfies UserOrSystem
-      } catch {
-        return undefined
-      }
-    })
-  )
-
-  return [...mappedUsers, ...systems.filter((s) => s !== undefined)]
+  return [...mappedUsers, ...mappedSystems]
 }
 
 export function isUser(userOrSystem: UserOrSystem): userOrSystem is User {
   return userOrSystem.type === TokenUserType.enum.user
 }
 
-export const getCredentials = async (userId: string) => {
-  const credentials = await getUserCredentialsByUserId(UUID.parse(userId))
+export const getCredentials = async (userId: UUID) => {
+  const credentials = await getUserCredentialsByUserId(userId)
 
   if (!credentials) {
     logger.error(`No user details found by given userid: ${userId}`)
-    throw new TRPCError({ code: 'UNAUTHORIZED' })
-  }
-
-  if (credentials.status !== 'active') {
-    logger.error(`User is not in active state for given userid: ${userId}`)
-    // Don't return a 404 as this gives away that this user account exists
     throw new TRPCError({ code: 'UNAUTHORIZED' })
   }
 
@@ -449,13 +403,15 @@ export async function checkSecurityQuestionMatch({
   if (!target) {
     return {
       matched: false,
-      questionKey: questions[0]?.questionKey ?? input.questionKey
+      questionKey: input.questionKey
     }
   }
 
   const hash = await generateHash(input.answer.toLowerCase(), salt)
   const matched = hash === target.answerHash
 
+  // On a wrong answer, rotate to a different question so the same prompt
+  // can't be brute-forced.
   const fallback = questions.find(
     (q) => q.questionKey !== input.questionKey
   )?.questionKey
@@ -463,5 +419,41 @@ export async function checkSecurityQuestionMatch({
   return {
     matched,
     questionKey: matched ? input.questionKey : (fallback ?? input.questionKey)
+  }
+}
+
+export async function verifyUser(input: { mobile?: string; email?: string }) {
+  const user = await getUserByMobileOrEmail(
+    input.mobile ? { mobile: input.mobile } : { email: input.email ?? '' }
+  )
+
+  if (!user) {
+    // Don't reveal whether the account exists
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
+
+  const questions = getSecurityQuestionsForUser(user)
+
+  const securityQuestionKey =
+    questions[Math.floor(Math.random() * questions.length)].questionKey
+
+  const roles = await getRoles()
+  const scope = roles.find((r) => r.id === user.role)?.scopes ?? []
+
+  return {
+    id: user.id,
+    username: user.username,
+    mobile: user.mobile ?? undefined,
+    email: user.email ?? undefined,
+    status: user.status,
+    name: [
+      {
+        use: 'en',
+        given: [user.firstname ?? ''],
+        family: user.surname ?? ''
+      }
+    ],
+    securityQuestionKey,
+    scope
   }
 }

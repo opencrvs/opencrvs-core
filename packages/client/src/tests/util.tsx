@@ -8,18 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  ApolloClient,
-  ApolloLink,
-  ApolloProvider,
-  InMemoryCache,
-  Observable
-} from '@apollo/client'
-import { MockedProvider } from '@apollo/client/testing'
 import { App, routesConfig } from '@client/App'
 import { offlineDataReady } from '@client/offline/actions'
 import { AppStore, createStore, IStoreState } from '@client/store'
-import { getSchema } from '@client/tests/graphql-schema-mock'
 import { EventType } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
@@ -34,7 +25,6 @@ import {
   shallow
 } from 'enzyme'
 import { readFileSync } from 'fs'
-import { graphql, print } from 'graphql'
 import * as jwt from 'jsonwebtoken'
 import { join } from 'path'
 import * as React from 'react'
@@ -58,25 +48,6 @@ export const setItem = vi.fn()
 
 configure({ adapter: new Adapter() })
 
-function createGraphQLClient() {
-  const schema = getSchema()
-  return new ApolloClient({
-    cache: new InMemoryCache(),
-    link: new ApolloLink((operation) => {
-      return new Observable((observer) => {
-        const { query, operationName, variables } = operation
-
-        graphql(schema, print(query), null, null, variables, operationName)
-          .then((result) => {
-            observer.next(result)
-            observer.complete()
-          })
-          .catch(observer.error.bind(observer))
-      })
-    })
-  })
-}
-
 export function getInitialState(): IStoreState {
   const { store: mockStore } = createStore()
 
@@ -96,9 +67,7 @@ export async function createTestApp(
   const { store } = await createTestStore()
   const router = createMemoryRouter(routesConfig, { initialEntries })
 
-  const app = mount(
-    <App store={store} router={router} client={createGraphQLClient()} />
-  )
+  const app = mount(<App store={store} router={router} />)
 
   if (config.waitUntilOfflineCountryConfigLoaded) {
     await waitForReady(app)
@@ -394,15 +363,10 @@ export async function createTestComponent(
   node: React.ReactElement<ITestView>,
   {
     store,
-    graphqlMocks,
-    apolloClient,
     initialEntries,
     path = '*'
   }: {
     store: AppStore
-    graphqlMocks?: MockedProvider['props']['mocks']
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    apolloClient?: ApolloClient<any>
     initialEntries?:
       | string[]
       | {
@@ -422,24 +386,6 @@ export async function createTestComponent(
   store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   await flushPromises()
 
-  const withGraphQL = (node: JSX.Element) => {
-    if (apolloClient) {
-      return <ApolloProvider client={apolloClient}>{node}</ApolloProvider>
-    }
-
-    return (
-      <MockedProvider
-        mocks={graphqlMocks}
-        addTypename={false}
-        defaultOptions={{
-          watchQuery: { fetchPolicy: 'no-cache' },
-          query: { fetchPolicy: 'no-cache' }
-        }}
-      >
-        {node}
-      </MockedProvider>
-    )
-  }
   const router = createMemoryRouter(
     [
       {
@@ -451,7 +397,7 @@ export async function createTestComponent(
   )
 
   function PropProxy() {
-    return withGraphQL(
+    return (
       <Provider store={store}>
         <I18nContainer>
           <ThemeProvider theme={getTheme()}>

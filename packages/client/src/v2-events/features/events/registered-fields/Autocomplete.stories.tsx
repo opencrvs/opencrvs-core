@@ -12,27 +12,22 @@
 import type { Meta, StoryFn, StoryObj } from '@storybook/react'
 import React from 'react'
 import styled from 'styled-components'
-import { fn } from '@storybook/test'
 import {
-  and,
   field,
   FieldType,
-  SelectOption,
-  not,
   ConditionalType
 } from '@opencrvs/commons/client'
 import {
   FormFieldGenerator,
-  FormFieldGeneratorProps
+  FormFieldGeneratorPropsWithoutRef
 } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 import { Autocomplete } from './Autocomplete'
 
-const meta: Meta<FormFieldGeneratorProps> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/Autocomplete',
   component: FormFieldGenerator,
-  args: { onChange: fn() },
   argTypes: {},
   decorators: [
     (Story, context) => (
@@ -49,13 +44,15 @@ export default meta
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
-export const ICD: StoryObj<typeof FormFieldGenerator> = {
+
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
+
+export const ICD: Story = {
   name: 'ICD10 Autocomplete',
   parameters: {
     layout: 'centered'
   },
   render: function Component(args) {
-    const [formData, setFormData] = React.useState({})
     return (
       <StyledFormFieldGenerator
         {...args}
@@ -102,10 +99,6 @@ export const ICD: StoryObj<typeof FormFieldGenerator> = {
           }
         ]}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-          setFormData(data)
-        }}
       />
     )
   }

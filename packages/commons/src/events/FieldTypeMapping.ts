@@ -53,6 +53,7 @@ import {
   IdReaderField,
   LoaderField,
   AgeField,
+  FieldGroup,
   CustomField,
   HiddenField,
   AutocompleteField,
@@ -106,6 +107,10 @@ import {
 import { ActionType } from './ActionType'
 import { EventConfig } from './EventConfig'
 
+type Mutable<T> = {
+  -readonly [K in keyof T]: T[K];
+};
+
 /**
  * FieldTypeMapping.ts should include functions that map field types to different formats dynamically.
  * File is separated from FieldType and FieldConfig to avoid circular dependencies.
@@ -114,29 +119,26 @@ import { EventConfig } from './EventConfig'
  */
 
 /**
- * Optionality of a field is defined in FieldConfig, not in FieldValue.
- * Allows for nullishness of a field value during validations based on FieldConfig.
- */
-type NullishFieldValueSchema = z.ZodOptional<
-  z.ZodNullable<FieldUpdateValueSchema>
->
-
-/**
- * Mapping of field types to Zod schema.
- * Useful for building dynamic validations against FieldConfig
- */
-/**
  * Mapping of field types to Zod schema.
  * Useful for building dynamic validations against FieldConfig
  */
 export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
   let schema:
     | FieldUpdateValueSchema
-    | NullishFieldValueSchema
     | DynamicNameValue
     | DynamicAddressFieldValue
+    | z.ZodObject<z.ZodRawShape>
 
   switch (field.type) {
+    case FieldType.FIELD_GROUP: {
+      schema = z.object(
+        field.fields.reduce((acc, subfield) => {
+          acc[subfield.id] = mapFieldTypeToZod(subfield, actionType)
+          return acc
+        }, {} as Mutable<z.ZodRawShape>)
+      )
+      break
+    }
     case FieldType.DATE:
       schema = PlainDate
       break
@@ -242,6 +244,7 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
 }
 
 type FieldTypeValueMap = {
+  [FieldType.FIELD_GROUP]: Record<string, FieldValue>
   [FieldType.DATE]: z.infer<typeof DateValue>
   [FieldType.AGE]: z.infer<typeof AgeValue>
   [FieldType.TIME]: z.infer<typeof TimeValue>
@@ -321,6 +324,15 @@ export type EventConfigToDeclarationFormType<T extends EventConfig> =
  */
 export function mapFieldTypeToEmptyValue(field: FieldConfig) {
   switch (field.type) {
+    case FieldType.FIELD_GROUP:
+      const nestedEmpty: Record<string, FieldUpdateValue> = field.fields.reduce(
+        (acc, subfield) => ({
+          ...acc,
+          [subfield.id]: mapFieldTypeToEmptyValue(subfield)
+        }),
+        {}
+      )
+      return nestedEmpty
     case FieldType.DIVIDER:
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
@@ -574,6 +586,16 @@ export const isRadioGroupFieldType = (field: {
   value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: RadioGroup } => {
   return field.config.type === FieldType.RADIO_GROUP
+}
+
+export const isFieldGroupFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is {
+  value: Record<string, FieldValue> | undefined
+  config: FieldGroup
+} => {
+  return field.config.type === FieldType.FIELD_GROUP
 }
 
 export const isLocationFieldType = (field: {

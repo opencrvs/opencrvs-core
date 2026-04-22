@@ -11,7 +11,7 @@
 import React from 'react'
 import { Meta, StoryObj } from '@storybook/react'
 import { http, HttpResponse } from 'msw'
-import { fn, expect, within } from '@storybook/test'
+import { expect, within } from '@storybook/test'
 import { waitFor } from '@storybook/testing-library'
 import { useSearchParams } from 'react-router-dom'
 import {
@@ -27,12 +27,10 @@ import { getTestValidatorContext } from '../../../../../.storybook/decorators'
 
 interface Args {
   fields: FieldConfig[]
-  onChange: (value: unknown) => void
 }
 
 const meta: Meta<Args> = {
   title: 'Inputs/QueryParamReader',
-  args: { onChange: fn() },
   decorators: [
     (Story) => (
       <TRPCProvider>
@@ -196,7 +194,6 @@ function Form(args: Args) {
       fields={args.fields}
       id="test-event-form"
       validatorContext={getTestValidatorContext()}
-      onChange={args.onChange}
     />
   )
 }
@@ -211,7 +208,7 @@ export const Default: StoryObj<Args> = {
     reactRouter: {
       router: {
         path: '/',
-        element: <Form fields={defaultFields} onChange={fn()} />
+        element: <Form fields={defaultFields} />
       },
       initialPath: '/?auth_token=123&client_session=abc'
     },
@@ -247,7 +244,7 @@ export const WithForwardedParams: StoryObj<Args> = {
     reactRouter: {
       router: {
         path: '/',
-        element: <Form fields={forwardedParams} onChange={fn()} />
+        element: <Form fields={forwardedParams} />
       },
       initialPath: '/?auth_token=123&client_session=abc'
     },
@@ -300,7 +297,7 @@ export const WithExtraUnpickedParameters: StoryObj<Args> = {
         element: (
           <>
             <DebugLocation />
-            <Form fields={defaultFields} onChange={fn()} />
+            <Form fields={defaultFields} />
           </>
         )
       },
