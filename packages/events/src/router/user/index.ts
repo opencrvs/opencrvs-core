@@ -88,13 +88,15 @@ export function createUserRoute(
           skip: 0,
           sortOrder: 'asc'
         })
+
         if (existingWithMobile.length > 0) {
           logger.error(
             `Phone number ${input.mobile} is already in use by another user`
           )
-          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_PHONE' })
+          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_MOBILE' })
         }
       }
+
       if (input.email) {
         const existingWithEmail = await searchUsers({
           email: input.email,
