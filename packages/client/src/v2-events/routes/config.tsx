@@ -12,9 +12,12 @@
 import React, { useEffect } from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
 
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { onlineManager } from '@tanstack/react-query'
 import { ActionType } from '@opencrvs/commons/client'
+import { APPLICATION_VERSION } from '@client/utils/constants'
+import { storeReloadModalVisibility } from '@client/reload/reducer'
+import type { AppStore } from '@client/store'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
@@ -104,6 +107,7 @@ function PrefetchQueries() {
  */
 
 export function useNetworkProbe() {
+  const dispatch = useDispatch<AppStore['dispatch']>()
   useEffect(() => {
     let cancelled = false
     let intervalId: ReturnType<typeof setInterval> | null = null
@@ -131,6 +135,10 @@ export function useNetworkProbe() {
         if (!cancelled) {
           if (!res.ok) {
             throw new Error('Network probe failed')
+          }
+          const gatewayVersion = res.headers.get('X-version')
+          if (gatewayVersion && gatewayVersion !== APPLICATION_VERSION) {
+            dispatch(storeReloadModalVisibility(true))
           }
           onlineManager.setOnline(true)
           if (intervalId !== null) {
@@ -170,7 +178,7 @@ export function useNetworkProbe() {
         clearInterval(intervalId)
       }
     }
-  }, [])
+  }, [dispatch])
 }
 
 export const routesConfig = {

@@ -19,7 +19,7 @@
     "generate-db-schema": "bash src/tests/generate-db-schema.sh"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "8.16.2",
+    "@elastic/elasticsearch": "^8.17.0",
     "@opencrvs/commons": "^1.9.0",
     "@trpc/server": "^11.8.0",
     "@types/bcryptjs": "^2.4.2",
