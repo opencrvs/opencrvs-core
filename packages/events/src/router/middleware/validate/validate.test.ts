@@ -283,8 +283,8 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      { 'test.checkbox': true },
-      { ...testContext, baseFormState: { 'test.text': 'helloooo' } }
+      { 'test.input': 'not empty', 'test.text': 'helloooo' },
+      testContext
     )
 
     expect(errors).toMatchSnapshot()
