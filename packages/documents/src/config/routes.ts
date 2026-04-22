@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import * as Hapi from '@hapi/hapi'
 import {
   fileUploadHandler,
   documentUploadHandler,
@@ -23,13 +24,13 @@ import { svgUploadHandler } from '@documents/features/uploadSvg/handler'
 import { deleteDocument } from '@documents/features/deleteDocument/handler'
 
 export const getRoutes = () => {
-  const routes = [
+  const routes: Hapi.ServerRoute[] = [
     // list files in directory
     {
       method: 'GET',
       path: `/list-files/{prefix*}`,
       handler: listFiles,
-      config: {
+      options: {
         tags: ['api']
       }
     },
@@ -38,7 +39,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: `/presigned-url/{filePath*}`,
       handler: createPreSignedUrl,
-      config: {
+      options: {
         tags: ['api']
       }
     },
@@ -47,7 +48,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: `/presigned-urls`,
       handler: createPresignedUrlsInBulk,
-      config: {
+      options: {
         tags: ['api']
       }
     },
@@ -55,7 +56,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/presigned-url',
       handler: createPreSignedUrl,
-      config: {
+      options: {
         tags: ['api']
       }
     },
@@ -64,7 +65,7 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/files/{filePath*}',
       handler: fileExistsHandler,
-      config: {
+      options: {
         tags: ['api']
       }
     },
@@ -73,7 +74,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/files',
       handler: fileUploadHandler,
-      config: {
+      options: {
         tags: ['api'],
         payload: {
           allow: ['multipart/form-data'],
@@ -87,7 +88,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/upload',
       handler: documentUploadHandler,
-      config: {
+      options: {
         tags: ['api']
       }
     },
@@ -96,7 +97,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/upload-svg',
       handler: svgUploadHandler,
-      config: {
+      options: {
         tags: ['api'],
         payload: {
           parse: false
@@ -108,7 +109,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/upload-vs-export',
       handler: vsExportUploaderHandler,
-      config: {
+      options: {
         auth: false,
         tags: ['api']
       }
@@ -118,7 +119,7 @@ export const getRoutes = () => {
       method: 'DELETE',
       path: '/files/{filePath*}',
       handler: deleteDocument,
-      config: {
+      options: {
         tags: ['api']
       }
     },
@@ -129,7 +130,7 @@ export const getRoutes = () => {
       handler: (request: any, h: any) => {
         return 'success'
       },
-      config: {
+      options: {
         tags: ['api']
       }
     },
@@ -143,7 +144,7 @@ export const getRoutes = () => {
           success: true
         }
       },
-      config: {
+      options: {
         auth: false,
         tags: ['api'],
         description: 'Health check endpoint'

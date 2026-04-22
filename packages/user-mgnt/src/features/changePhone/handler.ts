@@ -52,7 +52,7 @@ export default async function changePhoneHandler(
     // return 400 if there is a validation error when updating to mongo
     return h.response(err.message).code(400)
   }
-  recordUserAuditEvent(request.headers.authorization, {
+  recordUserAuditEvent(request.headers.authorization as string, {
     operation: 'user.phone_number_changed',
     requestData: { subjectId: userUpdateData.userId },
     responseSummary: { phoneNumber: userUpdateData.phoneNumber }

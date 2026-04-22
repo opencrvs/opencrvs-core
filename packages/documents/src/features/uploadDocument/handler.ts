@@ -66,7 +66,7 @@ export async function fileUploadHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const userId = getUserId(request.headers.authorization)
+  const userId = getUserId(request.headers.authorization as `Bearer ${string}`)
   const payload = await Payload.parseAsync(request.payload).catch((error) => {
     logger.error(error)
     throw badRequest('Invalid payload')
@@ -75,9 +75,9 @@ export async function fileUploadHandler(
 
   const extension = file.hapi.filename.split('.').pop()
   const filename = `${transactionId}.${extension}`
-  const filePath = (path
-    ? joinUrlPaths(path, filename)
-    : filename) as DocumentPath
+  const filePath = (
+    path ? joinUrlPaths(path, filename) : filename
+  ) as DocumentPath
 
   await minioClient.putObject(MINIO_BUCKET, filePath, file, {
     'created-by': userId,
@@ -100,7 +100,7 @@ export async function fileExistsHandler(
     filePath = filePath.slice(MINIO_BUCKET.length + 1)
   }
 
-  let documentPath = DocumentPath.parse(filePath)
+  const documentPath = DocumentPath.parse(filePath)
 
   let stat
 
@@ -128,7 +128,7 @@ export async function documentUploadHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const userId = getUserId(request.headers.authorization)
+  const userId = getUserId(request.headers.authorization as `Bearer ${string}`)
   if (!userId)
     return Promise.reject(
       new Error(
