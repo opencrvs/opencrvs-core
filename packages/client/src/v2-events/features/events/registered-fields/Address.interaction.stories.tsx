@@ -618,7 +618,7 @@ interface ResolvedAddress {
     district2?: string
     town?: string
     cityOrTown?: string
-  }
+  } | null
 }
 
 export const ToCertificateVariables: Story = {
