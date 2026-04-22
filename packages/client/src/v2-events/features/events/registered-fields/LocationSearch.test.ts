@@ -147,6 +147,21 @@ describe('filterLocationsByJurisdiction', () => {
 
       expect(result).toHaveLength(0)
     })
+
+    it('returns [] when userLocationId is unknown', () => {
+      // Without knowing the user's office we cannot determine their admin hierarchy,
+      // so no locations should be shown — returning allOptions would expose data
+      // outside their jurisdiction.
+      const result = filterLocationsByJurisdiction({
+        locations,
+        administrativeAreas,
+        userLocationId: undefined,
+        locationTypes: ['HEALTH_FACILITY'],
+        jurisdictionFilter: JurisdictionFilter.enum.administrativeArea
+      })
+
+      expect(result).toHaveLength(0)
+    })
   })
 
   describe('no jurisdiction filter — user sees all locations', () => {

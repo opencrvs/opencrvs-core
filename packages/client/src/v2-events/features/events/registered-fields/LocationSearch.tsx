@@ -36,7 +36,7 @@ import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
  * Pure filtering logic for location options, separated from React hook concerns for testability.
  *
  * - 'location' jurisdiction: returns only the user's own office if it matches locationTypes, otherwise [].
- * - 'administrativeArea' jurisdiction: returns all locations within the user's admin area hierarchy.
+ * - 'administrativeArea' jurisdiction: returns locations within the user's admin area hierarchy, or [] if userLocationId is unknown.
  * - no filter / 'all': returns all locations matching locationTypes.
  */
 export function filterLocationsByJurisdiction({
@@ -71,7 +71,10 @@ export function filterLocationsByJurisdiction({
   }
 
   if (jurisdictionFilter === JurisdictionFilter.enum.administrativeArea) {
-    if (!userLocationId) return allOptions
+    if (!userLocationId) {
+      // If we need to filter by administrative area but don't know the user's location, we can't determine their admin area - return no options
+      return []
+    }
     return allOptions.filter((o) =>
       isLocationUnderJurisdiction({
         locationId: userLocationId,
@@ -108,7 +111,13 @@ function useAvailableLocations(
         locationTypes,
         jurisdictionFilter
       }),
-    [locations, administrativeAreas, userLocationId, locationTypes, jurisdictionFilter]
+    [
+      locations,
+      administrativeAreas,
+      userLocationId,
+      locationTypes,
+      jurisdictionFilter
+    ]
   )
 }
 
