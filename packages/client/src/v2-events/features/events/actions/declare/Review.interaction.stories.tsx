@@ -511,8 +511,8 @@ export const ReviewForIncompleteNameInteraction: Story = {
       const surnameInput = await canvas.findByTestId('text__surname')
       await userEvent.clear(surnameInput)
 
-      const backToReviewButton = await canvas.findByText('Back to review')
-      await userEvent.click(backToReviewButton)
+      const goToReviewButton = await canvas.findByText('Go to review')
+      await userEvent.click(goToReviewButton)
       await canvas.findByText('Declaration incomplete')
     })
   }
@@ -577,8 +577,8 @@ export const ChangeFieldInReview: Story = {
     })
 
     await step('Navigate back to review', async () => {
-      const backToReviewButton = await canvas.findByText('Back to review')
-      await userEvent.click(backToReviewButton)
+      const goToReviewButton = await canvas.findByText('Go to review')
+      await userEvent.click(goToReviewButton)
 
       await waitFor(async () => {
         await expect(canvas.getByText("Applicant's name")).toBeInTheDocument()

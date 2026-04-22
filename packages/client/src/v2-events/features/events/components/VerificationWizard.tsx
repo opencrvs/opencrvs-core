@@ -128,7 +128,7 @@ export const VerificationWizard = ({
 
             {showReviewButton && (
               <Button size="large" type="secondary" onClick={onSubmit}>
-                {intl.formatMessage(formWizardMessages.backToReview)}
+                {intl.formatMessage(formWizardMessages.goToReview)}
               </Button>
             )}
           </Stack>
