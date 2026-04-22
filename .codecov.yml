@@ -25,10 +25,6 @@ coverage:
         paths:
           - packages/login
         threshold: 0.5
-      notification:
-        paths:
-          - packages/notification
-        threshold: 0.5
       client:
         paths:
           - packages/client

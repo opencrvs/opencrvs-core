@@ -66,7 +66,6 @@ export const handlers = {
         auth: true,
         'user-mgnt': true,
         metrics: true,
-        notification: true,
         countryconfig: true
       })
     })

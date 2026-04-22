@@ -32,6 +32,3 @@ services:
     environment:
       - NODE_ENV=development
 
-  notification:
-    environment:
-      - NODE_ENV=development

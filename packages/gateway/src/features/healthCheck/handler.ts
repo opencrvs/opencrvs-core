@@ -10,10 +10,7 @@
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import {
-  AUTH_URL,
-  COUNTRY_CONFIG_URL
-} from '@gateway/constants'
+import { AUTH_URL, COUNTRY_CONFIG_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 
 export async function checkServiceHealth(url: string) {
@@ -34,7 +31,6 @@ enum Services {
   AUTH = 'auth',
   USER_MGNT = 'user-mgnt',
   METRICS = 'metrics',
-  NOTIFICATION = 'notification',
   COUNTRY_CONFIG = 'countryconfig',
   GATEWAY = 'gateway'
 }

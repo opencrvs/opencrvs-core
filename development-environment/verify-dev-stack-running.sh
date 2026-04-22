@@ -14,10 +14,6 @@ echo "wait-on auth microservice" && wait-on -l tcp:4040
 echo
 echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
 echo
-echo "wait-on notification microservice" && wait-on -l tcp:2020
-echo
-echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
-echo
 echo "wait-on gateway microservice" && wait-on -l tcp:7070
 echo
 echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
