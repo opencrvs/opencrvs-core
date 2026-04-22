@@ -22,7 +22,7 @@ import { listLocationsRoute, setLocationsRoute } from '../locations'
 import { createUserRoute, searchUsersRoute } from '../user'
 
 /**
- * initialisationRouter contains routes related to the initialisation of the system, such as setting up the initial admin user and creating the first office location.
+ * initialisationRouter contains routes related to the initialisation of the system, such as authenticating the initial "super user" and creating the administrative hierarchy.
  * These routes are intended to be used only during the initial setup of the system and are protected accordingly.
  */
 export const initialisationRouter = internalRouter({

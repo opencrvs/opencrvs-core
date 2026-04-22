@@ -14,10 +14,7 @@ import { TRPCError } from '@trpc/server'
 import {
   FamilyName,
   logger,
-  User,
   UserAuditRecordInput,
-  UserInput,
-  UserOrSystem,
   UUID
 } from '@opencrvs/commons'
 import { internalProcedure, internalRouter } from '@events/router/trpc'
@@ -28,14 +25,11 @@ import {
 import { generateHash } from '@events/service/auth/hash'
 import {
   checkSecurityQuestionMatch,
-  createUser,
   getCredentials,
   getSecurityQuestionsForUser,
-  searchUsers,
   verifyUser
 } from '@events/service/users/api'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
-import { UserSearch } from '../user'
 
 const VerifyUserOutput = z.object({
   id: z.string(),
