@@ -32,7 +32,8 @@ import {
   TokenUserType,
   UserInput,
   hasScope,
-  EncodedScope
+  EncodedScope,
+  UUID
 } from '@opencrvs/commons/client'
 import { AppBar, Frame, Spinner } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -521,7 +522,7 @@ const ReviewUserComponent = () => {
                 mobile: formState.phoneNumber,
                 email: formState.email!,
                 role: formState.role!,
-                primaryOfficeId: formState.primaryOfficeId!,
+                primaryOfficeId: formState.primaryOfficeId as UUID,
                 signature: formState.signature,
                 name: [
                   {
@@ -560,7 +561,7 @@ const ReviewUserComponent = () => {
                 mobile: formState.phoneNumber,
                 email: formState.email!,
                 role: formState.role!,
-                primaryOfficeId: formState.primaryOfficeId!,
+                primaryOfficeId: formState.primaryOfficeId as UUID,
                 signature: formState.signature,
                 name: [
                   {
