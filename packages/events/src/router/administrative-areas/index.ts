@@ -11,12 +11,25 @@
 
 import * as z from 'zod/v4'
 import { AdministrativeArea, UUID } from '@opencrvs/commons'
-import { router, userAndSystemProcedure } from '@events/router/trpc'
+import {
+  internalProcedure,
+  router,
+  userAndSystemProcedure
+} from '@events/router/trpc'
 import {
   getAdministrativeAreas,
   setAdministrativeAreas
 } from '../../service/administrative-areas'
 import { allowedWithAnyOfScopes } from '../middleware'
+
+export function setAdministrativeAreasRoute(
+  procedure: typeof internalProcedure | typeof userAndSystemProcedure
+) {
+  return procedure
+    .input(z.array(AdministrativeArea).min(1))
+    .output(z.void())
+    .mutation(({ input }) => setAdministrativeAreas(input))
+}
 
 export const administrativeAreaRouter = router({
   list: userAndSystemProcedure
@@ -35,9 +48,9 @@ export const administrativeAreaRouter = router({
         ids: input?.ids
       })
     ),
-  set: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.data-seeding', 'config.update-all']))
-    .input(z.array(AdministrativeArea).min(1))
-    .output(z.void())
-    .mutation(async ({ input }) => setAdministrativeAreas(input))
+  set: setAdministrativeAreasRoute(
+    userAndSystemProcedure.use(
+      allowedWithAnyOfScopes(['user.data-seeding', 'config.update-all'])
+    )
+  )
 })

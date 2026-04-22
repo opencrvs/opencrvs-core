@@ -141,10 +141,9 @@ export async function authenticate(
 export async function authenticateSuperuser(
   password: string
 ): Promise<boolean> {
-  const auth =
-    await internalClient.initialisation.superuser.verifyPassword.mutate({
-      password
-    })
+  const auth = await internalClient.initialisation.authenticate.mutate({
+    password
+  })
 
   return auth.valid
 }

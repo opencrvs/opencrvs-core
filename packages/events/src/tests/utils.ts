@@ -13,6 +13,7 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
 import fc from 'fast-check'
+import { genSaltSync, hashSync } from 'bcryptjs'
 import {
   ActionStatus,
   ActionType,
@@ -223,13 +224,16 @@ export function createTestToken({
   return `Bearer ${token}`
 }
 
-export function createInternalServiceToken(): TokenWithBearer {
+export function createInternalServiceToken(
+  overrides: jwt.SignOptions = {}
+): TokenWithBearer {
   const token = jwt.sign({}, readFileSync(join(__dirname, './cert.key')), {
     subject: 'opencrvs:auth-service',
     algorithm: 'RS256',
     expiresIn: '604800',
     audience: ['opencrvs:events-user'],
-    issuer: 'opencrvs:auth-service'
+    issuer: 'opencrvs:auth-service',
+    ...overrides
   })
   return `Bearer ${token}`
 }
@@ -306,9 +310,10 @@ export function createTestClient(
   return caller
 }
 
-export function createInternalTestClient() {
+export function createInternalTestClient(tokenWithBearer?: TokenWithBearer) {
   const createCaller = tInternal.createCallerFactory(internalRouter)
-  const token = createInternalServiceToken()
+
+  const token = tokenWithBearer ?? createInternalServiceToken()
   const caller = createCaller({
     token
   })
@@ -945,4 +950,27 @@ export function assertScopeResult(
   })
 
   expect(result.success).toBe(isAccessibleWithScope)
+}
+
+export async function systemInitialisationTestSetup() {
+  const TEST_SUPER_USER_PASSWORD = 'super-secure-password'
+
+  const eventsDb = getClient()
+
+  const salt = genSaltSync(10)
+  const passwordHash = hashSync(TEST_SUPER_USER_PASSWORD, salt)
+
+  await eventsDb
+    .insertInto('systemInitialisation')
+    .values({
+      tokenHash: passwordHash,
+      tokenSalt: salt,
+      id: 1
+    })
+    .execute()
+
+  return {
+    db: eventsDb,
+    password: TEST_SUPER_USER_PASSWORD
+  }
 }

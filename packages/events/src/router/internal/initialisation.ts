@@ -11,84 +11,54 @@
 
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
-import { AdministrativeArea, Location, UUID } from '@opencrvs/commons'
 import { internalProcedure, internalRouter } from '@events/router/trpc'
 import { generateHash } from '@events/service/auth/hash'
 import {
   completeSystemInitialisation,
   getSystemInitialisation
 } from '@events/service/auth'
-import { setAdministrativeAreas } from '@events/service/administrative-areas'
-import { getLocations, setLocations } from '@events/service/locations/locations'
+import { setAdministrativeAreasRoute } from '../administrative-areas'
+import { listLocationsRoute, setLocationsRoute } from '../locations'
 
 export const initialisationRouter = internalRouter({
-  superuser: {
-    verifyPassword: internalProcedure
-      .input(z.object({ password: z.string() }))
-      .output(z.object({ valid: z.boolean() }))
-      .mutation(async ({ input }) => {
-        const systemInitialisation = await getSystemInitialisation()
-
-        if (systemInitialisation.completedAt !== null) {
-          return { valid: false }
-        }
-
-        const hash = await generateHash(
-          input.password,
-          systemInitialisation.tokenSalt
-        )
-        if (hash !== systemInitialisation.tokenHash) {
-          throw new TRPCError({ code: 'UNAUTHORIZED' })
-        }
-
-        return { valid: true }
-      }),
-    completeInitialisation: internalProcedure.mutation(async ({ input }) => {
+  authenticate: internalProcedure
+    .input(z.object({ password: z.string() }))
+    .output(z.object({ valid: z.boolean() }))
+    .mutation(async ({ input }) => {
       const systemInitialisation = await getSystemInitialisation()
 
       if (systemInitialisation.completedAt !== null) {
         throw new TRPCError({
-          code: 'CONFLICT',
-          message: 'System is already set up'
+          code: 'UNAUTHORIZED'
         })
       }
 
-      await completeSystemInitialisation()
-    })
-  },
+      const hash = await generateHash(
+        input.password,
+        systemInitialisation.tokenSalt
+      )
+      if (hash !== systemInitialisation.tokenHash) {
+        throw new TRPCError({ code: 'UNAUTHORIZED' })
+      }
+
+      return { valid: true }
+    }),
+  complete: internalProcedure.mutation(async () => {
+    const systemInitialisation = await getSystemInitialisation()
+
+    if (systemInitialisation.completedAt !== null) {
+      throw new TRPCError({
+        code: 'CONFLICT'
+      })
+    }
+
+    await completeSystemInitialisation()
+  }),
   administrativeAreas: {
-    set: internalProcedure
-      .input(z.array(AdministrativeArea).min(1))
-      .output(z.void())
-      .mutation(async ({ input }) => setAdministrativeAreas(input))
+    set: setAdministrativeAreasRoute(internalProcedure)
   },
   locations: {
-    set: internalProcedure
-      .input(z.array(Location).min(1))
-      .output(z.void())
-      .mutation(async ({ input }) => {
-        await setLocations(input)
-      }),
-
-    list: internalProcedure
-      .input(
-        z
-          .object({
-            isActive: z.boolean().optional(),
-            locationIds: z.array(UUID).optional(),
-            locationType: z.string().optional(),
-            externalId: z.string().optional()
-          })
-          .optional()
-      )
-      .output(z.array(Location))
-      .query(async ({ input }) =>
-        getLocations({
-          isActive: input?.isActive,
-          locationIds: input?.locationIds,
-          locationType: input?.locationType,
-          externalId: input?.externalId
-        })
-      )
+    set: setLocationsRoute(internalProcedure),
+    list: listLocationsRoute(internalProcedure)
   }
 })

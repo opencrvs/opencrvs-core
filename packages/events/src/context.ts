@@ -37,19 +37,6 @@ export const InternalTrpcContext = z.object({
   token: TokenWithBearer
 })
 export type InternalTrpcContext = z.infer<typeof InternalTrpcContext>
-/**
- * Internal user, used to bootstrap the system and then deactivate.
- */
-const SEEDER_SUPER_ADMIN = 'o.admin'
-
-/**
- * Super admin does not have a primary office. It is the one setting locations.
- * It should be used only once to bootstrap the system. Usage should be limited. Seeing it as 'system' is one way of doing that. (And it also plays well with types)
- */
-const SuperAdminContext = SystemContext.extend({
-  role: z.literal('SUPER_ADMIN')
-})
-type SuperAdminContext = z.infer<typeof SuperAdminContext>
 
 const tokenPublicKey = readFileSync(env.CERT_PUBLIC_KEY_PATH)
 
@@ -72,17 +59,38 @@ function verifyAppToken(token: TokenWithBearer): TokenClaims {
   return TokenClaims.parse(verified)
 }
 
-export function verifyInternalServiceToken(token: TokenWithBearer) {
-  const jwtToken = token.split(' ')[1]
+type InternalServiceSubject =
+  | 'opencrvs:auth-service'
+  | 'opencrvs:data-seeder-service'
 
-  return jwt.verify(jwtToken, tokenPublicKey, {
-    algorithms: ['RS256'],
-    issuer: 'opencrvs:auth-service',
-    audience: ['opencrvs:events-user']
-  })
+export function verifyInternalServiceToken(token: TokenWithBearer) {
+  const tokenWithoutBearer = token.split(' ')[1]
+  const subjects = [
+    'opencrvs:auth-service',
+    'opencrvs:data-seeder-service'
+  ] satisfies InternalServiceSubject[]
+
+  for (const subject of subjects) {
+    try {
+      return jwt.verify(tokenWithoutBearer, tokenPublicKey, {
+        subject,
+        algorithms: ['RS256'],
+        issuer: 'opencrvs:auth-service',
+        audience: ['opencrvs:events-user']
+      })
+    } catch (err) {
+      if (err instanceof jwt.TokenExpiredError) {
+        throw new TRPCError({ code: 'UNAUTHORIZED' })
+      }
+
+      continue
+    }
+  }
+
+  throw new TRPCError({ code: 'UNAUTHORIZED' })
 }
 
-export type TrpcUserContext = SystemContext | UserContext | SuperAdminContext
+export type TrpcUserContext = SystemContext | UserContext
 
 type HeadersLike =
   // gateway is not aware of Headers. We use this as a proxy.
@@ -141,21 +149,8 @@ async function resolveUserDetails(
       })
     }
 
-    const { primaryOfficeId, role, signature, username, administrativeAreaId } =
+    const { primaryOfficeId, role, signature, administrativeAreaId } =
       await getUser(userId)
-
-    if (username === SEEDER_SUPER_ADMIN) {
-      logger.warn(
-        `User ${username} is used for seeding. Treating it as a ${TokenUserType.enum.system} user type.`
-      )
-
-      return SuperAdminContext.parse({
-        type: TokenUserType.enum.system,
-        id: userId,
-        primaryOfficeId: undefined,
-        role
-      })
-    }
 
     return UserContext.parse({
       type: userType,

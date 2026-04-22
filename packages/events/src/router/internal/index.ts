@@ -252,7 +252,6 @@ export const internalUserRouter = internalRouter({
     .input(UserSearch)
     .output(z.array(UserOrSystem))
     .query(async ({ input }) => {
-      console.log('foobar')
       return searchUsers({
         ...input,
         primaryOfficeId: input.primaryOfficeId
