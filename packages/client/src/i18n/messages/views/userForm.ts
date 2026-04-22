@@ -59,6 +59,11 @@ export const messages = {
     description: "User's English surname",
     id: 'form.field.label.userSurname'
   },
+  fullName: {
+    defaultMessage: "User's full name",
+    description: "User's full English name",
+    id: 'form.field.label.userFullName'
+  },
   phoneNumber: {
     defaultMessage: 'Phone number',
     description: 'Input label for phone input',

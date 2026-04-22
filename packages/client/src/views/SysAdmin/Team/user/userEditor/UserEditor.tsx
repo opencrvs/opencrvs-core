@@ -120,7 +120,7 @@ function getUserEditConfig(
               type: FieldType.NAME,
               required: true,
               hideLabel: true,
-              label: messages.username
+              label: messages.fullName
             },
             {
               id: 'phoneNumber',
