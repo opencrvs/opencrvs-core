@@ -11,7 +11,13 @@
 
 import { Node, Project, SyntaxKind, Expression } from 'ts-morph'
 import path from 'path'
-import { legacyScopeToV2Scope, decodeScope, SCOPES } from '@opencrvs/commons'
+import {
+  decodeScope,
+} from '@opencrvs/commons/scopes'
+import {
+  legacyScopeToV2Scope,
+  SCOPES
+} from '@opencrvs/commons/scopes.deprecated.do-not-use'
 import { getCwd } from '.'
 
 const ROLES_FILE_RELATIVE_PATH = 'src/data-seeding/roles/roles.ts'
