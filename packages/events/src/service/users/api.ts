@@ -56,7 +56,7 @@ export type SearchUsersPayload = {
   sortOrder: 'asc' | 'desc'
 }
 
-async function generateUsername(
+export async function generateUsername(
   names: UserInput['name'],
   existingUserName?: string
 ) {
