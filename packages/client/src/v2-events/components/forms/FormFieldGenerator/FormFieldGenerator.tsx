@@ -173,6 +173,7 @@ export const FormFieldGenerator = forwardRef<
     return (
       <Formik<EventState>
         key={id}
+        enableReinitialize
         initialTouched={
           // Our form values are nested but to make the implementation easier,
           // we manually assert the value to be nested only when dealing with
