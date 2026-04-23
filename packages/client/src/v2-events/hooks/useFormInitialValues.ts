@@ -46,14 +46,17 @@ export function computeInitialValues(
       continue
     }
 
-    // Visible simple field: formValues ?? resolveSyncedFieldValue ?? getDefaultValue
+    /*
+    /* Visible simple field: formValue ?? resolveSyncedFieldValue ?? getDefaultValue
+     * where a formValue can be null
+     */
     const effectiveValue =
-      formValues[field.id] ??
-      resolveSyncedFieldValue(field, (syncRef) => {
-        const key = flattenFieldReference(syncRef)
-        return get(values, key) ?? get(context.baseFormState, key)
-      }) ??
-      getDefaultValue(field)
+      formValues[field.id] !== undefined
+        ? formValues[field.id]
+        : (resolveSyncedFieldValue(field, (syncRef) => {
+            const key = flattenFieldReference(syncRef)
+            return get(values, key) ?? get(context.baseFormState, key)
+          }) ?? getDefaultValue(field))
 
     values[field.id] = effectiveValue
   }
