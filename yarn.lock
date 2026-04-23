@@ -6025,26 +6025,6 @@
   resolved "https://registry.npmjs.org/@open-draft/until/-/until-2.1.0.tgz"
   integrity sha512-U69T3ItWHvLwGg5eJ0n3I62nWuE6ilHlmz7zM0npLBRvPRd7e6NYmg54vvRtP5mZG7kZqZCFVdsTWo7BPtBujg==
 
-"@opencrvs/toolkit@1.9.11-rc.f3d28ba":
-  version "1.9.11-rc.f3d28ba"
-  resolved "https://registry.yarnpkg.com/@opencrvs/toolkit/-/toolkit-1.9.11-rc.f3d28ba.tgz#4f6e18a8ed09d701eb56f1123e12c4f533e69d4c"
-  integrity sha512-/17cgh+/waovEcKCsrvXWnApdCWsmaGCin3KZctv56tvvJtyPYYRPu5mbVRSuNtDNeXUzXXWihQQdSqTE/jmew==
-  dependencies:
-    "@trpc/client" "11.4.3"
-    "@trpc/server" "^11.8.0"
-    ajv "^8.17.1"
-    ajv-formats "^3.0.1"
-    date-fns "^2.28.0"
-    jwt-decode "^3.0.0"
-    lodash "^4.17.10"
-    object-hash "^3.0.0"
-    qs "6.14.0"
-    superjson "1.9.0-0"
-    ts-morph "^27.0.2"
-    uuid "^9.0.0"
-    zod "^4.2.1"
-    zod-openapi "^5.4.6"
-
 "@opentelemetry/api@1.x":
   version "1.9.0"
   resolved "https://registry.npmjs.org/@opentelemetry/api/-/api-1.9.0.tgz"
