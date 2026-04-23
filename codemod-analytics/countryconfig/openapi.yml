@@ -14972,7 +14972,7 @@ components:
               - label
             additionalProperties: false
         analytics:
-          default: false
+          default: true
           description: Indicates whether the recors of this event type are included in
             analytics
           type: boolean
