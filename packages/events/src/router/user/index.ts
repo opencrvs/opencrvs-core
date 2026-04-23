@@ -162,7 +162,7 @@ export const userRouter = router({
       const user = await createUser(input, ctx.token)
       await writeAuditLog({
         ...input,
-        clientId: user.id,
+        clientId: ctx.user.id,
         clientType: user.type,
         operation: 'user.create_user',
         requestData: {
@@ -248,7 +248,7 @@ export const userRouter = router({
   changePassword: userOnlyProcedure
     .input(
       z.object({
-        existingPassword: z.string().optional(),
+        existingPassword: z.string(),
         password: z.string()
       })
     )
@@ -256,16 +256,14 @@ export const userRouter = router({
       const userId = UUID.parse(ctx.user.id)
       const record = await getCredentials(userId)
 
-      if (input.existingPassword) {
-        const existingHash = await generateHash(
-          input.existingPassword,
-          record.salt
-        )
-        if (existingHash !== record.passwordHash) {
-          logger.error(`Password didn't match for given userid: ${ctx.user.id}`)
-          // Don't return a 404 as this gives away that this user account exists
-          throw new TRPCError({ code: 'UNAUTHORIZED' })
-        }
+      const existingHash = await generateHash(
+        input.existingPassword,
+        record.salt
+      )
+      if (existingHash !== record.passwordHash) {
+        logger.error(`Password didn't match for given userid: ${ctx.user.id}`)
+        // Don't return a 404 as this gives away that this user account exists
+        throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
 
       const newHash = await generateHash(input.password, record.salt)

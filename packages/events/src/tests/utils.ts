@@ -223,9 +223,15 @@ export function createTestToken({
   return `Bearer ${token}`
 }
 
-export function createInternalServiceToken(): TokenWithBearer {
+export type InternalServiceSubject =
+  | 'opencrvs:auth-service'
+  | 'opencrvs:data-seeder-service'
+
+export function createInternalServiceToken(
+  subject: InternalServiceSubject
+): TokenWithBearer {
   const token = jwt.sign({}, readFileSync(join(__dirname, './cert.key')), {
-    subject: 'opencrvs:auth-service',
+    subject,
     algorithm: 'RS256',
     expiresIn: '604800',
     audience: ['opencrvs:events-user'],
@@ -306,9 +312,11 @@ export function createTestClient(
   return caller
 }
 
-export function createInternalTestClient() {
+export function createInternalTestClient(
+  subject: InternalServiceSubject = 'opencrvs:auth-service'
+) {
   const createCaller = tInternal.createCallerFactory(internalRouter)
-  const token = createInternalServiceToken()
+  const token = createInternalServiceToken(subject)
   const caller = createCaller({
     token
   })
@@ -424,38 +432,38 @@ function actionToClientAction(
   | ((eventId: string) => Promise<EventDocument>) {
   switch (action) {
     case ActionType.CREATE:
-      return () => client.event.create(generator.event.create())
+      return async () => client.event.create(generator.event.create())
     case ActionType.DECLARE:
-      return (eventId: string) =>
+      return async (eventId: string) =>
         client.event.actions.declare.request(
           generator.event.actions.declare(eventId, { keepAssignment: true })
         )
     case ActionType.REJECT:
-      return (eventId: string) =>
+      return async (eventId: string) =>
         client.event.actions.reject.request(
           generator.event.actions.reject(eventId, { keepAssignment: true })
         )
     case ActionType.ARCHIVE:
-      return (eventId: string) =>
+      return async (eventId: string) =>
         client.event.actions.archive.request(
           generator.event.actions.archive(eventId, { keepAssignment: true })
         )
     case ActionType.REGISTER:
-      return (eventId: string) =>
+      return async (eventId: string) =>
         client.event.actions.register.request(
           generator.event.actions.register(eventId, {
             keepAssignment: true
           })
         )
     case ActionType.PRINT_CERTIFICATE:
-      return (eventId: string) =>
+      return async (eventId: string) =>
         client.event.actions.printCertificate.request(
           generator.event.actions.printCertificate(eventId, {
             keepAssignment: true
           })
         )
     case ActionType.REQUEST_CORRECTION:
-      return (eventId: string) =>
+      return async (eventId: string) =>
         client.event.actions.correction.request.request(
           generator.event.actions.correction.request(eventId, {
             keepAssignment: true

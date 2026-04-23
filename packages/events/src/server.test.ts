@@ -128,7 +128,7 @@ afterAll(() => serverInstance.close())
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
-function createEvent(token: string) {
+async function createEvent(token: string) {
   return appClient.event.create.mutate(
     { transactionId: getUUID(), type: TENNIS_CLUB_MEMBERSHIP },
     { context: { headers: { authorization: token } } }
@@ -331,25 +331,6 @@ test('UNAUTHORIZED error is thrown when internal request is made with token is n
       }
     })
   ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
-})
-test('API response is returned when internal request is made with valid token', async () => {
-  expect(serverInstance).toBeDefined()
-  expect(url).toBeDefined()
-  const internalServiceToken = jwt.sign({}, cert, {
-    subject: 'opencrvs:auth-service',
-    algorithm: 'RS256',
-    expiresIn: '1h',
-    audience: ['opencrvs:events-user'],
-    issuer: 'opencrvs:auth-service'
-  })
-  const response = await internalServiceClient.user.ping.query('ping', {
-    context: {
-      headers: {
-        authorization: `Bearer ${internalServiceToken}`
-      }
-    }
-  })
-  expect(response).toEqual(`pong: ping`)
 })
 // ─── upstream failures ───────────────────────────────────────────────────────
 

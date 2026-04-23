@@ -11,12 +11,7 @@
 
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
-import {
-  FamilyName,
-  logger,
-  UserAuditRecordInput,
-  UUID
-} from '@opencrvs/commons'
+import { FamilyName, UserAuditRecordInput, UUID } from '@opencrvs/commons'
 import { internalProcedure, internalRouter } from '@events/router/trpc'
 import {
   getUserCredentialsByUsername,
@@ -129,27 +124,11 @@ export const internalUserRouter = internalRouter({
     .input(
       z.object({
         userId: UUID,
-        existingPassword: z.string().optional(),
         password: z.string()
       })
     )
     .mutation(async ({ input }) => {
       const record = await getCredentials(input.userId)
-
-      if (input.existingPassword) {
-        const existingHash = await generateHash(
-          input.existingPassword,
-          record.salt
-        )
-        if (existingHash !== record.passwordHash) {
-          logger.error(
-            `Password didn't match for given userid: ${input.userId}`
-          )
-          // Don't return a 404 as this gives away that this user account exists
-          throw new TRPCError({ code: 'UNAUTHORIZED' })
-        }
-      }
-
       const newHash = await generateHash(input.password, record.salt)
       await updatePasswordHash(UUID.parse(input.userId), newHash)
       void writeAuditLog({
