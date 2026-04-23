@@ -10,7 +10,6 @@ import type { default as SystemClientsTable } from './SystemClients'
 import type { default as AdministrativeAreasTable } from './AdministrativeAreas'
 import type { default as EventActionsTable } from './EventActions'
 import type { default as AuditLogTable } from './AuditLog'
-import type { default as PgmigrationsLegacyDataTable } from './PgmigrationsLegacyData'
 import type { default as UsersTable } from './Users'
 import type { default as EventsTable } from './Events'
 
@@ -32,8 +31,6 @@ export default interface AppSchema {
   eventActions: EventActionsTable
 
   auditLog: AuditLogTable
-
-  pgmigrationsLegacyData: PgmigrationsLegacyDataTable
 
   users: UsersTable
 

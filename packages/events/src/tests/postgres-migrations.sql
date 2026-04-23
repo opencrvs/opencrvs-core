@@ -35,7 +35,7 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner:
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: 
 --
 
 COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
@@ -49,7 +49,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner:
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
 --
 
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
@@ -357,21 +357,6 @@ ALTER SEQUENCE app.pgmigrations_id_seq OWNED BY app.pgmigrations.id;
 
 
 --
--- Name: pgmigrations_legacy_data_id_seq; Type: SEQUENCE; Schema: app; Owner: postgres
---
-
-CREATE SEQUENCE app.pgmigrations_legacy_data_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE app.pgmigrations_legacy_data_id_seq OWNER TO postgres;
-
---
 -- Name: system_clients; Type: TABLE; Schema: app; Owner: events_migrator
 --
 
@@ -397,12 +382,13 @@ ALTER TABLE app.system_clients OWNER TO events_migrator;
 --
 
 CREATE TABLE app.system_initialisation (
-    id integer NOT NULL,
+    id integer DEFAULT 1 NOT NULL,
     hash text,
     salt text,
     completed_at timestamp with time zone,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT completion_tokens_consistent CHECK ((((completed_at IS NULL) AND (hash IS NOT NULL) AND (salt IS NOT NULL)) OR ((completed_at IS NOT NULL) AND (hash IS NULL) AND (salt IS NULL))))
+    CONSTRAINT completion_tokens_consistent CHECK ((((completed_at IS NULL) AND (hash IS NOT NULL) AND (salt IS NOT NULL)) OR ((completed_at IS NOT NULL) AND (hash IS NULL) AND (salt IS NULL)))),
+    CONSTRAINT system_initialisation_id_check CHECK ((id = 1))
 );
 
 
@@ -413,28 +399,6 @@ ALTER TABLE app.system_initialisation OWNER TO events_migrator;
 --
 
 COMMENT ON TABLE app.system_initialisation IS 'Single-row table tracking application initialisation state. Populated once during initial migration, and never modified except to mark initialisation as completed.';
-
-
---
--- Name: system_initialisation_id_seq; Type: SEQUENCE; Schema: app; Owner: events_migrator
---
-
-CREATE SEQUENCE app.system_initialisation_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE app.system_initialisation_id_seq OWNER TO events_migrator;
-
---
--- Name: system_initialisation_id_seq; Type: SEQUENCE OWNED BY; Schema: app; Owner: events_migrator
---
-
-ALTER SEQUENCE app.system_initialisation_id_seq OWNED BY app.system_initialisation.id;
 
 
 --
@@ -474,8 +438,8 @@ CREATE TABLE app.users (
     office_id uuid NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    device text,
     data jsonb DEFAULT '{}'::jsonb NOT NULL,
+    device text,
     CONSTRAINT email_or_mobile_not_null CHECK (((email IS NOT NULL) OR (mobile IS NOT NULL)))
 );
 
@@ -494,13 +458,6 @@ COMMENT ON COLUMN app.users.legacy_id IS 'References the user id from the legacy
 --
 
 ALTER TABLE ONLY app.pgmigrations ALTER COLUMN id SET DEFAULT nextval('app.pgmigrations_id_seq'::regclass);
-
-
---
--- Name: system_initialisation id; Type: DEFAULT; Schema: app; Owner: events_migrator
---
-
-ALTER TABLE ONLY app.system_initialisation ALTER COLUMN id SET DEFAULT nextval('app.system_initialisation_id_seq'::regclass);
 
 
 --
