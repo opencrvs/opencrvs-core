@@ -179,9 +179,10 @@ export async function searchUsers(
 }
 
 type CreateUserPayload = z.infer<typeof UserInput>
+type UpdateUserPayload = Partial<z.infer<typeof UserInput>>
 
 export async function updateUser(
-  input: CreateUserPayload & { id: UUID },
+  input: UpdateUserPayload & { id: UUID },
   token: string
 ): Promise<User> {
   const existingUser = await getUserById(input.id)
@@ -193,12 +194,20 @@ export async function updateUser(
     })
   }
 
+  const name: IUserName[] = input.name ?? [
+    {
+      use: 'en',
+      given: [existingUser.firstname ?? ''],
+      family: existingUser.surname ?? ''
+    }
+  ]
+
   const oldUsername = existingUser.username
-  const newUsername = await generateUsername(input.name, existingUser.username)
+  const newUsername = await generateUsername(name, existingUser.username)
 
   await updateUserById(input.id, {
-    firstname: personNameFromV1ToV2(input.name).firstname,
-    surname: personNameFromV1ToV2(input.name).surname,
+    firstname: personNameFromV1ToV2(name).firstname,
+    surname: personNameFromV1ToV2(name).surname,
     fullHonorificName: input.fullHonorificName,
     email: input.email,
     mobile: input.mobile,
@@ -216,7 +225,7 @@ export async function updateUser(
       event: 'user-updated',
       payload: {
         recipient: {
-          name: personNameFromV1ToV2(input.name),
+          name: personNameFromV1ToV2(name),
           email: input.email,
           mobile: input.mobile
         },

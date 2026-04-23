@@ -71,7 +71,10 @@ export const UserInput = z.object({
   data: z.record(z.string(), FieldValue).optional().default({})
 })
 
+export const UserUpdateInput = UserInput.partial()
+
 export type UserInput = z.infer<typeof UserInput>
+export type UserUpdateInput = z.infer<typeof UserUpdateInput>
 
 export const System = z.object({
   id: z.string(),
