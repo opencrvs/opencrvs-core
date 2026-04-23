@@ -92,6 +92,7 @@ const DomesticAddressUpdateFieldValue = BaseAddressFieldUpdateValue.extend({
   administrativeArea: z
     .string()
     .uuid()
+    .or(z.literal(''))
     .nullish() /* Leaf level admin structure */
 })
 
