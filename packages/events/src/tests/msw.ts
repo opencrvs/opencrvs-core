@@ -111,6 +111,9 @@ const handlers = [
       return HttpResponse.json(payload)
     }
   ),
+  http.post(`${env.COUNTRY_CONFIG_URL}/triggers/user/:event`, () =>
+    HttpResponse.json({})
+  ),
   // token exchange for `event.actions.register.confirm` and `event.actions.register.reject`
   // query params such as `subject_token`, `subject_token_type` omitted for simplicity
   http.post(`${env.AUTH_URL}/token`, () =>
