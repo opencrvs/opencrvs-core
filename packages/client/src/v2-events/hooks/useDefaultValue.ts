@@ -231,7 +231,11 @@ export function mapFieldToDefaultValue(
 
       return `${hours}:${minutes}`
     }
+    // `replacePlaceholders` returns undefined for falsy values
     case FieldType.CHECKBOX: {
+      return field.defaultValue
+    }
+    case FieldType.BUTTON: {
       return field.defaultValue
     }
     case FieldType.TEXT:
@@ -250,7 +254,6 @@ export function mapFieldToDefaultValue(
     case FieldType.DATE_RANGE:
     case FieldType.SELECT_DATE_RANGE:
     case FieldType.PHONE:
-    case FieldType.BUTTON:
     case FieldType.SEARCH:
     case FieldType.ID:
     case FieldType.VERIFICATION_STATUS:
