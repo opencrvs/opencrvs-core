@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { randomBytes } from 'crypto'
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import {
@@ -221,7 +222,6 @@ export async function updateUser(
 
   if (newUsername !== oldUsername) {
     await updateUsernameById(UUID.parse(input.id), newUsername)
-
     await triggerUserEventNotification({
       event: 'user-updated',
       payload: {
@@ -242,16 +242,19 @@ export async function updateUser(
 }
 
 function generateRandomPassword() {
-  const length = 6
   const charset =
     'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-
-  let randomPassword = ''
-  for (let i = 0; i < length; i += 1) {
-    randomPassword += charset.charAt(Math.floor(Math.random() * charset.length))
+  const length = 12
+  // Rejection sampling eliminates modulo bias (256 % 62 = 8, so bytes 248-255 are discarded)
+  const result: string[] = []
+  const limit = 256 - (256 % charset.length)
+  while (result.length < length) {
+    const byte = randomBytes(1)[0]
+    if (byte < limit) {
+      result.push(charset[byte % charset.length])
+    }
   }
-
-  return randomPassword
+  return result.join('')
 }
 
 async function sendCredentialsNotification(

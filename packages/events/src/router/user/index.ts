@@ -266,7 +266,7 @@ export const userRouter = router({
   changePassword: userOnlyProcedure
     .input(
       z.object({
-        existingPassword: z.string().optional(),
+        existingPassword: z.string(),
         password: z.string()
       })
     )

@@ -62,7 +62,6 @@ services:
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - AUTH_URL=http://auth:4040
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
-      - NOTIFICATION_URL=http://notification:2020/
       - CHECK_INVALID_TOKEN=true
       - DOCUMENTS_URL=http://documents:9050
   events:
@@ -111,20 +110,6 @@ services:
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - DOCUMENTS_URL=http://documents:9050
       - EVENTS_URL=http://events:5555/
-  notification:
-    image: ghcr.io/opencrvs/ocrvs-notification:${VERSION}
-    #platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./packages/notification/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - base
-    environment:
-      - COUNTRY=${COUNTRY:-bgd}
-      - HOST=0.0.0.0
-      - COUNTRY_CONFIG_URL=http://countryconfig:3040
-      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
   migration:
     image: ghcr.io/opencrvs/ocrvs-migration:${VERSION}
     #platform: linux/amd64
