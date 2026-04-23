@@ -63,14 +63,6 @@ services:
     ports:
       - '3040:3040'
 
-  metrics:
-    volumes:
-      - '.secrets/public-key.pem:/secrets/public-key.pem'
-    environment:
-      - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
-    ports:
-      - '1050:1050'
-
   client:
     ports:
       - '3000:3000'
