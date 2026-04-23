@@ -24,7 +24,6 @@ import {
   TokenUserType,
   UUID
 } from '@opencrvs/commons'
-import { generateUsername } from '@events/service/users/api'
 import { setAdministrativeAreas } from '../service/administrative-areas'
 import { setLocations } from '../service/locations/locations'
 import { createUserWithCredentials } from '../storage/postgres/events/users'
@@ -164,7 +163,7 @@ export function seeder() {
         profileImagePath: null
       },
       {
-        username: await generateUsername(user.name),
+        username: `user-${id}`,
         passwordHash: 'dummy-hash',
         salt: 'dummy-salt',
         securityQuestions: {}

@@ -22,7 +22,8 @@ import {
   personNameFromV1ToV2,
   User,
   UserInput,
-  UserOrSystem
+  UserOrSystem,
+  UserUpdateInput
 } from '@opencrvs/commons'
 import {
   allowedWithAnyOfScopes,
@@ -175,7 +176,7 @@ export const userRouter = router({
     }),
   update: userAndSystemProcedure
     .use(allowedWithAnyOfScopes(['user.edit']))
-    .input(UserInput.and(z.object({ id: UUID })))
+    .input(UserUpdateInput.and(z.object({ id: UUID })))
     .use(canUpdateUserLocation)
     .output(User)
     .mutation(async ({ input, ctx }) => {
