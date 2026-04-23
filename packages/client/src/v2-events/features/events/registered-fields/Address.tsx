@@ -34,12 +34,15 @@ import {
   FormState,
   FieldConfig,
   EventConfig,
-  UUID
+  UUID,
+  JurisdictionFilter,
+  resolveJurisdictionReference
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { getOfflineData } from '@client/offline/selectors'
+import { getToken } from '@client/utils/authUtils'
 import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
@@ -551,11 +554,21 @@ function AddressInput(props: Props) {
     touched = {},
     ...otherProps
   } = props
+  const token = useSelector(getToken)
   const { config } = useSelector(getOfflineData)
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
+
+  const jurisdictionFilter = resolveJurisdictionReference(
+    addressConfig.configuration?.allowedLocations,
+    token,
+    eventConfig?.id
+  )
+  const isCountryLocked =
+    jurisdictionFilter !== undefined &&
+    jurisdictionFilter !== JurisdictionFilter.enum.all
 
   const { countryField, domesticFields, streetAddressFields } =
     generateAddressFields(addressConfig, appConfigAdminLevels, disabled)
@@ -573,7 +586,11 @@ function AddressInput(props: Props) {
     streetAddressFieldIds
   )
 
-  const fields = [countryField, ...domesticFields, ...streetAddressFields]
+  const fields = [
+    isCountryLocked ? withDisabledConditional(countryField) : countryField,
+    ...domesticFields,
+    ...streetAddressFields
+  ]
 
   return (
     <FormFieldGenerator
