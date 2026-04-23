@@ -44,7 +44,7 @@ export type EventConfig = {
   declaration: DeclarationFormConfig
   advancedSearch: AdvancedSearchConfig[]
   flags: FlagConfig[]
-  analytics?: boolean
+  analytics: boolean
 }
 
 export type EventConfigInput = Omit<
@@ -55,6 +55,7 @@ export type EventConfigInput = Omit<
   | 'actions'
   | 'dateOfEvent'
   | 'placeOfEvent'
+  | 'analytics'
 > & {
   dateOfEvent?:
     | z.input<typeof FieldReference>
@@ -64,6 +65,7 @@ export type EventConfigInput = Omit<
   flags?: FlagConfig[]
   declaration: DeclarationFormConfigInput
   actions: z.input<typeof ActionConfig>[]
+  analytics?: boolean
 }
 
 /**
@@ -126,7 +128,7 @@ const _EventConfigBase: z.ZodType<EventConfig, EventConfigInput> = z.object({
   analytics: z
     .boolean()
     .optional()
-    .default(false)
+    .default(true)
     .describe(
       'Indicates whether the recors of this event type are included in analytics'
     )
