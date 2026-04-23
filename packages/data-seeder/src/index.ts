@@ -21,7 +21,7 @@ export const createInitialisationClient = (token: string) => {
   return createTRPCClient<InitialisationRouter>({
     links: [
       httpLink({
-        url: new URL('initialisation', env.EVENTS_HOST).href,
+        url: new URL('events/initialisation/', env.GATEWAY_HOST).href,
         transformer: superjson,
         async headers() {
           return { authorization: `Bearer ${token}` }

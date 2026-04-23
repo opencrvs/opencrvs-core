@@ -73,7 +73,11 @@ export async function createInitialisationToken() {
     subject: 'opencrvs:data-seeder-service',
     algorithm: 'RS256',
     expiresIn: env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
-    audience: ['opencrvs:events-user', 'opencrvs:countryconfig-user'],
+    audience: [
+      'opencrvs:events-user',
+      'opencrvs:countryconfig-user',
+      'opencrvs:gateway-user'
+    ],
     issuer: JWT_ISSUER
   })
 }
