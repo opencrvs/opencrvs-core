@@ -194,7 +194,6 @@ export async function createTokenForActionConfirmation(
         'opencrvs:events-user',
         'opencrvs:user-mgnt-user',
         'opencrvs:auth-user',
-        'opencrvs:metrics-user',
         'opencrvs:countryconfig-user',
         'opencrvs:documents-user'
       ],

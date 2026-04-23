@@ -30,7 +30,6 @@ export async function checkServiceHealth(url: string) {
 enum Services {
   AUTH = 'auth',
   USER_MGNT = 'user-mgnt',
-  METRICS = 'metrics',
   COUNTRY_CONFIG = 'countryconfig',
   GATEWAY = 'gateway'
 }
