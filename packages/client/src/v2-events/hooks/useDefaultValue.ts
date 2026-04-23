@@ -207,7 +207,8 @@ export function mapFieldToDefaultValue(
         )
       return {
         ...field.defaultValue,
-        administrativeArea: resolvedAdministrativeArea
+        // valid administrativeArea or undefined (don't allow empty string)
+        administrativeArea: resolvedAdministrativeArea || undefined
       }
     }
     case FieldType.DATE: {
