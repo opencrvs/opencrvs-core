@@ -64,7 +64,7 @@ import {
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
 import { userCanReadOtherUser } from '../middleware'
 
-export const UserSearch = z.object({
+const UserSearch = z.object({
   username: z.string().optional(),
   mobile: z.string().optional(),
   email: z.string().optional(),
