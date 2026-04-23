@@ -11,7 +11,6 @@
 
 HEARTH_CONFIG=./build/dist/src/migrate-mongo-config-hearth.js
 EVENTS_CONFIG=./build/dist/src/migrate-mongo-config-events.js
-OPENHIM_CONFIG=./build/dist/src/migrate-mongo-config-openhim.js
 USER_MGNT_CONFIG=./build/dist/src/migrate-mongo-config-user-mgnt.js
 
 SCRIPT_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
@@ -29,13 +28,6 @@ for ((n=0;n<$EVENTS_FILES;n++)); do
   yarn --cwd $SCRIPT_PATH migrate-mongo down --file $EVENTS_CONFIG
 done
 yarn --cwd $SCRIPT_PATH migrate-mongo status --file $EVENTS_CONFIG
-
-## Revert openhim migrations
-OPENHIM_FILES=$(ls ./build/dist/src/migrations/openhim | wc -l)
-for ((n=0;n<$OPENHIM_FILES;n++)); do
-  yarn --cwd $SCRIPT_PATH migrate-mongo down --file $OPENHIM_CONFIG
-done
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $OPENHIM_CONFIG
 
 ## Revert user-mgnt migration
 USER_MGNT_FILES=$(ls ./build/dist/src/migrations/user-mgnt | wc -l)
