@@ -10,14 +10,9 @@
  */
 import { internalClient } from '@auth/features/authenticate/service'
 
-export async function changePassword(
-  userId: string,
-  password: string,
-  existingPassword?: string
-) {
+export async function changePassword(userId: string, password: string) {
   await internalClient.user.changePassword.mutate({
     userId,
-    password,
-    existingPassword
+    password
   })
 }

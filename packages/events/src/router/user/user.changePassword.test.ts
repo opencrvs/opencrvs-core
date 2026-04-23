@@ -24,6 +24,7 @@ test('returns UNAUTHORIZED when user not found', async () => {
   })
   await expect(
     client.user.changePassword({
+      existingPassword: 'test',
       password: 'newpassword'
     })
   ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
@@ -41,6 +42,7 @@ test('updates the password hash without existingPassword (reset flow)', async ()
     .execute()
 
   await client.user.changePassword({
+    existingPassword: 'oldpassword',
     password: 'newpassword'
   })
 
