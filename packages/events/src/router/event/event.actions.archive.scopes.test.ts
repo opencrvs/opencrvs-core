@@ -84,7 +84,8 @@ test('Check scopes against event.actions.archive', async () => {
         options
       })
 
-      const randomIndex = Math.floor(Math.random() * eventIds.length)
+      const identities = []
+      const randomIndex = Math.floor(Math.random() * identities.length)
       const [eventId] = eventIds.splice(randomIndex, 1)
 
       const result = await attemptScopedAction(

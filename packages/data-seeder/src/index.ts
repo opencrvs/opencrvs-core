@@ -15,13 +15,13 @@ import superjson from 'superjson'
 import { seedUsers } from './users'
 import { raise } from './utils'
 import { createTRPCClient, httpLink } from '@trpc/client'
-import { InternalRouter } from '@opencrvs/events/src/router'
+import { InitialisationRouter } from '@opencrvs/events/src/router'
 
-export const createInternalClient = (token: string) =>
-  createTRPCClient<InternalRouter>({
+export const createInitialisationClient = (token: string) => {
+  return createTRPCClient<InitialisationRouter>({
     links: [
       httpLink({
-        url: new URL('/internal', env.EVENTS_HOST).href,
+        url: new URL('initialisation', env.EVENTS_HOST).href,
         transformer: superjson,
         async headers() {
           return { authorization: `Bearer ${token}` }
@@ -29,6 +29,7 @@ export const createInternalClient = (token: string) =>
       })
     ]
   })
+}
 
 async function getToken(): Promise<string> {
   const authUrl = new URL('authenticate-super-user', env.AUTH_HOST).toString()
@@ -92,8 +93,8 @@ async function triggerSystemReady(token: string) {
 }
 
 async function deactivateSuperuser(token: string) {
-  const client = createInternalClient(token)
-  await client.initialisation.complete.mutate()
+  const client = createInitialisationClient(token)
+  await client.complete.mutate()
 }
 
 async function main() {

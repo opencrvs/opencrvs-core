@@ -17,7 +17,7 @@ import {
   UserAuditRecordInput,
   UUID
 } from '@opencrvs/commons'
-import { internalProcedure, internalRouter } from '@events/router/trpc'
+import { internalProcedure, serviceRouter } from '@events/router/trpc'
 import {
   getUserCredentialsByUsername,
   updatePasswordHash
@@ -30,6 +30,8 @@ import {
   verifyUser
 } from '@events/service/users/api'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
+import { getSystemInitialisation } from '@events/service/auth'
+import { canInitialiseSystem } from '../middleware'
 
 const VerifyUserOutput = z.object({
   id: z.string(),
@@ -45,7 +47,7 @@ const VerifyUserOutput = z.object({
 /**
  * Intermediary route for having an endpoint to test with. Will be removed once we merge the user management changes.
  */
-export const internalUserRouter = internalRouter({
+export const internalUserRouter = serviceRouter({
   ping: internalProcedure
     .input(z.string())
     .output(z.string())
@@ -168,6 +170,31 @@ export const internalUserRouter = internalRouter({
           clientId: input.requestData.subjectId,
           clientType: 'system'
         })
+      })
+  },
+  initialisation: {
+    authenticate: internalProcedure
+      .use(canInitialiseSystem())
+      .input(z.object({ password: z.string() }))
+      .output(z.object({ valid: z.boolean() }))
+      .mutation(async ({ input }) => {
+        const systemInitialisation = await getSystemInitialisation()
+
+        if (systemInitialisation.completedAt !== null) {
+          throw new TRPCError({
+            code: 'UNAUTHORIZED'
+          })
+        }
+
+        const hash = await generateHash(
+          input.password,
+          systemInitialisation.salt
+        )
+        if (hash !== systemInitialisation.hash) {
+          throw new TRPCError({ code: 'UNAUTHORIZED' })
+        }
+
+        return { valid: true }
       })
   }
 })

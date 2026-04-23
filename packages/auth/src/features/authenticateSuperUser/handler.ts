@@ -12,7 +12,7 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import {
   authenticateSuperuser,
-  createInternalServiceToken
+  createInitialisationToken
 } from '@auth/features/authenticate/service'
 import { unauthorized } from '@hapi/boom'
 
@@ -36,9 +36,7 @@ export default async function authenticateSuperUserHandler(
       throw unauthorized()
     }
 
-    const token = await createInternalServiceToken(
-      'opencrvs:data-seeder-service'
-    )
+    const token = await createInitialisationToken()
     return h.response({
       token
     })

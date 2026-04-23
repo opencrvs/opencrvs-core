@@ -11,7 +11,7 @@
 
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
-import { initialisationProcedure, internalRouter } from '@events/router/trpc'
+import { initialisationProcedure, serviceRouter } from '@events/router/trpc'
 import { generateHash } from '@events/service/auth/hash'
 import {
   completeSystemInitialisation,
@@ -25,7 +25,7 @@ import { createUserRoute, searchUsersRoute } from '../user'
  * initialisationRouter contains routes related to the initialisation of the system, such as authenticating the initial "super user" and creating the administrative hierarchy.
  * These routes are intended to be used only during the initial setup of the system and are protected accordingly.
  */
-export const initialisationRouter = internalRouter({
+export const initialisationRouter = serviceRouter({
   authenticate: initialisationProcedure
     .input(z.object({ password: z.string() }))
     .output(z.object({ valid: z.boolean() }))
@@ -46,14 +46,6 @@ export const initialisationRouter = internalRouter({
       return { valid: true }
     }),
   complete: initialisationProcedure.mutation(async () => {
-    const systemInitialisation = await getSystemInitialisation()
-
-    if (systemInitialisation.completedAt !== null) {
-      throw new TRPCError({
-        code: 'CONFLICT'
-      })
-    }
-
     await completeSystemInitialisation()
   }),
   administrativeAreas: {
@@ -68,3 +60,6 @@ export const initialisationRouter = internalRouter({
     create: createUserRoute(initialisationProcedure)
   }
 })
+
+/** @knipignore */
+export type InitialisationRouter = typeof initialisationRouter

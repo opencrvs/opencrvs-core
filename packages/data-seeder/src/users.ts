@@ -22,7 +22,7 @@ import {
   EncodedScope
 } from '@opencrvs/commons'
 import { fromZodError } from 'zod-validation-error'
-import { createInternalClient } from './index'
+import { createInitialisationClient } from './index'
 
 const RoleSchema = (eventIds: string[]) =>
   z.array(
@@ -191,9 +191,9 @@ async function userAlreadyExists(
   token: string,
   username: string
 ): Promise<boolean> {
-  const client = createInternalClient(token)
+  const client = createInitialisationClient(token)
 
-  const res = await client.initialisation.users.search.query({
+  const res = await client.users.search.query({
     username,
     count: 1,
     skip: 0,
@@ -204,8 +204,8 @@ async function userAlreadyExists(
 }
 
 async function createUser(token: string, userPayload: any) {
-  const client = createInternalClient(token)
-  return client.initialisation.users.create.mutate(userPayload)
+  const client = createInitialisationClient(token)
+  return client.users.create.mutate(userPayload)
 }
 
 export async function seedUsers(token: string) {
@@ -230,9 +230,9 @@ export async function seedUsers(token: string) {
 
     const externalId = officeIdentifier.split('_').at(-1)
 
-    const client = createInternalClient(token)
+    const client = createInitialisationClient(token)
 
-    const [primaryOffice] = await client.initialisation.locations.list.query({
+    const [primaryOffice] = await client.locations.list.query({
       externalId
     })
 

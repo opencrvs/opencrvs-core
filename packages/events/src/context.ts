@@ -33,10 +33,14 @@ export const TrpcContext = z.object({
 })
 export type TrpcContext = z.infer<typeof TrpcContext>
 
-export const InternalTrpcContext = z.object({
+/**
+ * Service, internal or external caller. e.g. data-seeder, auth-service.
+ */
+export const ServiceTrpcContext = z.object({
   token: TokenWithBearer
 })
-export type InternalTrpcContext = z.infer<typeof InternalTrpcContext>
+
+export type ServiceTrpcContext = z.infer<typeof ServiceTrpcContext>
 
 const tokenPublicKey = readFileSync(env.CERT_PUBLIC_KEY_PATH)
 
@@ -59,35 +63,37 @@ function verifyAppToken(token: TokenWithBearer): TokenClaims {
   return TokenClaims.parse(verified)
 }
 
-type InternalServiceSubject =
-  | 'opencrvs:auth-service'
-  | 'opencrvs:data-seeder-service'
+type ServiceSubject = 'opencrvs:auth-service' | 'opencrvs:data-seeder-service'
+
+function getServiceTokenVerifyOptions(
+  subject: ServiceSubject
+): jwt.VerifyOptions {
+  return {
+    subject,
+    algorithms: ['RS256'],
+    issuer: 'opencrvs:auth-service',
+    audience: ['opencrvs:events-user']
+  }
+}
 
 export function verifyInternalServiceToken(token: TokenWithBearer) {
   const tokenWithoutBearer = token.split(' ')[1]
-  const subjects = [
-    'opencrvs:auth-service',
-    'opencrvs:data-seeder-service'
-  ] satisfies InternalServiceSubject[]
 
-  for (const subject of subjects) {
-    try {
-      return jwt.verify(tokenWithoutBearer, tokenPublicKey, {
-        subject,
-        algorithms: ['RS256'],
-        issuer: 'opencrvs:auth-service',
-        audience: ['opencrvs:events-user']
-      })
-    } catch (err) {
-      if (err instanceof jwt.TokenExpiredError) {
-        throw new TRPCError({ code: 'UNAUTHORIZED' })
-      }
+  return jwt.verify(
+    tokenWithoutBearer,
+    tokenPublicKey,
+    getServiceTokenVerifyOptions('opencrvs:auth-service')
+  )
+}
 
-      continue
-    }
-  }
+export function verifyInitialisationToken(token: TokenWithBearer) {
+  const tokenWithoutBearer = token.split(' ')[1]
 
-  throw new TRPCError({ code: 'UNAUTHORIZED' })
+  return jwt.verify(
+    tokenWithoutBearer,
+    tokenPublicKey,
+    getServiceTokenVerifyOptions('opencrvs:data-seeder-service')
+  )
 }
 
 export type TrpcUserContext = SystemContext | UserContext
@@ -189,6 +195,19 @@ export function createInternalContext({ req }: { req: IncomingMessage }) {
     const token = TokenWithBearer.parse(normalizedHeaders.authorization)
 
     verifyInternalServiceToken(token)
+
+    return {
+      token
+    }
+  } catch {
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
+}
+
+export function createServiceContext({ req }: { req: IncomingMessage }) {
+  const normalizedHeaders = normalizeHeaders(req.headers)
+  try {
+    const token = TokenWithBearer.parse(normalizedHeaders.authorization)
 
     return {
       token

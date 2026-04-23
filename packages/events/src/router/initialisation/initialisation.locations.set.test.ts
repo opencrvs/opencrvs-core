@@ -17,7 +17,7 @@ import {
 } from '@opencrvs/commons'
 import {
   createInternalServiceToken,
-  createInternalTestClient,
+  createInitialisationTestClient,
   createTestToken,
   setupTestCase,
   systemInitialisationTestSetup,
@@ -39,12 +39,12 @@ const locationPayload: Location[] = [
 
 test('Returns 403 after initialisation is completed', async () => {
   await systemInitialisationTestSetup()
-  const client = createInternalTestClient()
-  await expect(client.initialisation.complete()).resolves.toBeUndefined()
+  const client = createInitialisationTestClient()
+  await expect(client.complete()).resolves.toBeUndefined()
 
-  await expect(
-    client.initialisation.locations.set(locationPayload)
-  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+  await expect(client.locations.set(locationPayload)).rejects.toMatchObject(
+    new TRPCError({ code: 'UNAUTHORIZED' })
+  )
 })
 
 test('Returns 403 when accessed with user app token', async () => {
@@ -56,9 +56,9 @@ test('Returns 403 when accessed with user app token', async () => {
     scopes: TEST_USER_DEFAULT_SCOPES,
     userType: TokenUserType.enum.user
   })
-  const client = createInternalTestClient(appToken)
+  const client = createInitialisationTestClient(appToken)
 
-  await expect(client.initialisation.locations.set([])).rejects.toMatchObject(
+  await expect(client.locations.set([])).rejects.toMatchObject(
     new TRPCError({ code: 'UNAUTHORIZED' })
   )
 })
@@ -72,11 +72,11 @@ test('Returns 403 when accessed with system app token', async () => {
     userType: TokenUserType.enum.system
   })
 
-  const client = createInternalTestClient(systemToken)
+  const client = createInitialisationTestClient(systemToken)
 
-  await expect(
-    client.initialisation.locations.set(locationPayload)
-  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+  await expect(client.locations.set(locationPayload)).rejects.toMatchObject(
+    new TRPCError({ code: 'UNAUTHORIZED' })
+  )
 })
 
 test('Returns 403 when accessed with internal token using invalid subject', async () => {
@@ -86,29 +86,27 @@ test('Returns 403 when accessed with internal token using invalid subject', asyn
     subject: 'invalid-subject'
   })
 
-  const client = createInternalTestClient(internalToken)
+  const client = createInitialisationTestClient(internalToken)
 
-  await expect(
-    client.initialisation.locations.set(locationPayload)
-  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+  await expect(client.locations.set(locationPayload)).rejects.toMatchObject(
+    new TRPCError({ code: 'UNAUTHORIZED' })
+  )
 })
 
 test('Prevents sending empty payload', async () => {
   await systemInitialisationTestSetup()
 
-  const client = createInternalTestClient()
+  const client = createInitialisationTestClient()
 
-  await expect(
-    client.initialisation.locations.set([])
-  ).rejects.toThrowErrorMatchingSnapshot()
+  await expect(client.locations.set([])).rejects.toThrowErrorMatchingSnapshot()
 })
 
 test('Creates single location', async () => {
   await systemInitialisationTestSetup()
 
-  const client = createInternalTestClient()
+  const client = createInitialisationTestClient()
 
-  await client.initialisation.locations.set(locationPayload)
+  await client.locations.set(locationPayload)
 
   const eventsDb = getClient()
 
@@ -121,7 +119,7 @@ test('Creates single location', async () => {
 test('Creates multiple locations under parent administrative area', async () => {
   await systemInitialisationTestSetup()
 
-  const client = createInternalTestClient()
+  const client = createInitialisationTestClient()
 
   const rng = createPrng(123123)
   const administrativeAreaId = generateUuid(rng)
@@ -132,7 +130,7 @@ test('Creates multiple locations under parent administrative area', async () => 
     rng
   )
 
-  await client.initialisation.administrativeAreas.set(administrativeAreaPayload)
+  await client.administrativeAreas.set(administrativeAreaPayload)
 
   const eventsDb = getClient()
 
@@ -140,7 +138,7 @@ test('Creates multiple locations under parent administrative area', async () => 
     [{ administrativeAreaId }, { administrativeAreaId }, {}],
     rng
   )
-  await client.initialisation.locations.set(multipleLocationsPayload)
+  await client.locations.set(multipleLocationsPayload)
 
   const locations = await eventsDb.selectFrom('locations').selectAll().execute()
 
@@ -156,12 +154,12 @@ test('Creates multiple locations under parent administrative area', async () => 
 test('updates externalId on existing location when re-seeded with a value', async () => {
   await systemInitialisationTestSetup()
 
-  const client = createInternalTestClient()
+  const client = createInitialisationTestClient()
 
   const locationId = generateUuid()
   const eventsDb = getClient()
 
-  await client.initialisation.locations.set([
+  await client.locations.set([
     {
       id: locationId,
       administrativeAreaId: null,
@@ -179,7 +177,7 @@ test('updates externalId on existing location when re-seeded with a value', asyn
 
   expect(locationsBeforeUpdate).toHaveLength(1)
 
-  await client.initialisation.locations.set([
+  await client.locations.set([
     {
       id: locationId,
       administrativeAreaId: null,
@@ -205,7 +203,7 @@ test('updates externalId on existing location when re-seeded with a value', asyn
 test('seeding locations is additive, not destructive', async () => {
   await systemInitialisationTestSetup()
 
-  const client = createInternalTestClient()
+  const client = createInitialisationTestClient()
 
   const eventsDb = getClient()
 
@@ -214,7 +212,7 @@ test('seeding locations is additive, not destructive', async () => {
 
   const initialPayload = generator.locations.set(5, administrativeAreaRng)
 
-  await client.initialisation.locations.set(initialPayload)
+  await client.locations.set(initialPayload)
 
   const locationsAfterInitialSeed = await eventsDb
     .selectFrom('locations')
@@ -225,7 +223,7 @@ test('seeding locations is additive, not destructive', async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_removedLocation, ...remainingLocationsPayload] = initialPayload
-  await client.initialisation.locations.set(remainingLocationsPayload)
+  await client.locations.set(remainingLocationsPayload)
 
   const locationsAfterOmittingOne = await eventsDb
     .selectFrom('locations')

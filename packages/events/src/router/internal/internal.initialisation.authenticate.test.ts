@@ -11,6 +11,7 @@
 import { TRPCError } from '@trpc/server'
 import { TokenUserType } from '@opencrvs/commons'
 import {
+  createInitialisationTestClient,
   createInternalServiceToken,
   createInternalTestClient,
   createTestToken,
@@ -18,18 +19,6 @@ import {
   systemInitialisationTestSetup,
   TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
-
-test('Returns 403 after initialisation is completed', async () => {
-  const systemInitialisation = await systemInitialisationTestSetup()
-  const client = createInternalTestClient()
-  await expect(client.initialisation.complete()).resolves.toBeUndefined()
-
-  await expect(
-    client.initialisation.authenticate({
-      password: systemInitialisation.password
-    })
-  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
-})
 
 test('Returns 403 when accessed with user app token', async () => {
   const systemInitialisation = await systemInitialisationTestSetup()
@@ -43,7 +32,7 @@ test('Returns 403 when accessed with user app token', async () => {
   const client = createInternalTestClient(appToken)
 
   await expect(
-    client.initialisation.authenticate({
+    client.user.initialisation.authenticate({
       password: systemInitialisation.password
     })
   ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
@@ -61,7 +50,7 @@ test('Returns 403 when accessed with system app token', async () => {
   const client = createInternalTestClient(appToken)
 
   await expect(
-    client.initialisation.authenticate({
+    client.user.initialisation.authenticate({
       password: systemInitialisation.password
     })
   ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
@@ -76,7 +65,7 @@ test('Returns 403 when accessed with internal token using invalid subject', asyn
   const client = createInternalTestClient(internalToken)
 
   await expect(
-    client.initialisation.authenticate({
+    client.user.initialisation.authenticate({
       password: systemInitialisation.password
     })
   ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
@@ -88,7 +77,7 @@ test('Returns 200 when accessed with proper internal token', async () => {
   const client = createInternalTestClient()
 
   await expect(
-    client.initialisation.authenticate({
+    client.user.initialisation.authenticate({
       password: systemInitialisation.password
     })
   ).resolves.toMatchObject({ valid: true })
@@ -97,7 +86,8 @@ test('Returns 200 when accessed with proper internal token', async () => {
 test('Returns 403 after initialisation is completed', async () => {
   const { db, password } = await systemInitialisationTestSetup()
 
-  const client = createInternalTestClient()
+  const internalClient = createInternalTestClient()
+  const initialisationClient = createInitialisationTestClient()
 
   const systemInitialisationBefore = await db
     .selectFrom('systemInitialisation')
@@ -106,13 +96,14 @@ test('Returns 403 after initialisation is completed', async () => {
 
   expect(systemInitialisationBefore).toHaveLength(1)
   expect(systemInitialisationBefore[0].completedAt).toBeNull()
+
   await expect(
-    client.initialisation.authenticate({
+    internalClient.user.initialisation.authenticate({
       password: password
     })
   ).resolves.toMatchObject({ valid: true })
 
-  await expect(client.initialisation.complete()).resolves.toBeUndefined()
+  await expect(initialisationClient.complete()).resolves.toBeUndefined()
 
   const systemInitialisationAfter = await db
     .selectFrom('systemInitialisation')
@@ -123,12 +114,12 @@ test('Returns 403 after initialisation is completed', async () => {
   expect(systemInitialisationAfter[0].completedAt).not.toBeNull()
 
   await expect(
-    client.initialisation.authenticate({
+    internalClient.user.initialisation.authenticate({
       password: password
     })
   ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
 
-  await expect(client.initialisation.complete()).rejects.toMatchObject(
+  await expect(initialisationClient.complete()).rejects.toMatchObject(
     new TRPCError({
       code: 'UNAUTHORIZED'
     })

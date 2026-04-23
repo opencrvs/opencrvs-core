@@ -11,12 +11,12 @@
 import { TRPCError } from '@trpc/server'
 import { generateUuid, Location, TokenUserType } from '@opencrvs/commons'
 import {
-  createInternalServiceToken,
-  createInternalTestClient,
+  createInitialisationTestClient,
   createTestToken,
   setupTestCase,
   systemInitialisationTestSetup,
-  TEST_USER_DEFAULT_SCOPES
+  TEST_USER_DEFAULT_SCOPES,
+  createInitialisationToken
 } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
 
@@ -33,12 +33,12 @@ const locationPayload: Location[] = [
 
 test('Returns 403 after initialisation is completed', async () => {
   await systemInitialisationTestSetup()
-  const client = createInternalTestClient()
-  await expect(client.initialisation.complete()).resolves.toBeUndefined()
+  const client = createInitialisationTestClient()
+  await expect(client.complete()).resolves.toBeUndefined()
 
-  await expect(
-    client.initialisation.locations.set(locationPayload)
-  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+  await expect(client.locations.set(locationPayload)).rejects.toMatchObject(
+    new TRPCError({ code: 'UNAUTHORIZED' })
+  )
 })
 
 test('Returns 403 when accessed with user app token', async () => {
@@ -50,9 +50,9 @@ test('Returns 403 when accessed with user app token', async () => {
     scopes: TEST_USER_DEFAULT_SCOPES,
     userType: TokenUserType.enum.user
   })
-  const client = createInternalTestClient(appToken)
+  const client = createInitialisationTestClient(appToken)
 
-  await expect(client.initialisation.locations.set([])).rejects.toMatchObject(
+  await expect(client.locations.set([])).rejects.toMatchObject(
     new TRPCError({ code: 'UNAUTHORIZED' })
   )
 })
@@ -66,34 +66,34 @@ test('Returns 403 when accessed with system app token', async () => {
     userType: TokenUserType.enum.system
   })
 
-  const client = createInternalTestClient(systemToken)
+  const client = createInitialisationTestClient(systemToken)
 
-  await expect(
-    client.initialisation.locations.set(locationPayload)
-  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+  await expect(client.locations.set(locationPayload)).rejects.toMatchObject(
+    new TRPCError({ code: 'UNAUTHORIZED' })
+  )
 })
 
 test('Returns 403 when accessed with internal token using invalid subject', async () => {
   await systemInitialisationTestSetup()
 
-  const internalToken = createInternalServiceToken({
+  const internalToken = createInitialisationToken({
     subject: 'invalid-subject'
   })
 
-  const client = createInternalTestClient(internalToken)
+  const client = createInitialisationTestClient(internalToken)
 
-  await expect(
-    client.initialisation.locations.set(locationPayload)
-  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+  await expect(client.locations.set(locationPayload)).rejects.toMatchObject(
+    new TRPCError({ code: 'UNAUTHORIZED' })
+  )
 })
 
 test('Allows user creation when with the right token', async () => {
   await systemInitialisationTestSetup()
 
-  const client = createInternalTestClient()
+  const client = createInitialisationTestClient()
   const eventsDb = getClient()
 
-  await client.initialisation.locations.set(locationPayload)
+  await client.locations.set(locationPayload)
   const location = await eventsDb
     .selectFrom('locations')
     .selectAll()
@@ -114,9 +114,7 @@ test('Allows user creation when with the right token', async () => {
     username
   }
 
-  await expect(
-    client.initialisation.users.create(userPayload)
-  ).resolves.toMatchObject({
+  await expect(client.users.create(userPayload)).resolves.toMatchObject({
     administrativeAreaId: undefined,
     primaryOfficeId: location.id,
     role: userPayload.role,
@@ -160,10 +158,10 @@ test('Allows user creation when with the right token', async () => {
 test('Throws error when creating user with existing email', async () => {
   await systemInitialisationTestSetup()
 
-  const client = createInternalTestClient()
+  const client = createInitialisationTestClient()
   const eventsDb = getClient()
 
-  await client.initialisation.locations.set(locationPayload)
+  await client.locations.set(locationPayload)
   const location = await eventsDb
     .selectFrom('locations')
     .selectAll()
@@ -196,12 +194,8 @@ test('Throws error when creating user with existing email', async () => {
     primaryOfficeId: location.id
   }
 
-  await expect(
-    client.initialisation.users.create(userPayload1)
-  ).resolves.toBeDefined()
-  await expect(
-    client.initialisation.users.create(userPayload2)
-  ).rejects.toThrowError(
+  await expect(client.users.create(userPayload1)).resolves.toBeDefined()
+  await expect(client.users.create(userPayload2)).rejects.toThrowError(
     new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
   )
 })
@@ -209,10 +203,10 @@ test('Throws error when creating user with existing email', async () => {
 test('Throws error when creating user with existing mobile', async () => {
   await systemInitialisationTestSetup()
 
-  const client = createInternalTestClient()
+  const client = createInitialisationTestClient()
   const eventsDb = getClient()
 
-  await client.initialisation.locations.set(locationPayload)
+  await client.locations.set(locationPayload)
   const location = await eventsDb
     .selectFrom('locations')
     .selectAll()
@@ -247,12 +241,8 @@ test('Throws error when creating user with existing mobile', async () => {
     primaryOfficeId: location.id
   }
 
-  await expect(
-    client.initialisation.users.create(userPayload1)
-  ).resolves.toBeDefined()
-  await expect(
-    client.initialisation.users.create(userPayload2)
-  ).rejects.toThrowError(
+  await expect(client.users.create(userPayload1)).resolves.toBeDefined()
+  await expect(client.users.create(userPayload2)).rejects.toThrowError(
     new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_MOBILE' })
   )
 })

@@ -16,12 +16,12 @@ import {
   TokenUserType
 } from '@opencrvs/commons'
 import {
-  createInternalServiceToken,
-  createInternalTestClient,
+  createInitialisationTestClient,
   createTestToken,
   setupTestCase,
   systemInitialisationTestSetup,
-  TEST_USER_DEFAULT_SCOPES
+  TEST_USER_DEFAULT_SCOPES,
+  createInitialisationToken
 } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
 import { payloadGenerator } from '@events/tests/generators'
@@ -38,11 +38,11 @@ const administrativeAreaPayload: AdministrativeArea[] = [
 
 test('Returns 403 after initialisation is completed', async () => {
   await systemInitialisationTestSetup()
-  const client = createInternalTestClient()
-  await expect(client.initialisation.complete()).resolves.toBeUndefined()
+  const client = createInitialisationTestClient()
+  await expect(client.complete()).resolves.toBeUndefined()
 
   await expect(
-    client.initialisation.administrativeAreas.set(administrativeAreaPayload)
+    client.administrativeAreas.set(administrativeAreaPayload)
   ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
 })
 
@@ -55,11 +55,11 @@ test('Returns 403 when accessed with user app token', async () => {
     scopes: TEST_USER_DEFAULT_SCOPES,
     userType: TokenUserType.enum.user
   })
-  const client = createInternalTestClient(appToken)
+  const client = createInitialisationTestClient(appToken)
 
-  await expect(
-    client.initialisation.administrativeAreas.set([])
-  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+  await expect(client.administrativeAreas.set([])).rejects.toMatchObject(
+    new TRPCError({ code: 'UNAUTHORIZED' })
+  )
 })
 
 test('Returns 403 when accessed with system app token', async () => {
@@ -70,40 +70,40 @@ test('Returns 403 when accessed with system app token', async () => {
     userType: TokenUserType.enum.system
   })
 
-  const client = createInternalTestClient(systemToken)
+  const client = createInitialisationTestClient(systemToken)
 
   await expect(
-    client.initialisation.administrativeAreas.set(administrativeAreaPayload)
+    client.administrativeAreas.set(administrativeAreaPayload)
   ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
 })
 
 test('Returns 403 when accessed with internal token using invalid subject', async () => {
   await systemInitialisationTestSetup()
-  const internalToken = createInternalServiceToken({
+  const internalToken = createInitialisationToken({
     subject: 'invalid-subject'
   })
 
-  const client = createInternalTestClient(internalToken)
+  const client = createInitialisationTestClient(internalToken)
 
   await expect(
-    client.initialisation.administrativeAreas.set(administrativeAreaPayload)
+    client.administrativeAreas.set(administrativeAreaPayload)
   ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
 })
 
 test('Prevents sending empty payload', async () => {
   await systemInitialisationTestSetup()
-  const client = createInternalTestClient()
+  const client = createInitialisationTestClient()
 
   await expect(
-    client.initialisation.administrativeAreas.set([])
+    client.administrativeAreas.set([])
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
 test('Creates single administrative area', async () => {
   await systemInitialisationTestSetup()
-  const client = createInternalTestClient()
+  const client = createInitialisationTestClient()
 
-  await client.initialisation.administrativeAreas.set(administrativeAreaPayload)
+  await client.administrativeAreas.set(administrativeAreaPayload)
 
   const eventsDb = getClient()
 
@@ -118,7 +118,7 @@ test('Creates single administrative area', async () => {
 
 test('Creates multiple administrative areas under parent administrative area', async () => {
   await systemInitialisationTestSetup()
-  const client = createInternalTestClient()
+  const client = createInitialisationTestClient()
 
   const rng = createPrng(123123)
   const parentAdministrativeAreaId = generateUuid(rng)
@@ -133,7 +133,7 @@ test('Creates multiple administrative areas under parent administrative area', a
     rng
   )
 
-  await client.initialisation.administrativeAreas.set(payload)
+  await client.administrativeAreas.set(payload)
 
   const eventsDb = getClient()
   const administrativeAreas = await eventsDb
@@ -154,12 +154,12 @@ test('Creates multiple administrative areas under parent administrative area', a
 
 test('updates externalId on existing administrative area when re-seeded with a value', async () => {
   await systemInitialisationTestSetup()
-  const client = createInternalTestClient()
+  const client = createInitialisationTestClient()
 
   const areaId = generateUuid()
   const eventsDb = getClient()
 
-  await client.initialisation.administrativeAreas.set([
+  await client.administrativeAreas.set([
     {
       id: areaId,
       parentId: null,
@@ -176,7 +176,7 @@ test('updates externalId on existing administrative area when re-seeded with a v
 
   expect(areasBeforeUpdate).toHaveLength(1)
 
-  await client.initialisation.administrativeAreas.set([
+  await client.administrativeAreas.set([
     {
       id: areaId,
       parentId: null,
@@ -200,7 +200,7 @@ test('updates externalId on existing administrative area when re-seeded with a v
 
 test('seeding administrative areas is additive, not destructive', async () => {
   await systemInitialisationTestSetup()
-  const client = createInternalTestClient()
+  const client = createInitialisationTestClient()
 
   const eventsDb = getClient()
 
@@ -212,7 +212,7 @@ test('seeding administrative areas is additive, not destructive', async () => {
     administrativeAreaRng
   )
 
-  await client.initialisation.administrativeAreas.set(initialPayload)
+  await client.administrativeAreas.set(initialPayload)
 
   const administrativeAreasAfterInitialSeed = await eventsDb
     .selectFrom('administrativeAreas')
@@ -226,9 +226,7 @@ test('seeding administrative areas is additive, not destructive', async () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_removedAdministrativeArea, ...remainingAdministrativeAreasPayload] =
     initialPayload
-  await client.initialisation.administrativeAreas.set(
-    remainingAdministrativeAreasPayload
-  )
+  await client.administrativeAreas.set(remainingAdministrativeAreasPayload)
 
   const administrativeAreasAferOmittingOne = await eventsDb
     .selectFrom('administrativeAreas')

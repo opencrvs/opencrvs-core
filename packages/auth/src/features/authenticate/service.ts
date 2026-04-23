@@ -51,19 +51,26 @@ const sign = promisify<
   string
 >(jwt.sign)
 
-type InternalServiceSubject =
-  | 'opencrvs:auth-service'
-  | 'opencrvs:data-seeder-service'
-
 /**
  * @returns token for internal service authentication, which has no scopes and a short expiry time.
  * Used for authenticating internal requests between services.
  */
-export async function createInternalServiceToken(
-  subject: InternalServiceSubject
-) {
+export async function createInternalServiceToken() {
   return sign({}, cert, {
-    subject,
+    subject: 'opencrvs:auth-service',
+    algorithm: 'RS256',
+    expiresIn: env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
+    audience: ['opencrvs:events-user'],
+    issuer: JWT_ISSUER
+  })
+}
+
+/**
+ * @returns token for initialisation methods authentication, which has no scopes and a short expiry time.
+ */
+export async function createInitialisationToken() {
+  return sign({}, cert, {
+    subject: 'opencrvs:data-seeder-service',
     algorithm: 'RS256',
     expiresIn: env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
     audience: ['opencrvs:events-user', 'opencrvs:countryconfig-user'],
@@ -77,7 +84,7 @@ export const internalClient = createTRPCClient<InternalRouter>({
       url: new URL('/internal', env.EVENTS_URL).href,
       transformer: superjson,
       async headers() {
-        const token = await createInternalServiceToken('opencrvs:auth-service')
+        const token = await createInternalServiceToken()
         return { authorization: `Bearer ${token}` }
       }
     })
@@ -140,7 +147,7 @@ export async function authenticate(
 export async function authenticateSuperuser(
   password: string
 ): Promise<boolean> {
-  const auth = await internalClient.initialisation.authenticate.mutate({
+  const auth = await internalClient.user.initialisation.authenticate.mutate({
     password
   })
 

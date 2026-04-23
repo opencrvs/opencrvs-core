@@ -15,7 +15,7 @@ import { TypeOf, z } from 'zod'
 import { raise } from './utils'
 import { fromZodError } from 'zod-validation-error'
 import { getUUID } from '@opencrvs/commons'
-import { createInternalClient } from './index'
+import { createInitialisationClient } from './index'
 
 const LOCATION_TYPES = [
   'ADMIN_STRUCTURE',
@@ -184,10 +184,8 @@ async function getLocations() {
 export async function seedLocations(token: string) {
   const { administrativeAreas, locations } = await getLocations()
 
-  const client = createInternalClient(token)
+  const client = createInitialisationClient(token)
 
-  await client.initialisation.administrativeAreas.set.mutate(
-    administrativeAreas
-  )
-  await client.initialisation.locations.set.mutate(locations)
+  await client.administrativeAreas.set.mutate(administrativeAreas)
+  await client.locations.set.mutate(locations)
 }

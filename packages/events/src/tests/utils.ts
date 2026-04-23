@@ -42,11 +42,12 @@ import {
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { SystemContext, UserContext } from '@opencrvs/commons'
-import { t, tInternal } from '@events/router/trpc'
+import { t, tService } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
 import { getClient } from '@events/storage/postgres/events'
 import { EventNotFoundError } from '@events/service/events/events'
 import { internalRouter } from '@events/router/internalRouter'
+import { initialisationRouter } from '@events/router/initialisation'
 import { getLocations } from '../service/locations/locations'
 import { NewEventActions } from '../storage/postgres/events/schema/app/EventActions'
 import {
@@ -238,6 +239,20 @@ export function createInternalServiceToken(
   return `Bearer ${token}`
 }
 
+export function createInitialisationToken(
+  overrides: jwt.SignOptions = {}
+): TokenWithBearer {
+  const token = jwt.sign({}, readFileSync(join(__dirname, './cert.key')), {
+    subject: 'opencrvs:data-seeder-service',
+    algorithm: 'RS256',
+    expiresIn: '604800',
+    audience: ['opencrvs:events-user'],
+    issuer: 'opencrvs:auth-service',
+    ...overrides
+  })
+  return `Bearer ${token}`
+}
+
 function createTokenExchangeTestToken(
   userId: string,
   eventId: string,
@@ -311,9 +326,22 @@ export function createTestClient(
 }
 
 export function createInternalTestClient(tokenWithBearer?: TokenWithBearer) {
-  const createCaller = tInternal.createCallerFactory(internalRouter)
+  const createCaller = tService.createCallerFactory(internalRouter)
 
   const token = tokenWithBearer ?? createInternalServiceToken()
+  const caller = createCaller({
+    token
+  })
+
+  return caller
+}
+
+export function createInitialisationTestClient(
+  tokenWithBearer?: TokenWithBearer
+) {
+  const createCaller = tService.createCallerFactory(initialisationRouter)
+
+  const token = tokenWithBearer ?? createInitialisationToken()
   const caller = createCaller({
     token
   })

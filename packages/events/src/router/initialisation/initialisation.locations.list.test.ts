@@ -17,7 +17,7 @@ import {
 } from '@opencrvs/commons'
 import {
   createInternalServiceToken,
-  createInternalTestClient,
+  createInitialisationTestClient,
   createTestToken,
   setupTestCase,
   systemInitialisationTestSetup,
@@ -27,10 +27,10 @@ import { payloadGenerator } from '@events/tests/generators'
 
 test('Returns 403 after initialisation is completed', async () => {
   await systemInitialisationTestSetup()
-  const client = createInternalTestClient()
-  await expect(client.initialisation.complete()).resolves.toBeUndefined()
+  const client = createInitialisationTestClient()
+  await expect(client.complete()).resolves.toBeUndefined()
 
-  await expect(client.initialisation.locations.list()).rejects.toMatchObject(
+  await expect(client.locations.list()).rejects.toMatchObject(
     new TRPCError({ code: 'UNAUTHORIZED' })
   )
 })
@@ -44,9 +44,9 @@ test('Returns 403 when accessed with user app token', async () => {
     scopes: TEST_USER_DEFAULT_SCOPES,
     userType: TokenUserType.enum.user
   })
-  const client = createInternalTestClient(appToken)
+  const client = createInitialisationTestClient(appToken)
 
-  await expect(client.initialisation.locations.list()).rejects.toMatchObject(
+  await expect(client.locations.list()).rejects.toMatchObject(
     new TRPCError({ code: 'UNAUTHORIZED' })
   )
 })
@@ -60,9 +60,9 @@ test('Returns 403 when accessed with system app token', async () => {
     userType: TokenUserType.enum.system
   })
 
-  const client = createInternalTestClient(systemToken)
+  const client = createInitialisationTestClient(systemToken)
 
-  await expect(client.initialisation.locations.list()).rejects.toMatchObject(
+  await expect(client.locations.list()).rejects.toMatchObject(
     new TRPCError({ code: 'UNAUTHORIZED' })
   )
 })
@@ -73,18 +73,18 @@ test('Returns 403 when accessed with internal token using invalid subject', asyn
     subject: 'invalid-subject'
   })
 
-  const client = createInternalTestClient(internalToken)
+  const client = createInitialisationTestClient(internalToken)
 
-  await expect(client.initialisation.locations.list()).rejects.toMatchObject(
+  await expect(client.locations.list()).rejects.toMatchObject(
     new TRPCError({ code: 'UNAUTHORIZED' })
   )
 })
 
 test('Returns single location in right format', async () => {
   await systemInitialisationTestSetup()
-  const client = createInternalTestClient()
+  const client = createInitialisationTestClient()
 
-  const initialLocations = await client.initialisation.locations.list()
+  const initialLocations = await client.locations.list()
 
   const setLocationPayload: Location[] = [
     {
@@ -97,9 +97,9 @@ test('Returns single location in right format', async () => {
     }
   ]
 
-  await client.initialisation.locations.set(setLocationPayload)
+  await client.locations.set(setLocationPayload)
 
-  const locations = await client.initialisation.locations.list()
+  const locations = await client.locations.list()
 
   expect(locations).toHaveLength(initialLocations.length + 1)
   expect(locations).toMatchObject(initialLocations.concat(setLocationPayload))
@@ -107,15 +107,13 @@ test('Returns single location in right format', async () => {
 
 test('Returns multiple locations', async () => {
   await systemInitialisationTestSetup()
-  const client = createInternalTestClient()
+  const client = createInitialisationTestClient()
 
   const locationRng = createPrng(8451323)
   const generator = payloadGenerator(locationRng)
-  await client.initialisation.locations.set(
-    generator.locations.set(5, locationRng)
-  )
+  await client.locations.set(generator.locations.set(5, locationRng))
 
-  const locations = await client.initialisation.locations.list()
+  const locations = await client.locations.list()
 
   expect(locations).toHaveLength(5)
 })
