@@ -22,7 +22,8 @@ import {
   personNameFromV1ToV2,
   User,
   UserInput,
-  UserOrSystem
+  UserOrSystem,
+  UserUpdateInput
 } from '@opencrvs/commons'
 import {
   allowedWithAnyOfScopes,
@@ -66,9 +67,9 @@ import { userCanReadOtherUser } from '../middleware'
 export const UserSearch = z.object({
   username: z.string().optional(),
   mobile: z.string().optional(),
+  email: z.string().optional(),
   status: z.string().optional(),
   primaryOfficeId: z.string().optional(),
-  locationId: z.string().optional(),
   count: z.number().min(0),
   skip: z.number().min(0),
   sortOrder: z.enum(['asc', 'desc'])
@@ -138,7 +139,9 @@ export function searchUsersRoute(
         primaryOfficeId: input.primaryOfficeId
           ? UUID.parse(input.primaryOfficeId)
           : undefined,
-        locationId: input.locationId ? UUID.parse(input.locationId) : undefined
+        locationId: input.primaryOfficeId
+          ? UUID.parse(input.primaryOfficeId)
+          : undefined
       })
     )
 }
@@ -201,7 +204,7 @@ export const userRouter = router({
   ),
   update: userAndSystemProcedure
     .use(allowedWithAnyOfScopes(['user.edit']))
-    .input(UserInput.and(z.object({ id: UUID })))
+    .input(UserUpdateInput.and(z.object({ id: UUID })))
     .use(canUpdateUserLocation)
     .output(User)
     .mutation(async ({ input, ctx }) => {

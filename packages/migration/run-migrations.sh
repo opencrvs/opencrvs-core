@@ -13,7 +13,6 @@ set -e # fail if any of the commands fails
 HEARTH_CONFIG=./build/dist/src/migrate-mongo-config-hearth.js
 : "${EVENTS_POSTGRES_URL:=postgres://events_migrator:migrator_password@localhost:5432/events}"
 : "${EVENTS_SUPERUSER_POSTGRES_URL:=postgres://postgres:postgres@localhost:5432/events}"
-OPENHIM_CONFIG=./build/dist/src/migrate-mongo-config-openhim.js
 USER_MGNT_CONFIG=./build/dist/src/migrate-mongo-config-user-mgnt.js
 PERFORMANCE_CONFIG=./build/dist/src/migrate-mongo-config-performance.js
 
@@ -126,9 +125,6 @@ run_pg_migrations \
   "$SCRIPT_PATH/src/migrations/events" \
   "$EVENTS_POSTGRES_URL" \
   "app"
-
-#openhim migrations
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $OPENHIM_CONFIG
 
 # User mgnt migration
 yarn --cwd $SCRIPT_PATH migrate-mongo up --file $USER_MGNT_CONFIG

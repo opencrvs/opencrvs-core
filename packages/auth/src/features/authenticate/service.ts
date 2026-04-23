@@ -51,16 +51,14 @@ const sign = promisify<
   string
 >(jwt.sign)
 
-/**
- * @returns token for internal service authentication, which has no scopes and a short expiry time.
- * Used for authenticating internal requests between services.
- */
-/** @knipignore */
-
 type InternalServiceSubject =
   | 'opencrvs:auth-service'
   | 'opencrvs:data-seeder-service'
 
+/**
+ * @returns token for internal service authentication, which has no scopes and a short expiry time.
+ * Used for authenticating internal requests between services.
+ */
 export async function createInternalServiceToken(
   subject: InternalServiceSubject
 ) {
@@ -224,7 +222,6 @@ export async function createTokenForActionConfirmation(
         'opencrvs:user-mgnt-user',
         'opencrvs:auth-user',
         'opencrvs:notification-user',
-        'opencrvs:metrics-user',
         'opencrvs:countryconfig-user',
         'opencrvs:documents-user',
         'opencrvs:notification-api-user'

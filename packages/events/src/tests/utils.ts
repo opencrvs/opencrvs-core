@@ -224,16 +224,24 @@ export function createTestToken({
   return `Bearer ${token}`
 }
 
+<<<<<<< HEAD
 export function createInternalServiceToken(
   overrides: jwt.SignOptions = {}
 ): TokenWithBearer {
+=======
+export function createInternalServiceToken(): TokenWithBearer {
+>>>>>>> ocrvs-11894
   const token = jwt.sign({}, readFileSync(join(__dirname, './cert.key')), {
     subject: 'opencrvs:auth-service',
     algorithm: 'RS256',
     expiresIn: '604800',
     audience: ['opencrvs:events-user'],
+<<<<<<< HEAD
     issuer: 'opencrvs:auth-service',
     ...overrides
+=======
+    issuer: 'opencrvs:auth-service'
+>>>>>>> ocrvs-11894
   })
   return `Bearer ${token}`
 }
@@ -310,10 +318,16 @@ export function createTestClient(
   return caller
 }
 
+<<<<<<< HEAD
 export function createInternalTestClient(tokenWithBearer?: TokenWithBearer) {
   const createCaller = tInternal.createCallerFactory(internalRouter)
 
   const token = tokenWithBearer ?? createInternalServiceToken()
+=======
+export function createInternalTestClient() {
+  const createCaller = tInternal.createCallerFactory(internalRouter)
+  const token = createInternalServiceToken()
+>>>>>>> ocrvs-11894
   const caller = createCaller({
     token
   })
