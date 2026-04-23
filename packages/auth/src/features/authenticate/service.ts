@@ -194,10 +194,8 @@ export async function createTokenForActionConfirmation(
         'opencrvs:events-user',
         'opencrvs:user-mgnt-user',
         'opencrvs:auth-user',
-        'opencrvs:notification-user',
         'opencrvs:countryconfig-user',
-        'opencrvs:documents-user',
-        'opencrvs:notification-api-user'
+        'opencrvs:documents-user'
       ],
       issuer: JWT_ISSUER
     }
