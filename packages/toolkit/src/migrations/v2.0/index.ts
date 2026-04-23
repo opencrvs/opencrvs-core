@@ -24,7 +24,9 @@ import { main as migrateWorkqueueConfigs } from './migrate-workqueue-configs'
 import { main as removeDemoScope } from './remove-demo-scope'
 import { main as removeHearthMigrations } from './remove-hearth-migrations'
 import { main as addAnalyticsOptionToEventConfigs } from './add-analytics-option-to-event-configs'
+import { main as createEventsIndex } from './create-events-index'
 import { main as checkoutUpstreamFiles } from './checkout-upstream-files'
+import { main as simplifyAnalyticsPrecalculations } from './simplify-analytics-precalculations'
 
 let cwd: string | undefined
 
@@ -68,5 +70,7 @@ export async function runUpgrade(ccwd: string | undefined) {
   await removeDemoScope()
   await removeHearthMigrations()
   await addAnalyticsOptionToEventConfigs()
+  await createEventsIndex()
   await checkoutUpstreamFiles()
+  await simplifyAnalyticsPrecalculations()
 }
