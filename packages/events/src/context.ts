@@ -185,25 +185,6 @@ export async function createContext({ req }: { req: IncomingMessage }) {
   }
 }
 
-/**
- * Context for internal service calls between services, authenticated with a service token. Does not include user details, as the token is not associated with a user.
- */
-export function createInternalContext({ req }: { req: IncomingMessage }) {
-  const normalizedHeaders = normalizeHeaders(req.headers)
-
-  try {
-    const token = TokenWithBearer.parse(normalizedHeaders.authorization)
-
-    verifyInternalServiceToken(token)
-
-    return {
-      token
-    }
-  } catch {
-    throw new TRPCError({ code: 'UNAUTHORIZED' })
-  }
-}
-
 export function createServiceContext({ req }: { req: IncomingMessage }) {
   const normalizedHeaders = normalizeHeaders(req.headers)
   try {

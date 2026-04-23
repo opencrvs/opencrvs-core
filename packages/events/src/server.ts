@@ -15,11 +15,7 @@ import { createHTTPHandler } from '@trpc/server/adapters/standalone'
 import '@opencrvs/commons/monitoring'
 import { logger } from '@opencrvs/commons'
 import { appRouter } from './router/router'
-import {
-  createContext,
-  createInternalContext,
-  createServiceContext
-} from './context'
+import { createContext, createServiceContext } from './context'
 import { handleHealthCheckResponse } from './service/health'
 import { internalRouter } from './router/internalRouter'
 import { initialisationRouter } from './router/initialisation'
@@ -61,7 +57,7 @@ const internalTrpcConfig: Parameters<typeof createHTTPHandler>[0] = {
       `Error for internal request: ${stringifyRequest(req)}. Error: '${error.message}'`
     )
   },
-  createContext: createInternalContext
+  createContext: createServiceContext
 }
 
 const initialisationTrpcConfig: Parameters<typeof createHTTPHandler>[0] = {
@@ -148,7 +144,7 @@ export function server() {
       return
     }
 
-    // If it's a tRPC request, handle it with the tRPC server. Discriminate between internal and app requests.
+    // If it's a tRPC request, handle it with the tRPC server. Discriminate between routes.
     if (isInternalTrpcRequest(req)) {
       internalTrpcServer(req, res)
     } else if (isInitialisationTrpcRequest(req)) {
