@@ -44,6 +44,7 @@ export type EventConfig = {
   declaration: DeclarationFormConfig
   advancedSearch: AdvancedSearchConfig[]
   flags: FlagConfig[]
+  analytics?: boolean
 }
 
 export type EventConfigInput = Omit<
@@ -121,6 +122,13 @@ const _EventConfigBase: z.ZodType<EventConfig, EventConfigInput> = z.object({
     .default([])
     .describe(
       'Configuration of flags associated with the actions of this event type.'
+    ),
+  analytics: z
+    .boolean()
+    .optional()
+    .default(false)
+    .describe(
+      'Indicates whether the recors of this event type are included in analytics'
     )
 })
 
