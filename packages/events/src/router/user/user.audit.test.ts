@@ -10,7 +10,6 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { http, HttpResponse } from 'msw'
 import { encodeScope, getUUID, TokenUserType } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
@@ -19,8 +18,6 @@ import {
   createTestClient,
   setupTestCase
 } from '@events/tests/utils'
-import { env } from '@events/environment'
-import { mswServer } from '../../tests/msw'
 
 describe('user.audit.record', () => {
   test('system client records an audit entry', async () => {
@@ -255,15 +252,6 @@ describe('user.audit.list', () => {
       encodeScope({ type: 'user.read-only-my-audit' })
     ])
 
-    mswServer.use(
-      http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
-        return HttpResponse.json({
-          ...user,
-          signature: user.signature ? { data: user.signature } : undefined
-        })
-      })
-    )
-
     const result = await client.user.audit.list({ userId: user.id })
     expect(result.total).toBe(0)
     expect(result.results).toHaveLength(0)
@@ -275,12 +263,6 @@ describe('user.audit.list', () => {
     const client = createTestClient(userA, [
       encodeScope({ type: 'user.read-only-my-audit' })
     ])
-
-    mswServer.use(
-      http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
-        return HttpResponse.json(userB)
-      })
-    )
 
     await expect(
       client.user.audit.list({ userId: userB.id })

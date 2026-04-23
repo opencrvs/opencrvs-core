@@ -109,7 +109,7 @@ async function reindexSearch(
     logger.info(`Batch ${batchId}: ${batch.length} events to index`)
 
     await Promise.all([
-      withRetry(() =>
+      withRetry(async () =>
         indexEventsInBulk(
           batch,
           configurations,

@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Kysely, sql } from 'kysely'
+import { TRPCError } from '@trpc/server'
 import { UUID } from '@opencrvs/commons/events'
 import { getClient } from '@events/storage/postgres/events'
 import { SearchUsersPayload } from '@events/service/users/api'
 import { NewUsers } from './schema/app/Users'
 import Schema from './schema/Database'
 import { NewUserCredentials } from './schema/app/UserCredentials'
-import { TRPCError } from '@trpc/server'
 
 export interface SecurityQuestion {
   questionKey: string

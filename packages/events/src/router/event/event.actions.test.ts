@@ -728,7 +728,7 @@ describe('Conditionals based on user role', () => {
 
     const users = await Promise.all(
       TestUserRole.options.map(async (role) => {
-        return await seed.user({
+        return seed.user({
           primaryOfficeId: locations[0].id,
           administrativeAreaId: locations[0].administrativeAreaId,
           name: [
