@@ -23,6 +23,7 @@ import { main as removeDeprecatedImports } from './remove-deprecated-imports'
 import { main as migrateWorkqueueConfigs } from './migrate-workqueue-configs'
 import { main as removeDemoScope } from './remove-demo-scope'
 import { main as removeHearthMigrations } from './remove-hearth-migrations'
+import { main as addAnalyticsOptionToEventConfigs } from './add-analytics-option-to-event-configs'
 import { main as checkoutUpstreamFiles } from './checkout-upstream-files'
 
 let cwd: string | undefined
@@ -66,5 +67,6 @@ export async function runUpgrade(ccwd: string | undefined) {
   await removeDeprecatedImports()
   await removeDemoScope()
   await removeHearthMigrations()
+  await addAnalyticsOptionToEventConfigs()
   await checkoutUpstreamFiles()
 }
