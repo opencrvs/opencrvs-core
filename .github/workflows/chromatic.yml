@@ -11,8 +11,6 @@ name: Chromatic
 
 on:
   pull_request:
-    paths:
-      - 'packages/client/**'
 
 jobs:
   chromatic:
@@ -25,12 +23,26 @@ jobs:
         with:
           fetch-depth: 0 # Chromatic needs full git history for baseline comparison
 
+      - name: Detect changes in packages/client
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            client:
+              - 'packages/client/**'
+
+      - name: Skip Chromatic (no client changes)
+        if: steps.changes.outputs.client != 'true'
+        run: echo "No changes in packages/client — skipping Chromatic."
+
       - name: Use Node.js from .nvmrc
+        if: steps.changes.outputs.client == 'true'
         uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
 
       - name: Cache Node.js dependencies
+        if: steps.changes.outputs.client == 'true'
         uses: actions/cache@v5
         with:
           path: |
@@ -41,18 +53,23 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Install dependencies
+        if: steps.changes.outputs.client == 'true'
         run: CI="" yarn install --frozen-lockfile
 
       - name: Build common package
+        if: steps.changes.outputs.client == 'true'
         run: cd packages/commons && yarn build
 
       - name: Build components
+        if: steps.changes.outputs.client == 'true'
         run: cd packages/components && yarn build
 
       - name: Build events router types
+        if: steps.changes.outputs.client == 'true'
         run: cd packages/events && node_modules/.bin/tsc -p tsconfig.router.json
 
       - name: Run Chromatic
+        if: steps.changes.outputs.client == 'true'
         run: yarn run chromatic
         working-directory: packages/client
         env:
