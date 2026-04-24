@@ -17,6 +17,7 @@ import {
   UUID
 } from '@opencrvs/commons/events'
 import {
+  getTokenPayload,
   isBase64FileString,
   logger,
   personNameFromV1ToV2,
@@ -82,6 +83,7 @@ export function createUserRoute(
     .input(UserInput)
     .output(User)
     .mutation(async ({ input, ctx }) => {
+      const tokenPayload = getTokenPayload(ctx.token)
       if (input.mobile) {
         const existingWithMobile = await searchUsers({
           mobile: input.mobile,
@@ -113,8 +115,8 @@ export function createUserRoute(
       const user = await createUser(input, ctx.token)
       await writeAuditLog({
         ...input,
-        clientId: user.id,
-        clientType: user.type,
+        clientId: tokenPayload.sub,
+        clientType: tokenPayload.userType,
         operation: 'user.create_user',
         requestData: {
           subjectId: user.id,

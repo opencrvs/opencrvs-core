@@ -104,9 +104,6 @@ function getUserEditConfig(
               id: 'primaryOfficeId',
               type: FieldType.LOCATION,
               required: true,
-              configuration: {
-                locationTypes: ['CRVS_OFFICE']
-              },
               label: messages.registrationOffice
             }
           ]

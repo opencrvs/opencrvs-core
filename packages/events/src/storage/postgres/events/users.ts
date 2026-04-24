@@ -229,7 +229,7 @@ export async function searchUsersWithInput(input: SearchUsersPayload) {
   }
 
   if (input.mobile) {
-    query = query.where('users.mobile', 'ilike', `%${input.mobile}%`)
+    query = query.where('users.mobile', '=', `%${input.mobile}%`)
   }
 
   if (input.email) {
@@ -248,11 +248,7 @@ export async function searchUsersWithInput(input: SearchUsersPayload) {
     query = query.where('users.officeId', '=', input.primaryOfficeId)
   }
 
-  const result = await query
-    .orderBy('users.createdAt', input.sortOrder)
-    .limit(input.count)
-    .offset(input.skip)
-    .execute()
+  const result = await query.limit(input.count).offset(input.skip).execute()
 
   return result
 }

@@ -295,13 +295,14 @@ export async function createUser(input: CreateUserPayload, _token: string) {
   const userPayload = {
     firstname: personNameFromV1ToV2(input.name).firstname,
     surname: personNameFromV1ToV2(input.name).surname,
-    email: input.email,
+    email: input.email.toLowerCase(),
     fullHonorificName: input.fullHonorificName,
     role: input.role,
     device: input.device,
     officeId: input.primaryOfficeId,
     mobile: input.mobile,
-    status: input.status ?? 'pending'
+    status: input.status ?? 'pending',
+    signaturePath: input.signature?.path
   }
 
   const userCredentialPayload = {
