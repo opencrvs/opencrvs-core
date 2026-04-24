@@ -11,6 +11,7 @@
 import {
   AddressField,
   AddressType,
+  AgeField,
   ButtonField,
   DateField,
   FieldType,
@@ -264,6 +265,23 @@ describe('mapFieldToDefaultValue', () => {
 
     const result = mapFieldToDefaultValue(buttonField, mockContext)
     expect(result).toBe(0)
+  })
+
+  it('AGE field returns { age, asOfDateRef } from defaultValue and configuration', () => {
+    const ageField: AgeField = {
+      id: 'applicant.age',
+      type: FieldType.AGE,
+      required: false,
+      conditionals: [],
+      defaultValue: 30,
+      label: generateTranslationConfig('Age'),
+      configuration: {
+        asOfDate: { $$field: 'event.dateOfBirth', $$subfield: [] }
+      }
+    }
+
+    const result = mapFieldToDefaultValue(ageField, mockContext)
+    expect(result).toEqual({ age: 30, asOfDateRef: 'event.dateOfBirth' })
   })
 
   it('NUMBER with defaultValue 0 returns 0, not undefined', () => {

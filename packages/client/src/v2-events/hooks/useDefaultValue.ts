@@ -232,6 +232,12 @@ export function mapFieldToDefaultValue(
 
       return `${hours}:${minutes}`
     }
+    case FieldType.AGE: {
+      return {
+        age: field.defaultValue,
+        asOfDateRef: field.configuration.asOfDate.$$field
+      }
+    }
     // `replacePlaceholders` returns undefined for falsy values e.g. 0, false
     case FieldType.CHECKBOX:
     case FieldType.NUMBER:
@@ -247,10 +253,8 @@ export function mapFieldToDefaultValue(
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
-    case FieldType.NUMBER:
     case FieldType.NUMBER_WITH_UNIT:
     case FieldType.EMAIL:
-    case FieldType.AGE:
     case FieldType.DATE_RANGE:
     case FieldType.SELECT_DATE_RANGE:
     case FieldType.PHONE:
