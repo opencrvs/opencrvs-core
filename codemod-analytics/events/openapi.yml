@@ -13908,7 +13908,7 @@ components:
             additionalProperties: false
         analytics:
           default: true
-          description: Indicates whether the recors of this event type are included in
+          description: Indicates whether the records of this event type are included in
             analytics
           type: boolean
       required:
