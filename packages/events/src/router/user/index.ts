@@ -21,6 +21,7 @@ import {
   isBase64FileString,
   logger,
   personNameFromV1ToV2,
+  TokenWithBearer,
   User,
   UserInput,
   UserOrSystem,
@@ -92,6 +93,12 @@ const AuditLogSubject = z.object({
   userType: z.enum(['system', 'user']).optional()
 })
 
+function getAuditLogIdentifiers(token: TokenWithBearer) {
+  const withoutBearer = token.replace('Bearer ', '')
+  const decoded = decode(withoutBearer)
+
+  return AuditLogSubject.parse(decoded)
+}
 export function createUserRoute(
   procedure: typeof internalProcedure | typeof userAndSystemProcedure
 ) {
@@ -99,8 +106,7 @@ export function createUserRoute(
     .input(UserInput)
     .output(User)
     .mutation(async ({ input, ctx }) => {
-      const decoded = decode(ctx.token)
-      const token = AuditLogSubject.parse(decoded)
+      const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
 
       if (input.mobile) {
         const existingWithMobile = await searchUsers({
@@ -135,8 +141,8 @@ export function createUserRoute(
       const user = await createUser(input, ctx.token)
       await writeAuditLog({
         ...input,
-        clientId: token.sub,
-        clientType: token.userType ?? 'system',
+        clientId: auditLogIdentifiers.sub,
+        clientType: auditLogIdentifiers.userType ?? 'system',
         operation: 'user.create_user',
         requestData: {
           subjectId: user.id,
