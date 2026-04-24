@@ -220,15 +220,24 @@ jobs:
           message: ${{ env.PR_COMMENT_BODY }}
 
   prepare-client-tests:
-    name: Prepare client tests
+    name: Prepare client tests (${{ matrix.branch }})
     runs-on: ubuntu-24.04
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        # On PRs, build both the PR branch and its base branch so the
+        # chromatic job can diff the two builds and skip Chromatic when
+        # nothing visual has changed. On pushes there is no base to diff
+        # against, so only the current ref is built.
+        branch: ${{ fromJSON(github.event_name == 'pull_request' && '["pr","base"]' || '["pr"]') }}
     steps:
       - name: Checking out git repo
         uses: actions/checkout@v6
         with:
           fetch-depth: 0 # Fetch history to compare PR changes against the base branch
+          ref: ${{ matrix.branch == 'base' && github.base_ref || '' }}
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v6
@@ -289,7 +298,7 @@ jobs:
       - name: Upload filesystem as artifact
         uses: actions/upload-artifact@v4.5.0
         with:
-          name: client
+          name: client-${{ matrix.branch }}
           include-hidden-files: true
           path: |
             .
@@ -305,7 +314,7 @@ jobs:
       - name: Download filesystem artifact
         uses: actions/download-artifact@v7
         with:
-          name: client
+          name: client-pr
           path: .
 
       - name: Use Node.js from .nvmrc
@@ -335,6 +344,109 @@ jobs:
       - name: Run linting
         run: cd packages/client && yarn lint
 
+  chromatic:
+    name: Run chromatic visual tests
+    needs: prepare-client-tests
+    runs-on: ubuntu-24.04
+
+    steps:
+      # Fresh checkout brings .git (needed by Chromatic TurboSnap). The
+      # artifact extracted on top adds the prebuilt commons/components
+      # outputs; source files in the artifact match those from checkout
+      # (same commit) so overwrites are no-ops.
+      - name: Checkout PR branch (for Chromatic git history)
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          path: pr
+
+      - name: Download PR filesystem artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: client-pr
+          path: pr
+
+      - name: Download base filesystem artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/download-artifact@v7
+        with:
+          name: client-base
+          path: base
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: pr/.nvmrc
+
+      - name: Cache Node.js dependencies (PR)
+        uses: actions/cache@v5
+        with:
+          path: |
+            pr/**/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('pr/yarn.lock', 'pr/packages/client/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies (PR)
+        working-directory: pr
+        run: CI="" yarn install --frozen-lockfile
+
+      - name: Cache Node.js dependencies (base)
+        if: github.event_name == 'pull_request'
+        uses: actions/cache@v5
+        with:
+          path: |
+            base/**/node_modules
+          key: node-${{ hashFiles('base/yarn.lock', 'base/packages/client/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies (base)
+        if: github.event_name == 'pull_request'
+        working-directory: base
+        run: CI="" yarn install --frozen-lockfile
+
+      - name: Build PR Storybook
+        working-directory: pr/packages/client
+        run: yarn run build-storybook
+
+      - name: Build base Storybook
+        if: github.event_name == 'pull_request'
+        working-directory: base/packages/client
+        run: yarn run build-storybook
+
+      - name: Compare Storybook builds
+        id: compare
+        if: github.event_name == 'pull_request'
+        run: |
+          # Hash each file's contents, sort by content hash (ignoring filenames,
+          # since Vite/Storybook may rename hashed chunks across builds), then
+          # hash the sorted list. Identical builds produce identical digests.
+          hash_dir() {
+            (cd "$1" && find . -type f -exec sha256sum {} \; | awk '{print $1}' | sort | sha256sum | awk '{print $1}')
+          }
+          PR_HASH=$(hash_dir pr/packages/client/storybook-static)
+          BASE_HASH=$(hash_dir base/packages/client/storybook-static)
+          echo "PR   Storybook hash: $PR_HASH"
+          echo "Base Storybook hash: $BASE_HASH"
+          if [ "$PR_HASH" = "$BASE_HASH" ]; then
+            echo "identical=true" >> "$GITHUB_OUTPUT"
+            echo "Storybook builds are identical — skipping Chromatic."
+          else
+            echo "identical=false" >> "$GITHUB_OUTPUT"
+            echo "Storybook builds differ — running Chromatic."
+          fi
+
+      - name: Run Chromatic
+        # Run Chromatic on pushes unconditionally (to update the baseline),
+        # and on PRs only when the Storybook build actually differs from base.
+        if: github.event_name != 'pull_request' || steps.compare.outputs.identical != 'true'
+        working-directory: pr/packages/client
+        run: yarn run chromatic --storybook-build-dir storybook-static
+        env:
+          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+
   test-storybook:
     name: Run storybook interaction tests
     needs: prepare-client-tests
@@ -344,7 +456,7 @@ jobs:
       - name: Download filesystem artifact
         uses: actions/download-artifact@v7
         with:
-          name: client
+          name: client-pr
           path: .
 
       - name: Use Node.js from .nvmrc
@@ -394,7 +506,7 @@ jobs:
       - name: Download filesystem artifact
         uses: actions/download-artifact@v7
         with:
-          name: client
+          name: client-pr
           path: .
 
       - name: Use Node.js from .nvmrc
