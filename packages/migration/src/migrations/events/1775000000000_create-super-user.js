@@ -60,5 +60,4 @@ export async function down(pgm) {
   await pgm.db.query(`DELETE FROM administrative_areas WHERE id = $1`, [
     ROOT_ADMIN_AREA_ID
   ])
-  await pgm.db.query('ALTER TABLE users ALTER COLUMN office_id SET NOT NULL')
 }

@@ -163,7 +163,7 @@ export const userRouter = router({
       await writeAuditLog({
         ...input,
         clientId: ctx.user.id,
-        clientType: user.type,
+        clientType: ctx.user.type,
         operation: 'user.create_user',
         requestData: {
           subjectId: user.id,
