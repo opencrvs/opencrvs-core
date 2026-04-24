@@ -55,10 +55,7 @@ const UPSTREAM_BRANCH = 'develop'
 // clashing with remotes the user may have (origin, upstream, etc.).
 const TEMP_REMOTE = 'opencrvs-upgrade-v19-v20-codemod'
 
-const FILES_TO_CHECKOUT = [
-  'infrastructure/postgres/setup-analytics.sh',
-  'src/analytics/analytics.ts'
-]
+const FILES_TO_CHECKOUT = ['infrastructure/', 'src/analytics/analytics.ts']
 
 // ─── Git helpers ─────────────────────────────────────────────────────────────
 
