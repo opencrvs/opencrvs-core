@@ -352,9 +352,12 @@ function UserListComponent({ userDetails }: UserListProps) {
           label: intl.formatMessage(messages.editUserDetailsTitle),
           handler: () => {
             navigate(
-              ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
-                userId: user.id
-              })
+              ROUTES.V2.SETTINGS.USER.REVIEW.buildPath(
+                {
+                  userId: user.id
+                },
+                { from: 'user.list' }
+              )
             )
           }
         }

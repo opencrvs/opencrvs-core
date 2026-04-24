@@ -122,9 +122,12 @@ export const UserAudit = () => {
         label: intl.formatMessage(sysMessages.editUserDetailsTitle),
         handler: () =>
           navigate(
-            ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
-              userId
-            })
+            ROUTES.V2.SETTINGS.USER.REVIEW.buildPath(
+              {
+                userId
+              },
+              { from: 'user.audit' }
+            )
           )
       }
     ]
