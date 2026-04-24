@@ -195,10 +195,9 @@ describe('filterLocationsByJurisdiction', () => {
     })
 
     it('returns both CRVS offices and health facilities when both types are specified', () => {
-      // Regression for: hospital offices not appearing in the registration office
-      // dropdown during user create/edit. The fix adds HEALTH_FACILITY alongside
-      // CRVS_OFFICE in getUserEditConfig so that hospital staff can be assigned
-      // to a hospital as their primary office.
+      // Verifies that the filter correctly handles multiple location types in one call.
+      // Related: the registration office dropdown in user create/edit was fixed by
+      // removing the locationTypes restriction entirely (so all location types are shown).
       const result = filterLocationsByJurisdiction({
         locations,
         administrativeAreas,
