@@ -42,10 +42,11 @@ jobs:
 
       - name: Build base branch client
         working-directory: base
+        # packages/commons is built automatically by its postinstall hook.
+        # packages/events router types are not needed for the Storybook build
+        # (Vite/esbuild don't type-check and the router import is type-only).
         run: |
-          cd packages/commons && yarn build
-          cd ../components && yarn build
-          cd ../events && node_modules/.bin/tsc -p tsconfig.router.json
+          cd packages/components && yarn build
           cd ../client && yarn build-storybook
 
       - name: Install dependencies (PR)
@@ -55,9 +56,7 @@ jobs:
       - name: Build PR branch client
         working-directory: pr
         run: |
-          cd packages/commons && yarn build
-          cd ../components && yarn build
-          cd ../events && node_modules/.bin/tsc -p tsconfig.router.json
+          cd packages/components && yarn build
           cd ../client && yarn build-storybook
 
       - name: Compare client builds
