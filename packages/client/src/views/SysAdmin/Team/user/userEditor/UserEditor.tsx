@@ -104,7 +104,7 @@ function getUserEditConfig(
               type: FieldType.LOCATION,
               required: true,
               configuration: {
-                locationTypes: ['CRVS_OFFICE']
+                locationTypes: ['CRVS_OFFICE', 'HEALTH_FACILITY']
               },
               label: messages.registrationOffice
             }
