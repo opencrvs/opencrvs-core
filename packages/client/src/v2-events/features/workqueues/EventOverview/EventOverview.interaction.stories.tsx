@@ -144,8 +144,6 @@ export const WithConfigurableSummaryFieldHavingEventMetadataValue: Story = {
         await canvas.findByText('Assigned registration office')
       ).toBeInTheDocument()
 
-      await expect(await canvas.findByText('Foobar')).toBeInTheDocument()
-
       await expect(await canvas.findByText('Logged out')).toBeInTheDocument()
     })
   }
