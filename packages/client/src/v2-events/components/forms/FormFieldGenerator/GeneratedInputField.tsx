@@ -743,7 +743,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
           {...field.config}
           disabled={disabled}
           eventType={eventConfig?.id}
-          locationTypes={field.config.configuration.locationTypes}
+          locationTypes={field.config.configuration?.locationTypes}
           value={field.value}
           onBlur={handleBlur}
           onChange={(val) => onFieldValueChange(name, val)}
@@ -1010,20 +1010,14 @@ export const GeneratedInputField = <T extends FieldConfig>(
 
   if (isHiddenFieldType(field)) {
     return (
-      <Hidden.Input
-        {...inputProps}
-        value={field.value as string | undefined}
-      />
+      <Hidden.Input {...inputProps} value={field.value as string | undefined} />
     )
   }
 
   if (isUserRoleFieldType(field)) {
     return (
       <InputField {...inputFieldProps}>
-        <UserRole.Input
-          {...inputProps}
-          value={field.value}
-        />
+        <UserRole.Input {...inputProps} value={field.value} />
       </InputField>
     )
   }
