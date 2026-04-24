@@ -11,13 +11,13 @@
 
 import { TRPCError } from '@trpc/server'
 import * as z from 'zod/v4'
+import { decode } from 'jsonwebtoken'
 import {
   AuditLogEntrySchema,
   UserAuditRecordInput,
   UUID
 } from '@opencrvs/commons/events'
 import {
-  getTokenPayload,
   isBase64FileString,
   logger,
   personNameFromV1ToV2,
@@ -87,6 +87,11 @@ const UserSearch = z.object({
   sortOrder: z.enum(['asc', 'desc'])
 })
 
+const AuditLogSubject = z.object({
+  sub: z.string(),
+  userType: z.enum(['system', 'user']).optional()
+})
+
 export function createUserRoute(
   procedure: typeof internalProcedure | typeof userAndSystemProcedure
 ) {
@@ -94,7 +99,8 @@ export function createUserRoute(
     .input(UserInput)
     .output(User)
     .mutation(async ({ input, ctx }) => {
-      const tokenPayload = getTokenPayload(ctx.token)
+      const decoded = decode(ctx.token)
+      const token = AuditLogSubject.parse(decoded)
 
       if (input.mobile) {
         const existingWithMobile = await searchUsers({
@@ -129,8 +135,8 @@ export function createUserRoute(
       const user = await createUser(input, ctx.token)
       await writeAuditLog({
         ...input,
-        clientId: tokenPayload.sub,
-        clientType: tokenPayload.userType ?? 'system',
+        clientId: token.sub,
+        clientType: token.userType ?? 'system',
         operation: 'user.create_user',
         requestData: {
           subjectId: user.id,
@@ -175,7 +181,7 @@ const auditRouter = router({
       await writeAuditLog({
         ...input,
         clientId: ctx.user.id,
-        clientType: ctx.user.type ?? 'system'
+        clientType: ctx.user.type
       })
     }),
   list: userOnlyProcedure
