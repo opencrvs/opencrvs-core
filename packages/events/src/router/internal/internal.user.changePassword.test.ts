@@ -10,11 +10,76 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { getUUID } from '@opencrvs/commons'
-import { createInternalTestClient, setupTestCase } from '@events/tests/utils'
+import { getUUID, TokenUserType } from '@opencrvs/commons'
+import {
+  createInternalServiceToken,
+  createInternalTestClient,
+  createTestToken,
+  setupTestCase,
+  TEST_USER_DEFAULT_SCOPES
+} from '@events/tests/utils'
 import { generateHash, generateSaltedHash } from '@events/service/auth/hash'
 
 const caller = createInternalTestClient()
+
+test('Returns 403 when accessed with user app token', async () => {
+  const { user } = await setupTestCase()
+
+  const appToken = createTestToken({
+    userId: user.id,
+    scopes: TEST_USER_DEFAULT_SCOPES,
+    userType: TokenUserType.enum.user
+  })
+  const client = createInternalTestClient(appToken)
+
+  await expect(
+    client.user.changePassword({ userId: user.id, password: 'newpassword' })
+  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+})
+
+test('Returns 403 when accessed with system app token', async () => {
+  const appToken = createTestToken({
+    userId: 'test-system',
+    scopes: TEST_USER_DEFAULT_SCOPES,
+    userType: TokenUserType.enum.system
+  })
+
+  const client = createInternalTestClient(appToken)
+
+  await expect(
+    client.user.changePassword({ userId: getUUID(), password: 'newpassword' })
+  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+})
+
+test('Returns 403 when accessed with internal token using invalid subject', async () => {
+  const internalToken = createInternalServiceToken({
+    subject: 'invalid-subject'
+  })
+
+  const client = createInternalTestClient(internalToken)
+
+  await expect(
+    client.user.changePassword({ userId: getUUID(), password: 'newpassword' })
+  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+})
+
+test('Returns 200 when accessed with proper internal token', async () => {
+  const { user, eventsDb } = await setupTestCase()
+  const { hash, salt } = await generateSaltedHash('oldpassword')
+
+  await eventsDb
+    .updateTable('userCredentials')
+    .set({ passwordHash: hash, salt })
+    .where('userId', '=', user.id)
+    .execute()
+
+  const token = createInternalServiceToken()
+  const client = createInternalTestClient(token)
+
+  await expect(
+    client.user.changePassword({ userId: user.id, password: 'newpassword' })
+  ).resolves.toBeUndefined()
+})
 
 test('returns UNAUTHORIZED when user not found', async () => {
   await expect(

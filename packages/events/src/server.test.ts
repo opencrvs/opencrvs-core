@@ -128,7 +128,7 @@ afterAll(() => serverInstance.close())
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
-async function createEvent(token: string) {
+function createEvent(token: string) {
   return appClient.event.create.mutate(
     { transactionId: getUUID(), type: TENNIS_CLUB_MEMBERSHIP },
     { context: { headers: { authorization: token } } }

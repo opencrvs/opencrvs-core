@@ -10,3 +10,4 @@
  */
 export { type AppRouter } from './router/router'
 export { type InternalRouter } from './router/internalRouter'
+export { type InitialisationRouter } from './router/initialisation'

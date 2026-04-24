@@ -11,6 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import * as z from 'zod/v4'
+import { decode } from 'jsonwebtoken'
 import {
   AuditLogEntrySchema,
   UserAuditRecordInput,
@@ -20,6 +21,7 @@ import {
   isBase64FileString,
   logger,
   personNameFromV1ToV2,
+  TokenWithBearer,
   User,
   UserInput,
   UserOrSystem,
@@ -30,6 +32,7 @@ import {
   canUpdateUserLocation
 } from '@events/router/middleware'
 import {
+  internalProcedure,
   router,
   userAndSystemProcedure,
   userOnlyProcedure
@@ -38,8 +41,7 @@ import { getRoles } from '@events/service/config/config'
 import { generateHash } from '@events/service/auth/hash'
 import {
   updatePasswordHash,
-  updateUserById,
-  deleteSuperUser
+  updateUserById
 } from '@events/storage/postgres/events/users'
 import { getUserActions } from '@events/service/events/user/actions'
 import {
@@ -63,6 +65,111 @@ import {
 } from '@events/service/verifyCode'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
 import { userCanReadOtherUser } from '../middleware'
+
+const UserSearch = z.object({
+  username: z.string().optional(),
+  mobile: z.string().optional(),
+  email: z.string().optional(),
+  status: z.string().optional(),
+  primaryOfficeId: z.string().optional(),
+  count: z.number().min(0),
+  skip: z.number().min(0),
+  sortBy: z
+    .enum([
+      'createdAt',
+      'firstname',
+      'surname',
+      'username',
+      'email',
+      'status',
+      'role'
+    ])
+    .default('createdAt'),
+  sortOrder: z.enum(['asc', 'desc'])
+})
+
+const AuditLogSubject = z.object({
+  sub: z.string(),
+  userType: z.enum(['system', 'user']).optional()
+})
+
+function getAuditLogIdentifiers(token: TokenWithBearer) {
+  const withoutBearer = token.replace('Bearer ', '')
+  const decoded = decode(withoutBearer)
+
+  return AuditLogSubject.parse(decoded)
+}
+export function createUserRoute(
+  procedure: typeof internalProcedure | typeof userAndSystemProcedure
+) {
+  return procedure
+    .input(UserInput)
+    .output(User)
+    .mutation(async ({ input, ctx }) => {
+      const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
+
+      if (input.mobile) {
+        const existingWithMobile = await searchUsers({
+          mobile: input.mobile,
+          count: 1,
+          skip: 0,
+          sortOrder: 'asc',
+          sortBy: 'createdAt'
+        })
+
+        if (existingWithMobile.length > 0) {
+          logger.error(
+            `Phone number ${input.mobile} is already in use by another user`
+          )
+          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_MOBILE' })
+        }
+      }
+
+      if (input.email) {
+        const existingWithEmail = await searchUsers({
+          email: input.email,
+          count: 1,
+          skip: 0,
+          sortOrder: 'asc',
+          sortBy: 'createdAt'
+        })
+        if (existingWithEmail.length > 0) {
+          logger.error(`Email ${input.email} is already in use by another user`)
+          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
+        }
+      }
+      const user = await createUser(input, ctx.token)
+      await writeAuditLog({
+        ...input,
+        clientId: auditLogIdentifiers.sub,
+        clientType: auditLogIdentifiers.userType ?? 'system',
+        operation: 'user.create_user',
+        requestData: {
+          subjectId: user.id,
+          role: user.role,
+          primaryOfficeId: user.primaryOfficeId
+        }
+      })
+
+      return user
+    })
+}
+
+export function searchUsersRoute(
+  procedure: typeof internalProcedure | typeof userAndSystemProcedure
+) {
+  return procedure
+    .input(UserSearch)
+    .output(z.array(UserOrSystem))
+    .query(async ({ input }) =>
+      searchUsers({
+        ...input,
+        primaryOfficeId: input.primaryOfficeId
+          ? UUID.parse(input.primaryOfficeId)
+          : undefined
+      })
+    )
+}
 
 const UserAuditListQuery = z.object({
   userId: z.string(),
@@ -105,20 +212,6 @@ const auditRouter = router({
     })
 })
 
-const UserSearch = z.object({
-  username: z.string().optional(),
-  mobile: z.string().optional(),
-  email: z.string().optional(),
-  status: z.string().optional(),
-  primaryOfficeId: z.string().optional(),
-  count: z.number().min(0),
-  skip: z.number().min(0),
-  sortBy: z
-    .enum(['createdAt', 'firstname', 'surname', 'username', 'email', 'status', 'role'])
-    .default('createdAt'),
-  sortOrder: z.enum(['asc', 'desc'])
-})
-
 export const userRouter = router({
   get: userOnlyProcedure
     .input(UUID)
@@ -131,54 +224,9 @@ export const userRouter = router({
 
       return users[0]
     }),
-  create: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.create']))
-    .input(UserInput)
-    .output(User)
-    .mutation(async ({ input, ctx }) => {
-      if (input.mobile) {
-        const existingWithMobile = await searchUsers({
-          mobile: input.mobile,
-          count: 1,
-          skip: 0,
-          sortBy: 'createdAt',
-          sortOrder: 'asc'
-        })
-        if (existingWithMobile.length > 0) {
-          logger.error(
-            `Phone number ${input.mobile} is already in use by another user`
-          )
-          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_PHONE' })
-        }
-      }
-      if (input.email) {
-        const existingWithEmail = await searchUsers({
-          email: input.email,
-          count: 1,
-          skip: 0,
-          sortBy: 'createdAt',
-          sortOrder: 'asc'
-        })
-        if (existingWithEmail.length > 0) {
-          logger.error(`Email ${input.email} is already in use by another user`)
-          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
-        }
-      }
-      const user = await createUser(input, ctx.token)
-      await writeAuditLog({
-        ...input,
-        clientId: ctx.user.id,
-        clientType: ctx.user.type,
-        operation: 'user.create_user',
-        requestData: {
-          subjectId: user.id,
-          role: user.role,
-          primaryOfficeId: user.primaryOfficeId
-        }
-      })
-
-      return user
-    }),
+  create: createUserRoute(
+    userAndSystemProcedure.use(allowedWithAnyOfScopes(['user.create']))
+  ),
   update: userAndSystemProcedure
     .use(allowedWithAnyOfScopes(['user.edit']))
     .input(UserUpdateInput.and(z.object({ id: UUID })))
@@ -232,17 +280,7 @@ export const userRouter = router({
     .input(z.array(z.string()))
     .output(z.array(UserOrSystem))
     .query(async ({ input }) => getUsersById(input)),
-  search: userAndSystemProcedure
-    .input(UserSearch)
-    .output(z.array(UserOrSystem))
-    .query(async ({ input }) =>
-      searchUsers({
-        ...input,
-        primaryOfficeId: input.primaryOfficeId
-          ? UUID.parse(input.primaryOfficeId)
-          : undefined
-      })
-    ),
+  search: searchUsersRoute(userAndSystemProcedure),
   actions: userOnlyProcedure
     .input(UserActionsQuery)
     .use(userCanReadOtherUser)
@@ -506,20 +544,6 @@ export const userRouter = router({
     )
     .mutation(async ({ input }) => {
       return activateUser(input)
-    }),
-  deactivateSuperUser: userAndSystemProcedure
-    .use(
-      allowedWithAnyOfScopes([
-        'bypassratelimit',
-        'user.create',
-        'user.data-seeding',
-        'integration.create'
-      ])
-    )
-    .input(z.object({ username: z.string() }))
-    .output(z.void())
-    .mutation(async ({ input }) => {
-      await deleteSuperUser(input.username)
     }),
   audit: auditRouter
 })

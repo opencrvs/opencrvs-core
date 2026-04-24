@@ -13,6 +13,7 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
 import fc from 'fast-check'
+import { genSaltSync, hashSync } from 'bcryptjs'
 import {
   ActionStatus,
   ActionType,
@@ -41,11 +42,12 @@ import {
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { SystemContext, UserContext } from '@opencrvs/commons'
-import { t, tInternal } from '@events/router/trpc'
+import { t, tService } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
 import { getClient } from '@events/storage/postgres/events'
 import { EventNotFoundError } from '@events/service/events/events'
 import { internalRouter } from '@events/router/internalRouter'
+import { initialisationRouter } from '@events/router/initialisation'
 import { getLocations } from '../service/locations/locations'
 import { NewEventActions } from '../storage/postgres/events/schema/app/EventActions'
 import {
@@ -223,19 +225,30 @@ export function createTestToken({
   return `Bearer ${token}`
 }
 
-export type InternalServiceSubject =
-  | 'opencrvs:auth-service'
-  | 'opencrvs:data-seeder-service'
-
 export function createInternalServiceToken(
-  subject: InternalServiceSubject
+  overrides: jwt.SignOptions = {}
 ): TokenWithBearer {
   const token = jwt.sign({}, readFileSync(join(__dirname, './cert.key')), {
-    subject,
+    subject: 'opencrvs:auth-service',
     algorithm: 'RS256',
     expiresIn: '604800',
     audience: ['opencrvs:events-user'],
-    issuer: 'opencrvs:auth-service'
+    issuer: 'opencrvs:auth-service',
+    ...overrides
+  })
+  return `Bearer ${token}`
+}
+
+export function createInitialisationToken(
+  overrides: jwt.SignOptions = {}
+): TokenWithBearer {
+  const token = jwt.sign({}, readFileSync(join(__dirname, './cert.key')), {
+    subject: 'opencrvs:data-seeder-service',
+    algorithm: 'RS256',
+    expiresIn: '604800',
+    audience: ['opencrvs:events-user'],
+    issuer: 'opencrvs:auth-service',
+    ...overrides
   })
   return `Bearer ${token}`
 }
@@ -312,11 +325,23 @@ export function createTestClient(
   return caller
 }
 
-export function createInternalTestClient(
-  subject: InternalServiceSubject = 'opencrvs:auth-service'
+export function createInternalTestClient(tokenWithBearer?: TokenWithBearer) {
+  const createCaller = tService.createCallerFactory(internalRouter)
+
+  const token = tokenWithBearer ?? createInternalServiceToken()
+  const caller = createCaller({
+    token
+  })
+
+  return caller
+}
+
+export function createInitialisationTestClient(
+  tokenWithBearer?: TokenWithBearer
 ) {
-  const createCaller = tInternal.createCallerFactory(internalRouter)
-  const token = createInternalServiceToken(subject)
+  const createCaller = tService.createCallerFactory(initialisationRouter)
+
+  const token = tokenWithBearer ?? createInitialisationToken()
   const caller = createCaller({
     token
   })
@@ -953,4 +978,27 @@ export function assertScopeResult(
   })
 
   expect(result.success).toBe(isAccessibleWithScope)
+}
+
+export async function systemInitialisationTestSetup() {
+  const TEST_SUPER_USER_PASSWORD = 'super-secure-password'
+
+  const eventsDb = getClient()
+
+  const salt = genSaltSync(10)
+  const hash = hashSync(TEST_SUPER_USER_PASSWORD, salt)
+
+  await eventsDb
+    .insertInto('systemInitialisation')
+    .values({
+      hash,
+      salt,
+      id: 1
+    })
+    .execute()
+
+  return {
+    db: eventsDb,
+    password: TEST_SUPER_USER_PASSWORD
+  }
 }

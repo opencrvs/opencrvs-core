@@ -12,12 +12,101 @@
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse } from 'msw'
 import { sql } from 'kysely'
-import { getUUID } from '@opencrvs/commons'
-import { createInternalTestClient, setupTestCase } from '@events/tests/utils'
+import { getUUID, TokenUserType } from '@opencrvs/commons'
+import {
+  createInternalServiceToken,
+  createInternalTestClient,
+  createTestToken,
+  setupTestCase,
+  TEST_USER_DEFAULT_SCOPES
+} from '@events/tests/utils'
 import { env } from '@events/environment'
 import { mswServer } from '../../tests/msw'
 
 const caller = createInternalTestClient()
+
+test('Returns 403 when accessed with user app token', async () => {
+  const { user } = await setupTestCase()
+
+  const appToken = createTestToken({
+    userId: user.id,
+    scopes: TEST_USER_DEFAULT_SCOPES,
+    userType: TokenUserType.enum.user
+  })
+  const client = createInternalTestClient(appToken)
+
+  await expect(
+    client.user.verifyUser({ email: 'any@example.com' })
+  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+})
+
+test('Returns 403 when accessed with system app token', async () => {
+  const appToken = createTestToken({
+    userId: 'test-system',
+    scopes: TEST_USER_DEFAULT_SCOPES,
+    userType: TokenUserType.enum.system
+  })
+
+  const client = createInternalTestClient(appToken)
+
+  await expect(
+    client.user.verifyUser({ email: 'any@example.com' })
+  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+})
+
+test('Returns 403 when accessed with internal token using invalid subject', async () => {
+  const internalToken = createInternalServiceToken({
+    subject: 'invalid-subject'
+  })
+
+  const client = createInternalTestClient(internalToken)
+
+  await expect(
+    client.user.verifyUser({ email: 'any@example.com' })
+  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+})
+
+test('Returns 200 when accessed with proper internal token', async () => {
+  const { eventsDb, locations } = await setupTestCase()
+
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/roles`, () =>
+      HttpResponse.json([{ id: 'REGISTRATION_AGENT', scopes: [] }])
+    )
+  )
+
+  const userId = getUUID()
+  await eventsDb
+    .insertInto('users')
+    .values({
+      id: userId,
+      email: 'authtest@example.com',
+      role: 'REGISTRATION_AGENT',
+      status: 'active',
+      officeId: locations[0].id
+    })
+    .execute()
+
+  await eventsDb
+    .insertInto('userCredentials')
+    .values({
+      userId,
+      username: 'authtest.user',
+      passwordHash: 'hash',
+      salt: 'salt',
+      securityQuestions: sql`cast (${JSON.stringify([
+        { questionKey: 'BIRTH_TOWN', answerHash: 'h1' }
+      ])} as jsonb)` as unknown as Record<string, unknown>
+    })
+    .execute()
+
+  const token = createInternalServiceToken()
+  const client = createInternalTestClient(token)
+
+  await expect(
+    client.user.verifyUser({ email: 'authtest@example.com' })
+  ).resolves.toMatchObject({ id: userId })
+})
 
 test('returns UNAUTHORIZED when user not found by mobile', async () => {
   await expect(

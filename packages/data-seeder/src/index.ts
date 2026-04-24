@@ -11,16 +11,31 @@
 import { env } from './environment'
 import fetch from 'node-fetch'
 import { seedLocations } from './locations'
+import superjson from 'superjson'
 import { seedUsers } from './users'
 import { raise } from './utils'
-import { createClient } from '@opencrvs/toolkit/api'
+import { createTRPCClient, httpLink } from '@trpc/client'
+import { InitialisationRouter } from '@opencrvs/events/src/router'
+
+export const createInitialisationClient = (token: string) => {
+  return createTRPCClient<InitialisationRouter>({
+    links: [
+      httpLink({
+        url: new URL('events/initialisation/', env.GATEWAY_HOST).href,
+        transformer: superjson,
+        async headers() {
+          return { authorization: `Bearer ${token}` }
+        }
+      })
+    ]
+  })
+}
 
 async function getToken(): Promise<string> {
   const authUrl = new URL('authenticate-super-user', env.AUTH_HOST).toString()
   const res = await fetch(authUrl, {
     method: 'POST',
     body: JSON.stringify({
-      username: 'o.admin',
       password: env.SUPER_USER_PASSWORD
     }),
     headers: {
@@ -78,9 +93,8 @@ async function triggerSystemReady(token: string) {
 }
 
 async function deactivateSuperuser(token: string) {
-  const url = new URL('events', env.GATEWAY_HOST).toString()
-  const client = createClient(url, `Bearer ${token}`)
-  await client.user.deactivateSuperUser.mutate({ username: 'o.admin' })
+  const client = createInitialisationClient(token)
+  await client.complete.mutate()
 }
 
 async function main() {

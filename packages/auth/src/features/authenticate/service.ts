@@ -66,6 +66,23 @@ export async function createInternalServiceToken() {
   })
 }
 
+/**
+ * @returns token for initialisation methods authentication, which has no scopes and a short expiry time.
+ */
+export async function createInitialisationToken() {
+  return sign({}, cert, {
+    subject: 'opencrvs:data-seeder-service',
+    algorithm: 'RS256',
+    expiresIn: env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
+    audience: [
+      'opencrvs:events-user',
+      'opencrvs:countryconfig-user',
+      'opencrvs:gateway-user'
+    ],
+    issuer: JWT_ISSUER
+  })
+}
+
 export const internalClient = createTRPCClient<InternalRouter>({
   links: [
     httpLink({
@@ -130,6 +147,16 @@ export async function authenticate(
     mobile: body.mobile,
     email: body.email
   }
+}
+
+export async function authenticateSuperuser(
+  password: string
+): Promise<boolean> {
+  const auth = await internalClient.user.initialisation.authenticate.mutate({
+    password
+  })
+
+  return auth.valid
 }
 
 export async function authenticateSystem(

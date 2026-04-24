@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { internalRouter as internalServiceRouter } from '@events/router/trpc'
+import { serviceRouter } from '@events/router/trpc'
 import { internalUserRouter } from './internal'
 
 /**
  * Internal routes that are not exposed to external clients but can be used for internal communication between services or for administrative purposes.
- * These routes require special authentication or permissions and should be protected accordingly.
+ * These routes should require a special authentication and should be protected accordingly.
  */
-export const internalRouter = internalServiceRouter({
+export const internalRouter = serviceRouter({
   user: internalUserRouter
 })
 

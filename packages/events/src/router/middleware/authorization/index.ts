@@ -42,9 +42,10 @@ import {
   getAcceptedScopesByType
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
-import { TrpcContext } from '@events/context'
+import { ServiceTrpcContext, TrpcContext } from '@events/context'
 import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
 import { getUserById } from '@events/storage/postgres/events/users'
+import { getSystemInitialisation } from '@events/service/auth'
 import { findUserOrSystem } from '../../../service/users/api'
 import { getInMemoryEventConfigurations } from '../../../service/config/config'
 import { getEventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
@@ -465,4 +466,26 @@ export const userCanReadOtherUser: MiddlewareFunction<
   }
 
   throw new TRPCError({ code: 'NOT_FOUND' })
+}
+
+export function canInitialiseSystem() {
+  const fn: MiddlewareFunction<
+    ServiceTrpcContext,
+    unknown,
+    ServiceTrpcContext,
+    ServiceTrpcContext,
+    unknown
+  > = async (opts) => {
+    const systemInitialisation = await getSystemInitialisation()
+
+    if (systemInitialisation.completedAt !== null) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED'
+      })
+    }
+
+    return opts.next()
+  }
+
+  return fn
 }
