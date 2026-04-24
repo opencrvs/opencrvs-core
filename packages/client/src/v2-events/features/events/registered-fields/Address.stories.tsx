@@ -19,7 +19,9 @@ import {
   AddressField,
   AddressType,
   getDeclaration,
-  UUID
+  UUID,
+  TestUserRole,
+  user
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Review } from '@client/v2-events/features/events/components/Review'
@@ -214,6 +216,33 @@ export const AddressFieldWithUserPrimaryOfficeAddress: FormStory = {
               type: FieldType.TEXT
             }
           ]
+        }
+      }
+    ]
+  }
+}
+
+export const AddressFieldWithLockedCountry: FormStory = {
+  name: 'Country field disabled for jurisdiction-restricted user',
+  parameters: {
+    userRole: TestUserRole.enum.COMMUNITY_LEADER
+  },
+  args: {
+    eventConfig: tennisClubMembershipEvent,
+    formValues: {
+      'storybook.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: ''
+      }
+    },
+    fields: [
+      {
+        ...addressField,
+        configuration: {
+          allowedLocations: user.jurisdiction(
+            user.scope('record.create').attribute('placeOfEvent')
+          )
         }
       }
     ]
