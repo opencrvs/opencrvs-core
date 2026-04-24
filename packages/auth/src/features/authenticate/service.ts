@@ -177,6 +177,7 @@ export async function createTokenForActionConfirmation(
       scope: [
         encodeScope({ type: 'record.confirm-registration' }),
         encodeScope({ type: 'record.reject-registration' }),
+        encodeScope({ type: 'record.read' }), // @TODO: Remove when v1.9.13 is merged to develop. It includes a narrower fix for this.
         userRejectScope
       ].filter(Boolean),
       eventId: 'eventId' in input ? input.eventId : undefined,
