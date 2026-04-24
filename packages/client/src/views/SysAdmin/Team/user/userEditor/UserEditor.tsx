@@ -83,6 +83,7 @@ function getUserEditConfig(
 ): EventConfig {
   return {
     id: '__user__',
+    analytics: false,
     summary: {
       fields: []
     },
