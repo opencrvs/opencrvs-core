@@ -130,7 +130,7 @@ const _EventConfigBase: z.ZodType<EventConfig, EventConfigInput> = z.object({
     .optional()
     .default(true)
     .describe(
-      'Indicates whether the recors of this event type are included in analytics'
+      'Indicates whether the records of this event type are included in analytics'
     )
 })
 
