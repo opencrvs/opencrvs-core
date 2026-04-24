@@ -11,11 +11,100 @@
 
 import { TRPCError } from '@trpc/server'
 import { sql } from 'kysely'
-import { getUUID } from '@opencrvs/commons'
-import { createInternalTestClient, setupTestCase } from '@events/tests/utils'
+import { getUUID, TokenUserType } from '@opencrvs/commons'
+import {
+  createInternalServiceToken,
+  createInternalTestClient,
+  createTestToken,
+  setupTestCase,
+  TEST_USER_DEFAULT_SCOPES
+} from '@events/tests/utils'
 import { generateSaltedHash } from '@events/service/auth/hash'
 
 const caller = createInternalTestClient()
+
+test('Returns 403 when accessed with user app token', async () => {
+  const { user } = await setupTestCase()
+
+  const appToken = createTestToken({
+    userId: user.id,
+    scopes: TEST_USER_DEFAULT_SCOPES,
+    userType: TokenUserType.enum.user
+  })
+  const client = createInternalTestClient(appToken)
+
+  await expect(
+    client.user.verifyPassword({ username: 'any', password: 'any' })
+  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+})
+
+test('Returns 403 when accessed with system app token', async () => {
+  const appToken = createTestToken({
+    userId: 'test-system',
+    scopes: TEST_USER_DEFAULT_SCOPES,
+    userType: TokenUserType.enum.system
+  })
+
+  const client = createInternalTestClient(appToken)
+
+  await expect(
+    client.user.verifyPassword({ username: 'any', password: 'any' })
+  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+})
+
+test('Returns 403 when accessed with internal token using invalid subject', async () => {
+  const internalToken = createInternalServiceToken({
+    subject: 'invalid-subject'
+  })
+
+  const client = createInternalTestClient(internalToken)
+
+  await expect(
+    client.user.verifyPassword({ username: 'any', password: 'any' })
+  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+})
+
+test('Returns 200 when accessed with proper internal token', async () => {
+  const { eventsDb, locations } = await setupTestCase()
+  const { hash, salt } = await generateSaltedHash('mypassword')
+
+  const userId = getUUID()
+  await eventsDb
+    .insertInto('users')
+    .values({
+      id: userId,
+      email: 'authtest@example.com',
+      role: 'REGISTRATION_AGENT',
+      status: 'active',
+      officeId: locations[0].id
+    })
+    .execute()
+
+  await eventsDb
+    .insertInto('userCredentials')
+    .values({
+      userId,
+      username: 'authtest.user',
+      passwordHash: hash,
+      salt,
+      securityQuestions:
+        sql`cast (${JSON.stringify([])} as jsonb)` as unknown as Record<
+          string,
+          unknown
+        >
+    })
+    .execute()
+
+  const token = createInternalServiceToken()
+  const client = createInternalTestClient(token)
+
+  await expect(
+    client.user.verifyPassword({
+      username: 'authtest.user',
+      password: 'mypassword'
+    })
+  ).resolves.toMatchObject({ id: userId })
+})
 
 test('returns UNAUTHORIZED when user not found', async () => {
   await expect(
