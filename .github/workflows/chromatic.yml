@@ -18,61 +18,72 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - name: Checking out git repo
+      - name: Checkout PR branch
         uses: actions/checkout@v6
         with:
+          path: pr
           fetch-depth: 0 # Chromatic needs full git history for baseline comparison
 
-      - name: Detect changes in folders which might affect visual tests
-        id: changes
-        uses: dorny/paths-filter@v3
+      - name: Checkout base branch
+        uses: actions/checkout@v6
         with:
-          filters: |
-            visual-tests:
-              - 'packages/client/**'
-              - 'packages/components/**'
-              - 'packages/commons/**'
-
-      - name: Skip Chromatic (no client changes)
-        if: steps.changes.outputs.visual-tests != 'true'
-        run: echo "No changes in packages/client — skipping Chromatic."
+          ref: ${{ github.base_ref }}
+          path: base
 
       - name: Use Node.js from .nvmrc
-        if: steps.changes.outputs.visual-tests == 'true'
         uses: actions/setup-node@v6
         with:
-          node-version-file: .nvmrc
+          node-version-file: pr/.nvmrc
 
-      - name: Cache Node.js dependencies
-        if: steps.changes.outputs.visual-tests == 'true'
-        uses: actions/cache@v5
-        with:
-          path: |
-            **/node_modules
-            ~/.cache/yarn/v6
-          key: node-${{ hashFiles('**/yarn.lock', 'packages/client/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies
-        if: steps.changes.outputs.visual-tests == 'true'
+      # Build base branch first so that if builds match we can skip early
+      - name: Install dependencies (base)
+        working-directory: base
         run: CI="" yarn install --frozen-lockfile
 
-      - name: Build common package
-        if: steps.changes.outputs.visual-tests == 'true'
-        run: cd packages/commons && yarn build
+      - name: Build base branch client
+        working-directory: base
+        run: |
+          cd packages/commons && yarn build
+          cd ../components && yarn build
+          cd ../events && node_modules/.bin/tsc -p tsconfig.router.json
+          cd ../client && yarn build-storybook
 
-      - name: Build components
-        if: steps.changes.outputs.visual-tests == 'true'
-        run: cd packages/components && yarn build
+      - name: Install dependencies (PR)
+        working-directory: pr
+        run: CI="" yarn install --frozen-lockfile
 
-      - name: Build events router types
-        if: steps.changes.outputs.visual-tests == 'true'
-        run: cd packages/events && node_modules/.bin/tsc -p tsconfig.router.json
+      - name: Build PR branch client
+        working-directory: pr
+        run: |
+          cd packages/commons && yarn build
+          cd ../components && yarn build
+          cd ../events && node_modules/.bin/tsc -p tsconfig.router.json
+          cd ../client && yarn build-storybook
+
+      - name: Compare client builds
+        id: compare
+        run: |
+          # Hash each file's contents, sort by content hash (ignoring filenames,
+          # since Storybook/Vite may rename hashed chunks across builds), then
+          # hash the sorted list. Identical builds produce identical digests.
+          hash_dir() {
+            (cd "$1" && find . -type f -exec sha256sum {} \; | awk '{print $1}' | sort | sha256sum | awk '{print $1}')
+          }
+          PR_HASH=$(hash_dir pr/packages/client/storybook-static)
+          BASE_HASH=$(hash_dir base/packages/client/storybook-static)
+          echo "PR   build hash: $PR_HASH"
+          echo "Base build hash: $BASE_HASH"
+          if [ "$PR_HASH" = "$BASE_HASH" ]; then
+            echo "identical=true" >> "$GITHUB_OUTPUT"
+            echo "Client builds are identical — skipping Chromatic."
+          else
+            echo "identical=false" >> "$GITHUB_OUTPUT"
+            echo "Client builds differ — running Chromatic."
+          fi
 
       - name: Run Chromatic
-        if: steps.changes.outputs.visual-tests == 'true'
-        run: yarn run chromatic
-        working-directory: packages/client
+        if: steps.compare.outputs.identical != 'true'
+        working-directory: pr/packages/client
+        run: yarn run chromatic --storybook-build-dir storybook-static
         env:
           CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
