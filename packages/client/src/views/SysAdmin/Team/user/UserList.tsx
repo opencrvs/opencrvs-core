@@ -246,6 +246,7 @@ function UserListComponent({ userDetails }: UserListProps) {
       primaryOfficeId: locationId,
       count: DEFAULT_FIELD_AGENT_LIST_SIZE,
       skip: (currentPageNumber - 1) * DEFAULT_FIELD_AGENT_LIST_SIZE,
+      sortBy: 'firstname',
       sortOrder: 'asc'
     },
     { enabled: !!locationId }

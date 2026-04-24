@@ -73,6 +73,17 @@ const UserSearch = z.object({
   primaryOfficeId: z.string().optional(),
   count: z.number().min(0),
   skip: z.number().min(0),
+  sortBy: z
+    .enum([
+      'createdAt',
+      'firstname',
+      'surname',
+      'username',
+      'email',
+      'status',
+      'role'
+    ])
+    .default('createdAt'),
   sortOrder: z.enum(['asc', 'desc'])
 })
 
@@ -89,7 +100,8 @@ export function createUserRoute(
           mobile: input.mobile,
           count: 1,
           skip: 0,
-          sortOrder: 'asc'
+          sortOrder: 'asc',
+          sortBy: 'createdAt'
         })
 
         if (existingWithMobile.length > 0) {
@@ -105,7 +117,8 @@ export function createUserRoute(
           email: input.email,
           count: 1,
           skip: 0,
-          sortOrder: 'asc'
+          sortOrder: 'asc',
+          sortBy: 'createdAt'
         })
         if (existingWithEmail.length > 0) {
           logger.error(`Email ${input.email} is already in use by another user`)
@@ -212,6 +225,7 @@ export const userRouter = router({
           mobile: input.mobile,
           count: 1,
           skip: 0,
+          sortBy: 'createdAt',
           sortOrder: 'asc'
         })
         if (
@@ -229,6 +243,7 @@ export const userRouter = router({
           email: input.email,
           count: 1,
           skip: 0,
+          sortBy: 'createdAt',
           sortOrder: 'asc'
         })
         if (
@@ -383,6 +398,7 @@ export const userRouter = router({
         mobile: input.phoneNumber,
         count: 1,
         skip: 0,
+        sortBy: 'createdAt',
         sortOrder: 'asc'
       })
 
@@ -447,6 +463,7 @@ export const userRouter = router({
         email: input.email,
         count: 1,
         skip: 0,
+        sortBy: 'createdAt',
         sortOrder: 'asc'
       })
 

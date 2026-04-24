@@ -45,6 +45,15 @@ import {
 import { generateSaltedHash, generateHash } from '@events/service/auth/hash'
 import { getRoles } from '../config/config'
 
+export type UserSortBy =
+  | 'createdAt'
+  | 'firstname'
+  | 'surname'
+  | 'username'
+  | 'email'
+  | 'status'
+  | 'role'
+
 export type SearchUsersPayload = {
   username?: string
   mobile?: string
@@ -54,6 +63,7 @@ export type SearchUsersPayload = {
   locationId?: UUID
   count: number
   skip: number
+  sortBy: UserSortBy
   sortOrder: 'asc' | 'desc'
 }
 
