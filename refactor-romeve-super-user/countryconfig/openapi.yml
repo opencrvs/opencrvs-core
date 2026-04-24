@@ -7752,7 +7752,6 @@ components:
             - id
             - label
             - type
-            - configuration
           additionalProperties: false
           description: Input field for a location
         - type: object
