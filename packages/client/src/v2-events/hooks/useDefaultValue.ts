@@ -232,10 +232,9 @@ export function mapFieldToDefaultValue(
 
       return `${hours}:${minutes}`
     }
-    // `replacePlaceholders` returns undefined for falsy values
-    case FieldType.CHECKBOX: {
-      return field.defaultValue
-    }
+    // `replacePlaceholders` returns undefined for falsy values e.g. 0, false
+    case FieldType.CHECKBOX:
+    case FieldType.NUMBER:
     case FieldType.BUTTON: {
       return field.defaultValue
     }
