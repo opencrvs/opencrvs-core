@@ -193,5 +193,22 @@ describe('filterLocationsByJurisdiction', () => {
 
       expect(result).toHaveLength(V2_DEFAULT_MOCK_LOCATIONS.length)
     })
+
+    it('returns both CRVS offices and health facilities when both types are specified', () => {
+      // Verifies that the filter correctly handles multiple location types in one call.
+      // Related: the registration office dropdown in user create/edit was fixed by
+      // removing the locationTypes restriction entirely (so all location types are shown).
+      const result = filterLocationsByJurisdiction({
+        locations,
+        administrativeAreas,
+        userLocationId: undefined,
+        locationTypes: ['CRVS_OFFICE', 'HEALTH_FACILITY'],
+        jurisdictionFilter: undefined
+      })
+
+      expect(result.some((l) => l.locationType === 'CRVS_OFFICE')).toBe(true)
+      expect(result.some((l) => l.locationType === 'HEALTH_FACILITY')).toBe(true)
+      expect(result).toHaveLength(V2_DEFAULT_MOCK_LOCATIONS.length)
+    })
   })
 })
