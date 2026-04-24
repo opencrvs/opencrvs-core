@@ -193,5 +193,23 @@ describe('filterLocationsByJurisdiction', () => {
 
       expect(result).toHaveLength(V2_DEFAULT_MOCK_LOCATIONS.length)
     })
+
+    it('returns both CRVS offices and health facilities when both types are specified', () => {
+      // Regression for: hospital offices not appearing in the registration office
+      // dropdown during user create/edit. The fix adds HEALTH_FACILITY alongside
+      // CRVS_OFFICE in getUserEditConfig so that hospital staff can be assigned
+      // to a hospital as their primary office.
+      const result = filterLocationsByJurisdiction({
+        locations,
+        administrativeAreas,
+        userLocationId: undefined,
+        locationTypes: ['CRVS_OFFICE', 'HEALTH_FACILITY'],
+        jurisdictionFilter: undefined
+      })
+
+      expect(result.some((l) => l.locationType === 'CRVS_OFFICE')).toBe(true)
+      expect(result.some((l) => l.locationType === 'HEALTH_FACILITY')).toBe(true)
+      expect(result).toHaveLength(V2_DEFAULT_MOCK_LOCATIONS.length)
+    })
   })
 })
