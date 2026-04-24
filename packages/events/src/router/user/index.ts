@@ -95,6 +95,7 @@ export function createUserRoute(
     .output(User)
     .mutation(async ({ input, ctx }) => {
       const tokenPayload = getTokenPayload(ctx.token)
+
       if (input.mobile) {
         const existingWithMobile = await searchUsers({
           mobile: input.mobile,
@@ -129,7 +130,7 @@ export function createUserRoute(
       await writeAuditLog({
         ...input,
         clientId: tokenPayload.sub,
-        clientType: tokenPayload.userType,
+        clientType: tokenPayload.userType ?? 'system',
         operation: 'user.create_user',
         requestData: {
           subjectId: user.id,
@@ -174,7 +175,7 @@ const auditRouter = router({
       await writeAuditLog({
         ...input,
         clientId: ctx.user.id,
-        clientType: ctx.user.type
+        clientType: ctx.user.type ?? 'system'
       })
     }),
   list: userOnlyProcedure

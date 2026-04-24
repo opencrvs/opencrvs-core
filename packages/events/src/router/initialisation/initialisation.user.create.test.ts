@@ -147,12 +147,12 @@ test('Allows user creation when with the right token', async () => {
   const auditLogs = await eventsDb.selectFrom('auditLog').selectAll().execute()
 
   expect(auditLogs).toHaveLength(1)
-  // @TODO: Ask whether we are intentionally logging the user id of the created user rather than the creator.
-  // expect(auditLogs[0]).toMatchObject({
-  //   operation: 'user.create_user',
-  //   clientId: user.id,
-  //   kissa: '1'
-  // })
+
+  expect(auditLogs[0]).toMatchObject({
+    operation: 'user.create_user',
+    clientId: 'opencrvs:data-seeder-service',
+    clientType: 'system'
+  })
 })
 
 test('Throws error when creating user with existing email', async () => {
