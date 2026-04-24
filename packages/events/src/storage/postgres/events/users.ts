@@ -218,7 +218,6 @@ export async function searchUsersWithInput(input: SearchUsersPayload) {
       'users.fullHonorificName',
       'locations.administrativeAreaId'
     ])
-    .orderBy('users.firstname', 'asc')
 
   if (input.username) {
     query = query.where(
@@ -229,7 +228,7 @@ export async function searchUsersWithInput(input: SearchUsersPayload) {
   }
 
   if (input.mobile) {
-    query = query.where('users.mobile', '=', `%${input.mobile}%`)
+    query = query.where('users.mobile', 'ilike', `%${input.mobile}%`)
   }
 
   if (input.email) {
@@ -248,7 +247,21 @@ export async function searchUsersWithInput(input: SearchUsersPayload) {
     query = query.where('users.officeId', '=', input.primaryOfficeId)
   }
 
-  const result = await query.limit(input.count).offset(input.skip).execute()
+  const sortColumn = {
+    createdAt: 'users.createdAt',
+    firstname: 'users.firstname',
+    surname: 'users.surname',
+    username: 'userCredentials.username',
+    email: 'users.email',
+    status: 'users.status',
+    role: 'users.role'
+  } as const
+
+  const result = await query
+    .orderBy(sortColumn[input.sortBy], input.sortOrder)
+    .limit(input.count)
+    .offset(input.skip)
+    .execute()
 
   return result
 }

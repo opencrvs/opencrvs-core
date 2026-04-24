@@ -113,6 +113,9 @@ const UserSearch = z.object({
   primaryOfficeId: z.string().optional(),
   count: z.number().min(0),
   skip: z.number().min(0),
+  sortBy: z
+    .enum(['createdAt', 'firstname', 'surname', 'username', 'email', 'status', 'role'])
+    .default('createdAt'),
   sortOrder: z.enum(['asc', 'desc'])
 })
 
@@ -138,6 +141,7 @@ export const userRouter = router({
           mobile: input.mobile,
           count: 1,
           skip: 0,
+          sortBy: 'createdAt',
           sortOrder: 'asc'
         })
         if (existingWithMobile.length > 0) {
@@ -152,6 +156,7 @@ export const userRouter = router({
           email: input.email,
           count: 1,
           skip: 0,
+          sortBy: 'createdAt',
           sortOrder: 'asc'
         })
         if (existingWithEmail.length > 0) {
@@ -185,6 +190,7 @@ export const userRouter = router({
           mobile: input.mobile,
           count: 1,
           skip: 0,
+          sortBy: 'createdAt',
           sortOrder: 'asc'
         })
         if (
@@ -202,6 +208,7 @@ export const userRouter = router({
           email: input.email,
           count: 1,
           skip: 0,
+          sortBy: 'createdAt',
           sortOrder: 'asc'
         })
         if (
@@ -366,6 +373,7 @@ export const userRouter = router({
         mobile: input.phoneNumber,
         count: 1,
         skip: 0,
+        sortBy: 'createdAt',
         sortOrder: 'asc'
       })
 
@@ -430,6 +438,7 @@ export const userRouter = router({
         email: input.email,
         count: 1,
         skip: 0,
+        sortBy: 'createdAt',
         sortOrder: 'asc'
       })
 
