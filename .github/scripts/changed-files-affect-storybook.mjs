@@ -100,7 +100,9 @@ for (const mod of rawModules) {
 function mapToSourceCandidates(rel) {
   const out = []
   let m
-  m = rel.match(/^packages\/commons\/build\/dist\/(?:common|esm)\/(.+)\.(?:js|d\.ts)$/)
+  m = rel.match(
+    /^packages\/commons\/build\/dist\/(?:common|esm)\/(.+)\.(?:js|d\.ts)$/
+  )
   if (m) {
     const stem = m[1].replace(/\/index$/, '')
     out.push(
@@ -139,11 +141,7 @@ const alwaysRelevantFiles = new Set([
   'packages/client/package.json',
   'packages/client/chromatic.config.json',
   'packages/components/package.json',
-  'packages/commons/package.json',
-  'yarn.lock',
-  '.nvmrc',
-  '.github/workflows/lint-and-test.yml',
-  '.github/scripts/changed-files-affect-storybook.mjs'
+  'packages/commons/package.json'
 ])
 const alwaysRelevantPrefixes = [
   'packages/client/.storybook/',
@@ -156,13 +154,16 @@ function isAlwaysRelevant(p) {
   // Story files and MDX docs anywhere in the client are always relevant
   // even if a brand-new story hasn't been bundled into the current
   // preview-stats.json yet.
-  if (/^packages\/client\/src\/.+\.stories\.(?:js|jsx|mjs|ts|tsx)$/.test(p)) return true
+  if (/^packages\/client\/src\/.+\.stories\.(?:js|jsx|mjs|ts|tsx)$/.test(p))
+    return true
   if (/^packages\/client\/src\/.+\.mdx$/.test(p)) return true
   return false
 }
 
 // 4. Compute changed files vs the PR base.
-const diff = execSync(`git diff --name-only ${base}...HEAD`, { encoding: 'utf8' })
+const diff = execSync(`git diff --name-only ${base}...HEAD`, {
+  encoding: 'utf8'
+})
 const changedFiles = diff.split('\n').filter(Boolean)
 
 // 5. Intersect.
