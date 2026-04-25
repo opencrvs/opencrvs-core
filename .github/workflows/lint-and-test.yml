@@ -407,14 +407,17 @@ jobs:
         working-directory: base
         run: CI="" yarn install --frozen-lockfile
 
+      # --webpack-stats-json emits preview-stats.json alongside the build,
+      # which Chromatic needs for TurboSnap (--only-changed) when we pass
+      # it a pre-built Storybook via --storybook-build-dir.
       - name: Build PR Storybook
         working-directory: pr/packages/client
-        run: yarn run build-storybook
+        run: yarn run build-storybook --webpack-stats-json
 
       - name: Build base Storybook
         if: github.event_name == 'pull_request'
         working-directory: base/packages/client
-        run: yarn run build-storybook
+        run: yarn run build-storybook --webpack-stats-json
 
       - name: Compare Storybook builds
         id: compare
@@ -423,8 +426,17 @@ jobs:
           # Hash each file's contents, sort by content hash (ignoring filenames,
           # since Vite/Storybook may rename hashed chunks across builds), then
           # hash the sorted list. Identical builds produce identical digests.
+          #
+          # Excluded from the hash because they legitimately differ between
+          # builds in different working directories (they embed absolute
+          # paths) without representing any visual change:
+          #   - preview-stats.json (TurboSnap module graph, contains paths)
+          #   - *.map              (sourcemaps contain paths)
           hash_dir() {
-            (cd "$1" && find . -type f -exec sha256sum {} \; | awk '{print $1}' | sort | sha256sum | awk '{print $1}')
+            (cd "$1" && find . -type f \
+              ! -name 'preview-stats.json' \
+              ! -name '*.map' \
+              -exec sha256sum {} \; | awk '{print $1}' | sort | sha256sum | awk '{print $1}')
           }
           PR_HASH=$(hash_dir pr/packages/client/storybook-static)
           BASE_HASH=$(hash_dir base/packages/client/storybook-static)
@@ -436,6 +448,12 @@ jobs:
           else
             echo "identical=false" >> "$GITHUB_OUTPUT"
             echo "Storybook builds differ — running Chromatic."
+            echo ""
+            echo "::group::Differing files (for debugging)"
+            diff -rq \
+              pr/packages/client/storybook-static \
+              base/packages/client/storybook-static || true
+            echo "::endgroup::"
           fi
 
       - name: Run Chromatic
