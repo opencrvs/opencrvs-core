@@ -423,20 +423,34 @@ jobs:
         id: compare
         if: github.event_name == 'pull_request'
         run: |
-          # Hash each file's contents, sort by content hash (ignoring filenames,
-          # since Vite/Storybook may rename hashed chunks across builds), then
-          # hash the sorted list. Identical builds produce identical digests.
+          # Compute a digest of a Storybook build that is stable across the
+          # two working directories (pr/ vs base/). For text files we first
+          # strip the workspace-specific absolute path prefixes, because
+          # Storybook bakes absolute addon paths into its build output (see
+          # `getAbsolutePath` in packages/client/.storybook/main.ts) and Vite
+          # may embed `import.meta.url`-style paths.
           #
-          # Excluded from the hash because they legitimately differ between
-          # builds in different working directories (they embed absolute
-          # paths) without representing any visual change:
+          # Files unconditionally excluded (they embed paths/metadata without
+          # representing any visual change):
           #   - preview-stats.json (TurboSnap module graph, contains paths)
           #   - *.map              (sourcemaps contain paths)
           hash_dir() {
-            (cd "$1" && find . -type f \
+            local dir="$1"
+            (cd "$dir" && find . -type f \
               ! -name 'preview-stats.json' \
               ! -name '*.map' \
-              -exec sha256sum {} \; | awk '{print $1}' | sort | sha256sum | awk '{print $1}')
+              -print0 | sort -z | while IFS= read -r -d '' f; do
+                if grep -Iq . "$f"; then
+                  # Text file: normalise workspace paths before hashing.
+                  sed \
+                    -e "s|$GITHUB_WORKSPACE/pr/|/|g" \
+                    -e "s|$GITHUB_WORKSPACE/base/|/|g" \
+                    "$f" | sha256sum
+                else
+                  # Binary file: hash as-is.
+                  sha256sum < "$f"
+                fi
+              done | awk '{print $1}' | sha256sum | awk '{print $1}')
           }
           PR_HASH=$(hash_dir pr/packages/client/storybook-static)
           BASE_HASH=$(hash_dir base/packages/client/storybook-static)
