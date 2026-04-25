@@ -220,24 +220,13 @@ jobs:
           message: ${{ env.PR_COMMENT_BODY }}
 
   prepare-client-tests:
-    name: Prepare client tests (${{ matrix.branch }})
+    name: Prepare client tests
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        # On PRs, build both the PR branch and its base branch so the
-        # chromatic job can diff the two builds and skip Chromatic when
-        # nothing visual has changed. On pushes there is no base to diff
-        # against, so only the current ref is built.
-        branch: ${{ fromJSON(github.event_name == 'pull_request' && '["pr","base"]' || '["pr"]') }}
     steps:
       - name: Checking out git repo
         uses: actions/checkout@v6
-        with:
-          fetch-depth: 0 # Fetch history to compare PR changes against the base branch
-          ref: ${{ matrix.branch == 'base' && github.base_ref || '' }}
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v6
@@ -295,10 +284,20 @@ jobs:
         run: |
           cd packages/components && yarn build
 
+      # Build Storybook once here (with --webpack-stats-json so that
+      # `preview-stats.json` is emitted). The artifact is reused by
+      # `chromatic` (--storybook-build-dir) and `test-storybook`,
+      # avoiding duplicate Storybook builds. `preview-stats.json` is the
+      # input to the change-detection script that decides whether
+      # Chromatic must run.
+      - name: Build Storybook (with TurboSnap stats)
+        working-directory: packages/client
+        run: yarn run build-storybook --webpack-stats-json
+
       - name: Upload filesystem as artifact
         uses: actions/upload-artifact@v4.5.0
         with:
-          name: client-${{ matrix.branch }}
+          name: client
           include-hidden-files: true
           path: |
             .
@@ -314,7 +313,7 @@ jobs:
       - name: Download filesystem artifact
         uses: actions/download-artifact@v7
         with:
-          name: client-pr
+          name: client
           path: .
 
       - name: Use Node.js from .nvmrc
@@ -350,133 +349,65 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      # Fresh checkout brings .git (needed by Chromatic TurboSnap). The
-      # artifact extracted on top adds the prebuilt commons/components
-      # outputs; source files in the artifact match those from checkout
-      # (same commit) so overwrites are no-ops.
-      - name: Checkout PR branch (for Chromatic git history)
+      # Fresh checkout brings .git (needed by Chromatic's TurboSnap and
+      # by the change-detection `git diff` below). The artifact
+      # extracted on top adds the prebuilt commons/components outputs
+      # and `packages/client/storybook-static/`; source files match the
+      # current commit so overwrites are no-ops.
+      - name: Checkout PR branch (for git history)
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          path: pr
 
-      - name: Download PR filesystem artifact
+      - name: Download filesystem artifact
         uses: actions/download-artifact@v7
         with:
-          name: client-pr
-          path: pr
-
-      - name: Download base filesystem artifact
-        if: github.event_name == 'pull_request'
-        uses: actions/download-artifact@v7
-        with:
-          name: client-base
-          path: base
+          name: client
+          path: .
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v6
         with:
-          node-version-file: pr/.nvmrc
+          node-version-file: .nvmrc
 
-      - name: Cache Node.js dependencies (PR)
-        uses: actions/cache@v5
-        with:
-          path: |
-            pr/**/node_modules
-            ~/.cache/yarn/v6
-          key: node-${{ hashFiles('pr/yarn.lock', 'pr/packages/client/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies (PR)
-        working-directory: pr
-        run: CI="" yarn install --frozen-lockfile
-
-      - name: Cache Node.js dependencies (base)
-        if: github.event_name == 'pull_request'
-        uses: actions/cache@v5
-        with:
-          path: |
-            base/**/node_modules
-          key: node-${{ hashFiles('base/yarn.lock', 'base/packages/client/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies (base)
-        if: github.event_name == 'pull_request'
-        working-directory: base
-        run: CI="" yarn install --frozen-lockfile
-
-      # We diff the client app build (Vite) rather than the Storybook build
-      # because stories use @faker-js/faker, which generates fresh random
-      # values on every Storybook build — meaning two Storybook builds of
-      # the same source never produce the same bytes. The client app build
-      # excludes story files and is deterministic for the same source.
-      - name: Build PR client
-        working-directory: pr/packages/client
-        run: yarn build
-
-      - name: Build base client
-        if: github.event_name == 'pull_request'
-        working-directory: base/packages/client
-        run: yarn build
-
-      - name: Compare client builds
-        id: compare
+      # Decide whether anything in this PR can affect Storybook by
+      # intersecting the file diff with the module graph emitted by
+      # Storybook's `--webpack-stats-json`. Backend-only changes in
+      # `packages/commons` (and similar) won't appear in the graph and
+      # therefore won't trigger Chromatic. Always runs Chromatic on
+      # pushes so the baseline can keep moving.
+      - name: Detect storybook-affecting changes
+        id: detect
         if: github.event_name == 'pull_request'
         run: |
-          # Compute a digest of a client build that is stable across the two
-          # working directories (pr/ vs base/). For text files we first
-          # strip the workspace-specific absolute path prefixes, because
-          # Vite may embed `import.meta.url`-style paths in some chunks.
-          #
-          # Files unconditionally excluded (they embed paths/metadata
-          # without representing any visual change):
-          #   - *.map (sourcemaps contain paths)
-          hash_dir() {
-            local dir="$1"
-            (cd "$dir" && find . -type f \
-              ! -name '*.map' \
-              -print0 | sort -z | while IFS= read -r -d '' f; do
-                if grep -Iq . "$f"; then
-                  # Text file: normalise workspace paths before hashing.
-                  sed \
-                    -e "s|$GITHUB_WORKSPACE/pr/|/|g" \
-                    -e "s|$GITHUB_WORKSPACE/base/|/|g" \
-                    "$f" | sha256sum
-                else
-                  # Binary file: hash as-is.
-                  sha256sum < "$f"
-                fi
-              done | awk '{print $1}' | sha256sum | awk '{print $1}')
-          }
-          PR_HASH=$(hash_dir pr/packages/client/build)
-          BASE_HASH=$(hash_dir base/packages/client/build)
-          echo "PR   client build hash: $PR_HASH"
-          echo "Base client build hash: $BASE_HASH"
-          if [ "$PR_HASH" = "$BASE_HASH" ]; then
-            echo "identical=true" >> "$GITHUB_OUTPUT"
-            echo "Client builds are identical — skipping Chromatic."
-          else
-            echo "identical=false" >> "$GITHUB_OUTPUT"
-            echo "Client builds differ — running Chromatic."
-            echo ""
-            echo "::group::Differing files (for debugging)"
-            diff -rq \
-              pr/packages/client/build \
-              base/packages/client/build || true
-            echo "::endgroup::"
-          fi
+          node .github/scripts/changed-files-affect-storybook.mjs \
+            --stats packages/client/storybook-static/preview-stats.json \
+            --base "${{ github.event.pull_request.base.sha }}"
+
+      - name: Cache Node.js dependencies
+        if: github.event_name != 'pull_request' || steps.detect.outputs.affects == 'true'
+        uses: actions/cache@v5
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        if: github.event_name != 'pull_request' || steps.detect.outputs.affects == 'true'
+        run: CI="" yarn install --frozen-lockfile
 
       - name: Run Chromatic
-        # Run Chromatic on pushes unconditionally (to update the baseline),
-        # and on PRs only when the client build actually differs from base.
-        # Chromatic builds Storybook itself (we don't pass
-        # --storybook-build-dir) so it can attach the preview-stats.json
-        # needed by TurboSnap.
-        if: github.event_name != 'pull_request' || steps.compare.outputs.identical != 'true'
-        working-directory: pr/packages/client
-        run: yarn run chromatic
+        # Push events always run Chromatic to keep the baseline current.
+        # PRs only run it when the diff intersects Storybook's bundle.
+        # `--storybook-build-dir` reuses the artifact built in
+        # `prepare-client-tests` so Chromatic skips its own Storybook
+        # build.
+        if: github.event_name != 'pull_request' || steps.detect.outputs.affects == 'true'
+        working-directory: packages/client
+        run: yarn run chromatic --storybook-build-dir storybook-static
         env:
           CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
@@ -489,7 +420,7 @@ jobs:
       - name: Download filesystem artifact
         uses: actions/download-artifact@v7
         with:
-          name: client-pr
+          name: client
           path: .
 
       - name: Use Node.js from .nvmrc
@@ -514,10 +445,9 @@ jobs:
         # Playwright is required since @storybook/test-runner depends on it
         run: npx playwright install --with-deps
 
-      - name: Build Storybook
-        working-directory: packages/client
-        run: yarn run build-storybook
-
+      # `storybook-static/` is restored from the artifact built in
+      # `prepare-client-tests`, so we don't need to build Storybook
+      # again here.
       - name: Serve Storybook and run tests
         working-directory: packages/client
         # based on https://storybook.js.org/docs/writing-tests/test-runner#run-against-non-deployed-storybooks
@@ -539,7 +469,7 @@ jobs:
       - name: Download filesystem artifact
         uses: actions/download-artifact@v7
         with:
-          name: client-pr
+          name: client
           path: .
 
       - name: Use Node.js from .nvmrc
