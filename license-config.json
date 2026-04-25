@@ -7,6 +7,7 @@
     ".git",
     ".github/DISCUSSION_TEMPLATE/Installation.yml",
     ".github/CODEOWNERS",
+    ".github/scripts/changed-files-affect-storybook.mjs",
     "**/patches",
     ".secrets",
     "deploy_key.enc",
