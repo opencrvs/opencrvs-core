@@ -231,6 +231,16 @@ export function FormSectionComponent({
       return
     }
 
+    const formContext = {
+      ...fullForm,
+      ...makeFormikFieldIdsOpenCRVSCompatible(fieldValues)
+    }
+
+    if (!isFieldVisible(listenerField, formContext, validatorContext)) {
+      set(fieldValues, formikCompatibleListenerFieldPath, undefined)
+      return
+    }
+
     const defaultValue = getDefaultValue(listenerField)
 
     set(fieldValues, formikCompatibleListenerFieldPath, defaultValue)
