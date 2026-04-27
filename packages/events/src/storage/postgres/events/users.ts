@@ -146,40 +146,6 @@ async function createUserCredentialInTrx(
   return id
 }
 
-export async function deleteSuperUser(username: string): Promise<void> {
-  const db = getClient()
-  await db.transaction().execute(async (trx) => {
-    const user = await trx
-      .selectFrom('users')
-      .innerJoin('userCredentials', 'userCredentials.userId', 'users.id')
-      .innerJoin('locations', 'locations.id', 'users.officeId')
-      .select(['users.id', 'users.officeId', 'locations.administrativeAreaId'])
-      .where('userCredentials.username', '=', username)
-      .executeTakeFirst()
-
-    if (!user) {
-      return
-    }
-
-    // user_credentials are deleted via ON DELETE CASCADE
-    await trx.deleteFrom('users').where('id', '=', user.id).execute()
-
-    if (user.officeId) {
-      await trx
-        .deleteFrom('locations')
-        .where('id', '=', user.officeId)
-        .execute()
-    }
-
-    if (user.administrativeAreaId) {
-      await trx
-        .deleteFrom('administrativeAreas')
-        .where('id', '=', user.administrativeAreaId)
-        .execute()
-    }
-  })
-}
-
 export async function createUserWithCredentials(
   user: NewUsers,
   cred: Omit<NewUserCredentials, 'userId'>
