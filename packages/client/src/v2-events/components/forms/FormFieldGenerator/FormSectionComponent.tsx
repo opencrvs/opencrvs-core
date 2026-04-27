@@ -37,7 +37,10 @@ import {
 import { useOnlineStatus } from '@client/utils'
 import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { makeFormikFieldIdsOpenCRVSCompatible, resolveSyncedFieldValue } from './utils'
+import {
+  makeFormikFieldIdsOpenCRVSCompatible,
+  resolveSyncedFieldValue
+} from './utils'
 import { FormItem, GeneratedInputField } from './GeneratedInputField'
 
 type AllProps = {
@@ -206,7 +209,9 @@ export function FormSectionComponent({
   const getDefaultValue = useDefaultValue()
   const { cacheHiddenFieldValue, popHiddenFieldValue } = useEventFormData()
 
-  const fullFormFields = eventConfig ? findAllFields(eventConfig).concat(pageFields) : pageFields
+  const fullFormFields = eventConfig
+    ? findAllFields(eventConfig).concat(pageFields)
+    : pageFields
   const listenerFieldsByParentId = getParentsOfListenerFields(fullFormFields)
 
   /** Sets the value for fields that listen to another field via `parent` and `value` properties */
@@ -219,11 +224,13 @@ export function FormSectionComponent({
       makeFormFieldIdFormikCompatible
     )
 
-    const firstNonFalsyValue = resolveSyncedFieldValue(listenerField, (syncRef) =>
-      get(
-        fieldValues,
-        flattenFieldReference(syncRef).map(makeFormFieldIdFormikCompatible)
-      )
+    const firstNonFalsyValue = resolveSyncedFieldValue(
+      listenerField,
+      (syncRef) =>
+        get(
+          fieldValues,
+          flattenFieldReference(syncRef).map(makeFormFieldIdFormikCompatible)
+        )
     )
 
     if (firstNonFalsyValue) {
