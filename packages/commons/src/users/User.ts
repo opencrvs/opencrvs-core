@@ -23,18 +23,22 @@ export type IUserName = {
   given: string[]
 }
 
+// * @deprecated - This is from 1.9, will be removed in v2.1.
+export const FamilyName = z.array(
+  z.object({
+    use: z.string(),
+    given: z.array(z.string()),
+    family: z.string()
+  })
+)
+export type FamilyName = z.infer<typeof FamilyName>
+
 export const User = z.object({
   id: z.string(),
-  name: z.array(
-    z.object({
-      use: z.string(),
-      given: z.array(z.string()),
-      family: z.string()
-    })
-  ),
+  name: FamilyName,
   role: z.string(),
   avatar: DocumentPath.optional(),
-  signature: DocumentPath.optional().describe(
+  signature: DocumentPath.nullish().describe(
     'Storage key for the user signature. e.g. signature.png'
   ),
   primaryOfficeId: UUID,
@@ -50,13 +54,7 @@ export const User = z.object({
 export type User = z.infer<typeof User>
 
 export const UserInput = z.object({
-  name: z.array(
-    z.object({
-      use: z.string(),
-      given: z.array(z.string()),
-      family: z.string()
-    })
-  ),
+  name: FamilyName,
   // @TODO: Separate from "create user from client"
   username: z.string().optional(),
   email: z.string(),
@@ -66,21 +64,24 @@ export const UserInput = z.object({
   // @TODO: Separate from "create user from client"
   password: z.string().optional(),
   role: z.string(),
-  primaryOfficeId: z.string(),
+  primaryOfficeId: UUID,
   device: z.string().optional(),
   status: z.enum(['active', 'pending']).optional(),
   signature: FileFieldValue.optional(),
   data: z.record(z.string(), FieldValue).optional().default({})
 })
 
+export const UserUpdateInput = UserInput.partial()
+
 export type UserInput = z.infer<typeof UserInput>
+export type UserUpdateInput = z.infer<typeof UserUpdateInput>
 
 export const System = z.object({
   id: z.string(),
   name: z.string(),
   type: TokenUserType.extract(['system']),
-  primaryOfficeId: z.undefined().optional(),
-  administrativeAreaId: z.undefined().optional(),
+  primaryOfficeId: UUID.optional(),
+  administrativeAreaId: UUID.optional(),
   signature: z.undefined().optional(),
   avatar: z.undefined().optional(),
   fullHonorificName: z.string().optional(),
