@@ -65,7 +65,6 @@ export const handlers = {
       return HttpResponse.json({
         auth: true,
         'user-mgnt': true,
-        notification: true,
         countryconfig: true
       })
     })

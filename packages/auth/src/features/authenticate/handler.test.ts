@@ -11,6 +11,7 @@
 import * as fetchAny from 'jest-fetch-mock'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
 import { createServer, AuthServer } from '@auth/server'
+import * as authenticateService from '@auth/features/authenticate/service'
 import { encodeScope } from '@opencrvs/commons'
 
 export const DEFAULT_ROLES_DEFINITION = [
@@ -151,18 +152,21 @@ export const DEFAULT_ROLES_DEFINITION = [
   label: { defaultMessage: string; description: string; id: string }
   scopes: string[]
 }>
-
 const fetch = fetchAny as fetchAny.FetchMock
+
 describe('authenticate handler receives a request', () => {
   let server: AuthServer
 
   beforeEach(async () => {
     server = await createServer()
+    fetch.resetMocks()
   })
 
-  describe('user management service says credentials are not valid', () => {
+  describe('events service says credentials are not valid', () => {
     it('returns a 401 response to client', async () => {
-      fetch.mockReject(new Error())
+      jest
+        .spyOn(authenticateService, 'authenticate')
+        .mockRejectedValue(new Error())
       const res = await server.server.inject({
         method: 'POST',
         url: '/authenticate',
@@ -175,9 +179,11 @@ describe('authenticate handler receives a request', () => {
       expect(res.statusCode).toBe(401)
     })
   })
-  describe('user management service says credentials are not valid', () => {
+  describe('events service says credentials are not valid', () => {
     it('returns a 401 response to client', async () => {
-      fetch.mockReject(new Error())
+      jest
+        .spyOn(authenticateService, 'authenticate')
+        .mockRejectedValue(new Error())
       const res = await server.server.inject({
         method: 'POST',
         url: '/authenticate',
@@ -192,13 +198,14 @@ describe('authenticate handler receives a request', () => {
   })
   describe('auth service returns 403 for deactivated users', () => {
     it('returns 403', async () => {
-      fetch.mockResponse(
-        JSON.stringify({
-          id: '1',
-          status: 'deactivated',
-          scope: ['admin']
-        })
-      )
+      jest.spyOn(authenticateService, 'authenticate').mockResolvedValue({
+        userId: '1',
+        status: 'deactivated',
+        role: 'NATIONAL_SYSTEM_ADMIN',
+        name: [],
+        mobile: undefined,
+        email: undefined
+      })
       const res = await server.server.inject({
         method: 'POST',
         url: '/authenticate',
@@ -216,22 +223,25 @@ describe('authenticate handler receives a request', () => {
       /* eslint-disable @typescript-eslint/no-require-imports */
       /* eslint-disable @typescript-eslint/no-var-requires */
       const reloadedCodeService = require('../verifyCode/service')
+      const reloadedAuthService = require('./service')
 
+      jest.spyOn(reloadedAuthService, 'authenticate').mockResolvedValue({
+        userId: '1',
+        status: 'active',
+        role: 'NATIONAL_SYSTEM_ADMIN',
+        name: [],
+        mobile: '+345345343',
+        email: undefined
+      })
       jest.spyOn(reloadedCodeService, 'generateNonce').mockReturnValue('12345')
-
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          id: '1',
-          status: 'active',
-          role: 'NATIONAL_SYSTEM_ADMIN',
-          mobile: `+345345343`
-        })
-      )
 
       fetch.mockResponse(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
         status: 200
       })
-      const spy = jest.spyOn(reloadedCodeService, 'sendVerificationCode')
+
+      const spy = jest
+        .spyOn(reloadedCodeService, 'sendVerificationCode')
+        .mockResolvedValue(undefined)
 
       await server.server.inject({
         method: 'POST',
@@ -249,18 +259,20 @@ describe('authenticate handler receives a request', () => {
     it('does not generate a mobile verification code for pending users', async () => {
       server = await createProductionEnvironmentServer()
 
+      /* eslint-disable @typescript-eslint/no-require-imports */
+      /* eslint-disable @typescript-eslint/no-var-requires */
       const reloadedCodeService = require('../verifyCode/service')
+      const reloadedAuthService = require('./service')
 
+      jest.spyOn(reloadedAuthService, 'authenticate').mockResolvedValue({
+        userId: '1',
+        status: 'pending',
+        role: 'NATIONAL_SYSTEM_ADMIN',
+        name: [],
+        mobile: '+345345343',
+        email: undefined
+      })
       jest.spyOn(reloadedCodeService, 'generateNonce').mockReturnValue('12345')
-
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          id: '1',
-          status: 'pending',
-          role: 'NATIONAL_SYSTEM_ADMIN',
-          mobile: `+345345343`
-        })
-      )
 
       fetch.mockResponse(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
         status: 200
