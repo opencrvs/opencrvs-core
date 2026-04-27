@@ -1,0 +1,108 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import { TRPCError } from '@trpc/server'
+import { TokenUserType } from '@opencrvs/commons'
+import {
+  createInitialisationTestClient,
+  createTestToken,
+  setupTestCase,
+  systemInitialisationTestSetup,
+  TEST_USER_DEFAULT_SCOPES,
+  createInitialisationToken
+} from '@events/tests/utils'
+
+test('Returns 403 when accessed with user app token', async () => {
+  await systemInitialisationTestSetup()
+  const { user } = await setupTestCase()
+
+  const appToken = createTestToken({
+    userId: user.id,
+    scopes: TEST_USER_DEFAULT_SCOPES,
+    userType: TokenUserType.enum.user
+  })
+  const client = createInitialisationTestClient(appToken)
+
+  await expect(client.complete()).rejects.toMatchObject(
+    new TRPCError({ code: 'UNAUTHORIZED' })
+  )
+})
+
+test('Returns 403 when accessed with system app token', async () => {
+  await systemInitialisationTestSetup()
+  const systemToken = createTestToken({
+    userId: 'test-system',
+    scopes: TEST_USER_DEFAULT_SCOPES,
+    userType: TokenUserType.enum.system
+  })
+
+  const client = createInitialisationTestClient(systemToken)
+
+  await expect(client.complete()).rejects.toMatchObject(
+    new TRPCError({ code: 'UNAUTHORIZED' })
+  )
+})
+
+test('Returns 403 when accessed with internal token using invalid subject', async () => {
+  await systemInitialisationTestSetup()
+
+  const internalToken = createInitialisationToken({
+    subject: 'invalid-subject'
+  })
+
+  const client = createInitialisationTestClient(internalToken)
+
+  await expect(client.complete()).rejects.toMatchObject(
+    new TRPCError({ code: 'UNAUTHORIZED' })
+  )
+})
+
+test('Returns 200 when accessed with proper internal token', async () => {
+  await systemInitialisationTestSetup()
+
+  const client = createInitialisationTestClient()
+
+  await expect(client.complete()).resolves.toBeUndefined()
+})
+
+test('Returns 403 after initialisation is completed', async () => {
+  const { db, password } = await systemInitialisationTestSetup()
+
+  const client = createInitialisationTestClient()
+
+  const systemInitialisationBefore = await db
+    .selectFrom('systemInitialisation')
+    .selectAll()
+    .execute()
+
+  expect(systemInitialisationBefore).toHaveLength(1)
+  expect(systemInitialisationBefore[0].completedAt).toBeNull()
+  await expect(
+    client.authenticate({
+      password: password
+    })
+  ).resolves.toMatchObject({ valid: true })
+
+  await expect(client.complete()).resolves.toBeUndefined()
+
+  const systemInitialisationAfter = await db
+    .selectFrom('systemInitialisation')
+    .selectAll()
+    .execute()
+
+  expect(systemInitialisationAfter).toHaveLength(1)
+  expect(systemInitialisationAfter[0].completedAt).not.toBeNull()
+
+  await expect(client.complete()).rejects.toMatchObject(
+    new TRPCError({
+      code: 'UNAUTHORIZED'
+    })
+  )
+})

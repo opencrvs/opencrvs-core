@@ -23,7 +23,6 @@ export const env = cleanEnv(process.env, {
     devDefault: '../../.secrets/public-key.pem'
   }),
   AUTH_URL: url({ devDefault: 'http://localhost:4040' }),
-  USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
   EVENTS_URL: url({ devDefault: 'http://localhost:5555/' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),

@@ -60,16 +60,6 @@ describe('POST /attachments', () => {
   test('returns FORBIDDEN when token does not have attachment.upload scope', async () => {
     const { user } = await setupTestCase()
 
-    mswServer.use(
-      http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () =>
-        HttpResponse.json({
-          primaryOfficeId: user.primaryOfficeId,
-          role: user.role,
-          signature: user.signature
-        })
-      )
-    )
-
     const token = createTestToken({
       userId: user.id,
       scopes: [encodeScope({ type: 'record.read' })],
@@ -93,13 +83,6 @@ describe('POST /attachments', () => {
     const expectedFileUrl = 'test-event/abc123.jpg'
 
     mswServer.use(
-      http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () =>
-        HttpResponse.json({
-          primaryOfficeId: user.primaryOfficeId,
-          role: user.role,
-          signature: user.signature
-        })
-      ),
       http.post(`${env.DOCUMENTS_URL}/files`, () => {
         return HttpResponse.text(expectedFileUrl)
       })
@@ -127,16 +110,6 @@ describe('POST /attachments', () => {
 
   test('returns error when required fields are missing', async () => {
     const { user } = await setupTestCase()
-
-    mswServer.use(
-      http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () =>
-        HttpResponse.json({
-          primaryOfficeId: user.primaryOfficeId,
-          role: user.role,
-          signature: user.signature
-        })
-      )
-    )
 
     const token = createTestToken({
       userId: user.id,

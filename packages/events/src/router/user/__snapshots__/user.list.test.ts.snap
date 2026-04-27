@@ -3,9 +3,10 @@
 exports[`Returns both normal users and system users 1`] = `
 [
   {
+    "administrativeAreaId": "27160bbd-32d1-4625-812f-860226bfb92a",
     "avatar": undefined,
     "device": undefined,
-    "email": undefined,
+    "email": "[sanitized]",
     "fullHonorificName": undefined,
     "id": "[sanitized]",
     "mobile": undefined,
@@ -25,9 +26,10 @@ exports[`Returns both normal users and system users 1`] = `
     "type": "user",
   },
   {
+    "administrativeAreaId": "15125bb4-f42d-41c1-b8fb-0012def8aa07",
     "avatar": undefined,
     "device": undefined,
-    "email": undefined,
+    "email": "[sanitized]",
     "fullHonorificName": undefined,
     "id": "[sanitized]",
     "mobile": undefined,
@@ -47,9 +49,10 @@ exports[`Returns both normal users and system users 1`] = `
     "type": "user",
   },
   {
+    "administrativeAreaId": "cb435d9c-910b-4d8a-a9ef-7b3f90516c5c",
     "avatar": undefined,
     "device": undefined,
-    "email": undefined,
+    "email": "[sanitized]",
     "fullHonorificName": undefined,
     "id": "[sanitized]",
     "mobile": undefined,
@@ -69,9 +72,10 @@ exports[`Returns both normal users and system users 1`] = `
     "type": "user",
   },
   {
+    "administrativeAreaId": "a0316c43-4f27-48fd-a034-ed3b4dc653fe",
     "avatar": undefined,
     "device": undefined,
-    "email": undefined,
+    "email": "[sanitized]",
     "fullHonorificName": undefined,
     "id": "[sanitized]",
     "mobile": undefined,
@@ -91,9 +95,10 @@ exports[`Returns both normal users and system users 1`] = `
     "type": "user",
   },
   {
+    "administrativeAreaId": "d2adaa28-878e-4b3d-adb5-ecedc043f15a",
     "avatar": undefined,
     "device": undefined,
-    "email": undefined,
+    "email": "[sanitized]",
     "fullHonorificName": undefined,
     "id": "[sanitized]",
     "mobile": undefined,
@@ -124,9 +129,10 @@ exports[`Returns both normal users and system users 1`] = `
 exports[`Returns multiple users with honorifics 1`] = `
 [
   {
+    "administrativeAreaId": "27160bbd-32d1-4625-812f-860226bfb92a",
     "avatar": undefined,
     "device": undefined,
-    "email": undefined,
+    "email": "[sanitized]",
     "fullHonorificName": "4th Class Registration Officer, John Doe",
     "id": "[sanitized]",
     "mobile": undefined,
@@ -146,9 +152,10 @@ exports[`Returns multiple users with honorifics 1`] = `
     "type": "user",
   },
   {
+    "administrativeAreaId": "15125bb4-f42d-41c1-b8fb-0012def8aa07",
     "avatar": undefined,
     "device": undefined,
-    "email": undefined,
+    "email": "[sanitized]",
     "fullHonorificName": "5th Class Registration Officer, John Doe",
     "id": "[sanitized]",
     "mobile": undefined,
@@ -168,9 +175,10 @@ exports[`Returns multiple users with honorifics 1`] = `
     "type": "user",
   },
   {
+    "administrativeAreaId": "cb435d9c-910b-4d8a-a9ef-7b3f90516c5c",
     "avatar": undefined,
     "device": undefined,
-    "email": undefined,
+    "email": "[sanitized]",
     "fullHonorificName": "6th Class Registration Officer, John Doe",
     "id": "[sanitized]",
     "mobile": undefined,
@@ -190,9 +198,10 @@ exports[`Returns multiple users with honorifics 1`] = `
     "type": "user",
   },
   {
+    "administrativeAreaId": "a0316c43-4f27-48fd-a034-ed3b4dc653fe",
     "avatar": undefined,
     "device": undefined,
-    "email": undefined,
+    "email": "[sanitized]",
     "fullHonorificName": "7th Class Registration Officer, John Doe",
     "id": "[sanitized]",
     "mobile": undefined,
@@ -212,9 +221,10 @@ exports[`Returns multiple users with honorifics 1`] = `
     "type": "user",
   },
   {
+    "administrativeAreaId": "d2adaa28-878e-4b3d-adb5-ecedc043f15a",
     "avatar": undefined,
     "device": undefined,
-    "email": undefined,
+    "email": "[sanitized]",
     "fullHonorificName": "8th Class Registration Officer, John Doe",
     "id": "[sanitized]",
     "mobile": undefined,
