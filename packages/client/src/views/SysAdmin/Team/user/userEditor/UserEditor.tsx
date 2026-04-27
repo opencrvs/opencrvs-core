@@ -30,10 +30,11 @@ import {
   never,
   PageTypes,
   TokenUserType,
-  UserInput,
   hasScope,
   EncodedScope,
-  UUID
+  UUID,
+  CreateUserInput,
+  UpdateUserInput
 } from '@opencrvs/commons/client'
 import { AppBar, Frame, Spinner } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -42,7 +43,7 @@ import {
   ICON_ALIGNMENT,
   SuccessButton
 } from '@opencrvs/components/lib/buttons'
-import { BackArrowDeepBlue, Check, Cross } from '@opencrvs/components/lib/icons'
+import { Check, Cross } from '@opencrvs/components/lib/icons'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { TRPCClientError } from '@trpc/client'
@@ -555,7 +556,7 @@ const ReviewUserComponent = () => {
                   formState[f.id] as FieldValue
                 ])
               )
-              const payload: UserInput = {
+              const payload: CreateUserInput = {
                 mobile: formState.phoneNumber,
                 email: formState.email!,
                 role: formState.role!,
@@ -594,7 +595,8 @@ const ReviewUserComponent = () => {
                   formState[f.id] as FieldValue
                 ])
               )
-              const payload: UserInput = {
+              const payload: UpdateUserInput = {
+                id: userId,
                 mobile: formState.phoneNumber,
                 email: formState.email!,
                 role: formState.role!,
@@ -609,20 +611,17 @@ const ReviewUserComponent = () => {
                 ],
                 data
               }
-              updateUserMutation.mutate(
-                { ...payload, id: userId },
-                {
-                  onSuccess: (data) => {
-                    clear()
-                    navigate(
-                      ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
-                        userId: data.id
-                      })
-                    )
-                  },
-                  onError: handleMutationError
-                }
-              )
+              updateUserMutation.mutate(payload, {
+                onSuccess: (data) => {
+                  clear()
+                  navigate(
+                    ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
+                      userId: data.id
+                    })
+                  )
+                },
+                onError: handleMutationError
+              })
             }}
             icon={() => <Check />}
             align={ICON_ALIGNMENT.LEFT}

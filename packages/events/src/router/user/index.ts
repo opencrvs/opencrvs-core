@@ -18,14 +18,14 @@ import {
   UUID
 } from '@opencrvs/commons/events'
 import {
+  CreateUserInput,
   isBase64FileString,
   logger,
   personNameFromV1ToV2,
   TokenWithBearer,
   User,
-  UserInput,
   UserOrSystem,
-  UserUpdateInput
+  UpdateUserInput
 } from '@opencrvs/commons'
 import {
   allowedWithAnyOfScopes,
@@ -99,60 +99,57 @@ function getAuditLogIdentifiers(token: TokenWithBearer) {
 
   return AuditLogSubject.parse(decoded)
 }
-export function createUserRoute(
-  procedure: typeof internalProcedure | typeof userAndSystemProcedure
-) {
-  return procedure
-    .input(UserInput)
-    .output(User)
-    .mutation(async ({ input, ctx }) => {
-      const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
 
-      if (input.mobile) {
-        const existingWithMobile = await searchUsers({
-          mobile: input.mobile,
-          count: 1,
-          skip: 0,
-          sortOrder: 'asc',
-          sortBy: 'createdAt'
-        })
-
-        if (existingWithMobile.length > 0) {
-          logger.error(
-            `Phone number ${input.mobile} is already in use by another user`
-          )
-          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_MOBILE' })
-        }
-      }
-
-      if (input.email) {
-        const existingWithEmail = await searchUsers({
-          email: input.email,
-          count: 1,
-          skip: 0,
-          sortOrder: 'asc',
-          sortBy: 'createdAt'
-        })
-        if (existingWithEmail.length > 0) {
-          logger.error(`Email ${input.email} is already in use by another user`)
-          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
-        }
-      }
-      const user = await createUser(input, ctx.token)
-      await writeAuditLog({
-        ...input,
-        clientId: auditLogIdentifiers.sub,
-        clientType: auditLogIdentifiers.userType ?? 'system',
-        operation: 'user.create_user',
-        requestData: {
-          subjectId: user.id,
-          role: user.role,
-          primaryOfficeId: user.primaryOfficeId
-        }
-      })
-
-      return user
+export async function handleCreateUser(
+  input: CreateUserInput,
+  ctx: { token: TokenWithBearer }
+): Promise<User> {
+  if (input.mobile) {
+    const existingWithMobile = await searchUsers({
+      mobile: input.mobile,
+      count: 1,
+      skip: 0,
+      sortOrder: 'asc',
+      sortBy: 'createdAt'
     })
+    if (existingWithMobile.length > 0) {
+      logger.error(
+        `Phone number ${input.mobile} is already in use by another user`
+      )
+      throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_MOBILE' })
+    }
+  }
+
+  if (input.email) {
+    const existingWithEmail = await searchUsers({
+      email: input.email,
+      count: 1,
+      skip: 0,
+      sortOrder: 'asc',
+      sortBy: 'createdAt'
+    })
+    if (existingWithEmail.length > 0) {
+      logger.error(`Email ${input.email} is already in use by another user`)
+      throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
+    }
+  }
+
+  const user = await createUser(input, ctx.token)
+
+  const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
+  await writeAuditLog({
+    ...input,
+    clientId: auditLogIdentifiers.sub,
+    clientType: auditLogIdentifiers.userType ?? 'system',
+    operation: 'user.create_user',
+    requestData: {
+      subjectId: user.id,
+      role: user.role,
+      primaryOfficeId: user.primaryOfficeId
+    }
+  })
+
+  return user
 }
 
 export function searchUsersRoute(
@@ -224,12 +221,14 @@ export const userRouter = router({
 
       return users[0]
     }),
-  create: createUserRoute(
-    userAndSystemProcedure.use(allowedWithAnyOfScopes(['user.create']))
-  ),
+  create: userAndSystemProcedure
+    .use(allowedWithAnyOfScopes(['user.create']))
+    .input(CreateUserInput)
+    .output(User)
+    .mutation(async ({ input, ctx }) => handleCreateUser(input, ctx)),
   update: userAndSystemProcedure
     .use(allowedWithAnyOfScopes(['user.edit']))
-    .input(UserUpdateInput.and(z.object({ id: UUID })))
+    .input(UpdateUserInput.and(z.object({ id: UUID })))
     .use(canUpdateUserLocation)
     .output(User)
     .mutation(async ({ input, ctx }) => {
