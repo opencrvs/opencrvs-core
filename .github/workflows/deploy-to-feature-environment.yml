@@ -293,24 +293,44 @@ jobs:
             });
 
             console.log(result);
-            await new Promise(resolve => setTimeout(resolve, 10000));
 
-            const runs = await github.rest.actions.listWorkflowRunsForRepo({
-              owner: 'opencrvs',
-              repo: 'e2e',
-              event: 'repository_dispatch',
-              per_page: 1
-            });
+            // Record the time just before dispatching so we can ignore any
+            // pre-existing runs when polling below.
+            const dispatchedAt = new Date();
 
-            if (runs.data.workflow_runs.length > 0) {
-              const runId = runs.data.workflow_runs[0].id;
-              console.log(`Captured runId: ${runId}`);
+            // GitHub Actions can take variable time to register a newly dispatched
+            // run in the API. Poll every 5 seconds for up to 60 seconds, and only
+            // accept a run whose created_at is >= dispatchedAt to avoid picking up
+            // a stale run from a previous dispatch (e.g. one triggered by farajaland).
+            let runId;
+            for (let i = 0; i < 12; i++) {
+              await new Promise(resolve => setTimeout(resolve, 5000));
 
-              // Set the runId as an output
-              core.setOutput('run_id', runId);
-            } else {
-              throw new Error('No workflow run found.');
+              const runs = await github.rest.actions.listWorkflowRunsForRepo({
+                owner: 'opencrvs',
+                repo: 'e2e',
+                event: 'repository_dispatch',
+                per_page: 5
+              });
+
+              const newRun = runs.data.workflow_runs.find(
+                r => new Date(r.created_at) >= dispatchedAt
+              );
+
+              if (newRun) {
+                runId = newRun.id;
+                console.log(`Captured runId: ${runId} (created at ${newRun.created_at})`);
+                break;
+              }
+
+              console.log(`Run not visible yet, retrying... (attempt ${i + 1}/12)`);
             }
+
+            if (!runId) {
+              throw new Error('No workflow run found after 60 seconds.');
+            }
+
+            core.setOutput('run_id', runId);
 
       - name: Print link to E2E workflow run
         id: print-links
