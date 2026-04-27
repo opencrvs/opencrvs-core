@@ -7056,7 +7056,6 @@ components:
             - id
             - label
             - type
-            - configuration
           additionalProperties: false
           description: Input field for a location
         - type: object
@@ -13906,6 +13905,11 @@ components:
               - requiresAction
               - label
             additionalProperties: false
+        analytics:
+          default: true
+          description: Indicates whether the records of this event type are included in
+            analytics
+          type: boolean
       required:
         - id
         - title
@@ -13915,6 +13919,7 @@ components:
         - declaration
         - advancedSearch
         - flags
+        - analytics
       additionalProperties: false
     EventDocument:
       type: object
