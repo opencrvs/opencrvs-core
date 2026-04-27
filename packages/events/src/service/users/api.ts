@@ -311,10 +311,8 @@ export async function resolveCreateUserInput(
       (input as CreateUserInputInternal).password ??
       env.DEFAULT_USER_PASSWORD ??
       generateRandomPassword(),
-    username:
-      (input as CreateUserInputInternal).username ??
-      (await generateUsername(input.name)),
-    status: (input as CreateUserInputInternal).status ?? 'pending'
+    status: (input as CreateUserInputInternal).status ?? 'pending',
+    username: input.username ?? (await generateUsername(input.name))
   })
 }
 
