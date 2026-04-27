@@ -54,11 +54,6 @@ export interface FormFieldGeneratorPropsWithoutRef {
   id: string
   readonlyMode?: boolean
   className?: string
-  /**
-   * Read only context values that are made available in the
-   * form validations/conditionals
-   */
-  formContext?: EventState
   /** Which fields are generated */
   fields: FieldConfig[]
   eventConfig?: EventConfig
@@ -82,8 +77,7 @@ export const FormFieldGenerator = forwardRef<
     {
       onFormChange,
       onTouchedChange,
-      fields,
-      formContext,
+      fields: pageFields,
       formValues,
       className,
       eventConfig,
@@ -98,8 +92,6 @@ export const FormFieldGenerator = forwardRef<
   ) => {
     const formikRef = useRef<FormikProps<EventState>>(null)
 
-    const fullForm = { ...formContext, ...formValues }
-
     useImperativeHandle(ref, () => ({
       /*
        * Most of this function can be replaced with a call to `formik.submit` if
@@ -110,7 +102,7 @@ export const FormFieldGenerator = forwardRef<
        * are simulating most of it by hand.
        */
       submit: (extraValues?: EventState) => {
-        const allTouched = buildFormState(fields, (field) => {
+        const allTouched = buildFormState(pageFields, (field) => {
           if (field.type === FieldType.NAME) {
             return {
               firstname: true,
@@ -157,16 +149,17 @@ export const FormFieldGenerator = forwardRef<
     }))
     const intl = useIntl()
     const { getInitialValues } = useFormInitialValues()
-    const initialValues = getInitialValues(fields, formValues ?? {}, {
-      ...validatorContext,
-      baseFormState: formContext
-    })
+    const initialPageValues = getInitialValues(
+      pageFields,
+      formValues ?? {},
+      validatorContext
+    )
     const formikCompatibleInitialValues =
-      makeFormFieldIdsFormikCompatible(initialValues)
+      makeFormFieldIdsFormikCompatible(initialPageValues)
     const formikCompatibleInitialTouched = makeFormFieldIdsFormikCompatible(
       pick(
         formTouched,
-        fields.map((field) => field.id)
+        pageFields.map((field) => field.id)
       )
     )
 
@@ -186,9 +179,9 @@ export const FormFieldGenerator = forwardRef<
           makeFormFieldIdsFormikCompatible(
             mapFormState(
               getValidationErrorsForForm(
-                fields,
+                pageFields,
                 {
-                  ...fullForm,
+                  ...formValues,
                   ...makeFormikFieldIdsOpenCRVSCompatible(values)
                 },
                 validatorContext
@@ -206,13 +199,12 @@ export const FormFieldGenerator = forwardRef<
             <FormSectionComponent
               className={className}
               eventConfig={eventConfig}
-              fields={fields}
-              fullForm={{
-                ...fullForm,
-                ...makeFormikFieldIdsOpenCRVSCompatible(formikProps.values)
-              }}
-              id={id}
+              fields={pageFields}
               isCorrection={isCorrection}
+              ocrvsFullForm={
+                formValues ??
+                makeFormikFieldIdsOpenCRVSCompatible(formikProps.values)
+              }
               readonlyMode={readonlyMode}
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}

@@ -51,7 +51,6 @@ type AddressFieldValue = NonNullable<AddressFieldUpdateValue>
 interface Props {
   id: string
   name: string
-  form: EventState
   onBlur: (formikFieldId: string, newTouched: FormState<boolean>) => void
   onChange: (newValue: AddressFieldValue) => void
   touched: IndexMap<FormState<boolean>> | undefined
@@ -536,7 +535,6 @@ function AddressInput(props: Props) {
     onBlur,
     onChange,
     config: addressConfig,
-    form,
     disabled,
     name,
     value = {
@@ -577,12 +575,17 @@ function AddressInput(props: Props) {
     <FormFieldGenerator
       {...otherProps}
       fields={fields}
-      // addressType is passed as context to the nested form due to the value
-      // being referred in conditionals but not having any associated field
-      formContext={{ ...form, addressType: value.addressType }}
       formTouched={nestedTouched}
       formValues={nestedValue}
-      validatorContext={validatorContext}
+      // addressType is passed as context to the nested form due to the value
+      // being referred in conditionals but not having any associated field
+      validatorContext={{
+        ...validatorContext,
+        baseFormState: {
+          ...validatorContext.baseFormState,
+          addressType: value.addressType
+        }
+      }}
       onFormChange={(nestedVal) =>
         onChange(transformNestedValueToParentValue(nestedVal, adminLevelIds))
       }
