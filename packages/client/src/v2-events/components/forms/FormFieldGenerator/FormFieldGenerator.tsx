@@ -201,10 +201,10 @@ export const FormFieldGenerator = forwardRef<
               eventConfig={eventConfig}
               fields={pageFields}
               isCorrection={isCorrection}
-              ocrvsFullForm={
-                formValues ??
-                makeFormikFieldIdsOpenCRVSCompatible(formikProps.values)
-              }
+              ocrvsFullForm={{
+                ...formValues,
+                ...makeFormikFieldIdsOpenCRVSCompatible(formikProps.values)
+              }}
               readonlyMode={readonlyMode}
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
