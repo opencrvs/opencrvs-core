@@ -2,6 +2,7 @@ import { env } from "./constants";
 import { createClient } from "@opencrvs/toolkit/api";
 import crypto from "node:crypto";
 import type { FastifyBaseLogger } from "fastify";
+import { EventDocument, getPendingAction } from "@opencrvs/toolkit/events";
 
 export class OpenCRVSError extends Error {
   constructor(message: string) {
@@ -48,18 +49,112 @@ export const confirmRegistration = (
     nationalId?: string;
     registrationNumber: string;
   },
+  { token, logger }: { token: string; logger?: FastifyBaseLogger },
+) => {
+  const url = new URL("events", env.OPENCRVS_GATEWAY_URL).toString();
+  const client = createClient(url, `Bearer ${token}`);
+
+  logger?.debug(
+    {
+      event: "opencrvs.registration.confirm.request",
+      eventId,
+      actionId,
+      registrationNumber,
+    },
+    "Confirming OpenCRVS registration",
+  );
+
+  return client.event.actions.register.accept
+    .mutate({
+      transactionId: `mosip-interop-${crypto.randomUUID()}`,
+      eventId,
+      actionId,
+      registrationNumber,
+      declaration: {
+        "child.nid": nationalId,
+      },
+    })
+    .catch((err: unknown) => {
+      logger?.warn(
+        {
+          event: "opencrvs.registration.confirm.failed",
+          err,
+          eventId,
+          actionId,
+          registrationNumber,
+        },
+        "Failed to confirm OpenCRVS registration",
+      );
+      throw err;
+    });
+};
+
+export const getEventActionType = async (
+  eventId: string,
   { token }: { token: string },
 ) => {
   const url = new URL("events", env.OPENCRVS_GATEWAY_URL).toString();
   const client = createClient(url, `Bearer ${token}`);
 
-  return client.event.actions.register.accept.mutate({
-    transactionId: `mosip-interop-${crypto.randomUUID()}`,
+  const event = (await client.event.get.query({ eventId })) as EventDocument;
+  const action = getPendingAction(event.actions);
+
+  return {
+    actionType: action.type,
+    eventType: event.type,
+    requestId:
+      action.type === "APPROVE_CORRECTION" ? action.requestId : undefined,
+  };
+};
+
+export const confirmApprovedBirthCorrection = (
+  {
     eventId,
     actionId,
-    registrationNumber,
-    declaration: {
-      "child.nid": nationalId,
+    requestId,
+    nationalId,
+  }: {
+    eventId: string;
+    actionId: string;
+    requestId: string;
+    nationalId: string;
+  },
+  { token, logger }: { token: string; logger?: FastifyBaseLogger },
+) => {
+  const url = new URL("events", env.OPENCRVS_GATEWAY_URL).toString();
+  const client = createClient(url, `Bearer ${token}`);
+
+  logger?.debug(
+    {
+      event: "opencrvs.birth-correction.confirm.request",
+      eventId,
+      actionId,
+      requestId,
     },
-  });
+    "Confirming approved OpenCRVS birth correction",
+  );
+
+  return client.event.actions.correction.approve.accept
+    .mutate({
+      transactionId: `mosip-interop-${crypto.randomUUID()}`,
+      eventId,
+      actionId,
+      requestId,
+      declaration: {
+        "child.nid": nationalId,
+      },
+    })
+    .catch((err: unknown) => {
+      logger?.warn(
+        {
+          event: "opencrvs.birth-correction.confirm.failed",
+          err,
+          eventId,
+          actionId,
+          requestId,
+        },
+        "Failed to confirm approved OpenCRVS birth correction",
+      );
+      throw err;
+    });
 };

@@ -5,7 +5,8 @@ import { decode } from "jsonwebtoken";
 import * as opencrvs from "../opencrvs-api";
 import { decryptMosipCredential } from "../websub/crypto";
 import { env } from "../constants";
-import { isBirthSubject } from "../websub/verify-vc";
+import type { BirthSubject } from "../websub/verify-vc";
+import { ActionType } from "@opencrvs/toolkit/events";
 
 export const CredentialIssuedSchema = z.object({
   publisher: z.string(),
@@ -46,7 +47,7 @@ export const credentialIssuedHandler = async (
       request.body.event.data.credential,
     );
 
-    // commented out for now, as there is an issue when verifying the VC
+    // commented out for now, as there is an issue when verifying the VC, likely due to canonicalization differences
     // await verifyCredentialOrThrow(verifiableCredential, {
     //   allowList: MOSIP_VERIFIABLE_CREDENTIAL_ALLOWED_URLS,
     // });
@@ -58,27 +59,46 @@ export const credentialIssuedHandler = async (
     const { token, registrationNumber } =
       getTransactionAndDiscard(transactionId);
     const { eventId, actionId } = decode(token) as TokenPayload;
+    const { actionType, eventType, requestId } =
+      await opencrvs.getEventActionType(eventId, { token });
 
-    if (isBirthSubject(verifiableCredential.credentialSubject)) {
-      opencrvs.confirmRegistration(
+    if (actionType === ActionType.REGISTER && eventType === "birth") {
+      await opencrvs.confirmRegistration(
         {
           eventId,
           actionId,
           registrationNumber,
-          nationalId: verifiableCredential.credentialSubject.VID,
+          nationalId: (verifiableCredential.credentialSubject as BirthSubject)
+            .VID,
         },
-        { token },
-      );
-    } else {
-      opencrvs.confirmRegistration(
-        {
-          eventId,
-          actionId,
-          registrationNumber,
-        },
-        { token },
+        { token, logger: request.log },
       );
     }
+
+    if (actionType === ActionType.REGISTER && eventType === "death") {
+      await opencrvs.confirmRegistration(
+        {
+          eventId,
+          actionId,
+          registrationNumber,
+        },
+        { token, logger: request.log },
+      );
+    }
+
+    if (actionType === ActionType.APPROVE_CORRECTION && eventType === "birth") {
+      await opencrvs.confirmApprovedBirthCorrection(
+        {
+          eventId,
+          actionId,
+          requestId: requestId!,
+          nationalId: (verifiableCredential.credentialSubject as BirthSubject)
+            .VID,
+        },
+        { token, logger: request.log },
+      );
+    }
+
     return reply
       .send({
         publisher: request.body.publisher,

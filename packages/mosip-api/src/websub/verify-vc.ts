@@ -9,10 +9,14 @@ const BirthSubject = z.object({
   vcVer: z.literal("VC-V1"),
 });
 
+export type BirthSubject = z.infer<typeof BirthSubject>;
+
 const DeathSubject = z.object({
   id: z.string().url(),
   vcVer: z.literal("VC-V1"),
 });
+
+export type DeathSubject = z.infer<typeof DeathSubject>;
 
 export const MOSIPVerifiableCredential = z.object({
   issuanceDate: z.string().datetime(),
