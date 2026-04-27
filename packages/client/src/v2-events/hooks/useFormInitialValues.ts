@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { get } from 'lodash'
+import { get, pick } from 'lodash'
 import {
   EventState,
   FieldConfig,
@@ -23,16 +23,16 @@ import { useDefaultValue } from './useDefaultValue'
 
 export function computeInitialValues(
   fields: FieldConfig[],
+  values: EventState,
   context: ValidatorContext,
   getDefaultValue: (field: FieldConfig) => FieldValue | undefined
 ): EventState {
-  const values: EventState = {}
-
   for (const field of fields) {
     if (field.type === FieldType.FIELD_GROUP) {
       // Recurse cumulatively — sub-fields see accumulated top-level state
       const subValues = computeInitialValues(
         field.fields,
+        (values[field.id] as EventState | undefined) ?? {},
         { ...context, baseFormState: { ...context.baseFormState, ...values } },
         getDefaultValue
       )
@@ -49,8 +49,8 @@ export function computeInitialValues(
      * where a formValue can be null
      */
     const effectiveValue =
-      context.baseFormState?.[field.id] !== undefined
-        ? context.baseFormState[field.id]
+      values[field.id] !== undefined
+        ? values[field.id]
         : (resolveSyncedFieldValue(field, (syncRef) => {
             const key = flattenFieldReference(syncRef)
             return get(values, key) ?? get(context.baseFormState, key)
@@ -67,15 +67,19 @@ export function useFormInitialValues() {
 
   return {
     getInitialValues: (
-      fields: FieldConfig[],
-      formValues: EventState,
+      pageFields: FieldConfig[],
+      fullForm: EventState,
       context: ValidatorContext
     ) =>
       computeInitialValues(
-        fields,
+        pageFields,
+        pick(
+          fullForm,
+          pageFields.map((field) => field.id)
+        ),
         {
           ...context,
-          baseFormState: { ...context.baseFormState, ...formValues }
+          baseFormState: { ...context.baseFormState, ...fullForm }
         },
         getDefaultValue
       )
