@@ -23,6 +23,9 @@ export function useSystemVariables() {
     user: {
       ...user,
       name: getUsersFullName(user.name, 'en'),
+      firstname: user.name[0].given[0],
+      middlename: user.name[0].given[1],
+      surname: user.name[0].family,
       administrativeAreaId: user.administrativeAreaId ?? undefined
     },
     $window: {
