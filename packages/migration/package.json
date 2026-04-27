@@ -42,7 +42,7 @@
     "node-pg-migrate": "^8.0.3",
     "pg": "^8.16.0",
     "tsx": "^4.15.7",
-    "uuid": "^3.2.1"
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "@types/fhir": "0.0.30",

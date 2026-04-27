@@ -50,7 +50,7 @@
     "redis": "^4.7.0",
     "superjson": "1.9.0-0",
     "tsconfig-paths": "^3.13.0",
-    "uuid": "^3.2.1",
+    "uuid": "^14.0.0",
     "uuid-validate": "^0.0.3",
     "winston": "^3.0.0"
   },
