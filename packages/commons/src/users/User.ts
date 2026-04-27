@@ -66,7 +66,7 @@ export const UserInput = z.object({
   role: z.string(),
   primaryOfficeId: UUID,
   device: z.string().optional(),
-  status: z.enum(['active', 'pending']).optional(),
+  status: z.enum(['active', 'deactivated', 'pending']).optional(),
   signature: FileFieldValue.optional(),
   data: z.record(z.string(), FieldValue).optional().default({})
 })

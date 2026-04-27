@@ -223,6 +223,7 @@ export async function updateUser(
     email: input.email,
     mobile: input.mobile,
     device: input.device,
+    status: input.status,
     role: input.role,
     officeId: input.primaryOfficeId,
     signaturePath: input.signature

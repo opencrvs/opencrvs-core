@@ -267,7 +267,9 @@ export const userRouter = router({
           throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
         }
       }
+
       const user = await updateUser(input, ctx.token)
+
       await writeAuditLog({
         operation: 'user.edit_user',
         requestData: { subjectId: input.id },
