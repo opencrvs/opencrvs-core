@@ -11,8 +11,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import * as z from 'zod/v4'
 
-// CIHAN TEST
-
 export const UUID = z.uuid().brand('UUID')
 export type UUID = z.infer<typeof UUID>
 
