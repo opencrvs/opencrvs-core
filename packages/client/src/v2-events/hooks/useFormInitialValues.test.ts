@@ -43,8 +43,7 @@ function run(
 ) {
   return computeInitialValues(
     fields,
-    formValues,
-    { ...emptyValidator, baseFormState: form },
+    { ...emptyValidator, baseFormState: { ...form, ...formValues } },
     stubGetDefaultValue
   )
 }

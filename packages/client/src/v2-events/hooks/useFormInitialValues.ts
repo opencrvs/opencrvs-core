@@ -23,18 +23,16 @@ import { useDefaultValue } from './useDefaultValue'
 
 export function computeInitialValues(
   fields: FieldConfig[],
-  formValues: EventState,
   context: ValidatorContext,
   getDefaultValue: (field: FieldConfig) => FieldValue | undefined
 ): EventState {
-  const values = { ...formValues }
+  const values: EventState = {}
 
   for (const field of fields) {
     if (field.type === FieldType.FIELD_GROUP) {
       // Recurse cumulatively — sub-fields see accumulated top-level state
       const subValues = computeInitialValues(
         field.fields,
-        (values[field.id] as EventState | undefined) ?? {},
         { ...context, baseFormState: { ...context.baseFormState, ...values } },
         getDefaultValue
       )
@@ -51,8 +49,8 @@ export function computeInitialValues(
      * where a formValue can be null
      */
     const effectiveValue =
-      formValues[field.id] !== undefined
-        ? formValues[field.id]
+      context.baseFormState?.[field.id] !== undefined
+        ? context.baseFormState[field.id]
         : (resolveSyncedFieldValue(field, (syncRef) => {
             const key = flattenFieldReference(syncRef)
             return get(values, key) ?? get(context.baseFormState, key)
@@ -72,6 +70,14 @@ export function useFormInitialValues() {
       fields: FieldConfig[],
       formValues: EventState,
       context: ValidatorContext
-    ) => computeInitialValues(fields, formValues, context, getDefaultValue)
+    ) =>
+      computeInitialValues(
+        fields,
+        {
+          ...context,
+          baseFormState: { ...context.baseFormState, ...formValues }
+        },
+        getDefaultValue
+      )
   }
 }
