@@ -34,7 +34,7 @@ export const FamilyName = z.array(
 export type FamilyName = z.infer<typeof FamilyName>
 
 export const User = z.object({
-  id: z.string(),
+  id: UUID,
   name: FamilyName,
   role: z.string(),
   avatar: DocumentPath.optional(),
@@ -86,7 +86,7 @@ export const UpdateUserInput = User.pick({
   .partial()
   .extend({
     signature: FileFieldValue.optional(),
-    id: z.string(),
+    id: UUID,
     status: z.enum(['active', 'deactivated']).optional() // can't set 'pending' via update
   })
 export type UpdateUserInput = z.infer<typeof UpdateUserInput>
@@ -100,7 +100,8 @@ export const CreateUserInputInternal = User.pick({
 })
   .extend({
     username: z.string(),
-    status: z.enum(['active']).optional()
+    status: z.enum(['active']).optional(),
+    password: z.string().optional()
   })
   .describe('User input for seeding initial users through internal API.')
 
