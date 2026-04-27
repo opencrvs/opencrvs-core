@@ -32,7 +32,8 @@ import {
   TokenUserType,
   UserInput,
   hasScope,
-  EncodedScope
+  EncodedScope,
+  UUID
 } from '@opencrvs/commons/client'
 import { AppBar, Frame, Spinner } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -57,6 +58,7 @@ import { create } from 'zustand'
 import { useUsers } from '../../../../../v2-events/hooks/useUsers'
 import { emptyMessage } from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 
 const Container = styled.div`
   display: flex;
@@ -223,19 +225,24 @@ export const useUserFormState = create<UserFormState>()((set, get) => ({
 
 const NEW_USER = '__NEW__'
 export const CreateNewUser = () => {
-  const [{ officeId }] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.CREATE)
+  const [{ officeId, from }] = useTypedSearchParams(
+    ROUTES.V2.SETTINGS.USER.CREATE
+  )
   const navigate = useNavigate()
   const { clear, setUserForm } = useUserFormState()
   useEffect(() => {
     clear()
     setUserForm({ primaryOfficeId: officeId })
     navigate(
-      ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-        userId: NEW_USER,
-        pageId: 'user.details'
-      })
+      ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
+        {
+          userId: NEW_USER,
+          pageId: 'user.details'
+        },
+        { from }
+      )
     )
-  }, [clear, navigate, officeId, setUserForm])
+  }, [clear, navigate, officeId, setUserForm, from])
   return <div />
 }
 
@@ -243,6 +250,7 @@ const EditUserComponent = () => {
   const intl = useIntl()
   const navigate = useNavigate()
   const { pageId, userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.EDIT)
+  const [searchParams] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.EDIT)
   const { getUserForm, setUserForm } = useUserFormState()
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
@@ -252,13 +260,16 @@ const EditUserComponent = () => {
   useEffect(() => {
     if (!formState['primaryOfficeId'] && pageId !== 'user.office') {
       navigate(
-        ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-          pageId: 'user.office',
-          userId: userId
-        })
+        ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
+          {
+            pageId: 'user.office',
+            userId: userId
+          },
+          searchParams
+        )
       )
     }
-  }, [formState, navigate, userId, pageId])
+  }, [formState, navigate, userId, pageId, searchParams])
 
   const additionalFields = window.config.ADDITIONAL_USER_FIELDS ?? []
   const eventConfig = getUserEditConfig(selectedRole, additionalFields)
@@ -273,7 +284,17 @@ const EditUserComponent = () => {
           : routes.TEAM_USER_LIST
       )
     } else {
-      navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }))
+      setUserForm({})
+      if (searchParams.from === 'user.list') {
+        navigate({
+          pathname: routes.TEAM_USER_LIST,
+          search: serializeSearchParams({
+            locationId: formState['primaryOfficeId']
+          })
+        })
+      } else {
+        navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }))
+      }
     }
   }
 
@@ -300,17 +321,23 @@ const EditUserComponent = () => {
         validatorContext={{}}
         onPageChange={(nextPageId: string) =>
           navigate(
-            ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-              pageId: nextPageId,
-              userId: userId
-            })
+            ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
+              {
+                pageId: nextPageId,
+                userId: userId
+              },
+              searchParams
+            )
           )
         }
         onSubmit={() => {
           navigate(
-            ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
-              userId: userId
-            })
+            ROUTES.V2.SETTINGS.USER.REVIEW.buildPath(
+              {
+                userId: userId
+              },
+              searchParams
+            )
           )
         }}
       />
@@ -325,6 +352,7 @@ const ReviewUserComponent = () => {
   const navigate = useNavigate()
   const { getUserForm, setUserForm, clear } = useUserFormState()
   const { userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.REVIEW)
+  const [searchParams] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.REVIEW)
   const isNewUser = userId === NEW_USER
   const { getUser, createUser, updateUser } = useUsers()
   const { listRoles } = useRoles()
@@ -406,7 +434,17 @@ const ReviewUserComponent = () => {
           : routes.TEAM_USER_LIST
       )
     } else {
-      navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }))
+      setUserForm({})
+      if (searchParams.from === 'user.list') {
+        navigate({
+          pathname: routes.TEAM_USER_LIST,
+          search: serializeSearchParams({
+            locationId: formState['primaryOfficeId']
+          })
+        })
+      } else {
+        navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }))
+      }
     }
   }
 
@@ -493,10 +531,13 @@ const ReviewUserComponent = () => {
         validatorContext={{}}
         onEdit={(values) =>
           navigate(
-            ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-              userId: userId,
-              pageId: values.pageId
-            })
+            ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
+              {
+                userId: userId,
+                pageId: values.pageId
+              },
+              searchParams
+            )
           )
         }
       >
@@ -518,7 +559,7 @@ const ReviewUserComponent = () => {
                 mobile: formState.phoneNumber,
                 email: formState.email!,
                 role: formState.role!,
-                primaryOfficeId: formState.primaryOfficeId!,
+                primaryOfficeId: formState.primaryOfficeId as UUID,
                 signature: formState.signature,
                 name: [
                   {
@@ -557,7 +598,7 @@ const ReviewUserComponent = () => {
                 mobile: formState.phoneNumber,
                 email: formState.email!,
                 role: formState.role!,
-                primaryOfficeId: formState.primaryOfficeId!,
+                primaryOfficeId: formState.primaryOfficeId as UUID,
                 signature: formState.signature,
                 name: [
                   {
@@ -640,23 +681,6 @@ function FormHeader({
   onClose?: () => void
   actionComponent?: React.ReactNode
 }) {
-  const BackButtonContainer = styled.div`
-    margin-right: 16px;
-    cursor: pointer;
-  `
-
-  const getHeaderLeft = () => {
-    return (
-      <BackButtonContainer
-        id="action_page_back_button"
-        onClick={onClose}
-        key="action_page_back_button"
-      >
-        <CircleButton>{<BackArrowDeepBlue />}</CircleButton>
-      </BackButtonContainer>
-    )
-  }
-
   const getHeaderRight = () => {
     return (
       <CircleButton
@@ -677,8 +701,6 @@ function FormHeader({
         mobileTitle={label}
         desktopRight={getHeaderRight()}
         mobileRight={getHeaderRight()}
-        mobileLeft={getHeaderLeft()}
-        desktopLeft={getHeaderLeft()}
       />
     </>
   )
