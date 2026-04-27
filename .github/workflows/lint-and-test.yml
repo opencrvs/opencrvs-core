@@ -370,22 +370,25 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      # Decide whether anything in this PR can affect Storybook by
-      # intersecting the file diff with the module graph emitted by
-      # Storybook's `--webpack-stats-json`. Backend-only changes in
+      # Decide whether the diff can affect Storybook by intersecting it
+      # with the module graph emitted by Storybook's
+      # `--webpack-stats-json`. Backend-only changes in
       # `packages/commons` (and similar) won't appear in the graph and
-      # therefore won't trigger Chromatic. Always runs Chromatic on
-      # pushes so the baseline can keep moving.
+      # therefore won't trigger Chromatic. The same gate applies to
+      # pushes on `develop`: if no module in the Storybook bundle
+      # changed, no snapshot can change and the baseline is preserved
+      # by definition.
       - name: Detect storybook-affecting changes
         id: detect
-        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
         run: |
           node .github/scripts/changed-files-affect-storybook.mjs \
             --stats packages/client/storybook-static/preview-stats.json \
-            --base "${{ github.event.pull_request.base.sha }}"
+            --base "$BASE_SHA"
 
       - name: Cache Node.js dependencies
-        if: github.event_name != 'pull_request' || steps.detect.outputs.affects == 'true'
+        if: steps.detect.outputs.affects == 'true'
         uses: actions/cache@v5
         with:
           path: |
@@ -396,16 +399,15 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Install dependencies
-        if: github.event_name != 'pull_request' || steps.detect.outputs.affects == 'true'
+        if: steps.detect.outputs.affects == 'true'
         run: CI="" yarn install --frozen-lockfile
 
       - name: Run Chromatic
-        # Push events always run Chromatic to keep the baseline current.
-        # PRs only run it when the diff intersects Storybook's bundle.
-        # `--storybook-build-dir` reuses the artifact built in
-        # `prepare-client-tests` so Chromatic skips its own Storybook
-        # build.
-        if: github.event_name != 'pull_request' || steps.detect.outputs.affects == 'true'
+        # Skipped (on both PRs and pushes) when the diff doesn't
+        # intersect the Storybook bundle. `--storybook-build-dir`
+        # reuses the artifact built in `prepare-client-tests` so
+        # Chromatic skips its own Storybook build.
+        if: steps.detect.outputs.affects == 'true'
         working-directory: packages/client
         run: yarn run chromatic --storybook-build-dir storybook-static
         env:
