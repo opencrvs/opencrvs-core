@@ -159,7 +159,8 @@ export const ROUTES = {
             {
               CREATE: route('create', {
                 searchParams: {
-                  officeId: string().defined()
+                  officeId: string().defined(),
+                  from: string()
                 }
               }),
               VIEW: route(':userId/view', {
@@ -170,12 +171,18 @@ export const ROUTES = {
               REVIEW: route(':userId/review', {
                 params: {
                   userId: string().defined()
+                },
+                searchParams: {
+                  from: string()
                 }
               }),
               EDIT: route(':userId/edit/:pageId', {
                 params: {
                   userId: string().defined(),
                   pageId: string()
+                },
+                searchParams: {
+                  from: string()
                 }
               })
             }
