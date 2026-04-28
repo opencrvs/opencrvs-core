@@ -12,12 +12,15 @@ import { randomBytes } from 'crypto'
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import {
+  CreateUserInput,
+  CreateUserInputInternal,
   DocumentPath,
+  FamilyName,
   IUserName,
   TokenUserType,
   UUID,
+  UpdateUserInput,
   User,
-  UserInput,
   UserOrSystem,
   isUUID,
   logger,
@@ -67,10 +70,7 @@ export type SearchUsersPayload = {
   sortOrder: 'asc' | 'desc'
 }
 
-async function generateUsername(
-  names: UserInput['name'],
-  existingUserName?: string
-) {
+async function generateUsername(names: FamilyName, existingUserName?: string) {
   const { given = [], family = '' } =
     names.find((name) => name.use === 'en') || {}
   const initials = given.reduce(
@@ -189,11 +189,8 @@ export async function searchUsers(
   return results.map(mapDbUserToUser)
 }
 
-type CreateUserPayload = z.infer<typeof UserInput>
-type UpdateUserPayload = Partial<z.infer<typeof UserInput>>
-
 export async function updateUser(
-  input: UpdateUserPayload & { id: UUID },
+  input: UpdateUserInput,
   token: string
 ): Promise<User> {
   const existingUser = await getUserById(input.id)
@@ -223,6 +220,7 @@ export async function updateUser(
     email: input.email,
     mobile: input.mobile,
     device: input.device,
+    status: input.status,
     role: input.role,
     officeId: input.primaryOfficeId,
     signaturePath: input.signature
@@ -295,28 +293,54 @@ async function sendCredentialsNotification(
   }
 }
 
-export async function createUser(input: CreateUserPayload, _token: string) {
-  // Hash the provided password, or generate a random placeholder for pending
-  // users who will set their own password via the activation flow.
-  const password =
-    input.password ?? env.DEFAULT_USER_PASSWORD ?? generateRandomPassword()
-  const { hash, salt } = await generateSaltedHash(password)
+export const ResolvedCreateUserInput = CreateUserInput.extend({
+  ...CreateUserInputInternal.shape,
+  // Ensure defaults are resolved.
+  password: z.string(),
+  username: z.string(),
+  status: z.enum(['active', 'pending'])
+})
+export type ResolvedCreateUserInput = z.infer<typeof ResolvedCreateUserInput>
+
+export async function resolveCreateUserInput(
+  input: CreateUserInput | CreateUserInputInternal
+): Promise<ResolvedCreateUserInput> {
+  return ResolvedCreateUserInput.parse({
+    ...input,
+    password:
+      (input as CreateUserInputInternal).password ??
+      env.DEFAULT_USER_PASSWORD ??
+      generateRandomPassword(),
+    status: (input as CreateUserInputInternal).status ?? 'pending',
+    username: input.username ?? (await generateUsername(input.name))
+  })
+}
+
+export async function createUser(
+  input: CreateUserInput | CreateUserInputInternal,
+  _token: string
+) {
+  const resolvedUser = await resolveCreateUserInput(input)
+  const v2Name = personNameFromV1ToV2(resolvedUser.name)
 
   const userPayload = {
-    firstname: personNameFromV1ToV2(input.name).firstname,
-    surname: personNameFromV1ToV2(input.name).surname,
-    email: input.email.toLowerCase(),
-    fullHonorificName: input.fullHonorificName,
-    role: input.role,
-    device: input.device,
-    officeId: input.primaryOfficeId,
-    mobile: input.mobile,
-    status: input.status ?? 'pending',
-    signaturePath: input.signature?.path
+    firstname: v2Name.firstname,
+    surname: v2Name.surname,
+    email: resolvedUser?.email?.toLowerCase(),
+    fullHonorificName: resolvedUser.fullHonorificName,
+    role: resolvedUser.role,
+    device: resolvedUser.device,
+    officeId: resolvedUser.primaryOfficeId,
+    mobile: resolvedUser.mobile,
+    status: resolvedUser.status,
+    signaturePath: resolvedUser.signature?.path
   }
 
+  // Hash the provided password, or generate a random placeholder for pending
+  // users who will set their own password via the activation flow.
+  const { hash, salt } = await generateSaltedHash(resolvedUser.password)
   const userCredentialPayload = {
-    username: input.username ?? (await generateUsername(input.name)),
+    username: resolvedUser.username,
     passwordHash: hash,
     salt,
     securityQuestions: []
@@ -330,7 +354,7 @@ export async function createUser(input: CreateUserPayload, _token: string) {
   await sendCredentialsNotification(
     input.name,
     userCredentialPayload.username,
-    password,
+    resolvedUser.password,
     _token,
     userPayload.mobile ?? undefined,
     userPayload.email

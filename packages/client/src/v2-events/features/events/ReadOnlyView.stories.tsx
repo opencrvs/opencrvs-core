@@ -11,7 +11,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { expect } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import { graphql, HttpResponse } from 'msw'
+
 import superjson from 'superjson'
 import { within } from '@testing-library/dom'
 import {
@@ -128,13 +128,6 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
           })
         ],
         user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.localRegistrar().v1
-              }
-            })
-          }),
           tRPCMsw.user.list.query(() => {
             return [generator.user.localRegistrar().v2]
           }),
@@ -188,13 +181,6 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
           })
         ],
         user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.localRegistrar().v1
-              }
-            })
-          }),
           tRPCMsw.user.list.query(() => {
             return [generator.user.localRegistrar().v2]
           }),

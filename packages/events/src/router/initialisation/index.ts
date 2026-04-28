@@ -11,6 +11,7 @@
 
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
+import { CreateUserInputInternal, User } from '@opencrvs/commons'
 import { initialisationProcedure, serviceRouter } from '@events/router/trpc'
 import { generateHash } from '@events/service/auth/hash'
 import {
@@ -19,7 +20,7 @@ import {
 } from '@events/service/auth'
 import { setAdministrativeAreasRoute } from '../administrative-areas'
 import { listLocationsRoute, setLocationsRoute } from '../locations'
-import { createUserRoute, searchUsersRoute } from '../user'
+import { handleCreateUser, searchUsersRoute } from '../user'
 
 /**
  * initialisationRouter contains routes related to the initialisation of the system, such as authenticating the initial "super user" and creating the administrative hierarchy.
@@ -57,7 +58,10 @@ export const initialisationRouter = serviceRouter({
   },
   users: {
     search: searchUsersRoute(initialisationProcedure),
-    create: createUserRoute(initialisationProcedure)
+    create: initialisationProcedure
+      .input(CreateUserInputInternal)
+      .output(User)
+      .mutation(async ({ input, ctx }) => handleCreateUser(input, ctx))
   }
 })
 

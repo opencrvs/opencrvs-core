@@ -18,7 +18,8 @@ import {
   generateEventDocument,
   generateTrackingId,
   getCurrentEventState,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  TestUserRole
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -26,6 +27,7 @@ import {
   addLocalEventConfig,
   setEventData
 } from '@client/v2-events/features/events/useEvents/api'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 import { ActionMenu } from '../ActionMenu'
 
 export default {
@@ -38,13 +40,15 @@ const createdEventDocument = generateEventDocument({
     {
       type: ActionType.CREATE,
       user: {
-        assignedTo: '69179374-0447-4545-4545-454545454545'
+        id: testDataGenerator().user.registrationAgent().v2.id,
+        assignedTo: testDataGenerator().user.registrationAgent().v2.id
       }
     },
     {
       type: ActionType.ASSIGN,
       user: {
-        assignedTo: '69179374-0447-4545-4545-454545454545'
+        id: testDataGenerator().user.registrationAgent().v2.id,
+        assignedTo: testDataGenerator().user.registrationAgent().v2.id
       }
     }
   ],
@@ -70,6 +74,8 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 export const deletedScenariosForRegistrationAgent: StoryObj<typeof ActionMenu> =
   {
     parameters: {
+      chromatic: { disableSnapshot: true },
+      userRole: TestUserRole.enum.REGISTRATION_AGENT,
       layout: 'centered',
       reactRouter: {
         router: routesConfig,
