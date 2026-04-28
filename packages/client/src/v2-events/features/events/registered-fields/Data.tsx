@@ -11,7 +11,7 @@
 import React, { useEffect } from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { get } from 'lodash'
+import { get, isEqual } from 'lodash'
 import {
   EventState,
   FieldProps,
@@ -203,13 +203,6 @@ function DataInput({
   // When we first render the field, let's save the values of the fields to the form data.
   // This is done because we want to send the values to the backend, so that they can be displayed in the Output later.
   useEffect(() => {
-    // We keep updating until the field value is actually found in the form data.
-    // Previously we tried only updating the value during render once, but ran into issues with form state not being updated.
-    const idWithDotSeparator = makeFormikFieldIdOpenCRVSCompatible(id)
-    if (idWithDotSeparator in formData) {
-      return
-    }
-
     const value = fields.reduce((acc, f) => {
       if (f.value === null || f.value === undefined) {
         return acc
@@ -217,6 +210,13 @@ function DataInput({
 
       return { ...acc, [f.config.id]: f.value }
     }, {})
+
+    // We keep updating until the field value is actually found in the form data.
+    // Previously we tried only updating the value during render once, but ran into issues with form state not being updated.
+    const idWithDotSeparator = makeFormikFieldIdOpenCRVSCompatible(id)
+    if (isEqual(formData[idWithDotSeparator], { data: value })) {
+      return
+    }
 
     onChange({ data: value })
   }, [id, formData, onChange, fields])
