@@ -178,7 +178,8 @@ test('Throws error when creating user with existing email', async () => {
         given: ['given1']
       }
     ],
-    primaryOfficeId: location.id
+    primaryOfficeId: location.id,
+    username: 'f.irstuser'
   }
 
   const userPayload2 = {
@@ -191,7 +192,8 @@ test('Throws error when creating user with existing email', async () => {
         given: ['given2']
       }
     ],
-    primaryOfficeId: location.id
+    primaryOfficeId: location.id,
+    username: 'a.nother'
   }
 
   await expect(client.users.create(userPayload1)).resolves.toBeDefined()
@@ -224,7 +226,8 @@ test('Throws error when creating user with existing mobile', async () => {
         given: ['given1']
       }
     ],
-    primaryOfficeId: location.id
+    primaryOfficeId: location.id,
+    username: 'f.irstuser'
   }
 
   const userPayload2 = {
@@ -238,7 +241,8 @@ test('Throws error when creating user with existing mobile', async () => {
         given: ['given2']
       }
     ],
-    primaryOfficeId: location.id
+    primaryOfficeId: location.id,
+    username: 'a.nother'
   }
 
   await expect(client.users.create(userPayload1)).resolves.toBeDefined()

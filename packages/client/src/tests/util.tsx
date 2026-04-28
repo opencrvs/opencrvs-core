@@ -132,7 +132,7 @@ export const selectOption = (
 }
 
 export const userDetails: UserDetails = {
-  id: 'b77b78af-a259-4bc1-85d5-b1e8c1382273',
+  id: 'b77b78af-a259-4bc1-85d5-b1e8c1382273' as UUID,
   type: 'user',
   status: 'active',
   name: [

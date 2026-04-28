@@ -31,8 +31,7 @@ test('Throws error when user does not have the right scope', async () => {
           given: ['given']
         }
       ],
-      primaryOfficeId: user.primaryOfficeId,
-      username: 'testuser123'
+      primaryOfficeId: user.primaryOfficeId
     })
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
@@ -46,7 +45,6 @@ test('Allows user creation when with the right scope', async () => {
     })
   ])
 
-  const username = 'testuser123'
   const userPayload = {
     email: 'testing+123@opencrvs.org',
     role: 'admin',
@@ -57,11 +55,12 @@ test('Allows user creation when with the right scope', async () => {
         given: ['given']
       }
     ],
-    primaryOfficeId: user.primaryOfficeId,
-    username
+    primaryOfficeId: user.primaryOfficeId
   }
 
-  await expect(client.user.create(userPayload)).resolves.toMatchObject({
+  const response = await client.user.create(userPayload)
+
+  expect(response).toMatchObject({
     administrativeAreaId: user.administrativeAreaId,
     primaryOfficeId: user.primaryOfficeId,
     role: userPayload.role,
@@ -75,7 +74,7 @@ test('Allows user creation when with the right scope', async () => {
   const createdUserCredentials = await eventsDb
     .selectFrom('userCredentials')
     .selectAll()
-    .where('username', '=', username)
+    .where('userCredentials.userId', '=', response.id)
     .executeTakeFirstOrThrow()
 
   const createdUser = await eventsDb
@@ -96,12 +95,12 @@ test('Allows user creation when with the right scope', async () => {
   const auditLogs = await eventsDb.selectFrom('auditLog').selectAll().execute()
 
   expect(auditLogs).toHaveLength(1)
-  // @TODO: Ask whether we are intentionally logging the user id of the created user rather than the creator.
-  // expect(auditLogs[0]).toMatchObject({
-  //   operation: 'user.create_user',
-  //   clientId: user.id,
-  //   kissa: '1'
-  // })
+
+  expect(auditLogs[0]).toMatchObject({
+    operation: 'user.create_user',
+    clientId: user.id,
+    clientType: 'user'
+  })
 })
 
 test('Throws error when creating user with existing email', async () => {
