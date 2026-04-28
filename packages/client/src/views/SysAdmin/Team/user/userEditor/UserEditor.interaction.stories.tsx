@@ -105,6 +105,7 @@ export const RegistrationOfficeIncludesHospitals: StoryObj<typeof EditUser> = {
 export const ClearedPhoneNumberNormalisedToUndefined: StoryObj = {
   render: () => <ReviewUser />,
   parameters: {
+    chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
