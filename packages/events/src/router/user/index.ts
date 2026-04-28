@@ -55,10 +55,12 @@ import {
   getCredentials,
   getUser,
   searchUsers,
-  updateUser
+  updateUser,
+  getUsersById,
+  isUser,
+  sendUsernameReminder
 } from '@events/service/users/api'
 import { uploadBase64File } from '@events/service/files'
-import { getUsersById, isUser } from '@events/service/users/api'
 import {
   checkVerificationCode,
   generateAndSendVerificationCode,
@@ -546,6 +548,20 @@ export const userRouter = router({
     )
     .mutation(async ({ input }) => {
       return activateUser(input)
+    }),
+  sendUsernameReminder: userAndSystemProcedure
+    .use(allowedWithAnyOfScopes(['user.edit']))
+    .input(UUID)
+    .mutation(async ({ input, ctx }) => {
+      const userId = UUID.parse(input)
+      await sendUsernameReminder(userId, ctx.token)
+      const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
+      await writeAuditLog({
+        operation: 'user.username_reminder_by_admin',
+        requestData: { subjectId: userId },
+        clientId: auditLogIdentifiers.sub,
+        clientType: auditLogIdentifiers.userType ?? 'system'
+      })
     }),
   audit: auditRouter
 })
