@@ -27,33 +27,18 @@ import { main as createEventsIndex } from './create-events-index'
 import { main as checkoutUpstreamFiles } from './checkout-upstream-files'
 import { main as simplifyAnalyticsPrecalculations } from './simplify-analytics-precalculations'
 import { main as mergeInfrastructureDirectory } from './merge-infrastructure-directory'
-
-let cwd: string | undefined
-
-export function getCwd() {
-  if (!cwd) {
-    throw new Error('Country config working directory not set.')
-  }
-
-  return cwd
-}
+import { main as deleteInfrastructureDirectory } from './delete-infrastructure-directory'
 
 /**
- * Run the upgrade process for a given country config directory.
- * @param ccwd - The country config working directory.
+ * Run the upgrade process for the country config in the current working
+ * directory.
+ *
+ * @param dockerSwarm - When true, the local `infrastructure/` directory is
+ *   merged with upstream changes (Docker Swarm deployments still need it).
+ *   When false (the default), `infrastructure/` is deleted entirely, since
+ *   non-Swarm deployments no longer ship it.
  */
-export async function runUpgrade(ccwd: string | undefined) {
-  if (ccwd) {
-    console.log('Country config working directory:', ccwd)
-    cwd = ccwd
-  }
-  if (!ccwd) {
-    console.log(
-      'Will use current working directory as country config working directory.'
-    )
-    cwd = process.cwd()
-  }
-
+export async function runUpgrade(dockerSwarm: boolean) {
   await migrateWorkqueueConfigs()
   await removeReviewFromRegisterAction()
   await makeBuiltInValidateActionsCustom()
@@ -72,5 +57,10 @@ export async function runUpgrade(ccwd: string | undefined) {
   await createEventsIndex()
   await checkoutUpstreamFiles()
   await simplifyAnalyticsPrecalculations()
-  await mergeInfrastructureDirectory()
+
+  if (dockerSwarm) {
+    await mergeInfrastructureDirectory()
+  } else {
+    await deleteInfrastructureDirectory()
+  }
 }

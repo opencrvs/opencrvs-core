@@ -58,7 +58,6 @@ import { execFileSync } from 'child_process'
 import { existsSync, mkdtempSync, writeFileSync } from 'fs'
 import { tmpdir } from 'os'
 import { join } from 'path'
-import { getCwd } from '.'
 import {
   assertIsGitRepo,
   runGit,
@@ -81,7 +80,7 @@ const INFRASTRUCTURE_DIR = 'infrastructure'
 function gitShowBytes(ref: string, path: string): Uint8Array | null {
   try {
     const buf = execFileSync('git', ['show', `${ref}:${path}`], {
-      cwd: getCwd(),
+      cwd: process.cwd(),
       stdio: ['ignore', 'pipe', 'pipe']
     })
     // Return a plain Uint8Array view to satisfy strict typings of `fs`
@@ -158,7 +157,7 @@ async function main(): Promise<void> {
     const conflictedFiles: string[] = []
 
     for (const file of upstreamFiles) {
-      const fullPath = join(getCwd(), file)
+      const fullPath = join(process.cwd(), file)
 
       if (!existsSync(fullPath)) {
         // New upstream file — `git checkout` handles binary correctly and
@@ -189,7 +188,7 @@ async function main(): Promise<void> {
       //   <0/127  → error (e.g. binary file rejected)
       try {
         execFileSync('git', ['merge-file', fullPath, baseTmp, theirsTmp], {
-          cwd: getCwd(),
+          cwd: process.cwd(),
           stdio: ['ignore', 'pipe', 'pipe']
         })
         runGit(['add', '--', file], { silent: true })

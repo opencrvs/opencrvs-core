@@ -44,8 +44,6 @@
  */
 
 import { execFileSync } from 'child_process'
-import { getCwd } from '.'
-
 export const UPSTREAM_URL =
   'https://github.com/opencrvs/opencrvs-countryconfig.git'
 
@@ -72,7 +70,7 @@ export function runGit(
   { silent = false }: { silent?: boolean } = {}
 ): string {
   return execFileSync('git', args, {
-    cwd: getCwd(),
+    cwd: process.cwd(),
     encoding: 'utf8',
     stdio: silent ? ['ignore', 'pipe', 'pipe'] : ['ignore', 'pipe', 'inherit']
   })
@@ -95,7 +93,7 @@ export function tryGit(args: string[]): boolean {
 export function assertIsGitRepo(): void {
   if (!tryGit(['rev-parse', '--is-inside-work-tree'])) {
     throw new Error(
-      `${getCwd()} is not a git repository. Initialise git (or run the upgrade inside a git checkout) before re-running.`
+      `${process.cwd()} is not a git repository. Initialise git (or run the upgrade inside a git checkout) before re-running.`
     )
   }
 }

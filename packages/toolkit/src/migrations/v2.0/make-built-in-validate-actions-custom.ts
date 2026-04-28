@@ -38,8 +38,6 @@ import {
   SourceFile
 } from 'ts-morph'
 import path from 'path'
-import { getCwd } from '.'
-
 const TOOLKIT_EVENTS_MODULE = '@opencrvs/toolkit/events'
 
 const REQUIRED_SYMBOLS = [
@@ -309,7 +307,7 @@ function processFile(filePath: string, project: Project): number {
     const eventType = resolveEventType(configArg)
     if (!eventType) {
       console.warn(
-        `  [${path.relative(getCwd(), configArg.getSourceFile().getFilePath())}] Could not resolve root 'type' from defineConfig — skipping auditHistoryLabel id generation`
+        `  [${path.relative(process.cwd(), configArg.getSourceFile().getFilePath())}] Could not resolve root 'type' from defineConfig — skipping auditHistoryLabel id generation`
       )
     }
 
@@ -328,7 +326,7 @@ function processFile(filePath: string, project: Project): number {
         fileNeedsImports = true
         configHadValidateAction = true
         console.log(
-          `  [${path.relative(getCwd(), filePath)}] Transformed VALIDATE action to CUSTOM with customActionType: '${VALIDATE_DECLARATION_VALUE}'`
+          `  [${path.relative(process.cwd(), filePath)}] Transformed VALIDATE action to CUSTOM with customActionType: '${VALIDATE_DECLARATION_VALUE}'`
         )
       }
     }
@@ -351,7 +349,7 @@ function processFile(filePath: string, project: Project): number {
 ]`
       })
       console.log(
-        `  [${path.relative(getCwd(), filePath)}] Added top-level 'flags' array to defineConfig`
+        `  [${path.relative(process.cwd(), filePath)}] Added top-level 'flags' array to defineConfig`
       )
     }
 
@@ -364,7 +362,7 @@ function processFile(filePath: string, project: Project): number {
 }
 
 async function main() {
-  const srcDir = path.join(getCwd(), 'src')
+  const srcDir = path.join(process.cwd(), 'src')
   console.log(`Scanning for defineConfig calls in: ${srcDir}\n`)
 
   const project = new Project({
@@ -406,7 +404,7 @@ async function main() {
   for (const filePath of modifiedFiles) {
     const sourceFile = project.getSourceFileOrThrow(filePath)
     await sourceFile.save()
-    console.log(`  Saved: ${path.relative(getCwd(), filePath)}`)
+    console.log(`  Saved: ${path.relative(process.cwd(), filePath)}`)
   }
 
   console.log(
