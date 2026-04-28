@@ -229,7 +229,7 @@ export const userRouter = router({
     .mutation(async ({ input, ctx }) => handleCreateUser(input, ctx)),
   update: userAndSystemProcedure
     .use(allowedWithAnyOfScopes(['user.edit']))
-    .input(UpdateUserInput.and(z.object({ id: UUID })))
+    .input(UpdateUserInput)
     .use(canUpdateUserLocation)
     .output(User)
     .mutation(async ({ input, ctx }) => {

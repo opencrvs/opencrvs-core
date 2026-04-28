@@ -144,6 +144,20 @@ test('successfully updates user fields and returns updated user', async () => {
   })
 })
 
+test('Persists custom data field when updated', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+
+  const customData = { department: 'civil', badge: 'B-42' }
+
+  const updatedUser = await client.user.update({
+    id: user.id,
+    data: customData
+  })
+
+  expect(updatedUser.data).toMatchObject(customData)
+})
+
 test('toggling user status keeps other fields intact', async () => {
   const { user, users } = await setupTestCase()
   const client = createTestClient(user, [USER_EDIT_SCOPE])

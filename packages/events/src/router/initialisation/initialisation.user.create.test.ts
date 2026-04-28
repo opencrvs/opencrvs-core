@@ -250,3 +250,72 @@ test('Throws error when creating user with existing mobile', async () => {
     new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_MOBILE' })
   )
 })
+
+test('Creates user with active status when status is provided', async () => {
+  await systemInitialisationTestSetup()
+  const client = createInitialisationTestClient()
+  const eventsDb = getClient()
+
+  await client.locations.set(locationPayload)
+  const location = await eventsDb
+    .selectFrom('locations')
+    .selectAll()
+    .executeTakeFirstOrThrow()
+
+  await client.users.create({
+    email: 'testing+active@opencrvs.org',
+    role: 'admin',
+    name: [{ use: 'en', family: 'Admin', given: ['Active'] }],
+    primaryOfficeId: location.id,
+    username: 'active.admin',
+    status: 'active'
+  })
+
+  const credentials = await eventsDb
+    .selectFrom('userCredentials')
+    .selectAll()
+    .where('username', '=', 'active.admin')
+    .executeTakeFirstOrThrow()
+
+  const dbUser = await eventsDb
+    .selectFrom('users')
+    .selectAll()
+    .where('id', '=', credentials.userId)
+    .executeTakeFirstOrThrow()
+
+  expect(dbUser.status).toBe('active')
+})
+
+test('Creates user with pending status when no status is provided', async () => {
+  await systemInitialisationTestSetup()
+  const client = createInitialisationTestClient()
+  const eventsDb = getClient()
+
+  await client.locations.set(locationPayload)
+  const location = await eventsDb
+    .selectFrom('locations')
+    .selectAll()
+    .executeTakeFirstOrThrow()
+
+  await client.users.create({
+    email: 'testing+nonstatus@opencrvs.org',
+    role: 'admin',
+    name: [{ use: 'en', family: 'User', given: ['Pending'] }],
+    primaryOfficeId: location.id,
+    username: 'pending.user'
+  })
+
+  const credentials = await eventsDb
+    .selectFrom('userCredentials')
+    .selectAll()
+    .where('username', '=', 'pending.user')
+    .executeTakeFirstOrThrow()
+
+  const dbUser = await eventsDb
+    .selectFrom('users')
+    .selectAll()
+    .where('id', '=', credentials.userId)
+    .executeTakeFirstOrThrow()
+
+  expect(dbUser.status).toBe('pending')
+})
