@@ -34,7 +34,7 @@ export const FamilyName = z.array(
 export type FamilyName = z.infer<typeof FamilyName>
 
 export const User = z.object({
-  id: z.string(),
+  id: UUID,
   name: FamilyName,
   role: z.string(),
   avatar: DocumentPath.optional(),

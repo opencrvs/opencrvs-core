@@ -151,7 +151,7 @@ export async function getUser(
 }
 
 export async function findUserOrSystem(
-  id: string
+  id: UUID
 ): Promise<UserOrSystem | undefined> {
   try {
     return await getUser(id)
