@@ -243,8 +243,12 @@ export function FormSectionComponent({
       ...makeFormikFieldIdsOpenCRVSCompatible(fieldValues)
     }
 
+    // Hidden listener fields are explicitly cleared (null) so their stale values
+    // don't leak into other fields that read from them (e.g. via `value` refs).
+    // We return early to skip applying the defaultValue, which would otherwise
+    // pollute the form state for fields that aren't currently relevant.
     if (!isFieldVisible(listenerField, formContext, validatorContext)) {
-      set(fieldValues, formikCompatibleListenerFieldPath, undefined)
+      set(fieldValues, formikCompatibleListenerFieldPath, null)
       return
     }
 
