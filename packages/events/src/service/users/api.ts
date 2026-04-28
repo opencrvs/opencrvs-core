@@ -144,7 +144,10 @@ export async function getUser(
   const user = await getUserById(UUID.parse(userId))
 
   if (!user) {
-    throw new Error(`User not found: ${userId}`)
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `User not found: ${userId}`
+    })
   }
 
   return mapDbUserToUser(user)
@@ -503,5 +506,44 @@ export async function verifyUser(input: { mobile?: string; email?: string }) {
     ],
     securityQuestionKey,
     scope
+  }
+}
+
+export async function sendUsernameReminder(
+  userId: UUID,
+  token: string
+): Promise<void> {
+  const user = await getUser(userId)
+
+  const userName: IUserName[] = [
+    {
+      use: 'en',
+      given: user.name[0]?.given ?? [],
+      family: user.name[0]?.family ?? ''
+    }
+  ]
+
+  try {
+    await triggerUserEventNotification({
+      event: 'username-reminder',
+      payload: {
+        recipient: {
+          name: personNameFromV1ToV2(userName),
+          email: user.email,
+          mobile: user.mobile
+        },
+        username: user.username
+      },
+      countryConfigUrl: env.COUNTRY_CONFIG_URL,
+      authHeader: { Authorization: token }
+    })
+  } catch (err) {
+    logger.error(
+      `Unable to send username reminder notification for error: ${err}`
+    )
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `Unable to send notification: ${err}`
+    })
   }
 }

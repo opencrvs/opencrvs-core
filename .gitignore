@@ -12,6 +12,8 @@ build
 
 # misc
 .claude-working/
+.claude
+CLAUDE.md
 .DS_Store
 .env*
 *.log
