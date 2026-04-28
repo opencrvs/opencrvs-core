@@ -71,7 +71,11 @@ export const UserInput = z.object({
   data: z.record(z.string(), FieldValue).optional().default({})
 })
 
-export const UserUpdateInput = UserInput.partial()
+export const UserUpdateInput = UserInput.partial().extend({
+  // Override: remove .default({}) so that an absent data field means
+  // 'preserve existing' rather than 'reset to empty object'.
+  data: z.record(z.string(), FieldValue).optional()
+})
 
 export type UserInput = z.infer<typeof UserInput>
 export type UserUpdateInput = z.infer<typeof UserUpdateInput>

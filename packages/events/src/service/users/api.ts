@@ -134,7 +134,9 @@ function mapDbUserToUser(user: DbUser): User & { username: string } {
       : undefined,
     primaryOfficeId: user.officeId,
     administrativeAreaId: user.administrativeAreaId ?? undefined,
-    fullHonorificName: user.fullHonorificName ?? undefined
+    fullHonorificName: user.fullHonorificName ?? undefined,
+    data:
+      user.data && Object.keys(user.data).length > 0 ? user.data : undefined
   }
 }
 
@@ -227,7 +229,8 @@ export async function updateUser(
     officeId: input.primaryOfficeId,
     signaturePath: input.signature
       ? input.signature.path
-      : existingUser.signaturePath
+      : existingUser.signaturePath,
+    data: input.data
   })
 
   if (newUsername !== oldUsername) {
@@ -312,7 +315,8 @@ export async function createUser(input: CreateUserPayload, _token: string) {
     officeId: input.primaryOfficeId,
     mobile: input.mobile,
     status: input.status ?? 'pending',
-    signaturePath: input.signature?.path
+    signaturePath: input.signature?.path,
+    data: input.data ?? {}
   }
 
   const userCredentialPayload = {

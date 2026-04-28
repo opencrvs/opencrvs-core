@@ -69,6 +69,7 @@ export async function getUserById(userId: UUID) {
       'users.officeId',
       'users.signaturePath',
       'users.profileImagePath',
+      'users.data',
       'locations.administrativeAreaId',
       'userCredentials.username'
     ])
@@ -182,6 +183,7 @@ export async function searchUsersWithInput(input: SearchUsersPayload) {
       'users.officeId',
       'users.profileImagePath',
       'users.fullHonorificName',
+      'users.data',
       'locations.administrativeAreaId'
     ])
 
@@ -256,6 +258,7 @@ type UpdateUserFields = Partial<{
   officeId: UUID
   signaturePath: string | null
   profileImagePath: string | null
+  data: Record<string, unknown>
 }>
 
 export async function updateUserById(userId: UUID, fields: UpdateUserFields) {
@@ -302,6 +305,7 @@ export async function getUsersAndSystemsByIds(ids: string[]) {
             'users.officeId',
             'users.signaturePath',
             'users.profileImagePath',
+            'users.data',
             'locations.administrativeAreaId',
             'userCredentials.username'
           ])
