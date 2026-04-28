@@ -26,6 +26,7 @@ import { main as removeHearthMigrations } from './remove-hearth-migrations'
 import { main as createEventsIndex } from './create-events-index'
 import { main as checkoutUpstreamFiles } from './checkout-upstream-files'
 import { main as simplifyAnalyticsPrecalculations } from './simplify-analytics-precalculations'
+import { main as mergeInfrastructureDirectory } from './merge-infrastructure-directory'
 
 let cwd: string | undefined
 
@@ -71,4 +72,5 @@ export async function runUpgrade(ccwd: string | undefined) {
   await createEventsIndex()
   await checkoutUpstreamFiles()
   await simplifyAnalyticsPrecalculations()
+  await mergeInfrastructureDirectory()
 }
