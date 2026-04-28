@@ -57,7 +57,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import styled, { withTheme } from 'styled-components'
 import { useOnlineStatus } from '../../../../utils'
 import { useAdministrativeAreas } from '../../../../v2-events/hooks/useAdministrativeAreas'
-import { UserActivationToggleModal } from './UserActivationModal'
+import { UserActivationModal } from './UserActivationModal'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const DEFAULT_PAGE_NUMBER = 1
@@ -624,7 +624,7 @@ function UserListComponent({ userDetails }: UserListProps) {
             />
           )}
           {toggleActivation.modalVisible && toggleActivation.selectedUser && (
-            <UserActivationToggleModal
+            <UserActivationModal
               user={toggleActivation.selectedUser}
               onClose={() => toggleUserActivationModal(undefined)}
               onSuccess={() => {

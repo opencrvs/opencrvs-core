@@ -20,15 +20,21 @@ import { getUserName } from '@client/utils/userUtils'
 
 const activateConfig = {
   title: messages.reactivateUserTitle,
-  subtitle: messages.reactivateUserSubtitle
+  subtitle: messages.reactivateUserSubtitle,
+  cta: messages.reactivate
 }
 
 const deactivateConfig = {
   title: messages.deactivateUserTitle,
-  subtitle: messages.deactivateUserSubtitle
+  subtitle: messages.deactivateUserSubtitle,
+  cta: messages.deactivate
 }
 
-export function UserActivationToggleModal({
+/**
+ *
+ * Modal for activating or deactivating a user. The action is determined by the current status of the user.
+ */
+export function UserActivationModal({
   onClose,
   user,
   onSuccess,
@@ -80,7 +86,7 @@ export function UserActivationToggleModal({
           key={`${updatedStatus}-user`}
           onClick={onClick}
         >
-          {intl.formatMessage(buttonMessages.send)}
+          {intl.formatMessage(actionConfig.cta)}
         </Button>
       ]}
       responsive={false}
