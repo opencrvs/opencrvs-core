@@ -343,9 +343,3 @@ const regStatusMessagesToDefine: Record<RegStatus, MessageDescriptor> = {
 
 export const recordAuditMessages: IRecordAuditMessages =
   defineMessages(messagesToDefine)
-
-const regActionMessages: Record<RegAction, MessageDescriptor> =
-  defineMessages(actionMessagesToDefine)
-
-const regStatusMessages: Record<RegStatus, MessageDescriptor> =
-  defineMessages(regStatusMessagesToDefine)

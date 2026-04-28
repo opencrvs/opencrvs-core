@@ -41,7 +41,8 @@ const registeredScenariosForFieldAgent: Scenario[] = [
       ActionType.UNASSIGN
     ],
     expected: {
-      ...getHiddenActions()
+      ...getHiddenActions(),
+      ['Assign']: AssertType.ENABLED
     }
   },
   {

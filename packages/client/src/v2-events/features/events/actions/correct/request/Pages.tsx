@@ -92,7 +92,7 @@ export function Pages() {
         actionType={ActionType.REQUEST_CORRECTION}
         attachmentPath={`events/${eventId}/`}
         eventConfig={configuration}
-        form={form}
+        formData={form}
         formPages={correctablePages}
         isCorrection={true}
         pageId={currentPageId}

@@ -91,7 +91,7 @@ export async function sendVerificationCode(
       Authorization: `Bearer ${await createToken(
         'auth',
         [],
-        ['opencrvs:notification-user', 'opencrvs:countryconfig-user'],
+        ['opencrvs:countryconfig-user'],
         JWT_ISSUER,
         undefined,
         TokenUserType.enum.system

@@ -3,6 +3,7 @@
 
 import type { default as AnnouncementsTable } from './Announcements'
 import type { default as EventActionDraftsTable } from './EventActionDrafts'
+import type { default as SystemInitialisationTable } from './SystemInitialisation'
 import type { default as SystemClientsTable } from './SystemClients'
 import type { default as EventActionsTable } from './EventActions'
 import type { default as AuditLogTable } from './AuditLog'
@@ -16,6 +17,8 @@ export default interface AppSchema {
   announcements: AnnouncementsTable
 
   eventActionDrafts: EventActionDraftsTable
+
+  systemInitialisation: SystemInitialisationTable
 
   systemClients: SystemClientsTable
 

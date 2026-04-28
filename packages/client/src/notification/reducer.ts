@@ -10,7 +10,7 @@
  */
 import { LoopReducer, Loop } from 'redux-loop'
 import * as actions from '@client/notification/actions'
-import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
+
 import { ShowUnassignedPayload } from '@client/notification/actions'
 
 type UserAuditSuccessToastState =
@@ -20,7 +20,7 @@ type UserAuditSuccessToastState =
   | {
       visible: true
       userFullName: string
-      action: AUDIT_ACTION
+      action: actions.AUDIT_ACTION
     }
 
 type userCreateDuplicateMobileFailedToastState = {

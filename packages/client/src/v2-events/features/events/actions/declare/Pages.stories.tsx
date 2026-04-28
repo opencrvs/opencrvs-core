@@ -11,11 +11,10 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { ActionType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
-import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
+import { ActionType } from '@opencrvs/commons/client'
+import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-import { setEventData, addLocalEventConfig } from '../../useEvents/api'
 import { Pages } from './index'
 
 const meta: Meta<typeof Pages> = {

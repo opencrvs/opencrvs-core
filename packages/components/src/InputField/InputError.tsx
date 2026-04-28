@@ -16,7 +16,7 @@ export interface IInputError {
   children?: React.ReactNode
 }
 
-const InputErrorWrapper = styled.div<IInputError>`
+export const InputError = styled.div<IInputError>`
   min-height: 18px;
   width: 100%;
   padding-top: 4px;
@@ -24,7 +24,3 @@ const InputErrorWrapper = styled.div<IInputError>`
   ${({ theme }) => theme.fonts.bold14}
   color: ${({ theme }) => theme.colors.negative};
 `
-
-export const InputError = ({ children, ...rest }: IInputError) => (
-  <InputErrorWrapper {...rest}>{children}</InputErrorWrapper>
-)

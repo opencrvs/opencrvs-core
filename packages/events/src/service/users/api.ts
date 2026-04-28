@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import fetch from 'node-fetch'
+import { randomBytes } from 'crypto'
 import { z } from 'zod'
+import { TRPCError } from '@trpc/server'
 import {
   DocumentPath,
   IUserName,
@@ -20,107 +20,145 @@ import {
   UserInput,
   UserOrSystem,
   isUUID,
-  joinUrl,
-  logger
+  logger,
+  personNameFromV1ToV2,
+  triggerUserEventNotification
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
 import {
   getSystemByLegacyId,
   getSystemClientById
 } from '@events/storage/postgres/events/system-clients'
+import {
+  getUserById,
+  getUsersAndSystemsByIds,
+  createUserWithCredentials,
+  searchUsersWithInput,
+  activateUserWithCredentials,
+  updateUserById,
+  updateUsernameById,
+  isUsernameTaken,
+  getUserCredentialsByUserId,
+  SecurityQuestion,
+  getUserByMobileOrEmail
+} from '@events/storage/postgres/events/users'
+import { generateSaltedHash, generateHash } from '@events/service/auth/hash'
+import { getRoles } from '../config/config'
 
-type UserAPIResult = {
-  id: string
-  avatar?: {
-    data: DocumentPath
-    type: string
-  }
-  signature?: {
-    data: DocumentPath
-    type: string
-  }
-  device?: string
-  name: IUserName[]
-  username: string
-  email: string
-  mobile: string
-  role: string
-  fullHonorificName?: string
-  practitionerId: string
-  primaryOfficeId: UUID
-  scope: string[]
-  status: string
-  creationDate: number
-}
+export type UserSortBy =
+  | 'createdAt'
+  | 'firstname'
+  | 'surname'
+  | 'username'
+  | 'email'
+  | 'status'
+  | 'role'
 
-type SearchUsersPayload = {
+export type SearchUsersPayload = {
   username?: string
   mobile?: string
   email?: string
   status?: string
-  primaryOfficeId?: string
-  locationId?: string
+  primaryOfficeId?: UUID
+  locationId?: UUID
   count: number
   skip: number
+  sortBy: UserSortBy
   sortOrder: 'asc' | 'desc'
 }
 
-export type SearchUsersResult = {
-  totalItems: number
-  results: UserAPIResult[]
+async function generateUsername(
+  names: UserInput['name'],
+  existingUserName?: string
+) {
+  const { given = [], family = '' } =
+    names.find((name) => name.use === 'en') || {}
+  const initials = given.reduce(
+    (accumulated, current) => accumulated + current.trim().charAt(0),
+    ''
+  )
+
+  let proposedUsername = `${initials}${initials === '' ? '' : '.'}${family
+    .trim()
+    .replace(/ /g, '-')}`.toLowerCase()
+
+  if (proposedUsername.length < 3) {
+    proposedUsername =
+      proposedUsername + '0'.repeat(3 - proposedUsername.length)
+  }
+
+  if (existingUserName && existingUserName === proposedUsername) {
+    return proposedUsername
+  }
+
+  try {
+    let usernameTaken = await isUsernameTaken(proposedUsername)
+    let i = 1
+    const copyProposedName = proposedUsername
+    while (usernameTaken) {
+      if (existingUserName && existingUserName === proposedUsername) {
+        return proposedUsername
+      }
+      proposedUsername = copyProposedName + i
+      i += 1
+      usernameTaken = await isUsernameTaken(proposedUsername)
+    }
+  } catch (err) {
+    logger.error(`Failed username generation: ${err}`)
+    throw new Error('Failed username generation')
+  }
+
+  return proposedUsername
 }
 
-export async function getLegacyUser(
-  userId: string,
-  token: string
-): Promise<User & { username: string }> {
-  const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'getUser').href, {
-    method: 'POST',
-    body: JSON.stringify({ userId }),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token
-    }
-  })
+type DbUser = NonNullable<Awaited<ReturnType<typeof getUserById>>>
 
-  if (!res.ok) {
-    throw new Error(
-      `Unable to retrieve user details. Error: ${res.status} status received`
-    )
-  }
-
-  const legacyUser = (await res.json()) as UserAPIResult
-
+function mapDbUserToUser(user: DbUser): User & { username: string } {
   return {
     type: TokenUserType.enum.user,
-    id: legacyUser.id,
-    name: legacyUser.name,
-    role: legacyUser.role,
-    email: legacyUser.email,
-    mobile: legacyUser.mobile,
-    username: legacyUser.username,
-    status: legacyUser.status as User['status'],
-    signature: legacyUser.signature?.data
-      ? legacyUser.signature.data
+    id: user.id,
+    name: [
+      { use: 'en', given: [user.firstname ?? ''], family: user.surname ?? '' }
+    ],
+    role: user.role,
+    email: user.email ?? undefined,
+    mobile: user.mobile ?? undefined,
+    device: user.device ?? undefined,
+    username: user.username,
+    status: user.status as User['status'],
+    signature: user.signaturePath
+      ? (user.signaturePath as DocumentPath)
       : undefined,
-    avatar: legacyUser.avatar?.data ? legacyUser.avatar.data : undefined,
-    primaryOfficeId: legacyUser.primaryOfficeId,
-    device: legacyUser.device ? legacyUser.device : undefined,
-    fullHonorificName: legacyUser.fullHonorificName
-      ? legacyUser.fullHonorificName
-      : undefined
+    avatar: user.profileImagePath
+      ? (user.profileImagePath as DocumentPath)
+      : undefined,
+    primaryOfficeId: user.officeId,
+    administrativeAreaId: user.administrativeAreaId ?? undefined,
+    fullHonorificName: user.fullHonorificName ?? undefined
   }
+}
+
+export async function getUser(
+  userId: string
+): Promise<User & { username: string }> {
+  const user = await getUserById(UUID.parse(userId))
+
+  if (!user) {
+    throw new Error(`User not found: ${userId}`)
+  }
+
+  return mapDbUserToUser(user)
 }
 
 export async function findUserOrSystem(
-  id: string,
-  token: string
+  id: string
 ): Promise<UserOrSystem | undefined> {
   try {
-    return await getLegacyUser(id, token)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (_) {
-    logger.info(`No user found for id: ${id}. Will look for a system instead.`)
+    return await getUser(id)
+  } catch (e) {
+    logger.info(
+      `No user found for id: ${id}. Will look for a system instead. Error: ${e instanceof Error ? e.message : String(e)}`
+    )
   }
 
   try {
@@ -134,238 +172,312 @@ export async function findUserOrSystem(
       legacyId: system.legacyId ? system.legacyId : undefined,
       name: system.name
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     logger.info(
-      `No system found for id: ${id}. User/system has probably been removed. Will return undefined.`
+      `No system found for id: ${id}. User/system has probably been removed. Will return undefined. Error: ${e instanceof Error ? e.message : String(e)}`
     )
   }
 
   return
 }
 
-async function getUser(id: string, token: string): Promise<User> {
-  const userOrSystem = await findUserOrSystem(id, token)
-  if (!userOrSystem) {
-    throw new Error(`No user or system found for id: ${id}`)
-  }
-
-  if (userOrSystem.type === TokenUserType.enum.system) {
-    throw new Error(`The id: ${id} belongs to a system, not a user`)
-  }
-
-  return userOrSystem
-}
-
 export async function searchUsers(
-  payload: SearchUsersPayload,
-  token: string
+  payload: SearchUsersPayload
 ): Promise<User[]> {
-  const res = await fetch(
-    joinUrl(env.USER_MANAGEMENT_URL, 'searchUsers').href,
-    {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      }
-    }
-  )
+  const results = await searchUsersWithInput(payload)
 
-  if (!res.ok) {
-    throw new Error(
-      `Unable to search users. Error: ${res.status} status received`
-    )
-  }
-
-  const { results } = (await res.json()) as SearchUsersResult
-
-  return results.map((user) => ({
-    type: TokenUserType.enum.user,
-    id: user.id,
-    name: user.name,
-    role: user.role,
-    signature: user.signature?.data ? user.signature.data : undefined,
-    avatar: user.avatar?.data ? user.avatar.data : undefined,
-    primaryOfficeId: user.primaryOfficeId,
-    status: user.status as User['status'],
-    device: user.device ? user.device : undefined,
-    fullHonorificName: user.fullHonorificName
-      ? user.fullHonorificName
-      : undefined
-  }))
+  return results.map(mapDbUserToUser)
 }
 
 type CreateUserPayload = z.infer<typeof UserInput>
+type UpdateUserPayload = Partial<z.infer<typeof UserInput>>
 
 export async function updateUser(
-  input: CreateUserPayload & { id: string },
+  input: UpdateUserPayload & { id: UUID },
   token: string
 ): Promise<User> {
-  const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'updateUser').href, {
-    method: 'POST',
-    body: JSON.stringify({
-      ...input,
-      signature: input.signature && {
-        type: input.signature.type,
-        data: input.signature.path
-      }
-    }),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token
+  const existingUser = await getUserById(input.id)
+
+  if (!existingUser) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `User not found: ${input.id}`
+    })
+  }
+
+  const name: IUserName[] = input.name ?? [
+    {
+      use: 'en',
+      given: [existingUser.firstname ?? ''],
+      family: existingUser.surname ?? ''
     }
+  ]
+
+  const oldUsername = existingUser.username
+  const newUsername = await generateUsername(name, existingUser.username)
+
+  await updateUserById(input.id, {
+    firstname: personNameFromV1ToV2(name).firstname,
+    surname: personNameFromV1ToV2(name).surname,
+    fullHonorificName: input.fullHonorificName,
+    email: input.email,
+    mobile: input.mobile,
+    device: input.device,
+    role: input.role,
+    officeId: input.primaryOfficeId,
+    signaturePath: input.signature
+      ? input.signature.path
+      : existingUser.signaturePath
   })
 
-  if (!res.ok) {
-    throw new Error(
-      `Unable to update user. Error: ${res.status} status received`
-    )
+  if (newUsername !== oldUsername) {
+    await updateUsernameById(UUID.parse(input.id), newUsername)
+    await triggerUserEventNotification({
+      event: 'user-updated',
+      payload: {
+        recipient: {
+          name: personNameFromV1ToV2(name),
+          email: input.email,
+          mobile: input.mobile
+        },
+        oldUsername,
+        newUsername
+      },
+      countryConfigUrl: env.COUNTRY_CONFIG_URL,
+      authHeader: { Authorization: token }
+    })
   }
 
-  const user = await getUser(input.id, token)
-  return user
+  return getUser(input.id)
 }
 
-export async function createUser(input: CreateUserPayload, token: string) {
-  const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'createUser').href, {
-    method: 'POST',
-    body: JSON.stringify({
-      ...input,
-      signature: input.signature && {
-        type: input.signature.type,
-        data: input.signature.path
-      }
-    }),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token
+function generateRandomPassword() {
+  const charset =
+    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+  const length = 12
+  // Rejection sampling eliminates modulo bias (256 % 62 = 8, so bytes 248-255 are discarded)
+  const result: string[] = []
+  const limit = 256 - (256 % charset.length)
+  while (result.length < length) {
+    const byte = randomBytes(1)[0]
+    if (byte < limit) {
+      result.push(charset[byte % charset.length])
     }
-  })
-
-  if (!res.ok) {
-    throw new Error(
-      `Unable to create user. Error: ${res.status} status received`
-    )
   }
-
-  const response = (await res.json()) as UserAPIResult
-  return getUser(response.id, token)
+  return result.join('')
 }
 
-export async function changeUserPassword(
-  payload: { userId: string; existingPassword: string; password: string },
-  token: string
-): Promise<void> {
-  const res = await fetch(
-    joinUrl(env.USER_MANAGEMENT_URL, 'changeUserPassword').href,
-    {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      }
-    }
-  )
-  if (!res.ok) {
-    throw new Error(
-      `Unable to change password. Error: ${res.status} status received`
-    )
-  }
-}
-
-export async function activateUser(
-  input: { userId: string; password: string; securityQNAs: unknown[] },
-  token: string
+async function sendCredentialsNotification(
+  userFullName: IUserName[],
+  username: string,
+  password: string,
+  token: string,
+  msisdn?: string,
+  email?: string
 ) {
-  const res = await fetch(
-    joinUrl(env.USER_MANAGEMENT_URL, 'activateUser').href,
-    {
-      method: 'POST',
-      body: JSON.stringify(input),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      }
-    }
-  )
-
-  if (!res.ok) {
-    throw new Error(
-      `Unable to change password. Error: ${res.status} status received`
-    )
+  try {
+    await triggerUserEventNotification({
+      event: 'user-created',
+      payload: {
+        recipient: {
+          name: personNameFromV1ToV2(userFullName),
+          email,
+          mobile: msisdn
+        },
+        username,
+        temporaryPassword: password
+      },
+      countryConfigUrl: env.COUNTRY_CONFIG_URL,
+      authHeader: { Authorization: token }
+    })
+  } catch (err) {
+    logger.error(`Unable to send notification for error : ${err}`)
   }
 }
 
-export async function changeUserPhone(
-  payload: { userId: string; phoneNumber: string },
-  token: string
-): Promise<void> {
-  const res = await fetch(
-    joinUrl(env.USER_MANAGEMENT_URL, 'changeUserPhone').href,
-    {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      }
-    }
+export async function createUser(input: CreateUserPayload, _token: string) {
+  // Hash the provided password, or generate a random placeholder for pending
+  // users who will set their own password via the activation flow.
+  const password =
+    input.password ?? env.DEFAULT_USER_PASSWORD ?? generateRandomPassword()
+  const { hash, salt } = await generateSaltedHash(password)
+
+  const userPayload = {
+    firstname: personNameFromV1ToV2(input.name).firstname,
+    surname: personNameFromV1ToV2(input.name).surname,
+    email: input.email.toLowerCase(),
+    fullHonorificName: input.fullHonorificName,
+    role: input.role,
+    device: input.device,
+    officeId: input.primaryOfficeId,
+    mobile: input.mobile,
+    status: input.status ?? 'pending',
+    signaturePath: input.signature?.path
+  }
+
+  const userCredentialPayload = {
+    username: input.username ?? (await generateUsername(input.name)),
+    passwordHash: hash,
+    salt,
+    securityQuestions: []
+  }
+
+  const postgresId = await createUserWithCredentials(
+    userPayload,
+    userCredentialPayload
   )
 
-  if (!res.ok) {
-    throw new Error(
-      `Unable to change phone number. Error: ${res.status} status received`
-    )
+  await sendCredentialsNotification(
+    input.name,
+    userCredentialPayload.username,
+    password,
+    _token,
+    userPayload.mobile ?? undefined,
+    userPayload.email
+  )
+
+  return getUser(postgresId)
+}
+
+export async function activateUser(input: {
+  userId: UUID
+  password: string
+  securityQNAs: { questionKey: string; answer: string }[]
+}): Promise<void> {
+  const { hash, salt } = await generateSaltedHash(input.password)
+
+  const securityQuestions = await Promise.all(
+    input.securityQNAs.map(async (qna) => ({
+      questionKey: qna.questionKey,
+      answerHash: await generateHash(qna.answer.toLowerCase(), salt)
+    }))
+  )
+
+  const userId = UUID.parse(input.userId)
+  await activateUserWithCredentials(userId, hash, salt, securityQuestions)
+}
+
+/**
+ * Retrieves multiple users/systems by their IDs.
+ *
+ * If no user or system is found for an id, we leave them out of the result.
+ * This is because a user might have been removed, and we don't want to throw an error in those cases.
+ *
+ * @param ids - Array of ids, which can be normal user or system ids
+ * @param token - Authorization token for API requests
+ * @returns Array of found users. If no users are found for some ids, we leave them out of the result.
+ */
+export const getUsersById = async (ids: string[]): Promise<UserOrSystem[]> => {
+  const { users, systems } = await getUsersAndSystemsByIds(ids)
+
+  const mappedUsers: UserOrSystem[] = users.map(mapDbUserToUser)
+  const mappedSystems: UserOrSystem[] = systems.map((s) => ({
+    type: TokenUserType.enum.system,
+    id: s.id,
+    legacyId: s.legacyId ?? undefined,
+    name: s.name
+  }))
+
+  return [...mappedUsers, ...mappedSystems]
+}
+
+export function isUser(userOrSystem: UserOrSystem): userOrSystem is User {
+  return userOrSystem.type === TokenUserType.enum.user
+}
+
+export const getCredentials = async (userId: UUID) => {
+  const credentials = await getUserCredentialsByUserId(userId)
+
+  if (!credentials) {
+    logger.error(`No user details found by given userid: ${userId}`)
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
+
+  return credentials
+}
+
+export const getSecurityQuestionsForUser = <
+  T extends { securityQuestions: unknown }
+>(
+  record: T
+): SecurityQuestion[] => {
+  if (
+    !Array.isArray(record.securityQuestions) ||
+    record.securityQuestions.length === 0
+  ) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: "User doesn't have security questions"
+    })
+  }
+  return record.securityQuestions
+}
+
+export async function checkSecurityQuestionMatch({
+  questions,
+  input,
+  salt
+}: {
+  questions: { questionKey: string; answerHash: string }[]
+  input: { questionKey: string; answer: string }
+  salt: string
+}) {
+  const target = questions.find((q) => q.questionKey === input.questionKey)
+
+  if (!target) {
+    return {
+      matched: false,
+      questionKey: input.questionKey
+    }
+  }
+
+  const hash = await generateHash(input.answer.toLowerCase(), salt)
+  const matched = hash === target.answerHash
+
+  // On a wrong answer, rotate to a different question so the same prompt
+  // can't be brute-forced.
+  const fallback = questions.find(
+    (q) => q.questionKey !== input.questionKey
+  )?.questionKey
+
+  return {
+    matched,
+    questionKey: matched ? input.questionKey : (fallback ?? input.questionKey)
   }
 }
 
-export async function changeUserEmail(
-  payload: { userId: string; email: string },
-  token: string
-): Promise<void> {
-  const res = await fetch(
-    joinUrl(env.USER_MANAGEMENT_URL, 'changeUserEmail').href,
-    {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      }
-    }
+export async function verifyUser(input: { mobile?: string; email?: string }) {
+  const user = await getUserByMobileOrEmail(
+    input.mobile ? { mobile: input.mobile } : { email: input.email ?? '' }
   )
 
-  if (!res.ok) {
-    throw new Error(
-      `Unable to change email. Error: ${res.status} status received`
-    )
+  if (!user) {
+    // Don't reveal whether the account exists
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
   }
-}
 
-export async function changeUserAvatar(
-  payload: { userId: string; avatar: { type: string; data: string } },
-  token: string
-) {
-  const res = await fetch(
-    joinUrl(env.USER_MANAGEMENT_URL, 'changeUserAvatar').href,
-    {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
+  const questions = getSecurityQuestionsForUser(user)
+
+  const securityQuestionKey =
+    questions[Math.floor(Math.random() * questions.length)].questionKey
+
+  const roles = await getRoles()
+  const scope = roles.find((r) => r.id === user.role)?.scopes ?? []
+
+  return {
+    id: user.id,
+    username: user.username,
+    mobile: user.mobile ?? undefined,
+    email: user.email ?? undefined,
+    status: user.status,
+    name: [
+      {
+        use: 'en',
+        given: [user.firstname ?? ''],
+        family: user.surname ?? ''
       }
-    }
-  )
-
-  if (!res.ok) {
-    throw new Error(
-      `Unable to change avatar. Error: ${res.status} status received`
-    )
+    ],
+    securityQuestionKey,
+    scope
   }
-
-  return res
 }

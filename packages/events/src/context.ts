@@ -10,12 +10,12 @@
  */
 
 import { IncomingMessage } from 'http'
+import { readFileSync } from 'fs'
 import * as z from 'zod/v4'
 import '@opencrvs/commons/monitoring'
 import { TRPCError } from '@trpc/server'
+import * as jwt from 'jsonwebtoken'
 import {
-  getUserId,
-  getUserTypeFromToken,
   logger,
   REINDEX_USER_ID,
   TokenUserType,
@@ -24,31 +24,79 @@ import {
   UserContext
 } from '@opencrvs/commons'
 export { SystemContext, UserContext }
-import { getLegacyUser } from './service/users/api'
-import { getLocationById } from './service/locations/locations'
+import { env } from './environment'
+import { getUser } from './service/users/api'
 
 export const TrpcContext = z.object({
   token: TokenWithBearer,
   user: z.union([SystemContext, UserContext])
 })
-
 export type TrpcContext = z.infer<typeof TrpcContext>
 
 /**
- * Internal user, used to bootstrap the system and then deactivate.
+ * Service, internal or external caller. e.g. data-seeder, auth-service.
  */
-const SEEDER_SUPER_ADMIN = 'o.admin'
-
-/**
- * Super admin does not have a primary office. It is the one setting locations.
- * It should be used only once to bootstrap the system. Usage should be limited. Seeing it as 'system' is one way of doing that. (And it also plays well with types)
- */
-const SuperAdminContext = SystemContext.extend({
-  role: z.literal('SUPER_ADMIN')
+export const ServiceTrpcContext = z.object({
+  token: TokenWithBearer
 })
-type SuperAdminContext = z.infer<typeof SuperAdminContext>
 
-export type TrpcUserContext = SystemContext | UserContext | SuperAdminContext
+export type ServiceTrpcContext = z.infer<typeof ServiceTrpcContext>
+
+const tokenPublicKey = readFileSync(env.CERT_PUBLIC_KEY_PATH)
+
+const TokenClaims = z.object({
+  sub: z.string(),
+  userType: TokenUserType,
+  scope: z.array(z.string())
+})
+type TokenClaims = z.infer<typeof TokenClaims>
+
+function verifyAppToken(token: TokenWithBearer): TokenClaims {
+  const jwtToken = token.split(' ')[1]
+
+  const verified = jwt.verify(jwtToken, tokenPublicKey, {
+    algorithms: ['RS256'],
+    issuer: 'opencrvs:auth-service',
+    audience: ['opencrvs:gateway-user', 'opencrvs:events-user']
+  })
+
+  return TokenClaims.parse(verified)
+}
+
+type ServiceSubject = 'opencrvs:auth-service' | 'opencrvs:data-seeder-service'
+
+function getServiceTokenVerifyOptions(
+  subject: ServiceSubject
+): jwt.VerifyOptions {
+  return {
+    subject,
+    algorithms: ['RS256'],
+    issuer: 'opencrvs:auth-service',
+    audience: ['opencrvs:events-user']
+  }
+}
+
+export function verifyInternalServiceToken(token: TokenWithBearer) {
+  const tokenWithoutBearer = token.split(' ')[1]
+
+  return jwt.verify(
+    tokenWithoutBearer,
+    tokenPublicKey,
+    getServiceTokenVerifyOptions('opencrvs:auth-service')
+  )
+}
+
+export function verifyInitialisationToken(token: TokenWithBearer) {
+  const tokenWithoutBearer = token.split(' ')[1]
+
+  return jwt.verify(
+    tokenWithoutBearer,
+    tokenPublicKey,
+    getServiceTokenVerifyOptions('opencrvs:data-seeder-service')
+  )
+}
+
+export type TrpcUserContext = SystemContext | UserContext
 
 type HeadersLike =
   // gateway is not aware of Headers. We use this as a proxy.
@@ -77,12 +125,13 @@ function normalizeHeaders(
 async function resolveUserDetails(
   token: TokenWithBearer
 ): Promise<TrpcUserContext> {
-  let userId: string | undefined
+  let userId: string
   let userType: TokenUserType
 
   try {
-    userId = getUserId(token)
-    userType = getUserTypeFromToken(token)
+    const claims = verifyAppToken(token)
+    userId = claims.sub
+    userType = claims.userType
   } catch {
     logger.error('Error while parsing token')
 
@@ -106,37 +155,20 @@ async function resolveUserDetails(
       })
     }
 
-    const { primaryOfficeId, role, signature, username } = await getLegacyUser(
-      userId,
-      token
-    )
+    const { primaryOfficeId, role, signature, administrativeAreaId } =
+      await getUser(userId)
 
-    if (username === SEEDER_SUPER_ADMIN) {
-      logger.warn(
-        `User ${username} is used for seeding. Treating it as a ${TokenUserType.enum.system} user type.`
-      )
-
-      return SuperAdminContext.parse({
-        type: TokenUserType.enum.system,
-        id: userId,
-        primaryOfficeId: undefined,
-        role
-      })
-    }
-
-    // @TODO: We should get this from a single source. Waiting for user migration.
-    const location = await getLocationById(primaryOfficeId)
     return UserContext.parse({
       type: userType,
       id: userId,
       primaryOfficeId,
-      administrativeAreaId: location.administrativeAreaId,
+      administrativeAreaId,
       signature,
       role
     })
   } catch (error) {
     logger.error(
-      `Error retrieving user details for ${userType} ${userId}: ${JSON.stringify(error)}`
+      `Error retrieving user details for ${userType} ${userId}: ${error}}`
     )
 
     throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
@@ -150,5 +182,18 @@ export async function createContext({ req }: { req: IncomingMessage }) {
   return {
     token,
     user: token && (await resolveUserDetails(token).catch(() => undefined))
+  }
+}
+
+export function createServiceContext({ req }: { req: IncomingMessage }) {
+  const normalizedHeaders = normalizeHeaders(req.headers)
+  try {
+    const token = TokenWithBearer.parse(normalizedHeaders.authorization)
+
+    return {
+      token
+    }
+  } catch {
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
   }
 }

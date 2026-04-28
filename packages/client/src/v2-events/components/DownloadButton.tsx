@@ -33,10 +33,7 @@ import { useAuthentication } from '@client/utils/userUtils'
 import { useEvents } from '../features/events/useEvents/useEvents'
 import { useUsers } from '../hooks/useUsers'
 import { AssignModal } from './AssignModal'
-import {
-  useResolveAssignmentActionConditionals,
-  useResolveActionConditionals
-} from '../features/workqueues/Actions/useActionConfigurationResolver'
+import { useResolveAssignmentActionConditionals } from '../features/workqueues/Actions/useActionConfigurationResolver'
 
 interface DownloadButtonProps {
   id?: string

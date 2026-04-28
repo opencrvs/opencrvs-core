@@ -91,7 +91,7 @@ export function Pages() {
         attachmentPath={`events/${eventId}/`}
         declaration={eventIndex.declaration}
         eventConfig={configuration}
-        form={annotation}
+        formData={annotation}
         formPages={formPages.map((page) => {
           if (formPages[0].id === page.id) {
             page = {

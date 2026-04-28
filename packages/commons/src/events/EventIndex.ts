@@ -50,6 +50,8 @@ export const Exact = z
     id: 'Exact'
   })
 
+export type Exact = z.infer<typeof Exact>
+
 export const ExactStatus = z
   .object({
     type: z.literal('exact'),
@@ -110,6 +112,7 @@ export const Within = z
   .meta({
     id: 'Within'
   })
+export type Within = z.infer<typeof Within>
 
 const RangeDate = z
   .object({
@@ -180,8 +183,8 @@ export const QueryExpression = z
     'legalStatuses.REGISTERED.createdAtLocation': z.optional(Within).nullable(),
     'legalStatuses.REGISTERED.createdByRole': z.optional(AnyOf),
     'legalStatuses.REGISTERED.registrationNumber': z.optional(Exact),
-    createdAtLocation: z.optional(Within),
-    updatedAtLocation: z.optional(Within),
+    createdAtLocation: z.optional(z.union([Within, Exact])),
+    updatedAtLocation: z.optional(z.union([Within, Exact])),
     assignedTo: z.optional(Exact),
     createdByUserType: z.optional(ExactUserType),
     updatedByUserRole: z.optional(Exact),

@@ -11,6 +11,7 @@
 import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import {
+  AdministrativeAreaField,
   JurisdictionFilter,
   Location,
   resolveJurisdictionReference,
@@ -22,10 +23,9 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getAdministrativeAreaHierarchy } from '@client/v2-events/utils'
 import { getToken } from '@client/utils/authUtils'
-import { SearchableSelect } from '../../../components/forms/inputs/SearchableSelect'
-import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
-import { useLocations } from '../../../hooks/useLocations'
-import { AdministrativeAreaField } from '../../../../../../commons/build/dist/esm/events/FieldConfig'
+import { SearchableSelect, SearchableSelectProps } from '@client/v2-events/components/forms/inputs/SearchableSelect'
+import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { LocationSearch } from './LocationSearch'
 
 /**
@@ -101,23 +101,26 @@ function useAvailableAdministrativeAreas(
   return options
 }
 
+interface AdministrativeAreaInputProps
+  extends Omit<
+    SearchableSelectProps,
+    'data-testid' | 'value' | 'onChange' | 'options'
+  > {
+  configuration: AdministrativeAreaField['configuration']
+  eventType?: string
+  partOf: string | null
+  onChange: (val: string | null) => void
+  value?: string | null
+}
+
 function AdministrativeAreaInput({
-  onChange,
+  configuration,
+  eventType,
   value,
   partOf,
-  id,
-  disabled,
-  configuration,
-  eventType
-}: {
-  onChange: (val: string | null) => void
-  partOf: string | null
-  value?: string | null
-  disabled?: boolean
-  configuration: AdministrativeAreaField['configuration']
-  id: string
-  eventType?: string
-}) {
+  onChange,
+  ...inputProps
+}: AdministrativeAreaInputProps) {
   const token = useSelector(getToken)
   const jurisdictionFilter = resolveJurisdictionReference(
     configuration.allowedLocations,
@@ -145,9 +148,9 @@ function AdministrativeAreaInput({
 
   return (
     <SearchableSelect
-      data-testid={'location__' + id}
-      disabled={disabled || hasOnlyOneOption}
-      id={id}
+      {...inputProps}
+      data-testid={'location__' + inputProps.id}
+      disabled={inputProps.disabled || hasOnlyOneOption}
       options={options}
       value={selectedLocation}
       onChange={(opt) => {
@@ -157,11 +160,11 @@ function AdministrativeAreaInput({
   )
 }
 
-function AdministrativeAreaOutput({ value }: { value: Stringifiable }) {
+function AdministrativeAreaOutput({ value }: { value: Stringifiable | undefined }) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
-  const administrativeAreaId = UUID.safeParse(value.toString()).data
+  const administrativeAreaId = UUID.safeParse(value?.toString()).data
 
   const administrativeArea =
     administrativeAreaId && administrativeAreas.get(administrativeAreaId)

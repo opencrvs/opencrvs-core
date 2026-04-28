@@ -161,6 +161,7 @@ describe('event.actions.notify', () => {
       transactionId: getUUID(),
       annotation: {},
       declaration: {
+        // expect name error
         'applicant.name': {
           firstname: 999999,
           surname: '999999'
@@ -528,6 +529,7 @@ describe('event.actions.notify', () => {
         transactionId: generateUuid(),
         type: 'NOTIFY',
         declaration: {
+          // testing partial address
           'applicant.address': {
             country: 'FAR'
           }
@@ -606,6 +608,7 @@ describe('event.actions.notify', () => {
         'applicant.address': {
           country: 'FAR',
           addressType: AddressType.INTERNATIONAL,
+          // testing wrong field (administrativeArea for DOMESTIC) in address
           administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a' // it goes away when AddressFieldValue parses it
         }
       },

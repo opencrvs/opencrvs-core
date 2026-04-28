@@ -25,6 +25,9 @@ import {
   ActionUpdate,
   EventState,
   EventDocument,
+  ConditionalType,
+  field as conditionalField,
+  not,
   encodeScope
 } from '@opencrvs/commons'
 import {
@@ -207,6 +210,72 @@ describe('Declare action', () => {
     if (savedAction?.status === ActionStatus.Requested) {
       expect(savedAction.declaration).toEqual(form)
     }
+  })
+
+  test('Skips required review field validation when review field is conditionally hidden', async () => {
+    // Build a modified event where review.signature is required but only shown when applicant.dobUnknown is truthy
+    const modifiedEvent = {
+      ...tennisClubMembershipEvent,
+      actions: tennisClubMembershipEvent.actions.map((action) => {
+        if (action.type !== ActionType.DECLARE) {
+          return action
+        }
+        return {
+          ...action,
+          review: {
+            ...action.review,
+            fields: action.review.fields.map((f) =>
+              f.id !== 'review.signature'
+                ? f
+                : {
+                    ...f,
+                    required: true,
+                    conditionals: [
+                      {
+                        type: ConditionalType.SHOW,
+                        conditional: not(
+                          conditionalField('applicant.dobUnknown').isFalsy()
+                        )
+                      }
+                    ]
+                  }
+            )
+          }
+        }
+      })
+    }
+
+    mswServer.use(
+      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+        return HttpResponse.json([modifiedEvent])
+      })
+    )
+
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
+
+    // applicant.dobUnknown is false → SHOW conditional not met → review.signature is hidden
+    const declaration = {
+      'applicant.dob': '2024-02-01',
+      'applicant.dobUnknown': false,
+      'applicant.name': { firstname: 'John', surname: 'Doe' },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: { state: 'state', district2: 'district2' }
+      }
+    } satisfies ActionUpdate
+
+    const data = generator.event.actions.declare(event.id, {
+      declaration,
+      annotation: {} // no signature provided – required check must be skipped for hidden field
+    })
+
+    await expect(
+      client.event.actions.declare.request(data)
+    ).resolves.not.toThrow()
   })
 
   test('gives validation error when a conditional page, which is visible, has a required field', async () => {

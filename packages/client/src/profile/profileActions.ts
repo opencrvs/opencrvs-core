@@ -91,9 +91,7 @@ export const checkAuth = (): CheckAuthAction => ({
   type: CHECK_AUTH
 })
 
-export const setUserDetails = (
-  payload: User
-): SetUserDetailsAction => ({
+export const setUserDetails = (payload: User): SetUserDetailsAction => ({
   type: SET_USER_DETAILS,
   payload
 })
@@ -103,7 +101,7 @@ export const userDetailsAvailable = (payload: UserDetails) => ({
   payload
 })
 
-export type UserDetailsAvailable = ReturnType<typeof userDetailsAvailable>
+type UserDetailsAvailable = ReturnType<typeof userDetailsAvailable>
 
 export const modifyUserDetails = (
   payload: Partial<UserDetails>

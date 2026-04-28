@@ -47,6 +47,22 @@ const archivedScenariosForLocalRegistrar: Scenario[] = [
     }
   },
   {
+    name: 'AssignedToSelf',
+    recordDownloaded: true,
+    actions: [
+      ActionType.CREATE,
+      AssignmentStatus.ASSIGNED_TO_SELF,
+      ActionType.DECLARE,
+      ActionType.ARCHIVE,
+      ActionType.UNASSIGN,
+      AssignmentStatus.ASSIGNED_TO_SELF
+    ],
+    expected: {
+      ...getHiddenActions(),
+      ['Unassign']: AssertType.ENABLED
+    }
+  },
+  {
     name: 'AssignedToOthers',
     recordDownloaded: false,
     actions: [
@@ -72,3 +88,4 @@ const stories = createStoriesFromScenarios(
 
 export const Unassigned = stories['Unassigned']
 export const AssignedToOthers = stories['AssignedToOthers']
+export const AssignedToSelf = stories['AssignedToSelf']

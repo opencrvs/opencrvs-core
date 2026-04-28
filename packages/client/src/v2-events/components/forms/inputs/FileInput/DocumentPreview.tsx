@@ -10,39 +10,13 @@
  */
 
 import * as React from 'react'
-import styled from 'styled-components'
+
 import {
   FileFieldValue,
   FileFieldValueWithOption
 } from '@opencrvs/commons/client'
 import { ImagePreview } from './ImagePreview'
 import { PdfPreview } from './PdfPreview'
-
-const ViewerWrapper = styled.div`
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 4;
-  width: 100%;
-  height: 100%;
-  background: ${({ theme }) => theme.colors.white};
-`
-
-const ViewerContainer = styled.div`
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  & img {
-    max-height: 80vh;
-    max-width: 80vw;
-    width: auto;
-  }
-`
 
 interface IProps {
   previewImage:

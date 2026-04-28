@@ -18,8 +18,6 @@ import { Page } from '@client/components/Page'
 import { I18nContainer } from '@client/i18n/components/I18nContainer'
 import { createStore } from '@client/store'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { useApolloClient } from '@client/utils/apolloClient'
-import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { Provider, useSelector } from 'react-redux'
 import {
@@ -95,46 +93,42 @@ function WaitForUserDetails({ children }: PropsWithChildren<{}>) {
 }
 
 function Wrapper({ store, router, initialPath, children }: WrapperProps) {
-  const { client } = useApolloClient(store)
-
   return (
-    <ApolloProvider client={client}>
-      <ThemeProvider theme={getTheme}>
-        <Provider store={store}>
-          <I18nContainer>
-            <TRPCProvider>
-              <RouterProvider
-                router={createMemoryRouter(
-                  [
-                    {
-                      path: '/',
-                      element: (
-                        <Page>
-                          <NavigationHistoryProvider>
-                            <WaitForUserDetails>
-                              <Outlet />
-                            </WaitForUserDetails>
-                          </NavigationHistoryProvider>
-                        </Page>
-                      ),
-                      children: [
-                        router || {
-                          path: initialPath,
-                          element: children
-                        }
-                      ]
-                    }
-                  ],
+    <ThemeProvider theme={getTheme}>
+      <Provider store={store}>
+        <I18nContainer>
+          <TRPCProvider>
+            <RouterProvider
+              router={createMemoryRouter(
+                [
                   {
-                    initialEntries: [initialPath]
+                    path: '/',
+                    element: (
+                      <Page>
+                        <NavigationHistoryProvider>
+                          <WaitForUserDetails>
+                            <Outlet />
+                          </WaitForUserDetails>
+                        </NavigationHistoryProvider>
+                      </Page>
+                    ),
+                    children: [
+                      router || {
+                        path: initialPath,
+                        element: children
+                      }
+                    ]
                   }
-                )}
-              ></RouterProvider>
-            </TRPCProvider>
-          </I18nContainer>
-        </Provider>
-      </ThemeProvider>
-    </ApolloProvider>
+                ],
+                {
+                  initialEntries: [initialPath]
+                }
+              )}
+            ></RouterProvider>
+          </TRPCProvider>
+        </I18nContainer>
+      </Provider>
+    </ThemeProvider>
   )
 }
 

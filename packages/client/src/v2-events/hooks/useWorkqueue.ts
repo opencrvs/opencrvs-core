@@ -13,7 +13,6 @@ import { useSelector } from 'react-redux'
 import { useCallback } from 'react'
 import {
   deserializeQuery,
-  User,
   UserOrSystem,
   WorkqueueConfig
 } from '@opencrvs/commons/client'

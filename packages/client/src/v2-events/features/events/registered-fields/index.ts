@@ -40,6 +40,7 @@ import { AlphaPrintButton } from './AlphaPrintButton'
 import { LinkButton } from './LinkButton'
 import { VerificationStatus } from './VerificationStatus'
 import { QueryParamReader } from './QueryParamReader'
+import { Autocomplete } from './Autocomplete'
 import { ImageView } from './ImageView'
 import { UserRole } from './UserRole'
 
@@ -68,6 +69,7 @@ export * from './TimeField'
 export * from './AlphaPrintButton'
 export * from './LinkButton'
 export * from './VerificationStatus'
+export * from './Autocomplete'
 export * from './ImageView'
 export * from './UserRole'
 
@@ -127,6 +129,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return Search
     case FieldType.HTTP:
       return Http
+    case FieldType.AUTOCOMPLETE:
+      return Autocomplete
     case FieldType.LINK_BUTTON:
       return LinkButton
     case FieldType.VERIFICATION_STATUS:

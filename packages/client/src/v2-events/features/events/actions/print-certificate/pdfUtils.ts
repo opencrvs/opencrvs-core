@@ -35,8 +35,7 @@ import {
   AdministrativeArea,
   getActionAnnotationFields,
   FieldUpdateValue,
-  FieldConfig,
-  DocumentPath
+  FieldConfig
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -534,6 +533,30 @@ export function compileSvg({
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     } as any /* This is here because Handlebars typing is insufficient and we can make the function type stricter */
   )
+
+  /**
+   * Handlebars helper: $join
+   *
+   * Joins provided values with the given separator, filtering out any empty or falsy values.
+   * Useful for rendering location hierarchies where some admin levels may be absent
+   * (e.g. an office registered directly under a province with no district).
+   *
+   * @param separator - The string to join with (e.g. ", ")
+   * @param values - One or more values to filter and join
+   * @returns The non-empty values joined by separator
+   *
+   * @example {{ $join ", " district province country }} // "Ibombo, Central, Farajaland"
+   * @example {{ $join ", " "" province country }}      // "Central, Farajaland" (empty district omitted)
+   * @example {{ $join ", " "" "" country }}            // "Farajaland" (both empty omitted)
+   */
+  Handlebars.registerHelper('$join', function (
+    ...args: [...(string | undefined | null)[], Handlebars.HelperOptions]
+  ) {
+    const separator = args[0] as string
+    const values = args.slice(1, -1) as Array<string | undefined | null>
+    return values.filter(Boolean).join(separator)
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  } as any)
 
   /**
    * Handlebars helper: $OR

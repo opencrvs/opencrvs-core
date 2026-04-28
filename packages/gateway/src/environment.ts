@@ -22,11 +22,7 @@ export const env = cleanEnv(process.env, {
   CERT_PUBLIC_KEY_PATH: str({
     devDefault: '../../.secrets/public-key.pem'
   }),
-  METRICS_URL: url({ devDefault: 'http://localhost:1050' }),
   AUTH_URL: url({ devDefault: 'http://localhost:4040' }),
-  USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
-  WEBHOOKS_URL: url({ devDefault: 'http://localhost:2525/' }),
-  NOTIFICATION_URL: url({ devDefault: 'http://localhost:2020/' }),
   EVENTS_URL: url({ devDefault: 'http://localhost:5555/' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),

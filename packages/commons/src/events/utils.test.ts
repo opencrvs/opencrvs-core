@@ -531,31 +531,31 @@ describe('getPendingAction', () => {
     const actionSequence = [
       {
         type: ActionType.CREATE,
-        status: 'Accepted' as const
+        status: ActionStatus.Accepted
       },
       {
         id: 'action-id-2' as UUID,
         type: ActionType.DECLARE,
-        status: 'Requested' as const
+        status: ActionStatus.Requested
       },
       {
         type: ActionType.DECLARE,
-        status: 'Accepted' as const,
+        status: ActionStatus.Accepted,
         originalActionId: 'action-id-2' as UUID
       },
       {
         id: 'action-id-5' as UUID,
         type: ActionType.REGISTER,
-        status: 'Requested' as const
+        status: ActionStatus.Requested
       },
       {
         type: ActionType.REGISTER,
-        status: 'Rejected' as const,
+        status: ActionStatus.Rejected,
         originalActionId: 'action-id-5' as UUID
       },
       {
         type: ActionType.REJECT,
-        status: 'Requested' as const,
+        status: ActionStatus.Requested,
         content: { reason: 'Please reconsider' }
       }
     ].map(({ type, ...defaults }) =>

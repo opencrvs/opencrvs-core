@@ -8,15 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ISerializedForm } from '@client/forms'
-import { Conditional } from '@client/forms/conditionals'
+
 import { ILanguage } from '@client/i18n/reducer'
-import {
-  AdminStructure,
-  CRVSOffice,
-  Facility,
-  ILocation
-} from '@client/offline/reducer'
+import { AdminStructure, CRVSOffice, Facility } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { EventType } from '@client/utils/gateway'
 import { cacheFile } from '@client/v2-events/cache'
@@ -25,23 +19,18 @@ import { IntlShape } from 'react-intl'
 import { fetchFileFromUrl } from './imageUtils'
 import { last } from 'lodash'
 
+interface Conditional {
+  description?: string
+  action: string
+  expression: string
+}
+
 export interface ILocationDataResponse {
   [locationId: string]: AdminStructure
 }
 export interface IFacilitiesDataResponse {
   [facilityId: string]: Facility
 }
-
-export const SearchCriteria = {
-  TRACKING_ID: 'TRACKING_ID',
-  REGISTRATION_NUMBER: 'REGISTRATION_NUMBER',
-  NATIONAL_ID: 'NATIONAL_ID',
-  NAME: 'NAME',
-  PHONE_NUMBER: 'PHONE_NUMBER',
-  EMAIL: 'EMAIL'
-} as const
-
-type SearchCriteriaType = keyof typeof SearchCriteria
 
 export interface IOfficesDataResponse {
   [facilityId: string]: CRVSOffice
@@ -60,15 +49,6 @@ export type CertificateConfiguration = Partial<{
 
 export interface IContentResponse {
   languages: ILanguage[]
-}
-
-export interface LoadFormsResponse {
-  forms: {
-    version: string
-    birth: ISerializedForm
-    death: ISerializedForm
-    marriage: ISerializedForm
-  }
 }
 
 interface ICountryLogo {
@@ -100,11 +80,6 @@ interface ICertificateConfigData {
 export interface ICertificateData extends ICertificateConfigData {
   hash?: string
   svg: string
-}
-
-interface ICurrency {
-  isoCode: string
-  languagesAndCountry: string[]
 }
 
 export interface AdminStructureItem {
@@ -179,37 +154,9 @@ async function loadConfigAnonymousUser(): Promise<
   return await res.json()
 }
 
-async function loadForms(): Promise<LoadFormsResponse> {
-  const url = '/api/forms'
-
-  const res = await fetch(url, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    }
-  })
-  if (res.status === 422) {
-    const err = new Error((await res.json()).message, {
-      cause: 'VALIDATION_ERROR'
-    })
-    throw err
-  }
-
-  if (res && !res.ok) {
-    throw new Error(res.statusText)
-  }
-
-  const response = await res.json()
-
-  return {
-    forms: { ...response }
-  }
-}
-
-
 const countryconfigBase: string = '/api/countryconfig'
 
-export type LoadConditionalsResponse = Record<string, Conditional>
+type LoadConditionalsResponse = Record<string, Conditional>
 async function importConditionals(): Promise<LoadConditionalsResponse> {
   // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
   const { conditionals } = await import(
@@ -264,42 +211,6 @@ async function loadLocations(): Promise<ILocationDataResponse> {
   return {}
 }
 
-function generateLocationResource(fhirLocation: fhir.Location): ILocation {
-  return {
-    id: fhirLocation.id as string,
-    name: fhirLocation.name as string,
-    statisticalId:
-      fhirLocation.identifier
-        ?.find(
-          (id) => id.system === 'http://opencrvs.org/specs/id/statistical-code'
-        )
-        ?.value?.replace('ADMIN_STRUCTURE_', '') ?? '',
-    alias:
-      fhirLocation.alias && fhirLocation.alias[0] ? fhirLocation.alias[0] : '',
-    status: fhirLocation.status as string,
-    physicalType:
-      fhirLocation.physicalType &&
-      fhirLocation.physicalType.coding &&
-      fhirLocation.physicalType.coding[0].display
-        ? fhirLocation.physicalType.coding[0].display
-        : '',
-    jurisdictionType:
-      fhirLocation.identifier?.find(
-        (id) => id.system === 'http://opencrvs.org/specs/id/jurisdiction-type'
-      )?.value ?? '',
-    type:
-      fhirLocation.type &&
-      fhirLocation.type.coding &&
-      fhirLocation.type.coding[0].code
-        ? fhirLocation.type.coding[0].code
-        : '',
-    partOf:
-      fhirLocation.partOf && fhirLocation.partOf.reference
-        ? fhirLocation.partOf.reference
-        : ''
-  }
-}
-
 async function loadFacilities(): Promise<IFacilitiesDataResponse> {
   return {}
 }
@@ -309,7 +220,6 @@ export const referenceApi = {
   loadFacilities,
   loadContent,
   loadConfig,
-  loadForms,
   importConditionals,
   importHandlebarHelpers,
   loadConfigAnonymousUser

@@ -60,11 +60,8 @@ services:
       - NODE_ENV=development
       - EVENTS_URL=http://events:5555/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
-      - METRICS_URL=http://metrics:1050
       - AUTH_URL=http://auth:4040
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
-      - NOTIFICATION_URL=http://notification:2020/
-      - WEBHOOKS_URL=http://webhooks:2525/
       - CHECK_INVALID_TOKEN=true
       - DOCUMENTS_URL=http://documents:9050
   events:
@@ -82,38 +79,6 @@ services:
       - DOCUMENTS_URL=http://documents:9050
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
       - AUTH_URL=http://auth:4040
-  # User facing services
-  metrics:
-    image: ghcr.io/opencrvs/ocrvs-metrics:${VERSION}
-    #platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./packages/metrics/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - base
-    environment:
-      - INFLUX_HOST=influxdb
-      - INFLUX_PORT=8086
-      - INFLUX_DB=ocrvs
-      - COUNTRY_CONFIG_URL=http://countryconfig:3040/
-      - MONGO_URL=mongodb://mongo1/metrics
-      - DASHBOARD_MONGO_URL=mongodb://mongo1/performance
-      - USER_MANAGEMENT_URL=http://user-mgnt:3030
-      - DOCUMENTS_URL=http://documents:9050
-  # END User facing services
-  scheduler:
-    image: ghcr.io/opencrvs/ocrvs-scheduler:${VERSION}
-    #platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./packages/scheduler/Dockerfile
-    depends_on:
-      - base
-    environment:
-      - NODE_ENV=development
-      - METRICS_URL=http://metrics:1050
-      - OPENHIM_MONGO_URL=mongodb://mongo1/openhim-dev
   auth:
     image: ghcr.io/opencrvs/ocrvs-auth:${VERSION}
     #platform: linux/amd64
@@ -142,40 +107,9 @@ services:
     environment:
       - MONGO_URL=mongodb://mongo1/user-mgnt
       - HOST=0.0.0.0
-      - METRICS_URL=http://metrics:1050
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - DOCUMENTS_URL=http://documents:9050
       - EVENTS_URL=http://events:5555/
-  webhooks:
-    image: ghcr.io/opencrvs/ocrvs-webhooks:${VERSION}
-    #platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./packages/webhooks/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - base
-    environment:
-      - REDIS_HOST=redis
-      - MONGO_URL=mongodb://mongo1/webhooks
-      - AUTH_URL=http://auth:4040
-      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
-      - HOST=0.0.0.0
-      - CHECK_INVALID_TOKEN=true
-  notification:
-    image: ghcr.io/opencrvs/ocrvs-notification:${VERSION}
-    #platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./packages/notification/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - base
-    environment:
-      - COUNTRY=${COUNTRY:-bgd}
-      - HOST=0.0.0.0
-      - COUNTRY_CONFIG_URL=http://countryconfig:3040
-      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
   migration:
     image: ghcr.io/opencrvs/ocrvs-migration:${VERSION}
     #platform: linux/amd64
@@ -189,7 +123,6 @@ services:
       - USER_MGNT_MONGO_URL=mongodb://mongo1/user-mgnt
       - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - DASHBOARD_MONGO_URL=mongodb://mongo1/performance
-      - OPENHIM_MONGO_URL=mongodb://mongo1/openhim-dev
       - EVENTS_MONGO_URL=mongodb://mongo1/events
       - ES_HOST=elasticsearch:9200
       - INFLUX_HOST=influxdb

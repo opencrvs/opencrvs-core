@@ -12,11 +12,8 @@
 import { NotificationComponent } from '@client/components/Notification'
 import { Page } from '@client/components/Page'
 import { ProtectedPage } from '@client/components/ProtectedPage'
-import { ProtectedRoute } from '@client/components/ProtectedRoute'
 import ScrollToTop from '@client/components/ScrollToTop'
 import { SessionExpireConfirmation } from '@client/components/SessionExpireConfirmation'
-import * as routes from '@client/navigation/routes'
-import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { getTheme } from '@opencrvs/components'
 import * as React from 'react'
 import { Provider } from 'react-redux'
@@ -30,12 +27,8 @@ import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { StyledErrorBoundary } from './components/StyledErrorBoundary'
 import { I18nContainer } from './i18n/components/I18nContainer'
-import { useApolloClient } from './utils/apolloClient'
-import { ApolloProvider } from './utils/ApolloProvider'
-import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { AppStore } from './store'
 import { routesConfig as v2RoutesConfig } from './v2-events/routes/config'
-import { TRPCProvider } from './v2-events/trpc'
 import { ReloadModal } from './views/Modals/ReloadModal'
 
 // Injecting global styles for the body tag - used only once
@@ -91,48 +84,33 @@ export const routesConfig = [
       createRedirect('/registration-home/readyToIssue/*', '/'),
       createRedirect('/registration-home/print/*', '/'),
       createRedirect('/registration-home/readyForReview/*', '/'),
-      createRedirect('/events', '/events/create'),
-      {
-        path: routes.TEAM_SEARCH,
-        element: (
-          <TRPCProvider>
-            <ProtectedRoute scopes={['user.read']}>
-              <TeamSearch />
-            </ProtectedRoute>
-          </TRPCProvider>
-        )
-      }
+      createRedirect('/events', '/events/create')
     ]
   }
 ]
 
 interface IAppProps {
-  client?: ApolloClient<NormalizedCacheObject>
   store: AppStore
   router: ReturnType<typeof createBrowserRouter>
 }
 
-export function App({ client, store, router }: IAppProps) {
-  const { client: apolloClient } = useApolloClient(store)
-
+export function App({ store, router }: IAppProps) {
   return (
     <ErrorBoundary>
       <GlobalStyle />
-      <ApolloProvider client={client ?? apolloClient}>
-        <Provider store={store}>
-          <I18nContainer>
-            <ThemeProvider theme={getTheme()}>
-              <StyledErrorBoundary>
-                <RouterProvider
-                  router={router}
-                  // v7_startTransition used to be true for a moment, but it changed the routing and broke some farajaland e2e tests (and possibly changed actual functionality as well).
-                  future={{ v7_startTransition: false }}
-                />
-              </StyledErrorBoundary>
-            </ThemeProvider>
-          </I18nContainer>
-        </Provider>
-      </ApolloProvider>
+      <Provider store={store}>
+        <I18nContainer>
+          <ThemeProvider theme={getTheme()}>
+            <StyledErrorBoundary>
+              <RouterProvider
+                router={router}
+                // v7_startTransition used to be true for a moment, but it changed the routing and broke some farajaland e2e tests (and possibly changed actual functionality as well).
+                future={{ v7_startTransition: false }}
+              />
+            </StyledErrorBoundary>
+          </ThemeProvider>
+        </I18nContainer>
+      </Provider>
     </ErrorBoundary>
   )
 }
