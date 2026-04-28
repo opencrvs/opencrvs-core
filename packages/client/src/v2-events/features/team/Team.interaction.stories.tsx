@@ -241,7 +241,6 @@ export const Navigation: Story = {
     })
   }
 }
-
 export const SendUsernameReminder: Story = {
   parameters: {
     msw: {
@@ -262,7 +261,6 @@ export const SendUsernameReminder: Story = {
       await canvas.findByText('Felix Katongo', { selector: '#profile-link' })
       await canvas.findByText('Kennedy Mweene', { selector: '#profile-link' })
     })
-
     await step(
       "Open Kennedy's action menu and click Send username reminder",
       async () => {
@@ -290,6 +288,51 @@ export const SendUsernameReminder: Story = {
 
     await step('Verify success toast is shown', async () => {
       await canvas.findByText('Username reminder sent to Kennedy Mweene')
+    })
+  }
+}
+
+export const ResendInvite: Story = {
+  parameters: {
+    msw: {
+      handlers: {
+        user: [
+          tRPCMsw.user.search.query(() => [
+            felix,
+            { ...kennedy, status: 'pending' as const }
+          ]),
+          tRPCMsw.user.get.query((id) => (id === kennedy.id ? kennedy : felix)),
+          tRPCMsw.user.roles.list.query(() => mockRoles),
+          tRPCMsw.user.resendInvite.mutation(() => undefined)
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Wait for user list to load', async () => {
+      await canvas.findByText('Felix Katongo', { selector: '#profile-link' })
+      await canvas.findByText('Kennedy Mweene', { selector: '#profile-link' })
+    })
+
+    await step(
+      "Open Kennedy's action menu and click Resend invite",
+      async () => {
+        const trigger = findMenuTriggerForUser(canvasElement, 'Kennedy Mweene')
+        await userEvent.click(trigger)
+
+        const popoverId = trigger.getAttribute('popovertarget')
+        const popover = popoverId ? document.getElementById(popoverId) : null
+        if (!popover) {
+          throw new Error('Kennedy menu popover not found')
+        }
+        await userEvent.click(within(popover).getByText('Resend invite'))
+      }
+    )
+
+    await step('Verify success toast is shown', async () => {
+      await canvas.findByText('Invite sent')
     })
   }
 }
