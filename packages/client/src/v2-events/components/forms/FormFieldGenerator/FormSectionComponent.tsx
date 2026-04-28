@@ -243,12 +243,20 @@ export function FormSectionComponent({
       ...makeFormikFieldIdsOpenCRVSCompatible(fieldValues)
     }
 
-    // Hidden listener fields are explicitly cleared (null) so their stale values
+    // Hidden listener fields are cleared to undefined so their stale values
     // don't leak into other fields that read from them (e.g. via `value` refs).
     // We return early to skip applying the defaultValue, which would otherwise
     // pollute the form state for fields that aren't currently relevant.
+
+    // Must be undefined, never null:
+    // null has a specific semantic in the declaration payload — it signals an
+    // intentional field removal and is preserved by getCleanedDeclarationDiff
+    // (via omitHiddenPaginatedFields with retainNullValues=true). Sending null
+    // for fields that were never part of the current action (e.g. correction
+    // form fields appearing in a declare payload) corrupts the event state.
+    // undefined is omitted from JSON serialisation and is therefore safe.
     if (!isFieldVisible(listenerField, formContext, validatorContext)) {
-      set(fieldValues, formikCompatibleListenerFieldPath, null)
+      set(fieldValues, formikCompatibleListenerFieldPath, undefined)
       return
     }
 
