@@ -10,7 +10,6 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import {
@@ -18,14 +17,13 @@ import {
   FieldType,
   generateTranslationConfig
 } from '@opencrvs/commons/client'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { FormFieldGenerator, FormFieldGeneratorPropsWithoutRef } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'FormFieldGenerator/Helper Text',
   component: FormFieldGenerator,
-  args: { onChange: fn() },
   argTypes: {
     validatorContext: { control: false }
   },
@@ -138,7 +136,7 @@ const helperTextFields: FieldConfig[] = [
   }
 ]
 
-export const HelperTextShowcase: StoryObj<typeof FormFieldGenerator> = {
+export const HelperTextShowcase: StoryObj<FormFieldGeneratorPropsWithoutRef> = {
   parameters: {
     layout: 'centered'
   },
@@ -148,9 +146,6 @@ export const HelperTextShowcase: StoryObj<typeof FormFieldGenerator> = {
         {...args}
         fields={helperTextFields}
         id="storybook-helper-text-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   }

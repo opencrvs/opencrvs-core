@@ -21,11 +21,6 @@ import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
 import { stringify } from 'qs'
 
-export interface IDynamicValues {
-  /*  eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  [key: string]: any
-}
-
 export function formatUrl(url: string, props: { [key: string]: string }) {
   const formattedUrl = Object.keys(props).reduce(
     (str, key) => str.replace(`:${key}`, props[key]),

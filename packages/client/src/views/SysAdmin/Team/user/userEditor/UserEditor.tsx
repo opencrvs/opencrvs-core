@@ -23,14 +23,18 @@ import {
   deepDropNulls,
   defineConditional,
   EventConfig,
+  FieldConfig,
+  FieldValue,
+  FileFieldValue,
   FieldType,
   never,
   PageTypes,
   TokenUserType,
-  EventConfigToDeclarationFormType,
-  UserInput,
   hasScope,
-  EncodedScope
+  EncodedScope,
+  UUID,
+  CreateUserInput,
+  UpdateUserInput
 } from '@opencrvs/commons/client'
 import { AppBar, Frame, Spinner } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -39,7 +43,7 @@ import {
   ICON_ALIGNMENT,
   SuccessButton
 } from '@opencrvs/components/lib/buttons'
-import { BackArrowDeepBlue, Check, Cross } from '@opencrvs/components/lib/icons'
+import { Check, Cross } from '@opencrvs/components/lib/icons'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { TRPCClientError } from '@trpc/client'
@@ -53,8 +57,13 @@ import {
 import styled from 'styled-components'
 import { create } from 'zustand'
 import { useUsers } from '../../../../../v2-events/hooks/useUsers'
-import { emptyMessage } from '@client/v2-events/utils'
+import {
+  createTemporaryId,
+  emptyMessage,
+  isTemporaryId
+} from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 
 const Container = styled.div`
   display: flex;
@@ -74,9 +83,13 @@ const SpinnerWrapper = styled.div`
   padding: 20px;
 `
 
-function getUserEditConfig(selectedRole?: { scopes: EncodedScope[] }) {
+function getUserEditConfig(
+  selectedRole?: { scopes: EncodedScope[] },
+  additionalFields: FieldConfig[] = []
+): EventConfig {
   return {
     id: '__user__',
+    analytics: false,
     summary: {
       fields: []
     },
@@ -97,9 +110,6 @@ function getUserEditConfig(selectedRole?: { scopes: EncodedScope[] }) {
               id: 'primaryOfficeId',
               type: FieldType.LOCATION,
               required: true,
-              configuration: {
-                locationTypes: ['CRVS_OFFICE']
-              },
               label: messages.registrationOffice
             }
           ]
@@ -115,7 +125,7 @@ function getUserEditConfig(selectedRole?: { scopes: EncodedScope[] }) {
               type: FieldType.NAME,
               required: true,
               hideLabel: true,
-              label: emptyMessage
+              label: messages.fullName
             },
             {
               id: 'phoneNumber',
@@ -151,7 +161,8 @@ function getUserEditConfig(selectedRole?: { scopes: EncodedScope[] }) {
               type: FieldType.TEXT,
               required: false,
               label: messages.userDevice
-            }
+            },
+            ...additionalFields
           ]
         },
         {
@@ -181,12 +192,20 @@ function getUserEditConfig(selectedRole?: { scopes: EncodedScope[] }) {
       ]
     },
     actions: []
-  } as const satisfies EventConfig
+  }
 }
 
-type EventState = Partial<
-  EventConfigToDeclarationFormType<ReturnType<typeof getUserEditConfig>>
->
+type EventState = {
+  primaryOfficeId?: string
+  role?: string
+  name?: { firstname: string; surname: string; middlename: string }
+  phoneNumber?: string
+  email?: string
+  fullHonorificName?: string
+  device?: string
+  signature?: FileFieldValue
+  [key: string]: unknown
+}
 
 interface UserFormState {
   userForm?: EventState
@@ -196,7 +215,7 @@ interface UserFormState {
   clear: () => void
 }
 
-const useUserFormState = create<UserFormState>()((set, get) => ({
+export const useUserFormState = create<UserFormState>()((set, get) => ({
   getUserForm: (initialValues?: EventState) =>
     get().userForm || deepDropNulls(initialValues ?? {}),
   setUserForm: (data: EventState) => {
@@ -209,21 +228,25 @@ const useUserFormState = create<UserFormState>()((set, get) => ({
   clear: () => set(() => ({ userForm: undefined }))
 }))
 
-const NEW_USER = '__NEW__'
 export const CreateNewUser = () => {
-  const [{ officeId }] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.CREATE)
+  const [{ officeId, from }] = useTypedSearchParams(
+    ROUTES.V2.SETTINGS.USER.CREATE
+  )
   const navigate = useNavigate()
   const { clear, setUserForm } = useUserFormState()
   useEffect(() => {
     clear()
     setUserForm({ primaryOfficeId: officeId })
     navigate(
-      ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-        userId: NEW_USER,
-        pageId: 'user.details'
-      })
+      ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
+        {
+          userId: createTemporaryId(),
+          pageId: 'user.details'
+        },
+        { from }
+      )
     )
-  }, [clear, navigate, officeId, setUserForm])
+  }, [clear, navigate, officeId, setUserForm, from])
   return <div />
 }
 
@@ -231,24 +254,29 @@ const EditUserComponent = () => {
   const intl = useIntl()
   const navigate = useNavigate()
   const { pageId, userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.EDIT)
+  const [searchParams] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.EDIT)
   const { getUserForm, setUserForm } = useUserFormState()
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
   const formState = getUserForm()
   const selectedRole = roles.find((role) => role.id === formState['role'])
-  const isNewUser = userId === NEW_USER
+  const isNewUser = isTemporaryId(userId)
   useEffect(() => {
     if (!formState['primaryOfficeId'] && pageId !== 'user.office') {
       navigate(
-        ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-          pageId: 'user.office',
-          userId: userId
-        })
+        ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
+          {
+            pageId: 'user.office',
+            userId: userId
+          },
+          searchParams
+        )
       )
     }
-  }, [formState, navigate, userId, pageId])
+  }, [formState, navigate, userId, pageId, searchParams])
 
-  const eventConfig = getUserEditConfig(selectedRole)
+  const additionalFields = window.config.ADDITIONAL_USER_FIELDS ?? []
+  const eventConfig = getUserEditConfig(selectedRole, additionalFields)
   const formConfig = eventConfig.declaration
 
   const handleClose = () => {
@@ -260,7 +288,17 @@ const EditUserComponent = () => {
           : routes.TEAM_USER_LIST
       )
     } else {
-      navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }))
+      setUserForm({})
+      if (searchParams.from === 'user.list') {
+        navigate({
+          pathname: routes.TEAM_USER_LIST,
+          search: serializeSearchParams({
+            locationId: formState['primaryOfficeId']
+          })
+        })
+      } else {
+        navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }))
+      }
     }
   }
 
@@ -278,7 +316,7 @@ const EditUserComponent = () => {
         showReviewButton={false}
         actionType={ActionType.DECLARE}
         eventConfig={eventConfig}
-        form={formState}
+        formData={formState as Record<string, FieldValue>}
         formPages={formConfig.pages}
         pageId={pageId || eventConfig.declaration.pages[0].id}
         setFormData={(data) => {
@@ -287,17 +325,23 @@ const EditUserComponent = () => {
         validatorContext={{}}
         onPageChange={(nextPageId: string) =>
           navigate(
-            ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-              pageId: nextPageId,
-              userId: userId
-            })
+            ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
+              {
+                pageId: nextPageId,
+                userId: userId
+              },
+              searchParams
+            )
           )
         }
         onSubmit={() => {
           navigate(
-            ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
-              userId: userId
-            })
+            ROUTES.V2.SETTINGS.USER.REVIEW.buildPath(
+              {
+                userId: userId
+              },
+              searchParams
+            )
           )
         }}
       />
@@ -312,7 +356,9 @@ const ReviewUserComponent = () => {
   const navigate = useNavigate()
   const { getUserForm, setUserForm, clear } = useUserFormState()
   const { userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.REVIEW)
-  const isNewUser = userId === NEW_USER
+
+  const [searchParams] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.REVIEW)
+  const isNewUser = isTemporaryId(userId)
   const { getUser, createUser, updateUser } = useUsers()
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
@@ -333,6 +379,7 @@ const ReviewUserComponent = () => {
   }
 
   const existingUserQuery = getUser.useQuery(userId, { enabled: !isNewUser })
+  const additionalFields = window.config.ADDITIONAL_USER_FIELDS ?? []
 
   useEffect(() => {
     if (isNewUser || !existingUserQuery.data) return
@@ -354,15 +401,18 @@ const ReviewUserComponent = () => {
       signature: user.signature
         ? { path: user.signature, originalFilename: '', type: '' }
         : undefined,
-      device: user.device
+      device: user.device,
+      // Additional field values are spread at the top level because FormFieldGenerator
+      // looks up values by field ID as a flat key (e.g. formState['user.staffId']).
+      // The nesting into data: {} only happens when building the UserInput payload.
+      ...(user.data ?? {})
     })
   }, [isNewUser, existingUserQuery.data, setUserForm, getUserForm])
 
   const formState = getUserForm()
-
   const createUserMutation = createUser()
   const updateUserMutation = updateUser()
-  const eventConfig = getUserEditConfig(selectedRole)
+  const eventConfig = getUserEditConfig(selectedRole, additionalFields)
   const formConfig = eventConfig.declaration
 
   const handleMutationError = (error: unknown) => {
@@ -389,7 +439,17 @@ const ReviewUserComponent = () => {
           : routes.TEAM_USER_LIST
       )
     } else {
-      navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }))
+      setUserForm({})
+      if (searchParams.from === 'user.list') {
+        navigate({
+          pathname: routes.TEAM_USER_LIST,
+          search: serializeSearchParams({
+            locationId: formState['primaryOfficeId']
+          })
+        })
+      } else {
+        navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }))
+      }
     }
   }
 
@@ -469,17 +529,20 @@ const ReviewUserComponent = () => {
         </Toast>
       )}
       <ReviewComponent.Body
-        form={formState}
+        form={formState as Record<string, FieldValue>}
         formConfig={formConfig}
         reviewFields={[]}
         title={intl.formatMessage(messages.userFormReviewTitle)}
         validatorContext={{}}
         onEdit={(values) =>
           navigate(
-            ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-              userId: userId,
-              pageId: values.pageId
-            })
+            ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
+              {
+                userId: userId,
+                pageId: values.pageId
+              },
+              searchParams
+            )
           )
         }
       >
@@ -491,12 +554,17 @@ const ReviewUserComponent = () => {
             fullWidth
             onClick={() => {
               resetErrors()
-              const payload: UserInput = {
-                ...formState,
+              const data: Record<string, FieldValue> = Object.fromEntries(
+                additionalFields.map((f) => [
+                  f.id,
+                  formState[f.id] as FieldValue
+                ])
+              )
+              const payload: CreateUserInput = {
                 mobile: formState.phoneNumber,
                 email: formState.email!,
                 role: formState.role!,
-                primaryOfficeId: formState.primaryOfficeId!,
+                primaryOfficeId: formState.primaryOfficeId as UUID,
                 signature: formState.signature,
                 name: [
                   {
@@ -504,7 +572,8 @@ const ReviewUserComponent = () => {
                     given: [formState!.name!.firstname],
                     family: formState!.name!.surname
                   }
-                ]
+                ],
+                data
               }
               createUserMutation.mutate(payload, {
                 onSuccess: () => {
@@ -524,12 +593,18 @@ const ReviewUserComponent = () => {
             id="submit-edit-user-form"
             onClick={() => {
               resetErrors()
-              const payload: UserInput = {
-                ...formState,
+              const data: Record<string, FieldValue> = Object.fromEntries(
+                additionalFields.map((f) => [
+                  f.id,
+                  formState[f.id] as FieldValue
+                ])
+              )
+              const payload: UpdateUserInput = {
+                id: userId,
                 mobile: formState.phoneNumber,
                 email: formState.email!,
                 role: formState.role!,
-                primaryOfficeId: formState.primaryOfficeId!,
+                primaryOfficeId: formState.primaryOfficeId as UUID,
                 signature: formState.signature,
                 name: [
                   {
@@ -537,22 +612,20 @@ const ReviewUserComponent = () => {
                     given: [formState!.name!.firstname],
                     family: formState!.name!.surname
                   }
-                ]
+                ],
+                data
               }
-              updateUserMutation.mutate(
-                { ...payload, id: userId },
-                {
-                  onSuccess: (data) => {
-                    clear()
-                    navigate(
-                      ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
-                        userId: data.id
-                      })
-                    )
-                  },
-                  onError: handleMutationError
-                }
-              )
+              updateUserMutation.mutate(payload, {
+                onSuccess: (data) => {
+                  clear()
+                  navigate(
+                    ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
+                      userId: data.id
+                    })
+                  )
+                },
+                onError: handleMutationError
+              })
             }}
             icon={() => <Check />}
             align={ICON_ALIGNMENT.LEFT}
@@ -611,23 +684,6 @@ function FormHeader({
   onClose?: () => void
   actionComponent?: React.ReactNode
 }) {
-  const BackButtonContainer = styled.div`
-    margin-right: 16px;
-    cursor: pointer;
-  `
-
-  const getHeaderLeft = () => {
-    return (
-      <BackButtonContainer
-        id="action_page_back_button"
-        onClick={onClose}
-        key="action_page_back_button"
-      >
-        <CircleButton>{<BackArrowDeepBlue />}</CircleButton>
-      </BackButtonContainer>
-    )
-  }
-
   const getHeaderRight = () => {
     return (
       <CircleButton
@@ -648,8 +704,6 @@ function FormHeader({
         mobileTitle={label}
         desktopRight={getHeaderRight()}
         mobileRight={getHeaderRight()}
-        mobileLeft={getHeaderLeft()}
-        desktopLeft={getHeaderLeft()}
       />
     </>
   )

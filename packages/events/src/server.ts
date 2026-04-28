@@ -15,8 +15,10 @@ import { createHTTPHandler } from '@trpc/server/adapters/standalone'
 import '@opencrvs/commons/monitoring'
 import { logger } from '@opencrvs/commons'
 import { appRouter } from './router/router'
-import { createContext } from './context'
+import { createContext, createServiceContext } from './context'
 import { handleHealthCheckResponse } from './service/health'
+import { internalRouter } from './router/internalRouter'
+import { initialisationRouter } from './router/initialisation'
 
 function stringifyRequest(req: IncomingMessage) {
   const url = new URL(req.url || '', `http://${req.headers.host}`)
@@ -39,11 +41,46 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
   createContext
 }
 
-function isTrpcRequest(req: IncomingMessage): boolean {
+// NOTE: This will not work without both trailing and leading slashes.
+const INTERNAL_TRPC_ROUTER_PREFIX = '/internal/'
+const INITIALISATION_TRPC_ROUTER_PREFIX = '/initialisation/'
+
+const internalTrpcConfig: Parameters<typeof createHTTPHandler>[0] = {
+  router: internalRouter,
+  basePath: INTERNAL_TRPC_ROUTER_PREFIX,
+  middleware: (req, _, next) => {
+    logger.info(`Internal request: ${stringifyRequest(req)}`)
+    return next()
+  },
+  onError: ({ error, req }) => {
+    logger.warn(
+      `Error for internal request: ${stringifyRequest(req)}. Error: '${error.message}'`
+    )
+  },
+  createContext: createServiceContext
+}
+
+const initialisationTrpcConfig: Parameters<typeof createHTTPHandler>[0] = {
+  router: initialisationRouter,
+  basePath: INITIALISATION_TRPC_ROUTER_PREFIX,
+  middleware: (req, _, next) => {
+    logger.info(`Initialisation request: ${stringifyRequest(req)}`)
+    return next()
+  },
+  onError: ({ error, req }) => {
+    logger.warn(
+      `Error for initialisation request: ${stringifyRequest(req)}. Error: '${error.message}'`
+    )
+  },
+  createContext: createServiceContext
+}
+
+function isAppTrpcRequest(req: IncomingMessage): boolean {
   if (!req.url) {
     throw new Error('No URL provided')
   }
   const url = new URL(req.url, `http://${req.headers.host}`)
+
   const pathName = url.pathname.replace(/^\//, '')
   const trpcProcedurePaths = Object.keys(appRouter._def.procedures)
 
@@ -54,9 +91,29 @@ function isTrpcRequest(req: IncomingMessage): boolean {
   )
 }
 
+function isInternalTrpcRequest(req: IncomingMessage): boolean {
+  if (!req.url) {
+    throw new Error('No URL provided')
+  }
+  const url = new URL(req.url, `http://${req.headers.host}`)
+
+  return url.pathname.startsWith(INTERNAL_TRPC_ROUTER_PREFIX)
+}
+
+function isInitialisationTrpcRequest(req: IncomingMessage): boolean {
+  if (!req.url) {
+    throw new Error('No URL provided')
+  }
+  const url = new URL(req.url, `http://${req.headers.host}`)
+
+  return url.pathname.startsWith(INITIALISATION_TRPC_ROUTER_PREFIX)
+}
+
 export function server() {
   const restServer = createOpenApiHttpHandler(trpcConfig)
   const trpcServer = createHTTPHandler(trpcConfig)
+  const internalTrpcServer = createHTTPHandler(internalTrpcConfig)
+  const initialisationTrpcServer = createHTTPHandler(initialisationTrpcConfig)
 
   return createServer((req, res) => {
     if (!req.url) {
@@ -87,8 +144,12 @@ export function server() {
       return
     }
 
-    // If it's a tRPC request, handle it with the tRPC server
-    if (isTrpcRequest(req)) {
+    // If it's a tRPC request, handle it with the tRPC server. Discriminate between routes.
+    if (isInternalTrpcRequest(req)) {
+      internalTrpcServer(req, res)
+    } else if (isInitialisationTrpcRequest(req)) {
+      initialisationTrpcServer(req, res)
+    } else if (isAppTrpcRequest(req)) {
       trpcServer(req, res)
     } else {
       // If it's a REST request, handle it with the REST server

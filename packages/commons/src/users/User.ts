@@ -13,7 +13,7 @@ import { DocumentPath } from '../documents'
 import * as z from 'zod/v4'
 import { UUID } from '../uuid'
 import { TokenUserType } from '../authentication'
-import { FileFieldValue } from '../events'
+import { FieldValue, FileFieldValue } from '../events'
 
 export const REINDEX_USER_ID = '__ANONYMOUS_REINDEX_USER__'
 
@@ -23,18 +23,22 @@ export type IUserName = {
   given: string[]
 }
 
+// * @deprecated - This is from 1.9, will be removed in v2.1.
+export const FamilyName = z.array(
+  z.object({
+    use: z.string(),
+    given: z.array(z.string()),
+    family: z.string()
+  })
+)
+export type FamilyName = z.infer<typeof FamilyName>
+
 export const User = z.object({
-  id: z.string(),
-  name: z.array(
-    z.object({
-      use: z.string(),
-      given: z.array(z.string()),
-      family: z.string()
-    })
-  ),
+  id: UUID,
+  name: FamilyName,
   role: z.string(),
   avatar: DocumentPath.optional(),
-  signature: DocumentPath.optional().describe(
+  signature: DocumentPath.nullish().describe(
     'Storage key for the user signature. e.g. signature.png'
   ),
   primaryOfficeId: UUID,
@@ -44,41 +48,72 @@ export const User = z.object({
   type: TokenUserType.extract(['user']),
   mobile: z.string().optional(),
   email: z.string().optional(),
-  status: z.enum(['active', 'deactivated', 'pending'])
+  status: z.enum(['active', 'deactivated', 'pending']),
+  data: z.record(z.string(), FieldValue).optional()
 })
+
 export type User = z.infer<typeof User>
 
-export const UserInput = z.object({
-  name: z.array(
-    z.object({
-      use: z.string(),
-      given: z.array(z.string()),
-      family: z.string()
-    })
-  ),
-  // @TODO: Separate from "create user from client"
-  username: z.string().optional(),
-  email: z.string(),
-  mobile: z.string().optional(),
-  fullHonorificName: z.string().optional(),
-  emailForNotification: z.string().optional(),
-  // @TODO: Separate from "create user from client"
-  password: z.string().optional(),
-  role: z.string(),
-  primaryOfficeId: z.string(),
-  device: z.string().optional(),
-  status: z.enum(['active', 'pending']).optional(),
-  signature: FileFieldValue.optional()
+export const CreateUserInput = User.pick({
+  name: true,
+  role: true,
+  primaryOfficeId: true,
+  mobile: true,
+  email: true,
+  fullHonorificName: true,
+  device: true,
+  data: true
 })
+  .extend({
+    username: z.undefined().optional(),
+    signature: FileFieldValue.optional()
+  })
+  .describe('User input for creating a new user through client API.')
 
-export type UserInput = z.infer<typeof UserInput>
+export type CreateUserInput = z.infer<typeof CreateUserInput>
+
+export const UpdateUserInput = User.pick({
+  name: true,
+  role: true,
+  primaryOfficeId: true,
+  mobile: true,
+  email: true,
+  fullHonorificName: true,
+  device: true,
+  signature: true,
+  status: true,
+  data: true
+})
+  .partial()
+  .extend({
+    signature: FileFieldValue.optional(),
+    id: UUID,
+    status: z.enum(['active', 'deactivated']).optional() // can't set 'pending' via update
+  })
+export type UpdateUserInput = z.infer<typeof UpdateUserInput>
+
+export const CreateUserInputInternal = User.pick({
+  name: true,
+  role: true,
+  primaryOfficeId: true,
+  mobile: true,
+  email: true
+})
+  .extend({
+    username: z.string(),
+    status: z.enum(['active']).optional(),
+    password: z.string().optional()
+  })
+  .describe('User input for seeding initial users through internal API.')
+
+export type CreateUserInputInternal = z.infer<typeof CreateUserInputInternal>
 
 export const System = z.object({
   id: z.string(),
   name: z.string(),
   type: TokenUserType.extract(['system']),
-  primaryOfficeId: z.undefined().optional(),
-  administrativeAreaId: z.undefined().optional(),
+  primaryOfficeId: UUID.optional(),
+  administrativeAreaId: UUID.optional(),
   signature: z.undefined().optional(),
   avatar: z.undefined().optional(),
   fullHonorificName: z.string().optional(),

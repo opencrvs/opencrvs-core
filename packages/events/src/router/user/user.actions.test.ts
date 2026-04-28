@@ -10,7 +10,6 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { http, HttpResponse } from 'msw'
 import {
   generateUuid,
   TestUserRole,
@@ -23,7 +22,6 @@ import {
   createTestClient,
   setupTestCase
 } from '@events/tests/utils'
-import { mswServer } from '../../tests/msw'
 
 test('Throws error if user does not have required scope', async () => {
   const { user } = await setupTestCase()
@@ -144,28 +142,11 @@ test('Finds user in nested location using administrative area id with my jurisdi
     }
   ])
 
-  const userToSearch = seed.user({
+  const userToSearch = await seed.user({
     name: [{ family: 'Smith', given: ['John'], use: 'en' }],
     primaryOfficeId: grandchildLocationId,
     role: TestUserRole.enum.FIELD_AGENT
   })
-
-  mswServer.use(
-    http.post(`http://localhost:3030/getUser`, async ({ request }) => {
-      const body = (await request.clone().json()) as { userId: string }
-      const userId = body.userId
-
-      if (userId === userToSearch.id) {
-        return HttpResponse.json(userToSearch)
-      }
-
-      if (userId === userOnParentLocation.id) {
-        return HttpResponse.json(userOnParentLocation)
-      }
-
-      throw new Error('should not happen')
-    })
-  )
 
   await expect(
     parentLocationClient.user.actions({
@@ -199,7 +180,7 @@ test('Find user with appropriate scopes', async () => {
     }
   ])
 
-  const userInTheSameOffice = seed.user({
+  const userInTheSameOffice = await seed.user({
     name: [{ family: 'Jones', given: ['James'], use: 'en' }],
     primaryOfficeId: userToSearchLocationId,
     role: TestUserRole.enum.FIELD_AGENT
@@ -209,7 +190,7 @@ test('Find user with appropriate scopes', async () => {
     encodeScope({ type: 'user.read', options: { accessLevel: 'location' } })
   ])
 
-  const userToSearch = seed.user({
+  const userToSearch = await seed.user({
     name: [{ family: 'Smith', given: ['John'], use: 'en' }],
     primaryOfficeId: userToSearchLocationId,
     role: TestUserRole.enum.FIELD_AGENT
@@ -219,27 +200,6 @@ test('Find user with appropriate scopes', async () => {
     encodeScope({ type: 'user.read' }),
     encodeScope({ type: 'user.read-only-my-audit' })
   ])
-
-  mswServer.use(
-    http.post(`http://localhost:3030/getUser`, async ({ request }) => {
-      const body = (await request.clone().json()) as { userId: string }
-      const userId = body.userId
-
-      if (userId === userToSearch.id) {
-        return HttpResponse.json(userToSearch)
-      }
-
-      if (userId === userInTheSameOffice.id) {
-        return HttpResponse.json(userInTheSameOffice)
-      }
-
-      if (userId === userOnParentLocation.id) {
-        return HttpResponse.json(userOnParentLocation)
-      }
-
-      throw new Error('should not happen')
-    })
-  )
 
   await expect(
     clientWithJurisdictionScope.user.actions({

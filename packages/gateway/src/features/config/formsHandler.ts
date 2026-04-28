@@ -17,7 +17,7 @@ export async function formsHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const token = request.headers.authorization
+  const token = request.headers.authorization as string
   const url = new URL('forms', COUNTRY_CONFIG_URL).toString()
   const response = await fetch(url, {
     headers: {

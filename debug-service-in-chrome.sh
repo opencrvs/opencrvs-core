@@ -13,10 +13,7 @@ SERVICES=(
   "auth:4040"
   "events:5555"
   "gateway:7070"
-  "metrics:1050"
-  "notification:2020"
   "user-mgnt:3030"
-  "webhooks:2525"
   "countryconfig:3040",
   "document:9050"
 )

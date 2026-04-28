@@ -96,6 +96,27 @@ export const AttachmentInput = zfd.formData({
   path: zfd.text(z.string().min(1).optional())
 })
 
+export async function uploadBase64File(
+  base64data: string,
+  token: string
+): Promise<string> {
+  const res = await fetch(new URL('/upload', env.DOCUMENTS_URL).toString(), {
+    method: 'POST',
+    headers: {
+      Authorization: token,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ fileData: base64data })
+  })
+  if (!res.ok) {
+    throw new Error(
+      `Base64 File upload failed: ${res.status} ${res.statusText}`
+    )
+  }
+  const result = (await res.json()) as { refUrl: string }
+  return result.refUrl
+}
+
 export async function uploadFile(
   input: z.infer<typeof AttachmentInput>,
   token: string

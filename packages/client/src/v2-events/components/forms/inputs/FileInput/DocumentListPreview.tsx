@@ -20,7 +20,6 @@ import {
   FileFieldValueWithOption,
   SelectOption
 } from '@opencrvs/commons/client'
-import { IAttachmentValue } from '@client/forms'
 
 const Wrapper = styled.div`
   max-width: 100%;
@@ -56,13 +55,19 @@ const Label = styled.div`
     flex-shrink: 0;
   }
 `
+interface AttachmentValue {
+  name?: string
+  type: string
+  data: string
+  uri?: string
+}
 
 interface Props {
   id?: string
   documents?: FileFieldValueWithOption[] | null
   processingDocuments?: Array<{ label: string }>
   label?: string
-  onSelect: (document: FileFieldValueWithOption | IAttachmentValue) => void
+  onSelect: (document: FileFieldValueWithOption | AttachmentValue) => void
   dropdownOptions?: SelectOption[]
   onDelete?: (path: DocumentPath) => void
   inReviewSection?: boolean

@@ -28,7 +28,4 @@ export const DASHBOARD = '/performance/dashboard/:id'
 
 export const TEAM_USER_LIST = '/team/users'
 
-export const USER_PROFILE = '/userProfile/:userId'
-
-export const VIEW_VERIFY_CERTIFICATE = '/verify-certificate/:declarationId'
 export const ORGANISATIONS_INDEX = '/organisation/:locationId?'

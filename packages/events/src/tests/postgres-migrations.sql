@@ -4,7 +4,7 @@
 
 
 -- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
--- Dumped by pg_dump version 17.6 (Debian 17.6-2.pgdg13+1)
+-- Dumped by pg_dump version 17.6 (Debian 17.6-1.pgdg13+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -378,6 +378,30 @@ CREATE TABLE app.system_clients (
 ALTER TABLE app.system_clients OWNER TO events_migrator;
 
 --
+-- Name: system_initialisation; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.system_initialisation (
+    id integer DEFAULT 1 NOT NULL,
+    hash text,
+    salt text,
+    completed_at timestamp with time zone,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT completion_tokens_consistent CHECK ((((completed_at IS NULL) AND (hash IS NOT NULL) AND (salt IS NOT NULL)) OR ((completed_at IS NOT NULL) AND (hash IS NULL) AND (salt IS NULL)))),
+    CONSTRAINT system_initialisation_id_check CHECK ((id = 1))
+);
+
+
+ALTER TABLE app.system_initialisation OWNER TO events_migrator;
+
+--
+-- Name: TABLE system_initialisation; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON TABLE app.system_initialisation IS 'Single-row table tracking application initialisation state. Populated once during initial migration, and never modified except to mark initialisation as completed.';
+
+
+--
 -- Name: user_credentials; Type: TABLE; Schema: app; Owner: events_migrator
 --
 
@@ -414,6 +438,8 @@ CREATE TABLE app.users (
     office_id uuid NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    data jsonb DEFAULT '{}'::jsonb NOT NULL,
+    device text,
     CONSTRAINT email_or_mobile_not_null CHECK (((email IS NOT NULL) OR (mobile IS NOT NULL)))
 );
 
@@ -571,6 +597,14 @@ ALTER TABLE ONLY app.system_clients
 
 
 --
+-- Name: system_initialisation system_initialisation_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.system_initialisation
+    ADD CONSTRAINT system_initialisation_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: user_credentials user_credentials_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
@@ -657,7 +691,28 @@ CREATE INDEX idx_audit_log_operation ON app.audit_log USING btree (operation);
 -- Name: idx_audit_log_transaction_id; Type: INDEX; Schema: app; Owner: events_migrator
 --
 
-CREATE UNIQUE INDEX idx_audit_log_transaction_id ON app.audit_log USING btree (transaction_id);
+CREATE INDEX idx_audit_log_transaction_id ON app.audit_log USING btree (transaction_id);
+
+
+--
+-- Name: idx_drafts_event_id; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_drafts_event_id ON app.event_action_drafts USING btree (event_id);
+
+
+--
+-- Name: idx_event_actions_event_id; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_event_actions_event_id ON app.event_actions USING btree (event_id);
+
+
+--
+-- Name: idx_event_actions_original_action_id; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_event_actions_original_action_id ON app.event_actions USING btree (original_action_id);
 
 
 --
@@ -822,6 +877,13 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.locations TO events_app;
 --
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.system_clients TO events_app;
+
+
+--
+-- Name: TABLE system_initialisation; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.system_initialisation TO events_app;
 
 
 --

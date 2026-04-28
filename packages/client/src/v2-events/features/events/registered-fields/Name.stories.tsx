@@ -12,18 +12,45 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import styled from 'styled-components'
-import { FieldType, NameField, NameFieldValue } from '@opencrvs/commons/client'
+import { FieldType, NameField } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { FormFieldGeneratorProps } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
+import { FormFieldGeneratorPropsWithoutRef } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
 import { ValueOutput } from '../components/Output'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
-const meta: Meta<FormFieldGeneratorProps> = {
+const nameField = {
+  id: 'storybook.name',
+  type: FieldType.NAME,
+  label: {
+    id: 'storybook.name.label',
+    defaultMessage: 'Name',
+    description: 'The title for the name input'
+  },
+  configuration: {
+    name: {
+      firstname: { required: true },
+      surname: { required: true }
+    }
+  }
+} satisfies NameField
+
+const StyledFormFieldGenerator = styled(FormFieldGenerator)`
+  width: 400px;
+`
+
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/Name',
   component: FormFieldGenerator,
+  parameters: {
+    layout: 'centered'
+  },
   argTypes: {
     validatorContext: { control: false }
+  },
+  args: {
+    id: 'name-form',
+    fields: [nameField]
   },
   decorators: [
     (Story, context) => (
@@ -37,91 +64,58 @@ const meta: Meta<FormFieldGeneratorProps> = {
 
 export default meta
 
-const StyledFormFieldGenerator = styled(FormFieldGenerator)`
-  width: 400px;
-`
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
 
-export const FirstNameLastNameRequired: StoryObj<typeof FormFieldGenerator> = {
-  name: 'First Name and Last name required',
-  parameters: {
-    layout: 'centered'
-  },
-  render: (args) => {
-    return (
-      <StyledFormFieldGenerator
-        {...args}
-        fields={[
-          {
-            id: 'storybook.name',
-            type: FieldType.NAME,
-            label: {
-              id: 'storybook.name.label',
-              defaultMessage: 'Name',
-              description: 'The title for the name input'
-            }
-          }
-        ]}
-        id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
-      />
-    )
+export const Basic: Story = {
+  name: 'First Name and Last name required, no Middle name'
+}
+
+export const WithRequiredErrorsShown: Story = {
+  name: 'Required errors visible',
+  args: {
+    formTouched: {
+      'storybook.name': {
+        firstname: true,
+        surname: true
+      }
+    }
   }
 }
 
-export const FirstNameLastNameRequiredMiddleNameOptional: StoryObj<
-  typeof FormFieldGenerator
-> = {
-  name: 'First Name and Last name required',
-  parameters: {
-    layout: 'centered'
-  },
-  render: function Component(args) {
-    return (
-      <StyledFormFieldGenerator
-        {...args}
-        fields={[
-          {
-            id: 'storybook.name',
-            type: FieldType.NAME,
-            label: {
-              id: 'storybook.name.label',
-              defaultMessage: 'Name',
-              description: 'The title for the name input'
-            },
-            configuration: {
-              name: {
-                firstname: { required: true },
-                middlename: { required: false },
-                surname: { required: true }
-              }
-            }
+export const OptionalMiddleName: Story = {
+  name: 'First Name and Last name required with optional Middle name',
+  args: {
+    fields: [
+      {
+        ...nameField,
+        configuration: {
+          ...nameField.configuration,
+          name: {
+            ...nameField.configuration.name,
+            middlename: { required: false }
           }
-        ]}
-      />
-    )
+        }
+      }
+    ]
   }
 }
 
-export const NameWithAllOptions: StoryObj<typeof FormFieldGenerator> = {
+export const WithAllOptions: Story = {
   name: 'With custom label and field ordering',
-  parameters: {
-    layout: 'centered'
+  args: {
+    formValues: {
+      'storybook.name': {
+        firstname: '',
+        surname: ''
+      }
+    }
   },
   render: function Component(args) {
-    const [formState, setFormState] = React.useState<
-      NameFieldValue | undefined
-    >(undefined)
+    const [form, setForm] = React.useState(args.formValues)
+    const [touched, setTouched] = React.useState(args.formTouched)
 
     const field: NameField = {
-      id: 'storybook.name',
-      type: FieldType.NAME,
-      label: {
-        id: 'storybook.name.label',
-        defaultMessage: 'Name',
-        description: 'The title for the name input'
-      },
+      ...nameField,
       configuration: {
         order: ['surname', 'firstname', 'middlename'],
         name: {
@@ -156,19 +150,18 @@ export const NameWithAllOptions: StoryObj<typeof FormFieldGenerator> = {
     return (
       <div>
         <strong>{'Current Value:'}</strong>
-        <ValueOutput config={field} value={formState} />
+        <ValueOutput config={field} value={form?.['storybook.name']} />
         <br />
         <br />
         <strong>{'Form:'}</strong>
 
         <StyledFormFieldGenerator
           {...args}
-          fields={[field]}
-          id="storybook.name"
-          onChange={(data) => {
-            setFormState(data['storybook.name'] as NameFieldValue)
-            args.onChange(data)
-          }}
+          formTouched={touched}
+          formValues={form}
+          id="name-form"
+          onFormChange={setForm}
+          onTouchedChange={setTouched}
         />
       </div>
     )

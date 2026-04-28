@@ -49,8 +49,11 @@ import {
   isDataFieldType,
   EventConfig,
   isAgeFieldType,
+  isFieldGroupFieldType,
+  FieldType,
   FieldUpdateValue,
   isCustomFieldType,
+  isAutocompleteFieldType,
   isImageViewFieldType,
   isHeadingFieldType,
   isUserRoleFieldType
@@ -76,6 +79,7 @@ import {
   getRegisteredFieldByFieldConfig,
   VerificationStatus,
   AgeField,
+  Autocomplete,
   ImageView,
   UserRole
 } from '@client/v2-events/features/events/registered-fields'
@@ -114,6 +118,26 @@ export function ValueOutput({
   eventConfig?: EventConfig
 }) {
   const field = { config, value }
+  if (isFieldGroupFieldType(field)) {
+    if (!field.value) {
+      return null
+    }
+    return (
+      <>
+        {field.config.fields.map((subfield, idx, subfields) => (
+          <React.Fragment key={subfield.id}>
+            <ValueOutput
+              config={subfield}
+              eventConfig={eventConfig}
+              searchMode={searchMode}
+              value={field.value?.[subfield.id]}
+            />
+            {idx < subfields.length - 1 ? <br /> : undefined}
+          </React.Fragment>
+        ))}
+      </>
+    )
+  }
 
   if (
     isEmailFieldType(field) ||
@@ -163,6 +187,10 @@ export function ValueOutput({
 
   if (isNumberWithUnitFieldType(field)) {
     return <NumberWithUnit.Output {...field} />
+  }
+
+  if (isAutocompleteFieldType(field)) {
+    return <Autocomplete.Output {...field} />
   }
 
   if (isSignatureFieldType(field)) {
@@ -297,6 +325,9 @@ function findPreviousValueWithSameLabel(
 }
 
 export function isEmptyValue(field: FieldConfig, value: unknown) {
+  if (field.type === FieldType.FIELD_GROUP) {
+    return value === undefined
+  }
   const module = getRegisteredFieldByFieldConfig(field)
   if (
     module &&
@@ -311,9 +342,9 @@ export function isEmptyValue(field: FieldConfig, value: unknown) {
 export function Output({
   field,
   value,
-  previousValue,
   showPreviouslyMissingValuesAsChanged = false,
   previousForm,
+  previousValue,
   formConfig,
   eventConfig,
   displayEmptyAsDash = false

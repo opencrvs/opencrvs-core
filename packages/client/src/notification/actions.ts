@@ -8,7 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
+
+export enum AUDIT_ACTION {
+  DEACTIVATE = 'DEACTIVATE',
+  REACTIVATE = 'REACTIVATE'
+}
 
 export const SHOW_USER_RECONNECTED_TOAST = 'SHOW_ONLINE_USER_SUCCESS_TOAST'
 export const HIDE_USER_RECONNECTED_TOAST = 'HIDE_ONLINE_USER_SUCCESS_TOAST'

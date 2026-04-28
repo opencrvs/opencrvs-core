@@ -12,7 +12,6 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { connect } from 'react-redux'
 import { IStoreState } from '@opencrvs/client/src/store'
-import { setInitialDeclarations } from '@client/declarations'
 import {
   getOfflineData,
   getOfflineDataLoaded,
@@ -58,7 +57,6 @@ interface IStateToProps {
 
 type IFullProps = IPageProps & IDispatchProps & IStateToProps
 interface IDispatchProps {
-  setInitialDeclarations: () => void
   checkAuth: typeof checkAuth
   showConfigurationErrorNotification: () => void
   hideConfigurationErrorNotification: () => void
@@ -129,7 +127,6 @@ const mapStateToProps = (store: IStoreState) => {
 }
 
 const mapDispatchToProps = {
-  setInitialDeclarations,
   checkAuth,
   showConfigurationErrorNotification,
   hideConfigurationErrorNotification,

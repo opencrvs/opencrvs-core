@@ -23,7 +23,7 @@ import {
   personNameFromV1ToV2
 } from '@opencrvs/commons'
 import { env } from '@auth/environment'
-import { recordUserAuditEvent } from '@auth/features/authenticate/service'
+import { recordAnonymousUserAuditEvent } from '@auth/features/authenticate/service'
 
 interface IPayload {
   nonce: string
@@ -55,14 +55,14 @@ export default async function sendUserNameHandler(
       username: retrievalStepInformation.username
     },
     countryConfigUrl: env.COUNTRY_CONFIG_URL_INTERNAL,
-    authHeader: { Authorization: request.headers.authorization }
+    authHeader: { Authorization: request.headers.authorization as string }
   })
 
-  await recordUserAuditEvent(request.headers.authorization, {
+  await recordAnonymousUserAuditEvent({
     operation: 'user.username_reminder',
     requestData: {
       subjectId: retrievalStepInformation.userId
-    },
+    }
   })
 
   await deleteRetrievalStepInformation(payload.nonce)

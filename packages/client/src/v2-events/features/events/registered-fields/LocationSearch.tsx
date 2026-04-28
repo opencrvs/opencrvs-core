@@ -33,6 +33,62 @@ import { getToken } from '@client/utils/authUtils'
 import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
 
 /**
+ * Pure filtering logic for location options, separated from React hook concerns for testability.
+ *
+ * - 'location' jurisdiction: returns only the user's own office if it matches locationTypes, otherwise [].
+ * - 'administrativeArea' jurisdiction: returns locations within the user's admin area hierarchy, or [] if userLocationId is unknown.
+ * - no filter / 'all': returns all locations matching locationTypes.
+ */
+export function filterLocationsByJurisdiction({
+  locations,
+  administrativeAreas,
+  userLocationId,
+  locationTypes,
+  jurisdictionFilter
+}: {
+  locations: Map<UUID, Location>
+  administrativeAreas: Map<UUID, AdministrativeArea>
+  userLocationId: string | undefined
+  locationTypes?: string[]
+  jurisdictionFilter?: JurisdictionFilter
+}): Location[] {
+  const matchesType = (location: Location) =>
+    location.locationType &&
+    (locationTypes ? locationTypes.includes(location.locationType) : true)
+
+  const allOptions = Array.from(locations.values()).filter(matchesType)
+
+  if (
+    jurisdictionFilter === JurisdictionFilter.enum.location &&
+    userLocationId
+  ) {
+    // If the jurisdiction filter is only for the user's own location, return their office
+    // only if it matches the required locationTypes. A user whose office is a CRVS_OFFICE
+    // should not appear as an option in a HEALTH_FACILITY field — return nothing instead,
+    // since their 'location' scope does not extend to other locations of the correct type.
+    const userOffice = locations.get(UUID.parse(userLocationId))
+    return userOffice && matchesType(userOffice) ? [userOffice] : []
+  }
+
+  if (jurisdictionFilter === JurisdictionFilter.enum.administrativeArea) {
+    if (!userLocationId) {
+      // If we need to filter by administrative area but don't know the user's location, we can't determine their admin area - return no options
+      return []
+    }
+    return allOptions.filter((o) =>
+      isLocationUnderJurisdiction({
+        locationId: userLocationId,
+        otherLocationId: o.id,
+        locations,
+        administrativeAreas
+      })
+    )
+  }
+
+  return allOptions
+}
+
+/**
  * Return the available location options. The options will be filtered based on the jurisdiction filter.
  */
 function useAvailableLocations(
@@ -46,43 +102,23 @@ function useAvailableLocations(
   const userDetails = useSelector(getUserDetails)
   const userLocationId = userDetails?.primaryOfficeId
 
-  // If the jurisdiction filter is only for users current location, we return the location as a single option.
-  if (
-    jurisdictionFilter === JurisdictionFilter.enum.location &&
-    userLocationId
-  ) {
-    const location = locations.get(UUID.parse(userLocationId))
-    return location ? [location] : []
-  }
-
-  const options = useMemo(() => {
-    return Array.from(locations.values()).filter(
-      (location) =>
-        location.locationType &&
-        (locationTypes ? locationTypes.includes(location.locationType) : true)
-    )
-  }, [locationTypes, locations])
-
-  // If jurisdiction filter is administrative area, we filter the options to only include locations that are under the user's admin area jurisdiction.
-  if (
-    jurisdictionFilter === JurisdictionFilter.enum.administrativeArea &&
-    userLocationId
-  ) {
-    return useMemo(
-      () =>
-        options.filter((o) =>
-          isLocationUnderJurisdiction({
-            locationId: userLocationId,
-            otherLocationId: o.id,
-            locations,
-            administrativeAreas
-          })
-        ),
-      [options, userLocationId, locations, administrativeAreas]
-    )
-  }
-
-  return options
+  return useMemo(
+    () =>
+      filterLocationsByJurisdiction({
+        locations,
+        administrativeAreas,
+        userLocationId,
+        locationTypes,
+        jurisdictionFilter
+      }),
+    [
+      locations,
+      administrativeAreas,
+      userLocationId,
+      locationTypes,
+      jurisdictionFilter
+    ]
+  )
 }
 
 function LocationSearchInput({

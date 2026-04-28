@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { messages } from '@client/i18n/messages/views/userSetup'
-import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { MessageDescriptor } from 'react-intl'
 import { AdministrativeArea, UUID } from '@opencrvs/commons/client'
 import { getAdministrativeAreaHierarchy } from '../../../v2-events/utils'
@@ -60,16 +59,6 @@ const AuditDescriptionMapping: Record<string, MessageDescriptor> = {
     messages.rejectedCorrectedAuditAction,
   'event.actions.mark_as_duplicate.request': messages.markedAsDuplicate,
   'event.actions.mark_as_not_duplicate.request': messages.markedAsNotDuplicate
-}
-
-export const getAddressName = (
-  offlineCountryConfig: IOfflineData,
-  { name, partOf }: ILocation
-): string => {
-  const parentLocationId = partOf.split('/')[1]
-  if (parentLocationId === '0') return name
-  const parentLocation = offlineCountryConfig?.locations[parentLocationId]
-  return `${name}, ${getAddressName(offlineCountryConfig, parentLocation)}`
 }
 
 export const getAddressNameV2 = (

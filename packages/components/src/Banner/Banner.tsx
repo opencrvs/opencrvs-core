@@ -13,60 +13,62 @@ import { Box } from '../Box'
 import { IStackProps, Stack } from '../Stack'
 import styled from 'styled-components'
 
-const Wrapper = styled(Box)`
+export type BannerVariant = 'active' | 'inactive' | 'pending' | 'default'
+
+const Wrapper = styled(Box)<{ variant: BannerVariant }>`
   padding: 0;
-`
-const HeaderWrapper = styled(Stack)<{
-  type: 'active' | 'inactive' | 'pending' | 'default'
-}>`
-  padding: 8px 16px;
-  --background-color: ${({ type, theme }) => `
-  ${type === 'active' ? theme.colors.greenLighter : ''}
-  ${type === 'inactive' ? theme.colors.redLighter : ''}
-  ${type === 'pending' ? theme.colors.orangeLighter : ''}
-  ${type === 'default' ? theme.colors.primaryLighter : ''}
+  overflow: hidden;
+  --banner-background-color: ${({ variant, theme }) => `
+    ${variant === 'active' ? theme.colors.greenLighter : ''}
+    ${variant === 'inactive' ? theme.colors.redLighter : ''}
+    ${variant === 'pending' ? theme.colors.orangeLighter : ''}
+    ${variant === 'default' ? theme.colors.primaryLighter : ''}
   `};
-  --color: ${({ type, theme }) => `
-  ${type === 'active' ? theme.colors.positiveDarker : ''}
-  ${type === 'inactive' ? theme.colors.negativeDarker : ''}
-  ${type === 'pending' ? theme.colors.neutralDarker : ''}
-  ${type === 'default' ? theme.colors.primaryDarker : ''}
-`};
-  background-color: var(--background-color);
-  color: var(--color);
+  --banner-border-color: ${({ variant, theme }) => `
+    ${variant === 'active' ? theme.colors.green : ''}
+    ${variant === 'inactive' ? theme.colors.red : ''}
+    ${variant === 'pending' ? theme.colors.orange : ''}
+    ${variant === 'default' ? theme.colors.primary : ''}
+  `};
+  border: 1px solid var(--banner-border-color);
 `
-const ContentWrapper = styled(Stack)`
-  padding: 16px;
+const HeaderWrapper = styled(Stack)`
+  padding: 12px 16px;
+  background-color: var(--banner-background-color);
+  border-bottom: 1px solid var(--banner-border-color);
+`
+const BodyWrapper = styled(Stack)`
+  padding: 20px 16px 8px;
+`
+
+const FooterWrapper = styled(Stack)`
+  padding: 8px 16px 16px;
 `
 
 export interface IBannerProps {
-  type: 'active' | 'inactive' | 'pending' | 'default'
+  variant: BannerVariant
 }
 
-const Container: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <Wrapper>{children}</Wrapper>
-)
-
-const Header: React.FC<{ children: React.ReactNode } & IBannerProps> = ({
+const Container: React.FC<{ children: React.ReactNode } & IBannerProps> = ({
   children,
-  type
-}) => (
-  <HeaderWrapper justifyContent="space-between" type={type}>
-    {children}
-  </HeaderWrapper>
+  variant
+}) => <Wrapper variant={variant}>{children}</Wrapper>
+
+const Header: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <HeaderWrapper justifyContent="space-between">{children}</HeaderWrapper>
 )
 
 const Body: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <ContentWrapper>{children}</ContentWrapper>
+  <BodyWrapper>{children}</BodyWrapper>
 )
 
 const Footer: React.FC<{ children: React.ReactNode } & IStackProps> = ({
   children,
   ...otherProps
 }) => (
-  <ContentWrapper direction="row" {...otherProps}>
+  <FooterWrapper direction="row" {...otherProps}>
     {children}
-  </ContentWrapper>
+  </FooterWrapper>
 )
 
 export const Banner = { Container, Header, Body, Footer }

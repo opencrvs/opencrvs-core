@@ -128,7 +128,7 @@ function BaseAsyncSelect<T>(
 }
 
 /** Based on components/src/Select.tsx */
-const StyledAsyncSelect = styled(BaseAsyncSelect)<StyledProps>`
+const StyledAsyncSelect = styled(BaseAsyncSelect)`
   width: 100%;
   ${({ theme }) => theme.fonts.reg19};
   background: ${({ theme }) => theme.colors.white};
@@ -235,7 +235,8 @@ const StyledAsyncSelect = styled(BaseAsyncSelect)<StyledProps>`
 
 const VISIBLE_OPTIONS_COUNT = 50
 
-export interface SearchableSelectProps<T = string> extends StyledProps {
+export interface SearchableSelectProps<T = string>
+  extends React.ComponentProps<typeof BaseAsyncSelect<T>> {
   id: string
   ['data-testid']?: string
   options: Option<T>[]
@@ -252,6 +253,7 @@ export interface SearchableSelectProps<T = string> extends StyledProps {
  */
 export function SearchableSelect<T = string>({
   options,
+  onBlur,
   onChange,
   value,
   id,
@@ -287,6 +289,7 @@ export function SearchableSelect<T = string>({
       loadOptions={loadOptions}
       touched={touched}
       value={value}
+      onBlur={onBlur}
       // @ts-expect-error -- using styled components prevents inferring generic.
       onChange={onChange}
     />

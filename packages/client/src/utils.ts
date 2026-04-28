@@ -23,10 +23,6 @@ export async function validateApplicationVersion() {
       ? []
       : (JSON.parse(userData) as IUserData[])
 
-    allUserData.forEach((userData) => {
-      userData['declarations'] = []
-    })
-
     await storage.setItem('USER_DATA', JSON.stringify(allUserData))
   }
 }
@@ -55,11 +51,4 @@ export function useOnlineStatus() {
   }, [])
 
   return isOnline
-}
-
-/** Tell compiler that accessing record with arbitrary key might result to undefined
- * Use when you **cannot guarantee**  that key exists in the record
- */
-export interface IndexMap<T> {
-  [id: string]: T | undefined
 }

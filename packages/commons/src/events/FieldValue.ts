@@ -56,6 +56,14 @@ export const AgeValue = z.object({
 export type AgeValue = z.infer<typeof AgeValue>
 export const AgeUpdateValue = AgeValue.optional().nullable()
 
+export const AutocompleteValue = z.object({
+  label: z.string(),
+  value: z.string()
+})
+export type AutocompleteValue = z.infer<typeof AutocompleteValue>
+export const AutocompleteUpdateValue = AutocompleteValue.optional().nullable()
+export type AutocompleteUpdateValue = z.infer<typeof AutocompleteUpdateValue>
+
 export const TimeValue = z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)
 export type TimeValue = z.infer<typeof TimeValue>
 
@@ -100,7 +108,7 @@ export type VerificationStatusValue = z.infer<typeof VerificationStatusValue>
 
 // We need to create a separate union of all field types excluding the DataFieldValue,
 // because otherwise the DataFieldValue would need to refer to itself.
-const FieldValuesWithoutDataField = z.union([
+const LeafFieldValues = z.union([
   AddressFieldValue,
   TextValue,
   PlainDate,
@@ -122,22 +130,29 @@ const FieldValuesWithoutDataField = z.union([
   IdReaderFieldValue,
   NumberWithUnitFieldValue,
   NumberWithUnitFieldUpdateValue,
-  CustomFieldValue
+  CustomFieldValue,
+  AutocompleteValue,
+  AutocompleteUpdateValue
 ])
-type FieldValuesWithoutDataField = z.infer<typeof FieldValuesWithoutDataField>
+type LeafFieldValues = z.infer<typeof LeafFieldValues>
+
+export const FieldGroupValue = z.record(z.string(), LeafFieldValues)
+export type FieldGroupValue = z.infer<typeof FieldGroupValue>
 
 // As data field value can refer to other field values, it can contain any other field value types
 export const DataFieldValue = z
   .object({
-    data: z.record(z.string(), FieldValuesWithoutDataField)
+    data: z.record(z.string(), LeafFieldValues)
   })
   .nullish()
 export type DataFieldValue = z.infer<typeof DataFieldValue>
 
-export type FieldValue = FieldValuesWithoutDataField | DataFieldValue
+export type FieldValue = LeafFieldValues | DataFieldValue | FieldGroupValue
+
 export const FieldValue: z.ZodType<FieldValue> = z.union([
-  FieldValuesWithoutDataField,
-  DataFieldValue
+  LeafFieldValues,
+  DataFieldValue,
+  FieldGroupValue
 ])
 
 // Priority order for schema matching.
@@ -160,7 +175,8 @@ const PRIORITY_ORDER = [
   'NumberWithUnitFieldUpdateValue',
   'FileFieldValue',
   'FileFieldWithOptionValue',
-  'DataFieldValue'
+  'DataFieldValue',
+  'GroupFieldValue'
 ] as const
 
 /**
@@ -234,12 +250,14 @@ export type FieldUpdateValue =
   | z.infer<typeof NumberWithUnitFieldUpdateValue>
   | z.infer<typeof FileFieldValue>
   | z.infer<typeof FileFieldWithOptionValue>
-  | z.infer<typeof DataFieldValue>
+  | DataFieldValue
+  | FieldGroupValue
   | z.infer<typeof NameFieldUpdateValue>
   | z.infer<typeof HttpFieldUpdateValue>
   | z.infer<typeof QueryParamReaderFieldUpdateValue>
   | z.infer<typeof CustomFieldValue>
   | z.infer<typeof HiddenFieldValue>
+  | z.infer<typeof AutocompleteUpdateValue>
 
 // All schemas are tagged using .describe() so we can identify them later
 // inside safeUnion(). The tag name should match PRIORITY_ORDER.
@@ -257,11 +275,13 @@ export const FieldUpdateValue: z.ZodType<FieldUpdateValue> = safeUnion([
   FileFieldValue.describe('FileFieldValue'),
   FileFieldWithOptionValue.describe('FileFieldWithOptionValue'),
   DataFieldValue.describe('DataFieldValue'),
+  FieldGroupValue.describe('GroupFieldValue'),
   NameFieldUpdateValue.describe('NameFieldUpdateValue'),
   HttpFieldUpdateValue.describe('HttpFieldUpdateValue'),
   QueryParamReaderFieldUpdateValue.describe('QueryParamReaderFieldUpdateValue'),
   CustomFieldValue.describe('CustomFieldValue'),
-  HiddenFieldValue.describe('HiddenFieldValue')
+  HiddenFieldValue.describe('HiddenFieldValue'),
+  AutocompleteUpdateValue.describe('AutocompleteUpdateValue')
 ])
 
 /**
@@ -275,6 +295,7 @@ export type FieldValueSchema =
   | typeof NumberFieldValue
   | typeof NumberWithUnitFieldValue
   | typeof DataFieldValue
+  | typeof FieldGroupValue
   | typeof NameFieldValue
   | z.ZodString
   | z.ZodBoolean
@@ -296,6 +317,7 @@ export type FieldUpdateValueSchema =
   | typeof NumberWithUnitFieldValue
   | typeof NumberWithUnitFieldUpdateValue
   | typeof DataFieldValue
+  | typeof FieldGroupValue
   | typeof NameFieldValue
   | typeof NameFieldUpdateValue
   | typeof HttpFieldUpdateValue
@@ -306,5 +328,6 @@ export type FieldUpdateValueSchema =
   | typeof DateValue
   | typeof EmailValue
   | typeof CustomFieldValue
+  | typeof AutocompleteValue
   | z.ZodString
   | z.ZodBoolean

@@ -20,6 +20,12 @@ import { main as renameApiPaths } from './rename-api-paths'
 import { main as convertConfigFilesToTs } from './convert-config-files-to-ts'
 import { main as migrateScopes } from './migrate-scopes'
 import { main as removeDeprecatedImports } from './remove-deprecated-imports'
+import { main as migrateWorkqueueConfigs } from './migrate-workqueue-configs'
+import { main as removeDemoScope } from './remove-demo-scope'
+import { main as removeHearthMigrations } from './remove-hearth-migrations'
+import { main as createEventsIndex } from './create-events-index'
+import { main as checkoutUpstreamFiles } from './checkout-upstream-files'
+import { main as simplifyAnalyticsPrecalculations } from './simplify-analytics-precalculations'
 
 let cwd: string | undefined
 
@@ -47,6 +53,7 @@ export async function runUpgrade(ccwd: string | undefined) {
     cwd = process.cwd()
   }
 
+  await migrateWorkqueueConfigs()
   await removeReviewFromRegisterAction()
   await makeBuiltInValidateActionsCustom()
   await removeDeleteActions()
@@ -59,4 +66,9 @@ export async function runUpgrade(ccwd: string | undefined) {
   await convertConfigFilesToTs()
   await migrateScopes()
   await removeDeprecatedImports()
+  await removeDemoScope()
+  await removeHearthMigrations()
+  await createEventsIndex()
+  await checkoutUpstreamFiles()
+  await simplifyAnalyticsPrecalculations()
 }

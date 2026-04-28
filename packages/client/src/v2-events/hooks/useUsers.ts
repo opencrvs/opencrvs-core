@@ -12,6 +12,7 @@
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { inferInput, inferOutput } from '@trpc/tanstack-react-query'
 import {
+  deepDropNulls,
   System,
   TokenUserType,
   User,
@@ -63,11 +64,11 @@ setQueryDefaults<
       await precacheFile(user.avatar)
     }
 
-    return {
+    return deepDropNulls({
       ...user,
-      signature: user.signature,
+      signature: user.signature ?? undefined,
       avatar: user.avatar
-    }
+    })
   }
 })
 
@@ -198,9 +199,11 @@ export function useUsers() {
       })
     },
     updateUser: ({
-      onSuccess
+      onSuccess,
+      onError
     }: {
       onSuccess?: (response: inferOutput<typeof trpc.user.update>) => void
+      onError?: () => void
     } = {}) => {
       const mutationOptions = trpc.user.update.mutationOptions()
 
@@ -210,7 +213,19 @@ export function useUsers() {
           void queryClient.invalidateQueries({
             queryKey: trpc.user.get.queryKey(response.id)
           })
+
+          void queryClient.invalidateQueries({
+            queryKey: trpc.user.list.queryKey()
+          })
+
+          void queryClient.invalidateQueries({
+            queryKey: trpc.user.search.queryKey()
+          })
+
           onSuccess?.(response)
+        },
+        onError: () => {
+          onError?.()
         }
       })
     },
@@ -299,6 +314,9 @@ export function useUsers() {
     ),
     changeAvatar: useMutation(
       trpcOptionsProxy.user.changeAvatar.mutationOptions()
+    ),
+    sendUsernameReminder: useMutation(
+      trpcOptionsProxy.user.sendUsernameReminder.mutationOptions()
     )
   }
 }
