@@ -561,7 +561,9 @@ const ReviewUserComponent = () => {
                 ])
               )
               const payload: CreateUserInput = {
-                mobile: formState.phoneNumber,
+                // Normalise to undefined so an empty string isn't stored as a
+                // unique value, causing duplicate-key errors on the next submit.
+                mobile: formState.phoneNumber || undefined,
                 email: formState.email!,
                 role: formState.role!,
                 primaryOfficeId: formState.primaryOfficeId as UUID,
@@ -601,7 +603,8 @@ const ReviewUserComponent = () => {
               )
               const payload: UpdateUserInput = {
                 id: userId,
-                mobile: formState.phoneNumber,
+                // See create payload above — same normalisation needed.
+                mobile: formState.phoneNumber || undefined,
                 email: formState.email!,
                 role: formState.role!,
                 primaryOfficeId: formState.primaryOfficeId as UUID,
