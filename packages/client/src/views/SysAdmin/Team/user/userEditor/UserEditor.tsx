@@ -57,7 +57,11 @@ import {
 import styled from 'styled-components'
 import { create } from 'zustand'
 import { useUsers } from '../../../../../v2-events/hooks/useUsers'
-import { emptyMessage } from '@client/v2-events/utils'
+import {
+  createTemporaryId,
+  emptyMessage,
+  isTemporaryId
+} from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 
@@ -224,7 +228,6 @@ export const useUserFormState = create<UserFormState>()((set, get) => ({
   clear: () => set(() => ({ userForm: undefined }))
 }))
 
-const NEW_USER = '__NEW__'
 export const CreateNewUser = () => {
   const [{ officeId, from }] = useTypedSearchParams(
     ROUTES.V2.SETTINGS.USER.CREATE
@@ -237,7 +240,7 @@ export const CreateNewUser = () => {
     navigate(
       ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
         {
-          userId: NEW_USER as UUID, // @TODO: Ask what this __new__ thing is
+          userId: createTemporaryId(),
           pageId: 'user.details'
         },
         { from }
@@ -257,7 +260,7 @@ const EditUserComponent = () => {
   const [roles] = listRoles.useSuspenseQuery()
   const formState = getUserForm()
   const selectedRole = roles.find((role) => role.id === formState['role'])
-  const isNewUser = userId === NEW_USER
+  const isNewUser = isTemporaryId(userId)
   useEffect(() => {
     if (!formState['primaryOfficeId'] && pageId !== 'user.office') {
       navigate(
@@ -355,7 +358,7 @@ const ReviewUserComponent = () => {
   const { userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.REVIEW)
 
   const [searchParams] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.REVIEW)
-  const isNewUser = userId === NEW_USER
+  const isNewUser = isTemporaryId(userId)
   const { getUser, createUser, updateUser } = useUsers()
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
