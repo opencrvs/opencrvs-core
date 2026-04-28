@@ -25,15 +25,14 @@ import { Faker, en } from '@faker-js/faker'
 // Initialize faker with seed, so that the test data stays consistent
 const faker = new Faker({ seed: 1001, locale: en })
 export { faker }
-
 const userIds = {
-  localRegistrar: '6821c175dce4d7886d4e8210',
-  registrationAgent: '67ef7f83d6a9cb92e9edaaa1',
-  fieldAgent: '67ef7f83d6a9cb92e9edaa99',
-  localSystemAdmin: '68cbd26fc64761565469591d',
-  nationalSystemAdmin: '68df9529f8f3a73007a4427c',
-  communityLeader: '69abc123def4567890abcdef',
-  provincialRegistrar: '69def456abc7890123abcdef'
+  localRegistrar: '69179374-0447-4545-4545-454545454545' as UUID,
+  registrationAgent: '69179374-0447-4545-4545-454545454546' as UUID,
+  fieldAgent: '69179374-0447-4545-4545-454545454547' as UUID,
+  localSystemAdmin: '69179374-0447-4545-4545-454545454548' as UUID,
+  nationalSystemAdmin: '69179374-0447-4545-4545-454545454549' as UUID,
+  communityLeader: '69179374-0447-4545-4545-454545454550' as UUID,
+  provincialRegistrar: '69179374-0447-4545-4545-454545454551' as UUID
 }
 /**
  * @returns a payload generator for creating events and actions with sensible defaults.
@@ -375,7 +374,7 @@ export function testDataGenerator(rngSeed?: number) {
     localSystemAdmin: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
       v1: {
         id: userIds.localSystemAdmin,
-        userMgntUserID: '68cbd26fc64761565469591d',
+        userMgntUserID: '69179374-0447-4545-4545-454545454548',
         creationDate: '1758188143348',
         username: 'a.ngonga',
         practitionerId: '723819da-3ddd-49b0-b46c-43c8e34e1c25',

@@ -38,13 +38,13 @@ const createdEventDocument = generateEventDocument({
     {
       type: ActionType.CREATE,
       user: {
-        assignedTo: '6821c175dce4d7886d4e8210'
+        assignedTo: '69179374-0447-4545-4545-454545454545'
       }
     },
     {
       type: ActionType.ASSIGN,
       user: {
-        assignedTo: '6821c175dce4d7886d4e8210'
+        assignedTo: '69179374-0447-4545-4545-454545454545'
       }
     }
   ],

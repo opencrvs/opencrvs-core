@@ -57,6 +57,10 @@ import {
   setupHierarchyWithUsers
 } from './generators'
 
+export const TEST_SYSTEM_ID = '00000000-0000-1000-8000-000000000001' as UUID
+export const TEST_SYSTEM_ID_2 = '00000000-0000-1000-8000-000000000002' as UUID
+export const REINDEX_SYSTEM_ID = '00000000-0000-1000-8000-000000000003' as UUID
+
 /**
  * Known unstable fields in events that should be sanitized for snapshot testing.
  * We should aim to have stable ids based on the actual users and events in the system.

@@ -33,7 +33,7 @@ describe('ForgotPIN tests', () => {
     store.dispatch(
       setUserDetails({
         ...userDetails,
-        id: '5eba726866458970cf2e23c2',
+        id: '69179374-0447-4545-4545-454545454545' as UUID,
         mobile: '+8801711111111',
         primaryOfficeId: '895cc945-94a9-4195-9a29-22e9310f3385' as UUID,
         name: [{ use: 'en', given: ['Shakib'], family: 'Al Hasan' }]
