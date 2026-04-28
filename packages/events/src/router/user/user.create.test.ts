@@ -103,6 +103,57 @@ test('Allows user creation when with the right scope', async () => {
   })
 })
 
+test('Multiple users with no email can be created without a unique key conflict', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.create'
+    })
+  ])
+
+  // Each user has a distinct mobile so the DB check constraint
+  // (email_or_mobile_not_null) is satisfied while email normalises to NULL.
+  await expect(
+    client.user.create({
+      email: '',
+      mobile: '+254700000001',
+      role: 'admin',
+      name: [{ use: 'en', family: 'family1', given: ['given1'] }],
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).resolves.toBeDefined()
+
+  await expect(
+    client.user.create({
+      email: '',
+      mobile: '+254700000002',
+      role: 'admin',
+      name: [{ use: 'en', family: 'family2', given: ['given2'] }],
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).resolves.toBeDefined()
+})
+
+test('Creating a user with neither email nor mobile violates the DB constraint', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.create'
+    })
+  ])
+
+  await expect(
+    client.user.create({
+      email: '',
+      role: 'admin',
+      name: [{ use: 'en', family: 'family', given: ['given'] }],
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).rejects.toThrow(/email_or_mobile_not_null/)
+})
+
 test('Throws error when creating user with existing email', async () => {
   const { user } = await setupTestCase()
 

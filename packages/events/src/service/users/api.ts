@@ -326,7 +326,8 @@ export async function createUser(
   const userPayload = {
     firstname: v2Name.firstname,
     surname: v2Name.surname,
-    email: resolvedUser?.email?.toLowerCase(),
+    // Normalise to undefined for the same reason as mobile above.
+    email: resolvedUser?.email?.toLowerCase() || undefined,
     fullHonorificName: resolvedUser.fullHonorificName,
     role: resolvedUser.role,
     device: resolvedUser.device,
