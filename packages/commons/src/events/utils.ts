@@ -852,7 +852,19 @@ export function aggregateActionDeclarations(event: EventDocument): EventState {
         return declaration
       }
 
-      return getCompleteActionDeclaration(declaration, event, requestAction)
+      const declarationWithApprovedCorrection = getCompleteActionDeclaration(
+        declaration,
+        event,
+        requestAction
+      )
+
+      // Apply async confirmation payload after the approved request so external
+      // integrations can finalize fields (e.g. child.nid) at approve time.
+      return getCompleteActionDeclaration(
+        declarationWithApprovedCorrection,
+        event,
+        action
+      )
     }
 
     return getCompleteActionDeclaration(declaration, event, action)

@@ -35,13 +35,13 @@ export default interface UsersTable {
 
   updatedAt: ColumnType<string, string | undefined, string>
 
-  device: ColumnType<string | null, string | null, string | null>
-
   data: ColumnType<
     Record<string, any>,
     Record<string, any> | undefined,
     Record<string, any>
   >
+
+  device: ColumnType<string | null, string | null, string | null>
 }
 
 export type Users = Selectable<UsersTable>

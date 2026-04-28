@@ -13,6 +13,7 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
 import fc from 'fast-check'
+import { genSaltSync, hashSync } from 'bcryptjs'
 import {
   ActionStatus,
   ActionType,
@@ -40,11 +41,13 @@ import {
   UUID
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import { t } from '@events/router/trpc'
+import { SystemContext, UserContext } from '@opencrvs/commons'
+import { t, tService } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
-import { SystemContext, UserContext } from '@events/context'
 import { getClient } from '@events/storage/postgres/events'
 import { EventNotFoundError } from '@events/service/events/events'
+import { internalRouter } from '@events/router/internalRouter'
+import { initialisationRouter } from '@events/router/initialisation'
 import { getLocations } from '../service/locations/locations'
 import { NewEventActions } from '../storage/postgres/events/schema/app/EventActions'
 import {
@@ -75,7 +78,8 @@ export const UNSTABLE_EVENT_FIELDS = [
   'dateOfEvent',
   'placeOfEvent',
   'registrationNumber',
-  'originalActionId'
+  'originalActionId',
+  'createdBySignature'
 ]
 /**u
  * Cleans up unstable fields in data for snapshot testing.
@@ -221,6 +225,34 @@ export function createTestToken({
   return `Bearer ${token}`
 }
 
+export function createInternalServiceToken(
+  overrides: jwt.SignOptions = {}
+): TokenWithBearer {
+  const token = jwt.sign({}, readFileSync(join(__dirname, './cert.key')), {
+    subject: 'opencrvs:auth-service',
+    algorithm: 'RS256',
+    expiresIn: '604800',
+    audience: ['opencrvs:events-user'],
+    issuer: 'opencrvs:auth-service',
+    ...overrides
+  })
+  return `Bearer ${token}`
+}
+
+export function createInitialisationToken(
+  overrides: jwt.SignOptions = {}
+): TokenWithBearer {
+  const token = jwt.sign({}, readFileSync(join(__dirname, './cert.key')), {
+    subject: 'opencrvs:data-seeder-service',
+    algorithm: 'RS256',
+    expiresIn: '604800',
+    audience: ['opencrvs:events-user'],
+    issuer: 'opencrvs:auth-service',
+    ...overrides
+  })
+  return `Bearer ${token}`
+}
+
 function createTokenExchangeTestToken(
   userId: string,
   eventId: string,
@@ -293,6 +325,30 @@ export function createTestClient(
   return caller
 }
 
+export function createInternalTestClient(tokenWithBearer?: TokenWithBearer) {
+  const createCaller = tService.createCallerFactory(internalRouter)
+
+  const token = tokenWithBearer ?? createInternalServiceToken()
+  const caller = createCaller({
+    token
+  })
+
+  return caller
+}
+
+export function createInitialisationTestClient(
+  tokenWithBearer?: TokenWithBearer
+) {
+  const createCaller = tService.createCallerFactory(initialisationRouter)
+
+  const token = tokenWithBearer ?? createInitialisationToken()
+  const caller = createCaller({
+    token
+  })
+
+  return caller
+}
+
 /**
  * The token that is passed to country config needs to have been exchanged for the specific eventId and actionId.
  */
@@ -344,18 +400,20 @@ export const setupTestCase = async (
 
   const locations = await getLocations()
 
-  const defaultUser = seed.user(
-    generator.user.create({
-      primaryOfficeId: locations[0].id,
-      administrativeAreaId: locations[0].administrativeAreaId
-    })
-  )
-  const secondaryUser = seed.user(
-    generator.user.create({
-      primaryOfficeId: locations[1].id,
-      administrativeAreaId: locations[1].administrativeAreaId
-    })
-  )
+  const [defaultUser, secondaryUser] = await Promise.all([
+    seed.user(
+      generator.user.create({
+        primaryOfficeId: locations[0].id,
+        administrativeAreaId: locations[0].administrativeAreaId
+      })
+    ),
+    seed.user(
+      generator.user.create({
+        primaryOfficeId: locations[1].id,
+        administrativeAreaId: locations[1].administrativeAreaId
+      })
+    )
+  ])
 
   const users = [defaultUser, secondaryUser]
 
@@ -399,38 +457,38 @@ function actionToClientAction(
   | ((eventId: string) => Promise<EventDocument>) {
   switch (action) {
     case ActionType.CREATE:
-      return () => client.event.create(generator.event.create())
+      return async () => client.event.create(generator.event.create())
     case ActionType.DECLARE:
-      return (eventId: string) =>
+      return async (eventId: string) =>
         client.event.actions.declare.request(
           generator.event.actions.declare(eventId, { keepAssignment: true })
         )
     case ActionType.REJECT:
-      return (eventId: string) =>
+      return async (eventId: string) =>
         client.event.actions.reject.request(
           generator.event.actions.reject(eventId, { keepAssignment: true })
         )
     case ActionType.ARCHIVE:
-      return (eventId: string) =>
+      return async (eventId: string) =>
         client.event.actions.archive.request(
           generator.event.actions.archive(eventId, { keepAssignment: true })
         )
     case ActionType.REGISTER:
-      return (eventId: string) =>
+      return async (eventId: string) =>
         client.event.actions.register.request(
           generator.event.actions.register(eventId, {
             keepAssignment: true
           })
         )
     case ActionType.PRINT_CERTIFICATE:
-      return (eventId: string) =>
+      return async (eventId: string) =>
         client.event.actions.printCertificate.request(
           generator.event.actions.printCertificate(eventId, {
             keepAssignment: true
           })
         )
     case ActionType.REQUEST_CORRECTION:
-      return (eventId: string) =>
+      return async (eventId: string) =>
         client.event.actions.correction.request.request(
           generator.event.actions.correction.request(eventId, {
             keepAssignment: true
@@ -531,7 +589,7 @@ export async function seedEvent(
       .insertInto('events')
       .values({
         eventType: eventConfig.id,
-        transactionId: `tx-${Date.now()}`,
+        transactionId: getUUID(),
         trackingId: getUUID()
       })
       .returning(['id'])
@@ -920,4 +978,27 @@ export function assertScopeResult(
   })
 
   expect(result.success).toBe(isAccessibleWithScope)
+}
+
+export async function systemInitialisationTestSetup() {
+  const TEST_SUPER_USER_PASSWORD = 'super-secure-password'
+
+  const eventsDb = getClient()
+
+  const salt = genSaltSync(10)
+  const hash = hashSync(TEST_SUPER_USER_PASSWORD, salt)
+
+  await eventsDb
+    .insertInto('systemInitialisation')
+    .values({
+      hash,
+      salt,
+      id: 1
+    })
+    .execute()
+
+  return {
+    db: eventsDb,
+    password: TEST_SUPER_USER_PASSWORD
+  }
 }

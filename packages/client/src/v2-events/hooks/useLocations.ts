@@ -28,6 +28,25 @@ setQueryDefaults(trpcOptionsProxy.locations.list, {
   staleTime: 1000 * 60 * 60 * 24 // keep it in cache 1 day
 })
 
+setQueryDefaults(trpcOptionsProxy.locations.get, {
+  queryFn: async (...params) => {
+    const {
+      queryKey: [, input]
+    } = params[0]
+
+    const queryOptions = trpcOptionsProxy.locations.get.queryOptions(
+      input.input
+    )
+
+    if (typeof queryOptions.queryFn !== 'function') {
+      throw new Error('queryFn is not a function')
+    }
+
+    return await queryOptions.queryFn(...params)
+  },
+  staleTime: 1000 * 60 * 60 * 24
+})
+
 export function useLocations() {
   const trpc = useTRPC()
   return {
@@ -65,7 +84,8 @@ export function useLocations() {
     },
     getLocation: {
       useQuery: (id: string) => {
-        const { queryFn, ...options } = trpc.locations.get.queryOptions({ id })
+        const { queryFn, ...options } =
+          trpcOptionsProxy.locations.get.queryOptions({ id })
         return useQuery({
           ...options,
           queryKey: trpc.locations.get.queryKey({ id })
