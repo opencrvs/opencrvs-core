@@ -402,6 +402,13 @@ export async function resendInvite(userId: UUID, token: string): Promise<void> {
     })
   }
 
+  if (user.status !== 'pending') {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Can only resend invite to a user in pending status'
+    })
+  }
+
   const password = env.DEFAULT_USER_PASSWORD ?? generateRandomPassword()
   const { hash, salt } = await generateSaltedHash(password)
 

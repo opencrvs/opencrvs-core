@@ -539,6 +539,7 @@ export const userRouter = router({
     .input(UUID)
     .mutation(async ({ input, ctx }) => {
       const userId = UUID.parse(input)
+
       await resendInvite(userId, ctx.token)
       const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
       await writeAuditLog({
