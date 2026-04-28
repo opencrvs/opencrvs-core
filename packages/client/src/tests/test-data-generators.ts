@@ -26,6 +26,7 @@ import { Faker, en } from '@faker-js/faker'
 const faker = new Faker({ seed: 1001, locale: en })
 export { faker }
 
+// @TODO: Use UUID's for users once user-mgnt is deprecated.
 const userIds = {
   localRegistrar: '6821c175dce4d7886d4e8210',
   registrationAgent: '67ef7f83d6a9cb92e9edaaa1',
@@ -75,7 +76,7 @@ export function testDataGenerator(rngSeed?: number) {
     id: userIds,
     fieldAgent: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
       v2: {
-        id: userIds.fieldAgent,
+        id: userIds.fieldAgent as UUID,
         name: [
           {
             use: 'en',
@@ -136,7 +137,7 @@ export function testDataGenerator(rngSeed?: number) {
     }),
     registrationAgent: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
       v2: {
-        id: user.id.registrationAgent,
+        id: user.id.registrationAgent as UUID,
         name: [{ use: 'en', given: ['Felix'], family: 'Katongo' }],
         role: TestUserRole.enum.REGISTRATION_AGENT,
         avatar: undefined,
@@ -191,7 +192,7 @@ export function testDataGenerator(rngSeed?: number) {
     }),
     localRegistrar: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
       v2: {
-        id: user.id.localRegistrar,
+        id: user.id.localRegistrar as UUID,
         name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
         role: TestUserRole.enum.LOCAL_REGISTRAR,
         fullHonorificName: '1st Order Honorable Kennedy Mweene',
@@ -261,7 +262,7 @@ export function testDataGenerator(rngSeed?: number) {
      */
     communityLeader: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
       v2: {
-        id: userIds.communityLeader,
+        id: userIds.communityLeader as UUID,
         name: [{ use: 'en', given: ['Gift'], family: 'Phiri' }],
         role: TestUserRole.enum.COMMUNITY_LEADER,
         fullHonorificName: undefined,
@@ -319,7 +320,7 @@ export function testDataGenerator(rngSeed?: number) {
      */
     provincialRegistrar: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
       v2: {
-        id: userIds.provincialRegistrar,
+        id: userIds.provincialRegistrar as UUID,
         name: [{ use: 'en', given: ['Mitchel'], family: 'Owen' }],
         role: TestUserRole.enum.PROVINCIAL_REGISTRAR,
         fullHonorificName: undefined,
@@ -414,7 +415,7 @@ export function testDataGenerator(rngSeed?: number) {
         __typename: 'User'
       } satisfies FetchUserQuery['getUser'],
       v2: {
-        id: userIds.localSystemAdmin,
+        id: userIds.localSystemAdmin as UUID,
         name: [
           {
             use: 'en',
@@ -432,7 +433,7 @@ export function testDataGenerator(rngSeed?: number) {
     }),
     nationalSystemAdmin: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
       v2: {
-        id: user.id.nationalSystemAdmin,
+        id: user.id.nationalSystemAdmin as UUID,
         name: [
           {
             use: 'en',
