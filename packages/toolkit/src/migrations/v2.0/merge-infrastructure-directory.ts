@@ -18,23 +18,38 @@
  *
  * What it does:
  *   1. Registers a temporary git remote that points at the canonical
- *      opencrvs-countryconfig repository and fetches the upstream branch.
- *   2. Determines the merge-base between HEAD and the upstream branch (if
- *      any). Country configs that share history with opencrvs-countryconfig
- *      will have one; those that started from scratch will not.
- *   3. For every file under `infrastructure/` on upstream, performs a
- *      file-scoped 3-way merge:
+ *      opencrvs-countryconfig repository and fetches both:
+ *        - the upstream "theirs" branch (v2.0) → `UPSTREAM_BRANCH`
+ *        - the synthetic merge-base branch (latest 1.9 release line)
+ *          → `BASE_BRANCH`
+ *   2. For every file under `infrastructure/` on upstream "theirs", performs
+ *      a file-scoped 3-way merge:
  *        - new file on upstream → checked out and staged
  *        - existing file       → 3-way merged in place via `git merge-file`,
- *                                using the merge-base version (or an empty
- *                                file if no shared history) as the ancestor
+ *                                using the BASE_BRANCH version of the file
+ *                                as the ancestor (or an empty file if the
+ *                                base doesn't have it)
  *      Files local to the country config that don't exist on upstream are
  *      left untouched.
- *   4. Cleanly merged files are staged. Files with conflicts are left in the
+ *   3. Cleanly merged files are staged. Files with conflicts are left in the
  *      working tree with standard <<<<<<< / ======= / >>>>>>> markers and
  *      MUST be resolved manually by the developer.
- *   5. Removes the temporary remote in all cases (success, failure, or
+ *   4. Removes the temporary remote in all cases (success, failure, or
  *      unexpected error) via a `finally` block.
+ *
+ * Why a content-based synthetic merge-base instead of `git merge-base`:
+ *   - Country config repos rarely share git history with
+ *     opencrvs-countryconfig (squashed forks, template-cloned repos, etc.),
+ *     so `git merge-base HEAD upstream/develop` typically returns nothing.
+ *   - With no merge-base, a 3-way merge degenerates to a 2-way diff against
+ *     an empty file — every line that differs becomes a conflict.
+ *   - `release-v1.9` is the latest 1.9.x release line on upstream and is a
+ *     near-perfect representation of "what `infrastructure/` looked like
+ *     before v2.0", regardless of whether the fork's git history reaches it.
+ *   - For files the country config never modified relative to that baseline,
+ *     `git merge-file` resolves cleanly to upstream's v2.0 version. Conflicts
+ *     are produced only where local edits genuinely overlap with v1.9 → v2.0
+ *     upstream edits — which is what the developer needs to review anyway.
  *
  * Why per-file merge instead of a real `git merge`:
  *   - Limits the blast radius to `infrastructure/` only — no other paths
@@ -52,6 +67,9 @@
  *   - Binary files in `infrastructure/` are not merged textually; if both
  *     sides changed a binary file, the result will be invalid and a warning
  *     is printed.
+ *   - Forks that are on a much older 1.9.x and never merged later 1.9 patches
+ *     may see a few extra conflicts on files where 1.9.x → release-v1.9
+ *     patches and v1.9 → v2.0 changes textually overlap.
  */
 
 import { execFileSync } from 'child_process'
@@ -72,6 +90,11 @@ import {
 const TEMP_REMOTE = 'opencrvs-upgrade-v19-v20-codemod-merge-infra'
 
 const INFRASTRUCTURE_DIR = 'infrastructure'
+
+// Synthetic merge-base: the tip of upstream's latest 1.9.x release line.
+// We use this branch's content as the "common ancestor" for every file,
+// since most country forks don't share git history with upstream.
+const BASE_BRANCH = 'release-v1.9'
 
 /**
  * Reads `git show <ref>:<path>` as a Uint8Array (binary-safe).
@@ -95,7 +118,7 @@ function gitShowBytes(ref: string, path: string): Uint8Array | null {
 
 async function main(): Promise<void> {
   console.log(
-    `Merging '${INFRASTRUCTURE_DIR}/' from ${UPSTREAM_URL}@${UPSTREAM_BRANCH}...\n`
+    `Merging '${INFRASTRUCTURE_DIR}/' from ${UPSTREAM_URL}@${UPSTREAM_BRANCH} (base: ${BASE_BRANCH})...\n`
   )
 
   assertIsGitRepo()
@@ -107,22 +130,15 @@ async function main(): Promise<void> {
     console.log(`  Adding temporary remote '${TEMP_REMOTE}' → ${UPSTREAM_URL}`)
     runGit(['remote', 'add', TEMP_REMOTE, UPSTREAM_URL], { silent: true })
 
-    // Full clone (no --depth=1) so `git merge-base` can find a common
-    // ancestor with the local history when one exists.
-    console.log(`  Fetching ${TEMP_REMOTE}/${UPSTREAM_BRANCH}...`)
-    runGit(['fetch', TEMP_REMOTE, UPSTREAM_BRANCH])
+    // Fetch both branches at depth=1 — we only need their tip contents,
+    // not their history (the merge is content-based, not history-based).
+    console.log(
+      `  Fetching ${TEMP_REMOTE}/{${UPSTREAM_BRANCH},${BASE_BRANCH}} (depth 1)...`
+    )
+    runGit(['fetch', '--depth=1', TEMP_REMOTE, UPSTREAM_BRANCH, BASE_BRANCH])
 
     const ref = `${TEMP_REMOTE}/${UPSTREAM_BRANCH}`
-
-    let mergeBase: string | null = null
-    try {
-      mergeBase = runGit(['merge-base', 'HEAD', ref], { silent: true }).trim()
-      console.log(`  Found merge-base: ${mergeBase}`)
-    } catch {
-      console.warn(
-        `  No common ancestor between HEAD and ${ref}. Falling back to a two-way merge (empty base) — expect more conflicts.`
-      )
-    }
+    const baseRef = `${TEMP_REMOTE}/${BASE_BRANCH}`
 
     // -z gives NUL-separated paths so filenames with spaces or newlines
     // survive the round-trip.
@@ -179,7 +195,11 @@ async function main(): Promise<void> {
       }
       writeFileSync(theirsTmp, theirContents)
 
-      const baseContents = mergeBase ? gitShowBytes(mergeBase, file) : null
+      // Pull the base version from upstream's latest 1.9 release line. If
+      // the file didn't exist there yet (added in v2.0), fall back to an
+      // empty base — `git merge-file` will then treat any local content as
+      // a local addition.
+      const baseContents = gitShowBytes(baseRef, file)
       writeFileSync(baseTmp, baseContents ?? new Uint8Array(0))
 
       // `git merge-file` does an in-place 3-way merge. Exit codes:
