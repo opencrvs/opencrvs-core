@@ -10,8 +10,11 @@
  */
 
 import { TRPCError } from '@trpc/server'
+import { http, HttpResponse } from 'msw'
 import { sql } from 'kysely'
 import { getUUID, encodeScope } from '@opencrvs/commons'
+import { env } from '@events/environment'
+import { mswServer } from '@events/tests/msw'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 const USER_EDIT_SCOPE = encodeScope({ type: 'user.edit' })
@@ -44,6 +47,33 @@ test('sendUsernameReminder sends notification and records audit log', async () =
 
   expect(auditEntry).toBeDefined()
   expect(auditEntry?.operation).toBe('user.username_reminder_by_admin')
+})
+
+test('sendUsernameReminder calls triggerUserEventNotification with username-reminder event', async () => {
+  const { user, users } = await setupTestCase()
+  const targetUser = users[1]
+
+  let capturedEvent: string | undefined
+  let capturedBody: unknown
+
+  mswServer.use(
+    http.post(
+      `${env.COUNTRY_CONFIG_URL}/triggers/user/:event`,
+      async ({ request, params }) => {
+        capturedEvent = params.event as string
+        capturedBody = await request.json()
+        return HttpResponse.json({})
+      }
+    )
+  )
+
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+  await client.user.sendUsernameReminder(targetUser.id)
+
+  expect(capturedEvent).toBe('username-reminder')
+  expect(capturedBody).toMatchObject({
+    username: expect.any(String)
+  })
 })
 
 test('sendUsernameReminder requires user.edit scope', async () => {
