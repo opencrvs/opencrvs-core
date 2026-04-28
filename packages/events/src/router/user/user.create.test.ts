@@ -145,6 +145,38 @@ test('Throws error when creating user with existing email', async () => {
   )
 })
 
+test('Multiple users with no mobile number can be created without a unique key conflict', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.create'
+    })
+  ])
+
+  // Sending mobile: '' mimics the pre-fix client behaviour where touching then
+  // clearing the phone field produced an empty string instead of undefined.
+  await expect(
+    client.user.create({
+      email: 'user1@opencrvs.org',
+      mobile: '',
+      role: 'admin',
+      name: [{ use: 'en', family: 'family1', given: ['given1'] }],
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).resolves.toBeDefined()
+
+  await expect(
+    client.user.create({
+      email: 'user2@opencrvs.org',
+      mobile: '',
+      role: 'admin',
+      name: [{ use: 'en', family: 'family2', given: ['given2'] }],
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).resolves.toBeDefined()
+})
+
 test('Throws error when creating user with existing mobile', async () => {
   const { user } = await setupTestCase()
 
