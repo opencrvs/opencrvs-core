@@ -880,14 +880,14 @@ function UserListComponent({ userDetails }: UserListProps) {
           {intl.formatMessage(messages.resetPasswordError)}
         </Toast>
       )}
-      {showActivationToggleSuccess && (
+      {showActivationToggleSuccess && toggleActivation.selectedUser && (
         <Toast
           id="activation_toggle_success"
           type="success"
           onClose={() => setShowActivationToggleSuccess(false)}
         >
           {intl.formatMessage(messages.toggleActivateStatusSuccess, {
-            name: getUserName(toggleActivation.selectedUser as User),
+            name: getUserName(toggleActivation.selectedUser),
             status:
               toggleActivation.selectedUser?.status === 'active'
                 ? intl.formatMessage(messages.deactivated)
@@ -895,14 +895,14 @@ function UserListComponent({ userDetails }: UserListProps) {
           })}
         </Toast>
       )}
-      {showActivationToggleError && (
+      {showActivationToggleError && toggleActivation.selectedUser && (
         <Toast
           id="activation_toggle_error"
           type="warning"
           onClose={() => setShowActivationToggleError(false)}
         >
           {intl.formatMessage(messages.toggleActivateStatusError, {
-            name: getUserName(toggleActivation.selectedUser as User),
+            name: getUserName(toggleActivation.selectedUser),
             status:
               toggleActivation.selectedUser?.status === 'active'
                 ? intl.formatMessage(messages.deactivated)
