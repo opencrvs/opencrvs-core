@@ -179,7 +179,7 @@ export const ROUTES = {
               EDIT: route(':userId/edit/:pageId', {
                 params: {
                   userId: uuid().defined(),
-                  pageId: string().defined()
+                  pageId: string()
                 },
                 searchParams: {
                   from: string()
