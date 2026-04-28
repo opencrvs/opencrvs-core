@@ -331,7 +331,9 @@ export async function createUser(
     role: resolvedUser.role,
     device: resolvedUser.device,
     officeId: resolvedUser.primaryOfficeId,
-    mobile: resolvedUser.mobile,
+    // Normalise to undefined — PostgreSQL's unique constraint treats "" as a
+    // duplicate, so any empty string must be stored as NULL instead.
+    mobile: resolvedUser.mobile || undefined,
     status: resolvedUser.status,
     signaturePath: resolvedUser.signature?.path
   }
