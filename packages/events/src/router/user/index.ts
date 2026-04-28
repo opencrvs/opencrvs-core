@@ -25,7 +25,8 @@ import {
   TokenWithBearer,
   User,
   UserOrSystem,
-  UpdateUserInput
+  UpdateUserInput,
+  CreateUserInputInternal
 } from '@opencrvs/commons'
 import {
   allowedWithAnyOfScopes,
@@ -101,7 +102,7 @@ function getAuditLogIdentifiers(token: TokenWithBearer) {
 }
 
 export async function handleCreateUser(
-  input: CreateUserInput,
+  input: CreateUserInput | CreateUserInputInternal,
   ctx: { token: TokenWithBearer }
 ): Promise<User> {
   if (input.mobile) {
