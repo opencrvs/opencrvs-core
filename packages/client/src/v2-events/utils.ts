@@ -24,7 +24,7 @@ import {
   getAcceptedScopesByType,
   decodeScope,
   RecordScopeTypeV2,
-  EncodedScope,
+  EncodedScope
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name'], language: string) {

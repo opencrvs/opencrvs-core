@@ -17,6 +17,7 @@ import { TestUserRole } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { EditUser, useUserFormState } from './UserEditor'
+import { createTemporaryId } from '@client/v2-events/utils'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [httpLink({ url: '/api/events' })],
@@ -53,7 +54,7 @@ export const RegistrationOfficeIncludesHospitals: StoryObj<typeof EditUser> = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-        userId: '__NEW__',
+        userId: createTemporaryId(),
         pageId: 'user.office'
       })
     }
