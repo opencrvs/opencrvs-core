@@ -317,6 +317,9 @@ export function useUsers() {
     ),
     sendUsernameReminder: useMutation(
       trpcOptionsProxy.user.sendUsernameReminder.mutationOptions()
+    ),
+    resendInvite: useMutation(
+      trpcOptionsProxy.user.resendInvite.mutationOptions()
     )
   }
 }

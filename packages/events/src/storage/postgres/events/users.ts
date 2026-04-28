@@ -122,6 +122,27 @@ export async function updatePasswordHash(userId: UUID, passwordHash: string) {
     .execute()
 }
 
+export async function resetUserCredentialsAndStatus(
+  userId: UUID,
+  passwordHash: string,
+  salt: string
+): Promise<void> {
+  const db = getClient()
+  await db.transaction().execute(async (trx) => {
+    await trx
+      .updateTable('userCredentials')
+      .set({ passwordHash, salt })
+      .where('userId', '=', userId)
+      .execute()
+
+    await trx
+      .updateTable('users')
+      .set({ status: 'pending' })
+      .where('id', '=', userId)
+      .execute()
+  })
+}
+
 async function createUserInTrx(user: NewUsers, trx: Kysely<Schema>) {
   const { id } = await trx
     .insertInto('users')
