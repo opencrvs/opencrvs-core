@@ -24,33 +24,29 @@ test('resendInvite throws NOT_FOUND when user does not exist', async () => {
 
   await expect(
     client.user.resendInvite(nonExistentUserId)
-  ).rejects.toMatchObject(new TRPCError({ code: 'NOT_FOUND' }))
+  ).rejects.toMatchObject({ code: 'NOT_FOUND' })
 })
 
-test('resendInvite generates new password and updates status to pending', async () => {
+test('resendInvite generates new credentials for a pending user', async () => {
   const { eventsDb, user, users } = await setupTestCase()
   const targetUser = users[1]
 
   const client = createTestClient(user, [USER_EDIT_SCOPE])
 
-  // Set initial user status to active
   await eventsDb
     .updateTable('users')
-    .set({ status: 'active' })
+    .set({ status: 'pending' })
     .where('id', '=', targetUser.id)
     .execute()
 
-  // Get initial credentials
   const initialCreds = await eventsDb
     .selectFrom('userCredentials')
     .select(['passwordHash', 'salt'])
     .where('userId', '=', targetUser.id)
     .executeTakeFirstOrThrow()
 
-  // Call resendInvite
   await client.user.resendInvite(targetUser.id)
 
-  // Verify user status changed to pending
   const updatedUser = await eventsDb
     .selectFrom('users')
     .select(['status'])
@@ -59,7 +55,6 @@ test('resendInvite generates new password and updates status to pending', async 
 
   expect(updatedUser.status).toBe('pending')
 
-  // Verify password hash was updated
   const updatedCreds = await eventsDb
     .selectFrom('userCredentials')
     .select(['passwordHash', 'salt'])
@@ -67,15 +62,25 @@ test('resendInvite generates new password and updates status to pending', async 
     .executeTakeFirstOrThrow()
 
   expect(updatedCreds.passwordHash).not.toBe(initialCreds.passwordHash)
-  // Salt should be updated as well (new salt generated with password)
   expect(updatedCreds.salt).not.toBe(initialCreds.salt)
+})
+
+test('resendInvite throws BAD_REQUEST when user is not in pending status', async () => {
+  const { user, users } = await setupTestCase()
+  const targetUser = users[1]
+
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+
+  // users[1] is created with status 'active' by the seeder
+  await expect(client.user.resendInvite(targetUser.id)).rejects.toMatchObject({
+    code: 'BAD_REQUEST'
+  })
 })
 
 test('resendInvite requires user.edit scope', async () => {
   const { user, users } = await setupTestCase()
   const targetUser = users[1]
 
-  // Create a client with insufficient scopes
   const limitedClient = createTestClient(user, [])
 
   await expect(
@@ -89,7 +94,12 @@ test('resendInvite generates fresh credentials on each call', async () => {
 
   const client = createTestClient(user, [USER_EDIT_SCOPE])
 
-  // Call resendInvite multiple times to ensure new password each time
+  await eventsDb
+    .updateTable('users')
+    .set({ status: 'pending' })
+    .where('id', '=', targetUser.id)
+    .execute()
+
   await client.user.resendInvite(targetUser.id)
 
   const creds1 = await eventsDb
@@ -98,7 +108,6 @@ test('resendInvite generates fresh credentials on each call', async () => {
     .where('userId', '=', targetUser.id)
     .executeTakeFirstOrThrow()
 
-  // Call again
   await client.user.resendInvite(targetUser.id)
 
   const creds2 = await eventsDb
@@ -107,7 +116,6 @@ test('resendInvite generates fresh credentials on each call', async () => {
     .where('userId', '=', targetUser.id)
     .executeTakeFirstOrThrow()
 
-  // Each call should generate different password/salt
   expect(creds2.passwordHash).not.toBe(creds1.passwordHash)
   expect(creds2.salt).not.toBe(creds1.salt)
 })
@@ -117,6 +125,12 @@ test('resendInvite writes audit log', async () => {
   const targetUser = users[1]
 
   const client = createTestClient(user, [USER_EDIT_SCOPE])
+
+  await eventsDb
+    .updateTable('users')
+    .set({ status: 'pending' })
+    .where('id', '=', targetUser.id)
+    .execute()
 
   await client.user.resendInvite(targetUser.id)
 
