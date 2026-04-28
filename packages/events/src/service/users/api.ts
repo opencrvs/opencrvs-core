@@ -135,7 +135,7 @@ function mapDbUserToUser(user: DbUser): User & { username: string } {
     primaryOfficeId: user.officeId,
     administrativeAreaId: user.administrativeAreaId ?? undefined,
     fullHonorificName: user.fullHonorificName ?? undefined,
-    data: user.data && Object.keys(user.data).length > 0 ? user.data : undefined
+    data: Object.keys(user.data).length > 0 ? user.data : undefined
   }
 }
 
