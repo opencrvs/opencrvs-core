@@ -11,7 +11,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { FieldType, TestUserRole } from '@opencrvs/commons/client'
+import { FieldType, TestUserRole, UUID } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
@@ -70,7 +70,7 @@ export const ReviewWithEmptyFields: StoryObj<typeof ReviewUser> = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
-        userId: '__NEW__'
+        userId: '__NEW__' as UUID // @TODO: Figure out what this concept is
       })
     }
   },

@@ -13,7 +13,7 @@ import { within, expect } from '@storybook/test'
 import { userEvent } from '@storybook/testing-library'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { TestUserRole } from '@opencrvs/commons/client'
+import { TestUserRole, UUID } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { EditUser, useUserFormState } from './UserEditor'
@@ -53,7 +53,7 @@ export const RegistrationOfficeIncludesHospitals: StoryObj<typeof EditUser> = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-        userId: '__NEW__',
+        userId: '__NEW__' as UUID, // @TODO: Figure out what this concept is
         pageId: 'user.office'
       })
     }
