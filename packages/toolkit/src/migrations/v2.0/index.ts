@@ -20,6 +20,10 @@ import { main as renameApiPaths } from './rename-api-paths'
 import { main as convertConfigFilesToTs } from './convert-config-files-to-ts'
 import { main as migrateScopes } from './migrate-scopes'
 import { main as removeDeprecatedImports } from './remove-deprecated-imports'
+import { main as removeUnusedEnvironmentVariables } from './remove-unused-environment-variables'
+import { main as removeFhirUrlHelpers } from './remove-fhir-url-helpers'
+import { main as migrateApplicationConfigUrl } from './migrate-application-config-url'
+import { main as removeOldStatisticsService } from './remove-old-statistics-service'
 import { main as migrateWorkqueueConfigs } from './migrate-workqueue-configs'
 import { main as removeDemoScope } from './remove-demo-scope'
 import { main as removeHearthMigrations } from './remove-hearth-migrations'
@@ -52,6 +56,10 @@ export async function runUpgrade(dockerSwarm: boolean) {
   await convertConfigFilesToTs()
   await migrateScopes()
   await removeDeprecatedImports()
+  await removeUnusedEnvironmentVariables()
+  await removeFhirUrlHelpers()
+  await migrateApplicationConfigUrl()
+  await removeOldStatisticsService()
   await removeDemoScope()
   await removeHearthMigrations()
   await createEventsIndex()
