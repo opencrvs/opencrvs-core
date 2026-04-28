@@ -237,7 +237,7 @@ export const CreateNewUser = () => {
     navigate(
       ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
         {
-          userId: NEW_USER,
+          userId: NEW_USER as UUID, // @TODO: Ask what this __new__ thing is
           pageId: 'user.details'
         },
         { from }
@@ -353,6 +353,7 @@ const ReviewUserComponent = () => {
   const navigate = useNavigate()
   const { getUserForm, setUserForm, clear } = useUserFormState()
   const { userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.REVIEW)
+
   const [searchParams] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.REVIEW)
   const isNewUser = userId === NEW_USER
   const { getUser, createUser, updateUser } = useUsers()

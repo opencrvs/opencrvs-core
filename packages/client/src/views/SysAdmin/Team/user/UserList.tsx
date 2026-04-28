@@ -490,7 +490,7 @@ function UserListComponent({ userDetails }: UserListProps) {
               onClick={() =>
                 navigate(
                   ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
-                    userId: String(user.id)
+                    userId: user.id
                   })
                 )
               }
@@ -505,7 +505,7 @@ function UserListComponent({ userDetails }: UserListProps) {
               onClick={() =>
                 navigate(
                   ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
-                    userId: String(user.id)
+                    userId: user.id
                   })
                 )
               }
