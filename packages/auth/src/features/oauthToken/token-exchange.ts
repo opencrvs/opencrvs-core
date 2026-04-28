@@ -69,15 +69,15 @@ export async function tokenExchangeHandler(
   }
   const { sub } = decodedOrError.right
 
-  const rejectScopeOfUserAssignedRole = decodedOrError.right.scope.find((s) =>
-    s.startsWith('record.declared.reject')
+  const extraScopes = decodedOrError.right.scope.filter(
+    (s) => s.startsWith('record.declared.reject') || s.startsWith('record.read')
   )
 
   // @TODO: If in the future we have a fine grained access control for records, check here that the subject actually has access to the record requested
   const recordToken = await createTokenForActionConfirmation(
     { eventId, actionId, recordId },
     sub as UUID,
-    rejectScopeOfUserAssignedRole
+    extraScopes
   )
 
   return oauthResponse.success(h, recordToken)

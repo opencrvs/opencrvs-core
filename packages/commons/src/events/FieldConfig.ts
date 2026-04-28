@@ -358,15 +358,13 @@ export type ParagraphConfiguration = z.infer<typeof ParagraphConfiguration>
 
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
-  defaultValue: NonEmptyTextValue.optional(),
   configuration: ParagraphConfiguration
 }).describe('A read-only HTML <p> paragraph')
 
 export type Paragraph = z.infer<typeof Paragraph>
 
 const PageHeader = BaseField.extend({
-  type: z.literal(FieldType.PAGE_HEADER),
-  defaultValue: NonEmptyTextValue.optional()
+  type: z.literal(FieldType.PAGE_HEADER)
 }).describe('A read-only header component for form pages')
 
 export type PageHeader = z.infer<typeof PageHeader>
@@ -451,7 +449,6 @@ export type RadioGroup = z.infer<typeof RadioGroup>
 
 const BulletList = BaseField.extend({
   type: z.literal(FieldType.BULLET_LIST),
-  defaultValue: TextValue.optional(),
   items: z.array(TranslationConfig).describe('A list of items'),
   configuration: z
     .object({

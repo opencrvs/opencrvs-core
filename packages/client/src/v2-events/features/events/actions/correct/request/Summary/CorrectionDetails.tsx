@@ -140,7 +140,10 @@ function buildCorrectionDetails(
       }
       return page.fields
         .filter((f) =>
-          isFieldVisible(f, { ...form, ...annotation }, validatorContext)
+          isFieldVisible(f, annotation, {
+            ...validatorContext,
+            baseFormState: form
+          })
         )
         .filter((f) => !isEmptyValue(f, { ...form, ...annotation }[f.id]))
         .map((field) => ({
