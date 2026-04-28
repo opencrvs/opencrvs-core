@@ -243,7 +243,8 @@ function UserListComponent({ userDetails }: UserListProps) {
     [locations, canAccessOffice]
   )
 
-  const { searchUsers, sendUsernameReminder } = useUsers()
+  const { searchUsers, sendUsernameReminder, sendResetPasswordInvite } =
+    useUsers()
   const {
     data: searchResults,
     isLoading,
@@ -337,19 +338,17 @@ function UserListComponent({ userDetails }: UserListProps) {
     [sendUsernameReminder]
   )
 
-  const resetPassword = useCallback(async function resetPassword(
-    userId: string
-  ) {
-    try {
-      throw new Error('@todo Reset password mutation is not implemented')
-      // const res = await userMutations.sendResetPasswordInvite(userId, [])
-      // if (res && res.data && res.data.resetPasswordInvite) {
-      //   setShowResetPasswordSuccess(true)
-      // }
-    } catch (err) {
-      setResetPasswordError(true)
-    }
-  }, [])
+  const resetPassword = useCallback(
+    async (userId: string) => {
+      try {
+        await sendResetPasswordInvite.mutateAsync(userId)
+        setShowResetPasswordSuccess(true)
+      } catch {
+        setResetPasswordError(true)
+      }
+    },
+    [sendResetPasswordInvite]
+  )
 
   const getMenuItems = useCallback(
     function getMenuItems(user: User) {
