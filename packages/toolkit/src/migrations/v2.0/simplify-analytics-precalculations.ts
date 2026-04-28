@@ -45,8 +45,6 @@ import {
 } from 'ts-morph'
 import fs from 'fs'
 import path from 'path'
-import { getCwd } from '.'
-
 const ANALYTICS_FILE_REL = 'src/analytics/analytics.ts'
 const FUNCTION_NAME = 'precalculateAdditionalAnalytics'
 const IMPORT_NAMES_TO_REMOVE = new Set(['Event', 'precalculateBirthEvent'])
@@ -182,7 +180,7 @@ function simplifyPrecalculateFunction(sourceFile: SourceFile): string[] {
 // ─── Entry point ─────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
-  const cwd = getCwd()
+  const cwd = process.cwd()
   const absPath = path.join(cwd, ANALYTICS_FILE_REL)
 
   if (!fs.existsSync(absPath)) {

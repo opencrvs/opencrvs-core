@@ -41,8 +41,6 @@ import {
   Node
 } from 'ts-morph'
 import path from 'path'
-import { getCwd } from '.'
-
 const DEFINE_CONFIG_NAME = 'defineConfig'
 const DEFINE_WORKQUEUES_NAME = 'defineWorkqueues'
 const ACTIONS_PROPERTY_NAME = 'actions'
@@ -369,7 +367,7 @@ function processFile(filePath: string, project: Project): number {
   if (!sourceFile) return 0
 
   let totalChanges = 0
-  const relPath = path.relative(getCwd(), filePath)
+  const relPath = path.relative(process.cwd(), filePath)
 
   const callExpressions = sourceFile.getDescendantsOfKind(
     SyntaxKind.CallExpression
@@ -428,7 +426,7 @@ function processFile(filePath: string, project: Project): number {
 // ─── Entry point ─────────────────────────────────────────────────────────────
 
 async function main() {
-  const srcDir = path.join(getCwd(), 'src')
+  const srcDir = path.join(process.cwd(), 'src')
   console.log(
     `Scanning for birth defineConfig and PRINT_CERTIFICATE workqueues in: ${srcDir}\n`
   )
@@ -470,7 +468,7 @@ async function main() {
   for (const filePath of modifiedFiles) {
     const sourceFile = project.getSourceFileOrThrow(filePath)
     await sourceFile.save()
-    console.log(`  Saved: ${path.relative(getCwd(), filePath)}`)
+    console.log(`  Saved: ${path.relative(process.cwd(), filePath)}`)
   }
 
   console.log(

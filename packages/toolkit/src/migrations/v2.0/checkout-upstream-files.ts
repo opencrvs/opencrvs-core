@@ -44,20 +44,20 @@
  */
 
 import { execFileSync } from 'child_process'
-import { getCwd } from '.'
-
-const UPSTREAM_URL = 'https://github.com/opencrvs/opencrvs-countryconfig.git'
+export const UPSTREAM_URL =
+  'https://github.com/opencrvs/opencrvs-countryconfig.git'
 
 // @TODO: This needs to be changed to 'release-v2.0.0' once the branch is created
-const UPSTREAM_BRANCH = 'develop'
+export const UPSTREAM_BRANCH = 'develop'
 
 // Remote name used only for the duration of this codemod. Prefixed to avoid
 // clashing with remotes the user may have (origin, upstream, etc.).
 const TEMP_REMOTE = 'opencrvs-upgrade-v19-v20-codemod'
 
 const FILES_TO_CHECKOUT = [
-  'infrastructure/postgres/setup-analytics.sh',
-  'src/analytics/analytics.ts'
+  'src/analytics/analytics.ts',
+  'Dockerfile',
+  'Dockerfile.assets'
 ]
 
 // ─── Git helpers ─────────────────────────────────────────────────────────────
@@ -69,12 +69,12 @@ const FILES_TO_CHECKOUT = [
  * long-running commands (e.g. `git fetch`). Pass `silent: true` to suppress
  * both stdout and stderr when you only care about the exit code.
  */
-function runGit(
+export function runGit(
   args: string[],
   { silent = false }: { silent?: boolean } = {}
 ): string {
   return execFileSync('git', args, {
-    cwd: getCwd(),
+    cwd: process.cwd(),
     encoding: 'utf8',
     stdio: silent ? ['ignore', 'pipe', 'pipe'] : ['ignore', 'pipe', 'inherit']
   })
@@ -85,7 +85,7 @@ function runGit(
  * Stderr/stdout are suppressed — use only when the exit code is the only
  * signal you care about.
  */
-function tryGit(args: string[]): boolean {
+export function tryGit(args: string[]): boolean {
   try {
     runGit(args, { silent: true })
     return true
@@ -94,10 +94,10 @@ function tryGit(args: string[]): boolean {
   }
 }
 
-function assertIsGitRepo(): void {
+export function assertIsGitRepo(): void {
   if (!tryGit(['rev-parse', '--is-inside-work-tree'])) {
     throw new Error(
-      `checkout-upstream-files: ${getCwd()} is not a git repository. Initialise git (or run the upgrade inside a git checkout) before re-running.`
+      `${process.cwd()} is not a git repository. Initialise git (or run the upgrade inside a git checkout) before re-running.`
     )
   }
 }
