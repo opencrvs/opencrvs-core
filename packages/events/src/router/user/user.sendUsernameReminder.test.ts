@@ -75,4 +75,8 @@ test('sendUsernameReminder can be called multiple times on the same user', async
     .execute()
 
   expect(auditEntries).toHaveLength(2)
+
+  auditEntries.forEach((x) =>
+    expect(x.operation).toBe('user.username_reminder_by_admin')
+  )
 })
