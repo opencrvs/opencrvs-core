@@ -1010,6 +1010,98 @@ describe('correction requests', () => {
     expect(applicantName.firstname).toBe('Doe')
     expect(applicantName.surname).toBe('John')
   })
+
+  test('approval declaration is merged on top of approved correction request', () => {
+    const correctionRequestId = generateUuid()
+    const correctionRequestAction = {
+      ...generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.REQUEST_CORRECTION,
+        defaults: {
+          id: correctionRequestId,
+          status: ActionStatus.Accepted,
+          createdAt: '2025-01-23T02:21:41.206Z',
+          declaration: {
+            'applicant.name': {
+              firstname: 'Doe',
+              surname: 'John'
+            }
+          }
+        }
+      }),
+      id: correctionRequestId
+    }
+
+    const approveCorrectionAction = {
+      ...generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.APPROVE_CORRECTION,
+        defaults: {
+          status: ActionStatus.Accepted,
+          createdAt: '2025-01-23T02:21:42.230Z',
+          declaration: {
+            'applicant.name': {
+              firstname: 'Jane',
+              surname: 'Smith'
+            }
+          }
+        }
+      }),
+      requestId: correctionRequestId
+    }
+
+    const event = {
+      type: TENNIS_CLUB_MEMBERSHIP,
+      id: generateUuid(),
+      trackingId: 'TEST12',
+      createdAt: '2025-01-23T02:21:38.343Z',
+      updatedAt: '2025-01-23T02:21:42.230Z',
+      actions: [
+        generateActionDocument({
+          configuration: tennisClubMembershipEvent,
+          action: ActionType.CREATE,
+          defaults: {
+            status: ActionStatus.Accepted,
+            createdAt: '2025-01-23T02:21:38.343Z'
+          }
+        }),
+        generateActionDocument({
+          configuration: tennisClubMembershipEvent,
+          action: ActionType.DECLARE,
+          defaults: {
+            status: ActionStatus.Accepted,
+            createdAt: '2025-01-23T02:21:39.161Z',
+            declaration: {
+              'applicant.name': {
+                firstname: 'John',
+                surname: 'Doe'
+              }
+            }
+          }
+        }),
+        generateActionDocument({
+          configuration: tennisClubMembershipEvent,
+          action: ActionType.REGISTER,
+          defaults: {
+            status: ActionStatus.Accepted,
+            createdAt: '2025-01-23T02:21:40.182Z',
+            declaration: {}
+          }
+        }),
+        correctionRequestAction,
+        approveCorrectionAction
+      ]
+    }
+
+    const state = getCurrentEventState(event, tennisClubMembershipEvent)
+    const applicantName = state.declaration['applicant.name'] as {
+      firstname: string
+      surname: string
+    }
+
+    expect(applicantName.firstname).toBe('Jane')
+    expect(applicantName.surname).toBe('Smith')
+  })
 })
 
 describe('address state transitions', () => {
