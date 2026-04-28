@@ -30,10 +30,11 @@ import {
   never,
   PageTypes,
   TokenUserType,
-  UserInput,
   hasScope,
   EncodedScope,
-  UUID
+  UUID,
+  CreateUserInput,
+  UpdateUserInput
 } from '@opencrvs/commons/client'
 import { AppBar, Frame, Spinner } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -42,7 +43,7 @@ import {
   ICON_ALIGNMENT,
   SuccessButton
 } from '@opencrvs/components/lib/buttons'
-import { BackArrowDeepBlue, Check, Cross } from '@opencrvs/components/lib/icons'
+import { Check, Cross } from '@opencrvs/components/lib/icons'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { TRPCClientError } from '@trpc/client'
@@ -56,7 +57,11 @@ import {
 import styled from 'styled-components'
 import { create } from 'zustand'
 import { useUsers } from '../../../../../v2-events/hooks/useUsers'
-import { emptyMessage } from '@client/v2-events/utils'
+import {
+  createTemporaryId,
+  emptyMessage,
+  isTemporaryId
+} from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 
@@ -223,7 +228,6 @@ export const useUserFormState = create<UserFormState>()((set, get) => ({
   clear: () => set(() => ({ userForm: undefined }))
 }))
 
-const NEW_USER = '__NEW__'
 export const CreateNewUser = () => {
   const [{ officeId, from }] = useTypedSearchParams(
     ROUTES.V2.SETTINGS.USER.CREATE
@@ -236,7 +240,7 @@ export const CreateNewUser = () => {
     navigate(
       ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
         {
-          userId: NEW_USER,
+          userId: createTemporaryId(),
           pageId: 'user.details'
         },
         { from }
@@ -256,7 +260,7 @@ const EditUserComponent = () => {
   const [roles] = listRoles.useSuspenseQuery()
   const formState = getUserForm()
   const selectedRole = roles.find((role) => role.id === formState['role'])
-  const isNewUser = userId === NEW_USER
+  const isNewUser = isTemporaryId(userId)
   useEffect(() => {
     if (!formState['primaryOfficeId'] && pageId !== 'user.office') {
       navigate(
@@ -352,8 +356,9 @@ const ReviewUserComponent = () => {
   const navigate = useNavigate()
   const { getUserForm, setUserForm, clear } = useUserFormState()
   const { userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.REVIEW)
+
   const [searchParams] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.REVIEW)
-  const isNewUser = userId === NEW_USER
+  const isNewUser = isTemporaryId(userId)
   const { getUser, createUser, updateUser } = useUsers()
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
@@ -555,7 +560,7 @@ const ReviewUserComponent = () => {
                   formState[f.id] as FieldValue
                 ])
               )
-              const payload: UserInput = {
+              const payload: CreateUserInput = {
                 mobile: formState.phoneNumber,
                 email: formState.email!,
                 role: formState.role!,
@@ -594,7 +599,8 @@ const ReviewUserComponent = () => {
                   formState[f.id] as FieldValue
                 ])
               )
-              const payload: UserInput = {
+              const payload: UpdateUserInput = {
+                id: userId,
                 mobile: formState.phoneNumber,
                 email: formState.email!,
                 role: formState.role!,
@@ -609,20 +615,17 @@ const ReviewUserComponent = () => {
                 ],
                 data
               }
-              updateUserMutation.mutate(
-                { ...payload, id: userId },
-                {
-                  onSuccess: (data) => {
-                    clear()
-                    navigate(
-                      ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
-                        userId: data.id
-                      })
-                    )
-                  },
-                  onError: handleMutationError
-                }
-              )
+              updateUserMutation.mutate(payload, {
+                onSuccess: (data) => {
+                  clear()
+                  navigate(
+                    ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
+                      userId: data.id
+                    })
+                  )
+                },
+                onError: handleMutationError
+              })
             }}
             icon={() => <Check />}
             align={ICON_ALIGNMENT.LEFT}

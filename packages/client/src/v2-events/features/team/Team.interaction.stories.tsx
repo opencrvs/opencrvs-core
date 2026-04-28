@@ -72,7 +72,16 @@ const meta: Meta<typeof TeamPage> = {
         user: [
           tRPCMsw.user.search.query(() => [felix, kennedy]),
           tRPCMsw.user.get.query((id) => (id === kennedy.id ? kennedy : felix)),
-          tRPCMsw.user.roles.list.query(() => mockRoles)
+          tRPCMsw.user.roles.list.query(() => mockRoles),
+          tRPCMsw.user.update.mutation((input) => {
+            if (input.id === kennedy.id) {
+              Object.assign(kennedy, input)
+              return kennedy
+            } else {
+              Object.assign(felix, input)
+              return felix
+            }
+          })
         ]
       }
     },
@@ -229,6 +238,84 @@ export const Navigation: Story = {
       })
       const backButton = await canvas.findByTestId('crcl-btn')
       await userEvent.click(backButton)
+    })
+  }
+}
+
+export const ToggleUserActivation: Story = {
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Wait for user list to load', async () => {
+      await canvas.findByText('Felix Katongo', { selector: '#profile-link' })
+      await canvas.findByText('Kennedy Mweene', { selector: '#profile-link' })
+    })
+
+    await step("Open Kennedy's action menu and click deactivate", async () => {
+      const trigger = findMenuTriggerForUser(canvasElement, 'Kennedy Mweene')
+      await userEvent.click(trigger)
+
+      const popoverId = trigger.getAttribute('popovertarget')
+      const popover = popoverId ? document.getElementById(popoverId) : null
+      if (!popover) {
+        throw new Error('Kennedy menu popover not found')
+      }
+      await userEvent.click(within(popover).getByText('Deactivate'))
+    })
+
+    await step('Verify deactivation modal is shown', async () => {
+      await canvas.findByText('Deactivate Kennedy Mweene?')
+      await canvas.findByText(
+        'This will revoke Kennedy Mweene’s ability to login and access the system. The account can be reactivated at a later date.'
+      )
+
+      await canvas.findByRole('button', { name: 'Cancel' })
+    })
+
+    await step('Deactivate user', async () => {
+      const deactivateButton = await canvas.findByRole('button', {
+        name: 'Deactivate'
+      })
+      await userEvent.click(deactivateButton)
+
+      await canvas.findByText(
+        'Updated Kennedy Mweene\'s account status to "Deactivated"'
+      )
+
+      await canvas.findByText('Deactivated')
+    })
+
+    await step('Open reactivate user', async () => {
+      const trigger = findMenuTriggerForUser(canvasElement, 'Kennedy Mweene')
+      await userEvent.click(trigger)
+
+      const popoverId = trigger.getAttribute('popovertarget')
+      const popover = popoverId ? document.getElementById(popoverId) : null
+      if (!popover) {
+        throw new Error('Kennedy menu popover not found')
+      }
+      await userEvent.click(within(popover).getByText('Reactivate'))
+    })
+
+    await step('Verify reactivate modal is shown', async () => {
+      await canvas.findByText('Reactivate Kennedy Mweene?')
+      await canvas.findByText(
+        'This will reactivate Kennedy Mweene’s ability to login and access the system.'
+      )
+
+      await canvas.findByRole('button', { name: 'Cancel' })
+
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Reactivate' })
+      )
+    })
+
+    await step('Reactivate user', async () => {
+      await canvas.findByText(
+        'Updated Kennedy Mweene\'s account status to "Active"'
+      )
+
+      await canvas.findAllByText('Active')
     })
   }
 }
