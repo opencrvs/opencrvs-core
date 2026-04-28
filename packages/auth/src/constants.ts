@@ -13,6 +13,7 @@ export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:auth-user',
   'opencrvs:user-mgnt-user',
   'opencrvs:gateway-user',
+  'opencrvs:events-user',
   'opencrvs:notification-user',
   'opencrvs:metrics-user',
   'opencrvs:countryconfig-user',

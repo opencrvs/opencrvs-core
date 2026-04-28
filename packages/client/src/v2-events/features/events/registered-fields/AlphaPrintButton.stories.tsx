@@ -10,7 +10,6 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
@@ -20,13 +19,11 @@ import { ROUTES } from '@client/v2-events/routes'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 
-import { noop } from '@client/v2-events'
 import { tennisClubMembershipEventDocument } from '../fixtures'
 import { getTestValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/AlphaPrintButton',
-  args: { onChange: fn() },
   decorators: [
     (Story) => (
       <TRPCProvider>
@@ -75,7 +72,6 @@ export const Default: StoryObj<typeof FormFieldGenerator> = {
             ]}
             id="my-form"
             validatorContext={getTestValidatorContext()}
-            onChange={() => noop()}
           />
         )
       },

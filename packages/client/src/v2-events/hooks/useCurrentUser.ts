@@ -45,6 +45,7 @@ export function useCurrentUser() {
     signature: user.signature
   }
 
+  // @todo: administrativeAreaId should be returned from the API
   if (user.primaryOfficeId) {
     const primaryOfficeLocation = locations.get(user.primaryOfficeId)
     const officeAdministrativeAreaId =

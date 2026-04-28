@@ -108,7 +108,7 @@ export type VerificationStatusValue = z.infer<typeof VerificationStatusValue>
 
 // We need to create a separate union of all field types excluding the DataFieldValue,
 // because otherwise the DataFieldValue would need to refer to itself.
-const FieldValuesWithoutDataField = z.union([
+const LeafFieldValues = z.union([
   AddressFieldValue,
   TextValue,
   PlainDate,
@@ -134,20 +134,25 @@ const FieldValuesWithoutDataField = z.union([
   AutocompleteValue,
   AutocompleteUpdateValue
 ])
-type FieldValuesWithoutDataField = z.infer<typeof FieldValuesWithoutDataField>
+type LeafFieldValues = z.infer<typeof LeafFieldValues>
+
+export const FieldGroupValue = z.record(z.string(), LeafFieldValues)
+export type FieldGroupValue = z.infer<typeof FieldGroupValue>
 
 // As data field value can refer to other field values, it can contain any other field value types
 export const DataFieldValue = z
   .object({
-    data: z.record(z.string(), FieldValuesWithoutDataField)
+    data: z.record(z.string(), LeafFieldValues)
   })
   .nullish()
 export type DataFieldValue = z.infer<typeof DataFieldValue>
 
-export type FieldValue = FieldValuesWithoutDataField | DataFieldValue
+export type FieldValue = LeafFieldValues | DataFieldValue | FieldGroupValue
+
 export const FieldValue: z.ZodType<FieldValue> = z.union([
-  FieldValuesWithoutDataField,
-  DataFieldValue
+  LeafFieldValues,
+  DataFieldValue,
+  FieldGroupValue
 ])
 
 // Priority order for schema matching.
@@ -170,7 +175,8 @@ const PRIORITY_ORDER = [
   'NumberWithUnitFieldUpdateValue',
   'FileFieldValue',
   'FileFieldWithOptionValue',
-  'DataFieldValue'
+  'DataFieldValue',
+  'GroupFieldValue'
 ] as const
 
 /**
@@ -244,7 +250,8 @@ export type FieldUpdateValue =
   | z.infer<typeof NumberWithUnitFieldUpdateValue>
   | z.infer<typeof FileFieldValue>
   | z.infer<typeof FileFieldWithOptionValue>
-  | z.infer<typeof DataFieldValue>
+  | DataFieldValue
+  | FieldGroupValue
   | z.infer<typeof NameFieldUpdateValue>
   | z.infer<typeof HttpFieldUpdateValue>
   | z.infer<typeof QueryParamReaderFieldUpdateValue>
@@ -268,6 +275,7 @@ export const FieldUpdateValue: z.ZodType<FieldUpdateValue> = safeUnion([
   FileFieldValue.describe('FileFieldValue'),
   FileFieldWithOptionValue.describe('FileFieldWithOptionValue'),
   DataFieldValue.describe('DataFieldValue'),
+  FieldGroupValue.describe('GroupFieldValue'),
   NameFieldUpdateValue.describe('NameFieldUpdateValue'),
   HttpFieldUpdateValue.describe('HttpFieldUpdateValue'),
   QueryParamReaderFieldUpdateValue.describe('QueryParamReaderFieldUpdateValue'),
@@ -287,6 +295,7 @@ export type FieldValueSchema =
   | typeof NumberFieldValue
   | typeof NumberWithUnitFieldValue
   | typeof DataFieldValue
+  | typeof FieldGroupValue
   | typeof NameFieldValue
   | z.ZodString
   | z.ZodBoolean
@@ -308,6 +317,7 @@ export type FieldUpdateValueSchema =
   | typeof NumberWithUnitFieldValue
   | typeof NumberWithUnitFieldUpdateValue
   | typeof DataFieldValue
+  | typeof FieldGroupValue
   | typeof NameFieldValue
   | typeof NameFieldUpdateValue
   | typeof HttpFieldUpdateValue

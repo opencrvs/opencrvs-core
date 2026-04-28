@@ -8,21 +8,5 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { useField } from 'formik'
-
-export function useResolveDefaultValue<T>({
-  fieldName,
-  defaultValue,
-  resolver
-}: {
-  fieldName?: string
-  defaultValue: T
-  resolver: (value: T) => string
-}) {
-  const [, , helpers] = useField(fieldName ?? '')
-  const resolvedValue = resolver(defaultValue)
-  if (defaultValue !== resolvedValue) {
-    void helpers.setValue(resolvedValue)
-  }
-  return resolvedValue
-}
+import path from 'path'
+process.env.CERT_PUBLIC_KEY_PATH = path.resolve(__dirname, 'cert.public.key')

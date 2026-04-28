@@ -15,12 +15,12 @@ import styled from 'styled-components'
 import { http, HttpResponse } from 'msw'
 import { FieldType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-import { FormFieldGeneratorProps } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
+import { FormFieldGeneratorPropsWithoutRef } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 import { Review } from '../components/Review'
 
-const meta: Meta<FormFieldGeneratorProps> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/Custom',
   component: FormFieldGenerator,
   argTypes: {
@@ -73,7 +73,7 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: '400px';
 `
 
-export const Input: StoryObj<typeof FormFieldGenerator> = {
+export const Input: StoryObj<FormFieldGeneratorPropsWithoutRef> = {
   name: 'Input',
   parameters: {
     layout: 'centered'
@@ -95,15 +95,15 @@ export const Input: StoryObj<typeof FormFieldGenerator> = {
             }
           }
         ]}
-        id="my-form"
-        initialValues={{
+        formValues={{
           'storybook.data': 3
         }}
+        id="my-form"
       />
     )
   }
 }
-export const Output: StoryObj<typeof FormFieldGenerator> = {
+export const Output: StoryObj<typeof Review.Body> = {
   name: 'Output',
   parameters: {
     layout: 'centered'

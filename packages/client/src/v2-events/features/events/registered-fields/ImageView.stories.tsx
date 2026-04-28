@@ -10,17 +10,18 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { FieldType } from '@opencrvs/commons/client'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormFieldGenerator,
+  FormFieldGeneratorPropsWithoutRef
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/ImageView',
-  args: { onChange: fn() },
   parameters: {
     layout: 'centered'
   },
@@ -67,7 +68,9 @@ const imageField = {
   }
 }
 
-export const LeftAligned: StoryObj<typeof FormFieldGenerator> = {
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
+
+export const LeftAligned: Story = {
   render: function Component(args) {
     return (
       <StyledFormFieldGenerator
@@ -87,7 +90,7 @@ export const LeftAligned: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
-export const CenterAligned: StoryObj<typeof FormFieldGenerator> = {
+export const CenterAligned: Story = {
   render: function Component(args) {
     return (
       <StyledFormFieldGenerator
@@ -107,7 +110,7 @@ export const CenterAligned: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
-export const RightAligned: StoryObj<typeof FormFieldGenerator> = {
+export const RightAligned: Story = {
   render: function Component(args) {
     return (
       <StyledFormFieldGenerator
