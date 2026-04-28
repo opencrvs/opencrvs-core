@@ -24,6 +24,7 @@ import { main as removeUnusedEnvironmentVariables } from './remove-unused-enviro
 import { main as removeFhirUrlHelpers } from './remove-fhir-url-helpers'
 import { main as migrateApplicationConfigUrl } from './migrate-application-config-url'
 import { main as removeOldStatisticsService } from './remove-old-statistics-service'
+import { main as updatePackageJson } from './update-package-json'
 import { main as migrateWorkqueueConfigs } from './migrate-workqueue-configs'
 import { main as removeDemoScope } from './remove-demo-scope'
 import { main as removeHearthMigrations } from './remove-hearth-migrations'
@@ -65,6 +66,7 @@ export async function runUpgrade(dockerSwarm: boolean) {
   await createEventsIndex()
   await checkoutUpstreamFiles()
   await simplifyAnalyticsPrecalculations()
+  await updatePackageJson()
 
   if (dockerSwarm) {
     await mergeInfrastructureDirectory()
