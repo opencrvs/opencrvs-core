@@ -23,9 +23,6 @@ export const GET_USER_DETAILS_SUCCESS =
   'PROFILE/GET_USER_DETAILS_SUCCESS' as const
 const GET_USER_DETAILS_FAILED = 'PROFILE/GET_USER_DETAILS_FAILED' as const
 export const USER_DETAILS_AVAILABLE = 'PROFILE/USER_DETAILS_AVAILABLE' as const
-export const SEND_VERIFY_CODE = 'PROFILE/SEND_VERIFY_CODE' as const
-export const SEND_VERIFY_CODE_COMPLETED =
-  'PROFILE/SEND_VERIFY_CODE_COMPLETED' as const
 
 type RedirectToAuthenticationAction = {
   type: typeof REDIRECT_TO_AUTHENTICATION
@@ -46,32 +43,6 @@ type SetUserDetailsAction = {
 type ModifyUserDetailsAction = {
   type: typeof MODIFY_USER_DETAILS
   payload: Partial<UserDetails>
-}
-type SendVerifyCode = {
-  type: typeof SEND_VERIFY_CODE
-  payload: {
-    userFullName: {
-      use: string
-      family: string
-      given: string[]
-    }[]
-    notificationEvent:
-      | typeof TriggerEvent.CHANGE_PHONE_NUMBER
-      | typeof TriggerEvent.CHANGE_EMAIL_ADDRESS
-    phoneNumber?: string
-    email?: string
-  }
-}
-
-type SendVerifyCodeSuccessAction = {
-  type: typeof SEND_VERIFY_CODE_COMPLETED
-  payload: {
-    userId: string
-    nonce: string
-    status: string
-    mobile?: string
-    email?: string
-  }
 }
 
 export type IGetStorageUserDetailsSuccessAction = {
@@ -159,5 +130,3 @@ export type Action =
   | IGetStorageUserDetailsFailedAction
   | ModifyUserDetailsAction
   | UserDetailsAvailable
-  | SendVerifyCode
-  | SendVerifyCodeSuccessAction
