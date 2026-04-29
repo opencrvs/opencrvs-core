@@ -1164,60 +1164,6 @@ export const handlers = {
         total: allResults.length
       }
     }),
-    graphql.query('fetchUser', (input) => {
-      const userId = input.variables.userId
-      const generator = testDataGenerator()
-      let response
-
-      if (userId == generator.user.id.fieldAgent) {
-        response = generator.user.fieldAgent().v1
-      } else if (userId == generator.user.id.registrationAgent) {
-        response = generator.user.registrationAgent().v1
-      } else if (userId == generator.user.id.localSystemAdmin) {
-        response = generator.user.localSystemAdmin().v1
-      } else if (userId == generator.user.id.nationalSystemAdmin) {
-        response = generator.user.nationalSystemAdmin().v1
-      } else if (userId == generator.user.id.provincialRegistrar) {
-        response = generator.user.provincialRegistrar().v1
-      } else if (userId == generator.user.id.communityLeader) {
-        response = generator.user.communityLeader().v1
-      } else {
-        response = generator.user.localRegistrar().v1
-      }
-
-      return HttpResponse.json({
-        data: {
-          getUser: response
-        }
-      })
-    }),
-    graphql.query('getUser', (input) => {
-      const userId = input.variables.userId
-      const generator = testDataGenerator()
-      let response
-
-      if (userId == generator.user.id.fieldAgent) {
-        response = generator.user.fieldAgent().v1
-      } else if (userId == generator.user.id.registrationAgent) {
-        response = generator.user.registrationAgent().v1
-      } else if (userId == generator.user.id.localSystemAdmin) {
-        response = generator.user.localSystemAdmin().v1
-      } else if (userId == generator.user.id.nationalSystemAdmin) {
-        response = generator.user.nationalSystemAdmin().v1
-      } else if (userId == generator.user.id.provincialRegistrar) {
-        response = generator.user.provincialRegistrar().v1
-      } else if (userId == generator.user.id.communityLeader) {
-        response = generator.user.communityLeader().v1
-      } else {
-        response = generator.user.localRegistrar().v1
-      }
-
-      return HttpResponse.json({
-        data: {
-          getUser: response
-        }
-      })
-    }),
     tRPCMsw.user.list.query(() => {
       const generator = testDataGenerator()
 

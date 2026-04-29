@@ -143,3 +143,26 @@ test('successfully updates user fields and returns updated user', async () => {
     primaryOfficeId: user.primaryOfficeId
   })
 })
+
+test('toggling user status keeps other fields intact', async () => {
+  const { user, users } = await setupTestCase()
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+
+  const userToTestWith = users[1]
+  const deactivatedUser = await client.user.update({
+    status: 'deactivated',
+    id: userToTestWith.id
+  })
+
+  expect(deactivatedUser).toMatchObject({
+    ...userToTestWith,
+    status: 'deactivated'
+  })
+
+  const reactivatedUser = await client.user.update({
+    status: 'active',
+    id: userToTestWith.id
+  })
+
+  expect(reactivatedUser).toMatchObject(userToTestWith)
+})

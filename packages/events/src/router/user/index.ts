@@ -18,14 +18,15 @@ import {
   UUID
 } from '@opencrvs/commons/events'
 import {
+  CreateUserInput,
   isBase64FileString,
   logger,
   personNameFromV1ToV2,
   TokenWithBearer,
   User,
-  UserInput,
   UserOrSystem,
-  UserUpdateInput
+  UpdateUserInput,
+  CreateUserInputInternal
 } from '@opencrvs/commons'
 import {
   allowedWithAnyOfScopes,
@@ -54,10 +55,12 @@ import {
   getCredentials,
   getUser,
   searchUsers,
-  updateUser
+  updateUser,
+  getUsersById,
+  isUser,
+  sendUsernameReminder
 } from '@events/service/users/api'
 import { uploadBase64File } from '@events/service/files'
-import { getUsersById, isUser } from '@events/service/users/api'
 import {
   checkVerificationCode,
   generateAndSendVerificationCode,
@@ -99,60 +102,57 @@ function getAuditLogIdentifiers(token: TokenWithBearer) {
 
   return AuditLogSubject.parse(decoded)
 }
-export function createUserRoute(
-  procedure: typeof internalProcedure | typeof userAndSystemProcedure
-) {
-  return procedure
-    .input(UserInput)
-    .output(User)
-    .mutation(async ({ input, ctx }) => {
-      const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
 
-      if (input.mobile) {
-        const existingWithMobile = await searchUsers({
-          mobile: input.mobile,
-          count: 1,
-          skip: 0,
-          sortOrder: 'asc',
-          sortBy: 'createdAt'
-        })
-
-        if (existingWithMobile.length > 0) {
-          logger.error(
-            `Phone number ${input.mobile} is already in use by another user`
-          )
-          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_MOBILE' })
-        }
-      }
-
-      if (input.email) {
-        const existingWithEmail = await searchUsers({
-          email: input.email,
-          count: 1,
-          skip: 0,
-          sortOrder: 'asc',
-          sortBy: 'createdAt'
-        })
-        if (existingWithEmail.length > 0) {
-          logger.error(`Email ${input.email} is already in use by another user`)
-          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
-        }
-      }
-      const user = await createUser(input, ctx.token)
-      await writeAuditLog({
-        ...input,
-        clientId: auditLogIdentifiers.sub,
-        clientType: auditLogIdentifiers.userType ?? 'system',
-        operation: 'user.create_user',
-        requestData: {
-          subjectId: user.id,
-          role: user.role,
-          primaryOfficeId: user.primaryOfficeId
-        }
-      })
-
-      return user
+export async function handleCreateUser(
+  input: CreateUserInput | CreateUserInputInternal,
+  ctx: { token: TokenWithBearer }
+): Promise<User> {
+  if (input.mobile) {
+    const existingWithMobile = await searchUsers({
+      mobile: input.mobile,
+      count: 1,
+      skip: 0,
+      sortOrder: 'asc',
+      sortBy: 'createdAt'
     })
+    if (existingWithMobile.length > 0) {
+      logger.error(
+        `Phone number ${input.mobile} is already in use by another user`
+      )
+      throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_MOBILE' })
+    }
+  }
+
+  if (input.email) {
+    const existingWithEmail = await searchUsers({
+      email: input.email,
+      count: 1,
+      skip: 0,
+      sortOrder: 'asc',
+      sortBy: 'createdAt'
+    })
+    if (existingWithEmail.length > 0) {
+      logger.error(`Email ${input.email} is already in use by another user`)
+      throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
+    }
+  }
+
+  const user = await createUser(input, ctx.token)
+
+  const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
+  await writeAuditLog({
+    ...input,
+    clientId: auditLogIdentifiers.sub,
+    clientType: auditLogIdentifiers.userType ?? 'system',
+    operation: 'user.create_user',
+    requestData: {
+      subjectId: user.id,
+      role: user.role,
+      primaryOfficeId: user.primaryOfficeId
+    }
+  })
+
+  return user
 }
 
 export function searchUsersRoute(
@@ -224,12 +224,14 @@ export const userRouter = router({
 
       return users[0]
     }),
-  create: createUserRoute(
-    userAndSystemProcedure.use(allowedWithAnyOfScopes(['user.create']))
-  ),
+  create: userAndSystemProcedure
+    .use(allowedWithAnyOfScopes(['user.create']))
+    .input(CreateUserInput)
+    .output(User)
+    .mutation(async ({ input, ctx }) => handleCreateUser(input, ctx)),
   update: userAndSystemProcedure
     .use(allowedWithAnyOfScopes(['user.edit']))
-    .input(UserUpdateInput.and(z.object({ id: UUID })))
+    .input(UpdateUserInput.and(z.object({ id: UUID })))
     .use(canUpdateUserLocation)
     .output(User)
     .mutation(async ({ input, ctx }) => {
@@ -267,7 +269,9 @@ export const userRouter = router({
           throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
         }
       }
+
       const user = await updateUser(input, ctx.token)
+
       await writeAuditLog({
         operation: 'user.edit_user',
         requestData: { subjectId: input.id },
@@ -544,6 +548,20 @@ export const userRouter = router({
     )
     .mutation(async ({ input }) => {
       return activateUser(input)
+    }),
+  sendUsernameReminder: userAndSystemProcedure
+    .use(allowedWithAnyOfScopes(['user.edit']))
+    .input(UUID)
+    .mutation(async ({ input, ctx }) => {
+      const userId = UUID.parse(input)
+      await sendUsernameReminder(userId, ctx.token)
+      const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
+      await writeAuditLog({
+        operation: 'user.username_reminder_by_admin',
+        requestData: { subjectId: userId },
+        clientId: auditLogIdentifiers.sub,
+        clientType: auditLogIdentifiers.userType ?? 'system'
+      })
     }),
   audit: auditRouter
 })

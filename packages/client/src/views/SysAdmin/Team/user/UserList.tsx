@@ -57,6 +57,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import styled, { withTheme } from 'styled-components'
 import { useOnlineStatus } from '../../../../utils'
 import { useAdministrativeAreas } from '../../../../v2-events/hooks/useAdministrativeAreas'
+import { UserActivationModal } from './UserActivationModal'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const DEFAULT_PAGE_NUMBER = 1
@@ -200,6 +201,12 @@ function UserListComponent({ userDetails }: UserListProps) {
   const [showResetPasswordSuccess, setShowResetPasswordSuccess] =
     useState(false)
   const [showResetPasswordError, setResetPasswordError] = useState(false)
+
+  const [showActivationToggleSuccess, setShowActivationToggleSuccess] =
+    useState(false)
+
+  const [showActivationToggleError, setShowActivationToggleError] =
+    useState(false)
   const { canReadUser, canEditUser, canAddOfficeUsers, canAccessOffice } =
     usePermissions()
 
@@ -236,7 +243,7 @@ function UserListComponent({ userDetails }: UserListProps) {
     [locations, canAccessOffice]
   )
 
-  const { searchUsers } = useUsers()
+  const { searchUsers, sendUsernameReminder } = useUsers()
   const {
     data: searchResults,
     isLoading,
@@ -318,19 +325,17 @@ function UserListComponent({ userDetails }: UserListProps) {
     }
   }, [])
 
-  const usernameReminder = useCallback(async function usernameReminder(
-    userId: string
-  ) {
-    try {
-      throw new Error('@todo Username reminder mutation is not implemented')
-      // const res = await userMutations.usernameReminderSend(userId, [])
-      // if (res && res.data && res.data.usernameReminder) {
-      //   setShowUsernameReminderSuccess(true)
-      // }
-    } catch (err) {
-      setShowUsernameReminderError(true)
-    }
-  }, [])
+  const usernameReminder = useCallback(
+    async (userId: string) => {
+      try {
+        await sendUsernameReminder.mutateAsync(userId as UUID)
+        setShowUsernameReminderSuccess(true)
+      } catch {
+        setShowUsernameReminderError(true)
+      }
+    },
+    [sendUsernameReminder]
+  )
 
   const resetPassword = useCallback(async function resetPassword(
     userId: string
@@ -483,7 +488,7 @@ function UserListComponent({ userDetails }: UserListProps) {
               onClick={() =>
                 navigate(
                   ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
-                    userId: String(user.id)
+                    userId: user.id
                   })
                 )
               }
@@ -498,7 +503,7 @@ function UserListComponent({ userDetails }: UserListProps) {
               onClick={() =>
                 navigate(
                   ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
-                    userId: String(user.id)
+                    userId: user.id
                   })
                 )
               }
@@ -616,14 +621,20 @@ function UserListComponent({ userDetails }: UserListProps) {
               }
             />
           )}
-          {/* {toggleActivation.selectedUser?.id ? (
-            <UserAuditActionModal
-              show={toggleActivation.modalVisible}
-              userId={toggleActivation.selectedUser.id}
-              onClose={() => toggleUserActivationModal()}
+          {toggleActivation.modalVisible && toggleActivation.selectedUser && (
+            <UserActivationModal
+              user={toggleActivation.selectedUser}
+              onClose={() => toggleUserActivationModal(undefined)}
+              onSuccess={() => {
+                toggleUserActivationModal(undefined)
+                setShowActivationToggleSuccess(true)
+              }}
+              onError={() => {
+                toggleUserActivationModal(undefined)
+                setShowActivationToggleError(true)
+              }}
             />
-          ) : null} */}
-
+          )}
           <ResponsiveModal
             id="username-reminder-modal"
             show={toggleUsernameReminder.modalVisible}
@@ -714,9 +725,9 @@ function UserListComponent({ userDetails }: UserListProps) {
       currentPageNumber,
       generateUserContents,
       intl,
-      // toggleActivation.modalVisible,
-      // toggleActivation.selectedUser,
-      // toggleUserActivationModal,
+      toggleActivation.modalVisible,
+      toggleActivation.selectedUser,
+      toggleUserActivationModal,
       toggleUsernameReminder.modalVisible,
       toggleUsernameReminder.selectedUser,
       toggleUsernameReminderModal,
@@ -865,6 +876,36 @@ function UserListComponent({ userDetails }: UserListProps) {
           onClose={() => setResetPasswordError(false)}
         >
           {intl.formatMessage(messages.resetPasswordError)}
+        </Toast>
+      )}
+      {showActivationToggleSuccess && toggleActivation.selectedUser && (
+        <Toast
+          id="activation_toggle_success"
+          type="success"
+          onClose={() => setShowActivationToggleSuccess(false)}
+        >
+          {intl.formatMessage(messages.toggleActivateStatusSuccess, {
+            name: getUserName(toggleActivation.selectedUser),
+            status:
+              toggleActivation.selectedUser?.status === 'active'
+                ? intl.formatMessage(messages.deactivated)
+                : intl.formatMessage(messages.active)
+          })}
+        </Toast>
+      )}
+      {showActivationToggleError && toggleActivation.selectedUser && (
+        <Toast
+          id="activation_toggle_error"
+          type="warning"
+          onClose={() => setShowActivationToggleError(false)}
+        >
+          {intl.formatMessage(messages.toggleActivateStatusError, {
+            name: getUserName(toggleActivation.selectedUser),
+            status:
+              toggleActivation.selectedUser?.status === 'active'
+                ? intl.formatMessage(messages.deactivated)
+                : intl.formatMessage(messages.active)
+          })}
         </Toast>
       )}
     </>
