@@ -138,7 +138,8 @@ function mapDbUserToUser(user: DbUser): User & { username: string } {
       : undefined,
     primaryOfficeId: user.officeId,
     administrativeAreaId: user.administrativeAreaId ?? undefined,
-    fullHonorificName: user.fullHonorificName ?? undefined
+    fullHonorificName: user.fullHonorificName ?? undefined,
+    data: Object.keys(user.data).length > 0 ? user.data : undefined
   }
 }
 
@@ -232,7 +233,8 @@ export async function updateUser(
     officeId: input.primaryOfficeId,
     signaturePath: input.signature
       ? input.signature.path
-      : existingUser.signaturePath
+      : existingUser.signaturePath,
+    data: input.data
   })
 
   if (newUsername !== oldUsername) {
@@ -348,7 +350,8 @@ export async function createUser(
     // duplicate, so any empty string must be stored as NULL instead.
     mobile: resolvedUser.mobile || undefined,
     status: resolvedUser.status,
-    signaturePath: resolvedUser.signature?.path
+    signaturePath: resolvedUser.signature?.path,
+    data: resolvedUser.data ?? {}
   }
 
   // Hash the provided password, or generate a random placeholder for pending

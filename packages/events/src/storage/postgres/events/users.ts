@@ -10,7 +10,7 @@
  */
 import { Kysely, sql } from 'kysely'
 import { TRPCError } from '@trpc/server'
-import { UUID } from '@opencrvs/commons/events'
+import { FieldValue, UUID } from '@opencrvs/commons/events'
 import { getClient } from '@events/storage/postgres/events'
 import { SearchUsersPayload } from '@events/service/users/api'
 import { NewUsers } from './schema/app/Users'
@@ -69,6 +69,7 @@ export async function getUserById(userId: UUID) {
       'users.officeId',
       'users.signaturePath',
       'users.profileImagePath',
+      'users.data',
       'locations.administrativeAreaId',
       'userCredentials.username'
     ])
@@ -216,6 +217,7 @@ export async function searchUsersWithInput(input: SearchUsersPayload) {
       'users.officeId',
       'users.profileImagePath',
       'users.fullHonorificName',
+      'users.data',
       'locations.administrativeAreaId'
     ])
 
@@ -290,6 +292,7 @@ type UpdateUserFields = Partial<{
   officeId: UUID
   signaturePath: string | null
   profileImagePath: string | null
+  data: Record<string, FieldValue>
 }>
 
 export async function updateUserById(userId: UUID, fields: UpdateUserFields) {
@@ -336,6 +339,7 @@ export async function getUsersAndSystemsByIds(ids: string[]) {
             'users.officeId',
             'users.signaturePath',
             'users.profileImagePath',
+            'users.data',
             'locations.administrativeAreaId',
             'userCredentials.username'
           ])
