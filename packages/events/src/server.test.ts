@@ -75,7 +75,7 @@ function createValidAppToken(payload: Record<string, unknown> = {}) {
     },
     cert,
     {
-      subject: '67ef7f83d6a9cb92e9edaa99',
+      subject: '69179374-0447-4545-4545-454545454547',
       algorithm: 'RS256',
       expiresIn: '1h',
       audience: 'opencrvs:events-user',

@@ -10,7 +10,7 @@
  */
 import { Kysely, sql } from 'kysely'
 import { TRPCError } from '@trpc/server'
-import { UUID } from '@opencrvs/commons/events'
+import { FieldValue, UUID } from '@opencrvs/commons/events'
 import { getClient } from '@events/storage/postgres/events'
 import { SearchUsersPayload } from '@events/service/users/api'
 import { NewUsers } from './schema/app/Users'
@@ -134,6 +134,27 @@ export async function updatePasswordHashAndSalt(
     .set({ passwordHash, salt })
     .where('userId', '=', userId)
     .execute()
+}
+
+export async function resetUserCredentialsAndStatus(
+  userId: UUID,
+  passwordHash: string,
+  salt: string
+): Promise<void> {
+  const db = getClient()
+  await db.transaction().execute(async (trx) => {
+    await trx
+      .updateTable('userCredentials')
+      .set({ passwordHash, salt })
+      .where('userId', '=', userId)
+      .execute()
+
+    await trx
+      .updateTable('users')
+      .set({ status: 'pending' })
+      .where('id', '=', userId)
+      .execute()
+  })
 }
 
 async function createUserInTrx(user: NewUsers, trx: Kysely<Schema>) {
@@ -271,7 +292,7 @@ type UpdateUserFields = Partial<{
   officeId: UUID
   signaturePath: string | null
   profileImagePath: string | null
-  data: Record<string, unknown>
+  data: Record<string, FieldValue>
 }>
 
 export async function updateUserById(userId: UUID, fields: UpdateUserFields) {

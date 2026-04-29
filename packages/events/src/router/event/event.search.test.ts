@@ -36,6 +36,7 @@ import {
   createTestClient,
   sanitizeForSnapshot,
   setupTestCase,
+  TEST_SYSTEM_ID,
   TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
@@ -1752,7 +1753,7 @@ test('User with "location" scope only sees events from their primary office', as
 test('User with "location" scope only sees events created by system user to their primary office', async () => {
   const { user, generator, locations } = await setupTestCase(5541)
 
-  const systemClient = createSystemTestClient('test-system', [
+  const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
     encodeScope({
       type: 'record.create',
       options: {
@@ -2259,7 +2260,7 @@ test('System integration with record search scope is allowed to search any recor
   // Create an event from another office
   await createEvent(otherClient, otherGen, [ActionType.DECLARE])
 
-  const recordSearchClient = createSystemTestClient('test-system', [
+  const recordSearchClient = createSystemTestClient(TEST_SYSTEM_ID, [
     encodeScope({
       type: 'record.search'
     })
@@ -2286,7 +2287,7 @@ test('System integration without record search scope is not allowed to search an
 
   await createEvent(client, generator, [ActionType.DECLARE])
 
-  const recordSearchClient = createSystemTestClient('test-system')
+  const recordSearchClient = createSystemTestClient(TEST_SYSTEM_ID)
 
   await expect(
     recordSearchClient.event.search({

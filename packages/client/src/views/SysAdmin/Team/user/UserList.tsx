@@ -243,8 +243,12 @@ function UserListComponent({ userDetails }: UserListProps) {
     [locations, canAccessOffice]
   )
 
-  const { searchUsers, sendUsernameReminder, sendResetPasswordInvite } =
-    useUsers()
+  const {
+    searchUsers,
+    sendUsernameReminder,
+    sendResetPasswordInvite,
+    resendInvite: resendInviteMutation
+  } = useUsers()
   const {
     data: searchResults,
     isLoading,
@@ -314,17 +318,17 @@ function UserListComponent({ userDetails }: UserListProps) {
     [toggleResetPassword]
   )
 
-  const resendInvite = useCallback(async function resendInvite(userId: string) {
-    try {
-      // const res = await userMutations.resendInvite(userId, [])
-      // if (res && res.data && res.data.resendInvite) {
-      //   setShowResendInviteSuccess(true)
-      // }
-      throw new Error('@todo Resend invite mutation is not implemented')
-    } catch (err) {
-      setShowResendInviteError(true)
-    }
-  }, [])
+  const resendInvite = useCallback(
+    async function resendInvite(userId: string) {
+      try {
+        await resendInviteMutation.mutateAsync(userId)
+        setShowResendInviteSuccess(true)
+      } catch (err) {
+        setShowResendInviteError(true)
+      }
+    },
+    [resendInviteMutation]
+  )
 
   const usernameReminder = useCallback(
     async (userId: string) => {
