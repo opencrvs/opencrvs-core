@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { TRPCError } from '@trpc/server'
+import { encodeScope } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import {
   updateUserById,
@@ -16,10 +18,20 @@ import {
 } from '@events/storage/postgres/events/users'
 
 const defaultSearch = { count: 10, skip: 0, sortOrder: 'asc' as const }
+const withReadAll = [encodeScope({ type: 'user.read' })]
+
+test('Throws NOT_FOUND if user does not have user.read scope', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [])
+
+  await expect(client.user.search(defaultSearch)).rejects.toMatchObject(
+    new TRPCError({ code: 'NOT_FOUND' })
+  )
+})
 
 test('returns empty list when no users match', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, withReadAll)
 
   const results = await client.user.search({
     ...defaultSearch,
@@ -31,7 +43,7 @@ test('returns empty list when no users match', async () => {
 
 test('returns all users when no filters are provided', async () => {
   const { user, users } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, withReadAll)
 
   const results = await client.user.search(defaultSearch)
 
@@ -40,7 +52,7 @@ test('returns all users when no filters are provided', async () => {
 
 test('filters by primaryOfficeId', async () => {
   const { user, locations, seed, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, withReadAll)
 
   const targetOffice = locations[2]
   const extraUser = await seed.user(
@@ -58,7 +70,7 @@ test('filters by primaryOfficeId', async () => {
 
 test('filters by status', async () => {
   const { user, users } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, withReadAll)
 
   await updateUserById(user.id, { status: 'deactivated' })
 
@@ -79,7 +91,7 @@ test('filters by status', async () => {
 
 test('filters by email (case-insensitive partial match)', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, withReadAll)
 
   const results = await client.user.search({
     ...defaultSearch,
@@ -92,7 +104,7 @@ test('filters by email (case-insensitive partial match)', async () => {
 
 test('filters by username (case-insensitive partial match)', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, withReadAll)
 
   await updateUsernameById(user.id, `u.niqueuser`)
 
@@ -107,7 +119,7 @@ test('filters by username (case-insensitive partial match)', async () => {
 
 test('filters by mobile (partial match)', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, withReadAll)
 
   await updateUserById(user.id, { mobile: '+447911123456' })
 
@@ -122,7 +134,7 @@ test('filters by mobile (partial match)', async () => {
 
 test('respects count and skip for pagination', async () => {
   const { user, seed, generator, locations } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, withReadAll)
 
   // Create a third user so we have at least 3 total, in a known order
   await seed.user(generator.user.create({ primaryOfficeId: locations[0].id }))
@@ -136,7 +148,7 @@ test('respects count and skip for pagination', async () => {
 
 test('sortOrder asc and desc by createdAt are reversed', async () => {
   const { user, seed, generator, locations } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, withReadAll)
 
   // Create users sequentially to guarantee distinct createdAt values
   await seed.user(generator.user.create({ primaryOfficeId: locations[0].id }))
@@ -146,4 +158,65 @@ test('sortOrder asc and desc by createdAt are reversed', async () => {
   const desc = await client.user.search({ ...defaultSearch, sortOrder: 'desc' })
 
   expect(asc.map((u) => u.id)).toEqual(desc.map((u) => u.id).reverse())
+})
+
+test('scopes results to caller office with location scope', async () => {
+  const { users } = await setupTestCase()
+  const client = createTestClient(users[0], [
+    encodeScope({ type: 'user.read', options: { accessLevel: 'location' } })
+  ])
+
+  const results = await client.user.search(defaultSearch)
+
+  expect(
+    results.every((u) => u.primaryOfficeId === users[0].primaryOfficeId)
+  ).toBe(true)
+  expect(results.some((u) => u.id === users[0].id)).toBe(true)
+  expect(results.some((u) => u.id === users[1].id)).toBe(false)
+})
+
+test('caller-provided primaryOfficeId is respected with location scope', async () => {
+  const { users, seed, generator } = await setupTestCase()
+  const client = createTestClient(users[0], [
+    encodeScope({ type: 'user.read', options: { accessLevel: 'location' } })
+  ])
+
+  const extraUser = await seed.user(
+    generator.user.create({ primaryOfficeId: users[0].primaryOfficeId })
+  )
+
+  const results = await client.user.search({
+    ...defaultSearch,
+    primaryOfficeId: users[0].primaryOfficeId
+  })
+
+  expect(results.some((u) => u.id === extraUser.id)).toBe(true)
+  expect(results.some((u) => u.id === users[1].id)).toBe(false)
+})
+
+test('scopes results to caller jurisdiction with administrativeArea scope', async () => {
+  const { users } = await setupTestCase()
+  const client = createTestClient(users[0], [
+    encodeScope({
+      type: 'user.read',
+      options: { accessLevel: 'administrativeArea' }
+    })
+  ])
+
+  const results = await client.user.search(defaultSearch)
+
+  expect(results.some((u) => u.id === users[0].id)).toBe(true)
+  expect(results.some((u) => u.id === users[1].id)).toBe(false)
+})
+
+test('returns all users with global user.read scope', async () => {
+  const { users } = await setupTestCase()
+  const client = createTestClient(users[0], [
+    encodeScope({ type: 'user.read' })
+  ])
+
+  const results = await client.user.search(defaultSearch)
+
+  expect(results.some((u) => u.id === users[0].id)).toBe(true)
+  expect(results.some((u) => u.id === users[1].id)).toBe(true)
 })
