@@ -29,7 +29,8 @@ import {
   CreateUserInputInternal
 } from '@opencrvs/commons'
 import {
-  allowedWithAnyOfScopes,
+  canAccessUserWithScopes,
+  canCreateUserWithScopes,
   canUpdateUserLocation
 } from '@events/router/middleware'
 import {
@@ -213,6 +214,7 @@ const auditRouter = router({
 export const userRouter = router({
   get: userOnlyProcedure
     .input(UUID)
+    // @TODO: missing scope check.
     .output(UserOrSystem)
     .query(async ({ input }) => {
       const users = await getUsersById([input])
@@ -223,14 +225,14 @@ export const userRouter = router({
       return users[0]
     }),
   create: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.create']))
     .input(CreateUserInput)
+    .use(canCreateUserWithScopes(['user.create']))
     .output(User)
     .mutation(async ({ input, ctx }) => handleCreateUser(input, ctx)),
   update: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.edit']))
     .input(UpdateUserInput.and(z.object({ id: UUID })))
     .use(canUpdateUserLocation)
+    .use(canAccessUserWithScopes(['user.edit']))
     .output(User)
     .mutation(async ({ input, ctx }) => {
       if (input.mobile) {

@@ -623,7 +623,18 @@ export function testDataGenerator(rngSeed?: number) {
         }),
         encodeScope({
           type: 'user.edit',
-          options: { accessLevel: 'administrativeArea' }
+          options: {
+            accessLevel: 'administrativeArea',
+            role: [
+              'FIELD_AGENT',
+              'POLICE_OFFICER',
+              'SOCIAL_WORKER',
+              'HEALTHCARE_WORKER',
+              'LOCAL_LEADER',
+              'REGISTRATION_AGENT',
+              'LOCAL_REGISTRAR'
+            ]
+          }
         }),
         encodeScope({
           type: 'organisation.read-locations',
@@ -632,8 +643,20 @@ export function testDataGenerator(rngSeed?: number) {
         encodeScope({ type: 'performance.read' }),
         encodeScope({ type: 'performance.read-dashboards' }),
         encodeScope({ type: 'performance.vital-statistics-export' }),
-        'user.create[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]',
-        'user.edit[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]'
+        encodeScope({
+          type: 'user.create',
+          options: {
+            role: [
+              'FIELD_AGENT',
+              'POLICE_OFFICER',
+              'SOCIAL_WORKER',
+              'HEALTHCARE_WORKER',
+              'LOCAL_LEADER',
+              'REGISTRATION_AGENT',
+              'LOCAL_REGISTRAR'
+            ]
+          }
+        })
       ],
       /**
        * COMMUNITY_LEADER: jurisdiction locked to their specific office location.
@@ -727,15 +750,43 @@ export function testDataGenerator(rngSeed?: number) {
       nationalSystemAdmin: [
         encodeScope({ type: 'config.update-all' }),
         encodeScope({ type: 'organisation.read-locations' }),
-        encodeScope({ type: 'user.create' }),
-        encodeScope({ type: 'user.edit' }),
         encodeScope({ type: 'user.read' }),
         encodeScope({ type: 'performance.read' }),
         encodeScope({ type: 'performance.read-dashboards' }),
         encodeScope({ type: 'performance.vital-statistics-export' }),
         encodeScope({ type: 'record.reindex' }),
-        'user.create[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]',
-        'user.edit[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]'
+        encodeScope({
+          type: 'user.create',
+          options: {
+            role: [
+              'FIELD_AGENT',
+              'HOSPITAL_CLERK',
+              'COMMUNITY_LEADER',
+              'REGISTRATION_AGENT',
+              'LOCAL_REGISTRAR',
+              'NATIONAL_REGISTRAR',
+              'LOCAL_SYSTEM_ADMIN',
+              'NATIONAL_SYSTEM_ADMIN',
+              'PERFORMANCE_MANAGER'
+            ]
+          }
+        }),
+        encodeScope({
+          type: 'user.edit',
+          options: {
+            role: [
+              'FIELD_AGENT',
+              'HOSPITAL_CLERK',
+              'COMMUNITY_LEADER',
+              'REGISTRATION_AGENT',
+              'LOCAL_REGISTRAR',
+              'NATIONAL_REGISTRAR',
+              'LOCAL_SYSTEM_ADMIN',
+              'NATIONAL_SYSTEM_ADMIN',
+              'PERFORMANCE_MANAGER'
+            ]
+          }
+        })
       ]
     }
   }

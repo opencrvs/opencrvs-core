@@ -37,6 +37,7 @@ import {
   TENNIS_CLUB_MEMBERSHIP,
   TokenUserType,
   TokenWithBearer,
+  User,
   UserFilter,
   UUID
 } from '@opencrvs/commons'
@@ -810,6 +811,53 @@ function eventMatchesScope({
   return true
 }
 
+function userMatchesScope({
+  userRequesting,
+  userTargeted,
+  role,
+  accessLevel,
+  isUnderAdministrativeArea
+}: {
+  userRequesting: CreatedUser
+  userTargeted: User
+  role: string[] | undefined
+  accessLevel: JurisdictionFilter | undefined
+  isUnderAdministrativeArea: (
+    locationId: UUID,
+    adminAreaId: UUID | null
+  ) => boolean
+}): boolean {
+  if (role && !role.includes(userTargeted.role)) {
+    return false
+  }
+
+  if (accessLevel === JurisdictionFilter.enum.location) {
+    if (userTargeted.primaryOfficeId !== userRequesting.primaryOfficeId) {
+      return false
+    }
+  }
+
+  if (accessLevel === JurisdictionFilter.enum.administrativeArea) {
+    const hasSameOffice =
+      userTargeted.primaryOfficeId === userRequesting.primaryOfficeId
+    const isRequesterLocationDirectlyUnderCountry =
+      userRequesting.administrativeAreaId === null
+
+    if (
+      !hasSameOffice &&
+      !isRequesterLocationDirectlyUnderCountry &&
+      !isUnderAdministrativeArea(
+        userTargeted.primaryOfficeId,
+        userRequesting.administrativeAreaId ?? null
+      )
+    ) {
+      return false
+    }
+  }
+
+  return true
+}
+
 /**
  *
  * @param rngSeed random seed
@@ -976,6 +1024,24 @@ export function assertScopeResult(
     placeOfEvent,
     isUnderAdministrativeArea
   })
+
+  expect(result.success).toBe(isAccessibleWithScope)
+}
+
+export function assertUserScopeResult(
+  result: { success: boolean; user: User },
+  props: {
+    userRequesting: CreatedUser
+    userTargeted: any
+    role: string[] | undefined
+    accessLevel: JurisdictionFilter | undefined
+    isUnderAdministrativeArea: (
+      locationId: UUID,
+      adminAreaId: UUID | null
+    ) => boolean
+  }
+) {
+  const isAccessibleWithScope = userMatchesScope(props)
 
   expect(result.success).toBe(isAccessibleWithScope)
 }
