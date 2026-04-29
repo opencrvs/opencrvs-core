@@ -113,10 +113,9 @@ test('Multiple users with no email can be created without a unique key conflict'
   ])
 
   // Each user has a distinct mobile so the DB check constraint
-  // (email_or_mobile_not_null) is satisfied while email normalises to NULL.
+  // (email_or_mobile_not_null) is satisfied while email is omitted (NULL in DB).
   await expect(
     client.user.create({
-      email: '',
       mobile: '01712345678',
       role: 'admin',
       name: [{ use: 'en', family: 'family1', given: ['given1'] }],
@@ -126,7 +125,6 @@ test('Multiple users with no email can be created without a unique key conflict'
 
   await expect(
     client.user.create({
-      email: '',
       mobile: '01812345678',
       role: 'admin',
       name: [{ use: 'en', family: 'family2', given: ['given2'] }],
@@ -146,7 +144,6 @@ test('Creating a user with neither email nor mobile violates the DB constraint',
 
   await expect(
     client.user.create({
-      email: '',
       role: 'admin',
       name: [{ use: 'en', family: 'family', given: ['given'] }],
       primaryOfficeId: user.primaryOfficeId

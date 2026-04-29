@@ -214,7 +214,7 @@ test('Throws error when creating user with existing mobile', async () => {
     .selectAll()
     .executeTakeFirstOrThrow()
 
-  const mobile = '+345345343'
+  const mobile = '01512345678'
   const userPayload1 = {
     email: 'testing+1@opencrvs.org',
     mobile,
