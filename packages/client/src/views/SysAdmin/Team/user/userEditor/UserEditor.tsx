@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, validationMessages } from '@client/i18n/messages'
 import { userMessages } from '@client/i18n/messages'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { messages } from '@client/i18n/messages/views/userForm'
@@ -23,11 +23,13 @@ import {
   deepDropNulls,
   defineConditional,
   EventConfig,
+  field,
   FieldConfig,
   FieldValue,
   FileFieldValue,
   FieldType,
   never,
+  or,
   PageTypes,
   TokenUserType,
   hasScope,
@@ -131,7 +133,19 @@ function getUserEditConfig(
               id: 'phoneNumber',
               type: FieldType.PHONE,
               required: false,
-              label: messages.phoneNumber
+              label: messages.phoneNumber,
+              validation: [
+                {
+                  // @ts-expect-error MessageDescriptor has optional fields; TranslationConfig requires them all present
+                  message: validationMessages.phoneNumberNotValid,
+                  validator: or(
+                    field('phoneNumber').matches(
+                      String(window.config.PHONE_NUMBER_PATTERN)
+                    ),
+                    field('phoneNumber').isFalsy()
+                  )
+                }
+              ]
             },
             {
               id: 'email',
