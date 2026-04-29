@@ -188,3 +188,78 @@ test('Throws error when creating user with existing mobile', async () => {
     new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_MOBILE' })
   )
 })
+
+test('persists data payload when creating a user', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.create'
+    })
+  ])
+
+  const data = { employeeId: 'EMP-001', department: 'Registry' }
+  const userPayload = {
+    email: 'data-test@opencrvs.org',
+    role: 'admin',
+    name: [{ use: 'en', family: 'Doe', given: ['Jane'] }],
+    primaryOfficeId: user.primaryOfficeId,
+    data
+  }
+
+  const created = await client.user.create(userPayload)
+
+  expect(created.data).toEqual(data)
+
+  const eventsDb = getClient()
+  const createdUserCredentials = await eventsDb
+    .selectFrom('userCredentials')
+    .selectAll()
+    .where('userId', '=', created.id)
+    .executeTakeFirstOrThrow()
+
+  const createdUser = await eventsDb
+    .selectFrom('users')
+    .selectAll()
+    .where('id', '=', createdUserCredentials.userId)
+    .executeTakeFirstOrThrow()
+
+  expect(createdUser.data).toEqual(data)
+})
+
+test('persists empty data object when data is not provided on create', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.create'
+    })
+  ])
+
+  const userPayload = {
+    email: 'nodata-test@opencrvs.org',
+    role: 'admin',
+    name: [{ use: 'en', family: 'Doe', given: ['John'] }],
+    primaryOfficeId: user.primaryOfficeId
+  }
+
+  const created = await client.user.create(userPayload)
+
+  // data field is optional on User and omitted when empty
+  expect(created.data).toBeUndefined()
+
+  const eventsDb = getClient()
+  const createdUserCredentials = await eventsDb
+    .selectFrom('userCredentials')
+    .selectAll()
+    .where('userId', '=', created.id)
+    .executeTakeFirstOrThrow()
+
+  const createdUser = await eventsDb
+    .selectFrom('users')
+    .selectAll()
+    .where('id', '=', createdUserCredentials.userId)
+    .executeTakeFirstOrThrow()
+
+  expect(createdUser.data).toEqual({})
+})
