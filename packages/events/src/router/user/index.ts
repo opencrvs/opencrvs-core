@@ -54,11 +54,14 @@ import {
   createUser,
   getCredentials,
   getUser,
+  getUsersById,
+  isUser,
   searchUsers,
-  updateUser
+  updateUser,
+  sendUsernameReminder,
+  sendResetPasswordInvite
 } from '@events/service/users/api'
 import { uploadBase64File } from '@events/service/files'
-import { getUsersById, isUser } from '@events/service/users/api'
 import {
   checkVerificationCode,
   generateAndSendVerificationCode,
@@ -546,6 +549,43 @@ export const userRouter = router({
     )
     .mutation(async ({ input }) => {
       return activateUser(input)
+    }),
+  sendUsernameReminder: userAndSystemProcedure
+    .use(allowedWithAnyOfScopes(['user.edit']))
+    .input(UUID)
+    .mutation(async ({ input, ctx }) => {
+      const userId = UUID.parse(input)
+      await sendUsernameReminder(userId, ctx.token)
+      const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
+      await writeAuditLog({
+        operation: 'user.username_reminder_by_admin',
+        requestData: { subjectId: userId },
+        clientId: auditLogIdentifiers.sub,
+        clientType: auditLogIdentifiers.userType ?? 'system'
+      })
+    }),
+  sendResetPasswordInvite: userAndSystemProcedure
+    .use(allowedWithAnyOfScopes(['user.edit']))
+    .input(UUID)
+    .mutation(async ({ input, ctx }) => {
+      const userId = UUID.parse(input)
+      const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
+      const adminUser = await getUser(auditLogIdentifiers.sub)
+      await sendResetPasswordInvite(
+        userId,
+        {
+          id: adminUser.id,
+          name: adminUser.name,
+          role: adminUser.role
+        },
+        ctx.token
+      )
+      await writeAuditLog({
+        operation: 'user.password_reset_by_admin',
+        requestData: { subjectId: userId },
+        clientId: auditLogIdentifiers.sub,
+        clientType: auditLogIdentifiers.userType ?? 'system'
+      })
     }),
   audit: auditRouter
 })
