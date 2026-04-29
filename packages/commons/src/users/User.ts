@@ -88,10 +88,7 @@ export const UpdateUserInput = User.pick({
   .extend({
     signature: FileFieldValue.optional(),
     id: UUID,
-    status: z.enum(['active', 'deactivated']).optional(), // can't set 'pending' via update
-    // Override: remove .default({}) so that an absent data field means
-    // 'preserve existing' rather than 'reset to empty object'.
-    data: z.record(z.string(), FieldValue).optional()
+    status: z.enum(['active', 'deactivated']).optional() // can't set 'pending' via update
   })
 export type UpdateUserInput = z.infer<typeof UpdateUserInput>
 

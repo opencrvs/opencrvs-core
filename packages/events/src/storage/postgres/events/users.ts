@@ -10,7 +10,7 @@
  */
 import { Kysely, sql } from 'kysely'
 import { TRPCError } from '@trpc/server'
-import { UUID } from '@opencrvs/commons/events'
+import { FieldValue, UUID } from '@opencrvs/commons/events'
 import { getClient } from '@events/storage/postgres/events'
 import { SearchUsersPayload } from '@events/service/users/api'
 import { NewUsers } from './schema/app/Users'
@@ -258,7 +258,7 @@ type UpdateUserFields = Partial<{
   officeId: UUID
   signaturePath: string | null
   profileImagePath: string | null
-  data: Record<string, unknown>
+  data: Record<string, FieldValue>
 }>
 
 export async function updateUserById(userId: UUID, fields: UpdateUserFields) {
