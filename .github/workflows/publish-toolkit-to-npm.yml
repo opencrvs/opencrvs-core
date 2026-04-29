@@ -46,8 +46,10 @@ jobs:
               echo "❌ Tag '$TAG_NAME' is not a valid semantic version (expected something like 1.2.3 or v1.2.3)"
               exit 1
             fi
+            echo "npm-tag=latest" >> $GITHUB_OUTPUT
           else
             TOOLKIT_VERSION="$PACKAGE_VERSION-rc.$(git rev-parse --short=7 HEAD)"
+            echo "npm-tag=next" >> $GITHUB_OUTPUT
           fi
           if npm view @opencrvs/toolkit@$TOOLKIT_VERSION > /dev/null 2>&1; then
           echo "Version $TOOLKIT_VERSION already exists on npm."
@@ -106,7 +108,7 @@ jobs:
 
       - name: Publish to npm
         if: steps.check-version.outputs.version-exists == 'false'
-        run: npm publish --access public
+        run: npm publish --access public --tag ${{ steps.check-version.outputs.npm-tag }}
         working-directory: packages/toolkit
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

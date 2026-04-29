@@ -15,7 +15,7 @@ import { UUID } from '../uuid'
 import { TokenUserType } from '../authentication'
 import { EmailValue, FieldValue, FileFieldValue } from '../events'
 
-export const REINDEX_USER_ID = '__ANONYMOUS_REINDEX_USER__'
+export const REINDEX_USER_ID = '00000000-0000-0000-0000-000000000000' as UUID
 
 export type IUserName = {
   use: string
@@ -109,7 +109,7 @@ export const CreateUserInputInternal = User.pick({
 export type CreateUserInputInternal = z.infer<typeof CreateUserInputInternal>
 
 export const System = z.object({
-  id: z.string(),
+  id: UUID,
   name: z.string(),
   type: TokenUserType.extract(['system']),
   primaryOfficeId: UUID.optional(),

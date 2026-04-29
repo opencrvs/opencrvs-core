@@ -12,6 +12,7 @@
 import { TRPCError } from '@trpc/server'
 import {
   generateUuid,
+  getUUID,
   TestUserRole,
   ActionType,
   createPrng,
@@ -29,7 +30,7 @@ test('Throws error if user does not have required scope', async () => {
 
   await expect(
     client.user.actions({
-      userId: '123-123-123'
+      userId: getUUID()
     })
   ).rejects.toMatchObject(new TRPCError({ code: 'NOT_FOUND' }))
 })
