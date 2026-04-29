@@ -410,13 +410,10 @@ export async function resendInvite(userId: UUID, token: string): Promise<void> {
   const password = env.DEFAULT_USER_PASSWORD ?? generateRandomPassword()
   const { hash, salt } = await generateSaltedHash(password)
 
-  const userName: IUserName[] = [
-    {
-      use: 'en',
-      given: user.firstname ? [user.firstname] : [],
-      family: user.surname ?? ''
-    }
-  ]
+  const userName: UserName = {
+    firstname: user.firstname,
+    surname: user.surname
+  }
 
   await sendCredentialsNotification(
     TriggerEvent.RESEND_INVITE,
@@ -555,7 +552,7 @@ export async function verifyUser(input: { mobile?: string; email?: string }) {
 
 export async function sendResetPasswordInvite(
   userId: UUID,
-  admin: { id: string; name: IUserName[]; role: string },
+  admin: { id: string; name: UserName; role: string },
   token: string
 ): Promise<void> {
   const user = await getUser(userId)
@@ -564,27 +561,19 @@ export async function sendResetPasswordInvite(
   const { hash, salt } = await generateSaltedHash(temporaryPassword)
   await updatePasswordHashAndSalt(userId, hash, salt)
 
-  const userName: IUserName[] = [
-    {
-      use: 'en',
-      given: user.name[0]?.given ?? [],
-      family: user.name[0]?.family ?? ''
-    }
-  ]
-
   try {
     await triggerUserEventNotification({
       event: 'reset-password-by-admin',
       payload: {
         recipient: {
-          name: personNameFromV1ToV2(userName),
+          name: user.name,
           email: user.email,
           mobile: user.mobile
         },
         temporaryPassword,
         admin: {
           id: admin.id,
-          name: personNameFromV1ToV2(admin.name),
+          name: admin.name,
           role: admin.role
         }
       },
