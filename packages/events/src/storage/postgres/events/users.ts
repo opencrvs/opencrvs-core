@@ -123,6 +123,19 @@ export async function updatePasswordHash(userId: UUID, passwordHash: string) {
     .execute()
 }
 
+export async function updatePasswordHashAndSalt(
+  userId: UUID,
+  passwordHash: string,
+  salt: string
+) {
+  const db = getClient()
+  return db
+    .updateTable('userCredentials')
+    .set({ passwordHash, salt })
+    .where('userId', '=', userId)
+    .execute()
+}
+
 async function createUserInTrx(user: NewUsers, trx: Kysely<Schema>) {
   const { id } = await trx
     .insertInto('users')
