@@ -175,6 +175,8 @@ async function isUserInCallerJurisdiction(
   targetOfficeId: UUID,
   accessLevels: ReturnType<typeof requireUserReadAccessLevels>
 ): Promise<boolean> {
+  // No explicit guard for missing primaryOfficeId (unlike userCanReadOtherUser middleware)
+  // because undefined !== targetOfficeId already produces false, achieving the same deny.
   if (accessLevels.includes(JurisdictionFilter.enum.all)) {
     return true
   }
@@ -217,10 +219,12 @@ export function searchUsersRoute(
 
         if (!accessLevels.includes(JurisdictionFilter.enum.all)) {
           if (accessLevels.includes(JurisdictionFilter.enum.location)) {
-            const officeId = input.primaryOfficeId
-              ? UUID.parse(input.primaryOfficeId)
-              : (user.primaryOfficeId ?? undefined)
-            return searchUsers({ ...input, primaryOfficeId: officeId })
+            // Always enforce caller's office — ignoring input.primaryOfficeId
+            // to prevent bypassing location scope with an arbitrary office ID.
+            return searchUsers({
+              ...input,
+              primaryOfficeId: user.primaryOfficeId ?? undefined
+            })
           }
 
           if (
@@ -387,6 +391,8 @@ export const userRouter = router({
 
       const filtered = await Promise.all(
         results.map(async (u) => {
+          // System users always pass through — user.list resolves audit trail
+          // participants which includes system clients, unlike user.get.
           if (u.type === TokenUserType.enum.system) {
             return u
           }

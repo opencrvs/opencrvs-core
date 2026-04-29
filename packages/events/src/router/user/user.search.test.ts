@@ -175,23 +175,22 @@ test('scopes results to caller office with location scope', async () => {
   expect(results.some((u) => u.id === users[1].id)).toBe(false)
 })
 
-test('caller-provided primaryOfficeId is respected with location scope', async () => {
-  const { users, seed, generator } = await setupTestCase()
+test('caller-provided foreign primaryOfficeId is ignored with location scope', async () => {
+  const { users } = await setupTestCase()
   const client = createTestClient(users[0], [
     encodeScope({ type: 'user.read', options: { accessLevel: 'location' } })
   ])
 
-  const extraUser = await seed.user(
-    generator.user.create({ primaryOfficeId: users[0].primaryOfficeId })
-  )
-
+  // users[1] is in a different office — passing their office ID should not grant access
   const results = await client.user.search({
     ...defaultSearch,
-    primaryOfficeId: users[0].primaryOfficeId
+    primaryOfficeId: users[1].primaryOfficeId
   })
 
-  expect(results.some((u) => u.id === extraUser.id)).toBe(true)
   expect(results.some((u) => u.id === users[1].id)).toBe(false)
+  expect(
+    results.every((u) => u.primaryOfficeId === users[0].primaryOfficeId)
+  ).toBe(true)
 })
 
 test('scopes results to caller jurisdiction with administrativeArea scope', async () => {
