@@ -75,6 +75,7 @@ interface IUserSetupMessages
   passwordResetAuditAction: MessageDescriptor
   usernameReminderByAdmin: MessageDescriptor
   passwordResetByAdmin: MessageDescriptor
+  resendInviteAuditAction: MessageDescriptor
   userNameReminderAuditAction: MessageDescriptor
   retrievedAuditAction: MessageDescriptor
   viewedAuditAction: MessageDescriptor
@@ -403,6 +404,11 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Sent password',
     description: 'Description for sending temporal password action',
     id: 'user.profile.auditList.passwordResetByAdmin'
+  },
+  resendInviteAuditAction: {
+    defaultMessage: 'Resent invite',
+    description: 'Description for resending user invite audit action',
+    id: 'user.profile.auditList.resendInvite'
   },
   usernameReminderByAdmin: {
     defaultMessage: 'Sent username reminder',
