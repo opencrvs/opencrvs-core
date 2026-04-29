@@ -399,8 +399,8 @@ export function canAccessUserWithScopes(scopes: UserScopeType[]) {
     TrpcContext,
     OpenApiMeta,
     TrpcContext,
-    TrpcContext & { id: string },
-    { id: string }
+    TrpcContext & { id: UUID },
+    { id: UUID }
   > = async ({ next, ctx, input }) => {
     const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
 
