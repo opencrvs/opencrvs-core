@@ -21,7 +21,6 @@ import {
   CreateUserInput,
   getAcceptedScopesFromToken,
   getScopeOptionValue,
-  hasScope,
   isBase64FileString,
   JurisdictionFilter,
   logger,
@@ -163,6 +162,43 @@ export async function handleCreateUser(
   return user
 }
 
+function requireUserReadAccessLevels(token: TokenWithBearer) {
+  const readScopes = getAcceptedScopesFromToken(token, ['user.read'])
+  if (readScopes.length === 0) {
+    throw new TRPCError({ code: 'NOT_FOUND' })
+  }
+  return readScopes.map((s) => getScopeOptionValue(s, 'accessLevel'))
+}
+
+async function isUserInCallerJurisdiction(
+  caller: { primaryOfficeId?: UUID | null; administrativeAreaId?: UUID | null },
+  targetOfficeId: UUID,
+  accessLevels: ReturnType<typeof requireUserReadAccessLevels>
+): Promise<boolean> {
+  if (accessLevels.includes(JurisdictionFilter.enum.all)) {
+    return true
+  }
+
+  const hasLocationOrAreaAccess =
+    accessLevels.includes(JurisdictionFilter.enum.location) ||
+    accessLevels.includes(JurisdictionFilter.enum.administrativeArea)
+
+  if (hasLocationOrAreaAccess && caller.primaryOfficeId === targetOfficeId) {
+    return true
+  }
+
+  if (accessLevels.includes(JurisdictionFilter.enum.administrativeArea)) {
+    return caller.administrativeAreaId
+      ? isLocationUnderAdministrativeArea({
+          administrativeAreaId: caller.administrativeAreaId,
+          locationId: targetOfficeId
+        })
+      : true
+  }
+
+  return false
+}
+
 export function searchUsersRoute(
   procedure: typeof internalProcedure | typeof userAndSystemProcedure
 ) {
@@ -177,25 +213,14 @@ export function searchUsersRoute(
           user: NonNullable<(typeof ctx & { user?: unknown })['user']>
         }
 
-        const readScopes = getAcceptedScopesFromToken(token, ['user.read'])
-
-        if (readScopes.length === 0) {
-          throw new TRPCError({ code: 'NOT_FOUND' })
-        }
-
-        const accessLevels = readScopes.map((s) =>
-          getScopeOptionValue(s, 'accessLevel')
-        )
+        const accessLevels = requireUserReadAccessLevels(token)
 
         if (!accessLevels.includes(JurisdictionFilter.enum.all)) {
           if (accessLevels.includes(JurisdictionFilter.enum.location)) {
             const officeId = input.primaryOfficeId
               ? UUID.parse(input.primaryOfficeId)
               : (user.primaryOfficeId ?? undefined)
-            return searchUsers({
-              ...input,
-              primaryOfficeId: officeId
-            })
+            return searchUsers({ ...input, primaryOfficeId: officeId })
           }
 
           if (
@@ -267,9 +292,7 @@ export const userRouter = router({
     .input(UUID)
     .output(UserOrSystem)
     .query(async ({ input, ctx }) => {
-      if (!hasScope(ctx.token, 'user.read')) {
-        throw new TRPCError({ code: 'NOT_FOUND' })
-      }
+      const accessLevels = requireUserReadAccessLevels(ctx.token)
 
       const users = await getUsersById([input])
       if (users.length === 0) {
@@ -282,41 +305,17 @@ export const userRouter = router({
         throw new TRPCError({ code: 'NOT_FOUND' })
       }
 
-      const readScopes = getAcceptedScopesFromToken(ctx.token, ['user.read'])
-      const accessLevels = readScopes.map((s) =>
-        getScopeOptionValue(s, 'accessLevel')
+      const canRead = await isUserInCallerJurisdiction(
+        ctx.user,
+        target.primaryOfficeId,
+        accessLevels
       )
 
-      if (accessLevels.includes(JurisdictionFilter.enum.all)) {
-        return target
+      if (!canRead) {
+        throw new TRPCError({ code: 'NOT_FOUND' })
       }
 
-      const hasLocationAccess =
-        accessLevels.includes(JurisdictionFilter.enum.location) ||
-        accessLevels.includes(JurisdictionFilter.enum.administrativeArea)
-
-      if (
-        hasLocationAccess &&
-        ctx.user.primaryOfficeId === target.primaryOfficeId
-      ) {
-        return target
-      }
-
-      const isUnderJurisdiction = ctx.user.administrativeAreaId
-        ? await isLocationUnderAdministrativeArea({
-            administrativeAreaId: ctx.user.administrativeAreaId,
-            locationId: target.primaryOfficeId
-          })
-        : true
-
-      if (
-        accessLevels.includes(JurisdictionFilter.enum.administrativeArea) &&
-        isUnderJurisdiction
-      ) {
-        return target
-      }
-
-      throw new TRPCError({ code: 'NOT_FOUND' })
+      return target
     }),
   create: userAndSystemProcedure
     .use(allowedWithAnyOfScopes(['user.create']))
@@ -378,17 +377,9 @@ export const userRouter = router({
     .input(z.array(z.string()))
     .output(z.array(UserOrSystem))
     .query(async ({ input, ctx }) => {
-      const readScopes = getAcceptedScopesFromToken(ctx.token, ['user.read'])
-
-      if (readScopes.length === 0) {
-        throw new TRPCError({ code: 'NOT_FOUND' })
-      }
+      const accessLevels = requireUserReadAccessLevels(ctx.token)
 
       const results = await getUsersById(input)
-
-      const accessLevels = readScopes.map((s) =>
-        getScopeOptionValue(s, 'accessLevel')
-      )
 
       if (accessLevels.includes(JurisdictionFilter.enum.all)) {
         return results
@@ -399,31 +390,12 @@ export const userRouter = router({
           if (u.type === TokenUserType.enum.system) {
             return u
           }
-
-          if (
-            accessLevels.includes(JurisdictionFilter.enum.location) ||
-            accessLevels.includes(JurisdictionFilter.enum.administrativeArea)
-          ) {
-            if (ctx.user.primaryOfficeId === u.primaryOfficeId) {
-              return u
-            }
-          }
-
-          if (
-            accessLevels.includes(JurisdictionFilter.enum.administrativeArea)
-          ) {
-            const isUnder = ctx.user.administrativeAreaId
-              ? await isLocationUnderAdministrativeArea({
-                  administrativeAreaId: ctx.user.administrativeAreaId,
-                  locationId: u.primaryOfficeId
-                })
-              : true
-            if (isUnder) {
-              return u
-            }
-          }
-
-          return null
+          const canRead = await isUserInCallerJurisdiction(
+            ctx.user,
+            u.primaryOfficeId,
+            accessLevels
+          )
+          return canRead ? u : null
         })
       )
 
