@@ -243,7 +243,7 @@ function UserListComponent({ userDetails }: UserListProps) {
     [locations, canAccessOffice]
   )
 
-  const { searchUsers } = useUsers()
+  const { searchUsers, sendUsernameReminder } = useUsers()
   const {
     data: searchResults,
     isLoading,
@@ -325,19 +325,17 @@ function UserListComponent({ userDetails }: UserListProps) {
     }
   }, [])
 
-  const usernameReminder = useCallback(async function usernameReminder(
-    userId: string
-  ) {
-    try {
-      throw new Error('@todo Username reminder mutation is not implemented')
-      // const res = await userMutations.usernameReminderSend(userId, [])
-      // if (res && res.data && res.data.usernameReminder) {
-      //   setShowUsernameReminderSuccess(true)
-      // }
-    } catch (err) {
-      setShowUsernameReminderError(true)
-    }
-  }, [])
+  const usernameReminder = useCallback(
+    async (userId: string) => {
+      try {
+        await sendUsernameReminder.mutateAsync(userId as UUID)
+        setShowUsernameReminderSuccess(true)
+      } catch {
+        setShowUsernameReminderError(true)
+      }
+    },
+    [sendUsernameReminder]
+  )
 
   const resetPassword = useCallback(async function resetPassword(
     userId: string
