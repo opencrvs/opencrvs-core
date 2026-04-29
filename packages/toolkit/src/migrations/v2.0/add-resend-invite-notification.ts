@@ -20,6 +20,16 @@
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import path from 'path'
+import {
+  ArrayLiteralExpression,
+  AsExpression,
+  Node,
+  ObjectLiteralExpression,
+  Project,
+  SyntaxKind,
+  SwitchStatement,
+  VariableDeclaration
+} from 'ts-morph'
 
 const EMAIL_TEMPLATES_INDEX = 'src/api/notification/email-templates/index.ts'
 const NOTIFICATION_HANDLER = 'src/api/notification/handler.ts'
@@ -28,130 +38,6 @@ const SMS_SERVICE = 'src/api/notification/sms-service.ts'
 const NOTIFICATION_CSV = 'src/translations/notification.csv'
 const RESEND_INVITE_HTML =
   'src/api/notification/email-templates/other/resend-invite.html'
-
-const TRIGGER_VARIABLE_ANCHOR_BEFORE = `  [TriggerEvent.CHANGE_PHONE_NUMBER]: z.object({
-    firstname: z.string(),
-    code: z.string()
-  })
-} as const`
-
-const TRIGGER_VARIABLE_ANCHOR_AFTER = `  [TriggerEvent.CHANGE_PHONE_NUMBER]: z.object({
-    firstname: z.string(),
-    code: z.string()
-  }),
-  [TriggerEvent.RESEND_INVITE]: z.object({
-    firstname: z.string(),
-    username: z.string(),
-    temporaryPassword: z.string(),
-    completeSetupUrl: z.string(),
-    loginURL: z.string()
-  })
-} as const`
-
-const TEMPLATES_ANCHOR_BEFORE = `  [TriggerEvent.USER_CREATED]: {
-    type: 'onboarding-invite',
-    subject: 'Welcome to OpenCRVS!',
-    template:
-      readOtherTemplate<TriggerVariable['user-created']>('onboarding-invite')
-  },
-  [TriggerEvent.TWO_FA]: {`
-
-const TEMPLATES_ANCHOR_AFTER = `  [TriggerEvent.USER_CREATED]: {
-    type: 'onboarding-invite',
-    subject: 'Welcome to OpenCRVS!',
-    template:
-      readOtherTemplate<TriggerVariable['user-created']>('onboarding-invite')
-  },
-  [TriggerEvent.RESEND_INVITE]: {
-    type: 'resend-invite',
-    subject: 'Your OpenCRVS account invitation',
-    template:
-      readOtherTemplate<TriggerVariable['resend-invite']>('resend-invite')
-  },
-  [TriggerEvent.TWO_FA]: {`
-
-const HANDLER_ANCHOR_BEFORE = `    case TriggerEvent.USER_CREATED:
-      return {
-        firstname,
-        username: payload.username,
-        temporaryPassword: payload.temporaryPassword,
-        completeSetupUrl: LOGIN_URL,
-        loginURL: LOGIN_URL
-      }
-
-    case TriggerEvent.USER_UPDATED:`
-
-const HANDLER_ANCHOR_AFTER = `    case TriggerEvent.USER_CREATED:
-      return {
-        firstname,
-        username: payload.username,
-        temporaryPassword: payload.temporaryPassword,
-        completeSetupUrl: LOGIN_URL,
-        loginURL: LOGIN_URL
-      }
-
-    case TriggerEvent.RESEND_INVITE:
-      return {
-        firstname,
-        username: payload.username,
-        temporaryPassword: payload.temporaryPassword,
-        completeSetupUrl: LOGIN_URL,
-        loginURL: LOGIN_URL
-      }
-
-    case TriggerEvent.USER_UPDATED:`
-
-const ROUTES_ANCHOR_BEFORE = `    {
-      method: 'POST',
-      path: '/triggers/user/user-created',
-      handler: makeNotificationHandler('user-created'),
-      options: {
-        auth: false,
-        tags: ['api'],
-        description: 'Handles notification for user creation'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/triggers/user/user-updated',`
-
-const ROUTES_ANCHOR_AFTER = `    {
-      method: 'POST',
-      path: '/triggers/user/user-created',
-      handler: makeNotificationHandler('user-created'),
-      options: {
-        auth: false,
-        tags: ['api'],
-        description: 'Handles notification for user creation'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/triggers/user/resend-invite',
-      handler: makeNotificationHandler('resend-invite'),
-      options: {
-        auth: false,
-        tags: ['api'],
-        description: 'Handles notification for resent user invite'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/triggers/user/user-updated',`
-
-const SMS_OTHER_BEFORE = `  userCredentialsNotification: 'userCredentialsNotification',
-  retieveUserNameNotification:`
-
-const SMS_OTHER_AFTER = `  userCredentialsNotification: 'userCredentialsNotification',
-  resendInviteNotification: 'resendInviteNotification',
-  retieveUserNameNotification:`
-
-const SMS_TRIGGER_BEFORE = `  ['user-created']: 'userCredentialsNotification',
-  ['user-updated']: 'updateUserNameNotification',`
-
-const SMS_TRIGGER_AFTER = `  ['user-created']: 'userCredentialsNotification',
-  ['resend-invite']: 'resendInviteNotification',
-  ['user-updated']: 'updateUserNameNotification',`
 
 const RESEND_INVITE_HTML_CONTENT = `<!doctype html>
 <html>
@@ -222,30 +108,25 @@ const RESEND_INVITE_HTML_CONTENT = `<!doctype html>
 const CSV_ROW =
   "resendInviteNotification,The SMS message that is sent when a user invitation is resent,Your OpenCRVS account invitation was resent. Please login with your username: {{username}} and temporary password: {{temporaryPassword}},Votre invitation de compte OpenCRVS a été renvoyée. Veuillez vous connecter avec votre nom d'utilisateur : {{username}} et votre mot de passe temporaire : {{temporaryPassword}}.\n"
 
-function replaceExactlyOnceOrSkip(
-  fileLabel: string,
-  contents: string,
-  before: string,
-  after: string,
-  anchorName: string
-): { contents: string; changed: boolean } {
-  const n = contents.split(before).length - 1
-  if (n === 0) {
-    // eslint-disable-next-line no-console
-    console.log(
-      `  [${fileLabel}] ${anchorName}: anchor not found — skipping (unexpected file shape).`
-    )
-    return { contents, changed: false }
+function getObjectLiteralFromConst(
+  declaration: VariableDeclaration | undefined
+): ObjectLiteralExpression | undefined {
+  if (!declaration) {
+    return
   }
-  if (n > 1) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      `  [${fileLabel}] ${anchorName}: ambiguous anchor (${n} matches) — skipping.`
-    )
-    return { contents, changed: false }
+  const initializer = declaration.getInitializer()
+  if (!initializer) {
+    return
   }
-  const next = contents.replace(before, after)
-  return { contents: next, changed: true }
+  if (Node.isObjectLiteralExpression(initializer)) {
+    return initializer
+  }
+  if (Node.isAsExpression(initializer)) {
+    const expression = (initializer as AsExpression).getExpression()
+    if (Node.isObjectLiteralExpression(expression)) {
+      return expression
+    }
+  }
 }
 
 function patchEmailTemplatesIndex(): boolean {
@@ -255,37 +136,249 @@ function patchEmailTemplatesIndex(): boolean {
     console.log(`  '${EMAIL_TEMPLATES_INDEX}' missing — skipping.`)
     return false
   }
-  let text = readFileSync(full, 'utf8')
+
+  const project = new Project({
+    skipAddingFilesFromTsConfig: true
+  })
+  const sourceFile = project.addSourceFileAtPath(full)
 
   let changed = false
 
-  if (!text.includes('[TriggerEvent.RESEND_INVITE]: z.object')) {
-    const r = replaceExactlyOnceOrSkip(
-      EMAIL_TEMPLATES_INDEX,
-      text,
-      TRIGGER_VARIABLE_ANCHOR_BEFORE,
-      TRIGGER_VARIABLE_ANCHOR_AFTER,
-      'TriggerVariable'
-    )
-    text = r.contents
-    if (r.changed) changed = true
+  const triggerVariableObject = getObjectLiteralFromConst(
+    sourceFile.getVariableDeclaration('TriggerVariable')
+  )
+  if (triggerVariableObject) {
+    const hasResendInviteVariable = triggerVariableObject
+      .getProperties()
+      .some((prop) => prop.getText().includes('[TriggerEvent.RESEND_INVITE]'))
+    if (!hasResendInviteVariable) {
+      triggerVariableObject.addPropertyAssignment({
+        name: '[TriggerEvent.RESEND_INVITE]',
+        initializer: `z.object({
+    firstname: z.string(),
+    username: z.string(),
+    temporaryPassword: z.string(),
+    completeSetupUrl: z.string(),
+    loginURL: z.string()
+  })`
+      })
+      changed = true
+    }
   }
 
-  if (!text.includes("readOtherTemplate<TriggerVariable['resend-invite']>")) {
-    const r = replaceExactlyOnceOrSkip(
-      EMAIL_TEMPLATES_INDEX,
-      text,
-      TEMPLATES_ANCHOR_BEFORE,
-      TEMPLATES_ANCHOR_AFTER,
-      '`templates`'
-    )
-    text = r.contents
-    if (r.changed) changed = true
+  const templatesObject = getObjectLiteralFromConst(
+    sourceFile.getVariableDeclaration('templates')
+  )
+  if (templatesObject) {
+    const hasResendInviteTemplate = templatesObject
+      .getProperties()
+      .some((prop) =>
+        prop
+          .getText()
+          .includes("readOtherTemplate<TriggerVariable['resend-invite']>")
+      )
+    if (!hasResendInviteTemplate) {
+      const userCreatedIndex = templatesObject
+        .getProperties()
+        .findIndex((prop) => prop.getText().includes('[TriggerEvent.USER_CREATED]'))
+      templatesObject.insertPropertyAssignment(
+        userCreatedIndex >= 0 ? userCreatedIndex + 1 : templatesObject.getProperties().length,
+        {
+          name: '[TriggerEvent.RESEND_INVITE]',
+          initializer: `{
+    type: 'resend-invite',
+    subject: 'Your OpenCRVS account invitation',
+    template:
+      readOtherTemplate<TriggerVariable['resend-invite']>('resend-invite')
+  }`
+        }
+      )
+      changed = true
+    }
   }
 
   if (changed) {
-    writeFileSync(full, text)
+    sourceFile.saveSync()
   }
+
+  return changed
+}
+
+function patchNotificationHandler(): boolean {
+  const full = path.join(process.cwd(), NOTIFICATION_HANDLER)
+  if (!existsSync(full)) {
+    return false
+  }
+
+  const project = new Project({ skipAddingFilesFromTsConfig: true })
+  const sourceFile = project.addSourceFileAtPath(full)
+  const convertFn = sourceFile.getFunction('convertPayloadToVariable')
+  if (!convertFn) {
+    return false
+  }
+
+  const switchStmt = convertFn.getFirstDescendantByKind(
+    SyntaxKind.SwitchStatement
+  ) as SwitchStatement | undefined
+  if (!switchStmt) {
+    return false
+  }
+
+  const clauses = switchStmt.getCaseBlock().getClauses()
+  const hasResendInvite = clauses.some(
+    (clause) =>
+      Node.isCaseClause(clause) &&
+      clause.getExpression().getText() === 'TriggerEvent.RESEND_INVITE'
+  )
+  if (hasResendInvite) {
+    return false
+  }
+
+  const userCreatedClauseIndex = clauses.findIndex(
+    (clause) =>
+      Node.isCaseClause(clause) &&
+      clause.getExpression().getText() === 'TriggerEvent.USER_CREATED'
+  )
+  if (userCreatedClauseIndex < 0) {
+    return false
+  }
+
+  const userCreatedClause = clauses[userCreatedClauseIndex]
+  sourceFile.insertText(
+    userCreatedClause.getEnd(),
+    `
+
+    case TriggerEvent.RESEND_INVITE:
+      return {
+        firstname,
+        username: payload.username,
+        temporaryPassword: payload.temporaryPassword,
+        completeSetupUrl: LOGIN_URL,
+        loginURL: LOGIN_URL
+      }`
+  )
+
+  sourceFile.saveSync()
+  return true
+}
+
+function getReturnedArrayLiteral(functionFilePath: string, fnName: string) {
+  const project = new Project({ skipAddingFilesFromTsConfig: true })
+  const sourceFile = project.addSourceFileAtPath(functionFilePath)
+  const fn = sourceFile.getFunction(fnName)
+  const returnStmt = fn?.getFirstDescendantByKind(SyntaxKind.ReturnStatement)
+  const expr = returnStmt?.getExpression()
+  if (!expr || !Node.isArrayLiteralExpression(expr)) {
+    return { sourceFile, arrayLiteral: undefined as ArrayLiteralExpression | undefined }
+  }
+  return { sourceFile, arrayLiteral: expr }
+}
+
+function patchUserNotificationRoutes(): boolean {
+  const full = path.join(process.cwd(), USER_NOTIFICATION_ROUTES)
+  if (!existsSync(full)) {
+    return false
+  }
+
+  const { sourceFile, arrayLiteral } = getReturnedArrayLiteral(
+    full,
+    'getUserNotificationRoutes'
+  )
+  if (!arrayLiteral) {
+    return false
+  }
+
+  const routeExists = arrayLiteral
+    .getElements()
+    .some((element) => element.getText().includes(`path: '/triggers/user/resend-invite'`))
+  if (routeExists) {
+    return false
+  }
+
+  const userCreatedIndex = arrayLiteral
+    .getElements()
+    .findIndex((element) => element.getText().includes(`path: '/triggers/user/user-created'`))
+
+  arrayLiteral.insertElement(
+    userCreatedIndex >= 0 ? userCreatedIndex + 1 : arrayLiteral.getElements().length,
+    `{
+      method: 'POST',
+      path: '/triggers/user/resend-invite',
+      handler: makeNotificationHandler('resend-invite'),
+      options: {
+        auth: false,
+        tags: ['api'],
+        description: 'Handles notification for resent user invite'
+      }
+    }`
+  )
+
+  sourceFile.saveSync()
+  return true
+}
+
+function patchSmsService(): boolean {
+  const full = path.join(process.cwd(), SMS_SERVICE)
+  if (!existsSync(full)) {
+    return false
+  }
+
+  const project = new Project({ skipAddingFilesFromTsConfig: true })
+  const sourceFile = project.addSourceFileAtPath(full)
+  let changed = false
+
+  const otherTemplatesObject = getObjectLiteralFromConst(
+    sourceFile.getVariableDeclaration('otherTemplates')
+  )
+  if (otherTemplatesObject) {
+    const hasResendTemplate = otherTemplatesObject
+      .getProperties()
+      .some((prop) => prop.getText().includes('resendInviteNotification'))
+    if (!hasResendTemplate) {
+      const userCredentialsIndex = otherTemplatesObject
+        .getProperties()
+        .findIndex((prop) => prop.getText().includes('userCredentialsNotification'))
+      otherTemplatesObject.insertPropertyAssignment(
+        userCredentialsIndex >= 0
+          ? userCredentialsIndex + 1
+          : otherTemplatesObject.getProperties().length,
+        {
+          name: 'resendInviteNotification',
+          initializer: `'resendInviteNotification'`
+        }
+      )
+      changed = true
+    }
+  }
+
+  const triggerToSmsTemplateObject = getObjectLiteralFromConst(
+    sourceFile.getVariableDeclaration('TriggerToSMSTemplate')
+  )
+  if (triggerToSmsTemplateObject) {
+    const hasResendInviteMap = triggerToSmsTemplateObject
+      .getProperties()
+      .some((prop) => prop.getText().includes(`['resend-invite']`))
+    if (!hasResendInviteMap) {
+      const userCreatedIndex = triggerToSmsTemplateObject
+        .getProperties()
+        .findIndex((prop) => prop.getText().includes(`['user-created']`))
+      triggerToSmsTemplateObject.insertPropertyAssignment(
+        userCreatedIndex >= 0
+          ? userCreatedIndex + 1
+          : triggerToSmsTemplateObject.getProperties().length,
+        {
+          name: `['resend-invite']`,
+          initializer: `'resendInviteNotification'`
+        }
+      )
+      changed = true
+    }
+  }
+
+  if (changed) {
+    sourceFile.saveSync()
+  }
+
   return changed
 }
 
@@ -297,61 +390,9 @@ async function main(): Promise<void> {
 
   if (patchEmailTemplatesIndex()) touched.push(EMAIL_TEMPLATES_INDEX)
 
-  /* handler */
-  const handlerPath = path.join(process.cwd(), NOTIFICATION_HANDLER)
-  if (existsSync(handlerPath)) {
-    let t = readFileSync(handlerPath, 'utf8')
-    if (
-      !t.includes('TriggerEvent.RESEND_INVITE') &&
-      t.includes(HANDLER_ANCHOR_BEFORE)
-    ) {
-      const count = t.split(HANDLER_ANCHOR_BEFORE).length - 1
-      if (count === 1) {
-        t = t.replace(HANDLER_ANCHOR_BEFORE, HANDLER_ANCHOR_AFTER)
-        writeFileSync(handlerPath, t)
-        touched.push(NOTIFICATION_HANDLER)
-      }
-    }
-  }
-
-  /* routes */
-  const routesPath = path.join(process.cwd(), USER_NOTIFICATION_ROUTES)
-  if (existsSync(routesPath)) {
-    let t = readFileSync(routesPath, 'utf8')
-    if (!t.includes(`/triggers/user/resend-invite`) && t.includes(ROUTES_ANCHOR_BEFORE)) {
-      const count = t.split(ROUTES_ANCHOR_BEFORE).length - 1
-      if (count === 1) {
-        t = t.replace(ROUTES_ANCHOR_BEFORE, ROUTES_ANCHOR_AFTER)
-        writeFileSync(routesPath, t)
-        touched.push(USER_NOTIFICATION_ROUTES)
-      }
-    }
-  }
-
-  /* sms-service */
-  const smsPath = path.join(process.cwd(), SMS_SERVICE)
-  if (existsSync(smsPath)) {
-    let t = readFileSync(smsPath, 'utf8')
-    let smsChanged = false
-    if (!t.includes(`resendInviteNotification`)) {
-      const n = t.split(SMS_OTHER_BEFORE).length - 1
-      if (n === 1) {
-        t = t.replace(SMS_OTHER_BEFORE, SMS_OTHER_AFTER)
-        smsChanged = true
-      }
-    }
-    if (!t.includes(`['resend-invite']`)) {
-      const n = t.split(SMS_TRIGGER_BEFORE).length - 1
-      if (n === 1) {
-        t = t.replace(SMS_TRIGGER_BEFORE, SMS_TRIGGER_AFTER)
-        smsChanged = true
-      }
-    }
-    if (smsChanged) {
-      writeFileSync(smsPath, t)
-      touched.push(SMS_SERVICE)
-    }
-  }
+  if (patchNotificationHandler()) touched.push(NOTIFICATION_HANDLER)
+  if (patchUserNotificationRoutes()) touched.push(USER_NOTIFICATION_ROUTES)
+  if (patchSmsService()) touched.push(SMS_SERVICE)
 
   /* csv */
   const csvPath = path.join(process.cwd(), NOTIFICATION_CSV)
