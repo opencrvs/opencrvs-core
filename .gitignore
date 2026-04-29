@@ -11,6 +11,8 @@ coverage
 build
 
 # misc
+.claude
+CLAUDE.md
 .claude-working/
 .claude
 CLAUDE.md

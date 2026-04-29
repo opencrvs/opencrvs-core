@@ -243,7 +243,12 @@ function UserListComponent({ userDetails }: UserListProps) {
     [locations, canAccessOffice]
   )
 
-  const { searchUsers, sendUsernameReminder } = useUsers()
+  const {
+    searchUsers,
+    sendUsernameReminder,
+    sendResetPasswordInvite,
+    resendInvite: resendInviteMutation
+  } = useUsers()
   const {
     data: searchResults,
     isLoading,
@@ -313,17 +318,17 @@ function UserListComponent({ userDetails }: UserListProps) {
     [toggleResetPassword]
   )
 
-  const resendInvite = useCallback(async function resendInvite(userId: string) {
-    try {
-      // const res = await userMutations.resendInvite(userId, [])
-      // if (res && res.data && res.data.resendInvite) {
-      //   setShowResendInviteSuccess(true)
-      // }
-      throw new Error('@todo Resend invite mutation is not implemented')
-    } catch (err) {
-      setShowResendInviteError(true)
-    }
-  }, [])
+  const resendInvite = useCallback(
+    async function resendInvite(userId: string) {
+      try {
+        await resendInviteMutation.mutateAsync(userId)
+        setShowResendInviteSuccess(true)
+      } catch (err) {
+        setShowResendInviteError(true)
+      }
+    },
+    [resendInviteMutation]
+  )
 
   const usernameReminder = useCallback(
     async (userId: string) => {
@@ -337,19 +342,17 @@ function UserListComponent({ userDetails }: UserListProps) {
     [sendUsernameReminder]
   )
 
-  const resetPassword = useCallback(async function resetPassword(
-    userId: string
-  ) {
-    try {
-      throw new Error('@todo Reset password mutation is not implemented')
-      // const res = await userMutations.sendResetPasswordInvite(userId, [])
-      // if (res && res.data && res.data.resetPasswordInvite) {
-      //   setShowResetPasswordSuccess(true)
-      // }
-    } catch (err) {
-      setResetPasswordError(true)
-    }
-  }, [])
+  const resetPassword = useCallback(
+    async (userId: string) => {
+      try {
+        await sendResetPasswordInvite.mutateAsync(userId)
+        setShowResetPasswordSuccess(true)
+      } catch {
+        setResetPasswordError(true)
+      }
+    },
+    [sendResetPasswordInvite]
+  )
 
   const getMenuItems = useCallback(
     function getMenuItems(user: User) {
