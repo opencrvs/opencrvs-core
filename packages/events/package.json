@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "^8.17.0",
-    "@opencrvs/commons": "^1.9.0",
+    "@opencrvs/commons": "^2.0.0",
     "@trpc/server": "^11.8.0",
     "@types/bcryptjs": "^2.4.2",
     "@types/luxon": "^3.6.2",
