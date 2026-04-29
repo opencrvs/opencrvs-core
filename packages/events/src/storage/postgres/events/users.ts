@@ -10,7 +10,7 @@
  */
 import { Kysely, sql } from 'kysely'
 import { TRPCError } from '@trpc/server'
-import { UUID } from '@opencrvs/commons/events'
+import { FieldValue, UUID } from '@opencrvs/commons/events'
 import { getClient } from '@events/storage/postgres/events'
 import { SearchUsersPayload } from '@events/service/users/api'
 import { NewUsers } from './schema/app/Users'
@@ -69,6 +69,7 @@ export async function getUserById(userId: UUID) {
       'users.officeId',
       'users.signaturePath',
       'users.profileImagePath',
+      'users.data',
       'locations.administrativeAreaId',
       'userCredentials.username'
     ])
@@ -120,6 +121,40 @@ export async function updatePasswordHash(userId: UUID, passwordHash: string) {
     .set({ passwordHash })
     .where('userId', '=', userId)
     .execute()
+}
+
+export async function updatePasswordHashAndSalt(
+  userId: UUID,
+  passwordHash: string,
+  salt: string
+) {
+  const db = getClient()
+  return db
+    .updateTable('userCredentials')
+    .set({ passwordHash, salt })
+    .where('userId', '=', userId)
+    .execute()
+}
+
+export async function resetUserCredentialsAndStatus(
+  userId: UUID,
+  passwordHash: string,
+  salt: string
+): Promise<void> {
+  const db = getClient()
+  await db.transaction().execute(async (trx) => {
+    await trx
+      .updateTable('userCredentials')
+      .set({ passwordHash, salt })
+      .where('userId', '=', userId)
+      .execute()
+
+    await trx
+      .updateTable('users')
+      .set({ status: 'pending' })
+      .where('id', '=', userId)
+      .execute()
+  })
 }
 
 async function createUserInTrx(user: NewUsers, trx: Kysely<Schema>) {
@@ -182,6 +217,7 @@ export async function searchUsersWithInput(input: SearchUsersPayload) {
       'users.officeId',
       'users.profileImagePath',
       'users.fullHonorificName',
+      'users.data',
       'locations.administrativeAreaId'
     ])
 
@@ -256,6 +292,7 @@ type UpdateUserFields = Partial<{
   officeId: UUID
   signaturePath: string | null
   profileImagePath: string | null
+  data: Record<string, FieldValue>
 }>
 
 export async function updateUserById(userId: UUID, fields: UpdateUserFields) {
@@ -302,6 +339,7 @@ export async function getUsersAndSystemsByIds(ids: string[]) {
             'users.officeId',
             'users.signaturePath',
             'users.profileImagePath',
+            'users.data',
             'locations.administrativeAreaId',
             'userCredentials.username'
           ])

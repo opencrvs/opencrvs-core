@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+/* eslint-disable max-lines */
 import { TRPCError } from '@trpc/server'
 import * as z from 'zod/v4'
 import { decode } from 'jsonwebtoken'
@@ -55,11 +55,15 @@ import {
   createUser,
   getCredentials,
   getUser,
+  getUsersById,
+  isUser,
   searchUsers,
-  updateUser
+  updateUser,
+  sendUsernameReminder,
+  sendResetPasswordInvite,
+  resendInvite
 } from '@events/service/users/api'
 import { uploadBase64File } from '@events/service/files'
-import { getUsersById, isUser } from '@events/service/users/api'
 import {
   checkVerificationCode,
   generateAndSendVerificationCode,
@@ -171,7 +175,7 @@ export function searchUsersRoute(
 }
 
 const UserAuditListQuery = z.object({
-  userId: z.string(),
+  userId: UUID,
   skip: z.number().optional().default(0),
   count: z.number().optional().default(10),
   timeStart: z.string().optional(),
@@ -533,6 +537,21 @@ export const userRouter = router({
         : input.avatar.data
       await updateUserById(UUID.parse(ctx.user.id), { profileImagePath })
     }),
+  resendInvite: userAndSystemProcedure
+    .use(allowedWithAnyOfScopes(['user.edit']))
+    .input(UUID)
+    .mutation(async ({ input, ctx }) => {
+      const userId = UUID.parse(input)
+
+      await resendInvite(userId, ctx.token)
+      const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
+      await writeAuditLog({
+        operation: 'user.resend_invite',
+        requestData: { subjectId: userId },
+        clientId: auditLogIdentifiers.sub,
+        clientType: auditLogIdentifiers.userType ?? 'system'
+      })
+    }),
   activate: userOnlyProcedure
     .input(
       z.object({
@@ -548,6 +567,43 @@ export const userRouter = router({
     )
     .mutation(async ({ input }) => {
       return activateUser(input)
+    }),
+  sendUsernameReminder: userAndSystemProcedure
+    .use(allowedWithAnyOfScopes(['user.edit']))
+    .input(UUID)
+    .mutation(async ({ input, ctx }) => {
+      const userId = UUID.parse(input)
+      await sendUsernameReminder(userId, ctx.token)
+      const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
+      await writeAuditLog({
+        operation: 'user.username_reminder_by_admin',
+        requestData: { subjectId: userId },
+        clientId: auditLogIdentifiers.sub,
+        clientType: auditLogIdentifiers.userType ?? 'system'
+      })
+    }),
+  sendResetPasswordInvite: userAndSystemProcedure
+    .use(allowedWithAnyOfScopes(['user.edit']))
+    .input(UUID)
+    .mutation(async ({ input, ctx }) => {
+      const userId = UUID.parse(input)
+      const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
+      const adminUser = await getUser(auditLogIdentifiers.sub)
+      await sendResetPasswordInvite(
+        userId,
+        {
+          id: adminUser.id,
+          name: adminUser.name,
+          role: adminUser.role
+        },
+        ctx.token
+      )
+      await writeAuditLog({
+        operation: 'user.password_reset_by_admin',
+        requestData: { subjectId: userId },
+        clientId: auditLogIdentifiers.sub,
+        clientType: auditLogIdentifiers.userType ?? 'system'
+      })
     }),
   audit: auditRouter
 })

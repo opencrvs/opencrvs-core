@@ -25,7 +25,6 @@ import { Faker, en } from '@faker-js/faker'
 // Initialize faker with seed, so that the test data stays consistent
 const faker = new Faker({ seed: 1001, locale: en })
 export { faker }
-
 const userIds = {
   localRegistrar: 'aa13a268-ae48-4a30-9450-554aebaab203' as UUID,
   registrationAgent: '861fa044-c8cf-4d9d-9cbc-f7a2e1d5b94a' as UUID,
@@ -375,7 +374,7 @@ export function testDataGenerator(rngSeed?: number) {
     localSystemAdmin: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
       v1: {
         id: userIds.localSystemAdmin,
-        userMgntUserID: '68cbd26fc64761565469591d',
+        userMgntUserID: '69179374-0447-4545-4545-454545454548',
         creationDate: '1758188143348',
         username: 'a.ngonga',
         practitionerId: '723819da-3ddd-49b0-b46c-43c8e34e1c25',

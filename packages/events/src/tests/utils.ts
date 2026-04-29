@@ -58,6 +58,10 @@ import {
   setupHierarchyWithUsers
 } from './generators'
 
+export const TEST_SYSTEM_ID = '9f3c6b7e-2a91-4f6d-b8d2-5c0e3a4f1b72' as UUID
+export const TEST_SYSTEM_ID_2 = '4d1a8c90-7e5b-4a3f-9c2d-1f6b8e7a2c55' as UUID
+export const REINDEX_SYSTEM_ID = 'e2b7f6a1-3d94-4c8e-a5f9-6b2d0c1a9e33' as UUID
+
 /**
  * Known unstable fields in events that should be sanitized for snapshot testing.
  * We should aim to have stable ids based on the actual users and events in the system.
@@ -208,7 +212,7 @@ export function createTestToken({
   userType,
   role
 }: {
-  userId: string
+  userId: UUID
   scopes: string[]
   userType?: TokenUserType
   role?: string
@@ -282,7 +286,7 @@ function createTokenExchangeTestToken(
 }
 
 export function createSystemTestClient(
-  systemId: string,
+  systemId: UUID,
   scopes: string[] = TEST_USER_DEFAULT_SCOPES
 ) {
   const createCaller = createCallerFactory(appRouter)

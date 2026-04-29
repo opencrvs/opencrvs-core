@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable max-lines */
 import { randomBytes } from 'crypto'
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
@@ -18,6 +19,7 @@ import {
   FamilyName,
   IUserName,
   TokenUserType,
+  TriggerEvent,
   UUID,
   UpdateUserInput,
   User,
@@ -43,9 +45,11 @@ import {
   isUsernameTaken,
   getUserCredentialsByUserId,
   SecurityQuestion,
-  getUserByMobileOrEmail
+  getUserByMobileOrEmail,
+  resetUserCredentialsAndStatus
 } from '@events/storage/postgres/events/users'
 import { generateSaltedHash, generateHash } from '@events/service/auth/hash'
+import { updatePasswordHashAndSalt } from '@events/storage/postgres/events/users'
 import { getRoles } from '../config/config'
 
 export type UserSortBy =
@@ -134,7 +138,8 @@ function mapDbUserToUser(user: DbUser): User & { username: string } {
       : undefined,
     primaryOfficeId: user.officeId,
     administrativeAreaId: user.administrativeAreaId ?? undefined,
-    fullHonorificName: user.fullHonorificName ?? undefined
+    fullHonorificName: user.fullHonorificName ?? undefined,
+    data: Object.keys(user.data).length > 0 ? user.data : undefined
   }
 }
 
@@ -144,14 +149,17 @@ export async function getUser(
   const user = await getUserById(UUID.parse(userId))
 
   if (!user) {
-    throw new Error(`User not found: ${userId}`)
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `User not found: ${userId}`
+    })
   }
 
   return mapDbUserToUser(user)
 }
 
 export async function findUserOrSystem(
-  id: string
+  id: UUID
 ): Promise<UserOrSystem | undefined> {
   try {
     return await getUser(id)
@@ -225,7 +233,8 @@ export async function updateUser(
     officeId: input.primaryOfficeId,
     signaturePath: input.signature
       ? input.signature.path
-      : existingUser.signaturePath
+      : existingUser.signaturePath,
+    data: input.data
   })
 
   if (newUsername !== oldUsername) {
@@ -266,6 +275,7 @@ function generateRandomPassword() {
 }
 
 async function sendCredentialsNotification(
+  event: typeof TriggerEvent.USER_CREATED | typeof TriggerEvent.RESEND_INVITE,
   userFullName: IUserName[],
   username: string,
   password: string,
@@ -275,7 +285,7 @@ async function sendCredentialsNotification(
 ) {
   try {
     await triggerUserEventNotification({
-      event: 'user-created',
+      event,
       payload: {
         recipient: {
           name: personNameFromV1ToV2(userFullName),
@@ -289,7 +299,11 @@ async function sendCredentialsNotification(
       authHeader: { Authorization: token }
     })
   } catch (err) {
-    logger.error(`Unable to send notification for error : ${err}`)
+    logger.error(`Unable to send ${event} notification for error : ${err}`)
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `Unable to send notification to for error : ${err}`
+    })
   }
 }
 
@@ -333,7 +347,8 @@ export async function createUser(
     officeId: resolvedUser.primaryOfficeId,
     mobile: resolvedUser.mobile,
     status: resolvedUser.status,
-    signaturePath: resolvedUser.signature?.path
+    signaturePath: resolvedUser.signature?.path,
+    data: resolvedUser.data ?? {}
   }
 
   // Hash the provided password, or generate a random placeholder for pending
@@ -346,18 +361,19 @@ export async function createUser(
     securityQuestions: []
   }
 
-  const postgresId = await createUserWithCredentials(
-    userPayload,
-    userCredentialPayload
-  )
-
   await sendCredentialsNotification(
+    TriggerEvent.USER_CREATED,
     input.name,
     userCredentialPayload.username,
     resolvedUser.password,
     _token,
     userPayload.mobile ?? undefined,
     userPayload.email
+  )
+
+  const postgresId = await createUserWithCredentials(
+    userPayload,
+    userCredentialPayload
   )
 
   return getUser(postgresId)
@@ -379,6 +395,47 @@ export async function activateUser(input: {
 
   const userId = UUID.parse(input.userId)
   await activateUserWithCredentials(userId, hash, salt, securityQuestions)
+}
+
+export async function resendInvite(userId: UUID, token: string): Promise<void> {
+  const user = await getUserById(userId)
+
+  if (!user) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `User not found: ${userId}`
+    })
+  }
+
+  if (user.status !== 'pending') {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Can only resend invite to a user in pending status'
+    })
+  }
+
+  const password = env.DEFAULT_USER_PASSWORD ?? generateRandomPassword()
+  const { hash, salt } = await generateSaltedHash(password)
+
+  const userName: IUserName[] = [
+    {
+      use: 'en',
+      given: user.firstname ? [user.firstname] : [],
+      family: user.surname ?? ''
+    }
+  ]
+
+  await sendCredentialsNotification(
+    TriggerEvent.RESEND_INVITE,
+    userName,
+    user.username,
+    password,
+    token,
+    user.mobile ?? undefined,
+    user.email ?? undefined
+  )
+
+  await resetUserCredentialsAndStatus(userId, hash, salt)
 }
 
 /**
@@ -503,5 +560,91 @@ export async function verifyUser(input: { mobile?: string; email?: string }) {
     ],
     securityQuestionKey,
     scope
+  }
+}
+
+export async function sendResetPasswordInvite(
+  userId: UUID,
+  admin: { id: string; name: IUserName[]; role: string },
+  token: string
+): Promise<void> {
+  const user = await getUser(userId)
+
+  const temporaryPassword = generateRandomPassword()
+  const { hash, salt } = await generateSaltedHash(temporaryPassword)
+  await updatePasswordHashAndSalt(userId, hash, salt)
+
+  const userName: IUserName[] = [
+    {
+      use: 'en',
+      given: user.name[0]?.given ?? [],
+      family: user.name[0]?.family ?? ''
+    }
+  ]
+
+  try {
+    await triggerUserEventNotification({
+      event: 'reset-password-by-admin',
+      payload: {
+        recipient: {
+          name: personNameFromV1ToV2(userName),
+          email: user.email,
+          mobile: user.mobile
+        },
+        temporaryPassword,
+        admin: {
+          id: admin.id,
+          name: personNameFromV1ToV2(admin.name),
+          role: admin.role
+        }
+      },
+      countryConfigUrl: env.COUNTRY_CONFIG_URL,
+      authHeader: { Authorization: token }
+    })
+  } catch (err) {
+    logger.error(`Unable to send reset password notification for error: ${err}`)
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `Unable to send notification: ${err}`
+    })
+  }
+}
+
+export async function sendUsernameReminder(
+  userId: UUID,
+  token: string
+): Promise<void> {
+  const user = await getUser(userId)
+
+  const userName: IUserName[] = [
+    {
+      use: 'en',
+      given: user.name[0]?.given ?? [],
+      family: user.name[0]?.family ?? ''
+    }
+  ]
+
+  try {
+    await triggerUserEventNotification({
+      event: 'username-reminder',
+      payload: {
+        recipient: {
+          name: personNameFromV1ToV2(userName),
+          email: user.email,
+          mobile: user.mobile
+        },
+        username: user.username
+      },
+      countryConfigUrl: env.COUNTRY_CONFIG_URL,
+      authHeader: { Authorization: token }
+    })
+  } catch (err) {
+    logger.error(
+      `Unable to send username reminder notification for error: ${err}`
+    )
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `Unable to send notification: ${err}`
+    })
   }
 }

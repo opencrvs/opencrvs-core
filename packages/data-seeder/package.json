@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/data-seeder",
-  "version": "1.9.12",
+  "version": "2.0.0",
   "description": "OpenCRVS data-seeder microservice",
   "homepage": "https://github.com/opencrvs/opencrvs-core#readme",
   "license": "MPL-2.0",
@@ -17,8 +17,8 @@
     "prettier": "3.5.3"
   },
   "dependencies": {
-    "@opencrvs/commons": "^1.9.0",
-    "@opencrvs/events": "^1.9.0",
+    "@opencrvs/commons": "^2.0.0",
+    "@opencrvs/events": "^2.0.0",
     "@trpc/client": "^11.0.0-rc.532",
     "@types/fhir": "^0.0.37",
     "@types/node": "^16.18.39",

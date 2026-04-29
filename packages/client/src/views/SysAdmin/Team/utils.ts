@@ -29,6 +29,7 @@ const AuditDescriptionMapping: Record<string, MessageDescriptor> = {
   'user.password_changed': messages.passwordChangedAuditAction,
   'user.password_reset': messages.passwordResetAuditAction,
   'user.password_reset_by_admin': messages.passwordResetByAdmin,
+  'user.resend_invite': messages.resendInviteAuditAction,
   'user.phone_number_changed': messages.phoneNumberChangedAuditAction,
   'user.email_address_changed': messages.emailAddressChangedAuditAction,
   'user.username_reminder': messages.userNameReminderAuditAction,

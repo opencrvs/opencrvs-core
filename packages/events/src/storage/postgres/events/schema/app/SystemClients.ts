@@ -18,7 +18,7 @@ export default interface SystemClientsTable {
     Record<string, any>
   >
 
-  createdBy: ColumnType<string, string, string>
+  createdBy: ColumnType<UUID, UUID, UUID>
 
   secretHash: ColumnType<string, string, string>
 

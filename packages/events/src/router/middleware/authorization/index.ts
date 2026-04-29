@@ -504,8 +504,8 @@ export const userCanReadOtherUser: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
   TrpcContext,
-  TrpcContext & { userId: string },
-  { userId: string }
+  TrpcContext & { userId: UUID },
+  { userId: UUID }
 > = async ({ next, ctx, input }) => {
   const { token, user: userReading } = ctx
 

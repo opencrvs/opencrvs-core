@@ -19,6 +19,7 @@ export const TriggerEvent = {
   USERNAME_REMINDER: 'username-reminder',
   RESET_PASSWORD: 'reset-password',
   RESET_PASSWORD_BY_ADMIN: 'reset-password-by-admin',
+  RESEND_INVITE: 'resend-invite',
   TWO_FA: '2fa',
   ALL_USER_NOTIFICATION: 'all-user-notification',
   CHANGE_PHONE_NUMBER: 'change-phone-number',
@@ -64,6 +65,10 @@ export const TriggerPayload = {
       name: NameFieldValue,
       role: z.string()
     })
+  }),
+  [TriggerEvent.RESEND_INVITE]: BasePayload.extend({
+    username: z.string(),
+    temporaryPassword: z.string()
   }),
   [TriggerEvent.TWO_FA]: BasePayload.extend({
     code: z.string()
