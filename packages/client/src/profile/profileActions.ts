@@ -10,7 +10,7 @@
  */
 
 import { UserDetails } from '@client/utils/userUtils'
-import { TriggerEvent, User } from '@opencrvs/commons/client'
+import { User } from '@opencrvs/commons/client'
 
 export const CHECK_AUTH = 'PROFILE/CHECK_AUTH' as const
 export const REDIRECT_TO_AUTHENTICATION =
@@ -107,19 +107,6 @@ export const redirectToAuthentication = (
     redirectBack
   }
 })
-
-export const SendVerifyCodeSuccess = (payload: {
-  userId: string
-  nonce: string
-  status: string
-  mobile?: string
-  email?: string
-}): SendVerifyCodeSuccessAction => {
-  return {
-    type: SEND_VERIFY_CODE_COMPLETED,
-    payload
-  }
-}
 
 export type Action =
   | CheckAuthAction

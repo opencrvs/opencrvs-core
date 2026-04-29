@@ -239,7 +239,7 @@ test('persists data payload when creating a user', async () => {
   const userPayload = {
     email: 'data-test@opencrvs.org',
     role: 'admin',
-    name: [{ use: 'en', family: 'Doe', given: ['Jane'] }],
+    name: { firstname: 'Jane', surname: 'Doe' },
     primaryOfficeId: user.primaryOfficeId,
     data
   }
@@ -276,7 +276,7 @@ test('persists empty data object when data is not provided on create', async () 
   const userPayload = {
     email: 'nodata-test@opencrvs.org',
     role: 'admin',
-    name: [{ use: 'en', family: 'Doe', given: ['John'] }],
+    name: { firstname: 'Jane', surname: 'Doe' },
     primaryOfficeId: user.primaryOfficeId
   }
 
