@@ -132,7 +132,8 @@ function getUserEditConfig(
             {
               id: 'phoneNumber',
               type: FieldType.PHONE,
-              required: false,
+              required:
+                window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms',
               label: messages.phoneNumber,
               validation: [
                 {
@@ -150,7 +151,8 @@ function getUserEditConfig(
             {
               id: 'email',
               type: FieldType.EMAIL,
-              required: true,
+              required:
+                window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'email',
               label: messages.email
             },
             {
