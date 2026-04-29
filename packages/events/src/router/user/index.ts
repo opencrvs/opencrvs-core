@@ -174,7 +174,7 @@ export function searchUsersRoute(
 }
 
 const UserAuditListQuery = z.object({
-  userId: z.string(),
+  userId: UUID,
   skip: z.number().optional().default(0),
   count: z.number().optional().default(10),
   timeStart: z.string().optional(),
