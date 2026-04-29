@@ -175,6 +175,7 @@ test('Rejects when username is provided by app caller', async () => {
       name: [{ use: 'en', family: 'family', given: ['given'] }],
       primaryOfficeId: user.primaryOfficeId,
       username: 'custom-username'
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any)
   ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
 })
@@ -191,6 +192,7 @@ test('Rejects password when provided by app caller', async () => {
       name: [{ use: 'en', family: 'family', given: ['given'] }],
       primaryOfficeId: user.primaryOfficeId,
       password: 'passWORD123456'
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any)
   ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
 })
