@@ -38,7 +38,7 @@ import {
   userAndSystemProcedure,
   userOnlyProcedure
 } from '@events/router/trpc'
-import { getRoles } from '@events/service/config/config'
+import { getApplicationConfig, getRoles } from '@events/service/config/config'
 import { generateHash } from '@events/service/auth/hash'
 import {
   updatePasswordHash,
@@ -101,11 +101,20 @@ function getAuditLogIdentifiers(token: TokenWithBearer) {
   return AuditLogSubject.parse(decoded)
 }
 
+async function validateMobile(mobile: string) {
+  const config = await getApplicationConfig()
+  const pattern = new RegExp(config.PHONE_NUMBER_PATTERN)
+  if (!pattern.test(mobile)) {
+    throw new TRPCError({ code: 'BAD_REQUEST', message: 'INVALID_MOBILE' })
+  }
+}
+
 export async function handleCreateUser(
   input: CreateUserInput | CreateUserInputInternal,
   ctx: { token: TokenWithBearer }
 ): Promise<User> {
   if (input.mobile) {
+    await validateMobile(input.mobile)
     const existingWithMobile = await searchUsers({
       mobile: input.mobile,
       count: 1,
@@ -234,6 +243,7 @@ export const userRouter = router({
     .output(User)
     .mutation(async ({ input, ctx }) => {
       if (input.mobile) {
+        await validateMobile(input.mobile)
         const existingWithMobile = await searchUsers({
           mobile: input.mobile,
           count: 1,

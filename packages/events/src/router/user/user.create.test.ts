@@ -117,7 +117,7 @@ test('Multiple users with no email can be created without a unique key conflict'
   await expect(
     client.user.create({
       email: '',
-      mobile: '+254700000001',
+      mobile: '01712345678',
       role: 'admin',
       name: [{ use: 'en', family: 'family1', given: ['given1'] }],
       primaryOfficeId: user.primaryOfficeId
@@ -127,7 +127,7 @@ test('Multiple users with no email can be created without a unique key conflict'
   await expect(
     client.user.create({
       email: '',
-      mobile: '+254700000002',
+      mobile: '01812345678',
       role: 'admin',
       name: [{ use: 'en', family: 'family2', given: ['given2'] }],
       primaryOfficeId: user.primaryOfficeId
@@ -237,7 +237,7 @@ test('Throws error when creating user with existing mobile', async () => {
     })
   ])
 
-  const mobile = '+345345343'
+  const mobile = '01512345678'
   const userPayload1 = {
     email: 'testing+1@opencrvs.org',
     mobile,
@@ -270,4 +270,54 @@ test('Throws error when creating user with existing mobile', async () => {
   await expect(client.user.create(userPayload2)).rejects.toThrowError(
     new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_MOBILE' })
   )
+})
+
+test('Creates user when mobile matches PHONE_NUMBER_PATTERN', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [encodeScope({ type: 'user.create' })])
+
+  await expect(
+    client.user.create({
+      email: 'valid-phone@opencrvs.org',
+      // matches the test MSW mock pattern: ^01[1-9][0-9]{8}$
+      mobile: '01712345678',
+      role: 'admin',
+      name: [{ use: 'en', family: 'family', given: ['given'] }],
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).resolves.toBeDefined()
+})
+
+test('Rejects user creation when mobile does not match PHONE_NUMBER_PATTERN', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [encodeScope({ type: 'user.create' })])
+
+  await expect(
+    client.user.create({
+      email: 'invalid-phone@opencrvs.org',
+      mobile: '12345',
+      role: 'admin',
+      name: [{ use: 'en', family: 'family', given: ['given'] }],
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).rejects.toThrowError(
+    new TRPCError({ code: 'BAD_REQUEST', message: 'INVALID_MOBILE' })
+  )
+})
+
+test('Creates user when no mobile is provided, skipping phone format validation', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [encodeScope({ type: 'user.create' })])
+
+  await expect(
+    client.user.create({
+      email: 'no-phone@opencrvs.org',
+      role: 'admin',
+      name: [{ use: 'en', family: 'family', given: ['given'] }],
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).resolves.toBeDefined()
 })
