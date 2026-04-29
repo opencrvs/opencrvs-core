@@ -203,7 +203,7 @@ describe('audit log', () => {
 
   describe('integrations.create', () => {
     test('writes an audit log entry when a system client creates an integration', async () => {
-      const systemId = '00000000-0000-1000-8000-000000000099'
+      const systemId = TEST_SYSTEM_ID
       const client = createSystemTestClient(systemId, [
         encodeScope({ type: 'integration.create' })
       ])
@@ -232,7 +232,7 @@ describe('audit log', () => {
     })
 
     test('does not include credentials in audit log response summary', async () => {
-      const systemId = '00000000-0000-1000-8000-000000000099'
+      const systemId = TEST_SYSTEM_ID
       const client = createSystemTestClient(systemId, [
         encodeScope({ type: 'integration.create' })
       ])

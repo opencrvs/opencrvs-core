@@ -16,6 +16,7 @@ import {
   createInternalTestClient,
   createTestToken,
   setupTestCase,
+  TEST_SYSTEM_ID,
   TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
 import { generateHash, generateSaltedHash } from '@events/service/auth/hash'
@@ -39,7 +40,7 @@ test('Returns 403 when accessed with user app token', async () => {
 
 test('Returns 403 when accessed with system app token', async () => {
   const appToken = createTestToken({
-    userId: 'test-system',
+    userId: TEST_SYSTEM_ID,
     scopes: TEST_USER_DEFAULT_SCOPES,
     userType: TokenUserType.enum.system
   })
