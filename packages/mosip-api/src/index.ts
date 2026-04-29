@@ -5,6 +5,7 @@ import {
   ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import { registrationEventHandler } from "./routes/event-registration";
+import { updateBiographicsHandler } from "./routes/update-biographics";
 import { env } from "./constants";
 import * as openapi from "./openapi-documentation";
 import { OIDPUserInfoSchema, OIDPQuerySchema } from "./esignet-api";
@@ -104,6 +105,11 @@ const initRoutes = (app: FastifyInstance) => {
     schema: {
       body: MosipInteropPayloadSchema,
     },
+  });
+  app.withTypeProvider<ZodTypeProvider>().route({
+    url: "/events/update-biographics",
+    method: "POST",
+    handler: updateBiographicsHandler,
   });
   app.withTypeProvider<ZodTypeProvider>().route({
     url: "/verify",

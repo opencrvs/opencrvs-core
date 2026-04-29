@@ -11,6 +11,16 @@ export const DeathRequestFieldsSchema = z.looseObject({
   birthCertificateNumber: z.undefined().optional(),
 });
 
+export const CorrectionRequestFieldsSchema = z.looseObject({
+  VID: z.string(),
+  fullName: z.string().optional(),
+  dateOfBirth: z.string().optional(),
+  gender: z.string().optional(),
+  introducerInfoToken: z.string().optional(),
+  birthCertificateNumber: z.undefined().optional(),
+  deathCertificateNumber: z.undefined().optional(),
+});
+
 export const MosipNotificationSchema = z.object({
   recipientFullName: z.string(),
   recipientEmail: z.string(),
@@ -20,7 +30,26 @@ export const MosipNotificationSchema = z.object({
 export const MosipInteropPayloadSchema = z.object({
   trackingId: z.string(),
   notification: MosipNotificationSchema,
-  requestFields: z.union([BirthRequestFieldsSchema, DeathRequestFieldsSchema]),
+  requestFields: z.union([
+    BirthRequestFieldsSchema,
+    DeathRequestFieldsSchema,
+    CorrectionRequestFieldsSchema,
+  ]),
+  schemaJson: z.string().optional(),
+  metaInfo: z.record(z.string(), z.unknown()),
+  audit: z.record(z.string(), z.unknown()),
+});
+
+export const MosipCorrectionPayloadSchema = z.object({
+  trackingId: z.string(),
+  notification: MosipNotificationSchema,
+  requestFields: z.object({
+    VID: z.string(),
+    fullName: z.string().optional(),
+    dateOfBirth: z.string().optional(),
+    gender: z.string().optional(),
+    introducerInfoToken: z.string().optional(),
+  }),
   schemaJson: z.string().optional(),
   metaInfo: z.record(z.string(), z.unknown()),
   audit: z.record(z.string(), z.unknown()),
@@ -48,7 +77,9 @@ export const RegistrationEventResponseSchema = z.record(
 
 export type BirthRequestFields = z.infer<typeof BirthRequestFieldsSchema>;
 export type DeathRequestFields = z.infer<typeof DeathRequestFieldsSchema>;
+export type CorrectionRequestFields = z.infer<typeof CorrectionRequestFieldsSchema>;
 export type MosipInteropPayload = z.infer<typeof MosipInteropPayloadSchema>;
+export type MosipCorrectionPayload = z.infer<typeof MosipCorrectionPayloadSchema>;
 export type VerifyNidPayload = z.infer<typeof VerifyNidPayloadSchema>;
 export type VerifyNidResponse = z.infer<typeof VerifyNidResponseSchema>;
 
@@ -105,6 +136,30 @@ export const createMosipInteropClient = (
 
       if (!response.ok) {
         throw new Error(`Failed to register event: ${await response.text()}`);
+      }
+
+      return RegistrationEventResponseSchema.parse(await response.json());
+    },
+    updateBiographics: async (payload: MosipCorrectionPayload) => {
+      const parsedPayload = MosipCorrectionPayloadSchema.parse(payload);
+      const MOSIP_API_CORRECTION_EVENT_URL = new URL(
+        "./events/update-biographics",
+        url,
+      ).href;
+
+      const response = await fetchWithTimeout(MOSIP_API_CORRECTION_EVENT_URL, {
+        method: "POST",
+        body: JSON.stringify(parsedPayload),
+        headers: {
+          Authorization: authorizationHeader,
+          "content-type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to update biographics: ${await response.text()}`,
+        );
       }
 
       return RegistrationEventResponseSchema.parse(await response.json());

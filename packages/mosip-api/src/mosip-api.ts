@@ -3,6 +3,7 @@ import MOSIPAuthenticator from "@mosip/ida-auth-sdk";
 import { schemaJson as defaultSchemaJson } from "./types/idSchemaJson";
 import {
   BirthRequestFields,
+  CorrectionRequestFields,
   DeathRequestFields,
   MosipInteropPayload,
 } from "@opencrvs/mosip/api";
@@ -248,6 +249,110 @@ export const postDeathRecord = async ({
       request: {
         registrationId: event.id,
         process: "CRVS_DEATH",
+        source: "CRVS1",
+        additionalInfoReqId: "",
+        notificationInfo: {
+          name: notification.recipientFullName,
+          phone: notification.recipientPhone || "",
+          email: notification.recipientEmail || "",
+        },
+      },
+    },
+    null,
+    2,
+  );
+
+  const processPacketResponse = await fetch(env.MOSIP_PROCESS_PACKET_URL, {
+    method: "POST",
+    body: processPacketRequestBody,
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: `Authorization=${authToken};`,
+    },
+  });
+
+  if (!processPacketResponse.ok) {
+    throw new Error(
+      `Failed sending record to MOSIP, response: ${await processPacketResponse.text()}`,
+    );
+  }
+
+  const processPacketResponseJson = await processPacketResponse.json();
+
+  if (processPacketResponseJson?.errors?.length > 0) {
+    throw new Error(
+      `Error in processing packet, response: ${await processPacketResponseJson?.errors[0]?.message}`,
+    );
+  }
+};
+
+export const postDemographicUpdateRecord = async ({
+  event,
+  requestFields,
+  schemaJson,
+  audit,
+  metaInfo,
+  notification,
+}: {
+  event: {
+    id: string;
+    trackingId: string;
+  };
+  requestFields: CorrectionRequestFields;
+  schemaJson?: string;
+  audit: MosipInteropPayload["audit"];
+  metaInfo: MosipInteropPayload["metaInfo"];
+  notification: MosipInteropPayload["notification"];
+}) => {
+  const authToken = await getMosipAuthToken("PACKET");
+
+  const updatePacketRequestBody = JSON.stringify(
+    {
+      id: "string",
+      version: "string",
+      requesttime: new Date().toISOString(),
+      request: {
+        id: event.id,
+        refId: `${env.MOSIP_CENTER_ID}_${env.MOSIP_MACHINE_ID}`,
+        offlineMode: false,
+        process: "CRVS_UPDATE",
+        source: "CRVS1",
+        schemaVersion: "0.500",
+        fields: requestFields,
+        metaInfo: metaInfo,
+        audits: Array.of(audit),
+        schemaJson: schemaJson ?? defaultSchemaJson,
+      },
+    },
+    null,
+    2,
+  );
+
+  const updatePacketResponse = await fetch(env.MOSIP_CREATE_PACKET_URL, {
+    method: "PUT",
+    body: updatePacketRequestBody,
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: `Authorization=${authToken};`,
+    },
+  });
+
+  if (!updatePacketResponse.ok) {
+    throw new Error(
+      `Failed sending record to MOSIP, response: ${await updatePacketResponse.text()}`,
+    );
+  }
+
+  await updatePacketResponse.json();
+
+  const processPacketRequestBody = JSON.stringify(
+    {
+      id: "mosip.registration.processor.workflow.instance",
+      requesttime: new Date().toISOString(),
+      version: "v1",
+      request: {
+        registrationId: event.id,
+        process: "CRVS_UPDATE",
         source: "CRVS1",
         additionalInfoReqId: "",
         notificationInfo: {

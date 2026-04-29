@@ -89,7 +89,21 @@ type CrvsDeathRequest = {
   };
 };
 
-type CrvsRequest = CrvsNewRequest | CrvsDeathRequest;
+type CrvsUpdateRequest = {
+  request: {
+    process: "CRVS_UPDATE";
+    id: string;
+    fields: {
+      VID: string;
+      fullName?: string;
+      dateOfBirth?: string;
+      gender?: string;
+      introducerInfoToken?: string;
+    };
+  };
+};
+
+type CrvsRequest = CrvsNewRequest | CrvsDeathRequest | CrvsUpdateRequest;
 
 const isCrvsNewRequest = (request: CrvsRequest): request is CrvsNewRequest => {
   return request.request.process === "CRVS_NEW";
@@ -99,6 +113,12 @@ const isCrvsDeathRequest = (
   request: CrvsRequest,
 ): request is CrvsDeathRequest => {
   return request.request.process === "CRVS_DEATH";
+};
+
+const isCrvsUpdateRequest = (
+  request: CrvsRequest,
+): request is CrvsUpdateRequest => {
+  return request.request.process === "CRVS_UPDATE";
 };
 
 export const packetManagerCreateHandler: RouteHandlerMethod = async (
@@ -167,6 +187,38 @@ export const packetManagerCreateHandler: RouteHandlerMethod = async (
     nationalIdNumber && deactivateNid(nationalIdNumber);
   }
 
+  if (isCrvsUpdateRequest(payload)) {
+    const id = payload.request.id;
+    const { VID, fullName, dateOfBirth, gender, introducerInfoToken } =
+      payload.request.fields;
+
+    await sendEmail(
+      `Biographic update received for VID ${VID}`,
+      [
+        `Request ID: ${id}`,
+        `VID: ${VID}`,
+        `Name updated: ${Boolean(fullName)}`,
+        `DOB updated: ${Boolean(dateOfBirth)}`,
+        `Gender updated: ${Boolean(gender)}`,
+        `Introducer token present: ${Boolean(introducerInfoToken)}`,
+      ].join("\n"),
+      request.log,
+    );
+
+    request.log.info(
+      {
+        event: "packet-manager.update-biographics",
+        requestId: id,
+        vidSuffix: VID.slice(-4),
+        hasFullName: Boolean(fullName),
+        hasDateOfBirth: Boolean(dateOfBirth),
+        hasGender: Boolean(gender),
+        hasIntroducerInfoToken: Boolean(introducerInfoToken),
+      },
+      "Received mock demographic update request",
+    );
+  }
+
   return reply.status(200).send({
     id: "mosip.registration.packet.writer",
     version: "v1",
@@ -177,7 +229,7 @@ export const packetManagerCreateHandler: RouteHandlerMethod = async (
         id: payload.request.id,
         packetName: "111111112_evidence",
         source: "CRVS1",
-        process: "CRVS_NEW",
+        process: payload.request.process,
         refId: payload.request.id,
         schemaVersion: "0.5",
         signature:
@@ -191,7 +243,7 @@ export const packetManagerCreateHandler: RouteHandlerMethod = async (
         id: payload.request.id,
         packetName: "111111112_optional",
         source: "CRVS1",
-        process: "CRVS_NEW",
+        process: payload.request.process,
         refId: payload.request.id,
         schemaVersion: "0.5",
         signature:
@@ -205,7 +257,7 @@ export const packetManagerCreateHandler: RouteHandlerMethod = async (
         id: payload.request.id,
         packetName: "111111112_id",
         source: "CRVS1",
-        process: "CRVS_NEW",
+        process: payload.request.process,
         refId: payload.request.id,
         schemaVersion: "0.1",
         signature:

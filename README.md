@@ -28,7 +28,7 @@ touch .env
 yarn dev
 
 # only run the main server without mocks
-yarn dev --filter=@opencrvs/mosip-api
+yarn workspace @opencrvs/mosip-api run dev
 
 # bump package.json versions
 yarn set-version 1.7.0-alpha.16
