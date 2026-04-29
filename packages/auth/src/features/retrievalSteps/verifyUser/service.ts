@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { redis } from '@auth/database'
-import { IUserName } from '@opencrvs/commons'
+import { UserName } from '@opencrvs/commons'
 import { internalClient } from '@auth/features/authenticate/service'
 
 export const RETRIEVAL_FLOW_USER_NAME = 'username'
@@ -39,7 +39,7 @@ export async function verifyUser(input: { mobile?: string; email?: string }) {
 export interface IRetrievalStepInformation {
   userId: string
   username: string
-  userFullName: IUserName[]
+  userFullName: UserName
   mobile?: string
   email?: string
   securityQuestionKey: string
