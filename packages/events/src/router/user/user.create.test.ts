@@ -179,7 +179,7 @@ test('Rejects when username is provided by app caller', async () => {
   ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
 })
 
-test.fails('Rejects password when provided by app caller', async () => {
+test('Rejects password when provided by app caller', async () => {
   const { user } = await setupTestCase()
 
   const client = createTestClient(user, [encodeScope({ type: 'user.create' })])

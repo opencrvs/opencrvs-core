@@ -66,6 +66,7 @@ export const CreateUserInput = User.pick({
 })
   .extend({
     username: z.undefined().optional(),
+    password: z.undefined().optional(),
     signature: FileFieldValue.optional()
   })
   .describe('User input for creating a new user through client API.')
