@@ -240,7 +240,7 @@ test('persists data payload when updating a user', async () => {
 
   const data = { employeeId: 'EMP-002', department: 'Vital Events' }
   const updatedUser = await client.user.update({
-    ...makeUpdateInput(user),
+    ...generateUpdateInput(user),
     data
   })
 
@@ -271,7 +271,7 @@ test('preserves existing data when data is omitted from update', async () => {
   const client = createTestClient(user, [USER_EDIT_SCOPE])
 
   // Update without supplying data — should leave existing data untouched
-  await client.user.update(makeUpdateInput(user))
+  await client.user.update(generateUpdateInput(user))
 
   const dbUser = await eventsDb
     .selectFrom('users')
@@ -296,7 +296,7 @@ test('overwrites data when an explicit data object is supplied on update', async
   const newData = { employeeId: 'NEW-001', region: 'North' }
 
   const updatedUser = await client.user.update({
-    ...makeUpdateInput(user),
+    ...generateUpdateInput(user),
     data: newData
   })
 
