@@ -823,7 +823,7 @@ function userMatchesScope({
   isUnderAdministrativeArea
 }: {
   userRequesting: CreatedUser
-  userTargeted: User
+  userTargeted: CreatedUser | User
   role: string[] | undefined
   accessLevel: JurisdictionFilter | undefined
   isUnderAdministrativeArea: (
@@ -1036,7 +1036,7 @@ export function assertUserScopeResult(
   result: { success: boolean; user: User },
   props: {
     userRequesting: CreatedUser
-    userTargeted: any
+    userTargeted: CreatedUser | User
     role: string[] | undefined
     accessLevel: JurisdictionFilter | undefined
     isUnderAdministrativeArea: (

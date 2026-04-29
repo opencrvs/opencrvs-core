@@ -535,7 +535,6 @@ export const userCanReadOtherUser: MiddlewareFunction<
   }
 
   const readScopes = getAcceptedScopesFromToken(token, ['user.read'])
-
   const accessLevels = readScopes.map((s) =>
     getScopeOptionValue(s, 'accessLevel')
   )
