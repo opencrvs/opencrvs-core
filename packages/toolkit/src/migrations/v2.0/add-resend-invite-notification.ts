@@ -23,13 +23,23 @@ import path from 'path'
 import {
   ArrayLiteralExpression,
   AsExpression,
+  IndentationText,
   Node,
   ObjectLiteralExpression,
   Project,
+  ProjectOptions,
+  SatisfiesExpression,
   SyntaxKind,
   SwitchStatement,
   VariableDeclaration
 } from 'ts-morph'
+
+const TS_MORPH_PROJECT_OPTIONS: ProjectOptions = {
+  skipAddingFilesFromTsConfig: true,
+  manipulationSettings: {
+    indentationText: IndentationText.TwoSpaces
+  }
+}
 
 const EMAIL_TEMPLATES_INDEX = 'src/api/notification/email-templates/index.ts'
 const NOTIFICATION_HANDLER = 'src/api/notification/handler.ts'
@@ -121,8 +131,16 @@ function getObjectLiteralFromConst(
   if (Node.isObjectLiteralExpression(initializer)) {
     return initializer
   }
+  /* `{...} as const` */
   if (Node.isAsExpression(initializer)) {
     const expression = (initializer as AsExpression).getExpression()
+    if (Node.isObjectLiteralExpression(expression)) {
+      return expression
+    }
+  }
+  /* `{...} satisfies Record<...>` */
+  if (Node.isSatisfiesExpression(initializer)) {
+    const expression = (initializer as SatisfiesExpression).getExpression()
     if (Node.isObjectLiteralExpression(expression)) {
       return expression
     }
@@ -137,9 +155,7 @@ function patchEmailTemplatesIndex(): boolean {
     return false
   }
 
-  const project = new Project({
-    skipAddingFilesFromTsConfig: true
-  })
+  const project = new Project(TS_MORPH_PROJECT_OPTIONS)
   const sourceFile = project.addSourceFileAtPath(full)
 
   let changed = false
@@ -152,17 +168,22 @@ function patchEmailTemplatesIndex(): boolean {
       .getProperties()
       .some((prop) => prop.getText().includes('[TriggerEvent.RESEND_INVITE]'))
     if (!hasResendInviteVariable) {
-      triggerVariableObject.addPropertyAssignment({
-        name: '[TriggerEvent.RESEND_INVITE]',
-        initializer: `z.object({
+      const properties = triggerVariableObject.getProperties()
+      const lastProperty = properties[properties.length - 1]
+      if (lastProperty) {
+        sourceFile.insertText(
+          lastProperty.getEnd(),
+          `,
+  [TriggerEvent.RESEND_INVITE]: z.object({
     firstname: z.string(),
     username: z.string(),
     temporaryPassword: z.string(),
     completeSetupUrl: z.string(),
     loginURL: z.string()
   })`
-      })
-      changed = true
+        )
+        changed = true
+      }
     }
   }
 
@@ -178,22 +199,25 @@ function patchEmailTemplatesIndex(): boolean {
           .includes("readOtherTemplate<TriggerVariable['resend-invite']>")
       )
     if (!hasResendInviteTemplate) {
-      const userCreatedIndex = templatesObject
+      const userCreatedProp = templatesObject
         .getProperties()
-        .findIndex((prop) => prop.getText().includes('[TriggerEvent.USER_CREATED]'))
-      templatesObject.insertPropertyAssignment(
-        userCreatedIndex >= 0 ? userCreatedIndex + 1 : templatesObject.getProperties().length,
-        {
-          name: '[TriggerEvent.RESEND_INVITE]',
-          initializer: `{
+        .find((prop) => prop.getText().includes('[TriggerEvent.USER_CREATED]'))
+      const anchor =
+        userCreatedProp ??
+        templatesObject.getProperties()[templatesObject.getProperties().length - 1]
+      if (anchor) {
+        sourceFile.insertText(
+          anchor.getEnd(),
+          `,
+  [TriggerEvent.RESEND_INVITE]: {
     type: 'resend-invite',
     subject: 'Your OpenCRVS account invitation',
     template:
       readOtherTemplate<TriggerVariable['resend-invite']>('resend-invite')
   }`
-        }
-      )
-      changed = true
+        )
+        changed = true
+      }
     }
   }
 
@@ -210,7 +234,7 @@ function patchNotificationHandler(): boolean {
     return false
   }
 
-  const project = new Project({ skipAddingFilesFromTsConfig: true })
+  const project = new Project(TS_MORPH_PROJECT_OPTIONS)
   const sourceFile = project.addSourceFileAtPath(full)
   const convertFn = sourceFile.getFunction('convertPayloadToVariable')
   if (!convertFn) {
@@ -263,7 +287,7 @@ function patchNotificationHandler(): boolean {
 }
 
 function getReturnedArrayLiteral(functionFilePath: string, fnName: string) {
-  const project = new Project({ skipAddingFilesFromTsConfig: true })
+  const project = new Project(TS_MORPH_PROJECT_OPTIONS)
   const sourceFile = project.addSourceFileAtPath(functionFilePath)
   const fn = sourceFile.getFunction(fnName)
   const returnStmt = fn?.getFirstDescendantByKind(SyntaxKind.ReturnStatement)
@@ -288,20 +312,26 @@ function patchUserNotificationRoutes(): boolean {
     return false
   }
 
-  const routeExists = arrayLiteral
-    .getElements()
-    .some((element) => element.getText().includes(`path: '/triggers/user/resend-invite'`))
+  const elements = arrayLiteral.getElements()
+  const routeExists = elements.some((element) =>
+    element.getText().includes(`path: '/triggers/user/resend-invite'`)
+  )
   if (routeExists) {
     return false
   }
 
-  const userCreatedIndex = arrayLiteral
-    .getElements()
-    .findIndex((element) => element.getText().includes(`path: '/triggers/user/user-created'`))
+  const anchor =
+    elements.find((element) =>
+      element.getText().includes(`path: '/triggers/user/user-created'`)
+    ) ?? elements[elements.length - 1]
+  if (!anchor) {
+    return false
+  }
 
-  arrayLiteral.insertElement(
-    userCreatedIndex >= 0 ? userCreatedIndex + 1 : arrayLiteral.getElements().length,
-    `{
+  sourceFile.insertText(
+    anchor.getEnd(),
+    `,
+    {
       method: 'POST',
       path: '/triggers/user/resend-invite',
       handler: makeNotificationHandler('resend-invite'),
@@ -323,7 +353,7 @@ function patchSmsService(): boolean {
     return false
   }
 
-  const project = new Project({ skipAddingFilesFromTsConfig: true })
+  const project = new Project(TS_MORPH_PROJECT_OPTIONS)
   const sourceFile = project.addSourceFileAtPath(full)
   let changed = false
 
