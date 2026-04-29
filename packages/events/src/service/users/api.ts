@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable max-lines */
 import { randomBytes } from 'crypto'
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
@@ -18,6 +19,7 @@ import {
   FamilyName,
   IUserName,
   TokenUserType,
+  TriggerEvent,
   UUID,
   UpdateUserInput,
   User,
@@ -43,7 +45,8 @@ import {
   isUsernameTaken,
   getUserCredentialsByUserId,
   SecurityQuestion,
-  getUserByMobileOrEmail
+  getUserByMobileOrEmail,
+  resetUserCredentialsAndStatus
 } from '@events/storage/postgres/events/users'
 import { generateSaltedHash, generateHash } from '@events/service/auth/hash'
 import { updatePasswordHashAndSalt } from '@events/storage/postgres/events/users'
@@ -270,6 +273,7 @@ function generateRandomPassword() {
 }
 
 async function sendCredentialsNotification(
+  event: typeof TriggerEvent.USER_CREATED | typeof TriggerEvent.RESEND_INVITE,
   userFullName: IUserName[],
   username: string,
   password: string,
@@ -279,7 +283,7 @@ async function sendCredentialsNotification(
 ) {
   try {
     await triggerUserEventNotification({
-      event: 'user-created',
+      event,
       payload: {
         recipient: {
           name: personNameFromV1ToV2(userFullName),
@@ -293,7 +297,11 @@ async function sendCredentialsNotification(
       authHeader: { Authorization: token }
     })
   } catch (err) {
-    logger.error(`Unable to send notification for error : ${err}`)
+    logger.error(`Unable to send ${event} notification for error : ${err}`)
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `Unable to send notification to for error : ${err}`
+    })
   }
 }
 
@@ -350,18 +358,19 @@ export async function createUser(
     securityQuestions: []
   }
 
-  const postgresId = await createUserWithCredentials(
-    userPayload,
-    userCredentialPayload
-  )
-
   await sendCredentialsNotification(
+    TriggerEvent.USER_CREATED,
     input.name,
     userCredentialPayload.username,
     resolvedUser.password,
     _token,
     userPayload.mobile ?? undefined,
     userPayload.email
+  )
+
+  const postgresId = await createUserWithCredentials(
+    userPayload,
+    userCredentialPayload
   )
 
   return getUser(postgresId)
@@ -383,6 +392,47 @@ export async function activateUser(input: {
 
   const userId = UUID.parse(input.userId)
   await activateUserWithCredentials(userId, hash, salt, securityQuestions)
+}
+
+export async function resendInvite(userId: UUID, token: string): Promise<void> {
+  const user = await getUserById(userId)
+
+  if (!user) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `User not found: ${userId}`
+    })
+  }
+
+  if (user.status !== 'pending') {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Can only resend invite to a user in pending status'
+    })
+  }
+
+  const password = env.DEFAULT_USER_PASSWORD ?? generateRandomPassword()
+  const { hash, salt } = await generateSaltedHash(password)
+
+  const userName: IUserName[] = [
+    {
+      use: 'en',
+      given: user.firstname ? [user.firstname] : [],
+      family: user.surname ?? ''
+    }
+  ]
+
+  await sendCredentialsNotification(
+    TriggerEvent.RESEND_INVITE,
+    userName,
+    user.username,
+    password,
+    token,
+    user.mobile ?? undefined,
+    user.email ?? undefined
+  )
+
+  await resetUserCredentialsAndStatus(userId, hash, salt)
 }
 
 /**
