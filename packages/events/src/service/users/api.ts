@@ -68,6 +68,7 @@ export type SearchUsersPayload = {
   status?: string
   primaryOfficeId?: UUID
   locationId?: UUID
+  administrativeAreaId?: UUID
   count: number
   skip: number
   sortBy: UserSortBy

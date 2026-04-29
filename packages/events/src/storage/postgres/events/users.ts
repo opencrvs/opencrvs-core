@@ -249,6 +249,14 @@ export async function searchUsersWithInput(input: SearchUsersPayload) {
     query = query.where('users.officeId', '=', input.primaryOfficeId)
   }
 
+  if (input.administrativeAreaId) {
+    query = query.where(
+      'locations.administrativeAreaId',
+      '=',
+      input.administrativeAreaId
+    )
+  }
+
   const sortColumn = {
     createdAt: 'users.createdAt',
     firstname: 'users.firstname',

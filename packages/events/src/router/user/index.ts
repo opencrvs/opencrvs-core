@@ -19,9 +19,14 @@ import {
 } from '@opencrvs/commons/events'
 import {
   CreateUserInput,
+  getAcceptedScopesFromToken,
+  getScopeOptionValue,
+  hasScope,
   isBase64FileString,
+  JurisdictionFilter,
   logger,
   personNameFromV1ToV2,
+  TokenUserType,
   TokenWithBearer,
   User,
   UserOrSystem,
@@ -69,6 +74,7 @@ import {
   generateNonce
 } from '@events/service/verifyCode'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
+import { isLocationUnderAdministrativeArea } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { userCanReadOtherUser } from '../middleware'
 
 const UserSearch = z.object({
@@ -163,14 +169,56 @@ export function searchUsersRoute(
   return procedure
     .input(UserSearch)
     .output(z.array(UserOrSystem))
-    .query(async ({ input }) =>
-      searchUsers({
+    .query(async ({ input, ctx }) => {
+      const isInternalCall = !('user' in ctx)
+
+      if (!isInternalCall) {
+        const { user, token } = ctx as typeof ctx & {
+          user: NonNullable<(typeof ctx & { user?: unknown })['user']>
+        }
+
+        const readScopes = getAcceptedScopesFromToken(token, ['user.read'])
+
+        if (readScopes.length === 0) {
+          throw new TRPCError({ code: 'NOT_FOUND' })
+        }
+
+        const accessLevels = readScopes.map((s) =>
+          getScopeOptionValue(s, 'accessLevel')
+        )
+
+        if (!accessLevels.includes(JurisdictionFilter.enum.all)) {
+          if (accessLevels.includes(JurisdictionFilter.enum.location)) {
+            const officeId = input.primaryOfficeId
+              ? UUID.parse(input.primaryOfficeId)
+              : (user.primaryOfficeId ?? undefined)
+            return searchUsers({
+              ...input,
+              primaryOfficeId: officeId
+            })
+          }
+
+          if (
+            accessLevels.includes(JurisdictionFilter.enum.administrativeArea)
+          ) {
+            return searchUsers({
+              ...input,
+              primaryOfficeId: input.primaryOfficeId
+                ? UUID.parse(input.primaryOfficeId)
+                : undefined,
+              administrativeAreaId: user.administrativeAreaId ?? undefined
+            })
+          }
+        }
+      }
+
+      return searchUsers({
         ...input,
         primaryOfficeId: input.primaryOfficeId
           ? UUID.parse(input.primaryOfficeId)
           : undefined
       })
-    )
+    })
 }
 
 const UserAuditListQuery = z.object({
@@ -218,13 +266,57 @@ export const userRouter = router({
   get: userOnlyProcedure
     .input(UUID)
     .output(UserOrSystem)
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
+      if (!hasScope(ctx.token, 'user.read')) {
+        throw new TRPCError({ code: 'NOT_FOUND' })
+      }
+
       const users = await getUsersById([input])
       if (users.length === 0) {
         throw new TRPCError({ code: 'NOT_FOUND' })
       }
 
-      return users[0]
+      const target = users[0]
+
+      if (target.type === TokenUserType.enum.system) {
+        throw new TRPCError({ code: 'NOT_FOUND' })
+      }
+
+      const readScopes = getAcceptedScopesFromToken(ctx.token, ['user.read'])
+      const accessLevels = readScopes.map((s) =>
+        getScopeOptionValue(s, 'accessLevel')
+      )
+
+      if (accessLevels.includes(JurisdictionFilter.enum.all)) {
+        return target
+      }
+
+      const hasLocationAccess =
+        accessLevels.includes(JurisdictionFilter.enum.location) ||
+        accessLevels.includes(JurisdictionFilter.enum.administrativeArea)
+
+      if (
+        hasLocationAccess &&
+        ctx.user.primaryOfficeId === target.primaryOfficeId
+      ) {
+        return target
+      }
+
+      const isUnderJurisdiction = ctx.user.administrativeAreaId
+        ? await isLocationUnderAdministrativeArea({
+            administrativeAreaId: ctx.user.administrativeAreaId,
+            locationId: target.primaryOfficeId
+          })
+        : true
+
+      if (
+        accessLevels.includes(JurisdictionFilter.enum.administrativeArea) &&
+        isUnderJurisdiction
+      ) {
+        return target
+      }
+
+      throw new TRPCError({ code: 'NOT_FOUND' })
     }),
   create: userAndSystemProcedure
     .use(allowedWithAnyOfScopes(['user.create']))
@@ -285,7 +377,58 @@ export const userRouter = router({
   list: userOnlyProcedure
     .input(z.array(z.string()))
     .output(z.array(UserOrSystem))
-    .query(async ({ input }) => getUsersById(input)),
+    .query(async ({ input, ctx }) => {
+      const readScopes = getAcceptedScopesFromToken(ctx.token, ['user.read'])
+
+      if (readScopes.length === 0) {
+        throw new TRPCError({ code: 'NOT_FOUND' })
+      }
+
+      const results = await getUsersById(input)
+
+      const accessLevels = readScopes.map((s) =>
+        getScopeOptionValue(s, 'accessLevel')
+      )
+
+      if (accessLevels.includes(JurisdictionFilter.enum.all)) {
+        return results
+      }
+
+      const filtered = await Promise.all(
+        results.map(async (u) => {
+          if (u.type === TokenUserType.enum.system) {
+            return u
+          }
+
+          if (
+            accessLevels.includes(JurisdictionFilter.enum.location) ||
+            accessLevels.includes(JurisdictionFilter.enum.administrativeArea)
+          ) {
+            if (ctx.user.primaryOfficeId === u.primaryOfficeId) {
+              return u
+            }
+          }
+
+          if (
+            accessLevels.includes(JurisdictionFilter.enum.administrativeArea)
+          ) {
+            const isUnder = ctx.user.administrativeAreaId
+              ? await isLocationUnderAdministrativeArea({
+                  administrativeAreaId: ctx.user.administrativeAreaId,
+                  locationId: u.primaryOfficeId
+                })
+              : true
+            if (isUnder) {
+              return u
+            }
+          }
+
+          return null
+        })
+      )
+
+      return filtered.filter((u): u is UserOrSystem => u !== null)
+    }),
   search: searchUsersRoute(userAndSystemProcedure),
   actions: userOnlyProcedure
     .input(UserActionsQuery)
