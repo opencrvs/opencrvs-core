@@ -30,6 +30,7 @@ import { main as removeDemoScope } from './remove-demo-scope'
 import { main as removeHearthMigrations } from './remove-hearth-migrations'
 import { main as createEventsIndex } from './create-events-index'
 import { main as checkoutUpstreamFiles } from './checkout-upstream-files'
+import { main as addResendInviteNotification } from './add-resend-invite-notification'
 import { main as simplifyAnalyticsPrecalculations } from './simplify-analytics-precalculations'
 import { main as mergeInfrastructureDirectory } from './merge-infrastructure-directory'
 import { main as deleteInfrastructureDirectory } from './delete-infrastructure-directory'
@@ -65,6 +66,7 @@ export async function runUpgrade(dockerSwarm: boolean) {
   await removeHearthMigrations()
   await createEventsIndex()
   await checkoutUpstreamFiles()
+  await addResendInviteNotification()
   await simplifyAnalyticsPrecalculations()
   await updatePackageJson()
 
