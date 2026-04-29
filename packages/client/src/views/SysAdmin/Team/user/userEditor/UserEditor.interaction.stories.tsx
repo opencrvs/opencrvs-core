@@ -94,6 +94,59 @@ export const RegistrationOfficeIncludesHospitals: StoryObj<typeof EditUser> = {
 }
 
 /**
+ * Regression test for: invalid phone number not showing a validation error.
+ *
+ * The user.details page has requireCompletionToContinue: true, so clicking
+ * Continue with an invalid phone number must surface the error inline and
+ * keep the user on the same page.
+ */
+export const InvalidPhoneNumberShowsValidationError: StoryObj<typeof EditUser> =
+  {
+    parameters: {
+      chromatic: { disableSnapshot: true },
+      reactRouter: {
+        router: routesConfig,
+        initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+          userId: createTemporaryId(),
+          pageId: 'user.details'
+        })
+      }
+    },
+    loaders: [
+      async () => {
+        window.config.ADDITIONAL_USER_FIELDS = []
+        // Pre-seed required fields so only the phone validation fires.
+        useUserFormState.getState().setUserForm({
+          primaryOfficeId: mockUser.primaryOfficeId,
+          role: TestUserRole.enum.REGISTRATION_AGENT,
+          name: { firstname: 'Test', surname: 'User', middlename: '' },
+          email: 'test@opencrvs.org'
+        })
+      }
+    ],
+    play: async ({ canvasElement, step }) => {
+      const canvas = within(canvasElement)
+
+      await step('Type an invalid phone number', async () => {
+        const phoneInput = await canvas.findByTestId('text__phoneNumber')
+        await userEvent.type(phoneInput, '12345')
+      })
+
+      await step('Click Continue to trigger validation', async () => {
+        await userEvent.click(await canvas.findByText('Continue'))
+      })
+
+      await step('Validation error is shown for the phone field', async () => {
+        await waitFor(() =>
+          expect(
+            canvasElement.querySelector('#phoneNumber_error')
+          ).toHaveTextContent('Not a valid mobile number')
+        )
+      })
+    }
+  }
+
+/**
  * Regression test for: touched-then-cleared phone field submitting "" instead
  * of undefined, causing a duplicate-key error on the second user creation at
  * the same office.
