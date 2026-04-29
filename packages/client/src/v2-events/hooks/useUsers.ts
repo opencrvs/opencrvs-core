@@ -314,6 +314,12 @@ export function useUsers() {
     ),
     changeAvatar: useMutation(
       trpcOptionsProxy.user.changeAvatar.mutationOptions()
+    ),
+    sendUsernameReminder: useMutation(
+      trpcOptionsProxy.user.sendUsernameReminder.mutationOptions()
+    ),
+    sendResetPasswordInvite: useMutation(
+      trpcOptionsProxy.user.sendResetPasswordInvite.mutationOptions()
     )
   }
 }

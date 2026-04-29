@@ -242,6 +242,108 @@ export const Navigation: Story = {
   }
 }
 
+export const SendUsernameReminder: Story = {
+  parameters: {
+    msw: {
+      handlers: {
+        user: [
+          tRPCMsw.user.search.query(() => [felix, kennedy]),
+          tRPCMsw.user.get.query((id) => (id === kennedy.id ? kennedy : felix)),
+          tRPCMsw.user.roles.list.query(() => mockRoles),
+          tRPCMsw.user.sendUsernameReminder.mutation(() => undefined)
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Wait for user list to load', async () => {
+      await canvas.findByText('Felix Katongo', { selector: '#profile-link' })
+      await canvas.findByText('Kennedy Mweene', { selector: '#profile-link' })
+    })
+
+    await step(
+      "Open Kennedy's action menu and click Send username reminder",
+      async () => {
+        const trigger = findMenuTriggerForUser(canvasElement, 'Kennedy Mweene')
+        await userEvent.click(trigger)
+
+        const popoverId = trigger.getAttribute('popovertarget')
+        const popover = popoverId ? document.getElementById(popoverId) : null
+        if (!popover) {
+          throw new Error('Kennedy menu popover not found')
+        }
+        await userEvent.click(
+          within(popover).getByText('Send username reminder')
+        )
+      }
+    )
+
+    await step('Verify confirmation modal is shown', async () => {
+      await canvas.findByText('Send username reminder?')
+    })
+
+    await step('Confirm send', async () => {
+      await userEvent.click(await canvas.findByRole('button', { name: 'Send' }))
+    })
+
+    await step('Verify success toast is shown', async () => {
+      await canvas.findByText('Username reminder sent to Kennedy Mweene')
+    })
+  }
+}
+
+export const SendResetPasswordInvite: Story = {
+  parameters: {
+    msw: {
+      handlers: {
+        user: [
+          tRPCMsw.user.search.query(() => [felix, kennedy]),
+          tRPCMsw.user.get.query((id) => (id === kennedy.id ? kennedy : felix)),
+          tRPCMsw.user.roles.list.query(() => mockRoles),
+          tRPCMsw.user.sendResetPasswordInvite.mutation(() => undefined)
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Wait for user list to load', async () => {
+      await canvas.findByText('Felix Katongo', { selector: '#profile-link' })
+      await canvas.findByText('Kennedy Mweene', { selector: '#profile-link' })
+    })
+
+    await step(
+      "Open Kennedy's action menu and click Reset Password",
+      async () => {
+        const trigger = findMenuTriggerForUser(canvasElement, 'Kennedy Mweene')
+        await userEvent.click(trigger)
+
+        const popoverId = trigger.getAttribute('popovertarget')
+        const popover = popoverId ? document.getElementById(popoverId) : null
+        if (!popover) {
+          throw new Error('Kennedy menu popover not found')
+        }
+        await userEvent.click(within(popover).getByText('Reset Password'))
+      }
+    )
+
+    await step('Verify confirmation modal is shown', async () => {
+      await canvas.findByText('Reset password?')
+    })
+
+    await step('Confirm send', async () => {
+      await userEvent.click(await canvas.findByRole('button', { name: 'Send' }))
+    })
+
+    await step('Verify success toast is shown', async () => {
+      await canvas.findByText('Temporary password sent to Kennedy Mweene')
+    })
+  }
+}
+
 export const ToggleUserActivation: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)

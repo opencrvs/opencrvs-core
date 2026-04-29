@@ -243,7 +243,8 @@ function UserListComponent({ userDetails }: UserListProps) {
     [locations, canAccessOffice]
   )
 
-  const { searchUsers } = useUsers()
+  const { searchUsers, sendUsernameReminder, sendResetPasswordInvite } =
+    useUsers()
   const {
     data: searchResults,
     isLoading,
@@ -325,33 +326,29 @@ function UserListComponent({ userDetails }: UserListProps) {
     }
   }, [])
 
-  const usernameReminder = useCallback(async function usernameReminder(
-    userId: string
-  ) {
-    try {
-      throw new Error('@todo Username reminder mutation is not implemented')
-      // const res = await userMutations.usernameReminderSend(userId, [])
-      // if (res && res.data && res.data.usernameReminder) {
-      //   setShowUsernameReminderSuccess(true)
-      // }
-    } catch (err) {
-      setShowUsernameReminderError(true)
-    }
-  }, [])
+  const usernameReminder = useCallback(
+    async (userId: string) => {
+      try {
+        await sendUsernameReminder.mutateAsync(userId as UUID)
+        setShowUsernameReminderSuccess(true)
+      } catch {
+        setShowUsernameReminderError(true)
+      }
+    },
+    [sendUsernameReminder]
+  )
 
-  const resetPassword = useCallback(async function resetPassword(
-    userId: string
-  ) {
-    try {
-      throw new Error('@todo Reset password mutation is not implemented')
-      // const res = await userMutations.sendResetPasswordInvite(userId, [])
-      // if (res && res.data && res.data.resetPasswordInvite) {
-      //   setShowResetPasswordSuccess(true)
-      // }
-    } catch (err) {
-      setResetPasswordError(true)
-    }
-  }, [])
+  const resetPassword = useCallback(
+    async (userId: string) => {
+      try {
+        await sendResetPasswordInvite.mutateAsync(userId)
+        setShowResetPasswordSuccess(true)
+      } catch {
+        setResetPasswordError(true)
+      }
+    },
+    [sendResetPasswordInvite]
+  )
 
   const getMenuItems = useCallback(
     function getMenuItems(user: User) {
