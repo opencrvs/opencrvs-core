@@ -147,6 +147,74 @@ export const InvalidPhoneNumberShowsValidationError: StoryObj<typeof EditUser> =
   }
 
 /**
+ * Regression test for: touched-then-cleared email field submitting "" instead
+ * of undefined, which would be rejected by the backend's z.email() validator.
+ *
+ * The form state is pre-seeded with email: "" (what the Zustand store holds
+ * after a user types an address and clears it). USER_NOTIFICATION_DELIVERY_METHOD
+ * is set to 'sms' so email is not required and the form submits. Submitting
+ * must normalise email to undefined so it is stored as NULL in the database.
+ */
+export const ClearedEmailNormalisedToUndefined: StoryObj = {
+  render: () => <ReviewUser />,
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: createTemporaryId()
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        createUser: [
+          tRPCMsw.user.create.mutation((input) => {
+            createUserSpy(input)
+            return mockUser
+          })
+        ]
+      }
+    }
+  },
+  loaders: [
+    async () => {
+      window.config.ADDITIONAL_USER_FIELDS = []
+      window.config.USER_NOTIFICATION_DELIVERY_METHOD = 'sms'
+      createUserSpy.mockReset()
+      useUserFormState.getState().setUserForm({
+        primaryOfficeId: mockUser.primaryOfficeId,
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        name: { firstname: 'Test', surname: 'User', middlename: '' },
+        phoneNumber: '01712345678',
+        email: '' // touched-and-cleared email field — the bug scenario
+      })
+    }
+  ],
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Submit the form with a cleared email', async () => {
+      const submitButton = await canvas.findByRole('button', {
+        name: /create user/i
+      })
+      await userEvent.click(submitButton)
+    })
+
+    await step(
+      'email is not sent as empty string — it must be undefined so the DB stores NULL',
+      async () => {
+        await waitFor(() =>
+          expect(createUserSpy).toHaveBeenCalledWith(
+            expect.not.objectContaining({ email: '' })
+          )
+        )
+      }
+    )
+  }
+}
+
+/**
  * Regression test for: touched-then-cleared phone field submitting "" instead
  * of undefined, causing a duplicate-key error on the second user creation at
  * the same office.

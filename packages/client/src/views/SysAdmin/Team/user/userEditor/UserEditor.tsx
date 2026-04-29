@@ -578,7 +578,7 @@ const ReviewUserComponent = () => {
                 // Normalise to undefined so an empty string isn't stored as a
                 // unique value, causing duplicate-key errors on the next submit.
                 mobile: formState.phoneNumber || undefined,
-                email: formState.email!,
+                email: formState.email || undefined,
                 role: formState.role!,
                 primaryOfficeId: formState.primaryOfficeId as UUID,
                 signature: formState.signature,
