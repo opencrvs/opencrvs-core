@@ -29,6 +29,7 @@ import {
   CreateUserInputInternal
 } from '@opencrvs/commons'
 import {
+  allowedWithAnyOfScopes,
   canAccessUserWithScopes,
   canCreateUserWithScopes,
   canUpdateUserLocation
@@ -569,7 +570,6 @@ export const userRouter = router({
       return activateUser(input)
     }),
   sendUsernameReminder: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.edit']))
     .input(UUID)
     .mutation(async ({ input, ctx }) => {
       const userId = UUID.parse(input)
