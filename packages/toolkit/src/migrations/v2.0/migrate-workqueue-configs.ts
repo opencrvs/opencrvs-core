@@ -30,8 +30,6 @@
 
 import { Node, ObjectLiteralExpression, Project, SyntaxKind } from 'ts-morph'
 import path from 'path'
-import { getCwd } from '.'
-
 const DEFINE_WORKQUEUES_NAME = 'defineWorkqueues'
 const ACTIONS_PROPERTY_NAME = 'actions'
 const ACTION_PROPERTY_NAME = 'action'
@@ -209,7 +207,7 @@ function processFile(filePath: string, project: Project): number {
   if (!sourceFile) return 0
 
   let migratedWorkqueues = 0
-  const relPath = path.relative(getCwd(), filePath)
+  const relPath = path.relative(process.cwd(), filePath)
 
   const callExpressions = sourceFile.getDescendantsOfKind(
     SyntaxKind.CallExpression
@@ -240,7 +238,7 @@ function processFile(filePath: string, project: Project): number {
 }
 
 async function main() {
-  const srcDir = path.join(getCwd(), 'src')
+  const srcDir = path.join(process.cwd(), 'src')
   // eslint-disable-next-line no-console
   console.log(`Scanning for defineWorkqueues calls in: ${srcDir}\n`)
 
@@ -285,7 +283,7 @@ async function main() {
     const sourceFile = project.getSourceFileOrThrow(filePath)
     await sourceFile.save()
     // eslint-disable-next-line no-console
-    console.log(`  Saved: ${path.relative(getCwd(), filePath)}`)
+    console.log(`  Saved: ${path.relative(process.cwd(), filePath)}`)
   }
 
   // eslint-disable-next-line no-console
