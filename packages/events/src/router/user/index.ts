@@ -600,8 +600,8 @@ export const userRouter = router({
         clientType: auditLogIdentifiers.userType ?? 'system'
       })
     }),
-  verifyPasswordById: userOnlyProcedure
-    .input(z.object({ id: UUID, password: z.string() }))
+  verifyLoggedInUserPassword: userOnlyProcedure
+    .input(z.object({ password: z.string() }))
     .output(
       z.object({
         mobile: z.string().optional(),
@@ -610,8 +610,8 @@ export const userRouter = router({
         id: z.string()
       })
     )
-    .mutation(async ({ input }) => {
-      return verifyPasswordById(input.id, input.password)
+    .mutation(async ({ input, ctx }) => {
+      return verifyPasswordById(ctx.user.id, input.password)
     }),
   audit: auditRouter
 })

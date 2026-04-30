@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fn, userEvent, waitFor, within } from '@storybook/test'
+import { expect, fn, userEvent, within } from '@storybook/test'
 import { TRPCError } from '@trpc/server'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
@@ -53,7 +53,7 @@ export const VerifyPasswordError: Story = {
       handlers: {
         user: [
           userGetHandler,
-          tRPCMsw.user.verifyPasswordById.mutation(() => {
+          tRPCMsw.user.verifyLoggedInUserPassword.mutation(() => {
             throw new TRPCError({ code: 'UNAUTHORIZED' })
           })
         ]
@@ -104,7 +104,7 @@ export const VerifyAndCreatePin: Story = {
       handlers: {
         user: [
           userGetHandler,
-          tRPCMsw.user.verifyPasswordById.mutation(() => ({
+          tRPCMsw.user.verifyLoggedInUserPassword.mutation(() => ({
             id: 'test-user-id',
             username: 'test.user',
             status: 'active',

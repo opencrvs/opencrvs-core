@@ -121,13 +121,16 @@ export function ForgotPIN({ goBack, onVerifyPassword }: IForgotPINProps) {
         return
       }
 
+      if (!userDetails?.id) {
+        logout()
+        return
+      }
+
       setVerifyingPassword(true)
 
-      const id = (userDetails && userDetails.id) || ''
       try {
-         
-        await trpcOptionsProxy.user.verifyPasswordById.mutationOptions()
-          .mutationFn!({ id, password })
+        await trpcOptionsProxy.user.verifyLoggedInUserPassword.mutationOptions()
+          .mutationFn!({ password })
         setVerifyingPassword(false)
         setError('')
         onVerifyPassword()
@@ -136,7 +139,7 @@ export function ForgotPIN({ goBack, onVerifyPassword }: IForgotPINProps) {
         setError(intl.formatMessage(errorMessages.passwordSubmissionError))
       }
     },
-    [password, userDetails, intl, onVerifyPassword]
+    [password, userDetails, intl, onVerifyPassword, logout]
   )
 
   const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
