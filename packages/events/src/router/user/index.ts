@@ -19,7 +19,6 @@ import {
 } from '@opencrvs/commons/events'
 import {
   CreateUserInput,
-  isBase64FileString,
   logger,
   TokenWithBearer,
   User,
@@ -63,7 +62,6 @@ import {
   sendResetPasswordInvite,
   resendInvite
 } from '@events/service/users/api'
-import { uploadBase64File } from '@events/service/files'
 import {
   checkVerificationCode,
   generateAndSendVerificationCode,
@@ -512,10 +510,7 @@ export const userRouter = router({
     .input(
       z.object({
         userId: z.string(),
-        avatar: z.object({
-          type: z.string(),
-          data: z.string()
-        })
+        avatar: z.string()
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -532,10 +527,9 @@ export const userRouter = router({
         )
         throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
-      const profileImagePath = isBase64FileString(input.avatar.data)
-        ? await uploadBase64File(input.avatar.data, ctx.token)
-        : input.avatar.data
-      await updateUserById(UUID.parse(ctx.user.id), { profileImagePath })
+      await updateUserById(UUID.parse(ctx.user.id), {
+        profileImagePath: input.avatar
+      })
     }),
   resendInvite: userAndSystemProcedure
     .input(UUID)
