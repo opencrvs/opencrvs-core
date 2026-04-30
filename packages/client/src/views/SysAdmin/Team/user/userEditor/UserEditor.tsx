@@ -621,7 +621,7 @@ const ReviewUserComponent = () => {
                 id: userId,
                 // See create payload above — same normalisation needed.
                 mobile: formState.phoneNumber || undefined,
-                email: formState.email!,
+                email: formState.email || undefined,
                 role: formState.role!,
                 primaryOfficeId: formState.primaryOfficeId as UUID,
                 signature: formState.signature,
