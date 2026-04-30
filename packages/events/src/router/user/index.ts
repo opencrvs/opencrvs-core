@@ -539,8 +539,8 @@ export const userRouter = router({
       await updateUserById(UUID.parse(ctx.user.id), { profileImagePath })
     }),
   resendInvite: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.edit']))
     .input(UUID)
+    .use(canAccessUserWithScopes(['user.edit']))
     .mutation(async ({ input, ctx }) => {
       const userId = UUID.parse(input)
 
@@ -571,6 +571,7 @@ export const userRouter = router({
     }),
   sendUsernameReminder: userAndSystemProcedure
     .input(UUID)
+    .use(canAccessUserWithScopes(['user.edit']))
     .mutation(async ({ input, ctx }) => {
       const userId = UUID.parse(input)
       await sendUsernameReminder(userId, ctx.token)

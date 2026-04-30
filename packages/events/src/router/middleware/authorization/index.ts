@@ -400,8 +400,9 @@ export function canAccessUserWithScopes(scopes: UserScopeType[]) {
     OpenApiMeta,
     TrpcContext,
     TrpcContext & { id: UUID },
-    { id: UUID }
+    { id: UUID } | UUID
   > = async ({ next, ctx, input }) => {
+    const incomingId = 'id' in input ? input.id : input
     const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
 
     const userRequesting = ctx.user
@@ -409,7 +410,7 @@ export function canAccessUserWithScopes(scopes: UserScopeType[]) {
       throw new TRPCError({ code: 'FORBIDDEN' })
     }
 
-    const otherUser = await findUserOrSystem(input.id)
+    const otherUser = await findUserOrSystem(incomingId)
 
     // Don't reveal the existence of the user
     if (!otherUser) {
@@ -446,7 +447,7 @@ export function canAccessUserWithScopes(scopes: UserScopeType[]) {
     return next({
       ctx: {
         ...ctx,
-        userId: input.id
+        userId: incomingId
       },
       input
     })
