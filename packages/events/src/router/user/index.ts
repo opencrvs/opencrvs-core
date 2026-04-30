@@ -218,7 +218,7 @@ const auditRouter = router({
 export const userRouter = router({
   get: userOnlyProcedure
     .input(UUID)
-    // @TODO: missing scope check.
+    .use(canAccessUserWithScopes(['user.read']))
     .output(UserOrSystem)
     .query(async ({ input }) => {
       const users = await getUsersById([input])
