@@ -128,6 +128,19 @@ export type System = z.infer<typeof System>
 export const UserOrSystem = z.discriminatedUnion('type', [User, System])
 export type UserOrSystem = z.infer<typeof UserOrSystem>
 
+export const UserOrSystemSummary = z.discriminatedUnion('type', [
+  User.pick({
+    id: true,
+    type: true,
+    name: true,
+    role: true,
+    signature: true,
+    fullHonorificName: true
+  }),
+  System.pick({ id: true, type: true, name: true })
+])
+export type UserOrSystemSummary = z.infer<typeof UserOrSystemSummary>
+
 export const UserContext = User.pick({
   id: true,
   primaryOfficeId: true,

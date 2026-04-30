@@ -96,18 +96,11 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
           return precacheFile(user.signature)
         }
 
-        if (user.avatar) {
-          return precacheFile(user.avatar)
-        }
         return user
       })
     )
 
-    return users.map((user) => ({
-      ...user,
-      signature: user.signature,
-      avatar: user.avatar
-    }))
+    return users
   }
 })
 
