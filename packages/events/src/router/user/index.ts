@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+ 
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -243,7 +243,7 @@ export const userRouter = router({
     .mutation(async ({ input, ctx }) => handleCreateUser(input, ctx)),
   update: userAndSystemProcedure
     .use(allowedWithAnyOfScopes(['user.edit']))
-    .input(UpdateUserInput.and(z.object({ id: UUID })))
+    .input(UpdateUserInput)
     .use(canUpdateUserLocation)
     .output(User)
     .mutation(async ({ input, ctx }) => {

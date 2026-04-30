@@ -19,7 +19,8 @@ import {
   hasScope,
   joinUrl,
   parseConfigurableScope,
-  EncodedScope
+  EncodedScope,
+  CreateUserInputInternal
 } from '@opencrvs/commons'
 import { fromZodError } from 'zod-validation-error'
 import { createInitialisationClient } from './index'
@@ -203,7 +204,7 @@ async function userAlreadyExists(
   return Boolean(res.length)
 }
 
-async function createUser(token: string, userPayload: any) {
+async function createUser(token: string, userPayload: CreateUserInputInternal) {
   const client = createInitialisationClient(token)
   return client.users.create.mutate(userPayload)
 }
@@ -245,7 +246,7 @@ export async function seedUsers(token: string) {
           given: [givenNames]
         }
       ],
-      ...(env.ACTIVATE_USERS && { status: 'active' }),
+      ...(env.ACTIVATE_USERS && { status: 'active' as const }),
       primaryOfficeId: primaryOffice.id,
       username
     }

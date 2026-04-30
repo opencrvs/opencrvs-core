@@ -193,6 +193,80 @@ test('Throws error when creating user with existing email', async () => {
   )
 })
 
+test('Persists custom data field when provided', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [encodeScope({ type: 'user.create' })])
+
+  const customData = { registrationNumber: 'REG-001', department: 'civil' }
+
+  const created = await client.user.create({
+    email: 'testing+data@opencrvs.org',
+    role: 'admin',
+    name: [{ use: 'en', family: 'family', given: ['given'] }],
+    primaryOfficeId: user.primaryOfficeId,
+    data: customData
+  })
+
+  expect(created.data).toMatchObject(customData)
+})
+
+test('Rejects when username is provided by app caller', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [encodeScope({ type: 'user.create' })])
+
+  await expect(
+    client.user.create({
+      email: 'testing+username@opencrvs.org',
+      role: 'admin',
+      name: [{ use: 'en', family: 'family', given: ['given'] }],
+      primaryOfficeId: user.primaryOfficeId,
+      username: 'custom-username'
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any)
+  ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
+})
+
+test('Rejects password when provided by app caller', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [encodeScope({ type: 'user.create' })])
+
+  await expect(
+    client.user.create({
+      email: 'testing+password@opencrvs.org',
+      role: 'admin',
+      name: [{ use: 'en', family: 'family', given: ['given'] }],
+      primaryOfficeId: user.primaryOfficeId,
+      password: 'passWORD123456'
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any)
+  ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
+})
+
+test('Auto-generates username from name', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [encodeScope({ type: 'user.create' })])
+
+  const created = await client.user.create({
+    email: 'testing+autogen@opencrvs.org',
+    role: 'admin',
+    name: [{ use: 'en', family: 'Smith', given: ['Jane'] }],
+    primaryOfficeId: user.primaryOfficeId
+  })
+
+  const eventsDb = getClient()
+  const credentials = await eventsDb
+    .selectFrom('userCredentials')
+    .selectAll()
+    .where('userId', '=', created.id)
+    .executeTakeFirstOrThrow()
+
+  expect(credentials.username).toMatch(/^j\.smith/)
+})
+
 test('Multiple users with no mobile number can be created without a unique key conflict', async () => {
   const { user } = await setupTestCase()
 
