@@ -492,7 +492,7 @@ export function canCreateUserWithScopes(scopes: UserScopeType[]) {
     })
 
     if (!hasAccess) {
-      throw new TRPCError({ code: 'NOT_FOUND' })
+      throw new TRPCError({ code: 'FORBIDDEN' })
     }
 
     return next()

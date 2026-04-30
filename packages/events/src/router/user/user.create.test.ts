@@ -10,9 +10,10 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { encodeScope } from '@opencrvs/commons'
+import { encodeScope, getUUID } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
+import { setupHierarchyWithUsers } from '@events/tests/generators'
 
 test('Throws error when user does not have the right scope', async () => {
   const { user } = await setupTestCase()
@@ -262,4 +263,150 @@ test('persists empty data object when data is not provided on create', async () 
     .executeTakeFirstOrThrow()
 
   expect(createdUser.data).toEqual({})
+})
+
+test('Prevents user creation when the role is not within scope', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.create',
+      options: {
+        role: ['admin'] // only allows creating users with admin role
+      }
+    })
+  ])
+
+  const userPayload = {
+    email: 'nodata-test@opencrvs.org',
+    role: 'cadmin',
+    name: [{ use: 'en', family: 'Doe', given: ['John'] }],
+    primaryOfficeId: user.primaryOfficeId
+  }
+
+  await expect(client.user.create(userPayload)).rejects.toThrowError(
+    new TRPCError({ code: 'FORBIDDEN' })
+  )
+
+  await expect(
+    client.user.create({ ...userPayload, role: 'admin' })
+  ).resolves.toBeDefined()
+})
+
+test('Prevents user creation when the location id is not within scope: "location"', async () => {
+  const { user, seed } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.create',
+      options: {
+        accessLevel: 'location'
+      }
+    })
+  ])
+
+  const topLevelLocationId = getUUID()
+  await seed.locations([
+    {
+      name: 'top-level-location',
+      administrativeAreaId: null,
+      id: topLevelLocationId,
+      locationType: 'EMBASSY',
+      validUntil: null
+    }
+  ])
+
+  const userPayload = {
+    email: 'nodata-test@opencrvs.org',
+    role: 'cadmin',
+    name: [{ use: 'en', family: 'Doe', given: ['John'] }],
+    primaryOfficeId: topLevelLocationId
+  }
+
+  await expect(client.user.create(userPayload)).rejects.toThrowError(
+    new TRPCError({ code: 'FORBIDDEN' })
+  )
+
+  await expect(
+    client.user.create({
+      ...userPayload,
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).resolves.toBeDefined()
+})
+
+test('Prevents user creation when the location id is not within scope: "administrativeArea"', async () => {
+  // 1. Setup test fixture with a known set of users, administrative areas and locations.
+  const { users, locations } = await setupHierarchyWithUsers()
+
+  const provinceAOffice = locations.find(
+    (loc) => loc.name === 'Province A CRVS Office'
+  )
+
+  if (!provinceAOffice) {
+    throw new Error('Test setup failed: ProvinceA Office not found')
+  }
+
+  const provinceAUser = users.find(
+    (u) => u.primaryOfficeId === provinceAOffice.id
+  )
+
+  if (!provinceAUser) {
+    throw new Error('Test setup failed: User for ProvinceA Office not found')
+  }
+
+  const client = createTestClient(provinceAUser, [
+    encodeScope({
+      type: 'user.create',
+      options: {
+        accessLevel: 'administrativeArea'
+      }
+    })
+  ])
+
+  // 1. Can create user and assign it to the same office
+  await expect(
+    client.user.create({
+      email: 'provincea-test@opencrvs.org',
+      role: 'admin',
+      name: [{ use: 'en', family: 'Doe', given: ['John'] }],
+      primaryOfficeId: provinceAOffice.id
+    })
+  ).resolves.toBeDefined()
+
+  // 2. Can create user and assign it to another office within the same administrative area
+  const villageAOffice = locations.find(
+    (loc) => loc.name === 'Village A CRVS Office'
+  )
+
+  if (!villageAOffice) {
+    throw new Error('Test setup failed: Village A Office not found')
+  }
+
+  await expect(
+    client.user.create({
+      email: 'villagea-test@opencrvs.org',
+      role: 'admin',
+      name: [{ use: 'en', family: 'Doe', given: ['John'] }],
+      primaryOfficeId: villageAOffice.id
+    })
+  ).resolves.toBeDefined()
+
+  // 3. can't create user and assign it to an office outside of the administrative area
+  const countryLevelOffice = locations.find(
+    (loc) => loc.name === 'Country-level CRVS Office'
+  )
+
+  if (!countryLevelOffice) {
+    throw new Error('Test setup failed: Country-Level Office not found')
+  }
+
+  await expect(
+    client.user.create({
+      email: 'countrylevel-test@opencrvs.org',
+      role: 'admin',
+      name: [{ use: 'en', family: 'Doe', given: ['John'] }],
+      primaryOfficeId: countryLevelOffice.id
+    })
+  ).rejects.toThrowError(new TRPCError({ code: 'FORBIDDEN' }))
 })
