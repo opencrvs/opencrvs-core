@@ -196,7 +196,7 @@ export function useAssignmentActions(event: EventIndex) {
     enabled: !!event.assignedTo
   })
   const assignedUserFullName = assignedToUser.data
-    ? getUsersFullName(assignedToUser.data.name, intl.locale)
+    ? getUsersFullName(assignedToUser.data.name)
     : null
   const assignedOffice = assignedToUser.data?.primaryOfficeId
   const assignedOfficeName =

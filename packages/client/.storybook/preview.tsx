@@ -264,7 +264,7 @@ const preview: Preview = {
 
         addUserToQueryData({
           id: generator.user.id.localSystemAdmin,
-          name: [{ use: 'en', given: ['Alex'], family: 'Ngonga' }],
+          name: { firstname: 'Alex', surname: 'Ngonga' },
           role: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
           primaryOfficeId,
           mobile: '+260978787878',
