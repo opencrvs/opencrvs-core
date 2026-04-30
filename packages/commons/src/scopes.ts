@@ -130,6 +130,10 @@ const AccessLevelOptions = z.object({
   accessLevel: JurisdictionFilter.optional()
 })
 
+const AllUserScopeOptions = AccessLevelOptions.extend({
+  role: userRole.optional()
+})
+
 const WorkqueueOrDashboardOptions = z.object({
   ids: z
     .preprocess(
@@ -142,6 +146,7 @@ const WorkqueueOrDashboardOptions = z.object({
 const AllScopeOptions = z.object({
   ...AllRecordScopeOptions.shape,
   ...AccessLevelOptions.shape,
+  ...AllUserScopeOptions.shape,
   ...WorkqueueOrDashboardOptions.shape
 })
 
@@ -254,20 +259,11 @@ export type ScopesWithRoleOption = z.infer<typeof ScopesWithRoleOption>
 export const UserScopeV2 = z.discriminatedUnion('type', [
   z.object({
     type: ScopesWithRoleOption,
-    options: z
-      .object({
-        accessLevel: JurisdictionFilter.optional(),
-        role: userRole.optional()
-      })
-      .optional()
+    options: AllUserScopeOptions.optional()
   }),
   z.object({
     type: UserScopeType.extract(['user.read']),
-    options: z
-      .object({
-        accessLevel: JurisdictionFilter.optional()
-      })
-      .optional()
+    options: AccessLevelOptions.optional()
   })
 ])
 
