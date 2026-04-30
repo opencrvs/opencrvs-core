@@ -10,7 +10,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn, userEvent, within, expect, waitFor } from '@storybook/test'
+import { userEvent, within, expect, waitFor } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { http, HttpResponse } from 'msw'
@@ -27,19 +27,17 @@ import {
   PRINT_DIGITAL_ID_CERTIFICATE_FORM
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormFieldGenerator,
+  FormFieldGeneratorPropsWithoutRef
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 import { Review } from '../components/Review'
 
-interface Args {
-  onChange: (val: unknown) => void
-}
-
-const meta: Meta<Args> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/Http',
-  args: { onChange: fn() },
   decorators: [
     (Story, context) => (
       <TRPCProvider>
@@ -55,6 +53,8 @@ export default meta
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
+
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
 
 const fetchBrnFields: FieldConfig[] = [
   {
@@ -184,7 +184,7 @@ const fetchBrnFields: FieldConfig[] = [
   }
 ]
 
-export const FetchBrn: StoryObj<typeof FormFieldGenerator> = {
+export const FetchBrn: Story = {
   name: 'Fetch BRN - Response with a Content-Type: application/json',
   parameters: {
     chromatic: {
@@ -216,9 +216,6 @@ export const FetchBrn: StoryObj<typeof FormFieldGenerator> = {
         {...args}
         fields={fetchBrnFields}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   }
@@ -257,9 +254,7 @@ export const HttpJsonResponseInCopy: StoryObj<typeof Review> = {
     )
   }
 }
-export const HttpPopulatesWithNonDeclarationFields: StoryObj<
-  typeof FormFieldGenerator
-> = {
+export const HttpPopulatesWithNonDeclarationFields: Story = {
   name: 'HTTP Field type populates correctly with fields not in EventConfig.declaration',
   parameters: {
     chromatic: {
@@ -294,9 +289,6 @@ export const HttpPopulatesWithNonDeclarationFields: StoryObj<
         eventConfig={digitalIdentityEvent}
         fields={PRINT_DIGITAL_ID_CERTIFICATE_FORM.pages[0].fields}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   }

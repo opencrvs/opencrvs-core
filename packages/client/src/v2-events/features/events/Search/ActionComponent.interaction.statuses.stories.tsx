@@ -207,8 +207,6 @@ export const DirectsNotifiedToEdit: Story = {
   }
 }
 
-const declaredEvent = createEventByStatus(EventStatus.enum.DECLARED)
-
 const registeredEvent = createEventByStatus(EventStatus.enum.REGISTERED)
 
 export const directsRegisteredToPrint: Story = {

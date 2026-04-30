@@ -10,33 +10,22 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
-import {
-  FieldPropsWithoutReferenceValue,
-  Country,
-  SelectOption
-} from '@opencrvs/commons/client'
+import { Country, SelectOption } from '@opencrvs/commons/client'
 import { countries } from '@client/utils/countries'
-import { Select } from './Select'
+import { Select, SelectInputProps } from './Select'
 import { StringifierContext } from './RegisteredField'
 
-function SelectCountryInput({
-  value,
-  onChange,
-  ...props
-}: FieldPropsWithoutReferenceValue<'COUNTRY'> & {
-  onChange: (val: string | undefined) => void
-  value?: string
-  disabled?: boolean
-}) {
+function SelectCountryInput(
+  props: Omit<SelectInputProps, 'options'> & {
+    options?: SelectInputProps['options']
+  }
+) {
   return (
     <Select.Input
       {...props}
       // @Todo ensure countries are of the same type
       data-testid={`location__${props.id}`}
-      options={countries as SelectOption[]}
-      type="SELECT"
-      value={value}
-      onChange={onChange}
+      options={props.options ?? (countries as SelectOption[])}
     />
   )
 }

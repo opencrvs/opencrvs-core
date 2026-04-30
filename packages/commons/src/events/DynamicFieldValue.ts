@@ -65,8 +65,9 @@ export function getDynamicAddressFieldValue(field: AddressField) {
     field.configuration?.streetAddressForm?.map((a) => a.id) ?? []
 
   // @todo - show required validation errors for street level fields like state/street
-  return schema.refine((arg) => {
-     
+  return (
+    schema as z.ZodType<AddressFieldValue | AddressFieldUpdateValue>
+  ).refine((arg) => {
     if (!arg) {
       return true
     }

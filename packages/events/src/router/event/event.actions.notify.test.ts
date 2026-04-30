@@ -24,7 +24,9 @@ import {
 import {
   createSystemTestClient,
   createTestClient,
-  setupTestCase
+  setupTestCase,
+  TEST_SYSTEM_ID,
+  TEST_SYSTEM_ID_2
 } from '@events/tests/utils'
 import { getLocations } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { EventNotFoundError } from '@events/service/events/events'
@@ -161,6 +163,7 @@ describe('event.actions.notify', () => {
       transactionId: getUUID(),
       annotation: {},
       declaration: {
+        // expect name error
         'applicant.name': {
           firstname: 999999,
           surname: '999999'
@@ -314,7 +317,7 @@ describe('event.actions.notify', () => {
         throw new Error('Child location not found')
       }
 
-      const systemClient = createSystemTestClient('test-system', [
+      const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
         encodeScope({
           type: 'record.create',
           options: {
@@ -376,7 +379,7 @@ describe('event.actions.notify', () => {
     test('should not require assignment or create unassign action for system user', async () => {
       const { generator } = await setupTestCase()
 
-      let client = createSystemTestClient('test-system', [
+      let client = createSystemTestClient(TEST_SYSTEM_ID, [
         encodeScope({
           type: 'record.create',
           options: {
@@ -397,7 +400,7 @@ describe('event.actions.notify', () => {
         createdAtLocation: locations[3].id
       })
 
-      client = createSystemTestClient('test-system-2', [
+      client = createSystemTestClient(TEST_SYSTEM_ID_2, [
         encodeScope({
           type: 'record.create',
           options: {
@@ -442,7 +445,7 @@ describe('event.actions.notify', () => {
       let client = createTestClient(user)
       const event = await client.event.create(generator.event.create())
 
-      client = createSystemTestClient('test-system-2', [
+      client = createSystemTestClient(TEST_SYSTEM_ID_2, [
         encodeScope({
           type: 'record.create',
           options: {
@@ -470,7 +473,7 @@ describe('event.actions.notify', () => {
 
     let client = createTestClient(user)
 
-    client = createSystemTestClient('test-system-2', [
+    client = createSystemTestClient(TEST_SYSTEM_ID_2, [
       encodeScope({
         type: 'record.create',
         options: {
@@ -528,6 +531,7 @@ describe('event.actions.notify', () => {
         transactionId: generateUuid(),
         type: 'NOTIFY',
         declaration: {
+          // testing partial address
           'applicant.address': {
             country: 'FAR'
           }
@@ -606,6 +610,7 @@ describe('event.actions.notify', () => {
         'applicant.address': {
           country: 'FAR',
           addressType: AddressType.INTERNATIONAL,
+          // testing wrong field (administrativeArea for DOMESTIC) in address
           administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a' // it goes away when AddressFieldValue parses it
         }
       },

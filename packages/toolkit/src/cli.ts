@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { runUpgrade } from './migrations/v2.0'
 
 const args = process.argv.slice(2)
 
@@ -62,6 +63,8 @@ Subcommands:
   switch (subcommand) {
     case 'init':
       console.log('Initialising environment...')
+      console.warn('This command is not implemented yet!')
+      process.exit(1)
       break
     default:
       console.error(`Unknown subcommand: environment ${subcommand}`)
@@ -69,12 +72,22 @@ Subcommands:
   }
 }
 
-function handleUpgrade() {
-  console.log('Running upgrade...')
+async function handleUpgrade() {
+  console.log('Initiating upgrade...')
+  try {
+    const pathToCountryconfig: string | undefined = args[1]
+    await runUpgrade(pathToCountryconfig)
+    console.log('Upgrade completed successfully!')
+  } catch (error) {
+    console.error('Upgrade failed:', error)
+    process.exit(1)
+  }
 }
 
 function handleCheckTranslations() {
   console.log('Checking translations...')
+  console.warn('This command is not implemented yet!')
+  process.exit(1)
 }
 
 main()

@@ -35,9 +35,10 @@ import {
   createEvent,
   createTestClient,
   createCountryConfigClient,
+  createSystemTestClient,
   setupTestCase,
-  TEST_USER_DEFAULT_SCOPES,
-  createSystemTestClient
+  TEST_SYSTEM_ID,
+  TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -2533,7 +2534,7 @@ test('System user can not register an event, even with the right scope', async (
 
   const humanUserClient = createTestClient(user)
 
-  const systemUserClient = createSystemTestClient('test-system', [
+  const systemUserClient = createSystemTestClient(TEST_SYSTEM_ID, [
     encodeScope({ type: 'record.register' })
   ])
 

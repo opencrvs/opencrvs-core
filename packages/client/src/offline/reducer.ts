@@ -35,7 +35,6 @@ import { UserDetails } from '@client/utils/userUtils'
 import { isOfflineDataLoaded } from './selectors'
 import { merge } from 'lodash'
 import { isNavigatorOnline } from '@client/utils'
-import { ISerializedForm } from '@client/forms'
 import { initHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import {
   Action as NotificationAction,
@@ -43,9 +42,6 @@ import {
 } from '@client/notification/actions'
 import { getToken } from '@client/utils/authUtils'
 import { ApplicationConfig } from '@opencrvs/commons/client'
-
-export const OFFLINE_LOCATIONS_KEY = 'locations'
-export const OFFLINE_FACILITIES_KEY = 'facilities'
 
 export interface ILocation {
   id: string
@@ -82,16 +78,8 @@ export interface CRVSOffice extends ILocation {
   physicalType: string
 }
 
-export interface IForms {
-  version: string
-  birth: ISerializedForm
-  death: ISerializedForm
-  marriage: ISerializedForm
-}
-
 export interface IOfflineData {
   locations: ILocationDataResponse
-  forms: IForms
   facilities: IFacilitiesDataResponse
   activeFacilities: IFacilitiesDataResponse
   offices: IOfficesDataResponse
@@ -219,11 +207,6 @@ const LOCATIONS_CMD = Cmd.run(() => referenceApi.loadLocations(), {
   failActionCreator: actions.locationsFailed
 })
 
-const FORMS_CMD = Cmd.run(() => referenceApi.loadForms(), {
-  successActionCreator: actions.formsLoaded,
-  failActionCreator: actions.formsFailed
-})
-
 const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
   successActionCreator: actions.configLoaded,
   failActionCreator: actions.configFailed
@@ -249,14 +232,7 @@ function delay(cmd: RunCmd<any>, time: number) {
 }
 
 function getDataLoadingCommands() {
-  return Cmd.list<actions.Action>([
-    CONFIG_CMD,
-    HANDLEBARS_CMD,
-    ...(import.meta.env.MODE === 'test' || import.meta.env.STORYBOOK
-      ? [FORMS_CMD]
-      : []),
-    CONTENT_CMD
-  ])
+  return Cmd.list<actions.Action>([CONFIG_CMD, HANDLEBARS_CMD, CONTENT_CMD])
 }
 
 function updateGlobalConfig() {
@@ -483,40 +459,6 @@ function reducer(
         delay(LOCATIONS_CMD, RETRY_TIMEOUT)
       )
     }
-
-    /*
-     * Forms
-     */
-
-    case actions.FORMS_LOADED: {
-      return {
-        ...state,
-        offlineData: {
-          ...state.offlineData,
-          forms: action.payload.forms
-        }
-      }
-    }
-    case actions.FORMS_FAILED: {
-      const payload = action.payload
-      if (payload.cause === 'VALIDATION_ERROR') {
-        return loop(
-          {
-            ...state,
-            loadingError: errorIfDataNotLoaded(state)
-          },
-          Cmd.action(configurationErrorNotification(payload.message))
-        )
-      }
-      return loop(
-        {
-          ...state,
-          loadingError: errorIfDataNotLoaded(state)
-        },
-        delay(FORMS_CMD, RETRY_TIMEOUT)
-      )
-    }
-
     /*
      * Facilities && Offices
      */

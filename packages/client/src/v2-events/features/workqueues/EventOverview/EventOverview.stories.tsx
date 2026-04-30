@@ -691,7 +691,7 @@ export const WithVariousUserRoles: Story = {
           createdBy: testDataGenerator().user.id.fieldAgent,
           createdAtLocation: 'loc-003' as UUID,
           createdByUserType: 'user' as const,
-          createdByRole: 'WEBHOOK',
+          createdByRole: 'FIELD_AGENT',
           declaration: {}
         },
         {

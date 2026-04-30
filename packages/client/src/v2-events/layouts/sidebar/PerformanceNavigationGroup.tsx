@@ -17,6 +17,7 @@ import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/Navigat
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { ROUTES } from '@client/v2-events/routes'
+import { useDashboards } from '@client/hooks/useDashboards'
 
 /**
  * Based on packages/client/src/components/interface/Navigation.tsx
@@ -31,6 +32,8 @@ export function PerformanceNavigationGroup({
   const intl = useIntl()
   const navigate = useNavigate()
   const { hasScope } = usePermissions()
+  const allowedDashboardIds = useDashboards()
+
   return (
     <>
       {hasScope('performance.read-dashboards') && (
@@ -38,6 +41,9 @@ export function PerformanceNavigationGroup({
           {
             <>
               {window.config.DASHBOARDS.map((config) => {
+                if (!allowedDashboardIds.includes(config.id)) {
+                  return null
+                }
                 return (
                   <NavigationItem
                     key={config.id}

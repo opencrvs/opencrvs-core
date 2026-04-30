@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { messages } from '@client/i18n/messages/views/userSetup'
-import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { MessageDescriptor } from 'react-intl'
 import { AdministrativeArea, UUID } from '@opencrvs/commons/client'
 import { getAdministrativeAreaHierarchy } from '../../../v2-events/utils'
@@ -30,6 +29,7 @@ const AuditDescriptionMapping: Record<string, MessageDescriptor> = {
   'user.password_changed': messages.passwordChangedAuditAction,
   'user.password_reset': messages.passwordResetAuditAction,
   'user.password_reset_by_admin': messages.passwordResetByAdmin,
+  'user.resend_invite': messages.resendInviteAuditAction,
   'user.phone_number_changed': messages.phoneNumberChangedAuditAction,
   'user.email_address_changed': messages.emailAddressChangedAuditAction,
   'user.username_reminder': messages.userNameReminderAuditAction,
@@ -60,16 +60,6 @@ const AuditDescriptionMapping: Record<string, MessageDescriptor> = {
     messages.rejectedCorrectedAuditAction,
   'event.actions.mark_as_duplicate.request': messages.markedAsDuplicate,
   'event.actions.mark_as_not_duplicate.request': messages.markedAsNotDuplicate
-}
-
-export const getAddressName = (
-  offlineCountryConfig: IOfflineData,
-  { name, partOf }: ILocation
-): string => {
-  const parentLocationId = partOf.split('/')[1]
-  if (parentLocationId === '0') return name
-  const parentLocation = offlineCountryConfig?.locations[parentLocationId]
-  return `${name}, ${getAddressName(offlineCountryConfig, parentLocation)}`
 }
 
 export const getAddressNameV2 = (

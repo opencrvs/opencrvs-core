@@ -19,3 +19,4 @@ grafana
 packages/*
 !packages/commons
 !packages/data-seeder
+!packages/events

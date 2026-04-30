@@ -14,6 +14,7 @@ import createFetchMock from 'vitest-fetch-mock'
 import { ContentSvg } from 'pdfmake/interfaces'
 import {
   ActionDocument,
+  AddressType,
   eventQueryDataGenerator,
   tennisClubMembershipEvent,
   UUID
@@ -242,6 +243,223 @@ describe('SVG compiler', () => {
       expectRenderOutput(
         '<svg><text>{{ $lookup ($action "DECLARE") "createdAt" }}</text></svg>',
         '<svg><text>23 January 2025</text></svg>'
+      )
+    })
+  })
+  describe('$join', () => {
+    // Uses the tennis club event's `applicant.address` field (ADDRESS type) with real
+    // mock admin area UUIDs so stringifyDeclaration can resolve district/province names.
+    // Ibombo (62a0ccb4) is a district under Central province (a45b982a).
+    // Addressing Central directly gives province-only (no district key).
+    function expectRenderWithAddress(
+      template: string,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      addressValue: Record<string, any>,
+      output: string
+    ) {
+      const generator = testDataGenerator(2323)
+      const registrar = generator.user.localRegistrar()
+      const { declaration: _decl, ...metadata } = tennisClubMembershipEventIndex
+
+      const result = compileSvg({
+        templateString: template,
+        $metadata: {
+          ...metadata,
+          createdBy: registrar.v2.id,
+          modifiedAt: new Date().toISOString(),
+          copiesPrintedForTemplate: 2
+        },
+        $actions: tennisClubMembershipEventDocument.actions as ActionDocument[],
+        $declaration: { 'applicant.address': addressValue },
+        review: false,
+        locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
+        administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
+        users: [registrar.v2],
+        language: { lang: 'en', messages: {} },
+        config: tennisClubMembershipEvent,
+        adminLevels: [
+          {
+            id: 'province',
+            label: {
+              id: 'field.address.province.label',
+              defaultMessage: 'Province',
+              description: 'Label for province in address'
+            }
+          },
+          {
+            id: 'district',
+            label: {
+              id: 'field.address.district.label',
+              defaultMessage: 'District',
+              description: 'Label for district in address'
+            }
+          }
+        ]
+      })
+
+      expect(result).toBe(output)
+    }
+
+    it('joins all values when all location levels are present', () => {
+      // Ibombo is a district under Central province → district + province present
+      // (domestic country code 'FAR' has no intl message in test env, resolves to '' and is dropped by $join)
+      expectRenderWithAddress(
+        '<svg><text>{{$join ", " ($lookup $declaration "applicant.address.district") ($lookup $declaration "applicant.address.province") ($lookup $declaration "applicant.address.country")}}</text></svg>',
+        {
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          country: 'FAR'
+        },
+        '<svg><text>Ibombo, Central</text></svg>'
+      )
+    })
+
+    it('omits district when absent, producing no leading comma', () => {
+      // Central is a province with no parent → only province, no district key
+      expectRenderWithAddress(
+        '<svg><text>{{$join ", " ($lookup $declaration "applicant.address.district") ($lookup $declaration "applicant.address.province") ($lookup $declaration "applicant.address.country")}}</text></svg>',
+        {
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+          country: 'FAR'
+        },
+        '<svg><text>Central</text></svg>'
+      )
+    })
+
+    it('combined with $or: uses state when present (international address)', () => {
+      // International address: streetLevelDetails.state is set, province is absent
+      // country code is resolved to its full English name via intl
+      expectRenderWithAddress(
+        '<svg><text>{{$join ", " ($or ($lookup $declaration "applicant.address.streetLevelDetails.state") ($lookup $declaration "applicant.address.province")) ($lookup $declaration "applicant.address.country")}}</text></svg>',
+        {
+          addressType: AddressType.INTERNATIONAL,
+          country: 'USA',
+          streetLevelDetails: { state: 'California' }
+        },
+        '<svg><text>California, United States of America</text></svg>'
+      )
+    })
+
+    it('combined with $or: falls back to province when state is absent (domestic address)', () => {
+      // Domestic address at province level: no state, province = Central
+      expectRenderWithAddress(
+        '<svg><text>{{$join ", " ($or ($lookup $declaration "applicant.address.streetLevelDetails.state") ($lookup $declaration "applicant.address.province")) ($lookup $declaration "applicant.address.country")}}</text></svg>',
+        {
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+          country: 'FAR'
+        },
+        '<svg><text>Central</text></svg>'
+      )
+    })
+
+    it('combined with $or: renders only country when both state and province are absent', () => {
+      // International address with no state set — only country remains
+      expectRenderWithAddress(
+        '<svg><text>{{$join ", " ($or ($lookup $declaration "applicant.address.streetLevelDetails.state") ($lookup $declaration "applicant.address.province")) ($lookup $declaration "applicant.address.country")}}</text></svg>',
+        {
+          addressType: AddressType.INTERNATIONAL,
+          country: 'USA',
+          streetLevelDetails: {}
+        },
+        '<svg><text>United States of America</text></svg>'
+      )
+    })
+  })
+  describe('administrativeHierarchy', () => {
+    // administrativeHierarchy is a computed convenience field on ADDRESS certificate variables.
+    // DOMESTIC: admin levels joined most-specific-first, then country.
+    // INTERNATIONAL: country only (streetLevelDetails is country-specific and not assumed).
+    //
+    // Note on 'FAR' (Farajaland): FAR is only added to the countries list when
+    // window.config.COUNTRY === 'FAR', which is set at runtime in dev and prod but
+    // not in the test environment. So in tests, SelectCountry.stringify('FAR') returns ''
+    // and gets filtered out. In dev/prod, it resolves to "Farajaland" and is included.
+    function expectAdministrativeHierarchy(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      addressValue: Record<string, any>,
+      output: string
+    ) {
+      const generator = testDataGenerator(2323)
+      const registrar = generator.user.localRegistrar()
+      const { declaration: _decl, ...metadata } = tennisClubMembershipEventIndex
+
+      const result = compileSvg({
+        templateString:
+          '<svg><text>{{$lookup $declaration "applicant.address.administrativeHierarchy"}}</text></svg>',
+        $metadata: {
+          ...metadata,
+          createdBy: registrar.v2.id,
+          modifiedAt: new Date().toISOString(),
+          copiesPrintedForTemplate: 2
+        },
+        $actions: tennisClubMembershipEventDocument.actions as ActionDocument[],
+        $declaration: { 'applicant.address': addressValue },
+        review: false,
+        locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
+        administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
+        users: [registrar.v2],
+        language: { lang: 'en', messages: {} },
+        config: tennisClubMembershipEvent,
+        adminLevels: [
+          {
+            id: 'province',
+            label: {
+              id: 'field.address.province.label',
+              defaultMessage: 'Province',
+              description: 'Label for province in address'
+            }
+          },
+          {
+            id: 'district',
+            label: {
+              id: 'field.address.district.label',
+              defaultMessage: 'District',
+              description: 'Label for district in address'
+            }
+          }
+        ]
+      })
+
+      expect(result).toBe(output)
+    }
+
+    it('domestic: district + province (most-specific-first, country filtered when unresolved)', () => {
+      // Ibombo (district) under Central (province) — FAR not in countries list in test env → filtered
+      // In dev/prod: "Ibombo, Central, Farajaland"
+      expectAdministrativeHierarchy(
+        {
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          country: 'FAR'
+        },
+        '<svg><text>Ibombo, Central</text></svg>'
+      )
+    })
+
+    it('domestic: province only when no district present', () => {
+      // Central has no parent → only province level resolved; FAR filtered in test env
+      // In dev/prod: "Central, Farajaland"
+      expectAdministrativeHierarchy(
+        {
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+          country: 'FAR'
+        },
+        '<svg><text>Central</text></svg>'
+      )
+    })
+
+    it('international: country only (streetLevelDetails is country-specific, not assumed)', () => {
+      // USA resolves to full English name via intl; state is ignored regardless
+      expectAdministrativeHierarchy(
+        {
+          addressType: AddressType.INTERNATIONAL,
+          country: 'USA',
+          streetLevelDetails: { state: 'California' }
+        },
+        '<svg><text>United States of America</text></svg>'
       )
     })
   })

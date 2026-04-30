@@ -20,10 +20,6 @@ services:
       - LANGUAGES=en
       - NODE_ENV=development
 
-  metrics:
-    environment:
-      - NODE_ENV=development
-
   auth:
     environment:
       - NODE_ENV=development
@@ -32,10 +28,3 @@ services:
     environment:
       - NODE_ENV=development
 
-  notification:
-    environment:
-      - NODE_ENV=development
-
-  webhooks:
-    environment:
-      - NODE_ENV=development

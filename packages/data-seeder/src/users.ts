@@ -12,6 +12,7 @@ import fetch from 'node-fetch'
 import { env } from './environment'
 import { z } from 'zod'
 import { raise } from './utils'
+
 import {
   decodeScope,
   EventConfig,
@@ -21,7 +22,7 @@ import {
   EncodedScope
 } from '@opencrvs/commons'
 import { fromZodError } from 'zod-validation-error'
-import { createClient } from '@opencrvs/toolkit/api'
+import { createInitialisationClient } from './index'
 
 const RoleSchema = (eventIds: string[]) =>
   z.array(
@@ -145,9 +146,7 @@ async function getUsers(token: string) {
 
   if (!parsedRoles.success) {
     raise(
-      fromZodError(parsedRoles.error, {
-        prefix: `Validation failed for roles returned from ${rolesUrl}`
-      }).message
+      `Validation failed for roles returned from ${rolesUrl}:\n${parsedRoles.error.toString()}`
     )
   }
 
@@ -192,21 +191,21 @@ async function userAlreadyExists(
   token: string,
   username: string
 ): Promise<boolean> {
-  const url = new URL('events', env.GATEWAY_HOST).toString()
-  const client = createClient(url, `Bearer ${token}`)
-  const res = await client.user.search.query({
+  const client = createInitialisationClient(token)
+
+  const res = await client.users.search.query({
     username,
     count: 1,
     skip: 0,
     sortOrder: 'asc'
   })
+
   return Boolean(res.length)
 }
 
 async function createUser(token: string, userPayload: any) {
-  const url = new URL('events', env.GATEWAY_HOST).toString()
-  const client = createClient(url, `Bearer ${token}`)
-  return client.user.create.mutate(userPayload)
+  const client = createInitialisationClient(token)
+  return client.users.create.mutate(userPayload)
 }
 
 export async function seedUsers(token: string) {
@@ -231,8 +230,8 @@ export async function seedUsers(token: string) {
 
     const externalId = officeIdentifier.split('_').at(-1)
 
-    const url = new URL('events', env.GATEWAY_HOST).toString()
-    const client = createClient(url, `Bearer ${token}`)
+    const client = createInitialisationClient(token)
+
     const [primaryOffice] = await client.locations.list.query({
       externalId
     })

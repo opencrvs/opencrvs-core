@@ -20,7 +20,6 @@ import {
   IContentResponse,
   IFacilitiesDataResponse,
   ILocationDataResponse,
-  LoadFormsResponse,
   LoadHandlebarHelpersResponse,
   ICertificateData
 } from '@client/utils/referenceApi'
@@ -47,18 +46,6 @@ type LocationsLoadedAction = {
 export const LOCATIONS_FAILED = 'OFFLINE/LOCATIONS_FAILED'
 type LocationsFailedAction = {
   type: typeof LOCATIONS_FAILED
-  payload: Error
-}
-
-export const FORMS_LOADED = 'OFFLINE/FORMS_LOADED'
-type FormsLoadedAction = {
-  type: typeof FORMS_LOADED
-  payload: LoadFormsResponse
-}
-
-export const FORMS_FAILED = 'OFFLINE/FORMS_FAILED'
-type FormsFailedAction = {
-  type: typeof FORMS_FAILED
   payload: Error
 }
 
@@ -127,16 +114,6 @@ export const locationsLoaded = (
 
 export const locationsFailed = (error: Error): LocationsFailedAction => ({
   type: LOCATIONS_FAILED,
-  payload: error
-})
-
-export const formsLoaded = (payload: LoadFormsResponse): FormsLoadedAction => ({
-  type: FORMS_LOADED,
-  payload: payload
-})
-
-export const formsFailed = (error: Error): FormsFailedAction => ({
-  type: FORMS_FAILED,
   payload: error
 })
 
@@ -222,8 +199,6 @@ export const handlebarsFailed = (error: Error) => ({
 export type Action =
   | LocationsFailedAction
   | LocationsLoadedAction
-  | FormsFailedAction
-  | FormsLoadedAction
   | IGetOfflineDataSuccessAction
   | IGetOfflineDataFailedAction
   | FacilitiesLoadedAction

@@ -10,11 +10,11 @@
  */
 
 import * as z from 'zod/v4'
-import { ActionTypes } from '@opencrvs/commons'
+import { ActionTypes, UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 
 export const UserActionsQuery = z.object({
-  userId: z.string(),
+  userId: UUID,
   skip: z.number().optional().default(0),
   count: z.number().optional().default(10),
   timeStart: z.string().optional(),

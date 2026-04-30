@@ -35,13 +35,13 @@ export default async function updateUser(
   h: Hapi.ResponseToolkit
 ) {
   const user = request.payload as IUser & { id: string }
-  const token = request.headers.authorization
+  const token = request.headers.authorization as string
   const existingUser: IUserModel | null = await User.findOne({ _id: user.id })
 
   if (!existingUser) {
     throw new Error(`No user found by given id: ${user.id}`)
   }
-  const scopes = getScopes(request.headers.authorization)
+  const scopes = getScopes(request.headers.authorization as string)
   const editableRoleIds = findScope(scopes, 'user.edit')?.options?.role
 
   if (Array.isArray(editableRoleIds) && !editableRoleIds.includes(user.role)) {
@@ -119,12 +119,12 @@ export default async function updateUser(
         newUsername: newUserName
       },
       countryConfigUrl: COUNTRY_CONFIG_URL,
-      authHeader: { Authorization: request.headers.authorization }
+      authHeader: { Authorization: request.headers.authorization as string }
     })
   }
   const resUser = _.omit(existingUser, ['passwordHash', 'salt'])
 
-  recordUserAuditEvent(request.headers.authorization, {
+  recordUserAuditEvent(request.headers.authorization as string, {
     operation: 'user.edit_user',
     requestData: { subjectId: user.id }
   })

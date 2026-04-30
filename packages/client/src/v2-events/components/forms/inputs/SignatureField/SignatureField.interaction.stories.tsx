@@ -10,7 +10,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn, within, expect, waitFor } from '@storybook/test'
+import { within, expect, waitFor } from '@storybook/test'
 import superjson from 'superjson'
 import React from 'react'
 import styled from 'styled-components'
@@ -28,12 +28,10 @@ import {
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { TestImage } from '@client/v2-events/features/events/fixtures'
-import { noop } from '@client/v2-events'
 import { getTestValidatorContext } from '../../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/SignatureField/Interaction',
-  args: { onChange: fn() },
   decorators: [
     (Story) => (
       <TRPCProvider>
@@ -134,9 +132,6 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
             ]}
             id="my-form"
             validatorContext={getTestValidatorContext()}
-            onChange={(data) => {
-              meta.args?.onChange?.(data) ?? noop()
-            }}
           />
         )
       },
@@ -249,9 +244,6 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
               ]}
               id="my-form"
               validatorContext={getTestValidatorContext()}
-              onChange={(data) => {
-                meta.args?.onChange?.(data) ?? noop()
-              }}
             />
           )
         },

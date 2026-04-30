@@ -186,6 +186,20 @@ function mapFieldTypeToMockValue(
     )
 
   switch (field.type) {
+    case FieldType.FIELD_GROUP: {
+      const nestedValue: Record<string, FieldValue> = field.fields.reduce(
+        (acc, subfield, index) => ({
+          ...acc,
+          [subfield.id]: mapFieldTypeToMockValue(
+            subfield,
+            i * 1000 + index,
+            rng
+          )
+        }),
+        {}
+      )
+      return nestedValue
+    }
     case FieldType.DIVIDER:
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
@@ -271,6 +285,7 @@ function mapFieldTypeToMockValue(
         type: 'image/png'
       } satisfies FileFieldValue
     case FieldType.SEARCH:
+    case FieldType.AUTOCOMPLETE:
     case FieldType.HTTP:
       return {
         error: null,

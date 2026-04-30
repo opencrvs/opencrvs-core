@@ -37,7 +37,7 @@ export const ACTION_SCOPE_MAP = {
   [ActionType.NOTIFY]: ['record.notify'],
   [ActionType.DECLARE]: ['record.declare', 'record.register'],
   [ActionType.EDIT]: ['record.edit'],
-  [ActionType.DELETE]: ['record.declare'],
+  [ActionType.DELETE]: ['record.declare', 'record.notify'],
   [ActionType.REGISTER]: ['record.register'],
   [ActionType.PRINT_CERTIFICATE]: ['record.print-certified-copies'],
   [ActionType.REQUEST_CORRECTION]: [

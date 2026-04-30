@@ -17,7 +17,6 @@ import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { useIntl } from 'react-intl'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { isAValidPhoneNumberFormat } from '@client/utils/validate'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { TriggerEvent } from '@opencrvs/commons/client'
@@ -28,6 +27,12 @@ interface IProps {
   show: boolean
   onSuccess: (phoneNumber: string, nonce: string) => void
   onClose: () => void
+}
+
+const isAValidPhoneNumberFormat = (value: string): boolean => {
+  const pattern = window.config.PHONE_NUMBER_PATTERN
+
+  return new RegExp(pattern).test(value)
 }
 
 export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {

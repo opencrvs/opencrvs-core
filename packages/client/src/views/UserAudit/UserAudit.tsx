@@ -25,7 +25,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { ROUTES } from '@client/v2-events/routes'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
-import { User } from '@opencrvs/commons/client'
+import { User, UUID } from '@opencrvs/commons/client'
 import { Link } from '@opencrvs/components/lib'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -52,7 +52,7 @@ const UserAvatar = styled(AvatarSmall)`
 export const UserAudit = () => {
   const intl = useIntl()
   const navigate = useNavigate()
-  const { userId } = useParams()
+  const { userId } = useParams<{ userId: UUID }>()
 
   const [showResendInviteSuccess, setShowResendInviteSuccess] =
     useState<boolean>(false)
@@ -71,7 +71,12 @@ export const UserAudit = () => {
   const [toggleUsernameReminder, setToggleUsernameReminder] = useState(false)
   const [toggleResetPassword, setToggleResetPassword] = useState(false)
   const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
-  const { getUser } = useUsers()
+  const {
+    getUser,
+    sendUsernameReminder,
+    sendResetPasswordInvite,
+    resendInvite: resendInviteMutation
+  } = useUsers()
   const { isFetching: loading, error, data } = getUser.useQuery(userId!)
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
@@ -92,39 +97,45 @@ export const UserAudit = () => {
     setToggleResetPassword((prevValue) => !prevValue)
   }
 
-  const resendInvite = async (userId: string) => {
+  const resendInvite = async (userId: UUID) => {
     try {
-      throw new Error('Resend invite is currently not implemented')
+      await resendInviteMutation.mutateAsync(userId)
+      setShowResendInviteSuccess(true)
     } catch (err) {
       setShowResendInviteError(true)
     }
   }
 
-  const usernameReminder = async (userId: string) => {
+  const usernameReminder = async (userId: UUID) => {
     try {
-      throw new Error('Username reminder is currently not implemented')
-    } catch (err) {
+      await sendUsernameReminder.mutateAsync(userId)
+      setShowUsernameReminderSuccess(true)
+    } catch {
       setShowUsernameReminderError(true)
     }
   }
 
-  const resetPassword = async (userId: string) => {
+  const resetPassword = async (userId: UUID) => {
     try {
-      throw new Error('Reset password is currently not implemented')
-    } catch (err) {
+      await sendResetPasswordInvite.mutateAsync(userId)
+      setShowResetPasswordSuccess(true)
+    } catch {
       setShowResetPasswordError(true)
     }
   }
 
-  const getMenuItems = (userId: string, status: string) => {
+  const getMenuItems = (userId: UUID, status: string) => {
     const menuItems: { label: string; handler: () => void }[] = [
       {
         label: intl.formatMessage(sysMessages.editUserDetailsTitle),
         handler: () =>
           navigate(
-            ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
-              userId
-            })
+            ROUTES.V2.SETTINGS.USER.REVIEW.buildPath(
+              {
+                userId
+              },
+              { from: 'user.audit' }
+            )
           )
       }
     ]
@@ -200,10 +211,7 @@ export const UserAudit = () => {
                         size="large"
                       />
                     }
-                    menuItems={getMenuItems(
-                      user.id as string,
-                      user.status as string
-                    )}
+                    menuItems={getMenuItems(user.id, user.status as string)}
                     hide={!canEditUser(user)}
                   />
                 ]

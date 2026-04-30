@@ -101,7 +101,32 @@ export function defineWorkqueue(workqueueInput: WorkqueueConfigInput) {
   return WorkqueueConfig.parse({ ...workqueueInput, query })
 }
 
-export function defineWorkqueues(workqueues: WorkqueueConfigInput[]) {
+function warnOnConfigurationIssues(
+  workqueue: WorkqueueConfigInputWithV19Compat
+) {
+  if (workqueue.actions) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `
+       ************** WARNING **************
+       'actions' property is deprecated, but used on workqueue: '${workqueue.slug}'.
+       Use 'action' property instead!
+       ************** WARNING **************
+      `
+    )
+  }
+}
+
+/** This is used for v1.9 to v2.0 migration to show specific migration errors. */
+type WorkqueueConfigInputWithV19Compat = WorkqueueConfigInput & {
+  /** @deprecated use 'action' property instead */
+  actions?: unknown
+}
+
+export function defineWorkqueues(
+  workqueues: WorkqueueConfigInputWithV19Compat[]
+) {
+  workqueues.forEach(warnOnConfigurationIssues)
   return workqueues.map((workqueue) => defineWorkqueue(workqueue))
 }
 
