@@ -402,7 +402,11 @@ export function canAccessUserWithScopes(scopes: UserScopeType[]) {
     TrpcContext & { id: UUID },
     { id: UUID } | UUID
   > = async ({ next, ctx, input }) => {
-    const incomingId = 'id' in input ? input.id : input
+    const parseResult = UUID.safeParse(input)
+    const incomingId: UUID = parseResult.success
+      ? parseResult.data
+      : (input as { id: UUID }).id
+
     const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
 
     const userRequesting = ctx.user
