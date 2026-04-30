@@ -236,7 +236,7 @@ test('Creates user with active status when status is provided', async () => {
   await client.users.create({
     email: 'testing+active@opencrvs.org',
     role: 'admin',
-    name: [{ use: 'en', family: 'Admin', given: ['Active'] }],
+    name: { firstname: 'Active', surname: 'Admin' },
     primaryOfficeId: location.id,
     username: 'active.admin',
     status: 'active'
@@ -271,7 +271,7 @@ test('Creates user with pending status when no status is provided', async () => 
   await client.users.create({
     email: 'testing+nonstatus@opencrvs.org',
     role: 'admin',
-    name: [{ use: 'en', family: 'User', given: ['Pending'] }],
+    name: { firstname: 'Pending', surname: 'User' },
     primaryOfficeId: location.id,
     username: 'pending.user'
   })

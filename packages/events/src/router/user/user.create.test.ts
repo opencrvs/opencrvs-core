@@ -130,7 +130,7 @@ test('Persists custom data field when provided', async () => {
   const created = await client.user.create({
     email: 'testing+data@opencrvs.org',
     role: 'admin',
-    name: [{ use: 'en', family: 'family', given: ['given'] }],
+    name: { firstname: 'given', surname: 'family' },
     primaryOfficeId: user.primaryOfficeId,
     data: customData
   })
@@ -180,7 +180,7 @@ test('Auto-generates username from name', async () => {
   const created = await client.user.create({
     email: 'testing+autogen@opencrvs.org',
     role: 'admin',
-    name: [{ use: 'en', family: 'Smith', given: ['Jane'] }],
+    name: { firstname: 'Jane', surname: 'Smith' },
     primaryOfficeId: user.primaryOfficeId
   })
 
