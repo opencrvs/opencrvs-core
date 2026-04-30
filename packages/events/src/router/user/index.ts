@@ -22,7 +22,6 @@ import {
   getAcceptedScopesFromToken,
   getScopeOptionValue,
   JurisdictionFilter,
-  isBase64FileString,
   logger,
   TokenWithBearer,
   User,
@@ -66,9 +65,9 @@ import {
   updateUser,
   sendUsernameReminder,
   sendResetPasswordInvite,
-  resendInvite
+  resendInvite,
+  verifyPasswordById
 } from '@events/service/users/api'
-import { uploadBase64File } from '@events/service/files'
 import {
   checkVerificationCode,
   generateAndSendVerificationCode,
@@ -550,10 +549,7 @@ export const userRouter = router({
     .input(
       z.object({
         userId: z.string(),
-        avatar: z.object({
-          type: z.string(),
-          data: z.string()
-        })
+        avatar: z.string()
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -570,10 +566,9 @@ export const userRouter = router({
         )
         throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
-      const profileImagePath = isBase64FileString(input.avatar.data)
-        ? await uploadBase64File(input.avatar.data, ctx.token)
-        : input.avatar.data
-      await updateUserById(UUID.parse(ctx.user.id), { profileImagePath })
+      await updateUserById(UUID.parse(ctx.user.id), {
+        profileImagePath: input.avatar
+      })
     }),
   resendInvite: userAndSystemProcedure
     .input(UUID)
@@ -642,6 +637,19 @@ export const userRouter = router({
         clientId: auditLogIdentifiers.sub,
         clientType: auditLogIdentifiers.userType ?? 'system'
       })
+    }),
+  verifyLoggedInUserPassword: userOnlyProcedure
+    .input(z.object({ password: z.string() }))
+    .output(
+      z.object({
+        mobile: z.string().optional(),
+        status: z.string(),
+        username: z.string(),
+        id: z.string()
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      return verifyPasswordById(ctx.user.id, input.password)
     }),
   audit: auditRouter
 })

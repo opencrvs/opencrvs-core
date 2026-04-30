@@ -526,6 +526,30 @@ export async function checkSecurityQuestionMatch({
   }
 }
 
+export async function verifyPasswordById(
+  id: UUID,
+  password: string
+): Promise<{ mobile?: string; status: string; username: string; id: string }> {
+  const credentials = await getCredentials(id)
+
+  const hash = await generateHash(password, credentials.salt)
+  if (hash !== credentials.passwordHash) {
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
+
+  const user = await getUserById(id)
+  if (!user) {
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
+
+  return {
+    mobile: user.mobile ?? undefined,
+    status: user.status,
+    username: user.username,
+    id: user.id
+  }
+}
+
 export async function verifyUser(input: { mobile?: string; email?: string }) {
   const user = await getUserByMobileOrEmail(
     input.mobile ? { mobile: input.mobile } : { email: input.email ?? '' }
