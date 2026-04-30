@@ -118,7 +118,7 @@ export const InvalidPhoneNumberShowsValidationError: StoryObj<typeof EditUser> =
       useUserFormState.getState().setUserForm({
         primaryOfficeId: mockUser.primaryOfficeId,
         role: TestUserRole.enum.REGISTRATION_AGENT,
-        name: { firstname: 'Test', surname: 'User', middlename: '' },
+        name: { firstname: 'Test', surname: 'User' },
         email: 'test@opencrvs.org'
       })
     },
@@ -182,7 +182,7 @@ export const ClearedEmailNormalisedToUndefined: StoryObj = {
     useUserFormState.getState().setUserForm({
       primaryOfficeId: mockUser.primaryOfficeId,
       role: TestUserRole.enum.REGISTRATION_AGENT,
-      name: { firstname: 'Test', surname: 'User', middlename: '' },
+      name: { firstname: 'Test', surname: 'User' },
       phoneNumber: '01712345678',
       email: '' // touched-and-cleared email field — the bug scenario
     })
@@ -246,7 +246,7 @@ export const ClearedPhoneNumberNormalisedToUndefined: StoryObj = {
     useUserFormState.getState().setUserForm({
       primaryOfficeId: mockUser.primaryOfficeId,
       role: TestUserRole.enum.REGISTRATION_AGENT,
-      name: { firstname: 'Test', surname: 'User', middlename: '' },
+      name: { firstname: 'Test', surname: 'User' },
       phoneNumber: '', // touched-and-cleared phone field — the bug scenario
       email: 'newuser@opencrvs.org'
     })
