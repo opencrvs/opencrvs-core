@@ -24,6 +24,7 @@ import {
   TokenWithBearer,
   User,
   UserOrSystem,
+  UserOrSystemSummary,
   UpdateUserInput,
   CreateUserInputInternal
 } from '@opencrvs/commons'
@@ -286,7 +287,7 @@ export const userRouter = router({
     }),
   list: userOnlyProcedure
     .input(z.array(z.string()))
-    .output(z.array(UserOrSystem))
+    .output(z.array(UserOrSystemSummary))
     .query(async ({ input }) => getUsersById(input)),
   search: searchUsersRoute(userAndSystemProcedure),
   actions: userOnlyProcedure
