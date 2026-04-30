@@ -37,6 +37,7 @@ import {
   createSystemTestClient,
   createTestClient,
   setupTestCase,
+  TEST_SYSTEM_ID,
   TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
 import {
@@ -1066,7 +1067,7 @@ describe('placeOfEvent location hierarchy handling', () => {
 
     const user = await seed.user({
       role: TestUserRole.enum.LOCAL_REGISTRAR,
-      name: [{ use: 'en', family: 'Doe', given: ['John'] }],
+      name: { firstname: 'John', surname: 'Doe' },
       primaryOfficeId: childOfficeId,
       fullHonorificName: undefined
     })
@@ -1303,7 +1304,7 @@ describe('placeOfEvent location hierarchy handling', () => {
     )
 
     // Step 4: Perform reindexing
-    const sysClient = createSystemTestClient('test-system', [
+    const sysClient = createSystemTestClient(TEST_SYSTEM_ID, [
       encodeScope({ type: 'record.reindex' })
     ])
 

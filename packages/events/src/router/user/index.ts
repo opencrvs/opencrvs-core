@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+/* eslint-disable max-lines */
 import { TRPCError } from '@trpc/server'
 import * as z from 'zod/v4'
 import { decode } from 'jsonwebtoken'
@@ -20,7 +20,6 @@ import {
 import {
   CreateUserInput,
   logger,
-  personNameFromV1ToV2,
   TokenWithBearer,
   User,
   UserOrSystem,
@@ -58,7 +57,8 @@ import {
   searchUsers,
   updateUser,
   sendUsernameReminder,
-  sendResetPasswordInvite
+  sendResetPasswordInvite,
+  resendInvite
 } from '@events/service/users/api'
 import {
   checkVerificationCode,
@@ -171,7 +171,7 @@ export function searchUsersRoute(
 }
 
 const UserAuditListQuery = z.object({
-  userId: z.string(),
+  userId: UUID,
   skip: z.number().optional().default(0),
   count: z.number().optional().default(10),
   timeStart: z.string().optional(),
@@ -230,7 +230,7 @@ export const userRouter = router({
     .mutation(async ({ input, ctx }) => handleCreateUser(input, ctx)),
   update: userAndSystemProcedure
     .use(allowedWithAnyOfScopes(['user.edit']))
-    .input(UpdateUserInput.and(z.object({ id: UUID })))
+    .input(UpdateUserInput)
     .use(canUpdateUserLocation)
     .output(User)
     .mutation(async ({ input, ctx }) => {
@@ -346,7 +346,7 @@ export const userRouter = router({
         nonce,
         token: rawToken,
         notificationEvent: input.notificationEvent,
-        recipientName: personNameFromV1ToV2(user.name),
+        recipientName: user.name,
         phoneNumber: user.mobile,
         email: user.email
       })
@@ -526,6 +526,21 @@ export const userRouter = router({
       }
       await updateUserById(UUID.parse(ctx.user.id), {
         profileImagePath: input.avatar
+      })
+    }),
+  resendInvite: userAndSystemProcedure
+    .use(allowedWithAnyOfScopes(['user.edit']))
+    .input(UUID)
+    .mutation(async ({ input, ctx }) => {
+      const userId = UUID.parse(input)
+
+      await resendInvite(userId, ctx.token)
+      const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
+      await writeAuditLog({
+        operation: 'user.resend_invite',
+        requestData: { subjectId: userId },
+        clientId: auditLogIdentifiers.sub,
+        clientType: auditLogIdentifiers.userType ?? 'system'
       })
     }),
   activate: userOnlyProcedure

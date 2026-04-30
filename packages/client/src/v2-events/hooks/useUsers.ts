@@ -320,6 +320,9 @@ export function useUsers() {
     ),
     sendResetPasswordInvite: useMutation(
       trpcOptionsProxy.user.sendResetPasswordInvite.mutationOptions()
+    ),
+    resendInvite: useMutation(
+      trpcOptionsProxy.user.resendInvite.mutationOptions()
     )
   }
 }

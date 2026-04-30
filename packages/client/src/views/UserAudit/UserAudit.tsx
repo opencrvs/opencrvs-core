@@ -71,7 +71,12 @@ export const UserAudit = () => {
   const [toggleUsernameReminder, setToggleUsernameReminder] = useState(false)
   const [toggleResetPassword, setToggleResetPassword] = useState(false)
   const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
-  const { getUser, sendUsernameReminder, sendResetPasswordInvite } = useUsers()
+  const {
+    getUser,
+    sendUsernameReminder,
+    sendResetPasswordInvite,
+    resendInvite: resendInviteMutation
+  } = useUsers()
   const { isFetching: loading, error, data } = getUser.useQuery(userId!)
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
@@ -94,7 +99,8 @@ export const UserAudit = () => {
 
   const resendInvite = async (userId: UUID) => {
     try {
-      throw new Error('Resend invite is currently not implemented')
+      await resendInviteMutation.mutateAsync(userId)
+      setShowResendInviteSuccess(true)
     } catch (err) {
       setShowResendInviteError(true)
     }
@@ -176,7 +182,7 @@ export const UserAudit = () => {
     return menuItems
   }
 
-  const userName = user ? getUsersFullName(user.name, intl.locale) : ''
+  const userName = user ? getUsersFullName(user.name) : ''
 
   return (
     <>

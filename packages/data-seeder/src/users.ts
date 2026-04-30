@@ -19,7 +19,8 @@ import {
   hasScope,
   joinUrl,
   parseConfigurableScope,
-  EncodedScope
+  EncodedScope,
+  CreateUserInputInternal
 } from '@opencrvs/commons'
 import { fromZodError } from 'zod-validation-error'
 import { createInitialisationClient } from './index'
@@ -84,12 +85,18 @@ const UserSchema = z.array(
   WithoutContact.extend({
     mobile: z.string(),
     email: z.string().email().optional()
-  }).or(
-    WithoutContact.extend({
-      email: z.string().email(),
-      mobile: z.string().optional()
-    })
-  )
+  })
+    .or(
+      WithoutContact.extend({
+        email: z.string().email(),
+        mobile: z.string().optional()
+      })
+    )
+    .transform(({ familyName, givenNames, ...user }) => ({
+      ...user,
+      firstname: givenNames,
+      surname: familyName
+    }))
 )
 
 async function getUsers(token: string) {
@@ -203,7 +210,7 @@ async function userAlreadyExists(
   return Boolean(res.length)
 }
 
-async function createUser(token: string, userPayload: any) {
+async function createUser(token: string, userPayload: CreateUserInputInternal) {
   const client = createInitialisationClient(token)
   return client.users.create.mutate(userPayload)
 }
@@ -213,8 +220,8 @@ export async function seedUsers(token: string) {
 
   for (const userMetadata of rawUsers) {
     const {
-      givenNames,
-      familyName,
+      firstname,
+      surname,
       primaryOfficeId: officeIdentifier,
       username,
       ...user
@@ -238,14 +245,11 @@ export async function seedUsers(token: string) {
 
     const userPayload = {
       ...user,
-      name: [
-        {
-          use: 'en',
-          family: familyName,
-          given: [givenNames]
-        }
-      ],
-      ...(env.ACTIVATE_USERS && { status: 'active' }),
+      name: {
+        firstname,
+        surname
+      },
+      ...(env.ACTIVATE_USERS && { status: 'active' as const }),
       primaryOfficeId: primaryOffice.id,
       username
     }

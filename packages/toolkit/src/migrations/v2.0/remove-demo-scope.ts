@@ -11,15 +11,13 @@
 
 import path from 'path'
 import { Project } from 'ts-morph'
-import { getCwd } from '.'
-
 const ROLES_HANDLER_RELATIVE_PATH = 'src/data-seeding/roles/handler.ts'
 
 async function main() {
-  const rolesHandlerPath = path.join(getCwd(), ROLES_HANDLER_RELATIVE_PATH)
+  const rolesHandlerPath = path.join(process.cwd(), ROLES_HANDLER_RELATIVE_PATH)
 
   const project = new Project({
-    tsConfigFilePath: path.resolve(getCwd(), 'tsconfig.json'),
+    tsConfigFilePath: path.resolve(process.cwd(), 'tsconfig.json'),
     skipAddingFilesFromTsConfig: false
   })
 

@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable max-lines */
 import { randomBytes } from 'crypto'
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
@@ -15,16 +16,15 @@ import {
   CreateUserInput,
   CreateUserInputInternal,
   DocumentPath,
-  FamilyName,
-  IUserName,
+  UserName,
   TokenUserType,
+  TriggerEvent,
   UUID,
   UpdateUserInput,
   User,
   UserOrSystem,
   isUUID,
   logger,
-  personNameFromV1ToV2,
   triggerUserEventNotification
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
@@ -43,7 +43,8 @@ import {
   isUsernameTaken,
   getUserCredentialsByUserId,
   SecurityQuestion,
-  getUserByMobileOrEmail
+  getUserByMobileOrEmail,
+  resetUserCredentialsAndStatus
 } from '@events/storage/postgres/events/users'
 import { generateSaltedHash, generateHash } from '@events/service/auth/hash'
 import { updatePasswordHashAndSalt } from '@events/storage/postgres/events/users'
@@ -71,15 +72,13 @@ export type SearchUsersPayload = {
   sortOrder: 'asc' | 'desc'
 }
 
-async function generateUsername(names: FamilyName, existingUserName?: string) {
-  const { given = [], family = '' } =
-    names.find((name) => name.use === 'en') || {}
-  const initials = given.reduce(
-    (accumulated, current) => accumulated + current.trim().charAt(0),
-    ''
-  )
+async function generateUsername(name: UserName, existingUserName?: string) {
+  const initials = name.firstname
+    .split(' ')
+    .map((n) => n.charAt(0))
+    .join('')
 
-  let proposedUsername = `${initials}${initials === '' ? '' : '.'}${family
+  let proposedUsername = `${initials}${initials === '' ? '' : '.'}${name.surname
     .trim()
     .replace(/ /g, '-')}`.toLowerCase()
 
@@ -118,9 +117,10 @@ function mapDbUserToUser(user: DbUser): User & { username: string } {
   return {
     type: TokenUserType.enum.user,
     id: user.id,
-    name: [
-      { use: 'en', given: [user.firstname ?? ''], family: user.surname ?? '' }
-    ],
+    name: {
+      firstname: user.firstname,
+      surname: user.surname
+    },
     role: user.role,
     email: user.email ?? undefined,
     mobile: user.mobile ?? undefined,
@@ -135,7 +135,8 @@ function mapDbUserToUser(user: DbUser): User & { username: string } {
       : undefined,
     primaryOfficeId: user.officeId,
     administrativeAreaId: user.administrativeAreaId ?? undefined,
-    fullHonorificName: user.fullHonorificName ?? undefined
+    fullHonorificName: user.fullHonorificName ?? undefined,
+    data: Object.keys(user.data).length > 0 ? user.data : undefined
   }
 }
 
@@ -155,7 +156,7 @@ export async function getUser(
 }
 
 export async function findUserOrSystem(
-  id: string
+  id: UUID
 ): Promise<UserOrSystem | undefined> {
   try {
     return await getUser(id)
@@ -206,20 +207,17 @@ export async function updateUser(
     })
   }
 
-  const name: IUserName[] = input.name ?? [
-    {
-      use: 'en',
-      given: [existingUser.firstname ?? ''],
-      family: existingUser.surname ?? ''
-    }
-  ]
+  const name: UserName = input.name ?? {
+    firstname: existingUser.firstname,
+    surname: existingUser.surname
+  }
 
   const oldUsername = existingUser.username
   const newUsername = await generateUsername(name, existingUser.username)
 
   await updateUserById(input.id, {
-    firstname: personNameFromV1ToV2(name).firstname,
-    surname: personNameFromV1ToV2(name).surname,
+    firstname: name.firstname,
+    surname: name.surname,
     fullHonorificName: input.fullHonorificName,
     email: input.email,
     mobile: input.mobile,
@@ -229,7 +227,8 @@ export async function updateUser(
     officeId: input.primaryOfficeId,
     signaturePath: input.signature
       ? input.signature.path
-      : existingUser.signaturePath
+      : existingUser.signaturePath,
+    data: input.data
   })
 
   if (newUsername !== oldUsername) {
@@ -238,7 +237,7 @@ export async function updateUser(
       event: 'user-updated',
       payload: {
         recipient: {
-          name: personNameFromV1ToV2(name),
+          name,
           email: input.email,
           mobile: input.mobile
         },
@@ -270,7 +269,8 @@ function generateRandomPassword() {
 }
 
 async function sendCredentialsNotification(
-  userFullName: IUserName[],
+  event: typeof TriggerEvent.USER_CREATED | typeof TriggerEvent.RESEND_INVITE,
+  name: UserName,
   username: string,
   password: string,
   token: string,
@@ -279,10 +279,10 @@ async function sendCredentialsNotification(
 ) {
   try {
     await triggerUserEventNotification({
-      event: 'user-created',
+      event,
       payload: {
         recipient: {
-          name: personNameFromV1ToV2(userFullName),
+          name,
           email,
           mobile: msisdn
         },
@@ -293,7 +293,11 @@ async function sendCredentialsNotification(
       authHeader: { Authorization: token }
     })
   } catch (err) {
-    logger.error(`Unable to send notification for error : ${err}`)
+    logger.error(`Unable to send ${event} notification for error : ${err}`)
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `Unable to send notification to for error : ${err}`
+    })
   }
 }
 
@@ -325,11 +329,10 @@ export async function createUser(
   _token: string
 ) {
   const resolvedUser = await resolveCreateUserInput(input)
-  const v2Name = personNameFromV1ToV2(resolvedUser.name)
 
   const userPayload = {
-    firstname: v2Name.firstname,
-    surname: v2Name.surname,
+    firstname: resolvedUser.name.firstname,
+    surname: resolvedUser.name.surname,
     email: resolvedUser?.email?.toLowerCase(),
     fullHonorificName: resolvedUser.fullHonorificName,
     role: resolvedUser.role,
@@ -337,7 +340,8 @@ export async function createUser(
     officeId: resolvedUser.primaryOfficeId,
     mobile: resolvedUser.mobile,
     status: resolvedUser.status,
-    signaturePath: resolvedUser.signature?.path
+    signaturePath: resolvedUser.signature?.path,
+    data: resolvedUser.data ?? {}
   }
 
   // Hash the provided password, or generate a random placeholder for pending
@@ -350,18 +354,19 @@ export async function createUser(
     securityQuestions: []
   }
 
-  const postgresId = await createUserWithCredentials(
-    userPayload,
-    userCredentialPayload
-  )
-
   await sendCredentialsNotification(
+    TriggerEvent.USER_CREATED,
     input.name,
     userCredentialPayload.username,
     resolvedUser.password,
     _token,
     userPayload.mobile ?? undefined,
     userPayload.email
+  )
+
+  const postgresId = await createUserWithCredentials(
+    userPayload,
+    userCredentialPayload
   )
 
   return getUser(postgresId)
@@ -383,6 +388,44 @@ export async function activateUser(input: {
 
   const userId = UUID.parse(input.userId)
   await activateUserWithCredentials(userId, hash, salt, securityQuestions)
+}
+
+export async function resendInvite(userId: UUID, token: string): Promise<void> {
+  const user = await getUserById(userId)
+
+  if (!user) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `User not found: ${userId}`
+    })
+  }
+
+  if (user.status !== 'pending') {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Can only resend invite to a user in pending status'
+    })
+  }
+
+  const password = env.DEFAULT_USER_PASSWORD ?? generateRandomPassword()
+  const { hash, salt } = await generateSaltedHash(password)
+
+  const userName: UserName = {
+    firstname: user.firstname,
+    surname: user.surname
+  }
+
+  await sendCredentialsNotification(
+    TriggerEvent.RESEND_INVITE,
+    userName,
+    user.username,
+    password,
+    token,
+    user.mobile ?? undefined,
+    user.email ?? undefined
+  )
+
+  await resetUserCredentialsAndStatus(userId, hash, salt)
 }
 
 /**
@@ -498,13 +541,10 @@ export async function verifyUser(input: { mobile?: string; email?: string }) {
     mobile: user.mobile ?? undefined,
     email: user.email ?? undefined,
     status: user.status,
-    name: [
-      {
-        use: 'en',
-        given: [user.firstname ?? ''],
-        family: user.surname ?? ''
-      }
-    ],
+    name: {
+      firstname: user.firstname,
+      surname: user.surname
+    },
     securityQuestionKey,
     scope
   }
@@ -512,7 +552,7 @@ export async function verifyUser(input: { mobile?: string; email?: string }) {
 
 export async function sendResetPasswordInvite(
   userId: UUID,
-  admin: { id: string; name: IUserName[]; role: string },
+  admin: { id: string; name: UserName; role: string },
   token: string
 ): Promise<void> {
   const user = await getUser(userId)
@@ -521,27 +561,19 @@ export async function sendResetPasswordInvite(
   const { hash, salt } = await generateSaltedHash(temporaryPassword)
   await updatePasswordHashAndSalt(userId, hash, salt)
 
-  const userName: IUserName[] = [
-    {
-      use: 'en',
-      given: user.name[0]?.given ?? [],
-      family: user.name[0]?.family ?? ''
-    }
-  ]
-
   try {
     await triggerUserEventNotification({
       event: 'reset-password-by-admin',
       payload: {
         recipient: {
-          name: personNameFromV1ToV2(userName),
+          name: user.name,
           email: user.email,
           mobile: user.mobile
         },
         temporaryPassword,
         admin: {
           id: admin.id,
-          name: personNameFromV1ToV2(admin.name),
+          name: admin.name,
           role: admin.role
         }
       },
@@ -563,20 +595,12 @@ export async function sendUsernameReminder(
 ): Promise<void> {
   const user = await getUser(userId)
 
-  const userName: IUserName[] = [
-    {
-      use: 'en',
-      given: user.name[0]?.given ?? [],
-      family: user.name[0]?.family ?? ''
-    }
-  ]
-
   try {
     await triggerUserEventNotification({
       event: 'username-reminder',
       payload: {
         recipient: {
-          name: personNameFromV1ToV2(userName),
+          name: user.name,
           email: user.email,
           mobile: user.mobile
         },

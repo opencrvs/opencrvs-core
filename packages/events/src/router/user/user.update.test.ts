@@ -13,6 +13,7 @@ import { TRPCError } from '@trpc/server'
 import { encodeScope } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { updateUserById } from '@events/storage/postgres/events/users'
+import { getClient } from '@events/storage/postgres/events'
 
 const USER_EDIT_SCOPE = encodeScope({ type: 'user.edit' })
 const CONFIG_UPDATE_ALL_SCOPE = encodeScope({ type: 'config.update-all' })
@@ -130,18 +131,109 @@ test('successfully updates user fields and returns updated user', async () => {
 
   const updatedUser = await client.user.update({
     ...makeUpdateInput(user),
-    name: [{ use: 'en', given: ['Jane'], family: 'Smith' }],
+    name: { firstname: 'Jane', surname: 'Smith' },
     email: `updated-${user.id}@test.example`,
     mobile: '+254700000099'
   })
 
   expect(updatedUser).toMatchObject({
     id: user.id,
-    name: [{ use: 'en', given: ['Jane'], family: 'Smith' }],
+    name: { firstname: 'Jane', surname: 'Smith' },
     email: `updated-${user.id}@test.example`,
     mobile: '+254700000099',
     primaryOfficeId: user.primaryOfficeId
   })
+})
+
+test('persists data payload when updating a user', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+
+  const data = { employeeId: 'EMP-002', department: 'Vital Events' }
+  const updatedUser = await client.user.update({
+    ...makeUpdateInput(user),
+    data
+  })
+
+  expect(updatedUser.data).toEqual(data)
+
+  const eventsDb = getClient()
+  const dbUser = await eventsDb
+    .selectFrom('users')
+    .selectAll()
+    .where('id', '=', user.id)
+    .executeTakeFirstOrThrow()
+
+  expect(dbUser.data).toEqual(data)
+})
+
+test('preserves existing data when data is omitted from update', async () => {
+  const { user } = await setupTestCase()
+
+  // Seed initial data directly into the DB
+  const initialData = { employeeId: 'EMP-003' }
+  const eventsDb = getClient()
+  await eventsDb
+    .updateTable('users')
+    .set({ data: initialData })
+    .where('id', '=', user.id)
+    .execute()
+
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+
+  // Update without supplying data — should leave existing data untouched
+  await client.user.update(makeUpdateInput(user))
+
+  const dbUser = await eventsDb
+    .selectFrom('users')
+    .selectAll()
+    .where('id', '=', user.id)
+    .executeTakeFirstOrThrow()
+
+  expect(dbUser.data).toEqual(initialData)
+})
+
+test('overwrites data when an explicit data object is supplied on update', async () => {
+  const { user } = await setupTestCase()
+
+  const eventsDb = getClient()
+  await eventsDb
+    .updateTable('users')
+    .set({ data: { employeeId: 'OLD-001' } })
+    .where('id', '=', user.id)
+    .execute()
+
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+  const newData = { employeeId: 'NEW-001', region: 'North' }
+
+  const updatedUser = await client.user.update({
+    ...makeUpdateInput(user),
+    data: newData
+  })
+
+  expect(updatedUser.data).toEqual(newData)
+
+  const dbUser = await eventsDb
+    .selectFrom('users')
+    .selectAll()
+    .where('id', '=', user.id)
+    .executeTakeFirstOrThrow()
+
+  expect(dbUser.data).toEqual(newData)
+})
+
+test('Persists custom data field when updated', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+
+  const customData = { department: 'civil', badge: 'B-42' }
+
+  const updatedUser = await client.user.update({
+    id: user.id,
+    data: customData
+  })
+
+  expect(updatedUser.data).toMatchObject(customData)
 })
 
 test('toggling user status keeps other fields intact', async () => {
