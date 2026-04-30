@@ -281,9 +281,7 @@ test('Rejects user update when mobile does not match PHONE_NUMBER_PATTERN', asyn
       ...makeUpdateInput(user),
       mobile: '12345'
     })
-  ).rejects.toThrowError(
-    new TRPCError({ code: 'BAD_REQUEST', message: 'INVALID_MOBILE' })
-  )
+  ).rejects.toThrow(/INVALID_MOBILE/)
 })
 
 test('Updates user when no mobile is provided, skipping phone format validation', async () => {

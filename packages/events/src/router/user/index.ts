@@ -1,4 +1,3 @@
- 
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -110,7 +109,10 @@ async function validateMobile(mobile: string) {
   const config = await getApplicationConfig()
   const pattern = new RegExp(config.PHONE_NUMBER_PATTERN)
   if (!pattern.test(mobile)) {
-    throw new TRPCError({ code: 'BAD_REQUEST', message: 'INVALID_MOBILE' })
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `INVALID_MOBILE: "${mobile}" does not match the configured pattern ${config.PHONE_NUMBER_PATTERN}`
+    })
   }
 }
 

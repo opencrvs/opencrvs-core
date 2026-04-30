@@ -448,9 +448,7 @@ test('Rejects user creation when mobile does not match PHONE_NUMBER_PATTERN', as
       name: [{ use: 'en', family: 'family', given: ['given'] }],
       primaryOfficeId: user.primaryOfficeId
     })
-  ).rejects.toThrowError(
-    new TRPCError({ code: 'BAD_REQUEST', message: 'INVALID_MOBILE' })
-  )
+  ).rejects.toThrow(/INVALID_MOBILE/)
 })
 
 test('Creates user when no mobile is provided, skipping phone format validation', async () => {
