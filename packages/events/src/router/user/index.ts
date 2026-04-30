@@ -60,7 +60,8 @@ import {
   updateUser,
   sendUsernameReminder,
   sendResetPasswordInvite,
-  resendInvite
+  resendInvite,
+  verifyPasswordById
 } from '@events/service/users/api'
 import {
   checkVerificationCode,
@@ -598,6 +599,19 @@ export const userRouter = router({
         clientId: auditLogIdentifiers.sub,
         clientType: auditLogIdentifiers.userType ?? 'system'
       })
+    }),
+  verifyLoggedInUserPassword: userOnlyProcedure
+    .input(z.object({ password: z.string() }))
+    .output(
+      z.object({
+        mobile: z.string().optional(),
+        status: z.string(),
+        username: z.string(),
+        id: z.string()
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      return verifyPasswordById(ctx.user.id, input.password)
     }),
   audit: auditRouter
 })
