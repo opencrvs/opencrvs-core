@@ -223,8 +223,9 @@ type EventState = {
 }
 
 interface UserFormState {
+  userId?: string
   userForm?: EventState
-  setUserForm: (data: EventState) => void
+  setUserForm: (data: EventState, userId?: string) => void
   getUserForm: (initialValues?: EventState) => EventState
   getTouchedFields: () => Record<string, boolean>
   clear: () => void
@@ -233,14 +234,14 @@ interface UserFormState {
 export const useUserFormState = create<UserFormState>()((set, get) => ({
   getUserForm: (initialValues?: EventState) =>
     get().userForm || deepDropNulls(initialValues ?? {}),
-  setUserForm: (data: EventState) => {
-    return set(() => ({ userForm: data }))
+  setUserForm: (data: EventState, userId?: string) => {
+    return set(() => ({ userForm: data, ...(userId ? { userId } : {}) }))
   },
   getTouchedFields: () =>
     Object.fromEntries(
       Object.entries(get().getUserForm()).map(([key]) => [key, true])
     ),
-  clear: () => set(() => ({ userForm: undefined }))
+  clear: () => set(() => ({ userForm: undefined, userId: undefined }))
 }))
 
 export const CreateNewUser = () => {
@@ -400,28 +401,37 @@ const ReviewUserComponent = () => {
     if (isNewUser || !existingUserQuery.data) return
     const user = existingUserQuery.data
     if (user.type !== TokenUserType.enum.user) return
-    if (Object.keys(getUserForm()).length > 0) return
+    // Preserve in-progress edits when navigating back from the edit page for the
+    // same user, but reload when the admin switches to a different user.
+    if (
+      useUserFormState.getState().userId === userId &&
+      Object.keys(getUserForm()).length > 0
+    )
+      return
 
-    setUserForm({
-      primaryOfficeId: user.primaryOfficeId,
-      role: user.role,
-      name: {
-        firstname: user.name.firstname,
-        surname: user.name.surname
+    setUserForm(
+      {
+        primaryOfficeId: user.primaryOfficeId,
+        role: user.role,
+        name: {
+          firstname: user.name.firstname,
+          surname: user.name.surname
+        },
+        phoneNumber: user.mobile,
+        email: user.email,
+        fullHonorificName: user.fullHonorificName,
+        signature: user.signature
+          ? { path: user.signature, originalFilename: '', type: '' }
+          : undefined,
+        device: user.device,
+        // Additional field values are spread at the top level because FormFieldGenerator
+        // looks up values by field ID as a flat key (e.g. formState['user.staffId']).
+        // The nesting into data: {} only happens when building the UserInput payload.
+        ...(user.data ?? {})
       },
-      phoneNumber: user.mobile,
-      email: user.email,
-      fullHonorificName: user.fullHonorificName,
-      signature: user.signature
-        ? { path: user.signature, originalFilename: '', type: '' }
-        : undefined,
-      device: user.device,
-      // Additional field values are spread at the top level because FormFieldGenerator
-      // looks up values by field ID as a flat key (e.g. formState['user.staffId']).
-      // The nesting into data: {} only happens when building the UserInput payload.
-      ...(user.data ?? {})
-    })
-  }, [isNewUser, existingUserQuery.data, setUserForm, getUserForm])
+      userId
+    )
+  }, [isNewUser, existingUserQuery.data, setUserForm, getUserForm, userId])
 
   const formState = getUserForm()
   const createUserMutation = createUser()
