@@ -11,8 +11,6 @@
 
 import { Project } from 'ts-morph'
 import path from 'path'
-import { getCwd } from '.'
-
 const DEPRECATED_IMPORT = 'SCOPES'
 const TARGET_MODULES = new Set([
   '@opencrvs/toolkit/scopes',
@@ -50,7 +48,7 @@ function processFile(filePath: string, project: Project): number {
     }
 
     console.log(
-      `  [${path.relative(getCwd(), filePath)}] Removed ${matchingNamedImports.length} deprecated '${DEPRECATED_IMPORT}' import(s) from '${decl.getModuleSpecifierValue()}'`
+      `  [${path.relative(process.cwd(), filePath)}] Removed ${matchingNamedImports.length} deprecated '${DEPRECATED_IMPORT}' import(s) from '${decl.getModuleSpecifierValue()}'`
     )
   }
 
@@ -58,7 +56,7 @@ function processFile(filePath: string, project: Project): number {
 }
 
 async function main() {
-  const srcDir = path.join(getCwd(), 'src')
+  const srcDir = path.join(process.cwd(), 'src')
   console.log(`Scanning for deprecated imports in: ${srcDir}\n`)
 
   const project = new Project({
@@ -94,7 +92,7 @@ async function main() {
   console.log(`\nSaving ${modifiedFiles.length} modified file(s)...`)
   for (const filePath of modifiedFiles) {
     await project.getSourceFileOrThrow(filePath).save()
-    console.log(`  Saved: ${path.relative(getCwd(), filePath)}`)
+    console.log(`  Saved: ${path.relative(process.cwd(), filePath)}`)
   }
 
   console.log(`\nDone. Removed ${totalRemoved} deprecated import(s).`)
