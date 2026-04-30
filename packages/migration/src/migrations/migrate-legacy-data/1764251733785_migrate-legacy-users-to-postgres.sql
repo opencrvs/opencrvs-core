@@ -3,12 +3,12 @@ INSERT INTO users(id, legacy_id, firstname, surname, full_honorific_name, role, 
 SELECT
   gen_random_uuid() AS id,
   lu._id AS legacy_id,
-  lu.name -> 0 -> 'given' ->> 0 AS firstname,
-  lu.name -> 0 ->> 'family' AS surname,
+  COALESCE(lu.name -> 0 -> 'given' ->> 0, '') AS firstname,
+  COALESCE(lu.name -> 0 ->> 'family', '') AS surname,
   lu."fullHonorificName" AS full_honorific_name,
   lu.role AS role,
   lu.status AS status,
-  LOWER(lu."emailForNotification") AS email,
+  LOWER(COALESCE(NULLIF(lu."emailForNotification", ''), NULLIF(lu.email, ''))) AS email,
   lu.mobile AS mobile,
 regexp_replace(
     (SELECT

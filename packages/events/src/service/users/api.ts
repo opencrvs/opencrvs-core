@@ -8,120 +8,162 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import fetch from 'node-fetch'
+/* eslint-disable max-lines */
+import { randomBytes } from 'crypto'
 import { z } from 'zod'
+import { TRPCError } from '@trpc/server'
 import {
+  CreateUserInput,
+  CreateUserInputInternal,
   DocumentPath,
-  IUserName,
+  UserName,
   TokenUserType,
+  TriggerEvent,
   UUID,
+  UpdateUserInput,
   User,
-  UserInput,
   UserOrSystem,
   isUUID,
-  joinUrl,
-  logger
+  logger,
+  triggerUserEventNotification
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
 import {
   getSystemByLegacyId,
   getSystemClientById
 } from '@events/storage/postgres/events/system-clients'
+import {
+  getUserById,
+  getUsersAndSystemsByIds,
+  createUserWithCredentials,
+  searchUsersWithInput,
+  activateUserWithCredentials,
+  updateUserById,
+  updateUsernameById,
+  isUsernameTaken,
+  getUserCredentialsByUserId,
+  SecurityQuestion,
+  getUserByMobileOrEmail,
+  resetUserCredentialsAndStatus
+} from '@events/storage/postgres/events/users'
+import { generateSaltedHash, generateHash } from '@events/service/auth/hash'
+import { updatePasswordHashAndSalt } from '@events/storage/postgres/events/users'
+import { getRoles } from '../config/config'
 
-type UserAPIResult = {
-  id: string
-  avatar?: {
-    data: DocumentPath
-    type: string
-  }
-  signature?: {
-    data: DocumentPath
-    type: string
-  }
-  device?: string
-  name: IUserName[]
-  username: string
-  email: string
-  emailForNotification: string
-  mobile: string
-  role: string
-  fullHonorificName?: string
-  practitionerId: string
-  primaryOfficeId: UUID
-  scope: string[]
-  status: string
-  creationDate: number
-}
+export type UserSortBy =
+  | 'createdAt'
+  | 'firstname'
+  | 'surname'
+  | 'username'
+  | 'email'
+  | 'status'
+  | 'role'
 
-type SearchUsersPayload = {
+export type SearchUsersPayload = {
   username?: string
   mobile?: string
   email?: string
   status?: string
-  primaryOfficeId?: string
-  locationId?: string
+  primaryOfficeId?: UUID
+  locationId?: UUID
   count: number
   skip: number
+  sortBy: UserSortBy
   sortOrder: 'asc' | 'desc'
 }
 
-export type SearchUsersResult = {
-  totalItems: number
-  results: UserAPIResult[]
+async function generateUsername(name: UserName, existingUserName?: string) {
+  const initials = name.firstname
+    .split(' ')
+    .map((n) => n.charAt(0))
+    .join('')
+
+  let proposedUsername = `${initials}${initials === '' ? '' : '.'}${name.surname
+    .trim()
+    .replace(/ /g, '-')}`.toLowerCase()
+
+  if (proposedUsername.length < 3) {
+    proposedUsername =
+      proposedUsername + '0'.repeat(3 - proposedUsername.length)
+  }
+
+  if (existingUserName && existingUserName === proposedUsername) {
+    return proposedUsername
+  }
+
+  try {
+    let usernameTaken = await isUsernameTaken(proposedUsername)
+    let i = 1
+    const copyProposedName = proposedUsername
+    while (usernameTaken) {
+      if (existingUserName && existingUserName === proposedUsername) {
+        return proposedUsername
+      }
+      proposedUsername = copyProposedName + i
+      i += 1
+      usernameTaken = await isUsernameTaken(proposedUsername)
+    }
+  } catch (err) {
+    logger.error(`Failed username generation: ${err}`)
+    throw new Error('Failed username generation')
+  }
+
+  return proposedUsername
 }
 
-export async function getLegacyUser(
-  userId: string,
-  token: string
-): Promise<User & { username: string }> {
-  const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'getUser').href, {
-    method: 'POST',
-    body: JSON.stringify({ userId }),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token
-    }
-  })
+type DbUser = NonNullable<Awaited<ReturnType<typeof getUserById>>>
 
-  if (!res.ok) {
-    throw new Error(
-      `Unable to retrieve user details. Error: ${res.status} status received`
-    )
-  }
-
-  const legacyUser = (await res.json()) as UserAPIResult
-
+function mapDbUserToUser(user: DbUser): User & { username: string } {
   return {
     type: TokenUserType.enum.user,
-    id: legacyUser.id,
-    name: legacyUser.name,
-    role: legacyUser.role,
-    email: legacyUser.email,
-    mobile: legacyUser.mobile,
-    username: legacyUser.username,
-    status: legacyUser.status as User['status'],
-    signature: legacyUser.signature?.data
-      ? legacyUser.signature.data
+    id: user.id,
+    name: {
+      firstname: user.firstname,
+      surname: user.surname
+    },
+    role: user.role,
+    email: user.email ?? undefined,
+    mobile: user.mobile ?? undefined,
+    device: user.device ?? undefined,
+    username: user.username,
+    status: user.status as User['status'],
+    signature: user.signaturePath
+      ? (user.signaturePath as DocumentPath)
       : undefined,
-    avatar: legacyUser.avatar?.data ? legacyUser.avatar.data : undefined,
-    primaryOfficeId: legacyUser.primaryOfficeId,
-    device: legacyUser.device ? legacyUser.device : undefined,
-    fullHonorificName: legacyUser.fullHonorificName
-      ? legacyUser.fullHonorificName
-      : undefined
+    avatar: user.profileImagePath
+      ? (user.profileImagePath as DocumentPath)
+      : undefined,
+    primaryOfficeId: user.officeId,
+    administrativeAreaId: user.administrativeAreaId ?? undefined,
+    fullHonorificName: user.fullHonorificName ?? undefined,
+    data: Object.keys(user.data).length > 0 ? user.data : undefined
   }
+}
+
+export async function getUser(
+  userId: string
+): Promise<User & { username: string }> {
+  const user = await getUserById(UUID.parse(userId))
+
+  if (!user) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `User not found: ${userId}`
+    })
+  }
+
+  return mapDbUserToUser(user)
 }
 
 export async function findUserOrSystem(
-  id: string,
-  token: string
+  id: UUID
 ): Promise<UserOrSystem | undefined> {
   try {
-    return await getLegacyUser(id, token)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (_) {
-    logger.info(`No user found for id: ${id}. Will look for a system instead.`)
+    return await getUser(id)
+  } catch (e) {
+    logger.info(
+      `No user found for id: ${id}. Will look for a system instead. Error: ${e instanceof Error ? e.message : String(e)}`
+    )
   }
 
   try {
@@ -135,238 +177,469 @@ export async function findUserOrSystem(
       legacyId: system.legacyId ? system.legacyId : undefined,
       name: system.name
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     logger.info(
-      `No system found for id: ${id}. User/system has probably been removed. Will return undefined.`
+      `No system found for id: ${id}. User/system has probably been removed. Will return undefined. Error: ${e instanceof Error ? e.message : String(e)}`
     )
   }
 
   return
 }
 
-async function getUser(id: string, token: string): Promise<User> {
-  const userOrSystem = await findUserOrSystem(id, token)
-  if (!userOrSystem) {
-    throw new Error(`No user or system found for id: ${id}`)
-  }
-
-  if (userOrSystem.type === TokenUserType.enum.system) {
-    throw new Error(`The id: ${id} belongs to a system, not a user`)
-  }
-
-  return userOrSystem
-}
-
 export async function searchUsers(
-  payload: SearchUsersPayload,
-  token: string
+  payload: SearchUsersPayload
 ): Promise<User[]> {
-  const res = await fetch(
-    joinUrl(env.USER_MANAGEMENT_URL, 'searchUsers').href,
-    {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      }
-    }
-  )
+  const results = await searchUsersWithInput(payload)
 
-  if (!res.ok) {
-    throw new Error(
-      `Unable to search users. Error: ${res.status} status received`
-    )
-  }
-
-  const { results } = (await res.json()) as SearchUsersResult
-
-  return results.map((user) => ({
-    type: TokenUserType.enum.user,
-    id: user.id,
-    name: user.name,
-    role: user.role,
-    signature: user.signature?.data ? user.signature.data : undefined,
-    avatar: user.avatar?.data ? user.avatar.data : undefined,
-    primaryOfficeId: user.primaryOfficeId,
-    status: user.status as User['status'],
-    device: user.device ? user.device : undefined,
-    fullHonorificName: user.fullHonorificName
-      ? user.fullHonorificName
-      : undefined
-  }))
+  return results.map(mapDbUserToUser)
 }
-
-type CreateUserPayload = z.infer<typeof UserInput>
 
 export async function updateUser(
-  input: CreateUserPayload & { id: string },
+  input: UpdateUserInput,
   token: string
 ): Promise<User> {
-  const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'updateUser').href, {
-    method: 'POST',
-    body: JSON.stringify({
-      ...input,
-      signature: input.signature && {
-        type: input.signature.type,
-        data: input.signature.path
-      }
-    }),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token
-    }
+  const existingUser = await getUserById(input.id)
+
+  if (!existingUser) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `User not found: ${input.id}`
+    })
+  }
+
+  const name: UserName = input.name ?? {
+    firstname: existingUser.firstname,
+    surname: existingUser.surname
+  }
+
+  const oldUsername = existingUser.username
+  const newUsername = await generateUsername(name, existingUser.username)
+
+  await updateUserById(input.id, {
+    firstname: name.firstname,
+    surname: name.surname,
+    fullHonorificName: input.fullHonorificName,
+    email: input.email,
+    mobile: input.mobile,
+    device: input.device,
+    status: input.status,
+    role: input.role,
+    officeId: input.primaryOfficeId,
+    signaturePath: input.signature
+      ? input.signature.path
+      : existingUser.signaturePath,
+    data: input.data
   })
 
-  if (!res.ok) {
-    throw new Error(
-      `Unable to update user. Error: ${res.status} status received`
-    )
+  if (newUsername !== oldUsername) {
+    await updateUsernameById(UUID.parse(input.id), newUsername)
+    await triggerUserEventNotification({
+      event: 'user-updated',
+      payload: {
+        recipient: {
+          name,
+          email: input.email,
+          mobile: input.mobile
+        },
+        oldUsername,
+        newUsername
+      },
+      countryConfigUrl: env.COUNTRY_CONFIG_URL,
+      authHeader: { Authorization: token }
+    })
   }
 
-  const user = await getUser(input.id, token)
-  return user
+  return getUser(input.id)
 }
 
-export async function createUser(input: CreateUserPayload, token: string) {
-  const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'createUser').href, {
-    method: 'POST',
-    body: JSON.stringify({
-      ...input,
-      signature: input.signature && {
-        type: input.signature.type,
-        data: input.signature.path
-      }
-    }),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token
+function generateRandomPassword() {
+  const charset =
+    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+  const length = 12
+  // Rejection sampling eliminates modulo bias (256 % 62 = 8, so bytes 248-255 are discarded)
+  const result: string[] = []
+  const limit = 256 - (256 % charset.length)
+  while (result.length < length) {
+    const byte = randomBytes(1)[0]
+    if (byte < limit) {
+      result.push(charset[byte % charset.length])
     }
+  }
+  return result.join('')
+}
+
+async function sendCredentialsNotification(
+  event: typeof TriggerEvent.USER_CREATED | typeof TriggerEvent.RESEND_INVITE,
+  name: UserName,
+  username: string,
+  password: string,
+  token: string,
+  msisdn?: string,
+  email?: string
+) {
+  try {
+    await triggerUserEventNotification({
+      event,
+      payload: {
+        recipient: {
+          name,
+          email,
+          mobile: msisdn
+        },
+        username,
+        temporaryPassword: password
+      },
+      countryConfigUrl: env.COUNTRY_CONFIG_URL,
+      authHeader: { Authorization: token }
+    })
+  } catch (err) {
+    logger.error(`Unable to send ${event} notification for error : ${err}`)
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `Unable to send notification to for error : ${err}`
+    })
+  }
+}
+
+export const ResolvedCreateUserInput = CreateUserInput.extend({
+  ...CreateUserInputInternal.shape,
+  // Ensure defaults are resolved.
+  password: z.string(),
+  username: z.string(),
+  status: z.enum(['active', 'pending'])
+})
+export type ResolvedCreateUserInput = z.infer<typeof ResolvedCreateUserInput>
+
+export async function resolveCreateUserInput(
+  input: CreateUserInput | CreateUserInputInternal
+): Promise<ResolvedCreateUserInput> {
+  return ResolvedCreateUserInput.parse({
+    ...input,
+    password:
+      (input as CreateUserInputInternal).password ??
+      env.DEFAULT_USER_PASSWORD ??
+      generateRandomPassword(),
+    status: (input as CreateUserInputInternal).status ?? 'pending',
+    username: input.username ?? (await generateUsername(input.name))
   })
-
-  if (!res.ok) {
-    throw new Error(
-      `Unable to create user. Error: ${res.status} status received`
-    )
-  }
-
-  const response = (await res.json()) as UserAPIResult
-  return getUser(response.id, token)
 }
 
-export async function changeUserPassword(
-  payload: { userId: string; existingPassword: string; password: string },
-  token: string
-): Promise<void> {
-  const res = await fetch(
-    joinUrl(env.USER_MANAGEMENT_URL, 'changeUserPassword').href,
-    {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      }
-    }
-  )
-  if (!res.ok) {
-    throw new Error(
-      `Unable to change password. Error: ${res.status} status received`
-    )
-  }
-}
-
-export async function activateUser(
-  input: { userId: string; password: string; securityQNAs: unknown[] },
-  token: string
+export async function createUser(
+  input: CreateUserInput | CreateUserInputInternal,
+  _token: string
 ) {
-  const res = await fetch(
-    joinUrl(env.USER_MANAGEMENT_URL, 'activateUser').href,
-    {
-      method: 'POST',
-      body: JSON.stringify(input),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      }
-    }
+  const resolvedUser = await resolveCreateUserInput(input)
+
+  const userPayload = {
+    firstname: resolvedUser.name.firstname,
+    surname: resolvedUser.name.surname,
+    email: resolvedUser?.email?.toLowerCase(),
+    fullHonorificName: resolvedUser.fullHonorificName,
+    role: resolvedUser.role,
+    device: resolvedUser.device,
+    officeId: resolvedUser.primaryOfficeId,
+    mobile: resolvedUser.mobile,
+    status: resolvedUser.status,
+    signaturePath: resolvedUser.signature?.path,
+    data: resolvedUser.data ?? {}
+  }
+
+  // Hash the provided password, or generate a random placeholder for pending
+  // users who will set their own password via the activation flow.
+  const { hash, salt } = await generateSaltedHash(resolvedUser.password)
+  const userCredentialPayload = {
+    username: resolvedUser.username,
+    passwordHash: hash,
+    salt,
+    securityQuestions: []
+  }
+
+  await sendCredentialsNotification(
+    TriggerEvent.USER_CREATED,
+    input.name,
+    userCredentialPayload.username,
+    resolvedUser.password,
+    _token,
+    userPayload.mobile ?? undefined,
+    userPayload.email
   )
 
-  if (!res.ok) {
-    throw new Error(
-      `Unable to change password. Error: ${res.status} status received`
-    )
+  const postgresId = await createUserWithCredentials(
+    userPayload,
+    userCredentialPayload
+  )
+
+  return getUser(postgresId)
+}
+
+export async function activateUser(input: {
+  userId: UUID
+  password: string
+  securityQNAs: { questionKey: string; answer: string }[]
+}): Promise<void> {
+  const { hash, salt } = await generateSaltedHash(input.password)
+
+  const securityQuestions = await Promise.all(
+    input.securityQNAs.map(async (qna) => ({
+      questionKey: qna.questionKey,
+      answerHash: await generateHash(qna.answer.toLowerCase(), salt)
+    }))
+  )
+
+  const userId = UUID.parse(input.userId)
+  await activateUserWithCredentials(userId, hash, salt, securityQuestions)
+}
+
+export async function resendInvite(userId: UUID, token: string): Promise<void> {
+  const user = await getUserById(userId)
+
+  if (!user) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `User not found: ${userId}`
+    })
+  }
+
+  if (user.status !== 'pending') {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Can only resend invite to a user in pending status'
+    })
+  }
+
+  const password = env.DEFAULT_USER_PASSWORD ?? generateRandomPassword()
+  const { hash, salt } = await generateSaltedHash(password)
+
+  const userName: UserName = {
+    firstname: user.firstname,
+    surname: user.surname
+  }
+
+  await sendCredentialsNotification(
+    TriggerEvent.RESEND_INVITE,
+    userName,
+    user.username,
+    password,
+    token,
+    user.mobile ?? undefined,
+    user.email ?? undefined
+  )
+
+  await resetUserCredentialsAndStatus(userId, hash, salt)
+}
+
+/**
+ * Retrieves multiple users/systems by their IDs.
+ *
+ * If no user or system is found for an id, we leave them out of the result.
+ * This is because a user might have been removed, and we don't want to throw an error in those cases.
+ *
+ * @param ids - Array of ids, which can be normal user or system ids
+ * @param token - Authorization token for API requests
+ * @returns Array of found users. If no users are found for some ids, we leave them out of the result.
+ */
+export const getUsersById = async (ids: string[]): Promise<UserOrSystem[]> => {
+  const { users, systems } = await getUsersAndSystemsByIds(ids)
+
+  const mappedUsers: UserOrSystem[] = users.map(mapDbUserToUser)
+  const mappedSystems: UserOrSystem[] = systems.map((s) => ({
+    type: TokenUserType.enum.system,
+    id: s.id,
+    legacyId: s.legacyId ?? undefined,
+    name: s.name
+  }))
+
+  return [...mappedUsers, ...mappedSystems]
+}
+
+export function isUser(userOrSystem: UserOrSystem): userOrSystem is User {
+  return userOrSystem.type === TokenUserType.enum.user
+}
+
+export const getCredentials = async (userId: UUID) => {
+  const credentials = await getUserCredentialsByUserId(userId)
+
+  if (!credentials) {
+    logger.error(`No user details found by given userid: ${userId}`)
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
+
+  return credentials
+}
+
+export const getSecurityQuestionsForUser = <
+  T extends { securityQuestions: unknown }
+>(
+  record: T
+): SecurityQuestion[] => {
+  if (
+    !Array.isArray(record.securityQuestions) ||
+    record.securityQuestions.length === 0
+  ) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: "User doesn't have security questions"
+    })
+  }
+  return record.securityQuestions
+}
+
+export async function checkSecurityQuestionMatch({
+  questions,
+  input,
+  salt
+}: {
+  questions: { questionKey: string; answerHash: string }[]
+  input: { questionKey: string; answer: string }
+  salt: string
+}) {
+  const target = questions.find((q) => q.questionKey === input.questionKey)
+
+  if (!target) {
+    return {
+      matched: false,
+      questionKey: input.questionKey
+    }
+  }
+
+  const hash = await generateHash(input.answer.toLowerCase(), salt)
+  const matched = hash === target.answerHash
+
+  // On a wrong answer, rotate to a different question so the same prompt
+  // can't be brute-forced.
+  const fallback = questions.find(
+    (q) => q.questionKey !== input.questionKey
+  )?.questionKey
+
+  return {
+    matched,
+    questionKey: matched ? input.questionKey : (fallback ?? input.questionKey)
   }
 }
 
-export async function changeUserPhone(
-  payload: { userId: string; phoneNumber: string },
+export async function verifyPasswordById(
+  id: UUID,
+  password: string
+): Promise<{ mobile?: string; status: string; username: string; id: string }> {
+  const credentials = await getCredentials(id)
+
+  const hash = await generateHash(password, credentials.salt)
+  if (hash !== credentials.passwordHash) {
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
+
+  const user = await getUserById(id)
+  if (!user) {
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
+
+  return {
+    mobile: user.mobile ?? undefined,
+    status: user.status,
+    username: user.username,
+    id: user.id
+  }
+}
+
+export async function verifyUser(input: { mobile?: string; email?: string }) {
+  const user = await getUserByMobileOrEmail(
+    input.mobile ? { mobile: input.mobile } : { email: input.email ?? '' }
+  )
+
+  if (!user) {
+    // Don't reveal whether the account exists
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
+
+  const questions = getSecurityQuestionsForUser(user)
+
+  const securityQuestionKey =
+    questions[Math.floor(Math.random() * questions.length)].questionKey
+
+  const roles = await getRoles()
+  const scope = roles.find((r) => r.id === user.role)?.scopes ?? []
+
+  return {
+    id: user.id,
+    username: user.username,
+    mobile: user.mobile ?? undefined,
+    email: user.email ?? undefined,
+    status: user.status,
+    name: {
+      firstname: user.firstname,
+      surname: user.surname
+    },
+    securityQuestionKey,
+    scope
+  }
+}
+
+export async function sendResetPasswordInvite(
+  userId: UUID,
+  admin: { id: string; name: UserName; role: string },
   token: string
 ): Promise<void> {
-  const res = await fetch(
-    joinUrl(env.USER_MANAGEMENT_URL, 'changeUserPhone').href,
-    {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      }
-    }
-  )
+  const user = await getUser(userId)
 
-  if (!res.ok) {
-    throw new Error(
-      `Unable to change phone number. Error: ${res.status} status received`
-    )
+  const temporaryPassword = generateRandomPassword()
+  const { hash, salt } = await generateSaltedHash(temporaryPassword)
+  await updatePasswordHashAndSalt(userId, hash, salt)
+
+  try {
+    await triggerUserEventNotification({
+      event: 'reset-password-by-admin',
+      payload: {
+        recipient: {
+          name: user.name,
+          email: user.email,
+          mobile: user.mobile
+        },
+        temporaryPassword,
+        admin: {
+          id: admin.id,
+          name: admin.name,
+          role: admin.role
+        }
+      },
+      countryConfigUrl: env.COUNTRY_CONFIG_URL,
+      authHeader: { Authorization: token }
+    })
+  } catch (err) {
+    logger.error(`Unable to send reset password notification for error: ${err}`)
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `Unable to send notification: ${err}`
+    })
   }
 }
 
-export async function changeUserEmail(
-  payload: { userId: string; email: string },
+export async function sendUsernameReminder(
+  userId: UUID,
   token: string
 ): Promise<void> {
-  const res = await fetch(
-    joinUrl(env.USER_MANAGEMENT_URL, 'changeUserEmail').href,
-    {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      }
-    }
-  )
+  const user = await getUser(userId)
 
-  if (!res.ok) {
-    throw new Error(
-      `Unable to change email. Error: ${res.status} status received`
+  try {
+    await triggerUserEventNotification({
+      event: 'username-reminder',
+      payload: {
+        recipient: {
+          name: user.name,
+          email: user.email,
+          mobile: user.mobile
+        },
+        username: user.username
+      },
+      countryConfigUrl: env.COUNTRY_CONFIG_URL,
+      authHeader: { Authorization: token }
+    })
+  } catch (err) {
+    logger.error(
+      `Unable to send username reminder notification for error: ${err}`
     )
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `Unable to send notification: ${err}`
+    })
   }
-}
-
-export async function changeUserAvatar(
-  payload: { userId: string; avatar: { type: string; data: string } },
-  token: string
-) {
-  const res = await fetch(
-    joinUrl(env.USER_MANAGEMENT_URL, 'changeUserAvatar').href,
-    {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      }
-    }
-  )
-
-  if (!res.ok) {
-    throw new Error(
-      `Unable to change avatar. Error: ${res.status} status received`
-    )
-  }
-
-  return res
 }

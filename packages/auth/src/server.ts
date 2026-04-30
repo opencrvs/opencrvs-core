@@ -66,7 +66,7 @@ import anonymousTokenHandler from './features/anonymousToken/handler'
 import reindexingTokenHandler, {
   responseSchema as reindexResponseSchema
 } from './features/reindexToken/handler'
-import { Boom, badRequest } from '@hapi/boom'
+import { badRequest } from '@hapi/boom'
 
 export type AuthServer = {
   server: Hapi.Server
@@ -91,15 +91,15 @@ export async function createServer() {
       cors: { origin: whitelist },
       payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT },
       response: {
-        failAction: async (req, _2, err: Boom) => {
+        failAction: async (req, _2, err: Error | undefined) => {
           if (process.env.NODE_ENV === 'production') {
             // In prod, log a limited error message and throw the default Bad Request error.
-            logger.error(`Response validationError: ${err.message}`)
+            logger.error(`Response validationError: ${err?.message}`)
             throw badRequest(`Invalid response payload returned from handler`)
           } else {
             // During development, log and respond with the full error.
             logger.error(
-              `${req.path} response has a validation error: ${err.message}`
+              `${req.path} response has a validation error: ${err?.message}`
             )
             throw err
           }

@@ -154,7 +154,7 @@ function User({ action }: { action: EventHistoryActionDocument }) {
       onClick={() =>
         navigate(
           ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
-            userId: String(user.id)
+            userId: user.id
           })
         )
       }

@@ -348,7 +348,7 @@ export function SystemList() {
                               day: 'numeric'
                             }
                           ),
-                          user: getUsersFullName(user.name, intl.locale)
+                          user: getUsersFullName(user.name)
                         })
                       : intl.formatMessage(integrationMessages.createdOn, {
                           date: intl.formatDate(

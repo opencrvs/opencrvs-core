@@ -13,6 +13,7 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
 import fc from 'fast-check'
+import { genSaltSync, hashSync } from 'bcryptjs'
 import {
   ActionStatus,
   ActionType,
@@ -36,15 +37,18 @@ import {
   TENNIS_CLUB_MEMBERSHIP,
   TokenUserType,
   TokenWithBearer,
+  User,
   UserFilter,
   UUID
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import { t } from '@events/router/trpc'
+import { SystemContext, UserContext } from '@opencrvs/commons'
+import { t, tService } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
-import { SystemContext, UserContext } from '@events/context'
 import { getClient } from '@events/storage/postgres/events'
 import { EventNotFoundError } from '@events/service/events/events'
+import { internalRouter } from '@events/router/internalRouter'
+import { initialisationRouter } from '@events/router/initialisation'
 import { getLocations } from '../service/locations/locations'
 import { NewEventActions } from '../storage/postgres/events/schema/app/EventActions'
 import {
@@ -53,6 +57,10 @@ import {
   seeder,
   setupHierarchyWithUsers
 } from './generators'
+
+export const TEST_SYSTEM_ID = '9f3c6b7e-2a91-4f6d-b8d2-5c0e3a4f1b72' as UUID
+export const TEST_SYSTEM_ID_2 = '4d1a8c90-7e5b-4a3f-9c2d-1f6b8e7a2c55' as UUID
+export const REINDEX_SYSTEM_ID = 'e2b7f6a1-3d94-4c8e-a5f9-6b2d0c1a9e33' as UUID
 
 /**
  * Known unstable fields in events that should be sanitized for snapshot testing.
@@ -75,7 +83,8 @@ export const UNSTABLE_EVENT_FIELDS = [
   'dateOfEvent',
   'placeOfEvent',
   'registrationNumber',
-  'originalActionId'
+  'originalActionId',
+  'createdBySignature'
 ]
 /**u
  * Cleans up unstable fields in data for snapshot testing.
@@ -203,7 +212,7 @@ export function createTestToken({
   userType,
   role
 }: {
-  userId: string
+  userId: UUID
   scopes: string[]
   userType?: TokenUserType
   role?: string
@@ -218,6 +227,34 @@ export function createTestToken({
     }
   )
 
+  return `Bearer ${token}`
+}
+
+export function createInternalServiceToken(
+  overrides: jwt.SignOptions = {}
+): TokenWithBearer {
+  const token = jwt.sign({}, readFileSync(join(__dirname, './cert.key')), {
+    subject: 'opencrvs:auth-service',
+    algorithm: 'RS256',
+    expiresIn: '604800',
+    audience: ['opencrvs:events-user'],
+    issuer: 'opencrvs:auth-service',
+    ...overrides
+  })
+  return `Bearer ${token}`
+}
+
+export function createInitialisationToken(
+  overrides: jwt.SignOptions = {}
+): TokenWithBearer {
+  const token = jwt.sign({}, readFileSync(join(__dirname, './cert.key')), {
+    subject: 'opencrvs:data-seeder-service',
+    algorithm: 'RS256',
+    expiresIn: '604800',
+    audience: ['opencrvs:events-user'],
+    issuer: 'opencrvs:auth-service',
+    ...overrides
+  })
   return `Bearer ${token}`
 }
 
@@ -249,7 +286,7 @@ function createTokenExchangeTestToken(
 }
 
 export function createSystemTestClient(
-  systemId: string,
+  systemId: UUID,
   scopes: string[] = TEST_USER_DEFAULT_SCOPES
 ) {
   const createCaller = createCallerFactory(appRouter)
@@ -290,6 +327,30 @@ export function createTestClient(
     },
     token
   })
+  return caller
+}
+
+export function createInternalTestClient(tokenWithBearer?: TokenWithBearer) {
+  const createCaller = tService.createCallerFactory(internalRouter)
+
+  const token = tokenWithBearer ?? createInternalServiceToken()
+  const caller = createCaller({
+    token
+  })
+
+  return caller
+}
+
+export function createInitialisationTestClient(
+  tokenWithBearer?: TokenWithBearer
+) {
+  const createCaller = tService.createCallerFactory(initialisationRouter)
+
+  const token = tokenWithBearer ?? createInitialisationToken()
+  const caller = createCaller({
+    token
+  })
+
   return caller
 }
 
@@ -344,18 +405,20 @@ export const setupTestCase = async (
 
   const locations = await getLocations()
 
-  const defaultUser = seed.user(
-    generator.user.create({
-      primaryOfficeId: locations[0].id,
-      administrativeAreaId: locations[0].administrativeAreaId
-    })
-  )
-  const secondaryUser = seed.user(
-    generator.user.create({
-      primaryOfficeId: locations[1].id,
-      administrativeAreaId: locations[1].administrativeAreaId
-    })
-  )
+  const [defaultUser, secondaryUser] = await Promise.all([
+    seed.user(
+      generator.user.create({
+        primaryOfficeId: locations[0].id,
+        administrativeAreaId: locations[0].administrativeAreaId
+      })
+    ),
+    seed.user(
+      generator.user.create({
+        primaryOfficeId: locations[1].id,
+        administrativeAreaId: locations[1].administrativeAreaId
+      })
+    )
+  ])
 
   const users = [defaultUser, secondaryUser]
 
@@ -399,38 +462,38 @@ function actionToClientAction(
   | ((eventId: string) => Promise<EventDocument>) {
   switch (action) {
     case ActionType.CREATE:
-      return () => client.event.create(generator.event.create())
+      return async () => client.event.create(generator.event.create())
     case ActionType.DECLARE:
-      return (eventId: string) =>
+      return async (eventId: string) =>
         client.event.actions.declare.request(
           generator.event.actions.declare(eventId, { keepAssignment: true })
         )
     case ActionType.REJECT:
-      return (eventId: string) =>
+      return async (eventId: string) =>
         client.event.actions.reject.request(
           generator.event.actions.reject(eventId, { keepAssignment: true })
         )
     case ActionType.ARCHIVE:
-      return (eventId: string) =>
+      return async (eventId: string) =>
         client.event.actions.archive.request(
           generator.event.actions.archive(eventId, { keepAssignment: true })
         )
     case ActionType.REGISTER:
-      return (eventId: string) =>
+      return async (eventId: string) =>
         client.event.actions.register.request(
           generator.event.actions.register(eventId, {
             keepAssignment: true
           })
         )
     case ActionType.PRINT_CERTIFICATE:
-      return (eventId: string) =>
+      return async (eventId: string) =>
         client.event.actions.printCertificate.request(
           generator.event.actions.printCertificate(eventId, {
             keepAssignment: true
           })
         )
     case ActionType.REQUEST_CORRECTION:
-      return (eventId: string) =>
+      return async (eventId: string) =>
         client.event.actions.correction.request.request(
           generator.event.actions.correction.request(eventId, {
             keepAssignment: true
@@ -531,7 +594,7 @@ export async function seedEvent(
       .insertInto('events')
       .values({
         eventType: eventConfig.id,
-        transactionId: `tx-${Date.now()}`,
+        transactionId: getUUID(),
         trackingId: getUUID()
       })
       .returning(['id'])
@@ -752,6 +815,53 @@ function eventMatchesScope({
   return true
 }
 
+function userMatchesScope({
+  userRequesting,
+  userTargeted,
+  role,
+  accessLevel,
+  isUnderAdministrativeArea
+}: {
+  userRequesting: CreatedUser
+  userTargeted: CreatedUser | User
+  role: string[] | undefined
+  accessLevel: JurisdictionFilter | undefined
+  isUnderAdministrativeArea: (
+    locationId: UUID,
+    adminAreaId: UUID | null
+  ) => boolean
+}): boolean {
+  if (role && !role.includes(userTargeted.role)) {
+    return false
+  }
+
+  if (accessLevel === JurisdictionFilter.enum.location) {
+    if (userTargeted.primaryOfficeId !== userRequesting.primaryOfficeId) {
+      return false
+    }
+  }
+
+  if (accessLevel === JurisdictionFilter.enum.administrativeArea) {
+    const hasSameOffice =
+      userTargeted.primaryOfficeId === userRequesting.primaryOfficeId
+    const isRequesterLocationDirectlyUnderCountry =
+      userRequesting.administrativeAreaId === null
+
+    if (
+      !hasSameOffice &&
+      !isRequesterLocationDirectlyUnderCountry &&
+      !isUnderAdministrativeArea(
+        userTargeted.primaryOfficeId,
+        userRequesting.administrativeAreaId ?? null
+      )
+    ) {
+      return false
+    }
+  }
+
+  return true
+}
+
 /**
  *
  * @param rngSeed random seed
@@ -920,4 +1030,45 @@ export function assertScopeResult(
   })
 
   expect(result.success).toBe(isAccessibleWithScope)
+}
+
+export function assertUserScopeResult(
+  result: { success: boolean; user: User },
+  props: {
+    userRequesting: CreatedUser
+    userTargeted: CreatedUser | User
+    role: string[] | undefined
+    accessLevel: JurisdictionFilter | undefined
+    isUnderAdministrativeArea: (
+      locationId: UUID,
+      adminAreaId: UUID | null
+    ) => boolean
+  }
+) {
+  const isAccessibleWithScope = userMatchesScope(props)
+
+  expect(result.success).toBe(isAccessibleWithScope)
+}
+
+export async function systemInitialisationTestSetup() {
+  const TEST_SUPER_USER_PASSWORD = 'super-secure-password'
+
+  const eventsDb = getClient()
+
+  const salt = genSaltSync(10)
+  const hash = hashSync(TEST_SUPER_USER_PASSWORD, salt)
+
+  await eventsDb
+    .insertInto('systemInitialisation')
+    .values({
+      hash,
+      salt,
+      id: 1
+    })
+    .execute()
+
+  return {
+    db: eventsDb,
+    password: TEST_SUPER_USER_PASSWORD
+  }
 }

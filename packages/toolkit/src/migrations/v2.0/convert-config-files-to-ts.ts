@@ -58,8 +58,6 @@ import {
   PropertyAssignment
 } from 'ts-morph'
 import nodePath from 'path'
-import { getCwd } from '.'
-
 // ─── Schema-valid keys per config type ───────────────────────────────────────
 
 const CLIENT_VALID_KEYS = new Set([
@@ -350,29 +348,6 @@ function generateTsContent(
   group: ConfigGroup,
   isProd: boolean
 ): string {
-  // ── File header ─────────────────────────────────────────────────────────────
-  const headerLines: string[] = []
-
-  if (isProd) {
-    headerLines.push(`import { env } from './environment'`)
-  }
-  headerLines.push(`import { ${group.defineFn} } from '${group.importFrom}'`)
-  if (group.applicationConfigImportPath) {
-    headerLines.push(
-      `import { applicationConfig } from '${group.applicationConfigImportPath}'`
-    )
-  }
-  headerLines.push('')
-
-  if (isProd) {
-    headerLines.push(`const scheme = 'https'`)
-    headerLines.push(`const hostname = env.DOMAIN`)
-    headerLines.push(`const sentry = env.SENTRY_DSN`)
-  } else {
-    headerLines.push(`const scheme = 'http'`)
-    headerLines.push(`const hostname = 'localhost'`)
-  }
-
   // ── Config properties ────────────────────────────────────────────────────────
   const propertyLines: string[] = []
   const seenKeys = new Set<string>()
@@ -421,6 +396,31 @@ function generateTsContent(
   }
 
   const body = propertyLines.join(',\n')
+
+  const headerLines: string[] = []
+
+  headerLines.push(`import * as fs from 'fs'`)
+  headerLines.push(`import { join } from 'path'`)
+
+  if (isProd) {
+    headerLines.push(`import { env } from './environment'`)
+  }
+  headerLines.push(`import { ${group.defineFn} } from '${group.importFrom}'`)
+  if (group.applicationConfigImportPath) {
+    headerLines.push(
+      `import { applicationConfig } from '${group.applicationConfigImportPath}'`
+    )
+  }
+  headerLines.push('')
+
+  if (isProd) {
+    headerLines.push(`const scheme = 'https'`)
+    headerLines.push(`const hostname = env.DOMAIN`)
+    headerLines.push(`const sentry = env.SENTRY_DSN`)
+  } else {
+    headerLines.push(`const scheme = 'http'`)
+    headerLines.push(`const hostname = 'localhost'`)
+  }
 
   return [
     ...headerLines,
@@ -667,11 +667,83 @@ function resolveConfigChain(
   return current.getText()
 }
 
+/**
+ * When inlining a value from `application-config.ts` into a file in a
+ * different directory, `__dirname`-based paths (e.g. for reading image
+ * assets) must be adjusted so they continue to resolve to the original
+ * location — the referenced files themselves are NOT moved.
+ *
+ * Rewrites `join(__dirname, ...)` / `path.join(__dirname, ...)` /
+ * `resolve(__dirname, ...)` / `path.resolve(__dirname, ...)` by inserting
+ * the relative path from the target directory back to the source directory
+ * as an extra leading argument.
+ *
+ * Example: inlining from `src/api/application/` into `src/login-config.ts`
+ *   join(__dirname, 'login-bg.jpg')
+ *     → join(__dirname, 'api/application', 'login-bg.jpg')
+ */
+function rewriteDirnameRefs(text: string, relDir: string): string {
+  if (!relDir || relDir === '.') return text
+  const relForward = relDir.replace(/\\/g, '/')
+  return text.replace(
+    /\b((?:path\.)?(?:join|resolve))\s*\(\s*__dirname\s*,/g,
+    `$1(__dirname, '${relForward}',`
+  )
+}
+
+/**
+ * Ensures the source file has a namespace `fs` import (`import * as fs from 'fs'`).
+ * No-op if a namespace or default `fs` import is already present.
+ */
+function ensureFsImport(sf: SourceFile): void {
+  const hasFs = sf
+    .getImportDeclarations()
+    .some(
+      (d) =>
+        d.getModuleSpecifierValue() === 'fs' &&
+        (d.getNamespaceImport() || d.getDefaultImport())
+    )
+  if (hasFs) return
+  sf.addImportDeclaration({
+    moduleSpecifier: 'fs',
+    namespaceImport: 'fs'
+  })
+}
+
+/**
+ * Ensures the source file has a named `join` import from 'path'.
+ * Merges into an existing 'path' import if present, otherwise adds a new
+ * `import { join } from 'path'` declaration.
+ */
+function ensureJoinImport(sf: SourceFile): void {
+  const pathImports = sf
+    .getImportDeclarations()
+    .filter((d) => d.getModuleSpecifierValue() === 'path')
+
+  if (
+    pathImports.some((d) =>
+      d.getNamedImports().some((ni) => ni.getName() === 'join')
+    )
+  ) {
+    return
+  }
+
+  if (pathImports.length > 0) {
+    pathImports[0].addNamedImport('join')
+    return
+  }
+
+  sf.addImportDeclaration({
+    moduleSpecifier: 'path',
+    namedImports: ['join']
+  })
+}
+
 // ─── Entry point ─────────────────────────────────────────────────────────────
 
 export async function main() {
-  const srcDir = nodePath.join(getCwd(), 'src')
-  const relCwd = (fp: string) => nodePath.relative(getCwd(), fp)
+  const srcDir = nodePath.join(process.cwd(), 'src')
+  const relCwd = (fp: string) => nodePath.relative(process.cwd(), fp)
 
   // ── Phase 1: Convert JS config files to TypeScript ────────────────────────
   console.log('Phase 1: Converting JS config files to TypeScript...\n')
@@ -734,6 +806,7 @@ export async function main() {
         // Before removing, inline every cross-file reference to each unknown key.
         // Example: applicationConfig.BIRTH.LATE_REGISTRATION_TARGET  →  45
         const filesToSaveAfterInlining = new Set<SourceFile>()
+        const appConfigDir = nodePath.dirname(appConfigAbsPath)
 
         for (const removedProp of propsToRemove) {
           const key = (removedProp as PropertyAssignment).getName()
@@ -743,6 +816,13 @@ export async function main() {
             if (sf.getFilePath() === appConfigAbsPath) continue
             if (!sf.getFilePath().includes('/src/')) continue
             if (sf.getFilePath().includes('/node_modules/')) continue
+
+            // Relative path from the target file's directory back to the
+            // applicationConfig's directory. Used to adjust `__dirname`-based
+            // paths in the inlined value (e.g. image asset references) since
+            // those assets are not moved.
+            const targetDir = nodePath.dirname(sf.getFilePath())
+            const relDirFromTarget = nodePath.relative(targetDir, appConfigDir)
 
             // Break-and-restart after each replacement because replaceWithText()
             // invalidates existing node references in the ts-morph tree
@@ -776,9 +856,25 @@ export async function main() {
                   continue
                 }
 
-                node.replaceWithText(resolvedValue)
+                const adjustedValue = rewriteDirnameRefs(
+                  resolvedValue,
+                  relDirFromTarget
+                )
+
+                node.replaceWithText(adjustedValue)
+
+                // If the inlined value references `fs` or `join`, ensure the
+                // target file has the corresponding imports — these are
+                // commonly used to read image assets from disk.
+                if (/\bfs\s*\./.test(adjustedValue)) {
+                  ensureFsImport(sf)
+                }
+                if (/\bjoin\s*\(/.test(adjustedValue)) {
+                  ensureJoinImport(sf)
+                }
+
                 console.log(
-                  `  Inlined applicationConfig.${accessPath.join('.')} → ${resolvedValue} in ${nodePath.relative(getCwd(), sf.getFilePath())}`
+                  `  Inlined applicationConfig.${accessPath.join('.')} → ${adjustedValue} in ${nodePath.relative(process.cwd(), sf.getFilePath())}`
                 )
                 filesToSaveAfterInlining.add(sf)
                 madeReplacement = true
@@ -792,7 +888,7 @@ export async function main() {
         for (const sf of Array.from(filesToSaveAfterInlining)) {
           await sf.save()
           console.log(
-            `  Saved (inlined): ${nodePath.relative(getCwd(), sf.getFilePath())}`
+            `  Saved (inlined): ${nodePath.relative(process.cwd(), sf.getFilePath())}`
           )
         }
 

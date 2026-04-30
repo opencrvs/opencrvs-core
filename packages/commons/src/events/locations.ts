@@ -23,7 +23,9 @@ import {
   scopeUsesFullOptions,
   UserFilter,
   isCustomActionScope,
-  scopeUsesPrintCertifiedCopiesOptions
+  scopeUsesPrintCertifiedCopiesOptions,
+  UserScopeV2,
+  scopeUsesRoleOptions
 } from '../scopes'
 import { SystemContext, UserContext } from '../users/User'
 
@@ -243,6 +245,68 @@ export function canAccessEventWithScope(
   }
 
   return true
+}
+
+export type UserWithResolvedHierarchy = {
+  role: string
+  administrativeHierarchy: UUID[]
+  primaryOfficeId: UUID
+}
+
+export function canAccessUserWithScope({
+  userToAccess,
+  scope,
+  user
+}: {
+  userToAccess: UserWithResolvedHierarchy
+  scope: UserScopeV2
+  user: UserContext | SystemContext
+}): boolean {
+  const opts = scope.options
+
+  const hasSameOffice = user.primaryOfficeId === userToAccess.primaryOfficeId
+
+  if (
+    opts?.accessLevel === JurisdictionFilter.enum.location &&
+    !hasSameOffice
+  ) {
+    return false
+  }
+
+  const hasAdministrativeAreaInHierarchy =
+    userToAccess.administrativeHierarchy.some(
+      (id) => user.administrativeAreaId === id
+    ) || user.administrativeAreaId === null // user with null administrative area has access to all administrative areas
+
+  if (
+    opts?.accessLevel === JurisdictionFilter.enum.administrativeArea &&
+    !hasAdministrativeAreaInHierarchy
+  ) {
+    return false
+  }
+
+  if (scopeUsesRoleOptions(scope)) {
+    const { options } = scope
+    if (options?.role && !options.role.includes(userToAccess.role)) {
+      return false
+    }
+  }
+
+  return true
+}
+
+export function canAccessOtherUserWithScopes({
+  scopes,
+  userToAccess,
+  user
+}: {
+  scopes: UserScopeV2[]
+  userToAccess: UserWithResolvedHierarchy
+  user: UserContext | SystemContext
+}) {
+  return scopes.some((scope) =>
+    canAccessUserWithScope({ userToAccess, scope, user })
+  )
 }
 
 /**

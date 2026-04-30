@@ -34,14 +34,6 @@ services:
     ports:
       - '5555:5555'
 
-  notification:
-    volumes:
-      - '.secrets/public-key.pem:/secrets/public-key.pem'
-    environment:
-      - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
-    ports:
-      - '2020:2020'
-
   gateway:
     volumes:
       - '.secrets/public-key.pem:/secrets/public-key.pem'
@@ -62,14 +54,6 @@ services:
       - CHECK_INVALID_TOKEN=true
     ports:
       - '3040:3040'
-
-  metrics:
-    volumes:
-      - '.secrets/public-key.pem:/secrets/public-key.pem'
-    environment:
-      - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
-    ports:
-      - '1050:1050'
 
   client:
     ports:

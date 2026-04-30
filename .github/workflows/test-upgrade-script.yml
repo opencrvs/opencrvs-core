@@ -14,7 +14,7 @@ on:
     inputs:
       countryconfig-branch:
         description: countryconfig branch name
-        default: release-v1.9.11
+        default: release-v1.9.12
         required: true
       ref:
         description: Commit SHA / branch / tag to checkout (optional)
@@ -58,7 +58,9 @@ jobs:
         run: |
           cd opencrvs-countryconfig
           ./node_modules/@opencrvs/toolkit/dist/cli.js upgrade
+          # remove unused files
           rm -rf src/api/notification/testData.ts
+          yarn --force
       - name: Test opencrvs-countryconfig compilation
         run: yarn test:compilation
         working-directory: opencrvs-countryconfig

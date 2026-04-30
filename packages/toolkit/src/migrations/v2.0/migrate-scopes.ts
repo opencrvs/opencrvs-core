@@ -11,9 +11,13 @@
 
 import { Node, Project, SyntaxKind, Expression } from 'ts-morph'
 import path from 'path'
-import { legacyScopeToV2Scope, decodeScope, SCOPES } from '@opencrvs/commons'
-import { getCwd } from '.'
-
+import {
+  decodeScope,
+} from '@opencrvs/commons/scopes'
+import {
+  legacyScopeToV2Scope,
+  SCOPES
+} from '@opencrvs/commons/scopes.deprecated.do-not-use'
 const ROLES_FILE_RELATIVE_PATH = 'src/data-seeding/roles/roles.ts'
 const SCOPES_PROPERTY_NAME = 'scopes'
 const TOOLKIT_SCOPES_MODULE = '@opencrvs/toolkit/scopes'
@@ -95,7 +99,7 @@ function migrateScopesArrays(
       if (scopeKey && !(scopeKey in SCOPES)) {
         // eslint-disable-next-line no-console
         console.warn(
-          `  [${path.relative(getCwd(), rolesFilePath)}] Removing unknown scope reference: SCOPES.${scopeKey}`
+          `  [${path.relative(process.cwd(), rolesFilePath)}] Removing unknown scope reference: SCOPES.${scopeKey}`
         )
         initializer.removeElement(index)
         removedCount++
@@ -106,7 +110,7 @@ function migrateScopesArrays(
       if (!legacyScope) {
         // eslint-disable-next-line no-console
         console.warn(
-          `  [${path.relative(getCwd(), rolesFilePath)}] Skipping non-literal scope expression: ${element.getText()}`
+          `  [${path.relative(process.cwd(), rolesFilePath)}] Skipping non-literal scope expression: ${element.getText()}`
         )
         continue
       }
@@ -118,7 +122,7 @@ function migrateScopesArrays(
         if (!scope) {
           // eslint-disable-next-line no-console
           console.warn(
-            `  [${path.relative(getCwd(), rolesFilePath)}] Could not decode migrated scope '${migratedScope}'.`
+            `  [${path.relative(process.cwd(), rolesFilePath)}] Could not decode migrated scope '${migratedScope}'.`
           )
           continue
         }
@@ -128,7 +132,7 @@ function migrateScopesArrays(
       } catch (error) {
         // eslint-disable-next-line no-console
         console.warn(
-          `  [${path.relative(getCwd(), rolesFilePath)}] Could not migrate scope '${legacyScope}': ${error}`
+          `  [${path.relative(process.cwd(), rolesFilePath)}] Could not migrate scope '${legacyScope}': ${error}`
         )
       }
     }
@@ -137,7 +141,7 @@ function migrateScopesArrays(
   if (removedCount > 0) {
     // eslint-disable-next-line no-console
     console.log(
-      `  Removed ${removedCount} unknown SCOPES reference(s) from '${path.relative(getCwd(), rolesFilePath)}'.`
+      `  Removed ${removedCount} unknown SCOPES reference(s) from '${path.relative(process.cwd(), rolesFilePath)}'.`
     )
   }
 
@@ -340,7 +344,7 @@ function removeRoleTypeDefinitionAndUnusedImports(
 }
 
 async function main() {
-  const cwd = getCwd()
+  const cwd = process.cwd()
   const srcDir = path.join(cwd, 'src')
   const rolesFilePath = path.join(cwd, ROLES_FILE_RELATIVE_PATH)
 

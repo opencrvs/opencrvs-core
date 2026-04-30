@@ -17,7 +17,8 @@ import { env } from '@events/environment'
 import {
   createSystemTestClient,
   createTestClient,
-  setupTestCase
+  setupTestCase,
+  TEST_SYSTEM_ID
 } from '@events/tests/utils'
 import { getLocations } from '@events/storage/postgres/administrative-hierarchy/locations'
 
@@ -25,7 +26,7 @@ describe('audit log', () => {
   describe('event.create', () => {
     test('writes an audit log entry when a system client creates an event', async () => {
       const { generator, locations } = await setupTestCase()
-      const systemId = 'test-system'
+      const systemId = TEST_SYSTEM_ID
       const client = createSystemTestClient(systemId, [
         encodeScope({
           type: 'record.create',
@@ -65,7 +66,7 @@ describe('audit log', () => {
   describe('event.get', () => {
     test('writes an audit log entry when a system client fetches an event', async () => {
       const { generator, locations } = await setupTestCase()
-      const systemId = 'test-system'
+      const systemId = TEST_SYSTEM_ID
 
       const systemClient = createSystemTestClient(systemId, [
         encodeScope({
@@ -104,7 +105,7 @@ describe('audit log', () => {
   describe('event.actions.notify', () => {
     test('writes an audit log entry when a system client notifies an event', async () => {
       const { generator } = await setupTestCase()
-      const systemId = 'test-system'
+      const systemId = TEST_SYSTEM_ID
       const locations = await getLocations()
 
       const client = createSystemTestClient(systemId, [
@@ -145,7 +146,7 @@ describe('audit log', () => {
 
   describe('event.search', () => {
     test('writes an audit log entry when a system client searches for events', async () => {
-      const systemId = 'test-system'
+      const systemId = TEST_SYSTEM_ID
       const client = createSystemTestClient(systemId, [
         encodeScope({ type: 'record.search' })
       ])
@@ -202,7 +203,7 @@ describe('audit log', () => {
 
   describe('integrations.create', () => {
     test('writes an audit log entry when a system client creates an integration', async () => {
-      const systemId = '00000000-0000-0000-0000-000000000099'
+      const systemId = TEST_SYSTEM_ID
       const client = createSystemTestClient(systemId, [
         encodeScope({ type: 'integration.create' })
       ])
@@ -231,7 +232,7 @@ describe('audit log', () => {
     })
 
     test('does not include credentials in audit log response summary', async () => {
-      const systemId = '00000000-0000-0000-0000-000000000099'
+      const systemId = TEST_SYSTEM_ID
       const client = createSystemTestClient(systemId, [
         encodeScope({ type: 'integration.create' })
       ])
@@ -255,7 +256,7 @@ describe('audit log', () => {
 
   describe('attachments.upload', () => {
     test('writes an audit log entry when a system client uploads an attachment', async () => {
-      const systemId = 'test-system'
+      const systemId = TEST_SYSTEM_ID
       const expectedFileUrl = 'test-event/abc123.jpg'
 
       mswServer.use(

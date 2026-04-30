@@ -27,8 +27,8 @@ export async function removeUserDetails() {
 }
 
 export function getUserName(userDetails: UserDetails | null) {
-  if (!userDetails?.name?.length) return ''
-  return getUsersFullName(userDetails.name, LANG_EN)
+  if (!userDetails?.name) return ''
+  return getUsersFullName(userDetails.name)
 }
 
 export function useAuthentication() {

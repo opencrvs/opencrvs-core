@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS system_clients(
   CONSTRAINT system_clients_status_check CHECK (status IN ('active', 'disabled'))
 );
 
-CREATE UNIQUE INDEX system_clients_legacy_id_idx ON system_clients(legacy_id) WHERE legacy_id IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS system_clients_legacy_id_idx ON system_clients(legacy_id) WHERE legacy_id IS NOT NULL;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON system_clients TO ${EVENTS_DB_USER};
 

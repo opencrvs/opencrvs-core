@@ -11,7 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse } from 'msw'
-import { encodeScope, UUID } from '@opencrvs/commons'
+import { encodeScope, getUUID, UUID } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
 import {
@@ -42,7 +42,9 @@ async function insertUser(
       role: 'ADMIN',
       status: 'active',
       mobile: '+1234567890',
-      officeId
+      officeId,
+      firstname: '',
+      surname: ''
     })
     .returning('id')
     .executeTakeFirstOrThrow() as Promise<{ id: UUID }>
@@ -73,7 +75,7 @@ async function insertAdminWithEmail(
   const email = 'admin@test.com'
   const result = await eventsDb
     .insertInto('users')
-    .values({ role: 'ADMIN', status: 'active', email, officeId })
+    .values({ role: 'ADMIN', status: 'active', email, officeId, firstname: '', surname: '' })
     .returning('id')
     .executeTakeFirstOrThrow()
   return { id: result.id as UUID, email }
@@ -98,8 +100,15 @@ describe('announcement.broadcast', () => {
   })
 
   test('rejects with NOT_FOUND if the logged-in admin is not in the database', async () => {
-    const { user } = await setupTestCase()
-    const client = createTestClient(user, [scope])
+    const client = createTestClient(
+      {
+        id: getUUID(),
+        primaryOfficeId: getUUID(),
+        role: '',
+        name: { firstname: '', surname: '' }
+      },
+      [scope]
+    )
 
     await expect(
       client.announcement.broadcast({
@@ -111,18 +120,9 @@ describe('announcement.broadcast', () => {
   })
 
   test('rejects with NOT_FOUND if no active users with email addresses exist', async () => {
-    const { user, eventsDb, locations } = await setupTestCase()
+    const { user, eventsDb } = await setupTestCase()
 
-    await eventsDb
-      .insertInto('users')
-      .values({
-        legacyId: user.id,
-        role: user.role,
-        status: 'active',
-        mobile: '+1234567890',
-        officeId: locations[0].id
-      })
-      .execute()
+    await eventsDb.updateTable('users').set({ status: 'pending' }).execute()
 
     const client = createTestClient(user, [scope])
 
@@ -151,13 +151,17 @@ describe('announcement.broadcast', () => {
           role: user.role,
           status: 'active',
           mobile: '+1234567890',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         },
         {
           role: 'REGISTRATION_AGENT',
           status: 'active',
           email: 'recipient@test.com',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         }
       ])
       .execute()
@@ -180,13 +184,17 @@ describe('announcement.broadcast', () => {
           role: user.role,
           status: 'active',
           mobile: '+1234567890',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         },
         {
           role: 'REGISTRATION_AGENT',
           status: 'active',
           email: 'recipient@test.com',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         }
       ])
       .execute()
@@ -214,13 +222,17 @@ describe('announcement.broadcast', () => {
           status: 'active',
           email: 'admin@test.com',
           mobile: '+1234567890',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         },
         {
           role: 'REGISTRATION_AGENT',
           status: 'active',
           email: 'recipient@test.com',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         }
       ])
       .execute()
@@ -263,13 +275,17 @@ describe('announcement.broadcast', () => {
           role: user.role,
           status: 'active',
           mobile: '+1234567890',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         },
         {
           role: 'REGISTRATION_AGENT',
           status: 'active',
           email: 'recipient@test.com',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         }
       ])
       .returning('id')
@@ -302,19 +318,25 @@ describe('announcement.broadcast', () => {
           status: 'active',
           email: 'admin@test.com',
           mobile: '+1234567890',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         },
         {
           role: 'REGISTRATION_AGENT',
           status: 'active',
           email: 'user1@test.com',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         },
         {
           role: 'REGISTRATION_AGENT',
           status: 'active',
           email: 'user2@test.com',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         }
       ])
       .execute()
