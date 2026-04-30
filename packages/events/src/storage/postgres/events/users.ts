@@ -13,6 +13,7 @@ import { TRPCError } from '@trpc/server'
 import { UUID } from '@opencrvs/commons/events'
 import { getClient } from '@events/storage/postgres/events'
 import { SearchUsersPayload } from '@events/service/users/api'
+import { getAdministrativeHierarchyByIdCte } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { NewUsers, UsersUpdate } from './schema/app/Users'
 import Schema from './schema/Database'
 import { NewUserCredentials } from './schema/app/UserCredentials'
@@ -196,7 +197,19 @@ export async function createUserWithCredentials(
   })
 }
 
-export async function searchUsersWithInput(input: SearchUsersPayload) {
+const sortColumn = {
+  createdAt: 'users.createdAt',
+  firstname: 'users.firstname',
+  surname: 'users.surname',
+  username: 'userCredentials.username',
+  email: 'users.email',
+  status: 'users.status',
+  role: 'users.role'
+} as const
+
+function buildSearchUsersBaseQuery(
+  input: Omit<SearchUsersPayload, 'skip' | 'count'>
+) {
   const db = getClient()
 
   let query = db
@@ -249,23 +262,34 @@ export async function searchUsersWithInput(input: SearchUsersPayload) {
     query = query.where('users.officeId', '=', input.primaryOfficeId)
   }
 
-  const sortColumn = {
-    createdAt: 'users.createdAt',
-    firstname: 'users.firstname',
-    surname: 'users.surname',
-    username: 'userCredentials.username',
-    email: 'users.email',
-    status: 'users.status',
-    role: 'users.role'
-  } as const
+  if (input.administrativeAreaId) {
+    const areaId = input.administrativeAreaId
+    query = query.where(
+      () =>
+        sql`EXISTS (
+        ${getAdministrativeHierarchyByIdCte(sql.ref('users.office_id'))}
+        SELECT 1 FROM area_chain WHERE id = ${areaId}
+      )`
+    )
+  }
 
-  const result = await query
+  return query
+}
+
+export async function searchUsersWithInput(input: SearchUsersPayload) {
+  return buildSearchUsersBaseQuery(input)
     .orderBy(sortColumn[input.sortBy], input.sortOrder)
     .limit(input.count)
     .offset(input.skip)
     .execute()
+}
 
-  return result
+export async function searchAllUsersWithInput(
+  input: Omit<SearchUsersPayload, 'skip' | 'count'>
+) {
+  return buildSearchUsersBaseQuery(input)
+    .orderBy(sortColumn[input.sortBy], input.sortOrder)
+    .execute()
 }
 
 export async function isUsernameTaken(username: string) {

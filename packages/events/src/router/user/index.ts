@@ -19,6 +19,9 @@ import {
 } from '@opencrvs/commons/events'
 import {
   CreateUserInput,
+  getAcceptedScopesFromToken,
+  getScopeOptionValue,
+  JurisdictionFilter,
   logger,
   TokenWithBearer,
   User,
@@ -59,6 +62,7 @@ import {
   getUsersById,
   isUser,
   searchUsers,
+  searchUsersAll,
   updateUser,
   sendUsernameReminder,
   sendResetPasswordInvite,
@@ -185,14 +189,47 @@ export function searchUsersRoute(
   return procedure
     .input(UserSearch)
     .output(z.array(UserOrSystem))
-    .query(async ({ input }) =>
-      searchUsers({
-        ...input,
-        primaryOfficeId: input.primaryOfficeId
-          ? UUID.parse(input.primaryOfficeId)
-          : undefined
-      })
-    )
+    .query(async ({ input, ctx }) => {
+      const primaryOfficeId = input.primaryOfficeId
+        ? UUID.parse(input.primaryOfficeId)
+        : undefined
+
+      // Internal procedures bypass scope check
+      if (!('user' in ctx)) {
+        return searchUsers({ ...input, primaryOfficeId })
+      }
+
+      const acceptedScopes = getAcceptedScopesFromToken(ctx.token, [
+        'user.search'
+      ])
+
+      if (acceptedScopes.length === 0) {
+        throw new TRPCError({ code: 'FORBIDDEN' })
+      }
+
+      const accessLevel = getScopeOptionValue(acceptedScopes[0], 'accessLevel')
+
+      if (
+        accessLevel === JurisdictionFilter.enum.administrativeArea &&
+        ctx.user.administrativeAreaId
+      ) {
+        const allUsers = await searchUsersAll({
+          ...input,
+          primaryOfficeId: primaryOfficeId,
+          administrativeAreaId: ctx.user.administrativeAreaId
+        })
+        return allUsers.slice(input.skip, input.skip + input.count)
+      }
+
+      if (accessLevel === JurisdictionFilter.enum.location) {
+        return searchUsers({
+          ...input,
+          primaryOfficeId: ctx.user.primaryOfficeId
+        })
+      }
+
+      return searchUsers({ ...input, primaryOfficeId })
+    })
 }
 
 const UserAuditListQuery = z.object({
