@@ -451,7 +451,11 @@ export async function indexEventsInBulk(
   return response
 }
 
-export async function indexEvent(event: EventDocument, config: EventConfig) {
+export async function indexEvent(
+  event: EventDocument,
+  config: EventConfig,
+  waitFor: boolean = false
+) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
   const eventIndex = eventToEventIndex(event, config)
@@ -463,7 +467,7 @@ export async function indexEvent(event: EventDocument, config: EventConfig) {
     id: event.id,
     /** We derive the full state (without nulls) from eventToEventIndex, replace instead of update. */
     document: eventIndexWithAdministrativeHierarchy,
-    refresh: 'wait_for'
+    refresh: waitFor ? 'wait_for' : false
   })
 }
 
