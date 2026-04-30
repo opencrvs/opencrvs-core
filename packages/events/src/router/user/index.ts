@@ -235,7 +235,7 @@ export const userRouter = router({
     .output(User)
     .mutation(async ({ input, ctx }) => handleCreateUser(input, ctx)),
   update: userAndSystemProcedure
-    .input(UpdateUserInput.and(z.object({ id: UUID })))
+    .input(UpdateUserInput)
     .use(canUpdateUserLocation)
     .use(canAccessUserWithScopes(['user.edit']))
     .output(User)
