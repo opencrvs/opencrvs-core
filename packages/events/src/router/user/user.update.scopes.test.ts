@@ -115,9 +115,7 @@ test('Check scopes against user.update with non-location payload', async () => {
       }
     ),
     {
-      seed: 2000642815,
-      path: '1:0:2:1',
-      endOnFailure: true
+      numRuns: 50
     }
   )
 })
