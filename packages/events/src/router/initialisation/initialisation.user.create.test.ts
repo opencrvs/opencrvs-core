@@ -104,13 +104,7 @@ test('Allows user creation when with the right token', async () => {
   const userPayload = {
     email: 'testing+123@opencrvs.org',
     role: 'admin',
-    name: [
-      {
-        use: 'en',
-        family: 'family',
-        given: ['given']
-      }
-    ],
+    name: { firstname: 'given', surname: 'family' },
     primaryOfficeId: location.id,
     username
   }
@@ -138,8 +132,8 @@ test('Allows user creation when with the right token', async () => {
 
   expect(createdUser).toMatchObject({
     email: userPayload.email,
-    firstname: userPayload.name[0].given[0],
-    surname: userPayload.name[0].family,
+    firstname: userPayload.name.firstname,
+    surname: userPayload.name.surname,
     officeId: userPayload.primaryOfficeId,
     role: userPayload.role,
     status: 'pending'
@@ -172,13 +166,7 @@ test('Throws error when creating user with existing email', async () => {
   const userPayload1 = {
     email,
     role: 'admin',
-    name: [
-      {
-        use: 'en',
-        family: 'family1',
-        given: ['given1']
-      }
-    ],
+    name: { firstname: 'given1', surname: 'family1' },
     primaryOfficeId: location.id,
     username: 'f.irstuser'
   }
@@ -186,13 +174,7 @@ test('Throws error when creating user with existing email', async () => {
   const userPayload2 = {
     email,
     role: 'admin2',
-    name: [
-      {
-        use: 'en',
-        family: 'family2',
-        given: ['given2']
-      }
-    ],
+    name: { firstname: 'given2', surname: 'family2' },
     primaryOfficeId: location.id,
     username: 'a.nother'
   }
@@ -220,13 +202,7 @@ test('Throws error when creating user with existing mobile', async () => {
     email: 'testing+1@opencrvs.org',
     mobile,
     role: 'admin',
-    name: [
-      {
-        use: 'en',
-        family: 'family1',
-        given: ['given1']
-      }
-    ],
+    name: { firstname: 'given1', surname: 'family1' },
     primaryOfficeId: location.id,
     username: 'f.irstuser'
   }
@@ -235,13 +211,7 @@ test('Throws error when creating user with existing mobile', async () => {
     email: 'testing+2@opencrvs.org',
     mobile,
     role: 'admin2',
-    name: [
-      {
-        use: 'en',
-        family: 'family2',
-        given: ['given2']
-      }
-    ],
+    name: { firstname: 'given2', surname: 'family2' },
     primaryOfficeId: location.id,
     username: 'a.nother'
   }
@@ -266,7 +236,7 @@ test('Creates user with active status when status is provided', async () => {
   await client.users.create({
     email: 'testing+active@opencrvs.org',
     role: 'admin',
-    name: [{ use: 'en', family: 'Admin', given: ['Active'] }],
+    name: { firstname: 'Active', surname: 'Admin' },
     primaryOfficeId: location.id,
     username: 'active.admin',
     status: 'active'
@@ -301,7 +271,7 @@ test('Creates user with pending status when no status is provided', async () => 
   await client.users.create({
     email: 'testing+nonstatus@opencrvs.org',
     role: 'admin',
-    name: [{ use: 'en', family: 'User', given: ['Pending'] }],
+    name: { firstname: 'Pending', surname: 'User' },
     primaryOfficeId: location.id,
     username: 'pending.user'
   })

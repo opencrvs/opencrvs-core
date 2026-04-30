@@ -2449,16 +2449,6 @@ export const handlers = {
           changeEmail: 'true'
         }
       })
-    }),
-    http.post('/api/gateway/sendVerifyCode', () => {
-      const generator = testDataGenerator()
-      return HttpResponse.json({
-        userId: generator.user.registrationAgent().v2.id,
-        nonce: 'UxN/IFJ3jGCjQBySQ+JP+A==',
-        status: 'Success',
-        mobile: '+260734237472',
-        email: 'kalushabwalya1.7@gmail.com'
-      })
     })
   ],
   referenceData: [

@@ -21,7 +21,6 @@ import {
   CreateUserInput,
   isBase64FileString,
   logger,
-  personNameFromV1ToV2,
   TokenWithBearer,
   User,
   UserOrSystem,
@@ -352,7 +351,7 @@ export const userRouter = router({
         nonce,
         token: rawToken,
         notificationEvent: input.notificationEvent,
-        recipientName: personNameFromV1ToV2(user.name),
+        recipientName: user.name,
         phoneNumber: user.mobile,
         email: user.email
       })

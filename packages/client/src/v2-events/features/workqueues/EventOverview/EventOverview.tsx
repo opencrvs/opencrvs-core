@@ -60,7 +60,7 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
   })
 
   const assignedTo = assignedToUser.data
-    ? getUsersFullName(assignedToUser.data.name, intl.locale)
+    ? getUsersFullName(assignedToUser.data.name)
     : null
 
   const { flags, ...flattenedEventIndex } = {
@@ -113,7 +113,7 @@ function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
     enabled: !!eventWithDrafts.assignedTo
   })
   const assignedTo = assignedToUser.data
-    ? getUsersFullName(assignedToUser.data.name, intl.locale)
+    ? getUsersFullName(assignedToUser.data.name)
     : null
 
   const { flags, ...flattenedEventIndex } = {

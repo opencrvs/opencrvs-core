@@ -1067,7 +1067,7 @@ describe('placeOfEvent location hierarchy handling', () => {
 
     const user = await seed.user({
       role: TestUserRole.enum.LOCAL_REGISTRAR,
-      name: [{ use: 'en', family: 'Doe', given: ['John'] }],
+      name: { firstname: 'John', surname: 'Doe' },
       primaryOfficeId: childOfficeId,
       fullHonorificName: undefined
     })

@@ -75,13 +75,7 @@ export function testDataGenerator(rngSeed?: number) {
     fieldAgent: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
       v2: {
         id: userIds.fieldAgent,
-        name: [
-          {
-            use: 'en',
-            given: ['Kalusha'],
-            family: 'Bwalya'
-          }
-        ],
+        name: { firstname: 'Kalusha', surname: 'Bwalya' },
         role: 'HOSPITAL_CLERK',
         fullHonorificName: undefined,
         signature: undefined,
@@ -136,7 +130,7 @@ export function testDataGenerator(rngSeed?: number) {
     registrationAgent: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
       v2: {
         id: user.id.registrationAgent,
-        name: [{ use: 'en', given: ['Felix'], family: 'Katongo' }],
+        name: { firstname: 'Felix', surname: 'Katongo' },
         role: TestUserRole.enum.REGISTRATION_AGENT,
         avatar: undefined,
         signature: undefined,
@@ -191,7 +185,7 @@ export function testDataGenerator(rngSeed?: number) {
     localRegistrar: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
       v2: {
         id: user.id.localRegistrar,
-        name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
+        name: { firstname: 'Kennedy', surname: 'Mweene' },
         role: TestUserRole.enum.LOCAL_REGISTRAR,
         fullHonorificName: '1st Order Honorable Kennedy Mweene',
         primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
@@ -261,7 +255,7 @@ export function testDataGenerator(rngSeed?: number) {
     communityLeader: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
       v2: {
         id: userIds.communityLeader,
-        name: [{ use: 'en', given: ['Gift'], family: 'Phiri' }],
+        name: { firstname: 'Gift', surname: 'Phiri' },
         role: TestUserRole.enum.COMMUNITY_LEADER,
         fullHonorificName: undefined,
         signature: undefined,
@@ -319,7 +313,7 @@ export function testDataGenerator(rngSeed?: number) {
     provincialRegistrar: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
       v2: {
         id: userIds.provincialRegistrar,
-        name: [{ use: 'en', given: ['Mitchel'], family: 'Owen' }],
+        name: { firstname: 'Mitchel', surname: 'Owen' },
         role: TestUserRole.enum.PROVINCIAL_REGISTRAR,
         fullHonorificName: undefined,
         signature: undefined,
@@ -414,13 +408,7 @@ export function testDataGenerator(rngSeed?: number) {
       } satisfies FetchUserQuery['getUser'],
       v2: {
         id: userIds.localSystemAdmin,
-        name: [
-          {
-            use: 'en',
-            given: ['Alex'],
-            family: 'Ngonga'
-          }
-        ],
+        name: { firstname: 'Alex', surname: 'Ngonga' },
         role: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
         status: Status.Active,
         mobile: '+260978787878',
@@ -432,13 +420,7 @@ export function testDataGenerator(rngSeed?: number) {
     nationalSystemAdmin: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
       v2: {
         id: user.id.nationalSystemAdmin,
-        name: [
-          {
-            use: 'en',
-            given: ['Jonathan'],
-            family: 'Campbell'
-          }
-        ],
+        name: { firstname: 'Jonathan', surname: 'Campbell' },
         role: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
         status: Status.Active,
         mobile: '+260921111111',

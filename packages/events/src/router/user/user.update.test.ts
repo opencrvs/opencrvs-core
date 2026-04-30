@@ -95,7 +95,7 @@ test('Prevents changing user who is located outside callers jurisdiction', async
   const newUser = await seed.user({
     primaryOfficeId: topLevelLocationId,
     role: TestUserRole.enum.FIELD_AGENT,
-    name: [{ use: 'en', given: ['Test'], family: 'User' }]
+    name: { firstname: 'Test', surname: 'User' }
   })
 
   await expect(
@@ -132,7 +132,7 @@ test('Allows changing user located under same location to a different one', asyn
   const newUser = await seed.user({
     primaryOfficeId: user.primaryOfficeId,
     role: TestUserRole.enum.FIELD_AGENT,
-    name: [{ use: 'en', given: ['Test'], family: 'User' }]
+    name: { firstname: 'Test', surname: 'User' }
   })
 
   const topLevelLocationId = getUUID()
@@ -220,14 +220,14 @@ test('successfully updates user fields and returns updated user', async () => {
 
   const updatedUser = await client.user.update({
     ...generateUpdateInput(user),
-    name: [{ use: 'en', given: ['Jane'], family: 'Smith' }],
+    name: { firstname: 'Jane', surname: 'Smith' },
     email: `updated-${user.id}@test.example`,
     mobile: '+254700000099'
   })
 
   expect(updatedUser).toMatchObject({
     id: user.id,
-    name: [{ use: 'en', given: ['Jane'], family: 'Smith' }],
+    name: { firstname: 'Jane', surname: 'Smith' },
     email: `updated-${user.id}@test.example`,
     mobile: '+254700000099',
     primaryOfficeId: user.primaryOfficeId

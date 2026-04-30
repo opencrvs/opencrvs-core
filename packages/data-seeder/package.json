@@ -7,6 +7,7 @@
   "scripts": {
     "seed": "NODE_OPTIONS=--dns-result-order=ipv4first ts-node -r tsconfig-paths/register src/index.ts",
     "test:compilation": "tsc --noEmit",
+    "test": "yarn test:compilation",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0"
   },
   "devDependencies": {
