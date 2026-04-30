@@ -386,6 +386,10 @@ export async function setupHierarchyWithUsers() {
   // 3. Create two users for each office to test 'user' scope limitations.
   const users = generateTestUsersForLocations(locations, rng)
 
+  for (const user of users) {
+    await seed.user(user)
+  }
+
   // Helper to check if an office is under a given administrative area. Used for testing propositions.
   function isUnderAdministrativeArea(
     locationId: UUID,

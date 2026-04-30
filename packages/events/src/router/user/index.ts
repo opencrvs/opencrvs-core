@@ -29,6 +29,8 @@ import {
 } from '@opencrvs/commons'
 import {
   allowedWithAnyOfScopes,
+  canAccessUserWithScopes,
+  canCreateUserWithScopes,
   canUpdateUserLocation
 } from '@events/router/middleware'
 import {
@@ -216,6 +218,7 @@ const auditRouter = router({
 export const userRouter = router({
   get: userOnlyProcedure
     .input(UUID)
+    // @TODO: missing scope check.
     .output(UserOrSystem)
     .query(async ({ input }) => {
       const users = await getUsersById([input])
@@ -226,14 +229,14 @@ export const userRouter = router({
       return users[0]
     }),
   create: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.create']))
     .input(CreateUserInput)
+    .use(canCreateUserWithScopes(['user.create']))
     .output(User)
     .mutation(async ({ input, ctx }) => handleCreateUser(input, ctx)),
   update: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.edit']))
     .input(UpdateUserInput)
     .use(canUpdateUserLocation)
+    .use(canAccessUserWithScopes(['user.edit']))
     .output(User)
     .mutation(async ({ input, ctx }) => {
       if (input.mobile) {
@@ -535,8 +538,8 @@ export const userRouter = router({
       await updateUserById(UUID.parse(ctx.user.id), { profileImagePath })
     }),
   resendInvite: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.edit']))
     .input(UUID)
+    .use(canAccessUserWithScopes(['user.edit']))
     .mutation(async ({ input, ctx }) => {
       const userId = UUID.parse(input)
 
@@ -566,8 +569,8 @@ export const userRouter = router({
       return activateUser(input)
     }),
   sendUsernameReminder: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.edit']))
     .input(UUID)
+    .use(canAccessUserWithScopes(['user.edit']))
     .mutation(async ({ input, ctx }) => {
       const userId = UUID.parse(input)
       await sendUsernameReminder(userId, ctx.token)
