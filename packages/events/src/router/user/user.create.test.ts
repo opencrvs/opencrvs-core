@@ -254,15 +254,22 @@ test('Multiple users with no mobile number can be created without a unique key c
 
   // Sending mobile: '' mimics the pre-fix client behaviour where touching then
   // clearing the phone field produced an empty string instead of undefined.
-  await expect(
-    client.user.create({
-      email: 'user1@opencrvs.org',
-      mobile: '',
-      role: 'admin',
-      name: { firstname: 'given1', surname: 'family1' },
-      primaryOfficeId: user.primaryOfficeId
-    })
-  ).resolves.toBeDefined()
+  const response = await client.user.create({
+    email: 'user1@opencrvs.org',
+    mobile: '',
+    role: 'admin',
+    name: { firstname: 'given1', surname: 'family1' },
+    primaryOfficeId: user.primaryOfficeId
+  })
+
+  const eventsDb = getClient()
+  const createdUser = await eventsDb
+    .selectFrom('users')
+    .select('mobile')
+    .where('id', '=', response.id)
+    .executeTakeFirstOrThrow()
+
+  expect(createdUser.mobile).toBeNull()
 
   await expect(
     client.user.create({

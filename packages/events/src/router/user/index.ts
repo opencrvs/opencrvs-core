@@ -107,7 +107,15 @@ function getAuditLogIdentifiers(token: TokenWithBearer) {
 
 async function validateMobile(mobile: string) {
   const config = await getApplicationConfig()
-  const pattern = new RegExp(config.PHONE_NUMBER_PATTERN)
+  let pattern: RegExp
+  try {
+    pattern = new RegExp(config.PHONE_NUMBER_PATTERN)
+  } catch {
+    logger.error(
+      `PHONE_NUMBER_PATTERN "${config.PHONE_NUMBER_PATTERN}" is not a valid regex — skipping mobile validation`
+    )
+    return
+  }
   if (!pattern.test(mobile)) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
