@@ -36,8 +36,9 @@ import {
 } from '@opencrvs/commons/fixtures'
 import {
   createTestClient,
-  setupTestCase,
   createSystemTestClient,
+  setupTestCase,
+  TEST_SYSTEM_ID,
   TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
 import { CreatedUser, payloadGenerator } from '@events/tests/generators'
@@ -1032,7 +1033,7 @@ describe('Declare action - hidden field nullification', () => {
 
 test('System user can not declare an event, even with the right scope', async () => {
   const { generator, locations } = await setupTestCase()
-  const systemUserClient = createSystemTestClient('test-system', [
+  const systemUserClient = createSystemTestClient(TEST_SYSTEM_ID, [
     encodeScope({ type: 'record.create' }),
     encodeScope({ type: 'record.declare' })
   ])
