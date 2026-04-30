@@ -20,7 +20,7 @@ test('returns UNAUTHORIZED when user not found', async () => {
     id: userId,
     role: 'REGISTRATION_AGENT',
     primaryOfficeId: getUUID(),
-    name: []
+    name: { firstname: '', surname: '' }
   })
   await expect(
     client.user.changePassword({

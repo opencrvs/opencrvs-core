@@ -10,10 +10,10 @@
  */
 import { Kysely, sql } from 'kysely'
 import { TRPCError } from '@trpc/server'
-import { FieldValue, UUID } from '@opencrvs/commons/events'
+import { UUID } from '@opencrvs/commons/events'
 import { getClient } from '@events/storage/postgres/events'
 import { SearchUsersPayload } from '@events/service/users/api'
-import { NewUsers } from './schema/app/Users'
+import { NewUsers, UsersUpdate } from './schema/app/Users'
 import Schema from './schema/Database'
 import { NewUserCredentials } from './schema/app/UserCredentials'
 
@@ -280,22 +280,7 @@ export async function isUsernameTaken(username: string) {
   return !!user
 }
 
-type UpdateUserFields = Partial<{
-  firstname: string | null
-  surname: string | null
-  fullHonorificName: string | null
-  email: string | null
-  mobile: string | null
-  device: string | null
-  role: string
-  status: string
-  officeId: UUID
-  signaturePath: string | null
-  profileImagePath: string | null
-  data: Record<string, FieldValue>
-}>
-
-export async function updateUserById(userId: UUID, fields: UpdateUserFields) {
+export async function updateUserById(userId: UUID, fields: UsersUpdate) {
   const db = getClient()
   if (fields.email) {
     fields.email = fields.email.toLowerCase()

@@ -77,7 +77,7 @@ const ProfileMenuComponent = ({
     let userName = ''
 
     if (userDetails && userDetails.name) {
-      userName = getUsersFullName(userDetails.name, intl.locale)
+      userName = getUsersFullName(userDetails.name)
     }
 
     return userName

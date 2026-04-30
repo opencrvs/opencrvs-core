@@ -37,7 +37,7 @@ describe('verifyNumber handler receives a request', () => {
       mobile: '+8801711111111',
       email: undefined,
       securityQuestionKey: 'dummyKey',
-      userFullName: []
+      userFullName: { firstname: '', surname: '' }
     })
     const stepOneRes: {
       result?: { nonce: string; securityQuestionKey?: string }
@@ -72,13 +72,7 @@ describe('verifyNumber handler receives a request', () => {
     jest
       .spyOn(retrievalService, 'getRetrievalStepInformation')
       .mockResolvedValueOnce({
-        userFullName: [
-          {
-            use: 'en',
-            family: 'Anik',
-            given: ['Sadman']
-          }
-        ],
+        userFullName: { firstname: 'Sadman', surname: 'Anik' },
         userId: '123',
         username: 'fake_user_name',
         mobile: '+8801711111111',

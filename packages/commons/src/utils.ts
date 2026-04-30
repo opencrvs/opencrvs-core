@@ -45,6 +45,9 @@ export const FullNameV1 = z.array(
 
 export type FullNameV1 = z.infer<typeof FullNameV1>
 
+/**
+ * @deprecated only used in user-mgnt
+ */
 export function personNameFromV1ToV2([name]: FullNameV1): NameFieldValue {
   return {
     firstname: name.given[0],

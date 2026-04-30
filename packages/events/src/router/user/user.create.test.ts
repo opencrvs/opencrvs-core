@@ -23,14 +23,7 @@ test('Throws error when user does not have the right scope', async () => {
     client.user.create({
       email: 'testing+123@opencrvs.org',
       role: 'admin',
-
-      name: [
-        {
-          use: 'en',
-          family: 'family',
-          given: ['given']
-        }
-      ],
+      name: { firstname: 'given', surname: 'family' },
       primaryOfficeId: user.primaryOfficeId
     })
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -48,13 +41,7 @@ test('Allows user creation when with the right scope', async () => {
   const userPayload = {
     email: 'testing+123@opencrvs.org',
     role: 'admin',
-    name: [
-      {
-        use: 'en',
-        family: 'family',
-        given: ['given']
-      }
-    ],
+    name: { firstname: 'given', surname: 'family' },
     primaryOfficeId: user.primaryOfficeId
   }
 
@@ -85,8 +72,8 @@ test('Allows user creation when with the right scope', async () => {
 
   expect(createdUser).toMatchObject({
     email: userPayload.email,
-    firstname: userPayload.name[0].given[0],
-    surname: userPayload.name[0].family,
+    firstname: userPayload.name.firstname,
+    surname: userPayload.name.surname,
     officeId: userPayload.primaryOfficeId,
     role: userPayload.role,
     status: 'pending'
@@ -116,26 +103,14 @@ test('Throws error when creating user with existing email', async () => {
   const userPayload1 = {
     email,
     role: 'admin',
-    name: [
-      {
-        use: 'en',
-        family: 'family1',
-        given: ['given1']
-      }
-    ],
+    name: { firstname: 'given1', surname: 'family1' },
     primaryOfficeId: user.primaryOfficeId
   }
 
   const userPayload2 = {
     email,
     role: 'admin2',
-    name: [
-      {
-        use: 'en',
-        family: 'family2',
-        given: ['given2']
-      }
-    ],
+    name: { firstname: 'given2', surname: 'family2' },
     primaryOfficeId: user.primaryOfficeId
   }
 
@@ -155,7 +130,7 @@ test('Persists custom data field when provided', async () => {
   const created = await client.user.create({
     email: 'testing+data@opencrvs.org',
     role: 'admin',
-    name: [{ use: 'en', family: 'family', given: ['given'] }],
+    name: { firstname: 'given', surname: 'family' },
     primaryOfficeId: user.primaryOfficeId,
     data: customData
   })
@@ -205,7 +180,7 @@ test('Auto-generates username from name', async () => {
   const created = await client.user.create({
     email: 'testing+autogen@opencrvs.org',
     role: 'admin',
-    name: [{ use: 'en', family: 'Smith', given: ['Jane'] }],
+    name: { firstname: 'Jane', surname: 'Smith' },
     primaryOfficeId: user.primaryOfficeId
   })
 
@@ -233,13 +208,7 @@ test('Throws error when creating user with existing mobile', async () => {
     email: 'testing+1@opencrvs.org',
     mobile,
     role: 'admin',
-    name: [
-      {
-        use: 'en',
-        family: 'family1',
-        given: ['given1']
-      }
-    ],
+    name: { firstname: 'given1', surname: 'family1' },
     primaryOfficeId: user.primaryOfficeId
   }
 
@@ -247,13 +216,7 @@ test('Throws error when creating user with existing mobile', async () => {
     email: 'testing+2@opencrvs.org',
     mobile,
     role: 'admin2',
-    name: [
-      {
-        use: 'en',
-        family: 'family2',
-        given: ['given2']
-      }
-    ],
+    name: { firstname: 'given2', surname: 'family2' },
     primaryOfficeId: user.primaryOfficeId
   }
 
@@ -276,7 +239,7 @@ test('persists data payload when creating a user', async () => {
   const userPayload = {
     email: 'data-test@opencrvs.org',
     role: 'admin',
-    name: [{ use: 'en', family: 'Doe', given: ['Jane'] }],
+    name: { firstname: 'Jane', surname: 'Doe' },
     primaryOfficeId: user.primaryOfficeId,
     data
   }
@@ -313,7 +276,7 @@ test('persists empty data object when data is not provided on create', async () 
   const userPayload = {
     email: 'nodata-test@opencrvs.org',
     role: 'admin',
-    name: [{ use: 'en', family: 'Doe', given: ['John'] }],
+    name: { firstname: 'Jane', surname: 'Doe' },
     primaryOfficeId: user.primaryOfficeId
   }
 

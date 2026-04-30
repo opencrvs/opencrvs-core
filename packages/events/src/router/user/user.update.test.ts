@@ -131,14 +131,14 @@ test('successfully updates user fields and returns updated user', async () => {
 
   const updatedUser = await client.user.update({
     ...makeUpdateInput(user),
-    name: [{ use: 'en', given: ['Jane'], family: 'Smith' }],
+    name: { firstname: 'Jane', surname: 'Smith' },
     email: `updated-${user.id}@test.example`,
     mobile: '+254700000099'
   })
 
   expect(updatedUser).toMatchObject({
     id: user.id,
-    name: [{ use: 'en', given: ['Jane'], family: 'Smith' }],
+    name: { firstname: 'Jane', surname: 'Smith' },
     email: `updated-${user.id}@test.example`,
     mobile: '+254700000099',
     primaryOfficeId: user.primaryOfficeId

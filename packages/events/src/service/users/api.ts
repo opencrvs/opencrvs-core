@@ -16,8 +16,7 @@ import {
   CreateUserInput,
   CreateUserInputInternal,
   DocumentPath,
-  FamilyName,
-  IUserName,
+  UserName,
   TokenUserType,
   TriggerEvent,
   UUID,
@@ -26,7 +25,6 @@ import {
   UserOrSystem,
   isUUID,
   logger,
-  personNameFromV1ToV2,
   triggerUserEventNotification
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
@@ -74,15 +72,13 @@ export type SearchUsersPayload = {
   sortOrder: 'asc' | 'desc'
 }
 
-async function generateUsername(names: FamilyName, existingUserName?: string) {
-  const { given = [], family = '' } =
-    names.find((name) => name.use === 'en') || {}
-  const initials = given.reduce(
-    (accumulated, current) => accumulated + current.trim().charAt(0),
-    ''
-  )
+async function generateUsername(name: UserName, existingUserName?: string) {
+  const initials = name.firstname
+    .split(' ')
+    .map((n) => n.charAt(0))
+    .join('')
 
-  let proposedUsername = `${initials}${initials === '' ? '' : '.'}${family
+  let proposedUsername = `${initials}${initials === '' ? '' : '.'}${name.surname
     .trim()
     .replace(/ /g, '-')}`.toLowerCase()
 
@@ -121,9 +117,10 @@ function mapDbUserToUser(user: DbUser): User & { username: string } {
   return {
     type: TokenUserType.enum.user,
     id: user.id,
-    name: [
-      { use: 'en', given: [user.firstname ?? ''], family: user.surname ?? '' }
-    ],
+    name: {
+      firstname: user.firstname,
+      surname: user.surname
+    },
     role: user.role,
     email: user.email ?? undefined,
     mobile: user.mobile ?? undefined,
@@ -210,20 +207,17 @@ export async function updateUser(
     })
   }
 
-  const name: IUserName[] = input.name ?? [
-    {
-      use: 'en',
-      given: [existingUser.firstname ?? ''],
-      family: existingUser.surname ?? ''
-    }
-  ]
+  const name: UserName = input.name ?? {
+    firstname: existingUser.firstname,
+    surname: existingUser.surname
+  }
 
   const oldUsername = existingUser.username
   const newUsername = await generateUsername(name, existingUser.username)
 
   await updateUserById(input.id, {
-    firstname: personNameFromV1ToV2(name).firstname,
-    surname: personNameFromV1ToV2(name).surname,
+    firstname: name.firstname,
+    surname: name.surname,
     fullHonorificName: input.fullHonorificName,
     email: input.email,
     mobile: input.mobile,
@@ -243,7 +237,7 @@ export async function updateUser(
       event: 'user-updated',
       payload: {
         recipient: {
-          name: personNameFromV1ToV2(name),
+          name,
           email: input.email,
           mobile: input.mobile
         },
@@ -276,7 +270,7 @@ function generateRandomPassword() {
 
 async function sendCredentialsNotification(
   event: typeof TriggerEvent.USER_CREATED | typeof TriggerEvent.RESEND_INVITE,
-  userFullName: IUserName[],
+  name: UserName,
   username: string,
   password: string,
   token: string,
@@ -288,7 +282,7 @@ async function sendCredentialsNotification(
       event,
       payload: {
         recipient: {
-          name: personNameFromV1ToV2(userFullName),
+          name,
           email,
           mobile: msisdn
         },
@@ -335,11 +329,10 @@ export async function createUser(
   _token: string
 ) {
   const resolvedUser = await resolveCreateUserInput(input)
-  const v2Name = personNameFromV1ToV2(resolvedUser.name)
 
   const userPayload = {
-    firstname: v2Name.firstname,
-    surname: v2Name.surname,
+    firstname: resolvedUser.name.firstname,
+    surname: resolvedUser.name.surname,
     email: resolvedUser?.email?.toLowerCase(),
     fullHonorificName: resolvedUser.fullHonorificName,
     role: resolvedUser.role,
@@ -417,13 +410,10 @@ export async function resendInvite(userId: UUID, token: string): Promise<void> {
   const password = env.DEFAULT_USER_PASSWORD ?? generateRandomPassword()
   const { hash, salt } = await generateSaltedHash(password)
 
-  const userName: IUserName[] = [
-    {
-      use: 'en',
-      given: user.firstname ? [user.firstname] : [],
-      family: user.surname ?? ''
-    }
-  ]
+  const userName: UserName = {
+    firstname: user.firstname,
+    surname: user.surname
+  }
 
   await sendCredentialsNotification(
     TriggerEvent.RESEND_INVITE,
@@ -551,13 +541,10 @@ export async function verifyUser(input: { mobile?: string; email?: string }) {
     mobile: user.mobile ?? undefined,
     email: user.email ?? undefined,
     status: user.status,
-    name: [
-      {
-        use: 'en',
-        given: [user.firstname ?? ''],
-        family: user.surname ?? ''
-      }
-    ],
+    name: {
+      firstname: user.firstname,
+      surname: user.surname
+    },
     securityQuestionKey,
     scope
   }
@@ -565,7 +552,7 @@ export async function verifyUser(input: { mobile?: string; email?: string }) {
 
 export async function sendResetPasswordInvite(
   userId: UUID,
-  admin: { id: string; name: IUserName[]; role: string },
+  admin: { id: string; name: UserName; role: string },
   token: string
 ): Promise<void> {
   const user = await getUser(userId)
@@ -574,27 +561,19 @@ export async function sendResetPasswordInvite(
   const { hash, salt } = await generateSaltedHash(temporaryPassword)
   await updatePasswordHashAndSalt(userId, hash, salt)
 
-  const userName: IUserName[] = [
-    {
-      use: 'en',
-      given: user.name[0]?.given ?? [],
-      family: user.name[0]?.family ?? ''
-    }
-  ]
-
   try {
     await triggerUserEventNotification({
       event: 'reset-password-by-admin',
       payload: {
         recipient: {
-          name: personNameFromV1ToV2(userName),
+          name: user.name,
           email: user.email,
           mobile: user.mobile
         },
         temporaryPassword,
         admin: {
           id: admin.id,
-          name: personNameFromV1ToV2(admin.name),
+          name: admin.name,
           role: admin.role
         }
       },
@@ -616,20 +595,12 @@ export async function sendUsernameReminder(
 ): Promise<void> {
   const user = await getUser(userId)
 
-  const userName: IUserName[] = [
-    {
-      use: 'en',
-      given: user.name[0]?.given ?? [],
-      family: user.name[0]?.family ?? ''
-    }
-  ]
-
   try {
     await triggerUserEventNotification({
       event: 'username-reminder',
       payload: {
         recipient: {
-          name: personNameFromV1ToV2(userName),
+          name: user.name,
           email: user.email,
           mobile: user.mobile
         },

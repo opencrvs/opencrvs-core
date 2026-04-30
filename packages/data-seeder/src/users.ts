@@ -85,12 +85,18 @@ const UserSchema = z.array(
   WithoutContact.extend({
     mobile: z.string(),
     email: z.string().email().optional()
-  }).or(
-    WithoutContact.extend({
-      email: z.string().email(),
-      mobile: z.string().optional()
-    })
-  )
+  })
+    .or(
+      WithoutContact.extend({
+        email: z.string().email(),
+        mobile: z.string().optional()
+      })
+    )
+    .transform(({ familyName, givenNames, ...user }) => ({
+      ...user,
+      firstname: givenNames,
+      surname: familyName
+    }))
 )
 
 async function getUsers(token: string) {
@@ -214,8 +220,8 @@ export async function seedUsers(token: string) {
 
   for (const userMetadata of rawUsers) {
     const {
-      givenNames,
-      familyName,
+      firstname,
+      surname,
       primaryOfficeId: officeIdentifier,
       username,
       ...user
@@ -239,13 +245,10 @@ export async function seedUsers(token: string) {
 
     const userPayload = {
       ...user,
-      name: [
-        {
-          use: 'en',
-          family: familyName,
-          given: [givenNames]
-        }
-      ],
+      name: {
+        firstname,
+        surname
+      },
       ...(env.ACTIVATE_USERS && { status: 'active' as const }),
       primaryOfficeId: primaryOffice.id,
       username
