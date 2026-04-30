@@ -490,7 +490,8 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
           event: findLocalEventDocument(eventId)
         }
       }),
-      annotation
+      annotation,
+      waitFor: true
     }
   }
 

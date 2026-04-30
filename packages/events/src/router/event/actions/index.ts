@@ -250,7 +250,11 @@ export async function defaultRequestHandler(
     })
     // For Async flow, we just return the event with the requested action and ensure it is indexed
   } else if (responseStatus === ActionConfirmationResponse.RequiresProcessing) {
-    await ensureEventIndexed(eventWithRequestedAction, configuration)
+    await ensureEventIndexed(
+      eventWithRequestedAction,
+      configuration,
+      input.waitFor ?? false
+    )
     return eventWithRequestedAction
   }
 
