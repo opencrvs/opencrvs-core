@@ -137,7 +137,6 @@ function getUserEditConfig(
               label: messages.phoneNumber,
               validation: [
                 {
-                  // @ts-expect-error MessageDescriptor has optional fields; TranslationConfig requires them all present
                   message: validationMessages.phoneNumberNotValid,
                   validator: or(
                     field('phoneNumber').matches(
