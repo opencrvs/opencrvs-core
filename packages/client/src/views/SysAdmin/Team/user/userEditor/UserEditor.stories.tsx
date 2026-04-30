@@ -59,6 +59,17 @@ const meta: Meta<typeof ReviewUser> = {
         ]
       }
     }
+  },
+  // Reset all shared mutable state to defaults before every story so no story
+  // can pollute the next. Story-level beforeEach only needs to set overrides.
+  beforeEach: () => {
+    window.config.ADDITIONAL_USER_FIELDS = []
+    // story-level MSW handlers don't reliably override the global /api/config
+    // handler (named-group vs flat-array registration in preview.tsx), so we
+    // mutate the source object that the global handler returns directly.
+    window.config.USER_NOTIFICATION_DELIVERY_METHOD = 'email'
+    mockOfflineData.config.USER_NOTIFICATION_DELIVERY_METHOD = 'email'
+    useUserFormState.getState().clear()
   }
 }
 
@@ -79,25 +90,13 @@ export const UserDetailsEmailDelivery: StoryObj = {
       })
     }
   },
-  loaders: [
-    async () => {
-      window.config.ADDITIONAL_USER_FIELDS = []
-      // Needed for the first render — getUserEditConfig reads window.config
-      // synchronously before the /api/config fetch settles.
-      window.config.USER_NOTIFICATION_DELIVERY_METHOD = 'email'
-      // story-level MSW handlers don't reliably override the global /api/config
-      // handler (named-group vs flat-array registration in preview.tsx), so we
-      // mutate the source object that the global handler returns directly. Each
-      // story that changes this value must also reset it (see below) to avoid
-      // polluting subsequent stories.
-      mockOfflineData.config.USER_NOTIFICATION_DELIVERY_METHOD = 'email'
-      // Pre-seed primaryOfficeId so user.office (requireCompletionToContinue)
-      // is satisfied and the router lands on user.details.
-      useUserFormState.getState().setUserForm({
-        primaryOfficeId: existingUser.primaryOfficeId
-      })
-    }
-  ]
+  beforeEach: () => {
+    // Pre-seed primaryOfficeId so user.office (requireCompletionToContinue)
+    // is satisfied and the router lands on user.details.
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: existingUser.primaryOfficeId
+    })
+  }
 }
 
 /**
@@ -115,18 +114,13 @@ export const UserDetailsSmsDelivery: StoryObj = {
       })
     }
   },
-  loaders: [
-    async () => {
-      window.config.ADDITIONAL_USER_FIELDS = []
-      // See UserDetailsEmailDelivery for why both window.config and
-      // mockOfflineData.config must be set.
-      window.config.USER_NOTIFICATION_DELIVERY_METHOD = 'sms'
-      mockOfflineData.config.USER_NOTIFICATION_DELIVERY_METHOD = 'sms'
-      useUserFormState.getState().setUserForm({
-        primaryOfficeId: existingUser.primaryOfficeId
-      })
-    }
-  ]
+  beforeEach: () => {
+    window.config.USER_NOTIFICATION_DELIVERY_METHOD = 'sms'
+    mockOfflineData.config.USER_NOTIFICATION_DELIVERY_METHOD = 'sms'
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: existingUser.primaryOfficeId
+    })
+  }
 }
 
 /**
@@ -142,16 +136,9 @@ export const ReviewWithEmptyFields: StoryObj<typeof ReviewUser> = {
       })
     }
   },
-  loaders: [
-    async () => {
-      window.config.ADDITIONAL_USER_FIELDS = [...additionalFields]
-      // Reset to the default — guards against UserDetailsSmsDelivery running
-      // first and leaving 'sms' in the shared mockOfflineData object.
-      window.config.USER_NOTIFICATION_DELIVERY_METHOD = 'email'
-      mockOfflineData.config.USER_NOTIFICATION_DELIVERY_METHOD = 'email'
-      useUserFormState.getState().clear()
-    }
-  ]
+  beforeEach: () => {
+    window.config.ADDITIONAL_USER_FIELDS = [...additionalFields]
+  }
 }
 
 /**
@@ -168,30 +155,24 @@ export const ReviewWithAllFieldsFilled: StoryObj<typeof ReviewUser> = {
       })
     }
   },
-  loaders: [
-    async () => {
-      window.config.ADDITIONAL_USER_FIELDS = [...additionalFields]
-      // Reset to the default — guards against UserDetailsSmsDelivery running
-      // first and leaving 'sms' in the shared mockOfflineData object.
-      window.config.USER_NOTIFICATION_DELIVERY_METHOD = 'email'
-      mockOfflineData.config.USER_NOTIFICATION_DELIVERY_METHOD = 'email'
-      // Pre-seed the store directly. When the component mounts,
-      // the useEffect sees a non-empty store and skips auto-populate,
-      // preserving the staffId value we set here.
-      useUserFormState.getState().setUserForm({
-        primaryOfficeId: existingUser.primaryOfficeId,
-        role: TestUserRole.enum.REGISTRATION_AGENT,
-        name: {
-          firstname: existingUser.name[0].given[0],
-          surname: existingUser.name[0].family,
-          middlename: ''
-        },
-        phoneNumber: '01233443443',
-        email: existingUser.email,
-        fullHonorificName: 'Dr. Felix Katongo',
-        device: 'iPhone 15',
-        'user.staffId': 'EMP-12345'
-      })
-    }
-  ]
+  beforeEach: () => {
+    window.config.ADDITIONAL_USER_FIELDS = [...additionalFields]
+    // Pre-seed the store directly. When the component mounts,
+    // the useEffect sees a non-empty store and skips auto-populate,
+    // preserving the staffId value we set here.
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: existingUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      name: {
+        firstname: existingUser.name[0].given[0],
+        surname: existingUser.name[0].family,
+        middlename: ''
+      },
+      phoneNumber: '01233443443',
+      email: existingUser.email,
+      fullHonorificName: 'Dr. Felix Katongo',
+      device: 'iPhone 15',
+      'user.staffId': 'EMP-12345'
+    })
+  }
 }

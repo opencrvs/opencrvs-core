@@ -18,6 +18,7 @@ import { TestUserRole } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
+import { mockOfflineData } from '@client/tests/mock-offline-data'
 import { EditUser, ReviewUser, useUserFormState } from './UserEditor'
 import { createTemporaryId } from '@client/v2-events/utils'
 
@@ -44,6 +45,12 @@ const meta: Meta<typeof EditUser> = {
         userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)]
       }
     }
+  },
+  beforeEach: () => {
+    window.config.ADDITIONAL_USER_FIELDS = []
+    window.config.USER_NOTIFICATION_DELIVERY_METHOD = 'email'
+    mockOfflineData.config.USER_NOTIFICATION_DELIVERY_METHOD = 'email'
+    useUserFormState.getState().clear()
   }
 }
 
@@ -65,12 +72,6 @@ export const RegistrationOfficeIncludesHospitals: StoryObj<typeof EditUser> = {
       })
     }
   },
-  loaders: [
-    async () => {
-      window.config.ADDITIONAL_USER_FIELDS = []
-      useUserFormState.getState().clear()
-    }
-  ],
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
@@ -112,18 +113,15 @@ export const InvalidPhoneNumberShowsValidationError: StoryObj<typeof EditUser> =
         })
       }
     },
-    loaders: [
-      async () => {
-        window.config.ADDITIONAL_USER_FIELDS = []
-        // Pre-seed required fields so only the phone validation fires.
-        useUserFormState.getState().setUserForm({
-          primaryOfficeId: mockUser.primaryOfficeId,
-          role: TestUserRole.enum.REGISTRATION_AGENT,
-          name: { firstname: 'Test', surname: 'User', middlename: '' },
-          email: 'test@opencrvs.org'
-        })
-      }
-    ],
+    beforeEach: () => {
+      // Pre-seed required fields so only the phone validation fires.
+      useUserFormState.getState().setUserForm({
+        primaryOfficeId: mockUser.primaryOfficeId,
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        name: { firstname: 'Test', surname: 'User', middlename: '' },
+        email: 'test@opencrvs.org'
+      })
+    },
     play: async ({ canvasElement, step }) => {
       const canvas = within(canvasElement)
 
@@ -177,20 +175,18 @@ export const ClearedEmailNormalisedToUndefined: StoryObj = {
       }
     }
   },
-  loaders: [
-    async () => {
-      window.config.ADDITIONAL_USER_FIELDS = []
-      window.config.USER_NOTIFICATION_DELIVERY_METHOD = 'sms'
-      createUserSpy.mockReset()
-      useUserFormState.getState().setUserForm({
-        primaryOfficeId: mockUser.primaryOfficeId,
-        role: TestUserRole.enum.REGISTRATION_AGENT,
-        name: { firstname: 'Test', surname: 'User', middlename: '' },
-        phoneNumber: '01712345678',
-        email: '' // touched-and-cleared email field — the bug scenario
-      })
-    }
-  ],
+  beforeEach: () => {
+    window.config.USER_NOTIFICATION_DELIVERY_METHOD = 'sms'
+    mockOfflineData.config.USER_NOTIFICATION_DELIVERY_METHOD = 'sms'
+    createUserSpy.mockReset()
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      name: { firstname: 'Test', surname: 'User', middlename: '' },
+      phoneNumber: '01712345678',
+      email: '' // touched-and-cleared email field — the bug scenario
+    })
+  },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
@@ -245,19 +241,16 @@ export const ClearedPhoneNumberNormalisedToUndefined: StoryObj = {
       }
     }
   },
-  loaders: [
-    async () => {
-      window.config.ADDITIONAL_USER_FIELDS = []
-      createUserSpy.mockReset()
-      useUserFormState.getState().setUserForm({
-        primaryOfficeId: mockUser.primaryOfficeId,
-        role: TestUserRole.enum.REGISTRATION_AGENT,
-        name: { firstname: 'Test', surname: 'User', middlename: '' },
-        phoneNumber: '', // touched-and-cleared phone field — the bug scenario
-        email: 'newuser@opencrvs.org'
-      })
-    }
-  ],
+  beforeEach: () => {
+    createUserSpy.mockReset()
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      name: { firstname: 'Test', surname: 'User', middlename: '' },
+      phoneNumber: '', // touched-and-cleared phone field — the bug scenario
+      email: 'newuser@opencrvs.org'
+    })
+  },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
