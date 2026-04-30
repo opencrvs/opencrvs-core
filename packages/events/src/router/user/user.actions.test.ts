@@ -144,7 +144,7 @@ test('Finds user in nested location using administrative area id with my jurisdi
   ])
 
   const userToSearch = await seed.user({
-    name: [{ family: 'Smith', given: ['John'], use: 'en' }],
+    name: { firstname: 'John', surname: 'Smith' },
     primaryOfficeId: grandchildLocationId,
     role: TestUserRole.enum.FIELD_AGENT
   })
@@ -182,7 +182,7 @@ test('Find user with appropriate scopes', async () => {
   ])
 
   const userInTheSameOffice = await seed.user({
-    name: [{ family: 'Jones', given: ['James'], use: 'en' }],
+    name: { firstname: 'James', surname: 'Jones' },
     primaryOfficeId: userToSearchLocationId,
     role: TestUserRole.enum.FIELD_AGENT
   })
@@ -192,7 +192,7 @@ test('Find user with appropriate scopes', async () => {
   ])
 
   const userToSearch = await seed.user({
-    name: [{ family: 'Smith', given: ['John'], use: 'en' }],
+    name: { firstname: 'John', surname: 'Smith' },
     primaryOfficeId: userToSearchLocationId,
     role: TestUserRole.enum.FIELD_AGENT
   })

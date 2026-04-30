@@ -10,7 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { encodeScope } from '@opencrvs/commons'
+import { encodeScope, getUUID, TestUserRole } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { updateUserById } from '@events/storage/postgres/events/users'
 import { getClient } from '@events/storage/postgres/events'
@@ -18,7 +18,7 @@ import { getClient } from '@events/storage/postgres/events'
 const USER_EDIT_SCOPE = encodeScope({ type: 'user.edit' })
 const CONFIG_UPDATE_ALL_SCOPE = encodeScope({ type: 'config.update-all' })
 
-function makeUpdateInput(user: {
+function generateUpdateInput(user: {
   id: string
   primaryOfficeId: string
   role: string
@@ -35,9 +35,9 @@ test('throws FORBIDDEN when user.edit scope is missing', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [])
 
-  await expect(client.user.update(makeUpdateInput(user))).rejects.toMatchObject(
-    new TRPCError({ code: 'FORBIDDEN' })
-  )
+  await expect(
+    client.user.update(generateUpdateInput(user))
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
 test('throws FORBIDDEN when trying to change primaryOfficeId without config.update-all scope', async () => {
@@ -47,7 +47,7 @@ test('throws FORBIDDEN when trying to change primaryOfficeId without config.upda
 
   await expect(
     client.user.update({
-      ...makeUpdateInput(user),
+      ...generateUpdateInput(user),
       primaryOfficeId: otherOfficeId
     })
   ).rejects.toMatchObject({ code: 'FORBIDDEN' })
@@ -62,11 +62,98 @@ test('allows changing primaryOfficeId when user has config.update-all scope', as
   const otherOfficeId = locations[1].id
 
   const updatedUser = await client.user.update({
-    ...makeUpdateInput(user),
+    ...generateUpdateInput(user),
     primaryOfficeId: otherOfficeId
   })
 
   expect(updatedUser.primaryOfficeId).toBe(otherOfficeId)
+})
+
+test('Prevents changing user who is located outside callers jurisdiction', async () => {
+  const { user, seed } = await setupTestCase()
+  const client = createTestClient(user, [
+    CONFIG_UPDATE_ALL_SCOPE,
+    encodeScope({
+      type: 'user.edit',
+      options: {
+        accessLevel: 'location'
+      }
+    })
+  ])
+
+  const topLevelLocationId = getUUID()
+  await seed.locations([
+    {
+      name: 'top-level-location',
+      administrativeAreaId: null,
+      id: topLevelLocationId,
+      locationType: 'EMBASSY',
+      validUntil: null
+    }
+  ])
+
+  const newUser = await seed.user({
+    primaryOfficeId: topLevelLocationId,
+    role: TestUserRole.enum.FIELD_AGENT,
+    name: { firstname: 'Test', surname: 'User' }
+  })
+
+  await expect(
+    client.user.update({
+      id: newUser.id,
+      signature: {
+        originalFilename: 'string',
+        path: 'string',
+        type: 'string'
+      }
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'NOT_FOUND' }))
+
+  await expect(
+    client.user.update({
+      id: newUser.id,
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'NOT_FOUND' }))
+})
+
+test('Allows changing user located under same location to a different one', async () => {
+  const { user, seed } = await setupTestCase()
+  const client = createTestClient(user, [
+    CONFIG_UPDATE_ALL_SCOPE,
+    encodeScope({
+      type: 'user.edit',
+      options: {
+        accessLevel: 'location'
+      }
+    })
+  ])
+
+  const newUser = await seed.user({
+    primaryOfficeId: user.primaryOfficeId,
+    role: TestUserRole.enum.FIELD_AGENT,
+    name: { firstname: 'Test', surname: 'User' }
+  })
+
+  const topLevelLocationId = getUUID()
+  await seed.locations([
+    {
+      name: 'top-level-location',
+      administrativeAreaId: null,
+      id: topLevelLocationId,
+      locationType: 'EMBASSY',
+      validUntil: null
+    }
+  ])
+
+  await expect(
+    client.user.update({
+      id: newUser.id,
+      primaryOfficeId: topLevelLocationId
+    })
+  ).resolves.toMatchObject({
+    primaryOfficeId: topLevelLocationId
+  })
 })
 
 test('throws CONFLICT with DUPLICATE_PHONE if mobile is already in use by another user', async () => {
@@ -79,7 +166,7 @@ test('throws CONFLICT with DUPLICATE_PHONE if mobile is already in use by anothe
 
   await expect(
     client.user.update({
-      ...makeUpdateInput(user),
+      ...generateUpdateInput(user),
       mobile: '01712345678'
     })
   ).rejects.toMatchObject(
@@ -96,7 +183,7 @@ test('throws CONFLICT with DUPLICATE_EMAIL if email is already in use by another
 
   await expect(
     client.user.update({
-      ...makeUpdateInput(user),
+      ...generateUpdateInput(user),
       email: duplicateEmail
     })
   ).rejects.toMatchObject(
@@ -112,7 +199,7 @@ test("allows update when mobile is the same user's own mobile", async () => {
 
   await expect(
     client.user.update({
-      ...makeUpdateInput(user),
+      ...generateUpdateInput(user),
       mobile: '01812345678'
     })
   ).resolves.not.toThrow()
@@ -122,7 +209,9 @@ test("allows update when email is the same user's own email", async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [USER_EDIT_SCOPE])
 
-  await expect(client.user.update(makeUpdateInput(user))).resolves.not.toThrow()
+  await expect(
+    client.user.update(generateUpdateInput(user))
+  ).resolves.not.toThrow()
 })
 
 test('successfully updates user fields and returns updated user', async () => {
@@ -130,15 +219,15 @@ test('successfully updates user fields and returns updated user', async () => {
   const client = createTestClient(user, [USER_EDIT_SCOPE])
 
   const updatedUser = await client.user.update({
-    ...makeUpdateInput(user),
-    name: [{ use: 'en', given: ['Jane'], family: 'Smith' }],
+    ...generateUpdateInput(user),
+    name: { firstname: 'Jane', surname: 'Smith' },
     email: `updated-${user.id}@test.example`,
     mobile: '01912345678'
   })
 
   expect(updatedUser).toMatchObject({
     id: user.id,
-    name: [{ use: 'en', given: ['Jane'], family: 'Smith' }],
+    name: { firstname: 'Jane', surname: 'Smith' },
     email: `updated-${user.id}@test.example`,
     mobile: '01912345678',
     primaryOfficeId: user.primaryOfficeId
@@ -151,7 +240,7 @@ test('persists data payload when updating a user', async () => {
 
   const data = { employeeId: 'EMP-002', department: 'Vital Events' }
   const updatedUser = await client.user.update({
-    ...makeUpdateInput(user),
+    ...generateUpdateInput(user),
     data
   })
 
@@ -182,7 +271,7 @@ test('preserves existing data when data is omitted from update', async () => {
   const client = createTestClient(user, [USER_EDIT_SCOPE])
 
   // Update without supplying data — should leave existing data untouched
-  await client.user.update(makeUpdateInput(user))
+  await client.user.update(generateUpdateInput(user))
 
   const dbUser = await eventsDb
     .selectFrom('users')
@@ -207,7 +296,7 @@ test('overwrites data when an explicit data object is supplied on update', async
   const newData = { employeeId: 'NEW-001', region: 'North' }
 
   const updatedUser = await client.user.update({
-    ...makeUpdateInput(user),
+    ...generateUpdateInput(user),
     data: newData
   })
 
@@ -265,7 +354,7 @@ test('Updates user when mobile matches PHONE_NUMBER_PATTERN', async () => {
 
   await expect(
     client.user.update({
-      ...makeUpdateInput(user),
+      ...generateUpdateInput(user),
       // matches the test MSW mock pattern: ^01[1-9][0-9]{8}$
       mobile: '01612345678'
     })
@@ -278,7 +367,7 @@ test('Rejects user update when mobile does not match PHONE_NUMBER_PATTERN', asyn
 
   await expect(
     client.user.update({
-      ...makeUpdateInput(user),
+      ...generateUpdateInput(user),
       mobile: '12345'
     })
   ).rejects.toThrow(/INVALID_MOBILE/)
@@ -288,5 +377,7 @@ test('Updates user when no mobile is provided, skipping phone format validation'
   const { user } = await setupTestCase()
   const client = createTestClient(user, [USER_EDIT_SCOPE])
 
-  await expect(client.user.update(makeUpdateInput(user))).resolves.toBeDefined()
+  await expect(
+    client.user.update(generateUpdateInput(user))
+  ).resolves.toBeDefined()
 })

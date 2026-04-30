@@ -27,14 +27,12 @@ import {
   EncodedScope
 } from '@opencrvs/commons/client'
 
-export function getUsersFullName(name: UserOrSystem['name'], language: string) {
+export function getUsersFullName(name: UserOrSystem['name']) {
   if (typeof name === 'string') {
     return name
   }
 
-  const match = name.find((n) => n.use === language) ?? name[0]
-
-  return joinValues([...match.given, match.family])
+  return joinValues([name.firstname, name.surname])
 }
 
 /** Utility to get all keys from union */

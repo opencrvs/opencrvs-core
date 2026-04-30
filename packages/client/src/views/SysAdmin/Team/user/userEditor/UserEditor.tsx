@@ -213,7 +213,7 @@ function getUserEditConfig(
 type EventState = {
   primaryOfficeId?: string
   role?: string
-  name?: { firstname: string; surname: string; middlename: string }
+  name?: { firstname: string; surname: string }
   phoneNumber?: string
   email?: string
   fullHonorificName?: string
@@ -406,9 +406,8 @@ const ReviewUserComponent = () => {
       primaryOfficeId: user.primaryOfficeId,
       role: user.role,
       name: {
-        firstname: user.name[0]?.given[0] ?? '',
-        surname: user.name[0]?.family ?? '',
-        middlename: ''
+        firstname: user.name.firstname,
+        surname: user.name.surname
       },
       phoneNumber: user.mobile,
       email: user.email,
@@ -583,13 +582,10 @@ const ReviewUserComponent = () => {
                 role: formState.role!,
                 primaryOfficeId: formState.primaryOfficeId as UUID,
                 signature: formState.signature,
-                name: [
-                  {
-                    use: 'en',
-                    given: [formState!.name!.firstname],
-                    family: formState!.name!.surname
-                  }
-                ],
+                name: {
+                  firstname: formState!.name!.firstname,
+                  surname: formState!.name!.surname
+                },
                 data
               }
               createUserMutation.mutate(payload, {
@@ -624,13 +620,10 @@ const ReviewUserComponent = () => {
                 role: formState.role!,
                 primaryOfficeId: formState.primaryOfficeId as UUID,
                 signature: formState.signature,
-                name: [
-                  {
-                    use: 'en',
-                    given: [formState!.name!.firstname],
-                    family: formState!.name!.surname
-                  }
-                ],
+                name: {
+                  firstname: formState!.name!.firstname,
+                  surname: formState!.name!.surname
+                },
                 data
               }
               updateUserMutation.mutate(payload, {

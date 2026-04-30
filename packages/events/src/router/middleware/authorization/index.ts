@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+/* eslint-disable max-lines */
 import { TRPCError } from '@trpc/server'
 import { MiddlewareFunction } from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
@@ -39,13 +39,17 @@ import {
   hasScope,
   getScopeOptionValue,
   JurisdictionFilter,
-  getAcceptedScopesByType
+  getAcceptedScopesByType,
+  canAccessOtherUserWithScopes,
+  UserScopeType,
+  CreateUserInput
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { ServiceTrpcContext, TrpcContext } from '@events/context'
 import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
 import { getUserById } from '@events/storage/postgres/events/users'
 import { getSystemInitialisation } from '@events/service/auth'
+import { getLocationHierarchy } from '@events/service/locations/locations'
 import { findUserOrSystem } from '../../../service/users/api'
 import { getInMemoryEventConfigurations } from '../../../service/config/config'
 import { getEventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
@@ -390,6 +394,117 @@ export const userCanCreateEvent: MiddlewareFunction<
   return next()
 }
 
+export function canAccessUserWithScopes(scopes: UserScopeType[]) {
+  const fn: MiddlewareFunction<
+    TrpcContext,
+    OpenApiMeta,
+    TrpcContext,
+    TrpcContext & { id: UUID },
+    { id: UUID } | UUID
+  > = async ({ next, ctx, input }) => {
+    const parseResult = UUID.safeParse(input)
+    const incomingId: UUID = parseResult.success
+      ? parseResult.data
+      : (input as { id: UUID }).id
+
+    const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
+
+    const userRequesting = ctx.user
+    if (acceptedScopes.length === 0) {
+      throw new TRPCError({ code: 'FORBIDDEN' })
+    }
+
+    const otherUser = await findUserOrSystem(incomingId)
+
+    // Don't reveal the existence of the user
+    if (!otherUser) {
+      throw new TRPCError({ code: 'NOT_FOUND' })
+    }
+
+    // Not supported for system users
+    if (otherUser.type === TokenUserType.enum.system) {
+      throw new TRPCError({ code: 'NOT_FOUND' })
+    }
+
+    if (!userRequesting.primaryOfficeId) {
+      throw new TRPCError({ code: 'NOT_FOUND' })
+    }
+
+    const userLocationHierarchy = await getLocationHierarchy(
+      otherUser.primaryOfficeId
+    )
+
+    const hasAccess = canAccessOtherUserWithScopes({
+      scopes: acceptedScopes,
+      userToAccess: {
+        role: otherUser.role,
+        administrativeHierarchy: userLocationHierarchy,
+        primaryOfficeId: otherUser.primaryOfficeId
+      },
+      user: userRequesting
+    })
+
+    if (!hasAccess) {
+      throw new TRPCError({ code: 'NOT_FOUND' })
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        userId: incomingId
+      },
+      input
+    })
+  }
+
+  return fn
+}
+
+export function canCreateUserWithScopes(scopes: UserScopeType[]) {
+  const fn: MiddlewareFunction<
+    TrpcContext,
+    OpenApiMeta,
+    TrpcContext,
+    TrpcContext,
+    CreateUserInput
+  > = async ({ next, ctx, input }) => {
+    const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
+
+    const userRequesting = ctx.user
+    const userToCreate = input
+
+    if (acceptedScopes.length === 0) {
+      throw new TRPCError({ code: 'FORBIDDEN' })
+    }
+
+    if (!userRequesting.primaryOfficeId) {
+      throw new TRPCError({ code: 'NOT_FOUND' })
+    }
+
+    const userLocationHierarchy = await getLocationHierarchy(
+      userToCreate.primaryOfficeId
+    )
+
+    const hasAccess = canAccessOtherUserWithScopes({
+      scopes: acceptedScopes,
+      userToAccess: {
+        role: userToCreate.role,
+        administrativeHierarchy: userLocationHierarchy,
+        primaryOfficeId: userToCreate.primaryOfficeId
+      },
+      user: userRequesting
+    })
+
+    if (!hasAccess) {
+      throw new TRPCError({ code: 'FORBIDDEN' })
+    }
+
+    return next()
+  }
+
+  return fn
+}
+
 export const userCanReadOtherUser: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
@@ -425,7 +540,6 @@ export const userCanReadOtherUser: MiddlewareFunction<
   }
 
   const readScopes = getAcceptedScopesFromToken(token, ['user.read'])
-
   const accessLevels = readScopes.map((s) =>
     getScopeOptionValue(s, 'accessLevel')
   )

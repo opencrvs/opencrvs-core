@@ -182,7 +182,7 @@ export const UserAudit = () => {
     return menuItems
   }
 
-  const userName = user ? getUsersFullName(user.name, intl.locale) : ''
+  const userName = user ? getUsersFullName(user.name) : ''
 
   return (
     <>

@@ -19,9 +19,7 @@ import {
 } from '@opencrvs/commons/events'
 import {
   CreateUserInput,
-  isBase64FileString,
   logger,
-  personNameFromV1ToV2,
   TokenWithBearer,
   User,
   UserOrSystem,
@@ -30,6 +28,8 @@ import {
 } from '@opencrvs/commons'
 import {
   allowedWithAnyOfScopes,
+  canAccessUserWithScopes,
+  canCreateUserWithScopes,
   canUpdateUserLocation
 } from '@events/router/middleware'
 import {
@@ -60,9 +60,9 @@ import {
   updateUser,
   sendUsernameReminder,
   sendResetPasswordInvite,
-  resendInvite
+  resendInvite,
+  verifyPasswordById
 } from '@events/service/users/api'
-import { uploadBase64File } from '@events/service/files'
 import {
   checkVerificationCode,
   generateAndSendVerificationCode,
@@ -229,6 +229,7 @@ const auditRouter = router({
 export const userRouter = router({
   get: userOnlyProcedure
     .input(UUID)
+    // @TODO: missing scope check.
     .output(UserOrSystem)
     .query(async ({ input }) => {
       const users = await getUsersById([input])
@@ -239,14 +240,14 @@ export const userRouter = router({
       return users[0]
     }),
   create: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.create']))
     .input(CreateUserInput)
+    .use(canCreateUserWithScopes(['user.create']))
     .output(User)
     .mutation(async ({ input, ctx }) => handleCreateUser(input, ctx)),
   update: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.edit']))
     .input(UpdateUserInput)
     .use(canUpdateUserLocation)
+    .use(canAccessUserWithScopes(['user.edit']))
     .output(User)
     .mutation(async ({ input, ctx }) => {
       if (input.mobile) {
@@ -362,7 +363,7 @@ export const userRouter = router({
         nonce,
         token: rawToken,
         notificationEvent: input.notificationEvent,
-        recipientName: personNameFromV1ToV2(user.name),
+        recipientName: user.name,
         phoneNumber: user.mobile,
         email: user.email
       })
@@ -523,10 +524,7 @@ export const userRouter = router({
     .input(
       z.object({
         userId: z.string(),
-        avatar: z.object({
-          type: z.string(),
-          data: z.string()
-        })
+        avatar: z.string()
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -543,14 +541,13 @@ export const userRouter = router({
         )
         throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
-      const profileImagePath = isBase64FileString(input.avatar.data)
-        ? await uploadBase64File(input.avatar.data, ctx.token)
-        : input.avatar.data
-      await updateUserById(UUID.parse(ctx.user.id), { profileImagePath })
+      await updateUserById(UUID.parse(ctx.user.id), {
+        profileImagePath: input.avatar
+      })
     }),
   resendInvite: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.edit']))
     .input(UUID)
+    .use(canAccessUserWithScopes(['user.edit']))
     .mutation(async ({ input, ctx }) => {
       const userId = UUID.parse(input)
 
@@ -580,8 +577,8 @@ export const userRouter = router({
       return activateUser(input)
     }),
   sendUsernameReminder: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.edit']))
     .input(UUID)
+    .use(canAccessUserWithScopes(['user.edit']))
     .mutation(async ({ input, ctx }) => {
       const userId = UUID.parse(input)
       await sendUsernameReminder(userId, ctx.token)
@@ -615,6 +612,19 @@ export const userRouter = router({
         clientId: auditLogIdentifiers.sub,
         clientType: auditLogIdentifiers.userType ?? 'system'
       })
+    }),
+  verifyLoggedInUserPassword: userOnlyProcedure
+    .input(z.object({ password: z.string() }))
+    .output(
+      z.object({
+        mobile: z.string().optional(),
+        status: z.string(),
+        username: z.string(),
+        id: z.string()
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      return verifyPasswordById(ctx.user.id, input.password)
     }),
   audit: auditRouter
 })

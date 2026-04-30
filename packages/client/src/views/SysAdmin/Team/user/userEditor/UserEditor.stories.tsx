@@ -164,9 +164,8 @@ export const ReviewWithAllFieldsFilled: StoryObj<typeof ReviewUser> = {
       primaryOfficeId: existingUser.primaryOfficeId,
       role: TestUserRole.enum.REGISTRATION_AGENT,
       name: {
-        firstname: existingUser.name[0].given[0],
-        surname: existingUser.name[0].family,
-        middlename: ''
+        firstname: existingUser.name.firstname,
+        surname: existingUser.name.surname
       },
       phoneNumber: '01233443443',
       email: existingUser.email,
