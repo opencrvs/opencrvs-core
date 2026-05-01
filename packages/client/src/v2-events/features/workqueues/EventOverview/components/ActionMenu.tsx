@@ -96,6 +96,7 @@ function ActionMenuItems({
   const filteredItems = items.filter(
     (item) => item.type !== ActionType.REGISTER
   )
+
   const sortedActions = sortActions(filteredItems, eventConfiguration)
   const intl = useIntl()
 

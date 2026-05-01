@@ -180,13 +180,13 @@ function useDeclarationActions(event: EventDocument) {
   return {
     modals: [modal, saveAndExitModal, deleteDeclarationModal],
     actions: [
-      {
+      /*{
         icon: actionIcons[ActionType.REGISTER],
         label: actionLabels[ActionType.REGISTER],
         onClick: async () => handleDeclaration(ActionType.REGISTER),
         hidden: !isActionAllowed(ActionType.REGISTER),
         disabled: hasValidationErrors || !canDirectlyRegister
-      },
+      },*/
       {
         icon: actionIcons[ActionType.DECLARE],
         label: actionLabels[ActionType.DECLARE],
