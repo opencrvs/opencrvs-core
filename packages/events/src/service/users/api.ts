@@ -333,12 +333,15 @@ export async function createUser(
   const userPayload = {
     firstname: resolvedUser.name.firstname,
     surname: resolvedUser.name.surname,
-    email: resolvedUser?.email?.toLowerCase(),
+    // Normalise to undefined for the same reason as mobile above.
+    email: resolvedUser?.email?.toLowerCase() || undefined,
     fullHonorificName: resolvedUser.fullHonorificName,
     role: resolvedUser.role,
     device: resolvedUser.device,
     officeId: resolvedUser.primaryOfficeId,
-    mobile: resolvedUser.mobile,
+    // Normalise to undefined — PostgreSQL's unique constraint treats "" as a
+    // duplicate, so any empty string must be stored as NULL instead.
+    mobile: resolvedUser.mobile || undefined,
     status: resolvedUser.status,
     signaturePath: resolvedUser.signature?.path,
     data: resolvedUser.data ?? {}
