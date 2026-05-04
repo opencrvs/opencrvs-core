@@ -19,14 +19,17 @@ import {
   EncodedScope,
   getAcceptedScopesByType,
   RecordScopeTypeV2,
-  RecordScopeV2
+  RecordScopeV2,
+  UserScopeV2
 } from '../scopes'
 import {
+  canAccessOtherUserWithScopes,
   EventIndexWithAdministrativeHierarchy,
   userCanAccessEventWithScopes
 } from './locations'
 import { UserContext } from '../users/User'
 import { EventIndex } from './EventIndex'
+import { UUID } from 'src/uuid'
 
 type AlwaysAllowed = null
 
@@ -151,4 +154,48 @@ export function isActionInScope({
   )
 
   return canAccess
+}
+
+/**
+ *
+ *
+ * @param allRoles - All possible roles in the system
+ * @param userLocation - The location and role information of the user whose role options are being determined
+ * @param acceptedScopes - The scopes of the user requesting the role update, used to determine which roles they can assign.
+ * @param userRequesting - The user context of the user requesting the role update, used to check location-based access to the target user's location.
+ *
+ * @returns An array of roles that the requesting user is allowed to assign to the target user based on their scopes and location
+ *
+ * 1) Used to determine which roles should be available in the dropdown when a user is editing another user's role in the user management interface.
+ * 2) Used to check if payload includes valid role.
+ */
+export function getAvailableRolesForUserUpdatePayload({
+  allRoles,
+  userLocation,
+  acceptedScopes,
+  userRequesting
+}: {
+  allRoles: string[]
+  userRequesting: UserContext
+  acceptedScopes: UserScopeV2[]
+  userLocation: {
+    role?: string
+    administrativeHierarchy: UUID[]
+    primaryOfficeId: UUID
+  }
+}) {
+  const availableRoles = allRoles.filter((role) => {
+    const canAccess = canAccessOtherUserWithScopes({
+      userToAccess: {
+        ...userLocation,
+        role
+      },
+      user: userRequesting,
+      scopes: acceptedScopes
+    })
+
+    return canAccess
+  })
+
+  return availableRoles
 }
