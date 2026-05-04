@@ -61,14 +61,17 @@ test('Check scopes against user.update with non-location payload', async () => {
     userRequesting: fc.constantFrom(...users),
     userTargeted: fc.constantFrom(...users),
     accessLevel: accessLevelOptions,
-    role: roleOptions
+    role: roleOptions,
+    updatedRole: fc.option(fc.constantFrom(...TestUserRole.options), {
+      nil: undefined
+    })
   })
 
   // 3. Test combination against random user and assert results
   await fc.assert(
     fc.asyncProperty(
       combinations,
-      async ({ userRequesting, userTargeted, ...options }) => {
+      async ({ userRequesting, userTargeted, updatedRole, ...options }) => {
         const scope = encodeScope({
           type: 'user.edit',
           options: {
@@ -84,6 +87,7 @@ test('Check scopes against user.update with non-location payload', async () => {
         try {
           // 1. Perform the action with the given test client.
           const changedUser = await testClient.user.update({
+            role: updatedRole,
             id: userTargeted.id,
             signature: {
               path: 'string',
@@ -105,17 +109,19 @@ test('Check scopes against user.update with non-location payload', async () => {
           }
         }
 
-        assertUserScopeResult(result, {
-          userRequesting,
-          userTargeted,
-          role: options.role,
-          accessLevel: options.accessLevel,
-          isUnderAdministrativeArea
-        })
+        // 3. Assert whether the result matches the expected outcome based on the scopes, roles and location of the user.
+        assertUserScopeResult(
+          { ...result, updatePayloadRole: updatedRole },
+          {
+            userRequesting,
+            userTargeted,
+            role: options.role,
+            accessLevel: options.accessLevel,
+            isUnderAdministrativeArea
+          }
+        )
       }
     ),
-    {
-      numRuns: 50
-    }
+    { numRuns: 50 }
   )
 })
