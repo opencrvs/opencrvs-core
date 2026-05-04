@@ -91,6 +91,54 @@ test('Allows user creation when with the right scope', async () => {
   })
 })
 
+test('Multiple users with no email can be created without a unique key conflict', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.create'
+    })
+  ])
+
+  // Each user has a distinct mobile so the DB check constraint
+  // (email_or_mobile_not_null) is satisfied while email is omitted (NULL in DB).
+  await expect(
+    client.user.create({
+      mobile: '01712345678',
+      role: 'admin',
+      name: { firstname: 'given1', surname: 'family1' },
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).resolves.toBeDefined()
+
+  await expect(
+    client.user.create({
+      mobile: '01812345678',
+      role: 'admin',
+      name: { firstname: 'given2', surname: 'family2' },
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).resolves.toBeDefined()
+})
+
+test('Creating a user with neither email nor mobile violates the DB constraint', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.create'
+    })
+  ])
+
+  await expect(
+    client.user.create({
+      role: 'admin',
+      name: { firstname: 'given', surname: 'family' },
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).rejects.toThrow(/email_or_mobile_not_null/)
+})
+
 test('Throws error when creating user with existing email', async () => {
   const { user } = await setupTestCase()
 
@@ -148,7 +196,7 @@ test('Rejects when username is provided by app caller', async () => {
     client.user.create({
       email: 'testing+username@opencrvs.org',
       role: 'admin',
-      name: [{ use: 'en', family: 'family', given: ['given'] }],
+      name: { firstname: 'given', surname: 'family' },
       primaryOfficeId: user.primaryOfficeId,
       username: 'custom-username'
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -165,7 +213,7 @@ test('Rejects password when provided by app caller', async () => {
     client.user.create({
       email: 'testing+password@opencrvs.org',
       role: 'admin',
-      name: [{ use: 'en', family: 'family', given: ['given'] }],
+      name: { firstname: 'given', surname: 'family' },
       primaryOfficeId: user.primaryOfficeId,
       password: 'passWORD123456'
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -195,6 +243,45 @@ test('Auto-generates username from name', async () => {
   expect(credentials.username).toMatch(/^j\.smith/)
 })
 
+test('Multiple users with no mobile number can be created without a unique key conflict', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.create'
+    })
+  ])
+
+  // Sending mobile: '' mimics the pre-fix client behaviour where touching then
+  // clearing the phone field produced an empty string instead of undefined.
+  const response = await client.user.create({
+    email: 'user1@opencrvs.org',
+    mobile: '',
+    role: 'admin',
+    name: { firstname: 'given1', surname: 'family1' },
+    primaryOfficeId: user.primaryOfficeId
+  })
+
+  const eventsDb = getClient()
+  const createdUser = await eventsDb
+    .selectFrom('users')
+    .select('mobile')
+    .where('id', '=', response.id)
+    .executeTakeFirstOrThrow()
+
+  expect(createdUser.mobile).toBeNull()
+
+  await expect(
+    client.user.create({
+      email: 'user2@opencrvs.org',
+      mobile: '',
+      role: 'admin',
+      name: { firstname: 'given2', surname: 'family2' },
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).resolves.toBeDefined()
+})
+
 test('Throws error when creating user with existing mobile', async () => {
   const { user } = await setupTestCase()
 
@@ -204,7 +291,7 @@ test('Throws error when creating user with existing mobile', async () => {
     })
   ])
 
-  const mobile = '+345345343'
+  const mobile = '01512345678'
   const userPayload1 = {
     email: 'testing+1@opencrvs.org',
     mobile,
@@ -446,4 +533,52 @@ test('Prevents user creation when the location id is not within scope: "administ
       primaryOfficeId: countryLevelOffice.id
     })
   ).rejects.toThrowError(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test('Creates user when mobile matches PHONE_NUMBER_PATTERN', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [encodeScope({ type: 'user.create' })])
+
+  await expect(
+    client.user.create({
+      email: 'valid-phone@opencrvs.org',
+      // matches the test MSW mock pattern: ^01[1-9][0-9]{8}$
+      mobile: '01712345678',
+      role: 'admin',
+      name: { firstname: 'given', surname: 'family' },
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).resolves.toBeDefined()
+})
+
+test('Rejects user creation when mobile does not match PHONE_NUMBER_PATTERN', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [encodeScope({ type: 'user.create' })])
+
+  await expect(
+    client.user.create({
+      email: 'invalid-phone@opencrvs.org',
+      mobile: '12345',
+      role: 'admin',
+      name: { firstname: 'given', surname: 'family' },
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).rejects.toThrow(/INVALID_MOBILE/)
+})
+
+test('Creates user when no mobile is provided, skipping phone format validation', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [encodeScope({ type: 'user.create' })])
+
+  await expect(
+    client.user.create({
+      email: 'no-phone@opencrvs.org',
+      role: 'admin',
+      name: { firstname: 'given', surname: 'family' },
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).resolves.toBeDefined()
 })

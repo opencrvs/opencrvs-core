@@ -160,14 +160,14 @@ test('throws CONFLICT with DUPLICATE_PHONE if mobile is already in use by anothe
   const { user, users } = await setupTestCase()
   const [, secondUser] = users
 
-  await updateUserById(secondUser.id, { mobile: '+254700000001' })
+  await updateUserById(secondUser.id, { mobile: '01712345678' })
 
   const client = createTestClient(user, [USER_EDIT_SCOPE])
 
   await expect(
     client.user.update({
       ...generateUpdateInput(user),
-      mobile: '+254700000001'
+      mobile: '01712345678'
     })
   ).rejects.toMatchObject(
     new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_PHONE' })
@@ -193,14 +193,14 @@ test('throws CONFLICT with DUPLICATE_EMAIL if email is already in use by another
 
 test("allows update when mobile is the same user's own mobile", async () => {
   const { user } = await setupTestCase()
-  await updateUserById(user.id, { mobile: '+254700000002' })
+  await updateUserById(user.id, { mobile: '01812345678' })
 
   const client = createTestClient(user, [USER_EDIT_SCOPE])
 
   await expect(
     client.user.update({
       ...generateUpdateInput(user),
-      mobile: '+254700000002'
+      mobile: '01812345678'
     })
   ).resolves.not.toThrow()
 })
@@ -222,14 +222,14 @@ test('successfully updates user fields and returns updated user', async () => {
     ...generateUpdateInput(user),
     name: { firstname: 'Jane', surname: 'Smith' },
     email: `updated-${user.id}@test.example`,
-    mobile: '+254700000099'
+    mobile: '01912345678'
   })
 
   expect(updatedUser).toMatchObject({
     id: user.id,
     name: { firstname: 'Jane', surname: 'Smith' },
     email: `updated-${user.id}@test.example`,
-    mobile: '+254700000099',
+    mobile: '01912345678',
     primaryOfficeId: user.primaryOfficeId
   })
 })
@@ -346,4 +346,38 @@ test('toggling user status keeps other fields intact', async () => {
   })
 
   expect(reactivatedUser).toMatchObject(userToTestWith)
+})
+
+test('Updates user when mobile matches PHONE_NUMBER_PATTERN', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+
+  await expect(
+    client.user.update({
+      ...generateUpdateInput(user),
+      // matches the test MSW mock pattern: ^01[1-9][0-9]{8}$
+      mobile: '01612345678'
+    })
+  ).resolves.toBeDefined()
+})
+
+test('Rejects user update when mobile does not match PHONE_NUMBER_PATTERN', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+
+  await expect(
+    client.user.update({
+      ...generateUpdateInput(user),
+      mobile: '12345'
+    })
+  ).rejects.toThrow(/INVALID_MOBILE/)
+})
+
+test('Updates user when no mobile is provided, skipping phone format validation', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+
+  await expect(
+    client.user.update(generateUpdateInput(user))
+  ).resolves.toBeDefined()
 })

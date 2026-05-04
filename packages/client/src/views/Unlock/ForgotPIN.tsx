@@ -22,6 +22,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
 import { getUserName } from '@client/utils/userUtils'
+import { trpcOptionsProxy } from '@client/v2-events/trpc'
 import { BackgroundWrapper } from '@client/views/common/Common'
 import { Box, Link, Stack, Toast } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -86,7 +87,7 @@ const Password = injectIntl(
   }
 )
 
-export function ForgotPIN(props: IForgotPINProps) {
+export function ForgotPIN({ goBack, onVerifyPassword }: IForgotPINProps) {
   const [password, setPassword] = useState<string>('')
   const [touched, setTouched] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
@@ -120,20 +121,25 @@ export function ForgotPIN(props: IForgotPINProps) {
         return
       }
 
+      if (!userDetails?.id) {
+        logout()
+        return
+      }
+
       setVerifyingPassword(true)
 
-      const id = (userDetails && userDetails.id) || ''
       try {
-        throw new Error('Password verification is currently not implemented')
-        // setVerifyingPassword(false)
-        // setError('')
-        // props.onVerifyPassword()
+        await trpcOptionsProxy.user.verifyLoggedInUserPassword.mutationOptions()
+          .mutationFn!({ password })
+        setVerifyingPassword(false)
+        setError('')
+        onVerifyPassword()
       } catch (e) {
         setVerifyingPassword(false)
         setError(intl.formatMessage(errorMessages.passwordSubmissionError))
       }
     },
-    [password, userDetails, intl]
+    [password, userDetails, intl, onVerifyPassword, logout]
   )
 
   const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -148,7 +154,7 @@ export function ForgotPIN(props: IForgotPINProps) {
     <BackgroundWrapper id="forgotPinPage">
       <Box id="Box">
         <Stack direction="row" justifyContent="space-between">
-          <Button type="icon" id="action_back" onClick={props.goBack}>
+          <Button type="icon" id="action_back" onClick={goBack}>
             <Icon name="ArrowLeft" />
           </Button>
           <Button type="icon" onClick={logout} id="logout">

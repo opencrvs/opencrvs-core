@@ -333,12 +333,15 @@ export async function createUser(
   const userPayload = {
     firstname: resolvedUser.name.firstname,
     surname: resolvedUser.name.surname,
-    email: resolvedUser?.email?.toLowerCase(),
+    // Normalise to undefined for the same reason as mobile above.
+    email: resolvedUser?.email?.toLowerCase() || undefined,
     fullHonorificName: resolvedUser.fullHonorificName,
     role: resolvedUser.role,
     device: resolvedUser.device,
     officeId: resolvedUser.primaryOfficeId,
-    mobile: resolvedUser.mobile,
+    // Normalise to undefined — PostgreSQL's unique constraint treats "" as a
+    // duplicate, so any empty string must be stored as NULL instead.
+    mobile: resolvedUser.mobile || undefined,
     status: resolvedUser.status,
     signaturePath: resolvedUser.signature?.path,
     data: resolvedUser.data ?? {}
@@ -514,6 +517,30 @@ export async function checkSecurityQuestionMatch({
   return {
     matched,
     questionKey: matched ? input.questionKey : (fallback ?? input.questionKey)
+  }
+}
+
+export async function verifyPasswordById(
+  id: UUID,
+  password: string
+): Promise<{ mobile?: string; status: string; username: string; id: string }> {
+  const credentials = await getCredentials(id)
+
+  const hash = await generateHash(password, credentials.salt)
+  if (hash !== credentials.passwordHash) {
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
+
+  const user = await getUserById(id)
+  if (!user) {
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
+
+  return {
+    mobile: user.mobile ?? undefined,
+    status: user.status,
+    username: user.username,
+    id: user.id
   }
 }
 

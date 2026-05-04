@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, validationMessages } from '@client/i18n/messages'
 import { userMessages } from '@client/i18n/messages'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { messages } from '@client/i18n/messages/views/userForm'
@@ -23,11 +23,13 @@ import {
   deepDropNulls,
   defineConditional,
   EventConfig,
+  field,
   FieldConfig,
   FieldValue,
   FileFieldValue,
   FieldType,
   never,
+  or,
   PageTypes,
   TokenUserType,
   hasScope,
@@ -130,13 +132,26 @@ function getUserEditConfig(
             {
               id: 'phoneNumber',
               type: FieldType.PHONE,
-              required: false,
-              label: messages.phoneNumber
+              required:
+                window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms',
+              label: messages.phoneNumber,
+              validation: [
+                {
+                  message: validationMessages.phoneNumberNotValid,
+                  validator: or(
+                    field('phoneNumber').matches(
+                      String(window.config.PHONE_NUMBER_PATTERN)
+                    ),
+                    field('phoneNumber').isFalsy()
+                  )
+                }
+              ]
             },
             {
               id: 'email',
               type: FieldType.EMAIL,
-              required: true,
+              required:
+                window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'email',
               label: messages.email
             },
             {
@@ -560,8 +575,10 @@ const ReviewUserComponent = () => {
                 ])
               )
               const payload: CreateUserInput = {
-                mobile: formState.phoneNumber,
-                email: formState.email!,
+                // Normalise to undefined so an empty string isn't stored as a
+                // unique value, causing duplicate-key errors on the next submit.
+                mobile: formState.phoneNumber || undefined,
+                email: formState.email || undefined,
                 role: formState.role!,
                 primaryOfficeId: formState.primaryOfficeId as UUID,
                 signature: formState.signature,
@@ -597,8 +614,9 @@ const ReviewUserComponent = () => {
               )
               const payload: UpdateUserInput = {
                 id: userId,
-                mobile: formState.phoneNumber,
-                email: formState.email!,
+                // See create payload above — same normalisation needed.
+                mobile: formState.phoneNumber || undefined,
+                email: formState.email || undefined,
                 role: formState.role!,
                 primaryOfficeId: formState.primaryOfficeId as UUID,
                 signature: formState.signature,
