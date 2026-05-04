@@ -403,13 +403,11 @@ jobs:
         run: CI="" yarn install --frozen-lockfile
 
       - name: Run Chromatic
-        # Skipped (on both PRs and pushes) when the diff doesn't
-        # intersect the Storybook bundle. `--storybook-build-dir`
-        # reuses the artifact built in `prepare-client-tests` so
-        # Chromatic skips its own Storybook build.
         if: steps.detect.outputs.affects == 'true'
         working-directory: packages/client
-        run: yarn run chromatic --storybook-build-dir storybook-static
+        run: |
+          yarn run chromatic --storybook-build-dir storybook-static --diagnostics-file
+          cat chromatic-diagnostics.json
         env:
           CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
