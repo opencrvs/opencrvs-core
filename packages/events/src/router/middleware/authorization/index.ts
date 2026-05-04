@@ -42,7 +42,9 @@ import {
   getAcceptedScopesByType,
   canAccessOtherUserWithScopes,
   UserScopeType,
-  CreateUserInput
+  CreateUserInput,
+  getAvailableRolesForUserUpdatePayload,
+  UserContext
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { ServiceTrpcContext, TrpcContext } from '@events/context'
@@ -51,7 +53,10 @@ import { getUserById } from '@events/storage/postgres/events/users'
 import { getSystemInitialisation } from '@events/service/auth'
 import { getLocationHierarchy } from '@events/service/locations/locations'
 import { findUserOrSystem } from '../../../service/users/api'
-import { getInMemoryEventConfigurations } from '../../../service/config/config'
+import {
+  getInMemoryEventConfigurations,
+  getRoles
+} from '../../../service/config/config'
 import { getEventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
 import { isLocationUnderAdministrativeArea } from '../../../storage/postgres/administrative-hierarchy/locations'
 
@@ -136,6 +141,54 @@ export const canUpdateUserLocation: MiddlewareFunction<
       ...ctx
     }
   })
+}
+
+export const canUpdateUserRole: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext,
+  { id: UUID; role?: string }
+> = async (opts) => {
+  const { token } = opts.ctx
+  const { input, ctx } = opts
+
+  const existingUser = await getUserById(UUID.parse(input.id))
+  if (!existingUser) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `No user found by given id: ${input.id}`
+    })
+  }
+
+  if (input.role === undefined || input.role === existingUser.role) {
+    return opts.next()
+  }
+
+  const acceptedScopes = getAcceptedScopesFromToken(token, ['user.edit'])
+
+  const administrativeHierarchy = await getLocationHierarchy(
+    existingUser.officeId
+  )
+
+  const availableRoles = getAvailableRolesForUserUpdatePayload({
+    acceptedScopes,
+    // Since we are only checking if the user can update to a specific role, we can pass an array with only that role to optimize the check instead of passing all roles in the system.
+    allRoles: [input.role],
+    userLocation: {
+      primaryOfficeId: existingUser.officeId,
+      administrativeHierarchy
+    },
+    userRequesting: ctx.user as UserContext
+  })
+
+  if (!availableRoles.includes(input.role)) {
+    throw new TRPCError({
+      code: 'FORBIDDEN'
+    })
+  }
+
+  return opts.next()
 }
 
 export const EventIdParam = z.object({

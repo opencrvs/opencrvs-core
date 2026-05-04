@@ -30,7 +30,8 @@ import {
   allowedWithAnyOfScopes,
   canAccessUserWithScopes,
   canCreateUserWithScopes,
-  canUpdateUserLocation
+  canUpdateUserLocation,
+  canUpdateUserRole
 } from '@events/router/middleware'
 import {
   internalProcedure,
@@ -255,6 +256,7 @@ export const userRouter = router({
   update: userAndSystemProcedure
     .input(UpdateUserInput)
     .use(canUpdateUserLocation)
+    .use(canUpdateUserRole)
     .use(canAccessUserWithScopes(['user.edit']))
     .output(User)
     .mutation(async ({ input, ctx }) => {

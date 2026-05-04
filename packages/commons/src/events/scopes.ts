@@ -179,7 +179,6 @@ export function getAvailableRolesForUserUpdatePayload({
   userRequesting: UserContext
   acceptedScopes: UserScopeV2[]
   userLocation: {
-    role?: string
     administrativeHierarchy: UUID[]
     primaryOfficeId: UUID
   }
