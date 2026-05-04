@@ -184,10 +184,8 @@ export async function defaultRequestHandler(
   event: EventDocument,
   configuration: EventConfig,
   // @TODO: Could this be typed with the actual input schema, or could these actually be anything?
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  inputSchema: z.ZodObject<any>,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  actionConfirmationResponseSchema?: z.ZodObject<any>
+  inputSchema: z.ZodObject<z.ZodRawShape>,
+  actionConfirmationResponseSchema?: z.ZodObject<z.ZodRawShape>
 ) {
   await throwConflictIfActionNotAllowed(input.eventId, input.type, token)
 
@@ -204,13 +202,12 @@ export async function defaultRequestHandler(
     { eventId: input.eventId, actionId: requestedAction.id },
     token
   )
-  const { responseStatus, responseBody: confirmationResponse } =
-    await requestActionConfirmation(
-      input.type,
-      input.transactionId,
-      eventWithRequestedAction,
-      setBearerForToken(eventActionToken)
-    )
+  const { responseStatus, responseBody } = await requestActionConfirmation(
+    input.type,
+    input.transactionId,
+    eventWithRequestedAction,
+    setBearerForToken(eventActionToken)
+  )
 
   // If we get an unexpected failure response, we just return HTTP 500 without saving the
   if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
@@ -218,62 +215,54 @@ export async function defaultRequestHandler(
       code: 'INTERNAL_SERVER_ERROR',
       message: 'Unexpected failure from country config action confirmation API'
     })
-    // For Async flow, we just return the event with the requested action and ensure it is indexed
-  } else if (responseStatus === ActionConfirmationResponse.RequiresProcessing) {
+  }
+
+  // For Async flow, we just return the event with the requested action and ensure it is indexed
+  if (responseStatus === ActionConfirmationResponse.RequiresProcessing) {
     await ensureEventIndexed(eventWithRequestedAction, configuration)
     return eventWithRequestedAction
   }
 
-  let status: ActionStatus = ActionStatus.Requested
-  let parsedBody
+  // For Sync flow, we parse the result and merge it with the action input
+  // before storing the accepted/rejected action
+  const status =
+    responseStatus === ActionConfirmationResponse.Success
+      ? ActionStatus.Accepted
+      : ActionStatus.Rejected
 
-  // If we immediately get a rejected response, we can mark the action as rejected
-  if (responseStatus === ActionConfirmationResponse.Rejected) {
-    status = ActionStatus.Rejected
+  const schema =
+    responseStatus === ActionConfirmationResponse.Success
+      ? (actionConfirmationResponseSchema ??
+        z.object({}).merge(inputSchema.partial()))
+      : inputSchema.partial()
 
-    logger.debug(
-      {
-        transactionId: input.transactionId,
-        actionType: input.type,
-        eventId: event.id
-      },
-      `Action immediately rejected (status: "${responseStatus}")`
-    )
+  const maybeParsed = schema.safeParse(responseBody ?? {})
+
+  if (!maybeParsed.success) {
+    logger.error(maybeParsed.error)
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message:
+        'Invalid payload received from country config action confirmation API'
+    })
   }
 
-  // If we immediately get a success response, we mark the action as succeeded
-  // and also validate the payload received from the notify API
-  if (responseStatus === ActionConfirmationResponse.Success) {
-    status = ActionStatus.Accepted
+  const parsedBody = maybeParsed.data
 
-    try {
-      parsedBody = (actionConfirmationResponseSchema ?? z.object({}))
-        .merge(inputSchema.partial())
-        .parse(confirmationResponse ?? {})
-    } catch (error) {
-      logger.error(error)
+  logger.debug(
+    {
+      transactionId: input.transactionId,
+      eventType: event.type,
+      actionType: input.type,
+      eventId: event.id
+    },
+    `Action immediately ${status === ActionStatus.Accepted ? 'accepted' : 'rejected'} (status: "${responseStatus}")`
+  )
 
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message:
-          'Invalid payload received from country config action confirmation API'
-      })
-    }
-
-    logger.debug(
-      {
-        transactionId: input.transactionId,
-        eventType: event.type,
-        actionType: input.type,
-        eventId: event.id
-      },
-      `Action immediately accepted (status: "${responseStatus}")`
-    )
-  }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { declaration, annotation, ...strippedInput } = input
 
-  const updatedEvent = await processAction(
+  return processAction(
     {
       ...strippedInput,
       declaration: {},
@@ -282,8 +271,6 @@ export async function defaultRequestHandler(
     },
     { event, user, token, status, configuration }
   )
-
-  return updatedEvent
 }
 
 /**
