@@ -18,18 +18,27 @@ import {
 import { NumberField } from '@opencrvs/commons/client'
 
 interface NumberInputProps
-  extends Omit<TextInputProps, 'type' | 'maxLength' | 'onChange'> {
+  extends Omit<TextInputProps, 'type' | 'onChange'> {
   onChange(val: number | undefined): void
   value: number | undefined
   min?: number
+  max?: number
+  maxLength?: number
 }
 
-function NumberInput({ value, disabled, ...props }: NumberInputProps) {
+function NumberInput({
+  value,
+  disabled,
+  min,
+  max,
+  maxLength,
+  ...props
+}: NumberInputProps) {
   const [inputValue, setInputValue] = React.useState(
     value && isNaN(value) ? undefined : value
   )
 
-  const allowOnlyPositive = props.min !== undefined && props.min >= 0
+  const allowOnlyPositive = min !== undefined && min >= 0
 
   React.useEffect(() => {
     setInputValue(value ?? undefined)
@@ -41,6 +50,9 @@ function NumberInput({ value, disabled, ...props }: NumberInputProps) {
       data-testid={`number__${props.id}`}
       isDisabled={disabled}
       value={inputValue}
+      min={min}
+      max={max}
+      maxLength={maxLength}
       onBlur={(e) => {
         props.onChange(inputValue)
         props.onBlur?.(e)

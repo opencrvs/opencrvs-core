@@ -181,6 +181,7 @@ const NumberField = BaseField.extend({
     .object({
       min: z.number().optional().describe('Minimum value'),
       max: z.number().optional().describe('Maximum value'),
+      maxLength: z.number().optional().describe('Maximum length of the input'),
       prefix: TranslationConfig.optional(),
       postfix: TranslationConfig.optional()
     })

@@ -181,9 +181,19 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.USER_ROLE:
       schema = field.required ? NonEmptyTextValue : TextValue
       break
-    case FieldType.NUMBER:
+    case FieldType.NUMBER: {
       schema = NumberFieldValue
+      if (field.type === FieldType.NUMBER) {
+        const config = field.configuration
+        if (config?.min !== undefined) {
+          schema = schema.min(config.min)
+        }
+        if (config?.max !== undefined) {
+          schema = schema.max(config.max)
+        }
+      }
       break
+    }
     case FieldType.NUMBER_WITH_UNIT:
       schema = field.required
         ? NumberWithUnitFieldValue
