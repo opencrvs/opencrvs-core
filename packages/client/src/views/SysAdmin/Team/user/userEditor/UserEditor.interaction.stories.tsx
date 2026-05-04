@@ -355,12 +355,16 @@ const localSystemAdminUser = generator.user.localSystemAdmin().v2
 const nationalSystemAdminUser = generator.user.nationalSystemAdmin().v2
 
 /**
- * 1) New user flow (temporary id) bypasses canEditUser entirely. The form
- *    must render and no unauthorized toast must appear.
+ * 1) New-user flow is gated by canAddOfficeUsers — the admin must hold a
+ *    user.create scope whose jurisdiction (accessLevel) covers the chosen
+ *    primaryOffice. NATIONAL_SYSTEM_ADMIN holds user.create without an
+ *    accessLevel filter (defaults to 'all'), so any office is permitted and
+ *    the form renders.
  */
-export const NewUserCreationIsAlwaysAllowed: StoryObj<typeof EditUser> = {
+export const NewUserCreationAllowedInJurisdiction: StoryObj<typeof EditUser> = {
   parameters: {
     chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
@@ -389,6 +393,62 @@ export const NewUserCreationIsAlwaysAllowed: StoryObj<typeof EditUser> = {
           'We are unable to display this page to you'
         )
       ).toBeNull()
+    })
+  }
+}
+
+/**
+ * 1b) Same gate, denial path: a role without a user.create scope (here,
+ *     REGISTRATION_AGENT) cannot create users in any office. The form must
+ *     not render and the unauthorized toast must surface.
+ *
+ *     This also covers the "outside jurisdiction" case structurally:
+ *     canAddOfficeUsers returns false whenever no matching scope's
+ *     accessLevel covers the chosen office. When tokens with
+ *     jurisdiction-restricted user.create scopes (accessLevel: 'location' /
+ *     'administrativeArea') are added to test fixtures, additional stories
+ *     can mirror this assertion with a target office outside the admin's
+ *     hierarchy.
+ */
+export const NewUserCreationBlockedWithoutJurisdiction: StoryObj<
+  typeof EditUser
+> = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.REGISTRATION_AGENT,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.details'
+      })
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId
+    })
+  },
+  play: async ({ step }) => {
+    await step(
+      'Unauthorized toast appears (no user.create scope grants jurisdiction over the chosen office)',
+      async () => {
+        await waitFor(() =>
+          expect(
+            within(document.body).getByText(
+              'We are unable to display this page to you'
+            )
+          ).toBeInTheDocument()
+        )
+      }
+    )
+
+    await step('New-user form is not rendered (redirected)', async () => {
+      await waitFor(() =>
+        expect(
+          document.querySelector('[data-testid="text__phoneNumber"]')
+        ).toBeNull()
+      )
     })
   }
 }

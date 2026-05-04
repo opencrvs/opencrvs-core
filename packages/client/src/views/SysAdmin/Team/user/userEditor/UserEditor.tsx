@@ -339,7 +339,7 @@ const EditUserComponent = () => {
   const userQuery = getUser.useQuery(userId, { enabled: !isNewUser })
   const targetUser = userQuery.data
 
-  const { canEditUser } = usePermissions()
+  const { canEditUser, canAddOfficeUsers } = usePermissions()
 
   const handleClose = useCloseUserForm({
     isNewUser,
@@ -349,10 +349,19 @@ const EditUserComponent = () => {
     setUserForm
   })
 
-  const isUnauthorized =
+  const newUserOfficeId = formState['primaryOfficeId'] as UUID | undefined
+
+  const isNewUserBlocked =
+    isNewUser &&
+    !!newUserOfficeId &&
+    !canAddOfficeUsers({ id: newUserOfficeId })
+
+  const isExistingUserBlocked =
     !isNewUser &&
     !!targetUser &&
     (targetUser.type !== TokenUserType.enum.user || !canEditUser(targetUser))
+
+  const isUnauthorized = isNewUserBlocked || isExistingUserBlocked
   const unauthorizedHandledRef = React.useRef(false)
 
   // Reset the one-shot guard when the route's userId changes so navigating
@@ -362,7 +371,8 @@ const EditUserComponent = () => {
   }, [userId])
 
   // Auth gate: surface a toast and redirect (replace) when the current user
-  // cannot edit the target. The ref guarantees we fire once per userId.
+  // cannot edit the target, or when creating a new user in an office outside
+  // the admin's jurisdiction. The ref guarantees we fire once per userId.
   useEffect(() => {
     if (isUnauthorized && !unauthorizedHandledRef.current) {
       unauthorizedHandledRef.current = true
@@ -557,12 +567,22 @@ const ReviewUserComponent = () => {
     setUserForm
   })
 
-  const { canEditUser } = usePermissions()
+  const { canEditUser, canAddOfficeUsers } = usePermissions()
   const targetUser = existingUserQuery.data
-  const isUnauthorized =
+
+  const newUserOfficeId = formState['primaryOfficeId'] as UUID | undefined
+
+  const isNewUserBlocked =
+    isNewUser &&
+    !!newUserOfficeId &&
+    !canAddOfficeUsers({ id: newUserOfficeId })
+
+  const isExistingUserBlocked =
     !isNewUser &&
     !!targetUser &&
     (targetUser.type !== TokenUserType.enum.user || !canEditUser(targetUser))
+
+  const isUnauthorized = isNewUserBlocked || isExistingUserBlocked
   const unauthorizedHandledRef = React.useRef(false)
 
   // Reset the one-shot guard when the route's userId changes.
@@ -570,7 +590,8 @@ const ReviewUserComponent = () => {
     unauthorizedHandledRef.current = false
   }, [userId])
 
-  // Auth gate: forbid reviewing edits for users the current user can't edit.
+  // Auth gate: forbid reviewing edits for users the current user can't edit,
+  // and forbid creating new users in offices outside the admin's jurisdiction.
   useEffect(() => {
     if (isUnauthorized && !unauthorizedHandledRef.current) {
       unauthorizedHandledRef.current = true
