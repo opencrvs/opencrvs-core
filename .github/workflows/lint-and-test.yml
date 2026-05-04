@@ -292,6 +292,8 @@ jobs:
       # Chromatic must run.
       - name: Build Storybook (with TurboSnap stats)
         working-directory: packages/client
+        env:
+          NODE_ENV: production
         run: yarn run build-storybook --webpack-stats-json
 
       - name: Upload filesystem as artifact
