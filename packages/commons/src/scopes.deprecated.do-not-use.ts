@@ -13,7 +13,7 @@ import * as z from 'zod/v4'
 import {
   EncodedScope,
   encodeScope,
-  RecordScopeTypeV2,
+  // RecordScopeTypeV2,
   RecordScopeV2,
   Scope
 } from './scopes'
@@ -399,7 +399,7 @@ export const legacyScopeToV2Scope = (v1Scope: string): EncodedScope => {
 
     if (configurableV1Scope.type === 'search') {
       return encodeScope({
-        type: type as RecordScopeTypeV2,
+        type: type as any,
         options: {
           event: configurableV1Scope.options.event || [],
           placeOfEvent:
@@ -421,7 +421,7 @@ export const legacyScopeToV2Scope = (v1Scope: string): EncodedScope => {
     }
 
     return encodeScope({
-      type: type as RecordScopeTypeV2,
+      type: type as any,
       options: configurableV1Scope.options as RecordScopeV2['options']
     })
   }

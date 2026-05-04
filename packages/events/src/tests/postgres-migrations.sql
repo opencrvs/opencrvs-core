@@ -4,7 +4,7 @@
 
 
 -- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
--- Dumped by pg_dump version 17.6 (Debian 17.6-2.pgdg13+1)
+-- Dumped by pg_dump version 17.6 (Debian 17.6-1.pgdg13+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -26,44 +26,6 @@ CREATE SCHEMA app;
 
 
 ALTER SCHEMA app OWNER TO events_migrator;
-
---
---
-
-
-
---
---
-
-
-
---
--- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
-
-
---
--- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: 
---
-
-COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
-
-
---
--- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
-
-
---
--- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
---
-
-COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
-
 
 --
 -- Name: action_status; Type: TYPE; Schema: app; Owner: events_migrator
@@ -89,17 +51,6 @@ CREATE TYPE app.user_type AS ENUM (
 
 
 ALTER TYPE app.user_type OWNER TO events_migrator;
-
---
---
-
-
-
-
---
---
-
-
 
 SET default_tablespace = '';
 
@@ -324,24 +275,6 @@ COMMENT ON TABLE app.events IS 'Stores life events associated with individuals, 
 
 
 --
---
-
-
-
-
---
---
-
-
-
-
---
---
-
-
-
-
---
 -- Name: locations; Type: TABLE; Schema: app; Owner: events_migrator
 --
 
@@ -396,21 +329,6 @@ ALTER SEQUENCE app.pgmigrations_id_seq OWNED BY app.pgmigrations.id;
 
 
 --
--- Name: pgmigrations_legacy_data_id_seq; Type: SEQUENCE; Schema: app; Owner: postgres
---
-
-CREATE SEQUENCE app.pgmigrations_legacy_data_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE app.pgmigrations_legacy_data_id_seq OWNER TO postgres;
-
---
 -- Name: system_clients; Type: TABLE; Schema: app; Owner: events_migrator
 --
 
@@ -430,6 +348,30 @@ CREATE TABLE app.system_clients (
 
 
 ALTER TABLE app.system_clients OWNER TO events_migrator;
+
+--
+-- Name: system_initialisation; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.system_initialisation (
+    id integer DEFAULT 1 NOT NULL,
+    hash text,
+    salt text,
+    completed_at timestamp with time zone,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT completion_tokens_consistent CHECK ((((completed_at IS NULL) AND (hash IS NOT NULL) AND (salt IS NOT NULL)) OR ((completed_at IS NOT NULL) AND (hash IS NULL) AND (salt IS NULL)))),
+    CONSTRAINT system_initialisation_id_check CHECK ((id = 1))
+);
+
+
+ALTER TABLE app.system_initialisation OWNER TO events_migrator;
+
+--
+-- Name: TABLE system_initialisation; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON TABLE app.system_initialisation IS 'Single-row table tracking application initialisation state. Populated once during initial migration, and never modified except to mark initialisation as completed.';
+
 
 --
 -- Name: user_credentials; Type: TABLE; Schema: app; Owner: events_migrator
@@ -456,8 +398,8 @@ ALTER TABLE app.user_credentials OWNER TO events_migrator;
 CREATE TABLE app.users (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     legacy_id text,
-    firstname text,
-    surname text,
+    firstname text NOT NULL,
+    surname text NOT NULL,
     full_honorific_name text,
     role text NOT NULL,
     status text NOT NULL,
@@ -468,8 +410,8 @@ CREATE TABLE app.users (
     office_id uuid NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    device text,
     data jsonb DEFAULT '{}'::jsonb NOT NULL,
+    device text,
     CONSTRAINT email_or_mobile_not_null CHECK (((email IS NOT NULL) OR (mobile IS NOT NULL)))
 );
 
@@ -624,6 +566,14 @@ ALTER TABLE ONLY app.system_clients
 
 ALTER TABLE ONLY app.system_clients
     ADD CONSTRAINT system_clients_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: system_initialisation system_initialisation_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.system_initialisation
+    ADD CONSTRAINT system_initialisation_pkey PRIMARY KEY (id);
 
 
 --
@@ -899,6 +849,13 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.locations TO events_app;
 --
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.system_clients TO events_app;
+
+
+--
+-- Name: TABLE system_initialisation; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.system_initialisation TO events_app;
 
 
 --

@@ -20,36 +20,31 @@ import { main as renameApiPaths } from './rename-api-paths'
 import { main as convertConfigFilesToTs } from './convert-config-files-to-ts'
 import { main as migrateScopes } from './migrate-scopes'
 import { main as removeDeprecatedImports } from './remove-deprecated-imports'
+import { main as removeUnusedEnvironmentVariables } from './remove-unused-environment-variables'
+import { main as removeFhirUrlHelpers } from './remove-fhir-url-helpers'
+import { main as migrateApplicationConfigUrl } from './migrate-application-config-url'
+import { main as removeOldStatisticsService } from './remove-old-statistics-service'
+import { main as updatePackageJson } from './update-package-json'
 import { main as migrateWorkqueueConfigs } from './migrate-workqueue-configs'
 import { main as removeDemoScope } from './remove-demo-scope'
 import { main as removeHearthMigrations } from './remove-hearth-migrations'
-
-let cwd: string | undefined
-
-export function getCwd() {
-  if (!cwd) {
-    throw new Error('Country config working directory not set.')
-  }
-
-  return cwd
-}
+import { main as createEventsIndex } from './create-events-index'
+import { main as checkoutUpstreamFiles } from './checkout-upstream-files'
+import { main as addResendInviteNotification } from './add-resend-invite-notification'
+import { main as simplifyAnalyticsPrecalculations } from './simplify-analytics-precalculations'
+import { main as mergeInfrastructureDirectory } from './merge-infrastructure-directory'
+import { main as deleteInfrastructureDirectory } from './delete-infrastructure-directory'
 
 /**
- * Run the upgrade process for a given country config directory.
- * @param ccwd - The country config working directory.
+ * Run the upgrade process for the country config in the current working
+ * directory.
+ *
+ * @param dockerSwarm - When true, the local `infrastructure/` directory is
+ *   merged with upstream changes (Docker Swarm deployments still need it).
+ *   When false (the default), `infrastructure/` is deleted entirely, since
+ *   non-Swarm deployments no longer ship it.
  */
-export async function runUpgrade(ccwd: string | undefined) {
-  if (ccwd) {
-    console.log('Country config working directory:', ccwd)
-    cwd = ccwd
-  }
-  if (!ccwd) {
-    console.log(
-      'Will use current working directory as country config working directory.'
-    )
-    cwd = process.cwd()
-  }
-
+export async function runUpgrade(dockerSwarm: boolean) {
   await migrateWorkqueueConfigs()
   await removeReviewFromRegisterAction()
   await makeBuiltInValidateActionsCustom()
@@ -63,6 +58,21 @@ export async function runUpgrade(ccwd: string | undefined) {
   await convertConfigFilesToTs()
   await migrateScopes()
   await removeDeprecatedImports()
+  await removeUnusedEnvironmentVariables()
+  await removeFhirUrlHelpers()
+  await migrateApplicationConfigUrl()
+  await removeOldStatisticsService()
   await removeDemoScope()
   await removeHearthMigrations()
+  await createEventsIndex()
+  await checkoutUpstreamFiles()
+  await addResendInviteNotification()
+  await simplifyAnalyticsPrecalculations()
+  await updatePackageJson()
+
+  if (dockerSwarm) {
+    await mergeInfrastructureDirectory()
+  } else {
+    await deleteInfrastructureDirectory()
+  }
 }

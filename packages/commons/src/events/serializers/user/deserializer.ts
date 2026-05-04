@@ -16,7 +16,7 @@ import {
   SerializableWithin,
   SerializedQueryExpression
 } from '../../../events/CountryConfigQueryInput'
-import { User } from '../../../users/User'
+import { UserOrSystem } from '../../../users/User'
 import { SerializedUserField } from './serializer'
 
 /**
@@ -46,7 +46,7 @@ import { SerializedUserField } from './serializer'
  */
 function userDeserializer(
   serializedUserField: SerializedUserField | string,
-  user: User
+  user: UserOrSystem
 ): string | undefined {
   if (typeof serializedUserField === 'string') {
     return serializedUserField
@@ -66,7 +66,10 @@ function userDeserializer(
       `Deserializer for ${serializedUserField.$userField} is not implemented yet`
     )
   }
-  return user[serializedUserField.$userField] ?? undefined
+  const value = (user as Record<string, unknown>)[
+    serializedUserField.$userField
+  ]
+  return typeof value === 'string' ? value : undefined
 }
 
 function isDefined<T>(value: T | undefined): value is T {
@@ -75,7 +78,7 @@ function isDefined<T>(value: T | undefined): value is T {
 
 function serializeLocationField<
   T extends SerializableWithin | SerializableExact
->(expression: T, user: User) {
+>(expression: T, user: UserOrSystem) {
   if (expression.type === 'exact') {
     return userDeserializer(expression.term, user)
   }
@@ -87,7 +90,7 @@ function serializeLocationField<
 
 function deserializeExpression<
   T extends SerializableWithin | SerializableExact
->(expression: T, user: User) {
+>(expression: T, user: UserOrSystem) {
   if (expression.type === 'exact') {
     const term = userDeserializer(expression.term, user)
     if (!term) {
@@ -113,7 +116,7 @@ function deserializeExpression<
 
 function deserializeQueryExpression(
   expression: SerializedQueryExpression,
-  user: User
+  user: UserOrSystem
 ): QueryExpression {
   const assignedTo = expression.assignedTo
     ? userDeserializer(expression.assignedTo.term, user)
@@ -214,7 +217,7 @@ function deserializeQueryExpression(
 
 export function deserializeQuery(
   query: CountryConfigQueryType,
-  user: User
+  user: UserOrSystem
 ): QueryType {
   return {
     ...query,

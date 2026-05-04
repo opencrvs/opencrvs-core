@@ -127,7 +127,7 @@ function SidebarComponent({
 
   let name = ''
   if (userDetails?.name) {
-    name = getUsersFullName(userDetails.name, language)
+    name = getUsersFullName(userDetails.name)
   }
 
   const role =

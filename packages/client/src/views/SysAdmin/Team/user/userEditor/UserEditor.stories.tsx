@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
@@ -15,7 +16,9 @@ import { FieldType, TestUserRole } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { ReviewUser, useUserFormState } from './UserEditor'
+import { mockOfflineData } from '@client/tests/mock-offline-data'
+import { EditUser, ReviewUser, useUserFormState } from './UserEditor'
+import { createTemporaryId } from '@client/v2-events/utils'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [httpLink({ url: '/api/events' })],
@@ -56,10 +59,69 @@ const meta: Meta<typeof ReviewUser> = {
         ]
       }
     }
+  },
+  // Reset all shared mutable state to defaults before every story so no story
+  // can pollute the next. Story-level beforeEach only needs to set overrides.
+  beforeEach: () => {
+    window.config.ADDITIONAL_USER_FIELDS = []
+    // story-level MSW handlers don't reliably override the global /api/config
+    // handler (named-group vs flat-array registration in preview.tsx), so we
+    // mutate the source object that the global handler returns directly.
+    window.config.USER_NOTIFICATION_DELIVERY_METHOD = 'email'
+    mockOfflineData.config.USER_NOTIFICATION_DELIVERY_METHOD = 'email'
+    useUserFormState.getState().clear()
   }
 }
 
 export default meta
+
+/**
+ * user.details form when the country uses email as the notification delivery
+ * method. The email field must be marked required; phone must be optional.
+ */
+export const UserDetailsEmailDelivery: StoryObj = {
+  render: () => <EditUser />,
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.details'
+      })
+    }
+  },
+  beforeEach: () => {
+    // Pre-seed primaryOfficeId so user.office (requireCompletionToContinue)
+    // is satisfied and the router lands on user.details.
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: existingUser.primaryOfficeId
+    })
+  }
+}
+
+/**
+ * user.details form when the country uses SMS as the notification delivery
+ * method. The phone field must be marked required; email must be optional.
+ */
+export const UserDetailsSmsDelivery: StoryObj = {
+  render: () => <EditUser />,
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.details'
+      })
+    }
+  },
+  beforeEach: () => {
+    window.config.USER_NOTIFICATION_DELIVERY_METHOD = 'sms'
+    mockOfflineData.config.USER_NOTIFICATION_DELIVERY_METHOD = 'sms'
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: existingUser.primaryOfficeId
+    })
+  }
+}
 
 /**
  * Review page for a new user with no fields filled in.
@@ -70,16 +132,13 @@ export const ReviewWithEmptyFields: StoryObj<typeof ReviewUser> = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
-        userId: '__NEW__'
+        userId: createTemporaryId()
       })
     }
   },
-  loaders: [
-    async () => {
-      window.config.ADDITIONAL_USER_FIELDS = [...additionalFields]
-      useUserFormState.getState().clear()
-    }
-  ]
+  beforeEach: () => {
+    window.config.ADDITIONAL_USER_FIELDS = [...additionalFields]
+  }
 }
 
 /**
@@ -96,26 +155,23 @@ export const ReviewWithAllFieldsFilled: StoryObj<typeof ReviewUser> = {
       })
     }
   },
-  loaders: [
-    async () => {
-      window.config.ADDITIONAL_USER_FIELDS = [...additionalFields]
-      // Pre-seed the store directly. When the component mounts,
-      // the useEffect sees a non-empty store and skips auto-populate,
-      // preserving the staffId value we set here.
-      useUserFormState.getState().setUserForm({
-        primaryOfficeId: existingUser.primaryOfficeId,
-        role: TestUserRole.enum.REGISTRATION_AGENT,
-        name: {
-          firstname: existingUser.name[0].given[0],
-          surname: existingUser.name[0].family,
-          middlename: ''
-        },
-        phoneNumber: existingUser.mobile,
-        email: existingUser.email,
-        fullHonorificName: 'Dr. Felix Katongo',
-        device: 'iPhone 15',
-        'user.staffId': 'EMP-12345'
-      })
-    }
-  ]
+  beforeEach: () => {
+    window.config.ADDITIONAL_USER_FIELDS = [...additionalFields]
+    // Pre-seed the store directly. When the component mounts,
+    // the useEffect sees a non-empty store and skips auto-populate,
+    // preserving the staffId value we set here.
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: existingUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      name: {
+        firstname: existingUser.name.firstname,
+        surname: existingUser.name.surname
+      },
+      phoneNumber: '01233443443',
+      email: existingUser.email,
+      fullHonorificName: 'Dr. Felix Katongo',
+      device: 'iPhone 15',
+      'user.staffId': 'EMP-12345'
+    })
+  }
 }

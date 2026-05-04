@@ -658,13 +658,15 @@ export type AdministrativeAreaField = z.infer<typeof AdministrativeAreaField>
 const LocationInput = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
   defaultValue: z.union([NonEmptyTextValue, SerializedUserField]).optional(),
-  configuration: z.object({
-    locationTypes: z
-      .array(z.string())
-      .optional()
-      .describe('Types of the locations that are available for selection.'),
-    allowedLocations: AllowedLocations
-  })
+  configuration: z
+    .object({
+      locationTypes: z
+        .array(z.string())
+        .optional()
+        .describe('Types of the locations that are available for selection.'),
+      allowedLocations: AllowedLocations
+    })
+    .optional()
 }).describe('Input field for a location')
 
 export type LocationInput = z.infer<typeof LocationInput>
@@ -1180,10 +1182,7 @@ export type FieldConfigInput =
  *  type to be inferred causes typescript compiler to fail with "inferred type
  *  exeeds max length"
  */
-export const FieldConfig: z.ZodType<
-  FieldConfig,
-  FieldConfigInput
-> = z
+export const FieldConfig: z.ZodType<FieldConfig, FieldConfigInput> = z
   .discriminatedUnion('type', [
     FieldGroup,
     Address,

@@ -113,7 +113,7 @@ function UserFullName({ userId }: { userId: string }) {
   if (!user) {
     return null
   }
-  return getUsersFullName(user.name, intl.locale)
+  return getUsersFullName(user.name)
 }
 
 function PlaceOfEventName({ id }: { id?: UUID }) {

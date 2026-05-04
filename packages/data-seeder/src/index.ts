@@ -11,18 +11,31 @@
 import { env } from './environment'
 import fetch from 'node-fetch'
 import { seedLocations } from './locations'
+import superjson from 'superjson'
 import { seedUsers } from './users'
-import { parseGQLResponse, raise } from './utils'
-import { print } from 'graphql'
-import gql from 'graphql-tag'
-import decode from 'jwt-decode'
+import { raise } from './utils'
+import { createTRPCClient, httpLink } from '@trpc/client'
+import { InitialisationRouter } from '@opencrvs/events/src/router'
+
+export const createInitialisationClient = (token: string) => {
+  return createTRPCClient<InitialisationRouter>({
+    links: [
+      httpLink({
+        url: new URL('events/initialisation/', env.GATEWAY_HOST).href,
+        transformer: superjson,
+        async headers() {
+          return { authorization: `Bearer ${token}` }
+        }
+      })
+    ]
+  })
+}
 
 async function getToken(): Promise<string> {
   const authUrl = new URL('authenticate-super-user', env.AUTH_HOST).toString()
   const res = await fetch(authUrl, {
     method: 'POST',
     body: JSON.stringify({
-      username: 'o.admin',
       password: env.SUPER_USER_PASSWORD
     }),
     headers: {
@@ -38,37 +51,6 @@ async function getToken(): Promise<string> {
   }
   const body = await res.json()
   return body.token
-}
-
-const deactivateUserMutation = print(gql`
-  mutation deactivateUser(
-    $userId: String!
-    $action: String!
-    $reason: String!
-    $comment: String
-  ) {
-    auditUser(
-      userId: $userId
-      action: $action
-      reason: $reason
-      comment: $comment
-    )
-  }
-`)
-
-interface TokenPayload {
-  sub: string
-  exp: string
-  algorithm: string
-  scope: string[]
-}
-
-function getTokenPayload(token: string): TokenPayload {
-  try {
-    return decode<TokenPayload>(token)
-  } catch (err) {
-    raise(`getTokenPayload: Error occurred during token decode : ${err}`)
-  }
 }
 
 async function triggerSystemReady(token: string) {
@@ -111,24 +93,8 @@ async function triggerSystemReady(token: string) {
 }
 
 async function deactivateSuperuser(token: string) {
-  const { sub } = getTokenPayload(token)
-  const res = await fetch(`${env.GATEWAY_HOST}/graphql`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({
-      query: deactivateUserMutation,
-      variables: {
-        userId: sub,
-        action: 'DEACTIVATE',
-        reason: 'Remove super user'
-      }
-    })
-  })
-
-  parseGQLResponse(await res.json())
+  const client = createInitialisationClient(token)
+  await client.complete.mutate()
 }
 
 async function main() {

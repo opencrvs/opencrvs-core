@@ -28,7 +28,9 @@ import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   createSystemTestClient,
   createTestToken,
-  setupTestCase
+  REINDEX_SYSTEM_ID,
+  setupTestCase,
+  TEST_SYSTEM_ID
 } from '@events/tests/utils'
 import {
   getEventAliasName,
@@ -79,7 +81,7 @@ const singleEventConfigHandler = http.get(
 )
 
 const reindexToken = createTestToken({
-  userId: 'reindex-system',
+  userId: REINDEX_SYSTEM_ID,
   scopes: [encodeScope({ type: 'record.reindex' })],
   role: 'TEST_SYSTEM_ROLE',
   userType: TokenUserType.enum.system
@@ -223,7 +225,7 @@ beforeEach(async () => {
 })
 
 test(`prevents forbidden access if missing required scope`, async () => {
-  const client = createSystemTestClient('test-system', [])
+  const client = createSystemTestClient(TEST_SYSTEM_ID, [])
 
   await expect(client.event.reindex.trigger()).rejects.toMatchObject(
     new TRPCError({ code: 'FORBIDDEN' })
@@ -231,7 +233,7 @@ test(`prevents forbidden access if missing required scope`, async () => {
 })
 
 test('allows access with reindex scope', async () => {
-  const client = createSystemTestClient('test-system', [
+  const client = createSystemTestClient(TEST_SYSTEM_ID, [
     encodeScope({ type: 'record.reindex' })
   ])
 
@@ -434,7 +436,7 @@ test('runReindex records completed status in reindexing_status index', async () 
   mswServer.use(postHandler)
   await runReindex(reindexToken)
 
-  const client = createSystemTestClient('reindex-system', [
+  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
     encodeScope({ type: 'record.reindex' })
   ])
   const history = await client.event.reindex.status()
@@ -453,7 +455,7 @@ test('runReindex records failed status when country config returns 500', async (
     // Swallow the error — we only want to inspect status
   })
 
-  const client = createSystemTestClient('reindex-system', [
+  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
     encodeScope({ type: 'record.reindex' })
   ])
   const history = await client.event.reindex.status()

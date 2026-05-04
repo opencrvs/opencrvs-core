@@ -132,17 +132,10 @@ export const selectOption = (
 }
 
 export const userDetails: UserDetails = {
-  id: 'b77b78af-a259-4bc1-85d5-b1e8c1382273',
+  id: 'b77b78af-a259-4bc1-85d5-b1e8c1382273' as UUID,
   type: 'user',
   status: 'active',
-  name: [
-    {
-      use: 'en',
-      given: ['Shakib'],
-      family: 'Al Hasan'
-    },
-    { use: 'bn', given: [''], family: '' }
-  ],
+  name: { firstname: 'Shakib', surname: 'Al Hasan' },
   role: TestUserRole.enum.FIELD_AGENT,
   mobile: '01677701431',
   primaryOfficeId: '6327dbd9-e118-4dbe-9246-cb0f7649a666' as UUID

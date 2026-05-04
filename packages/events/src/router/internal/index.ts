@@ -10,16 +10,167 @@
  */
 
 import * as z from 'zod/v4'
-import { internalProcedure, internalRouter } from '@events/router/trpc'
+import { TRPCError } from '@trpc/server'
+import { UserName, UserAuditRecordInput, UUID } from '@opencrvs/commons'
+import { internalProcedure, serviceRouter } from '@events/router/trpc'
+import {
+  getUserCredentialsByUsername,
+  updatePasswordHash
+} from '@events/storage/postgres/events/users'
+import { generateHash } from '@events/service/auth/hash'
+import {
+  checkSecurityQuestionMatch,
+  getCredentials,
+  getSecurityQuestionsForUser,
+  verifyUser
+} from '@events/service/users/api'
+import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
+import { getSystemInitialisation } from '@events/service/auth'
+import { canInitialiseSystem } from '../middleware'
+
+const VerifyUserOutput = z.object({
+  id: z.string(),
+  username: z.string(),
+  mobile: z.string().optional(),
+  email: z.string().optional(),
+  status: z.string(),
+  name: UserName,
+  securityQuestionKey: z.string(),
+  scope: z.array(z.string())
+})
 
 /**
  * Intermediary route for having an endpoint to test with. Will be removed once we merge the user management changes.
  */
-export const internalUserRouter = internalRouter({
+export const internalUserRouter = serviceRouter({
   ping: internalProcedure
     .input(z.string())
     .output(z.string())
     .query(({ input }) => {
       return `pong: ${input}`
-    })
+    }),
+  verifyPassword: internalProcedure
+    .input(
+      z.object({
+        username: z.string(),
+        password: z.string()
+      })
+    )
+    .output(
+      z.object({
+        id: z.string(),
+        name: UserName,
+        mobile: z.string().optional(),
+        email: z.string().optional(),
+        status: z.string(),
+        role: z.string()
+      })
+    )
+    .mutation(async ({ input }) => {
+      const user = await getUserCredentialsByUsername(input.username)
+
+      if (!user) {
+        throw new TRPCError({ code: 'UNAUTHORIZED' })
+      }
+
+      const hash = await generateHash(input.password, user.salt)
+      if (hash !== user.passwordHash) {
+        throw new TRPCError({ code: 'UNAUTHORIZED' })
+      }
+
+      return {
+        id: user.id,
+        name: {
+          firstname: user.firstname,
+          surname: user.surname
+        },
+        mobile: user.mobile ?? undefined,
+        email: user.email ?? undefined,
+        status: user.status,
+        role: user.role
+      }
+    }),
+  verifySecurityAnswer: internalProcedure
+    .input(
+      z.object({
+        userId: UUID,
+        questionKey: z.string(),
+        answer: z.string()
+      })
+    )
+    .output(z.object({ matched: z.boolean(), questionKey: z.string() }))
+    .mutation(async ({ input }) => {
+      const record = await getCredentials(input.userId)
+
+      const questions = getSecurityQuestionsForUser(record)
+      return checkSecurityQuestionMatch({
+        questions,
+        input,
+        salt: record.salt
+      })
+    }),
+  verifyUser: internalProcedure
+    .input(
+      z
+        .object({ mobile: z.string().optional(), email: z.string().optional() })
+        .refine((d) => d.mobile || d.email, 'mobile or email required')
+    )
+    .output(VerifyUserOutput)
+    .mutation(async ({ input }) => {
+      return verifyUser(input)
+    }),
+  changePassword: internalProcedure
+    .input(
+      z.object({
+        userId: UUID,
+        password: z.string()
+      })
+    )
+    .mutation(async ({ input }) => {
+      const record = await getCredentials(input.userId)
+      const newHash = await generateHash(input.password, record.salt)
+      await updatePasswordHash(UUID.parse(input.userId), newHash)
+      void writeAuditLog({
+        clientId: input.userId,
+        clientType: 'user',
+        operation: 'user.password_reset',
+        requestData: { subjectId: input.userId }
+      })
+    }),
+  audit: {
+    record: internalProcedure
+      .input(UserAuditRecordInput)
+      .mutation(async ({ input }) => {
+        await writeAuditLog({
+          ...input,
+          clientId: input.requestData.subjectId,
+          clientType: 'system'
+        })
+      })
+  },
+  initialisation: {
+    authenticate: internalProcedure
+      .use(canInitialiseSystem())
+      .input(z.object({ password: z.string() }))
+      .output(z.object({ valid: z.boolean() }))
+      .mutation(async ({ input }) => {
+        const systemInitialisation = await getSystemInitialisation()
+
+        if (systemInitialisation.completedAt !== null) {
+          throw new TRPCError({
+            code: 'UNAUTHORIZED'
+          })
+        }
+
+        const hash = await generateHash(
+          input.password,
+          systemInitialisation.salt
+        )
+        if (hash !== systemInitialisation.hash) {
+          throw new TRPCError({ code: 'UNAUTHORIZED' })
+        }
+
+        return { valid: true }
+      })
+  }
 })

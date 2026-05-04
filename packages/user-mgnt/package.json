@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/user-mgnt",
-  "version": "1.9.13",
+  "version": "2.0.0",
   "description": "OpenCRVS user management service",
   "license": "MPL-2.0",
   "private": true,
@@ -15,9 +15,9 @@
   },
   "dependencies": {
     "@hapi/boom": "^9.1.1",
-    "@hapi/hapi": "^20.0.1",
-    "@opencrvs/commons": "^1.9.0",
-    "@opencrvs/events": "^1.9.0",
+    "@hapi/hapi": "^21.0.0",
+    "@opencrvs/commons": "^2.0.0",
+    "@opencrvs/events": "^2.0.0",
     "@trpc/client": "^11.0.0-rc.532",
     "superjson": "1.9.0-0",
     "app-module-path": "^2.2.0",
@@ -70,7 +70,7 @@
   "lint-staged": {
     "src/**/*.ts": [
       "prettier --write",
-      "eslint -c .eslintrc.js --fix"
+      "eslint -c eslint.config.js --fix"
     ]
   },
   "jest": {

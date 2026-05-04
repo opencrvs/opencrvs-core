@@ -163,7 +163,13 @@ export function resolveActionConditionals({
   // 2. Check if the action is available for the event at all.
   const actionIsAvailableForEvent = allAvailableActions.includes(actionType)
   // 3. Check if the user can perform it.
-  const actionIsAllowedForUser = isActionAllowedForUser(actionType)
+  // For DECLARE, also allow users with NOTIFY scope — they can enter the declare form
+  // and submit as NOTIFY. Mirrors the same logic in DeclarationAction.tsx.
+  const actionIsAllowedForUser =
+    actionType === ActionType.DECLARE
+      ? isActionAllowedForUser(ActionType.DECLARE) ||
+        isActionAllowedForUser(ActionType.NOTIFY)
+      : isActionAllowedForUser(actionType)
   const actionConfig = getActionConfig({ eventConfiguration, actionType })
 
   // 4. Check if the action is enabled/visible based on the configuration conditionals.

@@ -11,7 +11,7 @@
 
 import { encodeScope, TestUserRole } from '@opencrvs/commons'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
-import { createTestToken } from '@events/tests/utils'
+import { createTestToken, TEST_SYSTEM_ID } from '@events/tests/utils'
 import { TrpcContext } from '@events/context'
 import { allowedWithAnyOfScopes } from '.'
 
@@ -26,7 +26,7 @@ describe('allowedWithAnyOfScopes()', () => {
     const mockOpts = {
       ctx: {
         token: createTestToken({
-          userId: 'test-user-id',
+          userId: TEST_SYSTEM_ID,
           scopes: [encodeScope({ type: 'record.declare' })],
           role: TestUserRole.enum.REGISTRATION_AGENT
         })
@@ -51,7 +51,7 @@ describe('allowedWithAnyOfScopes()', () => {
     const mockOpts = {
       ctx: {
         token: createTestToken({
-          userId: 'test-user-id',
+          userId: TEST_SYSTEM_ID,
           scopes: [encodeScope({ type: 'record.reindex' })],
           role: TestUserRole.enum.REGISTRATION_AGENT
         })

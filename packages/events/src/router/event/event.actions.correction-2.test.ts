@@ -34,7 +34,8 @@ import { ChildOnboardingEvent } from '@opencrvs/commons/fixtures'
 import {
   createSystemTestClient,
   createTestClient,
-  setupTestCase
+  setupTestCase,
+  TEST_SYSTEM_ID
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -385,7 +386,7 @@ describe('Search index should reflect corrected null informant fields', () => {
     })
 
     // 2) Search by informant name should return it
-    const recordSearchClient = createSystemTestClient('test-system', [
+    const recordSearchClient = createSystemTestClient(TEST_SYSTEM_ID, [
       encodeScope({ type: 'record.search' })
     ])
     const { results: resultsBeforeCorrection } =

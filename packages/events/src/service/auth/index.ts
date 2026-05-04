@@ -10,8 +10,13 @@
  */
 
 import fetch from 'node-fetch'
+import * as z from 'zod/v4'
 import { UUID } from '@opencrvs/commons'
 import { env } from '@events/environment'
+import {
+  getSystemInitialisation as getSystemInitialisationQuery,
+  completeSystemInitialisation as completeSystemInitialisationQuery
+} from '@events/storage/postgres/system-initialisation'
 
 export async function getAnonymousToken() {
   const res = await fetch(
@@ -59,4 +64,36 @@ export async function getActionConfirmationToken(
     access_token: string
   }
   return accessToken
+}
+
+const SystemInitialisation = z
+  .object({
+    id: z.number(),
+    hash: z.string(),
+    salt: z.string(),
+    completedAt: z.null()
+  })
+  .or(
+    z.object({
+      id: z.number(),
+      hash: z.null(),
+      salt: z.null(),
+      completedAt: z.string()
+    })
+  )
+
+export async function getSystemInitialisation() {
+  const systemInitialisation = await getSystemInitialisationQuery()
+  if (!systemInitialisation) {
+    throw new Error('System initialisation not found')
+  }
+
+  const parsedSystemInitialisation =
+    SystemInitialisation.parse(systemInitialisation)
+
+  return parsedSystemInitialisation
+}
+
+export async function completeSystemInitialisation() {
+  return await completeSystemInitialisationQuery()
 }
