@@ -33,10 +33,7 @@ import {
   ActionInputWithType,
   EventConfig
 } from '@opencrvs/commons/events'
-import {
-  TokenUserType,
-  TokenWithBearer
-} from '@opencrvs/commons/authentication'
+import { TokenWithBearer } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
 import {
   requiresAnyOfScopes,
@@ -426,7 +423,11 @@ export function getDefaultActionProcedures(
       }),
 
     reject: systemProcedure
-      .input(AsyncActionConfirmationResponseSchema)
+      .input(
+        AsyncActionConfirmationResponseSchema.extend({
+          keepAssignment: z.boolean().default(false)
+        })
+      )
       .use(middleware.requireActionConfirmationAuthorization)
       .mutation(async ({ input, ctx }) => {
         const { eventId, actionId } = input
@@ -451,17 +452,19 @@ export function getDefaultActionProcedures(
           return getEventById(input.eventId)
         }
 
-        return addAsyncRejectAction({
-          ...input,
-          originalActionId: actionId,
-          type: actionType,
-          createdBy: ctx.user.id,
-          createdByUserType: TokenUserType.Enum.user,
-          createdByRole: ctx.user.role,
-          createdAtLocation: ctx.user.primaryOfficeId ?? undefined,
+        const configuration = await getEventConfigurationById({
           token: ctx.token,
           eventType: event.type
         })
+
+        return addAsyncRejectAction(
+          { ...input, type: actionType, originalActionId: actionId },
+          {
+            event,
+            user: ctx.user,
+            configuration
+          }
+        )
       })
   }
 }
