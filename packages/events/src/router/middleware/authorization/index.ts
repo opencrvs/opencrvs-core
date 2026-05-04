@@ -526,7 +526,7 @@ export const userCanReadOtherUser: MiddlewareFunction<
     return next()
   }
 
-  if (!acceptedScopes) {
+  if (acceptedScopes.length === 0) {
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
 
@@ -569,14 +569,10 @@ export const userCanReadUserAudit: MiddlewareFunction<
   const acceptedScopes = getAcceptedScopesFromToken(token, ['user.read'])
   const hasReadMyAuditScope = hasScope(token, 'user.read-only-my-audit')
 
-  if (!acceptedScopes && !hasReadMyAuditScope) {
+  if (acceptedScopes.length === 0 && !hasReadMyAuditScope) {
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
   const otherUser = await getUser(input.userId)
-
-  if (!otherUser) {
-    throw new TRPCError({ code: 'NOT_FOUND' })
-  }
 
   if (hasReadMyAuditScope && userReading.id === otherUser.id) {
     return next()
