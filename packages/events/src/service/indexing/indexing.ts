@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -470,67 +469,6 @@ export async function indexEvent(event: EventDocument, config: EventConfig) {
     document: eventIndexWithAdministrativeHierarchy,
     refresh: 'wait_for'
   })
-}
-
-export async function getIndexedEvents(
-  userId: string,
-  eventConfigs: EventConfig[]
-) {
-  const esClient = getOrCreateClient()
-
-  const hasEventsIndex = await esClient.indices.existsAlias({
-    name: getEventAliasName()
-  })
-
-  if (!hasEventsIndex) {
-    logger.error(
-      `Event alias ${getEventAliasName()} not created. Sending empty array. Ensure indexing is running.`
-    )
-    return []
-  }
-
-  const query = {
-    // We basically want to fetch all events,
-    // UNLESS they are in status 'CREATED' (i.e. undeclared drafts) and not created by current user.
-    bool: {
-      should: [
-        {
-          bool: {
-            must_not: [{ term: { status: EventStatus.enum.CREATED } }],
-            should: undefined
-          }
-        },
-        {
-          bool: {
-            must: [
-              { term: { status: EventStatus.enum.CREATED } },
-              { term: { createdBy: userId } }
-            ],
-
-            should: undefined
-          }
-        }
-      ],
-
-      minimum_should_match: 1
-    }
-  } satisfies estypes.QueryDslQueryContainer
-
-  const response = await esClient.search<EncodedEventIndex>({
-    index: getEventAliasName(),
-    query,
-    size: ELASTICSEARCH_MAXIMUM_QUERY_SIZE,
-    request_cache: false
-  })
-
-  return response.hits.hits
-    .map((hit) => hit._source)
-    .filter((event): event is EncodedEventIndex => event !== undefined)
-    .map((eventIndex) => {
-      const eventConfig = getEventConfigById(eventConfigs, eventIndex.type)
-      const decodedEventIndex = decodeEventIndex(eventConfig, eventIndex)
-      return removeSecuredFields(eventConfig, decodedEventIndex)
-    })
 }
 
 export async function findRecordsByQuery({
