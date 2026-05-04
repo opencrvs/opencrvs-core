@@ -21,6 +21,7 @@ import { testDataGenerator } from '@client/tests/test-data-generators'
 import { mockOfflineData } from '@client/tests/mock-offline-data'
 import { EditUser, ReviewUser, useUserFormState } from './UserEditor'
 import { createTemporaryId } from '@client/v2-events/utils'
+import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [httpLink({ url: '/api/events' })],
@@ -269,6 +270,153 @@ export const ClearedPhoneNumberNormalisedToUndefined: StoryObj = {
             expect.not.objectContaining({ mobile: '' })
           )
         )
+      }
+    )
+  }
+}
+
+const userA = generator.user.registrationAgent().v2
+const userB = generator.user.localRegistrar().v2
+
+/**
+ * Find the ToggleMenu trigger button in the row containing the given user name.
+ */
+function findMenuTriggerForUser(
+  container: HTMLElement,
+  userName: string
+): HTMLButtonElement {
+  const profileLinks = Array.from(
+    container.querySelectorAll<HTMLButtonElement>('#profile-link')
+  )
+  const nameCell = profileLinks.find(
+    (el) => el.textContent?.trim() === userName
+  )
+  if (!nameCell) throw new Error(`User row not found for: ${userName}`)
+  const row = nameCell.closest('tr')
+  if (!row) throw new Error(`Table row not found for: ${userName}`)
+  const trigger = row.querySelector<HTMLButtonElement>('button[popovertarget]')
+  if (!trigger)
+    throw new Error(`Menu trigger not found in row for: ${userName}`)
+  return trigger
+}
+
+/**
+ * Regression test for: stale form state from a previously viewed user appearing
+ * when navigating to a different user's edit/review page.
+ *
+ * Scenario: the admin opens Kennedy's profile, edits a field, then cancels back
+ * to the user list without submitting. Opening Felix's profile next must show
+ * Felix's own data, not Kennedy's leftover form state.
+ */
+export const CorrectUserDataLoadedAfterSwitchingUsers: StoryObj<
+  typeof EditUser
+> = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath:
+        V1_LEGACY_ROUTES.TEAM_USER_LIST + `?locationId=${userA.primaryOfficeId}`
+    },
+    msw: {
+      handlers: {
+        user: [
+          tRPCMsw.user.search.query(() => [userA, userB]),
+          tRPCMsw.user.get.query((id) =>
+            id === userB.id ? { ...userB, data: {} } : { ...userA, data: {} }
+          )
+        ]
+      }
+    }
+  },
+  loaders: [
+    async () => {
+      window.config.ADDITIONAL_USER_FIELDS = []
+      useUserFormState.getState().clear()
+    }
+  ],
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Wait for user list to load', async () => {
+      await canvas.findByText(`${userA.name.firstname} ${userA.name.surname}`, {
+        selector: '#profile-link'
+      })
+      await canvas.findByText(`${userB.name.firstname} ${userB.name.surname}`, {
+        selector: '#profile-link'
+      })
+    })
+
+    await step(
+      `Open ${userB.name.firstname}'s action menu and click Edit details`,
+      async () => {
+        const trigger = findMenuTriggerForUser(
+          canvasElement,
+          `${userB.name.firstname} ${userB.name.surname}`
+        )
+        await userEvent.click(trigger)
+
+        const popoverId = trigger.getAttribute('popovertarget')
+        const popover = popoverId ? document.getElementById(popoverId) : null
+        if (!popover)
+          throw new Error(`${userB.name.firstname} menu popover not found`)
+        await userEvent.click(within(popover).getByText('Edit details'))
+      }
+    )
+
+    await step(
+      `Verify ${userB.name.firstname}'s review page loaded`,
+      async () => {
+        await canvas.findByText(
+          `${userB.name.firstname} ${userB.name.surname}`,
+          { selector: '[data-testid="row-value-name"]', exact: false }
+        )
+      }
+    )
+
+    await step('Click Edit on the email field', async () => {
+      await userEvent.click(await canvas.findByTestId('change-button-email'))
+    })
+
+    await step('Modify the email field without submitting', async () => {
+      const emailInputs = await canvas.findAllByTestId('text__email')
+      await userEvent.clear(emailInputs[0])
+      await userEvent.type(emailInputs[0], 'modified@example.com')
+      await userEvent.click(document.body)
+    })
+
+    await step(
+      'Cancel — close without submitting, back to user list',
+      async () => {
+        await userEvent.click(await canvas.findByTestId('crcl-btn'))
+      }
+    )
+
+    await step(
+      `Open ${userA.name.firstname}'s action menu and click Edit details`,
+      async () => {
+        const trigger = findMenuTriggerForUser(
+          canvasElement,
+          `${userA.name.firstname} ${userA.name.surname}`
+        )
+        await userEvent.click(trigger)
+
+        const popoverId = trigger.getAttribute('popovertarget')
+        const popover = popoverId ? document.getElementById(popoverId) : null
+        if (!popover)
+          throw new Error(`${userA.name.firstname} menu popover not found`)
+        await userEvent.click(within(popover).getByText('Edit details'))
+      }
+    )
+
+    await step(
+      `${userA.name.firstname}'s review page shows ${userA.name.firstname}'s data`,
+      async () => {
+        await expect(
+          canvas.findByText(`${userA.name.firstname} ${userA.name.surname}`, {
+            selector: '[data-testid="row-value-name"]',
+            exact: false
+          })
+        ).resolves.toBeInTheDocument()
       }
     )
   }
