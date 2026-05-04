@@ -13,29 +13,29 @@ import { DocumentPath } from '../documents'
 import * as z from 'zod/v4'
 import { UUID } from '../uuid'
 import { TokenUserType } from '../authentication'
-import { FieldValue, FileFieldValue } from '../events'
+import {
+  EmailValue,
+  FieldValue,
+  FileFieldValue,
+  NameFieldValue
+} from '../events'
 
-export const REINDEX_USER_ID = '__ANONYMOUS_REINDEX_USER__'
+export const REINDEX_USER_ID = '00000000-0000-0000-0000-000000000000' as UUID
 
+/**
+ * @deprecated only used in user-mgnt
+ */
 export type IUserName = {
   use: string
   family: string
   given: string[]
 }
 
-// * @deprecated - This is from 1.9, will be removed in v2.1.
-export const FamilyName = z.array(
-  z.object({
-    use: z.string(),
-    given: z.array(z.string()),
-    family: z.string()
-  })
-)
-export type FamilyName = z.infer<typeof FamilyName>
+export const UserName = NameFieldValue.omit({ middlename: true })
 
 export const User = z.object({
   id: UUID,
-  name: FamilyName,
+  name: UserName,
   role: z.string(),
   avatar: DocumentPath.optional(),
   signature: DocumentPath.nullish().describe(
@@ -47,12 +47,14 @@ export const User = z.object({
   fullHonorificName: z.string().optional(),
   type: TokenUserType.extract(['user']),
   mobile: z.string().optional(),
-  email: z.string().optional(),
+  email: EmailValue.optional(),
   status: z.enum(['active', 'deactivated', 'pending']),
   data: z.record(z.string(), FieldValue).optional()
 })
 
 export type User = z.infer<typeof User>
+
+export type UserName = User['name']
 
 export const CreateUserInput = User.pick({
   name: true,
@@ -66,6 +68,7 @@ export const CreateUserInput = User.pick({
 })
   .extend({
     username: z.undefined().optional(),
+    password: z.undefined().optional(),
     signature: FileFieldValue.optional()
   })
   .describe('User input for creating a new user through client API.')
@@ -109,7 +112,7 @@ export const CreateUserInputInternal = User.pick({
 export type CreateUserInputInternal = z.infer<typeof CreateUserInputInternal>
 
 export const System = z.object({
-  id: z.string(),
+  id: UUID,
   name: z.string(),
   type: TokenUserType.extract(['system']),
   primaryOfficeId: UUID.optional(),

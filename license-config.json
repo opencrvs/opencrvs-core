@@ -54,7 +54,9 @@
     "packages/events/.kanelrc.js",
     "packages/dashboards/data/metabase/*",
     "packages/events/src/tests/extract-dump.sh",
-    ".kube"
+    ".kube",
+    ".claude",
+    "packages/api-docs/public-key.pem"
   ],
   "license": "license-header.txt",
   "licenseFormats": {

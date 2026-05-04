@@ -27,7 +27,7 @@ import {
   sendVerificationCode,
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
-import { logger, UUID, IUserName } from '@opencrvs/commons'
+import { logger, UUID, UserName } from '@opencrvs/commons'
 import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
 import {
@@ -110,7 +110,7 @@ const eventsClient = createTRPCClient<AppRouter>({
 })
 
 export interface IAuthentication {
-  name: IUserName[]
+  name: UserName
   mobile?: string
   userId: string
   status: string
@@ -244,7 +244,7 @@ export async function createTokenForActionConfirmation(
 
 export async function storeUserInformation(
   nonce: string,
-  userFullName: IUserName[],
+  userFullName: UserName,
   userId: string,
   scope: string[],
   mobile?: string,
@@ -270,7 +270,7 @@ export async function generateAndSendVerificationCode(
   nonce: string,
   scope: string[],
   notificationEvent: NotificationEvent,
-  userFullName: IUserName[],
+  userFullName: UserName,
   mobile?: string,
   email?: string,
   role?: string | number

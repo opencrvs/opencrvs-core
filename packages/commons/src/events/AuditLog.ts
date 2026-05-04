@@ -177,6 +177,7 @@ const UserSubjectOnlyEntrySchema = AuditLogEntryBase.extend({
     'user.password_changed',
     'user.password_reset',
     'user.password_reset_by_admin',
+    'user.resend_invite',
     'user.username_reminder',
     'user.username_reminder_by_admin'
   ]),

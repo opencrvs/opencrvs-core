@@ -17,6 +17,7 @@ import {
   createTestToken,
   setupTestCase,
   systemInitialisationTestSetup,
+  TEST_SYSTEM_ID,
   TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
 
@@ -42,7 +43,7 @@ test('Returns 403 when accessed with system app token', async () => {
   const systemInitialisation = await systemInitialisationTestSetup()
 
   const appToken = createTestToken({
-    userId: 'test-system',
+    userId: TEST_SYSTEM_ID,
     scopes: TEST_USER_DEFAULT_SCOPES,
     userType: TokenUserType.enum.system
   })
