@@ -30,7 +30,8 @@ import {
   allowedWithAnyOfScopes,
   canAccessUserWithScopes,
   canCreateUserWithScopes,
-  canUpdateUserLocation
+  canUpdateUserLocation,
+  userCanReadOtherUser
 } from '@events/router/middleware'
 import {
   internalProcedure,
@@ -69,7 +70,7 @@ import {
   generateNonce
 } from '@events/service/verifyCode'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
-import { userCanReadOtherUser } from '../middleware'
+import { userCanReadUserAudit } from '../middleware'
 
 const UserSearch = z.object({
   username: z.string().optional(),
@@ -217,7 +218,7 @@ const auditRouter = router({
     .output(
       z.object({ results: z.array(AuditLogEntrySchema), total: z.number() })
     )
-    .use(userCanReadOtherUser)
+    .use(userCanReadUserAudit)
     .query(async ({ input }) => {
       const { results, total } = await queryUserAuditLog({
         subjectId: input.userId,
@@ -237,7 +238,7 @@ const auditRouter = router({
 export const userRouter = router({
   get: userOnlyProcedure
     .input(UUID)
-    .use(canAccessUserWithScopes(['user.read']))
+    .use(userCanReadOtherUser)
     .output(UserOrSystem)
     .query(async ({ input }) => {
       const users = await getUsersById([input])
@@ -311,7 +312,7 @@ export const userRouter = router({
   search: searchUsersRoute(userAndSystemProcedure),
   actions: userOnlyProcedure
     .input(UserActionsQuery)
-    .use(userCanReadOtherUser)
+    .use(userCanReadUserAudit)
     .query(async ({ input }) => {
       return getUserActions(input)
     }),

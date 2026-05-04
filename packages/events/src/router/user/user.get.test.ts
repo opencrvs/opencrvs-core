@@ -25,9 +25,10 @@ const withReadAll = [encodeScope({ type: 'user.read' })]
 
 test('Throws error if user not found with id', async () => {
   const { user } = await setupTestCase()
+  const uuid = getUUID()
   const client = createTestClient(user, withReadAll)
-  await expect(client.user.get(getUUID())).rejects.toMatchObject(
-    new TRPCError({ code: 'NOT_FOUND' })
+  await expect(client.user.get(uuid)).rejects.toThrowError(
+    new TRPCError({ code: 'NOT_FOUND', message: `User not found: ${uuid}` })
   )
 })
 
@@ -196,4 +197,11 @@ test('Returns user in nested location with administrativeArea scope', async () =
   await expect(client.user.get(userInNestedLocation.id)).resolves.toMatchObject(
     { id: userInNestedLocation.id }
   )
+})
+
+test('Returns oneself without scopes', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [])
+
+  await expect(client.user.get(user.id)).resolves.toMatchObject({ id: user.id })
 })
