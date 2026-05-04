@@ -140,6 +140,14 @@ const ReviewContainter = styled.div`
     padding: 0;
   }
 `
+
+const Highlighted = styled.strong`
+  color: ${({ theme }) => theme.colors.grey600};
+`
+
+const SupportingCopy = styled(Text)`
+  color: ${({ theme }) => theme.colors.supportingCopy};
+`
 const DeclarationDataContainer = styled.div``
 
 const reviewMessages = defineMessages({
@@ -692,9 +700,15 @@ function AcceptActionModal({
       width={600}
     >
       <Stack>
-        <Text color="grey500" element="p" variant="reg16">
-          {copy.supportingCopy ? intl.formatMessage(copy.supportingCopy) : null}
-        </Text>
+        <SupportingCopy color="grey500" element="p" variant="reg16">
+          {copy.supportingCopy
+            ? intl.formatMessage(copy.supportingCopy, {
+                strong: (chunks: React.ReactNode[]) => (
+                  <Highlighted>{chunks}</Highlighted>
+                )
+              })
+            : null}
+        </SupportingCopy>
       </Stack>
     </ResponsiveModal>
   )
