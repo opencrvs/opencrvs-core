@@ -53,10 +53,7 @@ import { getUserById } from '@events/storage/postgres/events/users'
 import { getSystemInitialisation } from '@events/service/auth'
 import { getLocationHierarchy } from '@events/service/locations/locations'
 import { findUserOrSystem } from '../../../service/users/api'
-import {
-  getInMemoryEventConfigurations,
-  getRoles
-} from '../../../service/config/config'
+import { getInMemoryEventConfigurations } from '../../../service/config/config'
 import { getEventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
 import { isLocationUnderAdministrativeArea } from '../../../storage/postgres/administrative-hierarchy/locations'
 

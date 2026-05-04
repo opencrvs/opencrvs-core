@@ -14,7 +14,12 @@ import { within, expect, fn, waitFor } from '@storybook/test'
 import { userEvent } from '@storybook/testing-library'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { TestUserRole } from '@opencrvs/commons/client'
+import {
+  TestUserRole,
+  TokenUserType,
+  User,
+  UUID
+} from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
@@ -271,5 +276,462 @@ export const ClearedPhoneNumberNormalisedToUndefined: StoryObj = {
         )
       }
     )
+  }
+}
+
+/**
+ * Authorization tests for the EditUser flow against the user.edit scope.
+ *
+ * Hierarchy in V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP:
+ *   Central (province, root)
+ *     └── Ibombo (district)
+ *   Sulaka  (province, separate root)
+ *
+ * Scope shape (test-data-generators.ts):
+ *   - NATIONAL_SYSTEM_ADMIN: user.edit with no jurisdiction filter; allowed
+ *     roles include REGISTRATION_AGENT.
+ *   - LOCAL_SYSTEM_ADMIN: user.edit with accessLevel: 'administrativeArea'
+ *     and an allowed role list that does NOT include NATIONAL_SYSTEM_ADMIN.
+ */
+
+const CENTRAL_ADMIN_AREA_ID = 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
+const SULAKA_ADMIN_AREA_ID = 'c599b691-fd2d-45e1-abf4-d185de727fb5' as UUID
+const CENTRAL_PROVINCIAL_OFFICE_ID =
+  '6f6186ce-cd5f-4a5f-810a-2d99e7c4ba12' as UUID
+const SULAKA_PROVINCIAL_OFFICE_ID =
+  '2884f5b9-17b4-49ce-bf4d-f538228935df' as UUID
+
+const TARGET_NSA_USER_ID = 'ac0babf3-282a-447a-aecc-3b9aa9fb7cc5' as UUID
+const TARGET_FIELD_AGENT_USER_ID =
+  'b7d2c1f4-3a5e-4c8d-9b2e-1f6a8d4e5c7b' as UUID
+
+const targetNationalSystemAdmin = {
+  id: TARGET_NSA_USER_ID,
+  name: { firstname: 'Target', surname: 'NSA' },
+  role: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
+  primaryOfficeId: CENTRAL_PROVINCIAL_OFFICE_ID,
+  administrativeAreaId: CENTRAL_ADMIN_AREA_ID,
+  type: TokenUserType.enum.user,
+  status: 'active',
+  mobile: '+260921000001',
+  email: 'target.nsa@opencrvs.org'
+} as unknown as User
+
+const targetFieldAgentInSulaka = {
+  id: TARGET_FIELD_AGENT_USER_ID,
+  name: { firstname: 'Target', surname: 'FieldAgent' },
+  role: TestUserRole.enum.FIELD_AGENT,
+  primaryOfficeId: SULAKA_PROVINCIAL_OFFICE_ID,
+  administrativeAreaId: SULAKA_ADMIN_AREA_ID,
+  type: TokenUserType.enum.user,
+  status: 'active',
+  mobile: '+260921000002',
+  email: 'target.fa@opencrvs.org'
+} as unknown as User
+
+/**
+ * Returns the user shape the redux profile fetch should receive for the
+ * current user (so we can override admin area / office at story level), and
+ * the target user payload for any other id.
+ */
+function userGetHandler({
+  currentUserId,
+  currentUser,
+  targetUser
+}: {
+  currentUserId: string
+  currentUser: User
+  targetUser: User
+}) {
+  return tRPCMsw.user.get.query((id) => {
+    if (id === currentUserId) {
+      return currentUser
+    }
+    return targetUser
+  })
+}
+
+const localSystemAdminUser = generator.user.localSystemAdmin().v2
+const nationalSystemAdminUser = generator.user.nationalSystemAdmin().v2
+
+/**
+ * 1) New user flow (temporary id) bypasses canEditUser entirely. The form
+ *    must render and no unauthorized toast must appear.
+ */
+export const NewUserCreationIsAlwaysAllowed: StoryObj<typeof EditUser> = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.details'
+      })
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('User details form renders for the new-user flow', async () => {
+      await expect(
+        canvas.findByTestId('text__phoneNumber')
+      ).resolves.toBeInTheDocument()
+    })
+
+    await step('No unauthorized toast is shown', async () => {
+      expect(
+        within(document.body).queryByText(
+          'We are unable to display this page to you'
+        )
+      ).toBeNull()
+    })
+  }
+}
+
+/**
+ * 2) NATIONAL_SYSTEM_ADMIN editing a REGISTRATION_AGENT — allowed by the
+ *    role list on user.edit. The form renders, no toast.
+ */
+export const EditUserWithProperAccess: StoryObj<typeof EditUser> = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: mockUser.id,
+        pageId: 'user.details'
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        user: [
+          userGetHandler({
+            currentUserId: nationalSystemAdminUser.id,
+            currentUser: nationalSystemAdminUser,
+            targetUser: mockUser
+          })
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      name: {
+        firstname: mockUser.name.firstname,
+        surname: mockUser.name.surname
+      },
+      email: mockUser.email
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('User details form is visible', async () => {
+      await expect(
+        canvas.findByTestId('text__phoneNumber')
+      ).resolves.toBeInTheDocument()
+    })
+
+    await step('No unauthorized toast is shown', async () => {
+      expect(
+        within(document.body).queryByText(
+          'We are unable to display this page to you'
+        )
+      ).toBeNull()
+    })
+  }
+}
+
+/**
+ * 3) LOCAL_SYSTEM_ADMIN trying to edit a NATIONAL_SYSTEM_ADMIN — blocked by
+ *    the role-restricted user.edit scope. Toast appears and the user is
+ *    redirected away from the edit form.
+ */
+export const EditUserBlockedByRoleRestriction: StoryObj<typeof EditUser> = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: TARGET_NSA_USER_ID,
+        pageId: 'user.details'
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        user: [
+          userGetHandler({
+            currentUserId: localSystemAdminUser.id,
+            // Pin the admin's jurisdiction to Central so the admin-area check
+            // passes; only the role check should fail in this story.
+            currentUser: {
+              ...localSystemAdminUser,
+              primaryOfficeId: CENTRAL_PROVINCIAL_OFFICE_ID,
+              administrativeAreaId: CENTRAL_ADMIN_AREA_ID
+            } as unknown as User,
+            targetUser: targetNationalSystemAdmin
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ step }) => {
+    await step(
+      'Unauthorized toast appears (target role is not in the user.edit role list)',
+      async () => {
+        await waitFor(() =>
+          expect(
+            within(document.body).getByText(
+              'We are unable to display this page to you'
+            )
+          ).toBeInTheDocument()
+        )
+      }
+    )
+
+    await step('Edit form is no longer rendered (redirected)', async () => {
+      await waitFor(() =>
+        expect(
+          document.querySelector('[data-testid="text__phoneNumber"]')
+        ).toBeNull()
+      )
+    })
+  }
+}
+
+/**
+ * 4) LOCAL_SYSTEM_ADMIN whose jurisdiction is Central trying to edit a
+ *    FIELD_AGENT under Sulaka (separate root). Role is allowed, but the
+ *    administrative-area check fails. Toast appears, user is redirected.
+ */
+export const EditUserBlockedByAdministrativeAreaMismatch: StoryObj<
+  typeof EditUser
+> = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: TARGET_FIELD_AGENT_USER_ID,
+        pageId: 'user.details'
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        user: [
+          userGetHandler({
+            currentUserId: localSystemAdminUser.id,
+            currentUser: {
+              ...localSystemAdminUser,
+              primaryOfficeId: CENTRAL_PROVINCIAL_OFFICE_ID,
+              administrativeAreaId: CENTRAL_ADMIN_AREA_ID
+            } as unknown as User,
+            targetUser: targetFieldAgentInSulaka
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ step }) => {
+    await step(
+      "Unauthorized toast appears (target sits outside the admin's jurisdiction)",
+      async () => {
+        await waitFor(() =>
+          expect(
+            within(document.body).getByText(
+              'We are unable to display this page to you'
+            )
+          ).toBeInTheDocument()
+        )
+      }
+    )
+
+    await step('Edit form is no longer rendered (redirected)', async () => {
+      await waitFor(() =>
+        expect(
+          document.querySelector('[data-testid="text__phoneNumber"]')
+        ).toBeNull()
+      )
+    })
+  }
+}
+
+/**
+ * Authorization tests for the ReviewUser flow.
+ *
+ * Same canEditUser gate as EditUser — opening the review page for an
+ * existing user the current user cannot edit must surface an unauthorized
+ * toast and redirect away (replace).
+ */
+
+export const ReviewUserWithProperAccess: StoryObj<typeof ReviewUser> = {
+  render: () => <ReviewUser />,
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: mockUser.id
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        user: [
+          userGetHandler({
+            currentUserId: nationalSystemAdminUser.id,
+            currentUser: nationalSystemAdminUser,
+            targetUser: mockUser
+          })
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      name: {
+        firstname: mockUser.name.firstname,
+        surname: mockUser.name.surname
+      },
+      email: mockUser.email
+    })
+  },
+  play: async ({ step }) => {
+    await step(
+      'Review page renders the confirm submit button (target editable)',
+      async () => {
+        await waitFor(() =>
+          expect(
+            document.querySelector('#submit-edit-user-form')
+          ).not.toBeNull()
+        )
+      }
+    )
+
+    await step('No unauthorized toast is shown', async () => {
+      expect(
+        within(document.body).queryByText(
+          'We are unable to display this page to you'
+        )
+      ).toBeNull()
+    })
+  }
+}
+
+export const ReviewUserBlockedByRoleRestriction: StoryObj<typeof ReviewUser> = {
+  render: () => <ReviewUser />,
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: TARGET_NSA_USER_ID
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        user: [
+          userGetHandler({
+            currentUserId: localSystemAdminUser.id,
+            currentUser: {
+              ...localSystemAdminUser,
+              primaryOfficeId: CENTRAL_PROVINCIAL_OFFICE_ID,
+              administrativeAreaId: CENTRAL_ADMIN_AREA_ID
+            } as unknown as User,
+            targetUser: targetNationalSystemAdmin
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ step }) => {
+    await step(
+      'Unauthorized toast appears (target role outside the user.edit role list)',
+      async () => {
+        await waitFor(() =>
+          expect(
+            within(document.body).getByText(
+              'We are unable to display this page to you'
+            )
+          ).toBeInTheDocument()
+        )
+      }
+    )
+
+    await step('Review submit button is gone (redirected)', async () => {
+      await waitFor(() =>
+        expect(document.querySelector('#submit-edit-user-form')).toBeNull()
+      )
+    })
+  }
+}
+
+export const ReviewUserBlockedByAdministrativeAreaMismatch: StoryObj<
+  typeof ReviewUser
+> = {
+  render: () => <ReviewUser />,
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: TARGET_FIELD_AGENT_USER_ID
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        user: [
+          userGetHandler({
+            currentUserId: localSystemAdminUser.id,
+            currentUser: {
+              ...localSystemAdminUser,
+              primaryOfficeId: CENTRAL_PROVINCIAL_OFFICE_ID,
+              administrativeAreaId: CENTRAL_ADMIN_AREA_ID
+            } as unknown as User,
+            targetUser: targetFieldAgentInSulaka
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ step }) => {
+    await step(
+      "Unauthorized toast appears (target sits outside the admin's jurisdiction)",
+      async () => {
+        await waitFor(() =>
+          expect(
+            within(document.body).getByText(
+              'We are unable to display this page to you'
+            )
+          ).toBeInTheDocument()
+        )
+      }
+    )
+
+    await step('Review submit button is gone (redirected)', async () => {
+      await waitFor(() =>
+        expect(document.querySelector('#submit-edit-user-form')).toBeNull()
+      )
+    })
   }
 }

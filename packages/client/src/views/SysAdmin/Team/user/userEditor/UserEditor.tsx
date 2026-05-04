@@ -8,7 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { buttonMessages, validationMessages } from '@client/i18n/messages'
+import {
+  buttonMessages,
+  errorMessages,
+  validationMessages
+} from '@client/i18n/messages'
 import { userMessages } from '@client/i18n/messages'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { messages } from '@client/i18n/messages/views/userForm'
@@ -49,7 +53,7 @@ import { Check, Cross } from '@opencrvs/components/lib/icons'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { TRPCClientError } from '@trpc/client'
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -66,6 +70,8 @@ import {
 } from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
+import { usePermissions } from '@client/hooks/useAuthorization'
+import toast from 'react-hot-toast'
 
 const Container = styled.div`
   display: flex;
@@ -243,6 +249,58 @@ export const useUserFormState = create<UserFormState>()((set, get) => ({
   clear: () => set(() => ({ userForm: undefined }))
 }))
 
+const USER_OFFICE_PAGE_ID = 'user.office'
+const UNAUTHORIZED_TOAST_ID = 'user-editor-unauthorized'
+const EMPTY_FORM: EventState = {}
+
+/**
+ * Shared close/redirect handler for the EditUser and ReviewUser flows.
+ *
+ * `replace: true` is used for forced redirects (e.g. unauthorized) so the
+ * gated page is not left in the browser history.
+ */
+function useCloseUserForm({
+  isNewUser,
+  primaryOfficeId,
+  fromUserList,
+  userId,
+  setUserForm
+}: {
+  isNewUser: boolean
+  primaryOfficeId: string | undefined
+  fromUserList: boolean
+  userId: UUID
+  setUserForm: (data: EventState) => void
+}) {
+  const navigate = useNavigate()
+  return useCallback(
+    (options?: { replace?: boolean }) => {
+      if (isNewUser) {
+        navigate(
+          primaryOfficeId
+            ? `${routes.TEAM_USER_LIST}?locationId=${primaryOfficeId}`
+            : routes.TEAM_USER_LIST,
+          options
+        )
+        return
+      }
+      setUserForm({})
+      if (fromUserList) {
+        navigate(
+          {
+            pathname: routes.TEAM_USER_LIST,
+            search: serializeSearchParams({ locationId: primaryOfficeId })
+          },
+          options
+        )
+      } else {
+        navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }), options)
+      }
+    },
+    [isNewUser, primaryOfficeId, fromUserList, userId, navigate, setUserForm]
+  )
+}
+
 export const CreateNewUser = () => {
   const [{ officeId, from }] = useTypedSearchParams(
     ROUTES.V2.SETTINGS.USER.CREATE
@@ -270,56 +328,99 @@ const EditUserComponent = () => {
   const navigate = useNavigate()
   const { pageId, userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.EDIT)
   const [searchParams] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.EDIT)
-  const { getUserForm, setUserForm } = useUserFormState()
+  const userForm = useUserFormState((s) => s.userForm)
+  const setUserForm = useUserFormState((s) => s.setUserForm)
+  const formState = userForm ?? EMPTY_FORM
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
-  const formState = getUserForm()
   const selectedRole = roles.find((role) => role.id === formState['role'])
   const isNewUser = isTemporaryId(userId)
+  const { getUser } = useUsers()
+  const userQuery = getUser.useQuery(userId, { enabled: !isNewUser })
+  const targetUser = userQuery.data
+
+  const { canEditUser } = usePermissions()
+
+  const handleClose = useCloseUserForm({
+    isNewUser,
+    primaryOfficeId: formState['primaryOfficeId'],
+    fromUserList: searchParams.from === 'user.list',
+    userId,
+    setUserForm
+  })
+
+  const isUnauthorized =
+    !isNewUser &&
+    !!targetUser &&
+    (targetUser.type !== TokenUserType.enum.user || !canEditUser(targetUser))
+  const unauthorizedHandledRef = React.useRef(false)
+
+  // Reset the one-shot guard when the route's userId changes so navigating
+  // between users in the same component instance re-evaluates authorization.
   useEffect(() => {
-    if (!formState['primaryOfficeId'] && pageId !== 'user.office') {
+    unauthorizedHandledRef.current = false
+  }, [userId])
+
+  // Auth gate: surface a toast and redirect (replace) when the current user
+  // cannot edit the target. The ref guarantees we fire once per userId.
+  useEffect(() => {
+    if (isUnauthorized && !unauthorizedHandledRef.current) {
+      unauthorizedHandledRef.current = true
+      toast.custom(
+        <Toast
+          type="warning"
+          onClose={() => toast.remove(UNAUTHORIZED_TOAST_ID)}
+        >
+          {intl.formatMessage(errorMessages.unauthorized)}
+        </Toast>,
+        { id: UNAUTHORIZED_TOAST_ID }
+      )
+      handleClose({ replace: true })
+    }
+  }, [isUnauthorized, handleClose, intl])
+
+  // Office-required redirect: any page other than the office picker needs
+  // primaryOfficeId in the form state. Skipped while the auth gate is firing.
+  useEffect(() => {
+    if (isUnauthorized) {
+      return
+    }
+    if (!formState['primaryOfficeId'] && pageId !== USER_OFFICE_PAGE_ID) {
       navigate(
         ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
           {
-            pageId: 'user.office',
-            userId: userId
+            pageId: USER_OFFICE_PAGE_ID,
+            userId
           },
           searchParams
         )
       )
     }
-  }, [formState, navigate, userId, pageId, searchParams])
+  }, [formState, navigate, userId, pageId, searchParams, isUnauthorized])
 
   const additionalFields = window.config.ADDITIONAL_USER_FIELDS ?? []
   const eventConfig = getUserEditConfig(selectedRole, additionalFields)
   const formConfig = eventConfig.declaration
 
-  const handleClose = () => {
-    if (isNewUser) {
-      const officeId = formState['primaryOfficeId']
-      navigate(
-        officeId
-          ? `${routes.TEAM_USER_LIST}?locationId=${officeId}`
-          : routes.TEAM_USER_LIST
-      )
-    } else {
-      setUserForm({})
-      if (searchParams.from === 'user.list') {
-        navigate({
-          pathname: routes.TEAM_USER_LIST,
-          search: serializeSearchParams({
-            locationId: formState['primaryOfficeId']
-          })
-        })
-      } else {
-        navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }))
-      }
-    }
+  if (userQuery.isLoading) {
+    return (
+      <ActionPageLight
+        title={intl.formatMessage(sysAdminMessages.editUserDetailsTitle)}
+        goBack={() => navigate(-1)}
+        hideBackground={true}
+      >
+        <Container>
+          <SpinnerWrapper>
+            <Spinner id="user-form-loading-spinner" size={25} />
+          </SpinnerWrapper>
+        </Container>
+      </ActionPageLight>
+    )
   }
 
   return (
     <FormLayout
-      onClose={handleClose}
+      onClose={() => handleClose()}
       title={
         isNewUser
           ? intl.formatMessage(messages.userFormTitle)
@@ -369,7 +470,9 @@ export const EditUser = withSuspense(EditUserComponent)
 const ReviewUserComponent = () => {
   const intl = useIntl()
   const navigate = useNavigate()
-  const { getUserForm, setUserForm, clear } = useUserFormState()
+  const userForm = useUserFormState((s) => s.userForm)
+  const setUserForm = useUserFormState((s) => s.setUserForm)
+  const clear = useUserFormState((s) => s.clear)
   const { userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.REVIEW)
 
   const [searchParams] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.REVIEW)
@@ -377,7 +480,9 @@ const ReviewUserComponent = () => {
   const { getUser, createUser, updateUser } = useUsers()
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
-  const selectedRole = roles.find((role) => role.id === getUserForm()['role'])
+  const selectedRole = roles.find(
+    (role) => role.id === (userForm ?? EMPTY_FORM)['role']
+  )
 
   const [showDuplicateMobileError, setShowDuplicateMobileError] =
     React.useState(false)
@@ -400,7 +505,7 @@ const ReviewUserComponent = () => {
     if (isNewUser || !existingUserQuery.data) return
     const user = existingUserQuery.data
     if (user.type !== TokenUserType.enum.user) return
-    if (Object.keys(getUserForm()).length > 0) return
+    if (userForm && Object.keys(userForm).length > 0) return
 
     setUserForm({
       primaryOfficeId: user.primaryOfficeId,
@@ -421,9 +526,9 @@ const ReviewUserComponent = () => {
       // The nesting into data: {} only happens when building the UserInput payload.
       ...(user.data ?? {})
     })
-  }, [isNewUser, existingUserQuery.data, setUserForm, getUserForm])
+  }, [isNewUser, existingUserQuery.data, setUserForm, userForm])
 
-  const formState = getUserForm()
+  const formState = userForm ?? EMPTY_FORM
   const createUserMutation = createUser()
   const updateUserMutation = updateUser()
   const eventConfig = getUserEditConfig(selectedRole, additionalFields)
@@ -444,28 +549,43 @@ const ReviewUserComponent = () => {
     }
   }
 
-  const handleClose = () => {
-    if (isNewUser) {
-      const officeId = formState['primaryOfficeId']
-      navigate(
-        officeId
-          ? `${routes.TEAM_USER_LIST}?locationId=${officeId}`
-          : routes.TEAM_USER_LIST
+  const handleClose = useCloseUserForm({
+    isNewUser,
+    primaryOfficeId: formState['primaryOfficeId'],
+    fromUserList: searchParams.from === 'user.list',
+    userId,
+    setUserForm
+  })
+
+  const { canEditUser } = usePermissions()
+  const targetUser = existingUserQuery.data
+  const isUnauthorized =
+    !isNewUser &&
+    !!targetUser &&
+    (targetUser.type !== TokenUserType.enum.user || !canEditUser(targetUser))
+  const unauthorizedHandledRef = React.useRef(false)
+
+  // Reset the one-shot guard when the route's userId changes.
+  useEffect(() => {
+    unauthorizedHandledRef.current = false
+  }, [userId])
+
+  // Auth gate: forbid reviewing edits for users the current user can't edit.
+  useEffect(() => {
+    if (isUnauthorized && !unauthorizedHandledRef.current) {
+      unauthorizedHandledRef.current = true
+      toast.custom(
+        <Toast
+          type="warning"
+          onClose={() => toast.remove(UNAUTHORIZED_TOAST_ID)}
+        >
+          {intl.formatMessage(errorMessages.unauthorized)}
+        </Toast>,
+        { id: UNAUTHORIZED_TOAST_ID }
       )
-    } else {
-      setUserForm({})
-      if (searchParams.from === 'user.list') {
-        navigate({
-          pathname: routes.TEAM_USER_LIST,
-          search: serializeSearchParams({
-            locationId: formState['primaryOfficeId']
-          })
-        })
-      } else {
-        navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }))
-      }
+      handleClose({ replace: true })
     }
-  }
+  }, [isUnauthorized, handleClose, intl])
 
   const isSubmitting =
     createUserMutation.isPending || updateUserMutation.isPending

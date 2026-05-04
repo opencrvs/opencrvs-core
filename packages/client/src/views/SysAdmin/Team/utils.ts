@@ -10,8 +10,11 @@
  */
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { MessageDescriptor } from 'react-intl'
-import { AdministrativeArea, UUID } from '@opencrvs/commons/client'
-import { getAdministrativeAreaHierarchy } from '../../../v2-events/utils'
+import {
+  AdministrativeArea,
+  getAdministrativeAreaHierarchy,
+  UUID
+} from '@opencrvs/commons/client'
 
 export enum UserStatus {
   ACTIVE,
