@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+/* eslint-disable max-lines */
 import { TRPCError } from '@trpc/server'
 import { MiddlewareFunction } from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
@@ -38,7 +38,6 @@ import {
   hasAnyScope,
   hasScope,
   getScopeOptionValue,
-  JurisdictionFilter,
   getAcceptedScopesByType,
   canAccessOtherUserWithScopes,
   UserScopeType,
@@ -53,7 +52,6 @@ import { getLocationHierarchy } from '@events/service/locations/locations'
 import { findUserOrSystem, getUser } from '../../../service/users/api'
 import { getInMemoryEventConfigurations } from '../../../service/config/config'
 import { getEventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
-import { isLocationUnderAdministrativeArea } from '../../../storage/postgres/administrative-hierarchy/locations'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
