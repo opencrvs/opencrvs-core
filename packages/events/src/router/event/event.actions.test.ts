@@ -731,13 +731,7 @@ describe('Conditionals based on user role', () => {
         return seed.user({
           primaryOfficeId: locations[0].id,
           administrativeAreaId: locations[0].administrativeAreaId,
-          name: [
-            {
-              use: 'en',
-              family: role,
-              given: ['John']
-            }
-          ],
+          name: { firstname: 'John', surname: role },
           role
         })
       })
@@ -780,13 +774,7 @@ describe('Conditionals based on user role', () => {
     const fieldAgent = await seed.user({
       primaryOfficeId: locations[0].id,
       administrativeAreaId: locations[0].administrativeAreaId,
-      name: [
-        {
-          use: 'en',
-          family: TestUserRole.enum.FIELD_AGENT,
-          given: ['John']
-        }
-      ],
+      name: { firstname: 'John', surname: TestUserRole.enum.FIELD_AGENT },
       role: TestUserRole.enum.FIELD_AGENT
     })
 
@@ -817,13 +805,7 @@ describe('Conditionals based on user role', () => {
 
     const registrationAgent = await seed.user({
       primaryOfficeId: locations[0].id,
-      name: [
-        {
-          use: 'en',
-          family: TestUserRole.enum.REGISTRATION_AGENT,
-          given: ['Jane']
-        }
-      ],
+      name: { firstname: 'Jane', surname: TestUserRole.enum.REGISTRATION_AGENT },
       role: TestUserRole.enum.FIELD_AGENT
     })
 

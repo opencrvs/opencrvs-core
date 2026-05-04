@@ -17,11 +17,15 @@ import {
   generateEventDocument
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import { createSystemTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createSystemTestClient,
+  setupTestCase,
+  TEST_SYSTEM_ID
+} from '@events/tests/utils'
 
 describe('bulkImport', () => {
   test('prevents forbidden access if missing required scope', async () => {
-    const client = createSystemTestClient('test-system', [])
+    const client = createSystemTestClient(TEST_SYSTEM_ID, [])
 
     await expect(
       client.event.bulkImport([
@@ -35,7 +39,7 @@ describe('bulkImport', () => {
 
   test('allows access with import scope', async () => {
     const { user } = await setupTestCase()
-    const client = createSystemTestClient('test-system', [
+    const client = createSystemTestClient(TEST_SYSTEM_ID, [
       encodeScope({ type: 'record.import' })
     ])
 
@@ -54,7 +58,7 @@ describe('bulkImport', () => {
 
   test('importing events indexes them into Elasticsearch at the next refresh', async () => {
     const { user } = await setupTestCase()
-    const client = createSystemTestClient('test-system', [
+    const client = createSystemTestClient(TEST_SYSTEM_ID, [
       encodeScope({ type: 'record.import' }),
       encodeScope({ type: 'record.read' }),
       encodeScope({

@@ -22,22 +22,18 @@ import {
   pickRandom,
   TestUserRole,
   TokenUserType,
+  UserName,
   UUID
 } from '@opencrvs/commons'
 import { setAdministrativeAreas } from '../service/administrative-areas'
 import { setLocations } from '../service/locations/locations'
 import { createUserWithCredentials } from '../storage/postgres/events/users'
-interface Name {
-  use: string
-  given: string[]
-  family: string
-}
 
 export interface CreatedUser {
   id: UUID
   primaryOfficeId: UUID
   role: string
-  name: Array<Name>
+  name: UserName
   fullHonorificName?: string
   administrativeAreaId?: UUID | null
 }
@@ -46,7 +42,7 @@ interface CreateUser {
   primaryOfficeId: UUID
   administrativeAreaId?: UUID | null
   role?: string
-  name?: Array<Name>
+  name?: UserName
   fullHonorificName?: string
 }
 
@@ -60,7 +56,7 @@ export function payloadGenerator(
   const user = {
     create: (input: CreateUser) => ({
       role: input.role ?? TestUserRole.enum.REGISTRATION_AGENT,
-      name: input.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
+      name: input.name ?? { firstname: 'John', surname: 'Doe' },
       primaryOfficeId: input.primaryOfficeId,
       avatar: 'avatar.jpg',
       status: 'active',
@@ -153,8 +149,8 @@ export function seeder() {
         role: user.role,
         status: 'active',
         legacyId: null,
-        firstname: user.name?.[0]?.given?.[0] ?? null,
-        surname: user.name?.[0]?.family ?? null,
+        firstname: user.name.firstname,
+        surname: user.name.surname,
         fullHonorificName: user.fullHonorificName ?? null,
         email: `user-${id}@test.example`,
         mobile: null,
@@ -326,13 +322,13 @@ function generateTestUsersForLocations(
     return [
       {
         ...base,
-        name: [{ use: 'en', given: [`Mirella-${i}`], family: location.name }],
+        name: { firstname: `Mirella-${i}`, surname: location.name },
         role: pickRandom(rng, TestUserRole.options),
         id: generateUuid(rng)
       },
       {
         ...base,
-        name: [{ use: 'en', given: [`Jonathan-${i}`], family: location.name }],
+        name: { firstname: `Jonathan-${i}`, surname: location.name },
         role: pickRandom(rng, TestUserRole.options),
         id: generateUuid(rng)
       }
@@ -389,6 +385,10 @@ export async function setupHierarchyWithUsers() {
 
   // 3. Create two users for each office to test 'user' scope limitations.
   const users = generateTestUsersForLocations(locations, rng)
+
+  for (const user of users) {
+    await seed.user(user)
+  }
 
   // Helper to check if an office is under a given administrative area. Used for testing propositions.
   function isUnderAdministrativeArea(

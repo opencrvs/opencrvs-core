@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+/* eslint-disable max-lines */
 import { TRPCError } from '@trpc/server'
 import * as z from 'zod/v4'
 import { decode } from 'jsonwebtoken'
@@ -19,9 +19,7 @@ import {
 } from '@opencrvs/commons/events'
 import {
   CreateUserInput,
-  isBase64FileString,
   logger,
-  personNameFromV1ToV2,
   TokenWithBearer,
   User,
   UserOrSystem,
@@ -30,6 +28,8 @@ import {
 } from '@opencrvs/commons'
 import {
   allowedWithAnyOfScopes,
+  canAccessUserWithScopes,
+  canCreateUserWithScopes,
   canUpdateUserLocation
 } from '@events/router/middleware'
 import {
@@ -38,7 +38,7 @@ import {
   userAndSystemProcedure,
   userOnlyProcedure
 } from '@events/router/trpc'
-import { getRoles } from '@events/service/config/config'
+import { getApplicationConfig, getRoles } from '@events/service/config/config'
 import { generateHash } from '@events/service/auth/hash'
 import {
   updatePasswordHash,
@@ -54,11 +54,15 @@ import {
   createUser,
   getCredentials,
   getUser,
+  getUsersById,
+  isUser,
   searchUsers,
-  updateUser
+  updateUser,
+  sendUsernameReminder,
+  sendResetPasswordInvite,
+  resendInvite,
+  verifyPasswordById
 } from '@events/service/users/api'
-import { uploadBase64File } from '@events/service/files'
-import { getUsersById, isUser } from '@events/service/users/api'
 import {
   checkVerificationCode,
   generateAndSendVerificationCode,
@@ -101,11 +105,31 @@ function getAuditLogIdentifiers(token: TokenWithBearer) {
   return AuditLogSubject.parse(decoded)
 }
 
+async function validateMobile(mobile: string) {
+  const config = await getApplicationConfig()
+  let pattern: RegExp
+  try {
+    pattern = new RegExp(config.PHONE_NUMBER_PATTERN)
+  } catch {
+    logger.error(
+      `PHONE_NUMBER_PATTERN "${config.PHONE_NUMBER_PATTERN}" is not a valid regex — skipping mobile validation`
+    )
+    return
+  }
+  if (!pattern.test(mobile)) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `INVALID_MOBILE: "${mobile}" does not match the configured pattern ${config.PHONE_NUMBER_PATTERN}`
+    })
+  }
+}
+
 export async function handleCreateUser(
   input: CreateUserInput | CreateUserInputInternal,
   ctx: { token: TokenWithBearer }
 ): Promise<User> {
   if (input.mobile) {
+    await validateMobile(input.mobile)
     const existingWithMobile = await searchUsers({
       mobile: input.mobile,
       count: 1,
@@ -170,7 +194,7 @@ export function searchUsersRoute(
 }
 
 const UserAuditListQuery = z.object({
-  userId: z.string(),
+  userId: UUID,
   skip: z.number().optional().default(0),
   count: z.number().optional().default(10),
   timeStart: z.string().optional(),
@@ -213,6 +237,7 @@ const auditRouter = router({
 export const userRouter = router({
   get: userOnlyProcedure
     .input(UUID)
+    // @TODO: missing scope check.
     .output(UserOrSystem)
     .query(async ({ input }) => {
       const users = await getUsersById([input])
@@ -223,17 +248,18 @@ export const userRouter = router({
       return users[0]
     }),
   create: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.create']))
     .input(CreateUserInput)
+    .use(canCreateUserWithScopes(['user.create']))
     .output(User)
     .mutation(async ({ input, ctx }) => handleCreateUser(input, ctx)),
   update: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.edit']))
-    .input(UpdateUserInput.and(z.object({ id: UUID })))
+    .input(UpdateUserInput)
     .use(canUpdateUserLocation)
+    .use(canAccessUserWithScopes(['user.edit']))
     .output(User)
     .mutation(async ({ input, ctx }) => {
       if (input.mobile) {
+        await validateMobile(input.mobile)
         const existingWithMobile = await searchUsers({
           mobile: input.mobile,
           count: 1,
@@ -345,7 +371,7 @@ export const userRouter = router({
         nonce,
         token: rawToken,
         notificationEvent: input.notificationEvent,
-        recipientName: personNameFromV1ToV2(user.name),
+        recipientName: user.name,
         phoneNumber: user.mobile,
         email: user.email
       })
@@ -506,10 +532,7 @@ export const userRouter = router({
     .input(
       z.object({
         userId: z.string(),
-        avatar: z.object({
-          type: z.string(),
-          data: z.string()
-        })
+        avatar: z.string()
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -526,10 +549,24 @@ export const userRouter = router({
         )
         throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
-      const profileImagePath = isBase64FileString(input.avatar.data)
-        ? await uploadBase64File(input.avatar.data, ctx.token)
-        : input.avatar.data
-      await updateUserById(UUID.parse(ctx.user.id), { profileImagePath })
+      await updateUserById(UUID.parse(ctx.user.id), {
+        profileImagePath: input.avatar
+      })
+    }),
+  resendInvite: userAndSystemProcedure
+    .input(UUID)
+    .use(canAccessUserWithScopes(['user.edit']))
+    .mutation(async ({ input, ctx }) => {
+      const userId = UUID.parse(input)
+
+      await resendInvite(userId, ctx.token)
+      const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
+      await writeAuditLog({
+        operation: 'user.resend_invite',
+        requestData: { subjectId: userId },
+        clientId: auditLogIdentifiers.sub,
+        clientType: auditLogIdentifiers.userType ?? 'system'
+      })
     }),
   activate: userOnlyProcedure
     .input(
@@ -546,6 +583,56 @@ export const userRouter = router({
     )
     .mutation(async ({ input }) => {
       return activateUser(input)
+    }),
+  sendUsernameReminder: userAndSystemProcedure
+    .input(UUID)
+    .use(canAccessUserWithScopes(['user.edit']))
+    .mutation(async ({ input, ctx }) => {
+      const userId = UUID.parse(input)
+      await sendUsernameReminder(userId, ctx.token)
+      const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
+      await writeAuditLog({
+        operation: 'user.username_reminder_by_admin',
+        requestData: { subjectId: userId },
+        clientId: auditLogIdentifiers.sub,
+        clientType: auditLogIdentifiers.userType ?? 'system'
+      })
+    }),
+  sendResetPasswordInvite: userAndSystemProcedure
+    .use(allowedWithAnyOfScopes(['user.edit']))
+    .input(UUID)
+    .mutation(async ({ input, ctx }) => {
+      const userId = UUID.parse(input)
+      const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
+      const adminUser = await getUser(auditLogIdentifiers.sub)
+      await sendResetPasswordInvite(
+        userId,
+        {
+          id: adminUser.id,
+          name: adminUser.name,
+          role: adminUser.role
+        },
+        ctx.token
+      )
+      await writeAuditLog({
+        operation: 'user.password_reset_by_admin',
+        requestData: { subjectId: userId },
+        clientId: auditLogIdentifiers.sub,
+        clientType: auditLogIdentifiers.userType ?? 'system'
+      })
+    }),
+  verifyLoggedInUserPassword: userOnlyProcedure
+    .input(z.object({ password: z.string() }))
+    .output(
+      z.object({
+        mobile: z.string().optional(),
+        status: z.string(),
+        username: z.string(),
+        id: z.string()
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      return verifyPasswordById(ctx.user.id, input.password)
     }),
   audit: auditRouter
 })

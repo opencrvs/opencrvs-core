@@ -81,7 +81,7 @@ function findUserById(userId: string, users: UserOrSystem[]) {
   }
 
   return {
-    name: getUsersFullName(user.name, 'en'),
+    name: getUsersFullName(user.name),
     signature: user.signature ?? '',
     fullHonorificName: user.fullHonorificName ?? ''
   }

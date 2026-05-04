@@ -18,6 +18,7 @@ import {
   createInternalTestClient,
   createTestToken,
   setupTestCase,
+  TEST_SYSTEM_ID,
   TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
 import { env } from '@events/environment'
@@ -42,7 +43,7 @@ test('Returns 403 when accessed with user app token', async () => {
 
 test('Returns 403 when accessed with system app token', async () => {
   const appToken = createTestToken({
-    userId: 'test-system',
+    userId: TEST_SYSTEM_ID,
     scopes: TEST_USER_DEFAULT_SCOPES,
     userType: TokenUserType.enum.system
   })
@@ -83,7 +84,9 @@ test('Returns 200 when accessed with proper internal token', async () => {
       email: 'authtest@example.com',
       role: 'REGISTRATION_AGENT',
       status: 'active',
-      officeId: locations[0].id
+      officeId: locations[0].id,
+      firstname: '',
+      surname: ''
     })
     .execute()
 
@@ -131,7 +134,9 @@ test('returns CONFLICT when user has no security questions', async () => {
       mobile: '+447700900001',
       role: 'REGISTRATION_AGENT',
       status: 'active',
-      officeId: locations[0].id
+      officeId: locations[0].id,
+      firstname: '',
+      surname: ''
     })
     .execute()
 
@@ -208,7 +213,7 @@ test('returns user info and a valid security question key on success (mobile)', 
     mobile: '+447700900002',
     email: 'jane@example.com',
     status: 'active',
-    name: [{ use: 'en', given: ['Jane'], family: 'Smith' }],
+    name: { firstname: 'Jane', surname: 'Smith' },
     scope: ['record.declare', 'record.read']
   })
   expect(['BIRTH_TOWN', 'FIRST_CHILD_NAME']).toContain(
@@ -233,7 +238,9 @@ test('looks up user by email (case-insensitive)', async () => {
       email: 'lookup@example.com',
       role: 'REGISTRATION_AGENT',
       status: 'active',
-      officeId: locations[0].id
+      officeId: locations[0].id,
+      firstname: '',
+      surname: ''
     })
     .execute()
 

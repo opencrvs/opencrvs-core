@@ -10,7 +10,6 @@
  */
 
 import { useIntl, defineMessages } from 'react-intl'
-import { personNameFromV1ToV2 } from '@opencrvs/commons/client'
 import { ActionType, TokenUserType } from '@opencrvs/commons/client'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
@@ -83,9 +82,9 @@ export function useUserDetails() {
 
     return {
       type: 'user',
-      name: getUsersFullName(user.name, intl.locale),
+      name: getUsersFullName(user.name),
       role,
-      ...personNameFromV1ToV2(user.name)
+      ...user.name
     } as const
   }
 
