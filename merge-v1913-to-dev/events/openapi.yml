@@ -788,6 +788,8 @@ paths:
                       pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
                     createdBy:
                       type: string
+                      format: uuid
+                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
                   required:
                     - id
                     - name
@@ -2008,6 +2010,7 @@ components:
                                 - registeredIn
                                 - registeredBy
                                 - accessLevel
+                                - role
                                 - ids
                           required:
                             - $scope
@@ -6621,6 +6624,7 @@ components:
                                 - registeredIn
                                 - registeredBy
                                 - accessLevel
+                                - role
                                 - ids
                           required:
                             - $scope
@@ -7043,6 +7047,7 @@ components:
                                 - registeredIn
                                 - registeredBy
                                 - accessLevel
+                                - role
                                 - ids
                           required:
                             - $scope
@@ -7056,7 +7061,6 @@ components:
             - id
             - label
             - type
-            - configuration
           additionalProperties: false
           description: Input field for a location
         - type: object
@@ -7279,6 +7283,7 @@ components:
                                 - registeredIn
                                 - registeredBy
                                 - accessLevel
+                                - role
                                 - ids
                           required:
                             - $scope
@@ -7514,6 +7519,7 @@ components:
                                 - registeredIn
                                 - registeredBy
                                 - accessLevel
+                                - role
                                 - ids
                           required:
                             - $scope
@@ -13906,6 +13912,11 @@ components:
               - requiresAction
               - label
             additionalProperties: false
+        analytics:
+          default: true
+          description: Indicates whether the records of this event type are included in
+            analytics
+          type: boolean
       required:
         - id
         - title
@@ -13915,6 +13926,7 @@ components:
         - declaration
         - advancedSearch
         - flags
+        - analytics
       additionalProperties: false
     EventDocument:
       type: object
