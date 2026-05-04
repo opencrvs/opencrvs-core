@@ -12,8 +12,8 @@ import { messages } from '@client/i18n/messages/views/userSetup'
 import { MessageDescriptor } from 'react-intl'
 import {
   AdministrativeArea,
-  getAdministrativeAreaHierarchy,
-  UUID
+  UUID,
+  getAdministrativeAreaHierarchy
 } from '@opencrvs/commons/client'
 
 export enum UserStatus {

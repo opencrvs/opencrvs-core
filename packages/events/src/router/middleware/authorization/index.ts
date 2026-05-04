@@ -111,8 +111,7 @@ export const canUpdateUserLocation: MiddlewareFunction<
   const existingUser = await getUserById(UUID.parse(input.id))
   if (!existingUser) {
     throw new TRPCError({
-      code: 'NOT_FOUND',
-      message: `No user found by given id: ${input.id}`
+      code: 'FORBIDDEN'
     })
   }
 
@@ -153,8 +152,7 @@ export const canUpdateUserRole: MiddlewareFunction<
   const existingUser = await getUserById(UUID.parse(input.id))
   if (!existingUser) {
     throw new TRPCError({
-      code: 'NOT_FOUND',
-      message: `No user found by given id: ${input.id}`
+      code: 'FORBIDDEN'
     })
   }
 

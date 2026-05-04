@@ -84,6 +84,10 @@ test('Check scopes against user.update with non-location payload', async () => {
 
         let result: { success: boolean; user: User }
 
+        const originalUser = (await clientReadingAllUsers.user.get(
+          userTargeted.id
+        )) as User
+
         try {
           // 1. Perform the action with the given test client.
           const changedUser = await testClient.user.update({
@@ -114,7 +118,7 @@ test('Check scopes against user.update with non-location payload', async () => {
           { ...result, updatePayloadRole: updatedRole },
           {
             userRequesting,
-            userTargeted,
+            userTargeted: originalUser,
             role: options.role,
             accessLevel: options.accessLevel,
             isUnderAdministrativeArea
