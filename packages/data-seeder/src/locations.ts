@@ -38,33 +38,14 @@ const LocationSchema = z.array(
         'LOCATION_LEVEL_4',
         'LOCATION_LEVEL_5'
       ])
-      .optional(),
-    statistics: z
-      .array(
-        z.object({
-          year: z.number(),
-          male_population: z.number(),
-          female_population: z.number(),
-          population: z.number(),
-          crude_birth_rate: z.number()
-        })
-      )
       .optional()
   })
 )
 
 function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
   const locationsMap = new Map(
-    locations.map(({ statistics, ...loc }) => {
-      return [
-        loc.id,
-        {
-          ...loc,
-          statistics: new Map(
-            (statistics ?? []).map(({ year, ...stats }) => [year, stats])
-          )
-        }
-      ]
+    locations.map((loc) => {
+      return [loc.id, loc]
     })
   )
 
@@ -85,37 +66,6 @@ function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
     }
     parent.children.push(loc.id)
   })
-
-  // Validate statistics only for top-level locations (states)
-  const statisticsErrors: Error[] = []
-  locationNodeMap.get('0')!.children.forEach((stateId) => {
-    const state = locationsMap.get(stateId)!
-    if (!state.statistics || state.statistics.size === 0) {
-      statisticsErrors.push(
-        new Error(
-          `Top-level location (state) "${state.name}" must have statistics data`
-        )
-      )
-      return
-    }
-
-    // Validate statistics data for the state
-    for (const [year, stats] of state.statistics.entries()) {
-      if (stats.population < stats.male_population + stats.female_population) {
-        statisticsErrors.push(
-          new Error(
-            `Location: ${state.name}, year: ${year} -> Sum of male population and female population ${
-              stats.male_population + stats.female_population
-            } is higher than the total population ${stats.population}`
-          )
-        )
-      }
-    }
-  })
-
-  if (statisticsErrors.length > 0) {
-    raise(statisticsErrors.map((error) => error.message).join('\n'))
-  }
 
   return locationsMap
 }
