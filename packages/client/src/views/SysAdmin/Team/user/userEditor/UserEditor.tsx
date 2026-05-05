@@ -275,6 +275,7 @@ function useCloseUserForm({
   const navigate = useNavigate()
   return useCallback(
     (options?: { replace?: boolean }) => {
+      setUserForm(EMPTY_FORM)
       if (isNewUser) {
         navigate(
           primaryOfficeId
@@ -284,7 +285,6 @@ function useCloseUserForm({
         )
         return
       }
-      setUserForm({})
       if (fromUserList) {
         navigate(
           {
@@ -362,32 +362,6 @@ const EditUserComponent = () => {
     (targetUser.type !== TokenUserType.enum.user || !canEditUser(targetUser))
 
   const isUnauthorized = isNewUserBlocked || isExistingUserBlocked
-  const unauthorizedHandledRef = React.useRef(false)
-
-  // Reset the one-shot guard when the route's userId changes so navigating
-  // between users in the same component instance re-evaluates authorization.
-  useEffect(() => {
-    unauthorizedHandledRef.current = false
-  }, [userId])
-
-  // Auth gate: surface a toast and redirect (replace) when the current user
-  // cannot edit the target, or when creating a new user in an office outside
-  // the admin's jurisdiction. The ref guarantees we fire once per userId.
-  useEffect(() => {
-    if (isUnauthorized && !unauthorizedHandledRef.current) {
-      unauthorizedHandledRef.current = true
-      toast.custom(
-        <Toast
-          type="warning"
-          onClose={() => toast.remove(UNAUTHORIZED_TOAST_ID)}
-        >
-          {intl.formatMessage(errorMessages.unauthorized)}
-        </Toast>,
-        { id: UNAUTHORIZED_TOAST_ID }
-      )
-      handleClose({ replace: true })
-    }
-  }, [isUnauthorized, handleClose, intl])
 
   // Office-required redirect: any page other than the office picker needs
   // primaryOfficeId in the form state. Skipped while the auth gate is firing.
@@ -430,7 +404,9 @@ const EditUserComponent = () => {
 
   return (
     <FormLayout
-      onClose={() => handleClose()}
+      onClose={handleClose}
+      isUnauthorized={isUnauthorized}
+      userId={userId}
       title={
         isNewUser
           ? intl.formatMessage(messages.userFormTitle)
@@ -583,30 +559,6 @@ const ReviewUserComponent = () => {
     (targetUser.type !== TokenUserType.enum.user || !canEditUser(targetUser))
 
   const isUnauthorized = isNewUserBlocked || isExistingUserBlocked
-  const unauthorizedHandledRef = React.useRef(false)
-
-  // Reset the one-shot guard when the route's userId changes.
-  useEffect(() => {
-    unauthorizedHandledRef.current = false
-  }, [userId])
-
-  // Auth gate: forbid reviewing edits for users the current user can't edit,
-  // and forbid creating new users in offices outside the admin's jurisdiction.
-  useEffect(() => {
-    if (isUnauthorized && !unauthorizedHandledRef.current) {
-      unauthorizedHandledRef.current = true
-      toast.custom(
-        <Toast
-          type="warning"
-          onClose={() => toast.remove(UNAUTHORIZED_TOAST_ID)}
-        >
-          {intl.formatMessage(errorMessages.unauthorized)}
-        </Toast>,
-        { id: UNAUTHORIZED_TOAST_ID }
-      )
-      handleClose({ replace: true })
-    }
-  }, [isUnauthorized, handleClose, intl])
 
   const isSubmitting =
     createUserMutation.isPending || updateUserMutation.isPending
@@ -660,6 +612,8 @@ const ReviewUserComponent = () => {
           : intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
       }
       onClose={handleClose}
+      isUnauthorized={isUnauthorized}
+      userId={userId}
     >
       {showDuplicateMobileError && (
         <Toast
@@ -800,14 +754,41 @@ function FormLayout({
   onSaveAndExit,
   onClose,
   title,
-  actionComponent
+  actionComponent,
+  isUnauthorized,
+  userId
 }: {
   children: React.ReactNode
   onSaveAndExit?: () => void | Promise<void>
-  onClose?: () => void
+  onClose?: (options?: { replace?: boolean }) => void
   title: string
   actionComponent?: React.ReactNode
+  isUnauthorized?: boolean
+  userId?: string
 }) {
+  const intl = useIntl()
+  const unauthorizedHandledRef = React.useRef(false)
+
+  useEffect(() => {
+    unauthorizedHandledRef.current = false
+  }, [userId])
+
+  useEffect(() => {
+    if (isUnauthorized && !unauthorizedHandledRef.current) {
+      unauthorizedHandledRef.current = true
+      toast.custom(
+        <Toast
+          type="warning"
+          onClose={() => toast.remove(UNAUTHORIZED_TOAST_ID)}
+        >
+          {intl.formatMessage(errorMessages.unauthorized)}
+        </Toast>,
+        { id: UNAUTHORIZED_TOAST_ID }
+      )
+      onClose?.({ replace: true })
+    }
+  }, [isUnauthorized, onClose, intl])
+
   return (
     <Frame
       header={
@@ -815,7 +796,7 @@ function FormLayout({
           actionComponent={actionComponent}
           label={title}
           onSaveAndExit={onSaveAndExit}
-          onClose={onClose}
+          onClose={onClose ? () => onClose() : undefined}
         />
       }
       skipToContentText="Skip to form"
