@@ -1,0 +1,11 @@
+{
+  "name": "@opencrvs/create-countryconfig",
+  "version": "1.0.0",
+  "description": "Scaffold a new OpenCRVS country configuration",
+  "bin": {
+    "create-countryconfig": "./index.js"
+  },
+  "files": ["index.js"],
+  "keywords": ["opencrvs", "countryconfig", "create"],
+  "license": "MPL-2.0"
+}

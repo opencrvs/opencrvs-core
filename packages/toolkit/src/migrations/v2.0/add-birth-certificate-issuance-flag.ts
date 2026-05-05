@@ -10,15 +10,17 @@
  */
 
 /**
- * Codemod: Add `pending-first-certificate-issuance` flag to birth event configs and workqueues.
+ * Codemod: Add `pending-first-certificate-issuance` flag to event configs and workqueues.
  *
  * Usage:
  *   ts-node -r tsconfig-paths/register src/migrations/v2.0/add-birth-certificate-issuance-flag.ts
  *
  * What it does:
- *   defineConfig (birth type only):
+ *   defineConfig (every event type — birth, death, marriage, custom, etc.):
  *     - Ensures the top-level `flags` array contains the `pending-first-certificate-issuance`
- *       flag definition
+ *       flag definition. The flag's i18n `label.id` is event-specific, e.g.
+ *       `event.birth.flag.pending-first-certificate-issuance`,
+ *       `event.death.flag.pending-first-certificate-issuance`.
  *     - Ensures every `REGISTER` action has
  *         `flags: [{ id: 'pending-first-certificate-issuance', operation: 'add' }]`
  *     - Ensures every `PRINT_CERTIFICATE` action has
@@ -48,6 +50,7 @@ const ACTION_PROPERTY_NAME = 'action'
 const FLAGS_PROPERTY_NAME = 'flags'
 const QUERY_PROPERTY_NAME = 'query'
 const TYPE_PROPERTY_NAME = 'type'
+const ID_PROPERTY_NAME = 'id'
 const CLAUSES_PROPERTY_NAME = 'clauses'
 const ANY_OF_PROPERTY_NAME = 'anyOf'
 
@@ -55,15 +58,21 @@ const FLAG_ID = 'pending-first-certificate-issuance'
 const REGISTER_TYPE = 'REGISTER'
 const PRINT_CERTIFICATE_TYPE = 'PRINT_CERTIFICATE'
 
-const FLAG_DEFINITION_INITIALIZER = `{
+/**
+ * Builds the flag-definition object literal for a given event type so the i18n
+ * `label.id` is namespaced per event (e.g. `event.death.flag.…`).
+ */
+function flagDefinitionInitializer(eventType: string): string {
+  return `{
   id: '${FLAG_ID}',
   label: {
-    id: 'event.birth.flag.${FLAG_ID}',
+    id: 'event.${eventType}.flag.${FLAG_ID}',
     defaultMessage: 'Pending first certificate issuance',
     description: 'Flag label for first certificate issuance'
   },
   requiresAction: true
 }`
+}
 
 // ─── Generic helpers ──────────────────────────────────────────────────────────
 
@@ -93,25 +102,38 @@ function isActionOfType(
 }
 
 /**
- * Returns true when the `defineConfig` root config object describes a birth event.
- * Handles both `'birth'` string literal and `EventType.BIRTH` enum access.
+ * Extracts the event type from a `defineConfig` root config object, using the
+ * (lower-cased) value of either the `type` or `id` property. Property name has
+ * shifted across core/country-config versions, so both are tried.
+ *
+ * Handles all known shapes:
+ *   - `type: 'birth'` / `id: 'birth'`
+ *   - `type: EventType.BIRTH` / `id: Event.Birth`
+ *
+ * For `PropertyAccessExpression` (enum access), the *member name* is returned
+ * lower-cased — this works for the conventional `EventType.BIRTH = 'birth'` and
+ * `Event.Birth = 'birth'` mappings used in core and country configs.
+ *
+ * Returns null when no event type can be determined.
  */
-function isBirthConfig(configArg: ObjectLiteralExpression): boolean {
-  const typeProperty = configArg.getProperty(TYPE_PROPERTY_NAME)
-  if (!typeProperty || !Node.isPropertyAssignment(typeProperty)) return false
+function getEventType(configArg: ObjectLiteralExpression): string | null {
+  for (const propName of [TYPE_PROPERTY_NAME, ID_PROPERTY_NAME]) {
+    const prop = configArg.getProperty(propName)
+    if (!prop || !Node.isPropertyAssignment(prop)) continue
 
-  const initializer = typeProperty.getInitializer()
-  if (!initializer) return false
+    const initializer = prop.getInitializer()
+    if (!initializer) continue
 
-  if (Node.isStringLiteral(initializer)) {
-    return initializer.getLiteralValue().toLowerCase() === 'birth'
+    if (Node.isStringLiteral(initializer)) {
+      return initializer.getLiteralValue().toLowerCase()
+    }
+
+    if (Node.isPropertyAccessExpression(initializer)) {
+      return initializer.getName().toLowerCase()
+    }
   }
 
-  if (Node.isPropertyAccessExpression(initializer)) {
-    return initializer.getName().toLowerCase() === 'birth'
-  }
-
-  return false
+  return null
 }
 
 /**
@@ -137,19 +159,22 @@ function hasElementWithId(array: ArrayLiteralExpression, id: string): boolean {
 // ─── defineConfig helpers ─────────────────────────────────────────────────────
 
 /**
- * Ensures the top-level `flags` array in a birth `defineConfig` contains the
- * `pending-first-certificate-issuance` flag definition.
+ * Ensures the top-level `flags` array in a `defineConfig` contains the
+ * `pending-first-certificate-issuance` flag definition. The flag's i18n
+ * `label.id` is namespaced per event type (e.g. `event.death.flag.…`).
  */
 function ensureTopLevelFlagDefinition(
-  configArg: ObjectLiteralExpression
+  configArg: ObjectLiteralExpression,
+  eventType: string
 ): boolean {
+  const initializer = flagDefinitionInitializer(eventType)
   const flagsProp = configArg.getProperty(FLAGS_PROPERTY_NAME)
 
   if (flagsProp && Node.isPropertyAssignment(flagsProp)) {
     const flagsInit = flagsProp.getInitializer()
     if (flagsInit && Node.isArrayLiteralExpression(flagsInit)) {
       if (hasElementWithId(flagsInit, FLAG_ID)) return false
-      flagsInit.addElement(FLAG_DEFINITION_INITIALIZER)
+      flagsInit.addElement(initializer)
       return true
     }
     return false
@@ -158,7 +183,7 @@ function ensureTopLevelFlagDefinition(
   // No `flags` property at all — create it
   configArg.addPropertyAssignment({
     name: FLAGS_PROPERTY_NAME,
-    initializer: `[\n  ${FLAG_DEFINITION_INITIALIZER}\n]`
+    initializer: `[\n  ${initializer}\n]`
   })
   return true
 }
@@ -191,19 +216,22 @@ function ensureActionOperationFlag(
 }
 
 /**
- * Processes a birth defineConfig object: ensures top-level flag definition,
+ * Processes a `defineConfig` object: ensures top-level flag definition,
  * REGISTER action flags, and PRINT_CERTIFICATE action flags.
  * Returns the number of changes made.
  */
-function processBirthConfig(
+function processConfig(
   configArg: ObjectLiteralExpression,
+  eventType: string,
   relPath: string
 ): number {
   let changes = 0
 
-  if (ensureTopLevelFlagDefinition(configArg)) {
+  if (ensureTopLevelFlagDefinition(configArg, eventType)) {
     changes++
-    console.log(`  [${relPath}] Added '${FLAG_ID}' to top-level flags`)
+    console.log(
+      `  [${relPath}] (${eventType}) Added '${FLAG_ID}' to top-level flags`
+    )
   }
 
   const actionsProp = configArg.getProperty(ACTIONS_PROPERTY_NAME)
@@ -221,7 +249,7 @@ function processBirthConfig(
       if (ensureActionOperationFlag(element, 'add')) {
         changes++
         console.log(
-          `  [${relPath}] Added '${FLAG_ID}' add-flag to REGISTER action`
+          `  [${relPath}] (${eventType}) Added '${FLAG_ID}' add-flag to REGISTER action`
         )
       }
     }
@@ -230,7 +258,7 @@ function processBirthConfig(
       if (ensureActionOperationFlag(element, 'remove')) {
         changes++
         console.log(
-          `  [${relPath}] Added '${FLAG_ID}' remove-flag to PRINT_CERTIFICATE action`
+          `  [${relPath}] (${eventType}) Added '${FLAG_ID}' remove-flag to PRINT_CERTIFICATE action`
         )
       }
     }
@@ -386,9 +414,11 @@ function processFile(filePath: string, project: Project): number {
 
       const configArg = args[0]
       if (!Node.isObjectLiteralExpression(configArg)) continue
-      if (!isBirthConfig(configArg)) continue
 
-      totalChanges += processBirthConfig(configArg, relPath)
+      const eventType = getEventType(configArg)
+      if (!eventType) continue
+
+      totalChanges += processConfig(configArg, eventType, relPath)
     }
 
     // ── defineWorkqueues ──────────────────────────────────────────────────────
@@ -428,7 +458,7 @@ function processFile(filePath: string, project: Project): number {
 async function main() {
   const srcDir = path.join(process.cwd(), 'src')
   console.log(
-    `Scanning for birth defineConfig and PRINT_CERTIFICATE workqueues in: ${srcDir}\n`
+    `Scanning for defineConfig and PRINT_CERTIFICATE workqueues in: ${srcDir}\n`
   )
 
   const project = new Project({
@@ -458,7 +488,7 @@ async function main() {
 
   if (modifiedFiles.length === 0) {
     console.log(
-      'No birth configs or PRINT_CERTIFICATE workqueues found. Nothing to do.'
+      'No event configs or PRINT_CERTIFICATE workqueues found. Nothing to do.'
     )
     return
   }
