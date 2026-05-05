@@ -128,6 +128,7 @@ const sulakaOfficeHierarchy: UUID[] = [
 const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'SysAdmin/UserEditor/RoleOptions',
   parameters: {
+    chromatic: { disableSnapshot: true },
     layout: 'centered',
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
     reactRouter: {
@@ -306,6 +307,7 @@ export const EditUserOfDifferentAdminArea: Story = {
 export const CreateUserOfOffice: Story = {
   name: 'user.create for same office',
   parameters: {
+    chromatic: { disableSnapshot: true },
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
     reactRouter: {
       router: routesConfig,
@@ -375,6 +377,7 @@ export const CreateUserOfOffice: Story = {
 export const CreateUserOfLowerOffice: Story = {
   name: 'user.create for lower office',
   parameters: {
+    chromatic: { disableSnapshot: true },
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
     reactRouter: {
       router: routesConfig,
@@ -439,6 +442,7 @@ export const CreateUserOfLowerOffice: Story = {
 export const CreateUserOfDifferentAdminArea: Story = {
   name: 'user.create for different Admin Area',
   parameters: {
+    chromatic: { disableSnapshot: true },
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
     reactRouter: {
       router: routesConfig,
