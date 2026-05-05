@@ -12,7 +12,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { graphql, HttpResponse } from 'msw'
 import { userEvent, within, expect, waitFor } from '@storybook/test'
 import {
   ActionType,
@@ -132,13 +131,6 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
           ...declarationTrpcMsw.events.handlers
         ],
         user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.localRegistrar().v1
-              }
-            })
-          }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
           }),
@@ -215,13 +207,6 @@ const msw = {
       ...declarationTrpcMsw.events.handlers
     ],
     user: [
-      graphql.query('fetchUser', () => {
-        return HttpResponse.json({
-          data: {
-            getUser: generator.user.registrationAgent().v1
-          }
-        })
-      }),
       tRPCMsw.user.list.query(([id]) => {
         return [mockUser]
       }),
@@ -409,13 +394,6 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
           ...declarationTrpcMsw.events.handlers
         ],
         user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.fieldAgent().v1
-              }
-            })
-          }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
           }),

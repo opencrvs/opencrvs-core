@@ -84,6 +84,14 @@ const scopeByEvent = z
   )
   .describe('Event type, e.g. birth, death')
 
+const userRole = z
+  // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
+  .preprocess(
+    (val) => (val === undefined ? undefined : [val].flat()),
+    z.array(z.string()).optional()
+  )
+  .describe('User role, e.g. admin, field agent')
+
 const scopeOptionsPlaceEvent = z
   .object({
     event: scopeByEvent,
@@ -122,6 +130,10 @@ const AccessLevelOptions = z.object({
   accessLevel: JurisdictionFilter.optional()
 })
 
+const AllUserScopeOptions = AccessLevelOptions.extend({
+  role: userRole.optional()
+})
+
 const WorkqueueOrDashboardOptions = z.object({
   ids: z
     .preprocess(
@@ -134,6 +146,7 @@ const WorkqueueOrDashboardOptions = z.object({
 const AllScopeOptions = z.object({
   ...AllRecordScopeOptions.shape,
   ...AccessLevelOptions.shape,
+  ...AllUserScopeOptions.shape,
   ...WorkqueueOrDashboardOptions.shape
 })
 
@@ -225,6 +238,43 @@ export const RecordScopeV2 = z
     "Scopes used to check user's permission to perform actions on a record."
   )
 
+const SystemScopeType = z.enum([
+  'organisation.read-locations',
+  'user.read',
+  'user.create',
+  'user.edit'
+])
+export type SystemScopeType = z.infer<typeof SystemScopeType>
+
+const UserScopeType = SystemScopeType.extract([
+  'user.read',
+  'user.create',
+  'user.edit'
+])
+export type UserScopeType = z.infer<typeof UserScopeType>
+
+const ScopesWithRoleOption = UserScopeType.extract(['user.edit', 'user.create'])
+export type ScopesWithRoleOption = z.infer<typeof ScopesWithRoleOption>
+
+export const UserScopeV2 = z.discriminatedUnion('type', [
+  z.object({
+    type: ScopesWithRoleOption,
+    options: AllUserScopeOptions.optional()
+  }),
+  z.object({
+    type: UserScopeType.extract(['user.read']),
+    options: AccessLevelOptions.optional()
+  })
+])
+
+export type UserScopeV2 = z.infer<typeof UserScopeV2>
+
+export function scopeUsesRoleOptions(
+  scope: UserScopeV2
+): scope is Extract<UserScopeV2, { type: ScopesWithRoleOption }> {
+  return ScopesWithRoleOption?.options.some((opt) => opt === scope.type)
+}
+
 export function scopeUsesDeclaredOptions(
   scope: Scope
 ): scope is Extract<
@@ -279,20 +329,15 @@ export const ResolvedRecordScopeV2 = z
 export type RecordScopeV2 = z.infer<typeof RecordScopeV2>
 export type ResolvedRecordScopeV2 = z.infer<typeof ResolvedRecordScopeV2>
 
-const SystemScopeType = z.enum([
-  'organisation.read-locations',
-  'user.read',
-  'user.create',
-  'user.edit'
-])
-
-export type SystemScopeType = z.infer<typeof SystemScopeType>
-
 /** The primary scope schema which gathers all scope types together. All scopes are discriminated by type and options are determined according to the type. */
 export const Scope = z.discriminatedUnion('type', [
   z.object({ type: PlainScopeType }),
   ...RecordScopeV2.options,
-  z.object({ type: SystemScopeType, options: AccessLevelOptions.optional() }),
+  ...UserScopeV2.options,
+  z.object({
+    type: z.literal('organisation.read-locations'),
+    options: AccessLevelOptions.optional()
+  }),
   z.object({
     type: z.literal('workqueue'),
     options: WorkqueueOrDashboardOptions

@@ -11,9 +11,9 @@ export default interface UsersTable {
   /** References the user id from the legacy database. */
   legacyId: ColumnType<string | null, string | null, string | null>
 
-  firstname: ColumnType<string | null, string | null, string | null>
+  firstname: ColumnType<string, string, string>
 
-  surname: ColumnType<string | null, string | null, string | null>
+  surname: ColumnType<string, string, string>
 
   fullHonorificName: ColumnType<string | null, string | null, string | null>
 
@@ -35,13 +35,13 @@ export default interface UsersTable {
 
   updatedAt: ColumnType<string, string | undefined, string>
 
-  device: ColumnType<string | null, string | null, string | null>
-
   data: ColumnType<
     Record<string, any>,
     Record<string, any> | undefined,
     Record<string, any>
   >
+
+  device: ColumnType<string | null, string | null, string | null>
 }
 
 export type Users = Selectable<UsersTable>

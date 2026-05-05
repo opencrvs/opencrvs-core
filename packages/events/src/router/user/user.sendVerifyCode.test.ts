@@ -10,39 +10,17 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { http, HttpResponse } from 'msw'
 import { getUUID } from '@opencrvs/commons'
 import {
   createSystemTestClient,
   createTestClient,
   setupTestCase
 } from '@events/tests/utils'
-import { env } from '@events/environment'
-import { mswServer } from '../../tests/msw'
-
-function mockGetUser(user: {
-  id: string
-  name: Array<{ use: string; given: string[]; family: string }>
-  mobile?: string
-  email?: string
-}) {
-  mswServer.use(
-    http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
-      return HttpResponse.json({
-        ...user,
-        mobile: user.mobile ?? '+8801234567890',
-        email: user.email ?? 'test@example.com'
-      })
-    })
-  )
-}
 
 describe('user.sendVerifyCode', () => {
   test('returns a nonce when sending verify code for change-phone-number', async () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user)
-
-    mockGetUser(user)
 
     const result = await client.user.sendVerifyCode({
       notificationEvent: 'change-phone-number'
@@ -57,8 +35,6 @@ describe('user.sendVerifyCode', () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user)
 
-    mockGetUser(user)
-
     const result = await client.user.sendVerifyCode({
       notificationEvent: 'change-email-address'
     })
@@ -71,8 +47,6 @@ describe('user.sendVerifyCode', () => {
   test('returns different nonces on subsequent calls', async () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user)
-
-    mockGetUser(user)
 
     const result1 = await client.user.sendVerifyCode({
       notificationEvent: 'change-phone-number'
@@ -94,5 +68,47 @@ describe('user.sendVerifyCode', () => {
         notificationEvent: 'change-phone-number'
       })
     ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+  })
+
+  test('nonce is a valid base64 string of expected length', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user)
+
+    const result = await client.user.sendVerifyCode({
+      notificationEvent: 'change-phone-number'
+    })
+
+    // 16 random bytes in base64 always yields 24 characters (22 data + 2 padding)
+    expect(result.nonce).toMatch(/^[A-Za-z0-9+/]{22}==$/)
+  })
+
+  test('different users receive different nonces', async () => {
+    const { user: user1 } = await setupTestCase()
+    const { user: user2 } = await setupTestCase()
+    const client1 = createTestClient(user1)
+    const client2 = createTestClient(user2)
+
+    const result1 = await client1.user.sendVerifyCode({
+      notificationEvent: 'change-phone-number'
+    })
+    const result2 = await client2.user.sendVerifyCode({
+      notificationEvent: 'change-phone-number'
+    })
+
+    expect(result1.nonce).not.toBe(result2.nonce)
+  })
+
+  test('different notification events for the same user return different nonces', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user)
+
+    const phoneResult = await client.user.sendVerifyCode({
+      notificationEvent: 'change-phone-number'
+    })
+    const emailResult = await client.user.sendVerifyCode({
+      notificationEvent: 'change-email-address'
+    })
+
+    expect(phoneResult.nonce).not.toBe(emailResult.nonce)
   })
 })

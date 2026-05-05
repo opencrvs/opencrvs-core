@@ -10,7 +10,6 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import { graphql, HttpResponse } from 'msw'
 import superjson from 'superjson'
 import {
   ActionType,
@@ -80,13 +79,6 @@ export const ReviewForLocalRegistrarComplete: Story = {
           })
         ],
         user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.localRegistrar().v1
-              }
-            })
-          }),
           tRPCMsw.user.list.query(() => {
             return [mockUser]
           }),

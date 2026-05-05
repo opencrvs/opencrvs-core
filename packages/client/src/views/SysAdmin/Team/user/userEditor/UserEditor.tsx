@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, validationMessages } from '@client/i18n/messages'
 import { userMessages } from '@client/i18n/messages'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { messages } from '@client/i18n/messages/views/userForm'
@@ -23,16 +23,20 @@ import {
   deepDropNulls,
   defineConditional,
   EventConfig,
+  field,
   FieldConfig,
   FieldValue,
   FileFieldValue,
   FieldType,
   never,
+  or,
   PageTypes,
   TokenUserType,
-  UserInput,
   hasScope,
-  EncodedScope
+  EncodedScope,
+  UUID,
+  CreateUserInput,
+  UpdateUserInput
 } from '@opencrvs/commons/client'
 import { AppBar, Frame, Spinner } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -41,7 +45,7 @@ import {
   ICON_ALIGNMENT,
   SuccessButton
 } from '@opencrvs/components/lib/buttons'
-import { BackArrowDeepBlue, Check, Cross } from '@opencrvs/components/lib/icons'
+import { Check, Cross } from '@opencrvs/components/lib/icons'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { TRPCClientError } from '@trpc/client'
@@ -55,8 +59,13 @@ import {
 import styled from 'styled-components'
 import { create } from 'zustand'
 import { useUsers } from '../../../../../v2-events/hooks/useUsers'
-import { emptyMessage } from '@client/v2-events/utils'
+import {
+  createTemporaryId,
+  emptyMessage,
+  isTemporaryId
+} from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 
 const Container = styled.div`
   display: flex;
@@ -123,13 +132,26 @@ function getUserEditConfig(
             {
               id: 'phoneNumber',
               type: FieldType.PHONE,
-              required: false,
-              label: messages.phoneNumber
+              required:
+                window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms',
+              label: messages.phoneNumber,
+              validation: [
+                {
+                  message: validationMessages.phoneNumberNotValid,
+                  validator: or(
+                    field('phoneNumber').matches(
+                      String(window.config.PHONE_NUMBER_PATTERN)
+                    ),
+                    field('phoneNumber').isFalsy()
+                  )
+                }
+              ]
             },
             {
               id: 'email',
               type: FieldType.EMAIL,
-              required: true,
+              required:
+                window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'email',
               label: messages.email
             },
             {
@@ -191,7 +213,7 @@ function getUserEditConfig(
 type EventState = {
   primaryOfficeId?: string
   role?: string
-  name?: { firstname: string; surname: string; middlename: string }
+  name?: { firstname: string; surname: string }
   phoneNumber?: string
   email?: string
   fullHonorificName?: string
@@ -221,21 +243,25 @@ export const useUserFormState = create<UserFormState>()((set, get) => ({
   clear: () => set(() => ({ userForm: undefined }))
 }))
 
-const NEW_USER = '__NEW__'
 export const CreateNewUser = () => {
-  const [{ officeId }] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.CREATE)
+  const [{ officeId, from }] = useTypedSearchParams(
+    ROUTES.V2.SETTINGS.USER.CREATE
+  )
   const navigate = useNavigate()
   const { clear, setUserForm } = useUserFormState()
   useEffect(() => {
     clear()
     setUserForm({ primaryOfficeId: officeId })
     navigate(
-      ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-        userId: NEW_USER,
-        pageId: 'user.details'
-      })
+      ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
+        {
+          userId: createTemporaryId(),
+          pageId: 'user.details'
+        },
+        { from }
+      )
     )
-  }, [clear, navigate, officeId, setUserForm])
+  }, [clear, navigate, officeId, setUserForm, from])
   return <div />
 }
 
@@ -243,22 +269,26 @@ const EditUserComponent = () => {
   const intl = useIntl()
   const navigate = useNavigate()
   const { pageId, userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.EDIT)
+  const [searchParams] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.EDIT)
   const { getUserForm, setUserForm } = useUserFormState()
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
   const formState = getUserForm()
   const selectedRole = roles.find((role) => role.id === formState['role'])
-  const isNewUser = userId === NEW_USER
+  const isNewUser = isTemporaryId(userId)
   useEffect(() => {
     if (!formState['primaryOfficeId'] && pageId !== 'user.office') {
       navigate(
-        ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-          pageId: 'user.office',
-          userId: userId
-        })
+        ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
+          {
+            pageId: 'user.office',
+            userId: userId
+          },
+          searchParams
+        )
       )
     }
-  }, [formState, navigate, userId, pageId])
+  }, [formState, navigate, userId, pageId, searchParams])
 
   const additionalFields = window.config.ADDITIONAL_USER_FIELDS ?? []
   const eventConfig = getUserEditConfig(selectedRole, additionalFields)
@@ -273,7 +303,17 @@ const EditUserComponent = () => {
           : routes.TEAM_USER_LIST
       )
     } else {
-      navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }))
+      setUserForm({})
+      if (searchParams.from === 'user.list') {
+        navigate({
+          pathname: routes.TEAM_USER_LIST,
+          search: serializeSearchParams({
+            locationId: formState['primaryOfficeId']
+          })
+        })
+      } else {
+        navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }))
+      }
     }
   }
 
@@ -300,17 +340,23 @@ const EditUserComponent = () => {
         validatorContext={{}}
         onPageChange={(nextPageId: string) =>
           navigate(
-            ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-              pageId: nextPageId,
-              userId: userId
-            })
+            ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
+              {
+                pageId: nextPageId,
+                userId: userId
+              },
+              searchParams
+            )
           )
         }
         onSubmit={() => {
           navigate(
-            ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
-              userId: userId
-            })
+            ROUTES.V2.SETTINGS.USER.REVIEW.buildPath(
+              {
+                userId: userId
+              },
+              searchParams
+            )
           )
         }}
       />
@@ -325,7 +371,9 @@ const ReviewUserComponent = () => {
   const navigate = useNavigate()
   const { getUserForm, setUserForm, clear } = useUserFormState()
   const { userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.REVIEW)
-  const isNewUser = userId === NEW_USER
+
+  const [searchParams] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.REVIEW)
+  const isNewUser = isTemporaryId(userId)
   const { getUser, createUser, updateUser } = useUsers()
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
@@ -358,9 +406,8 @@ const ReviewUserComponent = () => {
       primaryOfficeId: user.primaryOfficeId,
       role: user.role,
       name: {
-        firstname: user.name[0]?.given[0] ?? '',
-        surname: user.name[0]?.family ?? '',
-        middlename: ''
+        firstname: user.name.firstname,
+        surname: user.name.surname
       },
       phoneNumber: user.mobile,
       email: user.email,
@@ -406,7 +453,17 @@ const ReviewUserComponent = () => {
           : routes.TEAM_USER_LIST
       )
     } else {
-      navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }))
+      setUserForm({})
+      if (searchParams.from === 'user.list') {
+        navigate({
+          pathname: routes.TEAM_USER_LIST,
+          search: serializeSearchParams({
+            locationId: formState['primaryOfficeId']
+          })
+        })
+      } else {
+        navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }))
+      }
     }
   }
 
@@ -493,10 +550,13 @@ const ReviewUserComponent = () => {
         validatorContext={{}}
         onEdit={(values) =>
           navigate(
-            ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-              userId: userId,
-              pageId: values.pageId
-            })
+            ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
+              {
+                userId: userId,
+                pageId: values.pageId
+              },
+              searchParams
+            )
           )
         }
       >
@@ -514,19 +574,18 @@ const ReviewUserComponent = () => {
                   formState[f.id] as FieldValue
                 ])
               )
-              const payload: UserInput = {
-                mobile: formState.phoneNumber,
-                email: formState.email!,
+              const payload: CreateUserInput = {
+                // Normalise to undefined so an empty string isn't stored as a
+                // unique value, causing duplicate-key errors on the next submit.
+                mobile: formState.phoneNumber || undefined,
+                email: formState.email || undefined,
                 role: formState.role!,
-                primaryOfficeId: formState.primaryOfficeId!,
+                primaryOfficeId: formState.primaryOfficeId as UUID,
                 signature: formState.signature,
-                name: [
-                  {
-                    use: 'en',
-                    given: [formState!.name!.firstname],
-                    family: formState!.name!.surname
-                  }
-                ],
+                name: {
+                  firstname: formState!.name!.firstname,
+                  surname: formState!.name!.surname
+                },
                 data
               }
               createUserMutation.mutate(payload, {
@@ -553,35 +612,31 @@ const ReviewUserComponent = () => {
                   formState[f.id] as FieldValue
                 ])
               )
-              const payload: UserInput = {
-                mobile: formState.phoneNumber,
-                email: formState.email!,
+              const payload: UpdateUserInput = {
+                id: userId,
+                // See create payload above — same normalisation needed.
+                mobile: formState.phoneNumber || undefined,
+                email: formState.email || undefined,
                 role: formState.role!,
-                primaryOfficeId: formState.primaryOfficeId!,
+                primaryOfficeId: formState.primaryOfficeId as UUID,
                 signature: formState.signature,
-                name: [
-                  {
-                    use: 'en',
-                    given: [formState!.name!.firstname],
-                    family: formState!.name!.surname
-                  }
-                ],
+                name: {
+                  firstname: formState!.name!.firstname,
+                  surname: formState!.name!.surname
+                },
                 data
               }
-              updateUserMutation.mutate(
-                { ...payload, id: userId },
-                {
-                  onSuccess: (data) => {
-                    clear()
-                    navigate(
-                      ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
-                        userId: data.id
-                      })
-                    )
-                  },
-                  onError: handleMutationError
-                }
-              )
+              updateUserMutation.mutate(payload, {
+                onSuccess: (data) => {
+                  clear()
+                  navigate(
+                    ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
+                      userId: data.id
+                    })
+                  )
+                },
+                onError: handleMutationError
+              })
             }}
             icon={() => <Check />}
             align={ICON_ALIGNMENT.LEFT}
@@ -640,23 +695,6 @@ function FormHeader({
   onClose?: () => void
   actionComponent?: React.ReactNode
 }) {
-  const BackButtonContainer = styled.div`
-    margin-right: 16px;
-    cursor: pointer;
-  `
-
-  const getHeaderLeft = () => {
-    return (
-      <BackButtonContainer
-        id="action_page_back_button"
-        onClick={onClose}
-        key="action_page_back_button"
-      >
-        <CircleButton>{<BackArrowDeepBlue />}</CircleButton>
-      </BackButtonContainer>
-    )
-  }
-
   const getHeaderRight = () => {
     return (
       <CircleButton
@@ -677,8 +715,6 @@ function FormHeader({
         mobileTitle={label}
         desktopRight={getHeaderRight()}
         mobileRight={getHeaderRight()}
-        mobileLeft={getHeaderLeft()}
-        desktopLeft={getHeaderLeft()}
       />
     </>
   )

@@ -192,10 +192,7 @@ function AvatarChangeModalComp({
       changeAvatarMutation.mutate(
         {
           userId: userDetails.id,
-          avatar: {
-            data: url,
-            type: croppedImage.type
-          }
+          avatar: url
         },
         {
           onSuccess: (data) => {

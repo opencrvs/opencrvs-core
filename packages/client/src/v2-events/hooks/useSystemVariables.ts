@@ -22,7 +22,9 @@ export function useSystemVariables() {
   const variables = {
     user: {
       ...user,
-      name: getUsersFullName(user.name, 'en'),
+      name: getUsersFullName(user.name),
+      firstname: user.name.firstname,
+      surname: user.name.surname,
       administrativeAreaId: user.administrativeAreaId ?? undefined
     },
     $window: {

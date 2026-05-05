@@ -77,6 +77,23 @@ const handlers = [
       return HttpResponse.json(filenames)
     }
   ),
+  http.get(`${env.COUNTRY_CONFIG_URL}/config/roles`, () => {
+    return HttpResponse.json([])
+  }),
+  http.get(`${env.COUNTRY_CONFIG_URL}/config/application`, () =>
+    HttpResponse.json({
+      APPLICATION_NAME: 'Test',
+      COUNTRY_LOGO: { fileName: 'logo.png', file: '' },
+      SYSTEM_IANA_TIMEZONE: 'UTC',
+      CURRENCY: { isoCode: 'USD', languagesAndCountry: ['en-US'] },
+      ADMIN_STRUCTURE: [],
+      PHONE_NUMBER_PATTERN: '^01[1-9][0-9]{8}$',
+      USER_NOTIFICATION_DELIVERY_METHOD: 'email',
+      INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'email',
+      SEARCH_DEFAULT_CRITERIA: 'TRACKING_ID',
+      ADDITIONAL_USER_FIELDS: []
+    })
+  ),
   http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
     return HttpResponse.json([
       tennisClubMembershipEventWithCustomAction,
@@ -108,13 +125,9 @@ const handlers = [
       return HttpResponse.json(payload)
     }
   ),
-  http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
-    return HttpResponse.json({
-      primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902',
-      role: 'REGISTRATION_AGENT',
-      signature: 'signature.png'
-    })
-  }),
+  http.post(`${env.COUNTRY_CONFIG_URL}/triggers/user/:event`, () =>
+    HttpResponse.json({})
+  ),
   // token exchange for `event.actions.register.confirm` and `event.actions.register.reject`
   // query params such as `subject_token`, `subject_token_type` omitted for simplicity
   http.post(`${env.AUTH_URL}/token`, () =>

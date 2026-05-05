@@ -15,10 +15,6 @@ import {
 } from '@gateway/features/config/configHandler'
 import { formsHandler } from '@gateway/features/config/formsHandler'
 import healthCheckHandler from '@gateway/features/healthCheck/handler'
-import sendVerifyCodeHandler, {
-  requestSchema,
-  responseSchema
-} from '@gateway/routes/verifyCode/handler'
 import { trpcProxy } from '@gateway/v2-events/event-config/routes'
 import { ServerRoute } from '@hapi/hapi'
 import { authProxy, catchAllProxy, rateLimitedAuthProxy } from './proxies'
@@ -42,23 +38,6 @@ export const getRoutes = () => {
         auth: false,
         description: 'Checks the health of all services.',
         notes: 'Pass the service as a query param: service'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/sendVerifyCode',
-      handler: sendVerifyCodeHandler,
-      options: {
-        description: 'Send verify code to user contact',
-        notes:
-          'Generate a 6 digit verification code.' +
-          'Sends an SMS/email to the user with verification code.',
-        validate: {
-          payload: requestSchema
-        },
-        response: {
-          schema: responseSchema
-        }
       }
     },
     {

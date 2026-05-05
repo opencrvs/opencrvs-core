@@ -12,6 +12,7 @@
 import fetch from 'node-fetch'
 import { array } from 'zod'
 import {
+  ApplicationConfig,
   EventConfig,
   getOrThrow,
   logger,
@@ -135,12 +136,10 @@ export async function getInMemoryWorkqueueConfigurations(
   return inMemoryWorkqueueConfigurations
 }
 
-
-export async function getRoles(token: TokenWithBearer) {
+export async function getRoles() {
   const res = await fetch(new URL('/config/roles', env.COUNTRY_CONFIG_URL), {
     headers: {
-      'Content-Type': 'application/json',
-      Authorization: token
+      'Content-Type': 'application/json'
     }
   })
 
@@ -151,3 +150,15 @@ export async function getRoles(token: TokenWithBearer) {
   return array(Role).parse(await res.json())
 }
 
+export async function getApplicationConfig() {
+  const res = await fetch(
+    new URL('/config/application', env.COUNTRY_CONFIG_URL),
+    { headers: { 'Content-Type': 'application/json' } }
+  )
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch application config: ${res.status}`)
+  }
+
+  return ApplicationConfig.parse(await res.json())
+}
