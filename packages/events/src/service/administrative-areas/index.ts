@@ -11,6 +11,7 @@
 
 import { UUID, AdministrativeArea } from '@opencrvs/commons'
 import * as administrativeAreaRepo from '@events/storage/postgres/administrative-hierarchy/administrative-areas'
+import { clearAdministrativeHierarchyCache } from '@events/service/indexing/indexing'
 
 export async function getAdministrativeAreas(params?: {
   isActive?: boolean
@@ -26,4 +27,5 @@ export async function setAdministrativeAreas(
   administrativeAreas: AdministrativeArea[]
 ) {
   await administrativeAreaRepo.setAdministrativeAreas(administrativeAreas)
+  clearAdministrativeHierarchyCache()
 }

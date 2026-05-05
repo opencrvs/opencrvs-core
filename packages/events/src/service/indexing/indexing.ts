@@ -62,8 +62,16 @@ import {
 } from './query'
 
 // Elasticsearch has a limit of 10,000 results for a query, and
-// trying to get beyond that will result in a “Result window is too large“ error
+// trying to get beyond that will result in a “Result window is too large” error
 const ELASTICSEARCH_MAXIMUM_QUERY_SIZE = 10000
+
+// Administrative areas change only on initialisation/re-seeding, so a
+// process-level cache eliminates repeated recursive CTE queries per request.
+const administrativeHierarchyCache = new Map<string, string[]>()
+
+export function clearAdministrativeHierarchyCache() {
+  administrativeHierarchyCache.clear()
+}
 
 function eventToEventIndex(
   event: EventDocument,
@@ -466,7 +474,11 @@ export async function indexEvent(
   const eventIndex = eventToEventIndex(event, config)
 
   const eventIndexWithAdministrativeHierarchy =
-    await getEventIndexWithAdministrativeHierarchy(config, eventIndex)
+    await getEventIndexWithAdministrativeHierarchy(
+      config,
+      eventIndex,
+      administrativeHierarchyCache
+    )
   return esClient.index<EventIndexWithAdministrativeHierarchy>({
     index: indexName,
     id: event.id,
