@@ -2,6 +2,9 @@
 
 ## 1.9.13
 
+### Breaking changes
+- `action.reject(...)` now by default unassigns the event from the last assigned user. To keep assignment, `keepAssignment: true` option must be explicitly passed when rejecting an action.
+
 ### Bug fixes
 
 - Health facilities and other non-administrative locations are no longer included in the administrative area hierarchy when resolving location ancestry. [#12485](https://github.com/opencrvs/opencrvs-core/issues/12485)
@@ -11,6 +14,7 @@
 
 - The sidebar navigation footer now displays the user's assigned office alongside their name and role. [#11421](https://github.com/opencrvs/opencrvs-core/issues/11421)
 - The client now periodically polls `api/ping` every 5 seconds until all services are reachable, so users automatically recover from offline to online without a page reload. A `ConnectionStatus` indicator in the sidebar reflects real-time connectivity state. [#12055](https://github.com/opencrvs/opencrvs-core/issues/12055)
+- Allow assignment to be controlled when rejecting an action both synchronously and asynchronously by passing an optional `keepAssignment` parameter to response body (during synchronous rejection) or to the `action.reject` function (during asynchronous rejection). [#12347](https://github.com/opencrvs/opencrvs-core/issues/12347)
 
 ## 1.9.12
 
