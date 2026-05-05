@@ -397,18 +397,16 @@ const ReviewUserComponent = () => {
   const existingUserQuery = getUser.useQuery(userId, { enabled: !isNewUser })
   const additionalFields = window.config.ADDITIONAL_USER_FIELDS ?? []
 
-  useEffect(() => {
-    if (isNewUser || !existingUserQuery.data) return
-    const user = existingUserQuery.data
-    if (user.type !== TokenUserType.enum.user) return
-    // Preserve in-progress edits when navigating back from the edit page for the
-    // same user, but reload when the admin switches to a different user.
-    if (
-      useUserFormState.getState().userId === userId &&
-      Object.keys(getUserForm()).length > 0
-    )
-      return
+  const alreadyInitialized =
+    useUserFormState.getState().userId === userId &&
+    Object.keys(getUserForm()).length > 0
 
+  if (
+    !isNewUser &&
+    !alreadyInitialized &&
+    existingUserQuery.data?.type === TokenUserType.enum.user
+  ) {
+    const user = existingUserQuery.data
     setUserForm(
       {
         primaryOfficeId: user.primaryOfficeId,
@@ -431,7 +429,7 @@ const ReviewUserComponent = () => {
       },
       userId
     )
-  }, [isNewUser, existingUserQuery.data, setUserForm, getUserForm, userId])
+  }
 
   const formState = getUserForm()
   const createUserMutation = createUser()
