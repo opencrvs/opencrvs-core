@@ -34,7 +34,7 @@ test('Check scopes against user.update with non-location payload', async () => {
 
   const clientReadingAllUsers = createTestClient(users[0], [
     encodeScope({
-      type: 'record.read'
+      type: 'user.read'
     })
   ])
 
