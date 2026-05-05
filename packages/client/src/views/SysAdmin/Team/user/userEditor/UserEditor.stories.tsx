@@ -17,8 +17,9 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { mockOfflineData } from '@client/tests/mock-offline-data'
-import { EditUser, ReviewUser, useUserFormState } from './UserEditor'
+import { EditUser, ReviewUser } from './UserEditor'
 import { createTemporaryId } from '@client/v2-events/utils'
+import { useUserFormState } from './useUserFormState'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [httpLink({ url: '/api/events' })],
