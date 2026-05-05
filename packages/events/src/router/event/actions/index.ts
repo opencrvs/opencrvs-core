@@ -216,7 +216,8 @@ export async function defaultRequestHandler(
     input.eventId,
     input.type,
     token,
-    'customActionType' in input ? input.customActionType : undefined
+    'customActionType' in input ? input.customActionType : undefined,
+    event
   )
 
   const eventWithRequestedAction = await addAction(input, {
@@ -388,7 +389,7 @@ export function getDefaultActionProcedures(
       .mutation(async ({ ctx, input }) => {
         const { token, user, existingAction, duplicates } = ctx
         const { eventId } = input
-        const event = await getEventById(eventId)
+        const event = ctx.event
         const eventConfiguration = await getEventConfigurationById({
           token,
           eventType: event.type

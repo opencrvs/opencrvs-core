@@ -120,9 +120,10 @@ export async function throwConflictIfActionNotAllowed(
   eventId: UUID,
   actionType: ActionType,
   token: TokenWithBearer,
-  customActionType?: string
+  customActionType?: string,
+  existingEvent?: EventDocument
 ) {
-  const event = await getEventById(eventId)
+  const event = existingEvent ?? (await getEventById(eventId))
   const eventConfiguration = await getEventConfigurationById({
     eventType: event.type,
     token
