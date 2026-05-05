@@ -11,7 +11,8 @@
     "node": "22.x.x"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "packages/toolkit/create-countryconfig"
   ],
   "scripts": {
     "postinstall": "patch-package",
