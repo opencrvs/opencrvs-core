@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
 
 import { useSelector, useDispatch } from 'react-redux'
@@ -106,8 +106,14 @@ function PrefetchQueries() {
  * Each route is defined as a child of the `ROUTES.V2` route.
  */
 
-export function useNetworkProbe() {
-  const dispatch = useDispatch<AppStore['dispatch']>()
+export function useNetworkProbe({
+  onVersionMismatch
+}: { onVersionMismatch?: () => void } = {}) {
+  const onVersionMismatchRef = useRef(onVersionMismatch)
+  useEffect(() => {
+    onVersionMismatchRef.current = onVersionMismatch
+  })
+
   useEffect(() => {
     let cancelled = false
     let intervalId: ReturnType<typeof setInterval> | null = null
@@ -138,7 +144,7 @@ export function useNetworkProbe() {
           }
           const gatewayVersion = res.headers.get('X-version')
           if (gatewayVersion && gatewayVersion !== APPLICATION_VERSION) {
-            dispatch(storeReloadModalVisibility(true))
+            onVersionMismatchRef.current?.()
           }
           onlineManager.setOnline(true)
           if (intervalId !== null) {
@@ -178,13 +184,16 @@ export function useNetworkProbe() {
         clearInterval(intervalId)
       }
     }
-  }, [dispatch])
+  }, [])
 }
 
 export const routesConfig = {
   path: ROUTES.V2.path,
   Component: () => {
-    useNetworkProbe()
+    const dispatch = useDispatch<AppStore['dispatch']>()
+    useNetworkProbe({
+      onVersionMismatch: () => dispatch(storeReloadModalVisibility(true))
+    })
 
     const currentUser = useSelector(getUserDetails)
 
