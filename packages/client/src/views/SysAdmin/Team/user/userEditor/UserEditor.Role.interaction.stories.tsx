@@ -176,9 +176,12 @@ export default meta
 type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
 
 async function openRoleDropdown(canvasElement: HTMLElement) {
-  const canvas = within(canvasElement)
-  const combobox = await canvas.findByRole('combobox')
-  await userEvent.click(combobox)
+  const control = await waitFor(() => {
+    const el = canvasElement.querySelector('#role .react-select__control')
+    if (!el) throw new Error('Role dropdown not found')
+    return el
+  })
+  await userEvent.click(control)
 }
 
 /**
