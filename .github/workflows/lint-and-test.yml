@@ -293,6 +293,8 @@ jobs:
       - name: Build Storybook (with TurboSnap stats)
         working-directory: packages/client
         env:
+          # Why are we using NODE_ENV=production? It's recommended in Chromatic docs, to ensure webpack tree-shaking is working properly
+          # See: https://www.chromatic.com/docs/turbosnap/troubleshooting/#why-are-changes-not-being-detected-correctly
           NODE_ENV: production
         run: yarn run build-storybook --webpack-stats-json
 
