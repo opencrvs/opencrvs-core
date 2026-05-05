@@ -16,5 +16,6 @@ export const InputDescriptor = styled.p`
   color: ${({ theme }) => theme.colors.supportingCopy};
   width: 100%;
   margin: 0;
+  padding-bottom: 8px;
   display: inline-block;
 `
