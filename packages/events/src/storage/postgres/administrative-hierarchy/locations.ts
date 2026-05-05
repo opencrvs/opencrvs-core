@@ -200,16 +200,24 @@ function getAdministrativeHierarchyByIdCte(id: string) {
  * @param locationId
  * @returns The list of location hierarchy ids, ex: [admin_area_1_id, admin_area_2_id, locationId]
  */
-export async function getAdministrativeHierarchyById(id: string) {
-  const db = getClient()
+const administrativeHierarchyByIdCache = new Map<string, Promise<UUID[]>>()
 
+export function getAdministrativeHierarchyById(id: string): Promise<UUID[]> {
+  const cached = administrativeHierarchyByIdCache.get(id)
+  if (cached) { return cached }
+
+  const db = getClient()
   const query = sql<{ ids: UUID[] }>`
     ${getAdministrativeHierarchyByIdCte(id)}
     SELECT array_agg(id ORDER BY depth DESC) AS ids FROM area_chain;
   `
 
-  const result = await db.executeQuery(query.compile(db))
-  return result.rows.length > 0 ? result.rows[0].ids : []
+  const promise = db
+    .executeQuery(query.compile(db))
+    .then((result) => (result.rows.length > 0 ? result.rows[0].ids : []))
+
+  administrativeHierarchyByIdCache.set(id, promise)
+  return promise
 }
 
 export async function isLocationUnderAdministrativeArea({
