@@ -13,7 +13,7 @@ import React from 'react'
 import { LocationPicker } from './LocationPicker'
 import { TRPCProvider } from '../v2-events/trpc'
 import { noop } from 'lodash'
-import { V2_DEFAULT_MOCK_LOCATIONS } from '../tests/v2-events/administrative-hierarchy-mock'
+import { V2_DEFAULT_MOCK_LOCATIONS } from '@opencrvs/commons/client'
 
 const meta: Meta<typeof LocationPicker> = {
   title: 'LocationPicker',
