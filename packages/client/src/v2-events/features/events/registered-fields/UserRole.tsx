@@ -30,12 +30,30 @@ import { ROUTES } from '@client/v2-events/routes'
 import { StringifierContext } from './RegisteredField'
 import { Select, SelectInputProps } from './Select'
 
+// Outer shell: guards against a transiently absent primaryOfficeId (e.g.
+// during an auth-gate redirect where the form store is cleared before
+// navigation completes)
 function UserRoleInput(props: Omit<SelectInputProps, 'options'>) {
+  const userForm = useUserFormState((s) => s.userForm)
+  const subjectLocation = UUID.safeParse(userForm?.primaryOfficeId)
+
+  if (!subjectLocation.success) {
+    return <Select.Input {...props} options={[]} />
+  }
+
+  return (
+    <UserRoleInputWithLocation {...props} locationId={subjectLocation.data} />
+  )
+}
+
+function UserRoleInputWithLocation({
+  locationId,
+  ...props
+}: Omit<SelectInputProps, 'options'> & { locationId: UUID }) {
   const intl = useIntl()
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
-  const userForm = useUserFormState((s) => s.userForm)
-  const subjectLocation = UUID.safeParse(userForm?.primaryOfficeId)
+
   const { getLocationHierarchy } = useLocations()
   const { userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.EDIT)
 
@@ -46,13 +64,7 @@ function UserRoleInput(props: Omit<SelectInputProps, 'options'>) {
     throw new Error('User not found')
   }
 
-  if (!subjectLocation.success) {
-    throw new Error('Invalid subject location')
-  }
-
-  const locationHierarchy = getLocationHierarchy.useSuspenseQuery(
-    subjectLocation.data
-  )
+  const locationHierarchy = getLocationHierarchy.useSuspenseQuery(locationId)
 
   const isNewUser = isTemporaryId(userId)
 
@@ -73,7 +85,7 @@ function UserRoleInput(props: Omit<SelectInputProps, 'options'>) {
     } satisfies UserContext,
     acceptedScopes,
     userLocation: {
-      primaryOfficeId: subjectLocation.data,
+      primaryOfficeId: locationId,
       administrativeHierarchy: locationHierarchy
     }
   })

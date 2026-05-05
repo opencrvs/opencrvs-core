@@ -47,7 +47,12 @@ const meta: Meta<typeof EditUser> = {
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
     msw: {
       handlers: {
-        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)]
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        locationHierarchy: [
+          tRPCMsw.locations.getLocationHierarchy.query(
+            () => ibomboOfficeHierarchy
+          )
+        ]
       }
     }
   },
@@ -56,6 +61,9 @@ const meta: Meta<typeof EditUser> = {
     window.config.USER_NOTIFICATION_DELIVERY_METHOD = 'email'
     mockOfflineData.config.USER_NOTIFICATION_DELIVERY_METHOD = 'email'
     useUserFormState.getState().clear()
+    useUserFormState
+      .getState()
+      .setUserForm({ primaryOfficeId: mockUser.primaryOfficeId })
   }
 }
 
@@ -295,11 +303,19 @@ export const ClearedPhoneNumberNormalisedToUndefined: StoryObj = {
  */
 
 const CENTRAL_ADMIN_AREA_ID = 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
+const IBOMBO_ADMIN_AREA_ID = '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
 const SULAKA_ADMIN_AREA_ID = 'c599b691-fd2d-45e1-abf4-d185de727fb5' as UUID
 const CENTRAL_PROVINCIAL_OFFICE_ID =
   '6f6186ce-cd5f-4a5f-810a-2d99e7c4ba12' as UUID
 const SULAKA_PROVINCIAL_OFFICE_ID =
   '2884f5b9-17b4-49ce-bf4d-f538228935df' as UUID
+
+// mockUser.primaryOfficeId === Ibombo District Office
+const ibomboOfficeHierarchy: UUID[] = [
+  CENTRAL_ADMIN_AREA_ID,
+  IBOMBO_ADMIN_AREA_ID,
+  mockUser.primaryOfficeId
+]
 
 const TARGET_NSA_USER_ID = 'ac0babf3-282a-447a-aecc-3b9aa9fb7cc5' as UUID
 const TARGET_FIELD_AGENT_USER_ID =
@@ -401,18 +417,8 @@ export const NewUserCreationAllowedInJurisdiction: StoryObj<typeof EditUser> = {
  * 1b) Same gate, denial path: a role without a user.create scope (here,
  *     REGISTRATION_AGENT) cannot create users in any office. The form must
  *     not render and the unauthorized toast must surface.
- *
- *     This also covers the "outside jurisdiction" case structurally:
- *     canAddOfficeUsers returns false whenever no matching scope's
- *     accessLevel covers the chosen office. When tokens with
- *     jurisdiction-restricted user.create scopes (accessLevel: 'location' /
- *     'administrativeArea') are added to test fixtures, additional stories
- *     can mirror this assertion with a target office outside the admin's
- *     hierarchy.
  */
-export const NewUserCreationBlockedWithoutJurisdiction: StoryObj<
-  typeof EditUser
-> = {
+export const NewUserCreationBlockedWithoutScope: StoryObj<typeof EditUser> = {
   parameters: {
     chromatic: { disableSnapshot: true },
     userRole: TestUserRole.enum.REGISTRATION_AGENT,
@@ -432,6 +438,56 @@ export const NewUserCreationBlockedWithoutJurisdiction: StoryObj<
   play: async ({ step }) => {
     await step(
       'Unauthorized toast appears (no user.create scope grants jurisdiction over the chosen office)',
+      async () => {
+        await waitFor(() =>
+          expect(
+            within(document.body).getByText(
+              'We are unable to display this page to you'
+            )
+          ).toBeInTheDocument()
+        )
+      }
+    )
+
+    await step('New-user form is not rendered (redirected)', async () => {
+      await waitFor(() =>
+        expect(
+          document.querySelector('[data-testid="text__phoneNumber"]')
+        ).toBeNull()
+      )
+    })
+  }
+}
+
+/**
+ * 1c) LOCAL_SYSTEM_ADMIN (user.create with accessLevel: 'administrativeArea')
+ *     whose primary office is Ibombo District Office (Central jurisdiction)
+ *     tries to create a user in Sulaka Provincial Office (separate root).
+ *     Sulaka is not in Central's hierarchy → canAddOfficeUsers returns false
+ *     → toast appears and the form is not rendered.
+ */
+export const NewUserCreationBlockedOutsideJurisdiction: StoryObj<
+  typeof EditUser
+> = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.details'
+      })
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: SULAKA_PROVINCIAL_OFFICE_ID
+    })
+  },
+  play: async ({ step }) => {
+    await step(
+      'Unauthorized toast appears (chosen office is outside the user.create jurisdiction)',
       async () => {
         await waitFor(() =>
           expect(
