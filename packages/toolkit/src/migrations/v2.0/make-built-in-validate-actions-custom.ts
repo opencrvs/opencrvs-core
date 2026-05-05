@@ -27,6 +27,10 @@
  *   - Removes the `deduplication` property from those objects
  *   - Replaces `review: { fields: <value> }` with `form: <value>`, or
  *     `review: <expr>` with `form: <expr>.fields` when the value is not an inline object
+ *   - Adds the top-level `validated` flag definition and `{ id: 'validated',
+ *     operation: 'add' }` to the (now custom) validate action
+ *   - Adds `{ id: 'validated', operation: 'remove' }` to every `REGISTER` action
+ *     in the same config, closing the flag's lifecycle when registration happens
  *   - Saves the modified files in-place
  */
 
@@ -34,6 +38,7 @@ import {
   Project,
   SyntaxKind,
   ObjectLiteralExpression,
+  ArrayLiteralExpression,
   Node,
   SourceFile
 } from 'ts-morph'
@@ -74,6 +79,8 @@ function ensureImports(sourceFile: SourceFile): void {
 const DEFINE_CONFIG_NAME = 'defineConfig'
 const ACTIONS_PROPERTY_NAME = 'actions'
 const TYPE_PROPERTY_NAME = 'type'
+const ID_PROPERTY_NAME = 'id'
+const FLAGS_PROPERTY_NAME = 'flags'
 const CUSTOM_ACTION_TYPE_PROPERTY_NAME = 'customActionType'
 const AUDIT_HISTORY_LABEL_PROPERTY_NAME = 'auditHistoryLabel'
 const DEDUPLICATION_PROPERTY_NAME = 'deduplication'
@@ -83,9 +90,12 @@ const FORM_PROPERTY_NAME = 'form'
 const ACTION_TYPE_ENUM_NAME = 'ActionType'
 const VALIDATE_MEMBER_NAME = 'VALIDATE'
 const CUSTOM_MEMBER_NAME = 'CUSTOM'
+const REGISTER_MEMBER_NAME = 'REGISTER'
 const VALIDATE_STRING_LITERAL = 'VALIDATE'
 const CUSTOM_STRING_LITERAL = 'CUSTOM'
+const REGISTER_STRING_LITERAL = 'REGISTER'
 const VALIDATE_DECLARATION_VALUE = 'VALIDATE_DECLARATION'
+const VALIDATED_FLAG_VALUE = 'validated'
 
 function isValidateType(typeInitializer: Node): boolean {
   // Matches: ActionType.VALIDATE
@@ -262,6 +272,85 @@ function transformValidateActionToCustom(
   return true
 }
 
+function isRegisterAction(action: ObjectLiteralExpression): boolean {
+  const typeProperty = action.getProperty(TYPE_PROPERTY_NAME)
+  if (!typeProperty || !Node.isPropertyAssignment(typeProperty)) return false
+
+  const typeInit = typeProperty.getInitializer()
+  if (!typeInit) return false
+
+  // Matches: ActionType.REGISTER
+  if (Node.isPropertyAccessExpression(typeInit)) {
+    const enumExpr = typeInit.getExpression()
+    return (
+      Node.isIdentifier(enumExpr) &&
+      enumExpr.getText() === ACTION_TYPE_ENUM_NAME &&
+      typeInit.getName() === REGISTER_MEMBER_NAME
+    )
+  }
+
+  // Matches: "REGISTER"
+  if (Node.isStringLiteral(typeInit)) {
+    return typeInit.getLiteralValue() === REGISTER_STRING_LITERAL
+  }
+
+  return false
+}
+
+/**
+ * Returns true if an array literal contains an object literal with `id: <id>`.
+ */
+function arrayHasElementWithId(
+  array: ArrayLiteralExpression,
+  id: string
+): boolean {
+  for (const el of array.getElements()) {
+    if (!Node.isObjectLiteralExpression(el)) continue
+    const idProp = el.getProperty(ID_PROPERTY_NAME)
+    if (!idProp || !Node.isPropertyAssignment(idProp)) continue
+    const idInit = idProp.getInitializer()
+    if (
+      idInit &&
+      Node.isStringLiteral(idInit) &&
+      idInit.getLiteralValue() === id
+    ) {
+      return true
+    }
+  }
+  return false
+}
+
+/**
+ * Adds `{ id: 'validated', operation: 'remove' }` to a REGISTER action's
+ * `flags` array. Skips if any `validated` flag entry is already present —
+ * this keeps the codemod idempotent and avoids stomping on an intentional
+ * `add` op a maintainer may have authored manually.
+ *
+ * Returns true if a change was made.
+ */
+function ensureRegisterRemovesValidatedFlag(
+  action: ObjectLiteralExpression
+): boolean {
+  const entry = `{ id: '${VALIDATED_FLAG_VALUE}', operation: 'remove' }`
+  const flagsProp = action.getProperty(FLAGS_PROPERTY_NAME)
+
+  if (flagsProp && Node.isPropertyAssignment(flagsProp)) {
+    const flagsInit = flagsProp.getInitializer()
+    if (flagsInit && Node.isArrayLiteralExpression(flagsInit)) {
+      if (arrayHasElementWithId(flagsInit, VALIDATED_FLAG_VALUE)) return false
+      flagsInit.addElement(entry)
+      return true
+    }
+    return false
+  }
+
+  action.addPropertyAssignment({
+    name: FLAGS_PROPERTY_NAME,
+    initializer: `[${entry}]`
+  })
+  return true
+}
+
 function processFile(filePath: string, project: Project): number {
   const sourceFile = project.getSourceFile(filePath)
   if (!sourceFile) return 0
@@ -353,6 +442,22 @@ function processFile(filePath: string, project: Project): number {
       )
     }
 
+    // Close the `validated` flag's lifecycle: when the validate action adds the
+    // flag, the matching REGISTER action(s) must remove it on registration.
+    if (configHadValidateAction) {
+      for (const element of actionsInitializer.getElements()) {
+        if (!Node.isObjectLiteralExpression(element)) continue
+        if (!isRegisterAction(element)) continue
+
+        if (ensureRegisterRemovesValidatedFlag(element)) {
+          transformedCount++
+          console.log(
+            `  [${path.relative(process.cwd(), filePath)}] Added '${VALIDATED_FLAG_VALUE}' remove-flag to REGISTER action`
+          )
+        }
+      }
+    }
+
     if (fileNeedsImports) {
       ensureImports(sourceFile)
     }
@@ -408,7 +513,7 @@ async function main() {
   }
 
   console.log(
-    `\nDone. Transformed ${totalTransformed} VALIDATE action(s) to CUSTOM with customActionType: '${VALIDATE_DECLARATION_VALUE}'.`
+    `\nDone. Applied ${totalTransformed} change(s): VALIDATE → CUSTOM (${VALIDATE_DECLARATION_VALUE}) and '${VALIDATED_FLAG_VALUE}' remove-flag on matching REGISTER actions.`
   )
 }
 

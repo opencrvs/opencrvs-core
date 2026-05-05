@@ -40,8 +40,8 @@ export const ApplicationConfig = z.object({
     })
   ),
   PHONE_NUMBER_PATTERN: z.string().or(z.instanceof(RegExp)),
-  USER_NOTIFICATION_DELIVERY_METHOD: z.string(),
-  INFORMANT_NOTIFICATION_DELIVERY_METHOD: z.string(),
+  USER_NOTIFICATION_DELIVERY_METHOD: z.enum(['email', 'sms']),
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD: z.enum(['email', 'sms']),
   SEARCH_DEFAULT_CRITERIA: SearchCriteria.optional().default('TRACKING_ID'),
   ADDITIONAL_USER_FIELDS: z.array(FieldConfig).optional().default([])
 })
@@ -68,8 +68,8 @@ export const BackgroundConfig = z
 export const LoginConfig = z.object({
   COUNTRY: z.string(),
   LANGUAGES: z.array(z.string()),
-  USER_NOTIFICATION_DELIVERY_METHOD: z.string(),
-  INFORMANT_NOTIFICATION_DELIVERY_METHOD: z.string(),
+  USER_NOTIFICATION_DELIVERY_METHOD: z.enum(['email', 'sms']),
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD: z.enum(['email', 'sms']),
   PHONE_NUMBER_PATTERN: z.string().or(z.instanceof(RegExp)),
   LOGIN_BACKGROUND: BackgroundConfig,
   SENTRY: z.string().optional()

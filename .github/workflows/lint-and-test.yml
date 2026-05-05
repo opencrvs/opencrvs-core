@@ -227,8 +227,6 @@ jobs:
     steps:
       - name: Checking out git repo
         uses: actions/checkout@v6
-        with:
-          fetch-depth: 0 # Fetch history to compare PR changes against the base branch
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v6
@@ -286,6 +284,18 @@ jobs:
         run: |
           cd packages/components && yarn build
 
+      # Build Storybook once here (with --webpack-stats-json so that
+      # `preview-stats.json` is emitted). The artifact is reused by
+      # `chromatic` (--storybook-build-dir) and `test-storybook`,
+      # avoiding duplicate Storybook builds. `preview-stats.json` is the
+      # input to the change-detection script that decides whether
+      # Chromatic must run.
+      - name: Build Storybook (with TurboSnap stats)
+        working-directory: packages/client
+        env:
+          NODE_ENV: production
+        run: yarn run build-storybook --webpack-stats-json
+
       - name: Upload filesystem as artifact
         uses: actions/upload-artifact@v4.5.0
         with:
@@ -341,6 +351,16 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
+      # Fresh checkout brings .git (needed by Chromatic's TurboSnap and
+      # by the change-detection `git diff` below). The artifact
+      # extracted on top adds the prebuilt commons/components outputs
+      # and `packages/client/storybook-static/`; source files match the
+      # current commit so overwrites are no-ops.
+      - name: Checkout PR branch (for git history)
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
       - name: Download filesystem artifact
         uses: actions/download-artifact@v7
         with:
@@ -352,7 +372,25 @@ jobs:
         with:
           node-version-file: .nvmrc
 
+      # Decide whether the diff can affect Storybook by intersecting it
+      # with the module graph emitted by Storybook's
+      # `--webpack-stats-json`. Backend-only changes in
+      # `packages/commons` (and similar) won't appear in the graph and
+      # therefore won't trigger Chromatic. The same gate applies to
+      # pushes on `develop`: if no module in the Storybook bundle
+      # changed, no snapshot can change and the baseline is preserved
+      # by definition.
+      - name: Detect storybook-affecting changes
+        id: detect
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          node .github/scripts/changed-files-affect-storybook.mjs \
+            --stats packages/client/storybook-static/preview-stats.json \
+            --base "$BASE_SHA"
+
       - name: Cache Node.js dependencies
+        if: steps.detect.outputs.affects == 'true'
         uses: actions/cache@v5
         with:
           path: |
@@ -363,23 +401,15 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Install dependencies
+        if: steps.detect.outputs.affects == 'true'
         run: CI="" yarn install --frozen-lockfile
 
-      - name: Fetch full Git history
-        run: |
-          git clone --bare https://github.com/opencrvs/opencrvs-core.git .git
-          git config --local --bool core.bare false
-          git reset --hard
-          git clean -fd
-          git fetch --prune
-          git checkout ${{ github.head_ref || github.ref_name }}
-          git reset --hard
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Run Chromatic
-        run: yarn run chromatic
+        if: steps.detect.outputs.affects == 'true'
         working-directory: packages/client
+        run: |
+          yarn run chromatic --storybook-build-dir storybook-static --diagnostics-file
+          cat chromatic-diagnostics.json
         env:
           CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
@@ -417,10 +447,9 @@ jobs:
         # Playwright is required since @storybook/test-runner depends on it
         run: npx playwright install --with-deps
 
-      - name: Build Storybook
-        working-directory: packages/client
-        run: yarn run build-storybook
-
+      # `storybook-static/` is restored from the artifact built in
+      # `prepare-client-tests`, so we don't need to build Storybook
+      # again here.
       - name: Serve Storybook and run tests
         working-directory: packages/client
         # based on https://storybook.js.org/docs/writing-tests/test-runner#run-against-non-deployed-storybooks
