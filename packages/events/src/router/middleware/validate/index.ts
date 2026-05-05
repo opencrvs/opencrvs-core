@@ -182,7 +182,9 @@ function validateDeclarationUpdateAction({
   // Only check keys from declarationUpdate (the client's input), not fields inherited from the previous state
   // that may have become hidden due to changes in the current update.
   const declarationUpdateOnlyComplete = Object.fromEntries(
-    Object.entries(completeDeclaration).filter(([key]) => key in declarationUpdate)
+    Object.entries(completeDeclaration).filter(
+      ([key]) => key in declarationUpdate
+    )
   )
   const invalidKeys = getInvalidUpdateKeys({
     update: declarationUpdateOnlyComplete,
