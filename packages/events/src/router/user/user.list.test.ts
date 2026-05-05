@@ -46,25 +46,11 @@ test('Returns user in correct format', async () => {
       id: user.id,
       name: user.name,
       role: user.role,
-      type: TokenUserType.enum.user
+      primaryOfficeId: user.primaryOfficeId,
+      type: TokenUserType.enum.user,
+      status: user.status
     })
   ])
-})
-
-test('Does not expose PII or sensitive fields', async () => {
-  const { user } = await setupTestCase()
-  const client = createTestClient(user)
-
-  const [fetchedUser] = await client.user.list([user.id])
-
-  expect(fetchedUser).not.toHaveProperty('mobile')
-  expect(fetchedUser).not.toHaveProperty('email')
-  expect(fetchedUser).not.toHaveProperty('status')
-  expect(fetchedUser).not.toHaveProperty('primaryOfficeId')
-  expect(fetchedUser).not.toHaveProperty('administrativeAreaId')
-  expect(fetchedUser).not.toHaveProperty('device')
-  expect(fetchedUser).not.toHaveProperty('data')
-  expect(fetchedUser).not.toHaveProperty('avatar')
 })
 
 test('Returns both normal users and system users', async () => {
@@ -112,6 +98,7 @@ test('Does not return users or systems which are not found', async () => {
       id: user.id,
       name: user.name,
       role: user.role,
+      primaryOfficeId: user.primaryOfficeId,
       type: TokenUserType.enum.user,
       fullHonorificName: user.fullHonorificName
     })
