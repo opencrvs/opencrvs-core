@@ -30,22 +30,6 @@ import { ROUTES } from '@client/v2-events/routes'
 import { StringifierContext } from './RegisteredField'
 import { Select, SelectInputProps } from './Select'
 
-// Outer shell: guards against a transiently absent primaryOfficeId (e.g.
-// during an auth-gate redirect where the form store is cleared before
-// navigation completes)
-function UserRoleInput(props: Omit<SelectInputProps, 'options'>) {
-  const userForm = useUserFormState((s) => s.userForm)
-  const subjectLocation = UUID.safeParse(userForm?.primaryOfficeId)
-
-  if (!subjectLocation.success) {
-    return <Select.Input {...props} options={[]} />
-  }
-
-  return (
-    <UserRoleInputWithLocation {...props} locationId={subjectLocation.data} />
-  )
-}
-
 function UserRoleInputWithLocation({
   locationId,
   ...props
@@ -96,6 +80,22 @@ function UserRoleInputWithLocation({
   }))
 
   return <Select.Input {...props} options={options} />
+}
+
+// Outer shell: guards against a transiently absent primaryOfficeId (e.g.
+// during an auth-gate redirect where the form store is cleared before
+// navigation completes)
+function UserRoleInput(props: Omit<SelectInputProps, 'options'>) {
+  const userForm = useUserFormState((s) => s.userForm)
+  const subjectLocation = UUID.safeParse(userForm?.primaryOfficeId)
+
+  if (!subjectLocation.success) {
+    return <Select.Input {...props} options={[]} />
+  }
+
+  return (
+    <UserRoleInputWithLocation {...props} locationId={subjectLocation.data} />
+  )
 }
 
 function UserRoleOutput({ value }: { value: string | undefined }) {

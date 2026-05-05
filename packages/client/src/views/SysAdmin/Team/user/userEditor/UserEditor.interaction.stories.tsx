@@ -446,6 +446,7 @@ export const NewUserCreationBlockedWithoutScope: StoryObj<typeof EditUser> = {
             )
           ).toBeInTheDocument()
         )
+        document.getElementById('undefinedCancel')?.click()
       }
     )
 
@@ -496,6 +497,7 @@ export const NewUserCreationBlockedOutsideJurisdiction: StoryObj<
             )
           ).toBeInTheDocument()
         )
+        document.getElementById('undefinedCancel')?.click()
       }
     )
 
@@ -613,6 +615,7 @@ export const EditUserBlockedByRoleRestriction: StoryObj<typeof EditUser> = {
             )
           ).toBeInTheDocument()
         )
+        document.getElementById('undefinedCancel')?.click()
       }
     )
 
@@ -672,6 +675,7 @@ export const EditUserBlockedByAdministrativeAreaMismatch: StoryObj<
             )
           ).toBeInTheDocument()
         )
+        document.getElementById('undefinedCancel')?.click()
       }
     )
 
@@ -789,6 +793,7 @@ export const ReviewUserBlockedByRoleRestriction: StoryObj<typeof ReviewUser> = {
             )
           ).toBeInTheDocument()
         )
+        document.getElementById('undefinedCancel')?.click()
       }
     )
 
@@ -841,6 +846,7 @@ export const ReviewUserBlockedByAdministrativeAreaMismatch: StoryObj<
             )
           ).toBeInTheDocument()
         )
+        document.getElementById('undefinedCancel')?.click()
       }
     )
 
