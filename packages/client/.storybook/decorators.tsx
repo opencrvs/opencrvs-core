@@ -21,7 +21,7 @@ import {
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { getLeafAdministrativeAreaIds } from '@client/v2-events/hooks/useAdministrativeAreas'
 
-const generator = testDataGenerator()
+const generator = testDataGenerator(1337)
 
 /**
  *
