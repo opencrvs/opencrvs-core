@@ -41,6 +41,8 @@ async function reindexBatchToCountryConfig(
   token: TokenWithBearer,
   batch: EventDocument[]
 ): Promise<void> {
+  const start = new Date()
+
   const response = await fetch(new URL('/reindex', env.COUNTRY_CONFIG_URL), {
     method: 'POST',
     headers: {
@@ -49,12 +51,35 @@ async function reindexBatchToCountryConfig(
     },
     body: JSON.stringify(batch)
   })
-
+  const batchId = batch[0]?.id ?? 'unknown'
+  logger.info(
+    `Batch ${batchId}: Reindex batch to country config took ${new Date().valueOf() - start.valueOf()} ms`
+  )
   if (!response.ok) {
     throw new Error(
       `Failed to reindex country config batch: ${response.status} ${response.statusText}`
     )
   }
+}
+
+async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
+  let retries = 0
+  const maxRetries = 5
+  while (retries <= maxRetries) {
+    try {
+      return await fn()
+    } catch (error) {
+      logger.warn(
+        `Request failed, retry in 5 seconds. Retry ${retries + 1}/${maxRetries}: ${error}`
+      )
+      retries++
+      if (retries >= maxRetries) {
+        throw error
+      }
+      await new Promise((resolve) => setTimeout(resolve, 5000))
+    }
+  }
+  throw new Error(`Max retries exceeded. This should never happen`)
 }
 
 async function reindexSearch(
@@ -76,16 +101,23 @@ async function reindexSearch(
     if (buffer.length === 0) {
       return
     }
+    const start = new Date()
     const batch = buffer
     buffer = []
-    logger.info(`Reindexing ${batch.length} events`)
+    const batchId = batch[0]?.id ?? 'unknown'
+    logger.info(`Batch ${batchId}: ${batch.length} events to index`)
 
     await Promise.all([
-      indexEventsInBulk(batch, configurations, indexNameOverrides),
-      reindexBatchToCountryConfig(token, batch)
+      withRetry(() =>
+        indexEventsInBulk(batch, configurations, indexNameOverrides)
+      ),
+      withRetry(() => reindexBatchToCountryConfig(token, batch))
     ])
 
     await onBatchProcessed?.(batch.length)
+    logger.info(
+      `Batch ${batchId}: Processing batch took ${new Date().valueOf() - start.valueOf()} ms`
+    )
   }
 
   return new Transform({
@@ -146,6 +178,9 @@ export async function runReindex(token: TokenWithBearer) {
     async (batchSize) => {
       processedCount += batchSize
       await updateReindexingProgress(runId, processedCount)
+      logger.info(
+        `Reindex total records processed: ${processedCount}. Per second: ${Math.round(processedCount / ((new Date().valueOf() - start.valueOf()) / 1000))}`
+      )
     }
   )
 
@@ -171,7 +206,7 @@ export async function runReindex(token: TokenWithBearer) {
     throw err
   }
   await Promise.all(
-    configurations.map((config) =>
+    configurations.map(async (config) =>
       finaliseReindexIndex(
         config.id,
         getTemporaryIndexName(config.id, timestamp)
@@ -183,7 +218,7 @@ export async function runReindex(token: TokenWithBearer) {
   await pruneOldReindexingStatusEntries()
 }
 
-export function reindex(token: TokenWithBearer) {
+export async function reindex(token: TokenWithBearer) {
   logger.info('Reindex started in background')
   return runReindex(token)
 }

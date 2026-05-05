@@ -260,6 +260,7 @@ jobs:
           Farajaland Commit Hash: ${{ env.FARAJALAND_COMMIT_HASH }}
           Keep e2e: ${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}
           E2E Branch: ${{ needs.generate_stack_name_and_branch.outputs.e2e_branch }}
+          Chart Branch: ${{ needs.generate_stack_name_and_branch.outputs.chart_branch }}
           Stack: ${{ steps.generate_stack.outputs.stack }}
           """
 

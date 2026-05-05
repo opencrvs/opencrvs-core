@@ -60,3 +60,13 @@ export const LocalSystemAdmin: Story = {
     }
   }
 }
+
+export const AssignedOfficeDisplayed: Story = {
+  parameters: {
+    userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.buildPath({})
+    }
+  }
+}

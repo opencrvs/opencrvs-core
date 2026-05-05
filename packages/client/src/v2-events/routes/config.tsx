@@ -85,58 +85,77 @@ function PrefetchQueries() {
  * Each route is defined as a child of the `ROUTES.V2` route.
  */
 
+export function useNetworkProbe() {
+  useEffect(() => {
+    let cancelled = false
+    let intervalId: ReturnType<typeof setInterval> | null = null
+    let probeInProgress = false
+    let currentController: AbortController | null = null
+    let abortTimeoutId: ReturnType<typeof setTimeout> | null = null
+
+    onlineManager.setOnline(false)
+
+    async function probeNetwork() {
+      if (probeInProgress) {
+        return
+      }
+      probeInProgress = true
+      try {
+        currentController = new AbortController()
+        abortTimeoutId = setTimeout(() => currentController?.abort(), 3000)
+
+        const res = await fetch('/api/ping', {
+          method: 'GET',
+          cache: 'no-store',
+          signal: currentController.signal
+        })
+
+        if (!cancelled) {
+          onlineManager.setOnline(res.ok)
+          if (res.ok && intervalId !== null) {
+            clearInterval(intervalId)
+            intervalId = null
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          onlineManager.setOnline(false)
+        }
+      } finally {
+        if (abortTimeoutId !== null) {
+          clearTimeout(abortTimeoutId)
+          abortTimeoutId = null
+        }
+        probeInProgress = false
+        currentController = null
+      }
+    }
+
+    void probeNetwork()
+
+    intervalId = setInterval(() => {
+      if (!onlineManager.isOnline()) {
+        void probeNetwork()
+      }
+    }, 5000)
+
+    return () => {
+      cancelled = true
+      currentController?.abort()
+      if (abortTimeoutId !== null) {
+        clearTimeout(abortTimeoutId)
+      }
+      if (intervalId !== null) {
+        clearInterval(intervalId)
+      }
+    }
+  }, [])
+}
+
 export const routesConfig = {
   path: ROUTES.V2.path,
   Component: () => {
-    useEffect(() => {
-      let cancelled = false
-
-      onlineManager.setOnline(false)
-
-      async function probeNetwork() {
-        try {
-          const controller = new AbortController()
-          setTimeout(() => controller.abort(), 3000)
-
-          const res = await fetch('/api/ping', {
-            method: 'GET',
-            cache: 'no-store',
-            signal: controller.signal
-          })
-
-          const status = await res.json()
-          const services = [
-            'auth',
-            'search',
-            'user-mgnt',
-            'metrics',
-            'notification',
-            'countryconfig',
-            'workflow'
-          ]
-
-          const allServicesReady =
-            res.ok &&
-            services.every((service) => {
-              return status[service] === true
-            })
-
-          if (!cancelled) {
-            onlineManager.setOnline(allServicesReady)
-          }
-        } catch {
-          if (!cancelled) {
-            onlineManager.setOnline(false)
-          }
-        }
-      }
-
-      void probeNetwork()
-
-      return () => {
-        cancelled = true
-      }
-    }, [])
+    useNetworkProbe()
 
     const currentUser = useSelector(getUserDetails)
 
