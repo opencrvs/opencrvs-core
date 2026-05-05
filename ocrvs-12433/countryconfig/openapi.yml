@@ -2704,6 +2704,7 @@ components:
                                 - registeredIn
                                 - registeredBy
                                 - accessLevel
+                                - role
                                 - ids
                           required:
                             - $scope
@@ -7317,6 +7318,7 @@ components:
                                 - registeredIn
                                 - registeredBy
                                 - accessLevel
+                                - role
                                 - ids
                           required:
                             - $scope
@@ -7739,6 +7741,7 @@ components:
                                 - registeredIn
                                 - registeredBy
                                 - accessLevel
+                                - role
                                 - ids
                           required:
                             - $scope
@@ -7974,6 +7977,7 @@ components:
                                 - registeredIn
                                 - registeredBy
                                 - accessLevel
+                                - role
                                 - ids
                           required:
                             - $scope
@@ -8209,6 +8213,7 @@ components:
                                 - registeredIn
                                 - registeredBy
                                 - accessLevel
+                                - role
                                 - ids
                           required:
                             - $scope
