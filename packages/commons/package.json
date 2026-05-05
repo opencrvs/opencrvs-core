@@ -4,6 +4,7 @@
   "description": "OpenCRVS common modules and utils",
   "license": "MPL-2.0",
   "main": "./build/dist/common/index.js",
+  "sideEffects": false,
   "exports": {
     ".": "./build/dist/common/index.js",
     "./monitoring": "./build/dist/common/monitoring.js",
