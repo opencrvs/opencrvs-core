@@ -531,6 +531,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
           {...inputProps}
           max={field.config.configuration?.max}
           min={field.config.configuration?.min}
+          maxLength={field.config.configuration?.maxLength}
           value={field.value}
         />
       </InputField>
