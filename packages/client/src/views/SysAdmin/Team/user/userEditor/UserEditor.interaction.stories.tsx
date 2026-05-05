@@ -21,11 +21,13 @@ import {
   UUID
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
-import { ROUTES, routesConfig } from '@client/v2-events/routes'
+import { ROUTES } from '@client/v2-events/routes/routes'
+import { routesConfig } from '@client/v2-events/routes/config'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { mockOfflineData } from '@client/tests/mock-offline-data'
-import { EditUser, ReviewUser, useUserFormState } from './UserEditor'
 import { createTemporaryId } from '@client/v2-events/utils'
+
+import { useUserFormState } from './useUserFormState'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [httpLink({ url: '/api/events' })],
@@ -41,7 +43,7 @@ const generator = testDataGenerator()
 const mockUser = generator.user.registrationAgent().v2
 const createUserSpy = fn()
 
-const meta: Meta<typeof EditUser> = {
+const meta: Meta = {
   title: 'SysAdmin/UserEditor/Interaction',
   parameters: {
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
@@ -75,7 +77,7 @@ export default meta
  * The registration office field must include both CRVS_OFFICE and HEALTH_FACILITY
  * locations so that hospital clerks can be assigned to a hospital as their office.
  */
-export const RegistrationOfficeIncludesHospitals: StoryObj<typeof EditUser> = {
+export const RegistrationOfficeIncludesHospitals: StoryObj = {
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -114,48 +116,47 @@ export const RegistrationOfficeIncludesHospitals: StoryObj<typeof EditUser> = {
  * Continue with an invalid phone number must surface the error inline and
  * keep the user on the same page.
  */
-export const InvalidPhoneNumberShowsValidationError: StoryObj<typeof EditUser> =
-  {
-    parameters: {
-      chromatic: { disableSnapshot: true },
-      reactRouter: {
-        router: routesConfig,
-        initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-          userId: createTemporaryId(),
-          pageId: 'user.details'
-        })
-      }
-    },
-    beforeEach: () => {
-      // Pre-seed required fields so only the phone validation fires.
-      useUserFormState.getState().setUserForm({
-        primaryOfficeId: mockUser.primaryOfficeId,
-        role: TestUserRole.enum.REGISTRATION_AGENT,
-        name: { firstname: 'Test', surname: 'User' },
-        email: 'test@opencrvs.org'
-      })
-    },
-    play: async ({ canvasElement, step }) => {
-      const canvas = within(canvasElement)
-
-      await step('Type an invalid phone number', async () => {
-        const phoneInput = await canvas.findByTestId('text__phoneNumber')
-        await userEvent.type(phoneInput, '12345')
-      })
-
-      await step('Click Continue to trigger validation', async () => {
-        await userEvent.click(await canvas.findByText('Continue'))
-      })
-
-      await step('Validation error is shown for the phone field', async () => {
-        await waitFor(() =>
-          expect(
-            canvasElement.querySelector('#phoneNumber_error')
-          ).toHaveTextContent('Not a valid mobile number')
-        )
+export const InvalidPhoneNumberShowsValidationError = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.details'
       })
     }
+  },
+  beforeEach: () => {
+    // Pre-seed required fields so only the phone validation fires.
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      name: { firstname: 'Test', surname: 'User' },
+      email: 'test@opencrvs.org'
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Type an invalid phone number', async () => {
+      const phoneInput = await canvas.findByTestId('text__phoneNumber')
+      await userEvent.type(phoneInput, '12345')
+    })
+
+    await step('Click Continue to trigger validation', async () => {
+      await userEvent.click(await canvas.findByText('Continue'))
+    })
+
+    await step('Validation error is shown for the phone field', async () => {
+      await waitFor(() =>
+        expect(
+          canvasElement.querySelector('#phoneNumber_error')
+        ).toHaveTextContent('Not a valid mobile number')
+      )
+    })
   }
+}
 
 /**
  * Regression test for: touched-then-cleared email field submitting "" instead
@@ -167,7 +168,6 @@ export const InvalidPhoneNumberShowsValidationError: StoryObj<typeof EditUser> =
  * must normalise email to undefined so it is stored as NULL in the database.
  */
 export const ClearedEmailNormalisedToUndefined: StoryObj = {
-  render: () => <ReviewUser />,
   parameters: {
     chromatic: { disableSnapshot: true },
     reactRouter: {
@@ -233,7 +233,6 @@ export const ClearedEmailNormalisedToUndefined: StoryObj = {
  * normalise this to undefined so mobile is stored as NULL in the database.
  */
 export const ClearedPhoneNumberNormalisedToUndefined: StoryObj = {
-  render: () => <ReviewUser />,
   parameters: {
     chromatic: { disableSnapshot: true },
     reactRouter: {
@@ -377,7 +376,7 @@ const nationalSystemAdminUser = generator.user.nationalSystemAdmin().v2
  *    accessLevel filter (defaults to 'all'), so any office is permitted and
  *    the form renders.
  */
-export const NewUserCreationAllowedInJurisdiction: StoryObj<typeof EditUser> = {
+export const NewUserCreationAllowedInJurisdiction: StoryObj = {
   parameters: {
     chromatic: { disableSnapshot: true },
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
@@ -418,7 +417,7 @@ export const NewUserCreationAllowedInJurisdiction: StoryObj<typeof EditUser> = {
  *     REGISTRATION_AGENT) cannot create users in any office. The form must
  *     not render and the unauthorized toast must surface.
  */
-export const NewUserCreationBlockedWithoutScope: StoryObj<typeof EditUser> = {
+export const NewUserCreationBlockedWithoutScope: StoryObj = {
   parameters: {
     chromatic: { disableSnapshot: true },
     userRole: TestUserRole.enum.REGISTRATION_AGENT,
@@ -467,9 +466,7 @@ export const NewUserCreationBlockedWithoutScope: StoryObj<typeof EditUser> = {
  *     Sulaka is not in Central's hierarchy → canAddOfficeUsers returns false
  *     → toast appears and the form is not rendered.
  */
-export const NewUserCreationBlockedOutsideJurisdiction: StoryObj<
-  typeof EditUser
-> = {
+export const NewUserCreationBlockedOutsideJurisdiction: StoryObj = {
   parameters: {
     chromatic: { disableSnapshot: true },
     userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
@@ -515,7 +512,7 @@ export const NewUserCreationBlockedOutsideJurisdiction: StoryObj<
  * 2) NATIONAL_SYSTEM_ADMIN editing a REGISTRATION_AGENT — allowed by the
  *    role list on user.edit. The form renders, no toast.
  */
-export const EditUserWithProperAccess: StoryObj<typeof EditUser> = {
+export const EditUserWithProperAccess: StoryObj = {
   parameters: {
     chromatic: { disableSnapshot: true },
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
@@ -574,7 +571,7 @@ export const EditUserWithProperAccess: StoryObj<typeof EditUser> = {
  *    the role-restricted user.edit scope. Toast appears and the user is
  *    redirected away from the edit form.
  */
-export const EditUserBlockedByRoleRestriction: StoryObj<typeof EditUser> = {
+export const EditUserBlockedByRoleRestriction: StoryObj = {
   parameters: {
     chromatic: { disableSnapshot: true },
     userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
@@ -634,9 +631,7 @@ export const EditUserBlockedByRoleRestriction: StoryObj<typeof EditUser> = {
  *    FIELD_AGENT under Sulaka (separate root). Role is allowed, but the
  *    administrative-area check fails. Toast appears, user is redirected.
  */
-export const EditUserBlockedByAdministrativeAreaMismatch: StoryObj<
-  typeof EditUser
-> = {
+export const EditUserBlockedByAdministrativeAreaMismatch: StoryObj = {
   parameters: {
     chromatic: { disableSnapshot: true },
     userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
@@ -697,8 +692,7 @@ export const EditUserBlockedByAdministrativeAreaMismatch: StoryObj<
  * toast and redirect away (replace).
  */
 
-export const ReviewUserWithProperAccess: StoryObj<typeof ReviewUser> = {
-  render: () => <ReviewUser />,
+export const ReviewUserWithProperAccess: StoryObj = {
   parameters: {
     chromatic: { disableSnapshot: true },
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
@@ -754,8 +748,7 @@ export const ReviewUserWithProperAccess: StoryObj<typeof ReviewUser> = {
   }
 }
 
-export const ReviewUserBlockedByRoleRestriction: StoryObj<typeof ReviewUser> = {
-  render: () => <ReviewUser />,
+export const ReviewUserBlockedByRoleRestriction: StoryObj = {
   parameters: {
     chromatic: { disableSnapshot: true },
     userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
@@ -805,10 +798,7 @@ export const ReviewUserBlockedByRoleRestriction: StoryObj<typeof ReviewUser> = {
   }
 }
 
-export const ReviewUserBlockedByAdministrativeAreaMismatch: StoryObj<
-  typeof ReviewUser
-> = {
-  render: () => <ReviewUser />,
+export const ReviewUserBlockedByAdministrativeAreaMismatch: StoryObj = {
   parameters: {
     chromatic: { disableSnapshot: true },
     userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,

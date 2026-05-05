@@ -8,11 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  buttonMessages,
-  errorMessages,
-  validationMessages
-} from '@client/i18n/messages'
+import { buttonMessages, errorMessages } from '@client/i18n/messages'
 import { userMessages } from '@client/i18n/messages'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { messages } from '@client/i18n/messages/views/userForm'
@@ -23,21 +19,9 @@ import { useRoles } from '@client/v2-events/hooks/useRoles'
 import { ROUTES } from '@client/v2-events/routes/routes'
 import {
   ActionType,
-  alwaysTrue,
-  deepDropNulls,
-  defineConditional,
-  EventConfig,
-  field,
-  FieldConfig,
   FieldValue,
   FileFieldValue,
-  FieldType,
-  never,
-  or,
-  PageTypes,
   TokenUserType,
-  hasScope,
-  EncodedScope,
   UUID,
   CreateUserInput,
   UpdateUserInput
@@ -61,7 +45,6 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import styled from 'styled-components'
-import { create } from 'zustand'
 import { useUsers } from '../../../../../v2-events/hooks/useUsers'
 import { createTemporaryId, isTemporaryId } from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
@@ -69,6 +52,7 @@ import { serializeSearchParams } from '@client/v2-events/features/events/Search/
 import { usePermissions } from '@client/hooks/useAuthorization'
 import toast from 'react-hot-toast'
 import { useUserEditConfig } from '@client/hooks/useUserEditConfig'
+import { useUserFormState } from './useUserFormState'
 
 const Container = styled.div`
   display: flex;
@@ -107,19 +91,6 @@ interface UserFormState {
   getTouchedFields: () => Record<string, boolean>
   clear: () => void
 }
-
-export const useUserFormState = create<UserFormState>()((set, get) => ({
-  getUserForm: (initialValues?: EventState) =>
-    get().userForm || deepDropNulls(initialValues ?? {}),
-  setUserForm: (data: EventState) => {
-    return set(() => ({ userForm: data }))
-  },
-  getTouchedFields: () =>
-    Object.fromEntries(
-      Object.entries(get().getUserForm()).map(([key]) => [key, true])
-    ),
-  clear: () => set(() => ({ userForm: undefined }))
-}))
 
 const USER_OFFICE_PAGE_ID = 'user.office'
 const UNAUTHORIZED_TOAST_ID = 'user-editor-unauthorized'
@@ -173,7 +144,7 @@ function useCloseUserForm({
   )
 }
 
-export const CreateNewUser = () => {
+const CreateNewUserComponent = () => {
   const [{ officeId, from }] = useTypedSearchParams(
     ROUTES.V2.SETTINGS.USER.CREATE
   )
@@ -194,6 +165,8 @@ export const CreateNewUser = () => {
   }, [clear, navigate, officeId, setUserForm, from])
   return <div />
 }
+
+export const CreateNewUser = withSuspense(CreateNewUserComponent)
 
 const EditUserComponent = () => {
   const intl = useIntl()
