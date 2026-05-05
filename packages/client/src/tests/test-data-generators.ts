@@ -69,7 +69,9 @@ export function testDataGenerator(rngSeed?: number) {
       communityLeader:
         'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXdvcmtxdWV1ZSZpZHM9YWxsLWV2ZW50cyxhc3NpZ25lZC10by15b3UscmVjZW50LHJlcXVpcmVzLXVwZGF0ZXMsc2VudC1mb3ItcmV2aWV3IiwidHlwZT1yZWNvcmQuc2VhcmNoIiwidHlwZT1yZWNvcmQuY3JlYXRlJmV2ZW50PWJpcnRoLGRlYXRoLHRlbm5pcy1jbHViLW1lbWJlcnNoaXAsY2hpbGQtb25ib2FyZGluZyZwbGFjZU9mRXZlbnQ9bG9jYXRpb24iLCJ0eXBlPXJlY29yZC5yZWFkIiwidHlwZT1yZWNvcmQubm90aWZ5IiwidHlwZT1yZWNvcmQuZWRpdCJdLCJ1c2VyVHlwZSI6InVzZXIiLCJyb2xlIjoiQ09NTVVOSVRZX0xFQURFUiIsImlhdCI6MTQ4NzA3NjcwOCwiYXVkIjoib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiYzg3N2RkYTAtMDM2Mi00YWY2LWE4OGQtNWFiOGYzNTgwMzBlIn0.kE3wUjNRCw2FTH9xdEmerLJsfya-_7Huyaj21chcpQXvDNQcMYsShLHuUvTxSVBcmW8tnEZ4kIznedqgmmFkfDt1b9JrjIAyyXTsjVOzuHHAw7igM5unrox1RGE-5AAMlRukjQGhdfEGRyqnZVtvxLFtjZREZEiqVEKSibNhz8XoqCGYU407GzzL99NGw2Fxx4kxEYTR6e8D5Q0SZWlwfIuzo-ga3FkRp7Tb1-TUJtivBUEzJEKGqNi_lxBlsfLua7atXYnHWpQGbNVGv8X5jxEcDp-Qc_7NLAyU_uyVVJ1YQo7WeNdI5-gpatdEFJWzbiQ34f7TIWvCqZtnbypE__y1ts2g6tYVHWIqO_A9d4fXq5VPxqfbx3mZ2ncu0ktpX-pXiLggm5ZmlXQmrHOuDOTWStmGuOf3GojIZ0_nS2F1sb1TSgIlezQr9Q6F4HXd9eowoq_sOpvv8FFdJttUt74B85BgVNCvHUNX2dMB5xR-3ps1HFywIQY8LgA3aOJoIBkJs4ouxkVEk_husOLhPvwbdRlqbRIa5PG7YACxH6-uh21kfJnukNpyZnDTaZIE_xBq9YAkxECXE0qfiXlMr2X3TlNDULlLc_xT5qxhavS2MWikRGHB74nu1bVOe0nzeKBHCv_cdCpjeh9nSXMlO__FCQiMLTBRdYdoBsFzrpA',
       provincialRegistrar:
-        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXBlcmZvcm1hbmNlLnJlYWQiLCJ0eXBlPXBlcmZvcm1hbmNlLnJlYWQtZGFzaGJvYXJkcyIsInR5cGU9cHJvZmlsZS5lbGVjdHJvbmljLXNpZ25hdHVyZSIsInR5cGU9b3JnYW5pc2F0aW9uLnJlYWQtbG9jYXRpb25zJmFjY2Vzc0xldmVsPWxvY2F0aW9uIiwidHlwZT13b3JrcXVldWUmaWRzPWFsbC1ldmVudHMsYXNzaWduZWQtdG8teW91LHJlY2VudCxyZXF1aXJlcy1jb21wbGV0aW9uLHJlcXVpcmVzLXVwZGF0ZXMsaW4tcmV2aWV3LWFsbCxpbi1leHRlcm5hbC12YWxpZGF0aW9uLHJlYWR5LXRvLXByaW50LHJlYWR5LXRvLWlzc3VlIiwidHlwZT11c2VyLnJlYWQtb25seS1teS1hdWRpdCIsInR5cGU9cmVjb3JkLnNlYXJjaCIsInR5cGU9cmVjb3JkLmNyZWF0ZSZldmVudD1iaXJ0aCxkZWF0aCx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwLGNoaWxkLW9uYm9hcmRpbmcmcGxhY2VPZkV2ZW50PWFkbWluaXN0cmF0aXZlQXJlYSIsInR5cGU9cmVjb3JkLnJlYWQiLCJ0eXBlPXJlY29yZC5kZWNsYXJlIiwidHlwZT1yZWNvcmQucmVqZWN0IiwidHlwZT1yZWNvcmQuYXJjaGl2ZSIsInR5cGU9cmVjb3JkLnJlZ2lzdGVyIiwidHlwZT1yZWNvcmQuZWRpdCIsInR5cGU9cmVjb3JkLnByaW50LWNlcnRpZmllZC1jb3BpZXMiLCJ0eXBlPXJlY29yZC5jb3JyZWN0IiwidHlwZT1yZWNvcmQudW5hc3NpZ24tb3RoZXJzIiwidHlwZT1yZWNvcmQucmV2aWV3LWR1cGxpY2F0ZXMiXSwidXNlclR5cGUiOiJ1c2VyIiwicm9sZSI6IlBST1ZJTkNJQUxfUkVHSVNUUkFSIiwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiJmMTE1NThmMi1mZjU3LTQzODItOTg3NS1kNThmNDIwNmI0N2YifQ.Se-W6wawck7vyteBzbBDEBKWP8guupwz-oBgxWwalIVa4ZI0iO3y8-qJy37S-MTwrCUMV9MOI4w60-Cnwdej-U7SekD7jVO-54-f5K7ZQFiS9retN9FfNekIPYBIaU0y_Udvl-GxtEs3E7biyqwGe4TRk67cCYEUieopFH9GGOxabTH4cvvjHlIrF_Z56ZI3fsiF-WWgZZHyEmUqZ5kMPnz6Z8MfVd-mAhBEVyvEbMBZjzr-cvICAQE0qiJ2YiFw-SenwQOdqsKYOZyi2PZuahaJdNZ3czG-CrJ9qSMB1eP2ikuBkTUczVQpwha8qI40b0IEdwNQ63yddbwdpO6sUAIYDDhqP8ltgmdHFeWxATYGRg1w6KTPo5BwqzzhiNIvwwTgsIXYlxprkJr0-MTFJRZNYY_kT6I8rArBqufyUFNQW8WJ0Tqe9qA98CC0WFA5lP5Ka4BUw5dGHDV_N317O2-TpxEfQPI3ZBEyJIwEzWJ63_8207Es3xDCnAJUawf8jFJ1eIZBhXLKadeAY7U0x8rlLcNPlafmqYtoTsrzg5Mf1jDnjLnirx0nheKAoLemcmf9EchPHvOQ2-wtNWmiV8Z78ScRjEUeztx537jU_PtYcjErsCK-LLEnQsOT0a2gwY9DsZqCYZ7SbHBNMsorpUYMTJbZy-0zu5_kP2NhR3Q'
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXBlcmZvcm1hbmNlLnJlYWQiLCJ0eXBlPXBlcmZvcm1hbmNlLnJlYWQtZGFzaGJvYXJkcyIsInR5cGU9cHJvZmlsZS5lbGVjdHJvbmljLXNpZ25hdHVyZSIsInR5cGU9b3JnYW5pc2F0aW9uLnJlYWQtbG9jYXRpb25zJmFjY2Vzc0xldmVsPWxvY2F0aW9uIiwidHlwZT13b3JrcXVldWUmaWRzPWFsbC1ldmVudHMsYXNzaWduZWQtdG8teW91LHJlY2VudCxyZXF1aXJlcy1jb21wbGV0aW9uLHJlcXVpcmVzLXVwZGF0ZXMsaW4tcmV2aWV3LWFsbCxpbi1leHRlcm5hbC12YWxpZGF0aW9uLHJlYWR5LXRvLXByaW50LHJlYWR5LXRvLWlzc3VlIiwidHlwZT11c2VyLnJlYWQtb25seS1teS1hdWRpdCIsInR5cGU9cmVjb3JkLnNlYXJjaCIsInR5cGU9cmVjb3JkLmNyZWF0ZSZldmVudD1iaXJ0aCxkZWF0aCx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwLGNoaWxkLW9uYm9hcmRpbmcmcGxhY2VPZkV2ZW50PWFkbWluaXN0cmF0aXZlQXJlYSIsInR5cGU9cmVjb3JkLnJlYWQiLCJ0eXBlPXJlY29yZC5kZWNsYXJlIiwidHlwZT1yZWNvcmQucmVqZWN0IiwidHlwZT1yZWNvcmQuYXJjaGl2ZSIsInR5cGU9cmVjb3JkLnJlZ2lzdGVyIiwidHlwZT1yZWNvcmQuZWRpdCIsInR5cGU9cmVjb3JkLnByaW50LWNlcnRpZmllZC1jb3BpZXMiLCJ0eXBlPXJlY29yZC5jb3JyZWN0IiwidHlwZT1yZWNvcmQudW5hc3NpZ24tb3RoZXJzIiwidHlwZT1yZWNvcmQucmV2aWV3LWR1cGxpY2F0ZXMiXSwidXNlclR5cGUiOiJ1c2VyIiwicm9sZSI6IlBST1ZJTkNJQUxfUkVHSVNUUkFSIiwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiJmMTE1NThmMi1mZjU3LTQzODItOTg3NS1kNThmNDIwNmI0N2YifQ.Se-W6wawck7vyteBzbBDEBKWP8guupwz-oBgxWwalIVa4ZI0iO3y8-qJy37S-MTwrCUMV9MOI4w60-Cnwdej-U7SekD7jVO-54-f5K7ZQFiS9retN9FfNekIPYBIaU0y_Udvl-GxtEs3E7biyqwGe4TRk67cCYEUieopFH9GGOxabTH4cvvjHlIrF_Z56ZI3fsiF-WWgZZHyEmUqZ5kMPnz6Z8MfVd-mAhBEVyvEbMBZjzr-cvICAQE0qiJ2YiFw-SenwQOdqsKYOZyi2PZuahaJdNZ3czG-CrJ9qSMB1eP2ikuBkTUczVQpwha8qI40b0IEdwNQ63yddbwdpO6sUAIYDDhqP8ltgmdHFeWxATYGRg1w6KTPo5BwqzzhiNIvwwTgsIXYlxprkJr0-MTFJRZNYY_kT6I8rArBqufyUFNQW8WJ0Tqe9qA98CC0WFA5lP5Ka4BUw5dGHDV_N317O2-TpxEfQPI3ZBEyJIwEzWJ63_8207Es3xDCnAJUawf8jFJ1eIZBhXLKadeAY7U0x8rlLcNPlafmqYtoTsrzg5Mf1jDnjLnirx0nheKAoLemcmf9EchPHvOQ2-wtNWmiV8Z78ScRjEUeztx537jU_PtYcjErsCK-LLEnQsOT0a2gwY9DsZqCYZ7SbHBNMsorpUYMTJbZy-0zu5_kP2NhR3Q',
+      testAdmin:
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXVzZXIucmVhZCIsInR5cGU9dXNlci5jcmVhdGUmcm9sZT1GSUVMRF9BR0VOVCIsInR5cGU9dXNlci5jcmVhdGUmYWNjZXNzTGV2ZWw9YWRtaW5pc3RyYXRpdmVBcmVhJnJvbGU9TE9DQUxfUkVHSVNUUkFSIiwidHlwZT11c2VyLmNyZWF0ZSZhY2Nlc3NMZXZlbD1sb2NhdGlvbiZyb2xlPUNPTU1VTklUWV9MRUFERVIiLCJ0eXBlPXVzZXIuZWRpdCZyb2xlPVJFR0lTVFJBVElPTl9BR0VOVCIsInR5cGU9dXNlci5lZGl0JmFjY2Vzc0xldmVsPWFkbWluaXN0cmF0aXZlQXJlYSZyb2xlPUxPQ0FMX1NZU1RFTV9BRE1JTiIsInR5cGU9dXNlci5lZGl0JmFjY2Vzc0xldmVsPWxvY2F0aW9uJnJvbGU9UFJPVklOQ0lBTF9SRUdJU1RSQVIiXSwidXNlclR5cGUiOiJ1c2VyIiwicm9sZSI6IkZJRUxEX0FHRU5UIiwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI4ZjhiNDMxYi1lZjQ3LTQwNjgtYjY3OC1lZjJkZDkzZTkyMDgifQ.elOcSaujgfwO59HQankBhw5a_4UmG33aOul7epSRfQGefy-JDMmmR0Pk2Fumf-j0599t7YzinvL1c90BA5Yg__LbaUda0hBN0WjyWUqv6kqKKIKWzSzx1QUe1OPrelXcYc7GIOh1TGw-5qTB0BWjSodIEzsVAFUb4djkEz4nG3Tj40U2t-0AkmrvxQ0RPN0K2J69xFu5u0VFwuYmLKlEppuebVgNE4zye1mrGX86d6rHuMa2p3GyuTrCJJAEknwo3LgI4mxXo4o2ZG7JkcW3pYGfdcQaGFwuD-pQm_XMTPArXfxWjWz3sgKNEzYh-ja7iIMdN-ACHpfZt1NiRnYckeukBiXUxbVilKFmDZ_O2AfEHO2MhssreHlI4V1Z8Kjyj3CTm25Brk79qVDYXl-dQsaXk4IM2PYsO0YN0pCl5NTGAloiVjvwPL2qeejr7apQyicpfCm5xD203Qb08jR_vKh6Rw5CvxkJOfjjxjADLjA7zEdLvdTalTSkVKRQhpBLKESH2vCi53vqGBHvcbDpyEKlUlePuomneVriSsk9YSRHLKHQaIOKFATl8BvVniu7I-r9cMq4j5mT_4osvjEgciYdkNWY9kDZsFd82qHNgXgmVxdptVjNzStpnX2clVHXK-InYHJouRYDH-X5yUFBVv6A3-bRlpCAUJyf2mUt3rM'
     },
     id: userIds,
     fieldAgent: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
@@ -84,6 +86,7 @@ export function testDataGenerator(rngSeed?: number) {
         type: TokenUserType.enum.user,
         mobile: '+260911111111',
         email: 'kalushabwalya17@gmail.com',
+        administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
         primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
       } satisfies User,
       v1: {
@@ -137,6 +140,7 @@ export function testDataGenerator(rngSeed?: number) {
         fullHonorificName: undefined,
         status: 'active',
         primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+        administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
         mobile: '+260922222222',
         email: 'kalushabwalya17+@gmail.com',
         type: TokenUserType.enum.user
@@ -189,6 +193,7 @@ export function testDataGenerator(rngSeed?: number) {
         role: TestUserRole.enum.LOCAL_REGISTRAR,
         fullHonorificName: '1st Order Honorable Kennedy Mweene',
         primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+        administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
         avatar: undefined,
         mobile: '+260933333333',
         email: 'kalushabwalya1.7@gmail.com',
@@ -320,6 +325,7 @@ export function testDataGenerator(rngSeed?: number) {
         avatar: undefined,
         type: TokenUserType.enum.user,
         primaryOfficeId: '6f6186ce-cd5f-4a5f-810a-2d99e7c4ba12' as UUID,
+        administrativeAreaId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
         email: 'kalushabwaly.a17@gmail.com',
         mobile: '+260921111111',
         status: Status.Active
@@ -472,7 +478,9 @@ export function testDataGenerator(rngSeed?: number) {
     scopes: {
       /**
        * scopes are same as countryconfig/src/data-seeding/roles/roles.ts
-       * except for workque scope that has an extra workqueue: all-events
+       * except for,
+       *  - workque scope that has an extra workqueue: all-events
+       *  - test admin scope that has extra user create and edit scopes
        */
       localRegistrar: [
         encodeScope({ type: 'performance.read' }),
@@ -768,6 +776,39 @@ export function testDataGenerator(rngSeed?: number) {
               'PERFORMANCE_MANAGER'
             ]
           }
+        })
+      ],
+      testAdmin: [
+        encodeScope({ type: 'user.read' }),
+        encodeScope({
+          type: 'user.create',
+          options: { role: ['FIELD_AGENT'] }
+        }),
+        encodeScope({
+          type: 'user.create',
+          options: {
+            accessLevel: 'administrativeArea',
+            role: ['LOCAL_REGISTRAR']
+          }
+        }),
+        encodeScope({
+          type: 'user.create',
+          options: { accessLevel: 'location', role: ['COMMUNITY_LEADER'] }
+        }),
+        encodeScope({
+          type: 'user.edit',
+          options: { role: ['REGISTRATION_AGENT'] }
+        }),
+        encodeScope({
+          type: 'user.edit',
+          options: {
+            accessLevel: 'administrativeArea',
+            role: ['LOCAL_SYSTEM_ADMIN']
+          }
+        }),
+        encodeScope({
+          type: 'user.edit',
+          options: { accessLevel: 'location', role: ['PROVINCIAL_REGISTRAR'] }
         })
       ]
     }

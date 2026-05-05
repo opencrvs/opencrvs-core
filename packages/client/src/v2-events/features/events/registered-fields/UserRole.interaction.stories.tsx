@@ -30,6 +30,7 @@ import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useUserFormState } from '@client/views/SysAdmin/Team/user/userEditor/UserEditor'
 import { createTemporaryId } from '@client/v2-events/utils'
+import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
@@ -44,13 +45,37 @@ const generator = testDataGenerator()
 // HEALTHCARE_WORKER, so those rows are filtered out by
 // getAvailableRolesForUserUpdatePayload before reaching the dropdown.
 const mockRoles = [
-  { id: TestUserRole.enum.FIELD_AGENT, scopes: [] },
-  { id: 'POLICE_OFFICER', scopes: [] },
-  { id: TestUserRole.enum.COMMUNITY_LEADER, scopes: [] },
-  { id: 'HEALTHCARE_WORKER', scopes: [] },
-  { id: TestUserRole.enum.REGISTRATION_AGENT, scopes: [] },
-  { id: TestUserRole.enum.LOCAL_REGISTRAR, scopes: [] },
-  { id: 'NATIONAL_REGISTRAR', scopes: [] }
+  { id: TestUserRole.enum.FIELD_AGENT, scopes: [] }, // Field Agent
+  { id: TestUserRole.enum.COMMUNITY_LEADER, scopes: [] }, // Community Leader
+  { id: TestUserRole.enum.REGISTRATION_AGENT, scopes: [] }, // Registration Agent
+  { id: TestUserRole.enum.LOCAL_REGISTRAR, scopes: [] }, // Local Registrar
+  { id: TestUserRole.enum.PROVINCIAL_REGISTRAR, scopes: [] }, // Provincial Registrar
+  { id: TestUserRole.enum.LOCAL_SYSTEM_ADMIN, scopes: [] }, // Administrator
+  { id: 'POLICE_OFFICER', scopes: [] }, // Police Officer
+  { id: 'HEALTHCARE_WORKER', scopes: [] } // Healthcare Worker
+]
+
+type RoleLabel =
+  | 'Field Agent'
+  | 'Community Leader'
+  | 'Registration Agent'
+  | 'Local Registrar'
+  | 'Provincial Registrar'
+  | 'Administrator'
+  | 'Police Officer'
+  | 'Healthcare Worker'
+  | 'Unknown'
+
+const AllRoles: RoleLabel[] = [
+  'Field Agent',
+  'Community Leader',
+  'Registration Agent',
+  'Local Registrar',
+  'Provincial Registrar',
+  'Administrator',
+  'Police Officer',
+  'Healthcare Worker',
+  'Unknown'
 ]
 
 const userRoleField = {
@@ -85,19 +110,26 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
 const CENTRAL_ADMIN_AREA_ID = 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
 const IBOMBO_ADMIN_AREA_ID = '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
 const SULAKA_ADMIN_AREA_ID = 'c599b691-fd2d-45e1-abf4-d185de727fb5' as UUID
+const KLOW_ADMIN_AREA_ID = '1d4e5f6a-7b8c-4912-8efa-345678901234' as UUID
 
 const IBOMBO_DISTRICT_OFFICE_ID = '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
 const SULAKA_PROVINCIAL_OFFICE_ID =
   '2884f5b9-17b4-49ce-bf4d-f538228935df' as UUID
+const KLOW_VILLAGE_OFFICE_ID = '1f4a5b6c-7d8e-4312-8abc-345678901234' as UUID
 
 // A real (non-temporary) user ID to use as the subject in "edit user" stories.
 // isTemporaryId checks for the 'tmp-' prefix; any stable UUID avoids the throw.
-const SUBJECT_USER_ID = generator.user.registrationAgent().v2.id
+const RegistrationAgentId = generator.user.registrationAgent().v2.id
 
 const ibomboOfficeHierarchy: UUID[] = [
   CENTRAL_ADMIN_AREA_ID,
+  IBOMBO_ADMIN_AREA_ID
+]
+
+const klowOfficeHierarchy: UUID[] = [
+  CENTRAL_ADMIN_AREA_ID,
   IBOMBO_ADMIN_AREA_ID,
-  IBOMBO_DISTRICT_OFFICE_ID
+  KLOW_ADMIN_AREA_ID
 ]
 
 const sulakaOfficeHierarchy: UUID[] = [
@@ -105,18 +137,46 @@ const sulakaOfficeHierarchy: UUID[] = [
   SULAKA_PROVINCIAL_OFFICE_ID
 ]
 
+/**
+ * user.create:
+ *  - roles from accessLevel = 'location': COMMUNITY_LEADER
+ *  - roles from accessLevel = 'administrativeArea': LOCAL_REGISTRAR
+ *  - roles without accessLevel restriction : FIELD_AGENT
+ *
+ * user.edit:
+ *  - roles from accessLevel = 'location': PROVINCIAL_REGISTRAR
+ *  - roles from accessLevel = 'administrativeArea': LOCAL_SYSTEM_ADMIN
+ *  - roles without accessLevel restriction : REGISTRATION_AGENT
+ */
+
 const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/UserRole',
   parameters: {
     layout: 'centered',
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: RegistrationAgentId,
+        pageId: 'user.details'
+      })
+    },
     msw: {
       handlers: {
         userRole: [
           tRPCMsw.user.roles.list.query(() => mockRoles),
-          tRPCMsw.locations.getLocationHierarchy.query(
-            () => ibomboOfficeHierarchy
-          )
+          tRPCMsw.locations.getLocationHierarchy.query((input) => {
+            if (input.locationId === IBOMBO_DISTRICT_OFFICE_ID) {
+              return ibomboOfficeHierarchy
+            }
+            if (input.locationId === KLOW_VILLAGE_OFFICE_ID) {
+              return klowOfficeHierarchy
+            }
+            if (input.locationId === SULAKA_PROVINCIAL_OFFICE_ID) {
+              return sulakaOfficeHierarchy
+            }
+            return []
+          })
         ]
       }
     }
@@ -131,6 +191,7 @@ const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   ],
   beforeEach: () => {
     useUserFormState.getState().clear()
+    window.localStorage.setItem('opencrvs', generator.user.token.testAdmin)
   }
 }
 
@@ -155,235 +216,318 @@ async function openRoleDropdown(canvasElement: HTMLElement) {
 }
 
 /**
- * NATIONAL_SYSTEM_ADMIN edits a user at Ibombo District Office.
- * NSA scope has no accessLevel filter — only the role whitelist applies.
- * POLICE_OFFICER and HEALTHCARE_WORKER are absent from NSA's user.edit role
- * list, so they are filtered out regardless of the subject's office location.
+ * For same office, it is allowed to edit roles to
+ *  - roles from accessLevel = 'location': PROVINCIAL_REGISTRAR
+ *  - roles from accessLevel = 'administrativeArea': LOCAL_SYSTEM_ADMIN
+ *  - roles without accessLevel restriction : REGISTRATION_AGENT
  */
-export const RestrictedByEditScope: Story = {
-  name: 'Role options restricted by user.edit scope',
+
+export const EditUserOfOffice: Story = {
+  name: 'user.edit for same office',
   render: (args) => <RoleForm {...args} />,
   beforeEach: () => {
     useUserFormState.getState().setUserForm({
-      id: SUBJECT_USER_ID,
       primaryOfficeId: IBOMBO_DISTRICT_OFFICE_ID
     })
   },
   play: async ({ canvasElement, step }) => {
     await openRoleDropdown(canvasElement)
 
-    await step('Roles from the NSA user.edit whitelist appear', async () => {
-      await waitFor(() => {
-        expect(
-          within(document.body).getByText('Field Agent')
-        ).toBeInTheDocument()
-        expect(
-          within(document.body).getByText('Community Leader')
-        ).toBeInTheDocument()
-        expect(
-          within(document.body).getByText('Registration Agent')
-        ).toBeInTheDocument()
-        expect(
-          within(document.body).getByText('Local Registrar')
-        ).toBeInTheDocument()
-        expect(
-          within(document.body).getByText('Registrar General')
-        ).toBeInTheDocument()
+    const visibleRoles: RoleLabel[] = [
+      'Registration Agent',
+      'Provincial Registrar',
+      'Administrator'
+    ]
+
+    for (const role of AllRoles) {
+      if (visibleRoles.includes(role)) {
+        await step(`${role} is visible`, async () => {
+          await waitFor(() => {
+            expect(within(document.body).getByText(role)).toBeInTheDocument()
+          })
+        })
+      } else {
+        await step(`${role} is not visible`, async () => {
+          await waitFor(() => {
+            expect(within(document.body).queryByText(role)).toBeNull()
+          })
+        })
+      }
+    }
+  }
+}
+
+/**
+ * For office in the same administrative area, it is allowed to edit roles to
+ *  - roles from accessLevel = 'administrativeArea': LOCAL_SYSTEM_ADMIN
+ *  - roles without accessLevel restriction : REGISTRATION_AGENT
+ */
+
+export const EditUserOfLowerOffice: Story = {
+  name: 'user.edit for lower office',
+  render: (args) => <RoleForm {...args} />,
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: KLOW_VILLAGE_OFFICE_ID
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    await openRoleDropdown(canvasElement)
+
+    const visibleRoles: RoleLabel[] = ['Registration Agent', 'Administrator']
+
+    for (const role of AllRoles) {
+      if (visibleRoles.includes(role)) {
+        await step(`${role} is visible`, async () => {
+          await waitFor(() => {
+            expect(within(document.body).getByText(role)).toBeInTheDocument()
+          })
+        })
+      } else {
+        await step(`${role} is not visible`, async () => {
+          await waitFor(() => {
+            expect(within(document.body).queryByText(role)).toBeNull()
+          })
+        })
+      }
+    }
+  }
+}
+
+/**
+ * For office in a different administrative area, it is allowed to edit roles to
+ *  - roles without accessLevel restriction : REGISTRATION_AGENT
+ */
+
+export const EditUserOfDifferentAdminArea: Story = {
+  name: 'user.edit for different Admin Area',
+  render: (args) => <RoleForm {...args} />,
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: SULAKA_PROVINCIAL_OFFICE_ID
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    await openRoleDropdown(canvasElement)
+
+    const visibleRoles: RoleLabel[] = ['Registration Agent']
+
+    for (const role of AllRoles) {
+      if (visibleRoles.includes(role)) {
+        await step(`${role} is visible`, async () => {
+          await waitFor(() => {
+            expect(within(document.body).getByText(role)).toBeInTheDocument()
+          })
+        })
+      } else {
+        await step(`${role} is not visible`, async () => {
+          await waitFor(() => {
+            expect(within(document.body).queryByText(role)).toBeNull()
+          })
+        })
+      }
+    }
+  }
+}
+
+/**
+ * For same office, it is allowed to create roles to
+ *  - roles from accessLevel = 'location': COMMUNITY_LEADER
+ *  - roles from accessLevel = 'administrativeArea': LOCAL_REGISTRAR
+ *  - roles without accessLevel restriction : FIELD_AGENT
+ */
+
+export const CreateUserOfOffice: Story = {
+  name: 'user.create for same office',
+  render: (args) => <RoleForm {...args} />,
+  parameters: {
+    userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: `tmp-${RegistrationAgentId}` as UUID,
+        pageId: 'user.details'
       })
-    })
-
-    await step('Roles absent from the NSA whitelist are hidden', async () => {
-      expect(within(document.body).queryByText('Police Officer')).toBeNull()
-      expect(within(document.body).queryByText('Healthcare Worker')).toBeNull()
-    })
-  }
-}
-
-/**
- * LOCAL_SYSTEM_ADMIN whose jurisdiction covers Ibombo district edits a user
- * at Ibombo District Office — the subject's office IS inside the LSA's area.
- *
- * getLocationHierarchy returns [Central, Ibombo, IbomboDistrictOffice].
- * LSA's administrativeAreaId (Ibombo) appears in that chain → access granted.
- * Only roles present in both LSA's user.edit scope AND the system role list
- * are shown (COMMUNITY_LEADER and NATIONAL_REGISTRAR are outside LSA scope).
- */
-export const LocalAdminOfficeInHierarchy: Story = {
-  name: 'LSA: subject office inside jurisdiction — roles filtered by scope',
-  parameters: {
-    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+    },
     msw: {
       handlers: {
         userRole: [
           tRPCMsw.user.roles.list.query(() => mockRoles),
-          tRPCMsw.locations.getLocationHierarchy.query(
-            () => ibomboOfficeHierarchy
-          )
-        ],
-        user: [
-          tRPCMsw.user.get.query(() => ({
-            ...generator.user.localSystemAdmin().v2,
-            administrativeAreaId: IBOMBO_ADMIN_AREA_ID
-          }))
+          tRPCMsw.locations.getLocationHierarchy.query((input) => {
+            if (input.locationId === IBOMBO_DISTRICT_OFFICE_ID) {
+              return ibomboOfficeHierarchy
+            }
+            if (input.locationId === KLOW_VILLAGE_OFFICE_ID) {
+              return klowOfficeHierarchy
+            }
+            if (input.locationId === SULAKA_PROVINCIAL_OFFICE_ID) {
+              return sulakaOfficeHierarchy
+            }
+            return []
+          })
         ]
       }
     }
   },
-  render: (args) => <RoleForm {...args} />,
   beforeEach: () => {
     useUserFormState.getState().setUserForm({
-      id: SUBJECT_USER_ID,
       primaryOfficeId: IBOMBO_DISTRICT_OFFICE_ID
     })
   },
   play: async ({ canvasElement, step }) => {
     await openRoleDropdown(canvasElement)
 
-    await step(
-      'Roles in both LSA scope and the system role list appear',
-      async () => {
-        await waitFor(() => {
-          expect(
-            within(document.body).getByText('Field Agent')
-          ).toBeInTheDocument()
-          expect(
-            within(document.body).getByText('Police Officer')
-          ).toBeInTheDocument()
-          expect(
-            within(document.body).getByText('Healthcare Worker')
-          ).toBeInTheDocument()
-          expect(
-            within(document.body).getByText('Registration Agent')
-          ).toBeInTheDocument()
-          expect(
-            within(document.body).getByText('Local Registrar')
-          ).toBeInTheDocument()
+    const visibleRoles: RoleLabel[] = [
+      'Field Agent',
+      'Local Registrar',
+      'Community Leader'
+    ]
+
+    for (const role of AllRoles) {
+      if (visibleRoles.includes(role)) {
+        await step(`${role} is visible`, async () => {
+          await waitFor(() => {
+            expect(within(document.body).getByText(role)).toBeInTheDocument()
+          })
+        })
+      } else {
+        await step(`${role} is not visible`, async () => {
+          await waitFor(() => {
+            expect(within(document.body).queryByText(role)).toBeNull()
+          })
         })
       }
-    )
-
-    await step('Roles outside LSA scope are hidden', async () => {
-      expect(within(document.body).queryByText('Community Leader')).toBeNull()
-      expect(within(document.body).queryByText('Registrar General')).toBeNull()
-    })
+    }
   }
 }
 
 /**
- * LOCAL_SYSTEM_ADMIN whose jurisdiction covers Ibombo district edits a user
- * at Sulaka Provincial Office — the subject's office is OUTSIDE the LSA's area.
- *
- * getLocationHierarchy returns [Sulaka, SulakaProvincialOffice].
- * LSA's administrativeAreaId (Ibombo) does NOT appear in that chain →
- * the accessLevel: 'administrativeArea' check fails for every role →
- * the dropdown is empty.
+ * For office in the same administrative area, it is allowed to create roles to
+ *  - roles from accessLevel = 'administrativeArea': LOCAL_REGISTRAR
+ *  - roles without accessLevel restriction : FIELD_AGENT
  */
-export const LocalAdminOfficeOutsideHierarchy: Story = {
-  name: 'LSA: subject office outside jurisdiction — dropdown is empty',
+
+export const CreateUserOfLowerOffice: Story = {
+  name: 'user.create for lower office',
+  render: (args) => <RoleForm {...args} />,
   parameters: {
-    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+    userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: `tmp-${RegistrationAgentId}` as UUID,
+        pageId: 'user.details'
+      })
+    },
     msw: {
       handlers: {
         userRole: [
           tRPCMsw.user.roles.list.query(() => mockRoles),
-          tRPCMsw.locations.getLocationHierarchy.query(
-            () => sulakaOfficeHierarchy
-          )
-        ],
-        user: [
-          tRPCMsw.user.get.query(() => ({
-            ...generator.user.localSystemAdmin().v2,
-            administrativeAreaId: IBOMBO_ADMIN_AREA_ID
-          }))
+          tRPCMsw.locations.getLocationHierarchy.query((input) => {
+            if (input.locationId === IBOMBO_DISTRICT_OFFICE_ID) {
+              return ibomboOfficeHierarchy
+            }
+            if (input.locationId === KLOW_VILLAGE_OFFICE_ID) {
+              return klowOfficeHierarchy
+            }
+            if (input.locationId === SULAKA_PROVINCIAL_OFFICE_ID) {
+              return sulakaOfficeHierarchy
+            }
+            return []
+          })
         ]
       }
     }
   },
-  render: (args) => <RoleForm {...args} />,
   beforeEach: () => {
     useUserFormState.getState().setUserForm({
-      id: SUBJECT_USER_ID,
+      primaryOfficeId: KLOW_VILLAGE_OFFICE_ID
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    await openRoleDropdown(canvasElement)
+
+    const visibleRoles: RoleLabel[] = ['Field Agent', 'Local Registrar']
+
+    for (const role of AllRoles) {
+      if (visibleRoles.includes(role)) {
+        await step(`${role} is visible`, async () => {
+          await waitFor(() => {
+            expect(within(document.body).getByText(role)).toBeInTheDocument()
+          })
+        })
+      } else {
+        await step(`${role} is not visible`, async () => {
+          await waitFor(() => {
+            expect(within(document.body).queryByText(role)).toBeNull()
+          })
+        })
+      }
+    }
+  }
+}
+
+/**
+ * For office in a different administrative area, it is allowed to create roles to
+ *  - roles without accessLevel restriction : FIELD_AGENT
+ */
+
+export const CreateUserOfDifferentAdminArea: Story = {
+  name: 'user.create for different Admin Area',
+  render: (args) => <RoleForm {...args} />,
+  parameters: {
+    userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: `tmp-${RegistrationAgentId}` as UUID,
+        pageId: 'user.details'
+      })
+    },
+    msw: {
+      handlers: {
+        userRole: [
+          tRPCMsw.user.roles.list.query(() => mockRoles),
+          tRPCMsw.locations.getLocationHierarchy.query((input) => {
+            if (input.locationId === IBOMBO_DISTRICT_OFFICE_ID) {
+              return ibomboOfficeHierarchy
+            }
+            if (input.locationId === KLOW_VILLAGE_OFFICE_ID) {
+              return klowOfficeHierarchy
+            }
+            if (input.locationId === SULAKA_PROVINCIAL_OFFICE_ID) {
+              return sulakaOfficeHierarchy
+            }
+            return []
+          })
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
       primaryOfficeId: SULAKA_PROVINCIAL_OFFICE_ID
     })
   },
   play: async ({ canvasElement, step }) => {
     await openRoleDropdown(canvasElement)
 
-    await step(
-      'No roles shown — subject office is outside LSA jurisdiction',
-      async () => {
-        await waitFor(() => {
-          expect(within(document.body).queryByText('Field Agent')).toBeNull()
-          expect(
-            within(document.body).queryByText('Registration Agent')
-          ).toBeNull()
-        })
-      }
-    )
-  }
-}
+    const visibleRoles: RoleLabel[] = ['Field Agent']
 
-/**
- * LOCAL_SYSTEM_ADMIN creating a NEW user (isTemporaryId = true) at Sulaka
- * Provincial Office — outside the LSA's Ibombo jurisdiction.
- *
- * Because isNewUser = true, the component uses 'user.create' scope instead of
- * 'user.edit'. LSA's user.create scope has no accessLevel restriction, so the
- * administrative-area check is skipped entirely. All roles in the create-scope
- * whitelist that exist in the system role list appear, regardless of location.
- */
-export const LocalAdminNewUserOutsideHierarchy: Story = {
-  name: 'LSA: new user outside jurisdiction — user.create bypasses location check',
-  parameters: {
-    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
-    msw: {
-      handlers: {
-        userRole: [
-          tRPCMsw.user.roles.list.query(() => mockRoles),
-          tRPCMsw.locations.getLocationHierarchy.query(
-            () => sulakaOfficeHierarchy
-          )
-        ],
-        user: [
-          tRPCMsw.user.get.query(() => ({
-            ...generator.user.localSystemAdmin().v2,
-            administrativeAreaId: IBOMBO_ADMIN_AREA_ID
-          }))
-        ]
+    for (const role of AllRoles) {
+      if (visibleRoles.includes(role)) {
+        await step(`${role} is visible`, async () => {
+          await waitFor(() => {
+            expect(within(document.body).getByText(role)).toBeInTheDocument()
+          })
+        })
+      } else {
+        await step(`${role} is not visible`, async () => {
+          await waitFor(() => {
+            expect(within(document.body).queryByText(role)).toBeNull()
+          })
+        })
       }
     }
-  },
-  render: (args) => <RoleForm {...args} />,
-  beforeEach: () => {
-    useUserFormState.getState().setUserForm({
-      id: createTemporaryId(),
-      primaryOfficeId: SULAKA_PROVINCIAL_OFFICE_ID
-    })
-  },
-  play: async ({ canvasElement, step }) => {
-    await openRoleDropdown(canvasElement)
-
-    await step(
-      'Roles appear despite office being outside jurisdiction (user.create has no location filter)',
-      async () => {
-        await waitFor(() => {
-          expect(
-            within(document.body).getByText('Field Agent')
-          ).toBeInTheDocument()
-          expect(
-            within(document.body).getByText('Police Officer')
-          ).toBeInTheDocument()
-          expect(
-            within(document.body).getByText('Healthcare Worker')
-          ).toBeInTheDocument()
-          expect(
-            within(document.body).getByText('Registration Agent')
-          ).toBeInTheDocument()
-          expect(
-            within(document.body).getByText('Local Registrar')
-          ).toBeInTheDocument()
-        })
-      }
-    )
   }
 }
