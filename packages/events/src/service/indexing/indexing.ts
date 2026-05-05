@@ -60,6 +60,14 @@ import {
   withJurisdictionFilters
 } from './query'
 
+// Administrative areas change only on initialisation/re-seeding, so a
+// process-level cache eliminates repeated recursive CTE queries per request.
+const administrativeHierarchyCache = new Map<string, string[]>()
+
+export function clearAdministrativeHierarchyCache() {
+  administrativeHierarchyCache.clear()
+}
+
 function eventToEventIndex(
   event: EventDocument,
   config: EventConfig
@@ -461,7 +469,11 @@ export async function indexEvent(
   const eventIndex = eventToEventIndex(event, config)
 
   const eventIndexWithAdministrativeHierarchy =
-    await getEventIndexWithAdministrativeHierarchy(config, eventIndex)
+    await getEventIndexWithAdministrativeHierarchy(
+      config,
+      eventIndex,
+      administrativeHierarchyCache
+    )
   return esClient.index<EventIndexWithAdministrativeHierarchy>({
     index: indexName,
     id: event.id,
