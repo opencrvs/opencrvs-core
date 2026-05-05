@@ -38,6 +38,8 @@ export function getAcceptedScopesFromToken<T extends ScopeType>(
     .filter((scope): scope is Extract<Scope, { type: T }> => scope !== null)
 }
 
+// CIHAN TEST
+
 /*
  * Describes a "legacy" user role such as FIELD_AGENT, REGISTRATION_AGENT, etc.
  * These are roles we are slowly sunsettings in favor of the new, more configurable user roles.
