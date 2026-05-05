@@ -320,8 +320,16 @@ export function getAdminLevelHierarchy(
   // Collect location objects from leaf to root
   const collectedLocations: Location[] = []
 
-  let current = locationId
+  const srcLocation = locationId
     ? locations.find((l) => l.id === locationId.toString())
+    : null
+
+  if (srcLocation?.locationType === 'ADMIN_STRUCTURE') {
+    collectedLocations.push(srcLocation)
+  }
+
+  let current = srcLocation
+    ? locations.find((l) => l.id === srcLocation.parentId)
     : null
 
   while (current) {

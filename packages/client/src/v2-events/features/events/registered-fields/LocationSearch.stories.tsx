@@ -141,3 +141,15 @@ export const LocationSearchOutputResolvedPualula: StoryObj<
     value: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' // Pualula
   }
 }
+
+// Central Health Post is a HEALTH_FACILITY directly under "Central" (province).
+// Output must be: Central Health Post, Central, Farajaland
+export const LocationSearchOutputResolvedCentralHealthPost: StoryObj<
+  typeof LocationSearch.Output
+> = {
+  name: 'LocationSearch output for facility under intermediate admin level',
+  render: (props) => <LocationSearch.Output {...props} />,
+  args: {
+    value: 'b1c2d3e4-f5a6-7890-bcde-f12345678901' // Central Health Post
+  }
+}
