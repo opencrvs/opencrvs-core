@@ -122,6 +122,24 @@ export function useLocations() {
             locationId
           })
         }).data
+      },
+      useQuery: (
+        locationId: UUID,
+        options?: {
+          enabled?: boolean
+        }
+      ) => {
+        const { queryFn, ...rest } =
+          trpcOptionsProxy.locations.getLocationHierarchy.queryOptions({
+            locationId
+          })
+        return useQuery({
+          ...rest,
+          ...options,
+          queryKey: trpc.locations.getLocationHierarchy.queryKey({
+            locationId
+          })
+        }).data
       }
     }
   }

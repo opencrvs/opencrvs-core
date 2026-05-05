@@ -20,7 +20,7 @@ import * as routes from '@client/navigation/routes'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useRoles } from '@client/v2-events/hooks/useRoles'
-import { ROUTES } from '@client/v2-events/routes'
+import { ROUTES } from '@client/v2-events/routes/routes'
 import {
   ActionType,
   alwaysTrue,
@@ -63,15 +63,12 @@ import {
 import styled from 'styled-components'
 import { create } from 'zustand'
 import { useUsers } from '../../../../../v2-events/hooks/useUsers'
-import {
-  createTemporaryId,
-  emptyMessage,
-  isTemporaryId
-} from '@client/v2-events/utils'
+import { createTemporaryId, isTemporaryId } from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import toast from 'react-hot-toast'
+import { useUserEditConfig } from '@client/hooks/useUserEditConfig'
 
 const Container = styled.div`
   display: flex;
@@ -90,131 +87,6 @@ const SpinnerWrapper = styled.div`
   align-items: center;
   padding: 20px;
 `
-
-function getUserEditConfig(
-  selectedRole?: { scopes: EncodedScope[] },
-  additionalFields: FieldConfig[] = []
-): EventConfig {
-  return {
-    id: '__user__',
-    analytics: false,
-    summary: {
-      fields: []
-    },
-    advancedSearch: [],
-    flags: [],
-    title: emptyMessage,
-    label: emptyMessage,
-    declaration: {
-      label: emptyMessage,
-      pages: [
-        {
-          id: 'user.office',
-          title: messages.registrationOffice,
-          type: PageTypes.enum.FORM,
-          requireCompletionToContinue: true,
-          fields: [
-            {
-              id: 'primaryOfficeId',
-              type: FieldType.LOCATION,
-              required: true,
-              label: messages.registrationOffice
-            }
-          ]
-        },
-        {
-          id: 'user.details',
-          title: messages.userDetails,
-          type: PageTypes.enum.FORM,
-          requireCompletionToContinue: true,
-          fields: [
-            {
-              id: 'name',
-              type: FieldType.NAME,
-              required: true,
-              hideLabel: true,
-              label: messages.fullName
-            },
-            {
-              id: 'phoneNumber',
-              type: FieldType.PHONE,
-              required:
-                window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms',
-              label: messages.phoneNumber,
-              validation: [
-                {
-                  message: validationMessages.phoneNumberNotValid,
-                  validator: or(
-                    field('phoneNumber').matches(
-                      String(window.config.PHONE_NUMBER_PATTERN)
-                    ),
-                    field('phoneNumber').isFalsy()
-                  )
-                }
-              ]
-            },
-            {
-              id: 'email',
-              type: FieldType.EMAIL,
-              required:
-                window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'email',
-              label: messages.email
-            },
-            {
-              id: 'fullHonorificName',
-              type: FieldType.TEXT,
-              required: false,
-              label: messages.fullHonorificName
-            },
-            {
-              id: 'divider',
-              type: FieldType.DIVIDER,
-              label: emptyMessage
-            },
-            {
-              id: 'role',
-              type: FieldType.USER_ROLE,
-              required: true,
-              label: messages.labelRole
-            },
-            {
-              id: 'device',
-              type: FieldType.TEXT,
-              required: false,
-              label: messages.userDevice
-            },
-            ...additionalFields
-          ]
-        },
-        {
-          id: 'user.signature',
-          title: messages.userSignatureAttachmentTitle,
-          requireCompletionToContinue: true,
-          type: PageTypes.enum.FORM,
-          conditional: hasScope(
-            selectedRole?.scopes ?? [],
-            'profile.electronic-signature'
-          )
-            ? defineConditional(alwaysTrue())
-            : never(),
-          fields: [
-            {
-              id: 'signature',
-              type: FieldType.SIGNATURE,
-              required: false,
-              label: messages.userSignatureAttachment,
-              signaturePromptLabel: messages.userSignatureAttachment,
-              configuration: {
-                maxFileSize: 123456
-              }
-            }
-          ]
-        }
-      ]
-    },
-    actions: []
-  }
-}
 
 type EventState = {
   primaryOfficeId?: string
@@ -338,6 +210,15 @@ const EditUserComponent = () => {
   const { getUser } = useUsers()
   const userQuery = getUser.useQuery(userId, { enabled: !isNewUser })
   const targetUser = userQuery.data
+  const additionalFields = window.config.ADDITIONAL_USER_FIELDS ?? []
+  const maybeLocationId = UUID.safeParse(userForm?.primaryOfficeId)
+  const { getConfig } = useUserEditConfig(
+    maybeLocationId.success ? maybeLocationId.data : undefined,
+    selectedRole,
+    additionalFields
+  )
+  const eventConfig = getConfig()
+  const formConfig = eventConfig.declaration
 
   const { canEditUser, canAddOfficeUsers } = usePermissions()
 
@@ -381,10 +262,6 @@ const EditUserComponent = () => {
       )
     }
   }, [formState, navigate, userId, pageId, searchParams, isUnauthorized])
-
-  const additionalFields = window.config.ADDITIONAL_USER_FIELDS ?? []
-  const eventConfig = getUserEditConfig(selectedRole, additionalFields)
-  const formConfig = eventConfig.declaration
 
   if (userQuery.isLoading) {
     return (
@@ -486,6 +363,14 @@ const ReviewUserComponent = () => {
 
   const existingUserQuery = getUser.useQuery(userId, { enabled: !isNewUser })
   const additionalFields = window.config.ADDITIONAL_USER_FIELDS ?? []
+  const maybeLocationId = UUID.safeParse(userForm?.primaryOfficeId)
+  const { getConfig } = useUserEditConfig(
+    maybeLocationId.success ? maybeLocationId.data : undefined,
+    selectedRole,
+    additionalFields
+  )
+  const eventConfig = getConfig()
+  const formConfig = eventConfig.declaration
 
   useEffect(() => {
     if (isNewUser || !existingUserQuery.data) return
@@ -517,8 +402,6 @@ const ReviewUserComponent = () => {
   const formState = userForm ?? EMPTY_FORM
   const createUserMutation = createUser()
   const updateUserMutation = updateUser()
-  const eventConfig = getUserEditConfig(selectedRole, additionalFields)
-  const formConfig = eventConfig.declaration
 
   const handleMutationError = (error: unknown) => {
     if (error instanceof TRPCClientError && error.data?.code === 'CONFLICT') {

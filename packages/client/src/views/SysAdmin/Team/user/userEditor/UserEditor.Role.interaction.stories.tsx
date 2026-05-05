@@ -11,27 +11,19 @@
 
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
-import styled from 'styled-components'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { within, expect, waitFor } from '@storybook/test'
 import { userEvent } from '@storybook/testing-library'
-import {
-  FieldType,
-  TestUserRole,
-  UserRoleField,
-  UUID
-} from '@opencrvs/commons/client'
-import {
-  FormFieldGenerator,
-  FormFieldGeneratorPropsWithoutRef
-} from '@client/v2-events/components/forms/FormFieldGenerator'
+import { TestUserRole, UUID } from '@opencrvs/commons/client'
+import { FormFieldGeneratorPropsWithoutRef } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useUserFormState } from '@client/views/SysAdmin/Team/user/userEditor/UserEditor'
 import { createTemporaryId } from '@client/v2-events/utils'
-import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import { withValidatorContext } from '../../../../../.storybook/decorators'
+import { routesConfig } from '@client/v2-events/routes'
+import { ROUTES } from '@client/v2-events/routes/routes'
+import { withValidatorContext } from '../../../../../../.storybook/decorators'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [httpLink({ url: '/api/events' })],
@@ -77,20 +69,6 @@ const AllRoles: RoleLabel[] = [
   'Healthcare Worker',
   'Unknown'
 ]
-
-const userRoleField = {
-  id: 'storybook.userRole',
-  type: FieldType.USER_ROLE,
-  label: {
-    id: 'storybook.userRole.label',
-    defaultMessage: 'Role',
-    description: 'The label for the user role select input'
-  }
-} satisfies UserRoleField
-
-const StyledFormFieldGenerator = styled(FormFieldGenerator)`
-  width: 400px;
-`
 
 /*
  * Administrative area IDs (from V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS):
@@ -150,7 +128,7 @@ const sulakaOfficeHierarchy: UUID[] = [
  */
 
 const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
-  title: 'Inputs/UserRole',
+  title: 'SysAdmin/UserEditor/RoleOptions',
   parameters: {
     layout: 'centered',
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
@@ -199,16 +177,6 @@ export default meta
 
 type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
 
-function RoleForm(args: FormFieldGeneratorPropsWithoutRef) {
-  return (
-    <StyledFormFieldGenerator
-      {...args}
-      fields={[userRoleField]}
-      id="user-role-form"
-    />
-  )
-}
-
 async function openRoleDropdown(canvasElement: HTMLElement) {
   const canvas = within(canvasElement)
   const combobox = await canvas.findByRole('combobox')
@@ -224,7 +192,6 @@ async function openRoleDropdown(canvasElement: HTMLElement) {
 
 export const EditUserOfOffice: Story = {
   name: 'user.edit for same office',
-  render: (args) => <RoleForm {...args} />,
   beforeEach: () => {
     useUserFormState.getState().setUserForm({
       primaryOfficeId: IBOMBO_DISTRICT_OFFICE_ID
@@ -265,7 +232,6 @@ export const EditUserOfOffice: Story = {
 
 export const EditUserOfLowerOffice: Story = {
   name: 'user.edit for lower office',
-  render: (args) => <RoleForm {...args} />,
   beforeEach: () => {
     useUserFormState.getState().setUserForm({
       primaryOfficeId: KLOW_VILLAGE_OFFICE_ID
@@ -301,7 +267,6 @@ export const EditUserOfLowerOffice: Story = {
 
 export const EditUserOfDifferentAdminArea: Story = {
   name: 'user.edit for different Admin Area',
-  render: (args) => <RoleForm {...args} />,
   beforeEach: () => {
     useUserFormState.getState().setUserForm({
       primaryOfficeId: SULAKA_PROVINCIAL_OFFICE_ID
@@ -339,7 +304,6 @@ export const EditUserOfDifferentAdminArea: Story = {
 
 export const CreateUserOfOffice: Story = {
   name: 'user.create for same office',
-  render: (args) => <RoleForm {...args} />,
   parameters: {
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
     reactRouter: {
@@ -409,7 +373,6 @@ export const CreateUserOfOffice: Story = {
 
 export const CreateUserOfLowerOffice: Story = {
   name: 'user.create for lower office',
-  render: (args) => <RoleForm {...args} />,
   parameters: {
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
     reactRouter: {
@@ -474,7 +437,6 @@ export const CreateUserOfLowerOffice: Story = {
 
 export const CreateUserOfDifferentAdminArea: Story = {
   name: 'user.create for different Admin Area',
-  render: (args) => <RoleForm {...args} />,
   parameters: {
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
     reactRouter: {
