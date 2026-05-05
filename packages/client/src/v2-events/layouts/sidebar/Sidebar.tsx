@@ -143,7 +143,7 @@ function SidebarComponent({
       )) ??
     ''
   const primaryOffice = userDetails?.primaryOfficeId
-    ? getLocation.useQuery(userDetails.primaryOfficeId)?.data?.name
+    ? getLocation.useQuery(userDetails.primaryOfficeId).data?.name
     : undefined
 
   const avatar = <Avatar avatar={userDetails?.avatar} name={name} />
