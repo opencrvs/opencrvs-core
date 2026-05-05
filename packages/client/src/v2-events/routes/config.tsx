@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
 
 import { useSelector, useDispatch } from 'react-redux'
@@ -106,54 +106,94 @@ function PrefetchQueries() {
  * Each route is defined as a child of the `ROUTES.V2` route.
  */
 
+export function useNetworkProbe({
+  onVersionMismatch
+}: { onVersionMismatch?: () => void } = {}) {
+  const onVersionMismatchRef = useRef(onVersionMismatch)
+  useEffect(() => {
+    onVersionMismatchRef.current = onVersionMismatch
+  })
+
+  useEffect(() => {
+    let cancelled = false
+    let intervalId: ReturnType<typeof setInterval> | null = null
+    let probeInProgress = false
+    let currentController: AbortController | null = null
+    let abortTimeoutId: ReturnType<typeof setTimeout> | null = null
+
+    onlineManager.setOnline(false)
+
+    async function probeNetwork() {
+      if (probeInProgress) {
+        return
+      }
+      probeInProgress = true
+      try {
+        currentController = new AbortController()
+        abortTimeoutId = setTimeout(() => currentController?.abort(), 3000)
+
+        const res = await fetch('/api/ping', {
+          method: 'GET',
+          cache: 'no-store',
+          signal: currentController.signal
+        })
+
+        if (!cancelled) {
+          if (!res.ok) {
+            throw new Error('Network probe failed')
+          }
+          const gatewayVersion = res.headers.get('X-version')
+          if (gatewayVersion && gatewayVersion !== APPLICATION_VERSION) {
+            onVersionMismatchRef.current?.()
+          }
+          onlineManager.setOnline(true)
+          if (intervalId !== null) {
+            clearInterval(intervalId)
+            intervalId = null
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          onlineManager.setOnline(false)
+        }
+      } finally {
+        if (abortTimeoutId !== null) {
+          clearTimeout(abortTimeoutId)
+          abortTimeoutId = null
+        }
+        probeInProgress = false
+        currentController = null
+      }
+    }
+
+    void probeNetwork()
+
+    intervalId = setInterval(() => {
+      if (!onlineManager.isOnline()) {
+        void probeNetwork()
+      }
+    }, 5000)
+
+    return () => {
+      cancelled = true
+      currentController?.abort()
+      if (abortTimeoutId !== null) {
+        clearTimeout(abortTimeoutId)
+      }
+      if (intervalId !== null) {
+        clearInterval(intervalId)
+      }
+    }
+  }, [])
+}
+
 export const routesConfig = {
   path: ROUTES.V2.path,
   Component: () => {
     const dispatch = useDispatch<AppStore['dispatch']>()
-
-    useEffect(() => {
-      let cancelled = false
-
-      onlineManager.setOnline(false)
-
-      async function probeNetwork() {
-        try {
-          const controller = new AbortController()
-          setTimeout(() => controller.abort(), 3000)
-
-          const res = await fetch('/api/ping', {
-            method: 'GET',
-            cache: 'no-store',
-            signal: controller.signal
-          })
-
-          if (!res.ok) {
-            throw new Error('Network probe failed')
-          }
-
-          await res.json()
-
-          const gatewayVersion = res.headers.get('X-version')
-          if (gatewayVersion && gatewayVersion !== APPLICATION_VERSION) {
-            dispatch(storeReloadModalVisibility(true))
-          }
-
-          if (!cancelled) {
-            onlineManager.setOnline(true)
-          }
-        } catch {
-          if (!cancelled) {
-            onlineManager.setOnline(false)
-          }
-        }
-      }
-
-      void probeNetwork()
-
-      return () => {
-        cancelled = true
-      }
-    }, [dispatch])
+    useNetworkProbe({
+      onVersionMismatch: () => dispatch(storeReloadModalVisibility(true))
+    })
 
     const currentUser = useSelector(getUserDetails)
 

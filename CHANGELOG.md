@@ -75,6 +75,17 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - Change reindex call to make operation non-destructive. Create endpoint to track progress of reindex. [#11877](https://github.com/opencrvs/opencrvs-core/issues/11877)
 - Fixed vulnerabilities on CSP HTTP Header for login page [#12094](https://github.com/opencrvs/opencrvs-core/issues/12094)
 
+## 1.9.13
+
+### Bug fixes
+
+- The work queue list now automatically refreshes after a new event is created, without requiring a manual page reload. Previously the sidebar count updated immediately but the list itself stayed stale. [#12103](https://github.com/opencrvs/opencrvs-core/issues/12103)
+
+### Improvements
+
+- The sidebar navigation footer now displays the user's assigned office alongside their name and role. [#11421](https://github.com/opencrvs/opencrvs-core/issues/11421)
+- The client now periodically polls `api/ping` every 5 seconds until all services are reachable, so users automatically recover from offline to online without a page reload. A `ConnectionStatus` indicator in the sidebar reflects real-time connectivity state. [#12055](https://github.com/opencrvs/opencrvs-core/issues/12055)
+
 ## 1.9.12
 
 ### Infrastructure
