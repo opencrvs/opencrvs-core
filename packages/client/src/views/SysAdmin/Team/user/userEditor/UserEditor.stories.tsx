@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
@@ -17,7 +16,6 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { mockOfflineData } from '@client/tests/mock-offline-data'
-import { EditUser, ReviewUser } from './UserEditor'
 import { createTemporaryId } from '@client/v2-events/utils'
 import { useUserFormState } from './useUserFormState'
 
@@ -47,7 +45,7 @@ const additionalFields = [
   }
 ] as const
 
-const meta: Meta<typeof ReviewUser> = {
+const meta: Meta = {
   title: 'SysAdmin/UserEditor',
   parameters: {
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
@@ -81,7 +79,6 @@ export default meta
  * method. The email field must be marked required; phone must be optional.
  */
 export const UserDetailsEmailDelivery: StoryObj = {
-  render: () => <EditUser />,
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -105,7 +102,6 @@ export const UserDetailsEmailDelivery: StoryObj = {
  * method. The phone field must be marked required; email must be optional.
  */
 export const UserDetailsSmsDelivery: StoryObj = {
-  render: () => <EditUser />,
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -128,7 +124,7 @@ export const UserDetailsSmsDelivery: StoryObj = {
  * Review page for a new user with no fields filled in.
  * The additional Staff ID field is visible but empty.
  */
-export const ReviewWithEmptyFields: StoryObj<typeof ReviewUser> = {
+export const ReviewWithEmptyFields: StoryObj = {
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -147,7 +143,7 @@ export const ReviewWithEmptyFields: StoryObj<typeof ReviewUser> = {
  * additional Staff ID field. The store is pre-seeded so the review renders
  * the staffId value immediately without relying on the async user.get effect.
  */
-export const ReviewWithAllFieldsFilled: StoryObj<typeof ReviewUser> = {
+export const ReviewWithAllFieldsFilled: StoryObj = {
   parameters: {
     reactRouter: {
       router: routesConfig,
