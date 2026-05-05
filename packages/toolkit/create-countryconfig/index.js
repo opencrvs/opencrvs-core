@@ -39,21 +39,35 @@ try {
   execSync(`git clone --depth 1 ${REPO_URL} ${projectName}`, {
     stdio: 'inherit'
   })
-
-  fs.rmSync(path.join(targetDir, '.git'), { recursive: true, force: true })
-
-  const pkgPath = path.join(targetDir, 'package.json')
-  if (fs.existsSync(pkgPath)) {
-    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
-    pkg.name = projectName
-    fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
-  }
-
-  console.log(`\nDone! To get started:\n`)
-  console.log(`  cd ${projectName}`)
-  console.log(`  git init`)
-  console.log(`  npm install\n`)
 } catch (err) {
   console.error('Failed to clone the repository:', err.message)
   process.exit(1)
 }
+
+try {
+  fs.rmSync(path.join(targetDir, '.git'), { recursive: true, force: true })
+} catch (err) {
+  console.error('Failed to remove .git directory:', err.message)
+  process.exit(1)
+}
+
+const pkgPath = path.join(targetDir, 'package.json')
+if (fs.existsSync(pkgPath)) {
+  try {
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
+    pkg.name = projectName
+    fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
+  } catch (err) {
+    console.error('Failed to update package.json:', err.message)
+    process.exit(1)
+  }
+} else {
+  console.warn(
+    `Warning: No package.json found in the cloned repository. Project name was not updated.`
+  )
+}
+
+console.log(`\nDone! To get started:\n`)
+console.log(`  cd ${projectName}`)
+console.log(`  git init`)
+console.log(`  npm install\n`)
