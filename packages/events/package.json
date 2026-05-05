@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "start": "concurrently 'cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon -r tsconfig-paths/register src/index.ts' 'tsc -w -p tsconfig.router.json --preserveWatchOutput'",
-    "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
+    "start:prod": "TS_NODE_BASEURL=./build/dist/src node --enable-source-maps --require ./build/dist/src/instrumentation.js -r tsconfig-paths/register build/dist/src/index.js",
     "test": "yarn test:compilation && vitest run --coverage",
     "test:watch": "vitest",
     "lint": "CI=true eslint -c eslint.config.js --fix --max-warnings=0",
@@ -19,6 +19,8 @@
     "generate-db-schema": "bash src/tests/generate-db-schema.sh"
   },
   "dependencies": {
+    "@opentelemetry/auto-instrumentations-node": "^0.74.0",
+    "@opentelemetry/sdk-node": "^0.216.0",
     "@elastic/elasticsearch": "^8.17.0",
     "@opencrvs/commons": "^1.9.0",
     "@trpc/server": "^11.8.0",
