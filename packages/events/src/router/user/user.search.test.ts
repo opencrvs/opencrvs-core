@@ -11,7 +11,12 @@
 
 import { TRPCError } from '@trpc/server'
 import { createPrng, encodeScope, generateUuid } from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createInitialisationTestClient,
+  createTestClient,
+  setupTestCase,
+  systemInitialisationTestSetup
+} from '@events/tests/utils'
 import {
   updateUserById,
   updateUsernameById
@@ -289,4 +294,32 @@ test('all scope (no options): returns users across all offices', async () => {
   const returnedIds = results.map((u) => u.id)
   expect(returnedIds).toContain(users[0].id)
   expect(returnedIds).toContain(users[1].id)
+})
+
+test('internal service: bypasses scope check and returns all users', async () => {
+  await systemInitialisationTestSetup()
+  const { users } = await setupTestCase()
+  const client = createInitialisationTestClient()
+
+  const results = await client.users.search(defaultSearch)
+
+  const returnedIds = results.map((u) => u.id)
+  expect(returnedIds).toContain(users[0].id)
+  expect(returnedIds).toContain(users[1].id)
+})
+
+test('internal service: filters by primaryOfficeId without scope', async () => {
+  await systemInitialisationTestSetup()
+  const { users } = await setupTestCase()
+  const client = createInitialisationTestClient()
+
+  const [primaryUser, secondaryUser] = users
+
+  const results = await client.users.search({
+    ...defaultSearch,
+    primaryOfficeId: primaryUser.primaryOfficeId
+  })
+
+  expect(results.some((u) => u.id === primaryUser.id)).toBe(true)
+  expect(results.some((u) => u.id === secondaryUser.id)).toBe(false)
 })

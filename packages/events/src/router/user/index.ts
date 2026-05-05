@@ -33,6 +33,7 @@ import {
   allowedWithAnyOfScopes,
   canAccessUserWithScopes,
   canCreateUserWithScopes,
+  canSearchUsers,
   canUpdateUserLocation,
   userCanReadOtherUser
 } from '@events/router/middleware'
@@ -193,7 +194,6 @@ export function searchUsersRoute(
         ? UUID.parse(input.primaryOfficeId)
         : undefined
 
-      // Internal procedures bypass scope check
       if (!('user' in ctx)) {
         return searchUsers({ ...input, primaryOfficeId })
       }
@@ -201,11 +201,6 @@ export function searchUsersRoute(
       const acceptedScopes = getAcceptedScopesFromToken(ctx.token, [
         'user.search'
       ])
-
-      if (acceptedScopes.length === 0) {
-        throw new TRPCError({ code: 'FORBIDDEN' })
-      }
-
       const accessLevel = getScopeOptionValue(acceptedScopes[0], 'accessLevel')
 
       if (
@@ -346,7 +341,7 @@ export const userRouter = router({
     .input(z.array(z.string()))
     .output(z.array(UserOrSystem))
     .query(async ({ input }) => getUsersById(input)),
-  search: searchUsersRoute(userAndSystemProcedure),
+  search: searchUsersRoute(userAndSystemProcedure.use(canSearchUsers)),
   actions: userOnlyProcedure
     .input(UserActionsQuery)
     .use(userCanReadUserAudit)

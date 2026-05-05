@@ -350,6 +350,24 @@ export const canSearchEvents: MiddlewareFunction<
   })
 }
 
+export const canSearchUsers: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext,
+  unknown
+> = async (opts) => {
+  const acceptedScopes = getAcceptedScopesFromToken(opts.ctx.token, [
+    'user.search'
+  ])
+
+  if (acceptedScopes.length === 0) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
+  return opts.next(opts)
+}
+
 export const userCanCreateEvent: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
