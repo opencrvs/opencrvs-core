@@ -310,7 +310,7 @@ export const ResolvedCreateUserInput = CreateUserInput.extend({
 })
 export type ResolvedCreateUserInput = z.infer<typeof ResolvedCreateUserInput>
 
-export async function resolveCreateUserInput(
+async function resolveCreateUserInput(
   input: CreateUserInput | CreateUserInputInternal
 ): Promise<ResolvedCreateUserInput> {
   return ResolvedCreateUserInput.parse({
