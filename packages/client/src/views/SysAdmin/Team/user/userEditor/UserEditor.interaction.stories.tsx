@@ -116,7 +116,7 @@ export const RegistrationOfficeIncludesHospitals: StoryObj = {
  * Continue with an invalid phone number must surface the error inline and
  * keep the user on the same page.
  */
-export const InvalidPhoneNumberShowsValidationError = {
+export const InvalidPhoneNumberShowsValidationError: StoryObj = {
   parameters: {
     chromatic: { disableSnapshot: true },
     reactRouter: {
