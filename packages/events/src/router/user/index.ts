@@ -183,6 +183,25 @@ export async function handleCreateUser(
   return user
 }
 
+// A user may have multiple user.search scopes — use the most permissive access level across all of them.
+const ACCESS_LEVEL_PRIORITY: JurisdictionFilter[] = [
+  JurisdictionFilter.enum.all,
+  JurisdictionFilter.enum.administrativeArea,
+  JurisdictionFilter.enum.location
+]
+
+function getMostPermissiveAccessLevel(
+  scopes: ReturnType<typeof getAcceptedScopesFromToken>
+): JurisdictionFilter {
+  const levels = scopes.map(
+    (s) => getScopeOptionValue(s, 'accessLevel') ?? JurisdictionFilter.enum.all
+  )
+  return (
+    ACCESS_LEVEL_PRIORITY.find((level) => levels.includes(level)) ??
+    JurisdictionFilter.enum.all
+  )
+}
+
 export function searchUsersRoute(
   procedure: typeof internalProcedure | typeof userAndSystemProcedure
 ) {
@@ -201,7 +220,7 @@ export function searchUsersRoute(
       const acceptedScopes = getAcceptedScopesFromToken(ctx.token, [
         'user.search'
       ])
-      const accessLevel = getScopeOptionValue(acceptedScopes[0], 'accessLevel')
+      const accessLevel = getMostPermissiveAccessLevel(acceptedScopes)
 
       if (
         accessLevel === JurisdictionFilter.enum.administrativeArea &&

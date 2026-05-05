@@ -285,6 +285,103 @@ test('administrativeArea scope: includes users in nested sub-areas', async () =>
   expect(results.some((u) => u.id === nestedUser.id)).toBe(true)
 })
 
+test('location + administrativeArea: administrativeArea wins', async () => {
+  const { user, seed, generator } = await setupTestCase()
+
+  const rng = createPrng(77777)
+  const sameAreaOfficeId = generateUuid(rng)
+
+  await seed.locations([
+    {
+      name: 'Same area office',
+      administrativeAreaId: user.administrativeAreaId,
+      locationType: 'CRVS_OFFICE',
+      id: sameAreaOfficeId,
+      validUntil: null,
+      externalId: 'same-area-office-001'
+    }
+  ])
+
+  // This user is in a different office but the same administrative area
+  // location scope alone would exclude them, administrativeArea should include them
+  const colleagueInSameArea = await seed.user(
+    generator.user.create({ primaryOfficeId: sameAreaOfficeId })
+  )
+
+  const client = createTestClient(user, [
+    encodeScope({ type: 'user.search', options: { accessLevel: 'location' } }),
+    encodeScope({
+      type: 'user.search',
+      options: { accessLevel: 'administrativeArea' }
+    })
+  ])
+
+  const results = await client.user.search(defaultSearch)
+
+  expect(results.some((u) => u.id === colleagueInSameArea.id)).toBe(true)
+})
+
+test('all + location: all wins', async () => {
+  const { user, users, locations, seed, generator } = await setupTestCase()
+
+  const outsideArea = locations.find(
+    (l) => l.administrativeAreaId !== user.administrativeAreaId
+  )
+  if (!outsideArea) {
+    throw new Error('No location found outside the user administrative area')
+  }
+
+  const outsideUser = await seed.user(
+    generator.user.create({ primaryOfficeId: outsideArea.id })
+  )
+
+  // location scope alone would restrict to caller's office,
+  // but all scope should return everyone
+  const client = createTestClient(user, [
+    encodeScope({ type: 'user.search', options: { accessLevel: 'location' } }),
+    encodeScope({ type: 'user.search' })
+  ])
+
+  const results = await client.user.search(defaultSearch)
+
+  const returnedIds = results.map((u) => u.id)
+  expect(returnedIds).toContain(users[0].id)
+  expect(returnedIds).toContain(users[1].id)
+  expect(returnedIds).toContain(outsideUser.id)
+})
+
+test('all + administrativeArea: all wins', async () => {
+  const { user, users, locations, seed, generator } = await setupTestCase()
+
+  const outsideArea = locations.find(
+    (l) => l.administrativeAreaId !== user.administrativeAreaId
+  )
+  if (!outsideArea) {
+    throw new Error('No location found outside the user administrative area')
+  }
+
+  const outsideUser = await seed.user(
+    generator.user.create({ primaryOfficeId: outsideArea.id })
+  )
+
+  // administrativeArea scope alone would exclude outsideUser,
+  // but all scope should return everyone
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.search',
+      options: { accessLevel: 'administrativeArea' }
+    }),
+    encodeScope({ type: 'user.search' })
+  ])
+
+  const results = await client.user.search(defaultSearch)
+
+  const returnedIds = results.map((u) => u.id)
+  expect(returnedIds).toContain(users[0].id)
+  expect(returnedIds).toContain(users[1].id)
+  expect(returnedIds).toContain(outsideUser.id)
+})
+
 test('all scope (no options): returns users across all offices', async () => {
   const { user, users } = await setupTestCase()
   const client = createTestClient(user, withSearchAll)
