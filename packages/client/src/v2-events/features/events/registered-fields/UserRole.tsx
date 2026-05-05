@@ -10,27 +10,91 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { UserRoleField } from '@opencrvs/commons/client'
+import { useSelector } from 'react-redux'
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import {
+  getAcceptedScopesByType,
+  getAvailableRolesForUserUpdatePayload,
+  UserContext,
+  UserRoleField,
+  UserScopeV2,
+  UUID
+} from '@opencrvs/commons/client'
 import { useRoles, formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { Select, SelectInputProps } from './Select'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { isTemporaryId } from '@client/v2-events/utils'
+import { ROUTES } from '@client/v2-events/routes'
+import { useUserFormState } from '@client/views/SysAdmin/Team/user/userEditor/useUserFormState'
 import { StringifierContext } from './RegisteredField'
+import { Select, SelectInputProps } from './Select'
 
-function UserRoleInput(props: Omit<SelectInputProps, 'options'>) {
+function UserRoleInputWithLocation({
+  locationId,
+  ...props
+}: Omit<SelectInputProps, 'options'> & { locationId: UUID }) {
   const intl = useIntl()
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
 
-  const options = roles.map((role) => ({
-    value: role.id,
-    label: formatUserRole(role.id, intl)
+  const { getLocationHierarchy } = useLocations()
+  const { userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.EDIT)
+
+  const currentUser = useSelector(getUserDetails)
+  const userScopes = useSelector(getScope) || []
+
+  if (!currentUser) {
+    throw new Error('User not found')
+  }
+
+  const locationHierarchy = getLocationHierarchy.useSuspenseQuery(locationId)
+
+  const isNewUser = isTemporaryId(userId)
+
+  const acceptedScopes = getAcceptedScopesByType({
+    acceptedScopes: [isNewUser ? 'user.create' : 'user.edit'],
+    scopes: userScopes
+  }) as UserScopeV2[] // @Todo: Remove this type assertion
+
+  const availabelRoles = getAvailableRolesForUserUpdatePayload({
+    allRoles: roles.map((role) => role.id),
+    userRequesting: {
+      id: currentUser.id,
+      primaryOfficeId: currentUser.primaryOfficeId,
+      administrativeAreaId: currentUser.administrativeAreaId,
+      role: currentUser.role,
+      signature: currentUser.signature,
+      type: currentUser.type
+    } satisfies UserContext,
+    acceptedScopes,
+    userLocation: {
+      primaryOfficeId: locationId,
+      administrativeHierarchy: locationHierarchy
+    }
+  })
+
+  const options = availabelRoles.map((role) => ({
+    value: role,
+    label: formatUserRole(role, intl)
   }))
 
+  return <Select.Input {...props} options={options} />
+}
+
+// Outer shell: guards against a transiently absent primaryOfficeId (e.g.
+// during an auth-gate redirect where the form store is cleared before
+// navigation completes)
+function UserRoleInput(props: Omit<SelectInputProps, 'options'>) {
+  const userForm = useUserFormState((s) => s.userForm)
+  const subjectLocation = UUID.safeParse(userForm?.primaryOfficeId)
+
+  if (!subjectLocation.success) {
+    return <Select.Input {...props} options={[]} />
+  }
+
   return (
-    <Select.Input
-      {...props}
-      options={options}
-    />
+    <UserRoleInputWithLocation {...props} locationId={subjectLocation.data} />
   )
 }
 
