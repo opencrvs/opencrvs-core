@@ -15,6 +15,7 @@ import {
   createTestToken,
   setupTestCase,
   systemInitialisationTestSetup,
+  TEST_SYSTEM_ID,
   TEST_USER_DEFAULT_SCOPES,
   createInitialisationToken
 } from '@events/tests/utils'
@@ -61,7 +62,7 @@ test('Returns 403 when accessed with system app token', async () => {
   await systemInitialisationTestSetup()
 
   const systemToken = createTestToken({
-    userId: 'test-system',
+    userId: TEST_SYSTEM_ID,
     scopes: TEST_USER_DEFAULT_SCOPES,
     userType: TokenUserType.enum.system
   })
@@ -103,13 +104,7 @@ test('Allows user creation when with the right token', async () => {
   const userPayload = {
     email: 'testing+123@opencrvs.org',
     role: 'admin',
-    name: [
-      {
-        use: 'en',
-        family: 'family',
-        given: ['given']
-      }
-    ],
+    name: { firstname: 'given', surname: 'family' },
     primaryOfficeId: location.id,
     username
   }
@@ -137,8 +132,8 @@ test('Allows user creation when with the right token', async () => {
 
   expect(createdUser).toMatchObject({
     email: userPayload.email,
-    firstname: userPayload.name[0].given[0],
-    surname: userPayload.name[0].family,
+    firstname: userPayload.name.firstname,
+    surname: userPayload.name.surname,
     officeId: userPayload.primaryOfficeId,
     role: userPayload.role,
     status: 'pending'
@@ -171,27 +166,17 @@ test('Throws error when creating user with existing email', async () => {
   const userPayload1 = {
     email,
     role: 'admin',
-    name: [
-      {
-        use: 'en',
-        family: 'family1',
-        given: ['given1']
-      }
-    ],
-    primaryOfficeId: location.id
+    name: { firstname: 'given1', surname: 'family1' },
+    primaryOfficeId: location.id,
+    username: 'f.irstuser'
   }
 
   const userPayload2 = {
     email,
     role: 'admin2',
-    name: [
-      {
-        use: 'en',
-        family: 'family2',
-        given: ['given2']
-      }
-    ],
-    primaryOfficeId: location.id
+    name: { firstname: 'given2', surname: 'family2' },
+    primaryOfficeId: location.id,
+    username: 'a.nother'
   }
 
   await expect(client.users.create(userPayload1)).resolves.toBeDefined()
@@ -212,37 +197,96 @@ test('Throws error when creating user with existing mobile', async () => {
     .selectAll()
     .executeTakeFirstOrThrow()
 
-  const mobile = '+345345343'
+  const mobile = '01512345678'
   const userPayload1 = {
     email: 'testing+1@opencrvs.org',
     mobile,
     role: 'admin',
-    name: [
-      {
-        use: 'en',
-        family: 'family1',
-        given: ['given1']
-      }
-    ],
-    primaryOfficeId: location.id
+    name: { firstname: 'given1', surname: 'family1' },
+    primaryOfficeId: location.id,
+    username: 'f.irstuser'
   }
 
   const userPayload2 = {
     email: 'testing+2@opencrvs.org',
     mobile,
     role: 'admin2',
-    name: [
-      {
-        use: 'en',
-        family: 'family2',
-        given: ['given2']
-      }
-    ],
-    primaryOfficeId: location.id
+    name: { firstname: 'given2', surname: 'family2' },
+    primaryOfficeId: location.id,
+    username: 'a.nother'
   }
 
   await expect(client.users.create(userPayload1)).resolves.toBeDefined()
   await expect(client.users.create(userPayload2)).rejects.toThrowError(
     new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_MOBILE' })
   )
+})
+
+test('Creates user with active status when status is provided', async () => {
+  await systemInitialisationTestSetup()
+  const client = createInitialisationTestClient()
+  const eventsDb = getClient()
+
+  await client.locations.set(locationPayload)
+  const location = await eventsDb
+    .selectFrom('locations')
+    .selectAll()
+    .executeTakeFirstOrThrow()
+
+  await client.users.create({
+    email: 'testing+active@opencrvs.org',
+    role: 'admin',
+    name: { firstname: 'Active', surname: 'Admin' },
+    primaryOfficeId: location.id,
+    username: 'active.admin',
+    status: 'active'
+  })
+
+  const credentials = await eventsDb
+    .selectFrom('userCredentials')
+    .selectAll()
+    .where('username', '=', 'active.admin')
+    .executeTakeFirstOrThrow()
+
+  const dbUser = await eventsDb
+    .selectFrom('users')
+    .selectAll()
+    .where('id', '=', credentials.userId)
+    .executeTakeFirstOrThrow()
+
+  expect(dbUser.status).toBe('active')
+})
+
+test('Creates user with pending status when no status is provided', async () => {
+  await systemInitialisationTestSetup()
+  const client = createInitialisationTestClient()
+  const eventsDb = getClient()
+
+  await client.locations.set(locationPayload)
+  const location = await eventsDb
+    .selectFrom('locations')
+    .selectAll()
+    .executeTakeFirstOrThrow()
+
+  await client.users.create({
+    email: 'testing+nonstatus@opencrvs.org',
+    role: 'admin',
+    name: { firstname: 'Pending', surname: 'User' },
+    primaryOfficeId: location.id,
+    username: 'pending.user'
+  })
+
+  const credentials = await eventsDb
+    .selectFrom('userCredentials')
+    .selectAll()
+    .where('username', '=', 'pending.user')
+    .executeTakeFirstOrThrow()
+
+  const dbUser = await eventsDb
+    .selectFrom('users')
+    .selectAll()
+    .where('id', '=', credentials.userId)
+    .executeTakeFirstOrThrow()
+
+  expect(dbUser.status).toBe('pending')
 })

@@ -29,13 +29,7 @@ describe('password change', () => {
       .spyOn(changePasswordService, 'changePassword')
       .mockResolvedValue(undefined)
     storeRetrievalStepInformation('12345', RetrievalSteps.SECURITY_Q_VERIFIED, {
-      userFullName: [
-        {
-          use: 'en',
-          family: 'Anik',
-          given: ['Sadman']
-        }
-      ],
+      userFullName: { firstname: 'Sadman', surname: 'Anik' },
       userId: '123',
       username: 'fake_user_name',
       mobile: '123123123',
@@ -90,13 +84,7 @@ describe('password change', () => {
         '12345',
         RetrievalSteps.NUMBER_VERIFIED,
         {
-          userFullName: [
-            {
-              use: 'en',
-              family: 'Anik',
-              given: ['Sadman']
-            }
-          ],
+          userFullName: { firstname: 'Sadman', surname: 'Anik' },
           userId: '123',
           username: 'fake_user_name',
           mobile: '123123123',

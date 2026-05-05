@@ -163,7 +163,7 @@ export function ActionMenu({
   }).data
 
   const assignedUserFullName = assignedToUser
-    ? getUsersFullName(assignedToUser.name, intl.locale)
+    ? getUsersFullName(assignedToUser.name)
     : ''
 
   const assignedOffice = assignedToUser?.primaryOfficeId

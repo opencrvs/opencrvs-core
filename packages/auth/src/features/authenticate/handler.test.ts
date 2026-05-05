@@ -202,7 +202,7 @@ describe('authenticate handler receives a request', () => {
         userId: '1',
         status: 'deactivated',
         role: 'NATIONAL_SYSTEM_ADMIN',
-        name: [],
+        name: { firstname: '', surname: '' },
         mobile: undefined,
         email: undefined
       })
@@ -229,7 +229,7 @@ describe('authenticate handler receives a request', () => {
         userId: '1',
         status: 'active',
         role: 'NATIONAL_SYSTEM_ADMIN',
-        name: [],
+        name: { firstname: '', surname: '' },
         mobile: '+345345343',
         email: undefined
       })
@@ -268,7 +268,7 @@ describe('authenticate handler receives a request', () => {
         userId: '1',
         status: 'pending',
         role: 'NATIONAL_SYSTEM_ADMIN',
-        name: [],
+        name: { firstname: '', surname: '' },
         mobile: '+345345343',
         email: undefined
       })

@@ -46,8 +46,10 @@ jobs:
               echo "❌ Tag '$TAG_NAME' is not a valid semantic version (expected something like 1.2.3 or v1.2.3)"
               exit 1
             fi
+            echo "npm-tag=latest" >> $GITHUB_OUTPUT
           else
             TOOLKIT_VERSION="$PACKAGE_VERSION-rc.$(git rev-parse --short=7 HEAD)"
+            echo "npm-tag=next" >> $GITHUB_OUTPUT
           fi
           if npm view @opencrvs/toolkit@$TOOLKIT_VERSION > /dev/null 2>&1; then
           echo "Version $TOOLKIT_VERSION already exists on npm."
@@ -106,7 +108,33 @@ jobs:
 
       - name: Publish to npm
         if: steps.check-version.outputs.version-exists == 'false'
-        run: npm publish --access public
+        run: npm publish --access public --tag ${{ steps.check-version.outputs.npm-tag }}
         working-directory: packages/toolkit
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Check if create-countryconfig version exists on npm
+        id: check-create-version
+        run: |
+          TOOLKIT_VERSION="${{ steps.check-version.outputs.toolkit-version }}"
+          if npm view @opencrvs/create-countryconfig@$TOOLKIT_VERSION > /dev/null 2>&1; then
+            echo "Version $TOOLKIT_VERSION already exists on npm."
+            echo "version-exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "Version $TOOLKIT_VERSION does not exist on npm."
+            echo "version-exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update create-countryconfig package.json version
+        if: steps.check-create-version.outputs.version-exists == 'false'
+        run: |
+          TOOLKIT_VERSION="${{ steps.check-version.outputs.toolkit-version }}"
+          jq --arg version "$TOOLKIT_VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
+        working-directory: packages/toolkit/create-countryconfig
+
+      - name: Publish create-countryconfig to npm
+        if: steps.check-create-version.outputs.version-exists == 'false'
+        run: npm publish --access public --tag ${{ steps.check-version.outputs.npm-tag }}
+        working-directory: packages/toolkit/create-countryconfig
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

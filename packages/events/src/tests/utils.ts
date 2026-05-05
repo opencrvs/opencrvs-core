@@ -37,6 +37,7 @@ import {
   TENNIS_CLUB_MEMBERSHIP,
   TokenUserType,
   TokenWithBearer,
+  User,
   UserFilter,
   UUID
 } from '@opencrvs/commons'
@@ -56,6 +57,10 @@ import {
   seeder,
   setupHierarchyWithUsers
 } from './generators'
+
+export const TEST_SYSTEM_ID = '9f3c6b7e-2a91-4f6d-b8d2-5c0e3a4f1b72' as UUID
+export const TEST_SYSTEM_ID_2 = '4d1a8c90-7e5b-4a3f-9c2d-1f6b8e7a2c55' as UUID
+export const REINDEX_SYSTEM_ID = 'e2b7f6a1-3d94-4c8e-a5f9-6b2d0c1a9e33' as UUID
 
 /**
  * Known unstable fields in events that should be sanitized for snapshot testing.
@@ -207,7 +212,7 @@ export function createTestToken({
   userType,
   role
 }: {
-  userId: string
+  userId: UUID
   scopes: string[]
   userType?: TokenUserType
   role?: string
@@ -281,7 +286,7 @@ function createTokenExchangeTestToken(
 }
 
 export function createSystemTestClient(
-  systemId: string,
+  systemId: UUID,
   scopes: string[] = TEST_USER_DEFAULT_SCOPES
 ) {
   const createCaller = createCallerFactory(appRouter)
@@ -810,6 +815,111 @@ function eventMatchesScope({
   return true
 }
 
+function userMatchesScope({
+  userRequesting,
+  userTargeted,
+  role,
+  accessLevel,
+  isUnderAdministrativeArea
+}: {
+  userRequesting: CreatedUser
+  userTargeted: CreatedUser | User
+  role: string[] | undefined
+  accessLevel: JurisdictionFilter | undefined
+  isUnderAdministrativeArea: (
+    locationId: UUID,
+    adminAreaId: UUID | null
+  ) => boolean
+}): boolean {
+  if (role && !role.includes(userTargeted.role)) {
+    return false
+  }
+
+  if (accessLevel === JurisdictionFilter.enum.location) {
+    if (userTargeted.primaryOfficeId !== userRequesting.primaryOfficeId) {
+      return false
+    }
+  }
+
+  if (accessLevel === JurisdictionFilter.enum.administrativeArea) {
+    const hasSameOffice =
+      userTargeted.primaryOfficeId === userRequesting.primaryOfficeId
+    const isRequesterLocationDirectlyUnderCountry =
+      userRequesting.administrativeAreaId === null
+
+    if (
+      !hasSameOffice &&
+      !isRequesterLocationDirectlyUnderCountry &&
+      !isUnderAdministrativeArea(
+        userTargeted.primaryOfficeId,
+        userRequesting.administrativeAreaId ?? null
+      )
+    ) {
+      return false
+    }
+  }
+
+  return true
+}
+
+function userCanUpdateToRole({
+  userRequesting,
+  userTargeted,
+  roleOption,
+  roleToUpdateTo,
+  accessLevel,
+  isUnderAdministrativeArea
+}: {
+  userRequesting: CreatedUser
+  userTargeted: CreatedUser | User
+  roleOption: string[] | undefined
+  accessLevel: JurisdictionFilter | undefined
+  roleToUpdateTo: string | undefined
+  isUnderAdministrativeArea: (
+    locationId: UUID,
+    adminAreaId: UUID | null
+  ) => boolean
+}): boolean {
+  const isUpdatingWithRoleOptionScope =
+    roleOption !== undefined && roleToUpdateTo !== undefined
+
+  if (isUpdatingWithRoleOptionScope) {
+    if (accessLevel === JurisdictionFilter.enum.location) {
+      if (userTargeted.primaryOfficeId !== userRequesting.primaryOfficeId) {
+        return false
+      }
+    }
+
+    if (accessLevel === JurisdictionFilter.enum.administrativeArea) {
+      const hasSameOffice =
+        userTargeted.primaryOfficeId === userRequesting.primaryOfficeId
+      const isRequesterLocationDirectlyUnderCountry =
+        userRequesting.administrativeAreaId === null
+
+      if (
+        !hasSameOffice &&
+        !isRequesterLocationDirectlyUnderCountry &&
+        !isUnderAdministrativeArea(
+          userTargeted.primaryOfficeId,
+          userRequesting.administrativeAreaId ?? null
+        )
+      ) {
+        return false
+      }
+    }
+
+    const hasRoleInScopeOptions = roleOption.some(
+      (role) => role === roleToUpdateTo
+    )
+
+    if (!hasRoleInScopeOptions) {
+      return false
+    }
+  }
+
+  return true
+}
+
 /**
  *
  * @param rngSeed random seed
@@ -978,6 +1088,35 @@ export function assertScopeResult(
   })
 
   expect(result.success).toBe(isAccessibleWithScope)
+}
+
+export function assertUserScopeResult(
+  result: {
+    success: boolean
+    user: User
+    updatePayloadRole: string | undefined
+  },
+  props: {
+    userRequesting: CreatedUser
+    userTargeted: CreatedUser | User
+    role: string[] | undefined
+    accessLevel: JurisdictionFilter | undefined
+    isUnderAdministrativeArea: (
+      locationId: UUID,
+      adminAreaId: UUID | null
+    ) => boolean
+  }
+) {
+  const isAccessibleWithScope = userMatchesScope(props)
+  const userCanUpdateToRoleOption = userCanUpdateToRole({
+    ...props,
+    roleToUpdateTo: result.updatePayloadRole,
+    roleOption: props.role
+  })
+
+  expect(result.success).toBe(
+    isAccessibleWithScope && userCanUpdateToRoleOption
+  )
 }
 
 export async function systemInitialisationTestSetup() {

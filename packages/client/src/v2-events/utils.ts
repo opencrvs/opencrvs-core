@@ -25,16 +25,15 @@ import {
   decodeScope,
   RecordScopeTypeV2,
   EncodedScope,
+  getAdministrativeAreaHierarchy
 } from '@opencrvs/commons/client'
 
-export function getUsersFullName(name: UserOrSystem['name'], language: string) {
+export function getUsersFullName(name: UserOrSystem['name']) {
   if (typeof name === 'string') {
     return name
   }
 
-  const match = name.find((n) => n.use === language) ?? name[0]
-
-  return joinValues([...match.given, match.family])
+  return joinValues([name.firstname, name.surname])
 }
 
 /** Utility to get all keys from union */
@@ -192,33 +191,6 @@ export function mergeWithoutNullsOrUndefined<T>(
 }
 
 type OutputMode = 'withIds' | 'withNames'
-
-// Given an administrative area id, return the full hierarchy from root to leaf.
-export function getAdministrativeAreaHierarchy(
-  administrativeAreaId: string | undefined | null,
-  administrativeAreas: Map<UUID, AdministrativeArea>
-) {
-  // Collect location objects from leaf to root
-  const collectedLocations: AdministrativeArea[] = []
-
-  const parsedAdministrativeAreaId =
-    administrativeAreaId && UUID.safeParse(administrativeAreaId).data
-
-  let current = parsedAdministrativeAreaId
-    ? administrativeAreas.get(parsedAdministrativeAreaId)
-    : null
-
-  while (current) {
-    collectedLocations.push(current)
-    if (!current.parentId) {
-      break
-    }
-    const parentId = current.parentId
-    current = administrativeAreas.get(parentId)
-  }
-
-  return collectedLocations
-}
 
 /*
   Function to traverse the administrative level hierarchy from an arbitrary / leaf point

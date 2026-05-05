@@ -199,9 +199,11 @@ export function useUsers() {
       })
     },
     updateUser: ({
-      onSuccess
+      onSuccess,
+      onError
     }: {
       onSuccess?: (response: inferOutput<typeof trpc.user.update>) => void
+      onError?: () => void
     } = {}) => {
       const mutationOptions = trpc.user.update.mutationOptions()
 
@@ -211,7 +213,19 @@ export function useUsers() {
           void queryClient.invalidateQueries({
             queryKey: trpc.user.get.queryKey(response.id)
           })
+
+          void queryClient.invalidateQueries({
+            queryKey: trpc.user.list.queryKey()
+          })
+
+          void queryClient.invalidateQueries({
+            queryKey: trpc.user.search.queryKey()
+          })
+
           onSuccess?.(response)
+        },
+        onError: () => {
+          onError?.()
         }
       })
     },
@@ -300,6 +314,15 @@ export function useUsers() {
     ),
     changeAvatar: useMutation(
       trpcOptionsProxy.user.changeAvatar.mutationOptions()
+    ),
+    sendUsernameReminder: useMutation(
+      trpcOptionsProxy.user.sendUsernameReminder.mutationOptions()
+    ),
+    sendResetPasswordInvite: useMutation(
+      trpcOptionsProxy.user.sendResetPasswordInvite.mutationOptions()
+    ),
+    resendInvite: useMutation(
+      trpcOptionsProxy.user.resendInvite.mutationOptions()
     )
   }
 }

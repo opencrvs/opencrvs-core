@@ -10,7 +10,7 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import { graphql, http, HttpResponse } from 'msw'
+import { http, HttpResponse } from 'msw'
 import superjson from 'superjson'
 import {
   ActionType,
@@ -114,13 +114,6 @@ export const ReviewForLocalRegistrarComplete: Story = {
           })
         ],
         user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.localRegistrar().v1
-              }
-            })
-          }),
           tRPCMsw.user.list.query(() => {
             return [mockUser]
           }),
@@ -152,13 +145,6 @@ export const ReviewForLocalRegistrarIncomplete: Story = {
           })
         ],
         user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.localRegistrar().v1
-              }
-            })
-          }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
           }),
@@ -209,13 +195,6 @@ export const ReviewForRegistrationAgentComplete: Story = {
           })
         ],
         user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.registrationAgent().v1
-              }
-            })
-          }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
           }),
@@ -258,13 +237,6 @@ export const ReviewForRegistrationAgentIncomplete: Story = {
           })
         ],
         user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.registrationAgent().v1
-              }
-            })
-          }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
           }),
@@ -308,13 +280,6 @@ export const ReviewForFieldAgentComplete: Story = {
           })
         ],
         user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.fieldAgent().v1
-              }
-            })
-          }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
           }),
@@ -354,13 +319,6 @@ export const ReviewForFieldAgentIncomplete: Story = {
           })
         ],
         user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.fieldAgent().v1
-              }
-            })
-          }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
           }),

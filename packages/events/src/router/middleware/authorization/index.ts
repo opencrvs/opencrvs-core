@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+/* eslint-disable max-lines */
 import { TRPCError } from '@trpc/server'
 import { MiddlewareFunction } from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
@@ -38,18 +38,22 @@ import {
   hasAnyScope,
   hasScope,
   getScopeOptionValue,
-  JurisdictionFilter,
-  getAcceptedScopesByType
+  getAcceptedScopesByType,
+  canAccessOtherUserWithScopes,
+  UserScopeType,
+  CreateUserInput,
+  getAvailableRolesForUserUpdatePayload,
+  UserContext
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { ServiceTrpcContext, TrpcContext } from '@events/context'
 import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
 import { getUserById } from '@events/storage/postgres/events/users'
 import { getSystemInitialisation } from '@events/service/auth'
-import { findUserOrSystem } from '../../../service/users/api'
+import { getLocationHierarchy } from '@events/service/locations/locations'
+import { findUserOrSystem, getUser } from '../../../service/users/api'
 import { getInMemoryEventConfigurations } from '../../../service/config/config'
 import { getEventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
-import { isLocationUnderAdministrativeArea } from '../../../storage/postgres/administrative-hierarchy/locations'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -105,8 +109,7 @@ export const canUpdateUserLocation: MiddlewareFunction<
   const existingUser = await getUserById(UUID.parse(input.id))
   if (!existingUser) {
     throw new TRPCError({
-      code: 'NOT_FOUND',
-      message: `No user found by given id: ${input.id}`
+      code: 'FORBIDDEN'
     })
   }
 
@@ -132,6 +135,53 @@ export const canUpdateUserLocation: MiddlewareFunction<
       ...ctx
     }
   })
+}
+
+export const canUpdateUserRole: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext,
+  { id: UUID; role?: string }
+> = async (opts) => {
+  const { token } = opts.ctx
+  const { input, ctx } = opts
+
+  const existingUser = await getUserById(UUID.parse(input.id))
+  if (!existingUser) {
+    throw new TRPCError({
+      code: 'FORBIDDEN'
+    })
+  }
+
+  if (input.role === undefined || input.role === existingUser.role) {
+    return opts.next()
+  }
+
+  const acceptedScopes = getAcceptedScopesFromToken(token, ['user.edit'])
+
+  const administrativeHierarchy = await getLocationHierarchy(
+    existingUser.officeId
+  )
+
+  const availableRoles = getAvailableRolesForUserUpdatePayload({
+    acceptedScopes,
+    // Since we are only checking if the user can update to a specific role, we can pass an array with only that role to optimize the check instead of passing all roles in the system.
+    allRoles: [input.role],
+    userLocation: {
+      primaryOfficeId: existingUser.officeId,
+      administrativeHierarchy
+    },
+    userRequesting: ctx.user as UserContext
+  })
+
+  if (!availableRoles.includes(input.role)) {
+    throw new TRPCError({
+      code: 'FORBIDDEN'
+    })
+  }
+
+  return opts.next()
 }
 
 export const EventIdParam = z.object({
@@ -390,82 +440,221 @@ export const userCanCreateEvent: MiddlewareFunction<
   return next()
 }
 
+export function canAccessUserWithScopes(scopes: UserScopeType[]) {
+  const fn: MiddlewareFunction<
+    TrpcContext,
+    OpenApiMeta,
+    TrpcContext,
+    TrpcContext & { id: UUID },
+    { id: UUID } | UUID
+  > = async ({ next, ctx, input }) => {
+    const parseResult = UUID.safeParse(input)
+    const incomingId: UUID = parseResult.success
+      ? parseResult.data
+      : (input as { id: UUID }).id
+
+    const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
+
+    const userRequesting = ctx.user
+    if (acceptedScopes.length === 0) {
+      throw new TRPCError({ code: 'FORBIDDEN' })
+    }
+
+    const otherUser = await findUserOrSystem(incomingId)
+
+    // Don't reveal the existence of the user
+    if (!otherUser) {
+      throw new TRPCError({ code: 'NOT_FOUND' })
+    }
+
+    // Not supported for system users
+    if (otherUser.type === TokenUserType.enum.system) {
+      throw new TRPCError({ code: 'NOT_FOUND' })
+    }
+
+    if (!userRequesting.primaryOfficeId) {
+      throw new TRPCError({ code: 'NOT_FOUND' })
+    }
+
+    const userLocationHierarchy = await getLocationHierarchy(
+      otherUser.primaryOfficeId
+    )
+
+    const hasAccess = canAccessOtherUserWithScopes({
+      scopes: acceptedScopes,
+      userToAccess: {
+        role: otherUser.role,
+        administrativeHierarchy: userLocationHierarchy,
+        primaryOfficeId: otherUser.primaryOfficeId
+      },
+      user: userRequesting
+    })
+
+    if (!hasAccess) {
+      throw new TRPCError({ code: 'NOT_FOUND' })
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        userId: incomingId
+      },
+      input
+    })
+  }
+
+  return fn
+}
+
+export function canCreateUserWithScopes(scopes: UserScopeType[]) {
+  const fn: MiddlewareFunction<
+    TrpcContext,
+    OpenApiMeta,
+    TrpcContext,
+    TrpcContext,
+    CreateUserInput
+  > = async ({ next, ctx, input }) => {
+    const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
+
+    const userRequesting = ctx.user
+    const userToCreate = input
+
+    if (acceptedScopes.length === 0) {
+      throw new TRPCError({ code: 'FORBIDDEN' })
+    }
+
+    if (!userRequesting.primaryOfficeId) {
+      throw new TRPCError({ code: 'NOT_FOUND' })
+    }
+
+    const userLocationHierarchy = await getLocationHierarchy(
+      userToCreate.primaryOfficeId
+    )
+
+    const hasAccess = canAccessOtherUserWithScopes({
+      scopes: acceptedScopes,
+      userToAccess: {
+        role: userToCreate.role,
+        administrativeHierarchy: userLocationHierarchy,
+        primaryOfficeId: userToCreate.primaryOfficeId
+      },
+      user: userRequesting
+    })
+
+    if (!hasAccess) {
+      throw new TRPCError({ code: 'FORBIDDEN' })
+    }
+
+    return next()
+  }
+
+  return fn
+}
+
 export const userCanReadOtherUser: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
   TrpcContext,
-  TrpcContext & { userId: string },
-  { userId: string }
+  TrpcContext & UUID,
+  UUID
+> = async ({ next, ctx, input }) => {
+  const { token, user: userReading } = ctx
+
+  const acceptedScopes = getAcceptedScopesFromToken(token, ['user.read'])
+
+  const isRequestingOwnUser = userReading.id === input
+
+  if (acceptedScopes.length === 0 && !isRequestingOwnUser) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
+  const otherUser = await getUser(input)
+
+  if (isRequestingOwnUser) {
+    return next()
+  }
+
+  if (acceptedScopes.length === 0) {
+    throw new TRPCError({ code: 'NOT_FOUND' })
+  }
+
+  if (!otherUser.primaryOfficeId) {
+    throw new TRPCError({ code: 'NOT_FOUND' })
+  }
+
+  const userLocationHierarchy = await getLocationHierarchy(
+    otherUser.primaryOfficeId
+  )
+
+  const hasAccess = canAccessOtherUserWithScopes({
+    scopes: acceptedScopes,
+    userToAccess: {
+      role: otherUser.role,
+      administrativeHierarchy: userLocationHierarchy,
+      primaryOfficeId: otherUser.primaryOfficeId
+    },
+    user: userReading
+  })
+
+  if (!hasAccess) {
+    throw new TRPCError({ code: 'NOT_FOUND' })
+  }
+
+  return next()
+}
+
+export const userCanReadUserAudit: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext & { userId: UUID },
+  { userId: UUID }
 > = async ({ next, ctx, input }) => {
   const { token, user: userReading } = ctx
 
   // Throw early to avoid mistakes in the logic below.
   // There are test cases for each but better safe than sorry.
-  const hasReadScope = hasScope(token, 'user.read')
+  const acceptedScopes = getAcceptedScopesFromToken(token, ['user.read'])
   const hasReadMyAuditScope = hasScope(token, 'user.read-only-my-audit')
 
-  if (!hasReadScope && !hasReadMyAuditScope) {
+  if (acceptedScopes.length === 0 && !hasReadMyAuditScope) {
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
-
-  const otherUser = await findUserOrSystem(input.userId)
-
-  // Don't reveal the existence of the user
-  if (!otherUser) {
-    throw new TRPCError({ code: 'NOT_FOUND' })
-  }
-
-  // Not supported for system users
-  if (otherUser.type === TokenUserType.enum.system) {
-    throw new TRPCError({ code: 'NOT_FOUND' })
-  }
-
-  if (!userReading.primaryOfficeId) {
-    throw new TRPCError({ code: 'NOT_FOUND' })
-  }
-
-  const readScopes = getAcceptedScopesFromToken(token, ['user.read'])
-
-  const accessLevels = readScopes.map((s) =>
-    getScopeOptionValue(s, 'accessLevel')
-  )
-
-  if (accessLevels.includes(JurisdictionFilter.enum.all)) {
-    return next()
-  }
-
-  const hasLocationAccess =
-    accessLevels.includes(JurisdictionFilter.enum.location) ||
-    accessLevels.includes(JurisdictionFilter.enum.administrativeArea)
-
-  if (
-    hasLocationAccess &&
-    userReading.primaryOfficeId === otherUser.primaryOfficeId
-  ) {
-    return next()
-  }
-
-  // If administrative area is undefined, we consider the user has access to all locations.
-  // This will change once we implement 2.0. user scopes.
-  const isUnderJurisdiction = userReading.administrativeAreaId
-    ? await isLocationUnderAdministrativeArea({
-        administrativeAreaId: userReading.administrativeAreaId,
-        locationId: otherUser.primaryOfficeId
-      })
-    : true
-
-  if (
-    accessLevels.includes(JurisdictionFilter.enum.administrativeArea) &&
-    isUnderJurisdiction
-  ) {
-    return next()
-  }
+  const otherUser = await getUser(input.userId)
 
   if (hasReadMyAuditScope && userReading.id === otherUser.id) {
     return next()
   }
 
-  throw new TRPCError({ code: 'NOT_FOUND' })
+  if (!otherUser.primaryOfficeId) {
+    throw new TRPCError({ code: 'NOT_FOUND' })
+  }
+
+  const userLocationHierarchy = await getLocationHierarchy(
+    otherUser.primaryOfficeId
+  )
+
+  const hasAccess = canAccessOtherUserWithScopes({
+    scopes: acceptedScopes,
+    userToAccess: {
+      role: otherUser.role,
+      administrativeHierarchy: userLocationHierarchy,
+      primaryOfficeId: otherUser.primaryOfficeId
+    },
+    user: userReading
+  })
+
+  if (!hasAccess) {
+    throw new TRPCError({ code: 'NOT_FOUND' })
+  }
+
+  return next({
+    ctx: {
+      ...ctx,
+      userId: input.userId
+    },
+    input
+  })
 }
 
 export function canInitialiseSystem() {

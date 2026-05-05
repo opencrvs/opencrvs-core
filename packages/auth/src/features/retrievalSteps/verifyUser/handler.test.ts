@@ -50,7 +50,7 @@ describe('verifyUser handler receives a request', () => {
       jest.spyOn(verifyUserService, 'verifyUser').mockResolvedValue({
         userId: '1',
         username: 'fake_user_name',
-        userFullName: [],
+        userFullName: { firstname: '', surname: '' },
         scope: ['demo'],
         status: 'active',
         mobile: '+8801711111111',
@@ -76,7 +76,7 @@ describe('verifyUser handler receives a request', () => {
       jest.spyOn(reloadedVerifyUserService, 'verifyUser').mockResolvedValue({
         userId: '1',
         username: 'fake_user_name',
-        userFullName: [],
+        userFullName: { firstname: '', surname: '' },
         scope: ['admin'],
         status: 'active',
         mobile: '+8801711111111',

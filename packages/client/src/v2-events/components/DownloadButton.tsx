@@ -201,7 +201,7 @@ export function DownloadButton({
           <AvatarSmall
             key={user?.avatar || 'default'}
             avatar={user?.avatar || undefined}
-            name={user && getUsersFullName(user.name, intl.locale)}
+            name={user && getUsersFullName(user.name)}
           />
         )}
       </DownloadAction>

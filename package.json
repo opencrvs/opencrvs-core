@@ -1,7 +1,7 @@
 {
   "description": "OpenCRVS core workspace",
   "license": "MPL-2.0",
-  "version": "1.9.12",
+  "version": "2.0.0",
   "private": true,
   "os": [
     "darwin",
@@ -11,7 +11,8 @@
     "node": "22.x.x"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "packages/toolkit/create-countryconfig"
   ],
   "scripts": {
     "postinstall": "patch-package",
