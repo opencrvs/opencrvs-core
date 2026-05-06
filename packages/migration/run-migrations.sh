@@ -10,6 +10,7 @@
 
 set -e # fail if any of the commands fails
 
+HEARTH_CONFIG=./build/dist/src/migrate-mongo-config-hearth.js
 : "${EVENTS_POSTGRES_URL:=postgres://events_migrator:migrator_password@localhost:5432/events}"
 : "${EVENTS_SUPERUSER_POSTGRES_URL:=postgres://postgres:postgres@localhost:5432/events}"
 USER_MGNT_CONFIG=./build/dist/src/migrate-mongo-config-user-mgnt.js
@@ -33,6 +34,17 @@ for arg in "$@"; do
     ;;
   esac
 done
+
+echo "Environment Variables CIHAN:"
+printenv
+
+
+# hearth migrations
+if [ "${SKIP_HEARTH_MIGRATIONS:-false}" = "true" ]; then
+  echo "Skipping HEARTH migrations because SKIP_HEARTH_MIGRATIONS=true"
+else
+  yarn --cwd "$SCRIPT_PATH" migrate-mongo up --file "$HEARTH_CONFIG"
+fi
 
 run_pg_migrations() {
   MIGRATIONS_PATH="$1"
