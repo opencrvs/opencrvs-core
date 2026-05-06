@@ -68,7 +68,17 @@ async function renderAppWithConfig() {
 }
 
 function withRetry(render: () => Promise<void>) {
-  render().catch(() => {
+  render().catch((error) => {
+    if (error?.message === 'VERSION_MISMATCH') {
+      const reloads = Number(
+        sessionStorage.getItem('version-mismatch-reloads') || 0
+      )
+      if (reloads < 3) {
+        sessionStorage.setItem('version-mismatch-reloads', String(reloads + 1))
+        window.location.reload()
+      }
+      return
+    }
     delay(() => withRetry(render), RETRY_TIMEOUT)
   })
 }
