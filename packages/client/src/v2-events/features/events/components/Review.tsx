@@ -46,6 +46,7 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { buttonMessages } from '@client/i18n/messages'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
+import { TranslationTextWithFormatModifier } from './TranslationTextWithFormatModifier'
 
 const ValidationError = styled.span`
   color: ${({ theme }) => theme.colors.negative};
@@ -141,13 +142,6 @@ const ReviewContainter = styled.div`
   }
 `
 
-const Highlighted = styled.strong`
-  color: ${({ theme }) => theme.colors.grey600};
-`
-
-const SupportingCopy = styled(Text)`
-  color: ${({ theme }) => theme.colors.supportingCopy};
-`
 const DeclarationDataContainer = styled.div``
 
 const reviewMessages = defineMessages({
@@ -700,15 +694,14 @@ function AcceptActionModal({
       width={600}
     >
       <Stack>
-        <SupportingCopy color="grey500" element="p" variant="reg16">
-          {copy.supportingCopy
-            ? intl.formatMessage(copy.supportingCopy, {
-                strong: (chunks: React.ReactNode[]) => (
-                  <Highlighted>{chunks}</Highlighted>
-                )
-              })
-            : null}
-        </SupportingCopy>
+        {copy.supportingCopy && (
+          <TranslationTextWithFormatModifier
+            color="supportingCopy"
+            element="p"
+            message={copy.supportingCopy}
+            variant="reg16"
+          />
+        )}
       </Stack>
     </ResponsiveModal>
   )
