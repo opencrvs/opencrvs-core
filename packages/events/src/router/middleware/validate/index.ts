@@ -279,7 +279,7 @@ function validateCustomAction({
   return getFieldErrors(customActionFields, annotation, context, {})
 }
 
-function validateNotifyAction({
+export function validateNotifyAction({
   eventConfig,
   annotation = {},
   declaration = {},

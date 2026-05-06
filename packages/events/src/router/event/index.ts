@@ -68,6 +68,7 @@ import { getDuplicateEvents } from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
 import { customActionProcedures } from './actions/custom'
+import { createAndNotifyProcedure } from './actions/createAndNotify'
 
 export const eventRouter = router({
   /*
@@ -312,6 +313,7 @@ export const eventRouter = router({
   }),
   actions: router({
     notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
+    createAndNotify: router(createAndNotifyProcedure()),
     declare: router(declareActionProcedures()),
     edit: router(getDefaultActionProcedures(ActionType.EDIT)),
     reject: router(getDefaultActionProcedures(ActionType.REJECT)),
