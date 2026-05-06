@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { buttonMessages, validationMessages } from '@client/i18n/messages'
+import { buttonMessages, errorMessages } from '@client/i18n/messages'
 import { userMessages } from '@client/i18n/messages'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { messages } from '@client/i18n/messages/views/userForm'
@@ -16,24 +16,12 @@ import * as routes from '@client/navigation/routes'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useRoles } from '@client/v2-events/hooks/useRoles'
-import { ROUTES } from '@client/v2-events/routes'
+import { ROUTES } from '@client/v2-events/routes/routes'
 import {
   ActionType,
-  alwaysTrue,
-  deepDropNulls,
-  defineConditional,
-  EventConfig,
-  field,
-  FieldConfig,
   FieldValue,
   FileFieldValue,
-  FieldType,
-  never,
-  or,
-  PageTypes,
   TokenUserType,
-  hasScope,
-  EncodedScope,
   UUID,
   CreateUserInput,
   UpdateUserInput
@@ -49,7 +37,7 @@ import { Check, Cross } from '@opencrvs/components/lib/icons'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { TRPCClientError } from '@trpc/client'
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -57,15 +45,14 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import styled from 'styled-components'
-import { create } from 'zustand'
 import { useUsers } from '../../../../../v2-events/hooks/useUsers'
-import {
-  createTemporaryId,
-  emptyMessage,
-  isTemporaryId
-} from '@client/v2-events/utils'
+import { createTemporaryId, isTemporaryId } from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
+import { usePermissions } from '@client/hooks/useAuthorization'
+import toast from 'react-hot-toast'
+import { useUserEditConfig } from '@client/hooks/useUserEditConfig'
+import { useUserFormState } from './useUserFormState'
 
 const Container = styled.div`
   display: flex;
@@ -84,131 +71,6 @@ const SpinnerWrapper = styled.div`
   align-items: center;
   padding: 20px;
 `
-
-function getUserEditConfig(
-  selectedRole?: { scopes: EncodedScope[] },
-  additionalFields: FieldConfig[] = []
-): EventConfig {
-  return {
-    id: '__user__',
-    analytics: false,
-    summary: {
-      fields: []
-    },
-    advancedSearch: [],
-    flags: [],
-    title: emptyMessage,
-    label: emptyMessage,
-    declaration: {
-      label: emptyMessage,
-      pages: [
-        {
-          id: 'user.office',
-          title: messages.registrationOffice,
-          type: PageTypes.enum.FORM,
-          requireCompletionToContinue: true,
-          fields: [
-            {
-              id: 'primaryOfficeId',
-              type: FieldType.LOCATION,
-              required: true,
-              label: messages.registrationOffice
-            }
-          ]
-        },
-        {
-          id: 'user.details',
-          title: messages.userDetails,
-          type: PageTypes.enum.FORM,
-          requireCompletionToContinue: true,
-          fields: [
-            {
-              id: 'name',
-              type: FieldType.NAME,
-              required: true,
-              hideLabel: true,
-              label: messages.fullName
-            },
-            {
-              id: 'phoneNumber',
-              type: FieldType.PHONE,
-              required:
-                window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms',
-              label: messages.phoneNumber,
-              validation: [
-                {
-                  message: validationMessages.phoneNumberNotValid,
-                  validator: or(
-                    field('phoneNumber').matches(
-                      String(window.config.PHONE_NUMBER_PATTERN)
-                    ),
-                    field('phoneNumber').isFalsy()
-                  )
-                }
-              ]
-            },
-            {
-              id: 'email',
-              type: FieldType.EMAIL,
-              required:
-                window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'email',
-              label: messages.email
-            },
-            {
-              id: 'fullHonorificName',
-              type: FieldType.TEXT,
-              required: false,
-              label: messages.fullHonorificName
-            },
-            {
-              id: 'divider',
-              type: FieldType.DIVIDER,
-              label: emptyMessage
-            },
-            {
-              id: 'role',
-              type: FieldType.USER_ROLE,
-              required: true,
-              label: messages.labelRole
-            },
-            {
-              id: 'device',
-              type: FieldType.TEXT,
-              required: false,
-              label: messages.userDevice
-            },
-            ...additionalFields
-          ]
-        },
-        {
-          id: 'user.signature',
-          title: messages.userSignatureAttachmentTitle,
-          requireCompletionToContinue: true,
-          type: PageTypes.enum.FORM,
-          conditional: hasScope(
-            selectedRole?.scopes ?? [],
-            'profile.electronic-signature'
-          )
-            ? defineConditional(alwaysTrue())
-            : never(),
-          fields: [
-            {
-              id: 'signature',
-              type: FieldType.SIGNATURE,
-              required: false,
-              label: messages.userSignatureAttachment,
-              signaturePromptLabel: messages.userSignatureAttachment,
-              configuration: {
-                maxFileSize: 123456
-              }
-            }
-          ]
-        }
-      ]
-    },
-    actions: []
-  }
-}
 
 type EventState = {
   primaryOfficeId?: string
@@ -230,20 +92,59 @@ interface UserFormState {
   clear: () => void
 }
 
-export const useUserFormState = create<UserFormState>()((set, get) => ({
-  getUserForm: (initialValues?: EventState) =>
-    get().userForm || deepDropNulls(initialValues ?? {}),
-  setUserForm: (data: EventState) => {
-    return set(() => ({ userForm: data }))
-  },
-  getTouchedFields: () =>
-    Object.fromEntries(
-      Object.entries(get().getUserForm()).map(([key]) => [key, true])
-    ),
-  clear: () => set(() => ({ userForm: undefined }))
-}))
+const USER_OFFICE_PAGE_ID = 'user.office'
+const UNAUTHORIZED_TOAST_ID = 'user-editor-unauthorized'
+const EMPTY_FORM: EventState = {}
 
-export const CreateNewUser = () => {
+/**
+ * Shared close/redirect handler for the EditUser and ReviewUser flows.
+ *
+ * `replace: true` is used for forced redirects (e.g. unauthorized) so the
+ * gated page is not left in the browser history.
+ */
+function useCloseUserForm({
+  isNewUser,
+  primaryOfficeId,
+  fromUserList,
+  userId,
+  setUserForm
+}: {
+  isNewUser: boolean
+  primaryOfficeId: string | undefined
+  fromUserList: boolean
+  userId: UUID
+  setUserForm: (data: EventState) => void
+}) {
+  const navigate = useNavigate()
+  return useCallback(
+    (options?: { replace?: boolean }) => {
+      setUserForm(EMPTY_FORM)
+      if (isNewUser) {
+        navigate(
+          primaryOfficeId
+            ? `${routes.TEAM_USER_LIST}?locationId=${primaryOfficeId}`
+            : routes.TEAM_USER_LIST,
+          options
+        )
+        return
+      }
+      if (fromUserList) {
+        navigate(
+          {
+            pathname: routes.TEAM_USER_LIST,
+            search: serializeSearchParams({ locationId: primaryOfficeId })
+          },
+          options
+        )
+      } else {
+        navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }), options)
+      }
+    },
+    [isNewUser, primaryOfficeId, fromUserList, userId, navigate, setUserForm]
+  )
+}
+
+const CreateNewUserComponent = () => {
   const [{ officeId, from }] = useTypedSearchParams(
     ROUTES.V2.SETTINGS.USER.CREATE
   )
@@ -265,61 +166,97 @@ export const CreateNewUser = () => {
   return <div />
 }
 
+export const CreateNewUser = withSuspense(CreateNewUserComponent)
+
 const EditUserComponent = () => {
   const intl = useIntl()
   const navigate = useNavigate()
   const { pageId, userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.EDIT)
   const [searchParams] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.EDIT)
-  const { getUserForm, setUserForm } = useUserFormState()
+  const userForm = useUserFormState((s) => s.userForm)
+  const setUserForm = useUserFormState((s) => s.setUserForm)
+  const formState = userForm ?? EMPTY_FORM
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
-  const formState = getUserForm()
   const selectedRole = roles.find((role) => role.id === formState['role'])
   const isNewUser = isTemporaryId(userId)
+  const { getUser } = useUsers()
+  const userQuery = getUser.useQuery(userId, { enabled: !isNewUser })
+  const targetUser = userQuery.data
+  const additionalFields = window.config.ADDITIONAL_USER_FIELDS ?? []
+  const maybeLocationId = UUID.safeParse(userForm?.primaryOfficeId)
+  const { getConfig } = useUserEditConfig(
+    maybeLocationId.success ? maybeLocationId.data : undefined,
+    selectedRole,
+    additionalFields
+  )
+  const eventConfig = getConfig()
+  const formConfig = eventConfig.declaration
+
+  const { canEditUser, canAddOfficeUsers } = usePermissions()
+
+  const handleClose = useCloseUserForm({
+    isNewUser,
+    primaryOfficeId: formState['primaryOfficeId'],
+    fromUserList: searchParams.from === 'user.list',
+    userId,
+    setUserForm
+  })
+
+  const newUserOfficeId = formState['primaryOfficeId'] as UUID | undefined
+
+  const isNewUserBlocked =
+    isNewUser &&
+    !!newUserOfficeId &&
+    !canAddOfficeUsers({ id: newUserOfficeId })
+
+  const isExistingUserBlocked =
+    !isNewUser &&
+    !!targetUser &&
+    (targetUser.type !== TokenUserType.enum.user || !canEditUser(targetUser))
+
+  const isUnauthorized = isNewUserBlocked || isExistingUserBlocked
+
+  // Office-required redirect: any page other than the office picker needs
+  // primaryOfficeId in the form state. Skipped while the auth gate is firing.
   useEffect(() => {
-    if (!formState['primaryOfficeId'] && pageId !== 'user.office') {
+    if (isUnauthorized) {
+      return
+    }
+    if (!formState['primaryOfficeId'] && pageId !== USER_OFFICE_PAGE_ID) {
       navigate(
         ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
           {
-            pageId: 'user.office',
-            userId: userId
+            pageId: USER_OFFICE_PAGE_ID,
+            userId
           },
           searchParams
         )
       )
     }
-  }, [formState, navigate, userId, pageId, searchParams])
+  }, [formState, navigate, userId, pageId, searchParams, isUnauthorized])
 
-  const additionalFields = window.config.ADDITIONAL_USER_FIELDS ?? []
-  const eventConfig = getUserEditConfig(selectedRole, additionalFields)
-  const formConfig = eventConfig.declaration
-
-  const handleClose = () => {
-    if (isNewUser) {
-      const officeId = formState['primaryOfficeId']
-      navigate(
-        officeId
-          ? `${routes.TEAM_USER_LIST}?locationId=${officeId}`
-          : routes.TEAM_USER_LIST
-      )
-    } else {
-      setUserForm({})
-      if (searchParams.from === 'user.list') {
-        navigate({
-          pathname: routes.TEAM_USER_LIST,
-          search: serializeSearchParams({
-            locationId: formState['primaryOfficeId']
-          })
-        })
-      } else {
-        navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }))
-      }
-    }
+  if (userQuery.isLoading) {
+    return (
+      <ActionPageLight
+        title={intl.formatMessage(sysAdminMessages.editUserDetailsTitle)}
+        goBack={() => navigate(-1)}
+        hideBackground={true}
+      >
+        <Container>
+          <SpinnerWrapper>
+            <Spinner id="user-form-loading-spinner" size={25} />
+          </SpinnerWrapper>
+        </Container>
+      </ActionPageLight>
+    )
   }
 
   return (
     <FormLayout
       onClose={handleClose}
+      isUnauthorized={isUnauthorized}
+      userId={userId}
       title={
         isNewUser
           ? intl.formatMessage(messages.userFormTitle)
@@ -369,7 +306,9 @@ export const EditUser = withSuspense(EditUserComponent)
 const ReviewUserComponent = () => {
   const intl = useIntl()
   const navigate = useNavigate()
-  const { getUserForm, setUserForm, clear } = useUserFormState()
+  const userForm = useUserFormState((s) => s.userForm)
+  const setUserForm = useUserFormState((s) => s.setUserForm)
+  const clear = useUserFormState((s) => s.clear)
   const { userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.REVIEW)
 
   const [searchParams] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.REVIEW)
@@ -377,7 +316,9 @@ const ReviewUserComponent = () => {
   const { getUser, createUser, updateUser } = useUsers()
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
-  const selectedRole = roles.find((role) => role.id === getUserForm()['role'])
+  const selectedRole = roles.find(
+    (role) => role.id === (userForm ?? EMPTY_FORM)['role']
+  )
 
   const [showDuplicateMobileError, setShowDuplicateMobileError] =
     React.useState(false)
@@ -395,12 +336,20 @@ const ReviewUserComponent = () => {
 
   const existingUserQuery = getUser.useQuery(userId, { enabled: !isNewUser })
   const additionalFields = window.config.ADDITIONAL_USER_FIELDS ?? []
+  const maybeLocationId = UUID.safeParse(userForm?.primaryOfficeId)
+  const { getConfig } = useUserEditConfig(
+    maybeLocationId.success ? maybeLocationId.data : undefined,
+    selectedRole,
+    additionalFields
+  )
+  const eventConfig = getConfig()
+  const formConfig = eventConfig.declaration
 
   useEffect(() => {
     if (isNewUser || !existingUserQuery.data) return
     const user = existingUserQuery.data
     if (user.type !== TokenUserType.enum.user) return
-    if (Object.keys(getUserForm()).length > 0) return
+    if (userForm && Object.keys(userForm).length > 0) return
 
     setUserForm({
       primaryOfficeId: user.primaryOfficeId,
@@ -421,13 +370,11 @@ const ReviewUserComponent = () => {
       // The nesting into data: {} only happens when building the UserInput payload.
       ...(user.data ?? {})
     })
-  }, [isNewUser, existingUserQuery.data, setUserForm, getUserForm])
+  }, [isNewUser, existingUserQuery.data, setUserForm, userForm])
 
-  const formState = getUserForm()
+  const formState = userForm ?? EMPTY_FORM
   const createUserMutation = createUser()
   const updateUserMutation = updateUser()
-  const eventConfig = getUserEditConfig(selectedRole, additionalFields)
-  const formConfig = eventConfig.declaration
 
   const handleMutationError = (error: unknown) => {
     if (error instanceof TRPCClientError && error.data?.code === 'CONFLICT') {
@@ -444,28 +391,30 @@ const ReviewUserComponent = () => {
     }
   }
 
-  const handleClose = () => {
-    if (isNewUser) {
-      const officeId = formState['primaryOfficeId']
-      navigate(
-        officeId
-          ? `${routes.TEAM_USER_LIST}?locationId=${officeId}`
-          : routes.TEAM_USER_LIST
-      )
-    } else {
-      setUserForm({})
-      if (searchParams.from === 'user.list') {
-        navigate({
-          pathname: routes.TEAM_USER_LIST,
-          search: serializeSearchParams({
-            locationId: formState['primaryOfficeId']
-          })
-        })
-      } else {
-        navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }))
-      }
-    }
-  }
+  const handleClose = useCloseUserForm({
+    isNewUser,
+    primaryOfficeId: formState['primaryOfficeId'],
+    fromUserList: searchParams.from === 'user.list',
+    userId,
+    setUserForm
+  })
+
+  const { canEditUser, canAddOfficeUsers } = usePermissions()
+  const targetUser = existingUserQuery.data
+
+  const newUserOfficeId = formState['primaryOfficeId'] as UUID | undefined
+
+  const isNewUserBlocked =
+    isNewUser &&
+    !!newUserOfficeId &&
+    !canAddOfficeUsers({ id: newUserOfficeId })
+
+  const isExistingUserBlocked =
+    !isNewUser &&
+    !!targetUser &&
+    (targetUser.type !== TokenUserType.enum.user || !canEditUser(targetUser))
+
+  const isUnauthorized = isNewUserBlocked || isExistingUserBlocked
 
   const isSubmitting =
     createUserMutation.isPending || updateUserMutation.isPending
@@ -519,6 +468,8 @@ const ReviewUserComponent = () => {
           : intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
       }
       onClose={handleClose}
+      isUnauthorized={isUnauthorized}
+      userId={userId}
     >
       {showDuplicateMobileError && (
         <Toast
@@ -659,14 +610,41 @@ function FormLayout({
   onSaveAndExit,
   onClose,
   title,
-  actionComponent
+  actionComponent,
+  isUnauthorized,
+  userId
 }: {
   children: React.ReactNode
   onSaveAndExit?: () => void | Promise<void>
-  onClose?: () => void
+  onClose?: (options?: { replace?: boolean }) => void
   title: string
   actionComponent?: React.ReactNode
+  isUnauthorized?: boolean
+  userId?: string
 }) {
+  const intl = useIntl()
+  const unauthorizedHandledRef = React.useRef(false)
+
+  useEffect(() => {
+    unauthorizedHandledRef.current = false
+  }, [userId])
+
+  useEffect(() => {
+    if (isUnauthorized && !unauthorizedHandledRef.current) {
+      unauthorizedHandledRef.current = true
+      toast.custom(
+        <Toast
+          type="warning"
+          onClose={() => toast.remove(UNAUTHORIZED_TOAST_ID)}
+        >
+          {intl.formatMessage(errorMessages.unauthorized)}
+        </Toast>,
+        { id: UNAUTHORIZED_TOAST_ID }
+      )
+      onClose?.({ replace: true })
+    }
+  }, [isUnauthorized, onClose, intl])
+
   return (
     <Frame
       header={
@@ -674,7 +652,7 @@ function FormLayout({
           actionComponent={actionComponent}
           label={title}
           onSaveAndExit={onSaveAndExit}
-          onClose={onClose}
+          onClose={onClose ? () => onClose() : undefined}
         />
       }
       skipToContentText="Skip to form"

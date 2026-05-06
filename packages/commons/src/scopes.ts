@@ -242,14 +242,16 @@ const SystemScopeType = z.enum([
   'organisation.read-locations',
   'user.read',
   'user.create',
-  'user.edit'
+  'user.edit',
+  'user.search'
 ])
 export type SystemScopeType = z.infer<typeof SystemScopeType>
 
 const UserScopeType = SystemScopeType.extract([
   'user.read',
   'user.create',
-  'user.edit'
+  'user.edit',
+  'user.search'
 ])
 export type UserScopeType = z.infer<typeof UserScopeType>
 
@@ -262,7 +264,7 @@ export const UserScopeV2 = z.discriminatedUnion('type', [
     options: AllUserScopeOptions.optional()
   }),
   z.object({
-    type: UserScopeType.extract(['user.read']),
+    type: UserScopeType.extract(['user.read', 'user.search']),
     options: AccessLevelOptions.optional()
   })
 ])

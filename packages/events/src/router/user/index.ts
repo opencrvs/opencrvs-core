@@ -19,6 +19,9 @@ import {
 } from '@opencrvs/commons/events'
 import {
   CreateUserInput,
+  getAcceptedScopesFromToken,
+  getScopeOptionValue,
+  JurisdictionFilter,
   logger,
   TokenWithBearer,
   User,
@@ -30,6 +33,7 @@ import {
   allowedWithAnyOfScopes,
   canAccessUserWithScopes,
   canCreateUserWithScopes,
+  canSearchUsers,
   canUpdateUserLocation,
   canUpdateUserRole,
   userCanReadOtherUser
@@ -59,6 +63,7 @@ import {
   getUsersById,
   isUser,
   searchUsers,
+  searchUsersAll,
   updateUser,
   sendUsernameReminder,
   sendResetPasswordInvite,
@@ -179,20 +184,66 @@ export async function handleCreateUser(
   return user
 }
 
+// A user may have multiple user.search scopes — use the most permissive access level across all of them.
+const ACCESS_LEVEL_PRIORITY: JurisdictionFilter[] = [
+  JurisdictionFilter.enum.all,
+  JurisdictionFilter.enum.administrativeArea,
+  JurisdictionFilter.enum.location
+]
+
+function getMostPermissiveAccessLevel(
+  scopes: ReturnType<typeof getAcceptedScopesFromToken>
+): JurisdictionFilter {
+  const levels = scopes.map(
+    (s) => getScopeOptionValue(s, 'accessLevel') ?? JurisdictionFilter.enum.all
+  )
+  return (
+    ACCESS_LEVEL_PRIORITY.find((level) => levels.includes(level)) ??
+    JurisdictionFilter.enum.all
+  )
+}
+
 export function searchUsersRoute(
   procedure: typeof internalProcedure | typeof userAndSystemProcedure
 ) {
   return procedure
     .input(UserSearch)
     .output(z.array(UserOrSystem))
-    .query(async ({ input }) =>
-      searchUsers({
-        ...input,
-        primaryOfficeId: input.primaryOfficeId
-          ? UUID.parse(input.primaryOfficeId)
-          : undefined
-      })
-    )
+    .query(async ({ input, ctx }) => {
+      const primaryOfficeId = input.primaryOfficeId
+        ? UUID.parse(input.primaryOfficeId)
+        : undefined
+
+      if (!('user' in ctx)) {
+        return searchUsers({ ...input, primaryOfficeId })
+      }
+
+      const acceptedScopes = getAcceptedScopesFromToken(ctx.token, [
+        'user.search'
+      ])
+      const accessLevel = getMostPermissiveAccessLevel(acceptedScopes)
+
+      if (
+        accessLevel === JurisdictionFilter.enum.administrativeArea &&
+        ctx.user.administrativeAreaId
+      ) {
+        const allUsers = await searchUsersAll({
+          ...input,
+          primaryOfficeId: primaryOfficeId,
+          administrativeAreaId: ctx.user.administrativeAreaId
+        })
+        return allUsers.slice(input.skip, input.skip + input.count)
+      }
+
+      if (accessLevel === JurisdictionFilter.enum.location) {
+        return searchUsers({
+          ...input,
+          primaryOfficeId: ctx.user.primaryOfficeId
+        })
+      }
+
+      return searchUsers({ ...input, primaryOfficeId })
+    })
 }
 
 const UserAuditListQuery = z.object({
@@ -311,7 +362,7 @@ export const userRouter = router({
     .input(z.array(z.string()))
     .output(z.array(UserOrSystem))
     .query(async ({ input }) => getUsersById(input)),
-  search: searchUsersRoute(userAndSystemProcedure),
+  search: searchUsersRoute(userAndSystemProcedure.use(canSearchUsers)),
   actions: userOnlyProcedure
     .input(UserActionsQuery)
     .use(userCanReadUserAudit)
