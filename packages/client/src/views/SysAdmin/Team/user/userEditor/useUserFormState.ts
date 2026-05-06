@@ -24,8 +24,9 @@ type EventState = {
 }
 
 interface UserFormState {
+  userId?: string
   userForm?: EventState
-  setUserForm: (data: EventState) => void
+  setUserForm: (data: EventState, userId?: string) => void
   getUserForm: (initialValues?: EventState) => EventState
   getTouchedFields: () => Record<string, boolean>
   clear: () => void
@@ -34,12 +35,12 @@ interface UserFormState {
 export const useUserFormState = create<UserFormState>()((set, get) => ({
   getUserForm: (initialValues?: EventState) =>
     get().userForm || deepDropNulls(initialValues ?? {}),
-  setUserForm: (data: EventState) => {
-    return set(() => ({ userForm: data }))
+  setUserForm: (data: EventState, userId?: string) => {
+    return set(() => ({ userForm: data, ...(userId ? { userId } : {}) }))
   },
   getTouchedFields: () =>
     Object.fromEntries(
       Object.entries(get().getUserForm()).map(([key]) => [key, true])
     ),
-  clear: () => set(() => ({ userForm: undefined }))
+  clear: () => set(() => ({ userForm: undefined, userId: undefined }))
 }))
