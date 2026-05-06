@@ -72,33 +72,9 @@ const router = createBrowserRouter(routesConfig, {
 })
 
 // eslint-disable-next-line no-console
-console.log('[SW] Waiting for service worker to be ready...')
-
-navigator.serviceWorker.getRegistration().then((reg) => {
+console.debug('Waiting for service worker to be ready...')
+void navigator.serviceWorker.ready.then(() => {
   // eslint-disable-next-line no-console
-  console.log('[SW] Registration at startup:', {
-    installing: reg?.installing?.state ?? null,
-    waiting: reg?.waiting?.state ?? null,
-    active: reg?.active?.state ?? null,
-    controller: navigator.serviceWorker.controller?.state ?? null
-  })
-})
-
-const swReadyTimeout = setTimeout(() => {
-  navigator.serviceWorker.getRegistration().then((reg) => {
-    // eslint-disable-next-line no-console
-    console.log('[SW] Still waiting after 10s — current state:', {
-      installing: reg?.installing?.state ?? null,
-      waiting: reg?.waiting?.state ?? null,
-      active: reg?.active?.state ?? null,
-      controller: navigator.serviceWorker.controller?.state ?? null
-    })
-  })
-}, 10000)
-
-void navigator.serviceWorker.ready.then((reg) => {
-  clearTimeout(swReadyTimeout)
-  // eslint-disable-next-line no-console
-  console.log('[SW] Service worker is ready:', reg.active?.state)
+  console.debug('Service worker is ready')
   root.render(<App router={router} store={store} />)
 })
