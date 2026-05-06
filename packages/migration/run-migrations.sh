@@ -35,10 +35,6 @@ for arg in "$@"; do
   esac
 done
 
-echo "Environment Variables CIHAN:"
-printenv
-
-
 # hearth migrations
 if [ "${SKIP_HEARTH_MIGRATIONS:-false}" = "true" ]; then
   echo "Skipping HEARTH migrations because SKIP_HEARTH_MIGRATIONS=true"
