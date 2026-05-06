@@ -72,7 +72,6 @@ if $dependencies; then
   concurrently "yarn run compose:deps"
   exit 0
 elif $services; then
-  export SKIP_HEARTH_MIGRATIONS=true
   yarn run start
   exit 0
 fi
@@ -136,7 +135,5 @@ echo
 sleep 10
 
 yarn dev:secrets:gen
-
-export SKIP_HEARTH_MIGRATIONS=true
 
 concurrently "yarn run start" "yarn run compose:deps"

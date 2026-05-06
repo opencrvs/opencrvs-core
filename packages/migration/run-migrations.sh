@@ -35,13 +35,6 @@ for arg in "$@"; do
   esac
 done
 
-# hearth migrations
-if [ "${SKIP_HEARTH_MIGRATIONS:-false}" = "true" ]; then
-  echo "Skipping HEARTH migrations because SKIP_HEARTH_MIGRATIONS=true"
-else
-  yarn --cwd "$SCRIPT_PATH" migrate-mongo up --file "$HEARTH_CONFIG"
-fi
-
 run_pg_migrations() {
   MIGRATIONS_PATH="$1"
   local database_url="$2"
@@ -103,6 +96,8 @@ export EVENTS_DB_USER="${EVENTS_DB_USER:-events_app}"
 
 # migrate legacy data (users + hearth locations); requires superuser and MongoDB credentials
 if [ $MIGRATE_LEGACY_DATA = true ]; then
+  yarn --cwd "$SCRIPT_PATH" migrate-mongo up --file "$HEARTH_CONFIG"
+
   # Mongo connection options — needed for FDW-based migrations
   if [ -n "$MONGO_REPLICA_SET" ]; then
     export MONGO_SERVER_OPTIONS="OPTIONS( address '${MONGO_HOST:-mongo1}', port '${MONGO_PORT:-27017}', replica_set '$MONGO_REPLICA_SET', authentication_database 'admin')"
