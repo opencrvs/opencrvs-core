@@ -72,9 +72,6 @@ export function request<T>(options: AxiosRequestConfig) {
   const onSuccess = (response: AxiosResponse<T>) => {
     const gatewayVersion = response.headers['x-version']
 
-    console.log('Response:', response)
-    console.log('Gateway Version:', gatewayVersion)
-    console.log('Login Client Version:', loginClientVersion)
     if (gatewayVersion && gatewayVersion !== loginClientVersion) {
       // eslint-disable-next-line no-console
       console.log(
