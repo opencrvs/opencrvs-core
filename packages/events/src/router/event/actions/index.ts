@@ -31,7 +31,8 @@ import {
   RejectCorrectionActionInput,
   getPendingAction,
   ActionInputWithType,
-  EventConfig
+  EventConfig,
+  BaseActionInput
 } from '@opencrvs/commons/events'
 import { TokenWithBearer } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
@@ -65,8 +66,8 @@ import {
  * @property {OpenApiMeta} [meta] - Meta information, incl. OpenAPI definition
  */
 interface ActionProcedureConfig {
-  inputSchema: z.ZodType
-  actionConfirmationResponseSchema: z.ZodType | undefined
+  inputSchema: z.ZodObject<z.ZodRawShape>
+  actionConfirmationResponseSchema: z.ZodObject<z.ZodRawShape> | undefined
   meta?: OpenApiMeta
 }
 
@@ -156,6 +157,8 @@ const ACTION_PROCEDURE_CONFIG = {
   }
 } satisfies Partial<Record<ActionType, ActionProcedureConfig>>
 
+type DistributiveOmit<T, K extends keyof T> = T extends T ? Omit<T, K> : never
+
 type ActionProcedure = {
   request: MutationProcedure<{
     input: ActionInput
@@ -163,7 +166,10 @@ type ActionProcedure = {
     meta: OpenApiMeta
   }>
   accept: MutationProcedure<{
-    input: ActionInput & { actionId: string }
+    input: DistributiveOmit<
+      ActionInput,
+      'keepAssignmentIfAccepted' | 'keepAssignmentIfRejected'
+    > & { actionId: string }
     output: EventDocument
     meta: OpenApiMeta
   }>
@@ -174,6 +180,26 @@ type ActionProcedure = {
   }>
 }
 
+const AsyncActionInput = BaseActionInput.pick({
+  eventId: true,
+  transactionId: true,
+  keepAssignment: true
+}).extend({
+  actionId: UUID
+})
+
+export type AsyncActionInput = z.infer<typeof AsyncActionInput>
+
+const SyncActionConfirmationSchema = BaseActionInput.pick({
+  keepAssignment: true,
+  declaration: true,
+  annotation: true
+})
+
+const SyncActionRejectionSchema = BaseActionInput.pick({
+  keepAssignment: true
+})
+
 export async function defaultRequestHandler(
   input: ActionInputWithType,
   user: TrpcUserContext,
@@ -181,7 +207,6 @@ export async function defaultRequestHandler(
   event: EventDocument,
   configuration: EventConfig,
   // @TODO: Could this be typed with the actual input schema, or could these actually be anything?
-  inputSchema: z.ZodObject<z.ZodRawShape>,
   actionConfirmationResponseSchema?: z.ZodObject<z.ZodRawShape>
 ) {
   await throwConflictIfActionNotAllowed(input.eventId, input.type, token)
@@ -230,8 +255,8 @@ export async function defaultRequestHandler(
   const schema =
     responseStatus === ActionConfirmationResponse.Success
       ? (actionConfirmationResponseSchema ??
-        z.object({}).merge(inputSchema.partial()))
-      : inputSchema.partial()
+        z.object({}).merge(SyncActionConfirmationSchema))
+      : SyncActionRejectionSchema
 
   const maybeParsed = schema.safeParse(responseBody ?? {})
 
@@ -256,12 +281,26 @@ export async function defaultRequestHandler(
     `Action immediately ${status === ActionStatus.Accepted ? 'accepted' : 'rejected'} (status: "${responseStatus}")`
   )
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { declaration, annotation, ...strippedInput } = input
+  const {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    declaration,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    annotation,
+    keepAssignment,
+    keepAssignmentIfAccepted,
+    keepAssignmentIfRejected,
+    ...strippedInput
+  } = input
+
+  const effectiveKeepAssignment =
+    status === ActionStatus.Accepted
+      ? (keepAssignmentIfAccepted ?? keepAssignment ?? false)
+      : (keepAssignmentIfRejected ?? keepAssignment ?? false)
 
   return processAction(
     {
       ...strippedInput,
+      keepAssignment: effectiveKeepAssignment,
       declaration: {},
       originalActionId: requestedAction.id,
       ...parsedBody
@@ -269,19 +308,6 @@ export async function defaultRequestHandler(
     { event, user, token, status, configuration }
   )
 }
-
-/**
- * These fields aren't required in the synchronous flow as the action is processed immediately and we still have access to them.
- */
-const AsyncActionConfirmationResponseSchema = z.object({
-  eventId: UUID,
-  actionId: UUID,
-  transactionId: z.string()
-})
-
-export type AsyncActionConfirmationResponseSchema = z.infer<
-  typeof AsyncActionConfirmationResponseSchema
->
 
 /**
  * Most actions share a similar model, where the action is first requested, and then either synchronously or asynchronously
@@ -298,14 +324,6 @@ export function getDefaultActionProcedures(
   actionType: keyof typeof ACTION_PROCEDURE_CONFIG
 ): ActionProcedure {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
-
-  let asyncAcceptInputFields = AsyncActionConfirmationResponseSchema
-
-  if (actionConfig.actionConfirmationResponseSchema) {
-    asyncAcceptInputFields = asyncAcceptInputFields.merge(
-      actionConfig.actionConfirmationResponseSchema
-    )
-  }
 
   const requireScopesForRequestMiddleware = requiresAnyOfScopes(
     [],
@@ -348,13 +366,16 @@ export function getDefaultActionProcedures(
           token,
           event,
           eventConfiguration,
-          actionConfig.inputSchema,
           actionConfig.actionConfirmationResponseSchema
         )
       }),
 
     accept: systemProcedure
-      .input(actionConfig.inputSchema.merge(asyncAcceptInputFields))
+      .input(
+        actionConfig.inputSchema
+          .merge(actionConfig.actionConfirmationResponseSchema ?? z.object({}))
+          .merge(AsyncActionInput)
+      )
       .use(middleware.requireActionConfirmationAuthorization)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
@@ -411,7 +432,10 @@ export function getDefaultActionProcedures(
         }
 
         return processAction(
-          { ...input, originalActionId: actionId },
+          {
+            ...input,
+            originalActionId: actionId
+          },
           {
             event,
             user,
@@ -423,11 +447,7 @@ export function getDefaultActionProcedures(
       }),
 
     reject: systemProcedure
-      .input(
-        AsyncActionConfirmationResponseSchema.extend({
-          keepAssignment: z.boolean().default(false)
-        })
-      )
+      .input(AsyncActionInput)
       .use(middleware.requireActionConfirmationAuthorization)
       .mutation(async ({ input, ctx }) => {
         const { eventId, actionId } = input
@@ -458,7 +478,12 @@ export function getDefaultActionProcedures(
         })
 
         return addAsyncRejectAction(
-          { ...input, type: actionType, originalActionId: actionId },
+          {
+            ...input,
+            type: actionType,
+            originalActionId: actionId,
+            keepAssignment: input.keepAssignment ?? false
+          },
           {
             event,
             user: ctx.user,
