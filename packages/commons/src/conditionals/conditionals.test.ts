@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { validate } from './validate'
+import { validate, compileClientFunction } from './validate'
 import {
   user,
   and,
@@ -2000,5 +2000,103 @@ describe('isGreaterThan and isLessThan conditionals', () => {
     expect(
       validate(field('employee.salary').isGreaterThan(10000), params)
     ).toBe(false)
+  })
+})
+
+describe('customClientValidator', () => {
+  function params(form: EventState): FormConditionalParameters {
+    return {
+      $form: form,
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $leafAdminStructureLocationIds: [],
+      $online: false
+    }
+  }
+
+  it('validates using an inline custom function (LUHN-style check)', () => {
+    // Simple even-digit-sum validator as a stand-in for a real LUHN check
+    const isEvenDigitSum = (value: unknown) => {
+      const digits = String(value).split('').map(Number)
+      return digits.reduce((sum, d) => sum + d, 0) % 2 === 0
+    }
+
+    const validator = field('nid').customClientValidator(isEvenDigitSum)
+
+    // "123" → digit sum 6 → even → valid
+    expect(validate(validator, params({ nid: '123' } as EventState))).toBe(true)
+    // "124" → digit sum 7 → odd → invalid
+    expect(validate(validator, params({ nid: '124' } as EventState))).toBe(
+      false
+    )
+  })
+
+  it('receives the full form context as the second argument', () => {
+    const sumEqualsTarget = (value: unknown, context: unknown) => {
+      const ctx = context as FormConditionalParameters
+      return Number(value) + Number(ctx.$form['b']) === 10
+    }
+
+    const validator = field('a').customClientValidator(sumEqualsTarget)
+
+    expect(
+      validate(validator, params({ a: '3', b: '7' } as unknown as EventState))
+    ).toBe(true)
+    expect(
+      validate(validator, params({ a: '3', b: '8' } as unknown as EventState))
+    ).toBe(false)
+  })
+
+  it('can be combined with and/or connectors', () => {
+    const isLong = (value: unknown) => String(value).length >= 5
+    const startsWithA = (value: unknown) => String(value).startsWith('A')
+
+    expect(
+      validate(
+        and(
+          field('code').customClientValidator(isLong),
+          field('code').customClientValidator(startsWithA)
+        ),
+        params({ code: 'ABCDE' } as EventState)
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        and(
+          field('code').customClientValidator(isLong),
+          field('code').customClientValidator(startsWithA)
+        ),
+        params({ code: 'BCD' } as EventState)
+      )
+    ).toBe(false)
+  })
+})
+
+describe('customClientEvaluation', () => {
+  it('serialises the function into a CodeToEvaluate descriptor', () => {
+    const computation = (value: unknown) => Number(value) * 2
+    const descriptor = field('amount').customClientEvaluation(computation)
+
+    expect(descriptor).toMatchObject({
+      $$field: 'amount',
+      $$code: expect.stringContaining('Number(value)')
+    })
+  })
+
+  it('descriptor $$code can be deserialised and executed correctly', () => {
+    const sumWithContext = (value: unknown, context: unknown) => {
+      const ctx = context as FormConditionalParameters
+      return Number(value) + Number(ctx.$form['b'])
+    }
+
+    const descriptor = field('a').customClientEvaluation(sumWithContext)
+
+    const result = compileClientFunction(descriptor.$$code)(3, {
+      $form: { a: 3, b: 7 },
+      $now: '2024-01-01',
+      $online: true
+    })
+
+    expect(result).toBe(10)
   })
 })

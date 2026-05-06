@@ -75,6 +75,28 @@ export const FieldReference = z
 
 export type FieldReference = z.infer<typeof FieldReference>
 
+export const CodeToEvaluate = z
+  .object({
+    $$code: z.string().describe('Serialised client-side function body'),
+    $$field: FieldId.describe(
+      'Field whose value is passed as the first argument'
+    ),
+    $$subfield: z
+      .array(z.string())
+      .optional()
+      .default([])
+      .describe('Optional nested path within the field value')
+  })
+  .describe(
+    'Serialised client-side evaluation function. Executed just-in-time on the client only.'
+  )
+
+export type CodeToEvaluate = z.infer<typeof CodeToEvaluate>
+
+export function isCodeToEvaluate(v: unknown): v is CodeToEvaluate {
+  return !!v && typeof v === 'object' && '$$code' in v
+}
+
 export const ValidationConfig = z.object({
   validator: Conditional,
   message: TranslationConfig
@@ -134,11 +156,15 @@ const BaseField = z
       .describe(
         'Indicates whether the field can be modified during record correction.'
       ),
-    value: FieldReference.or(z.array(FieldReference))
+    value: FieldReference.or(CodeToEvaluate)
+      .or(z.array(FieldReference.or(CodeToEvaluate)))
       .optional()
       .describe(
-        'Reference to the source field or fields. When a value is defined, it is copied from the parent field when changed. If multiple references are provided, the first truthy value is used.'
+        'Reference to the source field or fields. When a value is defined, it is copied from the parent field when changed. If multiple references are provided, the first truthy value is used. A CodeToEvaluate can be used to compute the value via a custom client-side function.'
       ),
+    evaluatedDefaultValue: CodeToEvaluate.optional().describe(
+      'Custom client-side function used to compute the default value. Executed just-in-time on the client. Takes precedence over defaultValue when set.'
+    ),
     analytics: z
       .boolean()
       .default(false)
@@ -701,7 +727,9 @@ export const StaticDataEntry = z
   .object({
     id: z.string().describe('ID for the data entry.'),
     label: TranslationConfig,
-    value: TranslationConfig.or(z.string()).or(FieldReference)
+    value: TranslationConfig.or(z.string())
+      .or(FieldReference)
+      .or(CodeToEvaluate)
   })
   .describe('Static data entry')
 

@@ -93,6 +93,29 @@ function resolveDataPath(
   return current
 }
 
+/** Returns today's date as an ISO date string (YYYY-MM-DD). */
+export function todayISO(): string {
+  return formatISO(new Date(), { representation: 'date' })
+}
+
+const compiledFunctionCache = new Map<string, (...args: unknown[]) => unknown>()
+
+/**
+ * Deserialises a serialised function string (produced by `.toString()`) into a callable.
+ * Results are cached by code string so each unique function body is compiled at most once.
+ * Runs in a clean scope — no access to outer closures or external imports.
+ */
+export function compileClientFunction(
+  code: string
+): (...args: unknown[]) => unknown {
+  let fn = compiledFunctionCache.get(code)
+  if (!fn) {
+    fn = new Function(`return (${code})`)() as (...args: unknown[]) => unknown
+    compiledFunctionCache.set(code, fn)
+  }
+  return fn
+}
+
 // https://ajv.js.org/packages/ajv-formats.html
 addFormats(ajv)
 
@@ -196,7 +219,7 @@ ajv.addKeyword({
   $data: true,
   errors: true,
   // @ts-ignore -- Force type. We will move this away from AJV next. Parsing the array will take seconds and is only called by core.
-  validate(schema: {}, data: string, _: unknown, dataContext?: DataContext) {
+  validate(_schema: {}, data: string, _: unknown, dataContext?: DataContext) {
     const locationIdInput = data
     const locations = dataContext?.rootData.$leafAdminStructureLocationIds ?? []
 
@@ -210,6 +233,23 @@ function mergeWithBaseFormState(
 ) {
   return { ...context.baseFormState, ...values }
 }
+
+ajv.addKeyword({
+  keyword: 'customClientValidator',
+  schemaType: 'object',
+  errors: true,
+  // @ts-ignore -- DataContext is not typed in AJV's public API
+  validate(
+    schema: { code: string },
+    data: unknown,
+    _: unknown,
+    dataContext?: DataContext
+  ) {
+    // External references (lodash etc.) are intentionally unavailable — validators must be
+    // self-contained so they survive serialisation into JSONSchema and transmission to core.
+    return compileClientFunction(schema.code)(data, dataContext?.rootData)
+  }
+})
 
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
   const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)

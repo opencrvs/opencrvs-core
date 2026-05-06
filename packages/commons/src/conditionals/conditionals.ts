@@ -17,7 +17,7 @@ import { userSerializer } from '../events/serializers/user/serializer'
 import { omitKeyDeep } from '../utils'
 import { UUID } from '../uuid'
 import { todayDateTimeValueSerializer } from '../events/serializers/date/serializer'
-import { FieldReference } from '../events/FieldConfig'
+import { CodeToEvaluate, FieldReference } from '../events/FieldConfig'
 
 /* eslint-disable max-lines */
 
@@ -795,6 +795,60 @@ export function createFieldConditionals(fieldId: string) {
           }
         },
         required: [fieldId]
+      }),
+
+    /**
+     * Custom client-side validator. The provided function is serialised and executed
+     * just-in-time on the client only. External references (e.g. lodash) are not
+     * available inside the function body — all logic must be self-contained.
+     *
+     * @example
+     * field('nid').customClientValidator((value) => {
+     *   // LUHN check — all logic must be inline
+     *   const digits = String(value).split('').map(Number)
+     *   // ...
+     *   return isValid
+     * })
+     */
+    customClientValidator(
+      validationFn: (
+        fieldValue: unknown,
+        context: FormConditionalParameters
+      ) => boolean
+    ): JSONSchema {
+      const code = validationFn.toString()
+      return defineFormConditional({
+        type: 'object',
+        properties: wrapToPath(
+          { [fieldId]: { customClientValidator: { code } } },
+          this.$$subfield
+        ),
+        required: [fieldId]
       })
+    },
+
+    /**
+     * Custom client-side evaluation. Returns a {@link CodeToEvaluate} descriptor
+     * that can be used as `value`, `evaluatedDefaultValue`, or a DATA component entry.
+     * The function is serialised and executed just-in-time on the client only.
+     * External references (e.g. lodash) are not available inside the function body.
+     *
+     * @example
+     * field('a').customClientEvaluation((aValue, ctx) =>
+     *   Number(aValue) + Number(ctx.$form.b)
+     * )
+     */
+    customClientEvaluation(
+      computationFn: (
+        fieldValue: unknown,
+        context: FormConditionalParameters
+      ) => unknown
+    ): CodeToEvaluate {
+      return {
+        $$code: computationFn.toString(),
+        $$field: fieldId,
+        $$subfield: this.$$subfield
+      }
+    }
   }
 }
