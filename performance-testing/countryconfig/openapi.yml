@@ -2663,6 +2663,7 @@ components:
                                 - user.read
                                 - user.create
                                 - user.edit
+                                - user.search
                                 - record.search
                                 - record.create
                                 - record.read
@@ -2704,6 +2705,7 @@ components:
                                 - registeredIn
                                 - registeredBy
                                 - accessLevel
+                                - role
                                 - ids
                           required:
                             - $scope
@@ -7276,6 +7278,7 @@ components:
                                 - user.read
                                 - user.create
                                 - user.edit
+                                - user.search
                                 - record.search
                                 - record.create
                                 - record.read
@@ -7317,6 +7320,7 @@ components:
                                 - registeredIn
                                 - registeredBy
                                 - accessLevel
+                                - role
                                 - ids
                           required:
                             - $scope
@@ -7698,6 +7702,7 @@ components:
                                 - user.read
                                 - user.create
                                 - user.edit
+                                - user.search
                                 - record.search
                                 - record.create
                                 - record.read
@@ -7739,6 +7744,7 @@ components:
                                 - registeredIn
                                 - registeredBy
                                 - accessLevel
+                                - role
                                 - ids
                           required:
                             - $scope
@@ -7933,6 +7939,7 @@ components:
                                 - user.read
                                 - user.create
                                 - user.edit
+                                - user.search
                                 - record.search
                                 - record.create
                                 - record.read
@@ -7974,6 +7981,7 @@ components:
                                 - registeredIn
                                 - registeredBy
                                 - accessLevel
+                                - role
                                 - ids
                           required:
                             - $scope
@@ -8168,6 +8176,7 @@ components:
                                 - user.read
                                 - user.create
                                 - user.edit
+                                - user.search
                                 - record.search
                                 - record.create
                                 - record.read
@@ -8209,6 +8218,7 @@ components:
                                 - registeredIn
                                 - registeredBy
                                 - accessLevel
+                                - role
                                 - ids
                           required:
                             - $scope
