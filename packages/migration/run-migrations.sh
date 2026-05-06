@@ -10,7 +10,6 @@
 
 set -e # fail if any of the commands fails
 
-HEARTH_CONFIG=./build/dist/src/migrate-mongo-config-hearth.js
 : "${EVENTS_POSTGRES_URL:=postgres://events_migrator:migrator_password@localhost:5432/events}"
 : "${EVENTS_SUPERUSER_POSTGRES_URL:=postgres://postgres:postgres@localhost:5432/events}"
 USER_MGNT_CONFIG=./build/dist/src/migrate-mongo-config-user-mgnt.js
@@ -34,9 +33,6 @@ for arg in "$@"; do
     ;;
   esac
 done
-
-# hearth migrations
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $HEARTH_CONFIG
 
 run_pg_migrations() {
   MIGRATIONS_PATH="$1"
