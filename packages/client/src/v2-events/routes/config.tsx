@@ -137,13 +137,18 @@ export const routesConfig = {
           if (gatewayVersion && gatewayVersion !== APPLICATION_VERSION) {
             dispatch(storeReloadModalVisibility(true))
           }
-
+        } catch {
+          /*
+           * The probe failed — the server is temporarily unreachable (e.g. a
+           * deployment is in progress) or the user has no internet connection.
+           * Either way we must still mark the app as online so that TanStack
+           * Query is allowed to run its queries and handle errors/retries on
+           * its own. Leaving onlineManager as false would permanently pause all
+           * queries, resulting in an infinite blank/spinner screen.
+           */
+        } finally {
           if (!cancelled) {
             onlineManager.setOnline(true)
-          }
-        } catch {
-          if (!cancelled) {
-            onlineManager.setOnline(false)
           }
         }
       }
