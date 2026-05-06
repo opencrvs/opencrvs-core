@@ -8,34 +8,34 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { TRPCError } from "@trpc/server"
-import { findLast } from "lodash"
-import * as z from "zod/v4"
+import { TRPCError } from '@trpc/server'
+import { findLast } from 'lodash'
+import * as z from 'zod/v4'
 import {
   canUserCreateEvent,
   getAcceptedScopesByType,
   getScopes,
   UUID
-} from "@opencrvs/commons"
+} from '@opencrvs/commons'
 import {
   ActionType,
   EventDocument,
   NotifyActionInput
-} from "@opencrvs/commons/events"
-import { systemOnlyProcedure } from "@events/router/trpc"
+} from '@opencrvs/commons/events'
+import { systemOnlyProcedure } from '@events/router/trpc'
 import {
   getEventConfigurationById,
   getInMemoryEventConfigurations
-} from "@events/service/config/config"
-import { createEvent } from "@events/service/events/events"
-import { locationExists } from "@events/storage/postgres/administrative-hierarchy/locations"
-import { writeAuditLog } from "@events/storage/postgres/events/auditLog"
-import { validateNotifyAction } from "@events/router/middleware/validate"
+} from '@events/service/config/config'
+import { createEvent } from '@events/service/events/events'
+import { locationExists } from '@events/storage/postgres/administrative-hierarchy/locations'
+import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
+import { validateNotifyAction } from '@events/router/middleware/validate'
 import {
   getValidatorContext,
   throwWhenNotEmpty
-} from "@events/router/middleware/validate/utils"
-import { defaultRequestHandler } from "@events/router/event/actions"
+} from '@events/router/middleware/validate/utils'
+import { defaultRequestHandler } from '@events/router/event/actions'
 
 /**
  * Input schema for the createAndNotify combinator endpoint.
@@ -61,7 +61,7 @@ export const CreateAndNotifyInput = NotifyActionInput.omit({
    * The provided location must not have any child locations.
    */
   createdAtLocation: UUID.describe(
-    "A valid office location ID. Required. The provided location must be a leaf-location, i.e. it must not have any child locations."
+    'A valid office location ID. Required. The provided location must be a leaf-location, i.e. it must not have any child locations.'
   )
 })
 
@@ -84,10 +84,11 @@ export function createAndNotifyProcedure() {
     request: systemOnlyProcedure
       .meta({
         openapi: {
-          summary: "Create an event and immediately notify (single request, system clients only)",
-          method: "POST",
-          path: "/events/notify",
-          tags: ["events"],
+          summary:
+            'Create an event and immediately notify (single request, system clients only)',
+          method: 'POST',
+          path: '/events/notify',
+          tags: ['events'],
           protect: true
         }
       })
@@ -111,31 +112,31 @@ export function createAndNotifyProcedure() {
         const eventConfig = eventConfigs.find((c) => c.id === eventType)
         if (!eventConfig) {
           throw new TRPCError({
-            code: "BAD_REQUEST",
+            code: 'BAD_REQUEST',
             message: `No configuration found for event type: ${eventType}`
           })
         }
 
         // Must have record.create scope for this event type
         if (!canUserCreateEvent(tokenScopes, eventType)) {
-          throw new TRPCError({ code: "FORBIDDEN" })
+          throw new TRPCError({ code: 'FORBIDDEN' })
         }
 
         // Must have record.notify scope for this event type
         const notifyScopes = getAcceptedScopesByType({
-          acceptedScopes: ["record.notify"],
+          acceptedScopes: ['record.notify'],
           scopes: tokenScopes
         })
 
         if (notifyScopes.length === 0) {
-          throw new TRPCError({ code: "FORBIDDEN" })
+          throw new TRPCError({ code: 'FORBIDDEN' })
         }
 
         const canNotify = notifyScopes.some((scope) => {
           if (
-            !("options" in scope) ||
+            !('options' in scope) ||
             !scope.options ||
-            !("event" in scope.options)
+            !('event' in scope.options)
           ) {
             // Scope has no event restriction - allows any event type
             return true
@@ -144,15 +145,15 @@ export function createAndNotifyProcedure() {
         })
 
         if (!canNotify) {
-          throw new TRPCError({ code: "FORBIDDEN" })
+          throw new TRPCError({ code: 'FORBIDDEN' })
         }
 
         // Location validation: createdAtLocation must exist in the locations table.
         const isValidLocation = await locationExists(createdAtLocation)
         if (!isValidLocation) {
           throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "createdAtLocation must be a valid location id"
+            code: 'BAD_REQUEST',
+            message: 'createdAtLocation must be a valid location id'
           })
         }
 
@@ -190,7 +191,7 @@ export function createAndNotifyProcedure() {
         const validatorContext = await getValidatorContext(token)
         const notifyErrors = validateNotifyAction({
           eventConfig: config,
-          declaration: declaration ?? {},
+          declaration: declaration,
           annotation,
           context: { ...validatorContext, event }
         })
@@ -201,7 +202,7 @@ export function createAndNotifyProcedure() {
           type: ActionType.NOTIFY,
           eventId: event.id,
           transactionId,
-          declaration: declaration ?? {},
+          declaration: declaration,
           annotation,
           createdAtLocation,
           keepAssignment
@@ -220,7 +221,7 @@ export function createAndNotifyProcedure() {
         await writeAuditLog({
           clientId: user.id,
           clientType: user.type,
-          operation: "event.actions.notify.request",
+          operation: 'event.actions.notify.request',
           requestData: {
             eventId: event.id,
             actionType: ActionType.NOTIFY,
