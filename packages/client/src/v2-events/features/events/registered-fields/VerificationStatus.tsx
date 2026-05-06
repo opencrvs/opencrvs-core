@@ -151,7 +151,9 @@ function Input({
       </Banner.Body>
       <Banner.Footer justifyContent="flex-end">
         <Button type="secondary" onClick={handleReset}>
-          {intl.formatMessage(messages.actions.revoke)}
+          {value === 'authenticated'
+            ? intl.formatMessage(messages.actions.revoke)
+            : intl.formatMessage(messages.actions.reset)}
         </Button>
       </Banner.Footer>
 

@@ -45,7 +45,7 @@ const verified = {
   resetConfirmation: {
     title: {
       id: 'views.idVerification.banner.verified.resetConfirmation.title',
-      defaultMessage: 'Revoke valid ID?'
+      defaultMessage: 'Reset valid ID?'
     },
     description: {
       id: 'views.idVerification.banner.verified.resetConfirmation.description',
