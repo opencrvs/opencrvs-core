@@ -9,12 +9,24 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { isActionInScope } from './scopes'
-import { encodeScope } from '../scopes'
+import {
+  getAvailableRolesForUserUpdatePayload,
+  isActionInScope
+} from './scopes'
+import { encodeScope, UserScopeV2 } from '../scopes'
 import { ActionType } from './ActionType'
-import { EventIndexWithAdministrativeHierarchy } from './locations'
+import {
+  EventIndexWithAdministrativeHierarchy,
+  getLocationHierarchy
+} from './locations'
 import { UserContext } from '../users/User'
 import { createPrng, generateUuid, TestUserRole } from './test.utils'
+import {
+  V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
+  V2_DEFAULT_MOCK_LOCATIONS,
+  V2_DEFAULT_MOCK_LOCATIONS_MAP
+} from './mocks.test.utils'
+import { getUUID, UUID } from '../uuid'
 
 const rng = createPrng(1)
 const officeUuid = generateUuid(rng)
@@ -187,5 +199,119 @@ describe('isActionInScope()', () => {
         })
       ).toBe(false)
     })
+  })
+})
+
+describe('getAvailableRolesForUserUpdatePayload()', () => {
+  const allRoles = [
+    'HOSPITAL_CLERK',
+    'COMMUNITY_LEADER',
+    'REGISTRATION_AGENT',
+    'LOCAL_REGISTRAR',
+    'PROVINCIAL_REGISTRAR'
+  ]
+
+  const userToEditLocation = V2_DEFAULT_MOCK_LOCATIONS.find(
+    (loc) => loc.name === 'Chisamba Rural Health Centre'
+  )
+
+  const userRequestingLocation = V2_DEFAULT_MOCK_LOCATIONS.find(
+    (loc) => loc.name === 'Chitanda Rural Health Centre'
+  )
+
+  if (!userToEditLocation || !userRequestingLocation) {
+    throw new Error('Test setup error: could not find required mock locations')
+  }
+
+  const userRequesting: UserContext = {
+    type: 'user',
+    primaryOfficeId: userRequestingLocation.id,
+    administrativeAreaId: userRequestingLocation.administrativeAreaId,
+    id: getUUID(),
+    role: TestUserRole.enum.COMMUNITY_LEADER
+  }
+
+  const resolvedHierarchy = userToEditLocation.administrativeAreaId
+    ? getLocationHierarchy(userToEditLocation.administrativeAreaId, {
+        administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
+        locations: V2_DEFAULT_MOCK_LOCATIONS_MAP
+      })
+    : [userToEditLocation.id]
+
+  const userLocation = {
+    primaryOfficeId: userToEditLocation.id as UUID,
+    administrativeHierarchy: resolvedHierarchy as UUID[]
+  }
+
+  it('returns empty array when user does not have access to users location', () => {
+    const acceptedScopes = [
+      {
+        type: 'user.create',
+        options: {
+          accessLevel: 'location',
+          role: allRoles
+        }
+      }
+    ] satisfies UserScopeV2[]
+
+    const availableRoles = getAvailableRolesForUserUpdatePayload({
+      allRoles,
+      userLocation,
+      userRequesting,
+      acceptedScopes
+    })
+
+    expect(availableRoles).toEqual([])
+  })
+
+  it('returns all roles when no options provided', () => {
+    const acceptedScopes = [
+      {
+        type: 'user.create'
+      }
+    ] satisfies UserScopeV2[]
+
+    const availableRoles = getAvailableRolesForUserUpdatePayload({
+      allRoles,
+      userLocation,
+      userRequesting,
+      acceptedScopes
+    })
+
+    expect(availableRoles).toEqual(allRoles)
+  })
+
+  it('returns all roles split between multiple scopes', () => {
+    const acceptedScopes = [
+      {
+        type: 'user.edit',
+        options: {
+          accessLevel: 'location',
+          role: ['HOSPITAL_CLERK']
+        }
+      },
+      {
+        type: 'user.edit',
+        options: {
+          role: ['COMMUNITY_LEADER']
+        }
+      },
+      {
+        type: 'user.edit',
+        options: {
+          role: ['LOCAL_REGISTRAR']
+        }
+      }
+    ] satisfies UserScopeV2[]
+
+    const availableRoles = getAvailableRolesForUserUpdatePayload({
+      allRoles,
+      userLocation,
+      userRequesting,
+      acceptedScopes
+    })
+
+    // Should not include HOSPITAL_CLERK since that role is only allowed at location level and the user does not have access to the user's location, but should include COMMUNITY_LEADER and LOCAL_REGISTRAR since those roles are allowed at any location level
+    expect(availableRoles).toEqual(['COMMUNITY_LEADER', 'LOCAL_REGISTRAR'])
   })
 })

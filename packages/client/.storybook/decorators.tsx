@@ -15,13 +15,13 @@ import {
   getOrThrow,
   getTokenPayload,
   TestUserRole,
-  ValidatorContext
+  ValidatorContext,
+  V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { getLeafAdministrativeAreaIds } from '@client/v2-events/hooks/useAdministrativeAreas'
-import { V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP } from '@client/tests/v2-events/administrative-hierarchy-mock'
 
-const generator = testDataGenerator()
+const generator = testDataGenerator(1337)
 
 /**
  *

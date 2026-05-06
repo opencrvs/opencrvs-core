@@ -16,7 +16,7 @@ import {
   Location,
   UUID
 } from '@opencrvs/commons/client'
-import { getLocationHierarchy, buildEventIndexWithHierarchy } from './utils'
+import { buildEventIndexWithHierarchy } from './utils'
 
 const province: AdministrativeArea = {
   id: 'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa' as UUID,
@@ -64,31 +64,7 @@ function buildMaps() {
   return { administrativeAreas, locations }
 }
 
-describe('getLocationHierarchy', () => {
-  it('returns root-first hierarchy for a location with an administrative area', () => {
-    const result = getLocationHierarchy(office.id, buildMaps())
-    expect(result).toEqual([province.id, district.id, office.id])
-  })
-
-  it('returns only the location id when it has no administrative area', () => {
-    const result = getLocationHierarchy(officeWithoutArea.id, buildMaps())
-    expect(result).toEqual([officeWithoutArea.id])
-  })
-
-  it('returns root-first hierarchy for an administrative area id', () => {
-    const result = getLocationHierarchy(district.id, buildMaps())
-    expect(result).toEqual([province.id, district.id])
-  })
-
-  it('returns single-element array for a root administrative area', () => {
-    const result = getLocationHierarchy(province.id, buildMaps())
-    expect(result).toEqual([province.id])
-  })
-})
-
-function makeEventIndex(
-  overrides: Partial<EventIndex> = {}
-): EventIndex {
+function makeEventIndex(overrides: Partial<EventIndex> = {}): EventIndex {
   const now = new Date().toISOString()
   return {
     id: 'eeeeeeee-eeee-4eee-eeee-eeeeeeeeeeee' as UUID,

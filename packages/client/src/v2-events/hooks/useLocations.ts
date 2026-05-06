@@ -47,6 +47,24 @@ setQueryDefaults(trpcOptionsProxy.locations.get, {
   staleTime: 1000 * 60 * 60 * 24
 })
 
+setQueryDefaults(trpcOptionsProxy.locations.getLocationHierarchy, {
+  queryFn: async (...params) => {
+    const {
+      queryKey: [, input]
+    } = params[0]
+
+    const queryOptions =
+      trpcOptionsProxy.locations.getLocationHierarchy.queryOptions(input.input)
+
+    if (typeof queryOptions.queryFn !== 'function') {
+      throw new Error('queryFn is not a function')
+    }
+
+    return await queryOptions.queryFn(...params)
+  },
+  staleTime: 1000 * 60 * 60 * 24
+})
+
 export function useLocations() {
   const trpc = useTRPC()
   return {
@@ -90,6 +108,38 @@ export function useLocations() {
           ...options,
           queryKey: trpc.locations.get.queryKey({ id })
         })
+      }
+    },
+    getLocationHierarchy: {
+      useSuspenseQuery: (locationId: UUID) => {
+        const { queryFn, ...options } =
+          trpcOptionsProxy.locations.getLocationHierarchy.queryOptions({
+            locationId
+          })
+        return useSuspenseQuery({
+          ...options,
+          queryKey: trpc.locations.getLocationHierarchy.queryKey({
+            locationId
+          })
+        }).data
+      },
+      useQuery: (
+        locationId: UUID,
+        options?: {
+          enabled?: boolean
+        }
+      ) => {
+        const { queryFn, ...rest } =
+          trpcOptionsProxy.locations.getLocationHierarchy.queryOptions({
+            locationId
+          })
+        return useQuery({
+          ...rest,
+          ...options,
+          queryKey: trpc.locations.getLocationHierarchy.queryKey({
+            locationId
+          })
+        }).data
       }
     }
   }

@@ -13,7 +13,12 @@ import { DocumentPath } from '../documents'
 import * as z from 'zod/v4'
 import { UUID } from '../uuid'
 import { TokenUserType } from '../authentication'
-import { FieldValue, FileFieldValue, NameFieldValue } from '../events'
+import {
+  EmailValue,
+  FieldValue,
+  FileFieldValue,
+  NameFieldValue
+} from '../events'
 
 export const REINDEX_USER_ID = '00000000-0000-0000-0000-000000000000' as UUID
 
@@ -42,7 +47,7 @@ export const User = z.object({
   fullHonorificName: z.string().optional(),
   type: TokenUserType.extract(['user']),
   mobile: z.string().optional(),
-  email: z.string().optional(),
+  email: EmailValue.optional(),
   status: z.enum(['active', 'deactivated', 'pending']),
   data: z.record(z.string(), FieldValue).optional()
 })
