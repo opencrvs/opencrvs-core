@@ -60,8 +60,6 @@ import {
   withJurisdictionFilters
 } from './query'
 
-// Administrative areas change only on initialisation/re-seeding, so a
-// process-level cache eliminates repeated recursive CTE queries per request.
 const administrativeHierarchyCache = new Map<string, string[]>()
 
 export function clearAdministrativeHierarchyCache() {
@@ -75,9 +73,7 @@ function eventToEventIndex(
   return encodeEventIndex(getCurrentEventState(event, config), config)
 }
 
-/*
- * This type ensures all properties of EventIndex are present in the mapping
- */
+/* This type ensures all properties of EventIndex are present in the mapping */
 type EventIndexMapping = { [key in keyof EventIndex]: estypes.MappingProperty }
 
 async function ensureAlias(indexName: string) {
@@ -246,9 +242,7 @@ function mapFieldTypeToElasticsearch(
         type: 'object',
         enabled: false
       }
-    /**
-     * Custom fields are not indexed as their structure is unknown.
-     */
+    /** Custom fields are not indexed as their structure is unknown. */
     case FieldType._EXPERIMENTAL_CUSTOM:
       return {
         type: 'object',
@@ -495,9 +489,7 @@ export async function findRecordsByQuery({
   acceptedScopes: RecordScopeV2[]
 }) {
   const esClient = getOrCreateClient()
-
   const { query, limit, offset } = search
-
   const resolvedScopes = acceptedScopes.map((scope) =>
     resolveRecordActionScopeToIds(scope, user)
   )
@@ -597,9 +589,7 @@ export async function getEventCount({
 
   return responses.reduce((acc: Record<string, number>, response, index) => {
     const slug = queries[index].slug
-
     const validatedResponse = MsearchResponseSchema.safeParse(response)
-
     return {
       ...acc,
       [slug]: validatedResponse.success
