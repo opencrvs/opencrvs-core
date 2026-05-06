@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { expect, within } from '@storybook/test'
 import { TranslationTextWithFormatModifier } from './TranslationTextWithFormatModifier'
@@ -39,7 +38,7 @@ async function checkTag(
   expectedText: string
 ) {
   const el = await within(canvasElement).findByText(expectedText)
-  expect(
+  await expect(
     el.tagName.toLowerCase(),
     `"${expectedText}" should be wrapped in <${tag}>`
   ).toBe(tag)
@@ -144,12 +143,12 @@ export const LineBreakAndTab: Story = {
     // Wait for the component to render before doing querySelector checks
     await within(canvasElement).findByText(/line one/, { exact: false })
 
-    expect(
+    await expect(
       canvasElement.querySelector('br'),
       '<br> element should be rendered for line breaks'
     ).not.toBeNull()
 
-    expect(
+    await expect(
       canvasElement.querySelector('span[style*="2em"]'),
       '<tab> should render a span with 2em width'
     ).not.toBeNull()
