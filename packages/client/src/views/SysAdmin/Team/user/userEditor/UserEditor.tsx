@@ -85,8 +85,9 @@ type EventState = {
 }
 
 interface UserFormState {
+  userId?: string
   userForm?: EventState
-  setUserForm: (data: EventState) => void
+  setUserForm: (data: EventState, userId?: string) => void
   getUserForm: (initialValues?: EventState) => EventState
   getTouchedFields: () => Record<string, boolean>
   clear: () => void
@@ -308,6 +309,7 @@ const ReviewUserComponent = () => {
   const navigate = useNavigate()
   const userForm = useUserFormState((s) => s.userForm)
   const setUserForm = useUserFormState((s) => s.setUserForm)
+  const getUserForm = useUserFormState((s) => s.getUserForm)
   const clear = useUserFormState((s) => s.clear)
   const { userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.REVIEW)
 
@@ -345,32 +347,39 @@ const ReviewUserComponent = () => {
   const eventConfig = getConfig()
   const formConfig = eventConfig.declaration
 
-  useEffect(() => {
-    if (isNewUser || !existingUserQuery.data) return
-    const user = existingUserQuery.data
-    if (user.type !== TokenUserType.enum.user) return
-    if (userForm && Object.keys(userForm).length > 0) return
+  const alreadyInitialized =
+    useUserFormState.getState().userId === userId &&
+    Object.keys(getUserForm()).length > 0
 
-    setUserForm({
-      primaryOfficeId: user.primaryOfficeId,
-      role: user.role,
-      name: {
-        firstname: user.name.firstname,
-        surname: user.name.surname
+  if (
+    !isNewUser &&
+    !alreadyInitialized &&
+    existingUserQuery.data?.type === TokenUserType.enum.user
+  ) {
+    const user = existingUserQuery.data
+    setUserForm(
+      {
+        primaryOfficeId: user.primaryOfficeId,
+        role: user.role,
+        name: {
+          firstname: user.name.firstname,
+          surname: user.name.surname
+        },
+        phoneNumber: user.mobile,
+        email: user.email,
+        fullHonorificName: user.fullHonorificName,
+        signature: user.signature
+          ? { path: user.signature, originalFilename: '', type: '' }
+          : undefined,
+        device: user.device,
+        // Additional field values are spread at the top level because FormFieldGenerator
+        // looks up values by field ID as a flat key (e.g. formState['user.staffId']).
+        // The nesting into data: {} only happens when building the UserInput payload.
+        ...(user.data ?? {})
       },
-      phoneNumber: user.mobile,
-      email: user.email,
-      fullHonorificName: user.fullHonorificName,
-      signature: user.signature
-        ? { path: user.signature, originalFilename: '', type: '' }
-        : undefined,
-      device: user.device,
-      // Additional field values are spread at the top level because FormFieldGenerator
-      // looks up values by field ID as a flat key (e.g. formState['user.staffId']).
-      // The nesting into data: {} only happens when building the UserInput payload.
-      ...(user.data ?? {})
-    })
-  }, [isNewUser, existingUserQuery.data, setUserForm, userForm])
+      userId
+    )
+  }
 
   const formState = userForm ?? EMPTY_FORM
   const createUserMutation = createUser()
