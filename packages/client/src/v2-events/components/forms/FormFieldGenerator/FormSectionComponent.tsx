@@ -23,7 +23,12 @@ import {
   isNonInteractiveFieldType,
   InteractiveFieldType,
   FieldReference,
+  CodeToEvaluate,
+  isCodeToEvaluate,
+  compileClientFunction,
+  todayISO,
   isFieldEnabled,
+  isOnline,
   ValidatorContext,
   isFieldVisible,
   findAllFields,
@@ -218,11 +223,20 @@ export function FormSectionComponent({
 
     const firstNonFalsyValue = resolveSyncedFieldValue(
       listenerField,
-      (syncRef) =>
-        get(
+      (syncRef) => {
+        if (isCodeToEvaluate(syncRef)) {
+          const fieldValue = get(fieldValues, syncRef.$$field)
+          return compileClientFunction(syncRef.$$code)(fieldValue, {
+            $form: fieldValues,
+            $now: todayISO(),
+            $online: isOnline()
+          })
+        }
+        return get(
           fieldValues,
           flattenFieldReference(syncRef).map(makeFormFieldIdFormikCompatible)
         )
+      }
     )
 
     if (firstNonFalsyValue) {

@@ -24,7 +24,11 @@ import {
   EventConfig,
   getDeclarationFields,
   DataEntry,
-  FieldReference
+  FieldReference,
+  isCodeToEvaluate,
+  compileClientFunction,
+  todayISO,
+  isOnline
 } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
@@ -53,7 +57,14 @@ function getFieldFromDataEntry({
   // Resolve value if it's a message descriptor
   let formattedValue: string
 
-  if (isFieldReference(rawValue)) {
+  if (isCodeToEvaluate(rawValue)) {
+    const fieldValue = get(formData, rawValue.$$field)
+    formattedValue = compileClientFunction(rawValue.$$code)(fieldValue, {
+      $form: formData,
+      $now: todayISO(),
+      $online: isOnline()
+    }) as string
+  } else if (isFieldReference(rawValue)) {
     formattedValue =
       rawValue.$$subfield.length > 0
         ? get(formData[rawValue.$$field], rawValue.$$subfield)
