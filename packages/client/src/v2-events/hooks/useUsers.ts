@@ -209,16 +209,16 @@ export function useUsers() {
 
       return useMutation({
         ...mutationOptions,
-        onSuccess: (response) => {
-          void queryClient.invalidateQueries({
+        onSuccess: async (response) => {
+          await queryClient.invalidateQueries({
             queryKey: trpc.user.get.queryKey(response.id)
           })
 
-          void queryClient.invalidateQueries({
+          await queryClient.invalidateQueries({
             queryKey: trpc.user.list.queryKey()
           })
 
-          void queryClient.invalidateQueries({
+          await queryClient.invalidateQueries({
             queryKey: trpc.user.search.queryKey()
           })
 

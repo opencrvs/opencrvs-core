@@ -19,7 +19,11 @@ import {
   ScopeType,
   getAcceptedScopesByType,
   getScopeOptionValue,
-  JurisdictionFilter
+  JurisdictionFilter,
+  canAccessOtherUserWithScopes,
+  getAdministrativeAreaHierarchy,
+  UserScopeV2,
+  UUID
 } from '@opencrvs/commons/client'
 import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
@@ -87,44 +91,29 @@ export function usePermissions() {
   }
 
   const canEditUser = (user: User) => {
-    const editableRoleIds = findScope(userScopes ?? [], 'user.edit')?.options
-      ?.role
-
-    if (Array.isArray(editableRoleIds)) {
-      return editableRoleIds.includes(user.role)
-    }
-
-    if (!userPrimaryOfficeId) {
+    if (!currentUser) {
       return false
     }
 
-    const acceptedScopes = getAcceptedScopesByType({
+    const editScopes = getAcceptedScopesByType({
       acceptedScopes: ['user.edit'],
       scopes: userScopes
+    }) as UserScopeV2[]
+
+    const administrativeHierarchy = getAdministrativeAreaHierarchy(
+      user.administrativeAreaId,
+      administrativeAreas
+    ).map((area) => area.id as UUID)
+
+    return canAccessOtherUserWithScopes({
+      scopes: editScopes,
+      userToAccess: {
+        role: user.role,
+        primaryOfficeId: user.primaryOfficeId,
+        administrativeHierarchy
+      },
+      user: currentUser
     })
-
-    const accessLevels = acceptedScopes.map((s) =>
-      getScopeOptionValue(s, 'accessLevel')
-    )
-
-    if (accessLevels.includes(JurisdictionFilter.enum.all)) {
-      return true
-    }
-
-    if (accessLevels.includes(JurisdictionFilter.enum.location)) {
-      return user.primaryOfficeId === userPrimaryOfficeId
-    }
-
-    if (accessLevels.includes(JurisdictionFilter.enum.administrativeArea)) {
-      return isLocationUnderJurisdiction({
-        locationId: userPrimaryOfficeId,
-        otherLocationId: user.primaryOfficeId,
-        locations,
-        administrativeAreas
-      })
-    }
-
-    return false
   }
 
   const creatableRoleIds = findScope(userScopes ?? [], 'user.create')?.options

@@ -14,47 +14,9 @@ import {
   Location,
   UUID,
   EventIndexWithAdministrativeHierarchy,
-  EventIndex
+  EventIndex,
+  getLocationHierarchy
 } from '@opencrvs/commons/client'
-import { getAdministrativeAreaHierarchy } from '@client/v2-events/utils'
-
-/**
- * Resolves a location or administrative area UUID into a root-first hierarchy of UUIDs.
- *
- * If the ID refers to a `Location` (e.g. CRVS office), the hierarchy includes
- * the administrative area ancestors followed by the location itself.
- * If the ID refers to an `AdministrativeArea`, returns the area's ancestor chain (root-first).
- *
- * Uses `getAdministrativeAreaHierarchy` which returns leaf-first order,
- * so the result is reversed to match the root-first convention used by the server.
- */
-export function getLocationHierarchy(
-  selectedId: UUID,
-  context: {
-    administrativeAreas: Map<UUID, AdministrativeArea>
-    locations: Map<UUID, Location>
-  }
-): UUID[] {
-  const { administrativeAreas, locations } = context
-  const loc = locations.get(selectedId)
-
-  if (loc) {
-    if (loc.administrativeAreaId) {
-      const hierarchy = getAdministrativeAreaHierarchy(
-        loc.administrativeAreaId,
-        administrativeAreas
-      )
-      return [...hierarchy.toReversed().map((area) => area.id), loc.id]
-    }
-    return [loc.id]
-  }
-
-  const hierarchy = getAdministrativeAreaHierarchy(
-    selectedId,
-    administrativeAreas
-  )
-  return hierarchy.toReversed().map((area) => area.id)
-}
 
 /**
  * Converts an `EventIndex` into an `EventIndexWithAdministrativeHierarchy`
