@@ -23,10 +23,7 @@ import {
   NotifyActionInput
 } from '@opencrvs/commons/events'
 import { systemOnlyProcedure } from '@events/router/trpc'
-import {
-  getEventConfigurationById,
-  getInMemoryEventConfigurations
-} from '@events/service/config/config'
+import { getInMemoryEventConfigurations } from '@events/service/config/config'
 import { createEvent } from '@events/service/events/events'
 import { locationExists } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
@@ -161,7 +158,7 @@ export function createAndNotifyProcedure() {
         // Use a derived transactionId so that the event-create step has its own idempotency
         // key, separate from the notify transactionId.
         const createTransactionId = `${transactionId}:create`
-        const config = await getEventConfigurationById({ token, eventType })
+
         const event = await createEvent({
           eventInput: {
             type: eventType,
@@ -171,7 +168,7 @@ export function createAndNotifyProcedure() {
           user,
           transactionId: createTransactionId,
           createdAtLocation,
-          config
+          config: eventConfig
         })
 
         // Step 2: Idempotency guard.
@@ -190,7 +187,7 @@ export function createAndNotifyProcedure() {
         // Step 3: Validate notify fields against the event configuration.
         const validatorContext = await getValidatorContext(token)
         const notifyErrors = validateNotifyAction({
-          eventConfig: config,
+          eventConfig,
           declaration: declaration,
           annotation,
           context: { ...validatorContext, event }
@@ -213,7 +210,7 @@ export function createAndNotifyProcedure() {
           user,
           token,
           event,
-          config,
+          eventConfig,
           NotifyActionInput
         )
 
