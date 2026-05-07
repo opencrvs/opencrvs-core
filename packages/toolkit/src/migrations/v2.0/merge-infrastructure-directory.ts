@@ -11,7 +11,7 @@
 
 /**
  * Codemod: Merge upstream changes into the local `infrastructure/` directory
- * from opencrvs/opencrvs-countryconfig.
+ * (or selected subdirectories of it) from opencrvs/opencrvs-countryconfig.
  *
  * Usage:
  *   ts-node -r tsconfig-paths/register src/migrations/v2.0/merge-infrastructure-directory.ts
@@ -22,8 +22,10 @@
  *        - the upstream "theirs" branch (v2.0) → `UPSTREAM_BRANCH`
  *        - the synthetic merge-base branch (latest 1.9 release line)
  *          → `BASE_BRANCH`
- *   2. For every file under `infrastructure/` on upstream "theirs", performs
- *      a file-scoped 3-way merge:
+ *   2. For every file under `infrastructure/` on upstream "theirs" (or, when
+ *      `subdirs` is provided, only files under
+ *      `infrastructure/<subdir>/` for each requested subdir), performs a
+ *      file-scoped 3-way merge:
  *        - new file on upstream → checked out and staged
  *        - existing file       → 3-way merged in place via `git merge-file`,
  *                                using the BASE_BRANCH version of the file
@@ -114,11 +116,33 @@ function gitShowBytes(ref: string, path: string): Uint8Array | null {
   }
 }
 
+interface MergeInfrastructureOptions {
+  /**
+   * Top-level subdirectories of `infrastructure/` to scope the merge to.
+   * When omitted or empty, the entire `infrastructure/` tree is merged
+   * (legacy behavior). Each name is relative to `infrastructure/` —
+   * e.g. `['postgres', 'metabase']` merges only
+   * `infrastructure/postgres/` and `infrastructure/metabase/`.
+   */
+  subdirs?: string[]
+}
+
 // ─── Entry point ─────────────────────────────────────────────────────────────
 
-async function main(): Promise<void> {
+async function main({
+  subdirs = []
+}: MergeInfrastructureOptions = {}): Promise<void> {
+  // Build the pathspec list passed to `git ls-tree`. Trailing slashes make
+  // git treat them as tree paths (recurse into them).
+  const pathspecs =
+    subdirs.length > 0
+      ? subdirs.map((s) => `${INFRASTRUCTURE_DIR}/${s}/`)
+      : [`${INFRASTRUCTURE_DIR}/`]
+
+  const scopeLabel = pathspecs.map((p) => `'${p}'`).join(', ')
+
   console.log(
-    `Merging '${INFRASTRUCTURE_DIR}/' from ${UPSTREAM_URL}@${UPSTREAM_BRANCH} (base: ${BASE_BRANCH})...\n`
+    `Merging ${scopeLabel} from ${UPSTREAM_URL}@${UPSTREAM_BRANCH} (base: ${BASE_BRANCH})...\n`
   )
 
   assertIsGitRepo()
@@ -141,17 +165,10 @@ async function main(): Promise<void> {
     const baseRef = `${TEMP_REMOTE}/${BASE_BRANCH}`
 
     // -z gives NUL-separated paths so filenames with spaces or newlines
-    // survive the round-trip.
+    // survive the round-trip. Multiple pathspecs after `--` are unioned
+    // by git, which scopes the listing to the requested subdirectories.
     const upstreamFiles = runGit(
-      [
-        'ls-tree',
-        '-r',
-        '--name-only',
-        '-z',
-        ref,
-        '--',
-        `${INFRASTRUCTURE_DIR}/`
-      ],
+      ['ls-tree', '-r', '--name-only', '-z', ref, '--', ...pathspecs],
       { silent: true }
     )
       .split('\0')
@@ -159,7 +176,7 @@ async function main(): Promise<void> {
 
     if (upstreamFiles.length === 0) {
       console.log(
-        `  No files found under '${INFRASTRUCTURE_DIR}/' on ${ref}. Nothing to merge.`
+        `  No files found under ${scopeLabel} on ${ref}. Nothing to merge.`
       )
       return
     }

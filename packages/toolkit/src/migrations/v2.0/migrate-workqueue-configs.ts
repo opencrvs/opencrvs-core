@@ -25,10 +25,20 @@
  *       - `actions: [{...}, {...}, ...]`     -> keeps first as `action`, warns about dropped extras
  *   - If `action` already exists, removes deprecated `actions` and keeps `action`
  *   - Removes unsupported `action.type` values (`DEFAULT`, `VALIDATE`, etc.)
+ *   - Ensures every workqueue ends up with a valid `action`. When none is
+ *     present (or the existing one is unsupported), falls back to
+ *     `action: { type: ActionType.READ }` and ensures `ActionType` is imported
+ *     from `@opencrvs/toolkit/events` in the file.
  *   - Saves modified files in-place
  */
 
-import { Node, ObjectLiteralExpression, Project, SyntaxKind } from 'ts-morph'
+import {
+  Node,
+  ObjectLiteralExpression,
+  Project,
+  SourceFile,
+  SyntaxKind
+} from 'ts-morph'
 import path from 'path'
 const DEFINE_WORKQUEUES_NAME = 'defineWorkqueues'
 const ACTIONS_PROPERTY_NAME = 'actions'
@@ -36,6 +46,10 @@ const ACTION_PROPERTY_NAME = 'action'
 const CONDITIONALS_PROPERTY_NAME = 'conditionals'
 const TYPE_PROPERTY_NAME = 'type'
 const SLUG_PROPERTY_NAME = 'slug'
+const READ_ACTION_TYPE = 'READ'
+const ACTION_TYPE_IMPORT_NAME = 'ActionType'
+const TOOLKIT_EVENTS_MODULE = '@opencrvs/toolkit/events'
+const READ_ACTION_FALLBACK_INITIALIZER = `{ type: ${ACTION_TYPE_IMPORT_NAME}.${READ_ACTION_TYPE} }`
 const SUPPORTED_WORKQUEUE_ACTION_TYPES = new Set([
   'READ',
   'DELETE',
@@ -94,112 +108,188 @@ function isUnsupportedActionType(action: ObjectLiteralExpression): boolean {
   return !SUPPORTED_WORKQUEUE_ACTION_TYPES.has(typeName)
 }
 
-function migrateWorkqueueActions(
+/**
+ * Ensures the workqueue has a valid singular `action` property. When the
+ * existing `action` is missing or has an unsupported type, replaces it with
+ * `action: { type: ActionType.READ }`.
+ *
+ * Returns whether anything was changed and whether the READ fallback was
+ * applied (so the caller can ensure `ActionType` is imported in the file).
+ */
+function ensureValidAction(
   workqueue: ObjectLiteralExpression,
   relPath: string
-): number {
-  const actionsProperty = workqueue.getProperty(ACTIONS_PROPERTY_NAME)
-  if (!actionsProperty || !Node.isPropertyAssignment(actionsProperty)) {
-    return 0
-  }
-
-  const actionsInitializer = actionsProperty.getInitializer()
-  if (!actionsInitializer || !Node.isArrayLiteralExpression(actionsInitializer)) {
-    return 0
-  }
-
+): { changed: boolean; usedReadFallback: boolean } {
   const workqueueLabel = getWorkqueueLabel(workqueue)
-  const existingActionProperty = workqueue.getProperty(ACTION_PROPERTY_NAME)
+  const actionProperty = workqueue.getProperty(ACTION_PROPERTY_NAME)
 
-  if (existingActionProperty) {
-    if (Node.isPropertyAssignment(existingActionProperty)) {
-      const existingActionInitializer = existingActionProperty.getInitializer()
-      if (existingActionInitializer && Node.isObjectLiteralExpression(existingActionInitializer)) {
-        const conditionalsProperty = existingActionInitializer.getProperty(
-          CONDITIONALS_PROPERTY_NAME
-        )
-        if (conditionalsProperty) {
-          conditionalsProperty.remove()
-          // eslint-disable-next-line no-console
-          console.log(
-            `  [${relPath}] Removed deprecated 'conditionals' from 'action' on workqueue '${workqueueLabel}'`
-          )
-        }
-
-        if (isUnsupportedActionType(existingActionInitializer)) {
-          existingActionProperty.remove()
-          // eslint-disable-next-line no-console
-          console.log(
-            `  [${relPath}] Removed unsupported 'action' type on workqueue '${workqueueLabel}'`
-          )
-        }
+  if (actionProperty && Node.isPropertyAssignment(actionProperty)) {
+    const initializer = actionProperty.getInitializer()
+    if (initializer && Node.isObjectLiteralExpression(initializer)) {
+      if (!isUnsupportedActionType(initializer)) {
+        return { changed: false, usedReadFallback: false }
       }
+
+      actionProperty.set({
+        name: ACTION_PROPERTY_NAME,
+        initializer: READ_ACTION_FALLBACK_INITIALIZER
+      })
+      // eslint-disable-next-line no-console
+      console.log(
+        `  [${relPath}] Replaced unsupported 'action' type with '${ACTION_TYPE_IMPORT_NAME}.${READ_ACTION_TYPE}' on workqueue '${workqueueLabel}'`
+      )
+      return { changed: true, usedReadFallback: true }
     }
-
-    actionsProperty.remove()
-    // eslint-disable-next-line no-console
-    console.log(
-      `  [${relPath}] Removed deprecated 'actions' from workqueue '${workqueueLabel}' (existing 'action' kept)`
-    )
-    return 1
   }
-
-  const actionCandidates = actionsInitializer
-    .getElements()
-    .filter((element): element is ObjectLiteralExpression =>
-      Node.isObjectLiteralExpression(element)
-    )
-
-  if (actionCandidates.length === 0) {
-    actionsProperty.remove()
-    // eslint-disable-next-line no-console
-    console.log(
-      `  [${relPath}] Removed empty 'actions' from workqueue '${workqueueLabel}'`
-    )
-    return 1
-  }
-
-  if (actionCandidates.length > 1) {
-    const droppedCount = actionCandidates.length - 1
-    // eslint-disable-next-line no-console
-    console.warn(
-      `  [${relPath}] Workqueue '${workqueueLabel}' has ${actionCandidates.length} actions; keeping first as 'action' and dropping ${droppedCount} extra action(s)`
-    )
-  }
-
-  const conditionalsProperty = actionCandidates[0].getProperty(
-    CONDITIONALS_PROPERTY_NAME
-  )
-  if (conditionalsProperty) {
-    conditionalsProperty.remove()
-    // eslint-disable-next-line no-console
-    console.log(
-      `  [${relPath}] Removed deprecated 'conditionals' from migrated 'action' on workqueue '${workqueueLabel}'`
-    )
-  }
-
-  if (isUnsupportedActionType(actionCandidates[0])) {
-    actionsProperty.remove()
-    // eslint-disable-next-line no-console
-    console.log(
-      `  [${relPath}] Removed deprecated 'actions' from workqueue '${workqueueLabel}' because action type is unsupported`
-    )
-    return 1
-  }
-
-  const firstActionText = actionCandidates[0].getText()
 
   workqueue.addPropertyAssignment({
     name: ACTION_PROPERTY_NAME,
-    initializer: firstActionText
+    initializer: READ_ACTION_FALLBACK_INITIALIZER
   })
-  actionsProperty.remove()
-
   // eslint-disable-next-line no-console
   console.log(
-    `  [${relPath}] Replaced 'actions' with 'action' on workqueue '${workqueueLabel}'`
+    `  [${relPath}] Added default 'action: ${READ_ACTION_FALLBACK_INITIALIZER}' to workqueue '${workqueueLabel}'`
   )
-  return 1
+  return { changed: true, usedReadFallback: true }
+}
+
+function migrateWorkqueueActions(
+  workqueue: ObjectLiteralExpression,
+  relPath: string
+): { changed: boolean; usedReadFallback: boolean } {
+  const workqueueLabel = getWorkqueueLabel(workqueue)
+  const actionsProperty = workqueue.getProperty(ACTIONS_PROPERTY_NAME)
+  let actionsArrayMigrated = false
+
+  if (actionsProperty && Node.isPropertyAssignment(actionsProperty)) {
+    const actionsInitializer = actionsProperty.getInitializer()
+    if (
+      actionsInitializer &&
+      Node.isArrayLiteralExpression(actionsInitializer)
+    ) {
+      const existingActionProperty = workqueue.getProperty(ACTION_PROPERTY_NAME)
+
+      if (existingActionProperty) {
+        if (Node.isPropertyAssignment(existingActionProperty)) {
+          const existingActionInitializer =
+            existingActionProperty.getInitializer()
+          if (
+            existingActionInitializer &&
+            Node.isObjectLiteralExpression(existingActionInitializer)
+          ) {
+            const conditionalsProperty = existingActionInitializer.getProperty(
+              CONDITIONALS_PROPERTY_NAME
+            )
+            if (conditionalsProperty) {
+              conditionalsProperty.remove()
+              // eslint-disable-next-line no-console
+              console.log(
+                `  [${relPath}] Removed deprecated 'conditionals' from 'action' on workqueue '${workqueueLabel}'`
+              )
+            }
+          }
+        }
+
+        actionsProperty.remove()
+        // eslint-disable-next-line no-console
+        console.log(
+          `  [${relPath}] Removed deprecated 'actions' from workqueue '${workqueueLabel}' (existing 'action' kept)`
+        )
+        actionsArrayMigrated = true
+      } else {
+        const actionCandidates = actionsInitializer
+          .getElements()
+          .filter((element): element is ObjectLiteralExpression =>
+            Node.isObjectLiteralExpression(element)
+          )
+
+        if (actionCandidates.length === 0) {
+          actionsProperty.remove()
+          // eslint-disable-next-line no-console
+          console.log(
+            `  [${relPath}] Removed empty 'actions' from workqueue '${workqueueLabel}'`
+          )
+          actionsArrayMigrated = true
+        } else {
+          if (actionCandidates.length > 1) {
+            const droppedCount = actionCandidates.length - 1
+            // eslint-disable-next-line no-console
+            console.warn(
+              `  [${relPath}] Workqueue '${workqueueLabel}' has ${actionCandidates.length} actions; keeping first as 'action' and dropping ${droppedCount} extra action(s)`
+            )
+          }
+
+          const conditionalsProperty = actionCandidates[0].getProperty(
+            CONDITIONALS_PROPERTY_NAME
+          )
+          if (conditionalsProperty) {
+            conditionalsProperty.remove()
+            // eslint-disable-next-line no-console
+            console.log(
+              `  [${relPath}] Removed deprecated 'conditionals' from migrated 'action' on workqueue '${workqueueLabel}'`
+            )
+          }
+
+          if (isUnsupportedActionType(actionCandidates[0])) {
+            actionsProperty.remove()
+            // eslint-disable-next-line no-console
+            console.log(
+              `  [${relPath}] Removed deprecated 'actions' from workqueue '${workqueueLabel}' because action type is unsupported`
+            )
+            actionsArrayMigrated = true
+          } else {
+            const firstActionText = actionCandidates[0].getText()
+            workqueue.addPropertyAssignment({
+              name: ACTION_PROPERTY_NAME,
+              initializer: firstActionText
+            })
+            actionsProperty.remove()
+            // eslint-disable-next-line no-console
+            console.log(
+              `  [${relPath}] Replaced 'actions' with 'action' on workqueue '${workqueueLabel}'`
+            )
+            actionsArrayMigrated = true
+          }
+        }
+      }
+    }
+  }
+
+  // Always ensure the workqueue ends up with a valid `action`. This both
+  // covers workqueues that never had an `actions` array, and patches up
+  // workqueues whose existing/migrated action type is unsupported.
+  const fallback = ensureValidAction(workqueue, relPath)
+
+  return {
+    changed: actionsArrayMigrated || fallback.changed,
+    usedReadFallback: fallback.usedReadFallback
+  }
+}
+
+/**
+ * Ensures `import { ActionType } from '@opencrvs/toolkit/events'` exists in
+ * the source file, merging into any existing import declaration from the
+ * same module specifier.
+ */
+function ensureActionTypeImport(sourceFile: SourceFile): void {
+  const existingImport = sourceFile.getImportDeclaration(
+    (decl) => decl.getModuleSpecifierValue() === TOOLKIT_EVENTS_MODULE
+  )
+
+  if (existingImport) {
+    const alreadyImported = existingImport
+      .getNamedImports()
+      .some((ni) => ni.getName() === ACTION_TYPE_IMPORT_NAME)
+    if (!alreadyImported) {
+      existingImport.addNamedImport(ACTION_TYPE_IMPORT_NAME)
+    }
+    return
+  }
+
+  sourceFile.addImportDeclaration({
+    moduleSpecifier: TOOLKIT_EVENTS_MODULE,
+    namedImports: [ACTION_TYPE_IMPORT_NAME]
+  })
 }
 
 function processFile(filePath: string, project: Project): number {
@@ -207,6 +297,7 @@ function processFile(filePath: string, project: Project): number {
   if (!sourceFile) return 0
 
   let migratedWorkqueues = 0
+  let needsActionTypeImport = false
   const relPath = path.relative(process.cwd(), filePath)
 
   const callExpressions = sourceFile.getDescendantsOfKind(
@@ -230,8 +321,14 @@ function processFile(filePath: string, project: Project): number {
 
     for (const element of workqueuesArg.getElements()) {
       if (!Node.isObjectLiteralExpression(element)) continue
-      migratedWorkqueues += migrateWorkqueueActions(element, relPath)
+      const result = migrateWorkqueueActions(element, relPath)
+      if (result.changed) migratedWorkqueues++
+      if (result.usedReadFallback) needsActionTypeImport = true
     }
+  }
+
+  if (needsActionTypeImport) {
+    ensureActionTypeImport(sourceFile)
   }
 
   return migratedWorkqueues
