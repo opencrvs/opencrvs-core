@@ -8,19 +8,11 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
-
-HEARTH_CONFIG=./build/dist/src/migrate-mongo-config-hearth.js
 EVENTS_CONFIG=./build/dist/src/migrate-mongo-config-events.js
 USER_MGNT_CONFIG=./build/dist/src/migrate-mongo-config-user-mgnt.js
 
 SCRIPT_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-# Revert hearth migrations
-HEARTH_FILES=$(ls ./build/dist/src/migrations/hearth | wc -l)
-for ((n=0;n<$HEARTH_FILES;n++)); do
-  yarn --cwd $SCRIPT_PATH migrate-mongo down --file $HEARTH_CONFIG
-done
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $HEARTH_CONFIG
 
 # Revert events migrations
 EVENTS_FILES=$(ls ./build/dist/src/migrations/events | wc -l)
