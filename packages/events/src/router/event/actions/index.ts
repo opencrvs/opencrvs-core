@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { TRPCError } from '@trpc/server'
-import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import * as z from 'zod/v4'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { logger, UUID } from '@opencrvs/commons'
@@ -17,7 +16,6 @@ import {
   ActionType,
   ActionStatus,
   EventDocument,
-  ActionInput,
   NotifyActionInput,
   RegisterActionInput,
   RejectDeclarationActionInput,
@@ -182,24 +180,6 @@ const AUDIT_LOG_OPERATION_MAP: Partial<
   [ActionType.REJECT_CORRECTION]: 'event.actions.correction.reject.request'
 }
 
-type ActionProcedure = {
-  request: MutationProcedure<{
-    input: ActionInput
-    output: EventDocument
-    meta: OpenApiMeta
-  }>
-  accept: MutationProcedure<{
-    input: ActionInput & { actionId: string }
-    output: EventDocument
-    meta: OpenApiMeta
-  }>
-  reject: MutationProcedure<{
-    input: { eventId: string; actionId: string; transactionId: string }
-    output: EventDocument
-    meta: OpenApiMeta
-  }>
-}
-
 export async function defaultRequestHandler(
   input: ActionInputWithType,
   user: TrpcUserContext,
@@ -352,7 +332,7 @@ const SYSTEM_USER_ALLOWED_ACTIONS = [
  */
 export function getDefaultActionProcedures(
   actionType: keyof typeof ACTION_PROCEDURE_CONFIG
-): ActionProcedure {
+) {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
   let asyncAcceptInputFields = AsyncActionConfirmationResponseSchema
