@@ -34,6 +34,7 @@ import { main as addResendInviteNotification } from './add-resend-invite-notific
 import { main as simplifyAnalyticsPrecalculations } from './simplify-analytics-precalculations'
 import { main as mergeInfrastructureDirectory } from './merge-infrastructure-directory'
 import { main as deleteInfrastructureDirectory } from './delete-infrastructure-directory'
+import { main as fixActionConfirmationHandlerType } from './fix-action-confirmation-handler-type'
 
 /**
  * Run the upgrade process for the country config in the current working
@@ -65,6 +66,7 @@ export async function runUpgrade(dockerSwarm: boolean) {
   await removeDemoScope()
   await removeHearthMigrations()
   await createEventsIndex()
+  await fixActionConfirmationHandlerType()
   await checkoutUpstreamFiles()
   await addResendInviteNotification()
   await simplifyAnalyticsPrecalculations()
