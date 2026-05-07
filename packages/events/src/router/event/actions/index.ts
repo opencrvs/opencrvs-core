@@ -191,13 +191,8 @@ const AsyncActionInput = BaseActionInput.pick({
 export type AsyncActionInput = z.infer<typeof AsyncActionInput>
 
 const SyncActionConfirmationSchema = BaseActionInput.pick({
-  keepAssignment: true,
   declaration: true,
   annotation: true
-})
-
-const SyncActionRejectionSchema = BaseActionInput.pick({
-  keepAssignment: true
 })
 
 export async function defaultRequestHandler(
@@ -254,9 +249,10 @@ export async function defaultRequestHandler(
 
   const schema =
     responseStatus === ActionConfirmationResponse.Success
-      ? (actionConfirmationResponseSchema ??
-        z.object({}).merge(SyncActionConfirmationSchema))
-      : SyncActionRejectionSchema
+      ? SyncActionConfirmationSchema.merge(
+          actionConfirmationResponseSchema ?? z.object({})
+        )
+      : z.object({})
 
   const maybeParsed = schema.safeParse(responseBody ?? {})
 
