@@ -840,7 +840,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: f92c5037-2af7-415c-b2a5-744178def569
+                transactionId: d4d3fa7e-c657-4e08-8f35-77ebe5de3f1f
                 type: birth
       responses:
         "200":
@@ -926,7 +926,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: e0acec54-3fbe-4e2b-b1a2-a214736f5506
+                transactionId: 56013c90-bbce-4b3c-b5d5-6ed0e91010b4
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -4702,9 +4702,6 @@ components:
               type: string
               enum:
                 - PARAGRAPH
-            defaultValue:
-              type: string
-              minLength: 1
             configuration:
               type: object
               properties:
@@ -5094,8 +5091,6 @@ components:
               type: string
               enum:
                 - BULLET_LIST
-            defaultValue:
-              type: string
             items:
               type: array
               items:
@@ -5265,9 +5260,6 @@ components:
               type: string
               enum:
                 - PAGE_HEADER
-            defaultValue:
-              type: string
-              minLength: 1
           required:
             - id
             - label
