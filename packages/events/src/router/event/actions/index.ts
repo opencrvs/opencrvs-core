@@ -180,8 +180,8 @@ const AUDIT_LOG_OPERATION_MAP: Partial<
   [ActionType.REJECT_CORRECTION]: 'event.actions.correction.reject.request'
 }
 
-export async function defaultRequestHandler(
-  input: ActionInputWithType,
+export async function defaultRequestHandler<T extends ActionType>(
+  input: Extract<ActionInputWithType, { type: T }>,
   user: TrpcUserContext,
   token: TokenWithBearer,
   event: EventDocument,
@@ -330,9 +330,9 @@ const SYSTEM_USER_ALLOWED_ACTIONS = [
  *
  * @param actionType - The action type for which we want to create router handlers.
  */
-export function getDefaultActionProcedures(
-  actionType: keyof typeof ACTION_PROCEDURE_CONFIG
-) {
+export function getDefaultActionProcedures<
+  T extends keyof typeof ACTION_PROCEDURE_CONFIG
+>(actionType: T) {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
   let asyncAcceptInputFields = AsyncActionConfirmationResponseSchema
@@ -378,7 +378,7 @@ export function getDefaultActionProcedures(
           return duplicates.event
         }
 
-        const result = await defaultRequestHandler(
+        const result = await defaultRequestHandler<T>(
           input,
           user,
           token,
