@@ -20,6 +20,7 @@ export interface ILeftNavigationProps {
   avatar?: () => void
   name?: string | null
   role?: string | null
+  assignedOffice?: string | null
   warning?: JSX.Element | null
   className?: string
   applicationVersion: string
@@ -85,6 +86,9 @@ const VersionCard = styled.div`
   background-color: ${({ theme }) => theme.colors.grey50};
   margin: 16px;
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 `
 
 const VersionText = styled.span`
@@ -99,6 +103,16 @@ const Container = styled.div`
 const MenuItem = styled.div`
   flex: 1 1 auto;
   overflow-y: auto;
+`
+
+const VersionCardName = styled.span`
+  ${({ theme }) => theme.fonts.bold12};
+  color: ${({ theme }) => theme.colors.grey600};
+  display: block;
+`
+const UserDescription = styled.span`
+  ${({ theme }) => theme.fonts.reg12};
+  color: ${({ theme }) => theme.colors.grey500};
 `
 
 export const LeftNavigation = (props: ILeftNavigationProps) => {
@@ -122,6 +136,12 @@ export const LeftNavigation = (props: ILeftNavigationProps) => {
       <MenuItem>{props.children && props.children}</MenuItem>
       <Container>
         <VersionCard>
+          <div>
+            <VersionCardName>{props.name}</VersionCardName>
+            <UserDescription>
+              {[props.role, props.assignedOffice].filter(Boolean).join(' • ')}
+            </UserDescription>
+          </div>
           <ConnectionStatus isOnline={props.isOnline} />
           {props.warning}
           <VersionText>OpenCRVS v{props.applicationVersion}</VersionText>

@@ -154,6 +154,7 @@ export const SidebarComponent = ({
     <LeftNavigation
       applicationName={offlineCountryConfig.config.APPLICATION_NAME}
       applicationVersion={runningVer}
+      assignedOffice={userDetails?.primaryOffice.name}
       avatar={() => avatar}
       isOnline={isOnline}
       name={name}

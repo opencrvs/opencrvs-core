@@ -13,7 +13,6 @@ import { useSelector } from 'react-redux'
 import { useCallback } from 'react'
 import {
   deserializeQuery,
-  User,
   UserOrSystem,
   WorkqueueConfig
 } from '@opencrvs/commons/client'
@@ -41,9 +40,7 @@ export const useWorkqueue = (workqueueSlug: string) => {
   const legacyUser = useSelector(getUserDetails)
   const { getUser } = useUsers()
   const [user] = getUser.useSuspenseQuery(legacyUser?.id ?? '')
-  const { useGetEventCountsByWorkqueue } = useEvents()
-
-  const { searchEvent } = useEvents()
+  const { useGetEventCountsByWorkqueue, searchEvent } = useEvents()
 
   const workqueues = useCountryConfigWorkqueueConfigurations()
   const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
@@ -55,30 +52,25 @@ export const useWorkqueue = (workqueueSlug: string) => {
 
   return {
     getResult: ({ offset, limit }: { offset: number; limit: number }) => {
-      const deserializedQuery = getDeserializedQuery(workqueueConfig, user)
+      const searchInput = {
+        query: getDeserializedQuery(workqueueConfig, user),
+        offset,
+        limit,
+        sort: [{ field: 'updatedAt', direction: 'desc' as const }]
+      }
       return {
         useSuspenseQuery: () =>
-          searchEvent.useSuspenseQuery(
-            {
-              query: deserializedQuery,
-              offset,
-              limit,
-              sort: [{ field: 'updatedAt', direction: 'desc' }]
-            },
-            {
-              refetchInterval: 20000
-            }
-          ),
+          searchEvent.useSuspenseQuery(searchInput, {
+            // Tag with workqueueSlug in meta so invalidateWorkqueueSearchQueries()
+            // can target this query without extending the cache key.
+            meta: { workqueueSlug },
+            refetchInterval: 20000
+          }),
         useQuery: () =>
-          searchEvent.useQuery(
-            {
-              query: deserializedQuery,
-              offset,
-              limit,
-              sort: [{ field: 'updatedAt', direction: 'desc' }]
-            },
-            { refetchInterval: 10000 }
-          )
+          searchEvent.useQuery(searchInput, {
+            meta: { workqueueSlug },
+            refetchInterval: 10000
+          })
       }
     },
     getCount: {
@@ -100,29 +92,25 @@ export function useWorkqueues() {
   const prefetch = useCallback(async () => {
     return Promise.all(
       workqueues.map(async (workqueueConfig) => {
-        const deserializedQuery = getDeserializedQuery(workqueueConfig, user)
-
-        const key = trpc.event.search.queryKey({
-          query: deserializedQuery,
+        const searchInput = {
+          query: getDeserializedQuery(workqueueConfig, user),
           offset: 0,
           limit: 10,
-          sort: [{ field: 'updatedAt', direction: 'desc' }]
-        })
+          sort: [{ field: 'updatedAt', direction: 'desc' as const }]
+        }
+        const options = trpc.event.search.queryOptions(searchInput)
 
-        const data = queryClient.getQueryData(key)
-        const isFetching = queryClient.isFetching({ queryKey: key }) > 0
+        const data = queryClient.getQueryData(options.queryKey)
+        const isFetching =
+          queryClient.isFetching({ queryKey: options.queryKey }) > 0
 
         if (data || isFetching) {
           return
         }
 
         return queryClient.prefetchQuery({
-          ...trpc.event.search.queryOptions({
-            query: deserializedQuery,
-            offset: 0,
-            limit: 10,
-            sort: [{ field: 'updatedAt', direction: 'desc' }]
-          })
+          ...options,
+          meta: { workqueueSlug: workqueueConfig.slug }
         })
       })
     )

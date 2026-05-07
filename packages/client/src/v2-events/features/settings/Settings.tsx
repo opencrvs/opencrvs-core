@@ -24,6 +24,7 @@ import {
 } from '@client/views/Settings/items'
 import { WorkqueueLayout } from '@client/v2-events/layouts/workqueues'
 import { EmailAddress } from '@client/views/Settings/items/EmailAddress'
+import { AssignedOffice } from '@client/views/Settings/items/AssignedOffice'
 
 const settingsTitle = {
   id: 'home.header.settingsTitle',
@@ -44,6 +45,7 @@ export function SettingsPage() {
           <PhoneNumber />
           <EmailAddress />
           <Role />
+          <AssignedOffice />
           <Language />
           <Password />
           <PIN />
