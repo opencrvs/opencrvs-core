@@ -13,7 +13,6 @@ USER_MGNT_CONFIG=./build/dist/src/migrate-mongo-config-user-mgnt.js
 
 SCRIPT_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-
 # Revert events migrations
 EVENTS_FILES=$(ls ./build/dist/src/migrations/events | wc -l)
 for ((n=0;n<$EVENTS_FILES;n++)); do
