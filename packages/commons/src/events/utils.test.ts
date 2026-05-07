@@ -24,10 +24,13 @@ import {
 import { TokenUserType } from '../authentication'
 import {
   createPrng,
+  field,
+  FieldType,
   fieldConfigsToActionPayload,
   tennisClubMembershipEvent
 } from '../client'
-import { generateActionDocument } from './test.utils'
+import { generateActionDocument, generateTranslationConfig } from './test.utils'
+import { DeclarationFormConfig } from './FormConfig'
 
 /* eslint-disable max-lines */
 
@@ -630,5 +633,44 @@ describe('omitHiddenPaginatedFields', () => {
 
     expect(missingKeys).not.toContain('recommender.name')
     expect(missingKeys).not.toContain('recommender.id')
+  })
+
+  it('keeps a field that appears on both a hidden page and a visible page', () => {
+    // Page A is always visible; page B is only visible when toggle=true.
+    // Both pages declare a field with the same id 'shared.field'.
+    // When toggle is false (page B hidden), 'shared.field' must be kept because page A is visible.
+    const label = generateTranslationConfig('dummy label')
+    const sharedField = {
+      id: 'shared.field',
+      type: FieldType.TEXT,
+      required: false,
+      conditionals: [],
+      label
+    }
+    const formConfig: DeclarationFormConfig = {
+      label,
+      pages: [
+        {
+          id: 'page-a',
+          type: 'FORM',
+          title: label,
+          requireCompletionToContinue: false,
+          fields: [sharedField]
+        },
+        {
+          id: 'page-b',
+          type: 'FORM',
+          title: label,
+          requireCompletionToContinue: false,
+          conditional: field('toggle').isEqualTo('true'),
+          fields: [sharedField]
+        }
+      ]
+    }
+
+    const values = { 'shared.field': 'value', toggle: 'false' }
+    const result = omitHiddenPaginatedFields(formConfig, values, {})
+
+    expect(result).toMatchObject({ 'shared.field': 'value' })
   })
 })

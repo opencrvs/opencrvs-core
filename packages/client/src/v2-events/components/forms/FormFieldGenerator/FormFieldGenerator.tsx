@@ -22,12 +22,11 @@ import {
   flattenFormState,
   FormState,
   IndexMap,
-  isFieldVisible,
   mapFormState,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
-import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
+import { useFormInitialValues } from '@client/v2-events/hooks/useFormInitialValues'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -55,11 +54,6 @@ export interface FormFieldGeneratorPropsWithoutRef {
   id: string
   readonlyMode?: boolean
   className?: string
-  /**
-   * Read only context values that are made available in the
-   * form validations/conditionals
-   */
-  formContext?: EventState
   /** Which fields are generated */
   fields: FieldConfig[]
   eventConfig?: EventConfig
@@ -70,7 +64,7 @@ export interface FormFieldGeneratorPropsWithoutRef {
   onFormChange?: (values: EventState) => void
   onTouchedChange?: (touched: IndexMap<FormState<boolean>>) => void
   /** Called when the form is submitted and all fields are valid */
-  onValidSubmit?: () => void
+  onValidSubmit?: (formValues: EventState) => void
   isCorrection?: boolean
   validatorContext: ValidatorContext
 }
@@ -83,8 +77,7 @@ export const FormFieldGenerator = forwardRef<
     {
       onFormChange,
       onTouchedChange,
-      fields,
-      formContext,
+      fields: pageFields,
       formValues,
       className,
       eventConfig,
@@ -99,8 +92,6 @@ export const FormFieldGenerator = forwardRef<
   ) => {
     const formikRef = useRef<FormikProps<EventState>>(null)
 
-    const fullForm = { ...formContext, ...formValues }
-
     useImperativeHandle(ref, () => ({
       /*
        * Most of this function can be replaced with a call to `formik.submit` if
@@ -111,7 +102,7 @@ export const FormFieldGenerator = forwardRef<
        * are simulating most of it by hand.
        */
       submit: (extraValues?: EventState) => {
-        const allTouched = buildFormState(fields, (field) => {
+        const allTouched = buildFormState(pageFields, (field) => {
           if (field.type === FieldType.NAME) {
             return {
               firstname: true,
@@ -140,46 +131,42 @@ export const FormFieldGenerator = forwardRef<
           makeFormFieldIdsFormikCompatible(allTouched)
         )
         onTouchedChange?.({ ...formTouched, ...allTouched })
-        onFormChange?.({
+        const updatedFormValues = {
           ...formValues,
           ...(formikRef.current?.values &&
             makeFormikFieldIdsOpenCRVSCompatible(formikRef.current.values)),
           ...extraValues
-        })
+        }
+        onFormChange?.(updatedFormValues)
         const currentErrors = flattenFormState(formikRef.current?.errors)
           .map(([, errs]) => errs)
           .filter((err) => err !== undefined)
         if (currentErrors.length === 0) {
-          onValidSubmit?.()
+          onValidSubmit?.(updatedFormValues)
         }
         return currentErrors
       }
     }))
     const intl = useIntl()
-    const getDefaultValues = useDefaultValue()
-    const defaultPageValues = getDefaultValues(
-      fields.filter((field) =>
-        isFieldVisible(field, fullForm, validatorContext)
-      )
+    const { getInitialValues } = useFormInitialValues()
+    const initialPageValues = getInitialValues(
+      pageFields,
+      formValues ?? {},
+      validatorContext
     )
-
-    const formikCompatibleInitialValues = makeFormFieldIdsFormikCompatible({
-      ...defaultPageValues,
-      ...pick(
-        formValues,
-        fields.map((field) => field.id)
-      )
-    })
+    const formikCompatibleInitialValues =
+      makeFormFieldIdsFormikCompatible(initialPageValues)
     const formikCompatibleInitialTouched = makeFormFieldIdsFormikCompatible(
       pick(
         formTouched,
-        fields.map((field) => field.id)
+        pageFields.map((field) => field.id)
       )
     )
 
     return (
       <Formik<EventState>
-        enableReinitialize={true}
+        key={id}
+        enableReinitialize
         initialTouched={
           // Our form values are nested but to make the implementation easier,
           // we manually assert the value to be nested only when dealing with
@@ -192,9 +179,9 @@ export const FormFieldGenerator = forwardRef<
           makeFormFieldIdsFormikCompatible(
             mapFormState(
               getValidationErrorsForForm(
-                fields,
+                pageFields,
                 {
-                  ...fullForm,
+                  ...formValues,
                   ...makeFormikFieldIdsOpenCRVSCompatible(values)
                 },
                 validatorContext
@@ -212,15 +199,13 @@ export const FormFieldGenerator = forwardRef<
             <FormSectionComponent
               className={className}
               eventConfig={eventConfig}
-              fields={fields}
-              fullForm={{
-                ...fullForm,
+              fields={pageFields}
+              isCorrection={isCorrection}
+              ocrvsFullForm={{
+                ...formValues,
                 ...makeFormikFieldIdsOpenCRVSCompatible(formikProps.values)
               }}
-              id={id}
-              isCorrection={isCorrection}
               readonlyMode={readonlyMode}
-              resetForm={formikProps.resetForm}
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
               touched={formikProps.touched}

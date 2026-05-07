@@ -537,14 +537,14 @@ function ReviewComponent({
               <ReviewContainter>
                 <FormFieldGenerator
                   fields={reviewFields}
-                  // This makes the declaration form available in the validations/conditionals
-                  // of the annotation form without bleeding into the current annotation values
-                  formContext={form}
                   formTouched={touched}
                   formValues={annotation}
                   id={'review'}
                   readonlyMode={readonlyMode}
-                  validatorContext={validatorContext}
+                  validatorContext={{
+                    ...validatorContext,
+                    baseFormState: form
+                  }}
                   onFormChange={onAnnotationChange}
                   onTouchedChange={setTouched}
                 />

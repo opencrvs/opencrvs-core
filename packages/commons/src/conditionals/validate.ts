@@ -204,6 +204,13 @@ ajv.addKeyword({
   }
 })
 
+function mergeWithBaseFormState(
+  values: EventState | ActionUpdate,
+  context: ValidatorContext
+) {
+  return { ...context.baseFormState, ...values }
+}
+
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
   const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
   if ('$form' in data) {
@@ -263,7 +270,7 @@ export function isConditionMet(
   context: ValidatorContext
 ) {
   return validate(conditional, {
-    $form: values,
+    $form: mergeWithBaseFormState(values, context),
     $now: formatISO(new Date(), { representation: 'date' }),
     $online: isOnline(),
     $user: context.user,
@@ -299,6 +306,7 @@ export type ValidatorContext = {
   user?: ITokenPayload
   leafAdminStructureLocationIds?: Array<{ id: UUID }>
   event?: EventDocument
+  baseFormState?: EventState
 }
 
 function isFieldConditionMet(
@@ -316,7 +324,7 @@ function isFieldConditionMet(
   }
 
   const validConditionals = getConditionalActionsForField(field, {
-    $form: form,
+    $form: mergeWithBaseFormState(form, context),
     $now: formatISO(new Date(), { representation: 'date' }),
     $online: isOnline(),
     $user: context.user,
@@ -583,7 +591,7 @@ export function runFieldValidations({
     return []
   }
   const conditionalParameters = {
-    $form: form,
+    $form: mergeWithBaseFormState(form, context),
     $now: formatISO(new Date(), { representation: 'date' }),
     /**
      * In real use cases, there can be hundreds of thousands of locations.

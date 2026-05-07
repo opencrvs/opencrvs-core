@@ -266,9 +266,9 @@ export const FormFieldParentChildReset: Story = {
             async (payload) => {
               await expect(payload.declaration).toEqual({
                 'recommender.relation': 'FRIEND',
+                'recommender.dob': null,
                 'recommender.name': {
                   firstname: 'John',
-                  middlename: '',
                   surname: 'Doe'
                 },
                 'recommender.dobUnknown': true,

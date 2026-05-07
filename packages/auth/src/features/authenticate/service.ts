@@ -147,15 +147,15 @@ type LegacyRecordValidationInput = {
 export async function createTokenForActionConfirmation(
   input: ActionConfirmationInput | LegacyRecordValidationInput,
   userId: UUID,
-  userRejectScope: string | undefined = undefined
+  extraScopes: string[] = []
 ) {
   return sign(
     {
       scope: [
         'record.confirm-registration',
         'record.reject-registration',
-        userRejectScope
-      ].filter(Boolean),
+        ...extraScopes
+      ],
       eventId: 'eventId' in input ? input.eventId : undefined,
       actionId: 'actionId' in input ? input.actionId : undefined,
       recordId: 'recordId' in input ? input.recordId : undefined,
