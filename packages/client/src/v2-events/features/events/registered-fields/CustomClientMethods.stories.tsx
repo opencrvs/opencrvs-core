@@ -132,17 +132,16 @@ export const CustomValidatorCrossFieldSum: Story = {
     const canvas = within(canvasElement)
 
     await step('Correct sum — no error shown', async () => {
-      const submitButton = await canvas.findByText('Continue')
-      await userEvent.click(submitButton)
+      const totalInput = await canvas.findByTestId('number__itemSum')
+      await userEvent.click(totalInput)
+      await userEvent.tab()
       await expect(
         canvas.queryByText('Total must equal Item A + Item B')
       ).toBeNull()
     })
 
     await step('Wrong sum — validation error appears', async () => {
-      const totalInput = await canvas.findByLabelText(
-        'Total amount (must equal Item A + Item B)'
-      )
+      const totalInput = await canvas.findByTestId('number__itemSum')
       await userEvent.clear(totalInput)
       await userEvent.type(totalInput, '5')
       await userEvent.tab()
@@ -150,9 +149,7 @@ export const CustomValidatorCrossFieldSum: Story = {
     })
 
     await step('Corrected sum — error disappears', async () => {
-      const totalInput = await canvas.findByLabelText(
-        'Total amount (must equal Item A + Item B)'
-      )
+      const totalInput = await canvas.findByTestId('number__itemSum')
       await userEvent.clear(totalInput)
       await userEvent.type(totalInput, '10')
       await userEvent.tab()
@@ -175,7 +172,8 @@ export const CustomEvaluationComputedValue: Story = {
   render: function Component(args) {
     const [form, setForm] = React.useState<EventState>({
       quantity: 2,
-      unitPrice: 15
+      unitPrice: 15,
+      lineTotal: 30
     })
     const [touched, setTouched] = React.useState(args.formTouched)
 
@@ -234,8 +232,8 @@ export const CustomEvaluationComputedValue: Story = {
     await step(
       'Line total is pre-computed from initial values (2 × 15 = 30)',
       async () => {
-        const totalInput = (await canvas.findByLabelText(
-          'Line total (auto-computed)'
+        const totalInput = (await canvas.findByTestId(
+          'number__lineTotal'
         )) as HTMLInputElement
         await expect(totalInput.value).toBe('30')
       }
@@ -244,13 +242,13 @@ export const CustomEvaluationComputedValue: Story = {
     await step(
       'Changing quantity updates line total automatically',
       async () => {
-        const quantityInput = await canvas.findByLabelText('Quantity')
+        const quantityInput = await canvas.findByTestId('number__quantity')
         await userEvent.clear(quantityInput)
         await userEvent.type(quantityInput, '5')
         await userEvent.tab()
 
-        const totalInput = (await canvas.findByLabelText(
-          'Line total (auto-computed)'
+        const totalInput = (await canvas.findByTestId(
+          'number__lineTotal'
         )) as HTMLInputElement
         await expect(totalInput.value).toBe('75')
       }
