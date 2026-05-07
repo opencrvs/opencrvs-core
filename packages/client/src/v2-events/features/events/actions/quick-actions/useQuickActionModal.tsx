@@ -12,7 +12,7 @@ import React from 'react'
 import { MessageDescriptor, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
-import { Dialog, Text } from '@opencrvs/components'
+import { Dialog } from '@opencrvs/components'
 import {
   DangerButton,
   PrimaryButton,
@@ -41,6 +41,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
+import { TranslationTextWithFormatModifier } from '../../components/TranslationTextWithFormatModifier'
 import { useModal } from '../../../../hooks/useModal'
 import { actionLabels } from '../../../workqueues/Actions/utils'
 import { register } from './register'
@@ -180,11 +181,14 @@ function QuickActionModal({
       onClose={() => close({ result: false })}
     >
       <Stack alignItems="left" direction="column" gap={16}>
-        <Text color="grey500" element="p" variant="reg16">
-          {config.supportingCopy
-            ? intl.formatMessage(config.supportingCopy)
-            : null}
-        </Text>
+        {config.supportingCopy && (
+          <TranslationTextWithFormatModifier
+            color="supportingCopy"
+            element="p"
+            message={config.supportingCopy}
+            variant="reg16"
+          />
+        )}
         <FormFieldGenerator
           eventConfig={eventConfiguration}
           fields={config.fields ?? []}
