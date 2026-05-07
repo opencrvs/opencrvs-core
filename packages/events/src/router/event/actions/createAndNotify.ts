@@ -46,7 +46,8 @@ import { defaultRequestHandler } from '@events/router/event/actions'
  * `createdAtLocation` is required (not nullish) because this endpoint is
  * system-only and system users must always supply a valid leaf office location.
  */
-export const CreateAndNotifyInput = NotifyActionInput.omit({
+
+const CreateAndNotifyInput = NotifyActionInput.omit({
   eventId: true,
   type: true
 }).extend({
@@ -62,7 +63,7 @@ export const CreateAndNotifyInput = NotifyActionInput.omit({
   )
 })
 
-export type CreateAndNotifyInput = z.infer<typeof CreateAndNotifyInput>
+type CreateAndNotifyInput = z.infer<typeof CreateAndNotifyInput>
 
 /**
  * Combinator procedure that creates a new event and immediately applies a NOTIFY action,
