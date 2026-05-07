@@ -159,6 +159,21 @@ const ACTION_PROCEDURE_CONFIG = {
 
 type DistributiveOmit<T, K extends keyof T> = T extends T ? Omit<T, K> : never
 
+const AsyncActionInput = BaseActionInput.pick({
+  eventId: true,
+  transactionId: true,
+  keepAssignment: true
+}).extend({
+  actionId: UUID
+})
+
+export type AsyncActionInput = z.infer<typeof AsyncActionInput>
+
+const SyncActionConfirmationSchema = BaseActionInput.pick({
+  declaration: true,
+  annotation: true
+})
+
 type ActionProcedure = {
   request: MutationProcedure<{
     input: ActionInput
@@ -174,26 +189,11 @@ type ActionProcedure = {
     meta: OpenApiMeta
   }>
   reject: MutationProcedure<{
-    input: { eventId: string; actionId: string; transactionId: string }
+    input: z.input<typeof AsyncActionInput>
     output: EventDocument
     meta: OpenApiMeta
   }>
 }
-
-const AsyncActionInput = BaseActionInput.pick({
-  eventId: true,
-  transactionId: true,
-  keepAssignment: true
-}).extend({
-  actionId: UUID
-})
-
-export type AsyncActionInput = z.infer<typeof AsyncActionInput>
-
-const SyncActionConfirmationSchema = BaseActionInput.pick({
-  declaration: true,
-  annotation: true
-})
 
 export async function defaultRequestHandler(
   input: ActionInputWithType,
