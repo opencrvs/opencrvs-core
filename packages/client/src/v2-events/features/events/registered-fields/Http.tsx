@@ -11,13 +11,13 @@
 
 import React, { useRef } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { get, isEqual } from 'lodash'
+import { isEqual } from 'lodash'
 import {
   FieldValue,
   getMixedPath,
   HttpField,
   HttpFieldValue,
-  isFieldReference,
+  isResolvableValueReference,
   isTemplateVariable,
   SystemVariables
 } from '@opencrvs/commons/client'
@@ -71,7 +71,7 @@ async function fetchHttpFieldValue(
     for (const [k, v] of Object.entries(cfg.body)) {
       if (isTemplateVariable(v) && v) {
         cfg.body[k] = getMixedPath(systemVariables, v)
-      } else if (isFieldReference(v)) {
+      } else if (isResolvableValueReference(v)) {
         cfg.body[k] = parseFieldReferenceToValue(v, form)
       } else {
         cfg.body[k] = v

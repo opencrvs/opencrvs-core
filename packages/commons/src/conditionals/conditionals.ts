@@ -17,7 +17,11 @@ import { userSerializer } from '../events/serializers/user/serializer'
 import { omitKeyDeep } from '../utils'
 import { UUID } from '../uuid'
 import { todayDateTimeValueSerializer } from '../events/serializers/date/serializer'
-import { CodeToEvaluate, FieldReference } from '../events/FieldConfig'
+import {
+  CodeToEvaluate,
+  FieldReference,
+  isCodeToEvaluate
+} from '../events/FieldConfig'
 
 /* eslint-disable max-lines */
 
@@ -248,6 +252,16 @@ export function isFieldReference(value: unknown): value is FieldReference {
 
 export function isEventFieldReference(value: unknown): value is FieldReference {
   return typeof value === 'object' && value !== null && '$$event' in value
+}
+
+/**
+ * Centralised guard so a future third reference type only needs to be added here
+ * and in {@link parseFieldReferenceToValue}, not at every call site.
+ */
+export function isResolvableValueReference(
+  value: unknown
+): value is FieldReference | CodeToEvaluate {
+  return isFieldReference(value) || isCodeToEvaluate(value)
 }
 
 /**

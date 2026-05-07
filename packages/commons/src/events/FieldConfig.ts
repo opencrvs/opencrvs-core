@@ -817,7 +817,7 @@ const HttpField = BaseField.extend({
       .optional()
       .describe('Value to set if the request fails'),
     params: z
-      .record(z.string(), z.union([z.string(), FieldReference]))
+      .record(z.string(), z.union([z.string(), FieldReference, CodeToEvaluate]))
       .optional(),
     timeout: z
       .number()

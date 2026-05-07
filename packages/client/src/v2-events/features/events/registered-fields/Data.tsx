@@ -24,24 +24,12 @@ import {
   EventConfig,
   getDeclarationFields,
   DataEntry,
-  FieldReference,
-  isCodeToEvaluate,
-  compileClientFunction,
-  todayISO,
-  isOnline
+  isResolvableValueReference
 } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { makeFormikFieldIdOpenCRVSCompatible } from '@client/v2-events/components/forms/utils'
-
-function isFieldReference(entry: unknown): entry is FieldReference {
-  return (
-    Boolean(entry) &&
-    typeof entry === 'object' &&
-    entry !== null &&
-    '$$field' in entry
-  )
-}
+import { parseFieldReferenceToValue } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
 
 function getFieldFromDataEntry({
   intl,
@@ -54,21 +42,12 @@ function getFieldFromDataEntry({
 }) {
   const { label, value: rawValue } = entry
 
-  // Resolve value if it's a message descriptor
   let formattedValue: string
 
-  if (isCodeToEvaluate(rawValue)) {
-    const fieldValue = get(formData, rawValue.$$field)
-    formattedValue = compileClientFunction(rawValue.$$code)(fieldValue, {
-      $form: formData,
-      $now: todayISO(),
-      $online: isOnline()
-    }) as string
-  } else if (isFieldReference(rawValue)) {
-    formattedValue =
-      rawValue.$$subfield.length > 0
-        ? get(formData[rawValue.$$field], rawValue.$$subfield)
-        : formData[rawValue.$$field]
+  if (isResolvableValueReference(rawValue)) {
+    formattedValue = String(
+      parseFieldReferenceToValue(rawValue, formData) ?? ''
+    )
   } else {
     formattedValue =
       typeof rawValue === 'object' &&
@@ -182,11 +161,8 @@ function DataInput({
 
       const value = entry.value
 
-      if (isFieldReference(value)) {
-        const resolvedValue =
-          value.$$subfield.length > 0
-            ? get(formData[value.$$field], value.$$subfield)
-            : formData[value.$$field]
+      if (isResolvableValueReference(value)) {
+        const resolvedValue = parseFieldReferenceToValue(value, formData)
 
         return getFieldFromDataEntry({
           intl,

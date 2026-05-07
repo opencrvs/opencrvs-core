@@ -10,11 +10,16 @@
  */
 import { compact, get } from 'lodash'
 import {
+  CodeToEvaluate,
+  compileClientFunction,
   FieldReference,
   FieldValue,
   HttpField,
   IndexMap,
-  isFieldReference
+  isCodeToEvaluate,
+  isOnline,
+  isResolvableValueReference,
+  todayISO
 } from '@opencrvs/commons/client'
 import {
   makeFormFieldIdFormikCompatible,
@@ -62,32 +67,45 @@ export function resolveSyncedFieldValue(
   return compact(refs.map(getValue))[0]
 }
 
-export function parseFieldReferenceToValue(
-  fieldReference: FieldReference,
+function getValueAtReferencePath(
+  ref: { $$field: string; $$subfield: string[] },
   fieldValues: Record<string, FieldValue>
-) {
-  return fieldReference.$$subfield.length > 0
-    ? get(fieldValues[fieldReference.$$field], fieldReference.$$subfield)
-    : fieldValues[fieldReference.$$field]
+): FieldValue {
+  return ref.$$subfield.length > 0
+    ? get(fieldValues[ref.$$field], ref.$$subfield)
+    : fieldValues[ref.$$field]
+}
+
+export function parseFieldReferenceToValue(
+  fieldReference: FieldReference | CodeToEvaluate,
+  fieldValues: Record<string, FieldValue>
+): FieldValue {
+  const fieldValue = getValueAtReferencePath(fieldReference, fieldValues)
+  if (isCodeToEvaluate(fieldReference)) {
+    return compileClientFunction(fieldReference.$$code)(fieldValue, {
+      $form: fieldValues,
+      $now: todayISO(),
+      $online: isOnline()
+    }) as FieldValue
+  }
+  return fieldValue
 }
 
 export function parseFieldReferencesInConfiguration(
   configuration: HttpField['configuration'],
   form: Record<string, FieldValue>
-) {
-  const result = {
+): Omit<HttpField['configuration'], 'trigger'> {
+  return {
     ...configuration,
     params: configuration.params
-      ? Object.fromEntries(
+      ? (Object.fromEntries(
           Object.entries(configuration.params).map(([key, value]) => [
             key,
-            isFieldReference(value)
+            isResolvableValueReference(value)
               ? parseFieldReferenceToValue(value, form)
               : value
           ])
-        )
+        ) as HttpField['configuration']['params'])
       : undefined
   }
-
-  return result
 }
