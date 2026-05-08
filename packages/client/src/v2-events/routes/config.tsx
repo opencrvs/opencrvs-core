@@ -9,15 +9,21 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
-
-import { useSelector, useDispatch } from 'react-redux'
+import { useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
 import { onlineManager } from '@tanstack/react-query'
+import { ResponsiveModal } from '@opencrvs/components'
+import { PrimaryButton } from '@opencrvs/components/src/buttons'
 import { ActionType } from '@opencrvs/commons/client'
+import { messages as reloadModalMessages } from '@client/i18n/messages/views/reloadModal'
+import { IStoreState } from '@client/store'
 import { APPLICATION_VERSION } from '@client/utils/constants'
-import { storeReloadModalVisibility } from '@client/reload/reducer'
-import type { AppStore } from '@client/store'
+import { storage } from '@client/storage'
+import { SCREEN_LOCK } from '@client/components/ProtectedPage'
+import { removeToken } from '@client/utils/authUtils'
+import { removeUserDetails } from '@client/utils/userUtils'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
@@ -109,7 +115,11 @@ function PrefetchQueries() {
 export const routesConfig = {
   path: ROUTES.V2.path,
   Component: () => {
-    const dispatch = useDispatch<AppStore['dispatch']>()
+    const [versionMismatch, setVersionMismatch] = useState(false)
+    const intl = useIntl()
+    const appName = useSelector(
+      (state: IStoreState) => state.offline.offlineData.config?.APPLICATION_NAME
+    )
 
     useEffect(() => {
       let cancelled = false
@@ -135,7 +145,9 @@ export const routesConfig = {
 
           const gatewayVersion = res.headers.get('X-version')
           if (gatewayVersion && gatewayVersion !== APPLICATION_VERSION) {
-            dispatch(storeReloadModalVisibility(true))
+            if (!cancelled) {
+              setVersionMismatch(true)
+            }
           }
         } catch {
           /*
@@ -158,7 +170,7 @@ export const routesConfig = {
       return () => {
         cancelled = true
       }
-    }, [dispatch])
+    }, [])
 
     const currentUser = useSelector(getUserDetails)
 
@@ -167,6 +179,16 @@ export const routesConfig = {
         'V2 routes cannot be initialised without user details. Make sure user details are fetched before the routes are rendered'
       )
     }
+
+    const handleLoginRedirect = async () => {
+      await storage.removeItem(SCREEN_LOCK)
+      await removeToken()
+      await removeUserDetails()
+      window.location.assign(
+        `/login?lang=${await storage.getItem('language')}&redirectTo=${ROUTES.V2.buildPath({})}`
+      )
+    }
+
     return (
       <NavigationHistoryProvider>
         <TRPCErrorBoundary>
@@ -175,6 +197,23 @@ export const routesConfig = {
             <Debug />
             <Toaster />
             <PrefetchQueries />
+            <ResponsiveModal
+              actions={[
+                <PrimaryButton key="login" onClick={handleLoginRedirect}>
+                  {intl.formatMessage(reloadModalMessages.loginAgain)}
+                </PrimaryButton>
+              ]}
+              autoHeight={true}
+              responsive={false}
+              show={versionMismatch}
+              showCloseButton={false}
+              title={intl.formatMessage(reloadModalMessages.title)}
+              titleHeightAuto={true}
+            >
+              {intl.formatMessage(reloadModalMessages.body, {
+                app_name: appName
+              })}
+            </ResponsiveModal>
           </TRPCProvider>
         </TRPCErrorBoundary>
       </NavigationHistoryProvider>
