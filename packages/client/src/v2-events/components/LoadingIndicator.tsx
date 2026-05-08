@@ -20,14 +20,6 @@ import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { errorMessages } from '@client/v2-events/messages'
 import { useOnlineStatus } from '@client/utils'
 
-const messages = defineMessages({
-  noConnection: {
-    defaultMessage: 'No connection',
-    description: 'No Connection hover text',
-    id: 'constants.noConnection'
-  }
-})
-
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
   ${({ theme }) => theme.fonts.reg16};
@@ -35,15 +27,6 @@ const ErrorText = styled.div`
   margin-top: 100px;
 `
 
-const ConnectivityContainer = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-`
-const NoConnectivity = styled(ConnectionError)`
-  width: 24px;
-  margin-right: 8px;
-`
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
@@ -60,10 +43,6 @@ const LoadingContainer = styled.div`
     align-items: center;
     justify-content: center;
   }
-`
-const Text = styled.div`
-  ${({ theme }) => theme.fonts.reg16};
-  text-align: center;
 `
 
 const MobileViewContainer = styled.div<{ noDeclaration?: boolean }>`
@@ -104,14 +83,6 @@ function LoadingIndicatorComp({
           <ErrorText id="search-result-error-text-count">
             {intl.formatMessage(errorMessages.queryError)}
           </ErrorText>
-        )}
-        {!isOnline && (
-          <ConnectivityContainer>
-            <NoConnectivity />
-            <Text id="wait-connection-text">
-              {intl.formatMessage(messages.noConnection)}
-            </Text>
-          </ConnectivityContainer>
         )}
       </MobileViewContainer>
     </Wrapper>

@@ -52,8 +52,7 @@ const fields = [
   {
     id: 'form.header',
     type: FieldType.PAGE_HEADER,
-    label: generateTranslationConfig('Form Header'),
-    defaultValue: 'Membership Application Form'
+    label: generateTranslationConfig('Membership Application Form')
   },
 
   {
@@ -351,8 +350,9 @@ const fields = [
   {
     id: 'club.rules',
     type: FieldType.PARAGRAPH,
-    label: generateTranslationConfig('Club Rules'),
-    defaultValue: 'All members must follow club guidelines and regulations.',
+    label: generateTranslationConfig(
+      'All members must follow club guidelines and regulations.'
+    ),
     configuration: {
       styles: { fontVariant: 'reg12', hint: true }
     }
@@ -362,7 +362,6 @@ const fields = [
     id: 'club.benefits',
     type: FieldType.BULLET_LIST,
     label: generateTranslationConfig('Club Benefits'),
-    defaultValue: 'Exclusive access to facilities',
     items: [
       generateTranslationConfig('Discounted events'),
       generateTranslationConfig('Priority bookings')
@@ -396,8 +395,6 @@ const fields = [
 ] satisfies FieldConfig[]
 
 const declaration = {
-  'form.header': 'Membership Application Form',
-  'form.divider': undefined,
   'applicant.firstname': 'John',
   'applicant.middlename': 'Michael',
   'applicant.surname': 'Doe',
@@ -444,8 +441,6 @@ const declaration = {
     data: null,
     error: null
   },
-  'club.rules': 'All members must follow club guidelines and regulations.',
-  'club.benefits': 'Exclusive access to facilities',
   'club.dataSummary': undefined,
   'consent.termsAccepted': false
 } satisfies EventState

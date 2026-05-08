@@ -88,7 +88,6 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
-        declaration={eventIndex.declaration}
         eventConfig={configuration}
         formData={annotation}
         formPages={formPages.map((page) => {
@@ -107,7 +106,10 @@ export function Pages() {
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
         showReviewButton={searchParams.from === 'review'}
-        validatorContext={validatorContext}
+        validatorContext={{
+          ...validatorContext,
+          baseFormState: eventIndex.declaration
+        }}
         onPageChange={(nextPageId: string) => {
           return navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath(

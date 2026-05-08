@@ -113,16 +113,18 @@ export const TEST_USER_DEFAULT_SCOPES = [
 export function createTestToken({
   userId,
   scopes,
+  eventId,
   userType,
   role
 }: {
   userId: string
   scopes: Scope[]
   userType?: TokenUserType
+  eventId?: string
   role: string
 }): TokenWithBearer {
   const token = jwt.sign(
-    { scope: scopes, sub: userId, userType, role },
+    { scope: scopes, sub: userId, userType, role, eventId },
     readFileSync(join(__dirname, './cert.key')),
     {
       algorithm: 'RS256',

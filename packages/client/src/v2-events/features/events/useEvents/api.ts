@@ -246,12 +246,30 @@ export async function refetchAllSearchQueries() {
    * Invalidate search queries
    */
   await Promise.all(
-    getQueriesData(trpcOptionsProxy.event.search).map(
-      async ([queryKey, eventIndices]) => {
-        return queryClient.refetchQueries({
-          queryKey
-        })
-      }
+    getQueriesData(trpcOptionsProxy.event.search).map(async ([queryKey]) => {
+      return queryClient.refetchQueries({
+        queryKey
+      })
+    })
+  )
+}
+
+/**
+ * Invalidate search queries for a specific workqueue identified by its slug.
+ * Queries are tagged with { workqueueSlug } in meta by useWorkqueue → getResult.
+ *
+ * For active observers (workqueue page mounted) this triggers an immediate
+ * background refetch. For inactive queries it marks them stale so the next
+ * mount fetches fresh data — no unnecessary network requests are fired.
+ */
+export async function invalidateWorkqueueSearchQueries(slug: string) {
+  const queries = queryClient.getQueryCache().findAll({
+    queryKey: trpcOptionsProxy.event.search.queryKey(),
+    predicate: (query) => query.meta?.workqueueSlug === slug
+  })
+  await Promise.all(
+    queries.map(async (query) =>
+      queryClient.invalidateQueries({ queryKey: query.queryKey, exact: true })
     )
   )
 }

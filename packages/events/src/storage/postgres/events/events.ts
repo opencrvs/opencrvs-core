@@ -75,19 +75,20 @@ async function getEventsByIdsInTrx(
     // We parse on the next step so casting mistakes will be caught immediately.
     .execute()) as (Events & { actions: EventActions[] })[]
 
-  return events.map((event) =>
-    EventDocument.parse({
-      ...event,
-      type: event.eventType,
-      actions: event.actions.map(({ actionType, createdAt, ...rest }) => {
-        return {
-          ...rest,
-          type: actionType,
-          // turns db format +00 to Z format
-          createdAt: DateTime.fromISO(createdAt).toISO()
-        }
-      })
-    })
+  return events.map(
+    (event) =>
+      ({
+        ...event,
+        type: event.eventType,
+        actions: event.actions.map(({ actionType, createdAt, ...rest }) => {
+          return {
+            ...rest,
+            type: actionType,
+            // turns db format +00 to Z format
+            createdAt: DateTime.fromISO(createdAt).toISO()
+          }
+        })
+      }) as EventDocument
   )
 }
 
@@ -112,9 +113,9 @@ export async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
   return toEventDocument(event, actions)
 }
 
-async function* processBatch(batch: Events[]) {
+async function* processBatch(batch: UUID[]) {
   const db = getClient()
-  const ids = batch.map((event) => event.id)
+  const ids = batch
 
   let eventDocs: EventDocument[] = []
   try {
@@ -146,11 +147,11 @@ async function* processBatch(batch: Events[]) {
  */
 export async function* streamEventDocuments() {
   const db = getClient()
-  const eventsStream = db.selectFrom('events').selectAll().stream()
-  let batch: Events[] = []
+  const eventsStream = db.selectFrom('events').select('id').stream()
+  let batch: UUID[] = []
 
   for await (const row of eventsStream) {
-    batch.push(row)
+    batch.push(row.id)
     if (batch.length === STREAM_BATCH_SIZE) {
       yield* processBatch(batch)
       batch = []
