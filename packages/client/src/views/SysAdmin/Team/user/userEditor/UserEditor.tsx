@@ -18,7 +18,6 @@ import { Review as ReviewComponent } from '@client/v2-events/features/events/com
 import { useRoles } from '@client/v2-events/hooks/useRoles'
 import { ROUTES } from '@client/v2-events/routes/routes'
 import {
-  ActionType,
   FieldValue,
   FileFieldValue,
   TokenUserType,
@@ -82,15 +81,6 @@ type EventState = {
   device?: string
   signature?: FileFieldValue
   [key: string]: unknown
-}
-
-interface UserFormState {
-  userId?: string
-  userForm?: EventState
-  setUserForm: (data: EventState, userId?: string) => void
-  getUserForm: (initialValues?: EventState) => EventState
-  getTouchedFields: () => Record<string, boolean>
-  clear: () => void
 }
 
 const USER_OFFICE_PAGE_ID = 'user.office'
@@ -267,7 +257,6 @@ const EditUserComponent = () => {
       <PagesComponent
         attachmentPath={`users/${userId}/`}
         showReviewButton={false}
-        actionType={ActionType.DECLARE}
         eventConfig={eventConfig}
         formData={formState as Record<string, FieldValue>}
         formPages={formConfig.pages}

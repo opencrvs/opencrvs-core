@@ -192,10 +192,9 @@ function QuickActionModal({
         <FormFieldGenerator
           eventConfig={eventConfiguration}
           fields={config.fields ?? []}
-          // Pass in the complete declaration form values so that read-only declaration data is available for Data components or calculations.
-          formContext={event.declaration}
           id={'quick-action-modal-form'}
-          validatorContext={validatorContext}
+          // Pass in the complete declaration form values so that read-only declaration data is available for Data components or calculations.
+          validatorContext={{...validatorContext, baseFormState: event.declaration}}
           onFormChange={handleChange}
         />
       </Stack>
