@@ -25,7 +25,7 @@ flowchart TD
     end
 
     subgraph CC["CountryConfig — after Core visible on npm"]
-        CC1["Bump @opencrvs/toolkit to vX.Y.Z on release branch"]
+        CC1["Bump @opencrvs/toolkit to vX.Y.Z on release branch\nRun yarn install to update lockfile"]
         CC2["git tag vX.Y.Z\ngit push origin tag vX.Y.Z"]
         CC3[Create draft release]
         CC4[Paste CHANGELOG.md to GitHub release]
@@ -36,9 +36,9 @@ flowchart TD
 
     subgraph POST["Post-release"]
         POST1[Merge both release branches into master + develop simultaneously]
-        POST2["Create release/X.Y.Z+1 from master in both repos\n(init-release.yml workflow aids this — not fully automated)"]
+        POST2["Create release/X.Y.Z+1 from master in both repos"]
         POST3["Commit version bump on new release branches"]
-        POST4[PR new branches into master + develop in both repos]
+        POST4["PR new branches into master + develop in both repos\n⚠️ init-release.yml may help with POST2–POST4 (unverified)"]
         POST1 --> POST2 --> POST3 --> POST4
     end
 
