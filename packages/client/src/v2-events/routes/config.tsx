@@ -12,9 +12,9 @@
 import React, { useEffect, useState } from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
 import { useIntl } from 'react-intl'
+import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 import { onlineManager } from '@tanstack/react-query'
-import { ResponsiveModal } from '@opencrvs/components'
 import { PrimaryButton } from '@opencrvs/components/src/buttons'
 import { ActionType } from '@opencrvs/commons/client'
 import { messages as reloadModalMessages } from '@client/i18n/messages/views/reloadModal'
@@ -106,6 +106,25 @@ function PrefetchQueries() {
   return null
 }
 
+const VersionMismatchPage = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+  background: ${({ theme }) => theme.colors.background};
+`
+
+const VersionMismatchContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 480px;
+  text-align: center;
+  padding: 24px;
+`
+
 /**
  * Configuration for the routes of the v2-events feature.
  *
@@ -189,6 +208,28 @@ export const routesConfig = {
       )
     }
 
+    // Render nothing but the notification when a version mismatch is detected.
+    // Mounting the full app tree (TRPCProvider, Outlet, workqueues) against a
+    // stale bundle would cause cascading errors, so we bail out early and ask
+    // the user to log in again with a clean session.
+    if (versionMismatch) {
+      return (
+        <VersionMismatchPage>
+          <VersionMismatchContent>
+            <h1>{intl.formatMessage(reloadModalMessages.title)}</h1>
+            <p>
+              {intl.formatMessage(reloadModalMessages.body, {
+                app_name: appName
+              })}
+            </p>
+            <PrimaryButton onClick={handleLoginRedirect}>
+              {intl.formatMessage(reloadModalMessages.loginAgain)}
+            </PrimaryButton>
+          </VersionMismatchContent>
+        </VersionMismatchPage>
+      )
+    }
+
     return (
       <NavigationHistoryProvider>
         <TRPCErrorBoundary>
@@ -197,23 +238,6 @@ export const routesConfig = {
             <Debug />
             <Toaster />
             <PrefetchQueries />
-            <ResponsiveModal
-              actions={[
-                <PrimaryButton key="login" onClick={handleLoginRedirect}>
-                  {intl.formatMessage(reloadModalMessages.loginAgain)}
-                </PrimaryButton>
-              ]}
-              autoHeight={true}
-              responsive={false}
-              show={versionMismatch}
-              showCloseButton={false}
-              title={intl.formatMessage(reloadModalMessages.title)}
-              titleHeightAuto={true}
-            >
-              {intl.formatMessage(reloadModalMessages.body, {
-                app_name: appName
-              })}
-            </ResponsiveModal>
           </TRPCProvider>
         </TRPCErrorBoundary>
       </NavigationHistoryProvider>
