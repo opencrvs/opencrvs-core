@@ -184,7 +184,7 @@ export const ChangePasswordStateClears: Story = {
 
     await step('Close modal', async () => {
       await userEvent.click(
-        canvasElement.querySelector('#close-btn') as HTMLElement
+        canvasElement.querySelector('[data-testid="close-dialog"]') as HTMLElement
       )
     })
 
