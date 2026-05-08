@@ -143,6 +143,10 @@ jobs:
 
       # Mirror this release initialisation in the companion repositories so all
       # three repos create their release branches and PRs at the same time.
+      # ${{ github.ref_name }} resolves to the branch name selected in the
+      # "Run workflow" dropdown (e.g. "master"), not the full ref path
+      # ("refs/heads/master") that context.ref carries. The workflow dispatch
+      # API requires a plain branch name, so ref_name is the correct value.
       - name: Trigger workflow in opencrvs-countryconfig
         uses: actions/github-script@v7
         with:
@@ -152,7 +156,7 @@ jobs:
               owner: context.repo.owner,
               repo: 'opencrvs-countryconfig',
               workflow_id: 'init-release.yml',
-              ref: context.ref,
+              ref: '${{ github.ref_name }}',
               inputs: {
                 version: '${{ inputs.version }}'
               }
@@ -167,7 +171,7 @@ jobs:
               owner: context.repo.owner,
               repo: 'opencrvs-farajaland',
               workflow_id: 'init-release.yml',
-              ref: context.ref,
+              ref: '${{ github.ref_name }}',
               inputs: {
                 version: '${{ inputs.version }}'
               }
