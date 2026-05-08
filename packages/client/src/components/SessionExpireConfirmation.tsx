@@ -11,7 +11,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { IStoreState } from '@client/store'
 import { redirectToAuthentication } from '@client/profile/profileActions'
@@ -34,10 +34,8 @@ const SessionExpireComponent = ({
     return null
   }
   return (
-    <ResponsiveModal
+    <Dialog
       title={intl.formatMessage(messages.sessionExpireTxt)}
-      contentHeight={96}
-      responsive={false}
       actions={[
         <PrimaryButton
           key="login"
@@ -47,7 +45,7 @@ const SessionExpireComponent = ({
           {intl.formatMessage(buttonMessages.login)}
         </PrimaryButton>
       ]}
-      show={true}
+      isOpen={true}
     />
   )
 }

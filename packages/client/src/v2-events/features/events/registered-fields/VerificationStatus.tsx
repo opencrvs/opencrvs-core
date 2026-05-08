@@ -16,7 +16,7 @@ import {
   Button,
   Icon,
   Pill,
-  ResponsiveModal,
+  Dialog,
   Stack,
   Text
 } from '@opencrvs/components'
@@ -86,10 +86,8 @@ function Input({
 
   const handleReset = async () => {
     const confirm = await openModal((close) => (
-      <ResponsiveModal
-        autoHeight
-        preventClickOnParent
-        show
+      <Dialog
+        isOpen
         actions={[
           <Button
             key="cancel-btn"
@@ -108,13 +106,12 @@ function Input({
             {intl.formatMessage(buttonMessages.continueButton)}
           </Button>
         ]}
-        handleClose={() => close(false)}
+        onClose={() => close(false)}
         id="assignment"
-        responsive={false}
         title={intl.formatMessage(messages[value].resetConfirmation.title)}
       >
         {intl.formatMessage(messages[value].resetConfirmation.description)}
-      </ResponsiveModal>
+      </Dialog>
     ))
     if (confirm) {
       onReset()

@@ -21,7 +21,7 @@ import {
   Checkbox,
   Link,
   ListReview,
-  ResponsiveModal,
+  Dialog,
   Stack,
   Text,
   TextArea
@@ -602,9 +602,7 @@ function EditModal({
 }) {
   const intl = useIntl()
   return (
-    <ResponsiveModal
-      autoHeight
-      showHeaderBorder
+    <Dialog
       actions={[
         <Button
           key="cancel_edit"
@@ -629,9 +627,8 @@ function EditModal({
           )}
         </Button>
       ]}
-      handleClose={() => close(null)}
-      responsive={false}
-      show={true}
+      onClose={() => close(null)}
+      isOpen={true}
       title={intl.formatMessage(copy?.title || reviewMessages.changeModalTitle)}
     >
       <Stack>
@@ -641,7 +638,7 @@ function EditModal({
           )}
         </Text>
       </Stack>
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 
@@ -663,9 +660,8 @@ function AcceptActionModal({
   const intl = useIntl()
 
   return (
-    <ResponsiveModal
-      autoHeight
-      show
+    <Dialog
+      isOpen
       actions={[
         <Button
           key={'cancel_' + action}
@@ -688,9 +684,9 @@ function AcceptActionModal({
           {intl.formatMessage(copy.onConfirm)}
         </Button>
       ]}
-      handleClose={() => close(null)}
-      showHeaderBorder={!!copy.supportingCopy}
+      onClose={() => close(null)}
       title={intl.formatMessage(copy.title, { event: eventType })}
+      variant="large"
       width={600}
     >
       <Stack>
@@ -703,7 +699,7 @@ function AcceptActionModal({
           />
         )}
       </Stack>
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 
@@ -781,14 +777,13 @@ function RejectActionModal({
   ]
 
   return (
-    <ResponsiveModal
-      showHeaderBorder
+    <Dialog
       actions={actions}
-      contentHeight={270}
-      handleClose={() => close(null)}
+      onClose={() => close(null)}
       id="reject-modal"
-      show={true}
+      isOpen={true}
       title={intl.formatMessage(reviewMessages.rejectModalTitle)}
+      variant="large"
       width={918}
     >
       <Stack alignItems="left" direction="column">
@@ -813,7 +808,7 @@ function RejectActionModal({
           }
         />
       </Stack>
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 

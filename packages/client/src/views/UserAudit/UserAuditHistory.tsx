@@ -26,7 +26,7 @@ import { orderBy } from 'lodash'
 
 import subMonths from 'date-fns/subMonths'
 
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import format from '@client/utils/date-formatting'
 import { Text } from '@opencrvs/components/lib/Text'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
@@ -354,14 +354,13 @@ function UserAuditHistoryComponent(props: Props) {
             }
           />
           {state.actionDetailsData && (
-            <ResponsiveModal
+            <Dialog
               actions={[]}
-              handleClose={() => toggleActionDetails(null)}
-              show={state.showModal}
-              responsive={true}
+              onClose={() => toggleActionDetails(null)}
+              isOpen={state.showModal}
               title={getActionMessage(state.actionDetailsData)}
+              variant="large"
               width={1024}
-              autoHeight={true}
             >
               <AuditContent>
                 {props.userName} -{' '}
@@ -370,7 +369,7 @@ function UserAuditHistoryComponent(props: Props) {
                   'MMMM dd, yyyy hh:mm a'
                 )}
               </AuditContent>
-            </ResponsiveModal>
+            </Dialog>
           )}
         </TableDiv>
       )}

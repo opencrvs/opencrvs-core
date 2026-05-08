@@ -14,7 +14,7 @@ import { useIntl } from 'react-intl'
 import styled from 'styled-components'
 import {
   Button,
-  ResponsiveModal,
+  Dialog,
   Select,
   Stack,
   Text,
@@ -56,7 +56,7 @@ export function MarkAsDuplicateModal({
     setComment(event.target.value)
   }
   return (
-    <ResponsiveModal
+    <Dialog
       actions={[
         <Button
           key="cancel"
@@ -78,17 +78,16 @@ export function MarkAsDuplicateModal({
           {intl.formatMessage(duplicateMessages.markAsDuplicateButton)}
         </Button>
       ]}
-      autoHeight={true}
-      handleClose={() => close()}
+      onClose={() => close()}
       id="mark-as-duplicate-modal"
-      show={true}
+      isOpen={true}
       title={intl.formatMessage(
         duplicateMessages.markAsDuplicateConfirmationTitle,
         {
           trackingId: originalTrackingId
         }
       )}
-      titleHeightAuto={true}
+      variant="large"
       width={840}
     >
       {
@@ -119,6 +118,6 @@ export function MarkAsDuplicateModal({
           />
         </Stack>
       }
-    </ResponsiveModal>
+    </Dialog>
   )
 }

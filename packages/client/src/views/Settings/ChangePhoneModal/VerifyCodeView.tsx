@@ -15,7 +15,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Message } from '@client/views/Settings/items/components'
 import { InputField } from '@opencrvs/components/lib/InputField'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import * as React from 'react'
@@ -134,9 +134,9 @@ export function VerifyCodeView({
   }, [show])
 
   return (
-    <ResponsiveModal
+    <Dialog
       id="VerifyCodeModal"
-      show={show}
+      isOpen={show}
       title={intl.formatMessage(messages.verifyPhoneLabel)}
       actions={[
         <TertiaryButton key="cancel" id="modal_cancel" onClick={onClose}>
@@ -151,9 +151,7 @@ export function VerifyCodeView({
           {intl.formatMessage(buttonMessages.continueButton)}
         </PrimaryButton>
       ]}
-      handleClose={onClose}
-      contentHeight={150}
-      contentScrollableY={true}
+      onClose={onClose}
     >
       <Message>
         {data.phoneNumber
@@ -192,6 +190,6 @@ export function VerifyCodeView({
           onChange={onChangeVerifyCode}
         />
       </InputField>
-    </ResponsiveModal>
+    </Dialog>
   )
 }

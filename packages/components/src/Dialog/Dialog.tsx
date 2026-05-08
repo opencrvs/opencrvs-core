@@ -8,11 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useRef } from 'react'
+import React, { useId, useRef } from 'react'
 import styled from 'styled-components'
 import { Text } from '../Text'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
+import { useDialogA11y } from './useDialogA11y'
 
 export interface IDialogProps {
   id?: string
@@ -47,7 +48,7 @@ const DialogContainer = styled.div<{
   width?: number
 }>`
   position: relative;
-  ${({ variant, width }) =>
+  ${({ variant, width, theme }) =>
     variant === 'small'
       ? `
         width: 480px;
@@ -57,13 +58,13 @@ const DialogContainer = styled.div<{
         min-height: 118px;
         height: auto;
         width: ${width ? `${width}px` : '80%'};
-            @media (max-width: 768px) and (orientation: portrait) {
-             width: 100%;
-             height: 100%;
-             max-width: 100%;
-             max-height: 100%;
-             border-radius: 0;
-             }
+        @media (max-width: ${theme.grid.breakpoints.lg}px) {
+          width: 100%;
+          height: 100%;
+          max-width: 100%;
+          max-height: 100%;
+          border-radius: 0;
+        }
       `}
   background-color: ${({ theme }) => theme.colors.white};
   border-radius: 4px;
@@ -97,6 +98,12 @@ const DialogFooter = styled.div`
   gap: 8px;
   justify-content: flex-end;
   border-top: 1px solid ${({ theme }) => theme.colors.grey200};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    flex-direction: column-reverse;
+    & > * {
+      width: 100%;
+    }
+  }
 `
 
 export function Dialog({
@@ -111,11 +118,17 @@ export function Dialog({
   titleIcon
 }: IDialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
+  const generatedTitleId = useId()
+  const titleId = id ? `${id}-title` : generatedTitleId
+  const contentId = `${titleId}-content`
+
   const handleClose = () => {
     if (onClose) {
       onClose()
     }
   }
+
+  useDialogA11y(dialogRef, isOpen, onClose)
 
   const hasActions = actions && actions.length > 0
 
@@ -140,24 +153,31 @@ export function Dialog({
             variant={variant}
             ref={dialogRef}
             role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+            aria-describedby={contentId}
+            tabIndex={-1}
           >
             <DialogHeader>
               <DialogTitle>
                 {titleIcon}
-                <Text variant="h2" element="h2" color="grey600">
+                <Text id={titleId} variant="h2" element="h2" color="grey600">
                   {title}
                 </Text>
               </DialogTitle>
-              <Button
-                data-testid="close-dialog"
-                type="icon"
-                size="medium"
-                onClick={handleClose}
-              >
-                <Icon name="X" size="large" weight="bold" />
-              </Button>
+              {onClose && (
+                <Button
+                  data-testid="close-dialog"
+                  aria-label="Close dialog"
+                  type="icon"
+                  size="medium"
+                  onClick={handleClose}
+                >
+                  <Icon name="X" size="large" weight="bold" />
+                </Button>
+              )}
             </DialogHeader>
-            <DialogContent>{children}</DialogContent>
+            <DialogContent id={contentId}>{children}</DialogContent>
             {hasActions && <DialogFooter>{actions}</DialogFooter>}
           </DialogContainer>
         </DialogWrapper>

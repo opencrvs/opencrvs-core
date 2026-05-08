@@ -13,7 +13,7 @@ import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { ErrorMessage } from '@opencrvs/components/lib/ErrorMessage'
 import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { userMessages as messages } from '@client/i18n/messages'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import styled from 'styled-components'
@@ -199,11 +199,10 @@ export function PasswordChangeModal({
   }
 
   return (
-    <ResponsiveModal
+    <Dialog
       id="ChangePasswordModal"
       title={intl.formatMessage(messages.changePassword)}
-      show={showPasswordChange}
-      contentHeight={420}
+      isOpen={showPasswordChange}
       actions={[
         <PrimaryButton
           id="confirm-button"
@@ -220,8 +219,9 @@ export function PasswordChangeModal({
           {intl.formatMessage(messages.confirmButtonLabel)}
         </PrimaryButton>
       ]}
+      variant="large"
       width={1000}
-      handleClose={hideModal}
+      onClose={hideModal}
     >
       <Message>{intl.formatMessage(messages.changePasswordMessage)}</Message>
 
@@ -387,6 +387,6 @@ export function PasswordChangeModal({
           </ValidationRulesSectionLg>
         </Row>
       </form>
-    </ResponsiveModal>
+    </Dialog>
   )
 }
