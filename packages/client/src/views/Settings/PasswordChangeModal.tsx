@@ -10,7 +10,6 @@
  */
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { InputField } from '@opencrvs/components/lib/InputField'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { ErrorMessage } from '@opencrvs/components/lib/ErrorMessage'
 import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
@@ -22,6 +21,7 @@ import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { PasswordInput } from '@opencrvs/components'
 
 const Message = styled.div`
   margin-bottom: 16px;
@@ -248,9 +248,8 @@ export function PasswordChangeModal({
                 required={false}
                 optionalLabel=""
               >
-                <TextInput
+                <PasswordInput
                   id="CurrentPassword"
-                  type="password"
                   touched={true}
                   value={currentPassword}
                   onChange={handleSetCurrentPassword}
@@ -268,9 +267,8 @@ export function PasswordChangeModal({
                 touched={true}
                 required={false}
               >
-                <TextInput
+                <PasswordInput
                   id="NewPassword"
-                  type="password"
                   touched={true}
                   value={newPassword}
                   onChange={checkPasswordStrength}
@@ -324,9 +322,8 @@ export function PasswordChangeModal({
                 required={false}
                 optionalLabel=""
               >
-                <TextInput
+                <PasswordInput
                   id="ConfirmPassword"
-                  type="password"
                   touched={true}
                   error={passwordMismatched}
                   value={confirmPassword}
