@@ -256,7 +256,9 @@ export const TogglePasswordVisibility: Story = {
       const input = canvasElement.querySelector(
         `#${inputId}`
       ) as HTMLInputElement
-      return input?.parentElement?.querySelector('button') as HTMLButtonElement
+      return (input.parentElement as HTMLElement).querySelector(
+        'button'
+      ) as HTMLButtonElement
     }
 
     await step('Toggle CurrentPassword visibility', async () => {
