@@ -10,6 +10,7 @@
  */
 import { buttonMessages } from '@client/i18n/messages'
 import { messages as userSetupMessages } from '@client/i18n/messages/views/userSetup'
+import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import {
@@ -26,7 +27,8 @@ export function AssignedOffice() {
   const intl = useIntl()
   const officeName = useSelector<IStoreState, string>((state) => {
     const userDetails = getUserDetails(state)
-    return userDetails?.primaryOffice.name ?? ''
+    if (!userDetails?.primaryOfficeId) return ''
+    return getOfflineData(state).offices?.[userDetails.primaryOfficeId]?.name ?? ''
   })
   return (
     <ListViewItemSimplified

@@ -14,7 +14,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import { userEvent, within, expect } from '@storybook/test'
+import { userEvent, within, expect, waitFor } from '@storybook/test'
 import {
   ActionType,
   createPrng,
@@ -630,7 +630,7 @@ export const WorkqueueAutoRefreshOnCountChange: Story = {
     autoRefreshDataChanged = false
   },
   parameters: {
-    userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
