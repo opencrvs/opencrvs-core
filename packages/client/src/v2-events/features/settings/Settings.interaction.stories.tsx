@@ -130,7 +130,7 @@ export const ChangePasswordStateClears: Story = {
     const canvas = within(canvasElement)
 
     await step('Open modal and trigger all validation states', async () => {
-      await waitFor(() =>
+      await waitFor(async () =>
         expect(canvasElement.querySelector('#BtnChangePassword')).toBeEnabled()
       )
       await userEvent.click(
