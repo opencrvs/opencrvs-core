@@ -147,9 +147,10 @@ export function PasswordChangeModal({
   ) => {
     const value = event.target.value
     setNewPassword(value)
-    setConfirmPassword(EMPTY_STRING)
-    setPasswordMatched(false)
-    setPasswordMismatched(false)
+    setPasswordMatched(confirmPassword.length > 0 && confirmPassword === value)
+    setPasswordMismatched(
+      confirmPassword.length > 0 && confirmPassword !== value
+    )
     setValidLength(value.length >= 12)
     setHasNumber(/\d/.test(value))
     setHasCases(/[a-z]/.test(value) && /[A-Z]/.test(value))
