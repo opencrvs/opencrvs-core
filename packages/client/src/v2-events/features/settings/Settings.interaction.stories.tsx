@@ -232,6 +232,155 @@ export const ChangePasswordStateClears: Story = {
   }
 }
 
+export const TogglePasswordVisibility: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.buildPath({})
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await waitFor(async () =>
+      expect(canvasElement.querySelector('#BtnChangePassword')).toBeEnabled()
+    )
+    await userEvent.click(
+      canvasElement.querySelector('#BtnChangePassword') as HTMLElement
+    )
+
+    await canvas.findByText('Change password')
+
+    const getToggleButton = (inputId: string) => {
+      const input = canvasElement.querySelector(
+        `#${inputId}`
+      ) as HTMLInputElement
+      return input?.parentElement?.querySelector('button') as HTMLButtonElement
+    }
+
+    await step('Toggle CurrentPassword visibility', async () => {
+      await userEvent.type(
+        canvasElement.querySelector('#CurrentPassword') as HTMLInputElement,
+        'somepassword'
+      )
+
+      const input = canvasElement.querySelector(
+        '#CurrentPassword'
+      ) as HTMLInputElement
+      await expect(input.type).toBe('password')
+
+      await userEvent.click(getToggleButton('CurrentPassword'))
+      await expect(input.type).toBe('text')
+
+      await userEvent.click(getToggleButton('CurrentPassword'))
+      await expect(input.type).toBe('password')
+    })
+
+    await step('Toggle NewPassword visibility', async () => {
+      await userEvent.type(
+        canvasElement.querySelector('#NewPassword') as HTMLInputElement,
+        'NewPass1234567'
+      )
+
+      const input = canvasElement.querySelector(
+        '#NewPassword'
+      ) as HTMLInputElement
+      await expect(input.type).toBe('password')
+
+      await userEvent.click(getToggleButton('NewPassword'))
+      await expect(input.type).toBe('text')
+
+      await userEvent.click(getToggleButton('NewPassword'))
+      await expect(input.type).toBe('password')
+    })
+
+    await step('Toggle ConfirmPassword visibility', async () => {
+      await userEvent.type(
+        canvasElement.querySelector('#ConfirmPassword') as HTMLInputElement,
+        'NewPass1234567'
+      )
+
+      const input = canvasElement.querySelector(
+        '#ConfirmPassword'
+      ) as HTMLInputElement
+      await expect(input.type).toBe('password')
+
+      await userEvent.click(getToggleButton('ConfirmPassword'))
+      await expect(input.type).toBe('text')
+
+      await userEvent.click(getToggleButton('ConfirmPassword'))
+      await expect(input.type).toBe('password')
+    })
+  }
+}
+
+export const ConfirmPasswordPreservedOnNewPasswordChange: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.buildPath({})
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await waitFor(async () =>
+      expect(canvasElement.querySelector('#BtnChangePassword')).toBeEnabled()
+    )
+    await userEvent.click(
+      canvasElement.querySelector('#BtnChangePassword') as HTMLElement
+    )
+
+    await canvas.findByText('Change password')
+
+    await step('Type confirm password first', async () => {
+      await userEvent.type(
+        canvasElement.querySelector('#ConfirmPassword') as HTMLInputElement,
+        'MyPass1234567'
+      )
+      await expect(
+        (canvasElement.querySelector('#ConfirmPassword') as HTMLInputElement)
+          .value
+      ).toBe('MyPass1234567')
+    })
+
+    await step('Type matching new password — passwords match', async () => {
+      await userEvent.type(
+        canvasElement.querySelector('#NewPassword') as HTMLInputElement,
+        'MyPass1234567'
+      )
+      await canvas.findByText('Passwords match')
+
+      await expect(
+        (canvasElement.querySelector('#ConfirmPassword') as HTMLInputElement)
+          .value
+      ).toBe('MyPass1234567')
+    })
+
+    await step(
+      'Change new password — confirm password preserved, mismatch shown',
+      async () => {
+        await userEvent.clear(
+          canvasElement.querySelector('#NewPassword') as HTMLInputElement
+        )
+        await userEvent.type(
+          canvasElement.querySelector('#NewPassword') as HTMLInputElement,
+          'DifferentPass1234567'
+        )
+
+        await canvas.findByText('Passwords do not match')
+
+        await expect(
+          (canvasElement.querySelector('#ConfirmPassword') as HTMLInputElement)
+            .value
+        ).toBe('MyPass1234567')
+      }
+    )
+  }
+}
+
 export const ChangeEmailAddress: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
