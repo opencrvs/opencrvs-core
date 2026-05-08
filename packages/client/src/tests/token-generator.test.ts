@@ -57,6 +57,12 @@ it('Generates tokens', () => {
       subject: generator.user.id.provincialRegistrar,
       userType: TokenUserType.enum.user,
       role: TestUserRole.enum.PROVINCIAL_REGISTRAR
+    }),
+    testAdmin: generateToken({
+      scope: generator.user.scopes.testAdmin,
+      subject: generator.user.id.fieldAgent,
+      userType: TokenUserType.enum.user,
+      role: TestUserRole.enum.FIELD_AGENT
     })
   }
   expect(token.fieldAgent).toMatchSnapshot('fieldAgent token')
@@ -66,4 +72,5 @@ it('Generates tokens', () => {
   expect(token.nationalSystemAdmin).toMatchSnapshot('nationalSystemAdmin token')
   expect(token.communityLeader).toMatchSnapshot('communityLeader token')
   expect(token.provincialRegistrar).toMatchSnapshot('provincialRegistrar token')
+  expect(token.testAdmin).toMatchSnapshot('testAdmin token')
 })

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Kysely, sql } from 'kysely'
+import { Kysely, RawBuilder, sql } from 'kysely'
 import { chunk } from 'lodash'
 import { Location, logger, UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
@@ -157,7 +157,9 @@ export async function getLocationById(locationId: UUID) {
     .executeTakeFirst()
 }
 
-function getAdministrativeHierarchyByIdCte(id: string) {
+export function getAdministrativeHierarchyByIdCte(
+  id: string | RawBuilder<unknown>
+) {
   return sql`
     WITH RECURSIVE area_chain AS (
         -- 1a: Start with location and get its administrative area

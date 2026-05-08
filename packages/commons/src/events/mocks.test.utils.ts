@@ -8,7 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { UUID, Location, AdministrativeArea } from '@opencrvs/commons/client'
+
+import { UUID } from 'src/uuid'
+import { AdministrativeArea, Location } from './locations'
 
 /*
  * Central
