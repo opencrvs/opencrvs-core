@@ -76,9 +76,9 @@ export const VerificationWizard = ({
             {intl.formatMessage(messages.confirm)}
           </Button>
         ]}
-        onClose={() => close()}
         isOpen={true}
         title={intl.formatMessage(pageConfig.actions.cancel.confirmation.title)}
+        onClose={() => close()}
       >
         <Stack>
           <Text color="grey500" element="p" variant="reg16">

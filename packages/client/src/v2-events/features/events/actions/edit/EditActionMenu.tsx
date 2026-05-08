@@ -131,10 +131,10 @@ function EditActionModal({
           {intl.formatMessage(messages.confirm)}
         </Button>
       ]}
-      onClose={() => close({ confirmed: false })}
       title={intl.formatMessage(title)}
       variant="large"
       width={800}
+      onClose={() => close({ confirmed: false })}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">

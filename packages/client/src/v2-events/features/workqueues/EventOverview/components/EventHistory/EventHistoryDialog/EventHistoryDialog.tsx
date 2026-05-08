@@ -122,12 +122,12 @@ export function EventHistoryDialog({
   return (
     <Dialog
       actions={[]}
-      onClose={close}
       id="event-history-modal"
       isOpen={true}
       title={title}
       variant="large"
       width={1024}
+      onClose={close}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg19">

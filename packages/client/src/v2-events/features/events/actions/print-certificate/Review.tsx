@@ -288,10 +288,10 @@ export function Review() {
             {intl.formatMessage(messages.print)}
           </Button>
         ]}
-        onClose={() => close(false)}
         id="confirm-print-modal"
         isOpen={true}
         title={intl.formatMessage(messages.printAndIssueModalTitle)}
+        onClose={() => close(false)}
       >
         {intl.formatMessage(messages.printAndIssueModalBody)}
       </Dialog>

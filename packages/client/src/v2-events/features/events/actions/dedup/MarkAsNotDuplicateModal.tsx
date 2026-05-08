@@ -46,7 +46,6 @@ export function MarkAsNotDuplicateModal({
           {intl.formatMessage(buttonMessages.confirm)}
         </Button>
       ]}
-      onClose={() => close(false)}
       id="not-duplicate-modal"
       isOpen={true}
       title={intl.formatMessage(
@@ -56,6 +55,7 @@ export function MarkAsNotDuplicateModal({
           trackingId
         }
       )}
+      onClose={() => close(false)}
     />
   )
 }

@@ -627,9 +627,9 @@ function EditModal({
           )}
         </Button>
       ]}
-      onClose={() => close(null)}
       isOpen={true}
       title={intl.formatMessage(copy?.title || reviewMessages.changeModalTitle)}
+      onClose={() => close(null)}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
@@ -684,10 +684,10 @@ function AcceptActionModal({
           {intl.formatMessage(copy.onConfirm)}
         </Button>
       ]}
-      onClose={() => close(null)}
       title={intl.formatMessage(copy.title, { event: eventType })}
       variant="large"
       width={600}
+      onClose={() => close(null)}
     >
       <Stack>
         {copy.supportingCopy && (
@@ -779,12 +779,12 @@ function RejectActionModal({
   return (
     <Dialog
       actions={actions}
-      onClose={() => close(null)}
       id="reject-modal"
       isOpen={true}
       title={intl.formatMessage(reviewMessages.rejectModalTitle)}
       variant="large"
       width={918}
+      onClose={() => close(null)}
     >
       <Stack alignItems="left" direction="column">
         <Text color="grey500" element="p" variant="reg16">

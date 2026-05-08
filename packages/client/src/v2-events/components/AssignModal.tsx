@@ -38,9 +38,9 @@ export function AssignModal({ close }: { close: (result: boolean) => void }) {
           {intl.formatMessage(buttonMessages.cancel)}
         </Button>
       ]}
-      onClose={() => close(false)}
       id="assignment"
       title={intl.formatMessage(conflictsMessages.assignTitle)}
+      onClose={() => close(false)}
     >
       {intl.formatMessage(conflictsMessages.assignDesc)}
     </Dialog>

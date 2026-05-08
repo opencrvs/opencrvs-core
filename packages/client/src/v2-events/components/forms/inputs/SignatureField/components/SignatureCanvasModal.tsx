@@ -70,12 +70,12 @@ export function SignatureCanvasModal({
           {intl.formatMessage(buttonMessages.apply)}
         </Button>
       ]}
-      onClose={onClose}
       id={`${id}_modal`}
       isOpen={true}
       title={title}
       variant="large"
       width={600}
+      onClose={onClose}
     >
       <SignatureDescription>
         {intl.formatMessage(messages.signatureInputDescription)}

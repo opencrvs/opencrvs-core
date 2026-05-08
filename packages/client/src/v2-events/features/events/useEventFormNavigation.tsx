@@ -125,9 +125,9 @@ export function useEventFormNavigation() {
             {intl.formatMessage(modalMessages.confirm)}
           </Button>
         ]}
-        onClose={() => close(null)}
         isOpen={true}
         title={intl.formatMessage(modalMessages.exitWithoutSavingTitle)}
+        onClose={() => close(null)}
       >
         <Stack>
           <Text color="grey500" element="p" variant="reg16">
@@ -177,9 +177,9 @@ export function useEventFormNavigation() {
             {intl.formatMessage(modalMessages.confirm)}
           </Button>
         ]}
-        onClose={() => close(null)}
         isOpen={true}
         title={intl.formatMessage(modalMessages.deleteDeclarationTitle)}
+        onClose={() => close(null)}
       >
         <Stack>
           <Text color="grey500" element="p" variant="reg16">

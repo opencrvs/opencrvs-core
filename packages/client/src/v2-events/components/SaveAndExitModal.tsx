@@ -68,12 +68,12 @@ export function useSaveAndExitModal() {
             {intl.formatMessage(saveAndExitModalMessages.confirm)}
           </Button>
         ]}
-        onClose={() => close(null)}
         id="save_declaration_confirmation"
         isOpen={true}
         title={intl.formatMessage(
           saveAndExitModalMessages.saveDeclarationConfirmModalTitle
         )}
+        onClose={() => close(null)}
       >
         <Stack>
           <Text color="grey500" element="p" variant="reg16">

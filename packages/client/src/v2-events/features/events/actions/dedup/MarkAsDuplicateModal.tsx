@@ -78,7 +78,6 @@ export function MarkAsDuplicateModal({
           {intl.formatMessage(duplicateMessages.markAsDuplicateButton)}
         </Button>
       ]}
-      onClose={() => close()}
       id="mark-as-duplicate-modal"
       isOpen={true}
       title={intl.formatMessage(
@@ -89,6 +88,7 @@ export function MarkAsDuplicateModal({
       )}
       variant="large"
       width={840}
+      onClose={() => close()}
     >
       {
         <Stack alignItems="stretch" direction="column" gap={10}>

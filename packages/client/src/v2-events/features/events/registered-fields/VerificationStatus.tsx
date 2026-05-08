@@ -106,9 +106,9 @@ function Input({
             {intl.formatMessage(buttonMessages.continueButton)}
           </Button>
         ]}
-        onClose={() => close(false)}
         id="assignment"
         title={intl.formatMessage(messages[value].resetConfirmation.title)}
+        onClose={() => close(false)}
       >
         {intl.formatMessage(messages[value].resetConfirmation.description)}
       </Dialog>

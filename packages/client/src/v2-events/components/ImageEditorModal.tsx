@@ -153,12 +153,12 @@ function ImageEditorModal({
           {intl.formatMessage(buttonMessages.apply)}
         </Button>
       ]}
-      onClose={() => onClose(null)}
       id="ImageEditorModal"
       isOpen={true}
       title={intl.formatMessage(messages.title)}
       variant="large"
       width={1080}
+      onClose={() => onClose(null)}
     >
       <Description>
         {error ? (
