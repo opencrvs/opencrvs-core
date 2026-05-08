@@ -840,7 +840,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: d4d3fa7e-c657-4e08-8f35-77ebe5de3f1f
+                transactionId: 8ae7499d-d4e9-42f3-93d2-064977f6dd41
                 type: birth
       responses:
         "200":
@@ -909,6 +909,10 @@ paths:
                   format: uuid
                 keepAssignment:
                   type: boolean
+                keepAssignmentIfAccepted:
+                  type: boolean
+                keepAssignmentIfRejected:
+                  type: boolean
                 createdAtLocation:
                   type: string
                   nullable: true
@@ -926,7 +930,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 56013c90-bbce-4b3c-b5d5-6ed0e91010b4
+                transactionId: f17d2be2-2170-4ecf-9e95-48ae2d263bcf
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -996,6 +1000,10 @@ paths:
                   type: string
                   format: uuid
                 keepAssignment:
+                  type: boolean
+                keepAssignmentIfAccepted:
+                  type: boolean
+                keepAssignmentIfRejected:
                   type: boolean
                 createdAtLocation:
                   type: string
@@ -1078,6 +1086,10 @@ paths:
                   type: string
                   format: uuid
                 keepAssignment:
+                  type: boolean
+                keepAssignmentIfAccepted:
+                  type: boolean
+                keepAssignmentIfRejected:
                   type: boolean
                 createdAtLocation:
                   type: string
@@ -1163,6 +1175,10 @@ paths:
                   type: string
                   format: uuid
                 keepAssignment:
+                  type: boolean
+                keepAssignmentIfAccepted:
+                  type: boolean
+                keepAssignmentIfRejected:
                   type: boolean
                 createdAtLocation:
                   type: string
