@@ -276,7 +276,7 @@ function validateCustomAction({
     eventConfig,
     customActionType
   )
-  return getFieldErrors(customActionFields, annotation, context, {})
+  return getFieldErrors(customActionFields, annotation, context)
 }
 
 function validateNotifyAction({

@@ -57,6 +57,13 @@ function hasPotentialDuplicates(
   return eventIndex.potentialDuplicates.length > 0
 }
 
+function wasRejected(event: EventDocument, actionType: ActionType): boolean {
+  return (
+    event.actions.filter((a) => a.type === actionType).at(-1)?.status ===
+    ActionStatus.Rejected
+  )
+}
+
 /**
  * Runs a sequence of actions from declare to register.
  *
@@ -75,10 +82,13 @@ export async function registerOnDeclare({
     annotation,
     eventId,
     transactionId,
-    keepAssignment: true
+    keepAssignmentIfAccepted: true
   })
 
-  if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
+  if (
+    hasPotentialDuplicates(declaredEvent, eventConfiguration) ||
+    wasRejected(declaredEvent, ActionType.DECLARE)
+  ) {
     return declaredEvent
   }
 
@@ -98,7 +108,7 @@ export async function editAndRegister({
   content,
   eventConfiguration
 }: EditRequestParams) {
-  await trpcClient.event.actions.edit.request.mutate({
+  const editedEvent = await trpcClient.event.actions.edit.request.mutate({
     declaration,
     annotation,
     eventId,
@@ -107,20 +117,27 @@ export async function editAndRegister({
     content
   })
 
+  if (wasRejected(editedEvent, ActionType.EDIT)) {
+    return editedEvent
+  }
+
   const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
-    declaration,
+    declaration: {},
     annotation,
     eventId,
     transactionId,
-    keepAssignment: true
+    keepAssignmentIfAccepted: true
   })
 
-  if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
+  if (
+    hasPotentialDuplicates(declaredEvent, eventConfiguration) ||
+    wasRejected(declaredEvent, ActionType.DECLARE)
+  ) {
     return declaredEvent
   }
 
   return trpcClient.event.actions.register.request.mutate({
-    declaration,
+    declaration: {},
     annotation,
     eventId,
     transactionId
@@ -134,7 +151,7 @@ export async function editAndDeclare({
   annotation,
   content
 }: EditRequestParams) {
-  await trpcClient.event.actions.edit.request.mutate({
+  const editedEvent = await trpcClient.event.actions.edit.request.mutate({
     declaration,
     annotation,
     eventId,
@@ -142,6 +159,10 @@ export async function editAndDeclare({
     keepAssignment: true,
     content
   })
+
+  if (wasRejected(editedEvent, ActionType.EDIT)) {
+    return editedEvent
+  }
 
   return trpcClient.event.actions.declare.request.mutate({
     declaration,
@@ -158,7 +179,7 @@ export async function editAndNotify({
   annotation,
   content
 }: EditRequestParams) {
-  await trpcClient.event.actions.edit.request.mutate({
+  const editedEvent = await trpcClient.event.actions.edit.request.mutate({
     declaration,
     annotation,
     eventId,
@@ -166,6 +187,10 @@ export async function editAndNotify({
     keepAssignment: true,
     content
   })
+
+  if (wasRejected(editedEvent, ActionType.EDIT)) {
+    return editedEvent
+  }
 
   return trpcClient.event.actions.notify.request.mutate({
     declaration,
@@ -247,8 +272,12 @@ export async function makeCorrectionOnRequest({
       declaration,
       transactionId,
       annotation,
-      keepAssignment: true
+      keepAssignmentIfAccepted: true
     })
+
+  if (wasRejected(response, ActionType.REQUEST_CORRECTION)) {
+    return response
+  }
 
   const requestId = response.actions.find(
     (a) =>
