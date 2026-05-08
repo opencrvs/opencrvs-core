@@ -115,9 +115,9 @@ export function Review() {
       >
         <Button
           key="continue_button"
-          type="primary"
           disabled={!anyValuesHaveChanged || incomplete}
           id="continue_button"
+          type="primary"
           onClick={() => {
             navigate(
               ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath(
