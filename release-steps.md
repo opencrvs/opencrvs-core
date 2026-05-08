@@ -36,7 +36,7 @@ flowchart TD
 
     subgraph POST["Post-release"]
         POST1[Merge both release branches into master + develop simultaneously]
-        POST2["Create release/X.Y.Z+1 from master in both repos"]
+        POST2["Create release/X.Y.Z+1 from release/X.Y.Z in both repos"]
         POST3["Commit version bump on new release branches"]
         POST4["PR new branches into master + develop in both repos\n⚠️ init-release.yml may help with POST2–POST4 (unverified)"]
         POST1 --> POST2 --> POST3 --> POST4
