@@ -17,18 +17,17 @@ import {
   AddressType,
   eventQueryDataGenerator,
   tennisClubMembershipEvent,
-  UUID
+  UUID,
+  V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
+  V2_DEFAULT_MOCK_LOCATIONS,
+  V2_DEFAULT_MOCK_LOCATIONS_MAP
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import {
   tennisClubMembershipEventDocument,
   tennisClubMembershipEventIndex
 } from '../../fixtures'
-import {
-  V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
-  V2_DEFAULT_MOCK_LOCATIONS,
-  V2_DEFAULT_MOCK_LOCATIONS_MAP
-} from '../../../../../tests/v2-events/administrative-hierarchy-mock'
+
 import {
   svgToPdfTemplate,
   stringifyEventMetadata,

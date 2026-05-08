@@ -37,6 +37,7 @@ import {
   getUsersAndSystemsByIds,
   createUserWithCredentials,
   searchUsersWithInput,
+  searchAllUsersWithInput,
   activateUserWithCredentials,
   updateUserById,
   updateUsernameById,
@@ -65,6 +66,7 @@ export type SearchUsersPayload = {
   email?: string
   status?: string
   primaryOfficeId?: UUID
+  administrativeAreaId?: UUID
   locationId?: UUID
   count: number
   skip: number
@@ -194,6 +196,13 @@ export async function searchUsers(
   return results.map(mapDbUserToUser)
 }
 
+export async function searchUsersAll(
+  payload: Omit<SearchUsersPayload, 'skip' | 'count'>
+): Promise<User[]> {
+  const results = await searchAllUsersWithInput(payload)
+  return results.map(mapDbUserToUser)
+}
+
 export async function updateUser(
   input: UpdateUserInput,
   token: string
@@ -310,7 +319,7 @@ export const ResolvedCreateUserInput = CreateUserInput.extend({
 })
 export type ResolvedCreateUserInput = z.infer<typeof ResolvedCreateUserInput>
 
-export async function resolveCreateUserInput(
+async function resolveCreateUserInput(
   input: CreateUserInput | CreateUserInputInternal
 ): Promise<ResolvedCreateUserInput> {
   return ResolvedCreateUserInput.parse({

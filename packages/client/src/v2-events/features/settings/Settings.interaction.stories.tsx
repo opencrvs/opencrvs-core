@@ -9,9 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { userEvent, within, expect, fireEvent } from '@storybook/test'
+import { userEvent, within, expect, fireEvent, waitFor } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
+import { TRPCError } from '@trpc/server'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
 import { SettingsPage } from './Settings'
@@ -103,6 +104,131 @@ export const ChangePhoneNumber: Story = {
     )
 
     await canvas.findByText('Phone number updated')
+  }
+}
+
+export const ChangePasswordStateClears: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        changePassword: [
+          tRPCMsw.user.changePassword.mutation(() => {
+            throw new TRPCError({
+              code: 'UNAUTHORIZED'
+            })
+          })
+        ]
+      }
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.buildPath({})
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Open modal and trigger all validation states', async () => {
+      await waitFor(async () =>
+        expect(canvasElement.querySelector('#BtnChangePassword')).toBeEnabled()
+      )
+      await userEvent.click(
+        canvasElement.querySelector('#BtnChangePassword') as HTMLElement
+      )
+
+      await canvas.findByText('Change password')
+
+      await userEvent.type(
+        canvasElement.querySelector('#CurrentPassword') as HTMLInputElement,
+        'currentpassword'
+      )
+
+      await userEvent.type(
+        canvasElement.querySelector('#NewPassword') as HTMLInputElement,
+        'NewPass1234567'
+      )
+
+      await userEvent.type(
+        canvasElement.querySelector('#ConfirmPassword') as HTMLInputElement,
+        'WrongPass9999'
+      )
+      await canvas.findByText('Passwords do not match')
+
+      await userEvent.clear(
+        canvasElement.querySelector('#ConfirmPassword') as HTMLInputElement
+      )
+      await userEvent.type(
+        canvasElement.querySelector('#ConfirmPassword') as HTMLInputElement,
+        'NewPass1234567'
+      )
+      await canvas.findByText('Passwords match')
+
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Confirm' })
+      )
+      await canvas.findByText(
+        'Current password incorrect. Please try again.',
+        {},
+        {
+          timeout: 5000
+        }
+      )
+    })
+
+    await step('Validation tick icons show passing rules', async () => {
+      await expect(
+        canvasElement.querySelectorAll('ellipse[fill="#49B78D"]').length
+      ).toBeGreaterThan(0)
+    })
+
+    await step('Close modal', async () => {
+      await userEvent.click(
+        canvasElement.querySelector('#close-btn') as HTMLElement
+      )
+    })
+
+    await step('Reopen modal — all state cleared', async () => {
+      await userEvent.click(
+        canvasElement.querySelector('#BtnChangePassword') as HTMLElement
+      )
+
+      await canvas.findByText('Change password')
+
+      await expect(
+        (canvasElement.querySelector('#CurrentPassword') as HTMLInputElement)
+          .value
+      ).toBe('')
+
+      await expect(
+        (canvasElement.querySelector('#NewPassword') as HTMLInputElement).value
+      ).toBe('')
+
+      await expect(
+        (canvasElement.querySelector('#ConfirmPassword') as HTMLInputElement)
+          .value
+      ).toBe('')
+
+      await expect(
+        canvas.queryByText('Passwords match')
+      ).not.toBeInTheDocument()
+
+      await expect(
+        canvas.queryByText('Passwords do not match')
+      ).not.toBeInTheDocument()
+
+      await expect(
+        canvas.queryByText('Current password incorrect. Please try again.')
+      ).not.toBeInTheDocument()
+
+      await expect(
+        canvasElement.querySelectorAll('ellipse[fill="#49B78D"]').length
+      ).toBe(0)
+
+      await expect(
+        await canvas.findByRole('button', { name: 'Confirm' })
+      ).toBeDisabled()
+    })
   }
 }
 

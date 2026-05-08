@@ -47,6 +47,20 @@ V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
 
 ### New features
 
+#### Rich text support in MessageDescriptor.defaultMessage
+
+`TranslationTextWithFormatModifier` — use inline HTML-like tags directly in a `MessageDescriptor.defaultMessage` and render rich text via this component instead of wiring `intl.formatMessage` handlers manually. Supported tags: `<strong>`, `<b>`, `<em>`, `<i>`, `<u>`, `<mark>`, `<small>`, `<sub>`, `<sup>`, `<del>`, `<ins>`, `<code>`, `<kbd>`, `<q>`, `<br></br>`, `<tab></tab>`. Example message:
+
+```
+{
+  id: 'id',
+  description: 'Rich text example in translation',
+  defaultMessage: '<strong>WARNING!</strong>: Record will be <strong>legally registered</strong> via the outbox.<br></br>Further amends require a legal correction process.'
+}
+```
+
+Currently used to render `supportingCopy` in the action confirmation dialog (`useQuickActionModal`). [#12441](https://github.com/opencrvs/opencrvs-core/issues/12441)
+
 #### Autocomplete Input
 
 A select component enhanced with suggestions based on user search input. Works in conjunction with a countryconfig endpoint that returns suggestions based on user input. The list of suggestions are fetched from a table in the reference_data schema in events database.

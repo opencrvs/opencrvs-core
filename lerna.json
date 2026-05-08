@@ -1,6 +1,6 @@
 {
   "lerna": "2.11.0",
-  "packages": ["packages/*"],
+  "packages": ["packages/*", "packages/toolkit/create-countryconfig"],
   "version": "0.0.0",
   "npmClient": "yarn"
 }

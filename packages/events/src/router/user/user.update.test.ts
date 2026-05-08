@@ -8,12 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+/* eslint-disable max-lines */
 import { TRPCError } from '@trpc/server'
 import { encodeScope, getUUID, TestUserRole } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { updateUserById } from '@events/storage/postgres/events/users'
 import { getClient } from '@events/storage/postgres/events'
+import { seeder, setupHierarchyWithUsers } from '@events/tests/generators'
 
 const USER_EDIT_SCOPE = encodeScope({ type: 'user.edit' })
 const CONFIG_UPDATE_ALL_SCOPE = encodeScope({ type: 'config.update-all' })
@@ -379,5 +380,256 @@ test('Updates user when no mobile is provided, skipping phone format validation'
 
   await expect(
     client.user.update(generateUpdateInput(user))
+  ).resolves.toBeDefined()
+})
+
+test('Prevents update when changing user\s role to something not in scope', async () => {
+  const { user, seed } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.edit',
+      options: {
+        role: [TestUserRole.enum.FIELD_AGENT]
+      }
+    })
+  ])
+
+  const newFieldAgent = await seed.user({
+    primaryOfficeId: user.primaryOfficeId,
+    role: TestUserRole.enum.FIELD_AGENT,
+    name: { firstname: 'Test', surname: 'User' }
+  })
+
+  await expect(
+    client.user.update({
+      id: newFieldAgent.id,
+      role: TestUserRole.enum.COMMUNITY_LEADER
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test('Allows changing user\s role to one within one of the scopes', async () => {
+  const { user, seed } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.edit',
+      options: {
+        role: [TestUserRole.enum.FIELD_AGENT]
+      }
+    }),
+    encodeScope({
+      type: 'user.edit',
+      options: {
+        role: [
+          TestUserRole.enum.FIELD_AGENT,
+          TestUserRole.enum.COMMUNITY_LEADER
+        ]
+      }
+    }),
+    encodeScope({
+      type: 'user.edit',
+      options: {
+        role: [
+          TestUserRole.enum.COMMUNITY_LEADER,
+          TestUserRole.enum.NATIONAL_REGISTRAR
+        ]
+      }
+    })
+  ])
+
+  const newFieldAgent = await seed.user({
+    primaryOfficeId: user.primaryOfficeId,
+    role: TestUserRole.enum.FIELD_AGENT,
+    name: { firstname: 'Test', surname: 'User' }
+  })
+
+  await expect(
+    client.user.update({
+      id: newFieldAgent.id,
+      role: TestUserRole.enum.COMMUNITY_LEADER
+    })
+  ).resolves.toBeDefined()
+})
+
+test("Prevents changing user's role to one not allowed within scope's jurisdiction", async () => {
+  // 1. Setup test fixture with a known set of users, administrative areas and locations.
+  const { users, locations } = await setupHierarchyWithUsers()
+  const seed = seeder()
+
+  const provinceAOffice = locations.find(
+    (loc) => loc.name === 'Province A CRVS Office'
+  )
+  // 1. Create user in province A office.
+
+  if (!provinceAOffice) {
+    throw new Error('Test setup failed: ProvinceA Office not found')
+  }
+
+  const provinceAUser = users.find(
+    (u) => u.primaryOfficeId === provinceAOffice.id
+  )
+
+  if (!provinceAUser) {
+    throw new Error('Test setup failed: User for ProvinceA Office not found')
+  }
+
+  const provinceAFieldAgent = await seed.user({
+    primaryOfficeId: provinceAOffice.id,
+    role: TestUserRole.enum.FIELD_AGENT,
+    name: { firstname: 'provinceA', surname: 'Field' }
+  })
+
+  // 2. Create users with different roles under the same administrative area.
+  const villageAOffice = locations.find(
+    (loc) => loc.name === 'Village A CRVS Office'
+  )
+
+  if (!villageAOffice) {
+    throw new Error('Test setup failed: Village A Office not found')
+  }
+
+  // 3. Create country level user.
+  const countryLevelOffice = locations.find(
+    (loc) => loc.name === 'Country-level CRVS Office'
+  )
+
+  if (!countryLevelOffice) {
+    throw new Error('Test setup failed: Country-Level Office not found')
+  }
+
+  const countryLevelUser = await seed.user({
+    role: TestUserRole.enum.FIELD_AGENT,
+    name: { firstname: 'Jane', surname: 'Doe' },
+    primaryOfficeId: countryLevelOffice.id
+  })
+
+  const villageAFieldAgent = await seed.user({
+    role: TestUserRole.enum.FIELD_AGENT,
+    name: { firstname: 'John', surname: 'Doe' },
+    primaryOfficeId: villageAOffice.id
+  })
+
+  const villageASocialWorker = await seed.user({
+    role: TestUserRole.enum.SOCIAL_WORKER,
+    name: { firstname: 'Jonny2', surname: 'Doe' },
+    primaryOfficeId: provinceAOffice.id
+  })
+
+  const client = createTestClient(provinceAUser, [
+    encodeScope({
+      type: 'user.edit',
+      options: {
+        accessLevel: 'all',
+        role: [TestUserRole.enum.FIELD_AGENT]
+      }
+    }),
+    encodeScope({
+      type: 'user.edit',
+      options: {
+        accessLevel: 'administrativeArea',
+        role: [
+          TestUserRole.enum.FIELD_AGENT,
+          TestUserRole.enum.COMMUNITY_LEADER
+        ]
+      }
+    }),
+    encodeScope({
+      type: 'user.edit',
+      options: {
+        accessLevel: 'location',
+        role: [
+          TestUserRole.enum.FIELD_AGENT,
+          TestUserRole.enum.NATIONAL_REGISTRAR
+        ]
+      }
+    })
+  ])
+
+  // 4. User at the same location can be changed to roles within all scopes.
+  await expect(
+    client.user.update({
+      id: provinceAFieldAgent.id,
+      role: TestUserRole.enum.COMMUNITY_LEADER
+    })
+  ).resolves.toBeDefined()
+
+  await expect(
+    client.user.update({
+      id: provinceAFieldAgent.id,
+      role: TestUserRole.enum.FIELD_AGENT
+    })
+  ).resolves.toBeDefined()
+
+  await expect(
+    client.user.update({
+      id: provinceAFieldAgent.id,
+      role: TestUserRole.enum.NATIONAL_REGISTRAR
+    })
+  ).resolves.toBeDefined()
+
+  // 4. Field agent under the administrative area can be changed to roles within administrative area scopes
+  await expect(
+    client.user.update({
+      id: villageAFieldAgent.id,
+      role: TestUserRole.enum.COMMUNITY_LEADER
+    })
+  ).resolves.toBeDefined()
+
+  await expect(
+    client.user.update({
+      id: villageAFieldAgent.id,
+      role: TestUserRole.enum.FIELD_AGENT
+    })
+  ).resolves.toBeDefined()
+
+  await expect(
+    client.user.update({
+      id: villageAFieldAgent.id,
+      role: TestUserRole.enum.NATIONAL_REGISTRAR
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+
+  // 5. Social worker under the same administrative area can't be changed at all.
+  await expect(
+    client.user.update({
+      id: villageASocialWorker.id,
+      role: TestUserRole.enum.COMMUNITY_LEADER
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'NOT_FOUND' }))
+
+  await expect(
+    client.user.update({
+      id: villageASocialWorker.id,
+      role: TestUserRole.enum.FIELD_AGENT
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'NOT_FOUND' }))
+
+  await expect(
+    client.user.update({
+      id: villageASocialWorker.id,
+      role: TestUserRole.enum.NATIONAL_REGISTRAR
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'NOT_FOUND' }))
+
+  // 6. Country level user role can't be changed but other details can be updated.
+  await expect(
+    client.user.update({
+      id: countryLevelUser.id,
+      role: TestUserRole.enum.COMMUNITY_LEADER
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+
+  await expect(
+    client.user.update({
+      id: countryLevelUser.id,
+      role: TestUserRole.enum.NATIONAL_REGISTRAR
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+
+  await expect(
+    client.user.update({
+      id: countryLevelUser.id,
+      role: TestUserRole.enum.FIELD_AGENT
+    })
   ).resolves.toBeDefined()
 })

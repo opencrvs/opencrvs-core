@@ -14,7 +14,7 @@ import { fn } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { AppRouter } from '@client/v2-events/trpc'
-import { V2_DEFAULT_MOCK_LOCATIONS } from '@client/tests/v2-events/administrative-hierarchy-mock'
+import { V2_DEFAULT_MOCK_LOCATIONS } from '@opencrvs/commons/client'
 import { UserSetupReview } from './SetupReviewPage'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({

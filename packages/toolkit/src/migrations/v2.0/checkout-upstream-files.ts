@@ -47,8 +47,7 @@ import { execFileSync } from 'child_process'
 export const UPSTREAM_URL =
   'https://github.com/opencrvs/opencrvs-countryconfig.git'
 
-// @TODO: This needs to be changed to 'release-v2.0.0' once the branch is created
-export const UPSTREAM_BRANCH = 'develop'
+export const UPSTREAM_BRANCH = 'release-v2.0.0'
 
 // Remote name used only for the duration of this codemod. Prefixed to avoid
 // clashing with remotes the user may have (origin, upstream, etc.).
