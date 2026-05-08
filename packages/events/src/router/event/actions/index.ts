@@ -31,12 +31,10 @@ import {
   RejectCorrectionActionInput,
   getPendingAction,
   ActionInputWithType,
-  EventConfig
+  EventConfig,
+  BaseActionInput
 } from '@opencrvs/commons/events'
-import {
-  TokenUserType,
-  TokenWithBearer
-} from '@opencrvs/commons/authentication'
+import { TokenWithBearer } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
 import {
   requiresAnyOfScopes,
@@ -68,8 +66,8 @@ import {
  * @property {OpenApiMeta} [meta] - Meta information, incl. OpenAPI definition
  */
 interface ActionProcedureConfig {
-  inputSchema: z.ZodType
-  actionConfirmationResponseSchema: z.ZodType | undefined
+  inputSchema: z.ZodObject<z.ZodRawShape>
+  actionConfirmationResponseSchema: z.ZodObject<z.ZodRawShape> | undefined
   meta?: OpenApiMeta
 }
 
@@ -159,6 +157,23 @@ const ACTION_PROCEDURE_CONFIG = {
   }
 } satisfies Partial<Record<ActionType, ActionProcedureConfig>>
 
+type DistributiveOmit<T, K extends keyof T> = T extends T ? Omit<T, K> : never
+
+const AsyncActionInput = BaseActionInput.pick({
+  eventId: true,
+  transactionId: true,
+  keepAssignment: true
+}).extend({
+  actionId: UUID
+})
+
+export type AsyncActionInput = z.infer<typeof AsyncActionInput>
+
+const SyncActionConfirmationSchema = BaseActionInput.pick({
+  declaration: true,
+  annotation: true
+})
+
 type ActionProcedure = {
   request: MutationProcedure<{
     input: ActionInput
@@ -166,12 +181,15 @@ type ActionProcedure = {
     meta: OpenApiMeta
   }>
   accept: MutationProcedure<{
-    input: ActionInput & { actionId: string }
+    input: DistributiveOmit<
+      ActionInput,
+      'keepAssignmentIfAccepted' | 'keepAssignmentIfRejected'
+    > & { actionId: string }
     output: EventDocument
     meta: OpenApiMeta
   }>
   reject: MutationProcedure<{
-    input: { eventId: string; actionId: string; transactionId: string }
+    input: z.input<typeof AsyncActionInput>
     output: EventDocument
     meta: OpenApiMeta
   }>
@@ -184,10 +202,7 @@ export async function defaultRequestHandler(
   event: EventDocument,
   configuration: EventConfig,
   // @TODO: Could this be typed with the actual input schema, or could these actually be anything?
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  inputSchema: z.ZodObject<any>,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  actionConfirmationResponseSchema?: z.ZodObject<any>
+  actionConfirmationResponseSchema?: z.ZodObject<z.ZodRawShape>
 ) {
   await throwConflictIfActionNotAllowed(input.eventId, input.type, token)
 
@@ -204,13 +219,12 @@ export async function defaultRequestHandler(
     { eventId: input.eventId, actionId: requestedAction.id },
     token
   )
-  const { responseStatus, responseBody: confirmationResponse } =
-    await requestActionConfirmation(
-      input.type,
-      input.transactionId,
-      eventWithRequestedAction,
-      setBearerForToken(eventActionToken)
-    )
+  const { responseStatus, responseBody } = await requestActionConfirmation(
+    input.type,
+    input.transactionId,
+    eventWithRequestedAction,
+    setBearerForToken(eventActionToken)
+  )
 
   // If we get an unexpected failure response, we just return HTTP 500 without saving the
   if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
@@ -218,86 +232,78 @@ export async function defaultRequestHandler(
       code: 'INTERNAL_SERVER_ERROR',
       message: 'Unexpected failure from country config action confirmation API'
     })
-    // For Async flow, we just return the event with the requested action and ensure it is indexed
-  } else if (responseStatus === ActionConfirmationResponse.RequiresProcessing) {
+  }
+
+  // For Async flow, we just return the event with the requested action and ensure it is indexed
+  if (responseStatus === ActionConfirmationResponse.RequiresProcessing) {
     await ensureEventIndexed(eventWithRequestedAction, configuration)
     return eventWithRequestedAction
   }
 
-  let status: ActionStatus = ActionStatus.Requested
-  let parsedBody
+  // For Sync flow, we parse the result and merge it with the action input
+  // before storing the accepted/rejected action
+  const status =
+    responseStatus === ActionConfirmationResponse.Success
+      ? ActionStatus.Accepted
+      : ActionStatus.Rejected
 
-  // If we immediately get a rejected response, we can mark the action as rejected
-  if (responseStatus === ActionConfirmationResponse.Rejected) {
-    status = ActionStatus.Rejected
+  const schema =
+    responseStatus === ActionConfirmationResponse.Success
+      ? SyncActionConfirmationSchema.merge(
+          actionConfirmationResponseSchema ?? z.object({})
+        )
+      : z.object({})
 
-    logger.debug(
-      {
-        transactionId: input.transactionId,
-        actionType: input.type,
-        eventId: event.id
-      },
-      `Action immediately rejected (status: "${responseStatus}")`
-    )
+  const maybeParsed = schema.safeParse(responseBody ?? {})
+
+  if (!maybeParsed.success) {
+    logger.error(maybeParsed.error)
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message:
+        'Invalid payload received from country config action confirmation API'
+    })
   }
 
-  // If we immediately get a success response, we mark the action as succeeded
-  // and also validate the payload received from the notify API
-  if (responseStatus === ActionConfirmationResponse.Success) {
-    status = ActionStatus.Accepted
+  const parsedBody = maybeParsed.data
 
-    try {
-      parsedBody = (actionConfirmationResponseSchema ?? z.object({}))
-        .merge(inputSchema.partial())
-        .parse(confirmationResponse ?? {})
-    } catch (error) {
-      logger.error(error)
+  logger.debug(
+    {
+      transactionId: input.transactionId,
+      eventType: event.type,
+      actionType: input.type,
+      eventId: event.id
+    },
+    `Action immediately ${status === ActionStatus.Accepted ? 'accepted' : 'rejected'} (status: "${responseStatus}")`
+  )
 
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message:
-          'Invalid payload received from country config action confirmation API'
-      })
-    }
+  const {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    declaration,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    annotation,
+    keepAssignment,
+    keepAssignmentIfAccepted,
+    keepAssignmentIfRejected,
+    ...strippedInput
+  } = input
 
-    logger.debug(
-      {
-        transactionId: input.transactionId,
-        eventType: event.type,
-        actionType: input.type,
-        eventId: event.id
-      },
-      `Action immediately accepted (status: "${responseStatus}")`
-    )
-  }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { declaration, annotation, ...strippedInput } = input
+  const effectiveKeepAssignment =
+    status === ActionStatus.Accepted
+      ? (keepAssignmentIfAccepted ?? keepAssignment ?? false)
+      : (keepAssignmentIfRejected ?? keepAssignment ?? false)
 
-  const updatedEvent = await processAction(
+  return processAction(
     {
       ...strippedInput,
+      keepAssignment: effectiveKeepAssignment,
       declaration: {},
       originalActionId: requestedAction.id,
       ...parsedBody
     },
     { event, user, token, status, configuration }
   )
-
-  return updatedEvent
 }
-
-/**
- * These fields aren't required in the synchronous flow as the action is processed immediately and we still have access to them.
- */
-const AsyncActionConfirmationResponseSchema = z.object({
-  eventId: UUID,
-  actionId: UUID,
-  transactionId: z.string()
-})
-
-export type AsyncActionConfirmationResponseSchema = z.infer<
-  typeof AsyncActionConfirmationResponseSchema
->
 
 /**
  * Most actions share a similar model, where the action is first requested, and then either synchronously or asynchronously
@@ -314,14 +320,6 @@ export function getDefaultActionProcedures(
   actionType: keyof typeof ACTION_PROCEDURE_CONFIG
 ): ActionProcedure {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
-
-  let asyncAcceptInputFields = AsyncActionConfirmationResponseSchema
-
-  if (actionConfig.actionConfirmationResponseSchema) {
-    asyncAcceptInputFields = asyncAcceptInputFields.merge(
-      actionConfig.actionConfirmationResponseSchema
-    )
-  }
 
   const requireScopesForRequestMiddleware = requiresAnyOfScopes(
     [],
@@ -364,13 +362,16 @@ export function getDefaultActionProcedures(
           token,
           event,
           eventConfiguration,
-          actionConfig.inputSchema,
           actionConfig.actionConfirmationResponseSchema
         )
       }),
 
     accept: systemProcedure
-      .input(actionConfig.inputSchema.merge(asyncAcceptInputFields))
+      .input(
+        actionConfig.inputSchema
+          .merge(actionConfig.actionConfirmationResponseSchema ?? z.object({}))
+          .merge(AsyncActionInput)
+      )
       .use(middleware.requireActionConfirmationAuthorization)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
@@ -427,7 +428,10 @@ export function getDefaultActionProcedures(
         }
 
         return processAction(
-          { ...input, originalActionId: actionId },
+          {
+            ...input,
+            originalActionId: actionId
+          },
           {
             event,
             user,
@@ -439,7 +443,7 @@ export function getDefaultActionProcedures(
       }),
 
     reject: systemProcedure
-      .input(AsyncActionConfirmationResponseSchema)
+      .input(AsyncActionInput)
       .use(middleware.requireActionConfirmationAuthorization)
       .mutation(async ({ input, ctx }) => {
         const { eventId, actionId } = input
@@ -464,17 +468,24 @@ export function getDefaultActionProcedures(
           return getEventById(input.eventId)
         }
 
-        return addAsyncRejectAction({
-          ...input,
-          originalActionId: actionId,
-          type: actionType,
-          createdBy: ctx.user.id,
-          createdByUserType: TokenUserType.Enum.user,
-          createdByRole: ctx.user.role,
-          createdAtLocation: ctx.user.primaryOfficeId ?? undefined,
+        const configuration = await getEventConfigurationById({
           token: ctx.token,
           eventType: event.type
         })
+
+        return addAsyncRejectAction(
+          {
+            ...input,
+            type: actionType,
+            originalActionId: actionId,
+            keepAssignment: input.keepAssignment ?? false
+          },
+          {
+            event,
+            user: ctx.user,
+            configuration
+          }
+        )
       })
   }
 }
