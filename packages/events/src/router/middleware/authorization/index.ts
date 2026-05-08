@@ -277,6 +277,7 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
     TrpcContext & { eventId: UUID; eventType: string },
     unknown
   > = async ({ next, ctx, getRawInput }) => {
+    const { eventId: grantedEventId } = getTokenPayload(ctx.token)
     const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
     const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
 
@@ -291,6 +292,13 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
 
     if (!input) {
       throw new TRPCError({ code: 'BAD_REQUEST' })
+    }
+
+    if (grantedEventId && grantedEventId !== input.eventId) {
+      throw new TRPCError({
+        code: 'FORBIDDEN',
+        message: 'Token does not grant access to this event'
+      })
     }
 
     const event = await getEventById(input.eventId)

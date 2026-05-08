@@ -161,7 +161,7 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   onBatchFieldValueChange: (
     values: Array<{ name: string; value: FieldValue | undefined }>
   ) => void
-  form: EventState
+  ocrvsFullForm: EventState
   /**
    * onBlur is used to set the touched state of the field
    */
@@ -216,7 +216,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
     onBatchFieldValueChange,
     onBlur,
     allKnownFields,
-    form,
+    ocrvsFullForm,
     disabled,
     attachmentPath,
     readonlyMode
@@ -290,7 +290,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
     return (
       <InputField {...parentInputFieldProps}>
         {field.config.fields.map((subfield) => {
-          if (!isFieldVisible(subfield, form, validatorContext)) {
+          if (!isFieldVisible(subfield, ocrvsFullForm, validatorContext)) {
             return null
           }
           const subfieldName = makeFormFieldIdFormikCompatible(subfield.id)
@@ -539,7 +539,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
   if (isNumberWithUnitFieldType(field)) {
     const resolvedOptions = resolveOptions(
       field.config.options,
-      form,
+      ocrvsFullForm,
       validatorContext
     )
     return (
@@ -615,12 +615,17 @@ export const GeneratedInputField = <T extends FieldConfig>(
         <Address.Input
           config={field.config}
           disabled={disabled}
-          eventConfig={eventConfig}
-          form={form}
           id={field.config.id}
           name={name}
           touched={groupTouched}
-          validatorContext={validatorContext}
+          // The main form is context (non-editable) for the inner address form
+          validatorContext={{
+            ...validatorContext,
+            baseFormState: {
+              ...validatorContext.baseFormState,
+              ...ocrvsFullForm
+            }
+          }}
           value={field.value}
           onBlur={onBlur}
           onChange={(val) => onFieldValueChange(name, val)}
@@ -631,7 +636,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
   if (isSelectFieldType(field)) {
     const resolvedOptions = resolveOptions(
       field.config.options,
-      form,
+      ocrvsFullForm,
       validatorContext
     )
 
@@ -656,7 +661,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
               ? { ...country, conditionals: override.conditionals }
               : country
           }),
-          form,
+          ocrvsFullForm,
           validatorContext
         )
       : undefined
@@ -684,7 +689,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
   if (isRadioGroupFieldType(field)) {
     const resolvedOptions = resolveOptions(
       field.config.options,
-      form,
+      ocrvsFullForm,
       validatorContext
     )
     return (
@@ -721,7 +726,8 @@ export const GeneratedInputField = <T extends FieldConfig>(
   if (isAdministrativeAreaFieldType(field)) {
     const partOfRef = field.config.configuration.partOf
 
-    const partOf = partOfRef && get(form, flattenFieldReference(partOfRef))
+    const partOf =
+      partOfRef && get(ocrvsFullForm, flattenFieldReference(partOfRef))
 
     return (
       <InputField {...inputFieldProps} htmlFor={name}>
@@ -791,7 +797,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
   if (isFileFieldWithOptionType(field)) {
     const resolvedOptions = resolveOptions(
       field.config.options,
-      form,
+      ocrvsFullForm,
       validatorContext
     )
     return (
@@ -816,7 +822,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <Data.Input
         {...field.config}
         allKnownFields={allKnownFields}
-        formData={form}
+        formData={{ ...validatorContext.baseFormState, ...ocrvsFullForm }}
         onChange={(val) => onFieldValueChange(name, val)}
       />
     )
@@ -857,18 +863,18 @@ export const GeneratedInputField = <T extends FieldConfig>(
         key={name}
         configuration={parseFieldReferencesInConfiguration(
           field.config.configuration,
-          form
+          ocrvsFullForm
         )}
-        form={form}
+        form={ocrvsFullForm}
         trigger={
           field.config.configuration.trigger
             ? {
                 mode: 'onChange',
-                value: form[field.config.configuration.trigger.$$field]
+                value: ocrvsFullForm[field.config.configuration.trigger.$$field]
               }
             : { mode: 'onMount' }
         }
-        onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        onChange={(val) => onFieldValueChange(name, val)}
       />
     )
   }
@@ -898,7 +904,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
         <Search.Input
           key={name}
           configuration={field.config.configuration}
-          form={form}
+          form={ocrvsFullForm}
           helperText={fieldDefinition.helperText}
           label={inputLabel}
           value={field.value}

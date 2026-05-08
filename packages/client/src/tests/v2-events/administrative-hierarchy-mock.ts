@@ -270,6 +270,13 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     externalId: 'Xr3Df8WpK6Ys'
   },
   {
+    id: 'b1c2d3e4-f5a6-7890-bcde-f12345678901' as UUID,
+    name: 'Central Health Post',
+    locationType: 'HEALTH_FACILITY',
+    administrativeAreaId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+    validUntil: null
+  },
+  {
     id: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
     name: 'Ibombo District Office',
     locationType: 'CRVS_OFFICE',
