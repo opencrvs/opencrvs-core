@@ -200,7 +200,7 @@ export function PasswordChangeModal({
     <Dialog
       id="ChangePasswordModal"
       title={intl.formatMessage(messages.changePassword)}
-      isOpen={showPasswordChange}
+      isOpen={true}
       actions={[
         <PrimaryButton
           id="confirm-button"
