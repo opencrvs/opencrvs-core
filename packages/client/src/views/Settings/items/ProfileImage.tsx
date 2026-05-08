@@ -83,7 +83,7 @@ export function ProfileImage() {
               setImageLoadingError(imageLoadingError)
             }
           >
-            <DynamicHeightLinkButton>
+            <DynamicHeightLinkButton data-testid="change-avatar">
               {intl.formatMessage(buttonMessages.change)}
             </DynamicHeightLinkButton>
           </ImageLoader>

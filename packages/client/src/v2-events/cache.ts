@@ -35,7 +35,7 @@ export function toFileUrl(path: DocumentPath): string {
  * @see CACHE_NAME
  */
 export async function cacheFile({ url, file }: { url: string; file: File }) {
-  const normalizedUrl = url.startsWith('/') ? url : `/${url}`
+  const normalizedUrl = toFileUrl(url as DocumentPath)
   const temporaryBlob = new Blob([file], { type: file.type })
   const cacheKeys = await caches.keys()
 
