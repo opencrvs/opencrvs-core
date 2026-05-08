@@ -29,7 +29,6 @@ import { StyledErrorBoundary } from './components/StyledErrorBoundary'
 import { I18nContainer } from './i18n/components/I18nContainer'
 import { AppStore } from './store'
 import { routesConfig as v2RoutesConfig } from './v2-events/routes/config'
-import { ReloadModal } from './views/Modals/ReloadModal'
 
 // Injecting global styles for the body tag - used only once
 const GlobalStyle = createGlobalStyle`
@@ -59,7 +58,6 @@ export const routesConfig = [
     path: '/',
     element: (
       <ScrollToTop>
-        <ReloadModal />
         <SessionExpireConfirmation />
         <NotificationComponent>
           <Page>
