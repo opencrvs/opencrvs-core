@@ -25,7 +25,7 @@ flowchart TD
     end
 
     subgraph CC["CountryConfig — after Core visible on npm"]
-        CC1["Bump @opencrvs/toolkit to vX.Y.Z on release branch\nRun yarn install to update lockfile"]
+        CC1["Bump @opencrvs/toolkit to vX.Y.Z on release branch\n⚠️ Run yarn install to update lockfile"]
         CC2["git tag vX.Y.Z\ngit push origin tag vX.Y.Z"]
         CC3[Create draft release]
         CC4[Paste CHANGELOG.md to GitHub release]
