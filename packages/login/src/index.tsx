@@ -48,6 +48,18 @@ if (
 }
 const { store } = createStore()
 
+// Proactive: if a new SW takes control mid-session (autoUpdate skipWaiting), reload
+// so the page runs against the new bundle. Guarded by hadController to skip the
+// very first SW install on a clean browser (no existing controller → not an update).
+if ('serviceWorker' in navigator) {
+  const hadController = !!navigator.serviceWorker.controller
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (hadController) {
+      window.location.reload()
+    }
+  })
+}
+
 const container = document.getElementById('root')
 const root = createRoot(container!)
 const router = createBrowserRouter(routesConfig, {
@@ -68,13 +80,38 @@ async function renderAppWithConfig() {
 }
 
 function withRetry(render: () => Promise<void>) {
-  render().catch((error) => {
+  render().catch(async (error) => {
     if (error?.message === 'VERSION_MISMATCH') {
       const reloads = Number(
         sessionStorage.getItem('version-mismatch-reloads') || 0
       )
       if (reloads < 3) {
         sessionStorage.setItem('version-mismatch-reloads', String(reloads + 1))
+        // Clear stale SW runtime caches (login-config.js, etc.) and stored
+        // language/user details so the next load starts fresh against the new version.
+        const keys = await caches.keys()
+        await Promise.all(
+          keys
+            .filter((k) => k.includes('-runtime'))
+            .map((k) => caches.delete(k))
+        )
+        await storage.removeItem('language')
+        await storage.removeItem('USER_DETAILS')
+
+        // Trigger an immediate SW update check rather than waiting for the
+        // browser's 24 h cycle. With autoUpdate, the new SW will skipWaiting
+        // and fire controllerchange → the listener above reloads the page.
+        // window.location.reload() below is the fallback when no new SW exists.
+        if ('serviceWorker' in navigator) {
+          try {
+            const registration = await navigator.serviceWorker.ready
+            await registration.update()
+          } catch (e) {
+            // eslint-disable-next-line no-console
+            console.warn('SW update failed, reloading anyway', e)
+          }
+        }
+
         window.location.reload()
       }
       return
