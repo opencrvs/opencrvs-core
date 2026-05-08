@@ -21,7 +21,7 @@ import Cropper from 'react-easy-crop'
 import type { Point, Area, Size } from 'react-easy-crop'
 import styled, { useTheme } from 'styled-components'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { ImageLoader } from './ImageLoader'
 import { getCroppedImage, IImage } from '@client/utils/imageUtils'
 
@@ -31,6 +31,8 @@ import { useOnlineStatus } from '@client/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { cacheFile } from '@client/v2-events/cache'
+import { modifyUserDetails } from '@client/profile/profileActions'
+import { DocumentPath } from '@opencrvs/commons/client'
 
 const Container = styled.div`
   align-self: center;
@@ -155,6 +157,8 @@ function AvatarChangeModalComp({
   const [zoom, setZoom] = React.useState<number>(1)
   const [croppedArea, setCroppedArea] = React.useState<Area>(DEFAULT_AREA)
 
+  const dispatch = useDispatch()
+
   const cropSize = useCropSize(theme.grid.breakpoints.md)
 
   const reset = () => {
@@ -197,6 +201,8 @@ function AvatarChangeModalComp({
         {
           onSuccess: (data) => {
             cacheFile({ url, file: croppedImage })
+
+            dispatch(modifyUserDetails({ avatar: url as DocumentPath }))
             onAvatarChanged(url)
             reset()
           }

@@ -30,6 +30,11 @@ export const getScope = (store: IStoreState): EncodedScope[] | null => {
   return tokenPayload && tokenPayload.scope
 }
 
+/**
+ * @deprecated. Please use queries directly where possible. Redux dependency is redundant and should be removed in 2.1 the latest.
+ * @see useCurrentUser
+ * @see useUsers
+ */
 export const getUserDetails = (
   store: IStoreState
 ): ProfileState['userDetails'] => getKey(store, 'userDetails')
