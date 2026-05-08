@@ -75,10 +75,22 @@ jobs:
           ref: ${{ steps.get_base_branch.outputs.base_branch }}
           fetch-depth: 0
 
+      - name: Check if release branch already exists
+        id: check_branch
+        run: |
+          if git ls-remote --exit-code --heads origin "release/${{ inputs.version }}" > /dev/null 2>&1; then
+            echo "Branch release/${{ inputs.version }} already exists, skipping creation."
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
       # Create the release branch, bump all package versions, and update the
       # CHANGELOG — then push. The PRs are opened only after these commits exist
       # on the remote, so both PRs immediately include the version-bump commits.
+      # Skipped if the release branch was already created by a previous run.
       - name: Create release branch and update version numbers and CHANGELOG
+        if: steps.check_branch.outputs.exists == 'false'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -121,6 +133,8 @@ jobs:
       #     This PR is always created regardless of what the base branch was:
       #       - z=0 (base is develop): carries only the two bump commits, clean diff.
       #       - z>0 (base is a prior release branch): also backports any patch fixes.
+      # Each PR is checked individually — one may already exist while the other
+      # does not, so both are always evaluated.
       - name: Create Pull Requests
         run: |
           PR_BRANCH="release/${{ inputs.version }}"
@@ -132,17 +146,27 @@ jobs:
             BODY=""
           fi
 
-          gh pr create \
-            --base "$TARGET_BRANCH" \
-            --head "$PR_BRANCH" \
-            --title "Release v${{ inputs.version }}" \
-            --body "$BODY"
+          EXISTING_MASTER_PR=$(gh pr list --head "$PR_BRANCH" --base "$TARGET_BRANCH" --state open --json number --jq '.[0].number // ""')
+          if [ -z "$EXISTING_MASTER_PR" ]; then
+            gh pr create \
+              --base "$TARGET_BRANCH" \
+              --head "$PR_BRANCH" \
+              --title "Release v${{ inputs.version }}" \
+              --body "$BODY"
+          else
+            echo "PR release/${{ inputs.version }} → $TARGET_BRANCH already exists (#$EXISTING_MASTER_PR), skipping."
+          fi
 
-          gh pr create \
-            --base "develop" \
-            --head "$PR_BRANCH" \
-            --title "chore: merge release v${{ inputs.version }} back to develop" \
-            --body "Merge release branch back to develop to include version bump and changelog updates."
+          EXISTING_DEVELOP_PR=$(gh pr list --head "$PR_BRANCH" --base "develop" --state open --json number --jq '.[0].number // ""')
+          if [ -z "$EXISTING_DEVELOP_PR" ]; then
+            gh pr create \
+              --base "develop" \
+              --head "$PR_BRANCH" \
+              --title "chore: merge release v${{ inputs.version }} back to develop" \
+              --body "Merge release branch back to develop to include version bump and changelog updates."
+          else
+            echo "PR release/${{ inputs.version }} → develop already exists (#$EXISTING_DEVELOP_PR), skipping."
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
