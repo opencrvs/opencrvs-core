@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { ErrorMessage } from '@opencrvs/components/lib/ErrorMessage'
@@ -205,9 +205,10 @@ export function PasswordChangeModal({
       show={showPasswordChange}
       contentHeight={420}
       actions={[
-        <PrimaryButton
+        <Button
           id="confirm-button"
           key="confirm"
+          type="primary"
           onClick={handleChangePassword}
           disabled={
             !Boolean(currentPassword.length) ||
@@ -218,7 +219,7 @@ export function PasswordChangeModal({
           }
         >
           {intl.formatMessage(messages.confirmButtonLabel)}
-        </PrimaryButton>
+        </Button>
       ]}
       width={1000}
       handleClose={hideModal}

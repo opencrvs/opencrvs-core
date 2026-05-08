@@ -20,10 +20,9 @@ import {
   LocationSearch
 } from '@opencrvs/components/lib/LocationSearch'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { CircleButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { colors } from '@opencrvs/components/lib/colors'
 import {
-  PickerButton,
   ContentWrapper,
   ModalContainer as CommonModalContainer,
   ModalHeader,
@@ -145,8 +144,10 @@ export function LocationPicker({
   }, [modalVisible])
   return (
     <div>
-      <PickerButton
+      <Button
         id="location-range-picker-action"
+        type="secondary"
+        size="small"
         onClick={() => setModalVisible(true)}
         disabled={disabled}
       >
@@ -158,7 +159,7 @@ export function LocationPicker({
           </span>
           <MapPin color={disabled ? colors.grey200 : undefined} />
         </ContentWrapper>
-      </PickerButton>
+      </Button>
       {modalVisible && (
         <>
           <ModalContainer id="picker-modal">
@@ -167,13 +168,13 @@ export function LocationPicker({
                 <LocationIcon />
                 <span>{intl.formatMessage(constantsMessages.location)}</span>
               </TitleContent>
-              <CircleButton
+              <Button
                 id="close-btn"
-                type="button"
+                type="icon"
                 onClick={() => setModalVisible(false)}
               >
                 <Cross color="currentColor" />
-              </CircleButton>
+              </Button>
             </ModalHeader>
             <ModalBody>
               <StyledLocationSearch

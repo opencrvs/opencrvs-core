@@ -28,11 +28,6 @@ import {
 } from '@opencrvs/commons/client'
 import { AppBar, Frame, Spinner } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
-import {
-  CircleButton,
-  ICON_ALIGNMENT,
-  SuccessButton
-} from '@opencrvs/components/lib/buttons'
 import { Check, Cross } from '@opencrvs/components/lib/icons'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Toast } from '@opencrvs/components/lib/Toast'
@@ -562,8 +557,9 @@ const ReviewUserComponent = () => {
             {intl.formatMessage(buttonMessages.createUser)}
           </Button>
         ) : (
-          <SuccessButton
+          <Button
             id="submit-edit-user-form"
+            type="positive"
             onClick={() => {
               resetErrors()
               const data: Record<string, FieldValue> = Object.fromEntries(
@@ -598,11 +594,10 @@ const ReviewUserComponent = () => {
                 onError: handleMutationError
               })
             }}
-            icon={() => <Check />}
-            align={ICON_ALIGNMENT.LEFT}
           >
+            <Check />
             {intl.formatMessage(buttonMessages.confirm)}
-          </SuccessButton>
+          </Button>
         )}
       </ReviewComponent.Body>
     </FormLayout>
@@ -684,14 +679,15 @@ function FormHeader({
 }) {
   const getHeaderRight = () => {
     return (
-      <CircleButton
+      <Button
         data-testid="crcl-btn"
         id="crcl-btn"
+        type="icon"
         onClick={onClose}
         key="crcl-btn"
       >
         <Cross color="currentColor" />
-      </CircleButton>
+      </Button>
     )
   }
 

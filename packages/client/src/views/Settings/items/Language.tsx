@@ -26,7 +26,7 @@ import {
   Label
 } from '@client/views/Settings/items/components'
 import { useSelector, useDispatch } from 'react-redux'
-import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { Select } from '@opencrvs/components/lib/Select'
 import { getAvailableLanguages } from '@client/i18n/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -117,16 +117,18 @@ export function Language() {
         title={intl.formatMessage(userMessages.changeLanguageTitle)}
         show={showModal}
         actions={[
-          <TertiaryButton
+          <Button
             key="cancel"
             id="modal_cancel"
+            type="tertiary"
+            size="small"
             onClick={cancelLanguageSettings}
           >
             {intl.formatMessage(buttonMessages.cancel)}
-          </TertiaryButton>,
-          <PrimaryButton key="apply" id="apply_change" onClick={changeLanguage}>
+          </Button>,
+          <Button key="apply" id="apply_change" type="primary" onClick={changeLanguage}>
             {intl.formatMessage(buttonMessages.apply)}
-          </PrimaryButton>
+          </Button>
         ]}
         handleClose={cancelLanguageSettings}
         contentHeight={175}

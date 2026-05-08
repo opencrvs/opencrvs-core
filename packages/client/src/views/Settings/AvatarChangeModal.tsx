@@ -12,11 +12,8 @@ import * as React from 'react'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { useIntl } from 'react-intl'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
-import {
-  PrimaryButton,
-  TertiaryButton,
-  LinkButton
-} from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
 import Cropper from 'react-easy-crop'
 import type { Point, Area, Size } from 'react-easy-crop'
 import styled, { useTheme } from 'styled-components'
@@ -214,17 +211,18 @@ function AvatarChangeModalComp({
       show={showChangeAvatar}
       title={intl.formatMessage(messages.changeAvatar)}
       actions={[
-        <TertiaryButton key="cancel" id="modal_cancel" onClick={handleCancel}>
+        <Button key="cancel" id="modal_cancel" type="tertiary" size="small" onClick={handleCancel}>
           {intl.formatMessage(buttonMessages.cancel)}
-        </TertiaryButton>,
-        <PrimaryButton
+        </Button>,
+        <Button
           key="apply"
           id="apply_change"
+          type="primary"
           disabled={!isOnline || !!error}
           onClick={handleApply}
         >
           {intl.formatMessage(buttonMessages.apply)}
-        </PrimaryButton>
+        </Button>
       ]}
       handleClose={handleCancel}
     >

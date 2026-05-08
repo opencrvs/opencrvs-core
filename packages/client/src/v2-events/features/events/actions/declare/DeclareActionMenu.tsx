@@ -21,7 +21,7 @@ import {
   getAvailableActionsForEvent,
   getActionConfig
 } from '@opencrvs/commons/client'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { Icon } from '@opencrvs/components'
@@ -234,13 +234,14 @@ export function DeclareActionMenu({ event }: { event: EventDocument }) {
     <>
       <DropdownMenu id="action">
         <DropdownMenu.Trigger asChild>
-          <PrimaryButton
+          <Button
             data-testid="action-dropdownMenu"
-            icon={() => <CaretDown />}
             size="medium"
+            type="primary"
           >
             {intl.formatMessage(messages.action)}
-          </PrimaryButton>
+            <CaretDown />
+          </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
           {actions.map(({ onClick, icon, label, disabled }, index) => (

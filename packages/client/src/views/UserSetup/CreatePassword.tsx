@@ -12,7 +12,7 @@ import * as React from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
@@ -124,13 +124,14 @@ export function CreatePassword({ setupData, goToStep }: IProps) {
   }
 
   const continueActionButton = (
-    <PrimaryButton
+    <Button
       id="Continue"
+      type="primary"
       onClick={whatNext}
       disabled={!hasCases || !hasNumber || !validLength}
     >
       {intl.formatMessage(buttonMessages.continueButton)}
-    </PrimaryButton>
+    </Button>
   )
 
   return (

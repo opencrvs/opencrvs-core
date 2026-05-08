@@ -11,7 +11,7 @@
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import * as React from 'react'
-import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
@@ -102,12 +102,13 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
       show={show}
       title={intl.formatMessage(messages.changePhoneLabel)}
       actions={[
-        <TertiaryButton key="cancel" id="modal_cancel" onClick={onClose}>
+        <Button key="cancel" id="modal_cancel" type="tertiary" size="small" onClick={onClose}>
           {intl.formatMessage(buttonMessages.cancel)}
-        </TertiaryButton>,
-        <PrimaryButton
+        </Button>,
+        <Button
           id="continue-button"
           key="continue"
+          type="primary"
           onClick={() => {
             const internationalFormat = convertToMSISDN(
               phoneNumber,
@@ -118,7 +119,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
           disabled={!Boolean(phoneNumber.length) || isInvalidPhoneNumber}
         >
           {intl.formatMessage(buttonMessages.continueButton)}
-        </PrimaryButton>
+        </Button>
       ]}
       handleClose={onClose}
       contentHeight={150}

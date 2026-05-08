@@ -20,7 +20,7 @@ import {
   getDeclaration,
   getCurrentEventState
 } from '@opencrvs/commons/client'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { buttonMessages } from '@client/i18n/messages'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -113,8 +113,9 @@ export function Review() {
           )
         }}
       >
-        <PrimaryButton
+        <Button
           key="continue_button"
+          type="primary"
           disabled={!anyValuesHaveChanged || incomplete}
           id="continue_button"
           onClick={() => {
@@ -127,7 +128,7 @@ export function Review() {
           }}
         >
           {intl.formatMessage(buttonMessages.continueButton)}
-        </PrimaryButton>
+        </Button>
       </ReviewComponent.Body>
     </FormLayout>
   )

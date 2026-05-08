@@ -17,7 +17,7 @@ import { Message } from '@client/views/Settings/items/components'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
-import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
@@ -139,17 +139,18 @@ export function VerifyCodeView({
       show={show}
       title={intl.formatMessage(messages.verifyPhoneLabel)}
       actions={[
-        <TertiaryButton key="cancel" id="modal_cancel" onClick={onClose}>
+        <Button key="cancel" id="modal_cancel" type="tertiary" size="small" onClick={onClose}>
           {intl.formatMessage(buttonMessages.cancel)}
-        </TertiaryButton>,
-        <PrimaryButton
+        </Button>,
+        <Button
           key="verify"
           id="verify-button"
+          type="primary"
           onClick={submitVerification}
           disabled={!isValidLength}
         >
           {intl.formatMessage(buttonMessages.continueButton)}
-        </PrimaryButton>
+        </Button>
       ]}
       handleClose={onClose}
       contentHeight={150}

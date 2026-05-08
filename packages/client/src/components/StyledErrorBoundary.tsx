@@ -13,7 +13,7 @@ import * as Sentry from '@sentry/react'
 import styled from 'styled-components'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { PageWrapper } from '@opencrvs/components/lib/PageWrapper'
-import { TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { Box } from '@opencrvs/components/lib/Box'
 import { errorMessages, buttonMessages } from '@client/i18n/messages'
 
@@ -70,12 +70,14 @@ const StyledErrorBoundaryComponent = ({ intl, children }: IFullProps) => {
             <ErrorMessage>
               {intl.formatMessage(errorMessages.unknownErrorDescription)}
             </ErrorMessage>
-            <TertiaryButton
+            <Button
               id="GoToHomepage"
+              type="tertiary"
+              size="small"
               onClick={() => (window.location.href = '/')}
             >
               {intl.formatMessage(buttonMessages.goToHomepage)}
-            </TertiaryButton>
+            </Button>
           </ErrorContainer>
         </PageWrapper>
       }

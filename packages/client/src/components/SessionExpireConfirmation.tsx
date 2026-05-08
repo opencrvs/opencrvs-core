@@ -12,7 +12,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { IStoreState } from '@client/store'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { messages } from '@client/i18n/messages/views/session'
@@ -39,13 +39,14 @@ const SessionExpireComponent = ({
       contentHeight={96}
       responsive={false}
       actions={[
-        <PrimaryButton
+        <Button
           key="login"
           id="login"
+          type="primary"
           onClick={() => redirectToAuthentication(true)}
         >
           {intl.formatMessage(buttonMessages.login)}
-        </PrimaryButton>
+        </Button>
       ]}
       show={true}
     />

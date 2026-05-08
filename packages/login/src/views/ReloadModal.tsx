@@ -10,7 +10,7 @@
  */
 
 import { ResponsiveModal } from '@opencrvs/components'
-import { PrimaryButton } from '@opencrvs/components/src/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { getReloadModalVisibility } from '@login/login/selectors'
@@ -57,9 +57,9 @@ export const ReloadModal = () => {
       autoHeight={true}
       titleHeightAuto={true}
       actions={[
-        <PrimaryButton key="reload" id="reload" onClick={handleReload}>
+        <Button key="reload" id="reload" type="primary" onClick={handleReload}>
           {intl.formatMessage(messages.update)}
-        </PrimaryButton>
+        </Button>
       ]}
       show={visibility}
     >
