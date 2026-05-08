@@ -101,13 +101,11 @@ const BoxedError = styled.div`
 `
 
 interface IProps {
-  showPasswordChange: boolean
   togglePasswordChangeModal: () => void
   passwordChanged: () => void
 }
 
 export function PasswordChangeModal({
-  showPasswordChange,
   togglePasswordChangeModal,
   passwordChanged
 }: IProps) {

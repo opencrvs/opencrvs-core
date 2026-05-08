@@ -119,6 +119,14 @@ setMutationDefaults(trpcOptionsProxy.user.changePhone, {
     await queryClient.invalidateQueries({
       queryKey: trpcOptionsProxy.user.get.queryKey(variables.userId)
     })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.list.queryKey()
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.search.queryKey()
+    })
   }
 })
 
@@ -130,6 +138,14 @@ setMutationDefaults(trpcOptionsProxy.user.changeEmail, {
     await queryClient.invalidateQueries({
       queryKey: trpcOptionsProxy.user.get.queryKey(variables.userId)
     })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.list.queryKey()
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.search.queryKey()
+    })
   }
 })
 setMutationDefaults(trpcOptionsProxy.user.changeAvatar, {
@@ -139,6 +155,14 @@ setMutationDefaults(trpcOptionsProxy.user.changeAvatar, {
   onSuccess: async (data, variables) => {
     await queryClient.invalidateQueries({
       queryKey: trpcOptionsProxy.user.get.queryKey(variables.userId)
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.list.queryKey()
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.search.queryKey()
     })
   }
 })
