@@ -72,23 +72,6 @@ const router = createBrowserRouter(routesConfig, {
   }
 })
 
-/*
- * When a new service worker activates mid-session (skipWaiting + clientsClaim),
- * it clears old precache entries. If the old page keeps running it may try to
- * load old hashed JS chunks or receive a new config.js format (e.g. LANGUAGES
- * changed from string to array between versions). Reloading immediately when
- * the controller changes ensures the new SW serves a fully-consistent bundle.
- *
- * We only reload if a controller was already present — the first activation
- * (controller: null → SW) is not an update and must not trigger a reload.
- */
-const hadController = !!navigator.serviceWorker.controller
-navigator.serviceWorker.addEventListener('controllerchange', () => {
-  if (hadController) {
-    window.location.reload()
-  }
-})
-
 // eslint-disable-next-line no-console
 console.debug('Waiting for service worker to be ready...')
 void navigator.serviceWorker.ready.then(() => {
