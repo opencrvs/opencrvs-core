@@ -167,6 +167,9 @@ export const routesConfig = {
             if (!cancelled) {
               setVersionMismatch(true)
             }
+          } else if (!cancelled) {
+            // Probe succeeded and versions match — safe to let tRPC queries run.
+            onlineManager.setOnline(true)
           }
         } catch {
           if (!cancelled) {
