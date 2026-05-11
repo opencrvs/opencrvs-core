@@ -106,14 +106,6 @@ export async function generateAndSendVerificationCode({
   } else {
     const verificationCode = generateAndStoreVerificationCode(nonce)
 
-    logger.info(
-      `Sending a verification to ${JSON.stringify({
-        mobile: phoneNumber,
-        email: email,
-        verificationCode
-      })}`
-    )
-
     await triggerUserEventNotification({
       event: notificationEvent,
       payload: {
