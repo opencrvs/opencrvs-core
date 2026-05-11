@@ -142,15 +142,17 @@ export function useNetworkProbe() {
         })
 
         if (!cancelled) {
-          onlineManager.setOnline(res.ok)
-          if (res.ok && intervalId !== null) {
-            clearInterval(intervalId)
-            intervalId = null
-          }
-
           const gatewayVersion = res.headers.get('X-version')
           if (gatewayVersion && gatewayVersion !== APPLICATION_VERSION) {
+            // Don't mark the app as online on version mismatch — no point
+            // resuming tRPC queries against a server running a different version.
             setVersionMismatch(true)
+          } else {
+            onlineManager.setOnline(res.ok)
+            if (res.ok && intervalId !== null) {
+              clearInterval(intervalId)
+              intervalId = null
+            }
           }
         }
       } catch {
