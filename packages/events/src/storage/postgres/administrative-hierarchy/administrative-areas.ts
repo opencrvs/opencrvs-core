@@ -114,8 +114,7 @@ export async function setAdministrativeAreas(
  *
  * @returns List of leaf level administrative area ids.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let leafLevelAdministrativeAreaIdsCache: Promise<any[]> | null = null
+let leafLevelAdministrativeAreaIdsCache: Promise<{ id: UUID }[]> | null = null
 
 export function getLeafLevelAdministrativeAreaIds() {
   if (!leafLevelAdministrativeAreaIdsCache) {
