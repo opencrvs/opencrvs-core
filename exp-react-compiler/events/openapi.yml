@@ -840,7 +840,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: d561f0c9-f7c2-4664-bbf0-13ff28c80969
+                transactionId: 5ddd5785-9fe8-4e9f-859f-611d43bcea4d
                 type: birth
       responses:
         "200":
@@ -909,6 +909,10 @@ paths:
                   format: uuid
                 keepAssignment:
                   type: boolean
+                keepAssignmentIfAccepted:
+                  type: boolean
+                keepAssignmentIfRejected:
+                  type: boolean
                 createdAtLocation:
                   type: string
                   nullable: true
@@ -926,7 +930,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 640419d8-05d5-49f8-8d1c-6d7a70a04f27
+                transactionId: 8245e169-a78a-4623-84a9-b588ab445dc3
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -996,6 +1000,10 @@ paths:
                   type: string
                   format: uuid
                 keepAssignment:
+                  type: boolean
+                keepAssignmentIfAccepted:
+                  type: boolean
+                keepAssignmentIfRejected:
                   type: boolean
                 createdAtLocation:
                   type: string
@@ -1078,6 +1086,10 @@ paths:
                   type: string
                   format: uuid
                 keepAssignment:
+                  type: boolean
+                keepAssignmentIfAccepted:
+                  type: boolean
+                keepAssignmentIfRejected:
                   type: boolean
                 createdAtLocation:
                   type: string
@@ -1163,6 +1175,10 @@ paths:
                   type: string
                   format: uuid
                 keepAssignment:
+                  type: boolean
+                keepAssignmentIfAccepted:
+                  type: boolean
+                keepAssignmentIfRejected:
                   type: boolean
                 createdAtLocation:
                   type: string
@@ -4702,9 +4718,6 @@ components:
               type: string
               enum:
                 - PARAGRAPH
-            defaultValue:
-              type: string
-              minLength: 1
             configuration:
               type: object
               properties:
@@ -5094,8 +5107,6 @@ components:
               type: string
               enum:
                 - BULLET_LIST
-            defaultValue:
-              type: string
             items:
               type: array
               items:
@@ -5265,9 +5276,6 @@ components:
               type: string
               enum:
                 - PAGE_HEADER
-            defaultValue:
-              type: string
-              minLength: 1
           required:
             - id
             - label
