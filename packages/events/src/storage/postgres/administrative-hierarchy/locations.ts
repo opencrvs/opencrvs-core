@@ -20,6 +20,14 @@ import Schema from '../events/schema/Database'
 // "bind message has ... parameter formats but 0 parameters"
 const INSERT_MAX_CHUNK_SIZE = 1000
 
+// Process-level cache for administrative hierarchies. Invalidated whenever
+// locations or administrative areas are written.
+const administrativeHierarchyByIdCache = new Map<string, Promise<UUID[]>>()
+
+export function clearAdministrativeHierarchyCache() {
+  administrativeHierarchyByIdCache.clear()
+}
+
 export async function setLocationsInTrx(
   trx: Kysely<Schema>,
   locations: NewLocations[]
@@ -203,13 +211,6 @@ export function getAdministrativeHierarchyByIdCte(
  * @param locationId
  * @returns The list of location hierarchy ids, ex: [admin_area_1_id, admin_area_2_id, locationId]
  */
-// Process-level cache for administrative hierarchies. Invalidated whenever
-// locations or administrative areas are written.
-const administrativeHierarchyByIdCache = new Map<string, Promise<UUID[]>>()
-
-export function clearAdministrativeHierarchyCache() {
-  administrativeHierarchyByIdCache.clear()
-}
 
 export function getAdministrativeHierarchyById(id: string): Promise<UUID[]> {
   const cached = administrativeHierarchyByIdCache.get(id)
