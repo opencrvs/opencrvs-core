@@ -12,11 +12,11 @@
 import React, { useEffect, useState } from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
 
+import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
 import { onlineManager } from '@tanstack/react-query'
 import { ActionType, SCOPES } from '@opencrvs/commons/client'
-import { ResponsiveModal } from '@opencrvs/components'
 import { PrimaryButton } from '@opencrvs/components/src/buttons'
 import { messages as reloadModalMessages } from '@client/i18n/messages/views/reloadModal'
 import { IStoreState } from '@client/store'
@@ -89,6 +89,25 @@ function PrefetchQueries() {
   return null
 }
 
+const VersionMismatchPage = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+  background: ${({ theme }) => theme.colors.background};
+`
+
+const VersionMismatchContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 480px;
+  text-align: center;
+  padding: 24px;
+`
+
 /**
  * Configuration for the routes of the v2-events feature.
  *
@@ -96,6 +115,8 @@ function PrefetchQueries() {
  */
 
 export function useNetworkProbe() {
+  const [versionMismatch, setVersionMismatch] = useState(false)
+
   useEffect(() => {
     let cancelled = false
     let intervalId: ReturnType<typeof setInterval> | null = null
@@ -125,6 +146,11 @@ export function useNetworkProbe() {
           if (res.ok && intervalId !== null) {
             clearInterval(intervalId)
             intervalId = null
+          }
+
+          const gatewayVersion = res.headers.get('X-version')
+          if (gatewayVersion && gatewayVersion !== APPLICATION_VERSION) {
+            setVersionMismatch(true)
           }
         }
       } catch {
@@ -160,13 +186,18 @@ export function useNetworkProbe() {
       }
     }
   }, [])
+
+  return { versionMismatch }
 }
 
 export const routesConfig = {
   path: ROUTES.V2.path,
   Component: () => {
-    useNetworkProbe()
-
+    const { versionMismatch } = useNetworkProbe()
+    const intl = useIntl()
+    const appName = useSelector(
+      (state: IStoreState) => state.offline.offlineData.config?.APPLICATION_NAME
+    )
     const currentUser = useSelector(getUserDetails)
 
     if (!currentUser) {
@@ -181,6 +212,28 @@ export const routesConfig = {
       await removeUserDetails()
       window.location.assign(
         `/login?lang=${await storage.getItem('language')}&redirectTo=${ROUTES.V2.buildPath({})}`
+      )
+    }
+
+    // Render nothing but the notification when a version mismatch is detected.
+    // Mounting the full app tree (TRPCProvider, Outlet, workqueues) against a
+    // stale bundle would cause cascading errors, so we bail out early and ask
+    // the user to log in again with a clean session.
+    if (versionMismatch) {
+      return (
+        <VersionMismatchPage>
+          <VersionMismatchContent>
+            <h1>{intl.formatMessage(reloadModalMessages.title)}</h1>
+            <p>
+              {intl.formatMessage(reloadModalMessages.body, {
+                app_name: appName
+              })}
+            </p>
+            <PrimaryButton onClick={handleLoginRedirect}>
+              {intl.formatMessage(reloadModalMessages.loginAgain)}
+            </PrimaryButton>
+          </VersionMismatchContent>
+        </VersionMismatchPage>
       )
     }
 
