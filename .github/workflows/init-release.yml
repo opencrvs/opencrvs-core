@@ -68,6 +68,7 @@ jobs:
         with:
           ref: ${{ steps.get_base_branch.outputs.base_branch }}
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check if release branch already exists
         id: check_branch
@@ -85,8 +86,6 @@ jobs:
       # Skipped if the release branch was already created by a previous run.
       - name: Create release branch and update version numbers and CHANGELOG
         if: steps.check_branch.outputs.exists == 'false'
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_AUTOMATION_PAT }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -164,12 +163,10 @@ jobs:
             echo "PR release/${{ inputs.version }} → develop already exists (#$EXISTING_DEVELOP_PR), skipping."
           fi
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_AUTOMATION_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Mirror this release initialisation in the companion repositories so all
       # three repos create their release branches and PRs at the same time.
-      # RELEASE_AUTOMATION_PAT is required here — GITHUB_TOKEN cannot trigger
-      # workflows in external repositories.
       # ${{ github.ref_name }} resolves to the branch name selected in the
       # "Run workflow" dropdown (e.g. "master"), not the full ref path
       # ("refs/heads/master") that context.ref carries. The workflow dispatch
@@ -177,7 +174,7 @@ jobs:
       - name: Trigger workflow in opencrvs-countryconfig
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.RELEASE_AUTOMATION_PAT }}
+          github-token: ${{ secrets.GH_TOKEN }}
           script: |
             github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
@@ -192,7 +189,7 @@ jobs:
       - name: Trigger workflow in opencrvs-farajaland
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.RELEASE_AUTOMATION_PAT }}
+          github-token: ${{ secrets.GH_TOKEN }}
           script: |
             github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
