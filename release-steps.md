@@ -34,6 +34,26 @@ flowchart TD
         CC1 --> CC2 --> CC3 --> CC4 --> CC5 --> CC6
     end
 
+    subgraph HC["Helm Charts"]
+        HC1["Bump helm chart `version` and `appVersion`"]
+        HC2["git tag vX.Y.Z\ngit push origin tag vX.Y.Z"]
+        HC3[Create draft release]
+        HC4[Paste CHANGELOG.md to GitHub release]
+        HC5["Paste copy items to release notes\n(generate with notebook)"]
+        HC6[Publish GitHub release]
+        HC1 --> HC2 --> HC3 --> HC4 --> HC5 --> HC6
+    end
+
+    subgraph IF["Infrastructure"]
+        IF1["Update reference to helm chart `version` in workflows"]
+        IF2["git tag vX.Y.Z\ngit push origin tag vX.Y.Z"]
+        IF3[Create draft release]
+        IF4[Paste CHANGELOG.md to GitHub release]
+        IF5["Paste copy items to release notes\n(generate with notebook)"]
+        IF6[Publish GitHub release]
+        IF1 --> IF2 --> IF3 --> IF4 --> IF5 --> IF6
+    end
+
     subgraph POST["Post-release"]
         POST1[Merge both release branches into master + develop simultaneously]
         POST2["Create release/X.Y.Z+1 from release/X.Y.Z in both repos"]
@@ -44,7 +64,9 @@ flowchart TD
 
     PRE --> CORE
     CORE --> CC
-    CC --> POST
+    CC --> HC
+    HC --> IF
+    IF --> POST
 ```
 
 ## Links
