@@ -582,3 +582,56 @@ test('Creates user when no mobile is provided, skipping phone format validation'
     })
   ).resolves.toBeDefined()
 })
+
+test('Persists all create-endpoint fields to database', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [encodeScope({ type: 'user.create' })])
+  const eventsDb = getClient()
+
+  const created = await client.user.create({
+    name: { firstname: 'Jane', surname: 'Doe' },
+    role: user.role,
+    primaryOfficeId: user.primaryOfficeId,
+    mobile: '01711234567',
+    email: 'all-fields-create@opencrvs.org',
+    fullHonorificName: 'Dr. Jane Doe',
+    device: 'iPhone 15',
+    data: { customKey: 'customValue' },
+    signature: {
+      originalFilename: 'signature.png',
+      path: 'signatures/test-sig.png',
+      type: 'image/png'
+    }
+  })
+
+  expect(created).toMatchObject({
+    name: { firstname: 'Jane', surname: 'Doe' },
+    role: user.role,
+    primaryOfficeId: user.primaryOfficeId,
+    mobile: '01711234567',
+    email: 'all-fields-create@opencrvs.org',
+    fullHonorificName: 'Dr. Jane Doe',
+    device: 'iPhone 15',
+    data: { customKey: 'customValue' },
+    signature: 'signatures/test-sig.png'
+  })
+
+  const dbUser = await eventsDb
+    .selectFrom('users')
+    .selectAll()
+    .where('id', '=', created.id)
+    .executeTakeFirstOrThrow()
+
+  expect(dbUser).toMatchObject({
+    firstname: 'Jane',
+    surname: 'Doe',
+    role: user.role,
+    officeId: user.primaryOfficeId,
+    mobile: '01711234567',
+    email: 'all-fields-create@opencrvs.org',
+    fullHonorificName: 'Dr. Jane Doe',
+    device: 'iPhone 15',
+    data: { customKey: 'customValue' },
+    signaturePath: 'signatures/test-sig.png'
+  })
+})
