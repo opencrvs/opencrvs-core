@@ -33,9 +33,15 @@ import {
   IReviewFormState,
   reviewReducer
 } from '@opencrvs/client/src/forms/register/reviewReducer'
+import {
+  advancedSearchParamReducer,
+  IAdvancedSearchParamState
+} from '@client/search/advancedSearch/reducer'
 import { IUserFormState, userFormReducer } from '@client/user/userReducer'
 import * as Sentry from '@sentry/react'
 import createSentryMiddleware from 'redux-sentry-middleware'
+import { submissionMiddleware } from './declarations/submissionMiddleware'
+import { workqueueReducer, WorkqueueState } from './workqueue'
 import { persistenceMiddleware } from './utils/persistence/persistenceMiddleware'
 
 export interface IStoreState {
@@ -47,6 +53,8 @@ export interface IStoreState {
   reviewForm: IReviewFormState
   offline: IOfflineDataState
   userForm: IUserFormState
+  workqueueState: WorkqueueState
+  advancedSearch: IAdvancedSearchParamState
 }
 
 const enhancedCreateStore = createReduxStore as StoreCreator
@@ -64,10 +72,13 @@ export const createStore = (): { store: AppStore } => {
     notification: notificationReducer,
     reviewForm: reviewReducer,
     offline: offlineDataReducer,
-    userForm: userFormReducer
+    userForm: userFormReducer,
+    workqueueState: workqueueReducer,
+    advancedSearch: advancedSearchParamReducer
   })
   // @ts-ignore
   const enhancer = compose(
+    applyMiddleware(submissionMiddleware),
     install(config),
     applyMiddleware(persistenceMiddleware),
     // @ts-ignore types are not correct for this module yet
