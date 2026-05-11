@@ -200,7 +200,34 @@ jobs:
                 version: '${{ inputs.version }}'
               }
             })
-
+      - name: Trigger workflow in opencrvs-helm-charts
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.HELM_CHARTS_WORKFLOW_TOKEN }}
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: 'opencrvs-helm-charts',
+              workflow_id: 'init-release.yml',
+              ref: '${{ github.ref_name }}',
+              inputs: {
+                version: '${{ inputs.version }}'
+              }
+            })
+      - name: Trigger workflow in infrastructure
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.INFRASTRUCTURE_WORKFLOW_TOKEN }}
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: 'infrastructure',
+              workflow_id: 'init-release.yml',
+              ref: '${{ github.ref_name }}',
+              inputs: {
+                version: '${{ inputs.version }}'
+              }
+            })
       - name: Trigger workflow in opencrvs-farajaland
         uses: actions/github-script@v7
         with:
