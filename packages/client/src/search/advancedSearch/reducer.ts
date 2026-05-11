@@ -8,9 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as actions from '@client/search/advancedSearch/actions'
-import * as offlineActions from '@client/offline/actions'
-import { Loop, LoopReducer } from 'redux-loop'
 
 export type IAdvancedSearchParamState = {
   event?: string
@@ -115,24 +112,4 @@ export const advancedSearchInitialState: IAdvancedSearchParamState = {
   informantDoBStart: '',
   informantDoBEnd: '',
   searchId: ''
-}
-
-type Actions = actions.AdvancedSearchParamActions | offlineActions.Action
-
-export const advancedSearchParamReducer: LoopReducer<
-  IAdvancedSearchParamState,
-  Actions
-> = (
-  state: IAdvancedSearchParamState = advancedSearchInitialState,
-  action: Actions
-): IAdvancedSearchParamState | Loop<IAdvancedSearchParamState, Actions> => {
-  switch (action.type) {
-    case actions.SET_ADVANCED_SEARCH_PARAM: {
-      return {
-        ...action.payload
-      }
-    }
-    default:
-      return state
-  }
 }
