@@ -249,7 +249,7 @@ export function PasswordChangeModal({
                 optionalLabel=""
               >
                 <PasswordInput
-                  id="CurrentPassword"
+                  id="currentPassword"
                   touched={true}
                   value={currentPassword}
                   onChange={handleSetCurrentPassword}
@@ -268,7 +268,7 @@ export function PasswordChangeModal({
                 required={false}
               >
                 <PasswordInput
-                  id="NewPassword"
+                  id="newPassword"
                   touched={true}
                   value={newPassword}
                   onChange={checkPasswordStrength}
@@ -323,7 +323,7 @@ export function PasswordChangeModal({
                 optionalLabel=""
               >
                 <PasswordInput
-                  id="ConfirmPassword"
+                  id="confirmPassword"
                   touched={true}
                   error={passwordMismatched}
                   value={confirmPassword}

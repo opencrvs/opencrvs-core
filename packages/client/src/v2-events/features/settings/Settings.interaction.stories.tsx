@@ -131,35 +131,35 @@ export const ChangePasswordStateClears: Story = {
 
     await step('Open modal and trigger all validation states', async () => {
       await waitFor(async () =>
-        expect(canvasElement.querySelector('#BtnChangePassword')).toBeEnabled()
+        expect(canvasElement.querySelector('#btnChangePassword')).toBeEnabled()
       )
       await userEvent.click(
-        canvasElement.querySelector('#BtnChangePassword') as HTMLElement
+        canvasElement.querySelector('#btnChangePassword') as HTMLElement
       )
 
       await canvas.findByText('Change password')
 
       await userEvent.type(
-        canvasElement.querySelector('#CurrentPassword') as HTMLInputElement,
+        canvasElement.querySelector('#currentPassword') as HTMLInputElement,
         'currentpassword'
       )
 
       await userEvent.type(
-        canvasElement.querySelector('#NewPassword') as HTMLInputElement,
+        canvasElement.querySelector('#newPassword') as HTMLInputElement,
         'NewPass1234567'
       )
 
       await userEvent.type(
-        canvasElement.querySelector('#ConfirmPassword') as HTMLInputElement,
+        canvasElement.querySelector('#confirmPassword') as HTMLInputElement,
         'WrongPass9999'
       )
       await canvas.findByText('Passwords do not match')
 
       await userEvent.clear(
-        canvasElement.querySelector('#ConfirmPassword') as HTMLInputElement
+        canvasElement.querySelector('#confirmPassword') as HTMLInputElement
       )
       await userEvent.type(
-        canvasElement.querySelector('#ConfirmPassword') as HTMLInputElement,
+        canvasElement.querySelector('#confirmPassword') as HTMLInputElement,
         'NewPass1234567'
       )
       await canvas.findByText('Passwords match')
@@ -190,22 +190,22 @@ export const ChangePasswordStateClears: Story = {
 
     await step('Reopen modal — all state cleared', async () => {
       await userEvent.click(
-        canvasElement.querySelector('#BtnChangePassword') as HTMLElement
+        canvasElement.querySelector('#btnChangePassword') as HTMLElement
       )
 
       await canvas.findByText('Change password')
 
       await expect(
-        (canvasElement.querySelector('#CurrentPassword') as HTMLInputElement)
+        (canvasElement.querySelector('#currentPassword') as HTMLInputElement)
           .value
       ).toBe('')
 
       await expect(
-        (canvasElement.querySelector('#NewPassword') as HTMLInputElement).value
+        (canvasElement.querySelector('#newPassword') as HTMLInputElement).value
       ).toBe('')
 
       await expect(
-        (canvasElement.querySelector('#ConfirmPassword') as HTMLInputElement)
+        (canvasElement.querySelector('#confirmPassword') as HTMLInputElement)
           .value
       ).toBe('')
 
@@ -244,10 +244,10 @@ export const TogglePasswordVisibility: Story = {
     const canvas = within(canvasElement)
 
     await waitFor(async () =>
-      expect(canvasElement.querySelector('#BtnChangePassword')).toBeEnabled()
+      expect(canvasElement.querySelector('#btnChangePassword')).toBeEnabled()
     )
     await userEvent.click(
-      canvasElement.querySelector('#BtnChangePassword') as HTMLElement
+      canvasElement.querySelector('#btnChangePassword') as HTMLElement
     )
 
     await canvas.findByText('Change password')
@@ -261,57 +261,57 @@ export const TogglePasswordVisibility: Story = {
       ) as HTMLButtonElement
     }
 
-    await step('Toggle CurrentPassword visibility', async () => {
+    await step('Toggle current password visibility', async () => {
       await userEvent.type(
-        canvasElement.querySelector('#CurrentPassword') as HTMLInputElement,
+        canvasElement.querySelector('#currentPassword') as HTMLInputElement,
         'somepassword'
       )
 
       const input = canvasElement.querySelector(
-        '#CurrentPassword'
+        '#currentPassword'
       ) as HTMLInputElement
       await expect(input.type).toBe('password')
 
-      await userEvent.click(getToggleButton('CurrentPassword'))
+      await userEvent.click(getToggleButton('currentPassword'))
       await expect(input.type).toBe('text')
 
-      await userEvent.click(getToggleButton('CurrentPassword'))
+      await userEvent.click(getToggleButton('currentPassword'))
       await expect(input.type).toBe('password')
     })
 
-    await step('Toggle NewPassword visibility', async () => {
+    await step('Toggle new password visibility', async () => {
       await userEvent.type(
-        canvasElement.querySelector('#NewPassword') as HTMLInputElement,
+        canvasElement.querySelector('#newPassword') as HTMLInputElement,
         'NewPass1234567'
       )
 
       const input = canvasElement.querySelector(
-        '#NewPassword'
+        '#newPassword'
       ) as HTMLInputElement
       await expect(input.type).toBe('password')
 
-      await userEvent.click(getToggleButton('NewPassword'))
+      await userEvent.click(getToggleButton('newPassword'))
       await expect(input.type).toBe('text')
 
-      await userEvent.click(getToggleButton('NewPassword'))
+      await userEvent.click(getToggleButton('newPassword'))
       await expect(input.type).toBe('password')
     })
 
-    await step('Toggle ConfirmPassword visibility', async () => {
+    await step('Toggle confirm password visibility', async () => {
       await userEvent.type(
-        canvasElement.querySelector('#ConfirmPassword') as HTMLInputElement,
+        canvasElement.querySelector('#confirmPassword') as HTMLInputElement,
         'NewPass1234567'
       )
 
       const input = canvasElement.querySelector(
-        '#ConfirmPassword'
+        '#confirmPassword'
       ) as HTMLInputElement
       await expect(input.type).toBe('password')
 
-      await userEvent.click(getToggleButton('ConfirmPassword'))
+      await userEvent.click(getToggleButton('confirmPassword'))
       await expect(input.type).toBe('text')
 
-      await userEvent.click(getToggleButton('ConfirmPassword'))
+      await userEvent.click(getToggleButton('confirmPassword'))
       await expect(input.type).toBe('password')
     })
   }
@@ -329,34 +329,34 @@ export const ConfirmPasswordPreservedOnNewPasswordChange: Story = {
     const canvas = within(canvasElement)
 
     await waitFor(async () =>
-      expect(canvasElement.querySelector('#BtnChangePassword')).toBeEnabled()
+      expect(canvasElement.querySelector('#btnChangePassword')).toBeEnabled()
     )
     await userEvent.click(
-      canvasElement.querySelector('#BtnChangePassword') as HTMLElement
+      canvasElement.querySelector('#btnChangePassword') as HTMLElement
     )
 
     await canvas.findByText('Change password')
 
     await step('Type confirm password first', async () => {
       await userEvent.type(
-        canvasElement.querySelector('#ConfirmPassword') as HTMLInputElement,
+        canvasElement.querySelector('#confirmPassword') as HTMLInputElement,
         'MyPass1234567'
       )
       await expect(
-        (canvasElement.querySelector('#ConfirmPassword') as HTMLInputElement)
+        (canvasElement.querySelector('#confirmPassword') as HTMLInputElement)
           .value
       ).toBe('MyPass1234567')
     })
 
     await step('Type matching new password — passwords match', async () => {
       await userEvent.type(
-        canvasElement.querySelector('#NewPassword') as HTMLInputElement,
+        canvasElement.querySelector('#newPassword') as HTMLInputElement,
         'MyPass1234567'
       )
       await canvas.findByText('Passwords match')
 
       await expect(
-        (canvasElement.querySelector('#ConfirmPassword') as HTMLInputElement)
+        (canvasElement.querySelector('#confirmPassword') as HTMLInputElement)
           .value
       ).toBe('MyPass1234567')
     })
@@ -365,17 +365,17 @@ export const ConfirmPasswordPreservedOnNewPasswordChange: Story = {
       'Change new password — confirm password preserved, mismatch shown',
       async () => {
         await userEvent.clear(
-          canvasElement.querySelector('#NewPassword') as HTMLInputElement
+          canvasElement.querySelector('#newPassword') as HTMLInputElement
         )
         await userEvent.type(
-          canvasElement.querySelector('#NewPassword') as HTMLInputElement,
+          canvasElement.querySelector('#newPassword') as HTMLInputElement,
           'DifferentPass1234567'
         )
 
         await canvas.findByText('Passwords do not match')
 
         await expect(
-          (canvasElement.querySelector('#ConfirmPassword') as HTMLInputElement)
+          (canvasElement.querySelector('#confirmPassword') as HTMLInputElement)
             .value
         ).toBe('MyPass1234567')
       }
