@@ -11,7 +11,7 @@
 
 import { UUID, AdministrativeArea } from '@opencrvs/commons'
 import * as administrativeAreaRepo from '@events/storage/postgres/administrative-hierarchy/administrative-areas'
-import { clearAdministrativeHierarchyCache } from '@events/service/indexing/indexing'
+import { clearAdministrativeHierarchyCache } from '@events/storage/postgres/administrative-hierarchy/locations'
 
 export async function getAdministrativeAreas(params?: {
   isActive?: boolean

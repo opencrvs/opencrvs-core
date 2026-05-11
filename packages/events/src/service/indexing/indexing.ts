@@ -60,12 +60,6 @@ import {
   withJurisdictionFilters
 } from './query'
 
-const administrativeHierarchyCache = new Map<string, string[]>()
-
-export function clearAdministrativeHierarchyCache() {
-  administrativeHierarchyCache.clear()
-}
-
 function eventToEventIndex(
   event: EventDocument,
   config: EventConfig
@@ -395,7 +389,6 @@ export type BulkResponse = estypes.BulkResponse
 export async function indexEventsInBulk(
   batch: EventDocument[],
   configs: EventConfig[],
-  locationHierarchyCache: Map<string, string[]> = new Map<string, string[]>(),
   indexNameOverrides?: Map<string, string>
 ) {
   const esClient = getOrCreateClient()
@@ -408,11 +401,7 @@ export async function indexEventsInBulk(
       const eventIndex = eventToEventIndex(doc, config)
 
       const eventIndexWithLocationHierarchy =
-        await getEventIndexWithAdministrativeHierarchy(
-          config,
-          eventIndex,
-          locationHierarchyCache
-        )
+        await getEventIndexWithAdministrativeHierarchy(config, eventIndex)
       return [
         {
           index: {
@@ -463,11 +452,7 @@ export async function indexEvent(
   const eventIndex = eventToEventIndex(event, config)
 
   const eventIndexWithAdministrativeHierarchy =
-    await getEventIndexWithAdministrativeHierarchy(
-      config,
-      eventIndex,
-      administrativeHierarchyCache
-    )
+    await getEventIndexWithAdministrativeHierarchy(config, eventIndex)
   return esClient.index<EventIndexWithAdministrativeHierarchy>({
     index: indexName,
     id: event.id,

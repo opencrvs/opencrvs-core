@@ -69,6 +69,7 @@ export async function setLocations(locations: NewLocations[]) {
   const db = getClient()
 
   await setLocationsInTrx(db, locations)
+  clearAdministrativeHierarchyCache()
 }
 
 export async function getLocations({
@@ -202,11 +203,19 @@ export function getAdministrativeHierarchyByIdCte(
  * @param locationId
  * @returns The list of location hierarchy ids, ex: [admin_area_1_id, admin_area_2_id, locationId]
  */
+// Process-level cache for administrative hierarchies. Invalidated whenever
+// locations or administrative areas are written.
 const administrativeHierarchyByIdCache = new Map<string, Promise<UUID[]>>()
+
+export function clearAdministrativeHierarchyCache() {
+  administrativeHierarchyByIdCache.clear()
+}
 
 export function getAdministrativeHierarchyById(id: string): Promise<UUID[]> {
   const cached = administrativeHierarchyByIdCache.get(id)
-  if (cached) { return cached }
+  if (cached) {
+    return cached
+  }
 
   const db = getClient()
   const query = sql<{ ids: UUID[] }>`
