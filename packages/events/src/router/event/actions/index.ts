@@ -12,6 +12,7 @@ import { TRPCError } from '@trpc/server'
 import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import * as z from 'zod/v4'
 import { OpenApiMeta } from 'trpc-to-openapi'
+import { fromZodError } from 'zod-validation-error'
 import { logger, UUID } from '@opencrvs/commons'
 import {
   ActionType,
@@ -287,7 +288,7 @@ export async function defaultRequestHandler(
   const maybeParsed = schema.safeParse(responseBody ?? {})
 
   if (!maybeParsed.success) {
-    logger.error(maybeParsed.error)
+    logger.error(fromZodError(maybeParsed.error))
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
       message:
