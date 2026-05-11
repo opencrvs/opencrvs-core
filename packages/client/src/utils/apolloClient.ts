@@ -31,8 +31,6 @@ import {
   persistenceMapper,
   clearOldCacheEntries
 } from '@client/utils/persistence'
-import { storeReloadModalVisibility } from '@client/reload/reducer'
-import { APPLICATION_VERSION } from './constants'
 import { storage } from '../storage'
 
 export let client: ApolloClient<NormalizedCacheObject>
@@ -74,17 +72,6 @@ export const createClient = (
 
   const responseLink = new ApolloLink((operation, forward) => {
     return forward(operation).map((response) => {
-      const context = operation.getContext()
-      const {
-        response: { headers }
-      } = context
-
-      const gatewayVersion = headers.get('X-version')
-
-      if (gatewayVersion !== APPLICATION_VERSION) {
-        store.dispatch(storeReloadModalVisibility(true))
-      }
-
       return response
     })
   })
