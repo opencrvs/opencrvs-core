@@ -15,6 +15,7 @@ import { userEvent } from '@storybook/testing-library'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import {
+  DocumentPath,
   TestUserRole,
   TokenUserType,
   User,
@@ -313,6 +314,12 @@ export const AllFieldsAreIncludedInCreatePayload: StoryObj = {
   beforeEach: () => {
     createUserSpy.mockReset()
     useUserFormState.getState().setUserForm({
+      phoneNumber: mockUser.mobile,
+      signature: {
+        path: mockUser.signature as DocumentPath,
+        originalFilename: 'signature.png',
+        type: 'image/png'
+      },
       primaryOfficeId: mockUser.primaryOfficeId,
       role: TestUserRole.enum.REGISTRATION_AGENT,
       name: { firstname: 'Test', surname: 'User' },
@@ -337,13 +344,17 @@ export const AllFieldsAreIncludedInCreatePayload: StoryObj = {
         await waitFor(() =>
           expect(createUserSpy).toHaveBeenCalledWith(
             expect.objectContaining({
-              mobile: undefined,
+              mobile: mockUser.mobile,
               email: 'test@opencrvs.org',
               fullHonorificName: 'Dr. Test User',
               device: 'Test Device',
               role: TestUserRole.enum.REGISTRATION_AGENT,
               primaryOfficeId: mockUser.primaryOfficeId,
-              signature: undefined,
+              signature: {
+                path: mockUser.signature as DocumentPath,
+                originalFilename: 'signature.png',
+                type: 'image/png'
+              },
               name: { firstname: 'Test', surname: 'User' },
               data: {
                 'user.staffId': null
@@ -392,6 +403,12 @@ export const AllFieldsAreIncludedInUpdatePayload: StoryObj = {
     updateUserSpy.mockReset()
     useUserFormState.getState().setUserForm(
       {
+        phoneNumber: mockUser.mobile,
+        signature: {
+          path: mockUser.signature as DocumentPath,
+          originalFilename: 'signature.png',
+          type: 'image/png'
+        },
         primaryOfficeId: mockUser.primaryOfficeId,
         role: TestUserRole.enum.REGISTRATION_AGENT,
         name: {
@@ -422,13 +439,17 @@ export const AllFieldsAreIncludedInUpdatePayload: StoryObj = {
           expect(updateUserSpy).toHaveBeenCalledWith(
             expect.objectContaining({
               id: mockUser.id,
-              mobile: undefined,
+              mobile: mockUser.mobile,
               email: mockUser.email,
               fullHonorificName: 'Dr. Updated User',
               device: 'Updated Device',
               role: TestUserRole.enum.REGISTRATION_AGENT,
               primaryOfficeId: mockUser.primaryOfficeId,
-              signature: undefined,
+              signature: {
+                path: mockUser.signature as DocumentPath,
+                originalFilename: 'signature.png',
+                type: 'image/png'
+              },
               name: {
                 firstname: mockUser.name.firstname,
                 surname: mockUser.name.surname
