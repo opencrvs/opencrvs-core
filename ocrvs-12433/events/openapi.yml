@@ -1969,6 +1969,7 @@ components:
                                 - user.read
                                 - user.create
                                 - user.edit
+                                - user.search
                                 - record.search
                                 - record.create
                                 - record.read
@@ -6583,6 +6584,7 @@ components:
                                 - user.read
                                 - user.create
                                 - user.edit
+                                - user.search
                                 - record.search
                                 - record.create
                                 - record.read
@@ -7006,6 +7008,7 @@ components:
                                 - user.read
                                 - user.create
                                 - user.edit
+                                - user.search
                                 - record.search
                                 - record.create
                                 - record.read
@@ -7242,6 +7245,7 @@ components:
                                 - user.read
                                 - user.create
                                 - user.edit
+                                - user.search
                                 - record.search
                                 - record.create
                                 - record.read
@@ -7478,6 +7482,7 @@ components:
                                 - user.read
                                 - user.create
                                 - user.edit
+                                - user.search
                                 - record.search
                                 - record.create
                                 - record.read
