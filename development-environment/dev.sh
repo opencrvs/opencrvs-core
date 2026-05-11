@@ -136,5 +136,4 @@ sleep 10
 
 yarn dev:secrets:gen
 
-
 concurrently "yarn run start" "yarn run compose:deps"
