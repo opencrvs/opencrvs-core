@@ -14,14 +14,15 @@ flowchart TD
     subgraph CORE["Core"]
         C1["Verify CHANGELOG.md + package.json match release version"]
         C2["git tag vX.Y.Z\ngit push origin tag vX.Y.Z"]
-        C3["⚡ Pipeline + npm publish triggered automatically"]
+        C3["⚡ Pipeline triggered automatically\n(docker images)"]
         C4["Verify docker images published\nCompare size vs previous — report unusual increases"]
         C5[Create draft release]
         C6[Paste CHANGELOG.md to GitHub release]
         C7["Paste copy items to release notes\n(generate with notebook)"]
         C8[Publish GitHub release]
-        C9[Verify toolkit version visible on npm]
-        C1 --> C2 --> C3 --> C4 --> C5 --> C6 --> C7 --> C8 --> C9
+        C9["⚡ npm publish for toolkit triggered automatically"]
+        C10[Verify toolkit version visible on npm]
+        C1 --> C2 --> C3 --> C4 --> C5 --> C6 --> C7 --> C8 --> C9 --> C10
     end
 
     subgraph CC["CountryConfig — after Core visible on npm"]
