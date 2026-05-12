@@ -343,7 +343,7 @@ export async function createUser(
     firstname: resolvedUser.name.firstname,
     surname: resolvedUser.name.surname,
     // Normalise to undefined for the same reason as mobile above.
-    email: resolvedUser?.email?.toLowerCase() || undefined,
+    email: resolvedUser.email?.toLowerCase() || undefined,
     fullHonorificName: resolvedUser.fullHonorificName,
     role: resolvedUser.role,
     device: resolvedUser.device,

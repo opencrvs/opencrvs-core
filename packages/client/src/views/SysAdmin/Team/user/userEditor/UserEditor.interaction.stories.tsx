@@ -15,6 +15,7 @@ import { userEvent } from '@storybook/testing-library'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import {
+  DocumentPath,
   TestUserRole,
   TokenUserType,
   User,
@@ -44,6 +45,7 @@ const mockRoles = [
 const generator = testDataGenerator()
 const mockUser = generator.user.registrationAgent().v2
 const createUserSpy = fn()
+const updateUserSpy = fn()
 
 const meta: Meta = {
   title: 'SysAdmin/UserEditor/Interaction',
@@ -281,6 +283,181 @@ export const ClearedPhoneNumberNormalisedToUndefined: StoryObj = {
         await waitFor(() =>
           expect(createUserSpy).toHaveBeenCalledWith(
             expect.not.objectContaining({ mobile: '' })
+          )
+        )
+      }
+    )
+  }
+}
+
+export const AllFieldsAreIncludedInCreatePayload: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: createTemporaryId()
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        createUser: [
+          tRPCMsw.user.create.mutation((input) => {
+            createUserSpy(input)
+            return mockUser
+          })
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    createUserSpy.mockReset()
+    useUserFormState.getState().setUserForm({
+      phoneNumber: mockUser.mobile,
+      signature: {
+        path: mockUser.signature as DocumentPath,
+        originalFilename: 'signature.png',
+        type: 'image/png'
+      },
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      name: { firstname: 'Test', surname: 'User' },
+      email: 'test@opencrvs.org',
+      fullHonorificName: 'Dr. Test User',
+      device: 'Test Device'
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Submit the create form', async () => {
+      const submitButton = await canvas.findByRole('button', {
+        name: /create user/i
+      })
+      await userEvent.click(submitButton)
+    })
+
+    await step(
+      'create payload contains every expected field at the correct value',
+      async () => {
+        await waitFor(() =>
+          expect(createUserSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+              mobile: mockUser.mobile,
+              email: 'test@opencrvs.org',
+              fullHonorificName: 'Dr. Test User',
+              device: 'Test Device',
+              role: TestUserRole.enum.REGISTRATION_AGENT,
+              primaryOfficeId: mockUser.primaryOfficeId,
+              signature: {
+                path: mockUser.signature as DocumentPath,
+                originalFilename: 'signature.png',
+                type: 'image/png'
+              },
+              name: { firstname: 'Test', surname: 'User' },
+              data: {
+                'user.staffId': null
+              }
+            })
+          )
+        )
+      }
+    )
+  }
+}
+
+export const AllFieldsAreIncludedInUpdatePayload: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: mockUser.id
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        user: [
+          tRPCMsw.user.get.query(() => ({
+            ...mockUser,
+            fullHonorificName: 'Dr. Existing User',
+            device: 'Existing Device'
+          }))
+        ],
+        updateUser: [
+          tRPCMsw.user.update.mutation((input) => {
+            updateUserSpy(input)
+            return {
+              ...mockUser,
+              fullHonorificName: 'Dr. Updated User',
+              device: 'Updated Device'
+            }
+          })
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    updateUserSpy.mockReset()
+    useUserFormState.getState().setUserForm(
+      {
+        phoneNumber: mockUser.mobile,
+        signature: {
+          path: mockUser.signature as DocumentPath,
+          originalFilename: 'signature.png',
+          type: 'image/png'
+        },
+        primaryOfficeId: mockUser.primaryOfficeId,
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        name: {
+          firstname: mockUser.name.firstname,
+          surname: mockUser.name.surname
+        },
+        email: mockUser.email,
+        fullHonorificName: 'Dr. Updated User',
+        device: 'Updated Device'
+      },
+      mockUser.id
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Submit the update form', async () => {
+      const submitButton = await canvas.findByRole('button', {
+        name: /confirm/i
+      })
+      await userEvent.click(submitButton)
+    })
+
+    await step(
+      'update payload contains every expected field at the correct value',
+      async () => {
+        await waitFor(() =>
+          expect(updateUserSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+              id: mockUser.id,
+              mobile: mockUser.mobile,
+              email: mockUser.email,
+              fullHonorificName: 'Dr. Updated User',
+              device: 'Updated Device',
+              role: TestUserRole.enum.REGISTRATION_AGENT,
+              primaryOfficeId: mockUser.primaryOfficeId,
+              signature: {
+                path: mockUser.signature as DocumentPath,
+                originalFilename: 'signature.png',
+                type: 'image/png'
+              },
+              name: {
+                firstname: mockUser.name.firstname,
+                surname: mockUser.name.surname
+              },
+              data: {
+                'user.staffId': null
+              }
+            })
           )
         )
       }

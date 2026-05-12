@@ -75,7 +75,8 @@ export async function registerOnDeclare({
     annotation,
     eventId,
     transactionId,
-    keepAssignment: true
+    keepAssignment: true,
+    waitFor: true
   })
 
   if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
@@ -86,7 +87,8 @@ export async function registerOnDeclare({
     declaration: {},
     annotation,
     eventId,
-    transactionId
+    transactionId,
+    waitFor: true
   })
 }
 
@@ -104,7 +106,8 @@ export async function editAndRegister({
     eventId,
     transactionId,
     keepAssignment: true,
-    content
+    content,
+    waitFor: true
   })
 
   const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
@@ -112,7 +115,8 @@ export async function editAndRegister({
     annotation,
     eventId,
     transactionId,
-    keepAssignment: true
+    keepAssignment: true,
+    waitFor: true
   })
 
   if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
@@ -123,7 +127,8 @@ export async function editAndRegister({
     declaration,
     annotation,
     eventId,
-    transactionId
+    transactionId,
+    waitFor: true
   })
 }
 
@@ -140,14 +145,16 @@ export async function editAndDeclare({
     eventId,
     transactionId,
     keepAssignment: true,
-    content
+    content,
+    waitFor: true
   })
 
   return trpcClient.event.actions.declare.request.mutate({
     declaration,
     annotation,
     eventId,
-    transactionId
+    transactionId,
+    waitFor: true
   })
 }
 
@@ -164,14 +171,16 @@ export async function editAndNotify({
     eventId,
     transactionId,
     keepAssignment: true,
-    content
+    content,
+    waitFor: true
   })
 
   return trpcClient.event.actions.notify.request.mutate({
     declaration,
     annotation,
     eventId,
-    transactionId
+    transactionId,
+    waitFor: true
   })
 }
 
@@ -189,6 +198,7 @@ export async function archiveOnDuplicate({
     transactionId,
     declaration,
     keepAssignment: true,
+    waitFor: true,
     ...(content.duplicateOf
       ? { content: { duplicateOf: content.duplicateOf } }
       : {})
@@ -197,7 +207,8 @@ export async function archiveOnDuplicate({
     eventId,
     transactionId,
     declaration,
-    content: { reason: content.reason }
+    content: { reason: content.reason },
+    waitFor: true
   })
 }
 
@@ -247,7 +258,8 @@ export async function makeCorrectionOnRequest({
       declaration,
       transactionId,
       annotation,
-      keepAssignment: true
+      keepAssignment: true,
+      waitFor: true
     })
 
   const requestId = response.actions.find(
@@ -268,6 +280,7 @@ export async function makeCorrectionOnRequest({
     requestId,
     annotation: {
       isImmediateCorrection: true
-    }
+    },
+    waitFor: true
   })
 }
