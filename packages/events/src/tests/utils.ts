@@ -125,6 +125,47 @@ export function sanitizeForSnapshot(data: unknown, fields: string[]) {
 
 const { createCallerFactory } = t
 
+/**
+ * Wraps a tRPC test caller so every leaf procedure call merges
+ * `waitFor: true` into the input. Mirrors what the real web client does — the
+ * server defaults `refresh` to `false` so HTTP requests don't block on
+ * Elasticsearch, but tests do need to see indexed state synchronously.
+ *
+ * Tests can still opt into async behavior by passing `waitFor: false`
+ * explicitly — `...input` wins over the injected default.
+ */
+function withWaitFor<T>(caller: T): T {
+  if (
+    caller === null ||
+    (typeof caller !== 'object' && typeof caller !== 'function')
+  ) {
+    return caller
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return new Proxy(caller as any, {
+    get(target, prop) {
+      const value = target[prop]
+      if (
+        value !== null &&
+        (typeof value === 'function' || typeof value === 'object')
+      ) {
+        return withWaitFor(value)
+      }
+      return value
+    },
+    apply(target, thisArg, args) {
+      const [input, ...rest] = args
+      const isPlainObject =
+        input !== null &&
+        typeof input === 'object' &&
+        (Object.getPrototypeOf(input) === Object.prototype ||
+          Object.getPrototypeOf(input) === null)
+      const patched = isPlainObject ? { waitFor: true, ...input } : input
+      return Reflect.apply(target, thisArg, [patched, ...rest])
+    }
+  })
+}
+
 export const TEST_USER_DEFAULT_SCOPES = [
   encodeScope({
     type: 'workqueue',
@@ -307,7 +348,7 @@ export function createSystemTestClient(
     token
   })
 
-  return caller
+  return withWaitFor(caller)
 }
 
 export function createTestClient(
@@ -329,7 +370,7 @@ export function createTestClient(
     },
     token
   })
-  return caller
+  return withWaitFor(caller)
 }
 
 export function createInternalTestClient(tokenWithBearer?: TokenWithBearer) {
@@ -340,7 +381,7 @@ export function createInternalTestClient(tokenWithBearer?: TokenWithBearer) {
     token
   })
 
-  return caller
+  return withWaitFor(caller)
 }
 
 export function createInitialisationTestClient(
@@ -353,7 +394,7 @@ export function createInitialisationTestClient(
     token
   })
 
-  return caller
+  return withWaitFor(caller)
 }
 
 /**
@@ -374,7 +415,7 @@ export function createCountryConfigClient(
     },
     token
   })
-  return caller
+  return withWaitFor(caller)
 }
 
 /**

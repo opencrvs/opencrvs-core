@@ -232,7 +232,8 @@ export async function defaultRequestHandler(
     input.eventId,
     input.type,
     token,
-    'customActionType' in input ? input.customActionType : undefined
+    'customActionType' in input ? input.customActionType : undefined,
+    event
   )
 
   const eventWithRequestedAction = await addAction(input, {
@@ -267,7 +268,7 @@ export async function defaultRequestHandler(
 
   // For Async flow, we just return the event with the requested action and ensure it is indexed
   if (responseStatus === ActionConfirmationResponse.RequiresProcessing) {
-    await ensureEventIndexed(eventWithRequestedAction, configuration)
+    await ensureEventIndexed(eventWithRequestedAction, configuration, input.waitFor ?? false)
     return eventWithRequestedAction
   }
 
@@ -383,7 +384,7 @@ export function getDefaultActionProcedures(
       .mutation(async ({ ctx, input }) => {
         const { token, user, existingAction, duplicates } = ctx
         const { eventId } = input
-        const event = await getEventById(eventId)
+        const event = ctx.event
         const eventConfiguration = await getEventConfigurationById({
           token,
           eventType: event.type

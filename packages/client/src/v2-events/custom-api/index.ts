@@ -82,7 +82,8 @@ export async function registerOnDeclare({
     annotation,
     eventId,
     transactionId,
-    keepAssignmentIfAccepted: true
+    keepAssignmentIfAccepted: true,
+    waitFor: true
   })
 
   if (
@@ -96,7 +97,8 @@ export async function registerOnDeclare({
     declaration: {},
     annotation,
     eventId,
-    transactionId
+    transactionId,
+    waitFor: true
   })
 }
 
@@ -113,8 +115,9 @@ export async function editAndRegister({
     annotation,
     eventId,
     transactionId,
-    keepAssignment: true,
-    content
+    keepAssignmentIfAccepted: true,
+    content,
+    waitFor: true
   })
 
   if (wasRejected(editedEvent, ActionType.EDIT)) {
@@ -126,7 +129,8 @@ export async function editAndRegister({
     annotation,
     eventId,
     transactionId,
-    keepAssignmentIfAccepted: true
+    keepAssignmentIfAccepted: true,
+    waitFor: true
   })
 
   if (
@@ -140,7 +144,8 @@ export async function editAndRegister({
     declaration: {},
     annotation,
     eventId,
-    transactionId
+    transactionId,
+    waitFor: true
   })
 }
 
@@ -156,8 +161,9 @@ export async function editAndDeclare({
     annotation,
     eventId,
     transactionId,
-    keepAssignment: true,
-    content
+    keepAssignmentIfAccepted: true,
+    content,
+    waitFor: true
   })
 
   if (wasRejected(editedEvent, ActionType.EDIT)) {
@@ -168,7 +174,8 @@ export async function editAndDeclare({
     declaration,
     annotation,
     eventId,
-    transactionId
+    transactionId,
+    waitFor: true
   })
 }
 
@@ -184,8 +191,9 @@ export async function editAndNotify({
     annotation,
     eventId,
     transactionId,
-    keepAssignment: true,
-    content
+    keepAssignmentIfAccepted: true,
+    content,
+    waitFor: true
   })
 
   if (wasRejected(editedEvent, ActionType.EDIT)) {
@@ -196,7 +204,8 @@ export async function editAndNotify({
     declaration,
     annotation,
     eventId,
-    transactionId
+    transactionId,
+    waitFor: true
   })
 }
 
@@ -213,7 +222,8 @@ export async function archiveOnDuplicate({
     eventId,
     transactionId,
     declaration,
-    keepAssignment: true,
+    keepAssignmentIfAccepted: true,
+    waitFor: true,
     ...(content.duplicateOf
       ? { content: { duplicateOf: content.duplicateOf } }
       : {})
@@ -222,7 +232,8 @@ export async function archiveOnDuplicate({
     eventId,
     transactionId,
     declaration,
-    content: { reason: content.reason }
+    content: { reason: content.reason },
+    waitFor: true
   })
 }
 
@@ -272,7 +283,8 @@ export async function makeCorrectionOnRequest({
       declaration,
       transactionId,
       annotation,
-      keepAssignmentIfAccepted: true
+      keepAssignmentIfAccepted: true,
+      waitFor: true
     })
 
   if (wasRejected(response, ActionType.REQUEST_CORRECTION)) {
@@ -297,6 +309,7 @@ export async function makeCorrectionOnRequest({
     requestId,
     annotation: {
       isImmediateCorrection: true
-    }
+    },
+    waitFor: true
   })
 }

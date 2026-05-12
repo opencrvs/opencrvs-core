@@ -35,4 +35,6 @@ export async function setAdministrativeHierarchy({
 
     await locationRepo.setLocationsInTrx(trx, locations)
   })
+
+  locationRepo.clearAdministrativeHierarchyCache()
 }
