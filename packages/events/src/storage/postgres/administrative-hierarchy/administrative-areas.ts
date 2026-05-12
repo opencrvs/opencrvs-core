@@ -114,21 +114,26 @@ export async function setAdministrativeAreas(
  *
  * @returns List of leaf level administrative area ids.
  */
-export async function getLeafLevelAdministrativeAreaIds() {
-  const db = getClient()
+let leafLevelAdministrativeAreaIdsCache: Promise<{ id: UUID }[]> | null = null
 
-  const query = db
-    .selectFrom('administrativeAreas as a1')
-    .select(['a1.id'])
-    .where(({ not, exists, selectFrom }) =>
-      not(
-        exists(
-          selectFrom('administrativeAreas as a2')
-            .select('a2.id')
-            .whereRef('a2.parentId', '=', 'a1.id')
+export function getLeafLevelAdministrativeAreaIds() {
+  if (!leafLevelAdministrativeAreaIdsCache) {
+    const db = getClient()
+
+    leafLevelAdministrativeAreaIdsCache = db
+      .selectFrom('administrativeAreas as a1')
+      .select(['a1.id'])
+      .where(({ not, exists, selectFrom }) =>
+        not(
+          exists(
+            selectFrom('administrativeAreas as a2')
+              .select('a2.id')
+              .whereRef('a2.parentId', '=', 'a1.id')
+          )
         )
       )
-    )
+      .execute()
+  }
 
-  return query.execute()
+  return leafLevelAdministrativeAreaIdsCache
 }

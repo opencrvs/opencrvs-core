@@ -120,9 +120,10 @@ export async function throwConflictIfActionNotAllowed(
   eventId: UUID,
   actionType: ActionType,
   token: TokenWithBearer,
-  customActionType?: string
+  customActionType?: string,
+  existingEvent?: EventDocument
 ) {
-  const event = await getEventById(eventId)
+  const event = existingEvent ?? (await getEventById(eventId))
   const eventConfiguration = await getEventConfigurationById({
     eventType: event.type,
     token
@@ -422,10 +423,11 @@ function isEventIndexable(event: EventDocument) {
 
 export async function ensureEventIndexed(
   event: EventDocument,
-  configuration: EventConfig
+  configuration: EventConfig,
+  waitFor = false
 ) {
   if (isEventIndexable(event)) {
-    await indexEvent(event, configuration)
+    await indexEvent(event, configuration, waitFor)
   }
 }
 
@@ -463,7 +465,7 @@ export async function processAction(
   })
 
   // Only send the event to Elasticsearch if it is not a draft
-  await ensureEventIndexed(updatedEvent, configuration)
+  await ensureEventIndexed(updatedEvent, configuration, input.waitFor ?? false)
   return updatedEvent
 }
 
