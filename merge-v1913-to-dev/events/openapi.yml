@@ -280,6 +280,8 @@ paths:
                   type: boolean
                 keepAssignmentIfRejected:
                   type: boolean
+                waitFor:
+                  type: boolean
                 createdAtLocation:
                   description: A valid office location ID. This is required for system users
                     performing actions. The provided location must be a
@@ -363,6 +365,8 @@ paths:
                   type: boolean
                 keepAssignmentIfRejected:
                   type: boolean
+                waitFor:
+                  type: boolean
                 createdAtLocation:
                   description: A valid office location ID. This is required for system users
                     performing actions. The provided location must be a
@@ -445,6 +449,8 @@ paths:
                 keepAssignmentIfAccepted:
                   type: boolean
                 keepAssignmentIfRejected:
+                  type: boolean
+                waitFor:
                   type: boolean
                 createdAtLocation:
                   description: A valid office location ID. This is required for system users
@@ -531,6 +537,8 @@ paths:
                 keepAssignmentIfAccepted:
                   type: boolean
                 keepAssignmentIfRejected:
+                  type: boolean
+                waitFor:
                   type: boolean
                 createdAtLocation:
                   description: A valid office location ID. This is required for system users
