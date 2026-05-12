@@ -27,6 +27,7 @@ export const BaseActionInput = z.object({
   annotation: ActionUpdate.optional(),
   originalActionId: UUID.optional(), // should not be part of base action.
   keepAssignment: z.boolean().optional(),
+  waitFor: z.boolean().optional(),
   // For normal users, the createdAtLocation is resolved on the backend from the user's primaryOfficeId.
   // @TODO: createdAtLocation should be limited to actions that system users can perform. For normal users, it should not be part of the base action.
   createdAtLocation: UUID.nullish().describe(
