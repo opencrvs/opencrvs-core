@@ -192,6 +192,17 @@ jobs:
             echo "arch=-amd64" >> $GITHUB_OUTPUT
           fi
 
+      - name: Determine previous image for static asset retention
+        id: prev-image
+        if: matrix.service == 'login' || matrix.service == 'client'
+        run: |
+          PREV="ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}"
+          if docker manifest inspect "$PREV" > /dev/null 2>&1; then
+            echo "arg=PREVIOUS_IMAGE=$PREV" >> $GITHUB_OUTPUT
+          else
+            echo "arg=" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build and push
         uses: Wandalen/wretry.action@v3.8.0
         with:
@@ -202,6 +213,7 @@ jobs:
             build-args: |
               VERSION=${{ needs.base.outputs.version }}
               BRANCH=${{ needs.base.outputs.branch }}
+              ${{ steps.prev-image.outputs.arg }}
             provenance: false
             push: true
             context: .
