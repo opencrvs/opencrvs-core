@@ -528,6 +528,8 @@ const ReviewUserComponent = () => {
                 // unique value, causing duplicate-key errors on the next submit.
                 mobile: formState.phoneNumber || undefined,
                 email: formState.email || undefined,
+                fullHonorificName: formState.fullHonorificName || undefined,
+                device: formState.device || undefined,
                 role: formState.role!,
                 primaryOfficeId: formState.primaryOfficeId as UUID,
                 signature: formState.signature,
@@ -566,6 +568,8 @@ const ReviewUserComponent = () => {
                 // See create payload above — same normalisation needed.
                 mobile: formState.phoneNumber || undefined,
                 email: formState.email || undefined,
+                fullHonorificName: formState.fullHonorificName || undefined,
+                device: formState.device || undefined,
                 role: formState.role!,
                 primaryOfficeId: formState.primaryOfficeId as UUID,
                 signature: formState.signature,
