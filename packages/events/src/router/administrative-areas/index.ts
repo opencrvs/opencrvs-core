@@ -28,7 +28,7 @@ export function setAdministrativeAreasRoute(
   return procedure
     .input(z.array(AdministrativeArea).min(1))
     .output(z.void())
-    .mutation(({ input }) => setAdministrativeAreas(input))
+    .mutation(async ({ input }) => setAdministrativeAreas(input))
 }
 
 export const administrativeAreaRouter = router({
