@@ -18,7 +18,7 @@ import {
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { userOnlyProcedure } from '@events/router/trpc'
-import { getEventById, processAction } from '@events/service/events/events'
+import { processAction } from '@events/service/events/events'
 import {
   defaultRequestHandler,
   getDefaultActionProcedures
@@ -57,7 +57,7 @@ export function declareActionProcedures() {
         }
 
         const configs = await getInMemoryEventConfigurations(token)
-        const event = await getEventById(input.eventId)
+        const event = ctx.event
 
         const config = configs.find((c) => c.id === event.type)
 
@@ -104,8 +104,6 @@ export function declareActionProcedures() {
           config
         )
 
-        const updatedEvent = await getEventById(input.eventId)
-
         if (duplicates.length > 0) {
           return processAction(
             {
@@ -122,7 +120,7 @@ export function declareActionProcedures() {
               }
             },
             {
-              eventId: updatedEvent.id,
+              eventId: declaredEvent.id,
               user,
               token,
               status: ActionStatus.Accepted,

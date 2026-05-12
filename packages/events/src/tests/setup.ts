@@ -10,7 +10,10 @@
  */
 import { Client } from 'pg'
 import { inject, vi } from 'vitest'
-import { getDeclarationFields, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/events'
+import {
+  getDeclarationFields,
+  TENNIS_CLUB_MEMBERSHIP
+} from '@opencrvs/commons/events'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   getPool,
@@ -18,7 +21,10 @@ import {
 } from '@events/storage/postgres/events'
 
 import { createIndex } from '@events/service/indexing/indexing'
-import { getReindexingStatusIndexName, getTemporaryIndexName } from '@events/storage/__mocks__/elasticsearch'
+import {
+  getReindexingStatusIndexName,
+  getTemporaryIndexName
+} from '@events/storage/__mocks__/elasticsearch'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { mswServer } from './msw'
 import { createDatabase, initializeSchemaAccess, migrate } from './postgres'
@@ -39,12 +45,12 @@ async function resetESServer() {
 
   getEventIndexName.mockImplementation((type: string) => type + '_' + id)
   getEventAliasName.mockReturnValue('events_' + id)
-  getReindexingStatusIndexName.mockReturnValue(
-    'reindexing_status_' + id
+  getReindexingStatusIndexName.mockReturnValue('reindexing_status_' + id)
+  getTemporaryIndexName.mockImplementation(
+    (eventType: string, timestamp: number) => {
+      return `${getEventIndexName(eventType)}_${timestamp}`
+    }
   )
-  getTemporaryIndexName.mockImplementation((eventType: string, timestamp: number) => {
-    return `${getEventIndexName(eventType)}_${timestamp}`
-  })
 
   const client = getOrCreateClient()
 
@@ -64,13 +70,16 @@ async function resetESServer() {
   await client.cluster.putSettings({
     body: {
       persistent: {
-        "action.auto_create_index": "false"
+        'action.auto_create_index': 'false'
       }
     }
   })
 
   // Create concrete indices
-  await createIndex(getEventIndexName(TENNIS_CLUB_MEMBERSHIP), getDeclarationFields(tennisClubMembershipEvent))
+  await createIndex(
+    getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+    getDeclarationFields(tennisClubMembershipEvent)
+  )
 }
 
 async function resetPostgresServer() {
@@ -93,7 +102,7 @@ async function resetPostgresServer() {
   await initializeSchemaAccess(databaseInitializer)
   await databaseInitializer.end()
 
-  resetEventsPostgresServer()
+  await resetEventsPostgresServer()
   getPool(EVENTS_APP_POSTGRES_URI)
 }
 
