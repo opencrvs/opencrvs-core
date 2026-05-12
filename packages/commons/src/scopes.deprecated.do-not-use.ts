@@ -457,17 +457,8 @@ export function migrateLegacyScopesToV2(scopes: string[]): string[] {
     .filter((scope): scope is EncodedScope => !!scope)
 }
 
-/**
- * v2 scope types whose options legitimately combine `accessLevel` and `role`
- * on a single object (`AllUserScopeOptions` in `./scopes`). For these, a v1.9
- * role array may contain TWO legacy entries — one literal (e.g.
- * `user.create:my-jurisdiction`) and one configurable (e.g.
- * `user.create[role=X|Y]`) — that v1.9 evaluated with AND semantics. v2.0
- * scope arrays use OR semantics, so the pair must be merged into one v2 scope
- * to preserve the original restriction.
- *
- * Kept in sync with `ScopesWithRoleOption` at packages/commons/src/scopes.ts.
- */
+// Scope types whose v2 options object carries both `accessLevel` and `role`.
+// Kept in sync with `ScopesWithRoleOption` at packages/commons/src/scopes.ts.
 const MERGEABLE_USER_SCOPE_TYPES = ['user.create', 'user.edit'] as const
 
 type MergeableUserScopeType = (typeof MERGEABLE_USER_SCOPE_TYPES)[number]
@@ -478,124 +469,110 @@ function isMergeableUserScopeType(
   return (MERGEABLE_USER_SCOPE_TYPES as readonly string[]).includes(type)
 }
 
+type DecodedEntry = { legacy: string; scope: Scope }
+
+function decodeLegacyScope(legacy: string): DecodedEntry {
+  const encoded = legacyScopeToV2Scope(legacy)
+  const scope = decodeScope(encoded)
+  if (!scope) {
+    throw new Error(
+      `Could not decode migrated scope from legacy '${legacy}' (encoded: '${encoded}').`
+    )
+  }
+  return { legacy, scope }
+}
+
+function groupByType(entries: DecodedEntry[]): Record<string, DecodedEntry[]> {
+  return entries.reduce<Record<string, DecodedEntry[]>>(
+    (groups, entry) => ({
+      ...groups,
+      [entry.scope.type]: [...(groups[entry.scope.type] ?? []), entry]
+    }),
+    {}
+  )
+}
+
+// Keep first occurrence of each unique scope (by deep equality).
+function deduplicateEntries(entries: DecodedEntry[]): DecodedEntry[] {
+  return entries.filter(
+    (entry, index) =>
+      entries.findIndex((e) => isEqual(e.scope, entry.scope)) === index
+  )
+}
+
+// Merges disjoint options from AND-paired v1.9 scopes into one v2 scope object.
+// Throws if two entries both define the same option key — resolve manually.
+function mergeEntries(
+  type: MergeableUserScopeType,
+  entries: DecodedEntry[]
+): Scope {
+  const optionsList = entries.map((e) =>
+    'options' in e.scope && e.scope.options
+      ? (e.scope.options as Record<string, unknown>)
+      : {}
+  )
+
+  // Detect key conflicts before merging — same key in two different entries.
+  const allKeys = optionsList.flatMap((opts) =>
+    Object.keys(opts).filter((k) => opts[k] !== undefined)
+  )
+  const conflictKey = allKeys.find((key, i) => allKeys.indexOf(key) !== i)
+  if (conflictKey) {
+    const conflicting = entries
+      .filter(
+        (e) => conflictKey in (('options' in e.scope && e.scope.options) || {})
+      )
+      .map((e) => JSON.stringify(e.legacy))
+    throw new Error(
+      `Cannot auto-merge two '${type}' scopes that both define '${conflictKey}'. ` +
+        `Conflicting legacy scopes: [${conflicting.join(', ')}]. ` +
+        `Resolve manually in roles.ts and re-run.`
+    )
+  }
+
+  const mergedOptions = Object.assign({}, ...optionsList)
+  const merged =
+    Object.keys(mergedOptions).length > 0
+      ? { type, options: mergedOptions }
+      : { type }
+  const parsed = Scope.safeParse(merged)
+  if (!parsed.success) {
+    throw new Error(
+      `Merged '${type}' scope failed schema validation: ${parsed.error.message}. ` +
+        `Legacy scopes: [${entries.map((e) => JSON.stringify(e.legacy)).join(', ')}].`
+    )
+  }
+  return parsed.data
+}
+
 /**
- * Helper for porting an ENTIRE legacy scopes array to v2, preserving AND
- * semantics for pairs of legacy scopes that targeted the same v2 type.
- *
- * v1.9 expressed restrictions like "create users in my jurisdiction AND only
- * with roles X|Y" using two separate scope strings:
- *
- *   ['user.create:my-jurisdiction', 'user.create[role=X|Y]']
- *
- * Per-string migration would produce two independent v2 scopes — which in v2
- * are evaluated with OR semantics, broadening the user's permissions
- * (privilege escalation, see issue #12489). This helper merges such pairs
- * into a single v2 scope:
- *
- *   { type: 'user.create', options: { accessLevel: 'administrativeArea', role: ['X', 'Y'] } }
- *
- * Merging is restricted to `MERGEABLE_USER_SCOPE_TYPES` because v1.9 grammar
- * has no other documented AND-paired patterns. For other v2 types that
- * appear more than once after dedup, all entries are kept and a warning is
- * logged so authoring oddities surface for review.
- *
- * If two scopes of the same mergeable type both define the same option key
- * (e.g. both define `role`), the function throws so the caller can stop the
- * migration and resolve the conflict manually rather than silently choosing
- * union (re-introduces the bug class) or intersection (silently restrictive).
+ * Migrates a v1.9 role scope array to v2. Merges AND-paired strings like
+ * `['user.create:my-jurisdiction', 'user.create[role=X|Y]']` into one v2 object
+ * to prevent privilege escalation from v2's OR semantics (issue #12489).
  *
  * @deprecated - will be removed after migration to V2 scopes is complete.
- *
- * @param legacyScopes - legacy v1.8/v1.9 scope strings for ONE role.
- * @returns array of decoded v2 Scope objects with AND pairs merged.
  */
 export function migrateLegacyScopesArrayToV2Scopes(
   legacyScopes: string[]
 ): Scope[] {
-  const decoded: Array<{ legacy: string; scope: Scope }> = legacyScopes.map(
-    (legacy) => {
-      const encoded = legacyScopeToV2Scope(legacy)
-      const scope = decodeScope(encoded)
-      if (!scope) {
-        throw new Error(
-          `Could not decode migrated scope from legacy '${legacy}' (encoded: '${encoded}').`
-        )
-      }
-      return { legacy, scope }
-    }
-  )
+  const groups = groupByType(legacyScopes.map(decodeLegacyScope))
 
-  const groups = new Map<string, Array<{ legacy: string; scope: Scope }>>()
-  for (const entry of decoded) {
-    const list = groups.get(entry.scope.type) ?? []
-    list.push(entry)
-    groups.set(entry.scope.type, list)
-  }
+  return Object.entries(groups).flatMap(([type, entries]) => {
+    const deduped = deduplicateEntries(entries)
 
-  const result: Scope[] = []
-
-  for (const [type, entries] of groups) {
-    const deduped: Array<{ legacy: string; scope: Scope }> = []
-    for (const entry of entries) {
-      if (!deduped.some((existing) => isEqual(existing.scope, entry.scope))) {
-        deduped.push(entry)
-      }
-    }
-
-    if (deduped.length <= 1) {
-      result.push(...deduped.map((e) => e.scope))
-      continue
-    }
+    if (deduped.length <= 1) return deduped.map((e) => e.scope)
 
     if (!isMergeableUserScopeType(type)) {
+      // Unexpected duplicates outside the known AND-pair pattern — keep all and warn.
       // eslint-disable-next-line no-console
       console.warn(
         `Multiple non-mergeable '${type}' scopes detected after dedup — kept all as-is. ` +
           `Legacy scopes: [${deduped.map((e) => JSON.stringify(e.legacy)).join(', ')}]. ` +
           `Review whether the duplication is intentional.`
       )
-      result.push(...deduped.map((e) => e.scope))
-      continue
+      return deduped.map((e) => e.scope)
     }
 
-    const mergedOptions: Record<string, unknown> = {}
-    const optionSources = new Map<string, string[]>()
-
-    for (const entry of deduped) {
-      const opts =
-        'options' in entry.scope && entry.scope.options
-          ? (entry.scope.options as Record<string, unknown>)
-          : {}
-      for (const [key, value] of Object.entries(opts)) {
-        if (value === undefined) continue
-        if (key in mergedOptions) {
-          const previous = optionSources.get(key) ?? []
-          const conflicting = [...previous, entry.legacy]
-          throw new Error(
-            `Cannot auto-merge two '${type}' scopes that both define '${key}'. ` +
-              `Conflicting legacy scopes: [${conflicting.map((s) => JSON.stringify(s)).join(', ')}]. ` +
-              `Resolve manually in roles.ts and re-run.`
-          )
-        }
-        mergedOptions[key] = value
-        optionSources.set(key, [entry.legacy])
-      }
-    }
-
-    const merged: unknown =
-      Object.keys(mergedOptions).length > 0
-        ? { type, options: mergedOptions }
-        : { type }
-
-    const parsed = Scope.safeParse(merged)
-    if (!parsed.success) {
-      throw new Error(
-        `Merged '${type}' scope failed schema validation: ${parsed.error.message}. ` +
-          `Legacy scopes: [${deduped.map((e) => JSON.stringify(e.legacy)).join(', ')}].`
-      )
-    }
-    result.push(parsed.data)
-  }
-
-  return result
+    return [mergeEntries(type, deduped)]
+  })
 }
