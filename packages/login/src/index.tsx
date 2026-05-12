@@ -32,6 +32,12 @@ WebFont.load({
   }
 })
 storage.configStorage('OpenCRVS')
+
+// LANGUAGES changed from a comma-separated string (1.9) to an array (2.0).
+// Normalise to string so all existing call sites work during SW-cached config transitions.
+if (Array.isArray(window.config.LANGUAGES)) {
+  window.config.LANGUAGES = window.config.LANGUAGES.join(',')
+}
 if (
   window.location.hostname !== 'localhost' &&
   window.location.hostname !== '127.0.0.1'
@@ -74,7 +80,6 @@ const router = createBrowserRouter(routesConfig, {
 async function renderAppWithConfig() {
   return authApi.getApplicationConfig().then((res) => {
     store.dispatch(applicationConfigLoadedAction(res))
-
     root.render(<App router={router} store={store} />)
   })
 }
