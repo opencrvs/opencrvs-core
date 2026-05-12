@@ -95,5 +95,5 @@ export async function getSystemInitialisation() {
 }
 
 export async function completeSystemInitialisation() {
-  return await completeSystemInitialisationQuery()
+  return completeSystemInitialisationQuery()
 }
