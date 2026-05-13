@@ -47,7 +47,7 @@ import {
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { ServiceTrpcContext, TrpcContext } from '@events/context'
-import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
+import { AsyncActionInput } from '@events/router/event/actions'
 import { getUserById } from '@events/storage/postgres/events/users'
 import { getSystemInitialisation } from '@events/service/auth'
 import { getLocationHierarchy } from '@events/service/locations/locations'
@@ -279,7 +279,7 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
   OpenApiMeta,
   TrpcContext,
   TrpcContext,
-  AsyncActionConfirmationResponseSchema
+  AsyncActionInput
 > = async ({ next, ctx, input }) => {
   const { token } = ctx
   const { eventId, actionId } = getTokenPayload(token)
@@ -323,6 +323,7 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
     TrpcContext & { eventId: UUID; eventType: string },
     unknown
   > = async ({ next, ctx, getRawInput }) => {
+    const { eventId: grantedEventId } = getTokenPayload(ctx.token)
     const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
     const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
 
@@ -337,6 +338,13 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
 
     if (!input) {
       throw new TRPCError({ code: 'BAD_REQUEST' })
+    }
+
+    if (grantedEventId && grantedEventId !== input.eventId) {
+      throw new TRPCError({
+        code: 'FORBIDDEN',
+        message: 'Token does not grant access to this event'
+      })
     }
 
     const event = await getEventById(input.eventId)

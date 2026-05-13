@@ -79,8 +79,7 @@ export function customActionProcedures() {
           user,
           token,
           event,
-          config,
-          CustomActionInput
+          config
         )
 
         await writeAuditLog({
