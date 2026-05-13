@@ -50,6 +50,21 @@ module.exports = defineConfig([
       'arrow-parens': 'off',
       'no-return-assign': 'off',
       'no-restricted-imports': 'error',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            "Property[key.name='defaultMessage'] > TemplateLiteral[expressions.length=0]",
+          message:
+            'Use a plain string literal for defaultMessage. Template literals are silently dropped by the translation extractor.'
+        },
+        {
+          selector:
+            "ObjectExpression:has(> Property[key.name='defaultMessage']) > Property[key.name='id'] > TemplateLiteral[expressions.length=0]",
+          message:
+            'Use a plain string literal for message id. Template literals are silently dropped by the translation extractor.'
+        }
+      ],
       'no-unreachable': 2,
       'import/no-unassigned-import': 'error',
       'import/no-extraneous-dependencies': 'off',

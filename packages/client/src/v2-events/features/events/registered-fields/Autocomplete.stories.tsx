@@ -12,11 +12,7 @@
 import type { Meta, StoryFn, StoryObj } from '@storybook/react'
 import React from 'react'
 import styled from 'styled-components'
-import {
-  field,
-  FieldType,
-  ConditionalType
-} from '@opencrvs/commons/client'
+import { field, FieldType, ConditionalType } from '@opencrvs/commons/client'
 import {
   FormFieldGenerator,
   FormFieldGeneratorPropsWithoutRef
@@ -86,7 +82,7 @@ export const ICD: Story = {
               defaultMessage:
                 'Enter the diagnosis or condition not found in the list above',
               description: 'This is the label for the field',
-              id: `symptom.icd10.other.label`
+              id: 'symptom.icd10.other.label'
             },
             conditionals: [
               {

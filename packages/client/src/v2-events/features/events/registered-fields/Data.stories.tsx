@@ -86,7 +86,7 @@ export const DataDisplay: Story = {
                     id: 'event.tennis-club-membership.action.print.verify.id.label'
                   },
                   value: {
-                    defaultMessage: `National ID | {applicant.id}`,
+                    defaultMessage: 'National ID | {applicant.id}',
                     description: 'This is the label for the field',
                     id: 'event.tennis-club-membership.action.print.verify.id.label'
                   }

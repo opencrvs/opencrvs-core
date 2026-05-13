@@ -117,7 +117,8 @@ export const CodeAndQuotation: Story = {
   args: {
     message: {
       id: 'test.code',
-      defaultMessage: `Run <code>npm install</code>, press <kbd>Enter</kbd>, then <q>confirm</q>`
+      defaultMessage:
+        'Run <code>npm install</code>, press <kbd>Enter</kbd>, then <q>confirm</q>'
     },
     element: 'span'
   },
