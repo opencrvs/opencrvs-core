@@ -70,7 +70,8 @@ function SearchSectionForm({
   section,
   handleFieldChange,
   fieldValues,
-  validatorContext
+  validatorContext,
+  eventConfig
 }: {
   section: {
     title: TranslationConfig
@@ -80,6 +81,7 @@ function SearchSectionForm({
   handleFieldChange: (fieldId: string, value: FieldValue) => void
   fieldValues?: EventState
   validatorContext: ValidatorContext
+  eventConfig: EventConfig
 }) {
   const intl = useIntl()
 
@@ -93,6 +95,7 @@ function SearchSectionForm({
       name={section.title.id}
     >
       <FormFieldGenerator
+        eventConfig={eventConfig}
         fields={section.fields}
         formValues={fieldValues}
         id={section.title.id}
@@ -146,7 +149,6 @@ export function TabSearch({
   const navigate = useNavigate()
   const validatorContext = useValidatorContext()
   const getDefaultValues = useDefaultValue()
-
   const advancedSearchSections = resolveAdvancedSearchConfig(currentEvent)
 
   const sections = advancedSearchSections.map((section) => ({
@@ -256,6 +258,7 @@ export function TabSearch({
       {sections.map((section) => (
         <SearchSectionForm
           key={section.title.id}
+          eventConfig={currentEvent}
           fieldValues={fieldValues}
           handleFieldChange={handleFieldChange}
           section={section}

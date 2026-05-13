@@ -509,3 +509,62 @@ export const AdvancedSearchPartialNameSearchSupport: Story = {
     )
   }
 }
+
+/**
+ * Verifies that a community leader's jurisdiction scope restricts the
+ * place-of-registration dropdown to their own office.
+ *
+ * The community leader token is set in `.storybook/preview.tsx` and includes
+ * the `record.search[registeredIn=location]` scope, which limits searchable
+ * locations to the user's primary office. As a result, the dropdown should
+ * only show "Klow Village Office".
+ */
+export const CommunityLeaderJurisdictionOnLocationFields: Story = {
+  parameters: {
+    ...storyParams,
+    userRole: TestUserRole.enum.COMMUNITY_LEADER,
+    reactRouter: {
+      ...storyParams.reactRouter,
+      initialPath: `${ROUTES.V2.ADVANCED_SEARCH.buildPath({})}`
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Place of registration dropdown is scoped to the community leader’s office',
+      async () => {
+        const searchButton = (
+          await canvas.findAllByRole('button', { name: 'Search' })
+        ).find((btn) => btn.id === 'search')
+
+        await expect(searchButton).toBeDisabled()
+
+        const accordion = await canvas.findByTestId(
+          'accordion-advancedSearch.form.registrationDetails'
+        )
+        await userEvent.click(
+          within(accordion).getByRole('button', { name: 'Show' })
+        )
+
+        const locationInput = canvasElement.querySelector(
+          '#searchable-select-event____legalStatuses____REGISTERED____createdAtLocation input'
+        )
+
+        if (!locationInput) {
+          throw new Error('Location input not found')
+        }
+
+        await userEvent.click(locationInput)
+
+        const listbox = await canvas.findByRole('listbox')
+        const locationOptions = within(listbox).queryAllByRole('listitem')
+
+        await expect(locationOptions).toHaveLength(1)
+        await expect(locationOptions[0]).toHaveTextContent(
+          'Klow Village Office'
+        )
+      }
+    )
+  }
+}
