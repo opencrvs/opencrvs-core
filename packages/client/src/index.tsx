@@ -31,12 +31,6 @@ WebFont.load({
 
 storage.configStorage()
 
-// LANGUAGES changed from a comma-separated string (1.9) to an array (2.0).
-// Normalise to string so all existing call sites work during SW-cached config transitions.
-if (Array.isArray(window.config.LANGUAGES)) {
-  window.config.LANGUAGES = window.config.LANGUAGES.join(',')
-}
-
 const { store } = createStore()
 
 if (

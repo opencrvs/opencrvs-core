@@ -32,12 +32,6 @@ WebFont.load({
   }
 })
 storage.configStorage('OpenCRVS')
-
-// LANGUAGES changed from a comma-separated string (1.9) to an array (2.0).
-// Normalise to string so all existing call sites work during SW-cached config transitions.
-if (Array.isArray(window.config.LANGUAGES)) {
-  window.config.LANGUAGES = window.config.LANGUAGES.join(',')
-}
 if (
   window.location.hostname !== 'localhost' &&
   window.location.hostname !== '127.0.0.1'
