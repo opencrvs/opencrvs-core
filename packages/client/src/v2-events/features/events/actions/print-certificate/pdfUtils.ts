@@ -30,7 +30,6 @@ import {
   DEFAULT_DATE_OF_EVENT_PROPERTY,
   ActionDocument,
   Location,
-  UserOrSystem,
   UUID,
   AdministrativeArea,
   getActionAnnotationFields,

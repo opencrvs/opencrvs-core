@@ -61,9 +61,7 @@ export function useUserDetails() {
     }
 
     const user = users.find((u) => u.id === createdBy)
-    const system = systems.find(
-      (s) => s.id === createdBy || s.legacyId === createdBy
-    )
+    const system = systems.find((s) => s.id === createdBy)
     if (system) {
       return {
         type: 'integration',

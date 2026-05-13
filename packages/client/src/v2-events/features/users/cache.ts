@@ -9,39 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventDocument, UserOrSystemSummary } from '@opencrvs/commons/client'
+import { EventDocument } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { findUserIdsFromDocument } from './utils'
-
-async function cacheUsers(userIds: string[]) {
-  // Collect all user IDs already present across any existing user.list cache entry.
-  // getQueriesData with the base (no-arg) query key matches every user.list query
-  // regardless of which specific IDs it was called with.
-  const cachedUserIds = new Set<string>(
-    queryClient
-      .getQueriesData<UserOrSystemSummary[]>({
-        queryKey: trpcOptionsProxy.user.list.queryKey()
-      })
-      .flatMap(([, data]) => data ?? [])
-      .map((user) => user.id)
-  )
-
-  // Only request IDs we have not seen before.
-  const uncachedIds = userIds.filter((id) => !cachedUserIds.has(id))
-
-  if (uncachedIds.length === 0) {
-    return
-  }
-
-  const { queryFn, ...options } =
-    trpcOptionsProxy.user.list.queryOptions(uncachedIds)
-
-  await queryClient.fetchQuery(options)
-}
 
 export async function cacheUsersFromEventDocument(
   eventDocument: EventDocument
 ) {
   const userIds = findUserIdsFromDocument(eventDocument)
-  await cacheUsers(userIds)
+  if (userIds.length === 0) {
+    return
+  }
+  const { queryFn, ...options } =
+    trpcOptionsProxy.user.list.queryOptions(userIds)
+  await queryClient.fetchQuery(options)
 }
