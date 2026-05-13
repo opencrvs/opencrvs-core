@@ -26,7 +26,6 @@ import {
   LanguageConfig,
   Location,
   PrintCertificateAction,
-  UserOrSystem,
   UserOrSystemSummary,
   UUID
 } from '@opencrvs/commons/client'
