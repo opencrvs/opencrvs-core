@@ -100,6 +100,7 @@ exports[`Returns relevant events in right order 1`] = `
 [
   {
     "assignedTo": "[sanitized]",
+    "assignedToSignature": "f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -148,6 +149,7 @@ exports[`Returns relevant events in right order 1`] = `
   },
   {
     "assignedTo": "[sanitized]",
+    "assignedToSignature": "f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -585,6 +587,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
 [
   {
     "assignedTo": "[sanitized]",
+    "assignedToSignature": "9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -631,6 +634,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
   },
   {
     "assignedTo": "[sanitized]",
+    "assignedToSignature": "9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -682,6 +686,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
 [
   {
     "assignedTo": "[sanitized]",
+    "assignedToSignature": "9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -728,6 +733,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
   },
   {
     "assignedTo": "[sanitized]",
+    "assignedToSignature": "9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -774,6 +780,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
   },
   {
     "assignedTo": "[sanitized]",
+    "assignedToSignature": "9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -824,6 +831,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
 exports[`User with "location" scope can see events from other offices based on their scopes 1`] = `
 {
   "assignedTo": "[sanitized]",
+  "assignedToSignature": "9dcede43-d8f5-4b9e-b391-ecc7cde52c75.png",
   "createdAt": "[sanitized]",
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
@@ -910,6 +918,7 @@ exports[`User with "location" scope only sees events created by system user to t
 exports[`User with "location" scope only sees events from their primary office 1`] = `
 {
   "assignedTo": "[sanitized]",
+  "assignedToSignature": "6dcc4bb0-4ee4-46e2-a58d-4d22985dfda4.png",
   "createdAt": "[sanitized]",
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
