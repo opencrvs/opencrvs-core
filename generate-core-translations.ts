@@ -48,6 +48,12 @@ function findSourceFiles(dir: string): string[] {
   return results
 }
 
+function getStringValue(node: ts.Expression): string | undefined {
+  if (ts.isStringLiteral(node)) return node.text
+  if (ts.isNoSubstitutionTemplateLiteral(node)) return node.text
+  return undefined
+}
+
 function extractMessageDescriptors(sourceCode: string): MessageDescriptor[] {
   const sourceFile = ts.createSourceFile(
     'temp.ts',
@@ -90,19 +96,24 @@ function extractMessageDescriptors(sourceCode: string): MessageDescriptor[] {
           ? descriptionNode.text
           : undefined
 
-      if (ts.isStringLiteral(idNode) && ts.isStringLiteral(msgNode)) {
+      const idVal = getStringValue(idNode)
+      const msgVal = getStringValue(msgNode)
+
+      if (idVal !== undefined && msgVal !== undefined) {
         matches.push({
-          id: idNode.text,
-          defaultMessage: msgNode.text,
+          id: idVal,
+          defaultMessage: msgVal,
           description: description
         })
       } else {
         console.warn(
-          `Skipping non-literal descriptor : ${node.getText(sourceFile)}`
+          `Skipping non-literal descriptor : ${node.getText(sourceFile).slice(0, 80)}`
         )
       }
     } catch {
-      console.warn(`Skipping dynamic descriptor : ${node.getText(sourceFile)}`)
+      console.warn(
+        `Skipping dynamic descriptor : ${node.getText(sourceFile).slice(0, 80)}`
+      )
     }
 
     ts.forEachChild(node, visit)
@@ -137,7 +148,18 @@ async function main() {
   for (const pkg of PACKAGES_TO_SCAN) {
     const srcDir = path.join(PACKAGES_DIR, pkg, 'src')
     console.log(`Scanning ${srcDir}...`)
-    Object.assign(allMessages, extractFromDirectory(srcDir))
+    const extracted = extractFromDirectory(srcDir)
+    for (const [id, entry] of Object.entries(extracted)) {
+      if (
+        allMessages[id] &&
+        allMessages[id].defaultMessage !== entry.defaultMessage
+      ) {
+        console.warn(
+          `Key "${id}" already defined with a different defaultMessage, overwriting with ${pkg} version`
+        )
+      }
+    }
+    Object.assign(allMessages, extracted)
   }
 
   const sorted = Object.fromEntries(
