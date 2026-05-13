@@ -70,24 +70,12 @@ export const createClient = (
     }
   })
 
-  const responseLink = new ApolloLink((operation, forward) => {
-    return forward(operation).map((response) => {
-      return response
-    })
-  })
   const timeoutLink = new TimeoutLink() as ApolloLink
   const persistLink = createPersistLink()
   const cache = restoredCache || new InMemoryCache()
 
   client = new ApolloClient({
-    link: from([
-      errorLink,
-      timeoutLink,
-      authLink,
-      persistLink,
-      responseLink,
-      httpLink
-    ]),
+    link: from([errorLink, timeoutLink, authLink, persistLink, httpLink]),
     cache
   })
   return client
