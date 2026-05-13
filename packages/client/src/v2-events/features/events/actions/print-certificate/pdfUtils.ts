@@ -35,7 +35,9 @@ import {
   AdministrativeArea,
   getActionAnnotationFields,
   FieldUpdateValue,
-  FieldConfig
+  FieldConfig,
+  UserOrSystemSummary,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -69,20 +71,24 @@ function omitFieldValuesFromDeclaration(
   }, {})
 }
 
-function findUserById(userId: string, users: UserOrSystem[]) {
+function findUserById(userId: string, users: UserOrSystemSummary[]) {
   const user = users.find((u) => u.id === userId)
 
   if (!user) {
     return {
       name: '',
-      signature: '',
       fullHonorificName: ''
+    }
+  }
+
+  if (user.type === TokenUserType.enum.system) {
+    return {
+      name: getUsersFullName(user.name)
     }
   }
 
   return {
     name: getUsersFullName(user.name),
-    signature: user.signature ?? '',
     fullHonorificName: user.fullHonorificName ?? ''
   }
 }
@@ -104,7 +110,7 @@ export const stringifyEventMetadata = ({
   intl: IntlShape
   locations: Map<UUID, Location>
   administrativeAreas: Map<UUID, AdministrativeArea>
-  users: UserOrSystem[]
+  users: UserOrSystemSummary[]
   adminLevels: AdminStructureItem[]
 }) => {
   return {
@@ -255,7 +261,7 @@ export function compileSvg({
   $declaration: EventState
   locations: Map<UUID, Location>
   administrativeAreas: Map<UUID, AdministrativeArea>
-  users: UserOrSystem[]
+  users: UserOrSystemSummary[]
   /**
    * Indicates whether certificate is reviewed or actually printed
    * in V1 "preview" was used. In V2, "review" is used to remain consistent with action terminology (review of print action rather than preview of certificate).

@@ -31,8 +31,8 @@ const messages = defineMessages({
 
 export function useUserDetails() {
   const intl = useIntl()
-  const { getUser, getSystem } = useUsers()
-  const users = getUser.getAllCached()
+  const { getUsers, getSystem } = useUsers()
+  const users = getUsers.getAllCached()
   const systems = getSystem.getAllCached()
 
   const getUserDetails = ({

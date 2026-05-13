@@ -95,7 +95,7 @@ export function DownloadButton({
 
   const { getEvent, actions } = useEvents()
   const users = useUsers()
-  const user = users.getUser.useQuery(event.assignedTo || '', {
+  const user = users.getUsers.useQueryById(event.assignedTo || '', {
     enabled: !!event.assignedTo
   }).data
 

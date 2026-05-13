@@ -92,10 +92,6 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
           return user
         }
 
-        if (user.signature) {
-          return precacheFile(user.signature)
-        }
-
         if (user.avatar) {
           return precacheFile(user.avatar)
         }
@@ -105,8 +101,7 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
 
     return users.map((user) => ({
       ...user,
-      signature: user.signature,
-      avatar: user.avatar
+      ...(user.type === TokenUserType.enum.user ? { avatar: user.avatar } : {})
     }))
   }
 })
@@ -192,17 +187,6 @@ export function useUsers() {
             queryKey: trpc.user.get.queryKey(id)
           }).data
         ]
-      },
-      getAllCached: () => {
-        return queryClient
-          .getQueriesData<User>({
-            queryKey: trpc.user.get.queryKey()
-          })
-          .flatMap(([, data]) => data)
-          .filter(
-            (userOrSystem): userOrSystem is User =>
-              userOrSystem?.type === TokenUserType.enum.user
-          )
       }
     },
     createUser: ({
@@ -272,13 +256,13 @@ export function useUsers() {
     getSystem: {
       getAllCached: () => {
         return queryClient
-          .getQueriesData<System>({
-            queryKey: trpc.user.get.queryKey()
+          .getQueriesData<UserOrSystem[]>({
+            queryKey: trpc.user.list.queryKey()
           })
-          .flatMap(([, data]) => data)
+          .flatMap(([, data]) => data ?? [])
           .filter(
             (userOrSystem): userOrSystem is System =>
-              userOrSystem?.type === TokenUserType.enum.system
+              userOrSystem.type === TokenUserType.enum.system
           )
       }
     },
@@ -298,6 +282,37 @@ export function useUsers() {
             queryKey: trpc.user.list.queryKey(ids)
           }).data
         ]
+      },
+      useQueryById: (
+        id: string,
+        options?: {
+          enabled?: boolean
+        }
+      ) => {
+        const ids = id ? [id] : []
+        const { queryFn, ...queryOptions } = trpc.user.list.queryOptions(ids)
+        const query = useQuery({
+          ...queryOptions,
+          ...options,
+          enabled: !!id && (options?.enabled ?? true),
+          queryKey: trpc.user.list.queryKey(ids)
+        })
+        const data = query.data as UserOrSystem[] | undefined
+        return {
+          ...query,
+          data: data?.[0]
+        }
+      },
+      getAllCached: () => {
+        return queryClient
+          .getQueriesData<UserOrSystem[]>({
+            queryKey: trpc.user.list.queryKey()
+          })
+          .flatMap(([, data]) => data ?? [])
+          .filter(
+            (userOrSystem): userOrSystem is User =>
+              userOrSystem.type === TokenUserType.enum.user
+          )
       }
     },
     searchUsers: {

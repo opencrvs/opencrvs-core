@@ -27,6 +27,7 @@ import {
   Location,
   PrintCertificateAction,
   UserOrSystem,
+  UserOrSystemSummary,
   UUID
 } from '@opencrvs/commons/client'
 import {
@@ -77,7 +78,7 @@ export const usePrintableCertificate = ({
   config: EventConfig
   locations: Map<UUID, Location>
   administrativeAreas: Map<UUID, AdministrativeArea>
-  users: UserOrSystem[]
+  users: UserOrSystemSummary[]
   certificateConfig?: CertificateTemplateConfig
   language?: LanguageConfig
 }) => {
