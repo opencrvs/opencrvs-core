@@ -16,7 +16,8 @@ import {
   System,
   TokenUserType,
   User,
-  UserOrSystem
+  UserOrSystem,
+  UserOrSystemSummary
 } from '@opencrvs/commons/client'
 import {
   hasConflict,
@@ -289,7 +290,7 @@ export function useUsers() {
     getSystem: {
       getAllCached: () => {
         return queryClient
-          .getQueriesData<UserOrSystem[]>({
+          .getQueriesData<UserOrSystemSummary[]>({
             queryKey: trpc.user.list.queryKey()
           })
           .flatMap(([, data]) => data ?? [])
@@ -330,7 +331,7 @@ export function useUsers() {
           enabled: !!id && (options?.enabled ?? true),
           queryKey: trpc.user.list.queryKey(ids)
         })
-        const data = query.data as UserOrSystem[] | undefined
+        const data = query.data as UserOrSystemSummary[] | undefined
         return {
           ...query,
           data: data?.[0]
@@ -338,7 +339,7 @@ export function useUsers() {
       },
       getAllCached: () => {
         return queryClient
-          .getQueriesData<UserOrSystem[]>({
+          .getQueriesData<UserOrSystemSummary[]>({
             queryKey: trpc.user.list.queryKey()
           })
           .flatMap(([, data]) => data ?? [])

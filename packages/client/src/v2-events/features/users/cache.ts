@@ -9,11 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  EventDocument,
-  UserOrSystem,
-  UserOrSystemSummary
-} from '@opencrvs/commons/client'
+import { EventDocument, UserOrSystemSummary } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { findUserIdsFromDocument } from './utils'
 
