@@ -451,10 +451,18 @@ interface IAppProps {
   router: ReturnType<typeof createBrowserRouter>
 }
 export function App({ client, store, router }: IAppProps) {
+  return (
+    <ErrorBoundary>
+      <AppWithApolloClient client={client} store={store} router={router} />
+    </ErrorBoundary>
+  )
+}
+
+function AppWithApolloClient({ client, store, router }: IAppProps) {
   const { client: apolloClient } = useApolloClient(store)
 
   return (
-    <ErrorBoundary>
+    <>
       <GlobalStyle />
       <ApolloProvider client={client ?? apolloClient}>
         <Provider store={store}>
@@ -471,6 +479,6 @@ export function App({ client, store, router }: IAppProps) {
           </I18nContainer>
         </Provider>
       </ApolloProvider>
-    </ErrorBoundary>
+    </>
   )
 }
