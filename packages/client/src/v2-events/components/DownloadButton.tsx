@@ -26,7 +26,8 @@ import {
   AssignmentStatus,
   EventIndex,
   getAssignmentStatus,
-  getOrThrow
+  getOrThrow,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { getUsersFullName } from '../utils'
 import { useAuthentication } from '@client/utils/userUtils'
@@ -98,6 +99,12 @@ export function DownloadButton({
   const user = users.getUsers.useQueryById(event.assignedTo || '', {
     enabled: !!event.assignedTo
   }).data
+
+  if (user && user.type === TokenUserType.enum.system) {
+    throw new Error(
+      `Event ${event.id} is assigned to a system user. This should never happen`
+    )
+  }
 
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 
