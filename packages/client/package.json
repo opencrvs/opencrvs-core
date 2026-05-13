@@ -30,8 +30,7 @@
     "src/**/*.{ts,tsx}": [
       "prettier --write",
       "eslint --fix",
-      "stylelint",
-      "yarn extract:translations"
+      "stylelint"
     ],
     "src/**/*.json": "prettier --write"
   },
