@@ -92,7 +92,7 @@ export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
 export function getAssignedUserSignatureFromActions(
   actions: Array<ActionDocument>
 ) {
-  return actions.reduce<null | string>((signature, action) => {
+  return actions.reduce<null | DocumentPath>((signature, action) => {
     if (action.type === ActionType.ASSIGN) {
       return action.createdBySignature || null
     }

@@ -126,6 +126,9 @@ export const EventMetadata = z.object({
     .string()
     .nullish()
     .describe('ID of the user currently assigned to the event.'),
+  assignedToSignature: DocumentPath.nullish().describe(
+    'Signature of the user who is currently assigned to the event.'
+  ),
   updatedBy: z
     .string()
     .nullish()

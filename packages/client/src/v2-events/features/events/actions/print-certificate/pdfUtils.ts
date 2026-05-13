@@ -119,7 +119,10 @@ export const stringifyEventMetadata = ({
       locations,
       administrativeAreas
     }),
-    assignedTo: findUserById(metadata.assignedTo ?? '', users),
+    assignedTo: {
+      ...findUserById(metadata.assignedTo ?? '', users),
+      signature: metadata.assignedToSignature
+    },
     dateOfEvent: metadata.dateOfEvent
       ? DateField.toCertificateVariables(metadata.dateOfEvent, {
           intl,
@@ -139,7 +142,10 @@ export const stringifyEventMetadata = ({
       locations,
       administrativeAreas
     }),
-    createdBy: findUserById(metadata.createdBy, users),
+    createdBy: {
+      ...findUserById(metadata.createdBy, users),
+      signature: metadata.createdBySignature
+    },
     createdAtLocation: LocationSearch.toCertificateVariables(
       metadata.createdAtLocation,
       {
