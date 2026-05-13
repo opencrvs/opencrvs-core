@@ -14,10 +14,6 @@ import { Outlet, RouteObject } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { onlineManager } from '@tanstack/react-query'
 import { ActionType, SCOPES } from '@opencrvs/commons/client'
-import { storage } from '@client/storage'
-import { SCREEN_LOCK } from '@client/components/ProtectedPage'
-import { removeToken } from '@client/utils/authUtils'
-import { removeUserDetails } from '@client/utils/userUtils'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
@@ -165,15 +161,6 @@ export const routesConfig = {
     if (!currentUser) {
       throw new Error(
         'V2 routes cannot be initialised without user details. Make sure user details are fetched before the routes are rendered'
-      )
-    }
-
-    const handleLoginRedirect = async () => {
-      await storage.removeItem(SCREEN_LOCK)
-      await removeToken()
-      await removeUserDetails()
-      window.location.assign(
-        `/login?lang=${await storage.getItem('language')}&redirectTo=${ROUTES.V2.buildPath({})}`
       )
     }
 
