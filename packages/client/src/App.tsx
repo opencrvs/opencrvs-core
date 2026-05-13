@@ -56,7 +56,6 @@ import { StyledErrorBoundary } from './components/StyledErrorBoundary'
 import { I18nContainer } from './i18n/components/I18nContainer'
 import { useApolloClient } from './utils/apolloClient'
 import { ApolloProvider } from './utils/ApolloProvider'
-
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { AppStore } from './store'
 import { routesConfig as v2RoutesConfig } from './v2-events/routes/config'

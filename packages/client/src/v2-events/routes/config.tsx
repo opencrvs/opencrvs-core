@@ -163,7 +163,6 @@ export const routesConfig = {
         'V2 routes cannot be initialised without user details. Make sure user details are fetched before the routes are rendered'
       )
     }
-
     return (
       <NavigationHistoryProvider>
         <TRPCErrorBoundary>
