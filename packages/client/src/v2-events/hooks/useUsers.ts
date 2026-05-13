@@ -75,34 +75,67 @@ setQueryDefaults<
 setQueryDefaults(trpcOptionsProxy.user.list, {
   queryFn: async (...params) => {
     const {
-      queryKey: [, input]
+      queryKey: [procedurePath, input]
     } = params[0]
 
-    const queryOptions = trpcOptionsProxy.user.list.queryOptions(input.input)
+    const requestedIds: string[] = input.input ?? []
 
-    if (typeof queryOptions.queryFn !== 'function') {
-      throw new Error('queryFn is not a function')
-    }
+    // Collect all users already present in ANY user.list cache entry.
+    // getQueriesData with the base (no-arg) prefix key matches every user.list
+    // entry regardless of which specific IDs each was fetched with.
+    type UserListItem = inferOutput<typeof trpcOptionsProxy.user.list>[number]
 
-    const users = await queryOptions.queryFn(...params)
-
-    await Promise.allSettled(
-      users.map(async (user) => {
-        if (user.type === TokenUserType.enum.system) {
-          return user
-        }
-
-        if (user.avatar) {
-          return precacheFile(user.avatar)
-        }
-        return user
-      })
+    const cachedUserMap = new Map<string, UserListItem>(
+      queryClient
+        .getQueriesData<inferOutput<typeof trpcOptionsProxy.user.list>>({
+          queryKey: trpcOptionsProxy.user.list.queryKey()
+        })
+        .flatMap(([, data]) => data ?? [])
+        .map((user) => [user.id as string, user])
     )
 
-    return users.map((user) => ({
-      ...user,
-      ...(user.type === TokenUserType.enum.user ? { avatar: user.avatar } : {})
-    }))
+    const uncachedIds = requestedIds.filter((id) => !cachedUserMap.has(id))
+
+    if (uncachedIds.length > 0) {
+      const uncachedQueryOptions =
+        trpcOptionsProxy.user.list.queryOptions(uncachedIds)
+
+      if (typeof uncachedQueryOptions.queryFn !== 'function') {
+        throw new Error('queryFn is not a function')
+      }
+
+      // Construct a context whose queryKey input is the uncached IDs only, so
+      // the raw tRPC queryFn makes an HTTP request for only those users.
+      const freshUsers = await uncachedQueryOptions.queryFn({
+        ...params[0],
+        queryKey: [
+          procedurePath,
+          { input: uncachedIds }
+        ] as (typeof params)[0]['queryKey']
+      })
+
+      await Promise.allSettled(
+        freshUsers.map(async (user) => {
+          if (user.type === TokenUserType.enum.system) {
+            return user
+          }
+          if (user.avatar) {
+            return precacheFile(user.avatar)
+          }
+          return user
+        })
+      )
+
+      for (const user of freshUsers) {
+        cachedUserMap.set(user.id as string, user)
+      }
+    }
+
+    // Return only the originally-requested IDs from the combined map,
+    // silently dropping any IDs the server does not know about.
+    return requestedIds
+      .map((id) => cachedUserMap.get(id))
+      .filter((u): u is UserListItem => u !== undefined)
   }
 })
 
