@@ -46,7 +46,7 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import * as React from 'react'
 import { useIntl } from 'react-intl'
-import { Provider } from 'react-redux'
+import { Provider, useSelector } from 'react-redux'
 import {
   createBrowserRouter,
   Outlet,
@@ -60,12 +60,16 @@ import { I18nContainer } from './i18n/components/I18nContainer'
 import { useApolloClient } from './utils/apolloClient'
 import { ApolloProvider } from './utils/ApolloProvider'
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
-import { AppStore } from './store'
+import { AppStore, IStoreState } from './store'
+import { storage } from './storage'
+import { removeToken } from './utils/authUtils'
+import { removeUserDetails } from './utils/userUtils'
 import {
   routesConfig as v2RoutesConfig,
   useNetworkProbe
 } from './v2-events/routes/config'
 import { messages as reloadModalMessages } from './i18n/messages/views/reloadModal'
+import { ROUTES } from './v2-events/routes/routes'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
@@ -458,13 +462,21 @@ interface IAppProps {
   router: ReturnType<typeof createBrowserRouter>
 }
 
+const SCREEN_LOCK = 'screenLock'
+
 function VersionMismatchModal({ show }: { show: boolean }) {
   const intl = useIntl()
+  const appName = useSelector(
+    (state: IStoreState) => state.offline.offlineData.config?.APPLICATION_NAME
+  )
 
-  const handleReLogin = () => {
-    localStorage.removeItem('opencrvs')
-    const lang = localStorage.getItem('language') || 'en'
-    window.location.assign(`/login?lang=${lang}&redirectTo=/`)
+  const handleReLogin = async () => {
+    await storage.removeItem(SCREEN_LOCK)
+    await removeToken()
+    await removeUserDetails()
+    window.location.assign(
+      `${window.config.LOGIN_URL}?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}${ROUTES.V2.buildPath({})}`
+    )
   }
 
   return (
@@ -481,7 +493,7 @@ function VersionMismatchModal({ show }: { show: boolean }) {
       ]}
       show={show}
     >
-      {intl.formatMessage(reloadModalMessages.body)}
+      {intl.formatMessage(reloadModalMessages.body, { app_name: appName })}
     </ResponsiveModal>
   )
 }
