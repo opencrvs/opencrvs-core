@@ -42,6 +42,7 @@ import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { UserAuditHistory } from './UserAuditHistory'
+import { UserActivationModal } from '../SysAdmin/Team/user/UserActivationModal'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -70,6 +71,11 @@ export const UserAudit = () => {
   const [showResetPasswordError, setShowResetPasswordError] = useState(false)
   const [toggleUsernameReminder, setToggleUsernameReminder] = useState(false)
   const [toggleResetPassword, setToggleResetPassword] = useState(false)
+  const [showActivationToggleSuccess, setShowActivationToggleSuccess] =
+    useState(false)
+  const [showActivationToggleError, setShowActivationToggleError] =
+    useState(false)
+
   const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
   const {
     getUser,
@@ -255,13 +261,20 @@ export const UserAudit = () => {
               <UserAuditHistory userId={user.id} userName={userName} />
             )}
           </>
-          {/* {user.id ? (
-            <UserAuditActionModal
-              show={modalVisible}
-              userId={user.id}
+          {modalVisible && user.id && (
+            <UserActivationModal
+              user={user}
               onClose={() => toggleUserActivationModal()}
+              onSuccess={() => {
+                toggleUserActivationModal()
+                setShowActivationToggleSuccess(true)
+              }}
+              onError={() => {
+                toggleUserActivationModal()
+                setShowActivationToggleError(true)
+              }}
             />
-          ) : null} */}
+          )}
           <ResponsiveModal
             id="username-reminder-modal"
             show={toggleUsernameReminder}
@@ -401,7 +414,37 @@ export const UserAudit = () => {
             >
               {intl.formatMessage(sysMessages.resetPasswordError)}
             </Toast>
-          )}{' '}
+          )}
+          {showActivationToggleSuccess && user && (
+            <Toast
+              id="activation_toggle_success"
+              type="success"
+              onClose={() => setShowActivationToggleSuccess(false)}
+            >
+              {intl.formatMessage(sysMessages.toggleActivateStatusSuccess, {
+                name: getUsersFullName(user.name),
+                status:
+                  user?.status === 'active'
+                    ? intl.formatMessage(sysMessages.active)
+                    : intl.formatMessage(sysMessages.deactivated)
+              })}
+            </Toast>
+          )}
+          {showActivationToggleError && user && (
+            <Toast
+              id="activation_toggle_error"
+              type="warning"
+              onClose={() => setShowActivationToggleError(false)}
+            >
+              {intl.formatMessage(sysMessages.toggleActivateStatusError, {
+                name: getUsersFullName(user.name),
+                status:
+                  user?.status === 'active'
+                    ? intl.formatMessage(sysMessages.deactivated)
+                    : intl.formatMessage(sysMessages.active)
+              })}
+            </Toast>
+          )}
         </Content>
       )}
     </>

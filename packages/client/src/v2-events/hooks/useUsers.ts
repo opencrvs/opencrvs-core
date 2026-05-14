@@ -119,6 +119,14 @@ setMutationDefaults(trpcOptionsProxy.user.changePhone, {
     await queryClient.invalidateQueries({
       queryKey: trpcOptionsProxy.user.get.queryKey(variables.userId)
     })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.list.queryKey()
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.search.queryKey()
+    })
   }
 })
 
@@ -130,6 +138,14 @@ setMutationDefaults(trpcOptionsProxy.user.changeEmail, {
     await queryClient.invalidateQueries({
       queryKey: trpcOptionsProxy.user.get.queryKey(variables.userId)
     })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.list.queryKey()
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.search.queryKey()
+    })
   }
 })
 setMutationDefaults(trpcOptionsProxy.user.changeAvatar, {
@@ -139,6 +155,14 @@ setMutationDefaults(trpcOptionsProxy.user.changeAvatar, {
   onSuccess: async (data, variables) => {
     await queryClient.invalidateQueries({
       queryKey: trpcOptionsProxy.user.get.queryKey(variables.userId)
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.list.queryKey()
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.search.queryKey()
     })
   }
 })
@@ -209,16 +233,16 @@ export function useUsers() {
 
       return useMutation({
         ...mutationOptions,
-        onSuccess: (response) => {
-          void queryClient.invalidateQueries({
+        onSuccess: async (response) => {
+          await queryClient.invalidateQueries({
             queryKey: trpc.user.get.queryKey(response.id)
           })
 
-          void queryClient.invalidateQueries({
+          await queryClient.invalidateQueries({
             queryKey: trpc.user.list.queryKey()
           })
 
-          void queryClient.invalidateQueries({
+          await queryClient.invalidateQueries({
             queryKey: trpc.user.search.queryKey()
           })
 

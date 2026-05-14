@@ -64,11 +64,12 @@ export function Password() {
           </DynamicHeightLinkButton>
         }
       />
-      <PasswordChangeModal
-        togglePasswordChangeModal={togglePasswordChangeModal}
-        showPasswordChange={showModal}
-        passwordChanged={changePassword}
-      />
+      {showModal && (
+        <PasswordChangeModal
+          togglePasswordChangeModal={togglePasswordChangeModal}
+          passwordChanged={changePassword}
+        />
+      )}
       {showSuccessNotification && (
         <Toast type="success" onClose={toggleSuccessNotification}>
           <FormattedMessage {...userMessages.passwordUpdated} />

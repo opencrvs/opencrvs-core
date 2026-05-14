@@ -37,6 +37,7 @@ import {
   getUsersAndSystemsByIds,
   createUserWithCredentials,
   searchUsersWithInput,
+  searchAllUsersWithInput,
   activateUserWithCredentials,
   updateUserById,
   updateUsernameById,
@@ -65,6 +66,7 @@ export type SearchUsersPayload = {
   email?: string
   status?: string
   primaryOfficeId?: UUID
+  administrativeAreaId?: UUID
   locationId?: UUID
   count: number
   skip: number
@@ -191,6 +193,13 @@ export async function searchUsers(
 ): Promise<User[]> {
   const results = await searchUsersWithInput(payload)
 
+  return results.map(mapDbUserToUser)
+}
+
+export async function searchUsersAll(
+  payload: Omit<SearchUsersPayload, 'skip' | 'count'>
+): Promise<User[]> {
+  const results = await searchAllUsersWithInput(payload)
   return results.map(mapDbUserToUser)
 }
 
@@ -334,7 +343,7 @@ export async function createUser(
     firstname: resolvedUser.name.firstname,
     surname: resolvedUser.name.surname,
     // Normalise to undefined for the same reason as mobile above.
-    email: resolvedUser?.email?.toLowerCase() || undefined,
+    email: resolvedUser.email?.toLowerCase() || undefined,
     fullHonorificName: resolvedUser.fullHonorificName,
     role: resolvedUser.role,
     device: resolvedUser.device,
