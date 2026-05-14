@@ -15,9 +15,9 @@ import {
   deepDropNulls,
   System,
   TokenUserType,
-  User,
   UserOrSystem,
-  UserOrSystemSummary
+  UserOrSystemSummary,
+  UserSummary
 } from '@opencrvs/commons/client'
 import {
   hasConflict,
@@ -79,14 +79,9 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
       queryKey: [procedurePath, input]
     } = params[0]
 
-    const requestedIds: string[] = input.input ?? []
+    const requestedIds = input.input ?? []
 
-    // Collect all users already present in ANY user.list cache entry.
-    // getQueriesData with the base (no-arg) prefix key matches every user.list
-    // entry regardless of which specific IDs each was fetched with.
-    type UserListItem = inferOutput<typeof trpcOptionsProxy.user.list>[number]
-
-    const cachedUserMap = new Map<string, UserListItem>(
+    const cachedUserMap = new Map(
       queryClient
         .getQueriesData<inferOutput<typeof trpcOptionsProxy.user.list>>({
           queryKey: trpcOptionsProxy.user.list.queryKey()
@@ -120,7 +115,7 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
             return user
           }
           if (user.avatar) {
-            return precacheFile(user.avatar)
+            await precacheFile(user.avatar)
           }
           return user
         })
@@ -135,7 +130,7 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
     // silently dropping any IDs the server does not know about.
     return requestedIds
       .map((id) => cachedUserMap.get(id))
-      .filter((u): u is UserListItem => u !== undefined)
+      .filter((u): u is UserSummary => u !== undefined)
   }
 })
 
@@ -330,7 +325,7 @@ export function useUsers() {
           enabled: !!id && (options?.enabled ?? true),
           queryKey: trpc.user.list.queryKey(ids)
         })
-        const data = query.data as UserOrSystemSummary[] | undefined
+        const data = query.data
         return {
           ...query,
           data: data?.[0]
@@ -343,7 +338,7 @@ export function useUsers() {
           })
           .flatMap(([, data]) => data ?? [])
           .filter(
-            (userOrSystem): userOrSystem is User =>
+            (userOrSystem): userOrSystem is UserSummary =>
               userOrSystem.type === TokenUserType.enum.user
           )
       }

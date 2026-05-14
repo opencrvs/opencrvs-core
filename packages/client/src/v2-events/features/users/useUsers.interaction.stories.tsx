@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-/* eslint-disable @typescript-eslint/promise-function-async */
+
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import { within, waitFor, expect } from '@storybook/test'
@@ -27,17 +27,8 @@ import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
 
-// ── Stable test data ──────────────────────────────────────────────────────────
-
 const generator = testDataGenerator()
 
-/**
- * The five user IDs in the same order that findUserIdsFromDocument will
- * extract them from the event document's actions.  Preserving this order
- * matters: it makes the query key produced by getUsers.useQuery an exact
- * match with the cache entry that cacheUsersFromEventDocument wrote, so the
- * full-set hook can resolve immediately from cache.
- */
 const REFERENCED_USER_IDS = [
   generator.user.id.fieldAgent,
   generator.user.id.registrationAgent,
@@ -46,20 +37,12 @@ const REFERENCED_USER_IDS = [
   generator.user.id.provincialRegistrar
 ]
 
-/**
- * Three of the five IDs. This deliberately creates a cache key that has never
- * been stored, exercising the smart queryFn's cross-entry scan.
- */
 const SUBSET_USER_IDS = [
   generator.user.id.fieldAgent,
   generator.user.id.localRegistrar,
   generator.user.id.provincialRegistrar
 ]
 
-/**
- * A record document whose five actions are each attributed to a different
- * user, exactly as a record downloaded from the server would look.
- */
 const eventWithFiveUsers = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [
@@ -102,35 +85,17 @@ const eventWithFiveUsers = generateEventDocument({
   ]
 })
 
-// ── MSW / spy setup ───────────────────────────────────────────────────────────
-
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [httpLink({ url: '/api/events' })],
   transformer: { input: superjson, output: superjson }
 })
 
-/**
- * Simple mutable counter. Storybook runs in a real browser so vi.fn() is not
- * available. Reset in each story's loaders to keep runs isolated.
- */
 const spies = { userList: 0 }
 
-// ── Component ─────────────────────────────────────────────────────────────────
-
-/**
- * Uses two independent getUsers.useQuery calls to show that the warm cache
- * (populated by the story loader) is sufficient for both:
- *
- *   full set  – identical query key → resolved directly from the cache entry
- *   subset    – different query key → smart queryFn scans all user.list
- *               entries and finds the three users without touching the network
- */
 function UserCachingDemo() {
   const fullSet = useUsers().getUsers.useQuery(REFERENCED_USER_IDS)
   const subset = useUsers().getUsers.useQuery(SUBSET_USER_IDS)
 
-  // UserOrSystemSummary is a discriminated union; narrow to UserSummary so we
-  // can safely access the structured { firstname, surname } name object.
   const asUsers = (data: typeof fullSet.data) =>
     (data ?? []).filter(
       (u): u is UserSummary => u.type === TokenUserType.enum.user
@@ -159,8 +124,6 @@ function UserCachingDemo() {
   )
 }
 
-// ── Story ─────────────────────────────────────────────────────────────────────
-
 const meta: Meta<unknown> = {
   title: 'Hooks/useUsers'
 }
@@ -173,23 +136,10 @@ export const CachesUsersOnEventDownload: Story = {
   name: 'Caches referenced users when a record is downloaded; serves them without network when offline',
 
   loaders: [
-    /**
-     * Reset the spy so each Storybook test run starts with a clean count.
-     * This loader runs after the global preview loader that calls
-     * queryClient.clear(), so the cache is empty when the next loader fires.
-     */
     () => {
       spies.userList = 0
     },
 
-    /**
-     * Simulate the side-effect that event.get's queryFn performs after
-     * fetching a record: it calls cacheUsersFromEventDocument so that all
-     * users referenced in the record's audit trail are pre-cached for offline
-     * use.  By doing this in a loader (before the component mounts) we can
-     * assert in the play function that the component hooks never had to reach
-     * the network.
-     */
     async () => {
       await cacheUsersFromEventDocument(eventWithFiveUsers)
     }
@@ -199,11 +149,6 @@ export const CachesUsersOnEventDownload: Story = {
     chromatic: { disableSnapshot: true },
     msw: {
       handlers: {
-        /**
-         * Override only the user.list handler so we can track call counts.
-         * All other default handlers (event.config.get, user.get, …) remain
-         * active through the global preview.tsx MSW configuration.
-         */
         user: [
           tRPCMsw.user.get.query(() => {
             return generator.user.localRegistrar().v2
@@ -230,6 +175,13 @@ export const CachesUsersOnEventDownload: Story = {
     const canvas = within(canvasElement)
 
     await step(
+      'user.list was called exactly once – the loader warmed the entire cache in a single request',
+      async () => {
+        await waitFor(() => expect(spies.userList).toBe(1))
+      }
+    )
+
+    await step(
       'All 5 users cached during record download are rendered by the full-set hook',
       async () => {
         for (const id of REFERENCED_USER_IDS) {
@@ -238,13 +190,6 @@ export const CachesUsersOnEventDownload: Story = {
             { timeout: 5000 }
           )
         }
-      }
-    )
-
-    await step(
-      'user.list was called exactly once – the loader warmed the entire cache in a single request',
-      async () => {
-        await waitFor(() => expect(spies.userList).toBe(1))
       }
     )
 
