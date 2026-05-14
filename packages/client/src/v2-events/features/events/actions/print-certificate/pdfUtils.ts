@@ -396,6 +396,7 @@ export function compileSvg({
           }),
           createdBy: users.find((user) => user.id === action.data.createdBy),
           createdByUserType: action.data.createdByUserType,
+          createdBySignature: action.data.createdBySignature,
           createdAtLocation: LocationSearch.toCertificateVariables(
             action.data.createdAtLocation,
             {
