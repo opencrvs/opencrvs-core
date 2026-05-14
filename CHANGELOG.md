@@ -2,6 +2,10 @@
 
 ## 2.0.0 Release Candidate
 
+### Upgrade guidance
+
+To ensure a smooth upgrade to 2.0, we recommend upgrading to **v1.9.14** first before upgrading to 2.0. v1.9.14 includes fixes that allow the client to gracefully handle the transition window between versions, preventing users from seeing a blank screen or errors during the upgrade.
+
 ### Breaking changes
 
 #### Scheduler service removed
