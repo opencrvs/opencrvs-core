@@ -475,7 +475,7 @@ function VersionMismatchModal({ show }: { show: boolean }) {
     await removeToken()
     await removeUserDetails()
     window.location.assign(
-      `${window.config.LOGIN_URL}?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}${ROUTES.V2.buildPath({})}`
+      `/login?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}${ROUTES.V2.buildPath({})}`
     )
   }
 
