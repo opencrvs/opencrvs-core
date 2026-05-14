@@ -17,8 +17,8 @@ on:
   push:
     branches:
       - '*'
-    tags:
-      - '*'
+  release:
+    types: [published]
 
 jobs:
   publish:

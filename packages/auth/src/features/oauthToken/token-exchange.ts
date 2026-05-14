@@ -57,13 +57,14 @@ export async function tokenExchangeHandler(
 
   const { sub, userType } = decodedOrError.right
 
-  const rejectScopeOfUserAssignedRole = decodedOrError.right.scope.find(
-    (s: EncodedScope) => {
+  const extraScopes = decodedOrError.right.scope.filter(
+    (s: EncodedScope): s is EncodedScope => {
       const v2Scope = decodeScope(s)
 
-      const isV2RejectScope = v2Scope?.type === 'record.reject'
+      const isRejectScope = v2Scope?.type === 'record.reject'
+      const isReadScope = v2Scope?.type === 'record.read'
 
-      return s.startsWith('record.declared.reject') || isV2RejectScope
+      return isReadScope || isRejectScope
     }
   )
 
@@ -72,7 +73,7 @@ export async function tokenExchangeHandler(
     { eventId, actionId },
     sub as UUID,
     userType as 'user' | 'system',
-    rejectScopeOfUserAssignedRole
+    extraScopes
   )
 
   return oauthResponse.success(h, recordToken)

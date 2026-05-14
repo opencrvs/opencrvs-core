@@ -22,6 +22,7 @@ import {
 
 import {
   migrateLegacyScopesToV2,
+  migrateLegacyScopesArrayToV2Scopes,
   legacyScopeToV2Scope
 } from './scopes.deprecated.do-not-use'
 
@@ -456,4 +457,156 @@ it('migrate legacy scopes to v2', () => {
     'type=record.unassign-others&event=birth,death,tennis-club-membership',
     'type=record.review-duplicates&event=birth,death,tennis-club-membership'
   ])
+})
+
+describe('migrateLegacyScopesArrayToV2Scopes() — AND-pair merge', () => {
+  // Regression: issue #12489. v1.9 expressed "in my jurisdiction AND only
+  // these roles" as two scope strings on the same role. v2.0 scope arrays
+  // use OR semantics, so the pair must collapse to a single v2 scope object
+  // to avoid privilege escalation.
+
+  it('merges user.create + my-jurisdiction + role list into one scope', () => {
+    const result = migrateLegacyScopesArrayToV2Scopes([
+      'user.create:my-jurisdiction',
+      'user.create[role=FIELD_AGENT|HOSPITAL_CLERK]'
+    ])
+
+    expect(result).toEqual([
+      {
+        type: 'user.create',
+        options: {
+          accessLevel: 'administrativeArea',
+          role: ['FIELD_AGENT', 'HOSPITAL_CLERK']
+        }
+      }
+    ])
+  })
+
+  it('merges user.create:all + role list into a role-only scope', () => {
+    // `user.create:all` decodes to `{ type: 'user.create' }` with no options.
+    // Merging with `[role=X|Y]` should yield only the role restriction.
+    const result = migrateLegacyScopesArrayToV2Scopes([
+      'user.create:all',
+      'user.create[role=FIELD_AGENT|REGISTRATION_AGENT]'
+    ])
+
+    expect(result).toEqual([
+      {
+        type: 'user.create',
+        options: { role: ['FIELD_AGENT', 'REGISTRATION_AGENT'] }
+      }
+    ])
+  })
+
+  it('merges v1 user.update:my-jurisdiction with v1 user.edit[role=...]', () => {
+    // `user.update:*` maps to v2 `user.edit`. Grouping must happen by
+    // post-conversion v2 type, not the v1 string.
+    const result = migrateLegacyScopesArrayToV2Scopes([
+      'user.update:my-jurisdiction',
+      'user.edit[role=FIELD_AGENT|LOCAL_REGISTRAR]'
+    ])
+
+    expect(result).toEqual([
+      {
+        type: 'user.edit',
+        options: {
+          accessLevel: 'administrativeArea',
+          role: ['FIELD_AGENT', 'LOCAL_REGISTRAR']
+        }
+      }
+    ])
+  })
+
+  it('throws when two scopes of the same type both define role', () => {
+    // The realistic v1.9 conflict shape: two distinct `[role=...]` strings
+    // for the same v2 type. We refuse to silently choose union (re-introduces
+    // the privilege-escalation bug) or intersection (silently restrictive),
+    // and let the operator resolve manually.
+    expect(() =>
+      migrateLegacyScopesArrayToV2Scopes([
+        'user.create[role=A|B]',
+        'user.create[role=C|D]'
+      ])
+    ).toThrow(
+      /Cannot auto-merge two 'user.create' scopes that both define 'role'/
+    )
+  })
+
+  it('dedups identical entries before deciding whether to merge', () => {
+    // Same logical scope listed twice — no merge needed, dedup to one.
+    const result = migrateLegacyScopesArrayToV2Scopes([
+      'user.create:my-jurisdiction',
+      'user.create:my-jurisdiction'
+    ])
+
+    expect(result).toEqual([
+      {
+        type: 'user.create',
+        options: { accessLevel: 'administrativeArea' }
+      }
+    ])
+  })
+
+  it('does not merge non-mergeable types appearing more than once', () => {
+    // record.declare has no AND-paired v1.9 pattern. Two distinct
+    // record.declare scopes should pass through unchanged.
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+    try {
+      const result = migrateLegacyScopesArrayToV2Scopes([
+        'record.declare[event=birth]',
+        'record.declare[event=death]'
+      ])
+
+      expect(result).toHaveLength(2)
+      expect(result).toEqual([
+        { type: 'record.declare', options: { event: ['birth'] } },
+        { type: 'record.declare', options: { event: ['death'] } }
+      ])
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining(
+          "Multiple non-mergeable 'record.declare' scopes detected"
+        )
+      )
+    } finally {
+      warn.mockRestore()
+    }
+  })
+
+  it('is order-independent: scope strings can appear in either order', () => {
+    const a = migrateLegacyScopesArrayToV2Scopes([
+      'user.create:my-jurisdiction',
+      'user.create[role=FIELD_AGENT]'
+    ])
+    const b = migrateLegacyScopesArrayToV2Scopes([
+      'user.create[role=FIELD_AGENT]',
+      'user.create:my-jurisdiction'
+    ])
+
+    expect(a).toEqual(b)
+  })
+
+  it('preserves unrelated scopes alongside merged pairs', () => {
+    // Mixed input: a user.create pair to merge, plus unrelated scopes.
+    const result = migrateLegacyScopesArrayToV2Scopes([
+      'performance.read',
+      'user.create:my-jurisdiction',
+      'record.declare[event=birth]',
+      'user.create[role=FIELD_AGENT]'
+    ])
+
+    // 4 inputs → 3 outputs (one merge happened).
+    expect(result).toHaveLength(3)
+    expect(result).toContainEqual({ type: 'performance.read' })
+    expect(result).toContainEqual({
+      type: 'record.declare',
+      options: { event: ['birth'] }
+    })
+    expect(result).toContainEqual({
+      type: 'user.create',
+      options: {
+        accessLevel: 'administrativeArea',
+        role: ['FIELD_AGENT']
+      }
+    })
+  })
 })
