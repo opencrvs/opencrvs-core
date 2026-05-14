@@ -488,4 +488,13 @@ describe('SVG compiler', () => {
       )
     })
   })
+
+  describe('signatures', () => {
+    it('stringifies complex form field values using the stringifier of said form input', () => {
+      expectRenderOutput(
+        `<svg><text>{{$lookup ($action 'REGISTER') 'createdBySignature'}}</text></svg>`,
+        '<svg><text>aa13a268-ae48-4a30-9450-554aebaab203/signature.png</text></svg>'
+      )
+    })
+  })
 })
