@@ -471,6 +471,13 @@ function VersionMismatchModal({ show }: { show: boolean }) {
   )
 
   const handleReLogin = async () => {
+    // Unregister the SW and clear all caches before redirecting so the stale
+    // SW cannot intercept the navigation to the login service.
+    if ('serviceWorker' in navigator) {
+      const registration = await navigator.serviceWorker.getRegistration()
+      await registration?.unregister()
+      await Promise.all((await caches.keys()).map((key) => caches.delete(key)))
+    }
     await storage.removeItem(SCREEN_LOCK)
     await removeToken()
     await removeUserDetails()
