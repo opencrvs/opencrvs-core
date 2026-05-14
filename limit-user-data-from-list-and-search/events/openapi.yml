@@ -15997,11 +15997,6 @@ components:
                     createdByRole:
                       description: Role of the user at the time of action request creation.
                       type: string
-                    createdBySignature:
-                      description: Signature of the user who created the action request.
-                      anyOf:
-                        - type: string
-                        - type: "null"
                   required:
                     - createdAt
                     - createdBy
@@ -16043,11 +16038,6 @@ components:
                     createdByRole:
                       description: Role of the user at the time of action request creation.
                       type: string
-                    createdBySignature:
-                      description: Signature of the user who created the action request.
-                      anyOf:
-                        - type: string
-                        - type: "null"
                     registrationNumber:
                       type: string
                       description: Registration number of the event. Always present for accepted
@@ -16102,14 +16092,6 @@ components:
               format: uuid
               pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
             - type: "null"
-        createdBySignature:
-          description: Signature of the user who created the event.
-          anyOf:
-            - type: string
-              description: A relative path within the S3 bucket, never starting with /. e.g.
-                document-id.jpg or directory/document-id.jpg. The document
-                service constructs the full /bucket/path internally.
-            - type: "null"
         updatedAtLocation:
           description: Location of the user who last changed the status.
           anyOf:
@@ -16127,14 +16109,6 @@ components:
           description: ID of the user currently assigned to the event.
           anyOf:
             - type: string
-            - type: "null"
-        assignedToSignature:
-          description: Signature of the user who is currently assigned to the event.
-          anyOf:
-            - type: string
-              description: A relative path within the S3 bucket, never starting with /. e.g.
-                document-id.jpg or directory/document-id.jpg. The document
-                service constructs the full /bucket/path internally.
             - type: "null"
         updatedBy:
           description: ID of the user who last changed the status.
