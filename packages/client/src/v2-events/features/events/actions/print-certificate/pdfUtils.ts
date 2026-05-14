@@ -54,7 +54,7 @@ type CertificateConfiguration = Partial<{
   fonts: Record<string, FontFamilyTypes>
 }>
 
-function omitFieldValuesFromDeclaration(
+function pickAnnotationFieldValues(
   annotationFields: FieldConfig[],
   values: Record<string, FieldUpdateValue>
 ) {
@@ -276,8 +276,6 @@ export function compileSvg({
   const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
   const resolvedDeclaration = stringifyDeclaration(fieldConfigs, $declaration)
 
-  console.log('resolvedDeclaration :>> ', resolvedDeclaration)
-
   for (const helperName of Object.keys(customHelpers)) {
     /*
      * Note for anyone adding new context variables to handlebar helpers:
@@ -347,8 +345,6 @@ export function compileSvg({
         adminLevels
       })
 
-      console.log('resolvedMetadata :>>>>>>> ', resolvedMetadata)
-
       if (isEqual($metadata, obj)) {
         return getMixedPath(resolvedMetadata, propertyPath)
       }
@@ -373,7 +369,7 @@ export function compileSvg({
           action.data.annotation != null
             ? stringifyDeclaration(
                 annotationFields,
-                omitFieldValuesFromDeclaration(
+                pickAnnotationFieldValues(
                   annotationFields,
                   action.data.annotation
                 )
