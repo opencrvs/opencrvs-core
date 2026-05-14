@@ -112,7 +112,7 @@ export const usePrintableCertificate = ({
     templateString: certificateConfig.svg,
     $metadata: modifiedMetadata,
     $declaration: declaration,
-    $actions: event.actions as ActionDocument[],
+    $actions: getAcceptedActions(event),
     review: true,
     locations,
     users,
@@ -148,7 +148,7 @@ export const usePrintableCertificate = ({
         copiesPrintedForTemplate
       },
       $declaration: declarationWithResolvedImages,
-      $actions: event.actions as ActionDocument[],
+      $actions: getAcceptedActions(updatedEvent),
       locations,
       review: false,
       users,
