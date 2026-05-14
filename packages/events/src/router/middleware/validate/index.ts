@@ -67,11 +67,10 @@ import {
 export function getFieldErrors(
   fields: FieldConfig[],
   data: ActionUpdate,
-  context: ValidatorContext,
-  declaration: EventState = {}
+  context: ValidatorContext
 ) {
   const visibleFields = fields.filter((field) =>
-    isFieldVisible(field, { ...data, ...declaration }, context)
+    isFieldVisible(field, data, context)
   )
 
   const visibleFieldIds = visibleFields.map((field) => field.id)
@@ -203,8 +202,7 @@ function validateDeclarationUpdateAction({
   const declarationErrors = getFieldErrors(
     allVisiblePageFields,
     cleanedDeclaration,
-    context,
-    {}
+    context
   )
 
   const declarationActionParse = DeclarationActions.safeParse(actionType)
@@ -222,9 +220,8 @@ function validateDeclarationUpdateAction({
 
   const annotationErrors = getFieldErrors(
     reviewFields,
-    { ...cleanedDeclaration, ...visibleAnnotationFields },
-    context,
-    {}
+    visibleAnnotationFields,
+    { ...context, baseFormState: cleanedDeclaration }
   )
 
   return [...declarationErrors, ...annotationErrors]
@@ -256,7 +253,10 @@ function validateActionAnnotation({
   )
 
   const errors = [
-    ...getFieldErrors(formFields, annotation, context, declaration),
+    ...getFieldErrors(formFields, annotation, {
+      ...context,
+      baseFormState: declaration
+    }),
     ...getVerificationPageErrors(visibleVerificationPageIds, annotation)
   ]
 
@@ -278,7 +278,7 @@ function validateCustomAction({
     eventConfig,
     customActionType
   )
-  return getFieldErrors(customActionFields, annotation, context, {})
+  return getFieldErrors(customActionFields, annotation, context)
 }
 
 function validateNotifyAction({

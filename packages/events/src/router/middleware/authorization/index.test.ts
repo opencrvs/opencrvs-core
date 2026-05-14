@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { encodeScope, TestUserRole } from '@opencrvs/commons'
+import { encodeScope, getUUID, TestUserRole, UUID } from '@opencrvs/commons'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { createTestToken, TEST_SYSTEM_ID } from '@events/tests/utils'
 import { TrpcContext } from '@events/context'
-import { allowedWithAnyOfScopes } from '.'
+import { allowedWithAnyOfScopes, canAccessEventWithScopes } from '.'
 
 describe('allowedWithAnyOfScopes()', () => {
   test('should throw TRPCError with code "FORBIDDEN" if none of the required scopes are present on the token', async () => {
@@ -62,5 +62,58 @@ describe('allowedWithAnyOfScopes()', () => {
     await middleware(mockOpts)
 
     expect(mockOpts.next).toHaveBeenCalled()
+  })
+})
+
+describe('canAccessEventWithScopes()', () => {
+  test('throws FORBIDDEN when token eventId does not match the requested event', async () => {
+    const eventA = getUUID()
+    const eventB = getUUID()
+    const input = { eventId: eventA }
+    const mockOpts = {
+      ctx: {
+        token: createTestToken({
+          eventId: eventB,
+          role: TestUserRole.enum.FIELD_AGENT,
+          userId: 'test-user-id' as UUID,
+          scopes: [encodeScope({ type: 'record.read'})]
+        })
+      },
+      getRawInput: () => input,
+      input,
+      next: vi.fn()
+    } as unknown as MiddlewareOptions<TrpcContext>
+
+    await expect(canAccessEventWithScopes(['record.read'])(mockOpts)).rejects.toMatchObject({
+      code: 'FORBIDDEN',
+      message: 'Token does not grant access to this event'
+    })
+
+    expect(mockOpts.next).not.toHaveBeenCalled()
+  })
+
+  test('passes eventId check when token eventId matches the requested event', async () => {
+    const eventId = getUUID()
+    const input = { eventId }
+    // Token and input share the same event ID — the check passes.
+    // The middleware then proceeds to getEventById (DB call) which will fail,
+    // but the failure will not be the eventId-specific FORBIDDEN.
+    const mockOpts = {
+      ctx: {
+        token: createTestToken({
+          eventId,
+          role: TestUserRole.enum.FIELD_AGENT,
+          userId: 'test-user-id' as UUID,
+          scopes: [encodeScope({ type: 'record.read'})]
+        })
+      },
+      getRawInput: () => input,
+      input,
+      next: vi.fn()
+    } as unknown as MiddlewareOptions<TrpcContext>
+
+    await expect(canAccessEventWithScopes(['record.read'])(mockOpts)).rejects.not.toMatchObject({
+      message: 'Token does not grant access to this event'
+    })
   })
 })
