@@ -58,7 +58,10 @@ import { useApolloClient } from './utils/apolloClient'
 import { ApolloProvider } from './utils/ApolloProvider'
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { AppStore } from './store'
-import { routesConfig as v2RoutesConfig } from './v2-events/routes/config'
+import {
+  routesConfig as v2RoutesConfig,
+  useNetworkProbe
+} from './v2-events/routes/config'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
@@ -450,7 +453,56 @@ interface IAppProps {
   store: AppStore
   router: ReturnType<typeof createBrowserRouter>
 }
+
+function VersionMismatchFallback() {
+  const handleReLogin = () => {
+    localStorage.removeItem('opencrvs')
+    const lang = localStorage.getItem('language') || 'en'
+    window.location.assign(`/login?lang=${lang}&redirectTo=/`)
+  }
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        height: '100vh',
+        background: '#f4f4f4'
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '16px',
+          maxWidth: '480px',
+          textAlign: 'center',
+          padding: '24px'
+        }}
+      >
+        <h1>A new version is available</h1>
+        <p>Please log in again to continue.</p>
+        <button
+          onClick={handleReLogin}
+          style={{ padding: '12px 24px', cursor: 'pointer' }}
+        >
+          Log in again
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export function App({ client, store, router }: IAppProps) {
+  const { versionMismatch } = useNetworkProbe()
+
+  if (versionMismatch) {
+    return <VersionMismatchFallback />
+  }
+
   return (
     <ErrorBoundary>
       <AppWithApolloClient client={client} store={store} router={router} />
