@@ -118,7 +118,8 @@ export function useApolloClient(store: Store<IStoreState, AnyAction>) {
 
     // skipping the persistent client in tests for now
     if (import.meta.env.MODE !== 'test') {
-      init()
+      // Version mismatch modal will surface the issue to the user
+      init().catch((err) => Sentry.captureException(err))
     }
   }, [store])
 

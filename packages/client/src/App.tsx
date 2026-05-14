@@ -42,7 +42,10 @@ import { VerifyCertificatePage } from '@client/views/VerifyCertificate/VerifyCer
 import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 import { SCOPES } from '@opencrvs/commons/client'
 import { getTheme } from '@opencrvs/components'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import * as React from 'react'
+import { useIntl } from 'react-intl'
 import { Provider } from 'react-redux'
 import {
   createBrowserRouter,
@@ -62,6 +65,7 @@ import {
   routesConfig as v2RoutesConfig,
   useNetworkProbe
 } from './v2-events/routes/config'
+import { messages as reloadModalMessages } from './i18n/messages/views/reloadModal'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
@@ -454,7 +458,9 @@ interface IAppProps {
   router: ReturnType<typeof createBrowserRouter>
 }
 
-function VersionMismatchFallback() {
+function VersionMismatchModal({ show }: { show: boolean }) {
+  const intl = useIntl()
+
   const handleReLogin = () => {
     localStorage.removeItem('opencrvs')
     const lang = localStorage.getItem('language') || 'en'
@@ -462,50 +468,36 @@ function VersionMismatchFallback() {
   }
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
-        height: '100vh',
-        background: '#f4f4f4'
-      }}
+    <ResponsiveModal
+      title={intl.formatMessage(reloadModalMessages.title)}
+      responsive={false}
+      showCloseButton={false}
+      autoHeight={true}
+      titleHeightAuto={true}
+      actions={[
+        <PrimaryButton key="login" id="login" onClick={handleReLogin}>
+          {intl.formatMessage(reloadModalMessages.loginAgain)}
+        </PrimaryButton>
+      ]}
+      show={show}
     >
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '16px',
-          maxWidth: '480px',
-          textAlign: 'center',
-          padding: '24px'
-        }}
-      >
-        <h1>A new version is available</h1>
-        <p>Please log in again to continue.</p>
-        <button
-          onClick={handleReLogin}
-          style={{ padding: '12px 24px', cursor: 'pointer' }}
-        >
-          Log in again
-        </button>
-      </div>
-    </div>
+      {intl.formatMessage(reloadModalMessages.body)}
+    </ResponsiveModal>
   )
 }
 
 export function App({ client, store, router }: IAppProps) {
+  const { versionMismatch } = useNetworkProbe()
   const { client: apolloClient } = useApolloClient(store)
 
   return (
     <ErrorBoundary>
       <GlobalStyle />
-      <ApolloProvider client={client ?? apolloClient}>
-        <Provider store={store}>
-          <I18nContainer>
-            <ThemeProvider theme={getTheme()}>
+      <Provider store={store}>
+        <I18nContainer>
+          <ThemeProvider theme={getTheme()}>
+            <VersionMismatchModal show={versionMismatch} />
+            <ApolloProvider client={client ?? apolloClient}>
               <StyledErrorBoundary>
                 <RouterProvider
                   router={router}
@@ -513,10 +505,10 @@ export function App({ client, store, router }: IAppProps) {
                   future={{ v7_startTransition: false }}
                 />
               </StyledErrorBoundary>
-            </ThemeProvider>
-          </I18nContainer>
-        </Provider>
-      </ApolloProvider>
+            </ApolloProvider>
+          </ThemeProvider>
+        </I18nContainer>
+      </Provider>
     </ErrorBoundary>
   )
 }
