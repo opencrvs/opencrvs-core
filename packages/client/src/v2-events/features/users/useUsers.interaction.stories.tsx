@@ -177,7 +177,7 @@ export const CachesUsersOnEventDownload: Story = {
     await step(
       'user.list was called exactly once – the loader warmed the entire cache in a single request',
       async () => {
-        await waitFor(() => expect(spies.userList).toBe(1))
+        return waitFor(async () => expect(spies.userList).toBe(1))
       }
     )
 
@@ -186,7 +186,8 @@ export const CachesUsersOnEventDownload: Story = {
       async () => {
         for (const id of REFERENCED_USER_IDS) {
           await waitFor(
-            () => expect(canvas.getByTestId(`full-${id}`)).toBeInTheDocument(),
+            async () =>
+              expect(canvas.getByTestId(`full-${id}`)).toBeInTheDocument(),
             { timeout: 5000 }
           )
         }
@@ -198,7 +199,7 @@ export const CachesUsersOnEventDownload: Story = {
       async () => {
         for (const id of SUBSET_USER_IDS) {
           await waitFor(
-            () =>
+            async () =>
               expect(canvas.getByTestId(`subset-${id}`)).toBeInTheDocument(),
             { timeout: 5000 }
           )
@@ -206,7 +207,7 @@ export const CachesUsersOnEventDownload: Story = {
 
         // The spy must not have grown: the smart queryFn's cross-entry scan
         // satisfied the subset query purely from the already-cached 5-user entry.
-        await waitFor(() => expect(spies.userList).toBe(1))
+        await waitFor(async () => expect(spies.userList).toBe(1))
       }
     )
   }
