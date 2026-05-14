@@ -33,6 +33,8 @@ export type IUserName = {
 
 export const UserName = NameFieldValue.omit({ middlename: true })
 
+const UserStatus = z.enum(['active', 'deactivated', 'pending'])
+
 export const User = z.object({
   id: UUID,
   name: UserName,
@@ -48,7 +50,7 @@ export const User = z.object({
   type: TokenUserType.extract(['user']),
   mobile: z.string().optional(),
   email: EmailValue.optional(),
-  status: z.enum(['active', 'deactivated', 'pending']),
+  status: UserStatus,
   data: z.record(z.string(), FieldValue).optional()
 })
 
@@ -153,9 +155,9 @@ export const UserOrSystemSummary = z.discriminatedUnion('type', [
   SystemSummary
 ])
 export const UserOrSystemSummaryWithStatus = z.discriminatedUnion('type', [
-  UserSummary.extend({ status: z.enum(['active', 'deactivated', 'pending']) }),
+  UserSummary.extend({ status: UserStatus }),
   SystemSummary.extend({
-    status: z.enum(['active', 'deactivated', 'pending']).optional()
+    status: UserStatus.optional()
   })
 ])
 

@@ -118,10 +118,7 @@ export const stringifyEventMetadata = ({
       locations,
       administrativeAreas
     }),
-    assignedTo: {
-      ...findUserById(metadata.assignedTo ?? '', users),
-      signature: metadata.assignedToSignature
-    },
+    assignedTo: findUserById(metadata.assignedTo ?? '', users),
     dateOfEvent: metadata.dateOfEvent
       ? DateField.toCertificateVariables(metadata.dateOfEvent, {
           intl,
@@ -141,10 +138,7 @@ export const stringifyEventMetadata = ({
       locations,
       administrativeAreas
     }),
-    createdBy: {
-      ...findUserById(metadata.createdBy, users),
-      signature: metadata.createdBySignature
-    },
+    createdBy: findUserById(metadata.createdBy, users),
     createdAtLocation: LocationSearch.toCertificateVariables(
       metadata.createdAtLocation,
       {
@@ -196,9 +190,7 @@ export const stringifyEventMetadata = ({
               metadata.legalStatuses.DECLARED.acceptedAt,
               { intl, locations, administrativeAreas }
             ),
-            createdByRole: metadata.legalStatuses.DECLARED.createdByRole,
-            createdBySignature:
-              metadata.legalStatuses.DECLARED.createdBySignature
+            createdByRole: metadata.legalStatuses.DECLARED.createdByRole
           }
         : null,
       [EventStatus.enum.REGISTERED]: metadata.legalStatuses.REGISTERED
@@ -221,9 +213,7 @@ export const stringifyEventMetadata = ({
             ),
             createdByRole: metadata.legalStatuses.REGISTERED.createdByRole,
             registrationNumber:
-              metadata.legalStatuses.REGISTERED.registrationNumber,
-            createdBySignature:
-              metadata.legalStatuses.REGISTERED.createdBySignature
+              metadata.legalStatuses.REGISTERED.registrationNumber
           }
         : null
     },
@@ -406,7 +396,6 @@ export function compileSvg({
           }),
           createdBy: users.find((user) => user.id === action.data.createdBy),
           createdByUserType: action.data.createdByUserType,
-          createdBySignature: action.data.createdBySignature,
           createdAtLocation: LocationSearch.toCertificateVariables(
             action.data.createdAtLocation,
             {
