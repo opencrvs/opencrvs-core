@@ -1164,7 +1164,6 @@ export const handlers = {
     }),
     tRPCMsw.user.list.query(() => {
       const generator = testDataGenerator()
-
       return [generator.user.localRegistrar().v2]
     }),
     tRPCMsw.user.get.query((userId) => {

@@ -13,7 +13,7 @@ import * as Joi from 'joi'
 import { AUTH_URL, COUNTRY_CONFIG_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 
-export async function checkServiceHealth(url: string) {
+async function checkServiceHealth(url: string) {
   const res = await fetch(url, {
     method: 'GET'
   })
@@ -55,15 +55,3 @@ export default async function healthCheckHandler(
   }
   return responses
 }
-
-export const querySchema = Joi.object({
-  service: Joi.array()
-    .items(
-      Joi.string().valid(
-        Services.AUTH,
-        Services.COUNTRY_CONFIG,
-        Services.GATEWAY
-      )
-    )
-    .single()
-})

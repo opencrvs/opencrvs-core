@@ -94,8 +94,8 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
         .flatMap(([, data]) => data ?? [])
         .map((user) => [user.id as string, user])
     )
-
     const uncachedIds = requestedIds.filter((id) => !cachedUserMap.has(id))
+    console.log({ cachedUserMap, uncachedIds })
 
     if (uncachedIds.length > 0) {
       const uncachedQueryOptions =
