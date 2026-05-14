@@ -5,7 +5,6 @@ exports[`Returns events based on the updatedAt column 1`] = `
   "createdAt": "[sanitized]",
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
-  "createdBySignature": "[sanitized]",
   "createdByUserType": "[sanitized]",
   "dateOfEvent": "[sanitized]",
   "declaration": {
@@ -32,7 +31,6 @@ exports[`Returns events based on the updatedAt column 1`] = `
       "createdAtLocation": "[sanitized]",
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
-      "createdBySignature": "[sanitized]",
       "createdByUserType": "[sanitized]",
     },
   },
@@ -53,7 +51,6 @@ exports[`Returns events based on the updatedAt column 2`] = `
   "createdAt": "[sanitized]",
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
-  "createdBySignature": "[sanitized]",
   "createdByUserType": "[sanitized]",
   "dateOfEvent": "[sanitized]",
   "declaration": {
@@ -80,7 +77,6 @@ exports[`Returns events based on the updatedAt column 2`] = `
       "createdAtLocation": "[sanitized]",
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
-      "createdBySignature": "[sanitized]",
       "createdByUserType": "[sanitized]",
     },
   },
@@ -100,11 +96,9 @@ exports[`Returns relevant events in right order 1`] = `
 [
   {
     "assignedTo": "[sanitized]",
-    "assignedToSignature": "f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
-    "createdBySignature": "[sanitized]",
     "createdByUserType": "[sanitized]",
     "dateOfEvent": "[sanitized]",
     "declaration": {
@@ -133,7 +127,6 @@ exports[`Returns relevant events in right order 1`] = `
         "createdAtLocation": "[sanitized]",
         "createdBy": "[sanitized]",
         "createdByRole": "REGISTRATION_AGENT",
-        "createdBySignature": "[sanitized]",
         "createdByUserType": "[sanitized]",
       },
     },
@@ -149,11 +142,9 @@ exports[`Returns relevant events in right order 1`] = `
   },
   {
     "assignedTo": "[sanitized]",
-    "assignedToSignature": "f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
-    "createdBySignature": "[sanitized]",
     "createdByUserType": "[sanitized]",
     "dateOfEvent": "[sanitized]",
     "declaration": {
@@ -180,7 +171,6 @@ exports[`Returns relevant events in right order 1`] = `
         "createdAtLocation": "[sanitized]",
         "createdBy": "[sanitized]",
         "createdByRole": "REGISTRATION_AGENT",
-        "createdBySignature": "[sanitized]",
         "createdByUserType": "[sanitized]",
       },
     },
@@ -587,11 +577,9 @@ exports[`User only sees tennis club membership events within their jurisdiction 
 [
   {
     "assignedTo": "[sanitized]",
-    "assignedToSignature": "9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
-    "createdBySignature": "[sanitized]",
     "createdByUserType": "[sanitized]",
     "dateOfEvent": "[sanitized]",
     "declaration": {
@@ -618,7 +606,6 @@ exports[`User only sees tennis club membership events within their jurisdiction 
         "createdAtLocation": "[sanitized]",
         "createdBy": "[sanitized]",
         "createdByRole": "REGISTRATION_AGENT",
-        "createdBySignature": "[sanitized]",
         "createdByUserType": "[sanitized]",
       },
     },
@@ -634,11 +621,9 @@ exports[`User only sees tennis club membership events within their jurisdiction 
   },
   {
     "assignedTo": "[sanitized]",
-    "assignedToSignature": "9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
-    "createdBySignature": "[sanitized]",
     "createdByUserType": "[sanitized]",
     "dateOfEvent": "[sanitized]",
     "declaration": {
@@ -665,7 +650,6 @@ exports[`User only sees tennis club membership events within their jurisdiction 
         "createdAtLocation": "[sanitized]",
         "createdBy": "[sanitized]",
         "createdByRole": "REGISTRATION_AGENT",
-        "createdBySignature": "[sanitized]",
         "createdByUserType": "[sanitized]",
       },
     },
@@ -686,11 +670,9 @@ exports[`User only sees tennis club membership events within their jurisdiction 
 [
   {
     "assignedTo": "[sanitized]",
-    "assignedToSignature": "9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
-    "createdBySignature": "[sanitized]",
     "createdByUserType": "[sanitized]",
     "dateOfEvent": "[sanitized]",
     "declaration": {
@@ -717,7 +699,6 @@ exports[`User only sees tennis club membership events within their jurisdiction 
         "createdAtLocation": "[sanitized]",
         "createdBy": "[sanitized]",
         "createdByRole": "REGISTRATION_AGENT",
-        "createdBySignature": "[sanitized]",
         "createdByUserType": "[sanitized]",
       },
     },
@@ -733,11 +714,9 @@ exports[`User only sees tennis club membership events within their jurisdiction 
   },
   {
     "assignedTo": "[sanitized]",
-    "assignedToSignature": "9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
-    "createdBySignature": "[sanitized]",
     "createdByUserType": "[sanitized]",
     "dateOfEvent": "[sanitized]",
     "declaration": {
@@ -764,7 +743,6 @@ exports[`User only sees tennis club membership events within their jurisdiction 
         "createdAtLocation": "[sanitized]",
         "createdBy": "[sanitized]",
         "createdByRole": "REGISTRATION_AGENT",
-        "createdBySignature": "[sanitized]",
         "createdByUserType": "[sanitized]",
       },
     },
@@ -780,11 +758,9 @@ exports[`User only sees tennis club membership events within their jurisdiction 
   },
   {
     "assignedTo": "[sanitized]",
-    "assignedToSignature": "9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
-    "createdBySignature": "[sanitized]",
     "createdByUserType": "[sanitized]",
     "dateOfEvent": "[sanitized]",
     "declaration": {
@@ -811,7 +787,6 @@ exports[`User only sees tennis club membership events within their jurisdiction 
         "createdAtLocation": "[sanitized]",
         "createdBy": "[sanitized]",
         "createdByRole": "REGISTRATION_AGENT",
-        "createdBySignature": "[sanitized]",
         "createdByUserType": "[sanitized]",
       },
     },
@@ -831,11 +806,9 @@ exports[`User only sees tennis club membership events within their jurisdiction 
 exports[`User with "location" scope can see events from other offices based on their scopes 1`] = `
 {
   "assignedTo": "[sanitized]",
-  "assignedToSignature": "9dcede43-d8f5-4b9e-b391-ecc7cde52c75.png",
   "createdAt": "[sanitized]",
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
-  "createdBySignature": "[sanitized]",
   "createdByUserType": "[sanitized]",
   "dateOfEvent": "[sanitized]",
   "declaration": {
@@ -862,7 +835,6 @@ exports[`User with "location" scope can see events from other offices based on t
       "createdAtLocation": "[sanitized]",
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
-      "createdBySignature": "[sanitized]",
       "createdByUserType": "[sanitized]",
     },
   },
@@ -918,11 +890,9 @@ exports[`User with "location" scope only sees events created by system user to t
 exports[`User with "location" scope only sees events from their primary office 1`] = `
 {
   "assignedTo": "[sanitized]",
-  "assignedToSignature": "6dcc4bb0-4ee4-46e2-a58d-4d22985dfda4.png",
   "createdAt": "[sanitized]",
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
-  "createdBySignature": "[sanitized]",
   "createdByUserType": "[sanitized]",
   "dateOfEvent": "[sanitized]",
   "declaration": {
@@ -949,7 +919,6 @@ exports[`User with "location" scope only sees events from their primary office 1
       "createdAtLocation": "[sanitized]",
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
-      "createdBySignature": "[sanitized]",
       "createdByUserType": "[sanitized]",
     },
   },
