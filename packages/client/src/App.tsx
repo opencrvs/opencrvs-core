@@ -42,11 +42,8 @@ import { VerifyCertificatePage } from '@client/views/VerifyCertificate/VerifyCer
 import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 import { SCOPES } from '@opencrvs/commons/client'
 import { getTheme } from '@opencrvs/components'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import * as React from 'react'
-import { useIntl } from 'react-intl'
-import { Provider, useSelector } from 'react-redux'
+import { Provider } from 'react-redux'
 import {
   createBrowserRouter,
   Outlet,
@@ -60,16 +57,12 @@ import { I18nContainer } from './i18n/components/I18nContainer'
 import { useApolloClient } from './utils/apolloClient'
 import { ApolloProvider } from './utils/ApolloProvider'
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
-import { AppStore, IStoreState } from './store'
-import { storage } from './storage'
-import { removeToken } from './utils/authUtils'
-import { removeUserDetails } from './utils/userUtils'
+import { AppStore } from './store'
 import {
   routesConfig as v2RoutesConfig,
   useNetworkProbe
 } from './v2-events/routes/config'
-import { messages as reloadModalMessages } from './i18n/messages/views/reloadModal'
-import { ROUTES } from './v2-events/routes/routes'
+import { VersionMismatchModal } from './components/VersionMismatchModal'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
@@ -460,49 +453,6 @@ interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
   store: AppStore
   router: ReturnType<typeof createBrowserRouter>
-}
-
-const SCREEN_LOCK = 'screenLock'
-
-function VersionMismatchModal({ show }: { show: boolean }) {
-  const intl = useIntl()
-  const appName = useSelector(
-    (state: IStoreState) => state.offline.offlineData.config?.APPLICATION_NAME
-  )
-
-  const handleReLogin = async () => {
-    // Unregister the SW and clear all caches before redirecting so the stale
-    // SW cannot intercept the navigation to the login service.
-    if ('serviceWorker' in navigator) {
-      const registration = await navigator.serviceWorker.getRegistration()
-      await registration?.unregister()
-      await Promise.all((await caches.keys()).map((key) => caches.delete(key)))
-    }
-    await storage.removeItem(SCREEN_LOCK)
-    await removeToken()
-    await removeUserDetails()
-    window.location.assign(
-      `/login?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}${ROUTES.V2.buildPath({})}`
-    )
-  }
-
-  return (
-    <ResponsiveModal
-      title={intl.formatMessage(reloadModalMessages.title)}
-      responsive={false}
-      showCloseButton={false}
-      autoHeight={true}
-      titleHeightAuto={true}
-      actions={[
-        <PrimaryButton key="login" id="login" onClick={handleReLogin}>
-          {intl.formatMessage(reloadModalMessages.loginAgain)}
-        </PrimaryButton>
-      ]}
-      show={show}
-    >
-      {intl.formatMessage(reloadModalMessages.body, { app_name: appName })}
-    </ResponsiveModal>
-  )
 }
 
 export function App({ client, store, router }: IAppProps) {
