@@ -61,11 +61,15 @@ import { useApolloClient } from './utils/apolloClient'
 import { ApolloProvider } from './utils/ApolloProvider'
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { AppStore, IStoreState } from './store'
+import { storage } from './storage'
+import { removeToken } from './utils/authUtils'
+import { removeUserDetails } from './utils/userUtils'
 import {
   routesConfig as v2RoutesConfig,
   useNetworkProbe
 } from './v2-events/routes/config'
 import { messages as reloadModalMessages } from './i18n/messages/views/reloadModal'
+import { ROUTES } from './v2-events/routes/routes'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
@@ -466,27 +470,13 @@ function VersionMismatchModal({ show }: { show: boolean }) {
     (state: IStoreState) => state.offline.offlineData.config?.APPLICATION_NAME
   )
 
-  const handleReload = () => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistration().then((registration) => {
-        if (registration) {
-          registration.update()
-          registration.onupdatefound = () => {
-            const installingWorker = registration.installing
-            if (installingWorker) {
-              installingWorker.onstatechange = () => {
-                if (
-                  installingWorker.state === 'installed' &&
-                  navigator.serviceWorker.controller
-                )
-                  window.location.reload()
-              }
-            }
-          }
-        }
-      })
-    }
-    window.location.reload()
+  const handleReLogin = async () => {
+    await storage.removeItem(SCREEN_LOCK)
+    await removeToken()
+    await removeUserDetails()
+    window.location.assign(
+      `/login?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}${ROUTES.V2.buildPath({})}`
+    )
   }
 
   return (
@@ -497,8 +487,8 @@ function VersionMismatchModal({ show }: { show: boolean }) {
       autoHeight={true}
       titleHeightAuto={true}
       actions={[
-        <PrimaryButton key="reload" id="reload" onClick={handleReload}>
-          {intl.formatMessage(reloadModalMessages.update)}
+        <PrimaryButton key="login" id="login" onClick={handleReLogin}>
+          {intl.formatMessage(reloadModalMessages.loginAgain)}
         </PrimaryButton>
       ]}
       show={show}
