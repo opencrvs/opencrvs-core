@@ -209,16 +209,15 @@ export async function createTokenForActionConfirmation(
   input: ActionConfirmationInput | LegacyRecordValidationInput,
   userId: UUID,
   userType: TokenUserType,
-  userRejectScope: string | undefined = undefined
+  extraScopes: EncodedScope[] = []
 ) {
   return sign(
     {
       scope: [
         encodeScope({ type: 'record.confirm-registration' }),
         encodeScope({ type: 'record.reject-registration' }),
-        encodeScope({ type: 'record.read' }), // @TODO: Remove when v1.9.13 is merged to develop. It includes a narrower fix for this.
-        userRejectScope
-      ].filter(Boolean),
+        ...extraScopes
+      ],
       eventId: 'eventId' in input ? input.eventId : undefined,
       actionId: 'actionId' in input ? input.actionId : undefined,
       recordId: 'recordId' in input ? input.recordId : undefined,

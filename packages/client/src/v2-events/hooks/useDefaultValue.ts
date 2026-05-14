@@ -40,7 +40,15 @@ interface Context extends SystemVariables {
   adminLevelIds: string[]
 }
 
-type FieldsWithDefaultValue = Extract<FieldConfig, { defaultValue?: unknown }> | FieldGroup
+type FieldsWithDefaultValue =
+  | Extract<FieldConfig, { defaultValue?: unknown }>
+  | FieldGroup
+
+function isFieldWithDefaultValue(
+  field: FieldConfig
+): field is FieldsWithDefaultValue {
+  return 'defaultValue' in field || field.type === FieldType.FIELD_GROUP
+}
 
 function isTextField(field: FieldConfig): field is TextField {
   return field.type === FieldType.TEXT
@@ -132,7 +140,6 @@ function replacePlaceholders({
   )
 }
 
-
 function isSerializedUserField(value: unknown): value is SerializedUserField {
   return !!value && typeof value === 'object' && '$userField' in value
 }
@@ -193,12 +200,16 @@ export function mapFieldToDefaultValue(
       }
     }
     case FieldType.ADDRESS: {
-      return {
-        ...field.defaultValue,
-        administrativeArea: resolveSerializedUserField(
+      const resolvedAdministrativeArea =
+        field.defaultValue.administrativeArea &&
+        resolveSerializedUserField(
           field.defaultValue.administrativeArea,
           context
         )
+      return {
+        ...field.defaultValue,
+        // valid administrativeArea or undefined (don't allow empty string)
+        administrativeArea: resolvedAdministrativeArea || undefined
       }
     }
     case FieldType.DATE: {
@@ -222,6 +233,18 @@ export function mapFieldToDefaultValue(
 
       return `${hours}:${minutes}`
     }
+    case FieldType.AGE: {
+      return {
+        age: field.defaultValue,
+        asOfDateRef: field.configuration.asOfDate.$$field
+      }
+    }
+    // `replacePlaceholders` returns undefined for falsy values e.g. 0, false
+    case FieldType.CHECKBOX:
+    case FieldType.NUMBER:
+    case FieldType.BUTTON: {
+      return field.defaultValue
+    }
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
     case FieldType.LOCATION:
@@ -232,17 +255,13 @@ export function mapFieldToDefaultValue(
     case FieldType.FACILITY:
     case FieldType.ALPHA_HIDDEN:
     case FieldType.OFFICE:
-    case FieldType.NUMBER:
     case FieldType.NUMBER_WITH_UNIT:
     case FieldType.EMAIL:
-    case FieldType.AGE:
     case FieldType._EXPERIMENTAL_CUSTOM:
     case FieldType.USER_ROLE:
-    case FieldType.CHECKBOX:
     case FieldType.DATE_RANGE:
     case FieldType.SELECT_DATE_RANGE:
     case FieldType.PHONE:
-    case FieldType.BUTTON:
     case FieldType.SEARCH:
     case FieldType.ID:
     case FieldType.VERIFICATION_STATUS:
@@ -286,7 +305,7 @@ export function useDefaultValue() {
       return buildFormState(fields, (field) => getDefaultValue(field))
     }
     const field = fieldOrFields
-    if (isNonInteractiveFieldType(field)) {
+    if (!isFieldWithDefaultValue(field)) {
       return
     }
     return mapFieldToDefaultValue(field, {
