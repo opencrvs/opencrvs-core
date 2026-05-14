@@ -39,8 +39,9 @@ export function VersionMismatchModal({ show }: { show: boolean }) {
     await storage.removeItem(SCREEN_LOCK)
     await removeToken()
     await removeUserDetails()
+    const loginUrl = window.config.LOGIN_URL ?? '/login'
     window.location.assign(
-      `/login?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}${ROUTES.V2.buildPath({})}`
+      `${loginUrl}?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}${ROUTES.V2.buildPath({})}`
     )
   }
 
