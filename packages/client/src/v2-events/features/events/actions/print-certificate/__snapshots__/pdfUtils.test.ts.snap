@@ -5,7 +5,6 @@ exports[`stringifyEventMetadata > Resolves event metadata 1`] = `
   "assignedTo": {
     "fullHonorificName": "1st Order Honorable Kennedy Mweene",
     "name": "Kennedy Mweene",
-    "signature": undefined,
   },
   "copiesPrintedForTemplate": 1,
   "createdAt": "1 February 2000",
@@ -17,7 +16,6 @@ exports[`stringifyEventMetadata > Resolves event metadata 1`] = `
   "createdBy": {
     "fullHonorificName": "1st Order Honorable Kennedy Mweene",
     "name": "Kennedy Mweene",
-    "signature": "8b05c80a-469d-43fd-9a83-1152b964ce25.png",
   },
   "dateOfEvent": "1 February 2000",
   "flags": [],
