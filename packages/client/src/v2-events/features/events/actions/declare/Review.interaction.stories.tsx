@@ -73,7 +73,7 @@ export default meta
 
 type Story = StoryObj<typeof ReviewIndex>
 
-const mockUser = generator.user.fieldAgent().v2
+const mockUser = generator.user.fieldAgent().summary
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {

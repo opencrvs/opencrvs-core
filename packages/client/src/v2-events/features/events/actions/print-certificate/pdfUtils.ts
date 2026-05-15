@@ -308,6 +308,7 @@ export function compileSvg({
    * @example {{ $actions "PRINT_CERTIFICATE" }}
    */
   function $actionsFn(actionType: string) {
+    console.log($actions.filter((a) => a.type === actionType))
     return $actions.filter((a) => a.type === actionType)
   }
 
