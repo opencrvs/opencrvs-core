@@ -327,6 +327,7 @@ export function compileSvg({
    */
 
   function $action(actionType: string) {
+    console.log($actions.findLast((a) => a.type === actionType))
     return $actions.findLast((a) => a.type === actionType)
   }
 
@@ -387,7 +388,6 @@ export function compileSvg({
                 )
               )
             : {}
-
         const resolvedAction = {
           id: action.data.id,
           type: action.data.type,

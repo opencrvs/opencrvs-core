@@ -48,7 +48,7 @@ const USER_IDS = Array.from({ length: 5 }, () => getUUID() as UUID)
  */
 const USER_SUMMARIES = USER_IDS.map((id, i) => ({
   id,
-  type: TokenUserType.enum.user as const,
+  type: TokenUserType.enum.user,
   name: { firstname: `User${i + 1}`, surname: `Test${i + 1}` },
   role: 'FIELD_AGENT',
   primaryOfficeId: getUUID() as UUID
@@ -112,11 +112,10 @@ async function makeWrapper() {
     return React.createElement(
       Provider,
       { store },
-      React.createElement(
-        TRPCProvider,
-        { waitForClientRestored: false },
+      React.createElement(TRPCProvider, {
+        waitForClientRestored: false,
         children
-      )
+      })
     )
   }
 }
@@ -138,9 +137,7 @@ describe('user summary caching after event download', () => {
 
     // The server should have been hit exactly once, with all 5 user IDs.
     expect(userListSpy).toHaveBeenCalledTimes(1)
-    expect(userListSpy).toHaveBeenCalledWith(
-      expect.arrayContaining(USER_IDS)
-    )
+    expect(userListSpy).toHaveBeenCalledWith(expect.arrayContaining(USER_IDS))
 
     // All 5 users must now be readable from the React Query cache via the
     // same hook that components use when rendering a record.
@@ -198,10 +195,9 @@ describe('user summary caching after event download', () => {
     // Request 3 of the 5 users. This produces a query key the cache has never
     // seen before ([id0, id2, id4] vs the original [id0..id4]).
     const subset = [USER_IDS[0], USER_IDS[2], USER_IDS[4]]
-    const { result } = renderHook(
-      () => useUsers().getUsers.useQuery(subset),
-      { wrapper }
-    )
+    const { result } = renderHook(() => useUsers().getUsers.useQuery(subset), {
+      wrapper
+    })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 

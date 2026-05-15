@@ -74,6 +74,7 @@ export default meta
 type Story = StoryObj<typeof ReviewIndex>
 
 const mockUser = generator.user.fieldAgent().summary
+const mockUserFull = generator.user.fieldAgent().v2
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {
@@ -146,7 +147,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
             }
           }),
           tRPCMsw.user.get.query((id) => {
-            return mockUser
+            return mockUserFull
           })
         ]
       }
@@ -211,7 +212,7 @@ const msw = {
         return [mockUser]
       }),
       tRPCMsw.user.get.query((id) => {
-        return mockUser
+        return mockUserFull
       })
     ]
   }

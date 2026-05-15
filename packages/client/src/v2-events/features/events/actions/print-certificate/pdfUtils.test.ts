@@ -493,7 +493,7 @@ describe('SVG compiler', () => {
     it('renders user signatures through action objects when $action is combined with $lookup', () => {
       expectRenderOutput(
         `<svg><text>{{$lookup ($action 'REGISTER') 'createdBySignature'}}</text></svg>`,
-        '<svg><text>aa13a268-ae48-4a30-9450-554aebaab203/signature.png</text></svg>'
+        '<svg><text>/aa13a268-ae48-4a30-9450-554aebaab203/signature.png</text></svg>'
       )
     })
   })
