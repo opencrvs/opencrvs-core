@@ -192,9 +192,7 @@ export const InvalidValue_NoRecordsFound: Story = {
     searchInput.blur()
 
     await waitFor(async () =>
-      expect(
-        canvas.queryByTestId('search-input-error')
-      ).not.toBeInTheDocument()
+      expect(canvas.queryByTestId('search-input-error')).not.toBeInTheDocument()
     )
     await userEvent.click(
       await canvas.findByRole('button', { name: /Confirm/i })
