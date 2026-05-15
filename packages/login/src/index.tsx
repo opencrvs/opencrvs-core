@@ -119,4 +119,26 @@ function withRetry(render: () => Promise<void>) {
   })
 }
 
-withRetry(renderAppWithConfig)
+const SW_RECOVERY_ATTEMPTED = 'sw_recovery_attempted'
+
+async function renderWithFallback() {
+  try {
+    await renderAppWithConfig()
+  } catch (error) {
+    if (
+      !sessionStorage.getItem(SW_RECOVERY_ATTEMPTED) &&
+      (error as Error)?.message !== 'VERSION_MISMATCH'
+    ) {
+      sessionStorage.setItem(SW_RECOVERY_ATTEMPTED, 'true')
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.getRegistration()
+        await registration?.unregister()
+      }
+      window.location.reload()
+    } else {
+      withRetry(renderAppWithConfig)
+    }
+  }
+}
+
+renderWithFallback()
