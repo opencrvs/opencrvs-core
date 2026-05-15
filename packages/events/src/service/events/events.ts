@@ -120,9 +120,10 @@ export async function throwConflictIfActionNotAllowed(
   eventId: UUID,
   actionType: ActionType,
   token: TokenWithBearer,
-  customActionType?: string
+  customActionType?: string,
+  existingEvent?: EventDocument
 ) {
-  const event = await getEventById(eventId)
+  const event = existingEvent ?? (await getEventById(eventId))
   const eventConfiguration = await getEventConfigurationById({
     eventType: event.type,
     token
@@ -422,10 +423,11 @@ function isEventIndexable(event: EventDocument) {
 
 export async function ensureEventIndexed(
   event: EventDocument,
-  configuration: EventConfig
+  configuration: EventConfig,
+  waitFor = false
 ) {
   if (isEventIndexable(event)) {
-    await indexEvent(event, configuration)
+    await indexEvent(event, configuration, waitFor)
   }
 }
 
@@ -463,51 +465,65 @@ export async function processAction(
   })
 
   // Only send the event to Elasticsearch if it is not a draft
-  await ensureEventIndexed(updatedEvent, configuration)
+  await ensureEventIndexed(updatedEvent, configuration, input.waitFor ?? false)
   return updatedEvent
 }
 
-type AsyncRejectActionInput = Omit<
+type AsyncRejectActionInput = Pick<
   z.infer<typeof AsyncRejectActionDocument>,
-  'createdAt' | 'id' | 'status'
+  'transactionId' | 'originalActionId' | 'type'
 > & {
-  transactionId: string
-  eventId: UUID
-  originalActionId: UUID
-  createdAtLocation?: UUID
-  createdByUserType: TokenUserType
-  token: TokenWithBearer
-  eventType: string
+  keepAssignment: boolean
 }
 
-export async function addAsyncRejectAction({
-  transactionId,
-  eventId,
-  type,
-  originalActionId,
-  createdBy,
-  createdByRole,
-  createdByUserType,
-  createdAtLocation,
-  eventType,
-  token
-}: AsyncRejectActionInput) {
-  const configuration = await getEventConfigurationById({
-    eventType,
-    token
-  })
-
+export async function addAsyncRejectAction(
+  {
+    transactionId,
+    originalActionId,
+    type,
+    keepAssignment
+  }: AsyncRejectActionInput,
+  {
+    user,
+    event,
+    configuration
+  }: {
+    user: TrpcUserContext
+    event: EventDocument
+    configuration: EventConfig
+  }
+) {
+  const eventId = event.id
   await eventsRepo.createAction({
     eventId,
     transactionId,
     actionType: type,
     status: ActionStatus.Rejected,
     originalActionId,
-    createdBy,
-    createdByRole,
-    createdByUserType,
-    createdAtLocation
+    createdBy: user.id,
+    createdByRole:
+      user.type === TokenUserType.enum.user
+        ? user.role
+        : undefined,
+    createdByUserType: user.type,
+    createdAtLocation: user.primaryOfficeId
   })
+
+  if (!keepAssignment) {
+    await eventsRepo.createAction(
+      buildAction(
+        {
+          eventId,
+          transactionId,
+          type: ActionType.UNASSIGN,
+          declaration: {},
+          assignedTo: null
+        },
+        ActionStatus.Accepted,
+        user
+      )
+    )
+  }
 
   const updatedEvent = await getEventById(eventId)
   await indexEvent(updatedEvent, configuration)

@@ -46,6 +46,7 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { buttonMessages } from '@client/i18n/messages'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
+import { TranslationTextWithFormatModifier } from './TranslationTextWithFormatModifier'
 
 const ValidationError = styled.span`
   color: ${({ theme }) => theme.colors.negative};
@@ -140,6 +141,7 @@ const ReviewContainter = styled.div`
     padding: 0;
   }
 `
+
 const DeclarationDataContainer = styled.div``
 
 const reviewMessages = defineMessages({
@@ -519,14 +521,14 @@ function ReviewComponent({
                 >
                   <FormFieldGenerator
                     fields={reviewFields}
-                    // This makes the declaration form available in the validations/conditionals
-                    // of the annotation form without bleeding into the current annotation values
-                    formContext={form}
                     formTouched={touched}
                     formValues={annotation}
                     id={'review'}
                     readonlyMode={readonlyMode}
-                    validatorContext={validatorContext}
+                    validatorContext={{
+                      ...validatorContext,
+                      baseFormState: form
+                    }}
                     onFormChange={onAnnotationChange}
                     onTouchedChange={setTouched}
                   />
@@ -692,9 +694,14 @@ function AcceptActionModal({
       width={600}
     >
       <Stack>
-        <Text color="grey500" element="p" variant="reg16">
-          {copy.supportingCopy ? intl.formatMessage(copy.supportingCopy) : null}
-        </Text>
+        {copy.supportingCopy && (
+          <TranslationTextWithFormatModifier
+            color="supportingCopy"
+            element="p"
+            message={copy.supportingCopy}
+            variant="reg16"
+          />
+        )}
       </Stack>
     </ResponsiveModal>
   )

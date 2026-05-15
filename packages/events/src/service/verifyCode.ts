@@ -40,6 +40,7 @@ function storeVerificationCode(nonce: string, code: string): void {
 
 function generateAndStoreVerificationCode(nonce: string): string {
   const code = crypto.randomInt(100000, 999999).toString()
+
   storeVerificationCode(nonce, code)
   return code
 }
@@ -85,28 +86,25 @@ export async function generateAndSendVerificationCode({
   phoneNumber?: string
   email?: string
 }): Promise<void> {
-  const isTwoFADisabled = !env.TWO_FA_ENABLED
+  const DEFAULT_CODE = '000000'
 
-  let verificationCode: string
-  if (isTwoFADisabled) {
-    verificationCode = '000000'
-    storeVerificationCode(nonce, verificationCode)
-  } else {
-    verificationCode = generateAndStoreVerificationCode(nonce)
-  }
+  if (!env.TWO_FA_ENABLED) {
+    if (env.isProduction) {
+      logger.warn(
+        'Two-factor authentication is disabled. Ensure TWO_FA_ENABLED is set to true in production environment.'
+      )
+    }
 
-  if (!env.isProduction) {
+    storeVerificationCode(nonce, DEFAULT_CODE)
     logger.info(
-      `Sending a verification to ${JSON.stringify({
+      `Used default verification code for ${JSON.stringify({
         mobile: phoneNumber,
         email: email,
-        verificationCode
+        DEFAULT_CODE
       })}`
     )
   } else {
-    if (isTwoFADisabled) {
-      throw new Error('2FA cannot be disabled in production')
-    }
+    const verificationCode = generateAndStoreVerificationCode(nonce)
 
     await triggerUserEventNotification({
       event: notificationEvent,
