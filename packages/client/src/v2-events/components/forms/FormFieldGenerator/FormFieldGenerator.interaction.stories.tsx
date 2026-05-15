@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -575,6 +576,53 @@ export const CustomRequiredValidationMessage: Story = {
 
         await canvas.findByText('Please fill up tennis style field')
         await canvas.findByText('Please fill up first name field')
+      }
+    )
+  }
+}
+
+const newfield = [
+  {
+    id: 'tennis-member.name',
+    type: FieldType.TEXT,
+    required: true,
+    label: {
+      defaultMessage: 'Name',
+      description: 'This is the label for the field',
+      id: 'field.name.label'
+    }
+  }
+] satisfies FieldConfig[]
+
+const newfieldvalue = {
+  'tennis-member.name': '               '
+} satisfies EventState
+
+export const TrimsWhitespaceOnSubmit: Story = {
+  name: 'Trims whitespace on submit',
+  parameters: {
+    layout: 'centered'
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={newfield}
+        formValues={newfieldvalue}
+        id="my-form"
+      />
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    await step(
+      'Shows validation error for input with only whitespace',
+      async () => {
+        await userEvent.click(
+          await canvas.findByTestId('text__tennis-member____name')
+        )
+        await userEvent.click(await canvas.findByText('Name'))
+        await canvas.findByText('Required')
       }
     )
   }
