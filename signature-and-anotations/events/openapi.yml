@@ -37,7 +37,7 @@ paths:
                               type: array
                               items:
                                 type: string
-                              default: &a6 []
+                              default: &a7 []
                               description: 'If the FieldValue is an object, subfield can be used to refer to
                                 e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                           required:
@@ -48,7 +48,7 @@ paths:
                           properties:
                             $$event:
                               type: string
-                              enum: &a7
+                              enum: &a8
                                 - createdAt
                                 - updatedAt
                                 - legalStatuses.DECLARED.createdAt
@@ -259,6 +259,7 @@ paths:
                                         - PARAGRAPH
                                         - PAGE_HEADER
                                         - RADIO_GROUP
+                                        - FIELD_GROUP
                                         - FILE
                                         - FILE_WITH_OPTIONS
                                         - BULLET_LIST
@@ -323,6 +324,38 @@ paths:
                                               - type: string
                                               - $ref: "#/components/schemas/TranslationConfig"
                                             description: The label of the option
+                                          conditionals:
+                                            type: array
+                                            items:
+                                              oneOf:
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - SHOW
+                                                    conditional:
+                                                      $ref: "#/components/schemas/Conditional"
+                                                  required:
+                                                    - type
+                                                    - conditional
+                                                  description: If 'SHOW' conditional is defined, the component is shown to the
+                                                    user only if the condition
+                                                    is met
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - ENABLE
+                                                    conditional:
+                                                      $ref: "#/components/schemas/Conditional"
+                                                  required:
+                                                    - type
+                                                    - conditional
+                                                  description: If 'ENABLE' conditional is defined, the component is enabled only
+                                                    if the condition is met
+                                            default: &a3 []
                                         required:
                                           - value
                                           - label
@@ -396,7 +429,7 @@ paths:
                                       type: array
                                       items:
                                         $ref: "#/components/schemas/FieldConditional"
-                                      default: &a3 []
+                                      default: &a4 []
                                       description: "
 
                                         \       In advanced search, we sometimes
@@ -445,7 +478,7 @@ paths:
                                         required:
                                           - validator
                                           - message
-                                      default: &a4 []
+                                      default: &a5 []
                                       description: Option for overriding the field validations specifically for
                                         advanced search form.
                                     fieldId:
@@ -512,6 +545,7 @@ paths:
                                         - PARAGRAPH
                                         - PAGE_HEADER
                                         - RADIO_GROUP
+                                        - FIELD_GROUP
                                         - FILE
                                         - FILE_WITH_OPTIONS
                                         - BULLET_LIST
@@ -576,6 +610,38 @@ paths:
                                               - type: string
                                               - $ref: "#/components/schemas/TranslationConfig"
                                             description: The label of the option
+                                          conditionals:
+                                            type: array
+                                            items:
+                                              oneOf:
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - SHOW
+                                                    conditional:
+                                                      $ref: "#/components/schemas/Conditional"
+                                                  required:
+                                                    - type
+                                                    - conditional
+                                                  description: If 'SHOW' conditional is defined, the component is shown to the
+                                                    user only if the condition
+                                                    is met
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - ENABLE
+                                                    conditional:
+                                                      $ref: "#/components/schemas/Conditional"
+                                                  required:
+                                                    - type
+                                                    - conditional
+                                                  description: If 'ENABLE' conditional is defined, the component is enabled only
+                                                    if the condition is met
+                                            default: *a3
                                         required:
                                           - value
                                           - label
@@ -649,7 +715,7 @@ paths:
                                       type: array
                                       items:
                                         $ref: "#/components/schemas/FieldConditional"
-                                      default: *a3
+                                      default: *a4
                                       description: "
 
                                         \       In advanced search, we sometimes
@@ -698,12 +764,12 @@ paths:
                                         required:
                                           - validator
                                           - message
-                                      default: *a4
+                                      default: *a5
                                       description: Option for overriding the field validations specifically for
                                         advanced search form.
                                     fieldId:
                                       type: string
-                                      enum: &a8
+                                      enum: &a9
                                         - event.trackingId
                                         - event.status
                                         - event.legalStatuses.REGISTERED.acceptedAt
@@ -722,7 +788,7 @@ paths:
                         required:
                           - title
                           - fields
-                      default: &a9 []
+                      default: &a10 []
                       description: Configuration of fields available in the advanced search feature.
                   required:
                     - id
@@ -774,7 +840,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: a3a6ba16-2ee0-493d-b394-bf363625b510
+                transactionId: 0d4af5eb-bedd-467c-8fc7-22995652126d
                 type: birth
       responses:
         "200":
@@ -832,7 +898,7 @@ paths:
                   additionalProperties: {}
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
-                  default: &a5 {}
+                  default: &a6 {}
                 annotation:
                   type: object
                   additionalProperties: {}
@@ -842,6 +908,10 @@ paths:
                   type: string
                   format: uuid
                 keepAssignment:
+                  type: boolean
+                keepAssignmentIfAccepted:
+                  type: boolean
+                keepAssignmentIfRejected:
                   type: boolean
                 createdAtLocation:
                   type: string
@@ -860,7 +930,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: ddfd4c25-8abd-49ae-838f-a5691e7a7f2f
+                transactionId: 64ca13ef-ff17-4bca-803a-d73015684df0
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -920,7 +990,7 @@ paths:
                   additionalProperties: {}
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
-                  default: *a5
+                  default: *a6
                 annotation:
                   type: object
                   additionalProperties: {}
@@ -930,6 +1000,10 @@ paths:
                   type: string
                   format: uuid
                 keepAssignment:
+                  type: boolean
+                keepAssignmentIfAccepted:
+                  type: boolean
+                keepAssignmentIfRejected:
                   type: boolean
                 createdAtLocation:
                   type: string
@@ -1002,7 +1076,7 @@ paths:
                   additionalProperties: {}
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
-                  default: *a5
+                  default: *a6
                 annotation:
                   type: object
                   additionalProperties: {}
@@ -1012,6 +1086,10 @@ paths:
                   type: string
                   format: uuid
                 keepAssignment:
+                  type: boolean
+                keepAssignmentIfAccepted:
+                  type: boolean
+                keepAssignmentIfRejected:
                   type: boolean
                 createdAtLocation:
                   type: string
@@ -1087,7 +1165,7 @@ paths:
                   additionalProperties: {}
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
-                  default: *a5
+                  default: *a6
                 annotation:
                   type: object
                   additionalProperties: {}
@@ -1097,6 +1175,10 @@ paths:
                   type: string
                   format: uuid
                 keepAssignment:
+                  type: boolean
+                keepAssignmentIfAccepted:
+                  type: boolean
+                keepAssignmentIfRejected:
                   type: boolean
                 createdAtLocation:
                   type: string
@@ -1175,13 +1257,13 @@ paths:
                 query:
                   allOf:
                     - $ref: "#/components/schemas/QueryType"
-                  default: &a16
+                  default: &a17
                     type: and
                     clauses:
                       - eventType: tennis-club-membership
                         status:
                           type: anyOf
-                          terms: &a17
+                          terms: &a18
                             - CREATED
                             - NOTIFIED
                             - DECLARED
@@ -1303,7 +1385,7 @@ paths:
                             description: Unique identifier of the transaction.
                           createdByUserType:
                             type: string
-                            enum: &a18
+                            enum: &a19
                               - user
                               - system
                             description: Indicates whether the action was created by a human-user or by a
@@ -1339,7 +1421,7 @@ paths:
                               rejected by a third-party integration.
                           type:
                             type: string
-                            enum: &a19
+                            enum: &a20
                               - NOTIFY
                               - DECLARE
                               - VALIDATE
@@ -1574,7 +1656,7 @@ components:
                   type: array
                   items:
                     type: string
-                  default: *a6
+                  default: *a7
                   description: 'If the FieldValue is an object, subfield can be used to refer to
                     e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
@@ -1585,7 +1667,7 @@ components:
               properties:
                 $$event:
                   type: string
-                  enum: *a7
+                  enum: *a8
               required:
                 - $$event
               description: Reference to a field defined in the event metadata, using the field
@@ -1782,6 +1864,7 @@ components:
                             - PARAGRAPH
                             - PAGE_HEADER
                             - RADIO_GROUP
+                            - FIELD_GROUP
                             - FILE
                             - FILE_WITH_OPTIONS
                             - BULLET_LIST
@@ -1845,6 +1928,37 @@ components:
                                   - type: string
                                   - $ref: "#/components/schemas/TranslationConfig"
                                 description: The label of the option
+                              conditionals:
+                                type: array
+                                items:
+                                  oneOf:
+                                    - type: object
+                                      properties:
+                                        type:
+                                          type: string
+                                          enum:
+                                            - SHOW
+                                        conditional:
+                                          $ref: "#/components/schemas/Conditional"
+                                      required:
+                                        - type
+                                        - conditional
+                                      description: If 'SHOW' conditional is defined, the component is shown to the
+                                        user only if the condition is met
+                                    - type: object
+                                      properties:
+                                        type:
+                                          type: string
+                                          enum:
+                                            - ENABLE
+                                        conditional:
+                                          $ref: "#/components/schemas/Conditional"
+                                      required:
+                                        - type
+                                        - conditional
+                                      description: If 'ENABLE' conditional is defined, the component is enabled only
+                                        if the condition is met
+                                default: *a3
                             required:
                               - value
                               - label
@@ -1906,7 +2020,7 @@ components:
                           type: array
                           items:
                             $ref: "#/components/schemas/FieldConditional"
-                          default: *a3
+                          default: *a4
                           description: "
 
                             \       In advanced search, we sometimes need to
@@ -1948,7 +2062,7 @@ components:
                             required:
                               - validator
                               - message
-                          default: *a4
+                          default: *a5
                           description: Option for overriding the field validations specifically for
                             advanced search form.
                         fieldId:
@@ -2013,6 +2127,7 @@ components:
                             - PARAGRAPH
                             - PAGE_HEADER
                             - RADIO_GROUP
+                            - FIELD_GROUP
                             - FILE
                             - FILE_WITH_OPTIONS
                             - BULLET_LIST
@@ -2076,6 +2191,37 @@ components:
                                   - type: string
                                   - $ref: "#/components/schemas/TranslationConfig"
                                 description: The label of the option
+                              conditionals:
+                                type: array
+                                items:
+                                  oneOf:
+                                    - type: object
+                                      properties:
+                                        type:
+                                          type: string
+                                          enum:
+                                            - SHOW
+                                        conditional:
+                                          $ref: "#/components/schemas/Conditional"
+                                      required:
+                                        - type
+                                        - conditional
+                                      description: If 'SHOW' conditional is defined, the component is shown to the
+                                        user only if the condition is met
+                                    - type: object
+                                      properties:
+                                        type:
+                                          type: string
+                                          enum:
+                                            - ENABLE
+                                        conditional:
+                                          $ref: "#/components/schemas/Conditional"
+                                      required:
+                                        - type
+                                        - conditional
+                                      description: If 'ENABLE' conditional is defined, the component is enabled only
+                                        if the condition is met
+                                default: *a3
                             required:
                               - value
                               - label
@@ -2137,7 +2283,7 @@ components:
                           type: array
                           items:
                             $ref: "#/components/schemas/FieldConditional"
-                          default: *a3
+                          default: *a4
                           description: "
 
                             \       In advanced search, we sometimes need to
@@ -2179,12 +2325,12 @@ components:
                             required:
                               - validator
                               - message
-                          default: *a4
+                          default: *a5
                           description: Option for overriding the field validations specifically for
                             advanced search form.
                         fieldId:
                           type: string
-                          enum: *a8
+                          enum: *a9
                         fieldType:
                           type: string
                           enum:
@@ -2197,7 +2343,7 @@ components:
             required:
               - title
               - fields
-          default: *a9
+          default: *a10
           description: Configuration of fields available in the advanced search feature.
       required:
         - id
@@ -2309,7 +2455,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -2327,7 +2473,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -2353,7 +2499,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: &a10 []
+              default: &a11 []
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -2376,7 +2522,7 @@ components:
                 required:
                   - validator
                   - message
-              default: &a11 []
+              default: &a12 []
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -2399,7 +2545,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -2417,7 +2563,164 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                    required:
+                      - $$field
+                      - $$subfield
+                    description: Reference to a field by its ID
+              description: Reference to the source field or fields. When a value is defined,
+                it is copied from the parent field when changed. If multiple
+                references are provided, the first truthy value is used.
+            analytics:
+              type: boolean
+              default: false
+              description: Indicates whether the field is included in analytics. When enabled,
+                its value becomes available in the analytics dashboard.
+            type:
+              type: string
+              enum:
+                - FIELD_GROUP
+            fields:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConfig"
+          required:
+            - id
+            - label
+            - type
+            - fields
+          description: Common properties shared across all field types.
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier of the field.
+            label:
+              description: Human-readable label of the field.
+              allOf:
+                - $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              anyOf:
+                - type: object
+                  properties:
+                    $$field:
+                      type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      type: array
+                      items:
+                        type: string
+                      default: *a7
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                  required:
+                    - $$field
+                    - $$subfield
+                  description: Reference to a field by its ID
+                - type: array
+                  items:
+                    type: object
+                    properties:
+                      $$field:
+                        type: string
+                        description: Unique identifier for the field
+                      $$subfield:
+                        type: array
+                        items:
+                          type: string
+                        default: *a7
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                    required:
+                      - $$field
+                      - $$subfield
+                    description: Reference to a field by its ID
+              description: Reference to the parent field or fields. When a parent field
+                changes, this field is reset.
+            required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+              description: Indicates whether the field is mandatory.
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a11
+              description: Conditions determining when the field is shown or enabled. By
+                default, the field is always shown and enabled.
+            secured:
+              type: boolean
+              default: false
+              description: Indicates whether the field is secured. Secured fields are not
+                indexed for search and are only visible when explicitly
+                assigned.
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a12
+              description: Additional validation rules applied to the field.
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates whether the field can be modified during record
+                correction.
+            value:
+              anyOf:
+                - type: object
+                  properties:
+                    $$field:
+                      type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      type: array
+                      items:
+                        type: string
+                      default: *a7
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                  required:
+                    - $$field
+                    - $$subfield
+                  description: Reference to a field by its ID
+                - type: array
+                  items:
+                    type: object
+                    properties:
+                      $$field:
+                        type: string
+                        description: Unique identifier for the field
+                      $$subfield:
+                        type: array
+                        items:
+                          type: string
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -2444,14 +2747,124 @@ components:
                 fields:
                   type: array
                   items:
-                    type: string
-                    enum:
-                      - country
-                      - administrativeArea
-                administrativeLevels:
-                  type: array
-                  items:
-                    type: string
+                    anyOf:
+                      - type: object
+                        properties:
+                          id:
+                            type: string
+                            description: Unique identifier of the field.
+                          type:
+                            type: string
+                            enum:
+                              - COUNTRY
+                          label:
+                            description: Human-readable label of the field.
+                            allOf:
+                              - $ref: "#/components/schemas/TranslationConfig"
+                          conditionals:
+                            type: array
+                            items:
+                              $ref: "#/components/schemas/FieldConditional"
+                            default: *a11
+                            description: Conditions determining when the field is shown or enabled. By
+                              default, the field is always shown and enabled.
+                          required:
+                            anyOf:
+                              - type: boolean
+                              - type: object
+                                properties:
+                                  message:
+                                    description: Custom required validation message
+                                    allOf:
+                                      - $ref: "#/components/schemas/TranslationConfig"
+                                required:
+                                  - message
+                            default: false
+                            description: Indicates whether the field is mandatory.
+                          optionOverrides:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                value:
+                                  type: string
+                                  description: The value of the option
+                                conditionals:
+                                  type: array
+                                  items:
+                                    oneOf:
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - SHOW
+                                          conditional:
+                                            $ref: "#/components/schemas/Conditional"
+                                        required:
+                                          - type
+                                          - conditional
+                                        description: If 'SHOW' conditional is defined, the component is shown to the
+                                          user only if the condition is met
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - ENABLE
+                                          conditional:
+                                            $ref: "#/components/schemas/Conditional"
+                                        required:
+                                          - type
+                                          - conditional
+                                        description: If 'ENABLE' conditional is defined, the component is enabled only
+                                          if the condition is met
+                                  default: *a3
+                              required:
+                                - value
+                            description: Conditionals for specific countries. Countries not listed are
+                              always shown and enabled.
+                        required:
+                          - id
+                          - type
+                        description: Country select field
+                      - type: object
+                        properties:
+                          id:
+                            type: string
+                            description: Unique identifier of the field.
+                          type:
+                            type: string
+                            enum:
+                              - ADMINISTRATIVE_AREA
+                          label:
+                            description: Human-readable label of the field.
+                            allOf:
+                              - $ref: "#/components/schemas/TranslationConfig"
+                          conditionals:
+                            type: array
+                            items:
+                              $ref: "#/components/schemas/FieldConditional"
+                            default: *a11
+                            description: Conditions determining when the field is shown or enabled. By
+                              default, the field is always shown and enabled.
+                          required:
+                            anyOf:
+                              - type: boolean
+                              - type: object
+                                properties:
+                                  message:
+                                    description: Custom required validation message
+                                    allOf:
+                                      - $ref: "#/components/schemas/TranslationConfig"
+                                required:
+                                  - message
+                            default: false
+                            description: Indicates whether the field is mandatory.
+                        required:
+                          - id
+                          - type
+                        description: Administrative area input field e.g. facility, office
                 streetAddressForm:
                   type: array
                   items:
@@ -2492,7 +2905,7 @@ components:
                             type: array
                             items:
                               type: string
-                            default: *a6
+                            default: *a7
                             description: 'If the FieldValue is an object, subfield can be used to refer to
                               e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                         required:
@@ -2524,7 +2937,7 @@ components:
                       properties:
                         $userField:
                           type: string
-                          enum: &a12
+                          enum: &a13
                             - id
                             - name
                             - role
@@ -2568,7 +2981,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -2586,7 +2999,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -2612,7 +3025,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -2635,7 +3048,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -2658,7 +3071,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -2676,7 +3089,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -2703,7 +3116,7 @@ components:
                   properties:
                     $userField:
                       type: string
-                      enum: *a12
+                      enum: *a13
                     $location:
                       type: string
                   required:
@@ -2750,7 +3163,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -2768,7 +3181,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -2794,7 +3207,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -2817,7 +3230,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -2840,7 +3253,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -2858,7 +3271,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -2917,7 +3330,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -2935,7 +3348,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -2961,7 +3374,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -2984,7 +3397,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3007,7 +3420,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -3025,7 +3438,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -3067,6 +3480,37 @@ components:
                       - type: string
                       - $ref: "#/components/schemas/TranslationConfig"
                     description: The label of the option
+                  conditionals:
+                    type: array
+                    items:
+                      oneOf:
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - SHOW
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          description: If 'SHOW' conditional is defined, the component is shown to the
+                            user only if the condition is met
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - ENABLE
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          description: If 'ENABLE' conditional is defined, the component is enabled only
+                            if the condition is met
+                    default: *a3
                 required:
                   - value
                   - label
@@ -3110,7 +3554,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -3128,7 +3572,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -3154,7 +3598,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3177,7 +3621,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3200,7 +3644,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -3218,7 +3662,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -3283,7 +3727,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -3301,7 +3745,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -3327,7 +3771,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3350,7 +3794,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3373,7 +3817,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -3391,7 +3835,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -3425,7 +3869,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -3464,7 +3908,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -3482,7 +3926,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -3508,7 +3952,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3531,7 +3975,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3554,7 +3998,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -3572,7 +4016,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -3626,7 +4070,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -3644,7 +4088,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -3670,7 +4114,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3693,7 +4137,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3716,7 +4160,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -3734,7 +4178,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -3791,7 +4235,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -3809,7 +4253,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -3835,7 +4279,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3858,7 +4302,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3881,7 +4325,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -3899,7 +4343,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -3970,7 +4414,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -3988,7 +4432,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -4014,7 +4458,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4037,7 +4481,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4060,7 +4504,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -4078,7 +4522,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -4099,7 +4543,7 @@ components:
                 - SELECT_DATE_RANGE
             defaultValue:
               type: string
-              enum: &a13
+              enum: &a14
                 - last7Days
                 - last30Days
                 - last90Days
@@ -4111,7 +4555,7 @@ components:
                 properties:
                   value:
                     type: string
-                    enum: *a13
+                    enum: *a14
                     description: The value of the option
                   label:
                     description: The label of the option
@@ -4147,7 +4591,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -4165,7 +4609,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -4191,7 +4635,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4214,7 +4658,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4237,7 +4681,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -4255,7 +4699,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -4274,9 +4718,6 @@ components:
               type: string
               enum:
                 - PARAGRAPH
-            defaultValue:
-              type: string
-              minLength: 1
             configuration:
               type: object
               properties:
@@ -4285,7 +4726,7 @@ components:
                   properties:
                     fontVariant:
                       type: string
-                      enum: &a14
+                      enum: &a15
                         - reg12
                         - reg14
                         - reg16
@@ -4325,7 +4766,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -4343,7 +4784,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -4369,7 +4810,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4392,7 +4833,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4415,7 +4856,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -4433,7 +4874,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -4467,6 +4908,37 @@ components:
                       - type: string
                       - $ref: "#/components/schemas/TranslationConfig"
                     description: The label of the option
+                  conditionals:
+                    type: array
+                    items:
+                      oneOf:
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - SHOW
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          description: If 'SHOW' conditional is defined, the component is shown to the
+                            user only if the condition is met
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - ENABLE
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          description: If 'ENABLE' conditional is defined, the component is enabled only
+                            if the condition is met
+                    default: *a3
                 required:
                   - value
                   - label
@@ -4508,7 +4980,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -4526,7 +4998,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -4552,7 +5024,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4575,7 +5047,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4598,7 +5070,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -4616,7 +5088,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -4635,8 +5107,6 @@ components:
               type: string
               enum:
                 - BULLET_LIST
-            defaultValue:
-              type: string
             items:
               type: array
               items:
@@ -4650,7 +5120,7 @@ components:
                   properties:
                     fontVariant:
                       type: string
-                      enum: *a14
+                      enum: *a15
               default: {}
           required:
             - id
@@ -4679,7 +5149,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -4697,7 +5167,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -4723,7 +5193,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4746,7 +5216,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4769,7 +5239,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -4787,7 +5257,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -4806,9 +5276,6 @@ components:
               type: string
               enum:
                 - PAGE_HEADER
-            defaultValue:
-              type: string
-              minLength: 1
           required:
             - id
             - label
@@ -4834,7 +5301,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -4852,7 +5319,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -4878,7 +5345,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4901,7 +5368,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4924,7 +5391,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -4942,7 +5409,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -4976,6 +5443,37 @@ components:
                       - type: string
                       - $ref: "#/components/schemas/TranslationConfig"
                     description: The label of the option
+                  conditionals:
+                    type: array
+                    items:
+                      oneOf:
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - SHOW
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          description: If 'SHOW' conditional is defined, the component is shown to the
+                            user only if the condition is met
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - ENABLE
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          description: If 'ENABLE' conditional is defined, the component is enabled only
+                            if the condition is met
+                    default: *a3
                 required:
                   - value
                   - label
@@ -5030,7 +5528,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -5048,7 +5546,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -5074,7 +5572,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5097,7 +5595,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5120,7 +5618,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -5138,7 +5636,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -5166,7 +5664,7 @@ components:
                       properties:
                         $userField:
                           type: string
-                          enum: *a12
+                          enum: *a13
                         $location:
                           type: string
                       required:
@@ -5179,7 +5677,7 @@ components:
                       properties:
                         $userField:
                           type: string
-                          enum: *a12
+                          enum: *a13
                         $location:
                           type: string
                       required:
@@ -5192,7 +5690,7 @@ components:
                       properties:
                         $userField:
                           type: string
-                          enum: *a12
+                          enum: *a13
                         $location:
                           type: string
                       required:
@@ -5311,7 +5809,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -5329,7 +5827,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -5355,7 +5853,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5378,7 +5876,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5401,7 +5899,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -5419,7 +5917,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -5466,7 +5964,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -5484,7 +5982,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -5510,7 +6008,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5533,7 +6031,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5556,7 +6054,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -5574,7 +6072,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -5621,7 +6119,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -5639,7 +6137,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -5665,7 +6163,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5688,7 +6186,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5711,7 +6209,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -5729,7 +6227,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -5777,7 +6275,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -5795,7 +6293,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -5821,7 +6319,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5844,7 +6342,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5867,7 +6365,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -5885,7 +6383,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -5930,7 +6428,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: &a15
+                    enum: &a16
                       - image/png
                       - image/jpg
                       - image/jpeg
@@ -5997,7 +6495,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -6015,7 +6513,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -6041,7 +6539,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6064,7 +6562,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6087,7 +6585,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -6105,7 +6603,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -6127,6 +6625,49 @@ components:
             defaultValue:
               type: string
               minLength: 1
+            optionOverrides:
+              type: array
+              items:
+                type: object
+                properties:
+                  value:
+                    type: string
+                    description: The value of the option
+                  conditionals:
+                    type: array
+                    items:
+                      oneOf:
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - SHOW
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          description: If 'SHOW' conditional is defined, the component is shown to the
+                            user only if the condition is met
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - ENABLE
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          description: If 'ENABLE' conditional is defined, the component is enabled only
+                            if the condition is met
+                    default: *a3
+                required:
+                  - value
+              description: Conditionals for specific countries. Countries not listed are
+                always shown and enabled.
           required:
             - id
             - label
@@ -6152,7 +6693,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -6170,7 +6711,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -6196,7 +6737,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6219,7 +6760,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6242,7 +6783,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -6260,7 +6801,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -6280,19 +6821,38 @@ components:
               enum:
                 - ADMINISTRATIVE_AREA
             defaultValue:
-              type: string
-              minLength: 1
+              anyOf:
+                - type: string
+                  minLength: 1
+                - type: object
+                  properties:
+                    $userField:
+                      type: string
+                      enum: *a13
+                    $location:
+                      type: string
+                  required:
+                    - $userField
             configuration:
               type: object
               properties:
                 partOf:
                   type: object
                   properties:
-                    $declaration:
+                    $$field:
                       type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      type: array
+                      items:
+                        type: string
+                      default: *a7
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
-                    - $declaration
-                  description: Parent location
+                    - $$field
+                    - $$subfield
+                  description: Reference to a field by its ID
                 type:
                   type: string
                   enum:
@@ -6328,7 +6888,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -6346,7 +6906,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -6372,7 +6932,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6395,7 +6955,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6418,7 +6978,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -6436,7 +6996,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -6480,7 +7040,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -6498,7 +7058,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -6524,7 +7084,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6547,7 +7107,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6570,7 +7130,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -6588,7 +7148,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -6649,7 +7209,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -6667,7 +7227,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -6693,7 +7253,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6716,7 +7276,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6739,7 +7299,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -6757,7 +7317,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -6804,7 +7364,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -6822,7 +7382,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -6848,7 +7408,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6871,7 +7431,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6894,7 +7454,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -6912,7 +7472,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -6959,7 +7519,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -6977,7 +7537,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -7003,7 +7563,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7026,7 +7586,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -7049,7 +7609,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -7067,7 +7627,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -7103,7 +7663,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -7136,7 +7696,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -7154,7 +7714,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -7180,7 +7740,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7203,7 +7763,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -7226,7 +7786,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -7244,7 +7804,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -7299,7 +7859,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -7317,7 +7877,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -7343,7 +7903,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7366,7 +7926,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -7389,7 +7949,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -7407,7 +7967,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -7439,6 +7999,37 @@ components:
                       - type: string
                       - $ref: "#/components/schemas/TranslationConfig"
                     description: The label of the option
+                  conditionals:
+                    type: array
+                    items:
+                      oneOf:
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - SHOW
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          description: If 'SHOW' conditional is defined, the component is shown to the
+                            user only if the condition is met
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - ENABLE
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          description: If 'ENABLE' conditional is defined, the component is enabled only
+                            if the condition is met
+                    default: *a3
                 required:
                   - value
                   - label
@@ -7489,7 +8080,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -7522,7 +8113,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -7540,7 +8131,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -7566,7 +8157,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7589,7 +8180,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -7612,7 +8203,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -7630,7 +8221,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -7679,7 +8270,7 @@ components:
                                     type: array
                                     items:
                                       type: string
-                                    default: *a6
+                                    default: *a7
                                     description: 'If the FieldValue is an object, subfield can be used to refer to
                                       e.g. `["foo", "bar"]` in `{ foo: { bar: 3
                                       } }`'
@@ -7728,7 +8319,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -7746,7 +8337,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -7772,7 +8363,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7795,7 +8386,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -7818,7 +8409,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -7836,7 +8427,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -7898,7 +8489,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -7916,7 +8507,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -7942,7 +8533,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7965,7 +8556,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -7988,7 +8579,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -8006,7 +8597,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -8063,7 +8654,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -8081,7 +8672,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -8107,7 +8698,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -8130,7 +8721,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -8153,7 +8744,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -8171,7 +8762,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -8222,7 +8813,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -8262,7 +8853,7 @@ components:
                             type: array
                             items:
                               type: string
-                            default: *a6
+                            default: *a7
                             description: 'If the FieldValue is an object, subfield can be used to refer to
                               e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                         required:
@@ -8304,7 +8895,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -8322,7 +8913,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -8348,7 +8939,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -8371,7 +8962,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -8394,7 +8985,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -8412,7 +9003,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -8473,7 +9064,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -8491,7 +9082,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -8517,7 +9108,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -8540,7 +9131,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -8563,7 +9154,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -8581,7 +9172,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -8602,7 +9193,7 @@ components:
                 - VERIFICATION_STATUS
             defaultValue:
               type: string
-              enum: &a21
+              enum: &a22
                 - verified
                 - authenticated
                 - failed
@@ -8647,7 +9238,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -8665,7 +9256,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -8691,7 +9282,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -8714,7 +9305,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -8737,7 +9328,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -8755,7 +9346,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -8809,7 +9400,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -8827,7 +9418,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -8853,7 +9444,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -8876,7 +9467,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -8899,7 +9490,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -8917,7 +9508,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -8964,7 +9555,7 @@ components:
                                 type: array
                                 items:
                                   type: string
-                                default: *a6
+                                default: *a7
                                 description: 'If the FieldValue is an object, subfield can be used to refer to
                                   e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
                                   }`'
@@ -8983,7 +9574,7 @@ components:
                                   type: array
                                   items:
                                     type: string
-                                  default: *a6
+                                  default: *a7
                                   description: 'If the FieldValue is an object, subfield can be used to refer to
                                     e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
                                     }`'
@@ -9010,7 +9601,7 @@ components:
                         type: array
                         items:
                           $ref: "#/components/schemas/FieldConditional"
-                        default: *a10
+                        default: *a11
                         description: Conditions determining when the field is shown or enabled. By
                           default, the field is always shown and enabled.
                       secured:
@@ -9033,7 +9624,7 @@ components:
                           required:
                             - validator
                             - message
-                        default: *a11
+                        default: *a12
                         description: Additional validation rules applied to the field.
                       helperText:
                         $ref: "#/components/schemas/TranslationConfig"
@@ -9056,7 +9647,7 @@ components:
                                 type: array
                                 items:
                                   type: string
-                                default: *a6
+                                default: *a7
                                 description: 'If the FieldValue is an object, subfield can be used to refer to
                                   e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
                                   }`'
@@ -9075,7 +9666,7 @@ components:
                                   type: array
                                   items:
                                     type: string
-                                  default: *a6
+                                  default: *a7
                                   description: 'If the FieldValue is an object, subfield can be used to refer to
                                     e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
                                     }`'
@@ -9132,7 +9723,7 @@ components:
                                 type: array
                                 items:
                                   type: string
-                                default: *a6
+                                default: *a7
                                 description: 'If the FieldValue is an object, subfield can be used to refer to
                                   e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
                                   }`'
@@ -9151,7 +9742,7 @@ components:
                                   type: array
                                   items:
                                     type: string
-                                  default: *a6
+                                  default: *a7
                                   description: 'If the FieldValue is an object, subfield can be used to refer to
                                     e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
                                     }`'
@@ -9178,7 +9769,7 @@ components:
                         type: array
                         items:
                           $ref: "#/components/schemas/FieldConditional"
-                        default: *a10
+                        default: *a11
                         description: Conditions determining when the field is shown or enabled. By
                           default, the field is always shown and enabled.
                       secured:
@@ -9201,7 +9792,7 @@ components:
                           required:
                             - validator
                             - message
-                        default: *a11
+                        default: *a12
                         description: Additional validation rules applied to the field.
                       helperText:
                         $ref: "#/components/schemas/TranslationConfig"
@@ -9224,7 +9815,7 @@ components:
                                 type: array
                                 items:
                                   type: string
-                                default: *a6
+                                default: *a7
                                 description: 'If the FieldValue is an object, subfield can be used to refer to
                                   e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
                                   }`'
@@ -9243,7 +9834,7 @@ components:
                                   type: array
                                   items:
                                     type: string
-                                  default: *a6
+                                  default: *a7
                                   description: 'If the FieldValue is an object, subfield can be used to refer to
                                     e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
                                     }`'
@@ -9314,7 +9905,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -9332,7 +9923,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -9358,7 +9949,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -9381,7 +9972,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -9404,7 +9995,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -9422,7 +10013,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -9478,7 +10069,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -9496,7 +10087,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -9522,7 +10113,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -9545,7 +10136,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -9568,7 +10159,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -9586,7 +10177,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -9641,7 +10232,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -9659,7 +10250,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -9685,7 +10276,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a10
+              default: *a11
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -9708,7 +10299,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a11
+              default: *a12
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -9731,7 +10322,7 @@ components:
                       type: array
                       items:
                         type: string
-                      default: *a6
+                      default: *a7
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
@@ -9749,7 +10340,7 @@ components:
                         type: array
                         items:
                           type: string
-                        default: *a6
+                        default: *a7
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
@@ -9793,7 +10384,7 @@ components:
                 query:
                   allOf:
                     - $ref: "#/components/schemas/QueryType"
-                  default: *a16
+                  default: *a17
                 limit:
                   type: number
                   default: 100
@@ -9926,7 +10517,7 @@ components:
             - eventType: tennis-club-membership
               status:
                 type: anyOf
-                terms: *a17
+                terms: *a18
               updatedAt:
                 type: range
                 gte: 2025-05-22
@@ -9997,7 +10588,7 @@ components:
           type: array
           items:
             type: string
-            enum: *a17
+            enum: *a18
       required:
         - type
         - terms
@@ -10010,7 +10601,7 @@ components:
             - exact
         term:
           type: string
-          enum: *a17
+          enum: *a18
       required:
         - type
         - term
@@ -10079,7 +10670,7 @@ components:
             - timePeriod
         term:
           type: string
-          enum: *a13
+          enum: *a14
       required:
         - type
         - term
@@ -10104,7 +10695,7 @@ components:
             - exact
         term:
           type: string
-          enum: *a18
+          enum: *a19
       required:
         - type
         - term
@@ -10821,7 +11412,7 @@ components:
                     description: Unique identifier of the transaction.
                   createdByUserType:
                     type: string
-                    enum: *a18
+                    enum: *a19
                     description: Indicates whether the action was created by a human-user or by a
                       system-user.
                   createdAt:
@@ -10855,7 +11446,7 @@ components:
                       rejected by a third-party integration.
                   type:
                     type: string
-                    enum: *a19
+                    enum: *a20
                 required:
                   - id
                   - transactionId
@@ -10927,7 +11518,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a18
+          enum: *a19
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10961,7 +11552,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: &a20
+          enum: &a21
             - Requested
             - Accepted
             - Rejected
@@ -10999,7 +11590,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a18
+          enum: *a19
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11033,7 +11624,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a20
+          enum: *a21
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11068,7 +11659,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a18
+          enum: *a19
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11102,7 +11693,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a20
+          enum: *a21
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11147,7 +11738,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a18
+          enum: *a19
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11181,7 +11772,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a20
+          enum: *a21
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11235,7 +11826,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a18
+          enum: *a19
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11269,7 +11860,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a20
+          enum: *a21
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11304,7 +11895,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a18
+          enum: *a19
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11338,7 +11929,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a20
+          enum: *a21
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11381,7 +11972,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a18
+          enum: *a19
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11415,7 +12006,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a20
+          enum: *a21
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11460,7 +12051,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a18
+          enum: *a19
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11494,7 +12085,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a20
+          enum: *a21
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11529,7 +12120,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a18
+          enum: *a19
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11563,7 +12154,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a20
+          enum: *a21
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11602,7 +12193,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a18
+          enum: *a19
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11636,7 +12227,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a20
+          enum: *a21
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11671,7 +12262,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a18
+          enum: *a19
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11705,7 +12296,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a20
+          enum: *a21
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11744,7 +12335,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a18
+          enum: *a19
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11778,7 +12369,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a20
+          enum: *a21
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11813,7 +12404,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a18
+          enum: *a19
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11847,7 +12438,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a20
+          enum: *a21
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11885,7 +12476,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a18
+          enum: *a19
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11919,7 +12510,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a20
+          enum: *a21
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11967,7 +12558,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a18
+          enum: *a19
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -12001,7 +12592,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a20
+          enum: *a21
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -12036,7 +12627,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a18
+          enum: *a19
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -12070,7 +12661,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a20
+          enum: *a21
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -12111,7 +12702,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a18
+          enum: *a19
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -12145,7 +12736,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a20
+          enum: *a21
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -12210,7 +12801,7 @@ components:
           description: The type of event, such as birth, death, or marriage.
         status:
           type: string
-          enum: *a17
+          enum: *a18
         legalStatuses:
           type: object
           properties:
@@ -12457,7 +13048,7 @@ components:
                     description: Date range with start and end dates in the format YYYY-MM-DD.
                       Inclusive start, exclusive end.
                   - type: string
-                    enum: *a13
+                    enum: *a14
                   - type: boolean
                   - type: number
                   - type: object
@@ -12538,7 +13129,7 @@ components:
                     required:
                       - loading
                   - type: string
-                    enum: *a21
+                    enum: *a22
                   - type: object
                     nullable: true
                     properties:
@@ -12646,7 +13237,7 @@ components:
                           description: Date range with start and end dates in the format YYYY-MM-DD.
                             Inclusive start, exclusive end.
                         - type: string
-                          enum: *a13
+                          enum: *a14
                         - type: boolean
                         - type: number
                         - type: object
@@ -12727,7 +13318,7 @@ components:
                           required:
                             - loading
                         - type: string
-                          enum: *a21
+                          enum: *a22
                         - type: object
                           nullable: true
                           properties:
@@ -12760,6 +13351,191 @@ components:
                               type: string
                 required:
                   - data
+              - type: object
+                additionalProperties:
+                  anyOf:
+                    - oneOf:
+                        - type: object
+                          properties:
+                            country:
+                              type: string
+                            streetLevelDetails:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            addressType:
+                              type: string
+                              enum:
+                                - DOMESTIC
+                            administrativeArea:
+                              type: string
+                              format: uuid
+                          required:
+                            - country
+                            - addressType
+                            - administrativeArea
+                        - type: object
+                          properties:
+                            country:
+                              type: string
+                            streetLevelDetails:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            addressType:
+                              type: string
+                              enum:
+                                - INTERNATIONAL
+                          required:
+                            - country
+                            - addressType
+                    - type: string
+                    - type: string
+                      format: date
+                      description: Date in the format YYYY-MM-DD
+                    - type: object
+                      properties:
+                        age:
+                          type: number
+                        asOfDateRef:
+                          type: string
+                      required:
+                        - age
+                        - asOfDateRef
+                    - type: string
+                      pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+                    - anyOf:
+                        - type: object
+                          properties:
+                            start:
+                              type: string
+                              format: date
+                              description: Date in the format YYYY-MM-DD
+                            end:
+                              type: string
+                              format: date
+                              description: Date in the format YYYY-MM-DD
+                          required:
+                            - start
+                            - end
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                      description: Date range with start and end dates in the format YYYY-MM-DD.
+                        Inclusive start, exclusive end.
+                    - type: string
+                      enum: *a14
+                    - type: boolean
+                    - type: number
+                    - type: object
+                      properties:
+                        path:
+                          type: string
+                          description: A full absolute path with bucket name, starting from the root of
+                            the S3 server, /bucket-name/document-id.jpg
+                        originalFilename:
+                          type: string
+                        type:
+                          type: string
+                      required:
+                        - path
+                        - originalFilename
+                        - type
+                    - type: array
+                      items:
+                        type: object
+                        properties:
+                          path:
+                            type: string
+                            description: A full absolute path with bucket name, starting from the root of
+                              the S3 server, /bucket-name/document-id.jpg
+                          originalFilename:
+                            type: string
+                          type:
+                            type: string
+                          option:
+                            type: string
+                        required:
+                          - path
+                          - originalFilename
+                          - type
+                          - option
+                    - type: object
+                      properties:
+                        firstname:
+                          type: string
+                        surname:
+                          type: string
+                        middlename:
+                          type: string
+                      required:
+                        - firstname
+                        - surname
+                    - anyOf:
+                        - anyOf:
+                            - type: object
+                              properties:
+                                firstname:
+                                  type: string
+                                  nullable: true
+                                surname:
+                                  type: string
+                                  nullable: true
+                                middlename:
+                                  type: string
+                                  nullable: true
+                            - type: "null"
+                    - type: number
+                    - type: object
+                      properties:
+                        loading:
+                          type: boolean
+                        error:
+                          type: object
+                          nullable: true
+                          properties:
+                            statusCode:
+                              type: number
+                            message:
+                              type: string
+                          required:
+                            - statusCode
+                            - message
+                        data: {}
+                      required:
+                        - loading
+                    - type: string
+                      enum: *a22
+                    - type: object
+                      nullable: true
+                      properties:
+                        data:
+                          type: object
+                          additionalProperties:
+                            type: string
+                      required:
+                        - data
+                    - type: object
+                      properties:
+                        data: {}
+                    - type: object
+                      properties:
+                        data: {}
+                    - type: object
+                      properties:
+                        numericValue:
+                          type: number
+                        unit:
+                          type: string
+                      required:
+                        - numericValue
+                        - unit
+                    - type: object
+                      properties:
+                        numericValue:
+                          type: number
+                        unit:
+                          type: string
           description: Aggregate representation of event data after all actions have been
             applied, with all updates consolidated and null values removed.
       required:
