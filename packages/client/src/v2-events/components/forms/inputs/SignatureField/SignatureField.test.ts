@@ -25,7 +25,7 @@ describe('SignatureField.toCertificateVariables', () => {
     window.config = originalConfig
   })
 
-  it('returns an object with url property when given a valid FileFieldValue', () => {
+  it('returns a URL string when given a valid FileFieldValue', () => {
     const fileValue = {
       path: '/ocrvs/signature-123.png',
       originalFilename: 'signature.png',
@@ -37,28 +37,31 @@ describe('SignatureField.toCertificateVariables', () => {
     expect(result).toBe('http://localhost:9000/ocrvs/signature-123.png')
   })
 
-  it('returns an empty object when value is undefined', () => {
+  it('returns an empty string when value is undefined', () => {
     const result = SignatureField.toCertificateVariables(undefined)
 
     expect(result).toBe('')
   })
 
-  it('returns an empty object when value is null', () => {
-    const result = SignatureField.toCertificateVariables(null as any)
+  it('returns an empty string when value is null', () => {
+    // @ts-expect-error testing runtime behaviour with null input
+    const result = SignatureField.toCertificateVariables(null)
 
     expect(result).toBe('')
   })
 
-  it('returns an empty object when value is an empty object', () => {
-    const result = SignatureField.toCertificateVariables({} as any)
+  it('returns an empty string when value is an empty object', () => {
+    // @ts-expect-error testing runtime behaviour with empty object input
+    const result = SignatureField.toCertificateVariables({})
 
     expect(result).toBe('')
   })
 
-  it('returns an empty object when value is missing required fields', () => {
+  it('returns an empty string when value is missing required fields', () => {
+    // @ts-expect-error testing runtime behaviour with missing required fields
     const result = SignatureField.toCertificateVariables({
       originalFilename: 'signature.png'
-    } as any)
+    })
 
     expect(result).toBe('')
   })
