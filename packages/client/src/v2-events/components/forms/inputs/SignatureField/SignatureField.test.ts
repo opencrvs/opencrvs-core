@@ -34,27 +34,25 @@ describe('SignatureField.toCertificateVariables', () => {
 
     const result = SignatureField.toCertificateVariables(fileValue)
 
-    expect(result).toEqual({
-      url: 'http://localhost:9000/ocrvs/signature-123.png'
-    })
+    expect(result).toBe('http://localhost:9000/ocrvs/signature-123.png')
   })
 
   it('returns an empty object when value is undefined', () => {
     const result = SignatureField.toCertificateVariables(undefined)
 
-    expect(result).toEqual({})
+    expect(result).toBe('')
   })
 
   it('returns an empty object when value is null', () => {
     const result = SignatureField.toCertificateVariables(null as any)
 
-    expect(result).toEqual({})
+    expect(result).toBe('')
   })
 
   it('returns an empty object when value is an empty object', () => {
     const result = SignatureField.toCertificateVariables({} as any)
 
-    expect(result).toEqual({})
+    expect(result).toBe('')
   })
 
   it('returns an empty object when value is missing required fields', () => {
@@ -62,7 +60,7 @@ describe('SignatureField.toCertificateVariables', () => {
       originalFilename: 'signature.png'
     } as any)
 
-    expect(result).toEqual({})
+    expect(result).toBe('')
   })
 
   it('correctly resolves Minio URL with different base URLs', () => {
@@ -76,9 +74,7 @@ describe('SignatureField.toCertificateVariables', () => {
 
     const result = SignatureField.toCertificateVariables(fileValue)
 
-    expect(result).toEqual({
-      url: 'https://minio.example.com/bucket/signature.png'
-    })
+    expect(result).toBe('https://minio.example.com/bucket/signature.png')
   })
 
   it('handles paths without leading slash', () => {
@@ -90,6 +86,6 @@ describe('SignatureField.toCertificateVariables', () => {
 
     const result = SignatureField.toCertificateVariables(fileValue)
 
-    expect(result.url).toBe('http://localhost:9000/ocrvs/signature.png')
+    expect(result).toBe('http://localhost:9000/ocrvs/signature.png')
   })
 })
