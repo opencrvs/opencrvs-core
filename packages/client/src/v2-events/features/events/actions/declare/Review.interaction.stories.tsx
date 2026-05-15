@@ -399,7 +399,7 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
             return [mockUser]
           }),
           tRPCMsw.user.get.query((id) => {
-            return mockUser
+            return mockUserFull
           })
         ]
       }
