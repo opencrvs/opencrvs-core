@@ -45,6 +45,7 @@ import { getUsersFullName } from '@client/v2-events/utils'
 import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { LocationSearch } from '@client/v2-events/features/events/registered-fields'
 import { AdminStructureItem } from '@client/utils/referenceApi'
+import { toFileUrl } from '@client/v2-events/cache'
 
 interface FontFamilyTypes {
   normal: string
@@ -397,7 +398,9 @@ export function compileSvg({
           }),
           createdBy: users.find((user) => user.id === action.data.createdBy),
           createdByUserType: action.data.createdByUserType,
-          createdBySignature: action.data.createdBySignature,
+          createdBySignature:
+            action.data.createdBySignature &&
+            toFileUrl(action.data.createdBySignature),
           createdAtLocation: LocationSearch.toCertificateVariables(
             action.data.createdAtLocation,
             {
