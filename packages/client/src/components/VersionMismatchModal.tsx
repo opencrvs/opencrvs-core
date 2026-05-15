@@ -18,9 +18,16 @@ import { storage } from '@client/storage'
 import { removeToken } from '@client/utils/authUtils'
 import { removeUserDetails } from '@client/utils/userUtils'
 import { messages as reloadModalMessages } from '@client/i18n/messages/views/reloadModal'
-import { ROUTES } from '@client/v2-events/routes/routes'
 
 const SCREEN_LOCK = 'screenLock'
+
+export function buildLoginUrl(lang: string | null) {
+  const loginUrl = window.config.LOGIN_URL ?? '/login'
+  const url = new URL(loginUrl, window.location.origin)
+  url.searchParams.set('lang', lang ?? 'en')
+  url.searchParams.set('redirectTo', window.location.pathname)
+  return url.toString()
+}
 
 export function VersionMismatchModal({ show }: { show: boolean }) {
   const intl = useIntl()
@@ -39,10 +46,8 @@ export function VersionMismatchModal({ show }: { show: boolean }) {
     await storage.removeItem(SCREEN_LOCK)
     await removeToken()
     await removeUserDetails()
-    const loginUrl = window.config.LOGIN_URL ?? '/login'
-    window.location.assign(
-      `${loginUrl}?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}${ROUTES.V2.buildPath({})}`
-    )
+    const lang = await storage.getItem('language')
+    window.location.assign(buildLoginUrl(lang))
   }
 
   return (
