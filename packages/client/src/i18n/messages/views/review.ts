@@ -74,13 +74,13 @@ const messagesToDefine = {
   signatureDescription: {
     defaultMessage:
       'I, the undersigned, hereby declare that the particulars in this form are true and correct to the best of my knowledge.',
-    description: 'Label awknowledging the correctness of the declaration',
+    description: 'Label acknowledging the correctness of the declaration',
     id: 'review.signature.description'
   },
   signatureInputDescription: {
     defaultMessage:
       'By signing this document with an electronic signature, I agree that such signature will be valid as handwritten signatures to the extent allowed by the laws of Farajaland.',
-    description: 'Description awknowledging the correctness of the declaration',
+    description: 'Description acknowledging the correctness of the declaration',
     id: 'review.signature.input.description'
   },
   signatureOpenSignatureInput: {
