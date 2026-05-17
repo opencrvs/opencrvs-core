@@ -48,13 +48,17 @@ if (
 }
 const { store } = createStore()
 
-// Proactive: if a new SW takes control mid-session (autoUpdate skipWaiting), reload
-// so the page runs against the new bundle. Guarded by hadController to skip the
-// very first SW install on a clean browser (no existing controller → not an update).
+// When a new SW takes control (autoUpdate skipWaiting), reload once so the page
+// runs against the fresh bundle. hadController skips the very first SW install
+// on a clean browser (no existing controller → not an update, no reload needed).
+// sw_reloaded prevents a loop: without it, if controllerchange keeps firing
+// (e.g. SW cycling during an upgrade), every fire would trigger another reload.
+const SW_RELOADED = 'sw_reloaded'
 if ('serviceWorker' in navigator) {
   const hadController = !!navigator.serviceWorker.controller
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (hadController) {
+    if (hadController && !sessionStorage.getItem(SW_RELOADED)) {
+      sessionStorage.setItem(SW_RELOADED, 'true')
       window.location.reload()
     }
   })
