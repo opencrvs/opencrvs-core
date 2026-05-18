@@ -53,7 +53,8 @@ const draft = generateEventDraftDocument({
   actionType: ActionType.REGISTER
 })
 
-const mockUser = generator.user.fieldAgent().v2
+const mockUser = generator.user.fieldAgent().summary
+const mockUserFull = generator.user.fieldAgent().v2
 
 export const ReviewForLocalRegistrarComplete: Story = {
   parameters: {
@@ -83,7 +84,7 @@ export const ReviewForLocalRegistrarComplete: Story = {
             return [mockUser]
           }),
           tRPCMsw.user.get.query(() => {
-            return mockUser
+            return mockUserFull
           })
         ]
       }
