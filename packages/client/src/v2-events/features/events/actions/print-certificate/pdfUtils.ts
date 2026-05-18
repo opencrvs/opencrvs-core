@@ -371,12 +371,10 @@ export function compileSvg({
         const actionConfig = config.actions.find(
           (a) => a.type === action.data.type
         )
-        if (!actionConfig) {
-          throw new Error(
-            'Action config not found for action type ' + action.data.type
-          )
-        }
-        const annotationFields = getActionAnnotationFields(actionConfig)
+
+        const annotationFields = actionConfig
+          ? getActionAnnotationFields(actionConfig)
+          : []
 
         const annotation =
           action.data.annotation != null
