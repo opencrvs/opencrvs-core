@@ -129,7 +129,7 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
         ],
         user: [
           tRPCMsw.user.list.query(() => {
-            return [generator.user.localRegistrar().v2]
+            return [generator.user.localRegistrar().summary]
           }),
           tRPCMsw.user.get.query((id) => generator.user.localRegistrar().v2)
         ]
@@ -182,7 +182,7 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
         ],
         user: [
           tRPCMsw.user.list.query(() => {
-            return [generator.user.localRegistrar().v2]
+            return [generator.user.localRegistrar().summary]
           }),
           tRPCMsw.user.get.query((id) => generator.user.localRegistrar().v2)
         ]

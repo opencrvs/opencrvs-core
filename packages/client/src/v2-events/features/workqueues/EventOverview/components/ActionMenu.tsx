@@ -132,7 +132,7 @@ export function ActionMenu({
 }) {
   const intl = useIntl()
   const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
-  const { getUser } = useUsers()
+  const { getUsers } = useUsers()
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
 
@@ -158,7 +158,7 @@ export function ActionMenu({
     throw new Error(`Event ${eventId} not found`)
   }
 
-  const assignedToUser = getUser.useQuery(eventIndex.assignedTo || '', {
+  const assignedToUser = getUsers.useQueryById(eventIndex.assignedTo || '', {
     enabled: !!eventIndex.assignedTo
   }).data
 
