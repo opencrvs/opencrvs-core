@@ -23,7 +23,6 @@ import {
   isNonInteractiveFieldType,
   InteractiveFieldType,
   FieldReference,
-  CodeToEvaluate,
   isCodeToEvaluate,
   compileClientFunction,
   todayISO,
@@ -221,6 +220,8 @@ export function FormSectionComponent({
       makeFormFieldIdFormikCompatible
     )
 
+    const now = todayISO()
+    const online = isOnline()
     const firstNonFalsyValue = resolveSyncedFieldValue(
       listenerField,
       (syncRef) => {
@@ -228,8 +229,8 @@ export function FormSectionComponent({
           const fieldValue = get(fieldValues, syncRef.$$field)
           return compileClientFunction(syncRef.$$code)(fieldValue, {
             $form: fieldValues,
-            $now: todayISO(),
-            $online: isOnline()
+            $now: now,
+            $online: online
           })
         }
         return get(

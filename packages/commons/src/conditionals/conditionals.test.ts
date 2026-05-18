@@ -29,8 +29,7 @@ import { event } from '../events/event'
 import { TokenUserType } from '../authentication'
 import { UUID } from '../uuid'
 
-/*  eslint-disable max-lines */
-
+/* eslint-disable max-lines */
 const DEFAULT_FORM = {
   'applicant.name': 'John Doe',
   'applicant.dob': '1990-01-02',
@@ -2073,7 +2072,7 @@ describe('customClientValidator', () => {
 })
 
 describe('customClientEvaluation', () => {
-  it('serialises the function into a CodeToEvaluate descriptor', () => {
+  it('serialises the function into a FieldReference descriptor with $$code', () => {
     const computation = (value: unknown) => Number(value) * 2
     const descriptor = field('amount').customClientEvaluation(computation)
 

@@ -17,7 +17,7 @@ import {
   getMixedPath,
   HttpField,
   HttpFieldValue,
-  isResolvableValueReference,
+  isFieldReference,
   isTemplateVariable,
   SystemVariables
 } from '@opencrvs/commons/client'
@@ -71,7 +71,7 @@ async function fetchHttpFieldValue(
     for (const [k, v] of Object.entries(cfg.body)) {
       if (isTemplateVariable(v) && v) {
         cfg.body[k] = getMixedPath(systemVariables, v)
-      } else if (isResolvableValueReference(v)) {
+      } else if (isFieldReference(v)) {
         cfg.body[k] = parseFieldReferenceToValue(v, form)
       } else {
         cfg.body[k] = v

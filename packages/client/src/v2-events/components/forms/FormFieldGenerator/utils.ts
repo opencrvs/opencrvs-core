@@ -10,15 +10,14 @@
  */
 import { compact, get } from 'lodash'
 import {
-  CodeToEvaluate,
   compileClientFunction,
-  FieldReference,
   FieldValue,
+  FieldReference,
   HttpField,
   IndexMap,
   isCodeToEvaluate,
+  isFieldReference,
   isOnline,
-  isResolvableValueReference,
   todayISO
 } from '@opencrvs/commons/client'
 import {
@@ -67,20 +66,14 @@ export function resolveSyncedFieldValue(
   return compact(refs.map(getValue))[0]
 }
 
-function getValueAtReferencePath(
-  ref: { $$field: string; $$subfield: string[] },
-  fieldValues: Record<string, FieldValue>
-): FieldValue {
-  return ref.$$subfield.length > 0
-    ? get(fieldValues[ref.$$field], ref.$$subfield)
-    : fieldValues[ref.$$field]
-}
-
 export function parseFieldReferenceToValue(
-  fieldReference: FieldReference | CodeToEvaluate,
+  fieldReference: FieldReference,
   fieldValues: Record<string, FieldValue>
 ): FieldValue {
-  const fieldValue = getValueAtReferencePath(fieldReference, fieldValues)
+  const fieldValue =
+    fieldReference.$$subfield.length > 0
+      ? get(fieldValues[fieldReference.$$field], fieldReference.$$subfield)
+      : fieldValues[fieldReference.$$field]
   if (isCodeToEvaluate(fieldReference)) {
     return compileClientFunction(fieldReference.$$code)(fieldValue, {
       $form: fieldValues,
@@ -101,7 +94,7 @@ export function parseFieldReferencesInConfiguration(
       ? (Object.fromEntries(
           Object.entries(configuration.params).map(([key, value]) => [
             key,
-            isResolvableValueReference(value)
+            isFieldReference(value)
               ? parseFieldReferenceToValue(value, form)
               : value
           ])

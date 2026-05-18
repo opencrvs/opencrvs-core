@@ -185,51 +185,48 @@ export function mapFieldToDefaultValue(
       return mapFieldToDefaultValue(subfield, context)
     })
   }
-  if (isCodeToEvaluate(field.evaluatedDefaultValue)) {
-    return compileClientFunction(field.evaluatedDefaultValue.$$code)(
-      undefined,
-      {
-        $form: {},
-        $now: todayISO(),
-        $online: isOnline(),
-        ...context
-      }
-    ) as FieldValue
+  // Extract to a local variable so TypeScript can narrow the type via isCodeToEvaluate.
+  // Narrowing does not propagate through repeated property accesses on union-typed objects.
+  const dv = field.defaultValue
+  if (isCodeToEvaluate(dv)) {
+    return compileClientFunction(dv.$$code)(undefined, {
+      $form: {},
+      $now: todayISO(),
+      $online: isOnline(),
+      ...context
+    }) as FieldValue
   }
 
-  if (field.defaultValue === undefined) {
+  if (dv === undefined) {
     return
   }
+
+  // dv is now a static default value — ComputedDefaultValue was handled above.
+  // TypeScript can't re-derive that from the local-variable guard, so we cast.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const staticDv = dv as any
+
   switch (field.type) {
     case FieldType.NAME: {
       return {
-        firstname: resolveSerializedUserField(
-          field.defaultValue.firstname,
-          context
-        ),
-        middlename: resolveSerializedUserField(
-          field.defaultValue.middlename,
-          context
-        ),
-        surname: resolveSerializedUserField(field.defaultValue.surname, context)
+        firstname: resolveSerializedUserField(staticDv.firstname, context),
+        middlename: resolveSerializedUserField(staticDv.middlename, context),
+        surname: resolveSerializedUserField(staticDv.surname, context)
       }
     }
     case FieldType.ADDRESS: {
       const resolvedAdministrativeArea =
-        field.defaultValue.administrativeArea &&
-        resolveSerializedUserField(
-          field.defaultValue.administrativeArea,
-          context
-        )
+        staticDv.administrativeArea &&
+        resolveSerializedUserField(staticDv.administrativeArea, context)
       return {
-        ...field.defaultValue,
+        ...staticDv,
         // valid administrativeArea or undefined (don't allow empty string)
         administrativeArea: resolvedAdministrativeArea || undefined
       }
     }
     case FieldType.DATE: {
-      if (typeof field.defaultValue === 'string') {
-        return field.defaultValue
+      if (typeof staticDv === 'string') {
+        return staticDv
       }
       const now = new Date()
       const year = now.getFullYear()
@@ -239,8 +236,8 @@ export function mapFieldToDefaultValue(
       return `${year}-${month}-${day}`
     }
     case FieldType.TIME: {
-      if (typeof field.defaultValue === 'string') {
-        return field.defaultValue
+      if (typeof staticDv === 'string') {
+        return staticDv
       }
       const now = new Date()
       const hours = String(now.getHours()).padStart(2, '0')
@@ -250,7 +247,7 @@ export function mapFieldToDefaultValue(
     }
     case FieldType.AGE: {
       return {
-        age: field.defaultValue,
+        age: staticDv,
         asOfDateRef: field.configuration.asOfDate.$$field
       }
     }
@@ -258,7 +255,7 @@ export function mapFieldToDefaultValue(
     case FieldType.CHECKBOX:
     case FieldType.NUMBER:
     case FieldType.BUTTON: {
-      return field.defaultValue
+      return staticDv
     }
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
@@ -283,15 +280,13 @@ export function mapFieldToDefaultValue(
     case FieldType.SIGNATURE:
     case FieldType.FILE:
     case FieldType.FILE_WITH_OPTIONS:
-      const defaultValue = field.defaultValue
-
-      if (isSerializedUserField(defaultValue)) {
-        return resolveSerializedUserField(defaultValue, context)
+      if (isSerializedUserField(staticDv)) {
+        return resolveSerializedUserField(staticDv, context)
       }
 
       return replacePlaceholders({
         field,
-        defaultValue,
+        defaultValue: staticDv,
         systemVariables: context
       })
   }

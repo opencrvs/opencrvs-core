@@ -17,14 +17,9 @@ import { userSerializer } from '../events/serializers/user/serializer'
 import { omitKeyDeep } from '../utils'
 import { UUID } from '../uuid'
 import { todayDateTimeValueSerializer } from '../events/serializers/date/serializer'
-import {
-  CodeToEvaluate,
-  FieldReference,
-  isCodeToEvaluate
-} from '../events/FieldConfig'
+import { CodeToEvaluate, FieldReference } from '../events/FieldConfig'
 
 /* eslint-disable max-lines */
-
 /** @knipignore */
 export type JSONSchema = {
   $id: string
@@ -250,18 +245,10 @@ export function isFieldReference(value: unknown): value is FieldReference {
   return typeof value === 'object' && value !== null && '$$field' in value
 }
 
-export function isEventFieldReference(value: unknown): value is FieldReference {
-  return typeof value === 'object' && value !== null && '$$event' in value
-}
-
-/**
- * Centralised guard so a future third reference type only needs to be added here
- * and in {@link parseFieldReferenceToValue}, not at every call site.
- */
-export function isResolvableValueReference(
+export function isEventFieldReference(
   value: unknown
-): value is FieldReference | CodeToEvaluate {
-  return isFieldReference(value) || isCodeToEvaluate(value)
+): value is { $$event: string } {
+  return typeof value === 'object' && value !== null && '$$event' in value
 }
 
 /**
@@ -842,10 +829,15 @@ export function createFieldConditionals(fieldId: string) {
     },
 
     /**
-     * Custom client-side evaluation. Returns a {@link CodeToEvaluate} descriptor
-     * that can be used as `value`, `evaluatedDefaultValue`, or a DATA component entry.
+     * Custom client-side evaluation. Returns a {@link FieldReference} descriptor
+     * that can be used as the `value` property or a DATA component entry.
+     * The function receives the referenced field's value as the first argument and
+     * the full form context as the second; its return value replaces the field reference.
      * The function is serialised and executed just-in-time on the client only.
      * External references (e.g. lodash) are not available inside the function body.
+     *
+     * For computing a default value without referencing a specific field, use
+     * `evaluate(fn)` in the `defaultValue` property instead.
      *
      * @example
      * field('a').customClientEvaluation((aValue, ctx) =>

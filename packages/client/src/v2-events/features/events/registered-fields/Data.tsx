@@ -24,7 +24,7 @@ import {
   EventConfig,
   getDeclarationFields,
   DataEntry,
-  isResolvableValueReference
+  isFieldReference
 } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
@@ -44,7 +44,7 @@ function getFieldFromDataEntry({
 
   let formattedValue: string
 
-  if (isResolvableValueReference(rawValue)) {
+  if (isFieldReference(rawValue)) {
     formattedValue = String(
       parseFieldReferenceToValue(rawValue, formData) ?? ''
     )
@@ -161,7 +161,7 @@ function DataInput({
 
       const value = entry.value
 
-      if (isResolvableValueReference(value)) {
+      if (isFieldReference(value)) {
         const resolvedValue = parseFieldReferenceToValue(value, formData)
 
         return getFieldFromDataEntry({

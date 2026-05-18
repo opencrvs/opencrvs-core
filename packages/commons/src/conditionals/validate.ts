@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -311,7 +310,7 @@ export function isConditionMet(
 ) {
   return validate(conditional, {
     $form: mergeWithBaseFormState(values, context),
-    $now: formatISO(new Date(), { representation: 'date' }),
+    $now: todayISO(),
     $online: isOnline(),
     $user: context.user,
     $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? [],
@@ -365,7 +364,7 @@ function isFieldConditionMet(
 
   const validConditionals = getConditionalActionsForField(field, {
     $form: mergeWithBaseFormState(form, context),
-    $now: formatISO(new Date(), { representation: 'date' }),
+    $now: todayISO(),
     $online: isOnline(),
     $user: context.user,
     $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? [],
@@ -475,7 +474,6 @@ function zodToIntlErrorMap(
     field.required && typeof field.required === 'object'
       ? field.required.message
       : errorMessages.requiredField
-  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
   switch (issue.code) {
     case 'invalid_string': {
       if (_ctx.data === '') {
@@ -632,7 +630,7 @@ export function runFieldValidations({
   }
   const conditionalParameters = {
     $form: mergeWithBaseFormState(form, context),
-    $now: formatISO(new Date(), { representation: 'date' }),
+    $now: todayISO(),
     /**
      * In real use cases, there can be hundreds of thousands of locations.
      * Make sure that the context contains only the locations that are needed for validation.
@@ -692,7 +690,6 @@ export function getValidatorsForField(
 ): NonNullable<FieldConfig['validation']> {
   return validations
     .map(({ validator, message }) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const jsonSchema = validator as any
 
       /*
