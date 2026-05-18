@@ -382,7 +382,7 @@ export function getActionAnnotation({
 
   const actionWithCompleteAnnotation = action && {
     ...action,
-    annotation: getCompleteActionAnnotation({}, event, action)
+    annotation: getCompleteActionAnnotation(event, action)
   }
 
   const matchingDraft = draft?.action.type === actionType ? draft : undefined
