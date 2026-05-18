@@ -105,6 +105,21 @@ const MobileActionBar = styled.div`
     gap: 8px;
     align-items: center;
     padding: 8px 0;
+
+    & > div:first-child {
+      flex: 1;
+      min-width: 0;
+    }
+
+    & > div:first-child > button {
+      width: 100%;
+    }
+
+    & > div:first-child > button span {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
   }
 `
 
