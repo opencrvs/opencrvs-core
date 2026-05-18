@@ -56,13 +56,15 @@ import { StyledErrorBoundary } from './components/StyledErrorBoundary'
 import { I18nContainer } from './i18n/components/I18nContainer'
 import { useApolloClient } from './utils/apolloClient'
 import { ApolloProvider } from './utils/ApolloProvider'
-
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { AppStore } from './store'
-import { routesConfig as v2RoutesConfig } from './v2-events/routes/config'
+import {
+  routesConfig as v2RoutesConfig,
+  useNetworkProbe
+} from './v2-events/routes/config'
+import { VersionMismatchModal } from './components/VersionMismatchModal'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
-import { ReloadModal } from './views/Modals/ReloadModal'
 import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
 import { PrintRecord } from './views/PrintRecord/PrintRecord'
 import { RecordAudit } from './views/RecordAudit/RecordAudit'
@@ -111,7 +113,6 @@ export const routesConfig = turnOffV2Events
         path: '/',
         element: (
           <ScrollToTop>
-            <ReloadModal />
             <SessionExpireConfirmation />
             <NotificationComponent>
               <Page>
@@ -353,7 +354,6 @@ export const routesConfig = turnOffV2Events
         path: '/',
         element: (
           <ScrollToTop>
-            <ReloadModal />
             <SessionExpireConfirmation />
             <NotificationComponent>
               <Page>
@@ -454,16 +454,19 @@ interface IAppProps {
   store: AppStore
   router: ReturnType<typeof createBrowserRouter>
 }
+
 export function App({ client, store, router }: IAppProps) {
+  const { versionMismatch } = useNetworkProbe()
   const { client: apolloClient } = useApolloClient(store)
 
   return (
     <ErrorBoundary>
       <GlobalStyle />
-      <ApolloProvider client={client ?? apolloClient}>
-        <Provider store={store}>
-          <I18nContainer>
-            <ThemeProvider theme={getTheme()}>
+      <Provider store={store}>
+        <I18nContainer>
+          <ThemeProvider theme={getTheme()}>
+            <VersionMismatchModal show={versionMismatch} />
+            <ApolloProvider client={client ?? apolloClient}>
               <StyledErrorBoundary>
                 <RouterProvider
                   router={router}
@@ -471,10 +474,10 @@ export function App({ client, store, router }: IAppProps) {
                   future={{ v7_startTransition: false }}
                 />
               </StyledErrorBoundary>
-            </ThemeProvider>
-          </I18nContainer>
-        </Provider>
-      </ApolloProvider>
+            </ApolloProvider>
+          </ThemeProvider>
+        </I18nContainer>
+      </Provider>
     </ErrorBoundary>
   )
 }

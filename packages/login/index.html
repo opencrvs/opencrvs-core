@@ -8,7 +8,7 @@ OpenCRVS is also distributed under the terms of the Civil Registration
 Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 -->
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" translate="no">
   <head>
     <meta charset="utf-8" />
@@ -99,6 +99,8 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
         </g>
       </svg>
     </div>
+    <!-- Runs independently of the main bundle to handle SW controllerchange on upgrade -->
+    <script src="/sw-recovery.js"></script>
     <script type="module" src="/src/index.tsx"></script>
   </body>
 </html>
