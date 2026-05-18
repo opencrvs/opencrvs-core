@@ -67,6 +67,14 @@ export const handlers = {
       })
     })
   ],
+  nidApi: [
+    http.post('/api/events/events/search', async () => {
+      return HttpResponse.json({
+        results: [],
+        total: 0
+      })
+    })
+  ],
   drafts: [
     tRPCMsw.event.draft.list.query(() => {
       return []
