@@ -89,21 +89,6 @@ export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
   }, null)
 }
 
-export function getAssignedUserSignatureFromActions(
-  actions: Array<ActionDocument>
-) {
-  return actions.reduce<null | string>((signature, action) => {
-    if (action.type === ActionType.ASSIGN) {
-      return action.createdBySignature || null
-    }
-    if (action.type === ActionType.UNASSIGN) {
-      return null
-    }
-
-    return signature
-  }, null)
-}
-
 type NonNullableDeep<T> = T extends [unknown, ...unknown[]] // <-- ✨ tiny change: handle tuples first
   ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
   : T extends UUID
@@ -292,10 +277,8 @@ export function getCurrentEventState(
     createdBy: creationAction.createdBy,
     createdByUserType: creationAction.createdByUserType,
     createdAtLocation: creationAction.createdAtLocation,
-    createdBySignature: creationAction.createdBySignature,
     updatedAt: acceptedActionMetadata.createdAt,
     assignedTo: getAssignedUserFromActions(acceptedActions),
-    assignedToSignature: getAssignedUserSignatureFromActions(acceptedActions),
     updatedBy: requestActionMetadata.createdBy,
     updatedAtLocation: requestActionMetadata.createdAtLocation,
     declaration,

@@ -284,7 +284,6 @@ describe('getCurrentEventState()', () => {
       createdAt: createAction.createdAt,
       createdBy: createAction.createdBy,
       createdAtLocation: createAction.createdAtLocation,
-      createdBySignature: createAction.createdBySignature,
       updatedAt: registerAcceptAction.createdAt,
       updatedBy: registerRequestAction.createdBy,
       createdByUserType: registerRequestAction.createdByUserType,
@@ -307,7 +306,6 @@ describe('getCurrentEventState()', () => {
           createdBy: declareRequestAction.createdBy,
           createdByUserType: declareRequestAction.createdByUserType,
           createdAtLocation: declareRequestAction.createdAtLocation,
-          createdBySignature: declareRequestAction.createdBySignature,
           createdByRole: declareRequestAction.createdByRole,
           acceptedAt: declareAcceptAction.createdAt
         },
@@ -316,7 +314,6 @@ describe('getCurrentEventState()', () => {
           createdBy: registerRequestAction.createdBy,
           createdByUserType: registerRequestAction.createdByUserType,
           createdAtLocation: registerRequestAction.createdAtLocation,
-          createdBySignature: registerRequestAction.createdBySignature,
           acceptedAt: registerAcceptAction.createdAt,
           createdByRole: registerRequestAction.createdByRole,
           // @ts-expect-error -- We do not have sufficient types for this in generator
@@ -389,7 +386,6 @@ describe('getCurrentEventState()', () => {
       createdBy: createAction.createdBy,
       createdByUserType: createAction.createdByUserType,
       createdAtLocation: createAction.createdAtLocation,
-      createdBySignature: createAction.createdBySignature,
       updatedAt: registerAcceptAction.createdAt,
       updatedBy: registerAcceptAction.createdBy,
       id: event.id,
@@ -409,7 +405,6 @@ describe('getCurrentEventState()', () => {
           createdBy: declareAcceptAction.createdBy,
           createdByUserType: declareAcceptAction.createdByUserType,
           createdAtLocation: declareAcceptAction.createdAtLocation,
-          createdBySignature: declareAcceptAction.createdBySignature,
           acceptedAt: declareAcceptAction.createdAt,
           createdByRole: declareAcceptAction.createdByRole
         },
@@ -418,7 +413,6 @@ describe('getCurrentEventState()', () => {
           createdBy: registerAcceptAction.createdBy,
           createdByUserType: registerAcceptAction.createdByUserType,
           createdAtLocation: registerAcceptAction.createdAtLocation,
-          createdBySignature: registerAcceptAction.createdBySignature,
           acceptedAt: registerAcceptAction.createdAt,
           createdByRole: registerAcceptAction.createdByRole,
           // @ts-expect-error -- We do not have sufficient types for this in generator

@@ -52,12 +52,15 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
       })
     : getCurrentEventState(event, eventConfiguration)
 
-  const { getUser } = useUsers()
+  const { getUsers } = useUsers()
   const intl = useIntl()
 
-  const assignedToUser = getUser.useQuery(eventWithDrafts.assignedTo || '', {
-    enabled: !!eventWithDrafts.assignedTo
-  })
+  const assignedToUser = getUsers.useQueryById(
+    eventWithDrafts.assignedTo || '',
+    {
+      enabled: !!eventWithDrafts.assignedTo
+    }
+  )
 
   const assignedTo = assignedToUser.data
     ? getUsersFullName(assignedToUser.data.name)
@@ -106,12 +109,15 @@ function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
       )
     : eventIndex
 
-  const { getUser } = useUsers()
+  const { getUsers } = useUsers()
   const intl = useIntl()
 
-  const assignedToUser = getUser.useQuery(eventWithDrafts.assignedTo || '', {
-    enabled: !!eventWithDrafts.assignedTo
-  })
+  const assignedToUser = getUsers.useQueryById(
+    eventWithDrafts.assignedTo || '',
+    {
+      enabled: !!eventWithDrafts.assignedTo
+    }
+  )
   const assignedTo = assignedToUser.data
     ? getUsersFullName(assignedToUser.data.name)
     : null
