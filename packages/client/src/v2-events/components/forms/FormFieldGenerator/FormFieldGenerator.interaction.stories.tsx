@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -526,6 +527,100 @@ export const AlternateVariantDefaultIsUsed: Story = {
     // fieldB (default='goodbye') is visible; fieldA (default='hello') is hidden.
     await expect(await canvas.findByTestId('text__form____value')).toHaveValue(
       'goodbye'
+    )
+  }
+}
+
+const hiddenListenerFields = [
+  {
+    id: 'form.type',
+    type: FieldType.SELECT,
+    required: true,
+    label: generateTranslationConfig('place type'),
+    options: [
+      {
+        label: generateTranslationConfig('Private home'),
+        value: 'PRIVATE_HOME'
+      },
+      {
+        label: generateTranslationConfig('Health facility'),
+        value: 'HEALTH_FACILITY'
+      }
+    ]
+  },
+  {
+    id: 'form.address',
+    type: FieldType.TEXT,
+    label: generateTranslationConfig('address'),
+    defaultValue: 'district-123',
+    parent: field('form.type'),
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: field('form.type').isEqualTo('PRIVATE_HOME')
+      }
+    ]
+  },
+  {
+    id: 'form.derivedId',
+    type: FieldType.TEXT,
+    label: generateTranslationConfig('derived id'),
+    parent: field('form.type'),
+    value: field('form.address')
+  }
+] satisfies FieldConfig[]
+
+/**
+ * Regression test for the bug where changing a parent field to a value that hides a listener
+ * field would cause the listener field's defaultValue to be applied to the hidden field,
+ * which would then propagate to aggregator fields via their `value` reference.
+ *
+ * Fix: hidden listener fields are cleared to `null` instead of having `defaultValue` applied.
+ */
+export const HiddenListenerDefaultNotPropagated: Story = {
+  name: 'Parent change clears hidden listener field instead of applying its default value',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={hiddenListenerFields}
+        formValues={{ 'form.type': 'PRIVATE_HOME' }}
+        id="my-form"
+      />
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Renders with address field visible and its default value applied',
+      async () => {
+        await expect(
+          await canvas.findByTestId('text__form____address')
+        ).toHaveValue('district-123')
+      }
+    )
+
+    await step(
+      'Changes type to Health facility, hiding the address field',
+      async () => {
+        await userEvent.click(await canvas.findByText('Private home'))
+        await userEvent.click(await canvas.findByText('Health facility'))
+      }
+    )
+
+    await step(
+      'Address field is hidden and derived id is cleared — not the hidden default',
+      async () => {
+        await expect(canvas.queryByText('address')).not.toBeInTheDocument()
+        await expect(canvas.getByTestId('text__form____derivedId')).toHaveValue(
+          ''
+        )
+      }
     )
   }
 }

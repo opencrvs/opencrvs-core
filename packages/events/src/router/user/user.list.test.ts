@@ -9,14 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { http, HttpResponse, HttpResponseInit } from 'msw'
-import { SystemRole, TokenUserType } from '@opencrvs/commons'
+import { TokenUserType } from '@opencrvs/commons'
 import {
   createTestClient,
   sanitizeForSnapshot,
   setupTestCase
 } from '@events/tests/utils'
-import { mswServer } from '../../tests/msw'
+import { createSystemClient } from '@events/storage/postgres/events/system-clients'
 
 test('Returns empty list when no ids provided', async () => {
   const { user } = await setupTestCase()
@@ -30,11 +29,6 @@ test('Returns empty list when no ids provided', async () => {
 test('Returns empty list when no ids match', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user)
-  mswServer.use(
-    http.post(`http://localhost:3030/getUser`, () => {
-      return HttpResponse.json({}, { status: 404 } as HttpResponseInit)
-    })
-  )
 
   const fetchedEvents = await client.user.list(['123-123-123'])
 
@@ -45,22 +39,16 @@ test('Returns user in correct format', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user)
 
-  mswServer.use(
-    http.post(`http://localhost:3030/getUser`, () => {
-      return HttpResponse.json(user)
-    })
-  )
   const fetchedUser = await client.user.list([user.id])
 
   expect(fetchedUser).toEqual([
-    {
+    expect.objectContaining({
       id: user.id,
       name: user.name,
       role: user.role,
-      signature: user.signature,
       primaryOfficeId: user.primaryOfficeId,
       type: TokenUserType.enum.user
-    }
+    })
   ])
 })
 
@@ -73,94 +61,46 @@ test('Returns both normal users and system users', async () => {
   )
 
   const userIds = []
-  const users: Array<ReturnType<typeof seed.user>> = []
+  const users: Array<Awaited<ReturnType<typeof seed.user>>> = []
 
   for (const userToCreate of usersToCreate) {
-    const createdUser = seed.user(userToCreate)
+    const createdUser = await seed.user(userToCreate)
     const userId = createdUser.id
     userIds.push(userId)
     users.push(createdUser)
   }
 
-  mswServer.use(
-    http.post(`http://localhost:3030/getUser`, async ({ request }) => {
-      const body = (await request.clone().json()) as { userId: string }
-      const userId = body.userId
-      const foundUser = users.find((u) => u.id === userId)
-
-      if (foundUser) {
-        return HttpResponse.json(foundUser)
-      }
-
-      return HttpResponse.json(
-        null,
-        // @ts-expect-error - MSW does not have a type for this?
-        { status: 401 }
-      )
-    })
-  )
-
   const systemUserId = '67bda93bfc07dee78ae55114'
 
-  mswServer.use(
-    http.post(`http://localhost:3030/getSystem`, async ({ request }) => {
-      const body = (await request.clone().json()) as { systemId: string }
-
-      if (body.systemId === systemUserId) {
-        return HttpResponse.json({
-          name: 'My health system integration',
-          createdBy: '',
-          username: '',
-          client_id: 'string',
-          status: '',
-          scope: [''],
-          sha_secret: '',
-          type: SystemRole.enum.HEALTH
-        })
-      }
-
-      return HttpResponse.json(
-        null,
-        // @ts-expect-error - MSW does not have a type for this?
-        { status: 401 }
-      )
-    })
-  )
+  await createSystemClient({
+    name: 'My health system integration',
+    legacyId: systemUserId,
+    createdBy: user.id,
+    salt: 'RANDOM_STRING',
+    secretHash: 'RANDOM_STRING',
+    shaSecret: 'RANDOM_STRING'
+  })
 
   const fetchedUsers = await client.user.list([...userIds, systemUserId])
 
-  expect(sanitizeForSnapshot(fetchedUsers, ['id'])).toMatchSnapshot()
+  expect(sanitizeForSnapshot(fetchedUsers, ['id', 'email'])).toMatchSnapshot()
 })
 
 test('Does not return users or systems which are not found', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user)
 
-  mswServer.use(
-    http.post(`http://localhost:3030/getUser`, async ({ request }) => {
-      const body = (await request.clone().json()) as { userId: string }
-      if (body.userId === user.id) {
-        return HttpResponse.json(user)
-      }
-
-      return HttpResponse.json(
-        null,
-        // @ts-expect-error - MSW does not have a type for this?
-        { status: 401 }
-      )
-    })
-  )
   const fetchedUser = await client.user.list([user.id, '123-123-123', 'foobar'])
 
   expect(fetchedUser).toEqual([
-    {
+    expect.objectContaining({
       id: user.id,
       name: user.name,
       role: user.role,
-      signature: user.signature,
       primaryOfficeId: user.primaryOfficeId,
-      type: TokenUserType.enum.user
-    }
+      type: TokenUserType.enum.user,
+      fullHonorificName: user.fullHonorificName
+    })
   ])
 })
 
@@ -173,21 +113,10 @@ test('Returns multiple users', async () => {
   )
 
   const userIds = []
-  const users: Array<ReturnType<typeof seed.user>> = []
   for (const userToCreate of usersToCreate) {
-    const createdUser = seed.user(userToCreate)
-    const userId = createdUser.id
-    userIds.push(userId)
-    users.push(createdUser)
+    const createdUser = await seed.user(userToCreate)
+    userIds.push(createdUser.id)
   }
-
-  mswServer.use(
-    http.post(`http://localhost:3030/getUser`, async ({ request }) => {
-      const body = (await request.clone().json()) as { userId: string }
-      const userId = body.userId
-      return HttpResponse.json(users.find((u) => u.id === userId))
-    })
-  )
 
   const fetchedUsers = await client.user.list(userIds)
 
@@ -207,24 +136,13 @@ test('Returns multiple users with honorifics', async () => {
   )
 
   const userIds = []
-  const users: Array<ReturnType<typeof seed.user>> = []
   for (const userToCreate of usersToCreate) {
-    const createdUser = seed.user(userToCreate)
-    const userId = createdUser.id
-    userIds.push(userId)
-    users.push(createdUser)
+    const createdUser = await seed.user(userToCreate)
+    userIds.push(createdUser.id)
   }
-
-  mswServer.use(
-    http.post(`http://localhost:3030/getUser`, async ({ request }) => {
-      const body = (await request.clone().json()) as { userId: string }
-      const userId = body.userId
-      return HttpResponse.json(users.find((u) => u.id === userId))
-    })
-  )
 
   const fetchedUsers = await client.user.list(userIds)
 
   expect(fetchedUsers).toHaveLength(locations.length)
-  expect(sanitizeForSnapshot(fetchedUsers, ['id'])).toMatchSnapshot()
+  expect(sanitizeForSnapshot(fetchedUsers, ['id', 'email'])).toMatchSnapshot()
 })

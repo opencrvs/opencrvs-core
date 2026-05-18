@@ -30,10 +30,13 @@ import {
   DEFAULT_DATE_OF_EVENT_PROPERTY,
   ActionDocument,
   Location,
-  UserOrSystem,
+  UUID,
+  AdministrativeArea,
   getActionAnnotationFields,
   FieldUpdateValue,
-  FieldConfig
+  FieldConfig,
+  UserOrSystemSummary,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -42,6 +45,7 @@ import { getUsersFullName } from '@client/v2-events/utils'
 import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { LocationSearch } from '@client/v2-events/features/events/registered-fields'
 import { AdminStructureItem } from '@client/utils/referenceApi'
+import { toFileUrl } from '@client/v2-events/cache'
 
 interface FontFamilyTypes {
   normal: string
@@ -67,20 +71,24 @@ function omitFieldValuesFromDeclaration(
   }, {})
 }
 
-function findUserById(userId: string, users: UserOrSystem[]) {
+function findUserById(userId: string, users: UserOrSystemSummary[]) {
   const user = users.find((u) => u.id === userId)
 
   if (!user) {
     return {
       name: '',
-      signature: '',
       fullHonorificName: ''
     }
   }
 
+  if (user.type === TokenUserType.enum.system) {
+    return {
+      name: getUsersFullName(user.name)
+    }
+  }
+
   return {
-    name: getUsersFullName(user.name, 'en'),
-    signature: user.signature ?? '',
+    name: getUsersFullName(user.name),
     fullHonorificName: user.fullHonorificName ?? ''
   }
 }
@@ -89,6 +97,7 @@ export const stringifyEventMetadata = ({
   metadata,
   intl,
   locations,
+  administrativeAreas,
   users,
   adminLevels
 }: {
@@ -99,32 +108,36 @@ export const stringifyEventMetadata = ({
     }
   >
   intl: IntlShape
-  locations: Location[]
-  users: UserOrSystem[]
+  locations: Map<UUID, Location>
+  administrativeAreas: Map<UUID, AdministrativeArea>
+  users: UserOrSystemSummary[]
   adminLevels: AdminStructureItem[]
 }) => {
   return {
     modifiedAt: DateField.toCertificateVariables(metadata.modifiedAt, {
       intl,
-      locations
+      locations,
+      administrativeAreas
     }),
     assignedTo: findUserById(metadata.assignedTo ?? '', users),
-    // @TODO: DATE_OF_EVENT config needs to be defined some other way and bake it in.
     dateOfEvent: metadata.dateOfEvent
       ? DateField.toCertificateVariables(metadata.dateOfEvent, {
           intl,
-          locations
+          locations,
+          administrativeAreas
         })
       : DateField.toCertificateVariables(
           metadata[DEFAULT_DATE_OF_EVENT_PROPERTY],
           {
             intl,
-            locations
+            locations,
+            administrativeAreas
           }
         ),
     createdAt: DateField.toCertificateVariables(metadata.createdAt, {
       intl,
-      locations
+      locations,
+      administrativeAreas
     }),
     createdBy: findUserById(metadata.createdBy, users),
     createdAtLocation: LocationSearch.toCertificateVariables(
@@ -132,12 +145,14 @@ export const stringifyEventMetadata = ({
       {
         intl,
         locations,
+        administrativeAreas,
         adminLevels
       }
     ),
     updatedAt: DateField.toCertificateVariables(metadata.updatedAt, {
       intl,
-      locations
+      locations,
+      administrativeAreas
     }),
     updatedBy: metadata.updatedBy
       ? findUserById(metadata.updatedBy, users)
@@ -152,6 +167,7 @@ export const stringifyEventMetadata = ({
       {
         intl,
         locations,
+        administrativeAreas,
         adminLevels
       }
     ),
@@ -161,7 +177,7 @@ export const stringifyEventMetadata = ({
         ? {
             createdAt: DateField.toCertificateVariables(
               metadata.legalStatuses.DECLARED.createdAt,
-              { intl, locations }
+              { intl, locations, administrativeAreas }
             ),
             createdBy: findUserById(
               metadata.legalStatuses.DECLARED.createdBy,
@@ -169,22 +185,20 @@ export const stringifyEventMetadata = ({
             ),
             createdAtLocation: LocationSearch.toCertificateVariables(
               metadata.legalStatuses.DECLARED.createdAtLocation,
-              { intl, locations, adminLevels }
+              { intl, locations, administrativeAreas, adminLevels }
             ),
             acceptedAt: DateField.toCertificateVariables(
               metadata.legalStatuses.DECLARED.acceptedAt,
-              { intl, locations }
+              { intl, locations, administrativeAreas }
             ),
-            createdByRole: metadata.legalStatuses.DECLARED.createdByRole,
-            createdBySignature:
-              metadata.legalStatuses.DECLARED.createdBySignature
+            createdByRole: metadata.legalStatuses.DECLARED.createdByRole
           }
         : null,
       [EventStatus.enum.REGISTERED]: metadata.legalStatuses.REGISTERED
         ? {
             createdAt: DateField.toCertificateVariables(
               metadata.legalStatuses.REGISTERED.createdAt,
-              { intl, locations }
+              { intl, locations, administrativeAreas }
             ),
             createdBy: findUserById(
               metadata.legalStatuses.REGISTERED.createdBy,
@@ -192,22 +206,15 @@ export const stringifyEventMetadata = ({
             ),
             createdAtLocation: LocationSearch.toCertificateVariables(
               metadata.legalStatuses.REGISTERED.createdAtLocation,
-              { intl, locations, adminLevels }
+              { intl, locations, administrativeAreas, adminLevels }
             ),
             acceptedAt: DateField.toCertificateVariables(
               metadata.legalStatuses.REGISTERED.acceptedAt,
-              { intl, locations }
+              { intl, locations, administrativeAreas }
             ),
             createdByRole: metadata.legalStatuses.REGISTERED.createdByRole,
             registrationNumber:
-              metadata.legalStatuses.REGISTERED.registrationNumber,
-            createdBySignature: metadata.legalStatuses.REGISTERED
-              .createdBySignature
-              ? new URL(
-                  metadata.legalStatuses.REGISTERED.createdBySignature,
-                  window.config.MINIO_BASE_URL
-                ).href
-              : undefined
+              metadata.legalStatuses.REGISTERED.registrationNumber
           }
         : null
     },
@@ -238,6 +245,7 @@ export function compileSvg({
   review,
   language,
   config,
+  administrativeAreas,
   adminLevels
 }: {
   templateString: string
@@ -247,8 +255,9 @@ export function compileSvg({
   }
   $actions: ActionDocument[]
   $declaration: EventState
-  locations: Location[]
-  users: UserOrSystem[]
+  locations: Map<UUID, Location>
+  administrativeAreas: Map<UUID, AdministrativeArea>
+  users: UserOrSystemSummary[]
   /**
    * Indicates whether certificate is reviewed or actually printed
    * in V1 "preview" was used. In V2, "review" is used to remain consistent with action terminology (review of print action rather than preview of certificate).
@@ -271,6 +280,7 @@ export function compileSvg({
   const stringifyDeclaration = getFormDataStringifier(
     intl,
     locations,
+    administrativeAreas,
     adminLevels
   )
   const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
@@ -299,6 +309,7 @@ export function compileSvg({
    * @example {{ $actions "PRINT_CERTIFICATE" }}
    */
   function $actionsFn(actionType: string) {
+    console.log($actions.filter((a) => a.type === actionType))
     return $actions.filter((a) => a.type === actionType)
   }
 
@@ -316,6 +327,7 @@ export function compileSvg({
    */
 
   function $action(actionType: string) {
+    console.log($actions.findLast((a) => a.type === actionType))
     return $actions.findLast((a) => a.type === actionType)
   }
 
@@ -341,6 +353,7 @@ export function compileSvg({
         metadata: $metadata,
         intl,
         locations,
+        administrativeAreas,
         users,
         adminLevels
       })
@@ -358,12 +371,10 @@ export function compileSvg({
         const actionConfig = config.actions.find(
           (a) => a.type === action.data.type
         )
-        if (!actionConfig) {
-          throw new Error(
-            'Action config not found for action type ' + action.data.type
-          )
-        }
-        const annotationFields = getActionAnnotationFields(actionConfig)
+
+        const annotationFields = actionConfig
+          ? getActionAnnotationFields(actionConfig)
+          : []
 
         const annotation =
           action.data.annotation != null
@@ -375,22 +386,25 @@ export function compileSvg({
                 )
               )
             : {}
-
         const resolvedAction = {
           id: action.data.id,
           type: action.data.type,
           createdAt: DateField.stringify(action.data.createdAt, {
             intl,
-            locations
+            locations,
+            administrativeAreas
           }),
           createdBy: users.find((user) => user.id === action.data.createdBy),
           createdByUserType: action.data.createdByUserType,
-          createdBySignature: action.data.createdBySignature,
+          createdBySignature:
+            action.data.createdBySignature &&
+            toFileUrl(action.data.createdBySignature),
           createdAtLocation: LocationSearch.toCertificateVariables(
             action.data.createdAtLocation,
             {
               intl,
               locations,
+              administrativeAreas,
               adminLevels
             }
           ),
@@ -522,6 +536,30 @@ export function compileSvg({
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     } as any /* This is here because Handlebars typing is insufficient and we can make the function type stricter */
   )
+
+  /**
+   * Handlebars helper: $join
+   *
+   * Joins provided values with the given separator, filtering out any empty or falsy values.
+   * Useful for rendering location hierarchies where some admin levels may be absent
+   * (e.g. an office registered directly under a province with no district).
+   *
+   * @param separator - The string to join with (e.g. ", ")
+   * @param values - One or more values to filter and join
+   * @returns The non-empty values joined by separator
+   *
+   * @example {{ $join ", " district province country }} // "Ibombo, Central, Farajaland"
+   * @example {{ $join ", " "" province country }}      // "Central, Farajaland" (empty district omitted)
+   * @example {{ $join ", " "" "" country }}            // "Farajaland" (both empty omitted)
+   */
+  Handlebars.registerHelper('$join', function (
+    ...args: [...(string | undefined | null)[], Handlebars.HelperOptions]
+  ) {
+    const separator = args[0] as string
+    const values = args.slice(1, -1) as Array<string | undefined | null>
+    return values.filter(Boolean).join(separator)
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  } as any)
 
   /**
    * Handlebars helper: $OR

@@ -37,11 +37,11 @@ export function UserAvatar({
   locale: string
 }) {
   const name =
-    typeof names === 'string' ? names : getUsersFullName(names, locale)
+    typeof names === 'string' ? names : getUsersFullName(names)
 
   return (
     <NameAvatar>
-      <AvatarSmall avatar={avatar} name={name} />
+      <AvatarSmall avatar={avatar?.data} name={name} />
       <span>{name}</span>
     </NameAvatar>
   )

@@ -14,35 +14,33 @@ import {
   ClientSpecificAction
 } from '../ActionType'
 import { EventIndex } from '../EventIndex'
-import { EventStatus, Flag, InherentFlags } from '../EventMetadata'
+import { EventStatus } from '../EventMetadata'
+import { Flag, InherentFlags } from '../Flag'
 
 const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
   [EventStatus.enum.CREATED]: [
     ActionType.READ,
     ActionType.DECLARE,
     ActionType.NOTIFY,
-    ActionType.DELETE
+    ActionType.DELETE,
+    ActionType.CUSTOM
   ],
   [EventStatus.enum.NOTIFIED]: [
     ActionType.READ,
-    ActionType.DECLARE,
+    ActionType.EDIT,
     ActionType.MARK_AS_DUPLICATE,
     ActionType.ARCHIVE,
-    ActionType.REJECT
+    ActionType.REJECT,
+    ActionType.CUSTOM
   ],
   [EventStatus.enum.DECLARED]: [
-    ActionType.READ,
-    ActionType.VALIDATE,
-    ActionType.MARK_AS_DUPLICATE,
-    ActionType.ARCHIVE,
-    ActionType.REJECT
-  ],
-  [EventStatus.enum.VALIDATED]: [
     ActionType.READ,
     ActionType.REGISTER,
     ActionType.MARK_AS_DUPLICATE,
     ActionType.ARCHIVE,
-    ActionType.REJECT
+    ActionType.REJECT,
+    ActionType.CUSTOM,
+    ActionType.EDIT
   ],
   [EventStatus.enum.REGISTERED]: [
     ActionType.READ,
@@ -50,14 +48,17 @@ const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
     ActionType.REQUEST_CORRECTION,
     ActionType.APPROVE_CORRECTION,
     ActionType.REJECT_CORRECTION,
+    ActionType.CUSTOM,
     ClientSpecificAction.REVIEW_CORRECTION_REQUEST
   ],
-  [EventStatus.enum.ARCHIVED]: [
-    ActionType.READ,
-    ActionType.ASSIGN,
-    ActionType.UNASSIGN
-  ]
-} as const satisfies Record<EventStatus, DisplayableAction[]>
+  [EventStatus.enum.ARCHIVED]: [ActionType.READ, ActionType.CUSTOM]
+} as const satisfies Record<
+  EventStatus,
+  Exclude<
+    DisplayableAction,
+    typeof ActionType.ASSIGN | typeof ActionType.UNASSIGN
+  >[]
+>
 
 const ACTION_FILTERS: {
   [K in DisplayableAction]?: (flags: Flag[]) => boolean
@@ -80,7 +81,7 @@ const ACTION_FILTERS: {
   [ActionType.MARK_AS_DUPLICATE]: (flags) =>
     flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&
     !flags.some((flag) => flag.endsWith(':requested')),
-  [ActionType.VALIDATE]: (flags) =>
+  [ActionType.EDIT]: (flags) =>
     !flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&
     !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.REGISTER]: (flags) =>
@@ -90,6 +91,12 @@ const ACTION_FILTERS: {
     !flags.includes(InherentFlags.REJECTED) &&
     !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.ARCHIVE]: (flags) =>
+    !flags.some((flag) => flag.endsWith(':requested')),
+  [ActionType.ASSIGN]: (flags) =>
+    !flags.some((flag) => flag.endsWith(':requested')),
+  [ActionType.UNASSIGN]: (flags) =>
+    !flags.some((flag) => flag.endsWith(':requested')),
+  [ActionType.CUSTOM]: (flags) =>
     !flags.some((flag) => flag.endsWith(':requested'))
 }
 
@@ -98,7 +105,7 @@ const ACTION_FILTERS: {
  * Some actions can be performed only if certain flags are
  * present and others only if certain flags are absent
  */
-function filterActionsByFlags(
+export function filterActionsByFlags(
   actions: DisplayableAction[],
   flags: Flag[]
 ): DisplayableAction[] {
@@ -116,58 +123,23 @@ function getAvailableActionsWithoutFlagFilters(
   status: EventStatus,
   flags: Flag[]
 ): DisplayableAction[] {
-  switch (status) {
-    case EventStatus.Enum.CREATED: {
-      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
-    }
-    case EventStatus.Enum.NOTIFIED: {
-      if (flags.includes(InherentFlags.REJECTED)) {
-        return getAvailableActionsWithoutFlagFilters(
-          EventStatus.Enum.CREATED,
-          flags.filter((flag) => flag !== InherentFlags.REJECTED)
-        )
-          .filter((action) => action !== ActionType.DELETE)
-          .concat(ActionType.ARCHIVE)
-      }
-      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
-    }
-    case EventStatus.Enum.DECLARED: {
-      if (flags.includes(InherentFlags.REJECTED)) {
-        return getAvailableActionsWithoutFlagFilters(
-          EventStatus.Enum.CREATED,
-          flags.filter((flag) => flag !== InherentFlags.REJECTED)
-        )
-          .filter((action) => action !== ActionType.DELETE)
-          .concat(ActionType.ARCHIVE)
-      }
-      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
-    }
-    case EventStatus.Enum.VALIDATED: {
-      if (flags.includes(InherentFlags.REJECTED)) {
-        return getAvailableActionsWithoutFlagFilters(
-          EventStatus.Enum.DECLARED,
-          flags.filter((flag) => flag !== InherentFlags.REJECTED)
-        )
-      }
-      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
-    }
-    case EventStatus.Enum.REGISTERED: {
-      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
-    }
-    case EventStatus.Enum.ARCHIVED: {
-      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
-    }
+  // A record should never stay in the EDIT_IN_PROGRESS flag, since it should always be declared or registered right after
+  if (flags.includes(InherentFlags.EDIT_IN_PROGRESS)) {
+    return [ActionType.NOTIFY, ActionType.DECLARE, ActionType.REGISTER]
   }
-}
 
-export function getAvailableActions(
-  status: EventStatus,
-  flags: Flag[]
-): DisplayableAction[] {
-  return filterActionsByFlags(
-    getAvailableActionsWithoutFlagFilters(status, flags),
-    flags
-  )
+  // At some point we will refactor 'Rejected' to be a countryconfig flag, at which point we can remove this silly logic.
+  if (flags.includes(InherentFlags.REJECTED)) {
+    return [
+      ActionType.READ,
+      ActionType.NOTIFY,
+      ActionType.CUSTOM,
+      ActionType.EDIT,
+      ActionType.ARCHIVE
+    ]
+  }
+
+  return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
 }
 
 export function getAvailableActionsForEvent(

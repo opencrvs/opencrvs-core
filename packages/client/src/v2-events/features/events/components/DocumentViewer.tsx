@@ -21,7 +21,6 @@ import {
   isFileFieldWithOptionType,
   FieldType
 } from '@opencrvs/commons/client'
-import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import {
   DocumentViewer as DocumentViewerComponent,
   DocumentViewerOptionValue
@@ -69,7 +68,7 @@ function getFileOptions(
         {
           value: {
             filename: field.value.path,
-            url: getUnsignedFileUrl(field.value.path),
+            url: field.value.path,
             id: field.config.id
           },
           label
@@ -96,7 +95,7 @@ function getFileOptions(
           return {
             value: {
               filename: formVal.path,
-              url: getUnsignedFileUrl(formVal.path),
+              url: formVal.path,
               id: `${field.config.id}-${formVal.option}`
             },
             label: `${fieldLabel} (${optionLabel})`

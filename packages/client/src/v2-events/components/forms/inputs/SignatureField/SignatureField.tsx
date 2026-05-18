@@ -17,15 +17,15 @@ import { ImageUploader, InputError } from '@opencrvs/components'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { FileFieldValue, MimeType } from '@opencrvs/commons/client'
+import {
+  DocumentPath,
+  FileFieldValue,
+  MimeType
+} from '@opencrvs/commons/client'
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages, validationMessages } from '@client/i18n/messages'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
-import {
-  cacheFile,
-  getFullDocumentPath,
-  getUnsignedFileUrl
-} from '@client/v2-events/cache'
+import { cacheFile, toFileUrl } from '@client/v2-events/cache'
 import { useOnFileChange } from '../FileInput/useOnFileChange'
 import { SignatureCanvasModal } from './components/SignatureCanvasModal'
 
@@ -45,6 +45,7 @@ interface SignatureFieldProps {
   onChange: (value: FileFieldValue | null) => void
   required?: boolean
   maxFileSize: number
+  filePath: string
   acceptedFileTypes?: MimeType[]
   modalTitle: string
   disabled?: boolean
@@ -69,6 +70,7 @@ function SignatureFieldInput({
   onChange,
   required,
   name,
+  filePath,
   modalTitle,
   maxFileSize,
   acceptedFileTypes = ['image/png'],
@@ -80,7 +82,7 @@ function SignatureFieldInput({
   const [signature, setSignature] = useState<FileFieldValue | undefined>(value)
   const [touched, setTouched] = useState(false)
 
-  const { uploadFile } = useFileUpload(name, {
+  const { uploadFile } = useFileUpload(filePath, name, {
     onSuccess: ({ path, originalFilename, type }) => {
       setSignature({
         path,
@@ -149,10 +151,7 @@ function SignatureFieldInput({
         </>
       )}
       {signature && (
-        <SignaturePreview
-          alt={modalTitle}
-          src={getUnsignedFileUrl(signature.path)}
-        />
+        <SignaturePreview alt={modalTitle} src={toFileUrl(signature.path)} />
       )}
       {signature && !disabled && (
         <Button
@@ -181,12 +180,12 @@ function SignatureFieldInput({
               signatureBase64,
               `signature-${name}-${Date.now()}.png`
             )
-            const path = getFullDocumentPath(signatureFile.name)
+            const path = signatureFile.name as DocumentPath
 
             // When we are in offline mode, the actual upload might not happen immediately.
             // Cache the "temporary" file to allow using same functionality for all files.
             await cacheFile({
-              url: getUnsignedFileUrl(path),
+              url: path,
               file: signatureFile
             })
 
@@ -205,6 +204,23 @@ function SignatureFieldInput({
   )
 }
 
+const SignatureOutputPreview = styled(SignaturePreview)`
+  max-width: 100%;
+`
+
+function SignatureOutput({ value }: { value?: FileFieldValue }) {
+  if (!value) {
+    return null
+  }
+  return (
+    <SignatureOutputPreview
+      alt="Signature preview"
+      src={toFileUrl(value.path)}
+    />
+  )
+}
+
 export const SignatureField = {
-  Input: SignatureFieldInput
+  Input: SignatureFieldInput,
+  Output: SignatureOutput
 }

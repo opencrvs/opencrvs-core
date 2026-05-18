@@ -13,7 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import styled from 'styled-components'
 import { within, expect } from '@storybook/test'
-import { userEvent } from '@storybook/testing-library'
+import { userEvent, waitFor } from '@storybook/testing-library'
 import {
   ConditionalType,
   FieldType,
@@ -57,7 +57,15 @@ export const WithHiddenOption: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(await canvas.findByRole('textbox'))
+    const control = await waitFor(() => {
+      const el = canvasElement.querySelector('.react-select__control')
+      if (!el) {
+        throw new Error('Dropdown not found')
+      }
+      return el
+    })
+    await userEvent.click(control)
+
     await expect(canvas.queryByText('Apple')).toBeInTheDocument()
     await expect(canvas.queryByText('Banana')).not.toBeInTheDocument()
     await expect(canvas.queryByText('Cherry')).toBeInTheDocument()
@@ -122,7 +130,14 @@ export const WithDisabledOption: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(await canvas.findByRole('textbox'))
+    const control = await waitFor(() => {
+      const el = canvasElement.querySelector('.react-select__control')
+      if (!el) {
+        throw new Error('Dropdown not found')
+      }
+      return el
+    })
+    await userEvent.click(control)
     const bananaOption = canvas.queryByText('Banana')
     await expect(bananaOption).toBeInTheDocument()
     // this can be replaced with aria-disabled attribute once the react-select

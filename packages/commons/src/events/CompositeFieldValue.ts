@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { FullDocumentPath } from '../documents'
-import { z } from 'zod'
+import { DocumentPath } from '../documents'
+import * as z from 'zod/v4'
 
 /**
  * Composite field value consists of multiple field values.
@@ -26,7 +26,7 @@ export const AddressType = {
 } as const
 
 export const FileFieldValue = z.object({
-  path: FullDocumentPath,
+  path: DocumentPath,
   originalFilename: z.string(),
   type: z.string()
 })
@@ -111,7 +111,7 @@ export const AddressFieldUpdateValue = z
 export type AddressFieldUpdateValue = z.infer<typeof AddressFieldUpdateValue>
 
 export const FileFieldValueWithOption = z.object({
-  path: FullDocumentPath,
+  path: DocumentPath,
   originalFilename: z.string(),
   type: z.string(),
   option: z.string()
@@ -139,7 +139,8 @@ export const HttpFieldUpdateValue = z
 
 export const QueryParamReaderFieldValue = z
   .object({
-    data: z.record(z.string(), z.string())
+    data: z.record(z.string(), z.string()),
+    updatedAt: z.iso.datetime()
   })
   .nullish()
 
@@ -172,3 +173,5 @@ export type NumberWithUnitFieldValue = z.infer<typeof NumberWithUnitFieldValue>
 export type NumberWithUnitFieldUpdateValue = z.infer<
   typeof NumberWithUnitFieldUpdateValue
 >
+export const CustomFieldValue = z.unknown().brand('CustomFieldValue')
+export type CustomFieldValue = z.infer<typeof CustomFieldValue>

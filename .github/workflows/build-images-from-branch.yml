@@ -14,7 +14,7 @@ on:
       - develop
       - main
     tags:
-      - '*'
+      - "*"
   workflow_call:
     inputs:
       branch_tag_name:
@@ -41,7 +41,7 @@ on:
       branch_tag_name:
         default: develop
         required: true
-        description: Branch or Tag to build from
+        description: Branch (or tag) to build from
       publish_release:
         type: boolean
         default: false
@@ -50,6 +50,7 @@ on:
         type: boolean
         required: false
         default: false
+        description: Skip security scanning of images
       build_arm:
         description: Build ARM images
         type: boolean
@@ -63,12 +64,12 @@ jobs:
         runner: ${{ (inputs.build_arm == true && fromJSON('["ubuntu-24.04", "ubuntu-24.04-arm"]')) || fromJSON('["ubuntu-24.04"]') }}
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         if: github.event_name == 'workflow_dispatch'
         with:
           ref: ${{ github.event.inputs.branch_tag_name }}
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         if: github.event_name == 'push' || github.event_name == 'pull_request'
         with:
           ref: ${{ github.event.pull_request.head.sha }}
@@ -97,13 +98,13 @@ jobs:
       - name: Get list of services
         id: get-services
         run: |
-          services=$(grep "^  [^ ]" docker-compose.yml | grep -v base| grep -v '#' | awk -F: '{print $1}' | sed -e 's/^ *//')
+          services=$(grep "^  [^ ]" docker-compose.yml | grep -v base | grep -v '#' | awk -F: '{print $1}' | sed -e 's/^ *//')
           services_json=$(echo $services | tr '\n' ',' | sed 's/,$//' | jq -R 'split(" ")' | tr -d '\n')
           # Set the list of service names as an output variable
           echo "services=$services_json" >> $GITHUB_OUTPUT
           echo "services=$services_json"
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -134,7 +135,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -159,25 +160,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: ${{ 
-          (inputs.build_arm == true && fromJSON('["ubuntu-24.04", "ubuntu-24.04-arm"]')) || 
-          fromJSON('["ubuntu-24.04"]') 
+        runner: ${{
+          (inputs.build_arm == true && fromJSON('["ubuntu-24.04", "ubuntu-24.04-arm"]')) ||
+          fromJSON('["ubuntu-24.04"]')
           }}
         service: ${{ fromJSON(needs.base.outputs.services) }}
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         if: github.event_name == 'workflow_dispatch'
         with:
-          ref: '${{ github.event.inputs.branch_tag_name }}'
+          ref: "${{ github.event.inputs.branch_tag_name }}"
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         if: github.event_name == 'push' || github.event_name == 'pull_request'
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -221,7 +222,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -254,28 +255,30 @@ jobs:
       matrix:
         service: ${{ fromJSON(needs.base.outputs.services) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           sparse-checkout: |
             trivy.yaml
             .trivyignore.yaml
           sparse-checkout-cone-mode: false
       - name: Gather Trivy output from base branch image
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.35.0
         with:
-          image-ref: 'ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ github.event.pull_request.base.ref }}'
+          image-ref: "ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ github.event.pull_request.base.ref }}"
           trivy-config: trivy.yaml
-          format: 'sarif'
-          output: './trivy-results-base.sarif'
-          exit-code: '0'
+          trivyignores: .trivyignore.yaml
+          format: "sarif"
+          output: "./trivy-results-base.sarif"
+          exit-code: "0"
       - name: Gather Trivy output from newly build image
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.35.0
         with:
-          image-ref: 'ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
+          image-ref: "ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}"
           trivy-config: trivy.yaml
-          format: 'sarif'
-          output: './trivy-results-branch.sarif'
-          exit-code: '0'
+          trivyignores: .trivyignore.yaml
+          format: "sarif"
+          output: "./trivy-results-branch.sarif"
+          exit-code: "0"
       - name: Remove lines that are always expected to be different
         run: |
           jq '.runs |= map(del(.originalUriBaseIds, .properties))' ${{ github.workspace }}/trivy-results-base.sarif > ${{ github.workspace }}/trivy-results-base.sarif
@@ -293,14 +296,15 @@ jobs:
       matrix:
         service: ${{ fromJSON(needs.base.outputs.services) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           sparse-checkout: |
             trivy.yaml
             .trivyignore.yaml
           sparse-checkout-cone-mode: false
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.35.0
         with:
-          image-ref: 'ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
+          image-ref: "ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}"
           trivy-config: trivy.yaml
+          trivyignores: .trivyignore.yaml

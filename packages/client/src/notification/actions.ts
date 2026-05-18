@@ -8,8 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { AdditionalIdWithCompositionId } from '@client/utils/gateway'
-import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
+
+export enum AUDIT_ACTION {
+  DEACTIVATE = 'DEACTIVATE',
+  REACTIVATE = 'REACTIVATE'
+}
 
 export const SHOW_USER_RECONNECTED_TOAST = 'SHOW_ONLINE_USER_SUCCESS_TOAST'
 export const HIDE_USER_RECONNECTED_TOAST = 'HIDE_ONLINE_USER_SUCCESS_TOAST'
@@ -88,7 +91,7 @@ type ShowSubmitFormErrorToast = {
     data: string
   }
 }
-export type ShowCreateUserErrorToast = {
+type ShowCreateUserErrorToast = {
   type: typeof SHOW_CREATE_USER_ERROR_TOAST
   payload: {
     data: string
@@ -96,7 +99,7 @@ export type ShowCreateUserErrorToast = {
   }
 }
 
-export type ShowCreateUserDuplicateEmailErrorToast = {
+type ShowCreateUserDuplicateEmailErrorToast = {
   type: typeof SHOW_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST
   payload: {
     data: string
@@ -108,7 +111,7 @@ type HideDownloadDeclarationFailedToast = {
   type: typeof HIDE_DOWNLOAD_DECLARATION_FAILED_TOAST
 }
 
-export type ShowDownloadDeclarationFailedToast = {
+type ShowDownloadDeclarationFailedToast = {
   type: typeof SHOW_DOWNLOAD_DECLARATION_FAILED_TOAST
 }
 
@@ -178,7 +181,7 @@ export interface ShowUnassignedPayload extends Record<string, string> {
   trackingId: string
 }
 
-export type ShowUnassignedDeclarations = {
+type ShowUnassignedDeclarations = {
   type: typeof SHOW_UNASSIGNED_DECLARATIONS
   payload: string[]
 }
@@ -222,27 +225,6 @@ export const showSubmitFormErrorToast = (
   payload: { data }
 })
 
-export const showCreateUserErrorToast = (
-  data: string,
-  mobile: string
-): ShowCreateUserErrorToast => ({
-  type: SHOW_CREATE_USER_ERROR_TOAST,
-  payload: { data, mobile }
-})
-
-export const showCreateUserDuplicateEmailErrorToast = (
-  data: string,
-  email: string
-): ShowCreateUserDuplicateEmailErrorToast => ({
-  type: SHOW_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST,
-  payload: { data, email }
-})
-
-export const showDownloadDeclarationFailedToast =
-  (): ShowDownloadDeclarationFailedToast => ({
-    type: SHOW_DOWNLOAD_DECLARATION_FAILED_TOAST
-  })
-
 export const hideDownloadDeclarationFailedToast =
   (): HideDownloadDeclarationFailedToast => ({
     type: HIDE_DOWNLOAD_DECLARATION_FAILED_TOAST
@@ -281,14 +263,6 @@ type ShowDuplicateRecordsToast = {
   payload: { trackingId: string; compositionId: string }
 }
 
-export const showDuplicateRecordsToast = ({
-  trackingId,
-  compositionId
-}: AdditionalIdWithCompositionId): ShowDuplicateRecordsToast => ({
-  type: SHOW_DUPLICATE_RECORDS_TOAST,
-  payload: { trackingId, compositionId }
-})
-
 type HideDuplicateRecordsToast = {
   type: typeof HIDE_DUPLICATE_RECORDS_TOAST
 }
@@ -310,20 +284,6 @@ export const showPINUpdateSuccessToast = (): ShowPINUpdateSuccessAction => ({
 
 export const hidePINUpdateSuccessToast = (): HidePINUpdateSuccessAction => ({
   type: HIDE_PIN_UPDATE_SUCCESS
-})
-
-export const showUnassigned = (
-  data: ShowUnassignedPayload
-): ShowUnassigned => ({
-  type: SHOW_UNASSIGNED,
-  payload: data
-})
-
-export const showUnassignedDeclarations = (
-  unassignedDeclarationTrackingIds: string[]
-): ShowUnassignedDeclarations => ({
-  type: SHOW_UNASSIGNED_DECLARATIONS,
-  payload: unassignedDeclarationTrackingIds
 })
 
 export const hideUnassignedModal = (): HideUnassigned => ({

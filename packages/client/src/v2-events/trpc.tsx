@@ -39,8 +39,8 @@ const { TRPCProvider: TRPCProviderRaw, useTRPC } =
 export { AppRouter, useTRPC }
 
 function getTrpcClient() {
-  // In storybook tests, we use httpLink as msw-trpc does not support httpBatchLink
-  if (import.meta.env.STORYBOOK === 'true') {
+  // In storybook and vitest tests, we use httpLink as msw-trpc does not support httpBatchLink
+  if (import.meta.env.STORYBOOK === 'true' || import.meta.env.MODE === 'test') {
     return createTRPCClient<AppRouter>({
       links: [
         loggerLink({
@@ -237,4 +237,11 @@ export function TRPCProvider({
       </TRPCProviderRaw>
     </PersistQueryClientProvider>
   )
+}
+
+export function hasConflict(error: unknown) {
+  if (error instanceof TRPCClientError) {
+    return error.data.code === 'CONFLICT'
+  }
+  return false
 }

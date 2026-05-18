@@ -12,7 +12,7 @@
 import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useIntl } from 'react-intl'
-import { stringify } from 'query-string'
+import { stringify } from 'qs'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
@@ -27,7 +27,7 @@ import { formatUrl } from '@client/navigation'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { useHasAccessToNavigationItem } from '@client/components/interface/useHasAccessToNavigationItem'
 
-const conmmunicationTab: string[] = [
+const communicationTab = [
   WORKQUEUE_TABS.informantNotification,
   WORKQUEUE_TABS.emailAllUsers
 ]
@@ -112,17 +112,18 @@ export function OrganisationNavigationGroup({
                 )}
                 onClick={() => setIsConfigExpanded(!isConfigExpanded)}
               />
-              {(isConfigExpanded ||
-                currentWorkqueueSlug === WORKQUEUE_TABS.systems) && (
-                <NavigationSubItem
-                  id={`navigation_${WORKQUEUE_TABS.systems}`}
-                  isSelected={currentWorkqueueSlug === WORKQUEUE_TABS.systems}
-                  label={intl.formatMessage(
-                    navigationMessages[WORKQUEUE_TABS.systems]
-                  )}
-                  onClick={() => navigate(routes.SYSTEM_LIST)}
-                />
-              )}
+              {hasAccess(WORKQUEUE_TABS.systems) &&
+                (isConfigExpanded ||
+                  currentWorkqueueSlug === WORKQUEUE_TABS.systems) && (
+                  <NavigationSubItem
+                    id={`navigation_${WORKQUEUE_TABS.systems}`}
+                    isSelected={currentWorkqueueSlug === WORKQUEUE_TABS.systems}
+                    label={intl.formatMessage(
+                      navigationMessages[WORKQUEUE_TABS.systems]
+                    )}
+                    onClick={() => navigate(routes.SYSTEM_LIST)}
+                  />
+                )}
             </>
           )}
           {hasAccess(WORKQUEUE_TABS.config) && (
@@ -130,7 +131,7 @@ export function OrganisationNavigationGroup({
               <NavigationItem
                 expandableIcon={() =>
                   isCommunicationExpanded ||
-                  conmmunicationTab.some(
+                  communicationTab.some(
                     (tab) => tab === currentWorkqueueSlug
                   ) ? (
                     <Expandable selected={true} />
@@ -140,7 +141,7 @@ export function OrganisationNavigationGroup({
                 }
                 icon={() => <Icon name="ChatCircle" size="small" />}
                 id={`navigation_${WORKQUEUE_TABS.communications}_main`}
-                isSelected={conmmunicationTab.some(
+                isSelected={communicationTab.some(
                   (tab) => tab === currentWorkqueueSlug
                 )}
                 label={intl.formatMessage(
@@ -151,7 +152,7 @@ export function OrganisationNavigationGroup({
                 }
               />
               {(isCommunicationExpanded ||
-                conmmunicationTab.some(
+                communicationTab.some(
                   (tab) => tab === currentWorkqueueSlug
                 )) && (
                 <NavigationSubItem

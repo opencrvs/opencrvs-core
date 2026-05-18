@@ -10,14 +10,19 @@
  */
 
 import { sql } from 'kysely'
-import z from 'zod'
-import { ActionStatus, Draft, TokenUserType, UUID } from '@opencrvs/commons'
+import * as z from 'zod/v4'
+import {
+  ActionStatus,
+  ActionType,
+  Draft,
+  TokenUserType,
+  UUID
+} from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import {
   EventActionDrafts,
   NewEventActionDrafts
 } from './schema/app/EventActionDrafts'
-import ActionType from './schema/app/ActionType'
 
 function toDraftDocument(draft: EventActionDrafts): Draft {
   return Draft.parse({
@@ -29,7 +34,7 @@ function toDraftDocument(draft: EventActionDrafts): Draft {
       transactionId: draft.transactionId,
       createdAt: draft.createdAt,
       createdBy: draft.createdBy,
-      createdByRole: draft.createdByRole,
+      createdByRole: draft.createdByRole ?? undefined,
       createdByUserType: draft.createdByUserType as TokenUserType,
       createdAtLocation: draft.createdAtLocation,
       declaration: draft.declaration,

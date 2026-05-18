@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - uses: mskelton/changelog-reminder-action@v3
         # forked repos cannot access secrets.GITHUB_TOKEN which causes this step
@@ -49,10 +49,29 @@ jobs:
           echo "Found packages: $PACKAGES"
           echo "matrix=${PACKAGES}" >> $GITHUB_OUTPUT
 
+      - name: Prepare coverage explanation
+        run: |
+          echo "COVERAGE_EXPLANATION<<EOF" >> $GITHUB_ENV
+          echo "_ℹ️ Coverage metrics explained:_" >> $GITHUB_ENV
+          echo "• *Statements* — Executed code statements (basic logic lines)" >> $GITHUB_ENV
+          echo "• *Branches* — Tested decision paths (if/else, switch, ternaries)" >> $GITHUB_ENV
+          echo "• *Functions* — Functions invoked during tests" >> $GITHUB_ENV
+          echo "• *Lines* — Source lines executed" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Post coverage explanation to PR
+        if: github.event_name == 'pull_request'
+        uses: mshick/add-pr-comment@v2
+        with:
+          message-id: test-coverage-explanation
+          message: ${{ env.COVERAGE_EXPLANATION }}
+
   test:
     name: Test
     needs: setup
     runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
     strategy:
       fail-fast: false
       matrix:
@@ -60,7 +79,7 @@ jobs:
 
     steps:
       - name: Checking out git repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Check package.json and scripts
         id: check-scripts
@@ -88,7 +107,7 @@ jobs:
 
       - name: Use Node.js from .nvmrc
         if: steps.check-scripts.outputs.skip != 'true'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
 
@@ -126,7 +145,7 @@ jobs:
           done
 
       - name: Cache Node.js dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             **/node_modules
@@ -152,6 +171,10 @@ jobs:
         run: |
           cd packages/components && yarn build
 
+      - name: Build events router types
+        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/events')
+        run: cd packages/events && node_modules/.bin/tsc -p tsconfig.router.json
+
       # TODO: should run parallel to unit tests as can take as much as unit tests
       - name: Run linting
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-lint != 'true'
@@ -161,6 +184,41 @@ jobs:
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
         run: cd ${{ matrix.package }} && yarn test
 
+      - name: Generate test coverage summary
+        if: github.event_name == 'pull_request'
+          && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
+        run: |
+          export PACKAGE_NAME=$(basename "${{ matrix.package }}")
+          export COVERAGE_FILE="./${{ matrix.package }}/coverage/coverage-summary.json"
+
+          GENERATED_REPORT=$(node -e '
+            const s = require(process.env.COVERAGE_FILE).total;
+            const title = `## 📊 ${process.env.PACKAGE_NAME} test coverage`;
+
+            console.log(
+              title + "\n\n" +
+              "```text\n" +
+              `Statements: ${s.statements.pct}%\n` +
+              `Branches:   ${s.branches.pct}%\n` +
+              `Functions:  ${s.functions.pct}%\n` +
+              `Lines:      ${s.lines.pct}%\n` +
+              `Updated at: ${new Date().toUTCString()}\n` +
+              "```"
+            );
+          ')
+
+          echo "PR_COMMENT_BODY<<EOF" >> $GITHUB_ENV
+          echo "$GENERATED_REPORT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Post test coverage to PR
+        if: github.event_name == 'pull_request'
+          && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
+        uses: mshick/add-pr-comment@v2
+        with:
+          message-id: ${{ matrix.package }}-test-coverage
+          message: ${{ env.PR_COMMENT_BODY }}
+
   prepare-client-tests:
     name: Prepare client tests
     runs-on: ubuntu-24.04
@@ -168,12 +226,10 @@ jobs:
       contents: read
     steps:
       - name: Checking out git repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Fetch history to compare PR changes against the base branch
+        uses: actions/checkout@v6
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
 
@@ -209,7 +265,7 @@ jobs:
           done
 
       - name: Cache Node.js dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             **/node_modules
@@ -228,6 +284,20 @@ jobs:
         run: |
           cd packages/components && yarn build
 
+      # Build Storybook once here (with --webpack-stats-json so that
+      # `preview-stats.json` is emitted). The artifact is reused by
+      # `chromatic` (--storybook-build-dir) and `test-storybook`,
+      # avoiding duplicate Storybook builds. `preview-stats.json` is the
+      # input to the change-detection script that decides whether
+      # Chromatic must run.
+      - name: Build Storybook (with TurboSnap stats)
+        working-directory: packages/client
+        env:
+          # Why are we using NODE_ENV=production? It's recommended in Chromatic docs, to ensure webpack tree-shaking is working properly
+          # See: https://www.chromatic.com/docs/turbosnap/troubleshooting/#why-are-changes-not-being-detected-correctly
+          NODE_ENV: production
+        run: yarn run build-storybook --webpack-stats-json
+
       - name: Upload filesystem as artifact
         uses: actions/upload-artifact@v4.5.0
         with:
@@ -237,6 +307,7 @@ jobs:
             .
             !**/.git
             !**/node_modules
+
   lint-client:
     name: Lint client
     needs: prepare-client-tests
@@ -244,18 +315,18 @@ jobs:
 
     steps:
       - name: Download filesystem artifact
-        uses: actions/download-artifact@v4.1.8
+        uses: actions/download-artifact@v7
         with:
           name: client
           path: .
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
 
       - name: Cache Node.js dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             **/node_modules
@@ -266,6 +337,9 @@ jobs:
 
       - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
+
+      - name: Build events router types
+        run: cd packages/events && node_modules/.bin/tsc -p tsconfig.router.json
 
       - name: Compile
         run: cd packages/client && yarn test:compilation
@@ -277,21 +351,52 @@ jobs:
     name: Run chromatic visual tests
     needs: prepare-client-tests
     runs-on: ubuntu-24.04
-
+    # Chromatic visual tests are disabled for now until we find a way to reduce the monthly costs
+    # On average, every day we create roughly 7500 - 10000 snapshots per working day
+    # Snapshots included in our plan are 35 000 per month and all exceeding snapshots are charged at $0.008 per snapshot
+    if: false
     steps:
+      # Fresh checkout brings .git (needed by Chromatic's TurboSnap and
+      # by the change-detection `git diff` below). The artifact
+      # extracted on top adds the prebuilt commons/components outputs
+      # and `packages/client/storybook-static/`; source files match the
+      # current commit so overwrites are no-ops.
+      - name: Checkout PR branch (for git history)
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
       - name: Download filesystem artifact
-        uses: actions/download-artifact@v4.1.8
+        uses: actions/download-artifact@v7
         with:
           name: client
           path: .
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
 
+      # Decide whether the diff can affect Storybook by intersecting it
+      # with the module graph emitted by Storybook's
+      # `--webpack-stats-json`. Backend-only changes in
+      # `packages/commons` (and similar) won't appear in the graph and
+      # therefore won't trigger Chromatic. The same gate applies to
+      # pushes on `develop`: if no module in the Storybook bundle
+      # changed, no snapshot can change and the baseline is preserved
+      # by definition.
+      - name: Detect storybook-affecting changes
+        id: detect
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          node .github/scripts/changed-files-affect-storybook.mjs \
+            --stats packages/client/storybook-static/preview-stats.json \
+            --base "$BASE_SHA"
+
       - name: Cache Node.js dependencies
-        uses: actions/cache@v4
+        if: steps.detect.outputs.affects == 'true'
+        uses: actions/cache@v5
         with:
           path: |
             **/node_modules
@@ -301,23 +406,15 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Install dependencies
+        if: steps.detect.outputs.affects == 'true'
         run: CI="" yarn install --frozen-lockfile
 
-      - name: Fetch full Git history
-        run: |
-          git clone --bare https://github.com/opencrvs/opencrvs-core.git .git
-          git config --local --bool core.bare false
-          git reset --hard
-          git clean -fd
-          git fetch --prune
-          git checkout ${{ github.head_ref || github.ref_name }}
-          git reset --hard
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Run Chromatic
-        run: yarn run chromatic
+        if: steps.detect.outputs.affects == 'true'
         working-directory: packages/client
+        run: |
+          yarn run chromatic --storybook-build-dir storybook-static --diagnostics-file
+          cat chromatic-diagnostics.json
         env:
           CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
@@ -328,18 +425,18 @@ jobs:
 
     steps:
       - name: Download filesystem artifact
-        uses: actions/download-artifact@v4.1.8
+        uses: actions/download-artifact@v7
         with:
           name: client
           path: .
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
 
       - name: Cache Node.js dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             **/node_modules
@@ -355,10 +452,9 @@ jobs:
         # Playwright is required since @storybook/test-runner depends on it
         run: npx playwright install --with-deps
 
-      - name: Build Storybook
-        working-directory: packages/client
-        run: yarn run build-storybook
-
+      # `storybook-static/` is restored from the artifact built in
+      # `prepare-client-tests`, so we don't need to build Storybook
+      # again here.
       - name: Serve Storybook and run tests
         working-directory: packages/client
         # based on https://storybook.js.org/docs/writing-tests/test-runner#run-against-non-deployed-storybooks
@@ -378,18 +474,18 @@ jobs:
 
     steps:
       - name: Download filesystem artifact
-        uses: actions/download-artifact@v4.1.8
+        uses: actions/download-artifact@v7
         with:
           name: client
           path: .
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
 
       - name: Cache Node.js dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             **/node_modules
@@ -402,7 +498,7 @@ jobs:
         run: CI="" yarn install --frozen-lockfile
 
       - name: Run Unit Test
-        run: cd packages/client && yarn test -- --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}
+        run: cd packages/client && yarn test --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}
 
   lint-knip:
     name: Lint unused exports with Knip
@@ -410,19 +506,19 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout base branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.base_ref }}
           path: base
 
       - name: Checkout the PR branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.head_ref }}
           path: pr
 
       - name: Use Node.js from .nvmrc from base branch
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: base/.nvmrc
 
@@ -431,7 +527,7 @@ jobs:
         working-directory: base
 
       - name: Use Node.js from .nvmrc from PR branch
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: pr/.nvmrc
 
@@ -474,10 +570,10 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
 

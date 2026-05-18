@@ -10,22 +10,382 @@
  */
 
 import { UUID } from '../uuid'
-import { z } from 'zod'
+import * as z from 'zod/v4'
+import { EventIndex } from './EventIndex'
+import {
+  ActionCreationMetadata,
+  RegistrationCreationMetadata
+} from './EventMetadata'
+import {
+  JurisdictionFilter,
+  RecordScopeV2,
+  scopeUsesDeclaredOptions,
+  scopeUsesFullOptions,
+  UserFilter,
+  isCustomActionScope,
+  scopeUsesPrintCertifiedCopiesOptions,
+  UserScopeV2,
+  scopeUsesRoleOptions
+} from '../scopes'
+import { SystemContext, UserContext } from '../users/User'
 
-export const LocationType = z.enum([
+/** @deprecated Moving on, location types are arbitrary and defined by the country config. */
+export const LocationTypeV1 = z.enum([
   'ADMIN_STRUCTURE',
   'CRVS_OFFICE',
   'HEALTH_FACILITY'
 ])
+export type LocationTypeV1 = z.infer<typeof LocationTypeV1>
 
-export type LocationType = z.infer<typeof LocationType>
+export const AdministrativeArea = z.object({
+  id: UUID,
+  name: z.string(),
+  externalId: z.string().nullish(),
+  parentId: UUID.nullable(),
+  validUntil: z.iso.datetime().nullable()
+})
+
+export type AdministrativeArea = z.infer<typeof AdministrativeArea>
 
 export const Location = z.object({
   id: UUID,
   name: z.string(),
-  parentId: UUID.nullable(),
-  validUntil: z.string().datetime().nullable(),
-  locationType: LocationType.nullable()
+  externalId: z.string().nullish(),
+  administrativeAreaId: UUID.nullable(),
+  validUntil: z.iso.datetime().nullable(),
+  locationType: z.string().nullable()
 })
 
 export type Location = z.infer<typeof Location>
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type WrapArrayPreserveNullish<V> = V extends readonly any[]
+  ? V
+  : NonNullable<V>[] | Extract<V, null | undefined>
+
+/**
+ * For type T, convert fields K to arrays. If field is string, convert to string[].
+ */
+type ToArrayFields<T, K extends PropertyKey> = T extends unknown
+  ? T extends object
+    ? { [P in keyof T]: P extends K ? WrapArrayPreserveNullish<T[P]> : T[P] }
+    : T
+  : never
+
+/**
+ * Event index type where all location fields are arrays representing full location hierarchy.
+ */
+export type EventIndexWithAdministrativeHierarchy = Omit<
+  ToArrayFields<
+    EventIndex,
+    'createdAtLocation' | 'updatedAtLocation' | 'placeOfEvent'
+  >,
+  'legalStatuses'
+> & {
+  legalStatuses: {
+    DECLARED:
+      | ToArrayFields<ActionCreationMetadata, 'createdAtLocation'>
+      | undefined
+    REGISTERED:
+      | ToArrayFields<RegistrationCreationMetadata, 'createdAtLocation'>
+      | undefined
+  }
+}
+
+/**
+ *
+ * @param locationIds location hierarchy from event index
+ * @param filter jurisdiction filter from the scope
+ * @param user user context to resolve scopes against.
+ * @returns whether the locationIds satisfy the jurisdiction filter for the user.
+ */
+function matchesJurisdictionFilter(
+  locationIds: UUID[] | null | undefined,
+  filter: JurisdictionFilter,
+  user: UserContext | SystemContext
+): boolean {
+  if (!locationIds) {
+    return false
+  }
+
+  if (filter === JurisdictionFilter.enum.location) {
+    return locationIds.some((id) => id === user.primaryOfficeId)
+  }
+  if (filter === JurisdictionFilter.enum.administrativeArea) {
+    return (
+      user.administrativeAreaId === null ||
+      locationIds.some((id) => id === user.administrativeAreaId)
+    )
+  }
+
+  return true
+}
+
+/**
+ * Given indexed event and resolved scope, determine if the scope allows access to the event.
+ *
+ * All of the options within the scope must be satisfied for access to be granted.
+ * Return false early to break out of checks as soon as possible - if any option is not satisfied, the scope does not allow access to the event, so no need to check further options.
+ *
+ */
+export function canAccessEventWithScope(
+  event: Partial<EventIndexWithAdministrativeHierarchy>,
+  scope: RecordScopeV2,
+  user: UserContext | SystemContext,
+  customActionType?: string
+): boolean {
+  const opts = scope.options
+
+  if (opts?.event) {
+    if (!event.type || !opts.event.includes(event.type)) {
+      return false
+    }
+  }
+
+  if (
+    opts?.placeOfEvent === JurisdictionFilter.enum.location &&
+    !matchesJurisdictionFilter(
+      event.placeOfEvent,
+      JurisdictionFilter.enum.location,
+      user
+    )
+  ) {
+    return false
+  }
+
+  if (
+    opts?.placeOfEvent === JurisdictionFilter.enum.administrativeArea &&
+    !matchesJurisdictionFilter(
+      event.placeOfEvent,
+      JurisdictionFilter.enum.administrativeArea,
+      user
+    )
+  ) {
+    return false
+  }
+
+  if (scopeUsesDeclaredOptions(scope)) {
+    const { options } = scope
+
+    if (options?.declaredBy === UserFilter.enum.user) {
+      if (event.legalStatuses?.DECLARED?.createdBy !== user.id) {
+        return false
+      }
+    }
+
+    if (
+      options?.declaredIn === JurisdictionFilter.enum.location &&
+      !matchesJurisdictionFilter(
+        event.legalStatuses?.DECLARED?.createdAtLocation,
+        JurisdictionFilter.enum.location,
+        user
+      )
+    ) {
+      return false
+    }
+
+    if (
+      options?.declaredIn === JurisdictionFilter.enum.administrativeArea &&
+      !matchesJurisdictionFilter(
+        event.legalStatuses?.DECLARED?.createdAtLocation,
+        JurisdictionFilter.enum.administrativeArea,
+        user
+      )
+    ) {
+      return false
+    }
+  }
+
+  if (
+    scopeUsesFullOptions(scope) ||
+    scopeUsesPrintCertifiedCopiesOptions(scope) ||
+    isCustomActionScope(scope)
+  ) {
+    const { options } = scope
+
+    if (options?.registeredBy === UserFilter.enum.user) {
+      if (event.legalStatuses?.REGISTERED?.createdBy !== user.id) {
+        return false
+      }
+    }
+
+    if (
+      options?.registeredIn === JurisdictionFilter.enum.location &&
+      !matchesJurisdictionFilter(
+        event.legalStatuses?.REGISTERED?.createdAtLocation,
+        JurisdictionFilter.enum.location,
+        user
+      )
+    ) {
+      return false
+    }
+
+    if (
+      options?.registeredIn === JurisdictionFilter.enum.administrativeArea &&
+      !matchesJurisdictionFilter(
+        event.legalStatuses?.REGISTERED?.createdAtLocation,
+        JurisdictionFilter.enum.administrativeArea,
+        user
+      )
+    ) {
+      return false
+    }
+  }
+
+  if (isCustomActionScope(scope)) {
+    const { options } = scope
+
+    if (
+      !customActionType ||
+      !options?.customActionTypes ||
+      !options?.customActionTypes.includes(customActionType)
+    ) {
+      return false
+    }
+  }
+
+  return true
+}
+
+export type UserWithResolvedHierarchy = {
+  role: string
+  administrativeHierarchy: UUID[]
+  primaryOfficeId: UUID
+}
+
+export function canAccessUserWithScope({
+  userToAccess,
+  scope,
+  user
+}: {
+  userToAccess: UserWithResolvedHierarchy
+  scope: UserScopeV2
+  user: UserContext | SystemContext
+}): boolean {
+  const opts = scope.options
+
+  const hasSameOffice = user.primaryOfficeId === userToAccess.primaryOfficeId
+
+  if (
+    opts?.accessLevel === JurisdictionFilter.enum.location &&
+    !hasSameOffice
+  ) {
+    return false
+  }
+
+  const hasAdministrativeAreaInHierarchy =
+    userToAccess.administrativeHierarchy.some(
+      (id) => user.administrativeAreaId === id
+    ) || user.administrativeAreaId === null // user with null administrative area has access to all administrative areas
+
+  if (
+    opts?.accessLevel === JurisdictionFilter.enum.administrativeArea &&
+    !hasAdministrativeAreaInHierarchy
+  ) {
+    return false
+  }
+
+  if (scopeUsesRoleOptions(scope)) {
+    const { options } = scope
+    if (options?.role && !options.role.includes(userToAccess.role)) {
+      return false
+    }
+  }
+
+  return true
+}
+
+export function canAccessOtherUserWithScopes({
+  scopes,
+  userToAccess,
+  user
+}: {
+  scopes: UserScopeV2[]
+  userToAccess: UserWithResolvedHierarchy
+  user: UserContext | SystemContext
+}) {
+  return scopes.some((scope) =>
+    canAccessUserWithScope({ userToAccess, scope, user })
+  )
+}
+
+/**
+ * Given indexed event and list of resolved scopes, determine if any of the scopes allow access to the event.
+ *
+ * One of the scopes must allow access for the event to be accessible.
+ */
+export function userCanAccessEventWithScopes(
+  event: Partial<EventIndexWithAdministrativeHierarchy>,
+  scopes: RecordScopeV2[],
+  user: UserContext | SystemContext,
+  customActionType?: string
+) {
+  return scopes.some((scope) =>
+    canAccessEventWithScope(event, scope, user, customActionType)
+  )
+}
+
+// Given an administrative area id, return the full hierarchy from root to leaf.
+export function getAdministrativeAreaHierarchy(
+  administrativeAreaId: string | undefined | null,
+  administrativeAreas: Map<UUID, AdministrativeArea>
+) {
+  // Collect location objects from leaf to root
+  const collectedLocations: AdministrativeArea[] = []
+
+  const parsedAdministrativeAreaId =
+    administrativeAreaId && UUID.safeParse(administrativeAreaId).data
+
+  let current = parsedAdministrativeAreaId
+    ? administrativeAreas.get(parsedAdministrativeAreaId)
+    : null
+
+  while (current) {
+    collectedLocations.push(current)
+    if (!current.parentId) {
+      break
+    }
+    const parentId = current.parentId
+    current = administrativeAreas.get(parentId)
+  }
+
+  return collectedLocations
+}
+
+/**
+ * Resolves a location or administrative area UUID into a root-first hierarchy of UUIDs.
+ *
+ * If the ID refers to a `Location` (e.g. CRVS office), the hierarchy includes
+ * the administrative area ancestors followed by the location itself.
+ * If the ID refers to an `AdministrativeArea`, returns the area's ancestor chain (root-first).
+ *
+ * Uses `getAdministrativeAreaHierarchy` which returns leaf-first order,
+ * so the result is reversed to match the root-first convention used by the server.
+ */
+export function getLocationHierarchy(
+  selectedId: UUID,
+  context: {
+    administrativeAreas: Map<UUID, AdministrativeArea>
+    locations: Map<UUID, Location>
+  }
+): UUID[] {
+  const { administrativeAreas, locations } = context
+  const loc = locations.get(selectedId)
+
+  if (loc) {
+    if (loc.administrativeAreaId) {
+      const hierarchy = getAdministrativeAreaHierarchy(
+        loc.administrativeAreaId,
+        administrativeAreas
+      )
+      return [...hierarchy.reverse().map((area) => area.id), loc.id]
+    }
+    return [loc.id]
+  }
+
+  const hierarchy = getAdministrativeAreaHierarchy(
+    selectedId,
+    administrativeAreas
+  )
+  return hierarchy.reverse().map((area) => area.id)
+}

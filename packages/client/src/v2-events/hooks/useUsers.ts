@@ -9,26 +9,37 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { inferInput, inferOutput } from '@trpc/tanstack-react-query'
 import {
-  FullDocumentUrl,
+  deepDropNulls,
+  System,
   TokenUserType,
-  User,
-  UserOrSystem
+  UserOrSystem,
+  UserOrSystemSummary,
+  UserSummary
 } from '@opencrvs/commons/client'
-import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
-import { getUnsignedFileUrl } from '@client/v2-events/cache'
-import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
+import {
+  hasConflict,
+  queryClient,
+  trpcOptionsProxy,
+  useTRPC
+} from '@client/v2-events/trpc'
+import {
+  QueryOptions,
+  setMutationDefaults,
+  setQueryDefaults
+} from '../features/events/useEvents/procedures/utils'
 import { precacheFile } from '../features/files/useFileUpload'
 
-type UserWithFullUrlFiles = Omit<UserOrSystem, 'signature' | 'avatar'> & {
-  signature?: FullDocumentUrl
-  avatar?: FullDocumentUrl
+type UserWithResolvedFiles = Omit<UserOrSystem, 'signature' | 'avatar'> & {
+  signature?: string
+  avatar?: string
 }
 
 setQueryDefaults<
   typeof trpcOptionsProxy.user.get,
-  Promise<UserWithFullUrlFiles>
+  Promise<UserWithResolvedFiles>
 >(trpcOptionsProxy.user.get, {
   queryFn: async (...params) => {
     const {
@@ -54,54 +65,128 @@ setQueryDefaults<
       await precacheFile(user.avatar)
     }
 
-    return {
+    return deepDropNulls({
       ...user,
-      signature: user.signature
-        ? getUnsignedFileUrl(user.signature)
-        : undefined,
-      avatar: user.avatar ? getUnsignedFileUrl(user.avatar) : undefined
-    }
+      signature: user.signature ?? undefined,
+      avatar: user.avatar
+    })
   }
 })
 
 setQueryDefaults(trpcOptionsProxy.user.list, {
   queryFn: async (...params) => {
     const {
-      queryKey: [, input]
+      queryKey: [procedurePath, input]
     } = params[0]
 
-    const queryOptions = trpcOptionsProxy.user.list.queryOptions(input.input)
+    const requestedIds = input.input ?? []
 
-    if (typeof queryOptions.queryFn !== 'function') {
-      throw new Error('queryFn is not a function')
+    const cachedUserMap = new Map(
+      queryClient
+        .getQueriesData<inferOutput<typeof trpcOptionsProxy.user.list>>({
+          queryKey: trpcOptionsProxy.user.list.queryKey()
+        })
+        .flatMap(([, data]) => data ?? [])
+        .map((user) => [user.id as string, user])
+    )
+    const uncachedIds = requestedIds.filter((id) => !cachedUserMap.has(id))
+
+    if (uncachedIds.length > 0) {
+      const uncachedQueryOptions =
+        trpcOptionsProxy.user.list.queryOptions(uncachedIds)
+
+      if (typeof uncachedQueryOptions.queryFn !== 'function') {
+        throw new Error('queryFn is not a function')
+      }
+
+      // Construct a context whose queryKey input is the uncached IDs only, so
+      // the raw tRPC queryFn makes an HTTP request for only those users.
+      const freshUsers = await uncachedQueryOptions.queryFn({
+        ...params[0],
+        queryKey: [
+          procedurePath,
+          { input: uncachedIds }
+        ] as (typeof params)[0]['queryKey']
+      })
+
+      await Promise.allSettled(
+        freshUsers.map(async (user) => {
+          if (user.type === TokenUserType.enum.system) {
+            return user
+          }
+          if (user.avatar) {
+            await precacheFile(user.avatar)
+          }
+          return user
+        })
+      )
+
+      for (const user of freshUsers) {
+        cachedUserMap.set(user.id as string, user)
+      }
     }
 
-    const users = await queryOptions.queryFn(...params)
+    // Return only the originally-requested IDs from the combined map,
+    // silently dropping any IDs the server does not know about.
+    return requestedIds
+      .map((id) => cachedUserMap.get(id))
+      .filter((u): u is UserSummary => u !== undefined)
+  }
+})
 
-    await Promise.allSettled(
-      users.map(async (user) => {
-        if (user.type === TokenUserType.enum.system) {
-          return user
-        }
+setMutationDefaults(trpcOptionsProxy.user.changePhone, {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  mutationFn: trpcOptionsProxy.user.changePhone.mutationOptions().mutationFn!,
+  retry: false,
+  onSuccess: async (data, variables) => {
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.get.queryKey(variables.userId)
+    })
 
-        if (user.signature) {
-          return precacheFile(user.signature)
-        }
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.list.queryKey()
+    })
 
-        if (user.avatar) {
-          return precacheFile(user.avatar)
-        }
-        return user
-      })
-    )
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.search.queryKey()
+    })
+  }
+})
 
-    return users.map((user) => ({
-      ...user,
-      signature: user.signature
-        ? getUnsignedFileUrl(user.signature)
-        : undefined,
-      avatar: user.avatar ? getUnsignedFileUrl(user.avatar) : undefined
-    }))
+setMutationDefaults(trpcOptionsProxy.user.changeEmail, {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  mutationFn: trpcOptionsProxy.user.changeEmail.mutationOptions().mutationFn!,
+  retry: false,
+  onSuccess: async (data, variables) => {
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.get.queryKey(variables.userId)
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.list.queryKey()
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.search.queryKey()
+    })
+  }
+})
+setMutationDefaults(trpcOptionsProxy.user.changeAvatar, {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  mutationFn: trpcOptionsProxy.user.changeAvatar.mutationOptions().mutationFn!,
+  retry: false,
+  onSuccess: async (data, variables) => {
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.get.queryKey(variables.userId)
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.list.queryKey()
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.search.queryKey()
+    })
   }
 })
 
@@ -130,14 +215,83 @@ export function useUsers() {
             queryKey: trpc.user.get.queryKey(id)
           }).data
         ]
-      },
+      }
+    },
+    createUser: ({
+      onSuccess
+    }: {
+      onSuccess?: (response: inferOutput<typeof trpc.user.create>) => void
+    } = {}) => {
+      const mutationOptions = trpc.user.create.mutationOptions()
+
+      return useMutation({
+        ...mutationOptions,
+        retry: (_failureCount, error) => {
+          return !hasConflict(error)
+        },
+        onSuccess: (response) => {
+          onSuccess?.(response)
+        }
+      })
+    },
+    updateUser: ({
+      onSuccess,
+      onError
+    }: {
+      onSuccess?: (response: inferOutput<typeof trpc.user.update>) => void
+      onError?: () => void
+    } = {}) => {
+      const mutationOptions = trpc.user.update.mutationOptions()
+
+      return useMutation({
+        ...mutationOptions,
+        onSuccess: async (response) => {
+          await queryClient.invalidateQueries({
+            queryKey: trpc.user.get.queryKey(response.id)
+          })
+
+          await queryClient.invalidateQueries({
+            queryKey: trpc.user.list.queryKey()
+          })
+
+          await queryClient.invalidateQueries({
+            queryKey: trpc.user.search.queryKey()
+          })
+
+          onSuccess?.(response)
+        },
+        onError: () => {
+          onError?.()
+        }
+      })
+    },
+    activateUser: ({
+      onSuccess,
+      onError
+    }: { onSuccess?: () => void; onError?: () => void } = {}) => {
+      const mutationOptions = trpc.user.activate.mutationOptions()
+
+      return useMutation({
+        ...mutationOptions,
+        onSuccess: () => {
+          onSuccess?.()
+        },
+        onError: () => {
+          onError?.()
+        }
+      })
+    },
+    getSystem: {
       getAllCached: () => {
         return queryClient
-          .getQueriesData<User>({
-            queryKey: trpc.user.get.queryKey()
+          .getQueriesData<UserOrSystemSummary[]>({
+            queryKey: trpc.user.list.queryKey()
           })
-          .flatMap(([, data]) => data)
-          .filter((user): user is User => Boolean(user))
+          .flatMap(([, data]) => data ?? [])
+          .filter(
+            (userOrSystem): userOrSystem is System =>
+              userOrSystem.type === TokenUserType.enum.system
+          )
       }
     },
     getUsers: {
@@ -156,7 +310,86 @@ export function useUsers() {
             queryKey: trpc.user.list.queryKey(ids)
           }).data
         ]
+      },
+      useQueryById: (
+        id: string,
+        options?: {
+          enabled?: boolean
+        }
+      ) => {
+        const ids = id ? [id] : []
+        const { queryFn, ...queryOptions } = trpc.user.list.queryOptions(ids)
+        const query = useQuery({
+          ...queryOptions,
+          ...options,
+          enabled: !!id && (options?.enabled ?? true),
+          queryKey: trpc.user.list.queryKey(ids)
+        })
+        const data = query.data
+        return {
+          ...query,
+          data: data?.[0]
+        }
+      },
+      getAllCached: () => {
+        return queryClient
+          .getQueriesData<UserOrSystemSummary[]>({
+            queryKey: trpc.user.list.queryKey()
+          })
+          .flatMap(([, data]) => data ?? [])
+          .filter(
+            (userOrSystem): userOrSystem is UserSummary =>
+              userOrSystem.type === TokenUserType.enum.user
+          )
       }
-    }
+    },
+    searchUsers: {
+      useQuery: (
+        input: inferInput<typeof trpc.user.search>,
+        additionalOptions: QueryOptions<typeof trpc.user.search> = {}
+      ) => {
+        return useQuery({
+          ...trpc.user.search.queryOptions(input),
+          ...additionalOptions,
+          queryKey: trpc.user.search.queryKey(input)
+        })
+      },
+      useSuspenseQuery: (
+        input: inferInput<typeof trpc.user.search>,
+        additionalOptions: QueryOptions<typeof trpc.user.search> = {}
+      ) => {
+        return [
+          useSuspenseQuery({
+            ...trpc.user.search.queryOptions(input),
+            ...additionalOptions,
+            queryKey: trpc.user.search.queryKey(input)
+          }).data
+        ]
+      }
+    },
+    changePassword: useMutation(
+      trpcOptionsProxy.user.changePassword.mutationOptions()
+    ),
+    sendVerifyCode: useMutation(
+      trpcOptionsProxy.user.sendVerifyCode.mutationOptions()
+    ),
+    changePhone: useMutation(
+      trpcOptionsProxy.user.changePhone.mutationOptions()
+    ),
+    changeEmail: useMutation(
+      trpcOptionsProxy.user.changeEmail.mutationOptions()
+    ),
+    changeAvatar: useMutation(
+      trpcOptionsProxy.user.changeAvatar.mutationOptions()
+    ),
+    sendUsernameReminder: useMutation(
+      trpcOptionsProxy.user.sendUsernameReminder.mutationOptions()
+    ),
+    sendResetPasswordInvite: useMutation(
+      trpcOptionsProxy.user.sendResetPasswordInvite.mutationOptions()
+    ),
+    resendInvite: useMutation(
+      trpcOptionsProxy.user.resendInvite.mutationOptions()
+    )
   }
 }

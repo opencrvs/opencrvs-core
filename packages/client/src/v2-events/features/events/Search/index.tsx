@@ -11,7 +11,7 @@
 
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { AdvancedSearch } from './AdvancedSearch'
-import { SearchResultIndex as SearchResult } from './SearchResultIndex'
+import { SearchResultIndex as SearchResult } from './SearchResult'
 
 const AdvancedSearchIndex = withSuspense(AdvancedSearch)
 const SearchResultIndex = withSuspense(SearchResult)

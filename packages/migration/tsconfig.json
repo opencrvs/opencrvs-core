@@ -12,6 +12,7 @@
     "rootDir": ".",
     "outDir": "build/dist",
     "strict": true,
+    "skipLibCheck": true,
     "lib": ["esnext.asynciterable", "es6", "es2017", "dom"],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,

@@ -27,12 +27,14 @@ export function FormLayout({
   route,
   children,
   onSaveAndExit,
-  appbarIcon = <DeclarationIcon />
+  appbarIcon = <DeclarationIcon />,
+  actionComponent
 }: {
   route: AllowedRouteWithEventId
   children: React.ReactNode
   onSaveAndExit?: () => void | Promise<void>
   appbarIcon?: React.ReactNode
+  actionComponent?: React.ReactNode
 }) {
   const intl = useIntl()
   const { eventId } = useTypedParams(route)
@@ -46,6 +48,7 @@ export function FormLayout({
     <Frame
       header={
         <FormHeader
+          actionComponent={actionComponent}
           appbarIcon={appbarIcon}
           label={intl.formatMessage(configuration.label)}
           route={route}

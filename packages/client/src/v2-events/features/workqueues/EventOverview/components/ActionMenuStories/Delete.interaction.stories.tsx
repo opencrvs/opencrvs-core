@@ -18,7 +18,8 @@ import {
   generateEventDocument,
   generateTrackingId,
   getCurrentEventState,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  TestUserRole
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -26,6 +27,7 @@ import {
   addLocalEventConfig,
   setEventData
 } from '@client/v2-events/features/events/useEvents/api'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 import { ActionMenu } from '../ActionMenu'
 
 export default {
@@ -38,13 +40,15 @@ const createdEventDocument = generateEventDocument({
     {
       type: ActionType.CREATE,
       user: {
-        assignedTo: '6821c175dce4d7886d4e8210'
+        id: testDataGenerator().user.registrationAgent().v2.id,
+        assignedTo: testDataGenerator().user.registrationAgent().v2.id
       }
     },
     {
       type: ActionType.ASSIGN,
       user: {
-        assignedTo: '6821c175dce4d7886d4e8210'
+        id: testDataGenerator().user.registrationAgent().v2.id,
+        assignedTo: testDataGenerator().user.registrationAgent().v2.id
       }
     }
   ],
@@ -70,10 +74,12 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 export const deletedScenariosForRegistrationAgent: StoryObj<typeof ActionMenu> =
   {
     parameters: {
+      chromatic: { disableSnapshot: true },
+      userRole: TestUserRole.enum.REGISTRATION_AGENT,
       layout: 'centered',
       reactRouter: {
         router: routesConfig,
-        initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+        initialPath: ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({
           eventId: createdEventDocument.id
         })
       },
@@ -109,13 +115,13 @@ export const deletedScenariosForRegistrationAgent: StoryObj<typeof ActionMenu> =
             document.querySelector('#action-Dropdown-Content')
           )
 
-          // click the 3rd <li>
+          // click the 2nd <li>
           const items = list?.querySelectorAll('li')
-          if (!items || items.length < 3) {
+          if (!items || items.length < 2) {
             throw new Error('Menu items not found')
           }
 
-          await userEvent.click(items[2])
+          await userEvent.click(items[1])
 
           await expect(canvas.getByText('Delete draft?')).toBeInTheDocument()
           await expect(

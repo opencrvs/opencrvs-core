@@ -30,9 +30,9 @@ jobs:
           cd $HOME/countryconfig
           git clone https://github.com/opencrvs/opencrvs-countryconfig.git
           cd opencrvs-countryconfig
-          if [ -n "$(git branch -a | grep ${{ github.head_ref }})" ]; then
+          if git show-ref --verify --quiet "refs/remotes/origin/${{ github.head_ref }}"; then
             working_branch=${{ github.head_ref }}
-          elif [ -n "$(git branch -a | grep ${{ github.base_ref }})" ]; then
+          elif git show-ref --verify --quiet "refs/remotes/origin/${{ github.base_ref }}"; then
             working_branch=${{ github.base_ref }}
           else
             working_branch='develop'
@@ -62,13 +62,13 @@ jobs:
           echo "countryconfig_path=$HOME/countryconfig/opencrvs-countryconfig" >> $GITHUB_OUTPUT
 
       - name: Checkout core repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: opencrvs/opencrvs-core
           ref: ${{ github.head_ref }}
 
       - name: Setup Node.js from core nvmrc
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
 

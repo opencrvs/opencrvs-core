@@ -17,6 +17,7 @@ import {
   ActionStatus,
   ActionType,
   Draft,
+  FieldConfig,
   generateEventDocument,
   generateWorkqueues,
   getCurrentEventState,
@@ -130,7 +131,7 @@ export const SaveAndExit: Story = {
           tRPCMsw.event.get.query(() => {
             return undeclaredDraftEvent
           }),
-          tRPCMsw.event.search.query((input) => {
+          tRPCMsw.event.search.query(() => {
             return {
               results: [
                 getCurrentEventState(
@@ -191,10 +192,10 @@ export const SaveAndExit: Story = {
       await userEvent.click(modal.getByRole('button', { name: /Confirm/ }))
     })
 
-    await step('Navigate to My drafts workqueue', async () => {
+    await step('Navigate to Drafts workqueue', async () => {
       await waitFor(
         async () =>
-          userEvent.click(canvas.getByRole('button', { name: /My drafts/ })),
+          userEvent.click(canvas.getByRole('button', { name: /Drafts/ })),
         { timeout: 5000 }
       )
     })
@@ -210,10 +211,7 @@ export const SaveAndExit: Story = {
     const recordInCreatedState = canvas.queryByText(/CREATED_STATUS/)
     await expect(recordInCreatedState).not.toBeInTheDocument()
 
-    const reviewButton = canvas.queryByRole('button', { name: 'Review' })
-    await expect(reviewButton).not.toBeInTheDocument()
-    // Draft status should not affect the action.
-    await canvas.findByRole('button', { name: 'Declare' })
+    await canvas.findByRole('button', { name: 'Update' })
   }
 }
 
@@ -303,16 +301,14 @@ export const DraftShownInForm: Story = {
 
     await waitFor(
       async () =>
-        userEvent.click(
-          await canvas.findByRole('button', { name: /My drafts/ })
-        ),
+        userEvent.click(await canvas.findByRole('button', { name: /Drafts/ })),
       { timeout: 5000 }
     )
     await userEvent.click(await canvas.findByText('Clearly Draft'))
 
     await userEvent.click(await canvas.findByRole('button', { name: /Action/ }))
 
-    await userEvent.click(await canvas.findByText(/Declare/))
+    await userEvent.click(await canvas.findByText(/Update/))
   }
 }
 
@@ -373,7 +369,117 @@ export const FilledPagesVisibleInReview: Story = {
   }
 }
 
+const placeOfEventFieldConfig: FieldConfig = {
+  id: 'eventLocationId',
+  label: {
+    id: 'event.birth.action.declare.form.section.child.field.birthLocation.label',
+    defaultMessage: 'Health Institution',
+    description: 'This is the label for the field'
+  },
+  parent: {
+    $$field: 'applicant.address',
+    $$subfield: []
+  },
+  required: true,
+  conditionals: [],
+  secured: false,
+  validation: [],
+  hideLabel: false,
+  uncorrectable: false,
+  value: {
+    $$field: 'applicant.address',
+    $$subfield: ['administrativeArea']
+  },
+  analytics: false,
+  type: 'ALPHA_HIDDEN'
+}
+
+const overriddenEventConfig = {
+  ...tennisClubMembershipEvent,
+  label: {
+    defaultMessage: 'Tennis club membership application with Place of Event',
+    description: 'This is what this event is referred as in the system',
+    id: 'event.tennis-club-membership.label'
+  },
+  placeOfEvent: { $$field: 'eventLocationId', $$subfield: [] },
+  declaration: {
+    ...tennisClubMembershipEvent.declaration,
+    pages: tennisClubMembershipEvent.declaration.pages.map((page, index) => {
+      if (index === 0) {
+        return {
+          ...page,
+          fields: [...page.fields, placeOfEventFieldConfig]
+        }
+      }
+      return page
+    })
+  }
+}
+
 export const CanSubmitValidlyFilledForm: Story = {
+  parameters: {
+    offline: {
+      events: [undeclaredDraftEvent],
+      configs: [overriddenEventConfig]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
+        eventId: undeclaredDraftEvent.id,
+        pageId: 'applicant'
+      })
+    },
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.actions.declare.request.mutation(async (payload) => {
+            await expect(payload.declaration?.['recommender.name']).toBeNull()
+            return generateEventDocument({
+              configuration: overriddenEventConfig,
+              actions: [
+                { type: ActionType.CREATE },
+                { type: ActionType.DECLARE }
+              ]
+            })
+          }),
+          tRPCMsw.event.actions.register.request.mutation(async (payload) => {
+            await expect(payload.declaration).not.toHaveProperty(
+              'recommender.name'
+            )
+            return generateEventDocument({
+              configuration: overriddenEventConfig,
+              actions: [
+                { type: ActionType.CREATE },
+                { type: ActionType.DECLARE },
+
+                { type: ActionType.REGISTER }
+              ]
+            })
+          }),
+          tRPCMsw.event.search.query((input) => {
+            return {
+              results: [
+                getCurrentEventState(
+                  generateEventDocument({
+                    configuration: overriddenEventConfig,
+                    actions: [
+                      { type: ActionType.CREATE },
+                      { type: ActionType.DECLARE },
+
+                      { type: ActionType.REGISTER }
+                    ]
+                  }),
+                  overriddenEventConfig
+                )
+              ],
+              total: 1
+            }
+          })
+        ]
+      }
+    },
+    chromatic: { disableSnapshot: true }
+  },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
@@ -396,10 +502,6 @@ export const CanSubmitValidlyFilledForm: Story = {
 
       await userEvent.type(await canvas.findByPlaceholderText('yyyy'), '1990')
 
-      await userEvent.click(
-        await canvas.findByText('Tennis club membership application')
-      )
-
       const country = await canvas.findByTestId('location__country')
       await userEvent.click(country)
       await selectEvent.select(country, 'Bangladesh')
@@ -411,6 +513,10 @@ export const CanSubmitValidlyFilledForm: Story = {
       const district = await canvas.findByLabelText(/District/i)
       await userEvent.click(district)
       await selectEvent.select(district, 'Ibombo')
+
+      const village = await canvas.findByLabelText(/Village/i)
+      await userEvent.click(village)
+      await selectEvent.select(village, 'Pemba')
 
       const continueButton = await canvas.findByText('Continue')
       await userEvent.click(continueButton)
@@ -439,85 +545,9 @@ export const CanSubmitValidlyFilledForm: Story = {
       async () => {
         await expect(canvas.queryByText('Required')).not.toBeInTheDocument()
         const registerButton = await canvas.findByText('Register')
-        await expect(registerButton).toBeEnabled()
         await userEvent.click(registerButton)
         await userEvent.click(await canvas.findByTestId('confirm_Declare'))
       }
     )
-  },
-  parameters: {
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
-        eventId: undeclaredDraftEvent.id,
-        pageId: 'applicant'
-      })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return undeclaredDraftEvent
-          }),
-          tRPCMsw.event.actions.declare.request.mutation(async (payload) => {
-            await expect(payload.declaration?.['recommender.name']).toBeNull()
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                { type: ActionType.CREATE },
-                { type: ActionType.DECLARE }
-              ]
-            })
-          }),
-          tRPCMsw.event.actions.validate.request.mutation(async (payload) => {
-            await expect(payload.declaration).not.toHaveProperty(
-              'recommender.name'
-            )
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                { type: ActionType.CREATE },
-                { type: ActionType.DECLARE },
-                { type: ActionType.VALIDATE }
-              ]
-            })
-          }),
-          tRPCMsw.event.actions.register.request.mutation(async (payload) => {
-            await expect(payload.declaration).not.toHaveProperty(
-              'recommender.name'
-            )
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                { type: ActionType.CREATE },
-                { type: ActionType.DECLARE },
-                { type: ActionType.VALIDATE },
-                { type: ActionType.REGISTER }
-              ]
-            })
-          }),
-          tRPCMsw.event.search.query((input) => {
-            return {
-              results: [
-                getCurrentEventState(
-                  generateEventDocument({
-                    configuration: tennisClubMembershipEvent,
-                    actions: [
-                      { type: ActionType.CREATE },
-                      { type: ActionType.DECLARE },
-                      { type: ActionType.VALIDATE },
-                      { type: ActionType.REGISTER }
-                    ]
-                  }),
-                  tennisClubMembershipEvent
-                )
-              ],
-              total: 1
-            }
-          })
-        ]
-      }
-    },
-    chromatic: { disableSnapshot: true }
   }
 }

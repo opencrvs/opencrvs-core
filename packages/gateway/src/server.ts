@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ApolloServer, BaseContext } from '@apollo/server'
 import { getPlugins } from '@gateway/config/plugins'
 import { getRoutes } from '@gateway/config/routes'
 import {
@@ -27,12 +26,7 @@ import * as Hapi from '@hapi/hapi'
 import { logger, validateFunc } from '@opencrvs/commons'
 import { readFileSync } from 'fs'
 
-import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default'
-import hapiApollo from '@as-integrations/hapi'
-import { getApolloConfig } from '@gateway/graphql/config'
-import * as database from '@gateway/utils/redis'
 import { badRequest, Boom, isBoom } from '@hapi/boom'
-import { Context } from './graphql/context'
 import { RateLimitError } from './rate-limit'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
@@ -67,11 +61,6 @@ export async function createServer() {
   const plugins = getPlugins()
 
   await app.register(plugins)
-
-  const apolloServer = new ApolloServer<BaseContext>({
-    ...getApolloConfig(),
-    plugins: [ApolloServerPluginLandingPageLocalDefault({ footer: false })]
-  })
 
   app.auth.strategy('jwt', 'jwt', {
     key: publicCert,
@@ -133,44 +122,12 @@ export async function createServer() {
   }
 
   async function start() {
-    await apolloServer.start()
-
-    await app.register({
-      plugin: hapiApollo,
-      options: {
-        path: '/graphql',
-        postRoute: {
-          options: {
-            auth: {
-              strategy: 'jwt',
-              mode: 'try'
-            }
-          }
-        },
-        getRoute: {
-          options: {
-            auth: {
-              strategy: 'jwt',
-              mode: 'try'
-            }
-          }
-        },
-        context: async ({ request }) => new Context(request),
-        apolloServer
-      }
-    })
-
-    // Start database before application server.
-    // We have had issues where the database was not ready when the server started which resulted in redis instance being undefined.
-
-    await database.start()
     await app.start()
     app.log('info', `server started on port ${PORT}`)
   }
 
   async function stop() {
     await app.stop()
-    await database.stop()
     app.log('info', 'server stopped')
   }
 

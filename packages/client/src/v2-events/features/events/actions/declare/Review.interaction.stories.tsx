@@ -12,7 +12,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { graphql, HttpResponse } from 'msw'
 import { userEvent, within, expect, waitFor } from '@storybook/test'
 import {
   ActionType,
@@ -74,7 +73,8 @@ export default meta
 
 type Story = StoryObj<typeof ReviewIndex>
 
-const mockUser = generator.user.fieldAgent().v2
+const mockUser = generator.user.fieldAgent().summary
+const mockUserFull = generator.user.fieldAgent().v2
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {
@@ -132,13 +132,6 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
           ...declarationTrpcMsw.events.handlers
         ],
         user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.localRegistrar().v1
-              }
-            })
-          }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
           }),
@@ -154,7 +147,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
             }
           }),
           tRPCMsw.user.get.query((id) => {
-            return mockUser
+            return mockUserFull
           })
         ]
       }
@@ -165,20 +158,18 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
       const canvas = within(canvasElement)
 
       await waitFor(async () => {
-        const registerButton = await canvas.findByRole('button', {
-          name: 'Register'
-        })
-
-        await expect(registerButton).toBeEnabled()
-        await userEvent.click(registerButton)
+        await userEvent.click(
+          await canvas.findByRole('button', { name: 'Action' })
+        )
+        await userEvent.click(await canvas.findByText('Register'))
       })
 
-      const modal = within(await canvas.findByRole('dialog'))
+      await canvas.findByRole('button', { name: 'Cancel' })
 
-      await modal.findByText('Register the tennis club membership application?')
-      await modal.findByRole('button', { name: 'Cancel' })
       await userEvent.click(
-        await modal.findByRole('button', { name: 'Register' })
+        await canvas.findByRole('button', {
+          name: 'Register'
+        })
       )
     })
 
@@ -192,7 +183,6 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
           'event.create': false,
           'event.actions.notify.request': false,
           'event.actions.declare.request': true,
-          'event.actions.validate.request': true,
           'event.actions.register.request': true
         })
       })
@@ -218,18 +208,11 @@ const msw = {
       ...declarationTrpcMsw.events.handlers
     ],
     user: [
-      graphql.query('fetchUser', () => {
-        return HttpResponse.json({
-          data: {
-            getUser: generator.user.registrationAgent().v1
-          }
-        })
-      }),
       tRPCMsw.user.list.query(([id]) => {
         return [mockUser]
       }),
       tRPCMsw.user.get.query((id) => {
-        return mockUser
+        return mockUserFull
       })
     ]
   }
@@ -262,18 +245,19 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     msw
   },
   play: async ({ canvasElement, step }) => {
-    await step('Modal has scope based content', async () => {
+    await step('User can declare', async () => {
       const canvas = within(canvasElement)
       await userEvent.click(
-        await canvas.findByRole('button', { name: 'Send for approval' })
+        await canvas.findByRole('button', { name: 'Action' })
       )
+      await userEvent.click(await canvas.findByText('Declare'))
 
-      const modal = within(await canvas.findByRole('dialog'))
+      await canvas.findByRole('button', { name: 'Cancel' })
 
-      await modal.findByText('Send for approval?')
-      await modal.findByRole('button', { name: 'Cancel' })
       await userEvent.click(
-        await modal.findByRole('button', { name: 'Confirm' })
+        await canvas.findByRole('button', {
+          name: 'Declare'
+        })
       )
     })
 
@@ -287,7 +271,6 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
           'event.create': false,
           'event.actions.notify.request': false,
           'event.actions.declare.request': true,
-          'event.actions.validate.request': true,
           'event.actions.register.request': false
         })
       })
@@ -319,19 +302,19 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
     msw
   },
   play: async ({ canvasElement, step }) => {
-    await step('Modal has scope based content', async () => {
+    await step('User can perform declare action', async () => {
       const canvas = within(canvasElement)
       await userEvent.click(
-        await canvas.findByRole('button', { name: 'Send for review' })
+        await canvas.findByRole('button', { name: 'Action' })
       )
+      await userEvent.click(await canvas.findByText('Declare'))
 
-      const modal = within(await canvas.findByRole('dialog'))
+      await canvas.findByRole('button', { name: 'Cancel' })
 
-      await modal.findByText('Send for review?')
-      await modal.findByText('This declaration will be sent for review')
-      await modal.findByRole('button', { name: 'Cancel' })
       await userEvent.click(
-        await modal.findByRole('button', { name: 'Confirm' })
+        await canvas.findByRole('button', {
+          name: 'Declare'
+        })
       )
     })
 
@@ -345,7 +328,6 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
           'event.create': false,
           'event.actions.notify.request': false,
           'event.actions.declare.request': true,
-          'event.actions.validate.request': false,
           'event.actions.register.request': false
         })
       })
@@ -413,18 +395,11 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
           ...declarationTrpcMsw.events.handlers
         ],
         user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.fieldAgent().v1
-              }
-            })
-          }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
           }),
           tRPCMsw.user.get.query((id) => {
-            return mockUser
+            return mockUserFull
           })
         ]
       }
@@ -434,18 +409,16 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
     await step('Modal has scope based content', async () => {
       const canvas = within(canvasElement)
       await userEvent.click(
-        await canvas.findByRole('button', { name: 'Send for review' })
+        await canvas.findByRole('button', { name: 'Action' })
       )
+      await userEvent.click(await canvas.findByText('Notify'))
 
-      const modal = within(await canvas.findByRole('dialog'))
+      await canvas.findByRole('button', { name: 'Cancel' })
 
-      await modal.findByText('Send for review?')
-      await modal.findByRole('button', { name: 'Cancel' })
-      await modal.findByText(
-        'This incomplete declaration will be sent for review.'
-      )
       await userEvent.click(
-        await modal.findByRole('button', { name: 'Confirm' })
+        await canvas.findByRole('button', {
+          name: 'Notify'
+        })
       )
     })
 
@@ -459,7 +432,6 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
           'event.create': false,
           'event.actions.notify.request': true,
           'event.actions.declare.request': false,
-          'event.actions.validate.request': false,
           'event.actions.register.request': false
         })
       })
@@ -513,7 +485,22 @@ export const ReviewForIncompleteNameInteraction: Story = {
 
       const goToReviewButton = await canvas.findByText('Go to review')
       await userEvent.click(goToReviewButton)
-      await canvas.findByText('Declaration incomplete')
+
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Action' })
+      )
+
+      await expect(
+        canvas.getByText('Declare', { selector: 'li[disabled]' })
+      ).toBeInTheDocument()
+
+      await userEvent.click(await canvas.findByText('Notify'))
+
+      await userEvent.click(
+        await canvas.findByRole('button', {
+          name: 'Notify'
+        })
+      )
     })
   }
 }

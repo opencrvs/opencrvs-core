@@ -19,7 +19,6 @@ import {
   ActionType,
   EventDocument,
   EventIndex,
-  getActionReview,
   getCurrentEventState,
   getDeclaration
 } from '@opencrvs/commons/client'
@@ -131,7 +130,7 @@ function ReviewDuplicate() {
   const intl = useIntl()
   const navigate = useNavigate()
   const events = useEvents()
-  const event = events.getEvent.findFromCache(eventId).data
+  const event = events.getEvent.useFindEventFromCache(eventId).data
   const validatorContext = useValidatorContext(event)
 
   useEffect(() => {
@@ -140,7 +139,7 @@ function ReviewDuplicate() {
       console.warn(
         `Event with id ${eventId} not found in cache. Redirecting to overview.`
       )
-      return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+      return navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
     }
   }, [event, eventId, navigate])
 
@@ -185,7 +184,14 @@ function ReviewDuplicate() {
     }))
   ]
 
-  const { title, fields } = getActionReview(configuration, ActionType.READ)
+  const actionConfiguration = configuration.actions.find(
+    (a) => a.type === ActionType.READ
+  )
+  if (!actionConfiguration) {
+    throw new Error('Action configuration not found')
+  }
+
+  const { title, fields } = actionConfiguration.review
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const formConfig = getDeclaration(configuration)

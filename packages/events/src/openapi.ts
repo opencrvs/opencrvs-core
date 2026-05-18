@@ -19,5 +19,66 @@ export const openApiDocument = generateOpenApiDocument(appRouter, {
   baseUrl: 'http://localhost:3000/api/events'
 })
 
+// Manually add the attachments endpoint
+ ;(openApiDocument.paths || {})['/attachments'] = {
+  post: {
+    summary: 'Upload a file attachment',
+    tags: ['Attachments'],
+    security: [{ bearerAuth: ['attachment.upload'] }],
+    requestBody: {
+      required: true,
+      content: {
+        'multipart/form-data': {
+          schema: {
+            type: 'object',
+            properties: {
+              path: {
+                type: 'string',
+                description: 'Optional path in S3 where the file should be stored'
+              },
+              transactionId: {
+                type: 'string',
+                description: 'Transaction ID'
+              },
+              file: {
+                type: 'string',
+                format: 'binary',
+                description: 'File to upload'
+              }
+            },
+            required: ['transactionId', 'file']
+          }
+        }
+      }
+    },
+    responses: {
+      '200': {
+        description: 'File uploaded successfully. Requires authentication and attachment.upload scope.',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                result: {
+                  type: 'object',
+                  properties: {
+                    data: {
+                      type: 'object',
+                      properties: {
+                        json: {
+                          type: 'string'
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
 // eslint-disable-next-line no-console
 console.log(yaml.stringify(openApiDocument))

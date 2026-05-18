@@ -13,8 +13,7 @@ import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import {
   formMessages as messages,
   buttonMessages,
-  userMessages,
-  QUESTION_KEYS
+  userMessages
 } from '@client/i18n/messages'
 import styled from 'styled-components'
 import { InputError } from '@opencrvs/components/lib/InputField'
@@ -29,6 +28,17 @@ import {
   ISecurityQuestionAnswer
 } from '@client/components/ProtectedAccount'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+
+enum QUESTION_KEYS {
+  BIRTH_TOWN,
+  HIGH_SCHOOL,
+  MOTHER_NAME,
+  FAVORITE_TEACHER,
+  FAVORITE_MOVIE,
+  FAVORITE_SONG,
+  FAVORITE_FOOD,
+  FIRST_CHILD_NAME
+}
 
 const EMPTY_VALUE = ''
 const VISIBLE_QUESTION = 3

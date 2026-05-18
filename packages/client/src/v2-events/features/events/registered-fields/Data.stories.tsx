@@ -112,7 +112,7 @@ export const DataDisplay: Story = {
 export const DataDisplayWithConditionallyHiddenFields: Story = {
   parameters: {
     layout: 'centered',
-    userRole: TestUserRole.Enum.REGISTRATION_AGENT
+    userRole: TestUserRole.enum.REGISTRATION_AGENT
   },
   render: (args) => {
     return (
@@ -174,7 +174,7 @@ export const DataDisplayWithConditionallyHiddenFields: Story = {
 export const DataDisplayWithConditionallyShownFields: Story = {
   parameters: {
     layout: 'centered',
-    userRole: TestUserRole.Enum.FIELD_AGENT
+    userRole: TestUserRole.enum.FIELD_AGENT
   },
   render: (args) => {
     return (

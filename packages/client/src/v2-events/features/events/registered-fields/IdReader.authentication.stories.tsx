@@ -1,0 +1,282 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+
+import { Meta, StoryObj } from '@storybook/react'
+import React from 'react'
+import styled from 'styled-components'
+import {
+  field,
+  FieldConfig,
+  FieldType,
+  FieldValue,
+  not,
+  TestUserRole
+} from '@opencrvs/commons/client'
+import { Stack } from '@opencrvs/components'
+import { TRPCProvider } from '@client/v2-events/trpc'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { getTestValidatorContext } from '../../../../../.storybook/decorators'
+
+const meta: Meta = {
+  title: 'ID Authentication',
+  argTypes: {},
+  decorators: [
+    (Story) => (
+      <TRPCProvider>
+        <Story />
+      </TRPCProvider>
+    )
+  ]
+}
+
+export default meta
+
+const StyledFormFieldGenerator = styled(FormFieldGenerator)`
+  width: 600px;
+`
+
+const qrMethod = {
+  id: 'storybook.id-reader.qr',
+  type: FieldType.QR_READER,
+  label: {
+    id: 'storybook.id-reader.qr.label',
+    defaultMessage: 'Scan QR code',
+    description: 'Label for QR code reader option'
+  }
+} as const
+
+const authMethod = {
+  id: 'storybook.id-reader.authentication',
+  type: FieldType.LINK_BUTTON,
+  label: {
+    id: 'storybook.id-reader.authentication.label',
+    defaultMessage: 'Use authentication',
+    description: 'Label for authentication option'
+  },
+  configuration: {
+    icon: 'Fingerprint',
+    url: 'https://fake-auth-service.opencrvs.org',
+    text: {
+      id: 'storybook.id-reader.authentication.button.label',
+      defaultMessage: 'Authenticate with National ID system',
+      description: 'Authentication button label'
+    }
+  }
+} as const
+
+const idReaderWithAuth: FieldConfig = {
+  id: 'storybook.id-reader',
+  type: FieldType.ID_READER,
+  label: {
+    id: 'storybook.id-reader.label',
+    defaultMessage: 'ID Reader',
+    description: 'ID Reader label'
+  },
+  methods: [authMethod, qrMethod],
+  helperText: {
+    id: 'storybook.id-reader.helperText',
+    defaultMessage:
+      'Scan the QR code on the ID card or authenticate online to fetch details.',
+    description: 'Helper text for ID reader with authentication option'
+  }
+}
+
+function paragraph(text: string): FieldConfig {
+  return {
+    id: 'storybook.paragraph.' + text.toLowerCase().replace(/\s+/g, '-'),
+    type: FieldType.PARAGRAPH,
+    label: {
+      id:
+        'storybook.paragraph.' +
+        text.toLowerCase().replace(/\s+/g, '-') +
+        '.label',
+      defaultMessage: text,
+      description: ''
+    },
+    configuration: {}
+  }
+}
+
+const requiredIdReaderWithAuth: FieldConfig = {
+  ...idReaderWithAuth,
+  id: 'storybook.id-reader.required',
+  required: true
+}
+
+const idReaderWithValidationError: FieldConfig = {
+  ...idReaderWithAuth,
+  id: 'storybook.id-reader.validation-error',
+  required: true
+}
+
+const idReaderWithFetchFailureError: FieldConfig = {
+  ...idReaderWithAuth,
+  id: 'storybook.id-reader.fetch-failed',
+  required: true,
+  validation: [
+    {
+      message: {
+        id: 'storybook.id-reader.fetch-failed.error',
+        defaultMessage:
+          'Failed to fetch authenticated details. Please try again.',
+        description: 'Validation error when authenticated details are missing'
+      },
+      validator: not(
+        field('storybook.id-reader.fetch-failed').get('data').isFalsy()
+      )
+    }
+  ]
+}
+
+const fetchLoader: FieldConfig = {
+  id: 'storybook.verify-nid-fetch-loader',
+  type: FieldType.LOADER,
+  variant: 'highlighted',
+  label: {
+    id: 'storybook.verify-nid-fetch-loader.label',
+    defaultMessage: 'ID Reader',
+    description: 'Label for ID fetch loading indicator'
+  },
+  configuration: {
+    text: {
+      id: 'storybook.verify-nid-fetch-loader.label',
+      defaultMessage: "Fetching individual's information...",
+      description: 'Loading text while fetching authenticated details'
+    }
+  }
+}
+
+const authenticationStatusConfiguration = {
+  status: {
+    id: 'storybook.verified.status.text',
+    defaultMessage:
+      '{value, select, authenticated {ID Authenticated} verified {ID Verified} failed {Unable to fetch details} pending {Pending verification} other {Invalid value}}',
+    description: 'Status text shown on the authentication status banner'
+  },
+  description: {
+    id: 'storybook.verified.status.description',
+    defaultMessage:
+      "{value, select, authenticated {This identity has been successfully authenticated with Farajaland's National ID System. To make edits, please remove the authentication first.} verified {This identity data has been successfully verified with Farajaland's National ID System.} pending {Identity pending verification with Farajaland's National ID System.} failed {There was a technical problem while fetching authenticated details. Please try again.} other {Invalid value}}",
+    description: 'Description text shown on the authentication status banner'
+  }
+}
+
+const authenticationStatusField: FieldConfig = {
+  id: 'storybook.verification-status',
+  type: FieldType.VERIFICATION_STATUS,
+  required: true,
+  label: {
+    id: 'storybook.verification-status.label',
+    defaultMessage: 'ID Reader',
+    description: 'Authentication status label'
+  },
+  configuration: authenticationStatusConfiguration
+}
+
+function AuthenticationStateStory({
+  fields,
+  initialValues,
+  initialTouched,
+}: {
+  fields: FieldConfig[]
+  initialValues?: Record<string, FieldValue>
+  initialTouched?: Record<string, boolean>
+}) {
+  return (
+    <Stack direction="column" gap={4}>
+      <StyledFormFieldGenerator
+        fields={fields}
+        formTouched={initialTouched}
+        formValues={initialValues}
+        id="id-reader-authentication-states"
+        validatorContext={getTestValidatorContext(
+          TestUserRole.enum.LOCAL_REGISTRAR
+        )}
+      />
+    </Stack>
+  )
+}
+
+export const Default: StoryObj = {
+  render: () => (
+    <AuthenticationStateStory
+      fields={[
+        paragraph('Default'),
+        idReaderWithAuth,
+
+        paragraph('Required field'),
+        requiredIdReaderWithAuth,
+
+        paragraph('Required error'),
+        idReaderWithValidationError,
+
+        paragraph('Loading'),
+        fetchLoader,
+
+        paragraph('Success'),
+        authenticationStatusField,
+
+        paragraph('Failed to fetch'),
+        idReaderWithFetchFailureError
+      ]}
+      initialTouched={{
+        'storybook.id-reader.validation-error': true,
+        'storybook.id-reader.fetch-failed': true
+      }}
+      initialValues={{
+        'storybook.id-reader.required': { data: {} },
+        'storybook.id-reader.fetch-failed': { data: null },
+        'storybook.verification-status': 'authenticated'
+      }}
+    />
+  )
+}
+
+function OfflineBrowserMock({ children }: { children: React.ReactNode }) {
+  React.useEffect(() => {
+    const originalDescriptor = Object.getOwnPropertyDescriptor(
+      window.navigator,
+      'onLine'
+    )
+
+    Object.defineProperty(window.navigator, 'onLine', {
+      configurable: true,
+      get: () => false
+    })
+
+    window.dispatchEvent(new Event('offline'))
+
+    return () => {
+      if (originalDescriptor) {
+        Object.defineProperty(window.navigator, 'onLine', originalDescriptor)
+      } else {
+        Object.defineProperty(window.navigator, 'onLine', {
+          configurable: true,
+          get: () => true
+        })
+      }
+
+      window.dispatchEvent(new Event('online'))
+    }
+  }, [])
+
+  return <>{children}</>
+}
+
+export const Offline: StoryObj = {
+  render: () => (
+    <OfflineBrowserMock>
+      <AuthenticationStateStory
+        fields={[idReaderWithAuth]}
+      />
+    </OfflineBrowserMock>
+  )
+}

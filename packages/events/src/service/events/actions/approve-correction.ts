@@ -46,7 +46,7 @@ export async function approveCorrection(
   }
 
   return addAction(input, {
-    event: storedEvent,
+    eventId: storedEvent.id,
     configuration,
     user,
     token,

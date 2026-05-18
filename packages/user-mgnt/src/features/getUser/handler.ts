@@ -12,8 +12,6 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
 import User from '@user-mgnt/model/user'
-import { getPractitionerSignature } from './service'
-import { logger } from '@opencrvs/commons'
 
 interface IVerifyPayload {
   userId: string
@@ -26,8 +24,6 @@ export default async function getUser(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const token = request.headers.authorization
-
   const { userId, practitionerId, mobile, email } =
     request.payload as IVerifyPayload
   let criteria = {}
@@ -54,17 +50,8 @@ export default async function getUser(
     throw unauthorized()
   }
 
-  let signature
-  try {
-    signature = await getPractitionerSignature(token, result.practitionerId)
-  } catch {
-    logger.error(
-      'Error fetching practitioner signature. Sending user without it.'
-    )
-  }
-
   const user = result.toObject()
-  return { ...user, id: user._id, signature: signature }
+  return { ...user, id: user._id }
 }
 
 export const getUserRequestSchema = Joi.object({

@@ -26,7 +26,7 @@ const messagesToDefine = {
   pageIntroduction: {
     id: 'integrations.pageIntroduction',
     defaultMessage:
-      'For each new client that needs to integrate with OpenCRVS you can create unique client IDs. A number of integration use cases are currently supported, based on both API and webhook technologies.',
+      'For each new client that needs to integrate with OpenCRVS you can create unique client IDs. A number of integration use cases are currently supported, based on API technologies.',
     description: 'Label for the text integration page intorduction'
   },
   copy: {
@@ -90,25 +90,6 @@ const messagesToDefine = {
     defaultMessage: 'Label',
     description: 'Label'
   },
-  webhookPermissionsDescription: {
-    id: 'integrations.webhookPermissionsDescription',
-    defaultMessage:
-      'Select the data you wish to be contained within the webhook payload',
-    description: 'Webhook description above permissions'
-  },
-  webhookDescription: {
-    id: 'integrations.webhookDescription',
-    defaultMessage:
-      'Select the data you wish to be contained within the webhook payload',
-    description: 'label for webhook client'
-  },
-
-  PIIDataLabel: {
-    id: 'integrations.webhook.PII',
-    defaultMessage: 'Include PII data',
-    description: 'Label for PII'
-  },
-
   birth: {
     id: 'integrations.birth',
     defaultMessage: 'Birth',
@@ -119,12 +100,6 @@ const messagesToDefine = {
     id: 'integrations.death',
     defaultMessage: 'Death',
     description: 'Label for death'
-  },
-
-  eventNotification: {
-    id: 'integrations.type.eventNotification',
-    defaultMessage: 'Event notification',
-    description: 'Label for event notification'
   },
 
   childDetails: {
@@ -197,38 +172,6 @@ const messagesToDefine = {
     id: 'integrations.informantDetailsNoPII',
     defaultMessage: 'Informant Details (No PII)',
     description: 'Label for informant details no PII'
-  },
-
-  recordSearch: {
-    id: 'integrations.type.recordSearch',
-    defaultMessage: 'Record search',
-    description: 'Label for record search'
-  },
-
-  nationalId: {
-    id: 'integrations.type.nationalId',
-    defaultMessage: 'National id',
-    description: 'Label for national id'
-  },
-  webhook: {
-    id: 'integrations.type.webhook',
-    defaultMessage: 'Webhook',
-    description: 'Label for web hook'
-  },
-  import: {
-    id: 'integrations.type.import',
-    defaultMessage: 'Import',
-    description: 'Label for import type system'
-  },
-  importExport: {
-    id: 'integrations.type.importExport',
-    defaultMessage: 'Import/Export',
-    description: 'Label for import/export type system'
-  },
-  healthSystem: {
-    id: 'integrations.type.healthSystem',
-    defaultMessage: 'Health integration',
-    description: 'Label for health system type'
   },
   healthnotificationAlertDescription: {
     id: 'integrations.eventNotificationDescription',
@@ -359,6 +302,38 @@ const messagesToDefine = {
     id: 'integrations.integratingSystemTypeAlertOther',
     defaultMessage: 'Other copy tbd. TODO: Euan',
     description: 'Label for alert when selecting other type'
+  },
+  integrationType: {
+    id: 'integrations.type',
+    defaultMessage:
+      '{type, select, HEALTH {Health integration} NATIONAL_ID {National ID} RECORD_SEARCH {Record search} IMPORT_EXPORT {Import/Export} other {Custom}}',
+    description:
+      'Label for integration type using ICU MessageFormat select for all types'
+  },
+  createdOnBy: {
+    id: 'integrations.createdOnBy',
+    defaultMessage: 'Created {date} by {user}',
+    description: 'Label showing when an integration was created and by whom'
+  },
+  createdOn: {
+    id: 'integrations.createdOn',
+    defaultMessage: 'Created {date}',
+    description: 'Label showing when an integration was created (no user info)'
+  },
+  clientDetails: {
+    id: 'integrations.clientDetails',
+    defaultMessage: 'Client details',
+    description: 'Label for the client details menu item and dialog title'
+  },
+  clientName: {
+    id: 'integrations.clientName',
+    defaultMessage: 'Client name',
+    description: 'Heading for the client name field in the details dialog'
+  },
+  scopes: {
+    id: 'integrations.scopes',
+    defaultMessage: 'Scopes',
+    description: 'Heading for the scopes list in the client details dialog'
   }
 }
 

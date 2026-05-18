@@ -13,7 +13,9 @@ import styled from 'styled-components'
 import React, { useState } from 'react'
 import PanControls from '@opencrvs/components/lib/DocumentViewer/components/PanControls'
 import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanViewer'
+import { DocumentPath } from '@opencrvs/commons/client'
 import { Option } from '@client/v2-events/utils'
+import { toFileUrl } from '@client/v2-events/cache'
 import { Select } from './Select'
 import { SimplePdfPreview } from './FileInput/SimplePdfPreview'
 
@@ -56,7 +58,7 @@ const ViewerImage = styled.div`
 `
 export interface DocumentViewerOptionValue {
   filename: string
-  url: string
+  url: DocumentPath
   id: string
 }
 
@@ -103,7 +105,13 @@ export function DocumentViewer({
       return <SimplePdfPreview pdfUrl={url} />
     }
 
-    return <PanViewer image={url} rotation={rotation} zoom={zoom} />
+    return (
+      <PanViewer
+        image={toFileUrl(url as DocumentPath)}
+        rotation={rotation}
+        zoom={zoom}
+      />
+    )
   }
 
   return (

@@ -89,6 +89,7 @@ export function Pages() {
       {modal}
       <PagesComponent
         hideBackToReview
+        attachmentPath={`events/${eventId}/`}
         eventConfig={configuration}
         formData={annotation}
         formPages={formPages.map((page) => {

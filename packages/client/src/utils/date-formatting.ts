@@ -13,43 +13,9 @@ import formatDistanceToNowStrict from 'date-fns/formatDistanceToNowStrict'
 import enGB from 'date-fns/locale/en-GB'
 import bn from 'date-fns/locale/bn'
 import fr from 'date-fns/locale/fr'
-import subYears from 'date-fns/subYears'
 import isValid from 'date-fns/isValid'
-import { PlainDate, plainDateToLocalDate } from '@opencrvs/commons/client'
 
 export const locales: Record<string, Locale> = { en: enGB, bn, fr }
-
-/*
- * useful when dealing with draft data
- */
-export function isValidPlainDate(rawDate: unknown): rawDate is PlainDate {
-  if (typeof rawDate !== 'string') {
-    return false
-  }
-  const [yyyy, mm, dd] = rawDate.split('-')
-  if (
-    !dd ||
-    !mm ||
-    !yyyy ||
-    dd.length === 0 ||
-    mm.length === 0 ||
-    yyyy.length < 4 ||
-    !isValid(new Date(rawDate))
-  ) {
-    return false
-  }
-  return true
-}
-
-export function formatPlainDate(
-  plainDate: PlainDate,
-  formatString = 'dd MMMM yyyy'
-) {
-  const localDate = plainDateToLocalDate(plainDate)
-  return format(localDate, formatString, {
-    locale: locales[window.__localeId__]
-  })
-}
 
 export const formatLongDate = (
   date: string,
@@ -86,10 +52,6 @@ export const formattedDuration = (fromDate: Date | number) => {
     addSuffix: true,
     roundingMethod: 'floor'
   })
-}
-
-export const convertAgeToDate = (age: string): string => {
-  return format(subYears(new Date(), Number(age)), 'yyyy-MM-dd')
 }
 
 export default function formatDate(

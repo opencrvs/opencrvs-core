@@ -12,12 +12,13 @@ import * as Hapi from '@hapi/hapi'
 import { clientCredentialsHandler } from './client-credentials'
 import * as oauthResponse from './responses'
 import { tokenExchangeHandler } from './token-exchange'
+import { getParam } from './utils'
 
 export async function tokenHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const grantType = request.query.grant_type
+  const grantType = getParam(request, 'grant_type')
 
   if (grantType === 'client_credentials') {
     return clientCredentialsHandler(request, h)

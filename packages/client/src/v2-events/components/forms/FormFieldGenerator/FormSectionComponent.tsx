@@ -49,6 +49,7 @@ type AllProps = {
   ocrvsFullForm: EventState
   className?: string
   readonlyMode?: boolean
+  attachmentPath: string
   /**
    * Update the form values in the non-formik state.
    */
@@ -194,6 +195,7 @@ export function FormSectionComponent({
   eventConfig,
   setValues,
   setTouched,
+  attachmentPath,
   isCorrection = false,
   validatorContext
 }: AllProps) {
@@ -203,7 +205,9 @@ export function FormSectionComponent({
   const getDefaultValue = useDefaultValue()
   const { cacheHiddenFieldValue, popHiddenFieldValue } = useEventFormData()
 
-  const fullFormFields = eventConfig ? findAllFields(eventConfig) : pageFields
+  const fullFormFields = eventConfig
+    ? findAllFields(eventConfig).concat(pageFields)
+    : pageFields
   const listenerFieldsByParentId = getParentsOfListenerFields(fullFormFields)
 
   /** Sets the value for fields that listen to another field via `parent` and `value` properties */
@@ -227,6 +231,28 @@ export function FormSectionComponent({
 
     if (firstNonFalsyValue) {
       set(fieldValues, formikCompatibleListenerFieldPath, firstNonFalsyValue)
+      return
+    }
+
+    const formContext = {
+      ...ocrvsFullForm,
+      ...makeFormikFieldIdsOpenCRVSCompatible(fieldValues)
+    }
+
+    // Hidden listener fields are cleared to undefined so their stale values
+    // don't leak into other fields that read from them (e.g. via `value` refs).
+    // We return early to skip applying the defaultValue, which would otherwise
+    // pollute the form state for fields that aren't currently relevant.
+
+    // Must be undefined, never null:
+    // null has a specific semantic in the declaration payload — it signals an
+    // intentional field removal and is preserved by getCleanedDeclarationDiff
+    // (via omitHiddenPaginatedFields with retainNullValues=true). Sending null
+    // for fields that were never part of the current action (e.g. correction
+    // form fields appearing in a declare payload) corrupts the event state.
+    // undefined is omitted from JSON serialisation and is therefore safe.
+    if (!isFieldVisible(listenerField, formContext, validatorContext)) {
+      set(fieldValues, formikCompatibleListenerFieldPath, undefined)
       return
     }
 
@@ -401,6 +427,7 @@ export function FormSectionComponent({
           >
             <GeneratedInputField
               allKnownFields={fullFormFields}
+              attachmentPath={attachmentPath}
               disabled={isDisabled}
               eventConfig={eventConfig}
               fieldDefinition={{ ...field, id: formikFieldId }}

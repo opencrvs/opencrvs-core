@@ -23,11 +23,15 @@ function withBearer(token: string): TokenWithBearer {
 
 const ERROR = 'ERROR'
 
-function signToken(params: { sub: string; userType: string }) {
+function signToken(params: {
+  sub: string
+  userType: string
+  scope?: string[]
+}) {
   return jwt.sign(params, readFileSync('./test/cert.key'), {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:workflow-user'
+    audience: 'opencrvs:gateway-user'
   })
 }
 

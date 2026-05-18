@@ -94,7 +94,7 @@ const downloadEvent = generateEventDocument({
 
 export const PaginationAfterDownload: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
@@ -477,10 +477,12 @@ export const DraftPagination: Story = {
         event: [
           tRPCMsw.event.draft.list.query(() => drafts),
           tRPCMsw.event.get.query((input) => {
-            const event = events.find((e) => e.event.id === input)?.event
+            const event = events.find(
+              (e) => e.event.id === input.eventId
+            )?.event
 
             if (!event) {
-              throw new Error(`Event not found with id: ${input}`)
+              throw new Error(`Event not found with id: ${input.eventId}`)
             }
 
             return event
@@ -521,6 +523,7 @@ export const DraftPagination: Story = {
 export const DraftPaginationOffline: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'draft' })
@@ -541,10 +544,12 @@ export const DraftPaginationOffline: Story = {
         event: [
           tRPCMsw.event.draft.list.query(() => drafts),
           tRPCMsw.event.get.query((input) => {
-            const event = events.find((e) => e.event.id === input)?.event
+            const event = events.find(
+              (e) => e.event.id === input.eventId
+            )?.event
 
             if (!event) {
-              throw new Error(`Event not found with id: ${input}`)
+              throw new Error(`Event not found with id: ${input.eventId}`)
             }
 
             return event
@@ -625,7 +630,7 @@ export const WorkqueueAutoRefreshOnCountChange: Story = {
     autoRefreshDataChanged = false
   },
   parameters: {
-    userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })

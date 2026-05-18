@@ -8,15 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
+import React, { useMemo } from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
 import {
   FieldPropsWithoutReferenceValue,
   Location,
-  LocationType,
-  joinValues
+  UUID,
+  joinValues,
+  AdministrativeArea,
+  JurisdictionFilter,
+  resolveJurisdictionReference
 } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
@@ -24,89 +26,145 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { SearchableSelect } from '@client/v2-events/components/forms/inputs/SearchableSelect'
+import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
+import { getToken } from '@client/utils/authUtils'
+import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
 
-interface SearchLocation {
-  id: string
-  searchableText: string
-  displayLabel: string
-}
+/**
+ * Pure filtering logic for location options, separated from React hook concerns for testability.
+ *
+ * - 'location' jurisdiction: returns only the user's own office if it matches locationTypes, otherwise [].
+ * - 'administrativeArea' jurisdiction: returns locations within the user's admin area hierarchy, or [] if userLocationId is unknown.
+ * - no filter / 'all': returns all locations matching locationTypes.
+ */
+export function filterLocationsByJurisdiction({
+  locations,
+  administrativeAreas,
+  userLocationId,
+  locationTypes,
+  jurisdictionFilter
+}: {
+  locations: Map<UUID, Location>
+  administrativeAreas: Map<UUID, AdministrativeArea>
+  userLocationId: string | undefined
+  locationTypes?: string[]
+  jurisdictionFilter?: JurisdictionFilter
+}): Location[] {
+  const matchesType = (location: Location) =>
+    location.locationType &&
+    (locationTypes ? locationTypes.includes(location.locationType) : true)
 
-const resourceTypeMap: Record<
-  'locations' | 'facilities' | 'offices',
-  LocationType
-> = {
-  locations: 'ADMIN_STRUCTURE',
-  facilities: 'HEALTH_FACILITY',
-  offices: 'CRVS_OFFICE'
-}
+  const allOptions = Array.from(locations.values()).filter(matchesType)
 
-function useAdministrativeAreas(
-  searchableResource: ('locations' | 'facilities' | 'offices')[]
-) {
-  const { getLocations } = useLocations()
-  const [allLocations] = getLocations.useSuspenseQuery({})
+  if (
+    jurisdictionFilter === JurisdictionFilter.enum.location &&
+    userLocationId
+  ) {
+    // If the jurisdiction filter is only for the user's own location, return their office
+    // only if it matches the required locationTypes. A user whose office is a CRVS_OFFICE
+    // should not appear as an option in a HEALTH_FACILITY field — return nothing instead,
+    // since their 'location' scope does not extend to other locations of the correct type.
+    const userOffice = locations.get(UUID.parse(userLocationId))
+    return userOffice && matchesType(userOffice) ? [userOffice] : []
+  }
 
-  return React.useMemo(() => {
-    const resourceLocations = allLocations.filter(
-      ({ locationType }) =>
-        locationType &&
-        searchableResource.some(
-          (r) =>
-            resourceTypeMap[r satisfies keyof typeof resourceTypeMap] ===
-            locationType
-        )
+  if (jurisdictionFilter === JurisdictionFilter.enum.administrativeArea) {
+    if (!userLocationId) {
+      // If we need to filter by administrative area but don't know the user's location, we can't determine their admin area - return no options
+      return []
+    }
+    return allOptions.filter((o) =>
+      isLocationUnderJurisdiction({
+        locationId: userLocationId,
+        otherLocationId: o.id,
+        locations,
+        administrativeAreas
+      })
     )
+  }
 
-    return resourceLocations.map((location) => ({
-      id: location.id,
-      searchableText: location.name.toLowerCase(),
-      displayLabel: location.name
-    }))
-  }, [searchableResource, allLocations])
+  return allOptions
 }
 
 /**
- * @deprecated -- Use/replace with SearchableSelect 1.10 onwards.
+ * Return the available location options. The options will be filtered based on the jurisdiction filter.
  */
+function useAvailableLocations(
+  locationTypes?: string[],
+  jurisdictionFilter?: JurisdictionFilter
+) {
+  const { getLocations } = useLocations()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+  const locations = getLocations.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const userDetails = useSelector(getUserDetails)
+  const userLocationId = userDetails?.primaryOfficeId
+
+  return useMemo(
+    () =>
+      filterLocationsByJurisdiction({
+        locations,
+        administrativeAreas,
+        userLocationId,
+        locationTypes,
+        jurisdictionFilter
+      }),
+    [
+      locations,
+      administrativeAreas,
+      userLocationId,
+      locationTypes,
+      jurisdictionFilter
+    ]
+  )
+}
+
 function LocationSearchInput({
   onChange,
   value,
-  searchableResource,
+  locationTypes,
   onBlur,
+  id,
+  eventType,
   ...props
 }: FieldPropsWithoutReferenceValue<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
   onChange: (val: string | undefined) => void
-  searchableResource: ('locations' | 'facilities' | 'offices')[]
+  locationTypes?: string[]
   value?: string
   onBlur?: (e: React.FocusEvent<HTMLElement>) => void
   disabled?: boolean
+  id: string
+  eventType?: string
 }) {
-  const locationList = useAdministrativeAreas(searchableResource)
-  const selectedLocation = locationList.find(
-    (location) => location.id === value
+  const token = useSelector(getToken)
+  const jurisdictionFilter = resolveJurisdictionReference(
+    props.configuration?.allowedLocations,
+    token,
+    eventType
   )
 
-  return (
-    <LocationSearchComponent
-      buttonLabel="Health facility"
-      locationList={locationList}
-      searchHandler={(location: SearchLocation) => {
-        if (location.id === '0') {
-          onChange(undefined)
-          return
-        }
+  const locations = useAvailableLocations(locationTypes, jurisdictionFilter)
 
-        onChange(location.id)
+  const options = useMemo(
+    () => locations.map((l) => ({ value: l.id, label: l.name })),
+    [locations]
+  )
+
+  const selectedOption =
+    options.find((option) => option.value === value) ?? null
+
+  return (
+    <SearchableSelect
+      data-testid={'location__' + id}
+      disabled={props.disabled}
+      id={id}
+      options={options}
+      value={selectedOption}
+      onChange={(opt) => {
+        onChange(opt?.value ?? undefined)
       }}
-      selectedLocation={selectedLocation}
-      onBlur={(...args) => {
-        /*
-         * This is here purely for legacy reasons.
-         * As without passing this in, onChange will not trigger.
-         */
-        onBlur?.(...args)
-      }}
-      {...props}
     />
   )
 }
@@ -115,11 +173,12 @@ function toCertificateVariables(
   value: Stringifiable | undefined | null,
   context: {
     intl: IntlShape
-    locations: Location[]
+    locations: Map<UUID, Location>
+    administrativeAreas: Map<UUID, AdministrativeArea>
     adminLevels?: AdminStructureItem[]
   }
 ) {
-  const { intl, locations, adminLevels = [] } = context
+  const { intl, locations, administrativeAreas, adminLevels = [] } = context
   const appConfigAdminLevels = adminLevels.map((level) => level.id)
 
   if (!value) {
@@ -136,12 +195,18 @@ function toCertificateVariables(
     description: 'Country name'
   })
 
-  const locationId = value.toString()
-  const location = locations.find((loc) => loc.id === locationId)
+  const locationId = UUID.safeParse(value.toString()).data
+  const location = locationId
+    ? (locations.get(locationId) ?? administrativeAreas.get(locationId))
+    : undefined
+
+  const parentAdministrativeAreaId =
+    (location as Location | undefined)?.administrativeAreaId ??
+    (location as AdministrativeArea | undefined)?.parentId
 
   const adminLevelHierarchy = getAdminLevelHierarchy(
-    locationId,
-    locations,
+    parentAdministrativeAreaId,
+    administrativeAreas,
     appConfigAdminLevels,
     'withNames'
   )
@@ -156,16 +221,20 @@ function toCertificateVariables(
 function LocationSearchOutput({ value }: { value: Stringifiable }) {
   const intl = useIntl()
   const { getLocations } = useLocations()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+
   const { config } = useSelector(getOfflineData)
-  const [locations] = getLocations.useSuspenseQuery()
+
+  const locations = getLocations.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const adminLevels = config.ADMIN_STRUCTURE
 
   const certificateVars = toCertificateVariables(value, {
     intl,
     locations,
+    administrativeAreas,
     adminLevels
   })
-
   const { name, country } = certificateVars
 
   const resolvedAdminLevels = adminLevels
@@ -173,11 +242,6 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
     .filter(Boolean)
     .reverse()
 
-  const location = locations.find(({ id }) => id === value.toString())
-
-  if (location?.locationType === LocationType.Enum.ADMIN_STRUCTURE) {
-    return joinValues([...resolvedAdminLevels, country], ', ')
-  }
   return joinValues([name, ...resolvedAdminLevels, country], ', ')
 }
 

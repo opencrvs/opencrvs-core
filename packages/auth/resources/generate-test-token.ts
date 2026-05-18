@@ -33,7 +33,6 @@ const optionList = [
     defaultValue: [
       'opencrvs:auth-user',
       'opencrvs:user-mgnt-user',
-      'opencrvs:hearth-user',
       'opencrvs:gateway-user',
       'opencrvs:config-user'
     ]

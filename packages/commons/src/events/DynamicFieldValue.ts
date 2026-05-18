@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { AddressField, NameField } from './FieldConfig'
 import { NonEmptyTextValue, TextValue } from './FieldValue'
 import {
@@ -65,8 +65,14 @@ export function getDynamicAddressFieldValue(field: AddressField) {
     field.configuration?.streetAddressForm?.map((a) => a.id) ?? []
 
   // @todo - show required validation errors for street level fields like state/street
-  return schema.refine((arg) => {
-    const submittedKeys = Object.keys(arg?.streetLevelDetails ?? {})
+  return (
+    schema as z.ZodType<AddressFieldValue | AddressFieldUpdateValue>
+  ).refine((arg) => {
+    if (!arg) {
+      return true
+    }
+
+    const submittedKeys = Object.keys(arg.streetLevelDetails ?? {})
     const invalidKeys = submittedKeys.filter((k) => !configIds.includes(k))
     if (invalidKeys.length) {
       // eslint-disable-next-line no-console
@@ -76,6 +82,7 @@ export function getDynamicAddressFieldValue(field: AddressField) {
       )
       return false
     }
+
     return true
   })
 }

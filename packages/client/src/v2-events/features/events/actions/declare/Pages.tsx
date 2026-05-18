@@ -102,6 +102,7 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
+        attachmentPath={`events/${event.id}/`}
         eventConfig={configuration}
         formData={formValues}
         formPages={declarationPages}

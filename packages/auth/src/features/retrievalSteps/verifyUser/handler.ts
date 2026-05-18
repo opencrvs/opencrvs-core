@@ -41,7 +41,7 @@ export default async function verifyUserHandler(
   const payload = request.payload as IVerifyUserPayload
   let result
   try {
-    result = await verifyUser(payload.mobile, payload.email)
+    result = await verifyUser({ mobile: payload.mobile, email: payload.email })
   } catch (err) {
     throw unauthorized()
   }

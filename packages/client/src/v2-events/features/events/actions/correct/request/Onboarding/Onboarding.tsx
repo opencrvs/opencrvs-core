@@ -99,6 +99,7 @@ export function Onboarding() {
     >
       <PagesComponent
         hideBackToReview
+        attachmentPath={`events/${event.id}/`}
         continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
         eventConfig={configuration}
         formData={annotation}

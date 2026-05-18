@@ -1,12 +1,13 @@
 {
   "name": "@opencrvs/data-seeder",
-  "version": "1.9.14",
+  "version": "2.0.0",
   "description": "OpenCRVS data-seeder microservice",
   "homepage": "https://github.com/opencrvs/opencrvs-core#readme",
   "license": "MPL-2.0",
   "scripts": {
     "seed": "NODE_OPTIONS=--dns-result-order=ipv4first ts-node -r tsconfig-paths/register src/index.ts",
     "test:compilation": "tsc --noEmit",
+    "test": "yarn test:compilation",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0"
   },
   "devDependencies": {
@@ -17,7 +18,9 @@
     "prettier": "3.5.3"
   },
   "dependencies": {
-    "@opencrvs/commons": "^1.3.0",
+    "@opencrvs/commons": "^2.0.0",
+    "@opencrvs/events": "^2.0.0",
+    "@trpc/client": "^11.0.0-rc.532",
     "@types/fhir": "^0.0.37",
     "@types/node": "^16.18.39",
     "@types/node-fetch": "^2.5.12",
@@ -30,8 +33,8 @@
     "tsconfig-paths": "^3.13.0",
     "typescript": "5.6.3",
     "uuid": "^3.3.2",
-    "zod": "^3.17.3",
-    "zod-validation-error": "^1.3.1"
+    "zod": "^4.2.1",
+    "zod-validation-error": "^5.0.0"
   },
   "lint-staged": {
     "src/**/*.ts": [

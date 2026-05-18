@@ -187,6 +187,7 @@ export const Pagination = ({
           })}
         </StyledPagination>
         <Button
+          id="next-page-button"
           type="icon"
           size="small"
           onClick={() => {

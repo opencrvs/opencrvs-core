@@ -10,7 +10,6 @@
  */
 import { LoginState } from '@login/login/reducer'
 import { IStoreState } from '@login/store'
-import { ILoginBackground } from '@login/utils/authApi'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 const getPartialState = (store: IStoreState): LoginState => store.login
@@ -41,17 +40,17 @@ export function selectCountryLogo(store: IStoreState) {
   return getKey(store, 'config').COUNTRY_LOGO?.file
 }
 
-export function selectCountryBackground(store: IStoreState): ILoginBackground {
-  const countryBackground = getKey(store, 'config').LOGIN_BACKGROUND
+export function selectCountryBackground() {
+  const countryBackground = window.config.LOGIN_BACKGROUND
   if (countryBackground?.backgroundImage) {
     return {
       backgroundColor: '',
       backgroundImage: countryBackground.backgroundImage,
-      imageFit: countryBackground.imageFit
+      imageFit: countryBackground.imageFit ?? ''
     }
   } else if (countryBackground?.backgroundColor) {
     return {
-      backgroundColor: countryBackground?.backgroundColor,
+      backgroundColor: countryBackground.backgroundColor,
       backgroundImage: '',
       imageFit: ''
     }
