@@ -88,6 +88,7 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
+        hideBackToReview
         eventConfig={configuration}
         formData={annotation}
         formPages={formPages.map((page) => {
@@ -105,7 +106,6 @@ export function Pages() {
         })}
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
-        showReviewButton={searchParams.from === 'review'}
         validatorContext={{
           ...validatorContext,
           baseFormState: eventIndex.declaration
