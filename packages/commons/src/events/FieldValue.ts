@@ -43,10 +43,7 @@ export { PlainDate, plainDateToLocalDate }
 
 export const TextValue = z.string()
 export const HiddenFieldValue = z.string()
-export const NonEmptyTextValue = z.preprocess(
-  (val) => (typeof val === 'string' ? val.trim() : val),
-  z.string().min(1)
-)
+export const NonEmptyTextValue = z.string().trim().min(1)
 
 export const DateValue = z.iso.date().describe('Date in the format YYYY-MM-DD')
 
