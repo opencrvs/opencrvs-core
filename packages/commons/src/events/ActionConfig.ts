@@ -156,10 +156,7 @@ const CustomActionConfig = ActionConfigBase.merge(
       'The label to show in audit history for this action. For example "Approved".'
     )
   })
-).meta({
-  description: 'Custom action configuration',
-  id: 'CustomActionConfig'
-})
+)
 
 export type CustomActionConfig = z.infer<typeof CustomActionConfig>
 
