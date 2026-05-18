@@ -18,6 +18,7 @@ import {
   TestUserRole,
   TokenUserType,
   User,
+  UserSummary,
   UUID
 } from '@opencrvs/commons/client'
 import { FetchUserQuery, Status } from '@client/utils/gateway'
@@ -75,7 +76,21 @@ export function testDataGenerator(rngSeed?: number) {
         'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXVzZXIucmVhZCIsInR5cGU9dXNlci5jcmVhdGUmcm9sZT1GSUVMRF9BR0VOVCIsInR5cGU9dXNlci5jcmVhdGUmYWNjZXNzTGV2ZWw9YWRtaW5pc3RyYXRpdmVBcmVhJnJvbGU9TE9DQUxfUkVHSVNUUkFSIiwidHlwZT11c2VyLmNyZWF0ZSZhY2Nlc3NMZXZlbD1sb2NhdGlvbiZyb2xlPUNPTU1VTklUWV9MRUFERVIiLCJ0eXBlPXVzZXIuZWRpdCZyb2xlPVJFR0lTVFJBVElPTl9BR0VOVCIsInR5cGU9dXNlci5lZGl0JmFjY2Vzc0xldmVsPWFkbWluaXN0cmF0aXZlQXJlYSZyb2xlPUxPQ0FMX1NZU1RFTV9BRE1JTiIsInR5cGU9dXNlci5lZGl0JmFjY2Vzc0xldmVsPWxvY2F0aW9uJnJvbGU9UFJPVklOQ0lBTF9SRUdJU1RSQVIiXSwidXNlclR5cGUiOiJ1c2VyIiwicm9sZSI6IkZJRUxEX0FHRU5UIiwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI4ZjhiNDMxYi1lZjQ3LTQwNjgtYjY3OC1lZjJkZDkzZTkyMDgifQ.elOcSaujgfwO59HQankBhw5a_4UmG33aOul7epSRfQGefy-JDMmmR0Pk2Fumf-j0599t7YzinvL1c90BA5Yg__LbaUda0hBN0WjyWUqv6kqKKIKWzSzx1QUe1OPrelXcYc7GIOh1TGw-5qTB0BWjSodIEzsVAFUb4djkEz4nG3Tj40U2t-0AkmrvxQ0RPN0K2J69xFu5u0VFwuYmLKlEppuebVgNE4zye1mrGX86d6rHuMa2p3GyuTrCJJAEknwo3LgI4mxXo4o2ZG7JkcW3pYGfdcQaGFwuD-pQm_XMTPArXfxWjWz3sgKNEzYh-ja7iIMdN-ACHpfZt1NiRnYckeukBiXUxbVilKFmDZ_O2AfEHO2MhssreHlI4V1Z8Kjyj3CTm25Brk79qVDYXl-dQsaXk4IM2PYsO0YN0pCl5NTGAloiVjvwPL2qeejr7apQyicpfCm5xD203Qb08jR_vKh6Rw5CvxkJOfjjxjADLjA7zEdLvdTalTSkVKRQhpBLKESH2vCi53vqGBHvcbDpyEKlUlePuomneVriSsk9YSRHLKHQaIOKFATl8BvVniu7I-r9cMq4j5mT_4osvjEgciYdkNWY9kDZsFd82qHNgXgmVxdptVjNzStpnX2clVHXK-InYHJouRYDH-X5yUFBVv6A3-bRlpCAUJyf2mUt3rM'
     },
     id: userIds,
-    fieldAgent: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
+    fieldAgent: (): {
+      summary: UserSummary
+      v2: User
+      v1: FetchUserQuery['getUser']
+    } => ({
+      summary: {
+        id: user.id.fieldAgent,
+        name: { firstname: 'Kalusha', surname: 'Bwalya' },
+        role: TestUserRole.enum.FIELD_AGENT,
+        fullHonorificName: undefined,
+        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+        administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+        avatar: undefined,
+        type: TokenUserType.enum.user
+      } satisfies UserSummary,
       v2: {
         id: userIds.fieldAgent,
         name: { firstname: 'Kalusha', surname: 'Bwalya' },
@@ -131,7 +146,21 @@ export function testDataGenerator(rngSeed?: number) {
         __typename: 'User'
       } satisfies FetchUserQuery['getUser']
     }),
-    registrationAgent: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
+    registrationAgent: (): {
+      summary: UserSummary
+      v2: User
+      v1: FetchUserQuery['getUser']
+    } => ({
+      summary: {
+        id: user.id.registrationAgent,
+        name: { firstname: 'Felix', surname: 'Katongo' },
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        fullHonorificName: 'Dr. Felix Katongo',
+        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+        administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+        avatar: 'path/to/avatar' as DocumentPath,
+        type: TokenUserType.enum.user
+      } satisfies UserSummary,
       v2: {
         id: user.id.registrationAgent,
         name: { firstname: 'Felix', surname: 'Katongo' },
@@ -187,7 +216,21 @@ export function testDataGenerator(rngSeed?: number) {
         __typename: 'User'
       } satisfies FetchUserQuery['getUser']
     }),
-    localRegistrar: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
+    localRegistrar: (): {
+      summary: UserSummary
+      v2: User
+      v1: FetchUserQuery['getUser']
+    } => ({
+      summary: {
+        id: user.id.localRegistrar,
+        name: { firstname: 'Kennedy', surname: 'Mweene' },
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
+        fullHonorificName: '1st Order Honorable Kennedy Mweene',
+        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+        administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+        avatar: undefined,
+        type: TokenUserType.enum.user
+      },
       v2: {
         id: user.id.localRegistrar,
         name: { firstname: 'Kennedy', surname: 'Mweene' },
@@ -258,7 +301,21 @@ export function testDataGenerator(rngSeed?: number) {
     /**
      * Gift Phiri — COMMUNITY_LEADER at Klow Village Office (village level).
      */
-    communityLeader: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
+    communityLeader: (): {
+      summary: UserSummary
+      v2: User
+      v1: FetchUserQuery['getUser']
+    } => ({
+      summary: {
+        id: userIds.communityLeader,
+        name: { firstname: 'Gift', surname: 'Phiri' },
+        role: TestUserRole.enum.COMMUNITY_LEADER,
+        fullHonorificName: undefined,
+        avatar: undefined,
+        type: TokenUserType.enum.user,
+        primaryOfficeId: '1f4a5b6c-7d8e-4312-8abc-345678901234' as UUID,
+        administrativeAreaId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
+      } satisfies UserSummary,
       v2: {
         id: userIds.communityLeader,
         name: { firstname: 'Gift', surname: 'Phiri' },
@@ -316,7 +373,20 @@ export function testDataGenerator(rngSeed?: number) {
     /**
      * Mitchel Owen — PROVINCIAL_REGISTRAR at Central Province Office (province level).
      */
-    provincialRegistrar: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
+    provincialRegistrar: (): {
+      summary: UserSummary
+      v2: User
+      v1: FetchUserQuery['getUser']
+    } => ({
+      summary: {
+        id: userIds.provincialRegistrar,
+        name: { firstname: 'Mitchel', surname: 'Owen' },
+        role: TestUserRole.enum.PROVINCIAL_REGISTRAR,
+        fullHonorificName: undefined,
+        avatar: undefined,
+        type: TokenUserType.enum.user,
+        primaryOfficeId: '6f6186ce-cd5f-4a5f-810a-2d99e7c4ba12' as UUID
+      },
       v2: {
         id: userIds.provincialRegistrar,
         name: { firstname: 'Mitchel', surname: 'Owen' },
@@ -372,7 +442,21 @@ export function testDataGenerator(rngSeed?: number) {
         __typename: 'User'
       } satisfies FetchUserQuery['getUser']
     }),
-    localSystemAdmin: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
+    localSystemAdmin: (): {
+      summary: UserSummary
+      v2: User
+      v1: FetchUserQuery['getUser']
+    } => ({
+      summary: {
+        id: userIds.localSystemAdmin,
+        name: { firstname: 'Alex', surname: 'Ngonga' },
+        role: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+        fullHonorificName: undefined,
+        avatar: undefined,
+        type: TokenUserType.enum.user,
+        primaryOfficeId: 'f403ca64-6a1d-4882-94c1-d8674df59a85' as UUID,
+        administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+      } satisfies UserSummary,
       v1: {
         id: userIds.localSystemAdmin,
         userMgntUserID: '69179374-0447-4545-4545-454545454548',
@@ -424,7 +508,21 @@ export function testDataGenerator(rngSeed?: number) {
         type: TokenUserType.enum.user
       }
     }),
-    nationalSystemAdmin: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
+    nationalSystemAdmin: (): {
+      summary: UserSummary
+      v2: User
+      v1: FetchUserQuery['getUser']
+    } => ({
+      summary: {
+        id: user.id.nationalSystemAdmin,
+        name: { firstname: 'Jonathan', surname: 'Campbell' },
+        role: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
+        fullHonorificName: undefined,
+        avatar: undefined,
+        type: TokenUserType.enum.user,
+        primaryOfficeId: '8788d17c-b639-4aa0-89f0-ebc64263d81c' as UUID,
+        administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+      } satisfies UserSummary,
       v2: {
         id: user.id.nationalSystemAdmin,
         name: { firstname: 'Jonathan', surname: 'Campbell' },

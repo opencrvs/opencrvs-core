@@ -14,7 +14,6 @@ import { TranslationConfig } from './TranslationConfig'
 import { PotentialDuplicate } from './ActionDocument'
 import { UUID } from '../uuid'
 import { Flag } from './Flag'
-import { DocumentPath } from '../documents'
 
 /**
  * Event statuses recognized by the system
@@ -53,11 +52,7 @@ export const ActionCreationMetadata = z.object({
   createdByRole: z
     .string()
     .optional()
-    .describe('Role of the user at the time of action request creation.'),
-  createdBySignature: z
-    .string()
-    .nullish()
-    .describe('Signature of the user who created the action request.')
+    .describe('Role of the user at the time of action request creation.')
 })
 
 export type ActionCreationMetadata = z.infer<typeof ActionCreationMetadata>
@@ -110,9 +105,6 @@ export const EventMetadata = z.object({
   // @TODO: createdAtLocation should be non-nullable in the future once all action requests have this field populated.
   createdAtLocation: UUID.nullish().describe(
     'Location of the user who created the event.'
-  ),
-  createdBySignature: DocumentPath.nullish().describe(
-    'Signature of the user who created the event.'
   ),
   updatedAtLocation: UUID.nullish().describe(
     'Location of the user who last changed the status.'
