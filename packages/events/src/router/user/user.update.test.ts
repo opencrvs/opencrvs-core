@@ -633,3 +633,58 @@ test("Prevents changing user's role to one not allowed within scope's jurisdicti
     })
   ).resolves.toBeDefined()
 })
+
+test('Persists all update-endpoint fields to database', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+  const eventsDb = getClient()
+
+  const updated = await client.user.update({
+    id: user.id,
+    name: { firstname: 'Updated', surname: 'User' },
+    role: user.role,
+    primaryOfficeId: user.primaryOfficeId,
+    mobile: '01922345678',
+    email: 'all-fields-update@opencrvs.org',
+    fullHonorificName: 'Prof. Updated User',
+    device: 'Samsung Galaxy S24',
+    data: { updatedKey: 'updatedValue' },
+    signature: {
+      originalFilename: 'updated-sig.png',
+      path: 'signatures/updated-sig.png',
+      type: 'image/png'
+    }
+  })
+
+  expect(updated).toMatchObject({
+    id: user.id,
+    name: { firstname: 'Updated', surname: 'User' },
+    role: user.role,
+    primaryOfficeId: user.primaryOfficeId,
+    mobile: '01922345678',
+    email: 'all-fields-update@opencrvs.org',
+    fullHonorificName: 'Prof. Updated User',
+    device: 'Samsung Galaxy S24',
+    data: { updatedKey: 'updatedValue' },
+    signature: 'signatures/updated-sig.png'
+  })
+
+  const dbUser = await eventsDb
+    .selectFrom('users')
+    .selectAll()
+    .where('id', '=', user.id)
+    .executeTakeFirstOrThrow()
+
+  expect(dbUser).toMatchObject({
+    firstname: 'Updated',
+    surname: 'User',
+    role: user.role,
+    officeId: user.primaryOfficeId,
+    mobile: '01922345678',
+    email: 'all-fields-update@opencrvs.org',
+    fullHonorificName: 'Prof. Updated User',
+    device: 'Samsung Galaxy S24',
+    data: { updatedKey: 'updatedValue' },
+    signaturePath: 'signatures/updated-sig.png'
+  })
+})

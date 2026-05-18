@@ -260,7 +260,9 @@ export const eventRouter = router({
       await throwConflictIfActionNotAllowed(
         input.eventId,
         ActionType.DELETE,
-        ctx.token
+        ctx.token,
+        undefined,
+        ctx.event
       )
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
@@ -277,7 +279,13 @@ export const eventRouter = router({
 
         // Consecutive middlewares lose some of the typing.
         const user = UserContext.parse(ctx.user)
-        await throwConflictIfActionNotAllowed(eventId, type, ctx.token)
+        await throwConflictIfActionNotAllowed(
+          eventId,
+          type,
+          ctx.token,
+          undefined,
+          ctx.event
+        )
 
         const previousDraft = await draftsRepo.findLatestDraftForAction(
           eventId,

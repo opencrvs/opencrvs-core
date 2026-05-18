@@ -18,7 +18,6 @@ import { Review as ReviewComponent } from '@client/v2-events/features/events/com
 import { useRoles } from '@client/v2-events/hooks/useRoles'
 import { ROUTES } from '@client/v2-events/routes/routes'
 import {
-  ActionType,
   FieldValue,
   FileFieldValue,
   TokenUserType,
@@ -82,15 +81,6 @@ type EventState = {
   device?: string
   signature?: FileFieldValue
   [key: string]: unknown
-}
-
-interface UserFormState {
-  userId?: string
-  userForm?: EventState
-  setUserForm: (data: EventState, userId?: string) => void
-  getUserForm: (initialValues?: EventState) => EventState
-  getTouchedFields: () => Record<string, boolean>
-  clear: () => void
 }
 
 const USER_OFFICE_PAGE_ID = 'user.office'
@@ -267,7 +257,6 @@ const EditUserComponent = () => {
       <PagesComponent
         attachmentPath={`users/${userId}/`}
         showReviewButton={false}
-        actionType={ActionType.DECLARE}
         eventConfig={eventConfig}
         formData={formState as Record<string, FieldValue>}
         formPages={formConfig.pages}
@@ -539,6 +528,8 @@ const ReviewUserComponent = () => {
                 // unique value, causing duplicate-key errors on the next submit.
                 mobile: formState.phoneNumber || undefined,
                 email: formState.email || undefined,
+                fullHonorificName: formState.fullHonorificName || undefined,
+                device: formState.device || undefined,
                 role: formState.role!,
                 primaryOfficeId: formState.primaryOfficeId as UUID,
                 signature: formState.signature,
@@ -577,6 +568,8 @@ const ReviewUserComponent = () => {
                 // See create payload above — same normalisation needed.
                 mobile: formState.phoneNumber || undefined,
                 email: formState.email || undefined,
+                fullHonorificName: formState.fullHonorificName || undefined,
+                device: formState.device || undefined,
                 role: formState.role!,
                 primaryOfficeId: formState.primaryOfficeId as UUID,
                 signature: formState.signature,

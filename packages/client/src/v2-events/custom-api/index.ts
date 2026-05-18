@@ -57,6 +57,13 @@ function hasPotentialDuplicates(
   return eventIndex.potentialDuplicates.length > 0
 }
 
+function wasRejected(event: EventDocument, actionType: ActionType): boolean {
+  return (
+    event.actions.filter((a) => a.type === actionType).at(-1)?.status ===
+    ActionStatus.Rejected
+  )
+}
+
 /**
  * Runs a sequence of actions from declare to register.
  *
@@ -75,10 +82,14 @@ export async function registerOnDeclare({
     annotation,
     eventId,
     transactionId,
-    keepAssignment: true
+    keepAssignmentIfAccepted: true,
+    waitFor: true
   })
 
-  if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
+  if (
+    hasPotentialDuplicates(declaredEvent, eventConfiguration) ||
+    wasRejected(declaredEvent, ActionType.DECLARE)
+  ) {
     return declaredEvent
   }
 
@@ -86,7 +97,8 @@ export async function registerOnDeclare({
     declaration: {},
     annotation,
     eventId,
-    transactionId
+    transactionId,
+    waitFor: true
   })
 }
 
@@ -98,32 +110,42 @@ export async function editAndRegister({
   content,
   eventConfiguration
 }: EditRequestParams) {
-  await trpcClient.event.actions.edit.request.mutate({
+  const editedEvent = await trpcClient.event.actions.edit.request.mutate({
     declaration,
     annotation,
     eventId,
     transactionId,
-    keepAssignment: true,
-    content
+    keepAssignmentIfAccepted: true,
+    content,
+    waitFor: true
   })
+
+  if (wasRejected(editedEvent, ActionType.EDIT)) {
+    return editedEvent
+  }
 
   const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
-    declaration,
+    declaration: {},
     annotation,
     eventId,
     transactionId,
-    keepAssignment: true
+    keepAssignmentIfAccepted: true,
+    waitFor: true
   })
 
-  if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
+  if (
+    hasPotentialDuplicates(declaredEvent, eventConfiguration) ||
+    wasRejected(declaredEvent, ActionType.DECLARE)
+  ) {
     return declaredEvent
   }
 
   return trpcClient.event.actions.register.request.mutate({
-    declaration,
+    declaration: {},
     annotation,
     eventId,
-    transactionId
+    transactionId,
+    waitFor: true
   })
 }
 
@@ -134,20 +156,26 @@ export async function editAndDeclare({
   annotation,
   content
 }: EditRequestParams) {
-  await trpcClient.event.actions.edit.request.mutate({
+  const editedEvent = await trpcClient.event.actions.edit.request.mutate({
     declaration,
     annotation,
     eventId,
     transactionId,
-    keepAssignment: true,
-    content
+    keepAssignmentIfAccepted: true,
+    content,
+    waitFor: true
   })
+
+  if (wasRejected(editedEvent, ActionType.EDIT)) {
+    return editedEvent
+  }
 
   return trpcClient.event.actions.declare.request.mutate({
     declaration,
     annotation,
     eventId,
-    transactionId
+    transactionId,
+    waitFor: true
   })
 }
 
@@ -158,20 +186,26 @@ export async function editAndNotify({
   annotation,
   content
 }: EditRequestParams) {
-  await trpcClient.event.actions.edit.request.mutate({
+  const editedEvent = await trpcClient.event.actions.edit.request.mutate({
     declaration,
     annotation,
     eventId,
     transactionId,
-    keepAssignment: true,
-    content
+    keepAssignmentIfAccepted: true,
+    content,
+    waitFor: true
   })
+
+  if (wasRejected(editedEvent, ActionType.EDIT)) {
+    return editedEvent
+  }
 
   return trpcClient.event.actions.notify.request.mutate({
     declaration,
     annotation,
     eventId,
-    transactionId
+    transactionId,
+    waitFor: true
   })
 }
 
@@ -188,7 +222,8 @@ export async function archiveOnDuplicate({
     eventId,
     transactionId,
     declaration,
-    keepAssignment: true,
+    keepAssignmentIfAccepted: true,
+    waitFor: true,
     ...(content.duplicateOf
       ? { content: { duplicateOf: content.duplicateOf } }
       : {})
@@ -197,7 +232,8 @@ export async function archiveOnDuplicate({
     eventId,
     transactionId,
     declaration,
-    content: { reason: content.reason }
+    content: { reason: content.reason },
+    waitFor: true
   })
 }
 
@@ -247,8 +283,13 @@ export async function makeCorrectionOnRequest({
       declaration,
       transactionId,
       annotation,
-      keepAssignment: true
+      keepAssignmentIfAccepted: true,
+      waitFor: true
     })
+
+  if (wasRejected(response, ActionType.REQUEST_CORRECTION)) {
+    return response
+  }
 
   const requestId = response.actions.find(
     (a) =>
@@ -268,6 +309,7 @@ export async function makeCorrectionOnRequest({
     requestId,
     annotation: {
       isImmediateCorrection: true
-    }
+    },
+    waitFor: true
   })
 }

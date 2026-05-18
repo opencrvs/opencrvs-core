@@ -160,6 +160,7 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
           <StyledIFrame
             ref={iframeRef}
             allowFullScreen
+            allow="clipboard-write"
             id={title}
             src={dashboard.url}
           />

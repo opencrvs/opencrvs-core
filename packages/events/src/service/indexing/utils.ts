@@ -241,8 +241,7 @@ export function getEventIndexWithoutLocationHierarchy(
  */
 export async function getEventIndexWithAdministrativeHierarchy(
   eventConfig: EventConfig,
-  event: EventIndex,
-  administrativeHierarchy?: Map<string, string[]>
+  event: EventIndex
 ) {
   const buildAdministrativeHierarchyById = async (
     id: UUID
@@ -251,15 +250,7 @@ export async function getEventIndexWithAdministrativeHierarchy(
       return []
     }
 
-    if (administrativeHierarchy && administrativeHierarchy.has(id)) {
-      return administrativeHierarchy.get(id) || [id]
-    }
-
-    const hierarchy = await getAdministrativeHierarchyById(id)
-    if (administrativeHierarchy) {
-      administrativeHierarchy.set(id, hierarchy)
-    }
-    return hierarchy
+    return getAdministrativeHierarchyById(id)
   }
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const tempEvent = { ...event, declaration: { ...event.declaration } } as any

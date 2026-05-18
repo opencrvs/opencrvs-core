@@ -10,6 +10,7 @@
  */
 import {
   createPrng,
+  DocumentPath,
   encodeScope,
   eventPayloadGenerator,
   generateUuid,
@@ -135,9 +136,9 @@ export function testDataGenerator(rngSeed?: number) {
         id: user.id.registrationAgent,
         name: { firstname: 'Felix', surname: 'Katongo' },
         role: TestUserRole.enum.REGISTRATION_AGENT,
-        avatar: undefined,
-        signature: undefined,
-        fullHonorificName: undefined,
+        avatar: 'path/to/avatar' as DocumentPath,
+        signature: 'path/to/signature' as DocumentPath,
+        fullHonorificName: 'Dr. Felix Katongo',
         status: 'active',
         primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
         administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
