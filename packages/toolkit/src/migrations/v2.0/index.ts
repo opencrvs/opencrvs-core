@@ -34,6 +34,7 @@ import { main as addResendInviteNotification } from './add-resend-invite-notific
 import { main as simplifyAnalyticsPrecalculations } from './simplify-analytics-precalculations'
 import { main as mergeInfrastructureDirectory } from './merge-infrastructure-directory'
 import { main as deleteInfrastructureDirectory } from './delete-infrastructure-directory'
+import { main as fixAcceptRequestedRegistrationFunctionType } from './fix-accept-requested-registration-function-type'
 
 /**
  * Top-level subdirectories of `infrastructure/` that non-Swarm deployments
@@ -78,6 +79,7 @@ export async function runUpgrade(dockerSwarm: boolean) {
   await checkoutUpstreamFiles()
   await addResendInviteNotification()
   await simplifyAnalyticsPrecalculations()
+  await fixAcceptRequestedRegistrationFunctionType()
   await updatePackageJson()
 
   if (dockerSwarm) {
