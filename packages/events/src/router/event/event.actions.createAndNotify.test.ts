@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { TRPCError } from "@trpc/server"
+import { TRPCError } from '@trpc/server'
 import {
   ActionStatus,
   ActionType,
@@ -16,21 +16,21 @@ import {
   getAcceptedActions,
   getUUID,
   TENNIS_CLUB_MEMBERSHIP
-} from "@opencrvs/commons"
+} from '@opencrvs/commons'
 import {
   createSystemTestClient,
   createTestClient,
   setupTestCase,
   TEST_SYSTEM_ID
-} from "@events/tests/utils"
+} from '@events/tests/utils'
 
-describe("event.actions.createAndNotify", () => {
-  describe("authorization", () => {
-    test("regular (non-system) user is forbidden regardless of scopes", async () => {
+describe('event.actions.createAndNotify', () => {
+  describe('authorization', () => {
+    test('regular (non-system) user is forbidden regardless of scopes', async () => {
       const { user, locations } = await setupTestCase()
       const client = createTestClient(user, [
-        encodeScope({ type: "record.create" }),
-        encodeScope({ type: "record.notify" })
+        encodeScope({ type: 'record.create' }),
+        encodeScope({ type: 'record.notify' })
       ])
 
       await expect(
@@ -40,10 +40,10 @@ describe("event.actions.createAndNotify", () => {
           declaration: {},
           createdAtLocation: locations[0].id
         })
-      ).rejects.toMatchObject(new TRPCError({ code: "FORBIDDEN" }))
+      ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
     })
 
-    test("prevents access when both scopes are missing", async () => {
+    test('prevents access when both scopes are missing', async () => {
       await setupTestCase()
       const client = createSystemTestClient(TEST_SYSTEM_ID, [])
 
@@ -54,13 +54,13 @@ describe("event.actions.createAndNotify", () => {
           declaration: {},
           createdAtLocation: getUUID()
         })
-      ).rejects.toMatchObject(new TRPCError({ code: "FORBIDDEN" }))
+      ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
     })
 
-    test("prevents access when only record.create scope is present", async () => {
+    test('prevents access when only record.create scope is present', async () => {
       await setupTestCase()
       const client = createSystemTestClient(TEST_SYSTEM_ID, [
-        encodeScope({ type: "record.create" })
+        encodeScope({ type: 'record.create' })
       ])
 
       await expect(
@@ -70,13 +70,13 @@ describe("event.actions.createAndNotify", () => {
           declaration: {},
           createdAtLocation: getUUID()
         })
-      ).rejects.toMatchObject(new TRPCError({ code: "FORBIDDEN" }))
+      ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
     })
 
-    test("prevents access when only record.notify scope is present", async () => {
+    test('prevents access when only record.notify scope is present', async () => {
       await setupTestCase()
       const client = createSystemTestClient(TEST_SYSTEM_ID, [
-        encodeScope({ type: "record.notify" })
+        encodeScope({ type: 'record.notify' })
       ])
 
       await expect(
@@ -86,14 +86,14 @@ describe("event.actions.createAndNotify", () => {
           declaration: {},
           createdAtLocation: getUUID()
         })
-      ).rejects.toMatchObject(new TRPCError({ code: "FORBIDDEN" }))
+      ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
     })
 
-    test("allows access when both record.create and record.notify scopes are present", async () => {
+    test('allows access when both record.create and record.notify scopes are present', async () => {
       const { locations } = await setupTestCase()
       const client = createSystemTestClient(TEST_SYSTEM_ID, [
-        encodeScope({ type: "record.create" }),
-        encodeScope({ type: "record.notify" })
+        encodeScope({ type: 'record.create' }),
+        encodeScope({ type: 'record.notify' })
       ])
 
       await expect(
@@ -106,15 +106,15 @@ describe("event.actions.createAndNotify", () => {
       ).resolves.toMatchObject({ type: TENNIS_CLUB_MEMBERSHIP })
     })
 
-    test("prevents access when record.create scope is for a different event type", async () => {
+    test('prevents access when record.create scope is for a different event type', async () => {
       await setupTestCase()
       const client = createSystemTestClient(TEST_SYSTEM_ID, [
         encodeScope({
-          type: "record.create",
-          options: { event: ["some-other-event"] }
+          type: 'record.create',
+          options: { event: ['some-other-event'] }
         }),
         encodeScope({
-          type: "record.notify",
+          type: 'record.notify',
           options: { event: [TENNIS_CLUB_MEMBERSHIP] }
         })
       ])
@@ -126,19 +126,19 @@ describe("event.actions.createAndNotify", () => {
           declaration: {},
           createdAtLocation: getUUID()
         })
-      ).rejects.toMatchObject(new TRPCError({ code: "FORBIDDEN" }))
+      ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
     })
 
-    test("prevents access when record.notify scope is for a different event type", async () => {
+    test('prevents access when record.notify scope is for a different event type', async () => {
       await setupTestCase()
       const client = createSystemTestClient(TEST_SYSTEM_ID, [
         encodeScope({
-          type: "record.create",
+          type: 'record.create',
           options: { event: [TENNIS_CLUB_MEMBERSHIP] }
         }),
         encodeScope({
-          type: "record.notify",
-          options: { event: ["some-other-event"] }
+          type: 'record.notify',
+          options: { event: ['some-other-event'] }
         })
       ])
 
@@ -149,18 +149,18 @@ describe("event.actions.createAndNotify", () => {
           declaration: {},
           createdAtLocation: getUUID()
         })
-      ).rejects.toMatchObject(new TRPCError({ code: "FORBIDDEN" }))
+      ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
     })
 
-    test("allows access when scopes are restricted to matching event type", async () => {
+    test('allows access when scopes are restricted to matching event type', async () => {
       const { locations } = await setupTestCase()
       const client = createSystemTestClient(TEST_SYSTEM_ID, [
         encodeScope({
-          type: "record.create",
+          type: 'record.create',
           options: { event: [TENNIS_CLUB_MEMBERSHIP] }
         }),
         encodeScope({
-          type: "record.notify",
+          type: 'record.notify',
           options: { event: [TENNIS_CLUB_MEMBERSHIP] }
         })
       ])
@@ -176,15 +176,15 @@ describe("event.actions.createAndNotify", () => {
     })
   })
 
-  test("creates an event and applies a NOTIFY action in one request", async () => {
+  test('creates an event and applies a NOTIFY action in one request', async () => {
     const { locations } = await setupTestCase()
     const client = createSystemTestClient(TEST_SYSTEM_ID, [
       encodeScope({
-        type: "record.create",
+        type: 'record.create',
         options: { event: [TENNIS_CLUB_MEMBERSHIP] }
       }),
       encodeScope({
-        type: "record.notify",
+        type: 'record.notify',
         options: { event: [TENNIS_CLUB_MEMBERSHIP] }
       })
     ])
@@ -192,7 +192,7 @@ describe("event.actions.createAndNotify", () => {
     const result = await client.event.actions.createAndNotify.request({
       eventType: TENNIS_CLUB_MEMBERSHIP,
       transactionId: getUUID(),
-      declaration: { "applicant.email": "test@opencrvs.org" },
+      declaration: { 'applicant.email': 'test@opencrvs.org' },
       createdAtLocation: locations[0].id
     })
 
@@ -204,11 +204,11 @@ describe("event.actions.createAndNotify", () => {
     ).toBeDefined()
   })
 
-  test("returned event contains CREATE and NOTIFY actions (no ASSIGN for system user)", async () => {
+  test('returned event contains CREATE and NOTIFY actions (no ASSIGN for system user)', async () => {
     const { locations } = await setupTestCase()
     const client = createSystemTestClient(TEST_SYSTEM_ID, [
-      encodeScope({ type: "record.create" }),
-      encodeScope({ type: "record.notify" })
+      encodeScope({ type: 'record.create' }),
+      encodeScope({ type: 'record.notify' })
     ])
 
     const result = await client.event.actions.createAndNotify.request({
@@ -222,19 +222,27 @@ describe("event.actions.createAndNotify", () => {
     expect(result.actions).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ type: ActionType.CREATE }),
-        expect.objectContaining({ type: ActionType.NOTIFY, status: ActionStatus.Requested }),
-        expect.objectContaining({ type: ActionType.NOTIFY, status: ActionStatus.Accepted })
+        expect.objectContaining({
+          type: ActionType.NOTIFY,
+          status: ActionStatus.Requested
+        }),
+        expect.objectContaining({
+          type: ActionType.NOTIFY,
+          status: ActionStatus.Accepted
+        })
       ])
     )
     // System users do not get an ASSIGN action
-    expect(result.actions.find((a) => a.type === ActionType.ASSIGN)).toBeUndefined()
+    expect(
+      result.actions.find((a) => a.type === ActionType.ASSIGN)
+    ).toBeUndefined()
   })
 
-  test("is idempotent: calling twice with the same transactionId returns the same event", async () => {
+  test('is idempotent: calling twice with the same transactionId returns the same event', async () => {
     const { locations, eventsDb } = await setupTestCase()
     const client = createSystemTestClient(TEST_SYSTEM_ID, [
-      encodeScope({ type: "record.create" }),
-      encodeScope({ type: "record.notify" })
+      encodeScope({ type: 'record.create' }),
+      encodeScope({ type: 'record.notify' })
     ])
 
     const transactionId = getUUID()
@@ -251,35 +259,32 @@ describe("event.actions.createAndNotify", () => {
     expect(first.id).toBe(second.id)
 
     // Only one event must exist in the database
-    const events = await eventsDb
-      .selectFrom("events")
-      .selectAll()
-      .execute()
+    const events = await eventsDb.selectFrom('events').selectAll().execute()
     expect(events).toHaveLength(1)
   })
 
-  test("fails with BAD_REQUEST for unknown event type", async () => {
+  test('fails with BAD_REQUEST for unknown event type', async () => {
     const { locations } = await setupTestCase()
     const client = createSystemTestClient(TEST_SYSTEM_ID, [
-      encodeScope({ type: "record.create" }),
-      encodeScope({ type: "record.notify" })
+      encodeScope({ type: 'record.create' }),
+      encodeScope({ type: 'record.notify' })
     ])
 
     await expect(
       client.event.actions.createAndNotify.request({
-        eventType: "does-not-exist",
+        eventType: 'does-not-exist',
         transactionId: getUUID(),
         declaration: {},
         createdAtLocation: locations[0].id
       })
-    ).rejects.toMatchObject({ code: "BAD_REQUEST" })
+    ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
   })
 
-  test("fails with BAD_REQUEST for malformed declaration field", async () => {
+  test('fails with BAD_REQUEST for malformed declaration field', async () => {
     const { locations } = await setupTestCase()
     const client = createSystemTestClient(TEST_SYSTEM_ID, [
-      encodeScope({ type: "record.create" }),
-      encodeScope({ type: "record.notify" })
+      encodeScope({ type: 'record.create' }),
+      encodeScope({ type: 'record.notify' })
     ])
 
     await expect(
@@ -287,24 +292,24 @@ describe("event.actions.createAndNotify", () => {
         eventType: TENNIS_CLUB_MEMBERSHIP,
         transactionId: getUUID(),
         declaration: {
-          "applicant.name": { firstname: 123 } as unknown as string
+          'applicant.name': { firstname: 123 } as unknown as string
         },
         createdAtLocation: locations[0].id
       })
-    ).rejects.toMatchObject({ code: "BAD_REQUEST" })
+    ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
   })
 
-  test("creates event with correct createdAtLocation on the CREATE action", async () => {
+  test('creates event with correct createdAtLocation on the CREATE action', async () => {
     const { locations } = await setupTestCase()
     const leafLocation = locations[0]
 
     const client = createSystemTestClient(TEST_SYSTEM_ID, [
       encodeScope({
-        type: "record.create",
+        type: 'record.create',
         options: { event: [TENNIS_CLUB_MEMBERSHIP] }
       }),
       encodeScope({
-        type: "record.notify",
+        type: 'record.notify',
         options: { event: [TENNIS_CLUB_MEMBERSHIP] }
       })
     ])
@@ -312,7 +317,7 @@ describe("event.actions.createAndNotify", () => {
     const result = await client.event.actions.createAndNotify.request({
       eventType: TENNIS_CLUB_MEMBERSHIP,
       transactionId: getUUID(),
-      declaration: { "applicant.email": "sys@opencrvs.org" },
+      declaration: { 'applicant.email': 'sys@opencrvs.org' },
       createdAtLocation: leafLocation.id
     })
 
@@ -328,12 +333,12 @@ describe("event.actions.createAndNotify", () => {
     )
   })
 
-  test("rejects when createdAtLocation is an unknown UUID", async () => {
+  test('rejects when createdAtLocation is an unknown UUID', async () => {
     await setupTestCase()
 
     const client = createSystemTestClient(TEST_SYSTEM_ID, [
-      encodeScope({ type: "record.create" }),
-      encodeScope({ type: "record.notify" })
+      encodeScope({ type: 'record.create' }),
+      encodeScope({ type: 'record.notify' })
     ])
 
     await expect(
@@ -343,17 +348,17 @@ describe("event.actions.createAndNotify", () => {
         declaration: {},
         createdAtLocation: getUUID()
       })
-    ).rejects.toMatchObject({ code: "BAD_REQUEST" })
+    ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
   })
 
-  test("rejects when createdAtLocation is an administrative area (non-leaf)", async () => {
+  test('rejects when createdAtLocation is an administrative area (non-leaf)', async () => {
     // Administrative area IDs are not valid location IDs (different table)
     const { locations } = await setupTestCase()
     const adminAreaId = locations[0].administrativeAreaId ?? getUUID()
 
     const client = createSystemTestClient(TEST_SYSTEM_ID, [
-      encodeScope({ type: "record.create" }),
-      encodeScope({ type: "record.notify" })
+      encodeScope({ type: 'record.create' }),
+      encodeScope({ type: 'record.notify' })
     ])
 
     await expect(
@@ -363,6 +368,6 @@ describe("event.actions.createAndNotify", () => {
         declaration: {},
         createdAtLocation: adminAreaId
       })
-    ).rejects.toMatchObject({ code: "BAD_REQUEST" })
+    ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
   })
 })

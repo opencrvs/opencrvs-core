@@ -211,8 +211,7 @@ export function createAndNotifyProcedure() {
           user,
           token,
           event,
-          eventConfig,
-          NotifyActionInput
+          eventConfig
         )
 
         // Step 5: Write audit log.
