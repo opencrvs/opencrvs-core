@@ -309,6 +309,81 @@ paths:
         "401": *a2
         "403": *a3
         "500": *a4
+  /events/notify:
+    post:
+      operationId: event-actions-createAndNotify-request
+      summary: Create an event and immediately notify (single request, system clients
+        only)
+      tags:
+        - events
+      security:
+        - Authorization: []
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                transactionId:
+                  type: string
+                declaration:
+                  default: {}
+                  type: object
+                  propertyNames:
+                    type: string
+                  additionalProperties:
+                    description: Value that matches exactly one of the possible schema types
+                      (TextValue, DateValue, DateRangeFieldValue). The best
+                      matching schema is chosen by priority.
+                  description: Record of field-level changes made by an action. Supports partial
+                    updates and nullable values.
+                annotation:
+                  type: object
+                  propertyNames:
+                    type: string
+                  additionalProperties:
+                    description: Value that matches exactly one of the possible schema types
+                      (TextValue, DateValue, DateRangeFieldValue). The best
+                      matching schema is chosen by priority.
+                  description: Record of field-level changes made by an action. Supports partial
+                    updates and nullable values.
+                originalActionId:
+                  type: string
+                  format: uuid
+                  pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                keepAssignment:
+                  type: boolean
+                keepAssignmentIfAccepted:
+                  type: boolean
+                keepAssignmentIfRejected:
+                  type: boolean
+                waitFor:
+                  type: boolean
+                createdAtLocation:
+                  type: string
+                  format: uuid
+                  pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                  description: A valid office location ID. Required. The provided location must be
+                    a leaf-location, i.e. it must not have any child locations.
+                eventType:
+                  type: string
+              required:
+                - transactionId
+                - createdAtLocation
+                - eventType
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventDocument"
+        "400": *a1
+        "401": *a2
+        "403": *a3
+        "500": *a4
   /events/{eventId}/correction/request:
     post:
       operationId: event-actions-correction-request-request
