@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -474,6 +475,7 @@ function zodToIntlErrorMap(
     field.required && typeof field.required === 'object'
       ? field.required.message
       : errorMessages.requiredField
+  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
   switch (issue.code) {
     case 'invalid_string': {
       if (_ctx.data === '') {
@@ -690,6 +692,7 @@ export function getValidatorsForField(
 ): NonNullable<FieldConfig['validation']> {
   return validations
     .map(({ validator, message }) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const jsonSchema = validator as any
 
       /*
