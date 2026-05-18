@@ -250,7 +250,6 @@ export async function defaultRequestHandler(
     { eventId: input.eventId, actionId: requestedAction.id },
     token
   )
-
   const { responseStatus, responseBody } = await requestActionConfirmation(
     input.type,
     input.transactionId,
@@ -268,7 +267,11 @@ export async function defaultRequestHandler(
 
   // For Async flow, we just return the event with the requested action and ensure it is indexed
   if (responseStatus === ActionConfirmationResponse.RequiresProcessing) {
-    await ensureEventIndexed(eventWithRequestedAction, configuration, input.waitFor ?? false)
+    await ensureEventIndexed(
+      eventWithRequestedAction,
+      configuration,
+      input.waitFor ?? false
+    )
     return eventWithRequestedAction
   }
 
