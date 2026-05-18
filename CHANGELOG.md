@@ -2,6 +2,10 @@
 
 ## 1.9.14 Release Candidate
 
+### Bug fixes
+
+- Signature fields referenced in certificate templates via Handlebars now resolve correctly. Signatures captured during registration and on the review page were previously not rendered in printed certificates even when the template referenced them. [#12277](https://github.com/opencrvs/opencrvs-core/issues/12277)
+
 ## 1.9.13
 
 ### Breaking changes
