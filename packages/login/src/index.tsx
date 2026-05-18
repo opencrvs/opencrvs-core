@@ -62,7 +62,6 @@ const router = createBrowserRouter(routesConfig, {
 async function renderAppWithConfig() {
   return authApi.getApplicationConfig().then((res) => {
     store.dispatch(applicationConfigLoadedAction(res))
-
     root.render(<App router={router} store={store} />)
   })
 }
