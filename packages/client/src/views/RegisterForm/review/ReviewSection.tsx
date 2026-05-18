@@ -795,10 +795,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     groupId: string,
     fieldName?: string
   ) => {
-    const { draft, pageRoute, writeDeclaration } = this.props
+    const { draft, pageRoute } = this.props
     const declaration = draft
     declaration.review = true
-    writeDeclaration(declaration)
 
     this.props.router.navigate(
       generateGoToPageGroupUrl({
