@@ -68,10 +68,52 @@ describe('getScopeOptionValue()', () => {
         type: 'record.search',
         options: {}
       },
-      'declaredIn'
+      'declaredBy'
     )
 
     expect(result).toEqual(undefined)
+  })
+
+  it('should return "all" for registeredIn when not set', () => {
+    const result = getScopeOptionValue(
+      { type: 'record.search', options: {} },
+      'registeredIn'
+    )
+
+    expect(result).toEqual(JurisdictionFilter.enum.all)
+  })
+
+  it('should return "all" for declaredIn when not set', () => {
+    const result = getScopeOptionValue(
+      { type: 'record.edit', options: {} },
+      'declaredIn'
+    )
+
+    expect(result).toEqual(JurisdictionFilter.enum.all)
+  })
+
+  it('should return set value for registeredIn over default', () => {
+    const result = getScopeOptionValue(
+      {
+        type: 'record.search',
+        options: { registeredIn: JurisdictionFilter.enum.administrativeArea }
+      },
+      'registeredIn'
+    )
+
+    expect(result).toEqual(JurisdictionFilter.enum.administrativeArea)
+  })
+
+  it('should return set value for declaredIn over default', () => {
+    const result = getScopeOptionValue(
+      {
+        type: 'record.edit',
+        options: { declaredIn: JurisdictionFilter.enum.location }
+      },
+      'declaredIn'
+    )
+
+    expect(result).toEqual(JurisdictionFilter.enum.location)
   })
 })
 
