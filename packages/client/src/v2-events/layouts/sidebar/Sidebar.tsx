@@ -90,6 +90,14 @@ function Workqueues({
   ))
 }
 
+export async function logout(language?: string) {
+  await storage.removeItem(SCREEN_LOCK)
+  await removeToken()
+  await removeUserDetails()
+  // redirect is handled at nginx level.
+  window.location.assign(`/login?lang=${language ?? ''}`)
+}
+
 function SidebarComponent({
   menuCollapse,
   navigationWidth,
@@ -149,15 +157,6 @@ function SidebarComponent({
   const avatar = <Avatar avatar={userDetails?.avatar} name={name} />
 
   const runningVer = String(localStorage.getItem('running-version'))
-
-  const logout = async () => {
-    await storage.removeItem(SCREEN_LOCK)
-    await removeToken()
-    await removeUserDetails()
-    window.location.assign(
-      `/login?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}${ROUTES.V2.buildPath({})}`
-    )
-  }
 
   return (
     <LeftNavigation
@@ -239,7 +238,7 @@ function SidebarComponent({
             icon={() => <LogoutNavigation />}
             id={`navigation_${WORKQUEUE_TABS.logout}`}
             label={intl.formatMessage(buttonMessages[WORKQUEUE_TABS.logout])}
-            onClick={logout}
+            onClick={() => logout(language)}
           />
         </NavigationGroup>
       )}
