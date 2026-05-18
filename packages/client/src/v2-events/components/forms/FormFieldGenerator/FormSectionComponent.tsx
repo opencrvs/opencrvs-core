@@ -235,7 +235,7 @@ export function FormSectionComponent({
     }
 
     const formContext = {
-      ...fullForm,
+      ...ocrvsFullForm,
       ...makeFormikFieldIdsOpenCRVSCompatible(fieldValues)
     }
 
