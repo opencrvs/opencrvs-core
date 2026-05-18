@@ -56,7 +56,7 @@ export function Password() {
         value={<ValueContainer>********</ValueContainer>}
         actions={
           <DynamicHeightLinkButton
-            id="BtnChangePassword"
+            id="btnChangePassword"
             onClick={togglePasswordChangeModal}
             disabled={!isOnline}
           >
