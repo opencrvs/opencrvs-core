@@ -47,8 +47,7 @@ test('Returns user in correct format', async () => {
       name: user.name,
       role: user.role,
       primaryOfficeId: user.primaryOfficeId,
-      type: TokenUserType.enum.user,
-      status: user.status
+      type: TokenUserType.enum.user
     })
   ])
 })
