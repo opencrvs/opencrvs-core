@@ -10,6 +10,7 @@
  */
 import { logout } from './Sidebar'
 
+// Mocking within storybook is impossible. The logout function is tested in unit test style instead.
 const assignMock = vi.fn()
 
 beforeAll(() => {

@@ -238,7 +238,7 @@ function SidebarComponent({
             icon={() => <LogoutNavigation />}
             id={`navigation_${WORKQUEUE_TABS.logout}`}
             label={intl.formatMessage(buttonMessages[WORKQUEUE_TABS.logout])}
-            onClick={() => logout(language)}
+            onClick={async () => logout(language)}
           />
         </NavigationGroup>
       )}
