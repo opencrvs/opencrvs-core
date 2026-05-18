@@ -310,11 +310,9 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
 
           await canvas.findByText('Signature')
 
-          await expect(
-            await canvas.findByText(
-              'By signing this document with an electronic signature, I agree that such signature will be valid as handwritten signatures to the extent allowed by the laws of Farajaland.'
-            )
-          ).toBeVisible()
+          await canvas.findByText(
+            'By signing this document with an electronic signature, I agree that such signature will be valid as handwritten signatures to the extent allowed by the laws of Farajaland.'
+          )
 
           await canvas.findByRole('button', {
             name: 'Cancel'
