@@ -72,25 +72,4 @@ function withRetry(render: () => Promise<void>) {
   })
 }
 
-const SW_RECOVERY_ATTEMPTED = 'sw_recovery_attempted'
-
-async function renderWithFallback() {
-  try {
-    await renderAppWithConfig()
-  } catch (error) {
-    // Guard against an infinite reload loop: if SW recovery already ran this
-    // session and the app still fails, fall through to withRetry instead.
-    if (!sessionStorage.getItem(SW_RECOVERY_ATTEMPTED)) {
-      sessionStorage.setItem(SW_RECOVERY_ATTEMPTED, 'true')
-      if ('serviceWorker' in navigator) {
-        const registration = await navigator.serviceWorker.getRegistration()
-        await registration?.unregister()
-      }
-      window.location.reload()
-    } else {
-      withRetry(renderAppWithConfig)
-    }
-  }
-}
-
-renderWithFallback()
+withRetry(renderAppWithConfig)
