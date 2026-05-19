@@ -17,6 +17,7 @@ interface IRegisterMessages
   reviewEventRegistration: MessageDescriptor
   submitDescription: MessageDescriptor
   registerFormQueryError: MessageDescriptor
+  goToReviewButton: MessageDescriptor
   backToReviewButton: MessageDescriptor
   saveDeclarationConfirmModalTitle: MessageDescriptor
   saveDeclarationConfirmModalDescription: MessageDescriptor
@@ -62,6 +63,10 @@ const messagesToDefine: IRegisterMessages = {
     defaultMessage:
       'The page cannot be loaded at this time due to low connectivity or a network error. Please click refresh to try again, or try again later.',
     description: 'The error message shown when a search query fails'
+  },
+  goToReviewButton: {
+    id: 'register.selectVitalEvent.goToReviewButton',
+    defaultMessage: 'Go to review'
   },
   backToReviewButton: {
     id: 'register.selectVitalEvent.backToReviewButton',

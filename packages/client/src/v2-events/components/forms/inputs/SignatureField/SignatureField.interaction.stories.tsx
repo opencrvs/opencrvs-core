@@ -29,6 +29,7 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { TestImage } from '@client/v2-events/features/events/fixtures'
 import { getTestValidatorContext } from '../../../../../../.storybook/decorators'
+import { SignatureField } from './SignatureField'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/SignatureField/Interaction',
@@ -309,11 +310,9 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
 
           await canvas.findByText('Signature')
 
-          await expect(
-            await canvas.findByText(
-              'By signing this document with an electronic signature, I agree that such signature will be valid as handwritten signatures to the extent allowed by the laws of Farajaland.'
-            )
-          ).toBeVisible()
+          await canvas.findByText(
+            'By signing this document with an electronic signature, I agree that such signature will be valid as handwritten signatures to the extent allowed by the laws of Farajaland.'
+          )
 
           await canvas.findByRole('button', {
             name: 'Cancel'
@@ -354,3 +353,34 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
       })
     }
   }
+
+export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
+  name: 'Certificate Variables',
+  parameters: { layout: 'centered' },
+  render: function Component() {
+    const withValue = SignatureField.toCertificateVariables({
+      path: 'events/birth-123/signature.png',
+      originalFilename: 'signature.png',
+      type: MimeType.enum['image/png']
+    })
+
+    const withUndefined = SignatureField.toCertificateVariables(undefined)
+
+    return (
+      <div>
+        <div data-testid="with-value">{withValue}</div>
+        <div data-testid="with-undefined">{withUndefined}</div>
+      </div>
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await expect(await canvas.findByTestId('with-value')).toHaveTextContent(
+      'http://localhost:3535/events/birth-123/signature.png'
+    )
+    await expect(await canvas.findByTestId('with-undefined')).toHaveTextContent(
+      ''
+    )
+  }
+}

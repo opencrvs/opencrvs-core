@@ -148,7 +148,7 @@ export const usePrintableCertificate = ({
         copiesPrintedForTemplate
       },
       $declaration: declarationWithResolvedImages,
-      $actions: event.actions as ActionDocument[],
+      $actions: getAcceptedActions(event),
       locations,
       review: false,
       users,

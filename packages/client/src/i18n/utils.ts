@@ -11,7 +11,11 @@
 import { storage } from '@client/storage'
 
 export function getAvailableLanguages() {
-  return window.config.LANGUAGES.split(',')
+  // 2.0 countryconfig returns LANGUAGES as string[], 1.9 returned a comma-separated string.
+  // Handle both so this code works during the upgrade window when the old SW bundle
+  // runs against a new 2.0 countryconfig.
+  const languages = window.config.LANGUAGES
+  return Array.isArray(languages) ? languages : languages.split(',')
 }
 
 export function getDefaultLanguage() {

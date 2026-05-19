@@ -147,7 +147,7 @@ export const RemovingExistingFileSendsNull: Story = {
 
       await userEvent.click(
         await canvas.findByRole('button', {
-          name: 'Back to review'
+          name: 'Go to review'
         })
       )
     })
@@ -429,7 +429,7 @@ export const RemovingMultipleFilesDeletesAll: Story = {
     await step('Clears file references and sends payload', async () => {
       await userEvent.click(
         await canvas.findByRole('button', {
-          name: 'Back to review'
+          name: 'Go to review'
         })
       )
       await canvas.findByText('No supporting documents')
