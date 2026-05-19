@@ -1013,9 +1013,13 @@ const AutocompleteField = BaseField.extend({
         })
       )
       .optional()
+      .describe(
+        'Manual entry is supported through configuration, allowing users to provide values not currently represented in the dataset.'
+      )
   })
 }).meta({
-  description: 'Autocomplete input field',
+  description:
+    'Generic autocomplete component designed for use with large dictionary-based datasets. The component supports dynamic retrieval of options from configurable data sources and is intended for datasets that may contain tens or hundreds of thousands of records.',
   id: 'AutocompleteField'
 })
 
