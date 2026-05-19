@@ -1528,6 +1528,7 @@ components:
         - type
         - review
       additionalProperties: false
+      description: Record-tab content displayed on the event overview page.
     ActionFlagConfig:
       type: object
       properties:
@@ -11868,6 +11869,8 @@ components:
         - type
         - review
       additionalProperties: false
+      description: Submitting a new declaration (includes review fields). This config
+        is also shared with ActionType.NOTIFY.
     Clause:
       oneOf:
         - type: object
@@ -12026,6 +12029,7 @@ components:
         - flags
         - type
       additionalProperties: false
+      description: Rejecting a record before registration
     RegisterActionConfig:
       type: object
       properties:
@@ -12071,6 +12075,7 @@ components:
         - flags
         - type
       additionalProperties: false
+      description: Registering a record
     PrintCertificateActionConfig:
       type: object
       properties:
@@ -12119,6 +12124,7 @@ components:
         - type
         - printForm
       additionalProperties: false
+      description: Printing a certificate
     PageConfig:
       oneOf:
         - type: object
@@ -12324,6 +12330,7 @@ components:
         - type
         - dialogCopy
       additionalProperties: false
+      description: Editing a record before registration
     ArchiveActionConfig:
       type: object
       properties:
@@ -12355,6 +12362,7 @@ components:
         - flags
         - type
       additionalProperties: false
+      description: Archiving a record
     CustomActionConfig:
       type: object
       properties:
@@ -12402,6 +12410,7 @@ components:
         - form
         - auditHistoryLabel
       additionalProperties: false
+      description: Custom action configuration
     FlagConfig:
       type: object
       properties:
