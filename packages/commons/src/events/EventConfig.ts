@@ -100,7 +100,7 @@ const _EventConfigBase: z.ZodType<EventConfig, EventConfigInput> = z.object({
   actions: z
     .array(ActionConfig)
     .describe(
-      'Configuration of system-defined actions associated with the event.'
+      'Configuration of core and custom actions associated with the event.'
     ),
   actionOrder: z
     .array(z.string())
@@ -123,7 +123,7 @@ const _EventConfigBase: z.ZodType<EventConfig, EventConfigInput> = z.object({
     .optional()
     .default([])
     .describe(
-      'Configuration of flags associated with the actions of this event type.'
+      'Configuration of custom flags associated with the actions of this event type.'
     ),
   analytics: z
     .boolean()
