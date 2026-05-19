@@ -15,6 +15,7 @@ import React from 'react'
 import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { userEvent, within, expect, waitFor } from '@storybook/test'
+import { onlineManager } from '@tanstack/react-query'
 import {
   ActionType,
   createPrng,
@@ -47,6 +48,9 @@ import { WorkqueueIndex } from './index'
 const meta: Meta<typeof WorkqueueIndex> = {
   title: 'Workqueue/Interaction',
   component: WorkqueueIndex,
+  beforeEach: () => {
+    onlineManager.setOnline(true)
+  },
   decorators: [
     (Story) => (
       <TRPCProvider>
