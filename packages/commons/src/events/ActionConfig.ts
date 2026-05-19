@@ -166,17 +166,40 @@ export const ActionConfig = z
      * OpenAPI references are defined here so our generated OpenAPI spec knows to reuse the models
      * and treat them as "models" instead of duplicating the data structure in each endpoint.
      */
-    ReadActionConfig.meta({ id: 'ReadActionConfig' }),
-    DeclareConfig.meta({ id: 'DeclareActionConfig' }),
-    RejectConfig.meta({ id: 'RejectActionConfig' }),
-    RegisterConfig.meta({ id: 'RegisterActionConfig' }),
+    ReadActionConfig.meta({
+      id: 'ReadActionConfig',
+      description: 'Record-tab content displayed on the event overview page.'
+    }),
+    DeclareConfig.meta({
+      id: 'DeclareActionConfig',
+      description:
+        'Submitting a new declaration (includes review fields). This config is also shared with ActionType.NOTIFY.'
+    }),
+    RejectConfig.meta({
+      id: 'RejectActionConfig',
+      description: 'Rejecting a record before registration'
+    }),
+    RegisterConfig.meta({
+      id: 'RegisterActionConfig',
+      description: 'Registering a record'
+    }),
     PrintCertificateActionConfig.meta({
-      id: 'PrintCertificateActionConfig'
+      id: 'PrintCertificateActionConfig',
+      description: 'Printing a certificate'
     }),
     RequestCorrectionConfig.meta({ id: 'RequestCorrectionActionConfig' }),
-    EditActionConfig.meta({ id: 'EditActionConfig' }),
-    ArchiveConfig.meta({ id: 'ArchiveActionConfig' }),
-    CustomActionConfig.meta({ id: 'CustomActionConfig' })
+    EditActionConfig.meta({
+      id: 'EditActionConfig',
+      description: 'Editing a record before registration'
+    }),
+    ArchiveConfig.meta({
+      id: 'ArchiveActionConfig',
+      description: 'Archiving a record'
+    }),
+    CustomActionConfig.meta({
+      id: 'CustomActionConfig',
+      description: 'Custom action configuration'
+    })
   ])
   .describe(
     'Configuration of an action available for an event. Data collected depends on the action type and is accessible through the annotation property in ActionDocument.'
