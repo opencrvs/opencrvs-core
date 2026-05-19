@@ -63,7 +63,7 @@ const FieldId = z
 
 export const FieldReference = z
   .object({
-    $$field: FieldId,
+    $$field: FieldId.describe('Id of the field to reference'),
     $$subfield: z
       .array(z.string())
       .optional()
