@@ -1493,36 +1493,7 @@ components:
           description: Flag actions which are executed when the action is performed.
           type: array
           items:
-            type: object
-            properties:
-              id:
-                anyOf:
-                  - anyOf:
-                      - type: string
-                        pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
-                      - type: string
-                        enum:
-                          - incomplete
-                          - rejected
-                          - correction-requested
-                          - potential-duplicate
-                          - edit-in-progress
-                  - type: string
-                    description: Custom flag identifier defined by the country config.
-              operation:
-                type: string
-                enum:
-                  - add
-                  - remove
-                description: Operation to perform on the flag.
-              conditional:
-                description: When conditional is met, the operation is performed on the flag. If
-                  not provided, the operation is performed unconditionally.
-                $ref: "#/components/schemas/Conditional"
-            required:
-              - id
-              - operation
-            additionalProperties: false
+            $ref: "#/components/schemas/ActionFlagConfig"
         supportingCopy:
           description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
@@ -1557,6 +1528,38 @@ components:
         - type
         - review
       additionalProperties: false
+    ActionFlagConfig:
+      type: object
+      properties:
+        id:
+          anyOf:
+            - anyOf:
+                - type: string
+                  pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                - type: string
+                  enum:
+                    - incomplete
+                    - rejected
+                    - correction-requested
+                    - potential-duplicate
+                    - edit-in-progress
+            - type: string
+              description: Custom flag identifier defined by the country config.
+        operation:
+          type: string
+          enum:
+            - add
+            - remove
+          description: Operation to perform on the flag.
+        conditional:
+          description: When conditional is met, the operation is performed on the flag. If
+            not provided, the operation is performed unconditionally.
+          $ref: "#/components/schemas/Conditional"
+      required:
+        - id
+        - operation
+      additionalProperties: false
+      description: Action flag configuration
     FieldConfig:
       oneOf:
         - type: object
@@ -1575,7 +1578,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -1594,7 +1597,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -1669,7 +1672,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -1688,7 +1691,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -1735,7 +1738,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -1754,7 +1757,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -1829,7 +1832,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -1848,7 +1851,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -1923,34 +1926,7 @@ components:
                                   default: []
                                   type: array
                                   items:
-                                    oneOf:
-                                      - type: object
-                                        properties:
-                                          type:
-                                            type: string
-                                            const: SHOW
-                                          conditional:
-                                            $ref: "#/components/schemas/Conditional"
-                                        required:
-                                          - type
-                                          - conditional
-                                        additionalProperties: false
-                                        description: If 'SHOW' conditional is defined, the component is shown to the
-                                          user only if the condition is met
-                                      - type: object
-                                        properties:
-                                          type:
-                                            type: string
-                                            const: ENABLE
-                                          conditional:
-                                            $ref: "#/components/schemas/Conditional"
-                                        required:
-                                          - type
-                                          - conditional
-                                        additionalProperties: false
-                                        description: If 'ENABLE' conditional is defined, the component is enabled only
-                                          if the condition is met
-                                    type: object
+                                    $ref: "#/components/schemas/ActionConditional"
                               required:
                                 - value
                               additionalProperties: false
@@ -2027,7 +2003,7 @@ components:
                         properties:
                           $$field:
                             type: string
-                            description: Unique identifier for the field
+                            description: Id of the field to reference
                           $$subfield:
                             default: []
                             description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -2187,7 +2163,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -2206,7 +2182,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -2281,7 +2257,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -2300,7 +2276,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -2387,7 +2363,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -2406,7 +2382,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -2481,7 +2457,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -2500,7 +2476,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -2559,7 +2535,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -2578,7 +2554,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -2653,7 +2629,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -2672,7 +2648,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -2721,34 +2697,7 @@ components:
                     default: []
                     type: array
                     items:
-                      oneOf:
-                        - type: object
-                          properties:
-                            type:
-                              type: string
-                              const: SHOW
-                            conditional:
-                              $ref: "#/components/schemas/Conditional"
-                          required:
-                            - type
-                            - conditional
-                          additionalProperties: false
-                          description: If 'SHOW' conditional is defined, the component is shown to the
-                            user only if the condition is met
-                        - type: object
-                          properties:
-                            type:
-                              type: string
-                              const: ENABLE
-                            conditional:
-                              $ref: "#/components/schemas/Conditional"
-                          required:
-                            - type
-                            - conditional
-                          additionalProperties: false
-                          description: If 'ENABLE' conditional is defined, the component is enabled only
-                            if the condition is met
-                      type: object
+                      $ref: "#/components/schemas/ActionConditional"
                 required:
                   - value
                   - label
@@ -2790,7 +2739,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -2809,7 +2758,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -2884,7 +2833,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -2903,7 +2852,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -2968,7 +2917,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -2987,7 +2936,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3062,7 +3011,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3081,7 +3030,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3112,7 +3061,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3155,7 +3104,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3174,7 +3123,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3249,7 +3198,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3268,7 +3217,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3333,7 +3282,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3352,7 +3301,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3427,7 +3376,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3446,7 +3395,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3512,7 +3461,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3531,7 +3480,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3606,7 +3555,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3625,7 +3574,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3699,7 +3648,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3718,7 +3667,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3793,7 +3742,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3812,7 +3761,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3884,7 +3833,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3903,7 +3852,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3978,7 +3927,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -3997,7 +3946,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4075,7 +4024,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4094,7 +4043,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4169,7 +4118,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4188,7 +4137,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4253,7 +4202,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4272,7 +4221,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4347,7 +4296,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4366,7 +4315,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4438,7 +4387,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4457,7 +4406,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4532,7 +4481,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4551,7 +4500,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4591,34 +4540,7 @@ components:
                     default: []
                     type: array
                     items:
-                      oneOf:
-                        - type: object
-                          properties:
-                            type:
-                              type: string
-                              const: SHOW
-                            conditional:
-                              $ref: "#/components/schemas/Conditional"
-                          required:
-                            - type
-                            - conditional
-                          additionalProperties: false
-                          description: If 'SHOW' conditional is defined, the component is shown to the
-                            user only if the condition is met
-                        - type: object
-                          properties:
-                            type:
-                              type: string
-                              const: ENABLE
-                            conditional:
-                              $ref: "#/components/schemas/Conditional"
-                          required:
-                            - type
-                            - conditional
-                          additionalProperties: false
-                          description: If 'ENABLE' conditional is defined, the component is enabled only
-                            if the condition is met
-                      type: object
+                      $ref: "#/components/schemas/ActionConditional"
                 required:
                   - value
                   - label
@@ -4660,7 +4582,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4679,7 +4601,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4754,7 +4676,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4773,7 +4695,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4843,7 +4765,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4862,7 +4784,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4937,7 +4859,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4956,7 +4878,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -4999,7 +4921,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -5018,7 +4940,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -5093,7 +5015,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -5112,7 +5034,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -5152,34 +5074,7 @@ components:
                     default: []
                     type: array
                     items:
-                      oneOf:
-                        - type: object
-                          properties:
-                            type:
-                              type: string
-                              const: SHOW
-                            conditional:
-                              $ref: "#/components/schemas/Conditional"
-                          required:
-                            - type
-                            - conditional
-                          additionalProperties: false
-                          description: If 'SHOW' conditional is defined, the component is shown to the
-                            user only if the condition is met
-                        - type: object
-                          properties:
-                            type:
-                              type: string
-                              const: ENABLE
-                            conditional:
-                              $ref: "#/components/schemas/Conditional"
-                          required:
-                            - type
-                            - conditional
-                          additionalProperties: false
-                          description: If 'ENABLE' conditional is defined, the component is enabled only
-                            if the condition is met
-                      type: object
+                      $ref: "#/components/schemas/ActionConditional"
                 required:
                   - value
                   - label
@@ -5231,7 +5126,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -5250,7 +5145,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -5325,7 +5220,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -5344,7 +5239,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -5561,7 +5456,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -5580,7 +5475,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -5655,7 +5550,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -5674,7 +5569,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -5720,7 +5615,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -5739,7 +5634,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -5814,7 +5709,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -5833,7 +5728,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -5879,7 +5774,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -5898,7 +5793,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -5973,7 +5868,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -5992,7 +5887,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -6039,7 +5934,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -6058,7 +5953,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -6133,7 +6028,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -6152,7 +6047,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -6269,7 +6164,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -6288,7 +6183,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -6363,7 +6258,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -6382,7 +6277,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -6420,34 +6315,7 @@ components:
                     default: []
                     type: array
                     items:
-                      oneOf:
-                        - type: object
-                          properties:
-                            type:
-                              type: string
-                              const: SHOW
-                            conditional:
-                              $ref: "#/components/schemas/Conditional"
-                          required:
-                            - type
-                            - conditional
-                          additionalProperties: false
-                          description: If 'SHOW' conditional is defined, the component is shown to the
-                            user only if the condition is met
-                        - type: object
-                          properties:
-                            type:
-                              type: string
-                              const: ENABLE
-                            conditional:
-                              $ref: "#/components/schemas/Conditional"
-                          required:
-                            - type
-                            - conditional
-                          additionalProperties: false
-                          description: If 'ENABLE' conditional is defined, the component is enabled only
-                            if the condition is met
-                      type: object
+                      $ref: "#/components/schemas/ActionConditional"
                 required:
                   - value
                 additionalProperties: false
@@ -6473,7 +6341,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -6492,7 +6360,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -6567,7 +6435,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -6586,7 +6454,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -6642,7 +6510,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -6761,7 +6629,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -6780,7 +6648,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -6855,7 +6723,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -6874,7 +6742,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -6916,7 +6784,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -6935,7 +6803,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -7010,7 +6878,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -7029,7 +6897,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -7181,7 +7049,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -7200,7 +7068,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -7275,7 +7143,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -7294,7 +7162,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -7418,7 +7286,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -7437,7 +7305,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -7512,7 +7380,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -7531,7 +7399,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -7655,7 +7523,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -7674,7 +7542,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -7749,7 +7617,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -7768,7 +7636,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -8639,7 +8507,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -8658,7 +8526,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -8733,7 +8601,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -8752,7 +8620,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -8806,7 +8674,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -8825,7 +8693,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -8900,7 +8768,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -8919,7 +8787,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -8957,34 +8825,7 @@ components:
                     default: []
                     type: array
                     items:
-                      oneOf:
-                        - type: object
-                          properties:
-                            type:
-                              type: string
-                              const: SHOW
-                            conditional:
-                              $ref: "#/components/schemas/Conditional"
-                          required:
-                            - type
-                            - conditional
-                          additionalProperties: false
-                          description: If 'SHOW' conditional is defined, the component is shown to the
-                            user only if the condition is met
-                        - type: object
-                          properties:
-                            type:
-                              type: string
-                              const: ENABLE
-                            conditional:
-                              $ref: "#/components/schemas/Conditional"
-                          required:
-                            - type
-                            - conditional
-                          additionalProperties: false
-                          description: If 'ENABLE' conditional is defined, the component is enabled only
-                            if the condition is met
-                      type: object
+                      $ref: "#/components/schemas/ActionConditional"
                 required:
                   - value
                   - label
@@ -9078,7 +8919,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -9097,7 +8938,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -9172,7 +9013,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -9191,7 +9032,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -9237,7 +9078,7 @@ components:
                                 properties:
                                   $$field:
                                     type: string
-                                    description: Unique identifier for the field
+                                    description: Id of the field to reference
                                   $$subfield:
                                     default: []
                                     description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -9292,7 +9133,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -9311,7 +9152,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -9386,7 +9227,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -9405,7 +9246,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -9497,7 +9338,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -9516,7 +9357,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -9591,7 +9432,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -9610,7 +9451,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -9666,7 +9507,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -9685,7 +9526,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -9760,7 +9601,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -9779,7 +9620,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -9834,7 +9675,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -9880,7 +9721,7 @@ components:
                         properties:
                           $$field:
                             type: string
-                            description: Unique identifier for the field
+                            description: Id of the field to reference
                           $$subfield:
                             default: []
                             description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -9925,7 +9766,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -9944,7 +9785,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10019,7 +9860,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10038,7 +9879,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10108,7 +9949,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10127,7 +9968,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10202,7 +10043,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10221,7 +10062,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10281,7 +10122,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10300,7 +10141,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10375,7 +10216,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10394,7 +10235,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10458,7 +10299,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10477,7 +10318,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10552,7 +10393,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10571,7 +10412,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10620,7 +10461,7 @@ components:
                             properties:
                               $$field:
                                 type: string
-                                description: Unique identifier for the field
+                                description: Id of the field to reference
                               $$subfield:
                                 default: []
                                 description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10640,7 +10481,7 @@ components:
                               properties:
                                 $$field:
                                   type: string
-                                  description: Unique identifier for the field
+                                  description: Id of the field to reference
                                 $$subfield:
                                   default: []
                                   description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10717,7 +10558,7 @@ components:
                             properties:
                               $$field:
                                 type: string
-                                description: Unique identifier for the field
+                                description: Id of the field to reference
                               $$subfield:
                                 default: []
                                 description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10737,7 +10578,7 @@ components:
                               properties:
                                 $$field:
                                   type: string
-                                  description: Unique identifier for the field
+                                  description: Id of the field to reference
                                 $$subfield:
                                   default: []
                                   description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10806,7 +10647,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10825,7 +10666,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10900,7 +10741,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10919,7 +10760,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10975,7 +10816,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -10994,7 +10835,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -11070,7 +10911,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -11089,7 +10930,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -11149,7 +10990,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -11168,7 +11009,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -11243,7 +11084,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -11262,7 +11103,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -11407,7 +11248,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -11426,7 +11267,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -11501,7 +11342,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -11520,7 +11361,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -11568,7 +11409,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -11587,7 +11428,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -11652,7 +11493,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -11671,7 +11512,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -11716,7 +11557,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -11735,7 +11576,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -11810,7 +11651,7 @@ components:
                   properties:
                     $$field:
                       type: string
-                      description: Unique identifier for the field
+                      description: Id of the field to reference
                     $$subfield:
                       default: []
                       description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -11829,7 +11670,7 @@ components:
                     properties:
                       $$field:
                         type: string
-                        description: Unique identifier for the field
+                        description: Id of the field to reference
                       $$subfield:
                         default: []
                         description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -11907,6 +11748,36 @@ components:
             pages.
       description: Field conditional configuration
       type: object
+    ActionConditional:
+      oneOf:
+        - type: object
+          properties:
+            type:
+              type: string
+              const: SHOW
+            conditional:
+              $ref: "#/components/schemas/Conditional"
+          required:
+            - type
+            - conditional
+          additionalProperties: false
+          description: If 'SHOW' conditional is defined, the component is shown to the
+            user only if the condition is met
+        - type: object
+          properties:
+            type:
+              type: string
+              const: ENABLE
+            conditional:
+              $ref: "#/components/schemas/Conditional"
+          required:
+            - type
+            - conditional
+          additionalProperties: false
+          description: If 'ENABLE' conditional is defined, the component is enabled only
+            if the condition is met
+      description: Action conditional configuration
+      type: object
     QrReaderField:
       type: object
       properties:
@@ -11924,7 +11795,7 @@ components:
               properties:
                 $$field:
                   type: string
-                  description: Unique identifier for the field
+                  description: Id of the field to reference
                 $$subfield:
                   default: []
                   description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -11943,7 +11814,7 @@ components:
                 properties:
                   $$field:
                     type: string
-                    description: Unique identifier for the field
+                    description: Id of the field to reference
                   $$subfield:
                     default: []
                     description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -12016,7 +11887,7 @@ components:
               properties:
                 $$field:
                   type: string
-                  description: Unique identifier for the field
+                  description: Id of the field to reference
                 $$subfield:
                   default: []
                   description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -12035,7 +11906,7 @@ components:
                 properties:
                   $$field:
                     type: string
-                    description: Unique identifier for the field
+                    description: Id of the field to reference
                   $$subfield:
                     default: []
                     description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -12092,36 +11963,7 @@ components:
           description: Flag actions which are executed when the action is performed.
           type: array
           items:
-            type: object
-            properties:
-              id:
-                anyOf:
-                  - anyOf:
-                      - type: string
-                        pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
-                      - type: string
-                        enum:
-                          - incomplete
-                          - rejected
-                          - correction-requested
-                          - potential-duplicate
-                          - edit-in-progress
-                  - type: string
-                    description: Custom flag identifier defined by the country config.
-              operation:
-                type: string
-                enum:
-                  - add
-                  - remove
-                description: Operation to perform on the flag.
-              conditional:
-                description: When conditional is met, the operation is performed on the flag. If
-                  not provided, the operation is performed unconditionally.
-                $ref: "#/components/schemas/Conditional"
-            required:
-              - id
-              - operation
-            additionalProperties: false
+            $ref: "#/components/schemas/ActionFlagConfig"
         supportingCopy:
           description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
@@ -12132,34 +11974,7 @@ components:
           description: Conditionals which can disable or hide actions.
           type: array
           items:
-            oneOf:
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    const: SHOW
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                additionalProperties: false
-                description: If 'SHOW' conditional is defined, the component is shown to the
-                  user only if the condition is met
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    const: ENABLE
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                additionalProperties: false
-                description: If 'ENABLE' conditional is defined, the component is enabled only
-                  if the condition is met
-            type: object
+            $ref: "#/components/schemas/ActionConditional"
         deduplication:
           type: object
           properties:
@@ -12354,36 +12169,7 @@ components:
           description: Flag actions which are executed when the action is performed.
           type: array
           items:
-            type: object
-            properties:
-              id:
-                anyOf:
-                  - anyOf:
-                      - type: string
-                        pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
-                      - type: string
-                        enum:
-                          - incomplete
-                          - rejected
-                          - correction-requested
-                          - potential-duplicate
-                          - edit-in-progress
-                  - type: string
-                    description: Custom flag identifier defined by the country config.
-              operation:
-                type: string
-                enum:
-                  - add
-                  - remove
-                description: Operation to perform on the flag.
-              conditional:
-                description: When conditional is met, the operation is performed on the flag. If
-                  not provided, the operation is performed unconditionally.
-                $ref: "#/components/schemas/Conditional"
-            required:
-              - id
-              - operation
-            additionalProperties: false
+            $ref: "#/components/schemas/ActionFlagConfig"
         supportingCopy:
           description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
@@ -12394,34 +12180,7 @@ components:
           description: Conditionals which can disable or hide actions.
           type: array
           items:
-            oneOf:
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    const: SHOW
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                additionalProperties: false
-                description: If 'SHOW' conditional is defined, the component is shown to the
-                  user only if the condition is met
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    const: ENABLE
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                additionalProperties: false
-                description: If 'ENABLE' conditional is defined, the component is enabled only
-                  if the condition is met
-            type: object
+            $ref: "#/components/schemas/ActionConditional"
         type:
           type: string
           const: REJECT
@@ -12441,36 +12200,7 @@ components:
           description: Flag actions which are executed when the action is performed.
           type: array
           items:
-            type: object
-            properties:
-              id:
-                anyOf:
-                  - anyOf:
-                      - type: string
-                        pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
-                      - type: string
-                        enum:
-                          - incomplete
-                          - rejected
-                          - correction-requested
-                          - potential-duplicate
-                          - edit-in-progress
-                  - type: string
-                    description: Custom flag identifier defined by the country config.
-              operation:
-                type: string
-                enum:
-                  - add
-                  - remove
-                description: Operation to perform on the flag.
-              conditional:
-                description: When conditional is met, the operation is performed on the flag. If
-                  not provided, the operation is performed unconditionally.
-                $ref: "#/components/schemas/Conditional"
-            required:
-              - id
-              - operation
-            additionalProperties: false
+            $ref: "#/components/schemas/ActionFlagConfig"
         supportingCopy:
           description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
@@ -12481,34 +12211,7 @@ components:
           description: Conditionals which can disable or hide actions.
           type: array
           items:
-            oneOf:
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    const: SHOW
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                additionalProperties: false
-                description: If 'SHOW' conditional is defined, the component is shown to the
-                  user only if the condition is met
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    const: ENABLE
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                additionalProperties: false
-                description: If 'ENABLE' conditional is defined, the component is enabled only
-                  if the condition is met
-            type: object
+            $ref: "#/components/schemas/ActionConditional"
         deduplication:
           type: object
           properties:
@@ -12542,36 +12245,7 @@ components:
           description: Flag actions which are executed when the action is performed.
           type: array
           items:
-            type: object
-            properties:
-              id:
-                anyOf:
-                  - anyOf:
-                      - type: string
-                        pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
-                      - type: string
-                        enum:
-                          - incomplete
-                          - rejected
-                          - correction-requested
-                          - potential-duplicate
-                          - edit-in-progress
-                  - type: string
-                    description: Custom flag identifier defined by the country config.
-              operation:
-                type: string
-                enum:
-                  - add
-                  - remove
-                description: Operation to perform on the flag.
-              conditional:
-                description: When conditional is met, the operation is performed on the flag. If
-                  not provided, the operation is performed unconditionally.
-                $ref: "#/components/schemas/Conditional"
-            required:
-              - id
-              - operation
-            additionalProperties: false
+            $ref: "#/components/schemas/ActionFlagConfig"
         supportingCopy:
           description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
@@ -12582,34 +12256,7 @@ components:
           description: Conditionals which can disable or hide actions.
           type: array
           items:
-            oneOf:
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    const: SHOW
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                additionalProperties: false
-                description: If 'SHOW' conditional is defined, the component is shown to the
-                  user only if the condition is met
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    const: ENABLE
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                additionalProperties: false
-                description: If 'ENABLE' conditional is defined, the component is enabled only
-                  if the condition is met
-            type: object
+            $ref: "#/components/schemas/ActionConditional"
         type:
           type: string
           const: PRINT_CERTIFICATE
@@ -12622,76 +12269,7 @@ components:
             pages:
               type: array
               items:
-                oneOf:
-                  - type: object
-                    properties:
-                      id:
-                        type: string
-                        description: Unique identifier for the page
-                      title:
-                        description: Header title of the page
-                        $ref: "#/components/schemas/TranslationConfig"
-                      requireCompletionToContinue:
-                        default: false
-                        description: If true, all required fields must be filled before continuing to
-                          the next page
-                        type: boolean
-                      fields:
-                        type: array
-                        items:
-                          $ref: "#/components/schemas/FieldConfig"
-                        description: Fields to be rendered on the page
-                      conditional:
-                        description: Page will be shown if condition is met. If conditional is not
-                          defined, the page will be always shown.
-                        $ref: "#/components/schemas/Conditional"
-                      type:
-                        default: FORM
-                        type: string
-                        const: FORM
-                    required:
-                      - id
-                      - title
-                      - requireCompletionToContinue
-                      - fields
-                      - type
-                    additionalProperties: false
-                  - type: object
-                    properties:
-                      id:
-                        type: string
-                        description: Unique identifier for the page
-                      title:
-                        description: Header title of the page
-                        $ref: "#/components/schemas/TranslationConfig"
-                      requireCompletionToContinue:
-                        default: false
-                        description: If true, all required fields must be filled before continuing to
-                          the next page
-                        type: boolean
-                      fields:
-                        type: array
-                        items:
-                          $ref: "#/components/schemas/FieldConfig"
-                        description: Fields to be rendered on the page
-                      conditional:
-                        description: Page will be shown if condition is met. If conditional is not
-                          defined, the page will be always shown.
-                        $ref: "#/components/schemas/Conditional"
-                      type:
-                        type: string
-                        const: VERIFICATION
-                      actions:
-                        $ref: "#/components/schemas/VerificationActionConfig"
-                    required:
-                      - id
-                      - title
-                      - requireCompletionToContinue
-                      - fields
-                      - type
-                      - actions
-                    additionalProperties: false
-                type: object
+                $ref: "#/components/schemas/PageConfig"
           required:
             - label
             - pages
@@ -12704,6 +12282,78 @@ components:
         - type
         - printForm
       additionalProperties: false
+    PageConfig:
+      oneOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the page
+            title:
+              description: Header title of the page
+              $ref: "#/components/schemas/TranslationConfig"
+            requireCompletionToContinue:
+              default: false
+              description: If true, all required fields must be filled before continuing to
+                the next page
+              type: boolean
+            fields:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConfig"
+              description: Fields to be rendered on the page
+            conditional:
+              description: Page will be shown if condition is met. If conditional is not
+                defined, the page will be always shown.
+              $ref: "#/components/schemas/Conditional"
+            type:
+              default: FORM
+              type: string
+              const: FORM
+          required:
+            - id
+            - title
+            - requireCompletionToContinue
+            - fields
+            - type
+          additionalProperties: false
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the page
+            title:
+              description: Header title of the page
+              $ref: "#/components/schemas/TranslationConfig"
+            requireCompletionToContinue:
+              default: false
+              description: If true, all required fields must be filled before continuing to
+                the next page
+              type: boolean
+            fields:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConfig"
+              description: Fields to be rendered on the page
+            conditional:
+              description: Page will be shown if condition is met. If conditional is not
+                defined, the page will be always shown.
+              $ref: "#/components/schemas/Conditional"
+            type:
+              type: string
+              const: VERIFICATION
+            actions:
+              $ref: "#/components/schemas/VerificationActionConfig"
+          required:
+            - id
+            - title
+            - requireCompletionToContinue
+            - fields
+            - type
+            - actions
+          additionalProperties: false
+      description: Page configuration
+      type: object
     VerificationActionConfig:
       type: object
       properties:
@@ -12751,36 +12401,7 @@ components:
           description: Flag actions which are executed when the action is performed.
           type: array
           items:
-            type: object
-            properties:
-              id:
-                anyOf:
-                  - anyOf:
-                      - type: string
-                        pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
-                      - type: string
-                        enum:
-                          - incomplete
-                          - rejected
-                          - correction-requested
-                          - potential-duplicate
-                          - edit-in-progress
-                  - type: string
-                    description: Custom flag identifier defined by the country config.
-              operation:
-                type: string
-                enum:
-                  - add
-                  - remove
-                description: Operation to perform on the flag.
-              conditional:
-                description: When conditional is met, the operation is performed on the flag. If
-                  not provided, the operation is performed unconditionally.
-                $ref: "#/components/schemas/Conditional"
-            required:
-              - id
-              - operation
-            additionalProperties: false
+            $ref: "#/components/schemas/ActionFlagConfig"
         supportingCopy:
           description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
@@ -12791,34 +12412,7 @@ components:
           description: Conditionals which can disable or hide actions.
           type: array
           items:
-            oneOf:
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    const: SHOW
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                additionalProperties: false
-                description: If 'SHOW' conditional is defined, the component is shown to the
-                  user only if the condition is met
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    const: ENABLE
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                additionalProperties: false
-                description: If 'ENABLE' conditional is defined, the component is enabled only
-                  if the condition is met
-            type: object
+            $ref: "#/components/schemas/ActionConditional"
         type:
           type: string
           const: REQUEST_CORRECTION
@@ -12831,76 +12425,7 @@ components:
             pages:
               type: array
               items:
-                oneOf:
-                  - type: object
-                    properties:
-                      id:
-                        type: string
-                        description: Unique identifier for the page
-                      title:
-                        description: Header title of the page
-                        $ref: "#/components/schemas/TranslationConfig"
-                      requireCompletionToContinue:
-                        default: false
-                        description: If true, all required fields must be filled before continuing to
-                          the next page
-                        type: boolean
-                      fields:
-                        type: array
-                        items:
-                          $ref: "#/components/schemas/FieldConfig"
-                        description: Fields to be rendered on the page
-                      conditional:
-                        description: Page will be shown if condition is met. If conditional is not
-                          defined, the page will be always shown.
-                        $ref: "#/components/schemas/Conditional"
-                      type:
-                        default: FORM
-                        type: string
-                        const: FORM
-                    required:
-                      - id
-                      - title
-                      - requireCompletionToContinue
-                      - fields
-                      - type
-                    additionalProperties: false
-                  - type: object
-                    properties:
-                      id:
-                        type: string
-                        description: Unique identifier for the page
-                      title:
-                        description: Header title of the page
-                        $ref: "#/components/schemas/TranslationConfig"
-                      requireCompletionToContinue:
-                        default: false
-                        description: If true, all required fields must be filled before continuing to
-                          the next page
-                        type: boolean
-                      fields:
-                        type: array
-                        items:
-                          $ref: "#/components/schemas/FieldConfig"
-                        description: Fields to be rendered on the page
-                      conditional:
-                        description: Page will be shown if condition is met. If conditional is not
-                          defined, the page will be always shown.
-                        $ref: "#/components/schemas/Conditional"
-                      type:
-                        type: string
-                        const: VERIFICATION
-                      actions:
-                        $ref: "#/components/schemas/VerificationActionConfig"
-                    required:
-                      - id
-                      - title
-                      - requireCompletionToContinue
-                      - fields
-                      - type
-                      - actions
-                    additionalProperties: false
-                type: object
+                $ref: "#/components/schemas/PageConfig"
           required:
             - label
             - pages
@@ -12924,36 +12449,7 @@ components:
           description: Flag actions which are executed when the action is performed.
           type: array
           items:
-            type: object
-            properties:
-              id:
-                anyOf:
-                  - anyOf:
-                      - type: string
-                        pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
-                      - type: string
-                        enum:
-                          - incomplete
-                          - rejected
-                          - correction-requested
-                          - potential-duplicate
-                          - edit-in-progress
-                  - type: string
-                    description: Custom flag identifier defined by the country config.
-              operation:
-                type: string
-                enum:
-                  - add
-                  - remove
-                description: Operation to perform on the flag.
-              conditional:
-                description: When conditional is met, the operation is performed on the flag. If
-                  not provided, the operation is performed unconditionally.
-                $ref: "#/components/schemas/Conditional"
-            required:
-              - id
-              - operation
-            additionalProperties: false
+            $ref: "#/components/schemas/ActionFlagConfig"
         supportingCopy:
           description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
@@ -12964,34 +12460,7 @@ components:
           description: Conditionals which can disable or hide actions.
           type: array
           items:
-            oneOf:
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    const: SHOW
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                additionalProperties: false
-                description: If 'SHOW' conditional is defined, the component is shown to the
-                  user only if the condition is met
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    const: ENABLE
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                additionalProperties: false
-                description: If 'ENABLE' conditional is defined, the component is enabled only
-                  if the condition is met
-            type: object
+            $ref: "#/components/schemas/ActionConditional"
         type:
           type: string
           const: EDIT
@@ -13029,36 +12498,7 @@ components:
           description: Flag actions which are executed when the action is performed.
           type: array
           items:
-            type: object
-            properties:
-              id:
-                anyOf:
-                  - anyOf:
-                      - type: string
-                        pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
-                      - type: string
-                        enum:
-                          - incomplete
-                          - rejected
-                          - correction-requested
-                          - potential-duplicate
-                          - edit-in-progress
-                  - type: string
-                    description: Custom flag identifier defined by the country config.
-              operation:
-                type: string
-                enum:
-                  - add
-                  - remove
-                description: Operation to perform on the flag.
-              conditional:
-                description: When conditional is met, the operation is performed on the flag. If
-                  not provided, the operation is performed unconditionally.
-                $ref: "#/components/schemas/Conditional"
-            required:
-              - id
-              - operation
-            additionalProperties: false
+            $ref: "#/components/schemas/ActionFlagConfig"
         supportingCopy:
           description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
@@ -13069,34 +12509,7 @@ components:
           description: Conditionals which can disable or hide actions.
           type: array
           items:
-            oneOf:
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    const: SHOW
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                additionalProperties: false
-                description: If 'SHOW' conditional is defined, the component is shown to the
-                  user only if the condition is met
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    const: ENABLE
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                additionalProperties: false
-                description: If 'ENABLE' conditional is defined, the component is enabled only
-                  if the condition is met
-            type: object
+            $ref: "#/components/schemas/ActionConditional"
         type:
           type: string
           const: ARCHIVE
@@ -13116,36 +12529,7 @@ components:
           description: Flag actions which are executed when the action is performed.
           type: array
           items:
-            type: object
-            properties:
-              id:
-                anyOf:
-                  - anyOf:
-                      - type: string
-                        pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
-                      - type: string
-                        enum:
-                          - incomplete
-                          - rejected
-                          - correction-requested
-                          - potential-duplicate
-                          - edit-in-progress
-                  - type: string
-                    description: Custom flag identifier defined by the country config.
-              operation:
-                type: string
-                enum:
-                  - add
-                  - remove
-                description: Operation to perform on the flag.
-              conditional:
-                description: When conditional is met, the operation is performed on the flag. If
-                  not provided, the operation is performed unconditionally.
-                $ref: "#/components/schemas/Conditional"
-            required:
-              - id
-              - operation
-            additionalProperties: false
+            $ref: "#/components/schemas/ActionFlagConfig"
         supportingCopy:
           description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
@@ -13156,34 +12540,7 @@ components:
           description: Conditionals which can disable or hide actions.
           type: array
           items:
-            oneOf:
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    const: SHOW
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                additionalProperties: false
-                description: If 'SHOW' conditional is defined, the component is shown to the
-                  user only if the condition is met
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    const: ENABLE
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                additionalProperties: false
-                description: If 'ENABLE' conditional is defined, the component is enabled only
-                  if the condition is met
-            type: object
+            $ref: "#/components/schemas/ActionConditional"
         type:
           type: string
           const: CUSTOM
@@ -13208,6 +12565,25 @@ components:
         - form
         - auditHistoryLabel
       additionalProperties: false
+    FlagConfig:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Custom flag identifier defined by the country config.
+        requiresAction:
+          type: boolean
+          description: Indicates if this flag expects an action to be performed to be
+            cleared.
+        label:
+          description: Human readable label of the flag.
+          $ref: "#/components/schemas/TranslationConfig"
+      required:
+        - id
+        - requiresAction
+        - label
+      additionalProperties: false
+      description: Flag configuration
     EventConfig:
       type: object
       properties:
@@ -13222,7 +12598,7 @@ components:
               properties:
                 $$field:
                   type: string
-                  description: Unique identifier for the field
+                  description: Id of the field to reference
                 $$subfield:
                   default: []
                   description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -13258,7 +12634,7 @@ components:
           properties:
             $$field:
               type: string
-              description: Unique identifier for the field
+              description: Id of the field to reference
             $$subfield:
               default: []
               description: 'If the FieldValue is an object, subfield can be used to refer to
@@ -13366,7 +12742,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionConfig"
-          description: Configuration of system-defined actions associated with the event.
+          description: Configuration of core and custom actions associated with the event.
         actionOrder:
           description: Order of actions in the action menu. Use either the action type for
             core actions or the customActionType for custom actions.
@@ -13564,34 +12940,7 @@ components:
                                 default: []
                                 type: array
                                 items:
-                                  oneOf:
-                                    - type: object
-                                      properties:
-                                        type:
-                                          type: string
-                                          const: SHOW
-                                        conditional:
-                                          $ref: "#/components/schemas/Conditional"
-                                      required:
-                                        - type
-                                        - conditional
-                                      additionalProperties: false
-                                      description: If 'SHOW' conditional is defined, the component is shown to the
-                                        user only if the condition is met
-                                    - type: object
-                                      properties:
-                                        type:
-                                          type: string
-                                          const: ENABLE
-                                        conditional:
-                                          $ref: "#/components/schemas/Conditional"
-                                      required:
-                                        - type
-                                        - conditional
-                                      additionalProperties: false
-                                      description: If 'ENABLE' conditional is defined, the component is enabled only
-                                        if the condition is met
-                                  type: object
+                                  $ref: "#/components/schemas/ActionConditional"
                             required:
                               - value
                               - label
@@ -13837,34 +13186,7 @@ components:
                                 default: []
                                 type: array
                                 items:
-                                  oneOf:
-                                    - type: object
-                                      properties:
-                                        type:
-                                          type: string
-                                          const: SHOW
-                                        conditional:
-                                          $ref: "#/components/schemas/Conditional"
-                                      required:
-                                        - type
-                                        - conditional
-                                      additionalProperties: false
-                                      description: If 'SHOW' conditional is defined, the component is shown to the
-                                        user only if the condition is met
-                                    - type: object
-                                      properties:
-                                        type:
-                                          type: string
-                                          const: ENABLE
-                                        conditional:
-                                          $ref: "#/components/schemas/Conditional"
-                                      required:
-                                        - type
-                                        - conditional
-                                      additionalProperties: false
-                                      description: If 'ENABLE' conditional is defined, the component is enabled only
-                                        if the condition is met
-                                  type: object
+                                  $ref: "#/components/schemas/ActionConditional"
                             required:
                               - value
                               - label
@@ -13995,27 +13317,11 @@ components:
             additionalProperties: false
         flags:
           default: []
-          description: Configuration of flags associated with the actions of this event
-            type.
+          description: Configuration of custom flags associated with the actions of this
+            event type.
           type: array
           items:
-            type: object
-            properties:
-              id:
-                type: string
-                description: Custom flag identifier defined by the country config.
-              requiresAction:
-                type: boolean
-                description: Indicates if this flag expects an action to be performed to be
-                  cleared.
-              label:
-                description: Human readable label of the flag.
-                $ref: "#/components/schemas/TranslationConfig"
-            required:
-              - id
-              - requiresAction
-              - label
-            additionalProperties: false
+            $ref: "#/components/schemas/FlagConfig"
         analytics:
           default: true
           description: Indicates whether the records of this event type are included in
