@@ -563,6 +563,16 @@ export const DraftPaginationOffline: Story = {
     }
   },
   play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    // Wait for the initial data to load before simulating an offline transition.
+    // Dispatching the offline event before queries complete would pause them
+    // indefinitely, preventing the workqueue from rendering at all.
+    const firstPageRows = await canvas.findAllByText(
+      'Tennis club membership application'
+    )
+    await expect(firstPageRows).toHaveLength(10)
+
     Object.defineProperty(window.navigator, 'onLine', {
       configurable: true,
       get: () => false
@@ -570,14 +580,6 @@ export const DraftPaginationOffline: Story = {
 
     // Dispatch offline event so useEffect listener reacts
     window.dispatchEvent(new Event('offline'))
-
-    const canvas = within(canvasElement)
-
-    // Expect 10 elements with text 'Tennis club membership application'
-    const firstPageRows = await canvas.findAllByText(
-      'Tennis club membership application'
-    )
-    await expect(firstPageRows).toHaveLength(10)
 
     // Check that offline labels are shown
     await canvas.findAllByText('No connection')
