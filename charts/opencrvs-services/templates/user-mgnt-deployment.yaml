@@ -1,0 +1,74 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: user-mgnt
+    service_name: opencrvs_user-mgnt
+  name: user-mgnt
+spec:
+  replicas: {{ .Values.user_mgnt.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: user-mgnt
+  template:
+    metadata:
+      annotations:
+        lastdeploy-timestamp: {{ now | quote }}
+      labels:
+        app: user-mgnt
+        service_name: opencrvs_user-mgnt
+    spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.user_mgnt) | nindent 6 }}
+      containers:
+        - name: user-mgnt
+          image: {{ include "opencrvs.image" (dict "root" . "service" .Values.user_mgnt) }}
+          env:
+            - name: APN_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: COUNTRY_CONFIG_URL
+              value: http://countryconfig.{{ .Release.Namespace }}.svc.cluster.local:3040
+            - name: CERT_PUBLIC_KEY_PATH
+              value: /secrets/public-key.pem
+            - name: HOST
+              value: 0.0.0.0
+            - name: DOCUMENTS_URL
+              value: http://documents.{{ .Release.Namespace }}.svc.cluster.local:9050
+            - name: EVENTS_URL
+              value: http://events.{{ .Release.Namespace }}.svc.cluster.local:5555/
+          {{- if eq .Values.mongodb.auth_mode "disabled" }}
+            - name: MONGO_URL
+              value: mongodb://{{ .Values.mongodb.host }}/user-mgnt
+          {{- else if or (eq .Values.mongodb.auth_mode "auto")  (eq .Values.mongodb.auth_mode "use_secret") }}
+            - name: MONGO_URL
+              valueFrom:
+                secretKeyRef:
+                  key: USER_MGNT_MONGO_URL
+                  name: {{ .Values.mongodb.urls_secret }}
+          {{- end }}
+          {{- include "render-env-vars" (dict "service_name" "user_mgnt" "Values" .Values) }}
+          {{- include "resources-helper" (dict "service_name" "user_mgnt" "Values" .Values) | indent 10 }}
+          {{- include "probes-helper" (dict "service_name" "user_mgnt" "Values" .Values) | indent 10 }}
+          ports:
+            - containerPort: {{ .Values.user_mgnt.port }}
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /secrets/public-key.pem
+              name: public-key
+              subPath: public-key.pem
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            items:
+              - key: public-key.pem
+                path: public-key.pem
+            name: {{ .Release.Name }}-cert-tls
+          name: public-key
+
+{{- include "service-helper" (dict "service_name" "user-mgnt" "Values" .Values) }}
+
+{{- include "hpa-helper" (dict "service_name" "user-mgnt" "Values" .Values) }}
+
+{{- include "pdb-helper" (dict "service_name" "user-mgnt" "Values" .Values) }}

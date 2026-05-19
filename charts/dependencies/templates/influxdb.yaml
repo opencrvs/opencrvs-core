@@ -1,0 +1,149 @@
+{{ if .Values.influxdb.enabled }}
+{{- $storageType := default .Values.storage_type .Values.influxdb.storage_type | default "pvc" }}
+{{- if eq $storageType "pvc" }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: influxdb
+  name: influxdb
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ default "1Gi" .Values.influxdb.data_storage_size }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: influxdb
+  name: influxdb-backup
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ default "1Gi" .Values.influxdb.data_storage_size }}
+{{- end }}
+---
+apiVersion: v1
+data:
+  influxdb.conf: |+
+    bind-address = ":8088"
+    [meta]
+      dir = "/var/lib/influxdb/meta"
+
+    [data]
+      dir = "/var/lib/influxdb/data"
+      engine = "tsm1"
+      wal-dir = "/var/lib/influxdb/wal"
+      max-values-per-tag = 0
+
+    [http]
+      flux-enabled=true
+      bind-address = ":8086"
+kind: ConfigMap
+metadata:
+  annotations:
+    use-subpath: 'true'
+    "helm.sh/resource-policy": keep
+  labels:
+    app: influxdb
+  name: influxdb-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: influxdb
+  name: influxdb
+spec:
+  clusterIP: None
+  ports:
+    - name: '8086'
+      port: 8086
+      targetPort: 8086
+  selector:
+    app: influxdb
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: influxdb
+  name: influxdb
+spec:
+  serviceName: influxdb
+  replicas: 1
+  selector:
+    matchLabels:
+      app: influxdb
+  template:
+    metadata:
+      labels:
+        app: influxdb
+    spec:
+    {{- if .Values.priority_class.enabled }}
+      priorityClassName: {{ .Values.priority_class.name }}
+    {{- end }}
+    {{- $node_selector := default .Values.node_selector .Values.influxdb.node_selector }}
+    {{- if $node_selector }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+            {{- range $k, $v := $node_selector }}
+              - key: {{ $k }}
+                operator: In
+                values:
+                - {{ $v }}
+            {{- end }}
+      {{- end }}
+      containers:
+        - image: influxdb:1.8.10
+          name: influxdb
+          {{- if or .Values.influxdb.secrets .Values.influxdb.env .Values.env }}
+          env:
+          {{- include "render-env-vars" (dict "service_name" "influxdb" "Values" .Values) }}
+          {{- end }}
+          ports:
+            - containerPort: 8086
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/influxdb
+              name: influxdb
+            - mountPath: /data/backups/influxdb
+              name: influxdb-backup
+            - mountPath: /etc/influxdb/influxdb.conf
+              name: influxdb-config
+              subPath: influxdb.conf
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            items:
+              - key: influxdb.conf
+                path: influxdb.conf
+            name: influxdb-config
+          name: influxdb-config
+        - name: influxdb
+      {{- if eq $storageType "pvc" }}
+          persistentVolumeClaim:
+            claimName: influxdb
+      {{- else if eq $storageType "host_path" }}
+          hostPath:
+            path: {{ .Values.influxdb.host_data_path | default "/data/influxdb" }}
+            type: DirectoryOrCreate
+      {{- end }}
+        - name: influxdb-backup
+      {{- if eq $storageType "pvc" }}
+          persistentVolumeClaim:
+            claimName: influxdb-backup
+      {{- else if eq $storageType "host_path" }}
+          hostPath:
+            path: {{ .Values.influxdb.host_data_path | default "/data/backup/influxdb" }}
+            type: DirectoryOrCreate
+      {{- end }}
+{{- end }}
