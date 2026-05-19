@@ -70,21 +70,11 @@ export const WorkqueueConfigWithoutQuery = WorkqueueConfig.omit({
   columns: true
 })
 
-export const WorkqueueConfigInput = z.object({
-  slug: z.string().describe('Determines the url of the workqueue.'),
-  name: TranslationConfig.describe(
-    'Title of the workflow (both in navigation and on the page)'
-  ),
-  query: CountryConfigQueryInputType,
-  action: z
-    .object({ type: WorkqueueActionType })
-    .optional()
-    .describe(
-      'Workqueue call-to-action button configuration. This determines the quick action button shown on each event card and the action taken when the button is clicked.'
-    ),
-  columns: z.array(WorkqueueColumn).default(mandatoryColumns),
-  icon: AvailableIcons,
-  emptyMessage: TranslationConfig.optional()
+export const WorkqueueConfigInput = WorkqueueConfig.extend({
+  query: CountryConfigQueryInputType
+}).meta({
+  description: 'Workqueue configuration',
+  id: 'WorkqueueConfig'
 })
 
 export type WorkqueueConfig = z.infer<typeof WorkqueueConfig>
