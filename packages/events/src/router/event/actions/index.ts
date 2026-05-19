@@ -331,6 +331,7 @@ export async function defaultRequestHandler(
   return processAction(
     {
       ...strippedInput,
+      waitFor: input.waitFor ?? false,
       keepAssignment: effectiveKeepAssignment,
       declaration: {},
       originalActionId: requestedAction.id,
@@ -441,7 +442,7 @@ export function getDefaultActionProcedures(
       .use(middleware.requireActionConfirmationAuthorization)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
-        const { eventId, actionId } = input
+        const { eventId, actionId, waitFor } = input
         const event = await getEventById(eventId)
         const originalAction = event.actions.find((a) => a.id === actionId)
         const confirmationAction = event.actions.find(
@@ -496,6 +497,7 @@ export function getDefaultActionProcedures(
         return processAction(
           {
             ...input,
+            waitFor: waitFor ?? false,
             originalActionId: actionId
           },
           {

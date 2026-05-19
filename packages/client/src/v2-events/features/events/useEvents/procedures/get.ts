@@ -84,7 +84,9 @@ function getViewEventQuery(
     queryKey: [['view-event', id]],
     meta: { eventConfig },
     queryFn: async () => {
-      const eventDocument = await trpcClient.event.get.query({ eventId: id })
+      const eventDocument = await trpcClient.event.get.query({
+        eventId: id
+      })
 
       await Promise.all([
         cacheFiles(eventDocument),

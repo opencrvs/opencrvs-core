@@ -210,6 +210,8 @@ export const eventRouter = router({
 
       const updatedEvent = await processAction(
         {
+          // NOTE: With the current implementation, this leaked in implicitly. For now, just make it visible.
+          waitFor: false,
           type: ActionType.READ,
           eventId,
           transactionId: getUUID(),
