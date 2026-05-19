@@ -185,11 +185,8 @@ export function mapFieldToDefaultValue(
       return mapFieldToDefaultValue(subfield, context)
     })
   }
-  // Extract to a local variable so TypeScript can narrow the type via isCodeToEvaluate.
-  // Narrowing does not propagate through repeated property accesses on union-typed objects.
-  const dv = field.defaultValue
-  if (isCodeToEvaluate(dv)) {
-    return compileClientFunction(dv.$$code)(undefined, {
+  if (isCodeToEvaluate(field.defaultValue)) {
+    return compileClientFunction(field.defaultValue.$$code)(undefined, {
       $form: {},
       $now: todayISO(),
       $online: isOnline(),
@@ -197,36 +194,40 @@ export function mapFieldToDefaultValue(
     }) as FieldValue
   }
 
-  if (dv === undefined) {
+  if (field.defaultValue === undefined) {
     return
   }
-
-  // dv is now a static default value — ComputedDefaultValue was handled above.
-  // TypeScript can't re-derive that from the local-variable guard, so we cast.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const staticDv = dv as any
 
   switch (field.type) {
     case FieldType.NAME: {
       return {
-        firstname: resolveSerializedUserField(staticDv.firstname, context),
-        middlename: resolveSerializedUserField(staticDv.middlename, context),
-        surname: resolveSerializedUserField(staticDv.surname, context)
+        firstname: resolveSerializedUserField(
+          field.defaultValue.firstname,
+          context
+        ),
+        middlename: resolveSerializedUserField(
+          field.defaultValue.middlename,
+          context
+        ),
+        surname: resolveSerializedUserField(field.defaultValue.surname, context)
       }
     }
     case FieldType.ADDRESS: {
       const resolvedAdministrativeArea =
-        staticDv.administrativeArea &&
-        resolveSerializedUserField(staticDv.administrativeArea, context)
+        field.defaultValue.administrativeArea &&
+        resolveSerializedUserField(
+          field.defaultValue.administrativeArea,
+          context
+        )
       return {
-        ...staticDv,
+        ...field.defaultValue,
         // valid administrativeArea or undefined (don't allow empty string)
         administrativeArea: resolvedAdministrativeArea || undefined
       }
     }
     case FieldType.DATE: {
-      if (typeof staticDv === 'string') {
-        return staticDv
+      if (typeof field.defaultValue === 'string') {
+        return field.defaultValue
       }
       const now = new Date()
       const year = now.getFullYear()
@@ -236,8 +237,8 @@ export function mapFieldToDefaultValue(
       return `${year}-${month}-${day}`
     }
     case FieldType.TIME: {
-      if (typeof staticDv === 'string') {
-        return staticDv
+      if (typeof field.defaultValue === 'string') {
+        return field.defaultValue
       }
       const now = new Date()
       const hours = String(now.getHours()).padStart(2, '0')
@@ -247,7 +248,7 @@ export function mapFieldToDefaultValue(
     }
     case FieldType.AGE: {
       return {
-        age: staticDv,
+        age: field.defaultValue,
         asOfDateRef: field.configuration.asOfDate.$$field
       }
     }
@@ -255,7 +256,7 @@ export function mapFieldToDefaultValue(
     case FieldType.CHECKBOX:
     case FieldType.NUMBER:
     case FieldType.BUTTON: {
-      return staticDv
+      return field.defaultValue
     }
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
@@ -280,13 +281,13 @@ export function mapFieldToDefaultValue(
     case FieldType.SIGNATURE:
     case FieldType.FILE:
     case FieldType.FILE_WITH_OPTIONS:
-      if (isSerializedUserField(staticDv)) {
-        return resolveSerializedUserField(staticDv, context)
+      if (isSerializedUserField(field.defaultValue)) {
+        return resolveSerializedUserField(field.defaultValue, context)
       }
 
       return replacePlaceholders({
         field,
-        defaultValue: staticDv,
+        defaultValue: field.defaultValue,
         systemVariables: context
       })
   }

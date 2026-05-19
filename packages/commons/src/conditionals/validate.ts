@@ -98,19 +98,35 @@ export function todayISO(): string {
   return formatISO(new Date(), { representation: 'date' })
 }
 
-const compiledFunctionCache = new Map<string, (...args: unknown[]) => unknown>()
+/**
+ * Signature of a function compiled from a serialised code string.
+ *
+ * @param data - The value the function operates on.
+ *   `unknown` rather than `FieldValue` because the same type covers two call sites:
+ *   - validator: receives the field value being validated (`FieldValue`)
+ *   - evaluator: receives `undefined` (no current value, computing a default)
+ *
+ * @param context - The ambient context available to the function (e.g. `$form`, `$now`,
+ *   `$online`, `$user`). Typed as `Record<string, unknown>` rather than a specific shape
+ *   because the two call sites pass different context objects — AJV rootData for validators,
+ *   a system-variables bag for evaluators — and both satisfy this structural type.
+ */
+type CompiledClientFunction = (
+  data: unknown,
+  context: Record<string, unknown> | undefined
+) => unknown
+
+const compiledFunctionCache = new Map<string, CompiledClientFunction>()
 
 /**
  * Deserialises a serialised function string (produced by `.toString()`) into a callable.
  * Results are cached by code string so each unique function body is compiled at most once.
  * Runs in a clean scope — no access to outer closures or external imports.
  */
-export function compileClientFunction(
-  code: string
-): (...args: unknown[]) => unknown {
+export function compileClientFunction(code: string): CompiledClientFunction {
   let fn = compiledFunctionCache.get(code)
   if (!fn) {
-    fn = new Function(`return (${code})`)() as (...args: unknown[]) => unknown
+    fn = new Function(`return (${code})`)() as CompiledClientFunction
     compiledFunctionCache.set(code, fn)
   }
   return fn
@@ -241,13 +257,15 @@ ajv.addKeyword({
   // @ts-ignore -- DataContext is not typed in AJV's public API
   validate(
     schema: { code: string },
-    data: unknown,
+    data: FieldValue,
     _: unknown,
     dataContext?: DataContext
   ) {
     // External references (lodash etc.) are intentionally unavailable — validators must be
     // self-contained so they survive serialisation into JSONSchema and transmission to core.
-    return compileClientFunction(schema.code)(data, dataContext?.rootData)
+    return Boolean(
+      compileClientFunction(schema.code)(data, dataContext?.rootData)
+    )
   }
 })
 
