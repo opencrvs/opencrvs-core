@@ -22,8 +22,7 @@ import { messages as reloadModalMessages } from '@client/i18n/messages/views/rel
 const SCREEN_LOCK = 'screenLock'
 
 export function buildLoginUrl(lang: string | null) {
-  const loginUrl = window.config.LOGIN_URL ?? '/login'
-  const url = new URL(loginUrl, window.location.origin)
+  const url = new URL('/login', window.location.origin)
   url.searchParams.set('lang', lang ?? 'en')
   url.searchParams.set('redirectTo', window.location.pathname)
   return url.toString()
