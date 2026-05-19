@@ -331,7 +331,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
             (h) =>
               h.type === ActionType.APPROVE_CORRECTION &&
               (h.requestId === x.id || h.requestId === x.originalActionId) &&
-              h.annotation?.isImmediateCorrection &&
+              h.content?.immediateCorrection &&
               h.createdBy === x.createdBy
           )
         // Adding flag on immediately approved REQUEST_CORRECTION to show it
@@ -350,7 +350,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
       // associated REQUEST_CORRECTION as 'Record corrected'
       if (
         x.type === ActionType.APPROVE_CORRECTION &&
-        x.annotation?.isImmediateCorrection
+        x.content?.immediateCorrection
       ) {
         return false
       }

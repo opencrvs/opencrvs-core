@@ -183,7 +183,7 @@ export function useActionForHistory() {
           x.type === ActionType.APPROVE_CORRECTION &&
           (x.requestId === action.id ||
             x.requestId === action.originalActionId) &&
-          x.annotation?.isImmediateCorrection &&
+          x.content?.immediateCorrection &&
           x.createdBy === action.createdBy
       )
       if (approveAction) {
