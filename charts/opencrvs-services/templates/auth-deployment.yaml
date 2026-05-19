@@ -49,6 +49,7 @@ spec:
         service_name: opencrvs_auth
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.auth) | nindent 6 }}
+      serviceAccountName: auth
       containers:
         - image: {{ include "opencrvs.image" (dict "root" . "service" .Values.auth) }}
           name: auth
@@ -125,3 +126,5 @@ spec:
 {{- include "hpa-helper" (dict "service_name" "auth" "Values" .Values) }}
 
 {{- include "pdb-helper" (dict "service_name" "auth" "Values" .Values) }}
+
+{{- include "service-account-helper" (dict "service_name" "auth" "Values" .Values) }}

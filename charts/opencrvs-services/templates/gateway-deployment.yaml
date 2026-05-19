@@ -50,6 +50,7 @@ spec:
         service.name: opencrvs_gateway
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.gateway) | nindent 6 }}
+      serviceAccountName: gateway
       containers:
         - name: gateway
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.gateway) }}
@@ -116,3 +117,5 @@ spec:
 {{- include "hpa-helper" (dict "service_name" "gateway" "Values" .Values) }}
 
 {{- include "pdb-helper" (dict "service_name" "gateway" "Values" .Values) }}
+
+{{- include "service-account-helper" (dict "service_name" "gateway" "Values" .Values) }}

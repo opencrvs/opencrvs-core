@@ -74,6 +74,7 @@ spec:
         service_name: opencrvs_countryconfig
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.countryconfig) | nindent 6 }}
+      serviceAccountName: countryconfig
       containers:
         - name: countryconfig
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.countryconfig) | quote }}
@@ -138,3 +139,5 @@ spec:
 {{- include "hpa-helper" (dict "service_name" "countryconfig" "Values" .Values) }}
 
 {{- include "pdb-helper" (dict "service_name" "countryconfig" "Values" .Values) }}
+
+{{- include "service-account-helper" (dict "service_name" "countryconfig" "Values" .Values) }}

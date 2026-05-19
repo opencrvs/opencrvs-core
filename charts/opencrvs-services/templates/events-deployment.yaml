@@ -49,6 +49,7 @@ spec:
         service_name: opencrvs_events
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.events) | nindent 6 }}
+      serviceAccountName: events
       containers:
         - name: events
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.events) }}
@@ -132,3 +133,5 @@ spec:
 {{- include "hpa-helper" (dict "service_name" "events" "Values" .Values) }}
 
 {{- include "pdb-helper" (dict "service_name" "events" "Values" .Values) }}
+
+{{- include "service-account-helper" (dict "service_name" "events" "Values" .Values) }}

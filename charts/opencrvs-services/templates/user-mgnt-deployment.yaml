@@ -20,6 +20,7 @@ spec:
         service_name: opencrvs_user-mgnt
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.user_mgnt) | nindent 6 }}
+      serviceAccountName: user-mgnt
       containers:
         - name: user-mgnt
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.user_mgnt) }}
@@ -72,3 +73,5 @@ spec:
 {{- include "hpa-helper" (dict "service_name" "user-mgnt" "Values" .Values) }}
 
 {{- include "pdb-helper" (dict "service_name" "user-mgnt" "Values" .Values) }}
+
+{{- include "service-account-helper" (dict "service_name" "user-mgnt" "Values" .Values) }}
