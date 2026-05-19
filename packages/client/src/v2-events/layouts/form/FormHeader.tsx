@@ -188,13 +188,16 @@ export function FormHeader({
                 />
               </>
             ) : (
-              <Button
-                size="small"
-                type="icon"
-                onClick={() => closeActionView()}
-              >
-                <Icon name="X" />
-              </Button>
+              <>
+                {actionComponent}
+                <Button
+                  size="small"
+                  type="icon"
+                  onClick={() => closeActionView()}
+                >
+                  <Icon name="X" />
+                </Button>
+              </>
             )}
           </>
         }
