@@ -2672,264 +2672,7 @@ components:
         - $ref: "#/components/schemas/IdReaderField"
         - $ref: "#/components/schemas/QueryParamReaderField"
         - $ref: "#/components/schemas/LoaderField"
-        - type: object
-          properties:
-            id:
-              type: string
-              description: Unique identifier of the field.
-            label:
-              description: Human-readable label of the field.
-              $ref: "#/components/schemas/TranslationConfig"
-            parent:
-              description: Reference to the parent field or fields. When a parent field
-                changes, this field is reset.
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Id of the field to reference
-                    $$subfield:
-                      default: []
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                    - $$subfield
-                  additionalProperties: false
-                  description: Reference to a field by its ID
-                - type: array
-                  items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Id of the field to reference
-                      $$subfield:
-                        default: []
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                      - $$subfield
-                    additionalProperties: false
-                    description: Reference to a field by its ID
-            required:
-              description: Indicates whether the field is mandatory.
-              default: false
-              anyOf:
-                - type: boolean
-                - type: object
-                  properties:
-                    message:
-                      description: Custom required validation message
-                      $ref: "#/components/schemas/TranslationConfig"
-                  required:
-                    - message
-                  additionalProperties: false
-            conditionals:
-              description: Conditions determining when the field is shown or enabled. By
-                default, the field is always shown and enabled.
-              default: []
-              type: array
-              items:
-                $ref: "#/components/schemas/FieldConditional"
-            secured:
-              description: Indicates whether the field is secured. Secured fields are not
-                indexed for search and are only visible when explicitly
-                assigned.
-              default: false
-              type: boolean
-            placeholder:
-              $ref: "#/components/schemas/TranslationConfig"
-            validation:
-              description: Additional validation rules applied to the field.
-              default: []
-              type: array
-              items:
-                type: object
-                properties:
-                  validator:
-                    $ref: "#/components/schemas/Conditional"
-                  message:
-                    $ref: "#/components/schemas/TranslationConfig"
-                required:
-                  - validator
-                  - message
-                additionalProperties: false
-            helperText:
-              $ref: "#/components/schemas/TranslationConfig"
-            hideLabel:
-              default: false
-              type: boolean
-            uncorrectable:
-              description: Indicates whether the field can be modified during record
-                correction.
-              default: false
-              type: boolean
-            value:
-              description: Reference to the source field or fields. When a value is defined,
-                it is copied from the parent field when changed. If multiple
-                references are provided, the first truthy value is used.
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Id of the field to reference
-                    $$subfield:
-                      default: []
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                    - $$subfield
-                  additionalProperties: false
-                  description: Reference to a field by its ID
-                - type: array
-                  items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Id of the field to reference
-                      $$subfield:
-                        default: []
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                      - $$subfield
-                    additionalProperties: false
-                    description: Reference to a field by its ID
-            analytics:
-              description: Indicates whether the field is included in analytics. When enabled,
-                its value becomes available in the analytics dashboard.
-              default: false
-              type: boolean
-            type:
-              type: string
-              const: SEARCH
-            defaultValue:
-              type: object
-              properties:
-                loading:
-                  type: boolean
-                error:
-                  anyOf:
-                    - type: object
-                      properties:
-                        statusCode:
-                          type: number
-                        message:
-                          type: string
-                      required:
-                        - statusCode
-                        - message
-                      additionalProperties: false
-                    - type: "null"
-                data: {}
-              required:
-                - loading
-                - data
-              additionalProperties: false
-            configuration:
-              type: object
-              properties:
-                query:
-                  default:
-                    type: and
-                    clauses:
-                      - eventType: tennis-club-membership
-                        status:
-                          type: anyOf
-                          terms:
-                            - CREATED
-                            - NOTIFIED
-                            - DECLARED
-                            - REGISTERED
-                            - ARCHIVED
-                        updatedAt:
-                          type: range
-                          gte: 2025-05-22
-                          lte: 2025-05-29
-                        data: {}
-                  $ref: "#/components/schemas/QueryType"
-                limit:
-                  default: 100
-                  type: number
-                offset:
-                  default: 0
-                  type: number
-                validation:
-                  type: object
-                  properties:
-                    validator:
-                      $ref: "#/components/schemas/Conditional"
-                    message:
-                      $ref: "#/components/schemas/TranslationConfig"
-                  required:
-                    - validator
-                    - message
-                  additionalProperties: false
-                indicators:
-                  type: object
-                  properties:
-                    loading:
-                      description: Text to display while the search is in progress
-                      $ref: "#/components/schemas/TranslationConfig"
-                    offline:
-                      description: Text to display when the application is offline
-                      $ref: "#/components/schemas/TranslationConfig"
-                    noResultsError:
-                      description: Text to display when no results are found during the search
-                      $ref: "#/components/schemas/TranslationConfig"
-                    httpError:
-                      description: Text to display when there is an HTTP error during the search
-                      $ref: "#/components/schemas/TranslationConfig"
-                    confirmButton:
-                      $ref: "#/components/schemas/TranslationConfig"
-                    clearButton:
-                      $ref: "#/components/schemas/TranslationConfig"
-                    clearModal:
-                      type: object
-                      properties:
-                        title:
-                          $ref: "#/components/schemas/TranslationConfig"
-                        description:
-                          $ref: "#/components/schemas/TranslationConfig"
-                        cancel:
-                          $ref: "#/components/schemas/TranslationConfig"
-                        confirm:
-                          $ref: "#/components/schemas/TranslationConfig"
-                      additionalProperties: false
-                    ok:
-                      $ref: "#/components/schemas/TranslationConfig"
-                  additionalProperties: false
-              required:
-                - query
-                - limit
-                - offset
-                - validation
-              additionalProperties: false
-          required:
-            - id
-            - label
-            - type
-            - configuration
-          additionalProperties: false
+        - $ref: "#/components/schemas/SearchField"
         - $ref: "#/components/schemas/CustomField"
         - $ref: "#/components/schemas/HiddenField"
         - $ref: "#/components/schemas/UserRoleField"
@@ -11913,6 +11656,264 @@ components:
         - configuration
       additionalProperties: false
       description: A non-interactive field that indicates an in progress operation in form
+    SearchField:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the field.
+        label:
+          description: Human-readable label of the field.
+          $ref: "#/components/schemas/TranslationConfig"
+        parent:
+          description: Reference to the parent field or fields. When a parent field
+            changes, this field is reset.
+          anyOf:
+            - type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Id of the field to reference
+                $$subfield:
+                  default: []
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                  type: array
+                  items:
+                    type: string
+              required:
+                - $$field
+                - $$subfield
+              additionalProperties: false
+              description: Reference to a field by its ID
+            - type: array
+              items:
+                type: object
+                properties:
+                  $$field:
+                    type: string
+                    description: Id of the field to reference
+                  $$subfield:
+                    default: []
+                    description: 'If the FieldValue is an object, subfield can be used to refer to
+                      e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                    type: array
+                    items:
+                      type: string
+                required:
+                  - $$field
+                  - $$subfield
+                additionalProperties: false
+                description: Reference to a field by its ID
+        required:
+          description: Indicates whether the field is mandatory.
+          default: false
+          anyOf:
+            - type: boolean
+            - type: object
+              properties:
+                message:
+                  description: Custom required validation message
+                  $ref: "#/components/schemas/TranslationConfig"
+              required:
+                - message
+              additionalProperties: false
+        conditionals:
+          description: Conditions determining when the field is shown or enabled. By
+            default, the field is always shown and enabled.
+          default: []
+          type: array
+          items:
+            $ref: "#/components/schemas/FieldConditional"
+        secured:
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
+          default: false
+          type: boolean
+        placeholder:
+          $ref: "#/components/schemas/TranslationConfig"
+        validation:
+          description: Additional validation rules applied to the field.
+          default: []
+          type: array
+          items:
+            type: object
+            properties:
+              validator:
+                $ref: "#/components/schemas/Conditional"
+              message:
+                $ref: "#/components/schemas/TranslationConfig"
+            required:
+              - validator
+              - message
+            additionalProperties: false
+        helperText:
+          $ref: "#/components/schemas/TranslationConfig"
+        hideLabel:
+          default: false
+          type: boolean
+        uncorrectable:
+          description: Indicates whether the field can be modified during record correction.
+          default: false
+          type: boolean
+        value:
+          description: Reference to the source field or fields. When a value is defined,
+            it is copied from the parent field when changed. If multiple
+            references are provided, the first truthy value is used.
+          anyOf:
+            - type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Id of the field to reference
+                $$subfield:
+                  default: []
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                  type: array
+                  items:
+                    type: string
+              required:
+                - $$field
+                - $$subfield
+              additionalProperties: false
+              description: Reference to a field by its ID
+            - type: array
+              items:
+                type: object
+                properties:
+                  $$field:
+                    type: string
+                    description: Id of the field to reference
+                  $$subfield:
+                    default: []
+                    description: 'If the FieldValue is an object, subfield can be used to refer to
+                      e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                    type: array
+                    items:
+                      type: string
+                required:
+                  - $$field
+                  - $$subfield
+                additionalProperties: false
+                description: Reference to a field by its ID
+        analytics:
+          description: Indicates whether the field is included in analytics. When enabled,
+            its value becomes available in the analytics dashboard.
+          default: false
+          type: boolean
+        type:
+          type: string
+          const: SEARCH
+        defaultValue:
+          type: object
+          properties:
+            loading:
+              type: boolean
+            error:
+              anyOf:
+                - type: object
+                  properties:
+                    statusCode:
+                      type: number
+                    message:
+                      type: string
+                  required:
+                    - statusCode
+                    - message
+                  additionalProperties: false
+                - type: "null"
+            data: {}
+          required:
+            - loading
+            - data
+          additionalProperties: false
+        configuration:
+          type: object
+          properties:
+            query:
+              default:
+                type: and
+                clauses:
+                  - eventType: tennis-club-membership
+                    status:
+                      type: anyOf
+                      terms:
+                        - CREATED
+                        - NOTIFIED
+                        - DECLARED
+                        - REGISTERED
+                        - ARCHIVED
+                    updatedAt:
+                      type: range
+                      gte: 2025-05-22
+                      lte: 2025-05-29
+                    data: {}
+              $ref: "#/components/schemas/QueryType"
+            limit:
+              default: 100
+              type: number
+            offset:
+              default: 0
+              type: number
+            validation:
+              type: object
+              properties:
+                validator:
+                  $ref: "#/components/schemas/Conditional"
+                message:
+                  $ref: "#/components/schemas/TranslationConfig"
+              required:
+                - validator
+                - message
+              additionalProperties: false
+            indicators:
+              type: object
+              properties:
+                loading:
+                  description: Text to display while the search is in progress
+                  $ref: "#/components/schemas/TranslationConfig"
+                offline:
+                  description: Text to display when the application is offline
+                  $ref: "#/components/schemas/TranslationConfig"
+                noResultsError:
+                  description: Text to display when no results are found during the search
+                  $ref: "#/components/schemas/TranslationConfig"
+                httpError:
+                  description: Text to display when there is an HTTP error during the search
+                  $ref: "#/components/schemas/TranslationConfig"
+                confirmButton:
+                  $ref: "#/components/schemas/TranslationConfig"
+                clearButton:
+                  $ref: "#/components/schemas/TranslationConfig"
+                clearModal:
+                  type: object
+                  properties:
+                    title:
+                      $ref: "#/components/schemas/TranslationConfig"
+                    description:
+                      $ref: "#/components/schemas/TranslationConfig"
+                    cancel:
+                      $ref: "#/components/schemas/TranslationConfig"
+                    confirm:
+                      $ref: "#/components/schemas/TranslationConfig"
+                  additionalProperties: false
+                ok:
+                  $ref: "#/components/schemas/TranslationConfig"
+              additionalProperties: false
+          required:
+            - query
+            - limit
+            - offset
+            - validation
+          additionalProperties: false
+      required:
+        - id
+        - label
+        - type
+        - configuration
+      additionalProperties: false
+      description: A search input field
     QueryType:
       type: object
       properties:
