@@ -66,10 +66,12 @@ export const VerificationPageConfig = FormPageConfig.extend({
 })
 export type VerificationPageConfig = z.infer<typeof VerificationPageConfig>
 
-export const PageConfig = z.discriminatedUnion('type', [
-  FormPageConfig,
-  VerificationPageConfig
-])
+export const PageConfig = z
+  .discriminatedUnion('type', [FormPageConfig, VerificationPageConfig])
+  .meta({
+    description: 'Page configuration',
+    id: 'PageConfig'
+  })
 
 export type PageConfig = z.infer<typeof PageConfig>
 export type PageConfigInput = z.input<typeof PageConfig>
