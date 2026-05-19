@@ -20,6 +20,7 @@ import {
   ActionType,
   generateEventDocument,
   generateWorkqueues,
+  getCurrentEventState,
   tennisClubMembershipEvent,
   never
 } from '@opencrvs/commons/client'
@@ -300,6 +301,17 @@ export const RedirectAfterPrint: Story = {
                 { type: ActionType.PRINT_CERTIFICATE }
               ]
             })
+          }),
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [
+                getCurrentEventState(
+                  tennisClubMembershipEventDocument,
+                  tennisClubMembershipEvent
+                )
+              ],
+              total: 1
+            }
           })
         ],
         workqueues: [

@@ -98,13 +98,13 @@ export function Onboarding() {
       title={intl.formatMessage(messages.title)}
     >
       <PagesComponent
+        hideBackToReview
         continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
         eventConfig={configuration}
         formData={annotation}
         formPages={formPages}
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
-        showReviewButton={false}
         validatorContext={{
           ...validatorContext,
           baseFormState: eventIndex.declaration
