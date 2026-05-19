@@ -52,6 +52,25 @@ it('Generates tokens', () => {
       userType: TokenUserType.enum.user,
       role: TestUserRole.enum.COMMUNITY_LEADER
     }),
+    communityLeaderRegisteredInLocation: generateToken({
+      scope: generator.user.scopes.communityLeaderRegisteredInLocation,
+      subject: generator.user.id.communityLeader,
+      userType: TokenUserType.enum.user,
+      role: TestUserRole.enum.COMMUNITY_LEADER
+    }),
+    communityLeaderRegisteredInAdministrativeArea: generateToken({
+      scope:
+        generator.user.scopes.communityLeaderRegisteredInAdministrativeArea,
+      subject: generator.user.id.communityLeader,
+      userType: TokenUserType.enum.user,
+      role: TestUserRole.enum.COMMUNITY_LEADER
+    }),
+    communityLeaderMultipleSearchScopes: generateToken({
+      scope: generator.user.scopes.communityLeaderMultipleSearchScopes,
+      subject: generator.user.id.communityLeader,
+      userType: TokenUserType.enum.user,
+      role: TestUserRole.enum.COMMUNITY_LEADER
+    }),
     provincialRegistrar: generateToken({
       scope: generator.user.scopes.provincialRegistrar,
       subject: generator.user.id.provincialRegistrar,
@@ -63,6 +82,12 @@ it('Generates tokens', () => {
       subject: generator.user.id.fieldAgent,
       userType: TokenUserType.enum.user,
       role: TestUserRole.enum.FIELD_AGENT
+    }),
+    communityLeaderSearchAllAndLocation: generateToken({
+      scope: generator.user.scopes.communityLeaderSearchAllAndLocation,
+      subject: generator.user.id.communityLeader,
+      userType: TokenUserType.enum.user,
+      role: TestUserRole.enum.COMMUNITY_LEADER
     })
   }
   expect(token.fieldAgent).toMatchSnapshot('fieldAgent token')
@@ -71,6 +96,18 @@ it('Generates tokens', () => {
   expect(token.localSystemAdmin).toMatchSnapshot('localSystemAdmin token')
   expect(token.nationalSystemAdmin).toMatchSnapshot('nationalSystemAdmin token')
   expect(token.communityLeader).toMatchSnapshot('communityLeader token')
+  expect(token.communityLeaderRegisteredInLocation).toMatchSnapshot(
+    'communityLeaderRegisteredInLocation token'
+  )
+  expect(token.communityLeaderRegisteredInAdministrativeArea).toMatchSnapshot(
+    'communityLeaderRegisteredInAdministrativeArea token'
+  )
+  expect(token.communityLeaderMultipleSearchScopes).toMatchSnapshot(
+    'communityLeaderMultipleSearchScopes token'
+  )
   expect(token.provincialRegistrar).toMatchSnapshot('provincialRegistrar token')
   expect(token.testAdmin).toMatchSnapshot('testAdmin token')
+  expect(token.communityLeaderSearchAllAndLocation).toMatchSnapshot(
+    'communityLeaderSearchAllAndLocation token'
+  )
 })

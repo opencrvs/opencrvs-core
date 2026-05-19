@@ -419,7 +419,9 @@ export const decodeScope = (query: EncodedScope) => {
 /** If a certain scope option is not set, we use the default value. */
 const DEFAULT_SCOPE_OPTIONS: Partial<AllScopeOptions> = {
   placeOfEvent: JurisdictionFilter.enum.all,
-  accessLevel: JurisdictionFilter.enum.all
+  accessLevel: JurisdictionFilter.enum.all,
+  registeredIn: JurisdictionFilter.enum.all,
+  declaredIn: JurisdictionFilter.enum.all
 }
 
 /**
