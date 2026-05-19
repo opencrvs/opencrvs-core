@@ -1057,6 +1057,9 @@ const SearchField = HttpField.extend({
       })
       .optional()
   })
+}).meta({
+  description: 'A search input field',
+  id: 'SearchField'
 })
 
 export type SearchField = z.infer<typeof SearchField>
