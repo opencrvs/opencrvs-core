@@ -546,6 +546,34 @@ const communityLeaderStoryBase = {
   }
 }
 
+const mockUser = {
+  ...generator.user.communityLeader().summary,
+  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
+}
+
+const mockUserFull = {
+  ...generator.user.communityLeader().v2,
+  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
+}
+
+const mswConfig = {
+  handlers: {
+    events: [
+      tRPCMsw.event.config.get.query(() => {
+        return [tennisClubMembershipEvent]
+      })
+    ],
+    user: [
+      tRPCMsw.user.list.query(() => {
+        return [mockUser]
+      }),
+      tRPCMsw.user.get.query(() => {
+        return mockUserFull
+      })
+    ]
+  }
+}
+
 /**
  * record.search[registeredIn=location] — dropdown restricted to the user's
  * own office only (Ibombo District Office).
@@ -553,17 +581,9 @@ const communityLeaderStoryBase = {
 export const JurisdictionScope_Location: Story = {
   parameters: {
     ...communityLeaderStoryBase,
-    token: generator.user.token.communityLeaderRegisteredInLocation
+    token: generator.user.token.communityLeaderRegisteredInLocation,
+    msw: mswConfig
   },
-  loaders: [
-    async () => {
-      await storeUserDetails({
-        ...generator.user.communityLeader().v2,
-        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
-      })
-      return {}
-    }
-  ],
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
@@ -590,17 +610,9 @@ export const JurisdictionScope_Location: Story = {
 export const JurisdictionScope_AdministrativeArea: Story = {
   parameters: {
     ...communityLeaderStoryBase,
-    token: generator.user.token.communityLeaderRegisteredInAdministrativeArea
+    token: generator.user.token.communityLeaderRegisteredInAdministrativeArea,
+    msw: mswConfig
   },
-  loaders: [
-    async () => {
-      await storeUserDetails({
-        ...generator.user.communityLeader().v2,
-        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
-      })
-      return {}
-    }
-  ],
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
@@ -638,17 +650,9 @@ const allOffices = [
 export const JurisdictionScope_All: Story = {
   parameters: {
     ...communityLeaderStoryBase,
-    token: generator.user.token.communityLeader
+    token: generator.user.token.communityLeader,
+    msw: mswConfig
   },
-  loaders: [
-    async () => {
-      await storeUserDetails({
-        ...generator.user.communityLeader().v2,
-        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
-      })
-      return {}
-    }
-  ],
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
@@ -679,17 +683,9 @@ export const JurisdictionScope_All: Story = {
 export const JurisdictionScope_AllBeatsLocation: Story = {
   parameters: {
     ...communityLeaderStoryBase,
-    token: generator.user.token.communityLeaderSearchAllAndLocation
+    token: generator.user.token.communityLeaderSearchAllAndLocation,
+    msw: mswConfig
   },
-  loaders: [
-    async () => {
-      await storeUserDetails({
-        ...generator.user.communityLeader().v2,
-        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
-      })
-      return {}
-    }
-  ],
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
@@ -720,17 +716,9 @@ export const JurisdictionScope_AllBeatsLocation: Story = {
 export const JurisdictionScope_MultipleScopes_MostRelaxedWins: Story = {
   parameters: {
     ...communityLeaderStoryBase,
-    token: generator.user.token.communityLeaderMultipleSearchScopes
+    token: generator.user.token.communityLeaderMultipleSearchScopes,
+    msw: mswConfig
   },
-  loaders: [
-    async () => {
-      await storeUserDetails({
-        ...generator.user.communityLeader().v2,
-        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
-      })
-      return {}
-    }
-  ],
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
