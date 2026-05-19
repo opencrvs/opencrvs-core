@@ -424,7 +424,7 @@ function isEventIndexable(event: EventDocument) {
 export async function ensureEventIndexed(
   event: EventDocument,
   configuration: EventConfig,
-  waitFor = false
+  waitFor: boolean
 ) {
   if (isEventIndexable(event)) {
     await indexEvent(event, configuration, waitFor)
@@ -464,6 +464,12 @@ export async function processAction(
     configuration
   })
 
+  if (!input.waitFor) {
+    // eslint-disable-next-line no-console
+    console.log(
+      `Indexing action without waiting for results. Action:  ${input.type}, Event ID: ${eventId}`
+    )
+  }
   // Only send the event to Elasticsearch if it is not a draft
   await ensureEventIndexed(updatedEvent, configuration, input.waitFor ?? false)
   return updatedEvent
@@ -474,6 +480,7 @@ type AsyncRejectActionInput = Pick<
   'transactionId' | 'originalActionId' | 'type'
 > & {
   keepAssignment: boolean
+  waitFor?: boolean
 }
 
 export async function addAsyncRejectAction(
@@ -481,7 +488,8 @@ export async function addAsyncRejectAction(
     transactionId,
     originalActionId,
     type,
-    keepAssignment
+    keepAssignment,
+    waitFor
   }: AsyncRejectActionInput,
   {
     user,
@@ -502,9 +510,7 @@ export async function addAsyncRejectAction(
     originalActionId,
     createdBy: user.id,
     createdByRole:
-      user.type === TokenUserType.enum.user
-        ? user.role
-        : undefined,
+      user.type === TokenUserType.enum.user ? user.role : undefined,
     createdByUserType: user.type,
     createdAtLocation: user.primaryOfficeId
   })
@@ -526,7 +532,7 @@ export async function addAsyncRejectAction(
   }
 
   const updatedEvent = await getEventById(eventId)
-  await indexEvent(updatedEvent, configuration)
+  await indexEvent(updatedEvent, configuration, waitFor ?? false)
   await draftsRepo.deleteDraftsByEventId(eventId)
 
   return updatedEvent
