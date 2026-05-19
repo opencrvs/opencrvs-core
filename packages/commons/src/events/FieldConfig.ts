@@ -1002,7 +1002,9 @@ const AutocompleteField = BaseField.extend({
   configuration: z.object({
     url: z
       .string()
-      .describe('URL to fetch autocomplete suggestions from')
+      .describe(
+        'URL to fetch autocomplete suggestions from. This should be a country config server endpoint.'
+      )
       .optional(),
     method: z.enum(['GET', 'POST']).default('GET').optional(),
     defaultOptions: z
