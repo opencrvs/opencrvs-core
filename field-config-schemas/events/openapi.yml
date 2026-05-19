@@ -9997,7 +9997,8 @@ components:
           properties:
             url:
               type: string
-              description: URL to fetch autocomplete suggestions from
+              description: URL to fetch autocomplete suggestions from. This should be a
+                country config server endpoint.
             method:
               default: GET
               type: string
