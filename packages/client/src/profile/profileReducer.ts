@@ -195,12 +195,26 @@ export const profileReducer: LoopReducer<
           })
         )
       } else {
+        const immediateCmd = Cmd.action(
+          actions.userDetailsAvailable(userDetailsCollection!)
+        )
+        // Use the cached value immediately so offline data loading is not delayed,
+        // but also re-fetch from the server so stale fields (e.g. primaryOfficeId
+        // changed by an admin) are corrected without requiring a re-login.
         return loop(
           {
             ...state,
             userDetails: userDetailsCollection
           },
-          Cmd.action(actions.userDetailsAvailable(userDetailsCollection!))
+          state.tokenPayload
+            ? Cmd.list([
+                immediateCmd,
+                Cmd.run(queries.fetchUserDetails, {
+                  successActionCreator: actions.setUserDetails,
+                  args: [state.tokenPayload.sub]
+                })
+              ])
+            : immediateCmd
         )
       }
 

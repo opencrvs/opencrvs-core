@@ -51,12 +51,17 @@ export const EnableConditional = z
     "If 'ENABLE' conditional is defined, the component is enabled only if the condition is met"
   )
 
-export const ActionConditional = z.discriminatedUnion('type', [
-  // Action can be shown / hidden
-  ShowConditional,
-  // Action can be shown to the user in the list but as disabled
-  EnableConditional
-])
+export const ActionConditional = z
+  .discriminatedUnion('type', [
+    // Action can be shown / hidden
+    ShowConditional,
+    // Action can be shown to the user in the list but as disabled
+    EnableConditional
+  ])
+  .meta({
+    description: 'Action conditional configuration',
+    id: 'ActionConditional'
+  })
 
 export type ActionConditional = z.infer<typeof ActionConditional>
 

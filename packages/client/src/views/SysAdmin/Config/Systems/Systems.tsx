@@ -151,8 +151,8 @@ export function SystemList() {
     resetRefreshSecret
   } = useIntegrations()
 
-  const { getUser } = useUsers()
-  const users = getUser.getAllCached()
+  const { getUsers } = useUsers()
+  const users = getUsers.getAllCached()
 
   const onChangeClientName = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewClientName(String(event.target.value))
