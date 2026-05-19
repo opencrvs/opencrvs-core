@@ -12,7 +12,7 @@
 import { TRPCError } from '@trpc/server'
 import { NoResultError } from 'kysely'
 import * as z from 'zod/v4'
-import { TokenUserType, TokenWithBearer, UUID } from '@opencrvs/commons'
+import { logger, TokenUserType, TokenWithBearer, UUID } from '@opencrvs/commons'
 import {
   ActionInputWithType,
   ActionStatus,
@@ -465,9 +465,13 @@ export async function processAction(
   })
 
   if (!input.waitFor) {
-    // eslint-disable-next-line no-console
-    console.log(
-      `Indexing action without waiting for results. Action:  ${input.type}, Event ID: ${eventId}`
+    logger.debug(
+      {
+        transactionId: input.transactionId,
+        actionType: input.type,
+        eventId
+      },
+      `Indexing action without waiting for results. Action type: ${input.type}`
     )
   }
   // Only send the event to Elasticsearch if it is not a draft
