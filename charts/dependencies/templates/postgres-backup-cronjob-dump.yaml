@@ -1,0 +1,95 @@
+{{ if and .Values.postgres.enabled (eq (include "postgres.backup_enabled" .) "true") }}
+{{- $run_as_cronjob := or .Values.backup.cronjob .Values.postgres.backup.cronjob }}
+{{ if eq .Values.postgres.backup.type "dump" }}
+---
+apiVersion: batch/v1
+{{ if $run_as_cronjob }}
+kind: CronJob
+{{- else }}
+kind: Job
+{{- end }}
+metadata:
+  name: postgres-backup
+  labels:
+    app: postgres
+    job-type: backup
+spec:
+  {{ if $run_as_cronjob }}
+  schedule: {{ .Values.postgres.backup.schedule.dump | default .Values.backup.schedule }}
+  {{- if .Values.timezone }}
+  timeZone: {{ .Values.timezone }}
+  {{- end }}
+  jobTemplate:
+    spec:
+  {{- end }}
+      template:
+        metadata:
+          labels:
+            app: postgres
+            job-type: backup
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: {{ .Values.postgres.image }}
+              env:
+                - name: POSTGRES_HOST
+                  value: postgres-0.postgres.{{ .Release.Namespace }}.svc.cluster.local
+              {{- if .Values.postgres.use_default_credentials }}
+                - name: POSTGRES_USER
+                  value: postgres
+                - name: PGPASSWORD
+                  value: postgres
+                - name: POSTGRES_DB
+                  value: postgres
+              {{- else }}
+                - name: POSTGRES_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.postgres.admin_user_secret_name }}
+                      key: POSTGRES_USER
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.postgres.admin_user_secret_name }}
+                      key: POSTGRES_PASSWORD
+              {{- end }}
+                - name: ENCRYPT_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.backup.backup_encryption_secret }}
+                      key: backup_encryption_key
+                - name: BACKUP_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.backup.backup_server_secret }}
+                      key: user
+                - name: BACKUP_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ default .Values.backup.backup_server_secret .Values.postgres.backup.server_secret }}
+                      key: host
+                - name: BACKUP_REMOTE_DIR
+                  value: {{ default .Values.backup.backup_server_dir .Values.postgres.backup.server_dir }}
+              {{- include "render-env-vars" (dict "service_name" "backup" "Values" .Values) | nindent 4 }}
+              command: ["/scripts/backup.sh"]
+              volumeMounts:
+                - name: backup-ssh-key
+                  mountPath: /ssh
+                  readOnly: true
+                - mountPath: /scripts
+                  name: postgres-scripts
+          volumes:
+            - name: backup-ssh-key
+              secret:
+                secretName: {{ default .Values.backup.backup_server_secret .Values.postgres.backup.server_secret }}
+                defaultMode: 0400
+                items:
+                  - key: ssh_key
+                    path: ssh_key
+            - name: postgres-scripts
+              configMap:
+                name: postgres-scripts
+                defaultMode: 0755
+{{- end }}
+{{- end }}

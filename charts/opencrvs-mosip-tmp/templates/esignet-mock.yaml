@@ -1,0 +1,69 @@
+{{- if .Values.esignet_mock.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: esignet-mock
+spec:
+  selector:
+    app: esignet-mock
+  ports:
+    - port: 20260
+      targetPort: 20260
+  type: ClusterIP
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: esignet-mock
+spec:
+  entryPoints:
+  {{- if .Values.ingress.ssl_enabled }}
+    - websecure
+  {{- end }}
+  {{- if or .Values.ingress.tls_resolver (not .Values.ingress.ssl_enabled) }}
+    - web
+  {{- end }}
+  routes:
+  - match: 'Host(`esignet-mock.{{ .Values.hostname }}`)'
+    kind: Rule
+    services:
+    - name: esignet-mock
+      namespace: {{ .Release.Namespace }}
+      port: 20260
+    middlewares:
+      - name: sts-and-basic-response-headers
+  {{- if .Values.ingress.tls_resolver }}
+  tls:
+    certResolver: {{ .Values.ingress.tls_resolver }}
+  {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: esignet-mock
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: esignet-mock
+  template:
+    metadata:
+      labels:
+        app: esignet-mock
+    spec:
+      containers:
+        - name: esignet-mock
+          image: {{ .Values.esignet_mock.image.repository }}:{{ .Values.esignet_mock.image.tag }}
+          env:
+            - name: CLIENT_APP_URL
+              value: https://register.{{ .Values.hostname }}
+          {{- include "render-env-vars" (dict "service_name" "esignet_mock" "Values" .Values) }}
+          volumeMounts:
+            - name: keystore
+              mountPath: /certs
+      volumes:
+        - name: keystore
+          secret:
+            secretName: mosip-certs
+{{- end }}

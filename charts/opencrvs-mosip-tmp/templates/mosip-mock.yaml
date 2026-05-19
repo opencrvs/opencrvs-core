@@ -1,0 +1,38 @@
+{{- if .Values.mosip_mock.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mosip-mock
+spec:
+  selector:
+    app: mosip-mock
+  ports:
+    - port: 20240
+      targetPort: 20240
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mosip-mock
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mosip-mock
+  template:
+    metadata:
+      labels:
+        app: mosip-mock
+    spec:
+      containers:
+        - name: mosip-mock
+          image: {{ .Values.mosip_mock.image.repository }}:{{ .Values.mosip_mock.image.tag }}
+          env:
+            - name: MOSIP_WEBSUB_CALLBACK_URL
+              value: http://mosip-api.{{ .Release.Namespace }}.svc.cluster.local:2024/websub/callback
+            - name: ISSUER_URL
+              value: http://mosip-mock.{{ .Release.Namespace }}.svc.cluster.local:20240
+          {{- include "render-env-vars" (dict "service_name" "mosip_mock" "Values" .Values) }}
+{{- end }}
