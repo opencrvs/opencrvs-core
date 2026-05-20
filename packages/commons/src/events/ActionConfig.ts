@@ -166,17 +166,48 @@ export const ActionConfig = z
      * OpenAPI references are defined here so our generated OpenAPI spec knows to reuse the models
      * and treat them as "models" instead of duplicating the data structure in each endpoint.
      */
-    ReadActionConfig.meta({ id: 'ReadActionConfig' }),
-    DeclareConfig.meta({ id: 'DeclareActionConfig' }),
-    RejectConfig.meta({ id: 'RejectActionConfig' }),
-    RegisterConfig.meta({ id: 'RegisterActionConfig' }),
-    PrintCertificateActionConfig.meta({
-      id: 'PrintCertificateActionConfig'
+    ReadActionConfig.meta({
+      id: 'ReadActionConfig',
+      description:
+        'Configuration for the read action — defines the record-tab content displayed on the event overview page.'
     }),
-    RequestCorrectionConfig.meta({ id: 'RequestCorrectionActionConfig' }),
-    EditActionConfig.meta({ id: 'EditActionConfig' }),
-    ArchiveConfig.meta({ id: 'ArchiveActionConfig' }),
-    CustomActionConfig.meta({ id: 'CustomActionConfig' })
+    DeclareConfig.meta({
+      id: 'DeclareActionConfig',
+      description:
+        'Configuration for the declare action. Includes review-page fields. Shared with the notify action (ActionType.NOTIFY).'
+    }),
+    RejectConfig.meta({
+      id: 'RejectActionConfig',
+      description: 'Configuration for rejecting a record before registration.'
+    }),
+    RegisterConfig.meta({
+      id: 'RegisterActionConfig',
+      description: 'Configuration for registering a record.'
+    }),
+    PrintCertificateActionConfig.meta({
+      id: 'PrintCertificateActionConfig',
+      description:
+        'Configuration for printing a certificate of a registered record.'
+    }),
+    RequestCorrectionConfig.meta({
+      id: 'RequestCorrectionActionConfig',
+      description:
+        'Configuration for requesting a correction on a registered record.'
+    }),
+    EditActionConfig.meta({
+      id: 'EditActionConfig',
+      description:
+        'Configuration for editing a record before registration.'
+    }),
+    ArchiveConfig.meta({
+      id: 'ArchiveActionConfig',
+      description: 'Configuration for archiving a record.'
+    }),
+    CustomActionConfig.meta({
+      id: 'CustomActionConfig',
+      description:
+        'Configuration for a country-defined custom action. An event may include any number of these.'
+    })
   ])
   .describe(
     'Configuration of an action available for an event. Data collected depends on the action type and is accessible through the annotation property in ActionDocument.'
