@@ -13343,6 +13343,53 @@ components:
         - auditHistoryLabel
       additionalProperties: false
       description: Custom action configuration
+    DeclarationFormConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the form
+          $ref: "#/components/schemas/TranslationConfig"
+        pages:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Unique identifier for the page
+              title:
+                description: Header title of the page
+                $ref: "#/components/schemas/TranslationConfig"
+              requireCompletionToContinue:
+                default: false
+                description: If true, all required fields must be filled before continuing to
+                  the next page
+                type: boolean
+              fields:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FieldConfig"
+                description: Fields to be rendered on the page
+              conditional:
+                description: Page will be shown if condition is met. If conditional is not
+                  defined, the page will be always shown.
+                $ref: "#/components/schemas/Conditional"
+              type:
+                default: FORM
+                type: string
+                const: FORM
+            required:
+              - id
+              - title
+              - requireCompletionToContinue
+              - fields
+              - type
+            additionalProperties: false
+      required:
+        - label
+        - pages
+      additionalProperties: false
+      description: Configuration of the declaration form.
     FlagConfig:
       type: object
       properties:
@@ -13528,52 +13575,8 @@ components:
           items:
             type: string
         declaration:
-          type: object
-          properties:
-            label:
-              description: Human readable description of the form
-              $ref: "#/components/schemas/TranslationConfig"
-            pages:
-              type: array
-              items:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    description: Unique identifier for the page
-                  title:
-                    description: Header title of the page
-                    $ref: "#/components/schemas/TranslationConfig"
-                  requireCompletionToContinue:
-                    default: false
-                    description: If true, all required fields must be filled before continuing to
-                      the next page
-                    type: boolean
-                  fields:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/FieldConfig"
-                    description: Fields to be rendered on the page
-                  conditional:
-                    description: Page will be shown if condition is met. If conditional is not
-                      defined, the page will be always shown.
-                    $ref: "#/components/schemas/Conditional"
-                  type:
-                    default: FORM
-                    type: string
-                    const: FORM
-                required:
-                  - id
-                  - title
-                  - requireCompletionToContinue
-                  - fields
-                  - type
-                additionalProperties: false
-          required:
-            - label
-            - pages
-          additionalProperties: false
           description: Configuration of the form used to gather event data.
+          $ref: "#/components/schemas/DeclarationFormConfig"
         advancedSearch:
           default: []
           description: Configuration of fields available in the advanced search feature.
