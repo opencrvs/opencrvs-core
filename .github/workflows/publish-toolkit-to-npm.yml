@@ -76,11 +76,6 @@ jobs:
         run: yarn build:all
         working-directory: packages/toolkit
 
-      - name: Authenticate to npm
-        if: steps.check-version.outputs.version-exists == 'false'
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-        working-directory: packages/toolkit
-
       - name: Update package.json version
         if: steps.check-version.outputs.version-exists == 'false'
         run: |
