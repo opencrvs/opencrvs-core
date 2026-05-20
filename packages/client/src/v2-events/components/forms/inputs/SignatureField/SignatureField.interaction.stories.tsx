@@ -305,34 +305,53 @@ export const UploadButtonsArmLockBypass: StoryObj<
     const getUploadButtons = async () =>
       canvas.findAllByRole('button', { name: 'Upload' })
 
+    /**
+     * Dispatching a `focus` event on `window` simulates the user returning
+     * from the native picker / camera / external app — the same signal the
+     * lockBypass module listens for to clear the pending bypass.
+     */
+    const simulateReturnFromPicker = () =>
+      window.dispatchEvent(new Event('focus'))
+
     await step('Bypass flag is not armed before user interacts', async () => {
-      // Drain any flag a previous story may have left behind, then confirm
-      // a fresh read returns false.
-      shouldBypassLock()
+      // Drain any pending bypass a previous story may have left behind.
+      simulateReturnFromPicker()
       await expect(shouldBypassLock()).toBe(false)
     })
 
     await step(
-      'SignatureField upload arms the bypass exactly once',
+      'SignatureField upload arms the bypass, focus return clears it',
       async () => {
         const [signatureUpload] = await getUploadButtons()
         await userEvent.click(signatureUpload)
 
+        // Upload click armed the bypass — repeated reads stay true because
+        // shouldBypassLock is a pure query.
         await expect(shouldBypassLock()).toBe(true)
+        await expect(shouldBypassLock()).toBe(true)
+
+        // User returns from the picker → focus listener clears the flag,
+        // so a later real background event still triggers the PIN re-lock.
+        simulateReturnFromPicker()
         await expect(shouldBypassLock()).toBe(false)
       }
     )
 
-    await step('FILE field upload arms the bypass exactly once', async () => {
-      const [, fileUpload] = await getUploadButtons()
-      await userEvent.click(fileUpload)
+    await step(
+      'FILE field upload arms the bypass, focus return clears it',
+      async () => {
+        const [, fileUpload] = await getUploadButtons()
+        await userEvent.click(fileUpload)
 
-      await expect(shouldBypassLock()).toBe(true)
-      await expect(shouldBypassLock()).toBe(false)
-    })
+        await expect(shouldBypassLock()).toBe(true)
+
+        simulateReturnFromPicker()
+        await expect(shouldBypassLock()).toBe(false)
+      }
+    )
 
     await step(
-      'FILE_WITH_OPTIONS upload arms the bypass exactly once',
+      'FILE_WITH_OPTIONS upload arms the bypass, focus return clears it',
       async () => {
         // The Upload button is disabled until a document type is picked.
         // Open the react-select dropdown and choose an option to enable it.
@@ -346,6 +365,8 @@ export const UploadButtonsArmLockBypass: StoryObj<
         await userEvent.click(fileWithOptionUpload)
 
         await expect(shouldBypassLock()).toBe(true)
+
+        simulateReturnFromPicker()
         await expect(shouldBypassLock()).toBe(false)
       }
     )

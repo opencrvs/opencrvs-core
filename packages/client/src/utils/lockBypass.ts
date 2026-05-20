@@ -19,9 +19,12 @@
  * picker, launching the camera, redirecting to an external app, and so on.
  * Without this, the PIN screen would appear every time the user comes back.
  *
- * Callers signal the upcoming background by calling {@link setLockBypass}
- * just before the action. `ProtectedPage` checks via
- * {@link shouldBypassLock} on visibility change to decide whether to lock.
+ * Flow:
+ *   1. Caller arms the bypass via {@link setLockBypass} just before the action.
+ *   2. `ProtectedPage` checks via {@link shouldBypassLock} on visibility
+ *      change to decide whether to lock.
+ *   3. The bypass is cleared when the window regains focus — i.e. when the
+ *      user actually returns from the external action.
  */
 
 /**
@@ -40,12 +43,27 @@ const LOCK_BYPASS_TTL_MS = 180_000
 let bypassValidUntil = 0
 
 /**
+ * Clear the bypass as soon as the user returns to the tab.
+ *
+ * The `focus` event on `window` fires when the tab regains focus — i.e.
+ * the user closed the file picker / camera / external app and is back.
+ * Tying the clear to this event (rather than to the lock check) keeps the
+ * read in {@link shouldBypassLock} side-effect-free, and ensures the
+ * bypass survives until the user actually returns.
+ */
+if (typeof window !== 'undefined') {
+  window.addEventListener('focus', () => {
+    bypassValidUntil = 0
+  })
+}
+
+/**
  * Tells `ProtectedPage` to skip the PIN lock on the next visibility change.
  *
  * Call this right before any user action that temporarily backgrounds the
  * tab — opening a native picker, launching the camera, redirecting to an
- * external app, etc. The flag auto-expires after 3 minutes so a stuck flag
- * can't disable the lock forever.
+ * external app, etc. The flag is cleared the moment the window regains
+ * focus, and auto-expires after 3 minutes as a safety net.
  *
  * @example
  * <button onClick={setLockBypass}>Open camera</button>
@@ -55,19 +73,17 @@ export function setLockBypass(): void {
 }
 
 /**
- * Returns `true` if the PIN lock should be skipped because a backgrounding
- * action was just intentionally triggered, `false` otherwise.
+ * Pure query: returns `true` if a bypass is currently pending, `false`
+ * otherwise.
  *
- * Single-shot: each call reads and clears the pending bypass, so each
- * {@link setLockBypass} grants exactly one skip. A later unrelated
- * background event will still trigger the PIN — that's the point.
+ * Has no side effect — multiple calls return the same value until either
+ * the window regains focus (cleared by the focus listener) or the TTL
+ * elapses.
  *
- * Called by `ProtectedPage` on every visibility change.
+ * Called by `ProtectedPage` on visibility change to decide whether to lock.
  *
  * @returns `true` to skip the lock, `false` to lock as usual.
  */
 export function shouldBypassLock(): boolean {
-  const pending = bypassValidUntil > Date.now()
-  bypassValidUntil = 0
-  return pending
+  return bypassValidUntil > Date.now()
 }
