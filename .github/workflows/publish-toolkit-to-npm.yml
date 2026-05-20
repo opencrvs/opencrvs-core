@@ -110,8 +110,6 @@ jobs:
         if: steps.check-version.outputs.version-exists == 'false'
         run: npm publish --provenance --access public --tag ${{ steps.check-version.outputs.npm-tag }}
         working-directory: packages/toolkit
-        env:
-          NODE_AUTH_TOKEN: ''
 
       - name: Check if create-countryconfig version exists on npm
         id: check-create-version
@@ -136,5 +134,3 @@ jobs:
         if: steps.check-create-version.outputs.version-exists == 'false'
         run: npm publish --provenance --access public --tag ${{ steps.check-version.outputs.npm-tag }}
         working-directory: packages/toolkit/create-countryconfig
-        env:
-          NODE_AUTH_TOKEN: ''
