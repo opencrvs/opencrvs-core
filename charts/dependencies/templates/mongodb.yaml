@@ -1,0 +1,100 @@
+{{ if .Values.mongodb.enabled }}
+{{- $storageType := default .Values.storage_type .Values.mongodb.storage_type | default "pvc" }}
+{{- if eq $storageType "pvc" }}
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: mongodb
+  name: mongodb
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ default "1Gi" .Values.mongodb.data_storage_size }}
+{{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mongodb
+  name: mongodb
+spec:
+  clusterIP: None
+  ports:
+    - port: 27017
+      targetPort: 27017
+  selector:
+    app: mongodb
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: mongodb
+  name: mongodb
+spec:
+  serviceName: mongodb
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+    {{- if .Values.priority_class.enabled }}
+      priorityClassName: datastore-high-priority
+    {{- end }}
+    {{- $node_selector := default .Values.node_selector .Values.mongodb.node_selector }}
+    {{- if $node_selector }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+            {{- range $k, $v := $node_selector }}
+              - key: {{ $k }}
+                operator: In
+                values:
+                - {{ $v }}
+            {{- end }}
+      {{- end }}
+      containers:
+        - image: mongo:4.4
+          {{- if not .Values.mongodb.use_default_credentials }}
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.mongodb.admin_user_secret_name }}
+                  key: MONGODB_ADMIN_USER
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.mongodb.admin_user_secret_name }}
+                  key: MONGODB_ADMIN_PASSWORD
+          {{- end }}
+          name: mongodb
+          ports:
+            - containerPort: 27017
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /data/db
+              name: mongodb-data
+      restartPolicy: Always
+      volumes:
+        - name: mongodb-data
+      {{- if eq $storageType "pvc" }}
+          persistentVolumeClaim:
+            claimName: mongodb
+      {{- else if eq $storageType "host_path" }}
+          hostPath:
+            path: {{ .Values.mongodb.host_data_path | default "/data/mongo" }}
+            type: DirectoryOrCreate
+      {{- end }}
+{{- end }}

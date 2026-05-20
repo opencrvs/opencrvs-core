@@ -92,7 +92,7 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - Added OAuth2 support for `application/x-www-form-urlencoded` content type in auth-service access token endpoints, maintaining backwards compatibility with query parameters. [#11590](https://github.com/opencrvs/opencrvs-core/pull/11590)
 - Change reindex call to make operation non-destructive. Create endpoint to track progress of reindex. [#11877](https://github.com/opencrvs/opencrvs-core/issues/11877)
 - Fixed vulnerabilities on CSP HTTP Header for login page [#12094](https://github.com/opencrvs/opencrvs-core/issues/12094)
-
+- Merged Helm charts as part of Monorepo [#12679](https://github.com/opencrvs/opencrvs-core/issues/12679)
 ## 1.9.13
 
 ### Breaking changes
@@ -104,6 +104,7 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 
 - Action confirmation tokens are now scoped with `record.read` access for the specific event, enabling the confirmation flow to fetch event data via the `event.get` tRPC endpoint. [#12350](https://github.com/opencrvs/opencrvs-core/issues/12350)
 - Within a form page, `defaultValue` resolution is now ordered: each field can reference the resolved values of fields above it, enabling intra-page derived defaults. [#12350](https://github.com/opencrvs/opencrvs-core/issues/12350)
+- 
 
 ### Bug fixes
 

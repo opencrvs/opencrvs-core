@@ -1,0 +1,133 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  # FIXME:
+  # - https://github.com/opencrvs/opencrvs-core/issues/6268
+  # - https://github.com/opencrvs/opencrvs-core/issues/7451
+  # - https://opencrvsworkspace.slack.com/archives/C02LU432JGK/p1757940561135439
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "4"
+  labels:
+    app: migration
+  name: data-migration-legacy
+spec:
+  template:
+    metadata:
+      labels:
+        app: migration
+    spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.data_migration) | nindent 6 }}
+      containers:
+        - name: migration
+          image: {{ include "opencrvs.image" (dict "root" . "service" .Values.data_migration) }}
+          command: ['/bin/sh', '-c', '/app/wait && yarn start:prod --migrate-legacy-data']
+          env:
+            - name: SUPER_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: SUPER_USER_PASSWORD
+                  name: opencrvs-superuser
+          {{- if eq .Values.elasticsearch.auth_mode "disabled" }}
+            - name: ES_HOST
+              value: "{{ .Values.elasticsearch.host }}:{{ .Values.elasticsearch.port }}"
+          {{- else if or (eq .Values.elasticsearch.auth_mode "auto") (eq .Values.elasticsearch.auth_mode "use_secret") }}
+            - name: ES_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: SEARCH_ELASTIC_HOST
+                  name: {{ .Values.elasticsearch.urls_secret }}
+          {{- end }}
+            - name: EVENTS_URL
+              value: http://events.{{ .Release.Namespace }}.svc.cluster.local:5555/
+            - name: AUTH_URL
+              value: http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040/
+            - name: INFLUX_DB
+              value: {{ .Values.influxdb.db | quote }}
+            - name: INFLUX_HOST
+              value: {{ .Values.influxdb.host | quote }}
+            - name: INFLUX_PORT
+              value: {{ .Values.influxdb.port | quote }}
+            - name: MINIO_HOST
+              value: {{ .Values.minio.host | quote }}
+            - name: MINIO_PORT
+              value: {{ .Values.minio.port | quote }}
+            - name: MONGO_HOST
+              value: {{ .Values.mongodb.host }}
+            - name: MONGO_PORT
+              value: "27017"
+          {{- if not (eq .Values.mongodb.auth_mode "disabled") }}
+            - name: MONGO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.mongodb.admin_user_secret_name }}
+                  key: MONGODB_ADMIN_USER
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.mongodb.admin_user_secret_name }}
+                  key: MONGODB_ADMIN_PASSWORD
+          {{- end }}
+          {{- if eq .Values.mongodb.auth_mode "disabled" }}
+            - name: USER_MGNT_MONGO_URL
+              value: mongodb://{{ .Values.mongodb.host }}/user-mgnt
+            - name: HEARTH_MONGO_URL
+              value: mongodb://{{ .Values.mongodb.host }}/hearth-dev
+            - name: DASHBOARD_MONGO_URL
+              value: mongodb://{{ .Values.mongodb.host }}/performance
+          {{- else if or (eq .Values.mongodb.auth_mode "auto")  (eq .Values.mongodb.auth_mode "use_secret") }}
+            - name: DASHBOARD_MONGO_URL
+              valueFrom:
+                secretKeyRef:
+                  key: PERFORMANCE_MONGO_URL
+                  name: {{ .Values.mongodb.urls_secret }}
+            - name: USER_MGNT_MONGO_URL
+              valueFrom:
+                secretKeyRef:
+                  key: USER_MGNT_MONGO_URL
+                  name: {{ .Values.mongodb.urls_secret }}
+            - name: HEARTH_MONGO_URL
+              valueFrom:
+                secretKeyRef:
+                  key: HEARTH_MONGO_URL
+                  name: {{ .Values.mongodb.urls_secret }}
+          {{- end }}
+          {{- if or (eq .Values.postgres.auth_mode "auto") (eq .Values.postgres.auth_mode "disabled") }}
+            - name: EVENTS_POSTGRES_URL
+              valueFrom:
+                secretKeyRef:
+                  key: events_migrator_db_url
+                  name: {{ .Values.postgres.urls_secret }}
+            - name: EVENTS_SUPERUSER_POSTGRES_URL
+              valueFrom:
+                secretKeyRef:
+                  key: events_superuser_db_url
+                  name: {{ .Values.postgres.urls_secret }}
+            - name: EVENTS_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  key: EVENTS_APP_POSTGRES_USER
+                  name: {{ .Values.postgres.users_secret }}
+            - name: EVENTS_MIGRATION_USER
+              valueFrom:
+                secretKeyRef:
+                  key: EVENTS_MIGRATOR_POSTGRES_USER
+                  name: {{ .Values.postgres.users_secret }}
+          {{- end }}
+
+          {{- if or (eq .Values.minio.auth_mode "auto") (eq .Values.minio.auth_mode "use_secret") }}
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: MINIO_ACCESS_KEY
+                  name: {{ .Values.minio.users_secret }}
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: MINIO_SECRET_KEY
+                  name: {{ .Values.minio.users_secret }}
+          {{- end }}
+            - name: WAIT_HOSTS
+              value: "{{ .Values.postgres.host }}:{{ .Values.postgres.port }},{{ .Values.mongodb.host }}:27017,{{ .Values.influxdb.host }}:{{ .Values.influxdb.port }},{{ .Values.minio.host }}:{{ .Values.minio.port }},{{ .Values.elasticsearch.host }}:{{ .Values.elasticsearch.port }}"
+          {{- include "render-env-vars" (dict "service_name" "data_migration" "Values" .Values) }}
+      restartPolicy: "OnFailure"

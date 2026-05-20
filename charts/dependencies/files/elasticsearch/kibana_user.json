@@ -1,0 +1,27 @@
+{
+  "cluster": [
+    "cluster:monitor/main",
+    "cluster:monitor/xpack/info",
+    "cluster:monitor/remote/info"
+  ],
+  "indices": [
+    {
+      "names": ["*"],
+      "privileges": [
+        "view_index_metadata",
+        "monitor",
+        "read",
+        "read_cross_cluster"
+      ],
+      "allow_restricted_indices": false
+    }
+  ],
+  "run_as": [],
+  "applications": [
+    {
+      "application": "kibana-.kibana",
+      "privileges": ["all"],
+      "resources": ["*"]
+    }
+  ]
+}
