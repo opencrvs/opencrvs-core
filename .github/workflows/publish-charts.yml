@@ -47,20 +47,20 @@ jobs:
             exit ${exit_code:-0}
       - name: Package helm charts
         run: |
-          mkdir packages
+          mkdir helm-packages
           charts=$(ls -1 charts)
           for chart in $(ls -1 charts)
           do
-            helm package charts/$chart --destination packages
+            helm package charts/$chart --destination helm-packages
           done
       - name: Publish helm charts
         env:
             GITHUB_TOKEN_REGISTRY: ${{ secrets.PACKAGE_GITHUB_TOKEN }}
         run: |
           echo $GITHUB_TOKEN_REGISTRY | helm registry login ghcr.io --username ocrvs-bot --password-stdin
-          for package in $(ls -1 packages)
+          for package in $(ls -1 helm-packages)
           do
-            helm push packages/$package oci://ghcr.io/opencrvs
+            helm push helm-packages/$package oci://ghcr.io/opencrvs
           done
 
       - name: Generate summary
