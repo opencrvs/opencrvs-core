@@ -1,3 +1,4 @@
+{{- if .Values.data_migration_legacy.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -131,3 +132,4 @@ spec:
               value: "{{ .Values.postgres.host }}:{{ .Values.postgres.port }},{{ .Values.mongodb.host }}:27017,{{ .Values.influxdb.host }}:{{ .Values.influxdb.port }},{{ .Values.minio.host }}:{{ .Values.minio.port }},{{ .Values.elasticsearch.host }}:{{ .Values.elasticsearch.port }}"
           {{- include "render-env-vars" (dict "service_name" "data_migration" "Values" .Values) }}
       restartPolicy: "OnFailure"
+{{- end }}
