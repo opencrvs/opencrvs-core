@@ -24,8 +24,6 @@
  * {@link shouldBypassLock} on visibility change to decide whether to lock.
  */
 
-const LOCK_BYPASS_KEY = 'lockBypass'
-
 /**
  * How long the bypass stays valid (3 minutes).
  *
@@ -36,35 +34,31 @@ const LOCK_BYPASS_KEY = 'lockBypass'
 const LOCK_BYPASS_TTL_MS = 180_000
 
 /**
+ * The expiry timestamp of the pending bypass. `0` means no bypass pending.
+ * Comparing against `Date.now()` enforces the TTL with no need for a timer.
+ */
+let bypassValidUntil = 0
+
+/**
  * Tells `ProtectedPage` to skip the PIN lock on the next visibility change.
  *
  * Call this right before any user action that temporarily backgrounds the
  * tab — opening a native picker, launching the camera, redirecting to an
- * external app, etc. The flag auto-clears after 3 minutes so a stuck flag
+ * external app, etc. The flag auto-expires after 3 minutes so a stuck flag
  * can't disable the lock forever.
- *
- * No-ops if `sessionStorage` is blocked (e.g. Safari private mode) — the
- * PIN screen will show, which is safe.
  *
  * @example
  * <button onClick={setLockBypass}>Open camera</button>
  */
 export function setLockBypass(): void {
-  try {
-    sessionStorage.setItem(LOCK_BYPASS_KEY, '1')
-    setTimeout(() => {
-      try {
-        sessionStorage.removeItem(LOCK_BYPASS_KEY)
-      } catch {}
-    }, LOCK_BYPASS_TTL_MS)
-  } catch {}
+  bypassValidUntil = Date.now() + LOCK_BYPASS_TTL_MS
 }
 
 /**
  * Returns `true` if the PIN lock should be skipped because a backgrounding
  * action was just intentionally triggered, `false` otherwise.
  *
- * Single-shot: when it returns `true` it also clears the flag, so each
+ * Single-shot: each call reads and clears the pending bypass, so each
  * {@link setLockBypass} grants exactly one skip. A later unrelated
  * background event will still trigger the PIN — that's the point.
  *
@@ -73,13 +67,7 @@ export function setLockBypass(): void {
  * @returns `true` to skip the lock, `false` to lock as usual.
  */
 export function shouldBypassLock(): boolean {
-  try {
-    const pending = sessionStorage.getItem(LOCK_BYPASS_KEY) === '1'
-    if (pending) {
-      sessionStorage.removeItem(LOCK_BYPASS_KEY)
-    }
-    return pending
-  } catch {
-    return false
-  }
+  const pending = bypassValidUntil > Date.now()
+  bypassValidUntil = 0
+  return pending
 }

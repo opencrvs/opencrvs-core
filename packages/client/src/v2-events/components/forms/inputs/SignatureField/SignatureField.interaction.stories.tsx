@@ -220,19 +220,23 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
 /**
  * Regression test for the mobile PIN-lock-during-upload fix.
  *
- * When the user taps the "Upload" button on a SignatureField, the uploader
- * must arm the file-picker bypass flag (via `setLockBypass`) before the OS
- * picker is invoked. Otherwise `ProtectedPage.handleVisibilityChange`
- * triggers the PIN re-lock as soon as the picker sends the page to
- * background — interrupting the upload mid-flow.
+ * Every uploader that opens a native picker — `SignatureField`,
+ * `SimpleDocumentUploader` (FILE), and `DocumentUploaderWithOption`
+ * (FILE_WITH_OPTIONS) — must arm the bypass flag (via `setLockBypass`)
+ * before the picker is invoked. Otherwise `ProtectedPage` triggers the
+ * PIN re-lock as soon as the picker sends the page to background,
+ * interrupting the upload mid-flow.
  *
- * Asserts via `shouldBypassLock()`, which atomically reads-and-clears the
- * flag — same call `ProtectedPage` would make on the visibility transition.
+ * Renders all three uploaders on the same form and checks each Upload
+ * button in turn. Asserts via `shouldBypassLock()` — the same call
+ * `ProtectedPage` would make on a visibility transition. Single-shot:
+ * the second call must return `false` so a later real background still
+ * triggers the PIN.
  */
-export const SignatureUploadArmsLockBypass: StoryObj<
+export const UploadButtonsArmLockBypass: StoryObj<
   typeof StyledFormFieldGenerator
 > = {
-  name: 'Upload button arms PIN-lock bypass before opening picker',
+  name: 'Upload buttons arm PIN-lock bypass (Signature / File / FileWithOptions)',
   parameters: {
     layout: 'centered',
     reactRouter: {
@@ -250,6 +254,34 @@ export const SignatureUploadArmsLockBypass: StoryObj<
                 },
                 signaturePromptLabel: generateTranslationConfig('Signature'),
                 label: generateTranslationConfig('Upload signature')
+              },
+              {
+                id: 'storybook.file',
+                type: FieldType.FILE,
+                configuration: {
+                  maxFileSize: 1 * 1024 * 1024,
+                  acceptedFileTypes: [MimeType.enum['image/png']]
+                },
+                label: generateTranslationConfig('Upload document')
+              },
+              {
+                id: 'storybook.fileWithOption',
+                type: FieldType.FILE_WITH_OPTIONS,
+                configuration: {
+                  maxFileSize: 1 * 1024 * 1024,
+                  acceptedFileTypes: [MimeType.enum['image/png']]
+                },
+                label: generateTranslationConfig('Upload supporting document'),
+                options: [
+                  {
+                    value: 'forest',
+                    label: generateTranslationConfig('Forest')
+                  },
+                  {
+                    value: 'beach',
+                    label: generateTranslationConfig('Beach')
+                  }
+                ]
               }
             ]}
             id="my-form"
@@ -264,6 +296,15 @@ export const SignatureUploadArmsLockBypass: StoryObj<
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
+    /**
+     * Both `formMessages.uploadFile` and `buttonMessages.upload` resolve to
+     * the string "Upload", so all three uploader buttons share that name.
+     * `findAllByRole` returns them in DOM order, which matches the order of
+     * the `fields` array above: [signature, file, fileWithOption].
+     */
+    const getUploadButtons = async () =>
+      canvas.findAllByRole('button', { name: 'Upload' })
+
     await step('Bypass flag is not armed before user interacts', async () => {
       // Drain any flag a previous story may have left behind, then confirm
       // a fresh read returns false.
@@ -271,20 +312,43 @@ export const SignatureUploadArmsLockBypass: StoryObj<
       await expect(shouldBypassLock()).toBe(false)
     })
 
-    await step('Tapping Upload arms the bypass exactly once', async () => {
-      const uploadButton = await canvas.findByRole('button', {
-        name: 'Upload'
-      })
+    await step(
+      'SignatureField upload arms the bypass exactly once',
+      async () => {
+        const [signatureUpload] = await getUploadButtons()
+        await userEvent.click(signatureUpload)
 
-      await userEvent.click(uploadButton)
+        await expect(shouldBypassLock()).toBe(true)
+        await expect(shouldBypassLock()).toBe(false)
+      }
+    )
 
-      // First check sees the bypass the upload button just armed.
+    await step('FILE field upload arms the bypass exactly once', async () => {
+      const [, fileUpload] = await getUploadButtons()
+      await userEvent.click(fileUpload)
+
       await expect(shouldBypassLock()).toBe(true)
-
-      // Second check sees no bypass — the flag is single-shot, so a later
-      // genuine background event would still trigger the PIN re-lock.
       await expect(shouldBypassLock()).toBe(false)
     })
+
+    await step(
+      'FILE_WITH_OPTIONS upload arms the bypass exactly once',
+      async () => {
+        // The Upload button is disabled until a document type is picked.
+        // Open the react-select dropdown and choose an option to enable it.
+        const selectControl = canvasElement.querySelector(
+          '.react-select__control'
+        ) as HTMLElement
+        await userEvent.click(selectControl)
+        await userEvent.click(await canvas.findByText('Forest'))
+
+        const [, , fileWithOptionUpload] = await getUploadButtons()
+        await userEvent.click(fileWithOptionUpload)
+
+        await expect(shouldBypassLock()).toBe(true)
+        await expect(shouldBypassLock()).toBe(false)
+      }
+    )
   }
 }
 
