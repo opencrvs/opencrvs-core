@@ -28,6 +28,7 @@ import {
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { TestImage } from '@client/v2-events/features/events/fixtures'
+import { shouldBypassLock } from '@client/utils/lockBypass'
 import { getTestValidatorContext } from '../../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
@@ -212,6 +213,77 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
 
       // alt text of the image
       await canvas.findByAltText('Signature')
+    })
+  }
+}
+
+/**
+ * Regression test for the mobile PIN-lock-during-upload fix.
+ *
+ * When the user taps the "Upload" button on a SignatureField, the uploader
+ * must arm the file-picker bypass flag (via `setLockBypass`) before the OS
+ * picker is invoked. Otherwise `ProtectedPage.handleVisibilityChange`
+ * triggers the PIN re-lock as soon as the picker sends the page to
+ * background — interrupting the upload mid-flow.
+ *
+ * Asserts via `shouldBypassLock()`, which atomically reads-and-clears the
+ * flag — same call `ProtectedPage` would make on the visibility transition.
+ */
+export const SignatureUploadArmsLockBypass: StoryObj<
+  typeof StyledFormFieldGenerator
+> = {
+  name: 'Upload button arms PIN-lock bypass before opening picker',
+  parameters: {
+    layout: 'centered',
+    reactRouter: {
+      router: {
+        path: '/event/:eventId',
+        element: (
+          <StyledFormFieldGenerator
+            fields={[
+              {
+                id: 'storybook.signature',
+                type: FieldType.SIGNATURE,
+                configuration: {
+                  maxFileSize: 1 * 1024 * 1024,
+                  acceptedFileTypes: [MimeType.enum['image/png']]
+                },
+                signaturePromptLabel: generateTranslationConfig('Signature'),
+                label: generateTranslationConfig('Upload signature')
+              }
+            ]}
+            id="my-form"
+            validatorContext={getTestValidatorContext()}
+          />
+        )
+      },
+      initialPath: '/event/123-abcd-213'
+    },
+    chromatic: { disableSnapshot: true }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Bypass flag is not armed before user interacts', async () => {
+      // Drain any flag a previous story may have left behind, then confirm
+      // a fresh read returns false.
+      shouldBypassLock()
+      await expect(shouldBypassLock()).toBe(false)
+    })
+
+    await step('Tapping Upload arms the bypass exactly once', async () => {
+      const uploadButton = await canvas.findByRole('button', {
+        name: 'Upload'
+      })
+
+      await userEvent.click(uploadButton)
+
+      // First check sees the bypass the upload button just armed.
+      await expect(shouldBypassLock()).toBe(true)
+
+      // Second check sees no bypass — the flag is single-shot, so a later
+      // genuine background event would still trigger the PIN re-lock.
+      await expect(shouldBypassLock()).toBe(false)
     })
   }
 }
