@@ -121,7 +121,7 @@ export function resolveEventCustomFlags(
 
   return actions.reduce((acc, action, idx) => {
     let actionConfig
-    if (isActionConfigType(action.type)) {
+    if (isActionConfigType(action.type) || action.type === ActionType.NOTIFY) {
       actionConfig = getActionConfig({
         eventConfiguration,
         actionType: action.type,
