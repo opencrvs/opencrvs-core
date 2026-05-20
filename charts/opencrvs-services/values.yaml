@@ -130,6 +130,7 @@ postgres:
   # Postgres hostname configuration
   host: postgres-0.postgres.opencrvs-deps-dev.svc.cluster.local
   port: 5432
+  sslmode: disable
   auth_mode: disabled
   # auth_mode:
   # - disabled: Default credentials are used postgres/postgres
@@ -444,6 +445,9 @@ user_mgnt:
 data_migration:
   image:
     name: ocrvs-migration
+
+data_migration_legacy:
+  enabled: true
 
 # data_cleanup: Wipe all persistent data from datastores including users
 # By running this job on production environment all data will be lost

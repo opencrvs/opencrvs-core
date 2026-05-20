@@ -56,5 +56,5 @@ spec:
       volumes:
       - name: config
         configMap:
-          name: apm-server-config
+          name: {{ .Values.apm_server.custom_config_configmap | default "apm-server-config" }}
 {{- end }}
