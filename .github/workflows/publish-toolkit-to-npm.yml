@@ -113,7 +113,7 @@ jobs:
 
       - name: Publish to npm
         if: steps.check-version.outputs.version-exists == 'false'
-        run: npm publish --access public --tag ${{ steps.check-version.outputs.npm-tag }}
+        run: npm publish --provenance --access public --tag ${{ steps.check-version.outputs.npm-tag }}
         working-directory: packages/toolkit
 
       - name: Check if create-countryconfig version exists on npm
@@ -137,5 +137,5 @@ jobs:
 
       - name: Publish create-countryconfig to npm
         if: steps.check-create-version.outputs.version-exists == 'false'
-        run: npm publish --access public --tag ${{ steps.check-version.outputs.npm-tag }}
+        run: npm publish --provenance --access public --tag ${{ steps.check-version.outputs.npm-tag }}
         working-directory: packages/toolkit/create-countryconfig
