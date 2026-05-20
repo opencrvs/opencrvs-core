@@ -20,6 +20,10 @@ on:
   release:
     types: [published]
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   publish:
     runs-on: ubuntu-24.04
@@ -32,6 +36,7 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           registry-url: 'https://registry.npmjs.org/'
+          package-manager-cache: false
 
       - name: Check if version exists on npm
         id: check-version
@@ -110,8 +115,6 @@ jobs:
         if: steps.check-version.outputs.version-exists == 'false'
         run: npm publish --access public --tag ${{ steps.check-version.outputs.npm-tag }}
         working-directory: packages/toolkit
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Check if create-countryconfig version exists on npm
         id: check-create-version
@@ -136,5 +139,3 @@ jobs:
         if: steps.check-create-version.outputs.version-exists == 'false'
         run: npm publish --access public --tag ${{ steps.check-version.outputs.npm-tag }}
         working-directory: packages/toolkit/create-countryconfig
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
