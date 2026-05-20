@@ -86,17 +86,17 @@ export function useAdministrativeAreas() {
 export function getLeafAdministrativeAreaIds(
   administrativeAreas: Map<UUID, AdministrativeArea>
 ): Array<{ id: UUID }> {
-  const nonLeafAdministrativeAreaIds = new Set<string>()
+  const nonLeafAdministrativeAreaIds: Record<string, true> = Object.create(null)
 
-  for (const [id, location] of administrativeAreas) {
+  for (const [, location] of administrativeAreas) {
     if (location.parentId) {
-      nonLeafAdministrativeAreaIds.add(location.parentId)
+      nonLeafAdministrativeAreaIds[location.parentId] = true
     }
   }
 
   const result: { id: UUID }[] = []
   for (const [id] of administrativeAreas) {
-    if (!nonLeafAdministrativeAreaIds.has(id)) {
+    if (!nonLeafAdministrativeAreaIds[id]) {
       result.push({ id })
     }
   }
@@ -104,30 +104,12 @@ export function getLeafAdministrativeAreaIds(
   return result
 }
 
-// Ref works since arrays are compared by reference.
-let cachedAdministrativeAreasRef: unknown = null
-/** In-memory cache of leaf administrative area IDs */
-let cachedLeafAdministrativeAreaIds: { id: UUID }[] | null = null
-
-/**
- * Uses in-memory caching to avoid recomputation on re-renders. Becomes costly with large datasets.
- *
- * @returns array of leaf administrative area IDs.
- */
 export function useSuspenseGetLeafAdministrativeAreaIds() {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
-  if (
-    cachedLeafAdministrativeAreaIds &&
-    cachedAdministrativeAreasRef === administrativeAreas
-  ) {
-    return cachedLeafAdministrativeAreaIds
-  }
-
-  const leafIds = getLeafAdministrativeAreaIds(administrativeAreas)
-  cachedAdministrativeAreasRef = administrativeAreas
-  cachedLeafAdministrativeAreaIds = leafIds
-
-  return leafIds
+  return useMemo(
+    () => getLeafAdministrativeAreaIds(administrativeAreas),
+    [administrativeAreas]
+  )
 }
