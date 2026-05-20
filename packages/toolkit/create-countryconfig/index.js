@@ -15,7 +15,10 @@ const { execSync } = require('child_process')
 const path = require('path')
 const fs = require('fs')
 
-const REPO_URL = 'https://github.com/opencrvs/opencrvs-countryconfig.git'
+const COUNTRYCONFIG_REPO_URL =
+  'https://github.com/opencrvs/opencrvs-countryconfig.git'
+const INFRASTRUCTURE_REPO_URL =
+  'https://github.com/opencrvs/infrastructure.git'
 
 const projectName = process.argv[2]
 
@@ -26,48 +29,75 @@ if (!projectName) {
   process.exit(1)
 }
 
-const targetDir = path.resolve(process.cwd(), projectName)
+const countryconfigDirName = projectName + '-countryconfig'
+const infrastructureDirName = projectName + '-infrastructure'
 
-if (fs.existsSync(targetDir)) {
-  console.error(`Error: Directory "${projectName}" already exists.`)
+const countryconfigTargetDir = path.resolve(process.cwd(), countryconfigDirName)
+const infrastructureTargetDir = path.resolve(process.cwd(), infrastructureDirName)
+
+if (fs.existsSync(countryconfigTargetDir)) {
+  console.error('Error: Directory "' + countryconfigDirName + '" already exists.')
   process.exit(1)
 }
 
-console.log(`\nScaffolding OpenCRVS country config in ./${projectName}...\n`)
+if (fs.existsSync(infrastructureTargetDir)) {
+  console.error('Error: Directory "' + infrastructureDirName + '" already exists.')
+  process.exit(1)
+}
+
+console.log('\nScaffolding OpenCRVS country config in ./' + countryconfigDirName + '...\n')
 
 try {
-  execSync(`git clone --depth 1 ${REPO_URL} ${projectName}`, {
-    stdio: 'inherit'
-  })
+  execSync('git clone --depth 1 ' + COUNTRYCONFIG_REPO_URL + ' ' + countryconfigDirName, { stdio: 'inherit' })
 } catch (err) {
-  console.error('Failed to clone the repository:', err.message)
+  console.error('Failed to clone the country config repository:', err.message)
   process.exit(1)
 }
 
 try {
-  fs.rmSync(path.join(targetDir, '.git'), { recursive: true, force: true })
+  fs.rmSync(path.join(countryconfigTargetDir, '.git'), { recursive: true, force: true })
 } catch (err) {
-  console.error('Failed to remove .git directory:', err.message)
+  console.error('Failed to remove .git directory from country config:', err.message)
   process.exit(1)
 }
 
-const pkgPath = path.join(targetDir, 'package.json')
+const pkgPath = path.join(countryconfigTargetDir, 'package.json')
 if (fs.existsSync(pkgPath)) {
   try {
     const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
-    pkg.name = projectName
+    pkg.name = countryconfigDirName
     fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
   } catch (err) {
     console.error('Failed to update package.json:', err.message)
     process.exit(1)
   }
 } else {
-  console.warn(
-    `Warning: No package.json found in the cloned repository. Project name was not updated.`
-  )
+  console.warn('Warning: No package.json found in the cloned country config repository. Project name was not updated.')
 }
 
-console.log(`\nDone! To get started:\n`)
-console.log(`  cd ${projectName}`)
-console.log(`  git init`)
-console.log(`  npm install\n`)
+console.log('\nScaffolding OpenCRVS infrastructure in ./' + infrastructureDirName + '...\n')
+
+try {
+  execSync('git clone --depth 1 ' + INFRASTRUCTURE_REPO_URL + ' ' + infrastructureDirName, { stdio: 'inherit' })
+} catch (err) {
+  console.error('Failed to clone the infrastructure repository:', err.message)
+  process.exit(1)
+}
+
+try {
+  fs.rmSync(path.join(infrastructureTargetDir, '.git'), { recursive: true, force: true })
+} catch (err) {
+  console.error('Failed to remove .git directory from infrastructure:', err.message)
+  process.exit(1)
+}
+
+console.log('\nDone! Your project has been set up in two directories:\n')
+console.log('  ./' + countryconfigDirName + '   -- country configuration')
+console.log('  ./' + infrastructureDirName + '  -- server infrastructure\n')
+console.log('To get started with the country config:\n')
+console.log('  cd ' + countryconfigDirName)
+console.log('  git init')
+console.log('  npm install\n')
+console.log('To get started with the infrastructure:\n')
+console.log('  cd ' + infrastructureDirName)
+console.log('  git init\n')
