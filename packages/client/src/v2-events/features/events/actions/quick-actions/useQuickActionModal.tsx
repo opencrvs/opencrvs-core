@@ -194,7 +194,10 @@ function QuickActionModal({
           fields={config.fields ?? []}
           id={'quick-action-modal-form'}
           // Pass in the complete declaration form values so that read-only declaration data is available for Data components or calculations.
-          validatorContext={{...validatorContext, baseFormState: event.declaration}}
+          validatorContext={{
+            ...validatorContext,
+            baseFormState: event.declaration
+          }}
           onFormChange={handleChange}
         />
       </Stack>
@@ -299,6 +302,7 @@ export function useCustomActionModal(
         customActionType: actionConfig.customActionType,
         declaration: {},
         transactionId: uuid(),
+        waitFor: true,
         annotation: modalResult.values
       })
 

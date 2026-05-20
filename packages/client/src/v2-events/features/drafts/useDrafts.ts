@@ -231,7 +231,8 @@ export function useDrafts() {
         annotation: deepDropNulls(localDraft.action.annotation),
         transactionId: localDraft.transactionId,
         type: localDraft.action.type,
-        status: localDraft.action.status
+        status: localDraft.action.status,
+        waitFor: true
       })
     },
     isLocalDraftSubmitted: createDraft.isSuccess,

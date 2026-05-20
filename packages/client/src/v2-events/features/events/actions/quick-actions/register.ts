@@ -19,7 +19,8 @@ export const register: QuickActionConfig = {
       declaration: {},
       /** As part of https://github.com/opencrvs/opencrvs-core/issues/11305, we will implement annotation fields to the register modal */
       annotation: {},
-      transactionId: uuid()
+      transactionId: uuid(),
+      waitFor: true
     })
   }
 }

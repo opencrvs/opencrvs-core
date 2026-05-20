@@ -542,6 +542,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
 
       return mutation.mutate({
         ...params,
+        waitFor: true,
         eventConfiguration,
         declaration: getCleanedDeclarationDiff({
           eventConfiguration,
