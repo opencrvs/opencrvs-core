@@ -188,7 +188,12 @@ export const EventIdParam = z.object({
   eventId: UUID,
   customActionType: z.string().optional()
 })
+export const EventIdParamWithWaitFor = EventIdParam.extend({
+  waitFor: z.boolean().optional()
+})
+
 export type EventIdParam = z.infer<typeof EventIdParam>
+export type EventIdParamWithWaitFor = z.infer<typeof EventIdParamWithWaitFor>
 
 export const requireAssignment: MiddlewareFunction<
   TrpcContext,
