@@ -1,0 +1,140 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: countryconfig-route
+spec:
+  entryPoints:
+  {{- if or .Values.ingress.ssl_enabled .Values.ingress.tls_resolver }}
+    - websecure
+  {{- end }}
+  {{- if or .Values.ingress.tls_resolver (not .Values.ingress.ssl_enabled) }}
+    - web
+  {{- end }}
+  routes:
+  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "countryconfig" "Values" .Values) }}`) && !Path(`/email`) && !Path(`/notification`) && !Path(`/dashboards/queries.json`)'
+    kind: Rule
+    services:
+    - name: countryconfig
+      namespace: {{ .Release.Namespace }}
+      port: {{ .Values.countryconfig.port }}
+    middlewares:
+      - name: sts-and-basic-response-headers
+      - name: enable-compression
+  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "countryconfig" "Values" .Values) }}`) && Path(`/email`)'
+    kind: Rule
+    services:
+    - name: countryconfig
+      namespace: {{ .Release.Namespace }}
+      port: {{ .Values.countryconfig.port }}
+    middlewares:
+      - name: block-internal-routes
+  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "countryconfig" "Values" .Values) }}`) && Path(`/notification`)'
+    kind: Rule
+    services:
+    - name: countryconfig
+      namespace: {{ .Release.Namespace }}
+      port: {{ .Values.countryconfig.port }}
+    middlewares:
+      - name: block-internal-routes
+  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "countryconfig" "Values" .Values) }}`) && Path(`/dashboards/queries.json`)'
+    kind: Rule
+    services:
+    - name: countryconfig
+      namespace: {{ .Release.Namespace }}
+      port: {{ .Values.countryconfig.port }}
+    middlewares:
+      - name: block-internal-routes
+  {{- if .Values.ingress.tls_resolver }}
+  tls:
+    certResolver: {{ .Values.ingress.tls_resolver }}
+  {{- else if .Values.ingress.tls_secret_name }}
+  tls:
+    secretName: {{ .Values.ingress.tls_secret_name }}
+  {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: countryconfig
+    service_name: opencrvs_countryconfig
+  name: countryconfig
+spec:
+  replicas: {{ .Values.countryconfig.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: countryconfig
+  template:
+    metadata:
+      annotations:
+        lastdeploy-timestamp: {{ now | quote }}
+      labels:
+        app: countryconfig
+        service_name: opencrvs_countryconfig
+    spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.countryconfig) | nindent 6 }}
+      containers:
+        - name: countryconfig
+          image: {{ include "opencrvs.image" (dict "root" . "service" .Values.countryconfig) | quote }}
+          env:
+            - name: CERT_PUBLIC_KEY_PATH
+              value: /secrets/public-key.pem
+            - name: COUNTRY_CONFIG_HOST
+              value: "0.0.0.0"
+            - name: CLIENT_APP_URL
+              value: {{ include "render-external-url" (dict "service_name" "register" "Values" .Values) }}
+            - name: LOGIN_URL
+              value: {{ include "render-external-url" (dict "service_name" "login" "Values" .Values) }}
+            # TODO: Check if this value is needed here?
+            - name: COUNTRY_CONFIG_URL
+              value: {{ include "render-external-url" (dict "service_name" "countryconfig" "Values" .Values) }}
+            - name: DOMAIN
+              value: {{ .Values.hostname | quote }}
+            - name: SUBDOMAIN_SEPARATOR
+              value: {{ .Values.subdomain_separator | quote }}
+            - name: GATEWAY_URL
+              value: "http://gateway.{{ .Release.Namespace }}.svc.cluster.local:7070"
+            - name: AUTH_URL
+              value: "http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040"
+          {{- if eq .Values.mongodb.auth_mode "disabled" }}
+            - name: MONGO_URL
+              value: mongodb://{{ .Values.mongodb.host }}/user-mgnt
+          {{- else if or (eq .Values.mongodb.auth_mode "auto")  (eq .Values.mongodb.auth_mode "use_secret") }}
+            - name: MONGO_URL
+              valueFrom:
+                secretKeyRef:
+                  key: USER_MGNT_MONGO_URL
+                  name: {{ .Values.mongodb.urls_secret }}
+          {{- end }}
+          {{- if not (eq .Values.postgres.auth_mode "managed") }}
+            - name: ANALYTICS_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  key: events_analytics_db_url
+                  name: {{ .Values.postgres.urls_secret }}
+          {{- end }}
+          {{- include "render-env-vars" (dict "service_name" "countryconfig" "Values" .Values) }}
+          {{- include "resources-helper" (dict "service_name" "countryconfig" "Values" .Values) | indent 10 }}
+          {{- include "probes-helper" (dict "service_name" "countryconfig" "Values" .Values) | indent 10 }}
+          ports:
+            - containerPort: {{ .Values.countryconfig.port }}
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /secrets/public-key.pem
+              name: public-key
+              subPath: public-key.pem
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            items:
+              - key: public-key.pem
+                path: public-key.pem
+            name: {{ .Release.Name }}-cert-tls
+          name: public-key
+
+{{- include "service-helper" (dict "service_name" "countryconfig" "Values" .Values) }}
+
+{{- include "hpa-helper" (dict "service_name" "countryconfig" "Values" .Values) }}
+
+{{- include "pdb-helper" (dict "service_name" "countryconfig" "Values" .Values) }}
