@@ -22,7 +22,8 @@ import {
   DeclarationActions,
   ActionStatus,
   getCompleteActionDeclaration,
-  getCompleteActionAnnotation
+  getCompleteActionAnnotation,
+  getCompleteActionContent
 } from '@opencrvs/commons/client'
 import { hasAnnotationChanged, getDeclarationComparison } from './utils'
 
@@ -108,11 +109,15 @@ export function extractHistoryActions(
     return false
   }
 
-  return fullEvent.actions.filter(isHistoryAction).map((action) => ({
-    ...action,
-    declaration: getCompleteActionDeclaration({}, fullEvent, action),
-    annotation: getCompleteActionAnnotation({}, fullEvent, action)
-  }))
+  return fullEvent.actions.filter(isHistoryAction).map((action) => {
+    const content = getCompleteActionContent(fullEvent, action)
+    return {
+      ...action,
+      ...(content !== undefined ? { content } : {}),
+      declaration: getCompleteActionDeclaration({}, fullEvent, action),
+      annotation: getCompleteActionAnnotation({}, fullEvent, action)
+    }
+  }) as ActionDocument[]
 }
 
 /**
