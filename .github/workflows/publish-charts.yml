@@ -13,7 +13,13 @@ on:
   push:
     tags:
       - "v*.*.*"
-
+    branches:
+      - "master"
+      - "develop"
+      - "release/*"
+    paths:
+      - "charts/**"
+      - ".github/workflows/publish-charts.yml"
 jobs:
   release:
     permissions:
