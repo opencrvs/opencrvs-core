@@ -196,7 +196,12 @@ export function FormHeader({
             ) : (
               <>
                 {actionComponent}
-                <Button size="small" type="icon" onClick={onClose}>
+                <Button
+                  data-testid="exit-button"
+                  size="small"
+                  type="icon"
+                  onClick={onClose}
+                >
                   <Icon name="X" />
                 </Button>
               </>
