@@ -77,6 +77,14 @@ export function FormHeader({
     await deleteDeclaration(eventId)
   }, [eventId, deleteDeclaration])
 
+  const onClose = useCallback(async () => {
+    if (isUndeclaredDraft(eventIndex.status)) {
+      await onExit()
+    } else {
+      closeActionView()
+    }
+  }, [eventIndex.status, onExit, closeActionView])
+
   const menuItems = isUndeclaredDraft(eventIndex.status)
     ? [
         {
@@ -136,9 +144,7 @@ export function FormHeader({
           data-testid="exit-button"
           size="small"
           type="icon"
-          onClick={async () =>
-            isUndeclaredDraft(eventIndex.status) ? onExit() : closeActionView()
-          }
+          onClick={onClose}
         >
           <Icon name="X" />
         </Button>
@@ -188,13 +194,17 @@ export function FormHeader({
                 />
               </>
             ) : (
-              <Button
-                size="small"
-                type="icon"
-                onClick={() => closeActionView()}
-              >
-                <Icon name="X" />
-              </Button>
+              <>
+                {actionComponent}
+                <Button
+                  data-testid="exit-button"
+                  size="small"
+                  type="icon"
+                  onClick={onClose}
+                >
+                  <Icon name="X" />
+                </Button>
+              </>
             )}
           </>
         }
