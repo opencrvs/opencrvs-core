@@ -168,37 +168,45 @@ export const ActionConfig = z
      */
     ReadActionConfig.meta({
       id: 'ReadActionConfig',
-      description: 'Record-tab content displayed on the event overview page.'
+      description:
+        'Configuration for the read action — defines the record-tab content displayed on the event overview page.'
     }),
     DeclareConfig.meta({
       id: 'DeclareActionConfig',
       description:
-        'Submitting a new declaration (includes review fields). This config is also shared with ActionType.NOTIFY.'
+        'Configuration for the declare action. Includes review-page fields. Shared with the notify action (ActionType.NOTIFY).'
     }),
     RejectConfig.meta({
       id: 'RejectActionConfig',
-      description: 'Rejecting a record before registration'
+      description: 'Configuration for rejecting a record before registration.'
     }),
     RegisterConfig.meta({
       id: 'RegisterActionConfig',
-      description: 'Registering a record'
+      description: 'Configuration for registering a record.'
     }),
     PrintCertificateActionConfig.meta({
       id: 'PrintCertificateActionConfig',
-      description: 'Printing a certificate'
+      description:
+        'Configuration for printing a certificate of a registered record.'
     }),
-    RequestCorrectionConfig.meta({ id: 'RequestCorrectionActionConfig' }),
+    RequestCorrectionConfig.meta({
+      id: 'RequestCorrectionActionConfig',
+      description:
+        'Configuration for requesting a correction on a registered record.'
+    }),
     EditActionConfig.meta({
       id: 'EditActionConfig',
-      description: 'Editing a record before registration'
+      description:
+        'Configuration for editing a record before registration.'
     }),
     ArchiveConfig.meta({
       id: 'ArchiveActionConfig',
-      description: 'Archiving a record'
+      description: 'Configuration for archiving a record.'
     }),
     CustomActionConfig.meta({
       id: 'CustomActionConfig',
-      description: 'Custom action configuration'
+      description:
+        'Configuration for a country-defined custom action. An event may include any number of these.'
     })
   ])
   .describe(

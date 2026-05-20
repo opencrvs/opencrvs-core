@@ -76,10 +76,20 @@ export const FieldReference = z
 
 export type FieldReference = z.infer<typeof FieldReference>
 
-export const ValidationConfig = z.object({
-  validator: Conditional,
-  message: TranslationConfig
-})
+export const ValidationConfig = z
+  .object({
+    validator: Conditional.describe(
+      'Conditional expression that must hold for the field value to be considered valid.'
+    ),
+    message: TranslationConfig.describe(
+      'Error message displayed when the validator does not hold.'
+    )
+  })
+  .meta({
+    id: 'ValidationConfig',
+    description:
+      'Validation rule applied to a form field. The validator is a conditional expression that must hold for the field value to be considered valid.'
+  })
 
 export type ValidationConfig = z.infer<typeof ValidationConfig>
 const requiredSchema = z

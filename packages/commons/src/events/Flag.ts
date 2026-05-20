@@ -80,8 +80,9 @@ export const FlagConfig = z
     label: TranslationConfig.describe('Human readable label of the flag.')
   })
   .meta({
-    description: 'Flag configuration',
-    id: 'FlagConfig'
+    id: 'FlagConfig',
+    description:
+      'Configuration for a custom flag that can be added to or removed from records by event actions.'
   })
 
 export type FlagConfig = z.infer<typeof FlagConfig>
@@ -100,6 +101,7 @@ export const ActionFlagConfig = z
     )
   })
   .meta({
-    description: 'Action flag configuration',
-    id: 'ActionFlagConfig'
+    id: 'ActionFlagConfig',
+    description:
+      'Add or remove operation applied to a flag when the parent action is accepted. Optionally gated by a conditional.'
   })
