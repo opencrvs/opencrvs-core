@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { useMemo } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { AdministrativeArea, UUID } from '@opencrvs/commons/client'
 import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
@@ -47,7 +48,7 @@ export function useAdministrativeAreas() {
         // Then we re-attach the queryKey explicitly so React Query can identify this cache.
 
         const { queryFn, ...rest } =
-        trpcOptionsProxy.administrativeAreas.list.queryOptions()
+          trpcOptionsProxy.administrativeAreas.list.queryOptions()
 
         const administrativeAreas = useSuspenseQuery({
           ...rest,
@@ -57,11 +58,15 @@ export function useAdministrativeAreas() {
           })
         }).data
 
-        const administrativeAreasMap = new Map<UUID, AdministrativeArea>(
-          administrativeAreas.map((administrativeArea) => [
-            administrativeArea.id,
-            administrativeArea
-          ])
+        const administrativeAreasMap = useMemo(
+          () =>
+            new Map<UUID, AdministrativeArea>(
+              administrativeAreas.map((administrativeArea) => [
+                administrativeArea.id,
+                administrativeArea
+              ])
+            ),
+          [administrativeAreas]
         )
         return administrativeAreasMap
       }
