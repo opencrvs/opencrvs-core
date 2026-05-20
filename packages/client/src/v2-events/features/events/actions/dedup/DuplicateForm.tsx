@@ -82,8 +82,7 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
           actions.duplicate.markNotDuplicate.mutate({
             transactionId: getUUID(),
             eventId: eventIndex.id,
-            keepAssignment: true,
-            waitFor: true
+            keepAssignment: true
           })
 
           navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
