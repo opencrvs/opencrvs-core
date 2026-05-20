@@ -144,6 +144,7 @@ export const EventConfig: z.ZodType<EventConfig, EventConfigInput> =
       validateActionOrder(event, ctx)
     })
     .meta({
-      id: 'EventConfig'
+      id: 'EventConfig',
+      description:
+        'Configuration defining an event type registered in OpenCRVS (for example birth or death).'
     })
-    .describe('Configuration defining an event type.')
