@@ -476,7 +476,7 @@ export async function processAction(
     )
   }
   // Only send the event to Elasticsearch if it is not a draft
-  await ensureEventIndexed(updatedEvent, configuration, input.waitFor ?? true)
+  await ensureEventIndexed(updatedEvent, configuration, input.waitFor)
   return updatedEvent
 }
 
