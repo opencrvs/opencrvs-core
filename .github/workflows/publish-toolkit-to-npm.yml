@@ -86,5 +86,5 @@ jobs:
 
       - name: Publish to npm
         if: steps.check-version.outputs.version-exists == 'false'
-        run: npm publish --provenance --access public --tag ${{ steps.check-version.outputs.npm-tag }}
+        run: npm publish --provenance --access public
         working-directory: packages/toolkit
