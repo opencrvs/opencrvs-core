@@ -25,6 +25,7 @@ import {
   never,
   or,
   PageTypes,
+  user,
   UserContext,
   UserScopeV2,
   UUID
@@ -113,6 +114,13 @@ export function useUserEditConfig(
                   id: 'primaryOfficeId',
                   type: FieldType.LOCATION,
                   required: true,
+                  configuration: {
+                    allowedLocations: user.jurisdiction(
+                      user
+                        .scope(isNewUser ? 'user.create' : 'user.edit')
+                        .attribute('accessLevel')
+                    )
+                  },
                   label: messages.registrationOffice
                 }
               ]
