@@ -54,7 +54,6 @@ import {
   trpcOptionsProxy
 } from '@client/v2-events/trpc'
 import { ToastKey } from '@client/v2-events/routes/Toaster'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 function retryUnlessConflict(
   _failureCount: number,
@@ -406,11 +405,15 @@ queryClient.setMutationDefaults(customMutationKeys.makeCorrectionOnRequest, {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useEventAction<P extends DecorateMutationProcedure<any>>(
-  trpcProcedure: P
+  trpcProcedure: P,
+  // validatorContext is passed in rather than read via useValidatorContext() here because
+  // useEvents() calls this function 20 times (once per action type). Calling useValidatorContext()
+  // inside each call would trigger useSuspenseGetLeafAdministrativeAreaIds → useAdministrativeAreas
+  // 20× per useEvents() render, cascading to thousands of hook calls across the workqueue.
+  // Callers must call useValidatorContext() once and pass it down.
+  validatorContext: ValidatorContext
 ) {
   const eventConfigurations = useEventConfigurations()
-
-  const validatorContext = useValidatorContext()
 
   const allOptions = {
     ...trpcProcedure.mutationOptions(),
@@ -504,11 +507,10 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
 }
 
 export function useEventCustomAction<T extends CustomMutationKeys>(
-  mutationName: T
+  mutationName: T,
+  validatorContext: ValidatorContext
 ) {
   const eventConfigurations = useEventConfigurations()
-
-  const validatorContext = useValidatorContext()
   const mutationKey = customMutationKeys[mutationName]
   const mutation = useMutation({
     mutationKey,

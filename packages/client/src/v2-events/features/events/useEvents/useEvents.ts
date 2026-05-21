@@ -23,6 +23,7 @@ import {
   Draft
 } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useDrafts } from '../../drafts/useDrafts'
 import { useEventConfigurations } from '../useEventConfiguration'
 import { useGetEvent } from './procedures/get'
@@ -72,7 +73,11 @@ function buildDraftedEventResult(
 export function useEvents() {
   const trpc = useTRPC()
   const getEvent = useGetEvent()
-  const assignMutation = useEventAction(trpc.event.actions.assignment.assign)
+  const validatorContext = useValidatorContext()
+  const assignMutation = useEventAction(
+    trpc.event.actions.assignment.assign,
+    validatorContext
+  )
   const eventConfigs = useEventConfigurations()
   const { getRemoteDraftByEventId } = useDrafts()
 
@@ -194,16 +199,43 @@ export function useEvents() {
       }
     },
     actions: {
-      custom: useEventAction(trpc.event.actions.custom.request),
-      reject: useEventAction(trpc.event.actions.reject.request),
-      archive: useEventAction(trpc.event.actions.archive.request),
-      notify: useEventAction(trpc.event.actions.notify.request),
-      declare: useEventAction(trpc.event.actions.declare.request),
-      register: useEventAction(trpc.event.actions.register.request),
+      custom: useEventAction(
+        trpc.event.actions.custom.request,
+        validatorContext
+      ),
+      reject: useEventAction(
+        trpc.event.actions.reject.request,
+        validatorContext
+      ),
+      archive: useEventAction(
+        trpc.event.actions.archive.request,
+        validatorContext
+      ),
+      notify: useEventAction(
+        trpc.event.actions.notify.request,
+        validatorContext
+      ),
+      declare: useEventAction(
+        trpc.event.actions.declare.request,
+        validatorContext
+      ),
+      register: useEventAction(
+        trpc.event.actions.register.request,
+        validatorContext
+      ),
       correction: {
-        request: useEventAction(trpc.event.actions.correction.request.request),
-        approve: useEventAction(trpc.event.actions.correction.approve.request),
-        reject: useEventAction(trpc.event.actions.correction.reject.request)
+        request: useEventAction(
+          trpc.event.actions.correction.request.request,
+          validatorContext
+        ),
+        approve: useEventAction(
+          trpc.event.actions.correction.approve.request,
+          validatorContext
+        ),
+        reject: useEventAction(
+          trpc.event.actions.correction.reject.request,
+          validatorContext
+        )
       },
       assignment: {
         assign: {
@@ -231,29 +263,47 @@ export function useEvents() {
             })
           }
         },
-        unassign: useEventAction(trpc.event.actions.assignment.unassign)
+        unassign: useEventAction(
+          trpc.event.actions.assignment.unassign,
+          validatorContext
+        )
       },
       duplicate: {
         markAsDuplicate: useEventAction(
-          trpc.event.actions.duplicate.markAsDuplicate
+          trpc.event.actions.duplicate.markAsDuplicate,
+          validatorContext
         ),
         markNotDuplicate: useEventAction(
-          trpc.event.actions.duplicate.markNotDuplicate
+          trpc.event.actions.duplicate.markNotDuplicate,
+          validatorContext
         )
       }
     },
     onlineActions: {
       printCertificate: useEventAction(
-        trpc.event.actions.printCertificate.request
+        trpc.event.actions.printCertificate.request,
+        validatorContext
       )
     },
     customActions: {
-      registerOnDeclare: useEventCustomAction('registerOnDeclare'),
-      archiveOnDuplicate: useEventCustomAction('archiveOnDuplicate'),
-      makeCorrectionOnRequest: useEventCustomAction('makeCorrectionOnRequest'),
-      editAndRegister: useEventCustomAction('editAndRegister'),
-      editAndDeclare: useEventCustomAction('editAndDeclare'),
-      editAndNotify: useEventCustomAction('editAndNotify')
+      registerOnDeclare: useEventCustomAction(
+        'registerOnDeclare',
+        validatorContext
+      ),
+      archiveOnDuplicate: useEventCustomAction(
+        'archiveOnDuplicate',
+        validatorContext
+      ),
+      makeCorrectionOnRequest: useEventCustomAction(
+        'makeCorrectionOnRequest',
+        validatorContext
+      ),
+      editAndRegister: useEventCustomAction(
+        'editAndRegister',
+        validatorContext
+      ),
+      editAndDeclare: useEventCustomAction('editAndDeclare', validatorContext),
+      editAndNotify: useEventCustomAction('editAndNotify', validatorContext)
     }
   }
 }
