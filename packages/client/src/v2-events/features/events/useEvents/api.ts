@@ -183,7 +183,7 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
 }
 
 export function findLocalEventDocument(eventId: string) {
-  return getQueryData(trpcOptionsProxy.event.get, { eventId })
+  return getQueryData(trpcOptionsProxy.event.get, { eventId, waitFor: false })
 }
 
 /*
