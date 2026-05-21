@@ -40,7 +40,6 @@ const AdministrativeAreasContext =
   React.createContext<AdministrativeAreasContextValue | null>(null)
 
 export function useAdministrativeAreas() {
-  const trpc = useTRPC()
   return {
     getAdministrativeAreas: {
       useSuspenseQuery: ({
@@ -50,6 +49,7 @@ export function useAdministrativeAreas() {
         isActive?: boolean
         ids?: UUID[]
       } = {}) => {
+        const trpc = useTRPC()
         const ctx = React.useContext(AdministrativeAreasContext)
 
         // We intentionally remove `queryFn` here because we already set a global default
