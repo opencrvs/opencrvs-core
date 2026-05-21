@@ -30,12 +30,13 @@ import {
   DEFAULT_DATE_OF_EVENT_PROPERTY,
   ActionDocument,
   Location,
-  UserOrSystem,
   UUID,
   AdministrativeArea,
   getActionAnnotationFields,
   FieldUpdateValue,
-  FieldConfig
+  FieldConfig,
+  UserOrSystemSummary,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -44,6 +45,7 @@ import { getUsersFullName } from '@client/v2-events/utils'
 import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { LocationSearch } from '@client/v2-events/features/events/registered-fields'
 import { AdminStructureItem } from '@client/utils/referenceApi'
+import { toFileUrl } from '@client/v2-events/cache'
 
 interface FontFamilyTypes {
   normal: string
@@ -69,20 +71,24 @@ function omitFieldValuesFromDeclaration(
   }, {})
 }
 
-function findUserById(userId: string, users: UserOrSystem[]) {
+function findUserById(userId: string, users: UserOrSystemSummary[]) {
   const user = users.find((u) => u.id === userId)
 
   if (!user) {
     return {
       name: '',
-      signature: '',
       fullHonorificName: ''
+    }
+  }
+
+  if (user.type === TokenUserType.enum.system) {
+    return {
+      name: getUsersFullName(user.name)
     }
   }
 
   return {
     name: getUsersFullName(user.name),
-    signature: user.signature ?? '',
     fullHonorificName: user.fullHonorificName ?? ''
   }
 }
@@ -104,7 +110,7 @@ export const stringifyEventMetadata = ({
   intl: IntlShape
   locations: Map<UUID, Location>
   administrativeAreas: Map<UUID, AdministrativeArea>
-  users: UserOrSystem[]
+  users: UserOrSystemSummary[]
   adminLevels: AdminStructureItem[]
 }) => {
   return {
@@ -185,9 +191,7 @@ export const stringifyEventMetadata = ({
               metadata.legalStatuses.DECLARED.acceptedAt,
               { intl, locations, administrativeAreas }
             ),
-            createdByRole: metadata.legalStatuses.DECLARED.createdByRole,
-            createdBySignature:
-              metadata.legalStatuses.DECLARED.createdBySignature
+            createdByRole: metadata.legalStatuses.DECLARED.createdByRole
           }
         : null,
       [EventStatus.enum.REGISTERED]: metadata.legalStatuses.REGISTERED
@@ -210,9 +214,7 @@ export const stringifyEventMetadata = ({
             ),
             createdByRole: metadata.legalStatuses.REGISTERED.createdByRole,
             registrationNumber:
-              metadata.legalStatuses.REGISTERED.registrationNumber,
-            createdBySignature:
-              metadata.legalStatuses.REGISTERED.createdBySignature
+              metadata.legalStatuses.REGISTERED.registrationNumber
           }
         : null
     },
@@ -255,7 +257,7 @@ export function compileSvg({
   $declaration: EventState
   locations: Map<UUID, Location>
   administrativeAreas: Map<UUID, AdministrativeArea>
-  users: UserOrSystem[]
+  users: UserOrSystemSummary[]
   /**
    * Indicates whether certificate is reviewed or actually printed
    * in V1 "preview" was used. In V2, "review" is used to remain consistent with action terminology (review of print action rather than preview of certificate).
@@ -307,6 +309,7 @@ export function compileSvg({
    * @example {{ $actions "PRINT_CERTIFICATE" }}
    */
   function $actionsFn(actionType: string) {
+    console.log($actions.filter((a) => a.type === actionType))
     return $actions.filter((a) => a.type === actionType)
   }
 
@@ -324,6 +327,7 @@ export function compileSvg({
    */
 
   function $action(actionType: string) {
+    console.log($actions.findLast((a) => a.type === actionType))
     return $actions.findLast((a) => a.type === actionType)
   }
 
@@ -367,12 +371,10 @@ export function compileSvg({
         const actionConfig = config.actions.find(
           (a) => a.type === action.data.type
         )
-        if (!actionConfig) {
-          throw new Error(
-            'Action config not found for action type ' + action.data.type
-          )
-        }
-        const annotationFields = getActionAnnotationFields(actionConfig)
+
+        const annotationFields = actionConfig
+          ? getActionAnnotationFields(actionConfig)
+          : []
 
         const annotation =
           action.data.annotation != null
@@ -384,7 +386,6 @@ export function compileSvg({
                 )
               )
             : {}
-
         const resolvedAction = {
           id: action.data.id,
           type: action.data.type,
@@ -395,7 +396,9 @@ export function compileSvg({
           }),
           createdBy: users.find((user) => user.id === action.data.createdBy),
           createdByUserType: action.data.createdByUserType,
-          createdBySignature: action.data.createdBySignature,
+          createdBySignature:
+            action.data.createdBySignature &&
+            toFileUrl(action.data.createdBySignature),
           createdAtLocation: LocationSearch.toCertificateVariables(
             action.data.createdAtLocation,
             {

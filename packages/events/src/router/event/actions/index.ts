@@ -186,7 +186,8 @@ type DistributiveOmit<T, K extends keyof T> = T extends T ? Omit<T, K> : never
 const AsyncActionInput = BaseActionInput.pick({
   eventId: true,
   transactionId: true,
-  keepAssignment: true
+  keepAssignment: true,
+  waitFor: true
 }).extend({
   actionId: UUID
 })
@@ -250,7 +251,6 @@ export async function defaultRequestHandler(
     { eventId: input.eventId, actionId: requestedAction.id },
     token
   )
-
   const { responseStatus, responseBody } = await requestActionConfirmation(
     input.type,
     input.transactionId,
@@ -268,7 +268,11 @@ export async function defaultRequestHandler(
 
   // For Async flow, we just return the event with the requested action and ensure it is indexed
   if (responseStatus === ActionConfirmationResponse.RequiresProcessing) {
-    await ensureEventIndexed(eventWithRequestedAction, configuration, input.waitFor ?? false)
+    await ensureEventIndexed(
+      eventWithRequestedAction,
+      configuration,
+      input.waitFor
+    )
     return eventWithRequestedAction
   }
 
@@ -328,6 +332,7 @@ export async function defaultRequestHandler(
   return processAction(
     {
       ...strippedInput,
+      waitFor: input.waitFor,
       keepAssignment: effectiveKeepAssignment,
       declaration: {},
       originalActionId: requestedAction.id,

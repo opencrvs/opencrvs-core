@@ -225,7 +225,10 @@ const preview: Preview = {
       const primaryOfficeId = '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
 
       if (options.parameters.userRole === TestUserRole.enum.FIELD_AGENT) {
-        window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+        window.localStorage.setItem(
+          'opencrvs',
+          options.parameters.token ?? generator.user.token.fieldAgent
+        )
         addUserToQueryData(generator.user.fieldAgent().v2)
       } else if (
         options.parameters.userRole === TestUserRole.enum.REGISTRATION_AGENT
@@ -241,7 +244,7 @@ const preview: Preview = {
       ) {
         window.localStorage.setItem(
           'opencrvs',
-          generator.user.token.communityLeader
+          options.parameters.token ?? generator.user.token.communityLeader
         )
 
         addUserToQueryData(generator.user.communityLeader().v2)

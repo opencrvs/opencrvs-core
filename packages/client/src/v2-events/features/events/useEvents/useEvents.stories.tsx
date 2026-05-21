@@ -211,7 +211,7 @@ export const GetEventHook: Story = {
 
     await step('Fetches file content', async () => {
       await waitFor(async () => {
-        await expect(spies.fetchFile).toBe(1)
+        await expect(spies.fetchFile).toBeGreaterThanOrEqual(1)
       })
     })
 

@@ -152,8 +152,8 @@ export function EventOverviewLayout({
   const { searchEventById } = useEvents()
   const { getRemoteDraftByEventId } = useDrafts()
   const draft = getRemoteDraftByEventId(eventId)
-  const { getUser } = useUsers()
-  const users = getUser.getAllCached()
+  const { getUsers } = useUsers()
+  const users = getUsers.getAllCached()
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
 

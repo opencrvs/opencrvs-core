@@ -1127,8 +1127,6 @@ export const eventQueryDataGenerator = (
     createdBy: overrides.createdBy ?? generateUuid(rng),
     createdAtLocation: overrides.createdAtLocation ?? generateUuid(rng),
     updatedAtLocation: overrides.updatedAtLocation ?? generateUuid(rng),
-    createdBySignature:
-      overrides.createdBySignature ?? generateRandomSignature(rng),
     updatedAt:
       overrides.updatedAt ?? addDays(new Date(createdAt), 1).toISOString(),
     assignedTo: overrides.assignedTo ?? null,

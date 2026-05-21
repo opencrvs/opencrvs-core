@@ -22,12 +22,14 @@ import {
   getAcceptedScopesFromToken,
   getScopeOptionValue,
   JurisdictionFilter,
+  UserOrSystemSummary,
   logger,
   TokenWithBearer,
   User,
   UserOrSystem,
   UpdateUserInput,
-  CreateUserInputInternal
+  CreateUserInputInternal,
+  UserOrSystemSummaryWithStatus
 } from '@opencrvs/commons'
 import {
   allowedWithAnyOfScopes,
@@ -208,7 +210,7 @@ export function searchUsersRoute(
 ) {
   return procedure
     .input(UserSearch)
-    .output(z.array(UserOrSystem))
+    .output(z.array(UserOrSystemSummaryWithStatus))
     .query(async ({ input, ctx }) => {
       const primaryOfficeId = input.primaryOfficeId
         ? UUID.parse(input.primaryOfficeId)
@@ -360,7 +362,7 @@ export const userRouter = router({
     }),
   list: userOnlyProcedure
     .input(z.array(z.string()))
-    .output(z.array(UserOrSystem))
+    .output(z.array(UserOrSystemSummary))
     .query(async ({ input }) => getUsersById(input)),
   search: searchUsersRoute(userAndSystemProcedure.use(canSearchUsers)),
   actions: userOnlyProcedure

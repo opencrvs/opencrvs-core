@@ -18,6 +18,7 @@ import {
   TestUserRole,
   TokenUserType,
   User,
+  UserSummary,
   UUID
 } from '@opencrvs/commons/client'
 import { FetchUserQuery, Status } from '@client/utils/gateway'
@@ -40,6 +41,35 @@ const userIds = {
  */
 export function testDataGenerator(rngSeed?: number) {
   const prng = createPrng(rngSeed ?? 1001)
+
+  /**
+   * Shared base scopes for communityLeader variants — excludes record.search so
+   * each variant can inject its own registeredIn restriction.
+   */
+  const communityLeaderBaseScopesWithoutSearch = [
+    encodeScope({
+      type: 'workqueue',
+      options: {
+        ids: [
+          'all-events',
+          'assigned-to-you',
+          'recent',
+          'requires-updates',
+          'sent-for-review'
+        ]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding'],
+        placeOfEvent: JurisdictionFilter.enum.location
+      }
+    }),
+    encodeScope({ type: 'record.read' }),
+    encodeScope({ type: 'record.notify' }),
+    encodeScope({ type: 'record.edit' })
+  ]
 
   const user = {
     token: {
@@ -68,14 +98,36 @@ export function testDataGenerator(rngSeed?: number) {
       nationalSystemAdmin:
         'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPWNvbmZpZy51cGRhdGUtYWxsIiwidHlwZT1vcmdhbmlzYXRpb24ucmVhZC1sb2NhdGlvbnMiLCJ0eXBlPXVzZXIucmVhZCIsInR5cGU9cGVyZm9ybWFuY2UucmVhZCIsInR5cGU9cGVyZm9ybWFuY2UucmVhZC1kYXNoYm9hcmRzIiwidHlwZT1wZXJmb3JtYW5jZS52aXRhbC1zdGF0aXN0aWNzLWV4cG9ydCIsInR5cGU9cmVjb3JkLnJlaW5kZXgiLCJ0eXBlPXVzZXIuY3JlYXRlJnJvbGU9RklFTERfQUdFTlQsSE9TUElUQUxfQ0xFUkssQ09NTVVOSVRZX0xFQURFUixSRUdJU1RSQVRJT05fQUdFTlQsTE9DQUxfUkVHSVNUUkFSLE5BVElPTkFMX1JFR0lTVFJBUixMT0NBTF9TWVNURU1fQURNSU4sTkFUSU9OQUxfU1lTVEVNX0FETUlOLFBFUkZPUk1BTkNFX01BTkFHRVIiLCJ0eXBlPXVzZXIuZWRpdCZyb2xlPUZJRUxEX0FHRU5ULEhPU1BJVEFMX0NMRVJLLENPTU1VTklUWV9MRUFERVIsUkVHSVNUUkFUSU9OX0FHRU5ULExPQ0FMX1JFR0lTVFJBUixOQVRJT05BTF9SRUdJU1RSQVIsTE9DQUxfU1lTVEVNX0FETUlOLE5BVElPTkFMX1NZU1RFTV9BRE1JTixQRVJGT1JNQU5DRV9NQU5BR0VSIl0sInVzZXJUeXBlIjoidXNlciIsInJvbGUiOiJOQVRJT05BTF9TWVNURU1fQURNSU4iLCJpYXQiOjE0ODcwNzY3MDgsImF1ZCI6Im9wZW5jcnZzOmdhdGV3YXktdXNlciIsImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6ImIxOGIxY2Q0LTg1ZTMtNGNhZi1iNjBmLTUzN2NiNzkwZjIwOCJ9.Dy6qsZW46D4DO6URt7hVNgMj4w2Gpwg6cba0a226tDw-c69JRT8ggzwYvhBU6UNU5W7zn6SWUIUrToGaejRHAdbeIgdSaxT4bN_D4AWc4yxfaU2Zps_vTd0z1HW6Jyy9uNwQQo14-j4C5-5qNK47Zdz9S1E_sg10cAUWFV8jg_8wTV1OiRacYMMteieOiq_biLde6xYSP_c8655CVsOE5y4WoRG4M3d8JzAh7fZYnbxsYvhQ9CNSj8lR6AmH_kEEzYttLHvgViwrf0Vj645-XIsAZTV-hymBW-NfzFlZSXl5Cceo4UGDY2uzLF18bUjpfnN7B8BvbanVWcz6GqyTFSEqjs4bRrN2ntpJD0CEspXtCTkTOH_qR8938fcHcDR_tXZR6bVO2ni8JJt0gbooX21SgltZANp65TifnI3vHUM7ZTWD_uK-dVon5xb5sA8ZhMB8qAmzmtWSsw_XoSopJxT2xX-l-O_NeooObdgaaQJlu9enJPzVbslFBCUU9hOj5RH_eAubMg4SzjD-LGA4hAXc_xtNnUa1EiI-fCSR6wtBswvRuhlqXyEZojTePT5WXsfALrfkZUFkreonDJyXHh7CO0a3aqkDkWoINNY-XTDmwppU_dXC02tMrnvrvpZkLQtZ-u3ag6Un0wQJPdTVNdAFGDm2zUntLbXDttqXlIE',
       communityLeader:
-        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXdvcmtxdWV1ZSZpZHM9YWxsLWV2ZW50cyxhc3NpZ25lZC10by15b3UscmVjZW50LHJlcXVpcmVzLXVwZGF0ZXMsc2VudC1mb3ItcmV2aWV3IiwidHlwZT1yZWNvcmQuc2VhcmNoIiwidHlwZT1yZWNvcmQuY3JlYXRlJmV2ZW50PWJpcnRoLGRlYXRoLHRlbm5pcy1jbHViLW1lbWJlcnNoaXAsY2hpbGQtb25ib2FyZGluZyZwbGFjZU9mRXZlbnQ9bG9jYXRpb24iLCJ0eXBlPXJlY29yZC5yZWFkIiwidHlwZT1yZWNvcmQubm90aWZ5IiwidHlwZT1yZWNvcmQuZWRpdCJdLCJ1c2VyVHlwZSI6InVzZXIiLCJyb2xlIjoiQ09NTVVOSVRZX0xFQURFUiIsImlhdCI6MTQ4NzA3NjcwOCwiYXVkIjoib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiYzg3N2RkYTAtMDM2Mi00YWY2LWE4OGQtNWFiOGYzNTgwMzBlIn0.kE3wUjNRCw2FTH9xdEmerLJsfya-_7Huyaj21chcpQXvDNQcMYsShLHuUvTxSVBcmW8tnEZ4kIznedqgmmFkfDt1b9JrjIAyyXTsjVOzuHHAw7igM5unrox1RGE-5AAMlRukjQGhdfEGRyqnZVtvxLFtjZREZEiqVEKSibNhz8XoqCGYU407GzzL99NGw2Fxx4kxEYTR6e8D5Q0SZWlwfIuzo-ga3FkRp7Tb1-TUJtivBUEzJEKGqNi_lxBlsfLua7atXYnHWpQGbNVGv8X5jxEcDp-Qc_7NLAyU_uyVVJ1YQo7WeNdI5-gpatdEFJWzbiQ34f7TIWvCqZtnbypE__y1ts2g6tYVHWIqO_A9d4fXq5VPxqfbx3mZ2ncu0ktpX-pXiLggm5ZmlXQmrHOuDOTWStmGuOf3GojIZ0_nS2F1sb1TSgIlezQr9Q6F4HXd9eowoq_sOpvv8FFdJttUt74B85BgVNCvHUNX2dMB5xR-3ps1HFywIQY8LgA3aOJoIBkJs4ouxkVEk_husOLhPvwbdRlqbRIa5PG7YACxH6-uh21kfJnukNpyZnDTaZIE_xBq9YAkxECXE0qfiXlMr2X3TlNDULlLc_xT5qxhavS2MWikRGHB74nu1bVOe0nzeKBHCv_cdCpjeh9nSXMlO__FCQiMLTBRdYdoBsFzrpA',
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXdvcmtxdWV1ZSZpZHM9YWxsLWV2ZW50cyxhc3NpZ25lZC10by15b3UscmVjZW50LHJlcXVpcmVzLXVwZGF0ZXMsc2VudC1mb3ItcmV2aWV3IiwidHlwZT1yZWNvcmQuY3JlYXRlJmV2ZW50PWJpcnRoLGRlYXRoLHRlbm5pcy1jbHViLW1lbWJlcnNoaXAsY2hpbGQtb25ib2FyZGluZyZwbGFjZU9mRXZlbnQ9bG9jYXRpb24iLCJ0eXBlPXJlY29yZC5yZWFkIiwidHlwZT1yZWNvcmQubm90aWZ5IiwidHlwZT1yZWNvcmQuZWRpdCIsInR5cGU9cmVjb3JkLnNlYXJjaCZwbGFjZU9mRXZlbnQ9YWRtaW5pc3RyYXRpdmVBcmVhIl0sInVzZXJUeXBlIjoidXNlciIsInJvbGUiOiJDT01NVU5JVFlfTEVBREVSIiwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiJjODc3ZGRhMC0wMzYyLTRhZjYtYTg4ZC01YWI4ZjM1ODAzMGUifQ.DyX0exD6AVqt5ZC6xYKkPvcvrJQFudNoYkjv0Q7pAjrVw3mLsYMT7e435PTmNS8E3k5WjnimwFwJXRvik00VBtFJzsqiTyoUADKmonQzuhfDinkLFIFHWRukfqRtezQX5OR8Vi4r5p4Vb72kIGnVDl3g0fwn43tzTqZQbHVgYoSmqYcE68pkFNyQghjDgDz40-1WQ0WCixKordDIpWh5Gf_flXIY0VpXQ5BXttU-PfWqY9pMYXmKlj17rsDvunGBrERJuiKiyvlb0y9b9KYtQk_iSWz9daqXahaf4g1roemYrSJawnaCyjN4_smTIG6NaMFWB03VQAKyBKFQ9ljdhgk1v1h53Eh2EIWM3iHF3ZCHSeujQOct-DFZju3xLhe1fuwFlozq7mFJBVKtdbI-4gNB4SyDOmP6nRgqRTF-GuDOo5vhv1K3QVvo6N7IX6rGfSoIrz1ooY4r9Hn9_Qqavogiq8lXioCNYr5PUnY2bTir0EvNHWyBo59V1ywxQcM8kX9XNXBaVZofe5MeaXaukB6Bqh7b-uHnmyTUxDh2etOxS7uc27BdKUVBzOLIjFQQzAbacaUn_H9WvNO3qLVB9R_Txy813OiS_whDck6HzxqHINf88BTP-fo6V5KgXhA04Xa0e-IXUF2vBylOMr7rJ_XDTdgwc66wuhoXdzdQ-HI',
+      communityLeaderRegisteredInLocation:
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXdvcmtxdWV1ZSZpZHM9YWxsLWV2ZW50cyxhc3NpZ25lZC10by15b3UscmVjZW50LHJlcXVpcmVzLXVwZGF0ZXMsc2VudC1mb3ItcmV2aWV3IiwidHlwZT1yZWNvcmQuY3JlYXRlJmV2ZW50PWJpcnRoLGRlYXRoLHRlbm5pcy1jbHViLW1lbWJlcnNoaXAsY2hpbGQtb25ib2FyZGluZyZwbGFjZU9mRXZlbnQ9bG9jYXRpb24iLCJ0eXBlPXJlY29yZC5yZWFkIiwidHlwZT1yZWNvcmQubm90aWZ5IiwidHlwZT1yZWNvcmQuZWRpdCIsInR5cGU9cmVjb3JkLnNlYXJjaCZyZWdpc3RlcmVkSW49bG9jYXRpb24iXSwidXNlclR5cGUiOiJ1c2VyIiwicm9sZSI6IkNPTU1VTklUWV9MRUFERVIiLCJpYXQiOjE0ODcwNzY3MDgsImF1ZCI6Im9wZW5jcnZzOmdhdGV3YXktdXNlciIsImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6ImM4NzdkZGEwLTAzNjItNGFmNi1hODhkLTVhYjhmMzU4MDMwZSJ9.CVF1v7qamvFqcbInKSHxbH8kgKyFhlCimVsvwyZaq5D5U4OUrAPdTM7vaKaESXY6zk3SmMac5d5lKHCm7064vE1Ela2xy9Oc-AHd5S3kWSjOrfzLcAGq5QrLZaqioPBrNXxHXkmoYJduMGUt7LF9zMmCDL4XKtQr888rg6SmoRpYjV9JWrrOBNl4MKEZ0ag9dVl-IAppOaMqMiRo3xQ83ichmHT4UtR8DbhYFwwjDQrb6ZxKIaenl7TcI0klhWGWZxjTSH8yjwETSrD1qSvCeaX1cW_7Pafgh4fYUhQAAXh4MyqAHF9A-enibGpqSfQqWrXXsRjgIoRRb8Ox1M-zcgzk0Qk9z3RLzWI5I9CRUWSeG2vy3_Fybf6NkJ7tnFfWuHdHrAVygP4Q93vaTsHsLecV6sDo-IRARwiEnLKTQ2wYaOGg2dclKYprYfZiYaThDHCLJmbB4rWBS8I6GWkFO2ha4PcYektBd0ITcho7MoIX7Jwb0qkZAvsOf35plfbaLpHETgR9Jdz6u2gre7TAUlBL1SvJ3Rl9IQTSDXY4G9rdvxbTZZmeGU1M2SHQCevECKy1gEGuye_LN-aY6APeJNtKKNOqmuBtCtq9cIetJ4pJJE7e0AsNbP35NSL6wxQY5y8fSzx5FcaqI92HnVZbyvJxy50GqJ7dUyq0ANu_P_A',
+      communityLeaderRegisteredInAdministrativeArea:
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXdvcmtxdWV1ZSZpZHM9YWxsLWV2ZW50cyxhc3NpZ25lZC10by15b3UscmVjZW50LHJlcXVpcmVzLXVwZGF0ZXMsc2VudC1mb3ItcmV2aWV3IiwidHlwZT1yZWNvcmQuY3JlYXRlJmV2ZW50PWJpcnRoLGRlYXRoLHRlbm5pcy1jbHViLW1lbWJlcnNoaXAsY2hpbGQtb25ib2FyZGluZyZwbGFjZU9mRXZlbnQ9bG9jYXRpb24iLCJ0eXBlPXJlY29yZC5yZWFkIiwidHlwZT1yZWNvcmQubm90aWZ5IiwidHlwZT1yZWNvcmQuZWRpdCIsInR5cGU9cmVjb3JkLnNlYXJjaCZyZWdpc3RlcmVkSW49YWRtaW5pc3RyYXRpdmVBcmVhIl0sInVzZXJUeXBlIjoidXNlciIsInJvbGUiOiJDT01NVU5JVFlfTEVBREVSIiwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiJjODc3ZGRhMC0wMzYyLTRhZjYtYTg4ZC01YWI4ZjM1ODAzMGUifQ.cjSrL4OWHpjxH3snaHg8ixN05KDNWZffGnotNj9qREsuWveOqWLddFlFWCYRU1KvsGj56mgfBZKpeym_TbhaRZydq1uMOFmsMD2cm720Pc4DEsjLJdff5R5dvQF1Go6nT6kGk9OeW365p5CgnjtzTHjA3O0_gBKev0QPqCivBgb1W8938DXnG6UyYB4aKNzqWnf4I5Qlb1bGACmUZpspmN2L31_3mTBhSW0AbIIkBOiy-6u1GwzG5mGDHfTZBtm-RJwaJu8ePcOHU4jF72M0mqOXt91DK1E3BCAIZ3c4fBJN_31ERjZdQVVLr0Q5kQfx0XyvlYqZ5xM1Xf27odxKW9aJTW2bjZMT04GMG45XdhGluLgTqED3wKVtDuef8UXaTsWKWfz6H3V4OnyjCeEZZCcmRviGUw0QEvO-JjAcs6SZr5YbRxDwHi8cSHJEW8tsob10jze8Z1RGvPxBH2WcnKvZM2Qh12k0p1R2K5K4kU2QsjJDKwosg8wNyoqmSnyg2MCb3RHwF6a5m5-E5gdWlva07ZqOx-IBpGfo6nHCKabu06kUCkm9xyNGCTdFABLoOsHZmBdWUDGlTKqJkrUKOCzqG5WEvQT5ohUwGb-5MPdAlZjSb-87qwPk6Yo_TjqxTLWKnrRemuna-n5GZ4gr_Rui7WxVuotMSjLFRfIndm8',
+      communityLeaderMultipleSearchScopes:
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXdvcmtxdWV1ZSZpZHM9YWxsLWV2ZW50cyxhc3NpZ25lZC10by15b3UscmVjZW50LHJlcXVpcmVzLXVwZGF0ZXMsc2VudC1mb3ItcmV2aWV3IiwidHlwZT1yZWNvcmQuY3JlYXRlJmV2ZW50PWJpcnRoLGRlYXRoLHRlbm5pcy1jbHViLW1lbWJlcnNoaXAsY2hpbGQtb25ib2FyZGluZyZwbGFjZU9mRXZlbnQ9bG9jYXRpb24iLCJ0eXBlPXJlY29yZC5yZWFkIiwidHlwZT1yZWNvcmQubm90aWZ5IiwidHlwZT1yZWNvcmQuZWRpdCIsInR5cGU9cmVjb3JkLnNlYXJjaCZyZWdpc3RlcmVkSW49bG9jYXRpb24iLCJ0eXBlPXJlY29yZC5zZWFyY2gmcmVnaXN0ZXJlZEluPWFkbWluaXN0cmF0aXZlQXJlYSJdLCJ1c2VyVHlwZSI6InVzZXIiLCJyb2xlIjoiQ09NTVVOSVRZX0xFQURFUiIsImlhdCI6MTQ4NzA3NjcwOCwiYXVkIjoib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiYzg3N2RkYTAtMDM2Mi00YWY2LWE4OGQtNWFiOGYzNTgwMzBlIn0.EjQWmGLrZ2qNlTHHFfmfK_CLlh7U6UQ_tm5i_CBAwNr6KIasyGprLEk1UcOluK2zdvgh8SXPZA5VlLgVJyc9LQ_tm7hDjJTofMEAKswxujsHSME_xu49wuh6SbizNdAluQYDeb-LOL_DLPlx0H__XU1mqtfqO4EwsgK6BsQl7KFacKvk7BY05TSOtxmglb9WbpezR_sgGHUlQOjoDg0gOtkxRM7AXLU5G2S02oIe0btYlZABPpeRjP4CACLLBr-0FPXRD53RfnHFM-SuFIzdHCgQTQGBaqaDFQcvbqdb5mxRWIpjLfWzYLGkPKQn2uS1ueGuC4U_19uku-b0dMWLi9b1JwTJPs-uXJMHsmGTrJBCr69JaJLUavg-G8vrK6keVpUd1uSMWmemrHUrYZl-8DVsFHEoqN2zoJ7KJC4oJfMa9xPkjqfsI6BLrVouXVREDuyP0NDxmdGZxEgnTQ_og5mE0gFq8FGlJsH1evKSwB3J-M-40gVfS5ruo8f_-jB86ZVjFkf-hdZULz2GQ6KEthw3ZQE3opQGINiHWM7opAgcddljrsUhX7du_aZuJfxeSYFuW-T5RTa_x6mYxtpaDSSTMux7VB_9LGoelBGQQVa91efDKwXDws2nY-PIWALLnrYq_zB83mlGUEiifjLxe-flohN0Dd5450_7Y3Bo5Dw',
+      communityLeaderSearchAllAndLocation:
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXdvcmtxdWV1ZSZpZHM9YWxsLWV2ZW50cyxhc3NpZ25lZC10by15b3UscmVjZW50LHJlcXVpcmVzLXVwZGF0ZXMsc2VudC1mb3ItcmV2aWV3IiwidHlwZT1yZWNvcmQuY3JlYXRlJmV2ZW50PWJpcnRoLGRlYXRoLHRlbm5pcy1jbHViLW1lbWJlcnNoaXAsY2hpbGQtb25ib2FyZGluZyZwbGFjZU9mRXZlbnQ9bG9jYXRpb24iLCJ0eXBlPXJlY29yZC5yZWFkIiwidHlwZT1yZWNvcmQubm90aWZ5IiwidHlwZT1yZWNvcmQuZWRpdCIsInR5cGU9cmVjb3JkLnNlYXJjaCZwbGFjZU9mRXZlbnQ9bG9jYXRpb24iLCJ0eXBlPXJlY29yZC5zZWFyY2gmcmVnaXN0ZXJlZEluPWxvY2F0aW9uIl0sInVzZXJUeXBlIjoidXNlciIsInJvbGUiOiJDT01NVU5JVFlfTEVBREVSIiwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiJjODc3ZGRhMC0wMzYyLTRhZjYtYTg4ZC01YWI4ZjM1ODAzMGUifQ.mQIt_ra5vdEAU-sf9ya2FMN6UwngtayupU2zsEqCIOhIuR2_4Ee6x7QCvoifEx8gLZMsbnBCOKEcGM0DB2dCQ75_9yF9HJiGq8BWbVr4ylGGWfIjPufKC7LVvg_VQoXAQHOsLWgRBGgSMUA5GNzmn_78D-9ajHzxw_eGqJc4VgR-t7vKYqYlIr7lgF4EUoQXuZMb2WO8ATuLcQdV4Bbv2Nq2dp_MfYFQrpKK70NPwov0-d-0Vtn7q-zWKbPCsC8pLLdv_UJ-sYylHF-th0NSUDXGlcaDiAR7Mxo3bueybLgUkWOrIFLmI2FUDKyeeMK72KGCPL3sNycbhmCoHxum_NoaUfCHm4qoZizHHyCip7-WVfBKu9zKn8j6Q1Ea8suYxLTaZIPvFVGJB92nqeZWIE7iyu-2y3dyB1ALRkaYeWIJiQtewqmtvUyNSef3L0vQWrXqKzipfZGGBwWa_S3k-6kPbKM64tl3IjIWfb0aNqeFX87P9Ph5zToHWrwK3OXzDsNldW_uKd3yCFK9JF5ff3olFbaOq1rq6gM0LK5Gd6WX2ZgJp2rf-7Hy7Q6JzbrTW-SNfRPWDig1WX2YGQTxlf5ccB0jSYBKR8rhoz3WNPUsYTvO7BQcWGG71t_bCgW2_kGzwML4H_ARV1LOCjaQCd4L91wsMOCYw_-gxvdSncw',
       provincialRegistrar:
         'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXBlcmZvcm1hbmNlLnJlYWQiLCJ0eXBlPXBlcmZvcm1hbmNlLnJlYWQtZGFzaGJvYXJkcyIsInR5cGU9cHJvZmlsZS5lbGVjdHJvbmljLXNpZ25hdHVyZSIsInR5cGU9b3JnYW5pc2F0aW9uLnJlYWQtbG9jYXRpb25zJmFjY2Vzc0xldmVsPWxvY2F0aW9uIiwidHlwZT13b3JrcXVldWUmaWRzPWFsbC1ldmVudHMsYXNzaWduZWQtdG8teW91LHJlY2VudCxyZXF1aXJlcy1jb21wbGV0aW9uLHJlcXVpcmVzLXVwZGF0ZXMsaW4tcmV2aWV3LWFsbCxpbi1leHRlcm5hbC12YWxpZGF0aW9uLHJlYWR5LXRvLXByaW50LHJlYWR5LXRvLWlzc3VlIiwidHlwZT11c2VyLnJlYWQtb25seS1teS1hdWRpdCIsInR5cGU9cmVjb3JkLnNlYXJjaCIsInR5cGU9cmVjb3JkLmNyZWF0ZSZldmVudD1iaXJ0aCxkZWF0aCx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwLGNoaWxkLW9uYm9hcmRpbmcmcGxhY2VPZkV2ZW50PWFkbWluaXN0cmF0aXZlQXJlYSIsInR5cGU9cmVjb3JkLnJlYWQiLCJ0eXBlPXJlY29yZC5kZWNsYXJlIiwidHlwZT1yZWNvcmQucmVqZWN0IiwidHlwZT1yZWNvcmQuYXJjaGl2ZSIsInR5cGU9cmVjb3JkLnJlZ2lzdGVyIiwidHlwZT1yZWNvcmQuZWRpdCIsInR5cGU9cmVjb3JkLnByaW50LWNlcnRpZmllZC1jb3BpZXMiLCJ0eXBlPXJlY29yZC5jb3JyZWN0IiwidHlwZT1yZWNvcmQudW5hc3NpZ24tb3RoZXJzIiwidHlwZT1yZWNvcmQucmV2aWV3LWR1cGxpY2F0ZXMiXSwidXNlclR5cGUiOiJ1c2VyIiwicm9sZSI6IlBST1ZJTkNJQUxfUkVHSVNUUkFSIiwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiJmMTE1NThmMi1mZjU3LTQzODItOTg3NS1kNThmNDIwNmI0N2YifQ.Se-W6wawck7vyteBzbBDEBKWP8guupwz-oBgxWwalIVa4ZI0iO3y8-qJy37S-MTwrCUMV9MOI4w60-Cnwdej-U7SekD7jVO-54-f5K7ZQFiS9retN9FfNekIPYBIaU0y_Udvl-GxtEs3E7biyqwGe4TRk67cCYEUieopFH9GGOxabTH4cvvjHlIrF_Z56ZI3fsiF-WWgZZHyEmUqZ5kMPnz6Z8MfVd-mAhBEVyvEbMBZjzr-cvICAQE0qiJ2YiFw-SenwQOdqsKYOZyi2PZuahaJdNZ3czG-CrJ9qSMB1eP2ikuBkTUczVQpwha8qI40b0IEdwNQ63yddbwdpO6sUAIYDDhqP8ltgmdHFeWxATYGRg1w6KTPo5BwqzzhiNIvwwTgsIXYlxprkJr0-MTFJRZNYY_kT6I8rArBqufyUFNQW8WJ0Tqe9qA98CC0WFA5lP5Ka4BUw5dGHDV_N317O2-TpxEfQPI3ZBEyJIwEzWJ63_8207Es3xDCnAJUawf8jFJ1eIZBhXLKadeAY7U0x8rlLcNPlafmqYtoTsrzg5Mf1jDnjLnirx0nheKAoLemcmf9EchPHvOQ2-wtNWmiV8Z78ScRjEUeztx537jU_PtYcjErsCK-LLEnQsOT0a2gwY9DsZqCYZ7SbHBNMsorpUYMTJbZy-0zu5_kP2NhR3Q',
       testAdmin:
         'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ0eXBlPXVzZXIucmVhZCIsInR5cGU9dXNlci5jcmVhdGUmcm9sZT1GSUVMRF9BR0VOVCIsInR5cGU9dXNlci5jcmVhdGUmYWNjZXNzTGV2ZWw9YWRtaW5pc3RyYXRpdmVBcmVhJnJvbGU9TE9DQUxfUkVHSVNUUkFSIiwidHlwZT11c2VyLmNyZWF0ZSZhY2Nlc3NMZXZlbD1sb2NhdGlvbiZyb2xlPUNPTU1VTklUWV9MRUFERVIiLCJ0eXBlPXVzZXIuZWRpdCZyb2xlPVJFR0lTVFJBVElPTl9BR0VOVCIsInR5cGU9dXNlci5lZGl0JmFjY2Vzc0xldmVsPWFkbWluaXN0cmF0aXZlQXJlYSZyb2xlPUxPQ0FMX1NZU1RFTV9BRE1JTiIsInR5cGU9dXNlci5lZGl0JmFjY2Vzc0xldmVsPWxvY2F0aW9uJnJvbGU9UFJPVklOQ0lBTF9SRUdJU1RSQVIiXSwidXNlclR5cGUiOiJ1c2VyIiwicm9sZSI6IkZJRUxEX0FHRU5UIiwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI4ZjhiNDMxYi1lZjQ3LTQwNjgtYjY3OC1lZjJkZDkzZTkyMDgifQ.elOcSaujgfwO59HQankBhw5a_4UmG33aOul7epSRfQGefy-JDMmmR0Pk2Fumf-j0599t7YzinvL1c90BA5Yg__LbaUda0hBN0WjyWUqv6kqKKIKWzSzx1QUe1OPrelXcYc7GIOh1TGw-5qTB0BWjSodIEzsVAFUb4djkEz4nG3Tj40U2t-0AkmrvxQ0RPN0K2J69xFu5u0VFwuYmLKlEppuebVgNE4zye1mrGX86d6rHuMa2p3GyuTrCJJAEknwo3LgI4mxXo4o2ZG7JkcW3pYGfdcQaGFwuD-pQm_XMTPArXfxWjWz3sgKNEzYh-ja7iIMdN-ACHpfZt1NiRnYckeukBiXUxbVilKFmDZ_O2AfEHO2MhssreHlI4V1Z8Kjyj3CTm25Brk79qVDYXl-dQsaXk4IM2PYsO0YN0pCl5NTGAloiVjvwPL2qeejr7apQyicpfCm5xD203Qb08jR_vKh6Rw5CvxkJOfjjxjADLjA7zEdLvdTalTSkVKRQhpBLKESH2vCi53vqGBHvcbDpyEKlUlePuomneVriSsk9YSRHLKHQaIOKFATl8BvVniu7I-r9cMq4j5mT_4osvjEgciYdkNWY9kDZsFd82qHNgXgmVxdptVjNzStpnX2clVHXK-InYHJouRYDH-X5yUFBVv6A3-bRlpCAUJyf2mUt3rM'
     },
     id: userIds,
-    fieldAgent: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
+    fieldAgent: (): {
+      summary: UserSummary
+      v2: User
+      v1: FetchUserQuery['getUser']
+    } => ({
+      summary: {
+        id: user.id.fieldAgent,
+        name: { firstname: 'Kalusha', surname: 'Bwalya' },
+        role: TestUserRole.enum.FIELD_AGENT,
+        fullHonorificName: undefined,
+        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+        administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+        avatar: undefined,
+        type: TokenUserType.enum.user
+      } satisfies UserSummary,
       v2: {
         id: userIds.fieldAgent,
         name: { firstname: 'Kalusha', surname: 'Bwalya' },
@@ -131,7 +183,21 @@ export function testDataGenerator(rngSeed?: number) {
         __typename: 'User'
       } satisfies FetchUserQuery['getUser']
     }),
-    registrationAgent: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
+    registrationAgent: (): {
+      summary: UserSummary
+      v2: User
+      v1: FetchUserQuery['getUser']
+    } => ({
+      summary: {
+        id: user.id.registrationAgent,
+        name: { firstname: 'Felix', surname: 'Katongo' },
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        fullHonorificName: 'Dr. Felix Katongo',
+        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+        administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+        avatar: 'path/to/avatar' as DocumentPath,
+        type: TokenUserType.enum.user
+      } satisfies UserSummary,
       v2: {
         id: user.id.registrationAgent,
         name: { firstname: 'Felix', surname: 'Katongo' },
@@ -187,7 +253,21 @@ export function testDataGenerator(rngSeed?: number) {
         __typename: 'User'
       } satisfies FetchUserQuery['getUser']
     }),
-    localRegistrar: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
+    localRegistrar: (): {
+      summary: UserSummary
+      v2: User
+      v1: FetchUserQuery['getUser']
+    } => ({
+      summary: {
+        id: user.id.localRegistrar,
+        name: { firstname: 'Kennedy', surname: 'Mweene' },
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
+        fullHonorificName: '1st Order Honorable Kennedy Mweene',
+        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+        administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+        avatar: undefined,
+        type: TokenUserType.enum.user
+      },
       v2: {
         id: user.id.localRegistrar,
         name: { firstname: 'Kennedy', surname: 'Mweene' },
@@ -258,7 +338,21 @@ export function testDataGenerator(rngSeed?: number) {
     /**
      * Gift Phiri — COMMUNITY_LEADER at Klow Village Office (village level).
      */
-    communityLeader: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
+    communityLeader: (): {
+      summary: UserSummary
+      v2: User
+      v1: FetchUserQuery['getUser']
+    } => ({
+      summary: {
+        id: userIds.communityLeader,
+        name: { firstname: 'Gift', surname: 'Phiri' },
+        role: TestUserRole.enum.COMMUNITY_LEADER,
+        fullHonorificName: undefined,
+        avatar: undefined,
+        type: TokenUserType.enum.user,
+        primaryOfficeId: '1f4a5b6c-7d8e-4312-8abc-345678901234' as UUID,
+        administrativeAreaId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
+      } satisfies UserSummary,
       v2: {
         id: userIds.communityLeader,
         name: { firstname: 'Gift', surname: 'Phiri' },
@@ -316,7 +410,20 @@ export function testDataGenerator(rngSeed?: number) {
     /**
      * Mitchel Owen — PROVINCIAL_REGISTRAR at Central Province Office (province level).
      */
-    provincialRegistrar: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
+    provincialRegistrar: (): {
+      summary: UserSummary
+      v2: User
+      v1: FetchUserQuery['getUser']
+    } => ({
+      summary: {
+        id: userIds.provincialRegistrar,
+        name: { firstname: 'Mitchel', surname: 'Owen' },
+        role: TestUserRole.enum.PROVINCIAL_REGISTRAR,
+        fullHonorificName: undefined,
+        avatar: undefined,
+        type: TokenUserType.enum.user,
+        primaryOfficeId: '6f6186ce-cd5f-4a5f-810a-2d99e7c4ba12' as UUID
+      },
       v2: {
         id: userIds.provincialRegistrar,
         name: { firstname: 'Mitchel', surname: 'Owen' },
@@ -372,7 +479,21 @@ export function testDataGenerator(rngSeed?: number) {
         __typename: 'User'
       } satisfies FetchUserQuery['getUser']
     }),
-    localSystemAdmin: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
+    localSystemAdmin: (): {
+      summary: UserSummary
+      v2: User
+      v1: FetchUserQuery['getUser']
+    } => ({
+      summary: {
+        id: userIds.localSystemAdmin,
+        name: { firstname: 'Alex', surname: 'Ngonga' },
+        role: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+        fullHonorificName: undefined,
+        avatar: undefined,
+        type: TokenUserType.enum.user,
+        primaryOfficeId: 'f403ca64-6a1d-4882-94c1-d8674df59a85' as UUID,
+        administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+      } satisfies UserSummary,
       v1: {
         id: userIds.localSystemAdmin,
         userMgntUserID: '69179374-0447-4545-4545-454545454548',
@@ -424,7 +545,21 @@ export function testDataGenerator(rngSeed?: number) {
         type: TokenUserType.enum.user
       }
     }),
-    nationalSystemAdmin: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
+    nationalSystemAdmin: (): {
+      summary: UserSummary
+      v2: User
+      v1: FetchUserQuery['getUser']
+    } => ({
+      summary: {
+        id: user.id.nationalSystemAdmin,
+        name: { firstname: 'Jonathan', surname: 'Campbell' },
+        role: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
+        fullHonorificName: undefined,
+        avatar: undefined,
+        type: TokenUserType.enum.user,
+        primaryOfficeId: '8788d17c-b639-4aa0-89f0-ebc64263d81c' as UUID,
+        administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+      } satisfies UserSummary,
       v2: {
         id: user.id.nationalSystemAdmin,
         name: { firstname: 'Jonathan', surname: 'Campbell' },
@@ -656,34 +791,57 @@ export function testDataGenerator(rngSeed?: number) {
        * They submit via the Declare form but the action is stored as NOTIFY.
        */
       communityLeader: [
+        ...communityLeaderBaseScopesWithoutSearch,
         encodeScope({
-          type: 'workqueue',
-          options: {
-            ids: [
-              'all-events',
-              'assigned-to-you',
-              'recent',
-              'requires-updates',
-              'sent-for-review'
-            ]
-          }
-        }),
-        encodeScope({ type: 'record.search' }),
+          type: 'record.search',
+          options: { placeOfEvent: 'administrativeArea' }
+        })
+      ],
+      /** record.search restricted to user's own office only. */
+      communityLeaderRegisteredInLocation: [
+        ...communityLeaderBaseScopesWithoutSearch,
         encodeScope({
-          type: 'record.create',
-          options: {
-            event: [
-              'birth',
-              'death',
-              'tennis-club-membership',
-              'child-onboarding'
-            ],
-            placeOfEvent: JurisdictionFilter.enum.location
-          }
+          type: 'record.search',
+          options: { registeredIn: JurisdictionFilter.enum.location }
+        })
+      ],
+      /** record.search restricted to user's administrative area. */
+      communityLeaderRegisteredInAdministrativeArea: [
+        ...communityLeaderBaseScopesWithoutSearch,
+        encodeScope({
+          type: 'record.search',
+          options: { registeredIn: JurisdictionFilter.enum.administrativeArea }
+        })
+      ],
+      /**
+       * Two record.search scopes: registeredIn=location + registeredIn=administrativeArea.
+       * Most relaxed (administrativeArea) wins via priority order.
+       */
+      communityLeaderMultipleSearchScopes: [
+        ...communityLeaderBaseScopesWithoutSearch,
+        encodeScope({
+          type: 'record.search',
+          options: { registeredIn: JurisdictionFilter.enum.location }
         }),
-        encodeScope({ type: 'record.read' }),
-        encodeScope({ type: 'record.notify' }),
-        encodeScope({ type: 'record.edit' })
+        encodeScope({
+          type: 'record.search',
+          options: { registeredIn: JurisdictionFilter.enum.administrativeArea }
+        })
+      ],
+      /**
+       * Two record.search scopes: one without registeredIn (defaults to 'all') + registeredIn=location.
+       * Most relaxed ('all') wins — same result as having no restriction.
+       */
+      communityLeaderSearchAllAndLocation: [
+        ...communityLeaderBaseScopesWithoutSearch,
+        encodeScope({
+          type: 'record.search',
+          options: { placeOfEvent: JurisdictionFilter.enum.location }
+        }),
+        encodeScope({
+          type: 'record.search',
+          options: { registeredIn: JurisdictionFilter.enum.location }
+        })
       ],
       /**
        * PROVINCIAL_REGISTRAR: jurisdiction locked to their administrative area (province).
