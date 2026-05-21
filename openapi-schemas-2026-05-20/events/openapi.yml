@@ -1269,6 +1269,60 @@ components:
         - type
         - gte
         - lte
+    TranslationConfig:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The identifier of the translation referred in translation CSV files
+        defaultMessage:
+          type: string
+          description: Default translation message
+        description:
+          type: string
+          description: Describe the translation for a translator to be able to identify it.
+      required:
+        - id
+        - defaultMessage
+        - description
+      description: Translation configuration
+    WorkqueueColumn:
+      type: object
+      properties:
+        label:
+          $ref: "#/components/schemas/TranslationConfig"
+        value:
+          type: object
+          properties:
+            $event:
+              type: string
+              enum:
+                - id
+                - type
+                - status
+                - createdAt
+                - dateOfEvent
+                - placeOfEvent
+                - createdBy
+                - createdByUserType
+                - updatedByUserRole
+                - createdAtLocation
+                - updatedAtLocation
+                - updatedAt
+                - assignedTo
+                - updatedBy
+                - trackingId
+                - legalStatuses
+                - flags
+                - title
+                - outbox
+          required:
+            - $event
+      required:
+        - label
+        - value
+      description: Configuration for a single workqueue column. The value references
+        an event metadata key (e.g. `dateOfEvent`, `status`, `trackingId`).
     error.BAD_REQUEST:
       type: object
       properties:
@@ -1499,16 +1553,16 @@ components:
         title:
           description: Title template for the singular event, supporting variables (e.g.
             "{applicant.name.firstname} {applicant.name.surname}").
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         fallbackTitle:
           description: Fallback title shown when the main title resolves to an empty value.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         summary:
           description: Summary information displayed in the event overview.
           $ref: "#/components/schemas/SummaryConfig"
         label:
           description: Human-readable label for the event type.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         actions:
           type: array
           items:
@@ -1554,24 +1608,6 @@ components:
       additionalProperties: false
       description: Configuration defining an event type registered in OpenCRVS (for
         example birth or death).
-    TranslationConfig:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The identifier of the translation referred in translation CSV files
-        defaultMessage:
-          type: string
-          description: Default translation message
-        description:
-          type: string
-          description: Describe the translation for a translator to be able to identify it.
-      required:
-        - id
-        - defaultMessage
-        - description
-      additionalProperties: false
-      description: Translation configuration
     Conditional:
       description: JSON schema conditional configuration
     SummaryConfig:
@@ -1585,7 +1621,7 @@ components:
                 properties:
                   emptyValueMessage:
                     description: Default message displayed when the field value is empty.
-                    $ref: "#/components/schemas/TranslationConfig"
+                    $ref: "#/components/schemas/TranslationConfigOutput"
                   conditionals:
                     default: []
                     type: array
@@ -1610,9 +1646,9 @@ components:
                     description: Field value template supporting variables from configuration and
                       EventMetadata (e.g. "{informant.phoneNo}
                       {informant.email}").
-                    $ref: "#/components/schemas/TranslationConfig"
+                    $ref: "#/components/schemas/TranslationConfigOutput"
                   label:
-                    $ref: "#/components/schemas/TranslationConfig"
+                    $ref: "#/components/schemas/TranslationConfigOutput"
                 required:
                   - id
                   - value
@@ -1623,7 +1659,7 @@ components:
                 properties:
                   emptyValueMessage:
                     description: Default message displayed when the field value is empty.
-                    $ref: "#/components/schemas/TranslationConfig"
+                    $ref: "#/components/schemas/TranslationConfigOutput"
                   conditionals:
                     default: []
                     type: array
@@ -1646,7 +1682,7 @@ components:
                   label:
                     description: Overrides the default label from the referenced field when
                       provided.
-                    $ref: "#/components/schemas/TranslationConfig"
+                    $ref: "#/components/schemas/TranslationConfigOutput"
                 required:
                   - fieldId
                 additionalProperties: false
@@ -1690,7 +1726,7 @@ components:
       properties:
         label:
           description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         flags:
           default: []
           description: Flag actions which are executed when the action is performed.
@@ -1699,7 +1735,7 @@ components:
             $ref: "#/components/schemas/ActionFlagConfig"
         supportingCopy:
           description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -1714,7 +1750,7 @@ components:
           properties:
             title:
               description: Title of the review page
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             fields:
               type: array
               items:
@@ -1802,7 +1838,7 @@ components:
               description: Unique identifier of the field.
             label:
               description: Human-readable label of the field.
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             parent:
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -1852,7 +1888,7 @@ components:
                   properties:
                     message:
                       description: Custom required validation message
-                      $ref: "#/components/schemas/TranslationConfig"
+                      $ref: "#/components/schemas/TranslationConfigOutput"
                   required:
                     - message
                   additionalProperties: false
@@ -1870,7 +1906,7 @@ components:
               default: false
               type: boolean
             placeholder:
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             validation:
               description: Additional validation rules applied to the field.
               default: []
@@ -1878,7 +1914,7 @@ components:
               items:
                 $ref: "#/components/schemas/ValidationConfig"
             helperText:
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             hideLabel:
               default: false
               type: boolean
@@ -2030,7 +2066,7 @@ components:
               description: Unique identifier of the field.
             label:
               description: Human-readable label of the field.
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             parent:
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -2080,7 +2116,7 @@ components:
                   properties:
                     message:
                       description: Custom required validation message
-                      $ref: "#/components/schemas/TranslationConfig"
+                      $ref: "#/components/schemas/TranslationConfigOutput"
                   required:
                     - message
                   additionalProperties: false
@@ -2098,7 +2134,7 @@ components:
               default: false
               type: boolean
             placeholder:
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             validation:
               description: Additional validation rules applied to the field.
               default: []
@@ -2106,7 +2142,7 @@ components:
               items:
                 $ref: "#/components/schemas/ValidationConfig"
             helperText:
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             hideLabel:
               default: false
               type: boolean
@@ -2279,7 +2315,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -2329,7 +2365,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -2346,7 +2382,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -2354,7 +2390,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -2480,7 +2516,7 @@ components:
           $ref: "#/components/schemas/Conditional"
         message:
           description: Error message displayed when the validator does not hold.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
       required:
         - validator
         - message
@@ -2496,7 +2532,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -2546,7 +2582,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -2563,7 +2599,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -2571,7 +2607,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -2647,7 +2683,7 @@ components:
                         const: COUNTRY
                       label:
                         description: Human-readable label of the field.
-                        $ref: "#/components/schemas/TranslationConfig"
+                        $ref: "#/components/schemas/TranslationConfigOutput"
                       conditionals:
                         description: Conditions determining when the field is shown or enabled. By
                           default, the field is always shown and enabled.
@@ -2664,7 +2700,7 @@ components:
                             properties:
                               message:
                                 description: Custom required validation message
-                                $ref: "#/components/schemas/TranslationConfig"
+                                $ref: "#/components/schemas/TranslationConfigOutput"
                             required:
                               - message
                             additionalProperties: false
@@ -2700,7 +2736,7 @@ components:
                         const: ADMINISTRATIVE_AREA
                       label:
                         description: Human-readable label of the field.
-                        $ref: "#/components/schemas/TranslationConfig"
+                        $ref: "#/components/schemas/TranslationConfigOutput"
                       conditionals:
                         description: Conditions determining when the field is shown or enabled. By
                           default, the field is always shown and enabled.
@@ -2717,7 +2753,7 @@ components:
                             properties:
                               message:
                                 description: Custom required validation message
-                                $ref: "#/components/schemas/TranslationConfig"
+                                $ref: "#/components/schemas/TranslationConfigOutput"
                             required:
                               - message
                             additionalProperties: false
@@ -2740,12 +2776,12 @@ components:
                         properties:
                           message:
                             description: Custom required validation message
-                            $ref: "#/components/schemas/TranslationConfig"
+                            $ref: "#/components/schemas/TranslationConfigOutput"
                         required:
                           - message
                         additionalProperties: false
                   label:
-                    $ref: "#/components/schemas/TranslationConfig"
+                    $ref: "#/components/schemas/TranslationConfigOutput"
                   type:
                     type: string
                     const: TEXT
@@ -2943,7 +2979,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -2993,7 +3029,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -3010,7 +3046,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -3018,7 +3054,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -3115,9 +3151,9 @@ components:
                 - text
                 - password
             prefix:
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             postfix:
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
           additionalProperties: false
       required:
         - id
@@ -3133,7 +3169,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -3183,7 +3219,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -3200,7 +3236,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -3208,7 +3244,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -3277,9 +3313,9 @@ components:
               description: Maximum value
               type: number
             prefix:
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             postfix:
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
           additionalProperties: false
       required:
         - id
@@ -3295,7 +3331,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -3345,7 +3381,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -3362,7 +3398,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -3370,7 +3406,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -3449,7 +3485,7 @@ components:
               label:
                 anyOf:
                   - type: string
-                  - $ref: "#/components/schemas/TranslationConfig"
+                  - $ref: "#/components/schemas/TranslationConfigOutput"
                 description: The label of the option
               conditionals:
                 default: []
@@ -3472,7 +3508,7 @@ components:
               type: number
             numberFieldPlaceholder:
               description: Placeholder for the number field
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
           additionalProperties: false
       required:
         - id
@@ -3489,7 +3525,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -3539,7 +3575,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -3556,7 +3592,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -3564,7 +3600,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -3639,9 +3675,9 @@ components:
               description: Number of visible columns
               type: number
             prefix:
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             postfix:
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
           additionalProperties: false
       required:
         - id
@@ -3657,7 +3693,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -3707,7 +3743,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -3724,7 +3760,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -3732,7 +3768,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -3813,9 +3849,9 @@ components:
               additionalProperties: false
               description: Reference to a field by its ID
             prefix:
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             postfix:
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
           required:
             - asOfDate
           additionalProperties: false
@@ -3834,7 +3870,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -3884,7 +3920,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -3901,7 +3937,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -3909,7 +3945,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -3986,7 +4022,7 @@ components:
           properties:
             notice:
               description: Text to display above the date input
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
           additionalProperties: false
       required:
         - id
@@ -4002,7 +4038,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -4052,7 +4088,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -4069,7 +4105,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -4077,7 +4113,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -4155,7 +4191,7 @@ components:
               type: boolean
             notice:
               description: Text to display above the time input
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
           additionalProperties: false
       required:
         - id
@@ -4171,7 +4207,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -4221,7 +4257,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -4238,7 +4274,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -4246,7 +4282,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -4332,7 +4368,7 @@ components:
           properties:
             notice:
               description: Text to display above the date input
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
           additionalProperties: false
       required:
         - id
@@ -4348,7 +4384,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -4398,7 +4434,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -4415,7 +4451,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -4423,7 +4459,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -4502,7 +4538,7 @@ components:
                 description: The value of the option
               label:
                 description: The label of the option
-                $ref: "#/components/schemas/TranslationConfig"
+                $ref: "#/components/schemas/TranslationConfigOutput"
             required:
               - value
               - label
@@ -4523,7 +4559,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -4573,7 +4609,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -4590,7 +4626,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -4598,7 +4634,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -4704,7 +4740,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -4754,7 +4790,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -4771,7 +4807,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -4779,7 +4815,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -4872,7 +4908,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -4922,7 +4958,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -4939,7 +4975,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -4947,7 +4983,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -5047,7 +5083,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -5097,7 +5133,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -5114,7 +5150,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -5122,7 +5158,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -5192,7 +5228,7 @@ components:
               label:
                 anyOf:
                   - type: string
-                  - $ref: "#/components/schemas/TranslationConfig"
+                  - $ref: "#/components/schemas/TranslationConfigOutput"
                 description: The label of the option
               conditionals:
                 default: []
@@ -5232,7 +5268,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -5282,7 +5318,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -5299,7 +5335,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -5307,7 +5343,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -5367,7 +5403,7 @@ components:
         items:
           type: array
           items:
-            $ref: "#/components/schemas/TranslationConfig"
+            $ref: "#/components/schemas/TranslationConfigOutput"
           description: A list of items
         configuration:
           default: {}
@@ -5405,7 +5441,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -5455,7 +5491,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -5472,7 +5508,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -5480,7 +5516,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -5551,7 +5587,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -5601,7 +5637,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -5618,7 +5654,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -5626,7 +5662,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -5696,7 +5732,7 @@ components:
               label:
                 anyOf:
                   - type: string
-                  - $ref: "#/components/schemas/TranslationConfig"
+                  - $ref: "#/components/schemas/TranslationConfigOutput"
                 description: The label of the option
               conditionals:
                 default: []
@@ -5728,7 +5764,7 @@ components:
             health facilities.\" }
 
             \  "
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
       required:
         - id
         - label
@@ -5744,7 +5780,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -5794,7 +5830,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -5811,7 +5847,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -5819,7 +5855,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -5986,12 +6022,12 @@ components:
                           properties:
                             message:
                               description: Custom required validation message
-                              $ref: "#/components/schemas/TranslationConfig"
+                              $ref: "#/components/schemas/TranslationConfigOutput"
                           required:
                             - message
                           additionalProperties: false
                     label:
-                      $ref: "#/components/schemas/TranslationConfig"
+                      $ref: "#/components/schemas/TranslationConfigOutput"
                   additionalProperties: false
                 middlename:
                   type: object
@@ -6004,12 +6040,12 @@ components:
                           properties:
                             message:
                               description: Custom required validation message
-                              $ref: "#/components/schemas/TranslationConfig"
+                              $ref: "#/components/schemas/TranslationConfigOutput"
                           required:
                             - message
                           additionalProperties: false
                     label:
-                      $ref: "#/components/schemas/TranslationConfig"
+                      $ref: "#/components/schemas/TranslationConfigOutput"
                   additionalProperties: false
                 surname:
                   type: object
@@ -6022,12 +6058,12 @@ components:
                           properties:
                             message:
                               description: Custom required validation message
-                              $ref: "#/components/schemas/TranslationConfig"
+                              $ref: "#/components/schemas/TranslationConfigOutput"
                           required:
                             - message
                           additionalProperties: false
                     label:
-                      $ref: "#/components/schemas/TranslationConfig"
+                      $ref: "#/components/schemas/TranslationConfigOutput"
                   additionalProperties: false
               additionalProperties: false
             order:
@@ -6042,9 +6078,9 @@ components:
               description: Maximum length of the text
               type: number
             prefix:
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             postfix:
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             showParentFieldError:
               description: If true, shows the parent field error and hides the subfield error
               default: false
@@ -6064,7 +6100,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -6114,7 +6150,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -6131,7 +6167,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -6139,7 +6175,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -6213,7 +6249,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -6263,7 +6299,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -6280,7 +6316,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -6288,7 +6324,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -6362,7 +6398,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -6412,7 +6448,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -6429,7 +6465,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -6437,7 +6473,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -6512,7 +6548,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -6562,7 +6598,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -6579,7 +6615,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -6587,7 +6623,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -6713,7 +6749,7 @@ components:
                     - auto
               additionalProperties: false
             fileName:
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
           required:
             - maxFileSize
           additionalProperties: false
@@ -6732,7 +6768,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -6782,7 +6818,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -6799,7 +6835,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -6807,7 +6843,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -6899,7 +6935,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -6949,7 +6985,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -6966,7 +7002,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -6974,7 +7010,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -7177,7 +7213,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -7227,7 +7263,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -7244,7 +7280,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -7252,7 +7288,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -7323,7 +7359,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -7373,7 +7409,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -7390,7 +7426,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -7398,7 +7434,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -7578,7 +7614,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -7628,7 +7664,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -7645,7 +7681,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -7653,7 +7689,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -7712,7 +7748,7 @@ components:
           const: SIGNATURE
         signaturePromptLabel:
           description: Title of the signature modal
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         defaultValue:
           anyOf:
             - anyOf:
@@ -8551,7 +8587,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -8601,7 +8637,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -8618,7 +8654,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -8626,7 +8662,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -8709,7 +8745,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -8759,7 +8795,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -8776,7 +8812,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -8784,7 +8820,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -8852,7 +8888,7 @@ components:
               label:
                 anyOf:
                   - type: string
-                  - $ref: "#/components/schemas/TranslationConfig"
+                  - $ref: "#/components/schemas/TranslationConfigOutput"
                 description: The label of the option
               conditionals:
                 default: []
@@ -8945,7 +8981,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -8995,7 +9031,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -9012,7 +9048,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -9020,7 +9056,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -9081,7 +9117,7 @@ components:
           type: object
           properties:
             subtitle:
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             data:
               type: array
               items:
@@ -9092,11 +9128,11 @@ components:
                         type: string
                         description: ID for the data entry.
                       label:
-                        $ref: "#/components/schemas/TranslationConfig"
+                        $ref: "#/components/schemas/TranslationConfigOutput"
                       value:
                         anyOf:
                           - anyOf:
-                              - $ref: "#/components/schemas/TranslationConfig"
+                              - $ref: "#/components/schemas/TranslationConfigOutput"
                               - type: string
                           - type: object
                             properties:
@@ -9149,7 +9185,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -9199,7 +9235,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -9216,7 +9252,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -9224,7 +9260,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -9325,7 +9361,7 @@ components:
                 - reg14
             text:
               description: Text to display on the button
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
           required:
             - text
           additionalProperties: false
@@ -9344,7 +9380,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -9394,7 +9430,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -9411,7 +9447,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -9419,7 +9455,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -9484,7 +9520,7 @@ components:
               description: Template ID from countryconfig templates to use for printing
             buttonLabel:
               description: Label for the print button
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
           required:
             - template
           additionalProperties: false
@@ -9504,7 +9540,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -9554,7 +9590,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -9571,7 +9607,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -9579,7 +9615,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -9755,7 +9791,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -9805,7 +9841,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -9822,7 +9858,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -9830,7 +9866,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -9934,7 +9970,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -9984,7 +10020,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -10001,7 +10037,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -10009,7 +10045,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -10074,7 +10110,7 @@ components:
               description: URL to open
             text:
               description: Text to display on the button
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             icon:
               description: Icon for the button. You can find icons from OpenCRVS UI-Kit.
               type: string
@@ -10097,7 +10133,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -10147,7 +10183,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -10164,7 +10200,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -10172,7 +10208,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -10241,10 +10277,10 @@ components:
           properties:
             status:
               description: Text to display on the status pill.
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             description:
               description: Explaining text on the banner in form.
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
           required:
             - status
             - description
@@ -10266,7 +10302,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -10316,7 +10352,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -10333,7 +10369,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -10341,7 +10377,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -10430,7 +10466,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -10480,7 +10516,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -10497,7 +10533,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -10505,7 +10541,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -10592,7 +10628,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -10642,7 +10678,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -10659,7 +10695,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -10667,7 +10703,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -10751,7 +10787,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -10801,7 +10837,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -10818,7 +10854,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -10826,7 +10862,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           description: Loader field does not show a label by default
           default: true
@@ -10895,7 +10931,7 @@ components:
           properties:
             text:
               description: Display text above the loading spinner
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
           required:
             - text
           additionalProperties: false
@@ -10914,7 +10950,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -10964,7 +11000,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -10981,7 +11017,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -10989,7 +11025,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -11104,34 +11140,34 @@ components:
               properties:
                 loading:
                   description: Text to display while the search is in progress
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
                 offline:
                   description: Text to display when the application is offline
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
                 noResultsError:
                   description: Text to display when no results are found during the search
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
                 httpError:
                   description: Text to display when there is an HTTP error during the search
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
                 confirmButton:
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
                 clearButton:
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
                 clearModal:
                   type: object
                   properties:
                     title:
-                      $ref: "#/components/schemas/TranslationConfig"
+                      $ref: "#/components/schemas/TranslationConfigOutput"
                     description:
-                      $ref: "#/components/schemas/TranslationConfig"
+                      $ref: "#/components/schemas/TranslationConfigOutput"
                     cancel:
-                      $ref: "#/components/schemas/TranslationConfig"
+                      $ref: "#/components/schemas/TranslationConfigOutput"
                     confirm:
-                      $ref: "#/components/schemas/TranslationConfig"
+                      $ref: "#/components/schemas/TranslationConfigOutput"
                   additionalProperties: false
                 ok:
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               additionalProperties: false
           required:
             - query
@@ -11154,7 +11190,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -11204,7 +11240,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -11221,7 +11257,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -11229,7 +11265,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -11306,7 +11342,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -11363,7 +11399,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -11371,7 +11407,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -11444,7 +11480,7 @@ components:
           description: Unique identifier of the field.
         label:
           description: Human-readable label of the field.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         parent:
           description: Reference to the parent field or fields. When a parent field
             changes, this field is reset.
@@ -11494,7 +11530,7 @@ components:
               properties:
                 message:
                   description: Custom required validation message
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - message
               additionalProperties: false
@@ -11511,7 +11547,7 @@ components:
           default: false
           type: boolean
         placeholder:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         validation:
           description: Additional validation rules applied to the field.
           default: []
@@ -11519,7 +11555,7 @@ components:
           items:
             $ref: "#/components/schemas/ValidationConfig"
         helperText:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         hideLabel:
           default: false
           type: boolean
@@ -11590,7 +11626,7 @@ components:
       properties:
         label:
           description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         flags:
           default: []
           description: Flag actions which are executed when the action is performed.
@@ -11599,7 +11635,7 @@ components:
             $ref: "#/components/schemas/ActionFlagConfig"
         supportingCopy:
           description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -11618,7 +11654,7 @@ components:
           properties:
             title:
               description: Title of the review page
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             fields:
               type: array
               items:
@@ -11634,13 +11670,13 @@ components:
           properties:
             notify:
               description: Confirmation text for the notify action
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             declare:
               description: Confirmation text for the declare action
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             register:
               description: Confirmation text for the register action
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
           required:
             - notify
             - declare
@@ -11660,7 +11696,7 @@ components:
         id:
           type: string
         label:
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         query:
           $ref: "#/components/schemas/Clause"
       required:
@@ -11803,7 +11839,7 @@ components:
       properties:
         label:
           description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         flags:
           default: []
           description: Flag actions which are executed when the action is performed.
@@ -11812,7 +11848,7 @@ components:
             $ref: "#/components/schemas/ActionFlagConfig"
         supportingCopy:
           description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -11835,7 +11871,7 @@ components:
       properties:
         label:
           description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         flags:
           default: []
           description: Flag actions which are executed when the action is performed.
@@ -11844,7 +11880,7 @@ components:
             $ref: "#/components/schemas/ActionFlagConfig"
         supportingCopy:
           description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -11869,7 +11905,7 @@ components:
       properties:
         label:
           description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         flags:
           default: []
           description: Flag actions which are executed when the action is performed.
@@ -11878,7 +11914,7 @@ components:
             $ref: "#/components/schemas/ActionFlagConfig"
         supportingCopy:
           description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -11895,7 +11931,7 @@ components:
           properties:
             label:
               description: Human readable description of the form
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             pages:
               type: array
               items:
@@ -11922,7 +11958,7 @@ components:
               description: Unique identifier for the page
             title:
               description: Header title of the page
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             requireCompletionToContinue:
               default: false
               description: If true, all required fields must be filled before continuing to
@@ -11955,7 +11991,7 @@ components:
               description: Unique identifier for the page
             title:
               description: Header title of the page
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             requireCompletionToContinue:
               default: false
               description: If true, all required fields must be filled before continuing to
@@ -11994,7 +12030,7 @@ components:
           type: object
           properties:
             label:
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
           required:
             - label
           additionalProperties: false
@@ -12002,14 +12038,14 @@ components:
           type: object
           properties:
             label:
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             confirmation:
               type: object
               properties:
                 title:
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
                 body:
-                  $ref: "#/components/schemas/TranslationConfig"
+                  $ref: "#/components/schemas/TranslationConfigOutput"
               required:
                 - title
                 - body
@@ -12028,7 +12064,7 @@ components:
       properties:
         label:
           description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         flags:
           default: []
           description: Flag actions which are executed when the action is performed.
@@ -12037,7 +12073,7 @@ components:
             $ref: "#/components/schemas/ActionFlagConfig"
         supportingCopy:
           description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -12054,7 +12090,7 @@ components:
           properties:
             label:
               description: Human readable description of the form
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             pages:
               type: array
               items:
@@ -12077,7 +12113,7 @@ components:
       properties:
         label:
           description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         flags:
           default: []
           description: Flag actions which are executed when the action is performed.
@@ -12086,7 +12122,7 @@ components:
             $ref: "#/components/schemas/ActionFlagConfig"
         supportingCopy:
           description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -12103,13 +12139,13 @@ components:
           properties:
             notify:
               description: Confirmation text for the notify with edits action
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             declare:
               description: Confirmation text for the declare with edits action
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
             register:
               description: Confirmation text for the register with edits action
-              $ref: "#/components/schemas/TranslationConfig"
+              $ref: "#/components/schemas/TranslationConfigOutput"
           required:
             - notify
             - declare
@@ -12127,7 +12163,7 @@ components:
       properties:
         label:
           description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         flags:
           default: []
           description: Flag actions which are executed when the action is performed.
@@ -12136,7 +12172,7 @@ components:
             $ref: "#/components/schemas/ActionFlagConfig"
         supportingCopy:
           description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -12159,7 +12195,7 @@ components:
       properties:
         label:
           description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         flags:
           default: []
           description: Flag actions which are executed when the action is performed.
@@ -12168,7 +12204,7 @@ components:
             $ref: "#/components/schemas/ActionFlagConfig"
         supportingCopy:
           description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -12192,7 +12228,7 @@ components:
         auditHistoryLabel:
           description: The label to show in audit history for this action. For example
             "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
       required:
         - label
         - flags
@@ -12208,7 +12244,7 @@ components:
       properties:
         label:
           description: Human readable description of the form
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         pages:
           type: array
           items:
@@ -12219,7 +12255,7 @@ components:
                 description: Unique identifier for the page
               title:
                 description: Header title of the page
-                $ref: "#/components/schemas/TranslationConfig"
+                $ref: "#/components/schemas/TranslationConfigOutput"
               requireCompletionToContinue:
                 default: false
                 description: If true, all required fields must be filled before continuing to
@@ -12255,7 +12291,7 @@ components:
       properties:
         title:
           description: Advanced search tab title
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
         fields:
           type: array
           items:
@@ -12369,7 +12405,7 @@ components:
                       defined.           \ 
 
                       \      "
-                    $ref: "#/components/schemas/TranslationConfig"
+                    $ref: "#/components/schemas/TranslationConfigOutput"
                   options:
                     type: array
                     items:
@@ -12381,7 +12417,7 @@ components:
                         label:
                           anyOf:
                             - type: string
-                            - $ref: "#/components/schemas/TranslationConfig"
+                            - $ref: "#/components/schemas/TranslationConfigOutput"
                           description: The label of the option
                         conditionals:
                           default: []
@@ -12442,7 +12478,7 @@ components:
                       searchCriteriaLabelPrefix: TranslationConfig }).
 
                       \    "
-                    $ref: "#/components/schemas/TranslationConfig"
+                    $ref: "#/components/schemas/TranslationConfigOutput"
                   conditionals:
                     description: "
 
@@ -12600,7 +12636,7 @@ components:
                       defined.           \ 
 
                       \      "
-                    $ref: "#/components/schemas/TranslationConfig"
+                    $ref: "#/components/schemas/TranslationConfigOutput"
                   options:
                     type: array
                     items:
@@ -12612,7 +12648,7 @@ components:
                         label:
                           anyOf:
                             - type: string
-                            - $ref: "#/components/schemas/TranslationConfig"
+                            - $ref: "#/components/schemas/TranslationConfigOutput"
                           description: The label of the option
                         conditionals:
                           default: []
@@ -12673,7 +12709,7 @@ components:
                       searchCriteriaLabelPrefix: TranslationConfig }).
 
                       \    "
-                    $ref: "#/components/schemas/TranslationConfig"
+                    $ref: "#/components/schemas/TranslationConfigOutput"
                   conditionals:
                     description: "
 
@@ -12750,7 +12786,7 @@ components:
             cleared.
         label:
           description: Human readable label of the flag.
-          $ref: "#/components/schemas/TranslationConfig"
+          $ref: "#/components/schemas/TranslationConfigOutput"
       required:
         - id
         - requiresAction
@@ -15769,6 +15805,24 @@ components:
         - flags
         - declaration
       additionalProperties: false
+    TranslationConfigOutput:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The identifier of the translation referred in translation CSV files
+        defaultMessage:
+          type: string
+          description: Default translation message
+        description:
+          type: string
+          description: Describe the translation for a translator to be able to identify it.
+      required:
+        - id
+        - defaultMessage
+        - description
+      additionalProperties: false
+      description: Translation configuration
     QueryTypeOutput:
       type: object
       properties:
@@ -16104,6 +16158,994 @@ components:
         - gte
         - lte
       additionalProperties: false
+    WorkqueueColumnOutput:
+      type: object
+      properties:
+        label:
+          $ref: "#/components/schemas/TranslationConfigOutput"
+        value:
+          type: object
+          properties:
+            $event:
+              type: string
+              enum:
+                - id
+                - type
+                - status
+                - createdAt
+                - dateOfEvent
+                - placeOfEvent
+                - createdBy
+                - createdByUserType
+                - updatedByUserRole
+                - createdAtLocation
+                - updatedAtLocation
+                - updatedAt
+                - assignedTo
+                - updatedBy
+                - trackingId
+                - legalStatuses
+                - flags
+                - title
+                - outbox
+          required:
+            - $event
+          additionalProperties: false
+      required:
+        - label
+        - value
+      additionalProperties: false
+      description: Configuration for a single workqueue column. The value references
+        an event metadata key (e.g. `dateOfEvent`, `status`, `trackingId`).
+    WorkqueueConfig:
+      type: object
+      properties:
+        slug:
+          type: string
+          description: Determines the url of the workqueue.
+        name:
+          description: Title of the workflow (both in navigation and on the page)
+          $ref: "#/components/schemas/TranslationConfigOutput"
+        query:
+          oneOf:
+            - type: object
+              properties:
+                type:
+                  type: string
+                  const: and
+                clauses:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      eventType:
+                        type: string
+                      status:
+                        anyOf:
+                          - $ref: "#/components/schemas/AnyOfStatusOutput"
+                          - $ref: "#/components/schemas/ExactStatusOutput"
+                      createdAt:
+                        $ref: "#/components/schemas/DateConditionOutput"
+                      updatedAt:
+                        $ref: "#/components/schemas/DateConditionOutput"
+                      legalStatuses.DECLARED.createdAtLocation:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            const: within
+                          location:
+                            anyOf:
+                              - type: string
+                              - type: object
+                                properties:
+                                  $userField:
+                                    type: string
+                                    enum:
+                                      - id
+                                      - name
+                                      - role
+                                      - fullHonorificName
+                                      - device
+                                      - firstname
+                                      - middlename
+                                      - surname
+                                      - signature
+                                      - avatar
+                                      - primaryOfficeId
+                                      - administrativeAreaId
+                                  $location:
+                                    type: string
+                                required:
+                                  - $userField
+                                additionalProperties: false
+                        required:
+                          - type
+                          - location
+                        additionalProperties: false
+                      legalStatuses.DECLARED.createdByRole:
+                        $ref: "#/components/schemas/AnyOfOutput"
+                      legalStatuses.REGISTERED.createdAt:
+                        $ref: "#/components/schemas/DateConditionOutput"
+                      legalStatuses.REGISTERED.createdAtLocation:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            const: within
+                          location:
+                            anyOf:
+                              - type: string
+                              - type: object
+                                properties:
+                                  $userField:
+                                    type: string
+                                    enum:
+                                      - id
+                                      - name
+                                      - role
+                                      - fullHonorificName
+                                      - device
+                                      - firstname
+                                      - middlename
+                                      - surname
+                                      - signature
+                                      - avatar
+                                      - primaryOfficeId
+                                      - administrativeAreaId
+                                  $location:
+                                    type: string
+                                required:
+                                  - $userField
+                                additionalProperties: false
+                        required:
+                          - type
+                          - location
+                        additionalProperties: false
+                      legalStatuses.REGISTERED.createdByRole:
+                        $ref: "#/components/schemas/AnyOfOutput"
+                      legalStatuses.REGISTERED.registrationNumber:
+                        $ref: "#/components/schemas/ExactOutput"
+                      createdAtLocation:
+                        anyOf:
+                          - type: object
+                            properties:
+                              type:
+                                type: string
+                                const: within
+                              location:
+                                anyOf:
+                                  - type: string
+                                  - type: object
+                                    properties:
+                                      $userField:
+                                        type: string
+                                        enum:
+                                          - id
+                                          - name
+                                          - role
+                                          - fullHonorificName
+                                          - device
+                                          - firstname
+                                          - middlename
+                                          - surname
+                                          - signature
+                                          - avatar
+                                          - primaryOfficeId
+                                          - administrativeAreaId
+                                      $location:
+                                        type: string
+                                    required:
+                                      - $userField
+                                    additionalProperties: false
+                            required:
+                              - type
+                              - location
+                            additionalProperties: false
+                          - type: object
+                            properties:
+                              type:
+                                type: string
+                                const: exact
+                              term:
+                                anyOf:
+                                  - type: string
+                                  - type: object
+                                    properties:
+                                      $userField:
+                                        type: string
+                                        enum:
+                                          - id
+                                          - name
+                                          - role
+                                          - fullHonorificName
+                                          - device
+                                          - firstname
+                                          - middlename
+                                          - surname
+                                          - signature
+                                          - avatar
+                                          - primaryOfficeId
+                                          - administrativeAreaId
+                                      $location:
+                                        type: string
+                                    required:
+                                      - $userField
+                                    additionalProperties: false
+                            required:
+                              - type
+                              - term
+                            additionalProperties: false
+                      updatedAtLocation:
+                        anyOf:
+                          - type: object
+                            properties:
+                              type:
+                                type: string
+                                const: within
+                              location:
+                                anyOf:
+                                  - type: string
+                                  - type: object
+                                    properties:
+                                      $userField:
+                                        type: string
+                                        enum:
+                                          - id
+                                          - name
+                                          - role
+                                          - fullHonorificName
+                                          - device
+                                          - firstname
+                                          - middlename
+                                          - surname
+                                          - signature
+                                          - avatar
+                                          - primaryOfficeId
+                                          - administrativeAreaId
+                                      $location:
+                                        type: string
+                                    required:
+                                      - $userField
+                                    additionalProperties: false
+                            required:
+                              - type
+                              - location
+                            additionalProperties: false
+                          - type: object
+                            properties:
+                              type:
+                                type: string
+                                const: exact
+                              term:
+                                anyOf:
+                                  - type: string
+                                  - type: object
+                                    properties:
+                                      $userField:
+                                        type: string
+                                        enum:
+                                          - id
+                                          - name
+                                          - role
+                                          - fullHonorificName
+                                          - device
+                                          - firstname
+                                          - middlename
+                                          - surname
+                                          - signature
+                                          - avatar
+                                          - primaryOfficeId
+                                          - administrativeAreaId
+                                      $location:
+                                        type: string
+                                    required:
+                                      - $userField
+                                    additionalProperties: false
+                            required:
+                              - type
+                              - term
+                            additionalProperties: false
+                      updatedByUserRole:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            const: exact
+                          term:
+                            anyOf:
+                              - type: string
+                              - type: object
+                                properties:
+                                  $userField:
+                                    type: string
+                                    enum:
+                                      - id
+                                      - name
+                                      - role
+                                      - fullHonorificName
+                                      - device
+                                      - firstname
+                                      - middlename
+                                      - surname
+                                      - signature
+                                      - avatar
+                                      - primaryOfficeId
+                                      - administrativeAreaId
+                                  $location:
+                                    type: string
+                                required:
+                                  - $userField
+                                additionalProperties: false
+                        required:
+                          - type
+                          - term
+                        additionalProperties: false
+                      assignedTo:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            const: exact
+                          term:
+                            anyOf:
+                              - type: string
+                              - type: object
+                                properties:
+                                  $userField:
+                                    type: string
+                                    enum:
+                                      - id
+                                      - name
+                                      - role
+                                      - fullHonorificName
+                                      - device
+                                      - firstname
+                                      - middlename
+                                      - surname
+                                      - signature
+                                      - avatar
+                                      - primaryOfficeId
+                                      - administrativeAreaId
+                                  $location:
+                                    type: string
+                                required:
+                                  - $userField
+                                additionalProperties: false
+                        required:
+                          - type
+                          - term
+                        additionalProperties: false
+                      createdBy:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            const: exact
+                          term:
+                            anyOf:
+                              - type: string
+                              - type: object
+                                properties:
+                                  $userField:
+                                    type: string
+                                    enum:
+                                      - id
+                                      - name
+                                      - role
+                                      - fullHonorificName
+                                      - device
+                                      - firstname
+                                      - middlename
+                                      - surname
+                                      - signature
+                                      - avatar
+                                      - primaryOfficeId
+                                      - administrativeAreaId
+                                  $location:
+                                    type: string
+                                required:
+                                  - $userField
+                                additionalProperties: false
+                        required:
+                          - type
+                          - term
+                        additionalProperties: false
+                      createdByUserType:
+                        $ref: "#/components/schemas/ExactUserTypeOutput"
+                      updatedBy:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            const: exact
+                          term:
+                            anyOf:
+                              - type: string
+                              - type: object
+                                properties:
+                                  $userField:
+                                    type: string
+                                    enum:
+                                      - id
+                                      - name
+                                      - role
+                                      - fullHonorificName
+                                      - device
+                                      - firstname
+                                      - middlename
+                                      - surname
+                                      - signature
+                                      - avatar
+                                      - primaryOfficeId
+                                      - administrativeAreaId
+                                  $location:
+                                    type: string
+                                required:
+                                  - $userField
+                                additionalProperties: false
+                        required:
+                          - type
+                          - term
+                        additionalProperties: false
+                      trackingId:
+                        $ref: "#/components/schemas/ExactOutput"
+                      flags:
+                        $ref: "#/components/schemas/ContainsFlagsOutput"
+                      data:
+                        $ref: "#/components/schemas/QueryInputOutput"
+                    additionalProperties: false
+              required:
+                - type
+                - clauses
+              additionalProperties: false
+            - type: object
+              properties:
+                type:
+                  type: string
+                  const: or
+                clauses:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      eventType:
+                        type: string
+                      status:
+                        anyOf:
+                          - $ref: "#/components/schemas/AnyOfStatusOutput"
+                          - $ref: "#/components/schemas/ExactStatusOutput"
+                      createdAt:
+                        $ref: "#/components/schemas/DateConditionOutput"
+                      updatedAt:
+                        $ref: "#/components/schemas/DateConditionOutput"
+                      legalStatuses.DECLARED.createdAtLocation:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            const: within
+                          location:
+                            anyOf:
+                              - type: string
+                              - type: object
+                                properties:
+                                  $userField:
+                                    type: string
+                                    enum:
+                                      - id
+                                      - name
+                                      - role
+                                      - fullHonorificName
+                                      - device
+                                      - firstname
+                                      - middlename
+                                      - surname
+                                      - signature
+                                      - avatar
+                                      - primaryOfficeId
+                                      - administrativeAreaId
+                                  $location:
+                                    type: string
+                                required:
+                                  - $userField
+                                additionalProperties: false
+                        required:
+                          - type
+                          - location
+                        additionalProperties: false
+                      legalStatuses.DECLARED.createdByRole:
+                        $ref: "#/components/schemas/AnyOfOutput"
+                      legalStatuses.REGISTERED.createdAt:
+                        $ref: "#/components/schemas/DateConditionOutput"
+                      legalStatuses.REGISTERED.createdAtLocation:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            const: within
+                          location:
+                            anyOf:
+                              - type: string
+                              - type: object
+                                properties:
+                                  $userField:
+                                    type: string
+                                    enum:
+                                      - id
+                                      - name
+                                      - role
+                                      - fullHonorificName
+                                      - device
+                                      - firstname
+                                      - middlename
+                                      - surname
+                                      - signature
+                                      - avatar
+                                      - primaryOfficeId
+                                      - administrativeAreaId
+                                  $location:
+                                    type: string
+                                required:
+                                  - $userField
+                                additionalProperties: false
+                        required:
+                          - type
+                          - location
+                        additionalProperties: false
+                      legalStatuses.REGISTERED.createdByRole:
+                        $ref: "#/components/schemas/AnyOfOutput"
+                      legalStatuses.REGISTERED.registrationNumber:
+                        $ref: "#/components/schemas/ExactOutput"
+                      createdAtLocation:
+                        anyOf:
+                          - type: object
+                            properties:
+                              type:
+                                type: string
+                                const: within
+                              location:
+                                anyOf:
+                                  - type: string
+                                  - type: object
+                                    properties:
+                                      $userField:
+                                        type: string
+                                        enum:
+                                          - id
+                                          - name
+                                          - role
+                                          - fullHonorificName
+                                          - device
+                                          - firstname
+                                          - middlename
+                                          - surname
+                                          - signature
+                                          - avatar
+                                          - primaryOfficeId
+                                          - administrativeAreaId
+                                      $location:
+                                        type: string
+                                    required:
+                                      - $userField
+                                    additionalProperties: false
+                            required:
+                              - type
+                              - location
+                            additionalProperties: false
+                          - type: object
+                            properties:
+                              type:
+                                type: string
+                                const: exact
+                              term:
+                                anyOf:
+                                  - type: string
+                                  - type: object
+                                    properties:
+                                      $userField:
+                                        type: string
+                                        enum:
+                                          - id
+                                          - name
+                                          - role
+                                          - fullHonorificName
+                                          - device
+                                          - firstname
+                                          - middlename
+                                          - surname
+                                          - signature
+                                          - avatar
+                                          - primaryOfficeId
+                                          - administrativeAreaId
+                                      $location:
+                                        type: string
+                                    required:
+                                      - $userField
+                                    additionalProperties: false
+                            required:
+                              - type
+                              - term
+                            additionalProperties: false
+                      updatedAtLocation:
+                        anyOf:
+                          - type: object
+                            properties:
+                              type:
+                                type: string
+                                const: within
+                              location:
+                                anyOf:
+                                  - type: string
+                                  - type: object
+                                    properties:
+                                      $userField:
+                                        type: string
+                                        enum:
+                                          - id
+                                          - name
+                                          - role
+                                          - fullHonorificName
+                                          - device
+                                          - firstname
+                                          - middlename
+                                          - surname
+                                          - signature
+                                          - avatar
+                                          - primaryOfficeId
+                                          - administrativeAreaId
+                                      $location:
+                                        type: string
+                                    required:
+                                      - $userField
+                                    additionalProperties: false
+                            required:
+                              - type
+                              - location
+                            additionalProperties: false
+                          - type: object
+                            properties:
+                              type:
+                                type: string
+                                const: exact
+                              term:
+                                anyOf:
+                                  - type: string
+                                  - type: object
+                                    properties:
+                                      $userField:
+                                        type: string
+                                        enum:
+                                          - id
+                                          - name
+                                          - role
+                                          - fullHonorificName
+                                          - device
+                                          - firstname
+                                          - middlename
+                                          - surname
+                                          - signature
+                                          - avatar
+                                          - primaryOfficeId
+                                          - administrativeAreaId
+                                      $location:
+                                        type: string
+                                    required:
+                                      - $userField
+                                    additionalProperties: false
+                            required:
+                              - type
+                              - term
+                            additionalProperties: false
+                      updatedByUserRole:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            const: exact
+                          term:
+                            anyOf:
+                              - type: string
+                              - type: object
+                                properties:
+                                  $userField:
+                                    type: string
+                                    enum:
+                                      - id
+                                      - name
+                                      - role
+                                      - fullHonorificName
+                                      - device
+                                      - firstname
+                                      - middlename
+                                      - surname
+                                      - signature
+                                      - avatar
+                                      - primaryOfficeId
+                                      - administrativeAreaId
+                                  $location:
+                                    type: string
+                                required:
+                                  - $userField
+                                additionalProperties: false
+                        required:
+                          - type
+                          - term
+                        additionalProperties: false
+                      assignedTo:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            const: exact
+                          term:
+                            anyOf:
+                              - type: string
+                              - type: object
+                                properties:
+                                  $userField:
+                                    type: string
+                                    enum:
+                                      - id
+                                      - name
+                                      - role
+                                      - fullHonorificName
+                                      - device
+                                      - firstname
+                                      - middlename
+                                      - surname
+                                      - signature
+                                      - avatar
+                                      - primaryOfficeId
+                                      - administrativeAreaId
+                                  $location:
+                                    type: string
+                                required:
+                                  - $userField
+                                additionalProperties: false
+                        required:
+                          - type
+                          - term
+                        additionalProperties: false
+                      createdBy:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            const: exact
+                          term:
+                            anyOf:
+                              - type: string
+                              - type: object
+                                properties:
+                                  $userField:
+                                    type: string
+                                    enum:
+                                      - id
+                                      - name
+                                      - role
+                                      - fullHonorificName
+                                      - device
+                                      - firstname
+                                      - middlename
+                                      - surname
+                                      - signature
+                                      - avatar
+                                      - primaryOfficeId
+                                      - administrativeAreaId
+                                  $location:
+                                    type: string
+                                required:
+                                  - $userField
+                                additionalProperties: false
+                        required:
+                          - type
+                          - term
+                        additionalProperties: false
+                      createdByUserType:
+                        $ref: "#/components/schemas/ExactUserTypeOutput"
+                      updatedBy:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            const: exact
+                          term:
+                            anyOf:
+                              - type: string
+                              - type: object
+                                properties:
+                                  $userField:
+                                    type: string
+                                    enum:
+                                      - id
+                                      - name
+                                      - role
+                                      - fullHonorificName
+                                      - device
+                                      - firstname
+                                      - middlename
+                                      - surname
+                                      - signature
+                                      - avatar
+                                      - primaryOfficeId
+                                      - administrativeAreaId
+                                  $location:
+                                    type: string
+                                required:
+                                  - $userField
+                                additionalProperties: false
+                        required:
+                          - type
+                          - term
+                        additionalProperties: false
+                      trackingId:
+                        $ref: "#/components/schemas/ExactOutput"
+                      flags:
+                        $ref: "#/components/schemas/ContainsFlagsOutput"
+                      data:
+                        $ref: "#/components/schemas/QueryInputOutput"
+                    additionalProperties: false
+              required:
+                - type
+                - clauses
+              additionalProperties: false
+          type: object
+        action:
+          description: Workqueue call-to-action button configuration. This determines the
+            quick action button shown on each event card and the action taken
+            when the button is clicked.
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - READ
+                - DELETE
+                - DECLARE
+                - REGISTER
+                - EDIT
+                - REJECT
+                - MARK_AS_DUPLICATE
+                - ARCHIVE
+                - PRINT_CERTIFICATE
+                - REQUEST_CORRECTION
+          required:
+            - type
+          additionalProperties: false
+        columns:
+          default:
+            - label:
+                id: workqueues.dateOfEvent
+                defaultMessage: Date of Event
+                description: "Label for workqueue column: dateOfEvent"
+              value:
+                $event: dateOfEvent
+            - label:
+                id: workqueue.default.column.modifiedAt
+                defaultMessage: Last updated
+                description: This is the label for the workqueue column
+              value:
+                $event: updatedAt
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkqueueColumnOutput"
+        icon:
+          type: string
+          enum:
+            - Archived
+            - Assigned
+            - Briefcase
+            - Certified
+            - Close
+            - Collapse
+            - Draft
+            - DuplicateYellow
+            - Expand
+            - ExternalValidate
+            - FilledCheck
+            - InReview
+            - Offline
+            - Registered
+            - RequiresUpdates
+            - Sent
+            - Validated
+            - WaitingApproval
+            - ChartActivity
+            - Activity
+            - Archive
+            - ArchiveTray
+            - ArrowLeft
+            - ArrowRight
+            - Buildings
+            - Circle
+            - CaretDown
+            - CaretLeft
+            - CaretRight
+            - ChartBar
+            - ChartLine
+            - ChatCircle
+            - CheckSquare
+            - Compass
+            - Check
+            - Copy
+            - Database
+            - DotsThreeVertical
+            - ArrowCounterClockwise
+            - MagnifyingGlassMinus
+            - MagnifyingGlassPlus
+            - Export
+            - Eye
+            - EyeSlash
+            - Envelope
+            - File
+            - FileSearch
+            - FileMinus
+            - FilePlus
+            - FileText
+            - FileX
+            - Handshake
+            - Gear
+            - GitBranch
+            - IdentificationCard
+            - List
+            - ListBullets
+            - Lock
+            - MagnifyingGlass
+            - MapPin
+            - Medal
+            - NotePencil
+            - Paperclip
+            - PaperPlaneTilt
+            - Pen
+            - PenNib
+            - Pencil
+            - PencilSimpleLine
+            - Phone
+            - Plus
+            - Printer
+            - SignOut
+            - Stamp
+            - Star
+            - Target
+            - TextT
+            - Trash
+            - UploadSimple
+            - User
+            - UserPlus
+            - Users
+            - WarningCircle
+            - X
+            - ChatText
+            - CircleWavyCheck
+            - CircleWavyQuestion
+            - ArchiveBox
+            - ArrowCircleDown
+            - FileArrowUp
+            - FileDotted
+            - Files
+            - PencilLine
+            - PencilCircle
+            - UserCircle
+            - Clock
+            - QrCode
+            - Webcam
+            - Sun
+            - DeviceTabletCamera
+            - Globe
+            - Fingerprint
+            - PushPin
+            - Timer
+        emptyMessage:
+          $ref: "#/components/schemas/TranslationConfigOutput"
+      required:
+        - slug
+        - name
+        - query
+        - columns
+        - icon
+      additionalProperties: false
+      description: Configuration for workqueue.
   securitySchemes:
     Authorization:
       type: http
