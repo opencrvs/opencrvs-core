@@ -20,6 +20,7 @@ import {
 } from 'react-select'
 import AsyncSelect, { AsyncProps } from 'react-select/async'
 import styled from 'styled-components'
+import { useIntl } from 'react-intl'
 import {
   AutocompleteField,
   AutocompleteValue,
@@ -274,10 +275,12 @@ function debouncePromise<Args extends any[], R>(
  *
  */
 function AutocompleteInput(props: AutocompleteProps) {
-  const { id, onChange, value, configuration, error, touched } = props
+  const { id, onChange, value, configuration, error, touched, placeholder } =
+    props
 
   const defaultOptions = configuration.defaultOptions
 
+  const intl = useIntl()
   const fetchOptions = useCallback(
     async (inputValue: string): Promise<AutocompleteValue[]> => {
       // We can skip the API call if the input is empty or just whitespace
@@ -333,6 +336,7 @@ function AutocompleteInput(props: AutocompleteProps) {
       inputId={id}
       isClearable={true}
       loadOptions={loadOptions}
+      placeholder={placeholder ? intl.formatMessage(placeholder) : undefined}
       touched={touched}
       value={value}
       onChange={handleChange}
