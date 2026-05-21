@@ -224,7 +224,7 @@ test(`should not have validation errors for required fields on a hidden page`, a
   }
 
   mswServer.use(
-    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
       return HttpResponse.json([customTennisClubMembershipEvent])
     })
   )
