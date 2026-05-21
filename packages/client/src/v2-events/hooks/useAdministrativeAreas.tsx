@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { AdministrativeArea, UUID } from '@opencrvs/commons/client'
 import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
@@ -31,6 +31,14 @@ setQueryDefaults(trpcOptionsProxy.administrativeAreas.list, {
   staleTime: 1000 * 60 * 60 * 24 // keep it in cache 1 day
 })
 
+interface AdministrativeAreasContextValue {
+  administrativeAreasMap: Map<UUID, AdministrativeArea>
+  leafAdminAreaIds: Array<{ id: UUID }>
+}
+
+const AdministrativeAreasContext =
+  React.createContext<AdministrativeAreasContextValue | null>(null)
+
 export function useAdministrativeAreas() {
   const trpc = useTRPC()
   return {
@@ -42,33 +50,34 @@ export function useAdministrativeAreas() {
         isActive?: boolean
         ids?: UUID[]
       } = {}) => {
+        const ctx = React.useContext(AdministrativeAreasContext)
+
         // We intentionally remove `queryFn` here because we already set a global default
         // via `setQueryDefaults`. Passing it again would override caching/persistence.
         // The `...rest` spread carries over things like staleTime, gcTime, enabled, etc.
         // Then we re-attach the queryKey explicitly so React Query can identify this cache.
-
         const { queryFn, ...rest } =
           trpcOptionsProxy.administrativeAreas.list.queryOptions()
 
-        const administrativeAreas = useSuspenseQuery({
+        const queryResult = useSuspenseQuery({
           ...rest,
           queryKey: trpc.administrativeAreas.list.queryKey({
             isActive,
             ids
           })
-        }).data
+        })
 
-        const administrativeAreasMap = useMemo(
+        return useMemo(
           () =>
+            ctx?.administrativeAreasMap ??
             new Map<UUID, AdministrativeArea>(
-              administrativeAreas.map((administrativeArea) => [
+              queryResult.data.map((administrativeArea) => [
                 administrativeArea.id,
                 administrativeArea
               ])
             ),
-          [administrativeAreas]
+          [ctx, queryResult.data]
         )
-        return administrativeAreasMap
       }
     }
   }
@@ -104,12 +113,48 @@ export function getLeafAdministrativeAreaIds(
   return result
 }
 
+export function AdministrativeAreasProvider({
+  children
+}: {
+  children: React.ReactNode
+}) {
+  const trpc = useTRPC()
+  const { queryFn, ...rest } =
+    trpcOptionsProxy.administrativeAreas.list.queryOptions()
+  const queryResult = useSuspenseQuery({
+    ...rest,
+    queryKey: trpc.administrativeAreas.list.queryKey({})
+  })
+
+  const administrativeAreasMap = useMemo(
+    () =>
+      new Map<UUID, AdministrativeArea>(queryResult.data.map((a) => [a.id, a])),
+    [queryResult.data]
+  )
+  const leafAdminAreaIds = useMemo(
+    () => getLeafAdministrativeAreaIds(administrativeAreasMap),
+    [administrativeAreasMap]
+  )
+  const value = useMemo(
+    () => ({ administrativeAreasMap, leafAdminAreaIds }),
+    [administrativeAreasMap, leafAdminAreaIds]
+  )
+  return (
+    <AdministrativeAreasContext.Provider value={value}>
+      {children}
+    </AdministrativeAreasContext.Provider>
+  )
+}
+
 export function useSuspenseGetLeafAdministrativeAreaIds() {
+  const ctx = React.useContext(AdministrativeAreasContext)
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
   return useMemo(
-    () => getLeafAdministrativeAreaIds(administrativeAreas),
-    [administrativeAreas]
+    () =>
+      ctx?.leafAdminAreaIds ??
+      getLeafAdministrativeAreaIds(administrativeAreas),
+    [ctx, administrativeAreas]
   )
 }

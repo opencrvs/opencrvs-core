@@ -30,6 +30,7 @@ import {
 } from '@opencrvs/components/lib/Workqueue'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { AdministrativeAreasProvider } from '@client/v2-events/hooks/useAdministrativeAreas'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useOnlineStatus } from '@client/utils'
@@ -214,28 +215,30 @@ export const SearchResultComponent = ({
 
   return (
     <WithTestId>
-      <WQContentWrapper
-        error={false}
-        isMobileSize={windowWidth < theme.grid.breakpoints.lg}
-        isShowPagination={isShowPagination}
-        noContent={totalResults === 0}
-        noResultText={
-          emptyMessage ? intl.formatMessage(emptyMessage) : noResultText
-        }
-        paginationId={currentPageNumber}
-        paginationVisibleOffline={paginationVisibleOffline}
-        tabBarContent={tabBarContent}
-        title={contentTitle}
-        totalPages={totalPages}
-        onPageChange={(page) => setOffset((page - 1) * limit)}
-      >
-        <Workqueue
-          columns={responsiveColumns}
-          content={rows}
-          hideLastBorder={!isShowPagination}
-          sortOrder={sortOrder}
-        />
-      </WQContentWrapper>
+      <AdministrativeAreasProvider>
+        <WQContentWrapper
+          error={false}
+          isMobileSize={windowWidth < theme.grid.breakpoints.lg}
+          isShowPagination={isShowPagination}
+          noContent={totalResults === 0}
+          noResultText={
+            emptyMessage ? intl.formatMessage(emptyMessage) : noResultText
+          }
+          paginationId={currentPageNumber}
+          paginationVisibleOffline={paginationVisibleOffline}
+          tabBarContent={tabBarContent}
+          title={contentTitle}
+          totalPages={totalPages}
+          onPageChange={(page) => setOffset((page - 1) * limit)}
+        >
+          <Workqueue
+            columns={responsiveColumns}
+            content={rows}
+            hideLastBorder={!isShowPagination}
+            sortOrder={sortOrder}
+          />
+        </WQContentWrapper>
+      </AdministrativeAreasProvider>
     </WithTestId>
   )
 }
