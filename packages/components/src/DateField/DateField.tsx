@@ -28,7 +28,7 @@ type IProps = {
   focusInput?: boolean
   notice?: string
   ignorePlaceHolder?: boolean
-  onChange: (dateString: string | undefined) => void
+  onChange: (dateString: string) => void
   /**
    * Test id for the component. Ids will receive postfix (-mm, -dd, -yyyy) based on the input.
    */
@@ -114,8 +114,7 @@ export const DateField = ({
       const updatedValue = { ...date, [segmentType]: val }
       setDate(updatedValue)
 
-      const isEmpty = !updatedValue.dd && !updatedValue.mm && !updatedValue.yyyy
-      onChange(isEmpty ? undefined: `${updatedValue.yyyy}-${updatedValue.mm}-${updatedValue.dd}`)
+      onChange(`${updatedValue.yyyy}-${updatedValue.mm}-${updatedValue.dd}`)
     }
   }
 

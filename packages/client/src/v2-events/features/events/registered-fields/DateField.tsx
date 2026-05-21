@@ -39,14 +39,14 @@ function DateInput({
   value = '',
   ...props
 }: DateFieldProps & {
-  onChange: (newValue: string) => void
+  onChange: (newValue: string | undefined) => void
   value: string
 }) {
   /**
    * Component library returns '--' for empty dates when input has been touched.
    * We limit the behavior to this component, while still allowing partial values. (e.g. '2021-01-')
    */
-  const cleanEmpty = (val: string) => (val === EMPTY_DATE ? '' : val)
+  const cleanEmpty = (val: string) => (val === EMPTY_DATE ? undefined : val)
   const cleanOnChange = (val: string) => onChange(cleanEmpty(val))
 
   return (
