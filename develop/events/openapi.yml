@@ -211,6 +211,16 @@ paths:
           name: customActionType
           schema:
             type: string
+        - in: query
+          name: waitFor
+          schema:
+            default: true
+            description: Whether the action should wait for the event to be indexed before
+              returning. Defaults to true. Setting this to false completes
+              faster but might lead to stale data in the client if the client
+              tries to read the event immediately after performing the action.
+              Use with care.
+            type: boolean
       responses:
         "200":
           description: Successful response
@@ -280,6 +290,12 @@ paths:
                 keepAssignmentIfRejected:
                   type: boolean
                 waitFor:
+                  default: true
+                  description: Whether action waits for the indexing before returning. Defaults to
+                    true. Setting this to to false completes faster but might
+                    lead to stale data in the client if the client tries to read
+                    the event immediately after performing the action. Use with
+                    care.
                   type: boolean
                 createdAtLocation:
                   description: A valid office location ID. This is required for system users
@@ -359,6 +375,12 @@ paths:
                 keepAssignmentIfRejected:
                   type: boolean
                 waitFor:
+                  default: true
+                  description: Whether action waits for the indexing before returning. Defaults to
+                    true. Setting this to to false completes faster but might
+                    lead to stale data in the client if the client tries to read
+                    the event immediately after performing the action. Use with
+                    care.
                   type: boolean
                 createdAtLocation:
                   type: string
@@ -440,6 +462,12 @@ paths:
                 keepAssignmentIfRejected:
                   type: boolean
                 waitFor:
+                  default: true
+                  description: Whether action waits for the indexing before returning. Defaults to
+                    true. Setting this to to false completes faster but might
+                    lead to stale data in the client if the client tries to read
+                    the event immediately after performing the action. Use with
+                    care.
                   type: boolean
                 createdAtLocation:
                   description: A valid office location ID. This is required for system users
@@ -525,6 +553,12 @@ paths:
                 keepAssignmentIfRejected:
                   type: boolean
                 waitFor:
+                  default: true
+                  description: Whether action waits for the indexing before returning. Defaults to
+                    true. Setting this to to false completes faster but might
+                    lead to stale data in the client if the client tries to read
+                    the event immediately after performing the action. Use with
+                    care.
                   type: boolean
                 createdAtLocation:
                   description: A valid office location ID. This is required for system users
@@ -613,6 +647,12 @@ paths:
                 keepAssignmentIfRejected:
                   type: boolean
                 waitFor:
+                  default: true
+                  description: Whether action waits for the indexing before returning. Defaults to
+                    true. Setting this to to false completes faster but might
+                    lead to stale data in the client if the client tries to read
+                    the event immediately after performing the action. Use with
+                    care.
                   type: boolean
                 createdAtLocation:
                   description: A valid office location ID. This is required for system users
