@@ -939,7 +939,7 @@ describe('"field" conditionals', () => {
             baz: null
           }
         }
-      },
+      } as EventState,
       $now: formatISO(new Date(), { representation: 'date' }),
       $leafAdminStructureLocationIds: [],
       $online: false
@@ -981,7 +981,7 @@ describe('"field" conditionals', () => {
             value: null
           }
         }
-      },
+      } as EventState,
       $now: formatISO(new Date(), { representation: 'date' }),
       $leafAdminStructureLocationIds: [],
       $online: false
