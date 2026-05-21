@@ -108,7 +108,7 @@ export function todayISO(): string {
  * path) are distinct sources, not duplicates.
  */
 export type ClientFunctionContext = {
-  $form: EventState | Record<string, unknown>
+  $form: EventState | ActionUpdate
   $now: string
   $online: boolean
   $user?: ITokenPayload
@@ -149,7 +149,7 @@ addFormats(ajv)
 // `$now` / `$online` are sampled fresh on each call — callers that care
 // about a stable timestamp/online flag should snapshot it themselves.
 export function buildClientFunctionContext(input: {
-  form: EventState | Record<string, unknown>
+  form: EventState | ActionUpdate
   validatorContext?: ValidatorContext
   systemVariables?: SystemVariables
   locations?: Location[]
@@ -158,6 +158,7 @@ export function buildClientFunctionContext(input: {
   return {
     $form: input.form,
     $now: todayISO(),
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     $online: isOnline(),
     $user: input.validatorContext?.user,
     $event: input.validatorContext?.event,
@@ -695,10 +696,17 @@ export function runFieldValidations({
   if (!isFieldVisible(field.config, form, context)) {
     return []
   }
-  // `leafAdminStructureLocationIds` must already be narrowed by the caller
-  // (e.g. to the user's admin scope) — there can be hundreds of thousands of
-  // locations in real deployments, and loading them all into memory chokes
-  // the app.
+  /**
+   * Built via the shared helper so every site that compiles a serialised
+   * client function (AJV `customClientValidator`, sync-listener evaluator,
+   * default-value evaluator, HTTP field-param resolver) feeds the function
+   * the same {@link ClientFunctionContext} shape.
+   *
+   * Note on locations: `validatorContext.leafAdminStructureLocationIds` must
+   * already be narrowed (e.g. to the user's admin scope) by the caller — there
+   * can be hundreds of thousands of locations in real deployments and
+   * loading them all into memory chokes the app.
+   */
   const conditionalParameters = buildClientFunctionContext({
     form: mergeWithBaseFormState(form, context),
     validatorContext: context

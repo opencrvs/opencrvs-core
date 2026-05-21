@@ -102,9 +102,7 @@ export const CustomValidatorCrossFieldSum: Story = {
               {
                 validator: field('itemSum').customClientValidator(
                   (value, ctx) => {
-                    const { $form } = ctx as {
-                      $form: Record<string, unknown>
-                    }
+                    const { $form } = ctx
                     return (
                       Number(value) ===
                       Number($form.itemA) + Number($form.itemB)
@@ -213,7 +211,7 @@ export const CustomEvaluationComputedValue: Story = {
             // Recompute whenever quantity or unitPrice changes
             parent: [field('quantity'), field('unitPrice')],
             value: field('quantity').customClientEvaluation((qty, ctx) => {
-              const { $form } = ctx as { $form: Record<string, unknown> }
+              const { $form } = ctx
               return Number(qty) * Number($form.unitPrice)
             })
           }

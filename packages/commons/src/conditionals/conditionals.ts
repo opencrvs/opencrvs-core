@@ -10,7 +10,7 @@
  */
 import * as objectHash from 'object-hash'
 import { EventDocument } from '../events/EventDocument'
-import { EventState } from '../events/ActionDocument'
+import { ActionUpdate, EventState } from '../events/ActionDocument'
 import { ITokenPayload as TokenPayload, Scope } from '../authentication'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
 import { userSerializer } from '../events/serializers/user/serializer'
@@ -66,7 +66,7 @@ export type EventConditionalParameters = CommonConditionalParameters & {
 }
 
 export type FormConditionalParameters = CommonConditionalParameters & {
-  $form: EventState | Record<string, unknown>
+  $form: EventState | ActionUpdate
   $leafAdminStructureLocationIds?: Array<{ id: UUID }>
 }
 

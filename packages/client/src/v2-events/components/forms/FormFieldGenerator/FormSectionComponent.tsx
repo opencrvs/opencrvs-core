@@ -244,7 +244,7 @@ export function FormSectionComponent({
       return
     }
 
-    const defaultValue = getDefaultValue(listenerField)
+    const defaultValue = getDefaultValue(listenerField, fieldValues)
 
     set(fieldValues, formikCompatibleListenerFieldPath, defaultValue)
 
