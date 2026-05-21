@@ -1,0 +1,40 @@
+{{- $ca := genCA "opensearchca" 4096 }}
+{{- $cn := printf "auth.%s.svc.cluster.local" .Release.Namespace }}
+{{- $cert := genSignedCert $cn nil (list $cn) 4096 $ca }}
+{{- $secret_name := printf "%s-key-tls" .Release.Name }}
+{{- $secret := lookup "v1" "Secret" .Release.Namespace $secret_name }}
+{{- if not $secret }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $secret_name }}
+  annotations:
+    "helm.sh/resource-policy": keep
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "0"
+type: Opaque
+data:
+  {{- if .Values.certs.key_file }}
+  "private-key.pem": |
+    {{ .Files.Get .Values.certs.key_file | b64enc | indent 4 }}
+  {{- else }}
+  "private-key.pem": {{ $cert.Key | b64enc | toYaml | indent 4}}
+  {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-cert-tls
+  annotations:
+    "helm.sh/resource-policy": keep
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "0"
+data:
+  {{- if .Values.certs.key_file }}
+  "public-key.pem": |
+{{ .Files.Get .Values.certs.crt_file | indent 4 }}
+  {{- else }}
+  "public-key.pem": {{ $cert.Cert | toYaml | indent 4}}
+  {{- end }}
+{{- end }}

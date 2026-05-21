@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+data:
+  on-deploy.sh: |
+    {{- .Files.Get "files/postgres-on-deploy.sh" | indent 8 }}
+kind: ConfigMap
+metadata:
+  labels:
+    app: postgres
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "0"
+  name: postgres-on-deploy-script
