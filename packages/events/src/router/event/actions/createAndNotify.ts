@@ -197,6 +197,7 @@ export function createAndNotifyProcedure() {
 
         // Step 4: Apply the NOTIFY action.
         const notifyInput = {
+          waitFor: true,
           type: ActionType.NOTIFY,
           eventId: event.id,
           transactionId,
