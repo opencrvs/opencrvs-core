@@ -38,6 +38,9 @@ jobs:
           registry-url: 'https://registry.npmjs.org/'
           package-manager-cache: false
 
+      - name: Update npm for OIDC trusted publishing
+        run: npm install -g npm@latest
+
       - name: Check if version exists on npm
         id: check-version
         run: |
