@@ -64,9 +64,7 @@ export const routesConfig = [
         <NotificationComponent>
           <Page>
             <MainSection>
-              <ProtectedPage
-                unprotectedRouteElements={['documents', 'affidavit']}
-              >
+              <ProtectedPage>
                 <Outlet />
               </ProtectedPage>
             </MainSection>

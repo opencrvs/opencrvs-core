@@ -1,0 +1,127 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: auth-route
+spec:
+  entryPoints:
+  {{- if or .Values.ingress.ssl_enabled .Values.ingress.tls_resolver }}
+    - websecure
+  {{- end }}
+  {{- if or .Values.ingress.tls_resolver (not .Values.ingress.ssl_enabled) }}
+    - web
+  {{- end }}
+  routes:
+  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "auth" "Values" .Values) }}`)'
+    kind: Rule
+    services:
+    - name: auth
+      namespace: {{ .Release.Namespace }}
+      port: {{ .Values.auth.port }}
+    middlewares:
+      - name: sts-and-basic-response-headers
+  {{- if .Values.ingress.tls_resolver }}
+  tls:
+    certResolver: {{ .Values.ingress.tls_resolver }}
+  {{- else if .Values.ingress.tls_secret_name }}
+  tls:
+    secretName: {{ .Values.ingress.tls_secret_name }}
+  {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: auth
+    service_name: opencrvs_auth
+  name: auth
+spec:
+  replicas: {{ .Values.auth.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      annotations:
+        lastdeploy-timestamp: {{ now | quote }}
+      labels:
+        app: auth
+        service_name: opencrvs_auth
+    spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.auth) | nindent 6 }}
+      containers:
+        - image: {{ include "opencrvs.image" (dict "root" . "service" .Values.auth) }}
+          name: auth
+          env:
+            - name: APN_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: REDIS_HOST
+              value: {{ .Values.redis.host | quote }}
+          {{- if eq .Values.redis.auth_mode "use_secret" }}
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: AUTH_REDIS_PASSWORD
+                  name: {{ .Values.redis.users_secret }}
+            - name: REDIS_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: AUTH_REDIS_USERNAME
+                  name: {{ .Values.redis.users_secret }}
+          {{- end }}
+            - name: COUNTRY_CONFIG_URL_EXTERNAL
+              value: {{ include "render-external-url" (dict "service_name" "countryconfig" "Values" .Values) }}
+            - name: CLIENT_APP_URL
+              value: {{ include "render-external-url" (dict "service_name" "register" "Values" .Values) }}
+            - name: LOGIN_URL
+              value: {{ include "render-external-url" (dict "service_name" "login" "Values" .Values) }}
+            - name: CERT_PRIVATE_KEY_PATH
+              value: /secrets/private-key.pem
+            - name: CERT_PUBLIC_KEY_PATH
+              value: /secrets/public-key.pem
+            - name: CONFIG_SMS_CODE_EXPIRY_SECONDS
+              value: '600'
+            - name: CONFIG_TOKEN_EXPIRY_SECONDS
+              value: '604800'
+            - name: EVENTS_URL
+              value: http://events.{{ .Release.Namespace }}.svc.cluster.local:5555/
+            - name: USER_MANAGEMENT_URL
+              value: http://user-mgnt.{{ .Release.Namespace }}.svc.cluster.local:3030/
+            - name: AUTH_PORT
+              value: "{{ .Values.auth.port }}"
+            - name: COUNTRY_CONFIG_URL_INTERNAL
+              value: http://countryconfig.{{ .Release.Namespace }}.svc.cluster.local:3040
+            - name: DOMAIN
+              value: {{ .Values.hostname | quote }}
+          {{- include "render-env-vars" (dict "service_name" "auth" "Values" .Values) }}
+          {{- include "resources-helper" (dict "service_name" "auth" "Values" .Values) | indent 10 }}
+          {{- include "probes-helper" (dict "service_name" "auth" "Values" .Values) | indent 10 }}
+          ports:
+            - containerPort: {{ .Values.auth.port }}
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /secrets/public-key.pem
+              name: public-key
+              subPath: public-key.pem
+            - mountPath: /secrets/private-key.pem
+              name: private-key
+              subPath: private-key.pem
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            items:
+              - key: public-key.pem
+                path: public-key.pem
+            name: {{ .Release.Name }}-cert-tls
+          name: public-key
+        - secret:
+            secretName: {{ .Release.Name }}-key-tls
+          name: private-key
+
+{{- include "service-helper" (dict "service_name" "auth" "Values" .Values) }}
+
+{{- include "hpa-helper" (dict "service_name" "auth" "Values" .Values) }}
+
+{{- include "pdb-helper" (dict "service_name" "auth" "Values" .Values) }}

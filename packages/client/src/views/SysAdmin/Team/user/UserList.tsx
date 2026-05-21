@@ -98,6 +98,31 @@ const Header = styled.h1`
   }
 `
 
+const MobileActionBar = styled.div`
+  display: none;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 0;
+
+    & > div:first-child {
+      flex: 1;
+      min-width: 0;
+    }
+
+    & > div:first-child > button {
+      width: 100%;
+    }
+
+    & > div:first-child > button span {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+`
+
 const LocationInfo = styled.div`
   padding: 8px 0px;
 `
@@ -771,6 +796,7 @@ function UserListComponent({ userDetails }: UserListProps) {
           ) : searchResults ? (
             <>
               <Header id="header">{searchedLocation?.name || ''}</Header>
+              <MobileActionBar>{LocationButton(locationId)}</MobileActionBar>
               <LocationInfo>
                 {searchedLocation && (
                   <LocationInfoValue>

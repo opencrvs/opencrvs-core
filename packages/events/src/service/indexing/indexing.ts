@@ -443,7 +443,7 @@ export async function indexEventsInBulk(
 export async function indexEvent(
   event: EventDocument,
   config: EventConfig,
-  waitFor: boolean = false
+  waitFor: boolean
 ) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)

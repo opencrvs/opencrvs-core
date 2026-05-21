@@ -1,0 +1,84 @@
+system.hostfs: /hostfs
+
+metricbeat.modules:
+- module: kubernetes
+  period: 1m
+  host: ${NODE_NAME}
+  hosts: ["https://${NODE_IP}:10250"]
+  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  ssl.verification_mode: "none"
+  metricsets:
+    - node
+    - pod
+    - container
+    - volume
+    - system
+    - event
+  include_labels:
+  - app
+  add_metadata: true
+- module: system
+  metricsets:
+    - cpu
+    - memory
+    - network
+    - process
+    - load
+    - diskio
+    - process_summary
+    - core
+    - socket
+  period: 1m
+- module: system
+  metricsets:
+    - filesystem
+  period: 5m
+  processors:
+    - drop_event.when.regexp:
+        system.filesystem.mount_point: "^/hostfs/run"
+processors:
+  - add_host_metadata: ~
+  - add_kubernetes_metadata:
+      host: ${NODE_NAME}
+      # Enable more indexers for better pod correlation
+      default_indexers.enabled: true
+      default_matchers.enabled: true
+  - add_fields:
+      target: ''
+      fields:
+        host.name: ${NODE_NAME}
+
+#========================== Elasticsearch output ===============================
+output.elasticsearch:
+  hosts: ['${ELASTICSEARCH_HOST}']
+  username: '${ELASTICSEARCH_USERNAME}'
+  password: '${ELASTICSEARCH_PASSWORD}'
+
+#============================== Dashboards =====================================
+setup.dashboards:
+  enabled: true
+
+#============================== Kibana =========================================
+setup.kibana:
+  host: '${KIBANA_HOST}'
+  username: ${KIBANA_USERNAME}
+  password: ${KIBANA_PASSWORD}
+
+#============================== Xpack Monitoring ===============================
+monitoring:
+  enabled: true
+  elasticsearch:
+    username: ${BEATS_USERNAME}
+    password: ${BEATS_PASSWORD}
+#============================== Index lifecycle management ===============================
+setup.ilm.enabled: true
+setup.ilm.policy_name: 'metricbeat-opencrvs-rollover-policy'
+setup.ilm.policy_file: /usr/share/metricbeat/rollover-policy.json
+setup.ilm.check_exists: true
+setup.ilm.overwrite: true
+
+#============================== Logging ===============================
+logging.level: info
+logging.selectors: ["*"]
+logging.metrics.enabled: true
+logging.to_files: false
