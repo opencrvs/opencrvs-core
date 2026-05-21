@@ -1,0 +1,80 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: documents
+    service_name: opencrvs_documents
+  name: documents
+spec:
+  replicas: {{ .Values.documents.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: documents
+  template:
+    metadata:
+      annotations:
+        lastdeploy-timestamp: {{ now | quote }}
+      labels:
+        app: documents
+        service_name: opencrvs_documents
+    spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.documents) | nindent 6 }}
+      containers:
+        - image: {{ include "opencrvs.image" (dict "root" . "service" .Values.documents) }}
+          name: documents
+          env:
+            - name: APN_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: COUNTRY_CONFIG_URL
+              value: http://countryconfig.{{ .Release.Namespace }}.svc.cluster.local:3040
+            - name: DOCUMENTS_PORT
+              value: "9050"
+            - name: CERT_PUBLIC_KEY_PATH
+              value: /secrets/public-key.pem
+            - name: MINIO_HOST
+              value: {{ .Values.minio.host | quote }}
+            - name: MINIO_PORT
+              value: {{ .Values.minio.port | quote }}
+            - name: MINIO_PROTOCOL
+              value: '{{ .Values.minio.external_protocol | default (include "http-scheme" .) }}:'
+            - name: MINIO_URL
+              value: {{ .Values.minio.external_url  | default (printf "minio.%s" .Values.hostname) }}
+          {{- if or (eq .Values.minio.auth_mode "auto") (eq .Values.minio.auth_mode "use_secret") }}
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: MINIO_ACCESS_KEY
+                  name: {{ .Values.minio.users_secret }}
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: MINIO_SECRET_KEY
+                  name: {{ .Values.minio.users_secret }}
+          {{- end }}
+          {{- include "render-env-vars" (dict "service_name" "documents" "Values" .Values) }}
+          {{- include "resources-helper" (dict "service_name" "documents" "Values" .Values) | indent 10 }}
+          {{- include "probes-helper" (dict "service_name" "documents" "Values" .Values) | indent 10 }}
+          ports:
+            - containerPort: {{ .Values.documents.port }}
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /secrets/public-key.pem
+              name: public-key
+              subPath: public-key.pem
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            items:
+              - key: public-key.pem
+                path: public-key.pem
+            name: {{ .Release.Name }}-cert-tls
+          name: public-key
+
+{{- include "service-helper" (dict "service_name" "documents" "Values" .Values) }}
+
+{{- include "hpa-helper" (dict "service_name" "documents" "Values" .Values) }}
+
+{{- include "pdb-helper" (dict "service_name" "documents" "Values" .Values) }}

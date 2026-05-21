@@ -17,7 +17,10 @@ export const DeclarationFormConfig = z
     label: TranslationConfig.describe('Human readable description of the form'),
     pages: z.array(FormPageConfig)
   })
-  .describe('Configuration of the declaration form.')
+  .meta({
+    id: 'DeclarationFormConfig',
+    description: 'Configuration of the declaration form.'
+  })
 
 export type DeclarationFormConfig = z.infer<typeof DeclarationFormConfig>
 export type DeclarationFormConfigInput = z.input<typeof DeclarationFormConfig>

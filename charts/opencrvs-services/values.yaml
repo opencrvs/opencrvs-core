@@ -1,0 +1,470 @@
+# NOTES:
+# Liveness and readiness probes defaults are here:
+# We are good to go with defaults for now
+# https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+
+###############################################################################
+# Dependencies configuration
+###############################################################################
+# Please update values.yaml for your particular environment with correct values
+# Default values for dependencies are configured with considerations:
+# - All dependencies are deployed by dependencies helm chart
+# - Dependencies are deployed in opencrvs-deps-dev namespace
+
+# Elasticsearch configuration, including the hostname and port.
+elasticsearch:
+  host: elasticsearch.opencrvs-deps-dev.svc.cluster.local
+  port: 9200
+  reindex_enabled: true
+  cronjob:
+    enabled: false
+    schedule: "0 2 * * *"
+  # auth_mode:
+  # - disabled: No authentication enabled for MongoDB, password-less access to databases
+  # - auto: Users are managed by OpenCRVS helm chart, this mode requires secret to be created with MongoDB admin user
+  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by MongoDB administrator, but helm
+  #               will pick up data from users_secret and urls_secret
+  # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
+  #            please check README.md
+  # It is recommended to setup auto or use_secret values for server environment
+  auth_mode: disabled
+
+  admin_user_secret_name: elasticsearch-admin-user
+  urls_secret: elasticsearch-opencrvs-urls
+  # INTERNAL USAGE ONLY: DON'T MODIFY THIS SECTION
+  # List of users to create and grant authorization to Elasticsearch.
+  # Column separated pair of placeholder and user name, <PLACEHOLDER>:<USERNAME>
+  # Placeholders are converted to variables:
+  # - <PLACEHOLDER>_ELASTIC_USERNAME
+  # - <PLACEHOLDER>_ELASTIC_PASSWORD
+  # If <USERNAME> is not provided, then random username is generated.
+  # Password is always generated randomly.
+  # Values are stored in secret named `elasticsearch-opencrvs-users`.
+  auth_users:
+    - SEARCH:search
+  # TEMPORAL SECRET TO STORE ELASTICSEARCH USERS
+  users_secret: elasticsearch-opencrvs-users
+# InfluxDB configuration, including the hostname, port, and database name.
+influxdb:
+  host: influxdb-0.influxdb.opencrvs-deps-dev.svc.cluster.local
+  port: 8086
+  db: ocrvs
+
+# MinIO configuration, including the hostname and port.
+minio:
+  host: minio-0.minio.opencrvs-deps-dev.svc.cluster.local
+  port: "3535"
+  # external_url: external <host/ip>[:port] available for client browser to issue signed document URL.
+  #                   Default: minio.<opencrvs domain>
+  # external_protocol: external protocol (http or https) available for client browser. (Default: helm chart http_scheme)
+  # auth_mode:
+  # - disabled: No authentication enabled for MongoDB, password-less access to databases
+  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by MongoDB administrator, but helm
+  #               will pick up data from users_secret
+  # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
+  #            please check README.md
+  auth_mode: disabled
+  users_secret: minio-opencrvs-users
+
+redis:
+  host: redis-0.redis.opencrvs-deps-dev.svc.cluster.local
+  # auth_mode:
+  # - disabled: No authentication enabled for MongoDB, password-less access to databases
+  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by MongoDB administrator, but helm
+  #               will pick up data from users_secret
+  # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
+  #            please check README.md
+  auth_mode: disabled
+  users_secret: redis-opencrvs-users
+
+mongodb:
+  # MongoDB hostname configuration.
+  host: mongodb-0.mongodb.opencrvs-deps-dev.svc.cluster.local
+  # auth_mode:
+  # - disabled: No authentication enabled for MongoDB, password-less access to databases
+  # - auto: Users are managed by OpenCRVS helm chart, this mode requires secret to be created with MongoDB admin user
+  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by MongoDB administrator, but helm
+  #               will pick up data from users_secret and urls_secret
+  # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
+  #            please check README.md
+  # It is recommended to setup auto or use_secret values for server environment
+  auth_mode: disabled
+
+  # MongoDB databases and users to create, if `use_default_credentials` is set to `false`.
+  admin_user_secret_name: mongodb-admin-user
+  users_secret: mongo-opencrvs-users
+  urls_secret: mongodb-urls
+  # INTERNAL USAGE ONLY: DON'T MODIFY THIS SECTION
+  # Mapping users to databases
+  databases:
+    # prefix: <PLACEHOLDER> to generate variable names:
+    # - <PLACEHOLDER>_DB, database name from `db` field
+    # - <PLACEHOLDER>_MONGODB_USER, user name from `user` field
+    # - <PLACEHOLDER>_MONGODB_PASSWORD, random password for user
+    # - <PLACEHOLDER>_MONGODB_ROLES, roles for user in JSON format
+    # db: Name of MongoDB database to create.
+    # user: Name of MongoDB user to create and attach to database.
+    # roles: JSON string with roles to assign to user.
+    #        If not provided, then user is created with `readWrite` role on the database.
+    #        If roles are provided, please add explicitly `readWrite` role for the database.
+    #        For example:
+    #        [{ role: 'readWrite', db: 'user-mgnt' }, ...]
+    - prefix: USER_MGNT
+      db: user-mgnt
+      user: user-mgnt
+    - prefix: HEARTH
+      db: hearth-dev
+      user: hearth
+      roles: "[{ role: 'readWrite', db: 'hearth' }, { role: 'readWrite', db: 'performance' }, { role: 'readWrite', db: 'hearth-dev' }]"
+    - prefix: PERFORMANCE
+      db: performance
+      user: performance
+    - prefix: EVENTS
+      db: events
+      user: events
+      roles: "[{ role: 'readWrite', db: 'events' }, {role: 'read', db: 'user-mgnt'}]"
+
+postgres:
+  # Image used as postgres client to run init scripts, it should contain psql and postgres_fdw extension installed
+  image: chumaky/postgres_mongo_fdw:17.6_fdw5.5.2
+  # Postgres hostname configuration
+  host: postgres-0.postgres.opencrvs-deps-dev.svc.cluster.local
+  port: 5432
+  sslmode: disable
+  auth_mode: disabled
+  # auth_mode:
+  # - disabled: Default credentials are used postgres/postgres
+  # - auto: Users are managed by OpenCRVS helm chart, this mode requires secret to be created with Postgres admin user
+  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by Postgres administrator, but helm
+  #               will pick up data from users_secret and urls_secret
+  # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
+  #            please check README.md
+  # It is recommended to setup auto or use_secret values for server environment
+
+  # Postgres databases and users to create, if `use_default_credentials` is set to `false`.
+  admin_user_secret_name: postgres-admin-user
+  users_secret: postgres-opencrvs-users
+  urls_secret: postgres-urls
+  # FIXME: Refactor like mongodb in the future when we get more databases
+  events_db: events
+  events_migrator: events_migrator
+  events_app: events_app
+  events_analytics: analytics
+  on_restore_cronjob:
+    enabled: false
+    schedule: "0 2 * * *"
+###############################################################################
+# Application configuration
+###############################################################################
+
+# Hostname for OpenCRVS application, without wildcard or subdomain.
+# All OpenCRVS services will be available under domain:
+hostname: opencrvs.localhost
+
+# subdomain_separator: separator between hostname and subdomains
+# generic form: <subdomain><subdomain_separator><hostname>
+# OpenCRVS can be deployed in different ways:
+# - as set of subdomains to hostname, examples:
+#            - auth.opencrvs.localhost
+#            - register.opencrvs.localhost
+# - as set of variations to main domain,
+#   in this variant wildcard certificate is needed only to one domain, examples:
+#            - auth-opencrvs.localhost
+#            - register-opencrvs.localhost
+subdomain_separator: "."
+
+# This section allows manually define credentials
+credentials: {}
+  # super_user_password: Define super user password from stdin
+
+# WARNING: Use only with Tilt
+# Define path to static files internal OpenCRVS certificates
+certs: {}
+  # cert_file: File with certificate
+  # key_file: File with key
+
+ingress:
+  # Access OpenCRVS services at https://<hostname>/
+  # For example, https://farajaland.org/
+  ssl_enabled: true
+  # Generate SSL Certificate by TLS resolver instead of using default traefik Certificate
+  tls_resolver: ""
+
+# See kubernetes documentation for more information on service types:
+# https://kubernetes.io/docs/concepts/services-networking/service/
+service_type: ClusterIP
+
+# timezone: You can specify a time zone for a CronJobs
+# https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#time-zones
+# For CronJobs with no time zone specified, the kube-controller-manager interprets schedules relative to its local time zone.
+# Example:
+# timezone: "Etc/UTC"
+
+# Kubernetes HTTP Probes configuration
+probes:
+  liveness:
+    # FIXME: /ping is not real healthz, just checking if http server is up
+    path: /ping
+    periodSeconds: 3
+    timeoutSeconds: 3
+  readiness:
+    path: /ping
+    periodSeconds: 3
+    timeoutSeconds: 3
+  startup:
+    path: /ping
+    periodSeconds: 3
+    timeoutSeconds: 1
+
+# Horizontal Pod Autoscaler (HPA) configuration:
+hpa:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 2
+  averageUtilization: 75
+
+# Pod Disruption Budget (PDB) configuration:
+pdb:
+  enabled: true
+  minAvailable: 50%
+
+# Resources allocated to OpenCRVS microservices (Kubernetes PODs):
+resources:
+  memoryRequest: "128Mi"
+  cpuRequest: "100m"
+  memoryLimit: "2Gi"
+  cpuLimit: "2"
+
+# Global environment variables applied to
+# all OpenCRVS microservices (Kubernetes PODs):
+env:
+  NODE_ENV: production
+  MINIO_BUCKET: ocrvs
+  # LOG_LEVEL: debug
+  # Application performance monitoring service URL.
+  # APN_SERVICE_URL: http://dependencies_apm-server:8200
+
+  # Sentry DSN (Data Source Name) configuration for error tracking.
+  # Note: The SENTRY_DSN should be defined at the global level of environment variables.
+  # SENTRY_DSN: https://...@o309867.ingest.sentry.io/....
+
+# OpenCRVS core image tag:
+# Deprecated: use platform.tag instead.
+image:
+  tag: v1.9.12
+
+# Deprecated: use platform.imagePullSecrets instead.
+imagePullSecrets: []
+
+# Default image configuration for the OpenCRVS platform.
+# These values apply to all OpenCRVS services unless overridden
+# by a service-specific image configuration.
+platform:
+  # Default tag for all OpenCRVS images.
+  tag: v1.9.12
+
+  # Default repository for all OpenCRVS images,
+  # for example: ghcr.io/opencrvs or myorg
+  repository: ghcr.io/opencrvs
+
+  # Secrets used to pull images from private registries, if needed.
+  # Example:
+  # imagePullSecrets:
+  #   - name: registry-secret
+  imagePullSecrets: []
+
+##############################################################
+# Per service configuration:
+auth:
+  port: 4040
+  env:
+    TWO_FA_ENABLED: false
+  image:
+    name: ocrvs-auth
+    # optional overrides:
+    # registry: registry.example.com
+    # repository: custom-org
+    # tag: v2.0.0
+
+client:
+  port: 3000
+  image:
+    name: ocrvs-client
+  # client is an nginx docker image
+  # nginx_conf_d_configmaps: see description for login.nginx_conf_d_configmaps section
+
+  # Health check probes configuration
+  probes:
+    liveness:
+      path: /health/ready
+      periodSeconds: 30
+    readiness:
+      path: /health/ready
+      periodSeconds: 30
+    startup:
+      path: /health/ready
+
+  env:
+    # FIXME: Do we need define this variable?
+    DECLARED_DECLARATION_SEARCH_QUERY_COUNT: 100
+
+config:
+  port: 2021
+  image:
+    name: ocrvs-config
+
+# Countryconfig service configuration, including the image tag and port number.
+countryconfig:
+  image:
+    name: opencrvs/ocrvs-countryconfig
+    tag: v1.9.11
+  port: 3040
+
+dashboards:
+  enabled: false
+  use_default_credentials: true
+  port: 4444
+  env:
+    METABASE_DATABASE_SSL: false
+    OPENCRVS_METABASE_MAP_NAME: Farajaland
+    OPENCRVS_METABASE_MAP_REGION_KEY: State
+    OPENCRVS_METABASE_MAP_REGION_NAME: State
+    OPENCRVS_METABASE_SITE_NAME: OpenCRVS Dashboards
+  # For stable work we need at least 4Gi of memory (check metabase logs at startup)
+  resources:
+    memoryRequest: "2Gi"
+    cpuRequest: "250m"
+    memoryLimit: "2Gi"
+    cpuLimit: "2"
+
+documents:
+  port: 9050
+  image:
+    name: ocrvs-documents
+
+events:
+  port: 5555
+  image:
+    name: ocrvs-events
+  env:
+    ES_INDEX_PREFIX: events
+  probes:
+    liveness:
+      path: /health/ready
+      timeoutSeconds: 10
+    readiness:
+      path: /health/ready
+      timeoutSeconds: 10
+    startup:
+      path: /health/ready
+
+gateway:
+  port: 7070
+  image:
+    name: ocrvs-gateway
+
+  env:
+    TWO_FA_ENABLED: false
+    CHECK_INVALID_TOKEN: "true"
+    CONFIG_SMS_CODE_EXPIRY_SECONDS: "600"
+    CONFIG_TOKEN_EXPIRY_SECONDS: "604800"
+    COUNTRY: FAR
+    DISABLE_RATE_LIMIT: "true"
+    LANGUAGES: "en,fr"
+
+login:
+  port: 3020
+  image:
+    name: ocrvs-login
+  # login is an nginx docker image
+  # nginx_conf_d_configmaps:
+  #     List of Configmap names to store custom configuration:
+  #     - each configmap must contain one configuration file
+  #     - configuration file name must match with configmap name
+  #     - each configmap is mounted inside /etc/nginx/conf.d.
+  # Example:
+  # nginx_conf_d_configmaps:
+  #   - login-nginx-headers
+  #   - login-nginx-auth
+  # Mounted files:
+  # ls -1 /etc/nginx/conf.d
+  # login-nginx-headers.conf
+  # login-nginx-auth.conf
+  # default.conf <- this file exists by default
+  # Example command to create configmap:
+  # kubectl create configmap login-nginx-login --from-file=foo.conf --from-file=login-nginx-login.conf
+  # login-nginx-login: is configmap name
+  # login-nginx-login.conf is file name. it should be same as configmap with .conf ending
+
+  # Health check probes configuration
+  probes:
+    liveness:
+      httpGet:
+        path: /health/ready
+    readiness:
+      httpGet:
+        path: /health/ready
+    startup:
+      httpGet:
+        path: /health/ready
+
+user_mgnt:
+  port: 3030
+  env:
+    DEFAULT_USER_PASSWORD: "test"
+  image:
+    name: ocrvs-user-mgnt
+
+events:
+  port: 5555
+  image:
+    name: ocrvs-events
+  env:
+    DEFAULT_USER_PASSWORD: "test"
+    TWO_FA_ENABLED: false
+  probes:
+    liveness:
+      path: /health/ready
+      timeoutSeconds: 10
+    readiness:
+      path: /health/ready
+      timeoutSeconds: 10
+    startup:
+      path: /health/ready
+      timeoutSeconds: 10
+user_mgnt:
+  port: 3030
+  image:
+    name: ocrvs-user-mgnt
+
+
+##############################################################
+# One time jobs:
+
+# data_migration: Job to migrate datastores while deployment
+data_migration:
+  image:
+    name: ocrvs-migration
+
+data_migration_legacy:
+  enabled: true
+
+# data_cleanup: Wipe all persistent data from datastores including users
+# By running this job on production environment all data will be lost
+data_cleanup:
+  enabled: false
+
+# data_seed: Initial data seeding into datastore, this job works only with clean environment
+# make sure your environment was cleaned up before running this job
+data_seed:
+  enabled: true
+  image:
+    name: ocrvs-data-seeder
+  env:
+    # When users are seeded, are they immediately active using a test password and
+    # six zeros as a 2-Factor auth code. Always set to false in production and staging.
+    ACTIVATE_USERS: "true"
+
+on_restore_cronjob:
+  enabled: false
+  schedule: "0 3 * * *"
