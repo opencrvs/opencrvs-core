@@ -10,15 +10,14 @@
  */
 import { compact, get } from 'lodash'
 import {
-  compileClientFunction,
+  buildClientFunctionContext,
+  runClientFunction,
   FieldValue,
   FieldReference,
   HttpField,
   IndexMap,
   isCodeToEvaluate,
-  isFieldReference,
-  isOnline,
-  todayISO
+  isFieldReference
 } from '@opencrvs/commons/client'
 import {
   makeFormFieldIdFormikCompatible,
@@ -75,11 +74,11 @@ export function parseFieldReferenceToValue(
       ? get(fieldValues[fieldReference.$$field], fieldReference.$$subfield)
       : fieldValues[fieldReference.$$field]
   if (isCodeToEvaluate(fieldReference)) {
-    return compileClientFunction(fieldReference.$$code)(fieldValue, {
-      $form: fieldValues,
-      $now: todayISO(),
-      $online: isOnline()
-    }) as FieldValue
+    return runClientFunction(
+      fieldReference.$$code,
+      fieldValue,
+      buildClientFunctionContext({ form: fieldValues })
+    ) as FieldValue
   }
   return fieldValue
 }

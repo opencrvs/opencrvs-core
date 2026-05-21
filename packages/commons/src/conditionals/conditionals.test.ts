@@ -2093,7 +2093,8 @@ describe('customClientEvaluation', () => {
     const result = compileClientFunction(descriptor.$$code)(3, {
       $form: { a: 3, b: 7 },
       $now: '2024-01-01',
-      $online: true
+      $online: true,
+      $leafAdminStructureLocationIds: []
     })
 
     expect(result).toBe(10)

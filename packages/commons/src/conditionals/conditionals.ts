@@ -18,6 +18,7 @@ import { omitKeyDeep } from '../utils'
 import { UUID } from '../uuid'
 import { todayDateTimeValueSerializer } from '../events/serializers/date/serializer'
 import { CodeToEvaluate, FieldReference } from '../events/FieldConfig'
+import type { ClientFunctionContext } from './validate'
 
 /* eslint-disable max-lines */
 /** @knipignore */
@@ -814,7 +815,7 @@ export function createFieldConditionals(fieldId: string) {
     customClientValidator(
       validationFn: (
         fieldValue: unknown,
-        context: FormConditionalParameters
+        context: ClientFunctionContext
       ) => boolean
     ): JSONSchema {
       const code = validationFn.toString()
@@ -847,7 +848,7 @@ export function createFieldConditionals(fieldId: string) {
     customClientEvaluation(
       computationFn: (
         fieldValue: unknown,
-        context: FormConditionalParameters
+        context: ClientFunctionContext
       ) => unknown
     ): CodeToEvaluate {
       return {

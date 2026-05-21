@@ -16,15 +16,14 @@ import {
   SystemVariables,
   SerializedUserField,
   isCodeToEvaluate,
-  compileClientFunction,
-  todayISO,
+  buildClientFunctionContext,
+  runClientFunction,
   isNonInteractiveFieldType,
   Location,
   FieldType,
   FieldValue,
   EventState,
   buildFormState,
-  isOnline,
   FieldGroup,
   TextField,
   FieldConfigDefaultValue,
@@ -186,12 +185,16 @@ export function mapFieldToDefaultValue(
     })
   }
   if (isCodeToEvaluate(field.defaultValue)) {
-    return compileClientFunction(field.defaultValue.$$code)(undefined, {
-      $form: {},
-      $now: todayISO(),
-      $online: isOnline(),
-      ...context
-    }) as FieldValue
+    return runClientFunction(
+      field.defaultValue.$$code,
+      undefined,
+      buildClientFunctionContext({
+        form: {},
+        systemVariables: context,
+        locations: context.locations,
+        adminLevelIds: context.adminLevelIds
+      })
+    ) as FieldValue
   }
 
   if (field.defaultValue === undefined) {

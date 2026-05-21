@@ -6,7 +6,7 @@
 
 - Two new toolkit methods allow country configurations to implement custom client-side logic that goes beyond the predefined `field()` methods. [#11653](https://github.com/opencrvs/opencrvs-core/issues/11653)
 
-  **`field('id').customClientValidator(fn)`** — validate a field with an arbitrary inline function. The function is serialised into the form configuration and executed just-in-time in the browser during validation (never server-side). All logic must be self-contained; external references such as lodash are not available.
+  **`field('id').customClientValidator(fn)`** — validate a field with an arbitrary inline function. The function is serialised into the form configuration and executed just-in-time during validation. All logic must be self-contained — external references such as lodash are not available — so the validator stays portable wherever the schema is evaluated.
 
   ```ts
   field('nid').customClientValidator((value) => {
