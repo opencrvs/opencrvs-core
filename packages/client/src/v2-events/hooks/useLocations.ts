@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { useMemo } from 'react'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { Location, UUID } from '@opencrvs/commons/client'
 import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
@@ -94,10 +95,13 @@ export function useLocations() {
           })
         }).data
 
-        const locationMap = new Map<UUID, Location>(
-          locationArray.map((location) => [location.id, location])
+        return useMemo(
+          () =>
+            new Map<UUID, Location>(
+              locationArray.map((location) => [location.id, location])
+            ),
+          [locationArray]
         )
-        return locationMap
       }
     },
     getLocation: {
