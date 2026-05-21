@@ -1,0 +1,75 @@
+{{ if and .Values.influxdb.enabled .Values.backup.enabled }}
+---
+apiVersion: batch/v1
+{{ if .Values.backup.cronjob }}
+kind: CronJob
+{{- else }}
+kind: Job
+{{- end }}
+metadata:
+  name: influxdb-backup
+  labels:
+    app: influxdb
+    job-type: backup
+spec:
+  {{ if .Values.backup.cronjob }}
+  schedule: {{ .Values.influxdb.backup_schedule | default .Values.backup.schedule }}
+  {{- if .Values.timezone }}
+  timeZone: {{ .Values.timezone }}
+  {{- end }}
+  jobTemplate:
+    spec:
+  {{- end }}
+      template:
+        metadata:
+          labels:
+            app: influxdb
+            job-type: backup
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: influxdb:1.8.10
+              env:
+                - name: INFLUXDB_HOST
+                  value: influxdb-0.influxdb.{{ .Release.Namespace }}.svc.cluster.local
+                - name: INFLUXDB_PORT
+                  value: "8088"
+                - name: ENCRYPT_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.backup.backup_encryption_secret }}
+                      key: backup_encryption_key
+                - name: BACKUP_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.backup.backup_server_secret }}
+                      key: user
+                - name: BACKUP_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.backup.backup_server_secret }}
+                      key: host
+                - name: BACKUP_REMOTE_DIR
+                  value: "{{ .Values.influxdb.backup_server_dir | default .Values.backup.backup_server_dir }}"
+              {{- include "render-env-vars" (dict "service_name" "backup" "Values" .Values) | nindent 4 }}
+              command: ["/scripts/backup.sh"]
+              volumeMounts:
+                - name: backup-ssh-key
+                  mountPath: /ssh
+                  readOnly: true
+                - mountPath: /scripts
+                  name: influxdb-scripts
+          volumes:
+            - name: backup-ssh-key
+              secret:
+                secretName: {{ .Values.backup.backup_server_secret }}
+                defaultMode: 0400
+                items:
+                  - key: ssh_key
+                    path: ssh_key
+            - name: influxdb-scripts
+              configMap:
+                name: influxdb-scripts
+                defaultMode: 0755
+{{- end }}

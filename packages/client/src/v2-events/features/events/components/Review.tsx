@@ -510,37 +510,7 @@ function ReviewComponent({
 
           {/* edit annotation fields  */}
           {hasAnnotationFieldsToShow && onAnnotationChange && (
-            <ReviewContainter>
-              <DeclarationDataContainer>
-                <Accordion
-                  expand={true}
-                  label={intl.formatMessage(reviewMessages.annotationsTitle)}
-                  labelForHideAction="Hide"
-                  labelForShowAction="Show"
-                  name="annotation"
-                >
-                  <FormFieldGenerator
-                    fields={reviewFields}
-                    formTouched={touched}
-                    formValues={annotation}
-                    id={'review'}
-                    readonlyMode={readonlyMode}
-                    validatorContext={{
-                      ...validatorContext,
-                      baseFormState: form
-                    }}
-                    onFormChange={onAnnotationChange}
-                    onTouchedChange={setTouched}
-                  />
-                </Accordion>
-              </DeclarationDataContainer>
-            </ReviewContainter>
-          )}
-
-          {/* show annotation fields */}
-          {hasAnnotationFieldsToShow &&
-            readonlyMode &&
-            displayedAnnotationFields.length > 0 && (
+            <FormData>
               <ReviewContainter>
                 <DeclarationDataContainer>
                   <Accordion
@@ -550,25 +520,61 @@ function ReviewComponent({
                     labelForShowAction="Show"
                     name="annotation"
                   >
-                    <ListReview id="annotation">
-                      {displayedAnnotationFields.map((field) => (
-                        <ListReview.Row
-                          key={field.id}
-                          actions={null}
-                          id={field.id}
-                          label={intl.formatMessage(field.label)}
-                          value={
-                            <Output
-                              field={field}
-                              value={annotation[field.id]}
-                            />
-                          }
-                        />
-                      ))}
-                    </ListReview>
+                    <FormFieldGenerator
+                      fields={reviewFields}
+                      formTouched={touched}
+                      formValues={annotation}
+                      id={'review'}
+                      readonlyMode={readonlyMode}
+                      validatorContext={{
+                        ...validatorContext,
+                        baseFormState: form
+                      }}
+                      onFormChange={onAnnotationChange}
+                      onTouchedChange={setTouched}
+                    />
                   </Accordion>
                 </DeclarationDataContainer>
               </ReviewContainter>
+            </FormData>
+          )}
+
+          {/* show annotation fields */}
+          {hasAnnotationFieldsToShow &&
+            readonlyMode &&
+            displayedAnnotationFields.length > 0 && (
+              <FormData>
+                <ReviewContainter>
+                  <DeclarationDataContainer>
+                    <Accordion
+                      expand={true}
+                      label={intl.formatMessage(
+                        reviewMessages.annotationsTitle
+                      )}
+                      labelForHideAction="Hide"
+                      labelForShowAction="Show"
+                      name="annotation"
+                    >
+                      <ListReview id="annotation">
+                        {displayedAnnotationFields.map((field) => (
+                          <ListReview.Row
+                            key={field.id}
+                            actions={null}
+                            id={field.id}
+                            label={intl.formatMessage(field.label)}
+                            value={
+                              <Output
+                                field={field}
+                                value={annotation[field.id]}
+                              />
+                            }
+                          />
+                        ))}
+                      </ListReview>
+                    </Accordion>
+                  </DeclarationDataContainer>
+                </ReviewContainter>
+              </FormData>
             )}
         </Card>
         {children}

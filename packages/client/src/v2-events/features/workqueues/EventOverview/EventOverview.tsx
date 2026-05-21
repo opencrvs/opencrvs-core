@@ -110,7 +110,6 @@ function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
     : eventIndex
 
   const { getUsers } = useUsers()
-  const intl = useIntl()
 
   const assignedToUser = getUsers.useQueryById(
     eventWithDrafts.assignedTo || '',

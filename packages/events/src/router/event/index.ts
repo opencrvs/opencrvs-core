@@ -32,7 +32,10 @@ import {
 } from '@opencrvs/commons/events'
 import { UserContext } from '@opencrvs/commons'
 import * as middleware from '@events/router/middleware'
-import { EventIdParam } from '@events/router/middleware'
+import {
+  EventIdParam,
+  EventIdParamWithWaitFor
+} from '@events/router/middleware'
 import {
   userOnlyProcedure,
   router,
@@ -198,10 +201,10 @@ export const eventRouter = router({
         protect: true
       }
     })
-    .input(EventIdParam)
+    .input(EventIdParamWithWaitFor)
     .output(EventDocument)
     .use(middleware.canAccessEventWithScopes(['record.read']))
-    .query(async ({ ctx }) => {
+    .query(async ({ ctx, input }) => {
       const { eventId, eventType } = ctx
       const configuration = await getEventConfigurationById({
         token: ctx.token,
@@ -210,6 +213,7 @@ export const eventRouter = router({
 
       const updatedEvent = await processAction(
         {
+          waitFor: input.waitFor,
           type: ActionType.READ,
           eventId,
           transactionId: getUUID(),

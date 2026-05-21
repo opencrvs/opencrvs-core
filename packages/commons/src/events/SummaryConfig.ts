@@ -40,6 +40,10 @@ export const SummaryConfig = z
       .array(z.union([Field, ReferenceField]))
       .describe('Fields displayed in the event summary view.')
   })
-  .describe('Configuration of the event summary section.')
+  .meta({
+    id: 'SummaryConfig',
+    description:
+      'Configuration of the event overview page. Defines which declaration fields appear in the record summary, optionally with custom labels, empty-value messages, and templated values.'
+  })
 
 export type SummaryConfig = z.infer<typeof SummaryConfig>
