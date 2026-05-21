@@ -18,9 +18,9 @@ import {
   AdministrativeArea,
   joinValues,
   Location,
-  UUID
+  UUID,
+  getAdministrativeAreaHierarchy
 } from '@opencrvs/commons/client'
-import { getAdministrativeAreaHierarchy } from '../v2-events/utils'
 
 export function filterLocations(
   locations: { [key: string]: ILocation },

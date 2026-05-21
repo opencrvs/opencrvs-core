@@ -12,7 +12,7 @@
 import { TRPCError } from '@trpc/server'
 import { NoResultError } from 'kysely'
 import * as z from 'zod/v4'
-import { TokenUserType, TokenWithBearer, UUID } from '@opencrvs/commons'
+import { logger, TokenUserType, TokenWithBearer, UUID } from '@opencrvs/commons'
 import {
   ActionInputWithType,
   ActionStatus,
@@ -120,9 +120,10 @@ export async function throwConflictIfActionNotAllowed(
   eventId: UUID,
   actionType: ActionType,
   token: TokenWithBearer,
-  customActionType?: string
+  customActionType?: string,
+  existingEvent?: EventDocument
 ) {
-  const event = await getEventById(eventId)
+  const event = existingEvent ?? (await getEventById(eventId))
   const eventConfiguration = await getEventConfigurationById({
     eventType: event.type,
     token
@@ -395,6 +396,7 @@ export async function addAction(
       buildAction(
         {
           eventId: input.eventId,
+          waitFor: input.waitFor,
           transactionId: input.transactionId,
           type: ActionType.UNASSIGN,
           declaration: {},
@@ -422,10 +424,11 @@ function isEventIndexable(event: EventDocument) {
 
 export async function ensureEventIndexed(
   event: EventDocument,
-  configuration: EventConfig
+  configuration: EventConfig,
+  waitFor: boolean
 ) {
   if (isEventIndexable(event)) {
-    await indexEvent(event, configuration)
+    await indexEvent(event, configuration, waitFor)
   }
 }
 
@@ -462,55 +465,80 @@ export async function processAction(
     configuration
   })
 
+  if (input.waitFor === false) {
+    logger.debug(
+      {
+        transactionId: input.transactionId,
+        actionType: input.type,
+        eventId
+      },
+      `Indexing action without waiting for results. Action type: ${input.type}`
+    )
+  }
   // Only send the event to Elasticsearch if it is not a draft
-  await ensureEventIndexed(updatedEvent, configuration)
+  await ensureEventIndexed(updatedEvent, configuration, input.waitFor)
   return updatedEvent
 }
 
-type AsyncRejectActionInput = Omit<
+type AsyncRejectActionInput = Pick<
   z.infer<typeof AsyncRejectActionDocument>,
-  'createdAt' | 'id' | 'status'
+  'transactionId' | 'originalActionId' | 'type'
 > & {
-  transactionId: string
-  eventId: UUID
-  originalActionId: UUID
-  createdAtLocation?: UUID
-  createdByUserType: TokenUserType
-  token: TokenWithBearer
-  eventType: string
+  keepAssignment: boolean
+  waitFor: boolean
 }
 
-export async function addAsyncRejectAction({
-  transactionId,
-  eventId,
-  type,
-  originalActionId,
-  createdBy,
-  createdByRole,
-  createdByUserType,
-  createdAtLocation,
-  eventType,
-  token
-}: AsyncRejectActionInput) {
-  const configuration = await getEventConfigurationById({
-    eventType,
-    token
-  })
-
+export async function addAsyncRejectAction(
+  {
+    transactionId,
+    originalActionId,
+    type,
+    keepAssignment,
+    waitFor
+  }: AsyncRejectActionInput,
+  {
+    user,
+    event,
+    configuration
+  }: {
+    user: TrpcUserContext
+    event: EventDocument
+    configuration: EventConfig
+  }
+) {
+  const eventId = event.id
   await eventsRepo.createAction({
     eventId,
     transactionId,
     actionType: type,
     status: ActionStatus.Rejected,
     originalActionId,
-    createdBy,
-    createdByRole,
-    createdByUserType,
-    createdAtLocation
+    createdBy: user.id,
+    createdByRole:
+      user.type === TokenUserType.enum.user ? user.role : undefined,
+    createdByUserType: user.type,
+    createdAtLocation: user.primaryOfficeId
   })
 
+  if (!keepAssignment) {
+    await eventsRepo.createAction(
+      buildAction(
+        {
+          eventId,
+          waitFor,
+          transactionId,
+          type: ActionType.UNASSIGN,
+          declaration: {},
+          assignedTo: null
+        },
+        ActionStatus.Accepted,
+        user
+      )
+    )
+  }
+
   const updatedEvent = await getEventById(eventId)
-  await indexEvent(updatedEvent, configuration)
+  await indexEvent(updatedEvent, configuration, waitFor)
   await draftsRepo.deleteDraftsByEventId(eventId)
 
   return updatedEvent

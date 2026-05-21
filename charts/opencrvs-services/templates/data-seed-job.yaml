@@ -1,0 +1,49 @@
+{{- if .Values.data_seed.enabled }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "3"
+  labels:
+    app: data-seed
+  name: data-seed
+  namespace: {{ .Release.Namespace }}
+spec:
+  template:
+    metadata:
+      labels:
+        app: data-seed
+    spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.data_seed) | nindent 6 }}
+      containers:
+        - name: data-seed
+          image: {{ include "opencrvs.image" (dict "root" . "service" .Values.data_seed) }}
+          env:
+            - name: AUTH_HOST
+              value: "http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040"
+            - name: GATEWAY_HOST
+              value: "http://gateway.{{ .Release.Namespace }}.svc.cluster.local:7070"
+            - name: COUNTRY_CONFIG_HOST
+              value: http://countryconfig.{{ .Release.Namespace }}.svc.cluster.local:3040
+            - name: SUPER_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: SUPER_USER_PASSWORD
+                  name: opencrvs-superuser
+          {{- if or (eq .Values.minio.auth_mode "auto") (eq .Values.minio.auth_mode "use_secret") }}
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  key: MINIO_ROOT_USER
+                  name: {{ .Values.minio.users_secret }}
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: MINIO_ROOT_PASSWORD
+                  name: {{ .Values.minio.users_secret }}
+          {{- end }}
+          {{- include "render-env-vars" (dict "service_name" "data_seed" "Values" .Values) }}
+      restartPolicy: "OnFailure"
+{{- end }}

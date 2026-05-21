@@ -11,7 +11,7 @@
 
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
-import { FamilyName, UserAuditRecordInput, UUID } from '@opencrvs/commons'
+import { UserName, UserAuditRecordInput, UUID } from '@opencrvs/commons'
 import { internalProcedure, serviceRouter } from '@events/router/trpc'
 import {
   getUserCredentialsByUsername,
@@ -34,7 +34,7 @@ const VerifyUserOutput = z.object({
   mobile: z.string().optional(),
   email: z.string().optional(),
   status: z.string(),
-  name: FamilyName,
+  name: UserName,
   securityQuestionKey: z.string(),
   scope: z.array(z.string())
 })
@@ -59,7 +59,7 @@ export const internalUserRouter = serviceRouter({
     .output(
       z.object({
         id: z.string(),
-        name: FamilyName,
+        name: UserName,
         mobile: z.string().optional(),
         email: z.string().optional(),
         status: z.string(),
@@ -80,13 +80,10 @@ export const internalUserRouter = serviceRouter({
 
       return {
         id: user.id,
-        name: [
-          {
-            use: 'en',
-            given: [user.firstname ?? ''],
-            family: user.surname ?? ''
-          }
-        ],
+        name: {
+          firstname: user.firstname,
+          surname: user.surname
+        },
         mobile: user.mobile ?? undefined,
         email: user.email ?? undefined,
         status: user.status,

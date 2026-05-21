@@ -27,7 +27,6 @@ import {
 import { queries } from '@client/profile/queries'
 import * as changeLanguageActions from '@client/i18n/actions'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { serviceApi } from '@client/profile/serviceApi'
 import { IStoreState } from '@client/store'
 import { ITokenPayload, User } from '@opencrvs/commons/client'
 
@@ -196,37 +195,28 @@ export const profileReducer: LoopReducer<
           })
         )
       } else {
+        const immediateCmd = Cmd.action(
+          actions.userDetailsAvailable(userDetailsCollection!)
+        )
+        // Use the cached value immediately so offline data loading is not delayed,
+        // but also re-fetch from the server so stale fields (e.g. primaryOfficeId
+        // changed by an admin) are corrected without requiring a re-login.
         return loop(
           {
             ...state,
             userDetails: userDetailsCollection
           },
-          Cmd.action(actions.userDetailsAvailable(userDetailsCollection!))
+          state.tokenPayload
+            ? Cmd.list([
+                immediateCmd,
+                Cmd.run(queries.fetchUserDetails, {
+                  successActionCreator: actions.setUserDetails,
+                  args: [state.tokenPayload.sub]
+                })
+              ])
+            : immediateCmd
         )
       }
-    case actions.SEND_VERIFY_CODE:
-      const { notificationEvent, phoneNumber, email } = action.payload
-      if (state.tokenPayload && notificationEvent && (phoneNumber || email)) {
-        return loop(
-          {
-            ...state
-          },
-          Cmd.run(serviceApi.sendVerifyCode, {
-            successActionCreator: actions.SendVerifyCodeSuccess,
-            args: [action.payload]
-          })
-        )
-      }
-      return state
-    case actions.SEND_VERIFY_CODE_COMPLETED:
-      const successPayload = action.payload
-      if (
-        state.tokenPayload &&
-        (!successPayload || successPayload.userId === state.tokenPayload.sub)
-      ) {
-        return { ...state, nonce: successPayload.nonce }
-      }
-      return state
 
     default:
       return state

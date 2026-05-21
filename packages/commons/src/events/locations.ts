@@ -23,7 +23,9 @@ import {
   scopeUsesFullOptions,
   UserFilter,
   isCustomActionScope,
-  scopeUsesPrintCertifiedCopiesOptions
+  scopeUsesPrintCertifiedCopiesOptions,
+  UserScopeV2,
+  scopeUsesRoleOptions
 } from '../scopes'
 import { SystemContext, UserContext } from '../users/User'
 
@@ -245,6 +247,68 @@ export function canAccessEventWithScope(
   return true
 }
 
+export type UserWithResolvedHierarchy = {
+  role: string
+  administrativeHierarchy: UUID[]
+  primaryOfficeId: UUID
+}
+
+export function canAccessUserWithScope({
+  userToAccess,
+  scope,
+  user
+}: {
+  userToAccess: UserWithResolvedHierarchy
+  scope: UserScopeV2
+  user: UserContext | SystemContext
+}): boolean {
+  const opts = scope.options
+
+  const hasSameOffice = user.primaryOfficeId === userToAccess.primaryOfficeId
+
+  if (
+    opts?.accessLevel === JurisdictionFilter.enum.location &&
+    !hasSameOffice
+  ) {
+    return false
+  }
+
+  const hasAdministrativeAreaInHierarchy =
+    userToAccess.administrativeHierarchy.some(
+      (id) => user.administrativeAreaId === id
+    ) || user.administrativeAreaId === null // user with null administrative area has access to all administrative areas
+
+  if (
+    opts?.accessLevel === JurisdictionFilter.enum.administrativeArea &&
+    !hasAdministrativeAreaInHierarchy
+  ) {
+    return false
+  }
+
+  if (scopeUsesRoleOptions(scope)) {
+    const { options } = scope
+    if (options?.role && !options.role.includes(userToAccess.role)) {
+      return false
+    }
+  }
+
+  return true
+}
+
+export function canAccessOtherUserWithScopes({
+  scopes,
+  userToAccess,
+  user
+}: {
+  scopes: UserScopeV2[]
+  userToAccess: UserWithResolvedHierarchy
+  user: UserContext | SystemContext
+}) {
+  return scopes.some((scope) =>
+    canAccessUserWithScope({ userToAccess, scope, user })
+  )
+}
+
 /**
  * Given indexed event and list of resolved scopes, determine if any of the scopes allow access to the event.
  *
@@ -259,4 +323,69 @@ export function userCanAccessEventWithScopes(
   return scopes.some((scope) =>
     canAccessEventWithScope(event, scope, user, customActionType)
   )
+}
+
+// Given an administrative area id, return the full hierarchy from root to leaf.
+export function getAdministrativeAreaHierarchy(
+  administrativeAreaId: string | undefined | null,
+  administrativeAreas: Map<UUID, AdministrativeArea>
+) {
+  // Collect location objects from leaf to root
+  const collectedLocations: AdministrativeArea[] = []
+
+  const parsedAdministrativeAreaId =
+    administrativeAreaId && UUID.safeParse(administrativeAreaId).data
+
+  let current = parsedAdministrativeAreaId
+    ? administrativeAreas.get(parsedAdministrativeAreaId)
+    : null
+
+  while (current) {
+    collectedLocations.push(current)
+    if (!current.parentId) {
+      break
+    }
+    const parentId = current.parentId
+    current = administrativeAreas.get(parentId)
+  }
+
+  return collectedLocations
+}
+
+/**
+ * Resolves a location or administrative area UUID into a root-first hierarchy of UUIDs.
+ *
+ * If the ID refers to a `Location` (e.g. CRVS office), the hierarchy includes
+ * the administrative area ancestors followed by the location itself.
+ * If the ID refers to an `AdministrativeArea`, returns the area's ancestor chain (root-first).
+ *
+ * Uses `getAdministrativeAreaHierarchy` which returns leaf-first order,
+ * so the result is reversed to match the root-first convention used by the server.
+ */
+export function getLocationHierarchy(
+  selectedId: UUID,
+  context: {
+    administrativeAreas: Map<UUID, AdministrativeArea>
+    locations: Map<UUID, Location>
+  }
+): UUID[] {
+  const { administrativeAreas, locations } = context
+  const loc = locations.get(selectedId)
+
+  if (loc) {
+    if (loc.administrativeAreaId) {
+      const hierarchy = getAdministrativeAreaHierarchy(
+        loc.administrativeAreaId,
+        administrativeAreas
+      )
+      return [...hierarchy.reverse().map((area) => area.id), loc.id]
+    }
+    return [loc.id]
+  }
+
+  const hierarchy = getAdministrativeAreaHierarchy(
+    selectedId,
+    administrativeAreas
+  )
+  return hierarchy.reverse().map((area) => area.id)
 }

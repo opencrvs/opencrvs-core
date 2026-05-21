@@ -10,10 +10,12 @@
  */
 
 import * as z from 'zod/v4'
+import { isEqual } from 'lodash'
 import {
+  decodeScope,
   EncodedScope,
   encodeScope,
-  RecordScopeTypeV2,
+  // RecordScopeTypeV2,
   RecordScopeV2,
   Scope
 } from './scopes'
@@ -399,7 +401,7 @@ export const legacyScopeToV2Scope = (v1Scope: string): EncodedScope => {
 
     if (configurableV1Scope.type === 'search') {
       return encodeScope({
-        type: type as RecordScopeTypeV2,
+        type: type as any,
         options: {
           event: configurableV1Scope.options.event || [],
           placeOfEvent:
@@ -421,7 +423,7 @@ export const legacyScopeToV2Scope = (v1Scope: string): EncodedScope => {
     }
 
     return encodeScope({
-      type: type as RecordScopeTypeV2,
+      type: type as any,
       options: configurableV1Scope.options as RecordScopeV2['options']
     })
   }
@@ -453,4 +455,124 @@ export function migrateLegacyScopesToV2(scopes: string[]): string[] {
       }
     })
     .filter((scope): scope is EncodedScope => !!scope)
+}
+
+// Scope types whose v2 options object carries both `accessLevel` and `role`.
+// Kept in sync with `ScopesWithRoleOption` at packages/commons/src/scopes.ts.
+const MERGEABLE_USER_SCOPE_TYPES = ['user.create', 'user.edit'] as const
+
+type MergeableUserScopeType = (typeof MERGEABLE_USER_SCOPE_TYPES)[number]
+
+function isMergeableUserScopeType(
+  type: string
+): type is MergeableUserScopeType {
+  return (MERGEABLE_USER_SCOPE_TYPES as readonly string[]).includes(type)
+}
+
+type DecodedEntry = { legacy: string; scope: Scope }
+
+function decodeLegacyScope(legacy: string): DecodedEntry {
+  const encoded = legacyScopeToV2Scope(legacy)
+  const scope = decodeScope(encoded)
+  if (!scope) {
+    throw new Error(
+      `Could not decode migrated scope from legacy '${legacy}' (encoded: '${encoded}').`
+    )
+  }
+  return { legacy, scope }
+}
+
+function groupByType(entries: DecodedEntry[]): Record<string, DecodedEntry[]> {
+  return entries.reduce<Record<string, DecodedEntry[]>>(
+    (groups, entry) => ({
+      ...groups,
+      [entry.scope.type]: [...(groups[entry.scope.type] ?? []), entry]
+    }),
+    {}
+  )
+}
+
+// Keep first occurrence of each unique scope (by deep equality).
+function deduplicateEntries(entries: DecodedEntry[]): DecodedEntry[] {
+  return entries.filter(
+    (entry, index) =>
+      entries.findIndex((e) => isEqual(e.scope, entry.scope)) === index
+  )
+}
+
+// Merges disjoint options from AND-paired v1.9 scopes into one v2 scope object.
+// Throws if two entries both define the same option key — resolve manually.
+function mergeEntries(
+  type: MergeableUserScopeType,
+  entries: DecodedEntry[]
+): Scope {
+  const optionsList = entries.map((e) =>
+    'options' in e.scope && e.scope.options
+      ? (e.scope.options as Record<string, unknown>)
+      : {}
+  )
+
+  // Detect key conflicts before merging — same key in two different entries.
+  const allKeys = optionsList.flatMap((opts) =>
+    Object.keys(opts).filter((k) => opts[k] !== undefined)
+  )
+  const conflictKey = allKeys.find((key, i) => allKeys.indexOf(key) !== i)
+  if (conflictKey) {
+    const conflicting = entries
+      .filter(
+        (e) => conflictKey in (('options' in e.scope && e.scope.options) || {})
+      )
+      .map((e) => JSON.stringify(e.legacy))
+    throw new Error(
+      `Cannot auto-merge two '${type}' scopes that both define '${conflictKey}'. ` +
+        `Conflicting legacy scopes: [${conflicting.join(', ')}]. ` +
+        `Resolve manually in roles.ts and re-run.`
+    )
+  }
+
+  const mergedOptions = Object.assign({}, ...optionsList)
+  const merged =
+    Object.keys(mergedOptions).length > 0
+      ? { type, options: mergedOptions }
+      : { type }
+  const parsed = Scope.safeParse(merged)
+  if (!parsed.success) {
+    throw new Error(
+      `Merged '${type}' scope failed schema validation: ${parsed.error.message}. ` +
+        `Legacy scopes: [${entries.map((e) => JSON.stringify(e.legacy)).join(', ')}].`
+    )
+  }
+  return parsed.data
+}
+
+/**
+ * Migrates a v1.9 role scope array to v2. Merges AND-paired strings like
+ * `['user.create:my-jurisdiction', 'user.create[role=X|Y]']` into one v2 object
+ * to prevent privilege escalation from v2's OR semantics (issue #12489).
+ *
+ * @deprecated - will be removed after migration to V2 scopes is complete.
+ */
+export function migrateLegacyScopesArrayToV2Scopes(
+  legacyScopes: string[]
+): Scope[] {
+  const groups = groupByType(legacyScopes.map(decodeLegacyScope))
+
+  return Object.entries(groups).flatMap(([type, entries]) => {
+    const deduped = deduplicateEntries(entries)
+
+    if (deduped.length <= 1) return deduped.map((e) => e.scope)
+
+    if (!isMergeableUserScopeType(type)) {
+      // Unexpected duplicates outside the known AND-pair pattern — keep all and warn.
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Multiple non-mergeable '${type}' scopes detected after dedup — kept all as-is. ` +
+          `Legacy scopes: [${deduped.map((e) => JSON.stringify(e.legacy)).join(', ')}]. ` +
+          `Review whether the duplication is intentional.`
+      )
+      return deduped.map((e) => e.scope)
+    }
+
+    return [mergeEntries(type, deduped)]
+  })
 }

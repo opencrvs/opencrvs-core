@@ -1,0 +1,71 @@
+{{ if .Values.redis.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: redis
+  name: redis
+spec:
+  clusterIP: None
+  ports:
+    - port: 6379
+      targetPort: 6379
+  selector:
+    app: redis
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: redis
+  name: redis
+spec:
+  serviceName: redis
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+      containers:
+        - image: redis:8
+          {{- if eq .Values.redis.auth_mode "acl" }}
+          command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+          {{- end }}
+          name: redis
+          {{- if .Values.redis.env }}
+          env:
+          {{- include "render-env-vars" (dict "service_name" "redis" "Values" .Values) }}
+          {{- end }}
+          ports:
+            - containerPort: 6379
+              protocol: TCP
+          {{- if eq .Values.redis.auth_mode "acl" }}
+          volumeMounts:
+            - name: redis-conf
+              mountPath: /usr/local/etc/redis/redis.conf
+              subPath: redis.conf
+              readOnly: true
+            - name: redis-acl
+              mountPath: /usr/local/etc/redis/users.acl
+              subPath: users.acl
+              readOnly: true
+          {{- end }}
+      restartPolicy: Always
+      volumes:
+      {{- if eq .Values.redis.auth_mode "acl" }}
+        - name: redis-acl
+          secret:
+            secretName: redis-opencrvs-acl
+        - name: redis-conf
+          configMap:
+            name: redis-opencrvs-conf
+      {{- end }}
+{{- end }}

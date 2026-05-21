@@ -66,10 +66,13 @@ export const VerificationPageConfig = FormPageConfig.extend({
 })
 export type VerificationPageConfig = z.infer<typeof VerificationPageConfig>
 
-export const PageConfig = z.discriminatedUnion('type', [
-  FormPageConfig,
-  VerificationPageConfig
-])
+export const PageConfig = z
+  .discriminatedUnion('type', [FormPageConfig, VerificationPageConfig])
+  .meta({
+    id: 'PageConfig',
+    description:
+      'Configuration for a single page in a form. Either a form page with fields and a continue button, or a verification page with verify/cancel options.'
+  })
 
 export type PageConfig = z.infer<typeof PageConfig>
 export type PageConfigInput = z.input<typeof PageConfig>

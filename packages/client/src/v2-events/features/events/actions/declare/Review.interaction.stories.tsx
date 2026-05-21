@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
+
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
@@ -73,7 +75,8 @@ export default meta
 
 type Story = StoryObj<typeof ReviewIndex>
 
-const mockUser = generator.user.fieldAgent().v2
+const mockUser = generator.user.fieldAgent().summary
+const mockUserFull = generator.user.fieldAgent().v2
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {
@@ -146,7 +149,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
             }
           }),
           tRPCMsw.user.get.query((id) => {
-            return mockUser
+            return mockUserFull
           })
         ]
       }
@@ -211,7 +214,7 @@ const msw = {
         return [mockUser]
       }),
       tRPCMsw.user.get.query((id) => {
-        return mockUser
+        return mockUserFull
       })
     ]
   }
@@ -398,7 +401,7 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
             return [mockUser]
           }),
           tRPCMsw.user.get.query((id) => {
-            return mockUser
+            return mockUserFull
           })
         ]
       }
@@ -571,5 +574,51 @@ export const ChangeFieldInReview: Story = {
         await expect(canvas.getByText('John Nileem-Rowa')).toBeInTheDocument()
       })
     })
+  }
+}
+
+export const MobileReviewShowsActionMenuAndExitsUndeclaredDraft: Story = {
+  name: 'Mobile: action menu visible and X-button exits undeclared draft',
+  loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
+    async () => {
+      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
+  parameters: {
+    viewport: { defaultViewport: 'mobile' },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: createdEventDocument.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    msw
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Action menu is rendered in mobile AppBar', async () => {
+      await expect(
+        await canvas.findByRole('button', { name: 'Action' })
+      ).toBeInTheDocument()
+    })
+
+    await step(
+      'Mobile X-button opens exit-without-saving modal for undeclared draft',
+      async () => {
+        const exitButton = await canvas.findByTestId('exit-button')
+        await userEvent.click(exitButton)
+
+        await expect(
+          await canvas.findByText('Exit without saving changes?')
+        ).toBeInTheDocument()
+      }
+    )
   }
 }

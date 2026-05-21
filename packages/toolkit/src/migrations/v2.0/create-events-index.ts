@@ -50,8 +50,6 @@
 import { Project, SyntaxKind, Node, SourceFile } from 'ts-morph'
 import fs from 'fs'
 import path from 'path'
-import { getCwd } from '.'
-
 const DEFINE_CONFIG_NAME = 'defineConfig'
 const HANDLER_FUNCTION_NAMES = new Set([
   'getCustomEventsHandler',
@@ -308,7 +306,7 @@ function modifyHandler(
 // ─── Entry point ─────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
-  const cwd = getCwd()
+  const cwd = process.cwd()
   const srcDir = path.join(cwd, 'src')
 
   console.log(`Scanning for defineConfig event exports in: ${srcDir}\n`)

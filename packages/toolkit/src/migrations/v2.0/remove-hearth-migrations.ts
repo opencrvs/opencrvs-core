@@ -11,8 +11,6 @@
 
 import * as fs from 'fs'
 import path from 'path'
-import { getCwd } from '.'
-
 const PATHS_TO_REMOVE = [
   {
     relativePath: 'src/migrations/hearth',
@@ -27,7 +25,7 @@ const PATHS_TO_REMOVE = [
 
 async function main() {
   for (const { relativePath, label } of PATHS_TO_REMOVE) {
-    const absolutePath = path.join(getCwd(), relativePath)
+    const absolutePath = path.join(process.cwd(), relativePath)
 
     if (fs.existsSync(absolutePath)) {
       fs.rmSync(absolutePath, { recursive: true, force: true })

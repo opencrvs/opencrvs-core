@@ -26,7 +26,8 @@ import {
   AssignmentStatus,
   EventIndex,
   getAssignmentStatus,
-  getOrThrow
+  getOrThrow,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { getUsersFullName } from '../utils'
 import { useAuthentication } from '@client/utils/userUtils'
@@ -95,9 +96,15 @@ export function DownloadButton({
 
   const { getEvent, actions } = useEvents()
   const users = useUsers()
-  const user = users.getUser.useQuery(event.assignedTo || '', {
+  const user = users.getUsers.useQueryById(event.assignedTo || '', {
     enabled: !!event.assignedTo
   }).data
+
+  if (user && user.type === TokenUserType.enum.system) {
+    throw new Error(
+      `Event ${event.id} is assigned to a system user. This should never happen`
+    )
+  }
 
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 
@@ -201,7 +208,7 @@ export function DownloadButton({
           <AvatarSmall
             key={user?.avatar || 'default'}
             avatar={user?.avatar || undefined}
-            name={user && getUsersFullName(user.name, intl.locale)}
+            name={user && getUsersFullName(user.name)}
           />
         )}
       </DownloadAction>

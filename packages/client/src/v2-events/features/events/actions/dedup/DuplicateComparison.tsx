@@ -109,11 +109,11 @@ function UserFullName({ userId }: { userId: string }) {
   const intl = useIntl()
   const users = useUsers()
 
-  const user = users.getUser.useQuery(userId).data
+  const user = users.getUsers.useQueryById(userId).data
   if (!user) {
     return null
   }
-  return getUsersFullName(user.name, intl.locale)
+  return getUsersFullName(user.name)
 }
 
 function PlaceOfEventName({ id }: { id?: UUID }) {

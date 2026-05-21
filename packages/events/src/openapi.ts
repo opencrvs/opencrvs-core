@@ -11,16 +11,21 @@
 
 import { generateOpenApiDocument } from 'trpc-to-openapi'
 import * as yaml from 'yaml'
+import { WorkqueueConfig } from '@opencrvs/commons'
 import { appRouter } from './router/router'
 
 export const openApiDocument = generateOpenApiDocument(appRouter, {
   title: 'OpenCRVS API',
   version: '1.8.0',
-  baseUrl: 'http://localhost:3000/api/events'
+  baseUrl: 'http://localhost:3000/api/events',
+  defs: {
+    // Manually add the WorkqueueConfig schema to the OpenAPI document, since it is not otherwise included.
+    WorkqueueConfig
+  }
 })
 
 // Manually add the attachments endpoint
- ;(openApiDocument.paths || {})['/attachments'] = {
+;(openApiDocument.paths || {})['/attachments'] = {
   post: {
     summary: 'Upload a file attachment',
     tags: ['Attachments'],
@@ -34,7 +39,8 @@ export const openApiDocument = generateOpenApiDocument(appRouter, {
             properties: {
               path: {
                 type: 'string',
-                description: 'Optional path in S3 where the file should be stored'
+                description:
+                  'Optional path in S3 where the file should be stored'
               },
               transactionId: {
                 type: 'string',
@@ -53,7 +59,8 @@ export const openApiDocument = generateOpenApiDocument(appRouter, {
     },
     responses: {
       '200': {
-        description: 'File uploaded successfully. Requires authentication and attachment.upload scope.',
+        description:
+          'File uploaded successfully. Requires authentication and attachment.upload scope.',
         content: {
           'application/json': {
             schema: {

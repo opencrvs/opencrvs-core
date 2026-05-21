@@ -1,0 +1,37 @@
+{{ if and .Values.postgres.enabled (eq (include "postgres.backup_enabled" .) "true") }}
+{{- if eq .Values.postgres.backup.type "differential" }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-on-deploy
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "1"
+spec:
+  template:
+    spec:
+      serviceAccountName: backup-runner
+      containers:
+        - name: stanza
+          image: bitnami/kubectl:latest
+          env:
+            - name: PGBACKREST_STANZA
+              value: main
+          command:
+            - /bin/sh
+            - -c
+            - |
+              kubectl exec -n {{ .Release.Namespace }} postgres-0 -- \
+                  pgbackrest --stanza="$PGBACKREST_STANZA" info > /tmp/pgbackrest_info 2>&1
+              if grep -q "missing stanza path" /tmp/pgbackrest_info; then
+                echo "Stanza '$PGBACKREST_STANZA' does not exist. Initializing..."
+                kubectl exec -n {{ .Release.Namespace }} postgres-0 -- \
+                  pgbackrest --stanza="$PGBACKREST_STANZA" stanza-create
+                echo "Stanza '$PGBACKREST_STANZA' created."
+              else
+                echo "Stanza '$PGBACKREST_STANZA' already exists."
+              fi
+      restartPolicy: OnFailure
+{{- end }}
+{{- end }}

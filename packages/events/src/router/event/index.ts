@@ -32,7 +32,10 @@ import {
 } from '@opencrvs/commons/events'
 import { UserContext } from '@opencrvs/commons'
 import * as middleware from '@events/router/middleware'
-import { EventIdParam } from '@events/router/middleware'
+import {
+  EventIdParam,
+  EventIdParamWithWaitFor
+} from '@events/router/middleware'
 import {
   userOnlyProcedure,
   router,
@@ -68,6 +71,7 @@ import { getDuplicateEvents } from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
 import { customActionProcedures } from './actions/custom'
+import { createAndNotifyProcedure } from './actions/createAndNotify'
 
 export const eventRouter = router({
   /*
@@ -197,10 +201,10 @@ export const eventRouter = router({
         protect: true
       }
     })
-    .input(EventIdParam)
+    .input(EventIdParamWithWaitFor)
     .output(EventDocument)
     .use(middleware.canAccessEventWithScopes(['record.read']))
-    .query(async ({ ctx }) => {
+    .query(async ({ ctx, input }) => {
       const { eventId, eventType } = ctx
       const configuration = await getEventConfigurationById({
         token: ctx.token,
@@ -209,6 +213,7 @@ export const eventRouter = router({
 
       const updatedEvent = await processAction(
         {
+          waitFor: input.waitFor,
           type: ActionType.READ,
           eventId,
           transactionId: getUUID(),
@@ -259,7 +264,9 @@ export const eventRouter = router({
       await throwConflictIfActionNotAllowed(
         input.eventId,
         ActionType.DELETE,
-        ctx.token
+        ctx.token,
+        undefined,
+        ctx.event
       )
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
@@ -276,7 +283,13 @@ export const eventRouter = router({
 
         // Consecutive middlewares lose some of the typing.
         const user = UserContext.parse(ctx.user)
-        await throwConflictIfActionNotAllowed(eventId, type, ctx.token)
+        await throwConflictIfActionNotAllowed(
+          eventId,
+          type,
+          ctx.token,
+          undefined,
+          ctx.event
+        )
 
         const previousDraft = await draftsRepo.findLatestDraftForAction(
           eventId,
@@ -312,6 +325,7 @@ export const eventRouter = router({
   }),
   actions: router({
     notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
+    createAndNotify: router(createAndNotifyProcedure()),
     declare: router(declareActionProcedures()),
     edit: router(getDefaultActionProcedures(ActionType.EDIT)),
     reject: router(getDefaultActionProcedures(ActionType.REJECT)),

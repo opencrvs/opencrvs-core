@@ -1,0 +1,22 @@
+app_name: dummy-service
+hostname: dummy-service.opencrvs.localhost
+
+service:
+  enabled: true
+  port: 80
+  container_port: 80
+
+allowed_hosts: '0.0.0.0'
+
+ingress:
+  enabled: true
+  ssl_enabled: false
+  tls_resolver: null 
+
+imagePullSecrets: []
+
+
+
+image:
+  name: ghcr.io/opencrvs/opencrvs-farajaland-demo-portals
+  tag: latest

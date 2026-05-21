@@ -33,13 +33,7 @@ describe('security question answer checking', () => {
       'TEST_NONCE',
       RetrievalSteps.NUMBER_VERIFIED,
       {
-        userFullName: [
-          {
-            use: 'en',
-            family: 'Anik',
-            given: ['Sadman']
-          }
-        ],
+        userFullName: { firstname: 'Sadman', surname: 'Anik' },
         userId: '123',
         username: 'fake_user_name',
         mobile: '123123123',
@@ -80,13 +74,7 @@ describe('security question answer checking', () => {
           'TEST_NONCE',
           RetrievalSteps.WAITING_FOR_VERIFICATION,
           {
-            userFullName: [
-              {
-                use: 'en',
-                family: 'Anik',
-                given: ['Sadman']
-              }
-            ],
+            userFullName: { firstname: 'Sadman', surname: 'Anik' },
             userId: '123',
             username: 'fake_user_name',
             mobile: '123123123',

@@ -12,6 +12,7 @@
 import fetch from 'node-fetch'
 import { array } from 'zod'
 import {
+  ApplicationConfig,
   EventConfig,
   getOrThrow,
   logger,
@@ -147,4 +148,17 @@ export async function getRoles() {
   }
 
   return array(Role).parse(await res.json())
+}
+
+export async function getApplicationConfig() {
+  const res = await fetch(
+    new URL('/config/application', env.COUNTRY_CONFIG_URL),
+    { headers: { 'Content-Type': 'application/json' } }
+  )
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch application config: ${res.status}`)
+  }
+
+  return ApplicationConfig.parse(await res.json())
 }

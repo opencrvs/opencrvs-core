@@ -8,6 +8,11 @@ exports[`createSearchOptions > creates search options for locations 1`] = `
     "searchableText": "Central Provincial Office",
   },
   {
+    "displayLabel": "Central Health Post, Central",
+    "id": "b1c2d3e4-f5a6-7890-bcde-f12345678901",
+    "searchableText": "Central Health Post",
+  },
+  {
     "displayLabel": "Ibombo District Office, Ibombo, Central",
     "id": "028d2c85-ca31-426d-b5d1-2cef545a4902",
     "searchableText": "Ibombo District Office",

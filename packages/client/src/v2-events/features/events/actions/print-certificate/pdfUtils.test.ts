@@ -17,18 +17,17 @@ import {
   AddressType,
   eventQueryDataGenerator,
   tennisClubMembershipEvent,
-  UUID
+  UUID,
+  V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
+  V2_DEFAULT_MOCK_LOCATIONS,
+  V2_DEFAULT_MOCK_LOCATIONS_MAP
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import {
   tennisClubMembershipEventDocument,
   tennisClubMembershipEventIndex
 } from '../../fixtures'
-import {
-  V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
-  V2_DEFAULT_MOCK_LOCATIONS,
-  V2_DEFAULT_MOCK_LOCATIONS_MAP
-} from '../../../../../tests/v2-events/administrative-hierarchy-mock'
+
 import {
   svgToPdfTemplate,
   stringifyEventMetadata,
@@ -486,6 +485,15 @@ describe('SVG compiler', () => {
       expectRenderOutput(
         '<svg><text>{{ $lookup $metadata "createdBy.fullHonorificName" }}</text></svg>',
         '<svg><text>1st Order Honorable Kennedy Mweene</text></svg>'
+      )
+    })
+  })
+
+  describe('Signatures', () => {
+    it('renders user signatures through action objects when $action is combined with $lookup', () => {
+      expectRenderOutput(
+        `<svg><text>{{$lookup ($action 'REGISTER') 'createdBySignature'}}</text></svg>`,
+        '<svg><text>/aa13a268-ae48-4a30-9450-554aebaab203/signature.png</text></svg>'
       )
     })
   })

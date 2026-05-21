@@ -27,7 +27,7 @@ import {
   sendVerificationCode,
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
-import { logger, UUID, IUserName } from '@opencrvs/commons'
+import { logger, UUID, UserName } from '@opencrvs/commons'
 import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
 import {
@@ -110,7 +110,7 @@ const eventsClient = createTRPCClient<AppRouter>({
 })
 
 export interface IAuthentication {
-  name: IUserName[]
+  name: UserName
   mobile?: string
   userId: string
   status: string
@@ -209,16 +209,15 @@ export async function createTokenForActionConfirmation(
   input: ActionConfirmationInput | LegacyRecordValidationInput,
   userId: UUID,
   userType: TokenUserType,
-  userRejectScope: string | undefined = undefined
+  extraScopes: EncodedScope[] = []
 ) {
   return sign(
     {
       scope: [
         encodeScope({ type: 'record.confirm-registration' }),
         encodeScope({ type: 'record.reject-registration' }),
-        encodeScope({ type: 'record.read' }), // @TODO: Remove when v1.9.13 is merged to develop. It includes a narrower fix for this.
-        userRejectScope
-      ].filter(Boolean),
+        ...extraScopes
+      ],
       eventId: 'eventId' in input ? input.eventId : undefined,
       actionId: 'actionId' in input ? input.actionId : undefined,
       recordId: 'recordId' in input ? input.recordId : undefined,
@@ -244,7 +243,7 @@ export async function createTokenForActionConfirmation(
 
 export async function storeUserInformation(
   nonce: string,
-  userFullName: IUserName[],
+  userFullName: UserName,
   userId: string,
   scope: string[],
   mobile?: string,
@@ -270,7 +269,7 @@ export async function generateAndSendVerificationCode(
   nonce: string,
   scope: string[],
   notificationEvent: NotificationEvent,
-  userFullName: IUserName[],
+  userFullName: UserName,
   mobile?: string,
   email?: string,
   role?: string | number
