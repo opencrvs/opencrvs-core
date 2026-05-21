@@ -62,7 +62,6 @@ export const handlers = {
     http.get('/api/ping', () => {
       return HttpResponse.json({
         auth: true,
-        'user-mgnt': true,
         countryconfig: true
       })
     })
