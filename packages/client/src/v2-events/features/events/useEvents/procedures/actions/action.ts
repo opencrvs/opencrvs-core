@@ -490,8 +490,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
           event: findLocalEventDocument(eventId)
         }
       }),
-      annotation,
-      waitFor: true
+      annotation
     }
   }
 
@@ -542,7 +541,6 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
 
       return mutation.mutate({
         ...params,
-        waitFor: true,
         eventConfiguration,
         declaration: getCleanedDeclarationDiff({
           eventConfiguration,

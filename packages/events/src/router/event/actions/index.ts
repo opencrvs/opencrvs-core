@@ -186,7 +186,8 @@ type DistributiveOmit<T, K extends keyof T> = T extends T ? Omit<T, K> : never
 const AsyncActionInput = BaseActionInput.pick({
   eventId: true,
   transactionId: true,
-  keepAssignment: true
+  keepAssignment: true,
+  waitFor: true
 }).extend({
   actionId: UUID
 })
@@ -270,7 +271,7 @@ export async function defaultRequestHandler(
     await ensureEventIndexed(
       eventWithRequestedAction,
       configuration,
-      input.waitFor ?? false
+      input.waitFor
     )
     return eventWithRequestedAction
   }
@@ -331,7 +332,7 @@ export async function defaultRequestHandler(
   return processAction(
     {
       ...strippedInput,
-      waitFor: input.waitFor ?? false,
+      waitFor: input.waitFor,
       keepAssignment: effectiveKeepAssignment,
       declaration: {},
       originalActionId: requestedAction.id,
@@ -442,7 +443,7 @@ export function getDefaultActionProcedures(
       .use(middleware.requireActionConfirmationAuthorization)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
-        const { eventId, actionId, waitFor } = input
+        const { eventId, actionId } = input
         const event = await getEventById(eventId)
         const originalAction = event.actions.find((a) => a.id === actionId)
         const confirmationAction = event.actions.find(
@@ -497,7 +498,6 @@ export function getDefaultActionProcedures(
         return processAction(
           {
             ...input,
-            waitFor: waitFor ?? false,
             originalActionId: actionId
           },
           {

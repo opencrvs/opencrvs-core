@@ -227,8 +227,7 @@ export function useEvents() {
               type: ActionType.ASSIGN,
               eventId,
               transactionId: getUUID(),
-              assignedTo,
-              waitFor: true
+              assignedTo
             })
           }
         },

@@ -83,7 +83,7 @@ export async function registerOnDeclare({
     eventId,
     transactionId,
     keepAssignmentIfAccepted: true,
-    waitFor: true
+
   })
 
   if (
@@ -98,7 +98,7 @@ export async function registerOnDeclare({
     annotation,
     eventId,
     transactionId,
-    waitFor: true
+
   })
 }
 
@@ -117,7 +117,7 @@ export async function editAndRegister({
     transactionId,
     keepAssignmentIfAccepted: true,
     content,
-    waitFor: true
+
   })
 
   if (wasRejected(editedEvent, ActionType.EDIT)) {
@@ -130,7 +130,7 @@ export async function editAndRegister({
     eventId,
     transactionId,
     keepAssignmentIfAccepted: true,
-    waitFor: true
+
   })
 
   if (
@@ -145,7 +145,7 @@ export async function editAndRegister({
     annotation,
     eventId,
     transactionId,
-    waitFor: true
+
   })
 }
 
@@ -163,7 +163,7 @@ export async function editAndDeclare({
     transactionId,
     keepAssignmentIfAccepted: true,
     content,
-    waitFor: true
+
   })
 
   if (wasRejected(editedEvent, ActionType.EDIT)) {
@@ -175,7 +175,7 @@ export async function editAndDeclare({
     annotation,
     eventId,
     transactionId,
-    waitFor: true
+
   })
 }
 
@@ -193,7 +193,7 @@ export async function editAndNotify({
     transactionId,
     keepAssignmentIfAccepted: true,
     content,
-    waitFor: true
+
   })
 
   if (wasRejected(editedEvent, ActionType.EDIT)) {
@@ -205,7 +205,7 @@ export async function editAndNotify({
     annotation,
     eventId,
     transactionId,
-    waitFor: true
+
   })
 }
 
@@ -223,7 +223,7 @@ export async function archiveOnDuplicate({
     transactionId,
     declaration,
     keepAssignmentIfAccepted: true,
-    waitFor: true,
+    ,
     ...(content.duplicateOf
       ? { content: { duplicateOf: content.duplicateOf } }
       : {})
@@ -233,7 +233,7 @@ export async function archiveOnDuplicate({
     transactionId,
     declaration,
     content: { reason: content.reason },
-    waitFor: true
+
   })
 }
 
@@ -284,7 +284,7 @@ export async function makeCorrectionOnRequest({
       transactionId,
       annotation,
       keepAssignmentIfAccepted: true,
-      waitFor: true
+
     })
 
   if (wasRejected(response, ActionType.REQUEST_CORRECTION)) {
@@ -310,6 +310,6 @@ export async function makeCorrectionOnRequest({
     annotation: {
       isImmediateCorrection: true
     },
-    waitFor: true
+
   })
 }

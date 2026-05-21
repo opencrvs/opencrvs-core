@@ -213,9 +213,7 @@ export const eventRouter = router({
 
       const updatedEvent = await processAction(
         {
-          // We assume there is no value for waiting for the read action.
-          // Making the selection explicit.
-          waitFor: input.waitFor ?? false,
+          waitFor: input.waitFor,
           type: ActionType.READ,
           eventId,
           transactionId: getUUID(),

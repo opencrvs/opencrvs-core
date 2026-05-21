@@ -106,7 +106,7 @@ export function declareActionProcedures() {
         if (duplicates.length > 0) {
           return processAction(
             {
-              waitFor: input.waitFor ?? false,
+              waitFor: input.waitFor,
               type: ActionType.DUPLICATE_DETECTED,
               transactionId: input.transactionId,
               eventId: input.eventId,

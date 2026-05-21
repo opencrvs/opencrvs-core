@@ -60,10 +60,12 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
       .map(async (draft) =>
         queryClient.prefetchQuery({
           queryKey: trpcOptionsProxy.event.get.queryKey({
-            eventId: draft.eventId
+            eventId: draft.eventId,
+            waitFor: false
           }),
           queryFn: trpcOptionsProxy.event.get.queryOptions({
-            eventId: draft.eventId
+            eventId: draft.eventId,
+            waitFor: false
           }).queryFn
         })
       )
@@ -231,8 +233,7 @@ export function useDrafts() {
         annotation: deepDropNulls(localDraft.action.annotation),
         transactionId: localDraft.transactionId,
         type: localDraft.action.type,
-        status: localDraft.action.status,
-        waitFor: true
+        status: localDraft.action.status
       })
     },
     isLocalDraftSubmitted: createDraft.isSuccess,

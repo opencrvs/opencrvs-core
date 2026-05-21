@@ -302,7 +302,6 @@ export function useCustomActionModal(
         customActionType: actionConfig.customActionType,
         declaration: {},
         transactionId: uuid(),
-        waitFor: true,
         annotation: modalResult.values
       })
 

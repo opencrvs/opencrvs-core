@@ -189,7 +189,12 @@ export const EventIdParam = z.object({
   customActionType: z.string().optional()
 })
 export const EventIdParamWithWaitFor = EventIdParam.extend({
-  waitFor: z.boolean().optional()
+  waitFor: z
+    .boolean()
+    .default(true)
+    .describe(
+      'Whether the action should wait for the event to be indexed before returning. Defaults to true. Setting this to false completes faster but might lead to stale data in the client if the client tries to read the event immediately after performing the action. Use with care.'
+    )
 })
 
 export type EventIdParam = z.infer<typeof EventIdParam>

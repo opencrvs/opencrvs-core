@@ -396,6 +396,7 @@ export async function addAction(
       buildAction(
         {
           eventId: input.eventId,
+          waitFor: input.waitFor,
           transactionId: input.transactionId,
           type: ActionType.UNASSIGN,
           declaration: {},
@@ -464,7 +465,7 @@ export async function processAction(
     configuration
   })
 
-  if (!input.waitFor) {
+  if (input.waitFor === false) {
     logger.debug(
       {
         transactionId: input.transactionId,
@@ -475,7 +476,7 @@ export async function processAction(
     )
   }
   // Only send the event to Elasticsearch if it is not a draft
-  await ensureEventIndexed(updatedEvent, configuration, input.waitFor ?? false)
+  await ensureEventIndexed(updatedEvent, configuration, input.waitFor ?? true)
   return updatedEvent
 }
 
@@ -484,7 +485,7 @@ type AsyncRejectActionInput = Pick<
   'transactionId' | 'originalActionId' | 'type'
 > & {
   keepAssignment: boolean
-  waitFor?: boolean
+  waitFor: boolean
 }
 
 export async function addAsyncRejectAction(
@@ -524,6 +525,7 @@ export async function addAsyncRejectAction(
       buildAction(
         {
           eventId,
+          waitFor,
           transactionId,
           type: ActionType.UNASSIGN,
           declaration: {},
@@ -536,7 +538,7 @@ export async function addAsyncRejectAction(
   }
 
   const updatedEvent = await getEventById(eventId)
-  await indexEvent(updatedEvent, configuration, waitFor ?? false)
+  await indexEvent(updatedEvent, configuration, waitFor)
   await draftsRepo.deleteDraftsByEventId(eventId)
 
   return updatedEvent
