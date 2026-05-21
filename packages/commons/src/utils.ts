@@ -8,8 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { NameFieldValue } from './events/CompositeFieldValue'
 import * as z from 'zod/v4'
 import * as _ from 'lodash'
 
