@@ -1,0 +1,93 @@
+{{- $storageType := default .Values.storage_type .Values.postgres.storage_type | default "pvc" }}
+{{- if and
+      (eq .Values.postgres.restore.type "differential")
+      (eq (include "postgres.restore_enabled" .) "true")
+}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-restore-runner-manifest
+data:
+  postgres-restore-runner.yaml: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: postgres-restore-runner
+      labels:
+        app: postgres-restore-runner
+    spec:
+      containers:
+      - name: restore-runner
+        image: {{ .Values.postgres.image }}
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            apt update
+            apt upgrade -y
+            apt install -y pgbackrest openssh-client
+            cat > /etc/ssh/ssh_config.d/backup.conf <<'EOF'
+            StrictHostKeyChecking no
+            EOF
+            sleep infinity
+        volumeMounts:
+          - name: postgres
+            mountPath: /var/lib/postgresql/data
+          - name: pgbackrest-config
+            mountPath: /etc/pgbackrest
+          - name: pgbackrest-ssh
+            mountPath: /root
+            readOnly: true
+        env:
+          - name: PGUSER
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.postgres.admin_user_secret_name }}
+                key: POSTGRES_USER
+          - name: PGBACKREST_CONFIG
+            value: /etc/pgbackrest/pgbackrest.conf
+          - name: PGBACKREST_REPO1_PATH
+            value: "{{ default .Values.postgres.restore.server_dir .Values.restore.backup_server_dir }}/postgres"
+          - name: PGBACKREST_STANZA
+            value: {{ .Values.postgres.backup.stanza }}
+          - name: PGBACKREST_REPO1_HOST_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ default .Values.postgres.restore.server_secret .Values.restore.backup_server_secret }}
+                key: user
+          - name: PGBACKREST_REPO1_HOST
+            valueFrom:
+              secretKeyRef:
+                name: {{ default .Values.postgres.restore.server_secret .Values.restore.backup_server_secret }}
+                key: host
+          - name: PGBACKREST_REPO1_TYPE
+            value: posix
+          - name: PGBACKREST_REPO1_CIPHER_TYPE
+            value: aes-256-cbc
+          - name: PGBACKREST_REPO1_CIPHER_PASS
+            valueFrom:
+              secretKeyRef:
+                name: {{ default .Values.postgres.restore.encryption_secret .Values.restore.backup_encryption_secret }}
+                key: backup_encryption_key
+      restartPolicy: Never
+      volumes:
+        - name: postgres
+      {{- if eq $storageType "pvc" }}
+          persistentVolumeClaim:
+            claimName: postgres
+      {{- else if eq $storageType "host_path" }}
+          hostPath:
+            path: {{ .Values.postgres.host_data_path | default "/data/postgres" }}
+            type: DirectoryOrCreate
+      {{- end }}
+        - name: pgbackrest-config
+          configMap:
+            name: postgres-pgbackrest-config
+        - name: pgbackrest-ssh
+          secret:
+            secretName: {{ default .Values.postgres.restore.server_secret .Values.restore.backup_server_secret }}
+            defaultMode: 0400
+            items:
+              - key: ssh_key
+                path: .ssh/id_rsa
+{{- end }}
