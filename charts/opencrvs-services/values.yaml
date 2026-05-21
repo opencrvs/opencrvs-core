@@ -408,12 +408,6 @@ login:
       httpGet:
         path: /health/ready
 
-user_mgnt:
-  port: 3030
-  env:
-    DEFAULT_USER_PASSWORD: "test"
-  image:
-    name: ocrvs-user-mgnt
 
 events:
   port: 5555
@@ -432,11 +426,6 @@ events:
     startup:
       path: /health/ready
       timeoutSeconds: 10
-user_mgnt:
-  port: 3030
-  image:
-    name: ocrvs-user-mgnt
-
 
 ##############################################################
 # One time jobs:
