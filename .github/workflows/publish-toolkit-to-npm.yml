@@ -45,6 +45,7 @@ jobs:
         id: check-version
         run: |
           PACKAGE_VERSION=$(node -p "require('../../package.json').version")
+          MAJOR_MINOR=$(echo "$PACKAGE_VERSION" | cut -d. -f1,2)
           if [ "$GITHUB_REF_TYPE" = "tag" ]; then
             TAG_NAME="$GITHUB_REF_NAME"
             if [[ "$TAG_NAME" =~ ([0-9]+)\.([0-9]+)\.([0-9]+)([-+][A-Za-z0-9.-]+)?$ ]]; then
@@ -54,8 +55,10 @@ jobs:
               echo "❌ Tag '$TAG_NAME' is not a valid semantic version (expected something like 1.2.3 or v1.2.3)"
               exit 1
             fi
+            echo "npm-tag=v$MAJOR_MINOR" >> $GITHUB_OUTPUT
           else
             TOOLKIT_VERSION="$PACKAGE_VERSION-rc.$(git rev-parse --short=7 HEAD)"
+            echo "npm-tag=v$MAJOR_MINOR-next" >> $GITHUB_OUTPUT
           fi
           if npm view @opencrvs/toolkit@$TOOLKIT_VERSION > /dev/null 2>&1; then
           echo "Version $TOOLKIT_VERSION already exists on npm."
