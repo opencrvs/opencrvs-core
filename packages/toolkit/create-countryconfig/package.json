@@ -5,7 +5,17 @@
   "bin": {
     "create-countryconfig": "./index.js"
   },
-  "files": ["index.js"],
-  "keywords": ["opencrvs", "countryconfig", "create"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/opencrvs/opencrvs-core.git"
+  },
+  "files": [
+    "index.js"
+  ],
+  "keywords": [
+    "opencrvs",
+    "countryconfig",
+    "create"
+  ],
   "license": "MPL-2.0"
 }

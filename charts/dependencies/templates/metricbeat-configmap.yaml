@@ -1,0 +1,22 @@
+{{- if .Values.monitoring.enabled }}
+---
+apiVersion: v1
+data:
+  metricbeat.yml: |
+{{ .Files.Get "files/beats/metricbeat.yml" | indent 4 }}
+kind: ConfigMap
+metadata:
+  labels:
+    app: metricbeat
+  name: metricbeat-config
+---
+apiVersion: v1
+data:
+  metricbeat-rollover-policy.json: |
+{{ .Files.Get "files/beats/metricbeat-rollover-policy.json" | indent 4 }}
+kind: ConfigMap
+metadata:
+  labels:
+    app: metricbeat
+  name: metricbeat-ilm-config
+{{- end }}

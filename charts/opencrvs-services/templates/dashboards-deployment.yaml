@@ -1,0 +1,135 @@
+{{- if .Values.dashboards.enabled }}
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: dashboards-route
+spec:
+  entryPoints:
+  {{- if or .Values.ingress.ssl_enabled .Values.ingress.tls_resolver }}
+    - websecure
+  {{- end }}
+  {{- if or .Values.ingress.tls_resolver (not .Values.ingress.ssl_enabled) }}
+    - web
+  {{- end }}
+  routes:
+  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "metabase" "Values" .Values) }}`)'
+    kind: Rule
+    services:
+    - name: dashboards
+      namespace: {{ .Release.Namespace }}
+      port: {{ .Values.dashboards.port }}
+    middlewares:
+      - name: sts-and-basic-response-headers
+  {{- if .Values.ingress.tls_resolver }}
+  tls:
+    certResolver: {{ .Values.ingress.tls_resolver }}
+  {{- else if .Values.ingress.tls_secret_name }}
+  tls:
+    secretName: {{ .Values.ingress.tls_secret_name }}
+  {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: dashboards
+  name: dashboards
+spec:
+  replicas: {{ .Values.dashboards.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: dashboards
+  template:
+    metadata:
+      annotations:
+        lastdeploy-timestamp: {{ now | quote }}
+      labels:
+        app: dashboards
+    spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.countryconfig) | nindent 6 }}
+      initContainers:
+        - name: copy-assets
+          image: {{ include "opencrvs.image" (dict "root" . "service" .Values.countryconfig) }}-assets
+          command:
+            - sh
+            - -c
+            - >
+              cp -R /assets/metabase/* /data-assets/ && \
+              chmod +x /data-assets/*.sh || true
+          volumeMounts:
+            - name: assets
+              mountPath: /data-assets
+      containers:
+        - name: dashboards
+          image: metabase/metabase:v0.56.4
+          command: ["/assets/run.sh"]
+          env:
+            - name: METABASE_DATABASE_HOST
+              value: {{ .Values.postgres.host }}
+            - name: METABASE_DATABASE_PORT
+              value: {{ .Values.postgres.port | quote }}
+            - name: METABASE_DATABASE_NAME
+              value: "events"
+          {{- if not (eq .Values.postgres.auth_mode "managed") }}
+            - name: METABASE_DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  key: EVENTS_ANALYTICS_POSTGRES_USER
+                  name: {{ .Values.postgres.users_secret }}
+            - name: METABASE_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: EVENTS_ANALYTICS_POSTGRES_PASSWORD
+                  name: {{ .Values.postgres.users_secret }}
+            {{- end }}
+            - name: METABASE_JAR
+              value: "/app/metabase.jar"
+            - name: MB_DB_INIT_SQL_FILE
+              value: "/assets/metabase.init.db.sql"
+            - name: MB_DB_FILE
+              value: "/assets/data/metabase/metabase.mv.db"
+            - name: OPENCRVS_ENVIRONMENT_CONFIGURATION_SQL_FILE
+              value: "/assets/environment-configuration.sql"
+            - name: OPENCRVS_METABASE_SITE_URL
+              value: {{ include "render-external-url" (dict "service_name" "metabase" "Values" .Values) }}
+            - name: OPENCRVS_METABASE_MAP_URL
+              value: "http://countryconfig.{{ .Release.Namespace }}.svc.cluster.local:3040/content/map.geojson"
+          {{- if .Values.dashboards.use_default_credentials }}
+            - name: OPENCRVS_METABASE_ADMIN_EMAIL
+              value: "user@opencrvs.org"
+            - name: OPENCRVS_METABASE_ADMIN_PASSWORD
+              value: m3tabase
+          {{- else }}
+            - name: OPENCRVS_METABASE_ADMIN_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: dashboards-admin-user
+                  key: OPENCRVS_METABASE_ADMIN_EMAIL
+            - name: OPENCRVS_METABASE_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dashboards-admin-user
+                  key: OPENCRVS_METABASE_ADMIN_PASSWORD
+          {{- end }}
+          {{- include "render-env-vars" (dict "service_name" "dashboards" "Values" .Values) }}
+          {{ include "resources-helper" (dict "service_name" "dashboards" "Values" .Values) | indent 10 }}
+          ports:
+            - containerPort: {{ .Values.dashboards.port }}
+              protocol: TCP
+          # TODO: Add liveness and readiness probes
+          volumeMounts:
+            - name: assets
+              mountPath: /assets
+      restartPolicy: Always
+      volumes:
+        - name: assets
+          emptyDir: {}
+{{- include "service-helper" (dict "service_name" "dashboards" "Values" .Values) }}
+
+{{- include "hpa-helper" (dict "service_name" "dashboards" "Values" .Values) }}
+
+{{- include "pdb-helper" (dict "service_name" "dashboards" "Values" .Values) }}
+
+
+{{- end }}

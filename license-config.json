@@ -27,6 +27,7 @@
     "AUTHORS",
     "LICENSE",
     "Tiltfile",
+    "charts",
     "license-header.txt",
     "**/*Dockerfile*",
     "**/packages/components/lib",
