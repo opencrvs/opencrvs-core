@@ -23,8 +23,3 @@ services:
   auth:
     environment:
       - NODE_ENV=development
-
-  user-mgnt:
-    environment:
-      - NODE_ENV=development
-

@@ -13,7 +13,7 @@ This will run all the pending migrations.
 
 - #### `yarn create:<package> migration-name`
 
-e.g. `yarn create:user-mgnt migration-name`
+e.g. `yarn create:events migration-name`
 
 This will create a new migration named `migration-name` prepended with the current
 timestamp in the migrations/<package> folder.
@@ -26,6 +26,6 @@ With **Postgres**, it's similar but the migrations are written in SQL instead of
 
 - #### `yarn status:<package>`
 
-e.g. `yarn status:user-mgnt`
+e.g. `yarn status:events`
 
 This will show status for the migration scripts defined in the migrations/<package> folder.
