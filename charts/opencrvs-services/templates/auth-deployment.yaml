@@ -87,8 +87,6 @@ spec:
               value: '604800'
             - name: EVENTS_URL
               value: http://events.{{ .Release.Namespace }}.svc.cluster.local:5555/
-            - name: USER_MANAGEMENT_URL
-              value: http://user-mgnt.{{ .Release.Namespace }}.svc.cluster.local:3030/
             - name: AUTH_PORT
               value: "{{ .Values.auth.port }}"
             - name: COUNTRY_CONFIG_URL_INTERNAL

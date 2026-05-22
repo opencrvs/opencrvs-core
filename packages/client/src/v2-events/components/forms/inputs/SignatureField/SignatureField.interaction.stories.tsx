@@ -28,6 +28,7 @@ import {
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { TestImage } from '@client/v2-events/features/events/fixtures'
+import { shouldBypassLock } from '@client/utils/lockBypass'
 import { getTestValidatorContext } from '../../../../../../.storybook/decorators'
 import { SignatureField } from './SignatureField'
 
@@ -214,6 +215,162 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
       // alt text of the image
       await canvas.findByAltText('Signature')
     })
+  }
+}
+
+/**
+ * Regression test for the mobile PIN-lock-during-upload fix.
+ *
+ * Every uploader that opens a native picker — `SignatureField`,
+ * `SimpleDocumentUploader` (FILE), and `DocumentUploaderWithOption`
+ * (FILE_WITH_OPTIONS) — must arm the bypass flag (via `setLockBypass`)
+ * before the picker is invoked. Otherwise `ProtectedPage` triggers the
+ * PIN re-lock as soon as the picker sends the page to background,
+ * interrupting the upload mid-flow.
+ *
+ * Renders all three uploaders on the same form and checks each Upload
+ * button in turn. Asserts via `shouldBypassLock()` — the same call
+ * `ProtectedPage` would make on a visibility transition. Single-shot:
+ * the second call must return `false` so a later real background still
+ * triggers the PIN.
+ */
+export const UploadButtonsArmLockBypass: StoryObj<
+  typeof StyledFormFieldGenerator
+> = {
+  name: 'Upload buttons arm PIN-lock bypass (Signature / File / FileWithOptions)',
+  parameters: {
+    layout: 'centered',
+    reactRouter: {
+      router: {
+        path: '/event/:eventId',
+        element: (
+          <StyledFormFieldGenerator
+            fields={[
+              {
+                id: 'storybook.signature',
+                type: FieldType.SIGNATURE,
+                configuration: {
+                  maxFileSize: 1 * 1024 * 1024,
+                  acceptedFileTypes: [MimeType.enum['image/png']]
+                },
+                signaturePromptLabel: generateTranslationConfig('Signature'),
+                label: generateTranslationConfig('Upload signature')
+              },
+              {
+                id: 'storybook.file',
+                type: FieldType.FILE,
+                configuration: {
+                  maxFileSize: 1 * 1024 * 1024,
+                  acceptedFileTypes: [MimeType.enum['image/png']]
+                },
+                label: generateTranslationConfig('Upload document')
+              },
+              {
+                id: 'storybook.fileWithOption',
+                type: FieldType.FILE_WITH_OPTIONS,
+                configuration: {
+                  maxFileSize: 1 * 1024 * 1024,
+                  acceptedFileTypes: [MimeType.enum['image/png']]
+                },
+                label: generateTranslationConfig('Upload supporting document'),
+                options: [
+                  {
+                    value: 'forest',
+                    label: generateTranslationConfig('Forest')
+                  },
+                  {
+                    value: 'beach',
+                    label: generateTranslationConfig('Beach')
+                  }
+                ]
+              }
+            ]}
+            id="my-form"
+            validatorContext={getTestValidatorContext()}
+          />
+        )
+      },
+      initialPath: '/event/123-abcd-213'
+    },
+    chromatic: { disableSnapshot: true }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    /**
+     * Both `formMessages.uploadFile` and `buttonMessages.upload` resolve to
+     * the string "Upload", so all three uploader buttons share that name.
+     * `findAllByRole` returns them in DOM order, which matches the order of
+     * the `fields` array above: [signature, file, fileWithOption].
+     */
+    const getUploadButtons = async () =>
+      canvas.findAllByRole('button', { name: 'Upload' })
+
+    /**
+     * Dispatching a `focus` event on `window` simulates the user returning
+     * from the native picker / camera / external app — the same signal the
+     * lockBypass module listens for to clear the pending bypass.
+     */
+    const simulateReturnFromPicker = () =>
+      window.dispatchEvent(new Event('focus'))
+
+    await step('Bypass flag is not armed before user interacts', async () => {
+      // Drain any pending bypass a previous story may have left behind.
+      simulateReturnFromPicker()
+      await expect(shouldBypassLock()).toBe(false)
+    })
+
+    await step(
+      'SignatureField upload arms the bypass, focus return clears it',
+      async () => {
+        const [signatureUpload] = await getUploadButtons()
+        await userEvent.click(signatureUpload)
+
+        // Upload click armed the bypass — repeated reads stay true because
+        // shouldBypassLock is a pure query.
+        await expect(shouldBypassLock()).toBe(true)
+        await expect(shouldBypassLock()).toBe(true)
+
+        // User returns from the picker → focus listener clears the flag,
+        // so a later real background event still triggers the PIN re-lock.
+        simulateReturnFromPicker()
+        await expect(shouldBypassLock()).toBe(false)
+      }
+    )
+
+    await step(
+      'FILE field upload arms the bypass, focus return clears it',
+      async () => {
+        const [, fileUpload] = await getUploadButtons()
+        await userEvent.click(fileUpload)
+
+        await expect(shouldBypassLock()).toBe(true)
+
+        simulateReturnFromPicker()
+        await expect(shouldBypassLock()).toBe(false)
+      }
+    )
+
+    await step(
+      'FILE_WITH_OPTIONS upload arms the bypass, focus return clears it',
+      async () => {
+        // The Upload button is disabled until a document type is picked.
+        // Open the react-select dropdown and choose an option to enable it.
+        const selectControl = canvasElement.querySelector(
+          '.react-select__control'
+        ) as HTMLElement
+        await userEvent.click(selectControl)
+        await userEvent.click(await canvas.findByText('Forest'))
+
+        const [, , fileWithOptionUpload] = await getUploadButtons()
+        await userEvent.click(fileWithOptionUpload)
+
+        await expect(shouldBypassLock()).toBe(true)
+
+        simulateReturnFromPicker()
+        await expect(shouldBypassLock()).toBe(false)
+      }
+    )
   }
 }
 
