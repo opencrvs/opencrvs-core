@@ -146,15 +146,30 @@ export function AdministrativeAreasProvider({
   )
 }
 
+// Ref works since arrays are compared by reference.
+let cachedAdministrativeAreasRef: unknown = null
+/** In-memory cache of leaf administrative area IDs */
+let cachedLeafAdministrativeAreaIds: { id: UUID }[] | null = null
+
+/**
+ * Uses in-memory caching to avoid recomputation on re-renders. Becomes costly with large datasets.
+ *
+ * @returns array of leaf administrative area IDs.
+ */
 export function useSuspenseGetLeafAdministrativeAreaIds() {
-  const ctx = React.useContext(AdministrativeAreasContext)
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
-  return useMemo(
-    () =>
-      ctx?.leafAdminAreaIds ??
-      getLeafAdministrativeAreaIds(administrativeAreas),
-    [ctx, administrativeAreas]
-  )
+  if (
+    cachedLeafAdministrativeAreaIds &&
+    cachedAdministrativeAreasRef === administrativeAreas
+  ) {
+    return cachedLeafAdministrativeAreaIds
+  }
+
+  const leafIds = getLeafAdministrativeAreaIds(administrativeAreas)
+  cachedAdministrativeAreasRef = administrativeAreas
+  cachedLeafAdministrativeAreaIds = leafIds
+
+  return leafIds
 }
