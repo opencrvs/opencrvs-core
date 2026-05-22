@@ -48,6 +48,7 @@ vi.mock('@client/v2-events/hooks/useLocations', () => ({
 vi.mock('@client/v2-events/hooks/useAdministrativeAreas', () => ({
   useAdministrativeAreas: () => ({
     getAdministrativeAreas: {
+      useFromContext: () => V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
       useSuspenseQuery: () => V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
     }
   })

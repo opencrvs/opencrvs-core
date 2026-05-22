@@ -36,7 +36,10 @@ import { TRPCProvider } from '@client/v2-events/trpc'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { getOfflineData } from '@client/offline/selectors'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
-import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
+import {
+  AdministrativeAreasProvider,
+  useAdministrativeAreas
+} from '../../../hooks/useAdministrativeAreas'
 import { Address } from './Address'
 
 const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
@@ -44,7 +47,9 @@ const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   decorators: [
     (Story, context) => (
       <TRPCProvider>
-        <Story {...context} />
+        <AdministrativeAreasProvider>
+          <Story {...context} />
+        </AdministrativeAreasProvider>
       </TRPCProvider>
     ),
     withValidatorContext

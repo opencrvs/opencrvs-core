@@ -110,7 +110,8 @@ export function useAdministrativeAreas() {
 export function getLeafAdministrativeAreaIds(
   administrativeAreas: Map<UUID, AdministrativeArea>
 ): Array<{ id: UUID }> {
-  const nonLeafAdministrativeAreaIds: Record<string, true> = Object.create(null)
+  const nonLeafAdministrativeAreaIds: Partial<Record<string, true>> =
+    Object.create(null)
 
   for (const [, location] of administrativeAreas) {
     if (location.parentId) {
