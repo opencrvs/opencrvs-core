@@ -1,7 +1,9 @@
 openapi: 3.1.0
 info:
   title: OpenCRVS API
-  version: 1.8.0
+  description: OpenCRVS Events API — for full documentation, see
+    [https://documentation.opencrvs.org](https://documentation.opencrvs.org)
+  version: 2.0.0
 servers:
   - url: http://localhost:3000/api/events
 paths:
@@ -10,7 +12,7 @@ paths:
       operationId: event-reindex-trigger
       summary: Triggers reindexing of search, workqueues and notifies country config
       tags:
-        - events
+        - Events
       security:
         - Authorization: []
       parameters: []
@@ -58,7 +60,7 @@ paths:
       operationId: event-reindex-status
       summary: Returns the status of current and past reindexing calls
       tags:
-        - events
+        - Events
       security:
         - Authorization: []
       parameters:
@@ -135,7 +137,7 @@ paths:
       operationId: event-config-get
       summary: List event configurations
       tags:
-        - events
+        - Events
       security:
         - Authorization: []
       responses:
@@ -155,7 +157,7 @@ paths:
       operationId: event-create
       summary: Create event
       tags:
-        - events
+        - Events
       security:
         - Authorization: []
       parameters: []
@@ -196,7 +198,7 @@ paths:
       operationId: event-get
       summary: Fetch full event document
       tags:
-        - events
+        - Events
       security:
         - Authorization: []
       parameters:
@@ -238,7 +240,7 @@ paths:
       operationId: event-actions-notify-request
       summary: Notify an event
       tags:
-        - events
+        - Events
       security:
         - Authorization: []
       parameters:
@@ -330,7 +332,7 @@ paths:
       summary: Create an event and immediately notify (single request, system clients
         only)
       tags:
-        - events
+        - Events
       security:
         - Authorization: []
       parameters: []
@@ -410,7 +412,7 @@ paths:
       operationId: event-actions-correction-request-request
       summary: Request correction for an event
       tags:
-        - events
+        - Events
       security:
         - Authorization: []
       parameters:
@@ -501,7 +503,7 @@ paths:
       operationId: event-actions-correction-approve-request
       summary: Approve correction for an event
       tags:
-        - events
+        - Events
       security:
         - Authorization: []
       parameters:
@@ -595,7 +597,7 @@ paths:
       operationId: event-actions-correction-reject-request
       summary: Reject correction for an event
       tags:
-        - events
+        - Events
       security:
         - Authorization: []
       parameters:
@@ -763,7 +765,7 @@ paths:
       summary: List locations
       description: Retrieve a list of locations based on provided filters.
       tags:
-        - locations
+        - Locations
       security:
         - Authorization: []
       parameters:
