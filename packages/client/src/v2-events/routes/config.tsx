@@ -163,8 +163,6 @@ export function useNetworkProbe() {
 export const routesConfig = {
   path: ROUTES.V2.path,
   Component: () => {
-    useNetworkProbe()
-
     const currentUser = useSelector(getUserDetails)
 
     if (!currentUser) {
