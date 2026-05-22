@@ -76,6 +76,211 @@ const meta: Meta = {
 export default meta
 
 /**
+ * Mock jurisdiction context used in office-picker scope stories below.
+ * IDs match V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS and V2_DEFAULT_MOCK_LOCATIONS.
+ *
+ * Hierarchy:
+ *   Central (province)
+ *     └── Ibombo (district)
+ *         ├── Ibombo District Office  ← LOCAL_SYSTEM_ADMIN's office (set in preview.tsx)
+ *         └── Ibombo Rural Health Centre
+ *   Sulaka (province, separate root)
+ *       └── Ilanga (district)
+ *           ├── Sulaka Provincial Office
+ *           └── Ilanga District Office
+ */
+const IBOMBO_DISTRICT_OFFICE_ID = '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
+
+/**
+ * LOCAL_SYSTEM_ADMIN holds user.edit { accessLevel: 'administrativeArea' },
+ * scoping their jurisdiction to the Ibombo administrative area (Central province).
+ * The office picker when editing an existing user must show only offices within
+ * that area and exclude offices from other provinces.
+ *
+ * Expected:
+ *   - "Ibombo District Office" visible (adminArea = Ibombo ✓)
+ *   - "Sulaka Provincial Office" absent (adminArea = Sulaka ✗)
+ */
+export const EditUserOfficePickerRestrictedByAdministrativeArea: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: mockUser.id,
+        pageId: 'user.office'
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        user: [tRPCMsw.user.get.query(() => mockUser)],
+        locationHierarchy: [
+          tRPCMsw.locations.getLocationHierarchy.query(() => [
+            CENTRAL_ADMIN_AREA_ID,
+            IBOMBO_ADMIN_AREA_ID,
+            IBOMBO_DISTRICT_OFFICE_ID
+          ])
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().clear()
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Ibombo District Office appears — it is within the Ibombo administrative area',
+      async () => {
+        const input = await canvas.findByRole('combobox')
+        await userEvent.type(input, 'Ibombo')
+        await expect(
+          canvas.findByText('Ibombo District Office')
+        ).resolves.toBeInTheDocument()
+      }
+    )
+
+    await step(
+      'Sulaka Provincial Office does not appear — it is outside the Ibombo jurisdiction',
+      async () => {
+        const input = canvas.getByRole('combobox')
+        await userEvent.clear(input)
+        await userEvent.type(input, 'Sulaka')
+        await waitFor(() =>
+          expect(canvas.queryByText('Sulaka Provincial Office')).toBeNull()
+        )
+      }
+    )
+  }
+}
+
+/**
+ * LOCAL_SYSTEM_ADMIN holds user.create { accessLevel: 'administrativeArea' },
+ * scoping their jurisdiction to the Ibombo administrative area (Central province).
+ * The office picker when creating a new user must show only offices within
+ * that area and exclude offices from other provinces.
+ *
+ * Expected:
+ *   - "Ibombo District Office" visible (adminArea = Ibombo ✓)
+ *   - "Ilanga District Office" absent (adminArea = Ilanga under Sulaka ✗)
+ */
+export const CreateUserOfficePickerRestrictedByAdministrativeArea: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.office'
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        // The admin's primaryOfficeId must resolve to a location in V2_DEFAULT_MOCK_LOCATIONS
+        // so that filterLocationsByJurisdiction can walk the administrative area hierarchy.
+        user: [
+          tRPCMsw.user.get.query(() => ({
+            ...localSystemAdminUser,
+            primaryOfficeId: IBOMBO_DISTRICT_OFFICE_ID
+          }))
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().clear()
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      "Ibombo District Office appears — within the admin's Ibombo jurisdiction",
+      async () => {
+        const input = await canvas.findByRole('combobox')
+        await userEvent.type(input, 'Ibombo')
+        await expect(
+          canvas.findByText('Ibombo District Office')
+        ).resolves.toBeInTheDocument()
+      }
+    )
+
+    await step(
+      'Ilanga District Office does not appear — it is in Ilanga/Sulaka, outside Ibombo jurisdiction',
+      async () => {
+        const input = canvas.getByRole('combobox')
+        await userEvent.clear(input)
+        await userEvent.type(input, 'Ilanga')
+        await waitFor(() =>
+          expect(canvas.queryByText('Ilanga District Office')).toBeNull()
+        )
+      }
+    )
+  }
+}
+
+/**
+ * NATIONAL_SYSTEM_ADMIN holds user.create without an accessLevel restriction,
+ * which resolves to 'all'. The office picker when creating a new user must
+ * show offices from any province in the system.
+ *
+ * Expected:
+ *   - "Ibombo District Office" visible (Central province ✓)
+ *   - "Sulaka Provincial Office" visible (Sulaka province ✓)
+ */
+export const CreateUserOfficePickerUnrestrictedForNationalAdmin: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.office'
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().clear()
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Ibombo District Office appears (in Central province)',
+      async () => {
+        const input = await canvas.findByRole('combobox')
+        await userEvent.type(input, 'Ibombo')
+        await expect(
+          canvas.findByText('Ibombo District Office')
+        ).resolves.toBeInTheDocument()
+      }
+    )
+
+    await step(
+      'Sulaka Provincial Office also appears — no jurisdiction restriction for national admin',
+      async () => {
+        const input = canvas.getByRole('combobox')
+        await userEvent.clear(input)
+        await userEvent.type(input, 'Sulaka')
+        await expect(
+          canvas.findByText('Sulaka Provincial Office')
+        ).resolves.toBeInTheDocument()
+      }
+    )
+  }
+}
+
+/**
  * Regression test for: hospital offices not appearing as Registration Office options.
  *
  * The registration office field must include both CRVS_OFFICE and HEALTH_FACILITY
