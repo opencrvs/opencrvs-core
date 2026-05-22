@@ -2,6 +2,34 @@
 
 ## 1.9.14 Release Candidate
 
+### New features
+
+- Two new toolkit methods allow country configurations to implement custom client-side logic that goes beyond the predefined `field()` methods. [#11653](https://github.com/opencrvs/opencrvs-core/issues/11653)
+
+  **`field('id').customClientValidator(fn)`** — validate a field with an arbitrary inline function. The function is serialised into the form configuration and executed just-in-time during validation. All logic must be self-contained — external references such as lodash are not available — so the validator stays portable wherever the schema is evaluated.
+
+  ```ts
+  field('nid').customClientValidator((value) => {
+    // LUHN check — all logic must be inline
+    const digits = String(value).split('').reverse().map(Number)
+    let sum = 0
+    digits.forEach((d, i) => {
+      const n = i % 2 === 0 ? d : d * 2
+      sum += n > 9 ? n - 9 : n
+    })
+    return sum % 10 === 0
+  })
+  ```
+
+  The result is a `JSONSchema` and can be used anywhere a conditional validator is accepted (field `validation[]`, page conditionals, etc.).
+
+  **`field('id').customClientEvaluation(fn)`** — compute a derived value from one field and the full form context. Returns a `CodeToEvaluate` descriptor usable as `value`, `evaluatedDefaultValue`, or a `DATA` component entry.
+
+  ```ts
+  field('quantity').customClientEvaluation((qty, ctx) =>
+    Number(qty) * Number(ctx.$form['unitPrice'])
+  )
+  ```
 ### Bug fixes
 
 - Signature fields referenced in certificate templates via Handlebars now resolve correctly. Signatures captured during registration and on the review page were previously not rendered in printed certificates even when the template referenced them. [#12277](https://github.com/opencrvs/opencrvs-core/issues/12277)

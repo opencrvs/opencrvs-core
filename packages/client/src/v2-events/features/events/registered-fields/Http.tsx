@@ -11,7 +11,7 @@
 
 import React, { useRef } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { get, isEqual } from 'lodash'
+import { isEqual } from 'lodash'
 import {
   FieldValue,
   getMixedPath,

@@ -13,7 +13,8 @@ import { FieldConfig } from '../events/FieldConfig'
 import { FieldType } from '../events/FieldType'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { errorMessages, validateFieldInput } from './validate'
+import { errorMessages, runFieldValidations, validateFieldInput } from './validate'
+import { field } from '../events/field'
 /**
  * Goal of testing is to ensure right error messages are returned, and our custom logic holds.
  * We should be able to trust zod validation for the rest.
@@ -143,5 +144,184 @@ describe(`validateFieldInput -- ${FieldType.EMAIL}`, () => {
         validateFieldInput({ field: input.field, value: input.value })
       ).toEqual(output)
     })
+  })
+})
+
+describe('runFieldValidations with customClientValidator', () => {
+  const errorMessage = {
+    id: 'error.customValidation',
+    defaultMessage: 'Custom validation failed',
+    description: ''
+  }
+
+  it('passes when the custom validator returns true', () => {
+    const fieldConfig: FieldConfig = {
+      type: FieldType.TEXT,
+      id: 'nid',
+      label: { id: 'nid.label', defaultMessage: 'NID', description: '' },
+      required: true,
+      validation: [
+        {
+          validator: field('nid').customClientValidator(
+            (value) => String(value).length === 6
+          ),
+          message: errorMessage
+        }
+      ]
+    }
+
+    expect(
+      runFieldValidations({
+        field: fieldConfig,
+        value: '123456',
+        form: { nid: '123456' },
+        context: {}
+      })
+    ).toEqual([])
+  })
+
+  it('fails when the custom validator returns false', () => {
+    const fieldConfig: FieldConfig = {
+      type: FieldType.TEXT,
+      id: 'nid',
+      label: { id: 'nid.label', defaultMessage: 'NID', description: '' },
+      required: true,
+      validation: [
+        {
+          validator: field('nid').customClientValidator(
+            (value) => String(value).length === 6
+          ),
+          message: errorMessage
+        }
+      ]
+    }
+
+    expect(
+      runFieldValidations({
+        field: fieldConfig,
+        value: '12345',
+        form: { nid: '12345' },
+        context: {}
+      })
+    ).toEqual([{ message: errorMessage }])
+  })
+
+  it('can access other form fields via context to cross-validate two number fields', () => {
+    // Ensures the value of itemSum equals itemA + itemB
+    const sumValidator = (value: unknown, ctx: unknown) => {
+      const { $form } = ctx as { $form: Record<string, unknown> }
+      return Number(value) === Number($form.itemA) + Number($form.itemB)
+    }
+
+    const fieldConfig: FieldConfig = {
+      type: FieldType.NUMBER,
+      id: 'itemSum',
+      label: { id: 'itemSum.label', defaultMessage: 'Sum', description: '' },
+      required: true,
+      validation: [
+        {
+          validator: field('itemSum').customClientValidator(sumValidator),
+          message: errorMessage
+        }
+      ]
+    }
+
+    expect(
+      runFieldValidations({
+        field: fieldConfig,
+        value: 10,
+        form: { itemA: 3, itemB: 7, itemSum: 10 },
+        context: {}
+      })
+    ).toEqual([])
+
+    expect(
+      runFieldValidations({
+        field: fieldConfig,
+        value: 8,
+        form: { itemA: 3, itemB: 7, itemSum: 8 },
+        context: {}
+      })
+    ).toEqual([{ message: errorMessage }])
+  })
+
+  it('can combine multiple custom validators on the same field', () => {
+    const isPositive = (value: unknown) => Number(value) > 0
+    const isEven = (value: unknown) => Number(value) % 2 === 0
+
+    const fieldConfig: FieldConfig = {
+      type: FieldType.NUMBER,
+      id: 'amount',
+      label: {
+        id: 'amount.label',
+        defaultMessage: 'Amount',
+        description: ''
+      },
+      required: true,
+      validation: [
+        {
+          validator: field('amount').customClientValidator(isPositive),
+          message: {
+            id: 'error.mustBePositive',
+            defaultMessage: 'Must be positive',
+            description: ''
+          }
+        },
+        {
+          validator: field('amount').customClientValidator(isEven),
+          message: {
+            id: 'error.mustBeEven',
+            defaultMessage: 'Must be even',
+            description: ''
+          }
+        }
+      ]
+    }
+
+    // 4 is positive and even — passes both
+    expect(
+      runFieldValidations({
+        field: fieldConfig,
+        value: 4,
+        form: { amount: 4 },
+        context: {}
+      })
+    ).toEqual([])
+
+    // -2 is not positive
+    expect(
+      runFieldValidations({
+        field: fieldConfig,
+        value: -2,
+        form: { amount: -2 },
+        context: {}
+      })
+    ).toEqual([
+      {
+        message: {
+          id: 'error.mustBePositive',
+          defaultMessage: 'Must be positive',
+          description: ''
+        }
+      }
+    ])
+
+    // 3 is not even
+    expect(
+      runFieldValidations({
+        field: fieldConfig,
+        value: 3,
+        form: { amount: 3 },
+        context: {}
+      })
+    ).toEqual([
+      {
+        message: {
+          id: 'error.mustBeEven',
+          defaultMessage: 'Must be even',
+          description: ''
+        }
+      }
+    ])
   })
 })
