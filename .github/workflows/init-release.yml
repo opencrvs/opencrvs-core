@@ -94,8 +94,8 @@ jobs:
 
           git checkout -b "release/${{ inputs.version }}"
 
-          # Bump package.json in every lerna package without creating git tags.
-          npx lerna exec 'yarn version --new-version ${{ inputs.version }} --no-git-tag-version'
+          # Bump all workspace package.json files and the root in one command.
+          npm version ${{ inputs.version }} --no-git-tag-version --workspaces --include-workspace-root
           git add .
           git commit -m "chore: update version to ${{ inputs.version }}"
 
