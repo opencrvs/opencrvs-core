@@ -1,6 +1,8 @@
 openapi: 3.1.0
 info:
   title: OpenCRVS API
+  description: OpenCRVS Events API — for full documentation, see
+    [https://documentation.opencrvs.org](https://documentation.opencrvs.org)
   version: 2.0.0
 servers:
   - url: http://localhost:3000/api/events
