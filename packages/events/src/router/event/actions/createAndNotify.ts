@@ -86,7 +86,7 @@ export function createAndNotifyProcedure() {
             'Create an event and immediately notify (single request, system clients only)',
           method: 'POST',
           path: '/events/notify',
-          tags: ['events'],
+          tags: ['Events'],
           protect: true
         }
       })
