@@ -126,19 +126,15 @@ export function AdministrativeAreasProvider({
     queryKey: trpc.administrativeAreas.list.queryKey({})
   })
 
-  const administrativeAreasMap = useMemo(
-    () =>
-      new Map<UUID, AdministrativeArea>(queryResult.data.map((a) => [a.id, a])),
-    [queryResult.data]
-  )
-  const leafAdminAreaIds = useMemo(
-    () => getLeafAdministrativeAreaIds(administrativeAreasMap),
-    [administrativeAreasMap]
-  )
-  const value = useMemo(
-    () => ({ administrativeAreasMap, leafAdminAreaIds }),
-    [administrativeAreasMap, leafAdminAreaIds]
-  )
+  const value = useMemo(() => {
+    const administrativeAreasMap = new Map<UUID, AdministrativeArea>(
+      queryResult.data.map((a) => [a.id, a])
+    )
+    return {
+      administrativeAreasMap,
+      leafAdminAreaIds: getLeafAdministrativeAreaIds(administrativeAreasMap)
+    }
+  }, [queryResult.data])
   return (
     <AdministrativeAreasContext.Provider value={value}>
       {children}
