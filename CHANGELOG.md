@@ -23,17 +23,19 @@
 
   The result is a `JSONSchema` and can be used anywhere a conditional validator is accepted (field `validation[]`, page conditionals, etc.).
 
-  **`field('id').customClientEvaluation(fn)`** — compute a derived value from one field and the full form context. Returns a `CodeToEvaluate` descriptor usable as `value`, `evaluatedDefaultValue`, or a `DATA` component entry.
+  **`field('id').customClientEvaluation(fn)`** — compute a derived value from one field and the full form context. Returns a `CodeToEvaluate` descriptor usable as `value`, `defaultValue`, or a `DATA` component entry.
 
   ```ts
-  field('quantity').customClientEvaluation((qty, ctx) =>
-    Number(qty) * Number(ctx.$form['unitPrice'])
+  field('quantity').customClientEvaluation(
+    (qty, ctx) => Number(qty) * Number(ctx.$form['unitPrice'])
   )
   ```
+
+- Always display a "Go to review" button on every page of declaration form to allow easier navigation between the preview and the form fields. [#10132](https://github.com/opencrvs/opencrvs-core/issues/10132)
+
 ### Bug fixes
 
 - Signature fields referenced in certificate templates via Handlebars now resolve correctly. Signatures captured during registration and on the review page were previously not rendered in printed certificates even when the template referenced them. [#12277](https://github.com/opencrvs/opencrvs-core/issues/12277)
-- Always display a "Go to review" button on every page of declaration form to allow easier navigation between the preview and the form fields. [#10132](https://github.com/opencrvs/opencrvs-core/issues/10132)
 
 ## 1.9.13
 
