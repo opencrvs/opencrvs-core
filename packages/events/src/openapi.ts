@@ -16,8 +16,10 @@ import { appRouter } from './router/router'
 
 export const openApiDocument = generateOpenApiDocument(appRouter, {
   title: 'OpenCRVS API',
-  version: '1.8.0',
+  version: '2.0.0',
   baseUrl: 'http://localhost:3000/api/events',
+  description:
+    'OpenCRVS Events API — for full documentation, see [https://documentation.opencrvs.org](https://documentation.opencrvs.org)',
   defs: {
     // Manually add the WorkqueueConfig schema to the OpenAPI document, since it is not otherwise included.
     WorkqueueConfig
