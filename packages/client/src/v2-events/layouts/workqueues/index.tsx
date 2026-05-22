@@ -29,7 +29,6 @@ import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { emptyMessage } from '@client/v2-events/utils'
 import { constantsMessages } from '@client/i18n/messages/constants'
-import { AdministrativeAreasProvider } from '@client/v2-events/hooks/useAdministrativeAreas'
 import { Hamburger } from '../sidebar/Hamburger'
 import { Sidebar } from '../sidebar/Sidebar'
 
@@ -86,36 +85,34 @@ export function WorkqueueLayout({
     }).length > 0
 
   return (
-    <AdministrativeAreasProvider>
-      <Frame
-        header={
-          <AppBar
-            desktopCenter={<DesktopCenter />}
-            desktopRight={<ProfileMenu key="profileMenu" />}
-            mobileLeft={<Hamburger />}
-            mobileRight={
-              hasSearchScope && (
-                <Button
-                  aria-label="Go to search"
-                  type={'icon'}
-                  onClick={() => navigate(ROUTES.V2.SEARCH.buildPath({}))}
-                >
-                  <Icon color="primary" name="MagnifyingGlass" size="medium" />
-                </Button>
-              )
-            }
-            mobileTitle={
-              title ?? intl.formatMessage(workqueueConfig?.name ?? emptyMessage)
-            }
-          />
-        }
-        navigation={<Sidebar key={workqueueSlug} />}
-        skipToContentText={intl.formatMessage(
-          constantsMessages.skipToMainContent
-        )}
-      >
-        {children}
-      </Frame>
-    </AdministrativeAreasProvider>
+    <Frame
+      header={
+        <AppBar
+          desktopCenter={<DesktopCenter />}
+          desktopRight={<ProfileMenu key="profileMenu" />}
+          mobileLeft={<Hamburger />}
+          mobileRight={
+            hasSearchScope && (
+              <Button
+                aria-label="Go to search"
+                type={'icon'}
+                onClick={() => navigate(ROUTES.V2.SEARCH.buildPath({}))}
+              >
+                <Icon color="primary" name="MagnifyingGlass" size="medium" />
+              </Button>
+            )
+          }
+          mobileTitle={
+            title ?? intl.formatMessage(workqueueConfig?.name ?? emptyMessage)
+          }
+        />
+      }
+      navigation={<Sidebar key={workqueueSlug} />}
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
+    >
+      {children}
+    </Frame>
   )
 }

@@ -121,7 +121,7 @@ function PlaceOfEventName({ id }: { id?: UUID }) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
 
   const locations = getLocations.useSuspenseQuery()
-  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useFromContext()
 
   const placeOfEventName = id
     ? (locations.get(id)?.name ?? administrativeAreas.get(id)?.name)

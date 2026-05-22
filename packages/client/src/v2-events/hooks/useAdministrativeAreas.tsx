@@ -11,7 +11,7 @@
 
 import React, { useMemo } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { AdministrativeArea, UUID } from '@opencrvs/commons/client'
+import { AdministrativeArea, getOrThrow, UUID } from '@opencrvs/commons/client'
 import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
 
@@ -31,17 +31,34 @@ setQueryDefaults(trpcOptionsProxy.administrativeAreas.list, {
   staleTime: 1000 * 60 * 60 * 24 // keep it in cache 1 day
 })
 
-interface AdministrativeAreasContextValue {
-  administrativeAreasMap: Map<UUID, AdministrativeArea>
-  leafAdminAreaIds: Array<{ id: UUID }>
-}
-
-const AdministrativeAreasContext =
-  React.createContext<AdministrativeAreasContextValue | null>(null)
+const AdministrativeAreasContext = React.createContext<Map<
+  UUID,
+  AdministrativeArea
+> | null>(null)
 
 export function useAdministrativeAreas() {
   return {
     getAdministrativeAreas: {
+      /**
+       * Reads the full administrative areas map from context.
+       * Use this in components that are descendants of AdministrativeAreasProvider
+       * (mounted at the V2 app root — available everywhere in the V2 route tree).
+       *
+       * Use useSuspenseQuery() only when you need a filtered subset via isActive or ids params.
+       */
+      useFromContext: () => {
+        const ctx = React.useContext(AdministrativeAreasContext)
+        return getOrThrow(
+          ctx,
+          'useFromContext must be used within an AdministrativeAreasProvider'
+        )
+      },
+      /**
+       * Fetches administrative areas directly from TanStack Query.
+       * Use this only when you need a filtered subset via isActive or ids params.
+       * For the full list, prefer useFromContext() which reads from shared context
+       * without registering an additional TanStack Query observer.
+       */
       useSuspenseQuery: ({
         isActive,
         ids
@@ -50,7 +67,6 @@ export function useAdministrativeAreas() {
         ids?: UUID[]
       } = {}) => {
         const trpc = useTRPC()
-        const ctx = React.useContext(AdministrativeAreasContext)
 
         // We intentionally remove `queryFn` here because we already set a global default
         // via `setQueryDefaults`. Passing it again would override caching/persistence.
@@ -59,7 +75,7 @@ export function useAdministrativeAreas() {
         const { queryFn, ...rest } =
           trpcOptionsProxy.administrativeAreas.list.queryOptions()
 
-        const queryResult = useSuspenseQuery({
+        const { data } = useSuspenseQuery({
           ...rest,
           queryKey: trpc.administrativeAreas.list.queryKey({
             isActive,
@@ -69,14 +85,13 @@ export function useAdministrativeAreas() {
 
         return useMemo(
           () =>
-            ctx?.administrativeAreasMap ??
             new Map<UUID, AdministrativeArea>(
-              queryResult.data.map((administrativeArea) => [
+              data.map((administrativeArea) => [
                 administrativeArea.id,
                 administrativeArea
               ])
             ),
-          [ctx, queryResult.data]
+          [data]
         )
       }
     }
@@ -126,15 +141,11 @@ export function AdministrativeAreasProvider({
     queryKey: trpc.administrativeAreas.list.queryKey({})
   })
 
-  const value = useMemo(() => {
-    const administrativeAreasMap = new Map<UUID, AdministrativeArea>(
-      queryResult.data.map((a) => [a.id, a])
-    )
-    return {
-      administrativeAreasMap,
-      leafAdminAreaIds: getLeafAdministrativeAreaIds(administrativeAreasMap)
-    }
-  }, [queryResult.data])
+  const value = useMemo(
+    () =>
+      new Map<UUID, AdministrativeArea>(queryResult.data.map((a) => [a.id, a])),
+    [queryResult.data]
+  )
   return (
     <AdministrativeAreasContext.Provider value={value}>
       {children}
@@ -154,7 +165,7 @@ let cachedLeafAdministrativeAreaIds: { id: UUID }[] | null = null
  */
 export function useSuspenseGetLeafAdministrativeAreaIds() {
   const { getAdministrativeAreas } = useAdministrativeAreas()
-  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useFromContext()
 
   if (
     cachedLeafAdministrativeAreaIds &&

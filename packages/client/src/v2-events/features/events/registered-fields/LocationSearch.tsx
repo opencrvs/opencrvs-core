@@ -98,7 +98,7 @@ function useAvailableLocations(
   const { getLocations } = useLocations()
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const locations = getLocations.useSuspenseQuery()
-  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useFromContext()
   const userDetails = useSelector(getUserDetails)
   const userLocationId = userDetails?.primaryOfficeId
 
@@ -226,7 +226,7 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
   const { config } = useSelector(getOfflineData)
 
   const locations = getLocations.useSuspenseQuery()
-  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useFromContext()
   const adminLevels = config.ADMIN_STRUCTURE
 
   const certificateVars = toCertificateVariables(value, {

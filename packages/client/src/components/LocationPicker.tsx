@@ -111,7 +111,7 @@ export function LocationPicker({
   const { getAdministrativeAreas } = useAdministrativeAreas()
 
   const locations = getLocations.useSuspenseQuery()
-  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useFromContext()
 
   const offlineSearchableLocations = createSearchOptions({
     locations,

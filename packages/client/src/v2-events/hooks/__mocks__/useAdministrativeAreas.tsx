@@ -19,6 +19,7 @@ export {
 export function useAdministrativeAreas() {
   return {
     getAdministrativeAreas: {
+      useFromContext: () => V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
       useSuspenseQuery: () => V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
     }
   }

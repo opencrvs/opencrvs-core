@@ -100,7 +100,7 @@ export function useFormDataStringifier() {
   const { getAdministrativeAreas } = useAdministrativeAreas()
 
   const locations = getLocations.useSuspenseQuery()
-  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useFromContext()
   const { config } = useSelector(getOfflineData)
   const adminLevels = config.ADMIN_STRUCTURE
 

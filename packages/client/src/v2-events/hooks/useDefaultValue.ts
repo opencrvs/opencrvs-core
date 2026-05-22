@@ -155,7 +155,10 @@ function resolveSerializedUserField(
     return value
   }
   if (value.$location) {
-    if (value.$userField !== 'primaryOfficeId' && value.$userField !== 'administrativeAreaId') {
+    if (
+      value.$userField !== 'primaryOfficeId' &&
+      value.$userField !== 'administrativeAreaId'
+    ) {
       return ''
     }
     const locationId = context.user.administrativeAreaId
@@ -290,7 +293,7 @@ export function useDefaultValue() {
   const systemVariables = useSystemVariables()
   const { config } = useSelector(getOfflineData)
   const { getAdministrativeAreas } = useAdministrativeAreas()
-  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useFromContext()
   const adminLevelIds = useMemo(
     () => config.ADMIN_STRUCTURE.map((level) => level.id),
     [config.ADMIN_STRUCTURE]

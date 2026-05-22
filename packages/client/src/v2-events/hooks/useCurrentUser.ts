@@ -30,7 +30,7 @@ export function useCurrentUser() {
   const { getAdministrativeAreas } = useAdministrativeAreas()
 
   const locations = getLocations.useSuspenseQuery()
-  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useFromContext()
 
   const sharedFields = deepDropNulls({
     id: user.id,

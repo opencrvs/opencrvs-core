@@ -39,7 +39,7 @@ import { LocationSearch } from './LocationSearch'
 function useUserAdministrativeAreaHierarchy() {
   const userDetails = useSelector(getUserDetails)
   const { getAdministrativeAreas } = useAdministrativeAreas()
-  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useFromContext()
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
   const userLocationId = userDetails?.primaryOfficeId
@@ -75,7 +75,7 @@ function useAvailableAdministrativeAreas(
   jurisdictionFilter?: JurisdictionFilter
 ) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
-  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useFromContext()
   const userAdministrativeAreaHierarchy = useUserAdministrativeAreaHierarchy()
 
   const options = React.useMemo(() => {
@@ -169,7 +169,7 @@ function AdministrativeAreaOutput({
   value: Stringifiable | undefined
 }) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
-  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useFromContext()
 
   const administrativeAreaId = UUID.safeParse(value?.toString()).data
 

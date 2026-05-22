@@ -59,7 +59,7 @@ export function AdministrativeLevels() {
   const { getLocations } = useLocations()
   const { getAdministrativeAreas } = useAdministrativeAreas()
 
-  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useFromContext()
   const locations = getLocations.useSuspenseQuery()
 
   const getNewLevel = (

@@ -42,6 +42,7 @@ import {
 } from '@client/v2-events/trpc'
 import { DeclarationAction } from '@client/v2-events/features/events/components/Action/DeclarationAction'
 import { NavigationHistoryProvider } from '@client/v2-events/components/NavigationStack'
+import { AdministrativeAreasProvider } from '@client/v2-events/hooks/useAdministrativeAreas'
 import { ReadonlyViewIndex } from '@client/v2-events/features/events/ReadOnlyView'
 import { AnnotationAction } from '@client/v2-events/features/events/components/Action/AnnotationAction'
 import { QuickSearchIndex } from '@client/v2-events/features/events/Search/QuickSearchIndex'
@@ -206,10 +207,12 @@ export const routesConfig = {
       <NavigationHistoryProvider>
         <TRPCErrorBoundary>
           <TRPCProvider storeIdentifier={currentUser.id}>
-            <Outlet />
-            <Debug />
-            <Toaster />
-            <PrefetchQueries />
+            <AdministrativeAreasProvider>
+              <Outlet />
+              <Debug />
+              <Toaster />
+              <PrefetchQueries />
+            </AdministrativeAreasProvider>
           </TRPCProvider>
         </TRPCErrorBoundary>
       </NavigationHistoryProvider>

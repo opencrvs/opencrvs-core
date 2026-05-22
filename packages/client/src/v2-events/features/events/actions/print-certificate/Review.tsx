@@ -177,7 +177,7 @@ export function Review() {
   const { getLocations } = useLocations()
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const locations = getLocations.useSuspenseQuery()
-  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useFromContext()
 
   const { certificateTemplates, language } = useAppConfig()
   const certificateConfig = certificateTemplates.find(

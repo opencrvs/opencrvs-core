@@ -214,7 +214,7 @@ function UserListComponent({ userDetails }: UserListProps) {
 
   const { getLocations } = useLocations()
   const { getAdministrativeAreas } = useAdministrativeAreas()
-  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useFromContext()
   const locations = getLocations.useSuspenseQuery()
 
   const [showResendInviteSuccess, setShowResendInviteSuccess] = useState(false)

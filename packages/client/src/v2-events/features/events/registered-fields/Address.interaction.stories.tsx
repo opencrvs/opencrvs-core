@@ -642,7 +642,7 @@ export const ToCertificateVariables: Story = {
     const { getAdministrativeAreas } = useAdministrativeAreas()
 
     const locations = getLocations.useSuspenseQuery()
-    const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+    const administrativeAreas = getAdministrativeAreas.useFromContext()
     const { config: appConfig } = useSelector(getOfflineData)
 
     const adminLevels = appConfig.ADMIN_STRUCTURE
