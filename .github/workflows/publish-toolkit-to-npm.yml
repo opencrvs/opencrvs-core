@@ -55,7 +55,7 @@ jobs:
               echo "❌ Tag '$TAG_NAME' is not a valid semantic version (expected something like 1.2.3 or v1.2.3)"
               exit 1
             fi
-            echo "npm-tag=v$MAJOR_MINOR" >> $GITHUB_OUTPUT
+            echo "npm-tag=v$MAJOR_MINOR-latest" >> $GITHUB_OUTPUT
           else
             TOOLKIT_VERSION="$PACKAGE_VERSION-rc.$(git rev-parse --short=7 HEAD)"
             echo "npm-tag=v$MAJOR_MINOR-next" >> $GITHUB_OUTPUT
