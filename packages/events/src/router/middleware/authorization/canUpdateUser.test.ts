@@ -150,7 +150,7 @@ test('grants access iff both existing and updated (location, role) satisfy any u
 
         // Oracle: requester scope must permit access to BOTH the existing and updated state
         const existingOk =
-          (!scopeRole || scopeRole.includes(existingUserRole)) &&
+          scopeRole.includes(existingUserRole) &&
           officeAccessible(
             existingHierarchy,
             existingOffice.id,
@@ -158,7 +158,7 @@ test('grants access iff both existing and updated (location, role) satisfy any u
             requestingUser
           )
         const updatedOk =
-          (!scopeRole || scopeRole.includes(updatedUserRole)) &&
+          scopeRole.includes(updatedUserRole) &&
           officeAccessible(
             updatedHierarchy,
             updatedOffice.id,
