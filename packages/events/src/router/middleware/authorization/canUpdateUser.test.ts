@@ -26,7 +26,7 @@ import {
 import { getUserById } from '@events/storage/postgres/events/users'
 import { getLocationHierarchy } from '@events/service/locations/locations'
 import { createTestToken } from '@events/tests/utils'
-import { canUpdateUser } from './index'
+import { canUpdateUser } from '@events/router/middleware/authorization'
 
 vi.mock('@events/storage/postgres/events/users', () => ({
   getUserById: vi.fn()
