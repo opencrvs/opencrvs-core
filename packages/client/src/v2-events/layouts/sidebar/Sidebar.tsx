@@ -220,6 +220,7 @@ function SidebarComponent({
       <OrganisationNavigationGroup
         currentWorkqueueSlug={workqueueSlug}
         primaryOfficeId={userDetails?.primaryOfficeId}
+        menuCollapse={menuCollapse}
       />
       <PerformanceNavigationGroup currentWorkqueueSlug={workqueueSlug} />
       {isMobileView && (
