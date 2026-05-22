@@ -114,11 +114,16 @@ export const canUpdateUser: MiddlewareFunction<
 
   const scopes = getAcceptedScopesFromToken(token, ['user.edit'])
 
-  const existingHierarchy = await getLocationHierarchy(existingUser.officeId)
-
-  const updatedHierarchy = await getLocationHierarchy(
-    input.primaryOfficeId || existingUser.officeId
+  const currentLocationHierarchy = await getLocationHierarchy(
+    existingUser.officeId
   )
+
+  const updatedLocationHierarchy = input.primaryOfficeId
+    ? await getLocationHierarchy(input.primaryOfficeId)
+    : currentLocationHierarchy
+
+  const updatedRole = input.role ?? existingUser.role
+  const updatedOfficeId = input.primaryOfficeId ?? existingUser.officeId
 
   const canAccessExistingAndUpdatedUser = scopes.some(
     (scope) =>
@@ -126,16 +131,16 @@ export const canUpdateUser: MiddlewareFunction<
         userToAccess: {
           role: existingUser.role,
           primaryOfficeId: existingUser.officeId,
-          administrativeHierarchy: existingHierarchy
+          administrativeHierarchy: currentLocationHierarchy
         },
         scope,
         user: ctx.user
       }) &&
       canAccessUserWithScope({
         userToAccess: {
-          role: input.role || existingUser.role,
-          primaryOfficeId: input.primaryOfficeId || existingUser.officeId,
-          administrativeHierarchy: updatedHierarchy
+          role: updatedRole,
+          primaryOfficeId: updatedOfficeId,
+          administrativeHierarchy: updatedLocationHierarchy
         },
         scope,
         user: ctx.user

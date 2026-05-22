@@ -128,77 +128,79 @@ test('grants access iff both existing and updated (location, role) satisfy any u
         (role) => role !== existingUserRole && role !== updatedUserRole
       ) as TestUserRole
 
-      // Four role constraint variants: none, existing only, updated only, both
-      const scopeRoleCombinations: string[][] = [
-        [irrelevantRole],
-        [existingUserRole],
-        [updatedUserRole],
-        [existingUserRole, updatedUserRole]
-      ]
+      const roleOptions = fc.option(
+        fc.constantFrom(
+          [irrelevantRole] as string[],
+          [existingUserRole] as string[],
+          [updatedUserRole] as string[],
+          [existingUserRole, updatedUserRole] as string[]
+        ),
+        { nil: undefined }
+      )
 
-      for (const scopeRole of scopeRoleCombinations) {
-        vi.clearAllMocks()
+      await fc.assert(
+        fc.asyncProperty(roleOptions, async (scopeRole) => {
+          vi.clearAllMocks()
 
-        // getLocationHierarchy is called twice inside canUpdateUser: once for each office
-        mockedGetUserById.mockResolvedValue({
-          officeId: existingOffice.id,
-          role: existingUserRole
-        })
-        mockedGetLocationHierarchy
-          .mockResolvedValueOnce(existingHierarchy)
-          .mockResolvedValueOnce(updatedHierarchy)
+          mockedGetUserById.mockResolvedValue({
+            officeId: existingOffice.id,
+            role: existingUserRole
+          })
+          mockedGetLocationHierarchy
+            .mockResolvedValueOnce(existingHierarchy)
+            .mockResolvedValueOnce(updatedHierarchy)
 
-        // Oracle: requester scope must permit access to BOTH the existing and updated state
-        const existingOk =
-          scopeRole.includes(existingUserRole) &&
-          officeAccessible(
-            existingHierarchy,
-            existingOffice.id,
-            accessLevel,
-            requestingUser
-          )
-        const updatedOk =
-          scopeRole.includes(updatedUserRole) &&
-          officeAccessible(
-            updatedHierarchy,
-            updatedOffice.id,
-            accessLevel,
-            requestingUser
-          )
-        const expectedAllowed = existingOk && updatedOk
+          const existingOk =
+            (scopeRole === undefined || scopeRole.includes(existingUserRole)) &&
+            officeAccessible(
+              existingHierarchy,
+              existingOffice.id,
+              accessLevel,
+              requestingUser
+            )
+          const updatedOk =
+            (scopeRole === undefined || scopeRole.includes(updatedUserRole)) &&
+            officeAccessible(
+              updatedHierarchy,
+              updatedOffice.id,
+              accessLevel,
+              requestingUser
+            )
+          const expectedAllowed = existingOk && updatedOk
 
-        const token = createTestToken({
-          userId: requestingUserId,
-          scopes: [
-            encodeScope({
-              type: 'user.edit',
-              options: { accessLevel, role: scopeRole }
-            })
-          ],
-          role: TestUserRole.enum.REGISTRATION_AGENT
-        })
-        const next = vi.fn((a) => a)
+          const token = createTestToken({
+            userId: requestingUserId,
+            scopes: [
+              encodeScope({
+                type: 'user.edit',
+                options: { accessLevel, role: scopeRole }
+              })
+            ],
+            role: TestUserRole.enum.REGISTRATION_AGENT
+          })
+          const next = vi.fn((a) => a)
 
-        try {
-          await canUpdateUser({
-            ctx: { token, user: requestingUser },
-            input: {
-              id: existingUserId,
-              primaryOfficeId: updatedOffice.id,
-              role: updatedUserRole
-            },
-            next
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          } as any)
-          expect(expectedAllowed).toBe(true)
-        } catch (e) {
-          if (e instanceof TRPCError) {
-            expect(expectedAllowed).toBe(false)
-          } else {
-            throw e
+          try {
+            await canUpdateUser({
+              ctx: { token, user: requestingUser },
+              input: {
+                id: existingUserId,
+                primaryOfficeId: updatedOffice.id,
+                role: updatedUserRole
+              },
+              next
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } as any)
+            expect(expectedAllowed).toBe(true)
+          } catch (e) {
+            if (e instanceof TRPCError) {
+              expect(expectedAllowed).toBe(false)
+            } else {
+              throw e
+            }
           }
-        }
-      }
+        })
+      )
     }),
     { numRuns: 100 }
   )
