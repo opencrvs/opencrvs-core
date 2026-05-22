@@ -121,7 +121,8 @@ jobs:
       # conflict-resolution commits do not land on the release branch itself.
       - name: Create merge-back branch for develop PR
         run: |
-          MERGEBACK_BRANCH="merge-back/release-${{ inputs.version }}-to-develop"
+          VERSION_NO_DOTS=$(echo "${{ inputs.version }}" | tr -d '.')
+          MERGEBACK_BRANCH="merge-back/release-${VERSION_NO_DOTS}-into-develop"
           if git ls-remote --exit-code --heads origin "$MERGEBACK_BRANCH" > /dev/null 2>&1; then
             echo "Branch $MERGEBACK_BRANCH already exists, skipping."
           else
@@ -136,18 +137,21 @@ jobs:
       #     The release PR. Merging this ships the version to production and
       #     is what triggers the publish workflow.
       #
-      #   PR 2 — merge-back/release-<version>-to-develop → develop
+      #   PR 2 — merge-back/release-<version-no-dots>-into-develop → develop
       #     Uses a dedicated branch so conflict-resolution commits stay off
       #     the release branch. Carries the version-bump commits (and any fixes
       #     cherry-picked onto the release branch) back into develop.
       #       - z=0 (base is develop): carries only the two bump commits, clean diff.
       #       - z>0 (base is a prior release branch): also backports any patch fixes.
+      #     Note: dots are stripped from the version (e.g. 1.9.14 → 1914) so the
+      #     branch name passes the '^[a-z][a-z0-9\/\-]{1,44}$' validation in core.
       # Each PR is checked individually — one may already exist while the other
       # does not, so both are always evaluated.
       - name: Create Pull Requests
         run: |
           PR_BRANCH="release/${{ inputs.version }}"
-          MERGEBACK_BRANCH="merge-back/release-${{ inputs.version }}-to-develop"
+          VERSION_NO_DOTS=$(echo "${{ inputs.version }}" | tr -d '.')
+          MERGEBACK_BRANCH="merge-back/release-${VERSION_NO_DOTS}-into-develop"
           TARGET_BRANCH="${{ steps.get_base_branch.outputs.target_branch }}"
 
           if [ -f .github/TEMPLATES/RELEASE_PR_TEMPLATE.md ]; then
