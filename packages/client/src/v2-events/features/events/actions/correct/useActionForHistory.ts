@@ -111,7 +111,7 @@ export function extractHistoryActions(
   return fullEvent.actions.filter(isHistoryAction).map((action) => ({
     ...action,
     declaration: getCompleteActionDeclaration({}, fullEvent, action),
-    annotation: getCompleteActionAnnotation({}, fullEvent, action)
+    annotation: getCompleteActionAnnotation(fullEvent, action)
   }))
 }
 
