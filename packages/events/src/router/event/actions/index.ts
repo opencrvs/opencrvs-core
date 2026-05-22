@@ -93,7 +93,7 @@ const ACTION_PROCEDURE_CONFIG = {
         summary: 'Notify an event',
         method: 'POST',
         path: '/events/{eventId}/notify',
-        tags: ['events'],
+        tags: ['Events'],
         protect: true
       }
     }
@@ -129,7 +129,7 @@ const ACTION_PROCEDURE_CONFIG = {
         summary: 'Request correction for an event',
         method: 'POST',
         path: '/events/{eventId}/correction/request',
-        tags: ['events'],
+        tags: ['Events'],
         protect: true
       }
     }
@@ -142,7 +142,7 @@ const ACTION_PROCEDURE_CONFIG = {
         summary: 'Approve correction for an event',
         method: 'POST',
         path: '/events/{eventId}/correction/approve',
-        tags: ['events'],
+        tags: ['Events'],
         protect: true
       }
     }
@@ -155,7 +155,7 @@ const ACTION_PROCEDURE_CONFIG = {
         summary: 'Reject correction for an event',
         method: 'POST',
         path: '/events/{eventId}/correction/reject',
-        tags: ['events'],
+        tags: ['Events'],
         protect: true
       }
     }
@@ -186,7 +186,8 @@ type DistributiveOmit<T, K extends keyof T> = T extends T ? Omit<T, K> : never
 const AsyncActionInput = BaseActionInput.pick({
   eventId: true,
   transactionId: true,
-  keepAssignment: true
+  keepAssignment: true,
+  waitFor: true
 }).extend({
   actionId: UUID
 })
@@ -270,7 +271,7 @@ export async function defaultRequestHandler(
     await ensureEventIndexed(
       eventWithRequestedAction,
       configuration,
-      input.waitFor ?? false
+      input.waitFor
     )
     return eventWithRequestedAction
   }
@@ -331,6 +332,7 @@ export async function defaultRequestHandler(
   return processAction(
     {
       ...strippedInput,
+      waitFor: input.waitFor,
       keepAssignment: effectiveKeepAssignment,
       declaration: {},
       originalActionId: requestedAction.id,

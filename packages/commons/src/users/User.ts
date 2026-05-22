@@ -22,15 +22,6 @@ import {
 
 export const REINDEX_USER_ID = '00000000-0000-0000-0000-000000000000' as UUID
 
-/**
- * @deprecated only used in user-mgnt
- */
-export type IUserName = {
-  use: string
-  family: string
-  given: string[]
-}
-
 export const UserName = NameFieldValue.omit({ middlename: true })
 
 const UserStatus = z.enum(['active', 'deactivated', 'pending'])

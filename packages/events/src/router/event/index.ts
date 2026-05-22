@@ -32,7 +32,10 @@ import {
 } from '@opencrvs/commons/events'
 import { UserContext } from '@opencrvs/commons'
 import * as middleware from '@events/router/middleware'
-import { EventIdParam } from '@events/router/middleware'
+import {
+  EventIdParam,
+  EventIdParamWithWaitFor
+} from '@events/router/middleware'
 import {
   userOnlyProcedure,
   router,
@@ -91,7 +94,7 @@ export const eventRouter = router({
             'Triggers reindexing of search, workqueues and notifies country config',
           method: 'POST',
           path: '/events/reindex',
-          tags: ['events']
+          tags: ['Events']
         }
       })
       .mutation(async ({ ctx, input }) => {
@@ -109,7 +112,7 @@ export const eventRouter = router({
           summary: 'Returns the status of current and past reindexing calls',
           method: 'GET',
           path: '/events/reindex',
-          tags: ['events']
+          tags: ['Events']
         }
       })
       .use(middleware.allowedWithAnyOfScopes(['record.reindex']))
@@ -132,7 +135,7 @@ export const eventRouter = router({
           summary: 'List event configurations',
           method: 'GET',
           path: '/config',
-          tags: ['events'],
+          tags: ['Events'],
           protect: true
         }
       })
@@ -148,7 +151,7 @@ export const eventRouter = router({
         summary: 'Create event',
         method: 'POST',
         path: '/events',
-        tags: ['events'],
+        tags: ['Events'],
         protect: true
       }
     })
@@ -194,14 +197,14 @@ export const eventRouter = router({
         summary: 'Fetch full event document',
         method: 'GET',
         path: '/events/{eventId}',
-        tags: ['events'],
+        tags: ['Events'],
         protect: true
       }
     })
-    .input(EventIdParam)
+    .input(EventIdParamWithWaitFor)
     .output(EventDocument)
     .use(middleware.canAccessEventWithScopes(['record.read']))
-    .query(async ({ ctx }) => {
+    .query(async ({ ctx, input }) => {
       const { eventId, eventType } = ctx
       const configuration = await getEventConfigurationById({
         token: ctx.token,
@@ -210,6 +213,7 @@ export const eventRouter = router({
 
       const updatedEvent = await processAction(
         {
+          waitFor: input.waitFor,
           type: ActionType.READ,
           eventId,
           transactionId: getUUID(),

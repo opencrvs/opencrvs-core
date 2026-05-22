@@ -1,0 +1,182 @@
+{{- if .Values.data_cleanup.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: data-cleanup
+  name: data-cleanup
+  namespace: {{ .Release.Namespace }}
+spec:
+  template:
+    metadata:
+      labels:
+        app: data-cleanup
+    spec:
+      containers:
+        - name: cleanup-mongo
+          image: "mongo:4.4"
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              echo "Running mongo cleanup script..."
+              DATABASES=(
+                {{- range $.Values.mongodb.databases }}
+                  {{ .db }}
+                {{- end }}
+              )
+              if [ ! -z ${MONGODB_ADMIN_USER+x} ] && [ ! -z ${MONGODB_ADMIN_PASSWORD+x} ]; then
+                AUTH="--username $MONGODB_ADMIN_USER --password $MONGODB_ADMIN_PASSWORD --authenticationDatabase admin";
+              else
+                AUTH="";
+              fi
+              for DB in "${DATABASES[@]}"; do
+                echo "Dropping database: $DB"
+                mongo $AUTH --host $MONGO_HOST --eval "db.getSiblingDB('$DB').dropDatabase()"
+              done
+              echo "Cleanup complete!"
+          env:
+            - name: MONGO_HOST
+              value: {{ .Values.mongodb.host }}
+          {{- if or (eq .Values.mongodb.auth_mode "auto") (eq .Values.mongodb.auth_mode "use_secret") }}
+            - name: MONGODB_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  key: MONGODB_ADMIN_USER
+                  name: {{ .Values.mongodb.admin_user_secret_name }}
+            - name: MONGODB_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: MONGODB_ADMIN_PASSWORD
+                  name: {{ .Values.mongodb.admin_user_secret_name }}
+          {{- end }}
+          {{- include "render-env-vars" (dict "service_name" "data_cleanup" "Values" .Values) }}
+        - name: cleanup-postgres
+          image: {{ .Values.postgres.image }}
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              echo "🔁 Dropping database '${POSTGRES_DB}' and roles..."
+              psql -h $POSTGRES_HOST -U "$POSTGRES_USER" -d postgres -v ON_ERROR_STOP=1 <<EOF
+              SELECT pg_terminate_backend(pid)
+              FROM pg_stat_activity
+              WHERE datname = '$POSTGRES_DB' AND pid <> pg_backend_pid();
+
+              DROP DATABASE IF EXISTS "$POSTGRES_DB" WITH (FORCE);
+
+              DROP ROLE IF EXISTS "$EVENTS_MIGRATOR_ROLE";
+              DROP ROLE IF EXISTS "$EVENTS_APP_ROLE";
+              EOF
+          env:
+            - name: POSTGRES_HOST
+              value: {{ .Values.postgres.host }}
+          # FIXME: Double check property name "managed"
+          {{- if eq .Values.postgres.auth_mode "disabled" }}
+            - name: PGPASSWORD
+              value: postgres
+            - name: POSTGRES_USER
+              value: postgres
+          {{- else if eq .Values.postgres.auth_mode "auto" }}
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_PASSWORD
+                  name: {{ .Values.postgres.admin_user_secret_name }}
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_USER
+                  name: {{ .Values.postgres.admin_user_secret_name }}
+          {{- end }}
+            - name: POSTGRES_DB
+              value: {{ .Values.postgres.events_db | replace "-" "_" }}
+            - name: EVENTS_APP_ROLE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgres.users_secret }}
+                  key: EVENTS_APP_POSTGRES_USER
+            - name: EVENTS_MIGRATOR_ROLE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgres.users_secret }}
+                  key: EVENTS_MIGRATOR_POSTGRES_USER
+        - name: cleanup-minio
+          image: "minio/mc"
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              MINIO_BUCKET=${MINIO_BUCKET:-ocrvs}
+              echo "Running mongo cleanup script..."
+              mc alias set myminio http://$MINIO_HOST:$MINIO_PORT ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD:-minioadmin}
+              mc rm --recursive --force myminio/$MINIO_BUCKET
+              mc rb myminio/$MINIO_BUCKET
+              [ "${make_bucket:-true}" == 'true' ] && mc mb myminio/$MINIO_BUCKET
+              echo "Cleanup complete!"
+          env:
+            - name: MINIO_HOST
+              value: {{ .Values.minio.host }}
+            - name: MINIO_PORT
+              value: {{ .Values.minio.port | quote }}
+          {{- if or (eq .Values.minio.auth_mode "auto") (eq .Values.minio.auth_mode "use_secret") }}
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  key: MINIO_ROOT_USER
+                  name: {{ .Values.minio.users_secret }}
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: MINIO_ROOT_PASSWORD
+                  name: {{ .Values.minio.users_secret }}
+          {{- end }}
+          {{- include "render-env-vars" (dict "service_name" "data_cleanup" "Values" .Values) }}
+        - name: cleanup-elasticsearch
+          image: "appropriate/curl"
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              approved_words="${ES_INDEX_PREFIX:-events}_ ${ELASTICSEARCH_INDEX_NAME:-ocrvs}"
+              indices=$(curl -sS -XGET http://$ELASTICSEARCH_HOST/_cat/indices?h=index)
+              echo "Running elasticsearch cleanup script..."
+              echo "--------------------------"
+              echo "🧹 cleanup for indices: $approved_words from $indices"
+              echo "--------------------------"
+              for index in $indices; do
+                for approved in $approved_words; do
+                  case "$index" in
+                    "$approved"*) 
+                      echo "Delete index $index..."
+                      curl -sS -XDELETE "http://$ELASTICSEARCH_HOST/$index"
+                      break
+                      ;;
+                  esac
+                done
+              done
+          env:
+          {{- if eq .Values.elasticsearch.auth_mode "disabled" }}
+            - name: ELASTICSEARCH_HOST
+              value: "{{ .Values.elasticsearch.host }}:{{ .Values.elasticsearch.port }}"
+          {{- else if or (eq .Values.elasticsearch.auth_mode "auto") (eq .Values.elasticsearch.auth_mode "use_secret") }}
+            - name: ELASTICSEARCH_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: SEARCH_ELASTIC_HOST
+                  name: {{ .Values.elasticsearch.urls_secret }}
+          {{- end }}
+          {{- include "render-env-vars" (dict "service_name" "data_cleanup" "Values" .Values) }}
+        - name: cleanup-influxdb
+          image: "appropriate/curl"
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Running elasticsearch cleanup script..."
+              curl -X POST http://$HOST:$PORT/query?db=$DB --data-urlencode "q=DROP SERIES FROM /.*/"
+          env:
+            - name: HOST
+              value: {{ .Values.influxdb.host }}
+            - name: PORT
+              value: {{ .Values.influxdb.port | quote }}
+            - name: DB
+              value: {{ .Values.influxdb.db }}
+          {{- include "render-env-vars" (dict "service_name" "data_cleanup" "Values" .Values) }}
+      restartPolicy: "OnFailure"
+{{- end }}

@@ -1,0 +1,155 @@
+{{ if and .Values.postgres.enabled (eq (include "postgres.restore_enabled" .) "true") }}
+{{- $run_as_cronjob := or .Values.restore.cronjob .Values.postgres.restore.cronjob }}
+{{ if eq .Values.postgres.restore.type "dump" }}
+---
+apiVersion: batch/v1
+{{- if $run_as_cronjob }}
+kind: CronJob
+{{- else }}
+kind: Job
+{{- end }}
+metadata:
+  name: postgres-restore
+  labels:
+    app: postgres
+    job-type: restore
+spec:
+  {{- if $run_as_cronjob }}
+  schedule: {{ default .Values.restore.schedule .Values.postgres.restore.schedule }}
+  {{- if .Values.timezone }}
+  timeZone: {{ .Values.timezone }}
+  {{- end }}
+  jobTemplate:
+    spec:
+  {{- end }}
+      template:
+        metadata:
+          labels:
+            app: postgres
+            job-type: restore
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: restore
+              image: {{ .Values.postgres.image }}
+              env:
+                - name: POSTGRES_HOST
+                  value: postgres-0.postgres.{{ .Release.Namespace }}.svc.cluster.local
+              {{- if .Values.postgres.use_default_credentials }}
+                - name: POSTGRES_USER
+                  value: postgres
+                - name: PGPASSWORD
+                  value: postgres
+                - name: POSTGRES_DB
+                  value: postgres
+              {{- else }}
+                - name: POSTGRES_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.postgres.admin_user_secret_name }}
+                      key: POSTGRES_USER
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.postgres.admin_user_secret_name }}
+                      key: POSTGRES_PASSWORD
+              {{- end }}
+                - name: ENCRYPT_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.restore.backup_encryption_secret }}
+                      key: backup_encryption_key
+                - name: BACKUP_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.restore.backup_server_secret }}
+                      key: user
+                - name: BACKUP_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.restore.backup_server_secret }}
+                      key: host
+                - name: BACKUP_REMOTE_DIR
+                  value: {{ default .Values.restore.backup_server_dir .Values.postgres.restore.server_dir }}
+              {{- include "render-env-vars" (dict "service_name" "restore" "Values" .Values) | nindent 4 }}
+              command: ["/scripts/restore.sh"]
+              volumeMounts:
+                - name: backup-ssh-key
+                  mountPath: /ssh
+                  readOnly: true
+                - mountPath: /scripts
+                  name: postgres-scripts
+          volumes:
+            - name: backup-ssh-key
+              secret:
+                secretName: {{ .Values.restore.backup_server_secret }}
+                defaultMode: 0400
+                items:
+                  - key: ssh_key
+                    path: ssh_key
+            - name: postgres-scripts
+              configMap:
+                name: postgres-scripts
+                defaultMode: 0755
+{{- end }}
+{{- if eq .Values.postgres.restore.type "differential" }}
+---
+apiVersion: batch/v1
+{{- if $run_as_cronjob }}
+kind: CronJob
+{{- else }}
+kind: Job
+{{- end }}
+metadata:
+  name: postgres-restore
+spec:
+  {{- if $run_as_cronjob }}
+  schedule: {{ default .Values.restore.schedule .Values.postgres.restore.schedule }}
+  {{- if .Values.timezone }}
+  timeZone: {{ .Values.timezone }}
+  {{- end }}
+  jobTemplate:
+    spec:
+  {{- end }}
+      template:
+        spec:
+          serviceAccountName: backup-runner
+          containers:
+            - name: runner
+              image: bitnami/kubectl:latest
+              command:
+                - /bin/sh
+                - -c
+                # 1. Delete previous pod and create clean
+                # 2. Stop postgres server
+                # 3. Restore latest production copy
+                # 4. Start postgres server
+                - |
+                  kubectl delete pod postgres-restore-runner --ignore-not-found
+                  kubectl apply -f /manifests/postgres-restore-runner.yaml --wait
+                  kubectl scale statefulset postgres --replicas=0
+                  kubectl wait --for=condition=ready pod -lapp=postgres-restore-runner
+                  while ! kubectl exec postgres-restore-runner -- pgbackrest version 2>/dev/null;
+                  do
+                    echo "Waiting for container initialization" && sleep 10
+                  done
+                  while kubectl exec postgres-restore-runner -- [ -f /var/lib/postgresql/data/postmaster.pid ] 2>/dev/null;
+                  do
+                    echo "Waiting for postgres stop" && sleep 10
+                  done
+                  kubectl exec postgres-restore-runner -- \
+                    rm -rf /var/lib/postgresql/data/*
+                  kubectl exec postgres-restore-runner -- \
+                    pgbackrest --stanza="{{ .Values.postgres.backup.stanza }}" restore --delta --force || exit 1
+                  kubectl scale statefulset postgres --replicas=1
+              volumeMounts:
+                - mountPath: /manifests
+                  name: manifests
+          restartPolicy: OnFailure
+          volumes:
+            - name: manifests
+              configMap:
+                name: postgres-restore-runner-manifest
+                defaultMode: 0755
+{{- end }}
+{{- end }}
