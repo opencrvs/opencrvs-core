@@ -12,8 +12,7 @@ import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
-  alwaysTrue,
-  defineConditional,
+  always,
   EncodedScope,
   EventConfig,
   field,
@@ -199,13 +198,13 @@ export function useUserEditConfig(
                 selectedRole?.scopes ?? [],
                 'profile.electronic-signature'
               )
-                ? defineConditional(alwaysTrue())
+                ? always()
                 : never(),
               fields: [
                 {
                   id: 'signature',
                   type: FieldType.SIGNATURE,
-                  required: false,
+                  required: true,
                   label: messages.userSignatureAttachment,
                   signaturePromptLabel: messages.userSignatureAttachment,
                   configuration: {

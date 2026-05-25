@@ -16,6 +16,7 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import {
   DocumentPath,
+  encodeScope,
   TestUserRole,
   TokenUserType,
   User,
@@ -31,6 +32,7 @@ import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 
 import { useUserFormState } from './useUserFormState'
 import { EditUser } from './UserEditor'
+import { useResolveAssignmentActionConditionals } from '@client/v2-events/features/workqueues/Actions/useActionConfigurationResolver'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [httpLink({ url: '/api/events' })],
@@ -665,6 +667,138 @@ export const AllFieldsAreIncludedInUpdatePayload: StoryObj = {
             })
           )
         )
+      }
+    )
+  }
+}
+
+const rolesWithSignatureScopes = [
+  { id: TestUserRole.enum.REGISTRATION_AGENT, scopes: [] },
+  {
+    id: TestUserRole.enum.LOCAL_REGISTRAR,
+    scopes: [
+      encodeScope({
+        type: 'profile.electronic-signature'
+      })
+    ]
+  },
+  { id: TestUserRole.enum.COMMUNITY_LEADER, scopes: [] }
+]
+
+export const SignatureRequiredForRegistrar: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.details'
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [
+          tRPCMsw.user.roles.list.query(() => rolesWithSignatureScopes)
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.LOCAL_REGISTRAR,
+      name: { firstname: 'Test', surname: 'User' },
+      phoneNumber: '01712345678',
+      email: 'test@opencrvs.org'
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Click Continue from the user details page', async () => {
+      await userEvent.type(
+        await canvas.findByTestId('text__user____staffId'),
+        '01712345678'
+      )
+      await userEvent.click(await canvas.findByText('Staff ID'))
+      await userEvent.click(await canvas.findByText('Continue'))
+    })
+
+    await step(
+      'Signature page is shown — Registrar role carries the electronic-signature scope',
+      async () => {
+        await expect(
+          canvas.findByText('Attach the signature')
+        ).resolves.toBeInTheDocument()
+        await expect(
+          canvas.findByRole('button', { name: 'Sign' })
+        ).resolves.toBeInTheDocument()
+      }
+    )
+
+    await step(
+      'Trying to continue without signing should show an error',
+      async () => {
+        await userEvent.click(await canvas.findByText('Continue'))
+        await expect(canvas.findByText('Required')).resolves.toBeInTheDocument()
+      }
+    )
+  }
+}
+
+export const SignatureNotRequiredForCommunityLeader: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.details'
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [
+          tRPCMsw.user.roles.list.query(() => rolesWithSignatureScopes)
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.COMMUNITY_LEADER,
+      name: { firstname: 'Test', surname: 'User' },
+      phoneNumber: '01712345678',
+      email: 'test@opencrvs.org'
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Click Continue from the user details page', async () => {
+      await userEvent.type(
+        await canvas.findByTestId('text__user____staffId'),
+        '01712345678'
+      )
+      await userEvent.click(await canvas.findByText('Staff ID'))
+      await userEvent.click(await canvas.findByText('Continue'))
+    })
+
+    await step(
+      'Review page is shown — the signature page is skipped for Community Leader',
+      async () => {
+        await expect(
+          canvas.findByRole('button', { name: /create user/i })
+        ).resolves.toBeInTheDocument()
+      }
+    )
+
+    await step(
+      'Signature page content is not present — the field is not required for this role',
+      async () => {
+        expect(canvas.queryByText('Attach the signature')).toBeNull()
+        expect(canvas.queryByRole('button', { name: 'Sign' })).toBeNull()
       }
     )
   }
