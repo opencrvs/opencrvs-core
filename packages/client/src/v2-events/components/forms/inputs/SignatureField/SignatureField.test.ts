@@ -83,7 +83,7 @@ describe('SignatureField.toCertificateVariables', () => {
 
   it('handles paths without leading slash', () => {
     const fileValue = {
-      path: 'ocrvs/signature.png',
+      path: 'ocrvs/signature.png' as DocumentPath,
       originalFilename: 'signature.png',
       type: 'image/png'
     }

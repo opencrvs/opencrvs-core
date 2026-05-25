@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-/*  eslint-disable max-lines */
+
 import z from 'zod/v4'
 import { ActionConditional, Conditional, FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
@@ -24,7 +24,7 @@ import {
   TimeValue,
   ButtonFieldValue,
   VerificationStatusValue,
-  FieldValue
+  SignatureFieldValue
 } from './FieldValue'
 import {
   CustomFieldValue,

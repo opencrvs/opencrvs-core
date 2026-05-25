@@ -19,6 +19,7 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { http, HttpResponse } from 'msw'
 import {
   ActionType,
+  DocumentPath,
   FieldType,
   generateEventDocument,
   generateTranslationConfig,
@@ -537,7 +538,7 @@ export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
   parameters: { layout: 'centered' },
   render: function Component() {
     const withValue = SignatureField.toCertificateVariables({
-      path: 'events/birth-123/signature.png',
+      path: 'events/birth-123/signature.png' as DocumentPath,
       originalFilename: 'signature.png',
       type: MimeType.enum['image/png']
     })

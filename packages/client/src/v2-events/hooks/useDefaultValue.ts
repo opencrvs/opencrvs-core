@@ -197,7 +197,6 @@ export function mapFieldToDefaultValue(
       buildClientFunctionContext({
         form: context.form,
         systemVariables: context,
-        locations: context.locations,
         adminLevelIds: context.adminLevelIds
       })
     ) as FieldValue
