@@ -691,13 +691,9 @@ describe('getCompleteActionAnnotation', () => {
       defaults: { annotation: { fieldB: 'from-action' } }
     })
 
-    const result = getCompleteActionAnnotation(
-      { fieldA: 'base' },
-      baseEvent,
-      action
-    )
+    const result = getCompleteActionAnnotation(baseEvent, action)
 
-    expect(result).toEqual({ fieldA: 'base', fieldB: 'from-action' })
+    expect(result).toEqual({ fieldB: 'from-action' })
   })
 
   it('ignores missing original action and merges annotation with action.annotation', () => {
@@ -710,13 +706,9 @@ describe('getCompleteActionAnnotation', () => {
       }
     })
 
-    const result = getCompleteActionAnnotation(
-      { fieldA: 'base' },
-      baseEvent,
-      action
-    )
+    const result = getCompleteActionAnnotation(baseEvent, action)
 
-    expect(result).toEqual({ fieldA: 'base', fieldB: 'from-action' })
+    expect(result).toEqual({ fieldB: 'from-action' })
   })
 
   it('ignores original action annotation when original status is not Requested', () => {
@@ -740,13 +732,9 @@ describe('getCompleteActionAnnotation', () => {
 
     const event: EventDocument = { ...baseEvent, actions: [originalAction] }
 
-    const result = getCompleteActionAnnotation(
-      { fieldA: 'base' },
-      event,
-      action
-    )
+    const result = getCompleteActionAnnotation(event, action)
 
-    expect(result).toEqual({ fieldA: 'base', fieldB: 'from-action' })
+    expect(result).toEqual({ fieldB: 'from-action' })
   })
 
   it('merges original action annotation when original status is Requested', () => {
@@ -770,14 +758,9 @@ describe('getCompleteActionAnnotation', () => {
 
     const event: EventDocument = { ...baseEvent, actions: [originalAction] }
 
-    const result = getCompleteActionAnnotation(
-      { fieldA: 'base' },
-      event,
-      action
-    )
+    const result = getCompleteActionAnnotation(event, action)
 
     expect(result).toEqual({
-      fieldA: 'base',
       fieldB: 'from-action',
       fieldC: 'from-original'
     })
@@ -804,7 +787,7 @@ describe('getCompleteActionAnnotation', () => {
 
     const event: EventDocument = { ...baseEvent, actions: [originalAction] }
 
-    const result = getCompleteActionAnnotation({}, event, action)
+    const result = getCompleteActionAnnotation(event, action)
 
     expect(result).toEqual({ field: 'from-action', fieldO: 'only-in-original' })
   })
