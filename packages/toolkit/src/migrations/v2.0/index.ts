@@ -34,15 +34,26 @@ import { main as addResendInviteNotification } from './add-resend-invite-notific
 import { main as simplifyAnalyticsPrecalculations } from './simplify-analytics-precalculations'
 import { main as mergeInfrastructureDirectory } from './merge-infrastructure-directory'
 import { main as deleteInfrastructureDirectory } from './delete-infrastructure-directory'
+import { main as fixAcceptRequestedRegistrationFunctionType } from './fix-accept-requested-registration-function-type'
+
+/**
+ * Top-level subdirectories of `infrastructure/` that non-Swarm deployments
+ * still need (e.g. Postgres init scripts, Metabase config). Everything else
+ * under `infrastructure/` is deleted, and these subdirectories are then
+ * merged with upstream so the country config picks up the v2.0 changes.
+ */
+const NON_SWARM_INFRA_SUBDIRS = ['postgres', 'metabase']
 
 /**
  * Run the upgrade process for the country config in the current working
  * directory.
  *
  * @param dockerSwarm - When true, the local `infrastructure/` directory is
- *   merged with upstream changes (Docker Swarm deployments still need it).
- *   When false (the default), `infrastructure/` is deleted entirely, since
- *   non-Swarm deployments no longer ship it.
+ *   merged with upstream changes in its entirety (Docker Swarm deployments
+ *   still need it all). When false (the default), everything under
+ *   `infrastructure/` is deleted EXCEPT the subdirectories listed in
+ *   `NON_SWARM_INFRA_SUBDIRS`, and those preserved subdirectories are then
+ *   merged with upstream.
  */
 export async function runUpgrade(dockerSwarm: boolean) {
   await migrateWorkqueueConfigs()
@@ -68,11 +79,13 @@ export async function runUpgrade(dockerSwarm: boolean) {
   await checkoutUpstreamFiles()
   await addResendInviteNotification()
   await simplifyAnalyticsPrecalculations()
+  await fixAcceptRequestedRegistrationFunctionType()
   await updatePackageJson()
 
   if (dockerSwarm) {
     await mergeInfrastructureDirectory()
   } else {
-    await deleteInfrastructureDirectory()
+    await deleteInfrastructureDirectory({ keep: NON_SWARM_INFRA_SUBDIRS })
+    await mergeInfrastructureDirectory({ subdirs: NON_SWARM_INFRA_SUBDIRS })
   }
 }

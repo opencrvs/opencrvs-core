@@ -10,9 +10,9 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 import { TestUserRole } from '@opencrvs/commons/client'
+import { V2_DEFAULT_MOCK_LOCATIONS } from '@opencrvs/commons/client'
 import { routesConfig } from '@client/v2-events/routes'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
-import { V2_DEFAULT_MOCK_LOCATIONS } from '@client/tests/v2-events/administrative-hierarchy-mock'
 import { TeamPage } from './Team'
 
 const meta: Meta<typeof TeamPage> = {
@@ -31,6 +31,18 @@ export const TeamPageStory: Story = {
   name: 'Team Page',
   parameters: {
     userRole: TestUserRole.enum.LOCAL_REGISTRAR,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: V1_LEGACY_ROUTES.TEAM_USER_LIST + `?locationId=${locationId}`
+    }
+  }
+}
+
+export const TeamPageMobile: Story = {
+  name: 'Team Page - Mobile',
+  parameters: {
+    userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
+    viewport: { defaultViewport: 'Tablet' },
     reactRouter: {
       router: routesConfig,
       initialPath: V1_LEGACY_ROUTES.TEAM_USER_LIST + `?locationId=${locationId}`

@@ -242,14 +242,16 @@ const SystemScopeType = z.enum([
   'organisation.read-locations',
   'user.read',
   'user.create',
-  'user.edit'
+  'user.edit',
+  'user.search'
 ])
 export type SystemScopeType = z.infer<typeof SystemScopeType>
 
 const UserScopeType = SystemScopeType.extract([
   'user.read',
   'user.create',
-  'user.edit'
+  'user.edit',
+  'user.search'
 ])
 export type UserScopeType = z.infer<typeof UserScopeType>
 
@@ -262,7 +264,7 @@ export const UserScopeV2 = z.discriminatedUnion('type', [
     options: AllUserScopeOptions.optional()
   }),
   z.object({
-    type: UserScopeType.extract(['user.read']),
+    type: UserScopeType.extract(['user.read', 'user.search']),
     options: AccessLevelOptions.optional()
   })
 ])
@@ -417,7 +419,9 @@ export const decodeScope = (query: EncodedScope) => {
 /** If a certain scope option is not set, we use the default value. */
 const DEFAULT_SCOPE_OPTIONS: Partial<AllScopeOptions> = {
   placeOfEvent: JurisdictionFilter.enum.all,
-  accessLevel: JurisdictionFilter.enum.all
+  accessLevel: JurisdictionFilter.enum.all,
+  registeredIn: JurisdictionFilter.enum.all,
+  declaredIn: JurisdictionFilter.enum.all
 }
 
 /**

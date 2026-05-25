@@ -10,42 +10,34 @@ services:
   # Expose dev secrets as a plain volume - these will use docker secrets in staging and prod
   auth:
     volumes:
-      - '.secrets/public-key.pem:/secrets/public-key.pem'
-      - '.secrets/private-key.pem:/secrets/private-key.pem'
+      - ".secrets/public-key.pem:/secrets/public-key.pem"
+      - ".secrets/private-key.pem:/secrets/private-key.pem"
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
       - CERT_PRIVATE_KEY_PATH=/secrets/private-key.pem
     ports:
-      - '4040:4040'
+      - "4040:4040"
 
-  user-mgnt:
-    volumes:
-      - '.secrets/public-key.pem:/secrets/public-key.pem'
-    environment:
-      - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
-      - HOST=0.0.0.0
-    ports:
-      - '3030:3030'
   events:
     volumes:
-      - '.secrets/public-key.pem:/secrets/public-key.pem'
+      - ".secrets/public-key.pem:/secrets/public-key.pem"
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
     ports:
-      - '5555:5555'
+      - "5555:5555"
 
   gateway:
     volumes:
-      - '.secrets/public-key.pem:/secrets/public-key.pem'
+      - ".secrets/public-key.pem:/secrets/public-key.pem"
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
     ports:
-      - '7070:7070'
+      - "7070:7070"
 
   countryconfig:
     image: opencrvs/ocrvs-farajaland:latest
     volumes:
-      - '.secrets/public-key.pem:/secrets/public-key.pem'
+      - ".secrets/public-key.pem:/secrets/public-key.pem"
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
       - MONGO_URL=mongodb://mongo1/user-mgnt
@@ -53,12 +45,12 @@ services:
       - AUTH_URL=http://auth:4040
       - CHECK_INVALID_TOKEN=true
     ports:
-      - '3040:3040'
+      - "3040:3040"
 
   client:
     ports:
-      - '3000:3000'
+      - "3000:3000"
 
   login:
     ports:
-      - '3020:3020'
+      - "3020:3020"

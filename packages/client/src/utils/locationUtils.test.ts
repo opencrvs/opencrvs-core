@@ -23,11 +23,11 @@ import {
 import { createIntl } from 'react-intl'
 import { ILanguage } from '@client/i18n/reducer'
 import {
+  UUID,
   V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
   V2_DEFAULT_MOCK_LOCATIONS,
   V2_DEFAULT_MOCK_LOCATIONS_MAP
-} from '../tests/v2-events/administrative-hierarchy-mock'
-import { UUID } from '@opencrvs/commons/client'
+} from '@opencrvs/commons/client'
 
 describe('locationUtil tests', () => {
   describe('filterLocations()', () => {

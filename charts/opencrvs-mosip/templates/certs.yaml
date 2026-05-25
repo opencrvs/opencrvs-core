@@ -1,0 +1,14 @@
+{{- $secret := lookup "v1" "Secret" .Release.Namespace "mosip-certs" }}
+{{- if not $secret }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mosip-certs
+  annotations:
+    "helm.sh/resource-policy": keep
+type: Opaque
+data:
+  esignet-jwk.txt: {{ .Files.Get "example-certs/esignet-jwk.txt" | b64enc | quote }}
+  ida-partner.crt: {{ .Files.Get "example-certs/ida-partner.crt" | b64enc | quote }}
+  keystore.p12:    {{ .Files.Get "example-certs/keystore.p12"    | b64enc | quote }}
+{{- end }}

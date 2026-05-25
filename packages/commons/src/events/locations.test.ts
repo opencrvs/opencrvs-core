@@ -12,10 +12,14 @@
 import { createPrng, generateUuid, TestUserRole } from './test.utils'
 import { SystemContext, UserContext } from '../users/User'
 import {
+  AdministrativeArea,
   canAccessEventWithScope,
-  EventIndexWithAdministrativeHierarchy
+  EventIndexWithAdministrativeHierarchy,
+  getLocationHierarchy,
+  Location
 } from './locations'
 import { RecordScopeV2 } from 'src/scopes'
+import { UUID } from 'src/uuid'
 
 describe('canAccessEventWithScope()', () => {
   const rng = createPrng(83429)
@@ -241,5 +245,73 @@ describe('canAccessEventWithScope()', () => {
         )
       ).toBe(false)
     })
+  })
+})
+
+const province: AdministrativeArea = {
+  id: 'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa' as UUID,
+  name: 'Province',
+  externalId: null,
+  parentId: null,
+  validUntil: null
+}
+
+const district: AdministrativeArea = {
+  id: 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb' as UUID,
+  name: 'District',
+  externalId: null,
+  parentId: province.id,
+  validUntil: null
+}
+
+const office: Location = {
+  id: 'cccccccc-cccc-4ccc-cccc-cccccccccccc' as UUID,
+  name: 'District Office',
+  externalId: null,
+  administrativeAreaId: district.id,
+  validUntil: null,
+  locationType: 'CRVS_OFFICE'
+}
+
+const officeWithoutArea: Location = {
+  id: 'dddddddd-dddd-4ddd-dddd-dddddddddddd' as UUID,
+  name: 'Standalone Office',
+  externalId: null,
+  administrativeAreaId: null,
+  validUntil: null,
+  locationType: 'CRVS_OFFICE'
+}
+
+function buildMaps() {
+  const administrativeAreas = new Map<UUID, AdministrativeArea>([
+    [province.id, province],
+    [district.id, district]
+  ])
+  const locations = new Map<UUID, Location>([
+    [office.id, office],
+    [officeWithoutArea.id, officeWithoutArea]
+  ])
+  return { administrativeAreas, locations }
+}
+
+describe('getLocationHierarchy', () => {
+  it('returns root-first hierarchy for a location with an administrative area', () => {
+    const result = getLocationHierarchy(office.id, buildMaps())
+    expect(result).toEqual([province.id, district.id, office.id])
+  })
+
+  it('returns only the location id when it has no administrative area', () => {
+    const result = getLocationHierarchy(officeWithoutArea.id, buildMaps())
+    expect(result).toEqual([officeWithoutArea.id])
+  })
+
+  it('returns root-first hierarchy for an administrative area id', () => {
+    const result = getLocationHierarchy(district.id, buildMaps())
+    expect(result).toEqual([province.id, district.id])
+  })
+
+  it('returns single-element array for a root administrative area', () => {
+    const result = getLocationHierarchy(province.id, buildMaps())
+    expect(result).toEqual([province.id])
   })
 })

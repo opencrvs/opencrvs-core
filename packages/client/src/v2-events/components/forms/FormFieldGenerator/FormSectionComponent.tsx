@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect } from 'react'
 import { FormikProps } from 'formik'
 import { cloneDeep, set, get, omit, unset, isNil } from 'lodash'
 import {
@@ -37,14 +37,16 @@ import {
 import { useOnlineStatus } from '@client/utils'
 import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { makeFormikFieldIdsOpenCRVSCompatible, resolveSyncedFieldValue } from './utils'
+import {
+  makeFormikFieldIdsOpenCRVSCompatible,
+  resolveSyncedFieldValue
+} from './utils'
 import { FormItem, GeneratedInputField } from './GeneratedInputField'
 
 type AllProps = {
-  id: string
   eventConfig?: EventConfig
   fields: FieldConfig[]
-  fullForm: EventState
+  ocrvsFullForm: EventState
   className?: string
   readonlyMode?: boolean
   attachmentPath: string
@@ -72,7 +74,7 @@ type AllProps = {
  */
 type UsedFormikProps = Pick<
   FormikProps<EventState>,
-  'values' | 'setTouched' | 'setValues' | 'touched' | 'resetForm'
+  'values' | 'setTouched' | 'setValues' | 'touched'
 >
 
 function focusElementByHash() {
@@ -182,31 +184,30 @@ function applyVisibilityTransitions(
 }
 
 export function FormSectionComponent({
-  values,
+  values: formikPageForm,
   fields: pageFields,
-  fullForm,
+  ocrvsFullForm,
   touched,
   onFormChange,
   onTouchedChange,
   className,
   readonlyMode,
-  id,
   eventConfig,
   setValues,
   setTouched,
-  resetForm,
   attachmentPath,
   isCorrection = false,
   validatorContext
 }: AllProps) {
   // Conditionals need to be able to react to whether the user is online or not
   useOnlineStatus()
-  const prevIdRef = useRef(id)
 
   const getDefaultValue = useDefaultValue()
   const { cacheHiddenFieldValue, popHiddenFieldValue } = useEventFormData()
 
-  const fullFormFields = eventConfig ? findAllFields(eventConfig).concat(pageFields) : pageFields
+  const fullFormFields = eventConfig
+    ? findAllFields(eventConfig).concat(pageFields)
+    : pageFields
   const listenerFieldsByParentId = getParentsOfListenerFields(fullFormFields)
 
   /** Sets the value for fields that listen to another field via `parent` and `value` properties */
@@ -219,15 +220,39 @@ export function FormSectionComponent({
       makeFormFieldIdFormikCompatible
     )
 
-    const firstNonFalsyValue = resolveSyncedFieldValue(listenerField, (syncRef) =>
-      get(
-        fieldValues,
-        flattenFieldReference(syncRef).map(makeFormFieldIdFormikCompatible)
-      )
+    const firstNonFalsyValue = resolveSyncedFieldValue(
+      listenerField,
+      (syncRef) =>
+        get(
+          fieldValues,
+          flattenFieldReference(syncRef).map(makeFormFieldIdFormikCompatible)
+        )
     )
 
     if (firstNonFalsyValue) {
       set(fieldValues, formikCompatibleListenerFieldPath, firstNonFalsyValue)
+      return
+    }
+
+    const formContext = {
+      ...ocrvsFullForm,
+      ...makeFormikFieldIdsOpenCRVSCompatible(fieldValues)
+    }
+
+    // Hidden listener fields are cleared to undefined so their stale values
+    // don't leak into other fields that read from them (e.g. via `value` refs).
+    // We return early to skip applying the defaultValue, which would otherwise
+    // pollute the form state for fields that aren't currently relevant.
+
+    // Must be undefined, never null:
+    // null has a specific semantic in the declaration payload — it signals an
+    // intentional field removal and is preserved by getCleanedDeclarationDiff
+    // (via omitHiddenPaginatedFields with retainNullValues=true). Sending null
+    // for fields that were never part of the current action (e.g. correction
+    // form fields appearing in a declare payload) corrupts the event state.
+    // undefined is omitted from JSON serialisation and is therefore safe.
+    if (!isFieldVisible(listenerField, formContext, validatorContext)) {
+      set(fieldValues, formikCompatibleListenerFieldPath, undefined)
       return
     }
 
@@ -242,7 +267,7 @@ export function FormSectionComponent({
     formikFieldId: string,
     value: FieldValue | undefined
   ) => {
-    const updatedValues = cloneDeep(values)
+    const updatedFormikPageForm = cloneDeep(formikPageForm)
 
     const ocrvsFieldId = makeFormikFieldIdOpenCRVSCompatible(formikFieldId)
     const listenerFields = listenerFieldsByParentId[ocrvsFieldId] ?? []
@@ -252,23 +277,23 @@ export function FormSectionComponent({
     )
 
     // update the value of the field that was changed
-    set(updatedValues, formikFieldId, value)
+    set(updatedFormikPageForm, formikFieldId, value)
 
     for (const listenerField of interactiveListenerFields) {
-      setValueForListenerField(listenerField, updatedValues)
+      setValueForListenerField(listenerField, updatedFormikPageForm)
     }
 
     if (eventConfig) {
       const updatedFullForm = {
-        ...fullForm,
-        ...makeFormikFieldIdsOpenCRVSCompatible(updatedValues)
+        ...ocrvsFullForm,
+        ...makeFormikFieldIdsOpenCRVSCompatible(updatedFormikPageForm)
       }
 
       applyVisibilityTransitions(
         eventConfig,
-        fullForm,
+        ocrvsFullForm,
         updatedFullForm,
-        updatedValues,
+        updatedFormikPageForm,
         validatorContext,
         cacheHiddenFieldValue,
         popHiddenFieldValue
@@ -281,11 +306,11 @@ export function FormSectionComponent({
 
     const updatedTouched = omit(touched, formikListenerFieldPaths)
 
-    void setValues(updatedValues)
+    void setValues(updatedFormikPageForm)
     void setTouched(updatedTouched)
     onFormChange((prevForm) => ({
       ...prevForm,
-      ...makeFormikFieldIdsOpenCRVSCompatible(updatedValues)
+      ...makeFormikFieldIdsOpenCRVSCompatible(updatedFormikPageForm)
     }))
     onTouchedChange((prevTouched) => ({
       ...prevTouched,
@@ -296,7 +321,7 @@ export function FormSectionComponent({
   const onBatchFieldValueChange = (
     newValues: Array<{ name: string; value: FieldValue | undefined }>
   ) => {
-    const updatedValues = cloneDeep(values)
+    const updatedValues = cloneDeep(formikPageForm)
     const updatedTouched = cloneDeep(touched)
 
     for (const { name: formikFieldId, value } of newValues) {
@@ -320,13 +345,13 @@ export function FormSectionComponent({
 
     if (eventConfig) {
       const updatedFullForm = {
-        ...fullForm,
+        ...ocrvsFullForm,
         ...makeFormikFieldIdsOpenCRVSCompatible(updatedValues)
       }
 
       applyVisibilityTransitions(
         eventConfig,
-        fullForm,
+        ocrvsFullForm,
         updatedFullForm,
         updatedValues,
         validatorContext,
@@ -384,24 +409,15 @@ export function FormSectionComponent({
     focusElementByHash()
   }, [])
 
-  useEffect(() => {
-    const sectionChanged = prevIdRef.current !== id
-
-    if (sectionChanged) {
-      resetForm()
-    }
-    prevIdRef.current = id
-  }, [id, resetForm])
-
   return (
     <section className={className}>
       {pageFields.map((field) => {
-        if (!isFieldVisible(field, fullForm, validatorContext)) {
+        if (!isFieldVisible(field, ocrvsFullForm, validatorContext)) {
           return null
         }
         const formikFieldId = makeFormFieldIdFormikCompatible(field.id)
         const isDisabled =
-          !isFieldEnabled(field, fullForm, validatorContext) ||
+          !isFieldEnabled(field, ocrvsFullForm, validatorContext) ||
           (isCorrection && field.uncorrectable)
 
         return (
@@ -415,8 +431,8 @@ export function FormSectionComponent({
               disabled={isDisabled}
               eventConfig={eventConfig}
               fieldDefinition={{ ...field, id: formikFieldId }}
-              form={fullForm}
               name={formikFieldId}
+              ocrvsFullForm={ocrvsFullForm}
               readonlyMode={readonlyMode}
               validatorContext={validatorContext}
               onBatchFieldValueChange={onBatchFieldValueChange}

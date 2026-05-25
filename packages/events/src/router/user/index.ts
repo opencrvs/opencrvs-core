@@ -19,18 +19,25 @@ import {
 } from '@opencrvs/commons/events'
 import {
   CreateUserInput,
+  getAcceptedScopesFromToken,
+  getScopeOptionValue,
+  JurisdictionFilter,
+  UserOrSystemSummary,
   logger,
   TokenWithBearer,
   User,
   UserOrSystem,
   UpdateUserInput,
-  CreateUserInputInternal
+  CreateUserInputInternal,
+  UserOrSystemSummaryWithStatus
 } from '@opencrvs/commons'
 import {
   allowedWithAnyOfScopes,
   canAccessUserWithScopes,
   canCreateUserWithScopes,
-  canUpdateUserLocation
+  canSearchUsers,
+  canUpdateUser,
+  userCanReadOtherUser
 } from '@events/router/middleware'
 import {
   internalProcedure,
@@ -57,6 +64,7 @@ import {
   getUsersById,
   isUser,
   searchUsers,
+  searchUsersAll,
   updateUser,
   sendUsernameReminder,
   sendResetPasswordInvite,
@@ -69,7 +77,7 @@ import {
   generateNonce
 } from '@events/service/verifyCode'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
-import { userCanReadOtherUser } from '../middleware'
+import { userCanReadUserAudit } from '../middleware'
 
 const UserSearch = z.object({
   username: z.string().optional(),
@@ -177,20 +185,66 @@ export async function handleCreateUser(
   return user
 }
 
+// A user may have multiple user.search scopes — use the most permissive access level across all of them.
+const ACCESS_LEVEL_PRIORITY: JurisdictionFilter[] = [
+  JurisdictionFilter.enum.all,
+  JurisdictionFilter.enum.administrativeArea,
+  JurisdictionFilter.enum.location
+]
+
+function getMostPermissiveAccessLevel(
+  scopes: ReturnType<typeof getAcceptedScopesFromToken>
+): JurisdictionFilter {
+  const levels = scopes.map(
+    (s) => getScopeOptionValue(s, 'accessLevel') ?? JurisdictionFilter.enum.all
+  )
+  return (
+    ACCESS_LEVEL_PRIORITY.find((level) => levels.includes(level)) ??
+    JurisdictionFilter.enum.all
+  )
+}
+
 export function searchUsersRoute(
   procedure: typeof internalProcedure | typeof userAndSystemProcedure
 ) {
   return procedure
     .input(UserSearch)
-    .output(z.array(UserOrSystem))
-    .query(async ({ input }) =>
-      searchUsers({
-        ...input,
-        primaryOfficeId: input.primaryOfficeId
-          ? UUID.parse(input.primaryOfficeId)
-          : undefined
-      })
-    )
+    .output(z.array(UserOrSystemSummaryWithStatus))
+    .query(async ({ input, ctx }) => {
+      const primaryOfficeId = input.primaryOfficeId
+        ? UUID.parse(input.primaryOfficeId)
+        : undefined
+
+      if (!('user' in ctx)) {
+        return searchUsers({ ...input, primaryOfficeId })
+      }
+
+      const acceptedScopes = getAcceptedScopesFromToken(ctx.token, [
+        'user.search'
+      ])
+      const accessLevel = getMostPermissiveAccessLevel(acceptedScopes)
+
+      if (
+        accessLevel === JurisdictionFilter.enum.administrativeArea &&
+        ctx.user.administrativeAreaId
+      ) {
+        const allUsers = await searchUsersAll({
+          ...input,
+          primaryOfficeId: primaryOfficeId,
+          administrativeAreaId: ctx.user.administrativeAreaId
+        })
+        return allUsers.slice(input.skip, input.skip + input.count)
+      }
+
+      if (accessLevel === JurisdictionFilter.enum.location) {
+        return searchUsers({
+          ...input,
+          primaryOfficeId: ctx.user.primaryOfficeId
+        })
+      }
+
+      return searchUsers({ ...input, primaryOfficeId })
+    })
 }
 
 const UserAuditListQuery = z.object({
@@ -217,7 +271,7 @@ const auditRouter = router({
     .output(
       z.object({ results: z.array(AuditLogEntrySchema), total: z.number() })
     )
-    .use(userCanReadOtherUser)
+    .use(userCanReadUserAudit)
     .query(async ({ input }) => {
       const { results, total } = await queryUserAuditLog({
         subjectId: input.userId,
@@ -237,7 +291,7 @@ const auditRouter = router({
 export const userRouter = router({
   get: userOnlyProcedure
     .input(UUID)
-    // @TODO: missing scope check.
+    .use(userCanReadOtherUser)
     .output(UserOrSystem)
     .query(async ({ input }) => {
       const users = await getUsersById([input])
@@ -254,8 +308,7 @@ export const userRouter = router({
     .mutation(async ({ input, ctx }) => handleCreateUser(input, ctx)),
   update: userAndSystemProcedure
     .input(UpdateUserInput)
-    .use(canUpdateUserLocation)
-    .use(canAccessUserWithScopes(['user.edit']))
+    .use(canUpdateUser)
     .output(User)
     .mutation(async ({ input, ctx }) => {
       if (input.mobile) {
@@ -306,12 +359,12 @@ export const userRouter = router({
     }),
   list: userOnlyProcedure
     .input(z.array(z.string()))
-    .output(z.array(UserOrSystem))
+    .output(z.array(UserOrSystemSummary))
     .query(async ({ input }) => getUsersById(input)),
-  search: searchUsersRoute(userAndSystemProcedure),
+  search: searchUsersRoute(userAndSystemProcedure.use(canSearchUsers)),
   actions: userOnlyProcedure
     .input(UserActionsQuery)
-    .use(userCanReadOtherUser)
+    .use(userCanReadUserAudit)
     .query(async ({ input }) => {
       return getUserActions(input)
     }),

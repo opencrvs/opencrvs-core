@@ -382,6 +382,7 @@ export async function getEventsAuditTrailed(
   const readActions = eventIds.map((eventId) =>
     buildAction(
       {
+        waitFor: false,
         type: ActionType.READ,
         declaration: {},
         eventId,

@@ -12,6 +12,7 @@ import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import {
   AdministrativeAreaField,
+  getAdministrativeAreaHierarchy,
   JurisdictionFilter,
   Location,
   resolveJurisdictionReference,
@@ -21,9 +22,11 @@ import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { getAdministrativeAreaHierarchy } from '@client/v2-events/utils'
 import { getToken } from '@client/utils/authUtils'
-import { SearchableSelect, SearchableSelectProps } from '@client/v2-events/components/forms/inputs/SearchableSelect'
+import {
+  SearchableSelect,
+  SearchableSelectProps
+} from '@client/v2-events/components/forms/inputs/SearchableSelect'
 import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { LocationSearch } from './LocationSearch'
@@ -160,7 +163,11 @@ function AdministrativeAreaInput({
   )
 }
 
-function AdministrativeAreaOutput({ value }: { value: Stringifiable | undefined }) {
+function AdministrativeAreaOutput({
+  value
+}: {
+  value: Stringifiable | undefined
+}) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 

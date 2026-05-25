@@ -8,12 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { JurisdictionFilter } from '@opencrvs/commons/client'
 import {
+  JurisdictionFilter,
   V2_DEFAULT_MOCK_LOCATIONS,
   V2_DEFAULT_MOCK_LOCATIONS_MAP,
   V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
-} from '@client/tests/v2-events/administrative-hierarchy-mock'
+} from '@opencrvs/commons/client'
+
 import { filterLocationsByJurisdiction } from './LocationSearch'
 
 /**
@@ -207,7 +208,9 @@ describe('filterLocationsByJurisdiction', () => {
       })
 
       expect(result.some((l) => l.locationType === 'CRVS_OFFICE')).toBe(true)
-      expect(result.some((l) => l.locationType === 'HEALTH_FACILITY')).toBe(true)
+      expect(result.some((l) => l.locationType === 'HEALTH_FACILITY')).toBe(
+        true
+      )
       expect(result).toHaveLength(V2_DEFAULT_MOCK_LOCATIONS.length)
     })
   })

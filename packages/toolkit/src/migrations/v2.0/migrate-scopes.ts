@@ -12,10 +12,7 @@
 import { Node, Project, SyntaxKind, Expression } from 'ts-morph'
 import path from 'path'
 import {
-  decodeScope,
-} from '@opencrvs/commons/scopes'
-import {
-  legacyScopeToV2Scope,
+  migrateLegacyScopesArrayToV2Scopes,
   SCOPES
 } from '@opencrvs/commons/scopes.deprecated.do-not-use'
 const ROLES_FILE_RELATIVE_PATH = 'src/data-seeding/roles/roles.ts'
@@ -72,37 +69,61 @@ function resolveLegacyScopeFromElement(element: Expression): string | null {
   return null
 }
 
+/**
+ * Walks each `scopes: [...]` array in the roles file, classifies elements,
+ * and rewrites the whole array using `migrateLegacyScopesArrayToV2Scopes`
+ * (which preserves v1.9 AND semantics by merging pairs of legacy scopes
+ * that targeted the same v2 type). See issue #12489.
+ *
+ * Elements are partitioned into three kinds:
+ *   - drop: `SCOPES.X` references where X is not in the SCOPES map (warned
+ *     and removed, matching pre-refactor behavior).
+ *   - raw: non-literal expressions we cannot statically resolve (e.g.
+ *     `...sharedScopes` spreads). Preserved verbatim in output so authoring
+ *     intent isn't lost.
+ *   - legacy: literal strings or resolvable `SCOPES.X` references.
+ *     Collected and passed as a batch to the merge function.
+ *
+ * The output array text is `[...rawTexts, ...mergedScopesAsJson]`. Order of
+ * legacy entries relative to raw expressions is not preserved — scopes in a
+ * v2 array compose with OR, so position is semantically irrelevant.
+ */
 function migrateScopesArrays(
   rolesFilePath: string,
   project: Project
-): { migratedCount: number; removedCount: number } {
+): { migratedCount: number; removedCount: number; mergedCount: number } {
   const sourceFile = project.getSourceFile(rolesFilePath)
-  if (!sourceFile) return { migratedCount: 0, removedCount: 0 }
+  if (!sourceFile) {
+    return { migratedCount: 0, removedCount: 0, mergedCount: 0 }
+  }
 
   let migratedCount = 0
   let removedCount = 0
+  let mergedCount = 0
 
   const scopesProperties = sourceFile
     .getDescendantsOfKind(SyntaxKind.PropertyAssignment)
     .filter((prop) => prop.getName() === SCOPES_PROPERTY_NAME)
 
+  const relPath = path.relative(process.cwd(), rolesFilePath)
+
   for (const scopesProp of scopesProperties) {
     const initializer = scopesProp.getInitializer()
     if (!initializer || !Node.isArrayLiteralExpression(initializer)) continue
 
-    const elements = initializer.getElements()
-    for (let index = elements.length - 1; index >= 0; index--) {
-      const element = elements[index]
-      if (!Node.isExpression(element)) continue
+    const rawTexts: string[] = []
+    const legacyStrings: string[] = []
+    let anyChange = false
 
+    for (const element of initializer.getElements()) {
       const scopeKey = resolveScopeKeyFromElementAccess(element)
       if (scopeKey && !(scopeKey in SCOPES)) {
         // eslint-disable-next-line no-console
         console.warn(
-          `  [${path.relative(process.cwd(), rolesFilePath)}] Removing unknown scope reference: SCOPES.${scopeKey}`
+          `  [${relPath}] Removing unknown scope reference: SCOPES.${scopeKey}`
         )
-        initializer.removeElement(index)
         removedCount++
+        anyChange = true
         continue
       }
 
@@ -110,42 +131,48 @@ function migrateScopesArrays(
       if (!legacyScope) {
         // eslint-disable-next-line no-console
         console.warn(
-          `  [${path.relative(process.cwd(), rolesFilePath)}] Skipping non-literal scope expression: ${element.getText()}`
+          `  [${relPath}] Preserving non-literal scope expression verbatim: ${element.getText()}`
         )
+        rawTexts.push(element.getText())
         continue
       }
 
-      try {
-        const migratedScope = legacyScopeToV2Scope(legacyScope)
-        const scope = decodeScope(migratedScope)
-
-        if (!scope) {
-          // eslint-disable-next-line no-console
-          console.warn(
-            `  [${path.relative(process.cwd(), rolesFilePath)}] Could not decode migrated scope '${migratedScope}'.`
-          )
-          continue
-        }
-
-        element.replaceWithText(JSON.stringify(scope))
-        migratedCount++
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          `  [${path.relative(process.cwd(), rolesFilePath)}] Could not migrate scope '${legacyScope}': ${error}`
-        )
-      }
+      legacyStrings.push(legacyScope)
+      anyChange = true
     }
+
+    if (!anyChange) continue
+
+    let mergedScopes
+    try {
+      mergedScopes = migrateLegacyScopesArrayToV2Scopes(legacyStrings)
+    } catch (error) {
+      throw new Error(
+        `[${relPath}] Failed to migrate scopes for role: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+        { cause: error }
+      )
+    }
+
+    migratedCount += legacyStrings.length
+    mergedCount += legacyStrings.length - mergedScopes.length
+
+    const outputElements = [
+      ...rawTexts,
+      ...mergedScopes.map((s) => JSON.stringify(s))
+    ]
+    scopesProp.setInitializer(`[${outputElements.join(', ')}]`)
   }
 
   if (removedCount > 0) {
     // eslint-disable-next-line no-console
     console.log(
-      `  Removed ${removedCount} unknown SCOPES reference(s) from '${path.relative(process.cwd(), rolesFilePath)}'.`
+      `  Removed ${removedCount} unknown SCOPES reference(s) from '${relPath}'.`
     )
   }
 
-  return { migratedCount, removedCount }
+  return { migratedCount, removedCount, mergedCount }
 }
 
 function ensureScopesHelpersImport(
@@ -364,7 +391,7 @@ async function main() {
   }
 
   const importChanged = ensureScopesHelpersImport(rolesFilePath, project)
-  const { migratedCount, removedCount } = migrateScopesArrays(
+  const { migratedCount, removedCount, mergedCount } = migrateScopesArrays(
     rolesFilePath,
     project
   )
@@ -392,7 +419,7 @@ async function main() {
 
   await sourceFile.save()
   console.log(
-    `Done. Migrated ${migratedCount} legacy scope(s), removed ${removedCount} unknown SCOPES reference(s), wrapped ${wrappedScopesCount} scope array(s) with defineScopes()${wrappedRoles ? ', wrapped roles with defineRoles()' : ''}${removedRoleType ? ', and removed Role type definition' : ''}${importChanged ? '. Updated toolkit/scopes imports.' : '.'}`
+    `Done. Migrated ${migratedCount} legacy scope(s), merged ${mergedCount} AND-paired scope(s) into single v2 objects (privilege-escalation fix, see issue #12489), removed ${removedCount} unknown SCOPES reference(s), wrapped ${wrappedScopesCount} scope array(s) with defineScopes()${wrappedRoles ? ', wrapped roles with defineRoles()' : ''}${removedRoleType ? ', and removed Role type definition' : ''}${importChanged ? '. Updated toolkit/scopes imports.' : '.'}`
   )
 }
 
