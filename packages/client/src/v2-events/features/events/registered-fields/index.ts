@@ -12,6 +12,7 @@ import { FieldConfig, FieldType } from '@opencrvs/commons/client'
 
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
+import { SignatureField } from '@client/v2-events/components/forms/inputs/SignatureField'
 import { Address } from './Address'
 import { AdministrativeArea } from './AdministrativeArea'
 import { BulletList } from './BulletList'
@@ -129,6 +130,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return File
     case FieldType.FILE_WITH_OPTIONS:
       return FileWithOption
+    case FieldType.SIGNATURE:
+      return SignatureField
     default:
       return undefined
   }

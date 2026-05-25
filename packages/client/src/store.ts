@@ -43,10 +43,6 @@ import createSentryMiddleware from 'redux-sentry-middleware'
 import { submissionMiddleware } from './declarations/submissionMiddleware'
 import { workqueueReducer, WorkqueueState } from './workqueue'
 import { persistenceMiddleware } from './utils/persistence/persistenceMiddleware'
-import {
-  IReloadModalVisibilityState,
-  reloadModalVisibilityReducer
-} from './reload/reducer'
 
 export interface IStoreState {
   profile: ProfileState
@@ -59,7 +55,6 @@ export interface IStoreState {
   userForm: IUserFormState
   workqueueState: WorkqueueState
   advancedSearch: IAdvancedSearchParamState
-  reloadModalVisibility: IReloadModalVisibilityState
 }
 
 const enhancedCreateStore = createReduxStore as StoreCreator
@@ -79,8 +74,7 @@ export const createStore = (): { store: AppStore } => {
     offline: offlineDataReducer,
     userForm: userFormReducer,
     workqueueState: workqueueReducer,
-    advancedSearch: advancedSearchParamReducer,
-    reloadModalVisibility: reloadModalVisibilityReducer
+    advancedSearch: advancedSearchParamReducer
   })
   // @ts-ignore
   const enhancer = compose(

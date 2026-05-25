@@ -12,9 +12,13 @@ import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { get } from 'lodash'
 import {
+  ActionUpdate,
   FieldConfig,
   SystemVariables,
   SerializedUserField,
+  isCodeToEvaluate,
+  buildClientFunctionContext,
+  runClientFunction,
   isNonInteractiveFieldType,
   Location,
   FieldType,
@@ -37,6 +41,7 @@ import { useLocations } from './useLocations'
 interface Context extends SystemVariables {
   locations: Location[]
   adminLevelIds: string[]
+  form: EventState | ActionUpdate
 }
 
 type FieldsWithDefaultValue =
@@ -181,9 +186,23 @@ export function mapFieldToDefaultValue(
       return mapFieldToDefaultValue(subfield, context)
     })
   }
+  if (isCodeToEvaluate(field.defaultValue)) {
+    return runClientFunction(
+      field.defaultValue.$$code,
+      undefined,
+      buildClientFunctionContext({
+        form: context.form,
+        systemVariables: context,
+        locations: context.locations,
+        adminLevelIds: context.adminLevelIds
+      })
+    ) as FieldValue
+  }
+
   if (field.defaultValue === undefined) {
     return
   }
+
   switch (field.type) {
     case FieldType.NAME: {
       return {
@@ -267,15 +286,13 @@ export function mapFieldToDefaultValue(
     case FieldType.SIGNATURE:
     case FieldType.FILE:
     case FieldType.FILE_WITH_OPTIONS:
-      const defaultValue = field.defaultValue
-
-      if (isSerializedUserField(defaultValue)) {
-        return resolveSerializedUserField(defaultValue, context)
+      if (isSerializedUserField(field.defaultValue)) {
+        return resolveSerializedUserField(field.defaultValue, context)
       }
 
       return replacePlaceholders({
         field,
-        defaultValue,
+        defaultValue: field.defaultValue,
         systemVariables: context
       })
   }
@@ -290,14 +307,21 @@ export function useDefaultValue() {
     () => config.ADMIN_STRUCTURE.map((level) => level.id),
     [config.ADMIN_STRUCTURE]
   )
-  function getDefaultValue(field: FieldConfig): FieldValue | undefined
-  function getDefaultValue(fields: FieldConfig[]): EventState
   function getDefaultValue(
-    fieldOrFields: FieldConfig | FieldConfig[]
+    field: FieldConfig,
+    form: EventState | ActionUpdate
+  ): FieldValue | undefined
+  function getDefaultValue(
+    fields: FieldConfig[],
+    form: EventState | ActionUpdate
+  ): EventState
+  function getDefaultValue(
+    fieldOrFields: FieldConfig | FieldConfig[],
+    form: EventState | ActionUpdate
   ): FieldValue | EventState | undefined {
     if (Array.isArray(fieldOrFields)) {
       const fields = fieldOrFields
-      return buildFormState(fields, (field) => getDefaultValue(field))
+      return buildFormState(fields, (field) => getDefaultValue(field, form))
     }
     const field = fieldOrFields
     if (!isFieldWithDefaultValue(field)) {
@@ -306,7 +330,8 @@ export function useDefaultValue() {
     return mapFieldToDefaultValue(field, {
       ...systemVariables,
       locations,
-      adminLevelIds
+      adminLevelIds,
+      form
     })
   }
   return getDefaultValue

@@ -10,17 +10,17 @@
  */
 import * as objectHash from 'object-hash'
 import { EventDocument } from '../events/EventDocument'
-import { EventState } from '../events/ActionDocument'
+import { ActionUpdate, EventState } from '../events/ActionDocument'
 import { ITokenPayload as TokenPayload, Scope } from '../authentication'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
 import { userSerializer } from '../events/serializers/user/serializer'
 import { omitKeyDeep } from '../utils'
 import { UUID } from '../uuid'
 import { todayDateTimeValueSerializer } from '../events/serializers/date/serializer'
-import { FieldReference } from '../events/FieldConfig'
+import { CodeToEvaluate, FieldReference } from '../events/FieldConfig'
+import type { ClientFunctionContext } from './validate'
 
 /* eslint-disable max-lines */
-
 /** @knipignore */
 export type JSONSchema = {
   $id: string
@@ -66,7 +66,7 @@ export type EventConditionalParameters = CommonConditionalParameters & {
 }
 
 export type FormConditionalParameters = CommonConditionalParameters & {
-  $form: EventState | Record<string, unknown>
+  $form: EventState | ActionUpdate
   $leafAdminStructureLocationIds?: Array<{ id: UUID }>
 }
 
@@ -246,7 +246,9 @@ export function isFieldReference(value: unknown): value is FieldReference {
   return typeof value === 'object' && value !== null && '$$field' in value
 }
 
-export function isEventFieldReference(value: unknown): value is FieldReference {
+export function isEventFieldReference(
+  value: unknown
+): value is { $$event: string } {
   return typeof value === 'object' && value !== null && '$$event' in value
 }
 
@@ -795,6 +797,65 @@ export function createFieldConditionals(fieldId: string) {
           }
         },
         required: [fieldId]
+      }),
+
+    /**
+     * Custom client-side validator. The provided function is serialised and executed
+     * just-in-time on the client only. External references (e.g. lodash) are not
+     * available inside the function body — all logic must be self-contained.
+     *
+     * @example
+     * field('nid').customClientValidator((value) => {
+     *   // LUHN check — all logic must be inline
+     *   const digits = String(value).split('').map(Number)
+     *   // ...
+     *   return isValid
+     * })
+     */
+    customClientValidator(
+      validationFn: (
+        fieldValue: unknown,
+        context: ClientFunctionContext
+      ) => boolean
+    ): JSONSchema {
+      const code = validationFn.toString()
+      return defineFormConditional({
+        type: 'object',
+        properties: wrapToPath(
+          { [fieldId]: { customClientValidator: { code } } },
+          this.$$subfield
+        ),
+        required: [fieldId]
       })
+    },
+
+    /**
+     * Custom client-side evaluation. Returns a {@link FieldReference} descriptor
+     * that can be used as the `value` property or a DATA component entry.
+     * The function receives the referenced field's value as the first argument and
+     * the full form context as the second; its return value replaces the field reference.
+     * The function is serialised and executed just-in-time on the client only.
+     * External references (e.g. lodash) are not available inside the function body.
+     *
+     * For computing a default value without referencing a specific field, use
+     * `evaluate(fn)` in the `defaultValue` property instead.
+     *
+     * @example
+     * field('a').customClientEvaluation((aValue, ctx) =>
+     *   Number(aValue) + Number(ctx.$form.b)
+     * )
+     */
+    customClientEvaluation(
+      computationFn: (
+        fieldValue: unknown,
+        context: ClientFunctionContext
+      ) => unknown
+    ): CodeToEvaluate {
+      return {
+        $$code: computationFn.toString(),
+        $$field: fieldId,
+        $$subfield: this.$$subfield
+      }
+    }
   }
 }
