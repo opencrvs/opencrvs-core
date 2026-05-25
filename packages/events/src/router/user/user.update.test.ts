@@ -700,3 +700,23 @@ test('clears all drafts when primaryOfficeId changes via user.update', async () 
 
   expect(await draftClient.event.draft.list()).toHaveLength(0)
 })
+
+test('preserves drafts when primaryOfficeId stays the same via user.update', async () => {
+  const { user, generator } = await setupTestCase()
+  const adminClient = createTestClient(user, [USER_EDIT_SCOPE])
+  const draftClient = createTestClient(user)
+
+  const event = await draftClient.event.create(generator.event.create())
+  await draftClient.event.draft.create({
+    eventId: event.id,
+    type: 'DECLARE',
+    status: 'Accepted',
+    transactionId: 'test-transaction-id'
+  })
+
+  expect(await draftClient.event.draft.list()).toHaveLength(1)
+
+  await adminClient.user.update(generateUpdateInput(user))
+
+  expect(await draftClient.event.draft.list()).toHaveLength(1)
+})
