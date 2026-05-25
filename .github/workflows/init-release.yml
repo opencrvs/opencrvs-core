@@ -95,7 +95,8 @@ jobs:
           git checkout -b "release/${{ inputs.version }}"
 
           # Bump all workspace package.json files and the root in one command.
-          npm version ${{ inputs.version }} --no-git-tag-version --workspaces --include-workspace-root
+          npx lerna exec 'yarn version --new-version ${{ inputs.version }} --no-git-tag-version'
+          yarn version --new-version ${{ inputs.version }} --no-git-tag-version
           git add .
           git commit -m "chore: update version to ${{ inputs.version }}"
 
