@@ -75,22 +75,11 @@ function PrefetchQueries() {
     {
       const locationsQuery = trpcOptionsProxy.locations.list.queryOptions()
 
-      const administrativeAreasQuery =
-        trpcOptionsProxy.administrativeAreas.list.queryOptions()
-
       // only fetch if we don't already have it cached
       if (!queryClient.getQueryData(locationsQuery.queryKey)) {
         void queryClient.prefetchQuery({
           queryKey: locationsQuery.queryKey,
           queryFn: locationsQuery.queryFn
-        })
-      }
-
-      // only fetch if we don't already have it cached
-      if (!queryClient.getQueryData(administrativeAreasQuery.queryKey)) {
-        void queryClient.prefetchQuery({
-          queryKey: administrativeAreasQuery.queryKey,
-          queryFn: administrativeAreasQuery.queryFn
         })
       }
     }
