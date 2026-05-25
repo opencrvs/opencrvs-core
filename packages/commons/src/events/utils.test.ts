@@ -843,13 +843,13 @@ describe('getCompleteActionContent', () => {
     expect(result).toEqual({ immediateCorrection: true })
   })
 
-  it('returns own content when action has content even if originalActionId is set', () => {
+  it('merges own content with original content, current action wins on conflict', () => {
     const originalAction = generateActionDocument({
       configuration: tennisClubMembershipEvent,
       action: ActionType.APPROVE_CORRECTION,
       defaults: {
         status: ActionStatus.Requested,
-        content: { immediateCorrection: false }
+        content: { immediateCorrection: false, fromOriginal: true }
       }
     })
 
@@ -866,7 +866,7 @@ describe('getCompleteActionContent', () => {
 
     const result = getCompleteActionContent(event, action)
 
-    expect(result).toEqual({ immediateCorrection: true })
+    expect(result).toEqual({ immediateCorrection: true, fromOriginal: true })
   })
 
   it('inherits content from Requested original action when own content is absent', () => {
@@ -892,7 +892,7 @@ describe('getCompleteActionContent', () => {
     expect(result).toEqual({ immediateCorrection: true })
   })
 
-  it('does not inherit content when original action status is not Requested', () => {
+  it('inherits content from original action regardless of status (Accepted or Rejected)', () => {
     const originalAction = generateActionDocument({
       configuration: tennisClubMembershipEvent,
       action: ActionType.APPROVE_CORRECTION,
@@ -912,7 +912,30 @@ describe('getCompleteActionContent', () => {
 
     const result = getCompleteActionContent(event, action)
 
-    expect(result).toBeUndefined()
+    expect(result).toEqual({ immediateCorrection: true })
+  })
+
+  it('inherits content from a Rejected original action', () => {
+    const originalAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.APPROVE_CORRECTION,
+      defaults: {
+        status: ActionStatus.Rejected,
+        content: { immediateCorrection: true }
+      }
+    })
+
+    const action = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.APPROVE_CORRECTION,
+      defaults: { originalActionId: originalAction.id }
+    })
+
+    const event: EventDocument = { ...baseEvent, actions: [originalAction] }
+
+    const result = getCompleteActionContent(event, action)
+
+    expect(result).toEqual({ immediateCorrection: true })
   })
 
   it('returns undefined when originalActionId is set but original action is not found', () => {

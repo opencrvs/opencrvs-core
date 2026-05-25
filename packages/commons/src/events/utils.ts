@@ -796,7 +796,7 @@ export function getCompleteActionContent(
     | null
     | undefined
 
-  if (!action.originalActionId || currentContent) {
+  if (!action.originalActionId) {
     return currentContent
   }
 
@@ -804,12 +804,11 @@ export function getCompleteActionContent(
     ({ id }) => id === action.originalActionId
   )
 
-  if (
-    originalAction?.status === ActionStatus.Requested &&
-    'content' in originalAction &&
-    originalAction.content
-  ) {
-    return originalAction.content as Record<string, unknown>
+  if (originalAction && 'content' in originalAction && originalAction.content) {
+    return {
+      ...(originalAction.content as Record<string, unknown>),
+      ...(currentContent ?? {})
+    }
   }
 
   return currentContent
