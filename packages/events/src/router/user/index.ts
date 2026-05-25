@@ -19,18 +19,25 @@ import {
 } from '@opencrvs/commons/events'
 import {
   CreateUserInput,
-  isBase64FileString,
+  getAcceptedScopesFromToken,
+  getScopeOptionValue,
+  JurisdictionFilter,
+  UserOrSystemSummary,
   logger,
-  personNameFromV1ToV2,
   TokenWithBearer,
   User,
   UserOrSystem,
   UpdateUserInput,
-  CreateUserInputInternal
+  CreateUserInputInternal,
+  UserOrSystemSummaryWithStatus
 } from '@opencrvs/commons'
 import {
   allowedWithAnyOfScopes,
-  canUpdateUserLocation
+  canAccessUserWithScopes,
+  canCreateUserWithScopes,
+  canSearchUsers,
+  canUpdateUser,
+  userCanReadOtherUser
 } from '@events/router/middleware'
 import {
   internalProcedure,
@@ -38,7 +45,7 @@ import {
   userAndSystemProcedure,
   userOnlyProcedure
 } from '@events/router/trpc'
-import { getRoles } from '@events/service/config/config'
+import { getApplicationConfig, getRoles } from '@events/service/config/config'
 import { generateHash } from '@events/service/auth/hash'
 import {
   updatePasswordHash,
@@ -57,19 +64,20 @@ import {
   getUsersById,
   isUser,
   searchUsers,
+  searchUsersAll,
   updateUser,
   sendUsernameReminder,
   sendResetPasswordInvite,
-  resendInvite
+  resendInvite,
+  verifyPasswordById
 } from '@events/service/users/api'
-import { uploadBase64File } from '@events/service/files'
 import {
   checkVerificationCode,
   generateAndSendVerificationCode,
   generateNonce
 } from '@events/service/verifyCode'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
-import { userCanReadOtherUser } from '../middleware'
+import { userCanReadUserAudit } from '../middleware'
 
 const UserSearch = z.object({
   username: z.string().optional(),
@@ -105,11 +113,31 @@ function getAuditLogIdentifiers(token: TokenWithBearer) {
   return AuditLogSubject.parse(decoded)
 }
 
+async function validateMobile(mobile: string) {
+  const config = await getApplicationConfig()
+  let pattern: RegExp
+  try {
+    pattern = new RegExp(config.PHONE_NUMBER_PATTERN)
+  } catch {
+    logger.error(
+      `PHONE_NUMBER_PATTERN "${config.PHONE_NUMBER_PATTERN}" is not a valid regex — skipping mobile validation`
+    )
+    return
+  }
+  if (!pattern.test(mobile)) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `INVALID_MOBILE: "${mobile}" does not match the configured pattern ${config.PHONE_NUMBER_PATTERN}`
+    })
+  }
+}
+
 export async function handleCreateUser(
   input: CreateUserInput | CreateUserInputInternal,
   ctx: { token: TokenWithBearer }
 ): Promise<User> {
   if (input.mobile) {
+    await validateMobile(input.mobile)
     const existingWithMobile = await searchUsers({
       mobile: input.mobile,
       count: 1,
@@ -157,20 +185,66 @@ export async function handleCreateUser(
   return user
 }
 
+// A user may have multiple user.search scopes — use the most permissive access level across all of them.
+const ACCESS_LEVEL_PRIORITY: JurisdictionFilter[] = [
+  JurisdictionFilter.enum.all,
+  JurisdictionFilter.enum.administrativeArea,
+  JurisdictionFilter.enum.location
+]
+
+function getMostPermissiveAccessLevel(
+  scopes: ReturnType<typeof getAcceptedScopesFromToken>
+): JurisdictionFilter {
+  const levels = scopes.map(
+    (s) => getScopeOptionValue(s, 'accessLevel') ?? JurisdictionFilter.enum.all
+  )
+  return (
+    ACCESS_LEVEL_PRIORITY.find((level) => levels.includes(level)) ??
+    JurisdictionFilter.enum.all
+  )
+}
+
 export function searchUsersRoute(
   procedure: typeof internalProcedure | typeof userAndSystemProcedure
 ) {
   return procedure
     .input(UserSearch)
-    .output(z.array(UserOrSystem))
-    .query(async ({ input }) =>
-      searchUsers({
-        ...input,
-        primaryOfficeId: input.primaryOfficeId
-          ? UUID.parse(input.primaryOfficeId)
-          : undefined
-      })
-    )
+    .output(z.array(UserOrSystemSummaryWithStatus))
+    .query(async ({ input, ctx }) => {
+      const primaryOfficeId = input.primaryOfficeId
+        ? UUID.parse(input.primaryOfficeId)
+        : undefined
+
+      if (!('user' in ctx)) {
+        return searchUsers({ ...input, primaryOfficeId })
+      }
+
+      const acceptedScopes = getAcceptedScopesFromToken(ctx.token, [
+        'user.search'
+      ])
+      const accessLevel = getMostPermissiveAccessLevel(acceptedScopes)
+
+      if (
+        accessLevel === JurisdictionFilter.enum.administrativeArea &&
+        ctx.user.administrativeAreaId
+      ) {
+        const allUsers = await searchUsersAll({
+          ...input,
+          primaryOfficeId: primaryOfficeId,
+          administrativeAreaId: ctx.user.administrativeAreaId
+        })
+        return allUsers.slice(input.skip, input.skip + input.count)
+      }
+
+      if (accessLevel === JurisdictionFilter.enum.location) {
+        return searchUsers({
+          ...input,
+          primaryOfficeId: ctx.user.primaryOfficeId
+        })
+      }
+
+      return searchUsers({ ...input, primaryOfficeId })
+    })
 }
 
 const UserAuditListQuery = z.object({
@@ -197,7 +271,7 @@ const auditRouter = router({
     .output(
       z.object({ results: z.array(AuditLogEntrySchema), total: z.number() })
     )
-    .use(userCanReadOtherUser)
+    .use(userCanReadUserAudit)
     .query(async ({ input }) => {
       const { results, total } = await queryUserAuditLog({
         subjectId: input.userId,
@@ -217,6 +291,7 @@ const auditRouter = router({
 export const userRouter = router({
   get: userOnlyProcedure
     .input(UUID)
+    .use(userCanReadOtherUser)
     .output(UserOrSystem)
     .query(async ({ input }) => {
       const users = await getUsersById([input])
@@ -227,17 +302,17 @@ export const userRouter = router({
       return users[0]
     }),
   create: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.create']))
     .input(CreateUserInput)
+    .use(canCreateUserWithScopes(['user.create']))
     .output(User)
     .mutation(async ({ input, ctx }) => handleCreateUser(input, ctx)),
   update: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.edit']))
-    .input(UpdateUserInput.and(z.object({ id: UUID })))
-    .use(canUpdateUserLocation)
+    .input(UpdateUserInput)
+    .use(canUpdateUser)
     .output(User)
     .mutation(async ({ input, ctx }) => {
       if (input.mobile) {
+        await validateMobile(input.mobile)
         const existingWithMobile = await searchUsers({
           mobile: input.mobile,
           count: 1,
@@ -284,12 +359,12 @@ export const userRouter = router({
     }),
   list: userOnlyProcedure
     .input(z.array(z.string()))
-    .output(z.array(UserOrSystem))
+    .output(z.array(UserOrSystemSummary))
     .query(async ({ input }) => getUsersById(input)),
-  search: searchUsersRoute(userAndSystemProcedure),
+  search: searchUsersRoute(userAndSystemProcedure.use(canSearchUsers)),
   actions: userOnlyProcedure
     .input(UserActionsQuery)
-    .use(userCanReadOtherUser)
+    .use(userCanReadUserAudit)
     .query(async ({ input }) => {
       return getUserActions(input)
     }),
@@ -349,7 +424,7 @@ export const userRouter = router({
         nonce,
         token: rawToken,
         notificationEvent: input.notificationEvent,
-        recipientName: personNameFromV1ToV2(user.name),
+        recipientName: user.name,
         phoneNumber: user.mobile,
         email: user.email
       })
@@ -510,10 +585,7 @@ export const userRouter = router({
     .input(
       z.object({
         userId: z.string(),
-        avatar: z.object({
-          type: z.string(),
-          data: z.string()
-        })
+        avatar: z.string()
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -530,14 +602,13 @@ export const userRouter = router({
         )
         throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
-      const profileImagePath = isBase64FileString(input.avatar.data)
-        ? await uploadBase64File(input.avatar.data, ctx.token)
-        : input.avatar.data
-      await updateUserById(UUID.parse(ctx.user.id), { profileImagePath })
+      await updateUserById(UUID.parse(ctx.user.id), {
+        profileImagePath: input.avatar
+      })
     }),
   resendInvite: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.edit']))
     .input(UUID)
+    .use(canAccessUserWithScopes(['user.edit']))
     .mutation(async ({ input, ctx }) => {
       const userId = UUID.parse(input)
 
@@ -567,8 +638,8 @@ export const userRouter = router({
       return activateUser(input)
     }),
   sendUsernameReminder: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.edit']))
     .input(UUID)
+    .use(canAccessUserWithScopes(['user.edit']))
     .mutation(async ({ input, ctx }) => {
       const userId = UUID.parse(input)
       await sendUsernameReminder(userId, ctx.token)
@@ -602,6 +673,19 @@ export const userRouter = router({
         clientId: auditLogIdentifiers.sub,
         clientType: auditLogIdentifiers.userType ?? 'system'
       })
+    }),
+  verifyLoggedInUserPassword: userOnlyProcedure
+    .input(z.object({ password: z.string() }))
+    .output(
+      z.object({
+        mobile: z.string().optional(),
+        status: z.string(),
+        username: z.string(),
+        id: z.string()
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      return verifyPasswordById(ctx.user.id, input.password)
     }),
   audit: auditRouter
 })

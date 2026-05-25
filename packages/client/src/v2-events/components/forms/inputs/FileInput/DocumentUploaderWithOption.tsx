@@ -27,6 +27,7 @@ import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { useIntlWithFormData } from '@client/v2-events/messages/utils'
 import { useImageEditorModal } from '@client/v2-events/components/ImageEditorModal'
 import { useImageProcessing } from '@client/utils/imageUtils'
+import { setLockBypass } from '@client/utils/lockBypass'
 import { DocumentUploader } from './SimpleDocumentUploader'
 import { DocumentListPreview } from './DocumentListPreview'
 import { DocumentPreview } from './DocumentPreview'
@@ -266,6 +267,7 @@ function DocumentUploaderWithOption({
           id={name}
           name={name}
           onChange={handleFileChange}
+          onClick={setLockBypass}
         >
           {intl.formatMessage(messages.uploadFile)}
         </DocumentUploader>

@@ -189,14 +189,14 @@ export function useAssignmentActions(event: EventIndex) {
   const isDownloadedAndAssignedToUser =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
   const intl = useIntl()
-  const { getUser } = useUsers()
+  const { getUsers } = useUsers()
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
-  const assignedToUser = getUser.useQuery(event.assignedTo || '', {
+  const assignedToUser = getUsers.useQueryById(event.assignedTo || '', {
     enabled: !!event.assignedTo
   })
   const assignedUserFullName = assignedToUser.data
-    ? getUsersFullName(assignedToUser.data.name, intl.locale)
+    ? getUsersFullName(assignedToUser.data.name)
     : null
   const assignedOffice = assignedToUser.data?.primaryOfficeId
   const assignedOfficeName =

@@ -31,10 +31,7 @@ export function getAcceptedScopesFromToken<T extends ScopeType>(
   return tokenScopes
     .map((scope) => {
       const parsedScope = decodeScope(scope)
-      return parsedScope &&
-        // Cast to string[] because Array<T>.includes requires exactly T, but
-        // parsedScope.type is the full RecordScopeV2['type'] union (wider than T).
-        (acceptedScopes as string[]).includes(parsedScope.type)
+      return parsedScope && acceptedScopes.some((s) => s === parsedScope.type)
         ? parsedScope
         : null
     })

@@ -77,7 +77,7 @@ const ProfileMenuComponent = ({
     let userName = ''
 
     if (userDetails && userDetails.name) {
-      userName = getUsersFullName(userDetails.name, intl.locale)
+      userName = getUsersFullName(userDetails.name)
     }
 
     return userName
@@ -100,6 +100,7 @@ const ProfileMenuComponent = ({
     <>
       <ToggleMenu
         id="ProfileMenu"
+        ariaLabel="Profile"
         toggleButton={
           <AvatarSmall
             name={getUserName(userDetails)}

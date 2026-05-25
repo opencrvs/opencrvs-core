@@ -80,6 +80,20 @@ const handlers = [
   http.get(`${env.COUNTRY_CONFIG_URL}/config/roles`, () => {
     return HttpResponse.json([])
   }),
+  http.get(`${env.COUNTRY_CONFIG_URL}/config/application`, () =>
+    HttpResponse.json({
+      APPLICATION_NAME: 'Test',
+      COUNTRY_LOGO: { fileName: 'logo.png', file: '' },
+      SYSTEM_IANA_TIMEZONE: 'UTC',
+      CURRENCY: { isoCode: 'USD', languagesAndCountry: ['en-US'] },
+      ADMIN_STRUCTURE: [],
+      PHONE_NUMBER_PATTERN: '^01[1-9][0-9]{8}$',
+      USER_NOTIFICATION_DELIVERY_METHOD: 'email',
+      INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'email',
+      SEARCH_DEFAULT_CRITERIA: 'TRACKING_ID',
+      ADDITIONAL_USER_FIELDS: []
+    })
+  ),
   http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
     return HttpResponse.json([
       tennisClubMembershipEventWithCustomAction,

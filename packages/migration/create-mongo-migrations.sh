@@ -9,15 +9,15 @@
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 # Define the target directory and filename
 
-if [[ "$1" =~ ^(hearth|openhim|performance|user-mgnt)$ ]]; then
+if [[ "$1" =~ ^(openhim|performance|user-mgnt)$ ]]; then
   TARGET_FOLDER="${BASH_REMATCH[1]}"
 else
-  echo "Example usage: yarn create:hearth <filename>"
+  echo "Example usage: yarn create:performance <filename>"
   exit 1
 fi
 
 if [ -z "$2" ]; then
-  echo "Example usage: yarn create:hearth <filename>"
+  echo "Example usage: yarn create:performance <filename>"
   exit 1
 fi
 

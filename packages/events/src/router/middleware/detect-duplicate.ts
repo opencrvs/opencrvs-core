@@ -24,7 +24,7 @@ import { getUUID, TokenUserType } from '@opencrvs/commons'
 import { TrpcContext } from '@events/context'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
-import { processAction, getEventById } from '@events/service/events/events'
+import { processAction } from '@events/service/events/events'
 
 function requiresDedupCheck(
   input: ActionInputWithType
@@ -35,7 +35,7 @@ function requiresDedupCheck(
 export const detectDuplicate: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
-  TrpcContext,
+  TrpcContext & { event: EventDocument },
   TrpcContext & {
     duplicates:
       | {
@@ -59,7 +59,7 @@ export const detectDuplicate: MiddlewareFunction<
   }
   const { user, token } = ctx
   const configs = await getInMemoryEventConfigurations(token)
-  const storedEvent = await getEventById(input.eventId)
+  const storedEvent = ctx.event
   const config = configs.find((c) => c.id === storedEvent.type)
 
   if (!config) {
@@ -141,6 +141,7 @@ export const detectDuplicate: MiddlewareFunction<
   if (duplicates.length > 0) {
     const event = await processAction(
       {
+        waitFor: input.waitFor,
         type: ActionType.DUPLICATE_DETECTED,
         transactionId: input.transactionId,
         eventId: input.eventId,

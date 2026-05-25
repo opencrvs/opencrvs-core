@@ -13,20 +13,14 @@ import { EventDocument } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { findUserIdsFromDocument } from './utils'
 
-async function cacheUsers(userIds: string[]) {
-  const { queryFn, ...options } =
-    trpcOptionsProxy.user.list.queryOptions(userIds)
-
-  const users = await queryClient.fetchQuery(options)
-
-  for (const user of users) {
-    queryClient.setQueryData(trpcOptionsProxy.user.get.queryKey(user.id), user)
-  }
-}
-
 export async function cacheUsersFromEventDocument(
   eventDocument: EventDocument
 ) {
   const userIds = findUserIdsFromDocument(eventDocument)
-  await cacheUsers(userIds)
+  if (userIds.length === 0) {
+    return
+  }
+  const { queryFn, ...options } =
+    trpcOptionsProxy.user.list.queryOptions(userIds)
+  await queryClient.fetchQuery(options)
 }

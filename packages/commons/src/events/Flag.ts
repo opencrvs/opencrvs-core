@@ -69,27 +69,39 @@ export type Flag = z.infer<typeof Flag>
 /**
  * Configuration of a custom flag that can be associated with a certain event type.
  */
-export const FlagConfig = z.object({
-  id: CustomFlag,
-  requiresAction: z
-    .boolean()
-    .describe(
-      'Indicates if this flag expects an action to be performed to be cleared.'
-    ),
-  label: TranslationConfig.describe('Human readable label of the flag.')
-})
+export const FlagConfig = z
+  .object({
+    id: CustomFlag,
+    requiresAction: z
+      .boolean()
+      .describe(
+        'Indicates if this flag expects an action to be performed to be cleared.'
+      ),
+    label: TranslationConfig.describe('Human readable label of the flag.')
+  })
+  .meta({
+    id: 'FlagConfig',
+    description:
+      'Configuration for a custom flag that can be added to or removed from records by event actions.'
+  })
 
 export type FlagConfig = z.infer<typeof FlagConfig>
 
 /**
  * Configuration for a flag action, which is executed when the action is performed.
  */
-export const ActionFlagConfig = z.object({
-  id: Flag,
-  operation: z
-    .enum(['add', 'remove'])
-    .describe('Operation to perform on the flag.'),
-  conditional: Conditional.optional().describe(
-    'When conditional is met, the operation is performed on the flag. If not provided, the operation is performed unconditionally.'
-  )
-})
+export const ActionFlagConfig = z
+  .object({
+    id: Flag,
+    operation: z
+      .enum(['add', 'remove'])
+      .describe('Operation to perform on the flag.'),
+    conditional: Conditional.optional().describe(
+      'When conditional is met, the operation is performed on the flag. If not provided, the operation is performed unconditionally.'
+    )
+  })
+  .meta({
+    id: 'ActionFlagConfig',
+    description:
+      'Add or remove operation applied to a flag when the parent action is accepted. Optionally gated by a conditional.'
+  })

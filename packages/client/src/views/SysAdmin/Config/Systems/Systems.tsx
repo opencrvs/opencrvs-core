@@ -151,8 +151,8 @@ export function SystemList() {
     resetRefreshSecret
   } = useIntegrations()
 
-  const { getUser } = useUsers()
-  const users = getUser.getAllCached()
+  const { getUsers } = useUsers()
+  const users = getUsers.getAllCached()
 
   const onChangeClientName = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewClientName(String(event.target.value))
@@ -348,7 +348,7 @@ export function SystemList() {
                               day: 'numeric'
                             }
                           ),
-                          user: getUsersFullName(user.name, intl.locale)
+                          user: getUsersFullName(user.name)
                         })
                       : intl.formatMessage(integrationMessages.createdOn, {
                           date: intl.formatDate(

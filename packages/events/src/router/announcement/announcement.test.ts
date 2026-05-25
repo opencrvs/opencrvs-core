@@ -42,7 +42,9 @@ async function insertUser(
       role: 'ADMIN',
       status: 'active',
       mobile: '+1234567890',
-      officeId
+      officeId,
+      firstname: '',
+      surname: ''
     })
     .returning('id')
     .executeTakeFirstOrThrow() as Promise<{ id: UUID }>
@@ -73,7 +75,7 @@ async function insertAdminWithEmail(
   const email = 'admin@test.com'
   const result = await eventsDb
     .insertInto('users')
-    .values({ role: 'ADMIN', status: 'active', email, officeId })
+    .values({ role: 'ADMIN', status: 'active', email, officeId, firstname: '', surname: '' })
     .returning('id')
     .executeTakeFirstOrThrow()
   return { id: result.id as UUID, email }
@@ -103,7 +105,7 @@ describe('announcement.broadcast', () => {
         id: getUUID(),
         primaryOfficeId: getUUID(),
         role: '',
-        name: []
+        name: { firstname: '', surname: '' }
       },
       [scope]
     )
@@ -149,13 +151,17 @@ describe('announcement.broadcast', () => {
           role: user.role,
           status: 'active',
           mobile: '+1234567890',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         },
         {
           role: 'REGISTRATION_AGENT',
           status: 'active',
           email: 'recipient@test.com',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         }
       ])
       .execute()
@@ -178,13 +184,17 @@ describe('announcement.broadcast', () => {
           role: user.role,
           status: 'active',
           mobile: '+1234567890',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         },
         {
           role: 'REGISTRATION_AGENT',
           status: 'active',
           email: 'recipient@test.com',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         }
       ])
       .execute()
@@ -212,13 +222,17 @@ describe('announcement.broadcast', () => {
           status: 'active',
           email: 'admin@test.com',
           mobile: '+1234567890',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         },
         {
           role: 'REGISTRATION_AGENT',
           status: 'active',
           email: 'recipient@test.com',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         }
       ])
       .execute()
@@ -261,13 +275,17 @@ describe('announcement.broadcast', () => {
           role: user.role,
           status: 'active',
           mobile: '+1234567890',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         },
         {
           role: 'REGISTRATION_AGENT',
           status: 'active',
           email: 'recipient@test.com',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         }
       ])
       .returning('id')
@@ -300,19 +318,25 @@ describe('announcement.broadcast', () => {
           status: 'active',
           email: 'admin@test.com',
           mobile: '+1234567890',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         },
         {
           role: 'REGISTRATION_AGENT',
           status: 'active',
           email: 'user1@test.com',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         },
         {
           role: 'REGISTRATION_AGENT',
           status: 'active',
           email: 'user2@test.com',
-          officeId: locations[0].id
+          officeId: locations[0].id,
+          firstname: '',
+          surname: ''
         }
       ])
       .execute()

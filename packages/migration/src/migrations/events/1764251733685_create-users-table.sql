@@ -2,8 +2,8 @@
 CREATE TABLE IF NOT EXISTS users(
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   legacy_id text UNIQUE NULLS DISTINCT,
-  firstname text,
-  surname text,
+  firstname text NOT NULL,
+  surname text NOT NULL,
   full_honorific_name text,
   role text NOT NULL,
   status text NOT NULL,

@@ -118,6 +118,14 @@ const bold12 = `
   margin: 0;
 `
 
+const bold10 = `
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 10px;
+  line-height: 140%;
+  margin: 0;
+`
+
 export const fonts = {
   hero,
   h1,
@@ -128,6 +136,7 @@ export const fonts = {
   bold16,
   bold14,
   bold12,
+  bold10,
   reg19,
   reg18,
   reg16,

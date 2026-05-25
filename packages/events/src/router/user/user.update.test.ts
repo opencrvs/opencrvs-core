@@ -8,17 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+/* eslint-disable max-lines */
 import { TRPCError } from '@trpc/server'
-import { encodeScope } from '@opencrvs/commons'
+import { encodeScope, getUUID, TestUserRole } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { updateUserById } from '@events/storage/postgres/events/users'
 import { getClient } from '@events/storage/postgres/events'
+import { seeder, setupHierarchyWithUsers } from '@events/tests/generators'
 
 const USER_EDIT_SCOPE = encodeScope({ type: 'user.edit' })
-const CONFIG_UPDATE_ALL_SCOPE = encodeScope({ type: 'config.update-all' })
 
-function makeUpdateInput(user: {
+function generateUpdateInput(user: {
   id: string
   primaryOfficeId: string
   role: string
@@ -35,52 +35,129 @@ test('throws FORBIDDEN when user.edit scope is missing', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [])
 
-  await expect(client.user.update(makeUpdateInput(user))).rejects.toMatchObject(
-    new TRPCError({ code: 'FORBIDDEN' })
-  )
+  await expect(
+    client.user.update(generateUpdateInput(user))
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
-test('throws FORBIDDEN when trying to change primaryOfficeId without config.update-all scope', async () => {
+test('throws FORBIDDEN when changing primaryOfficeId to a location outside the user.edit scope jurisdiction', async () => {
   const { user, locations } = await setupTestCase()
-  const client = createTestClient(user, [USER_EDIT_SCOPE])
+  const client = createTestClient(user, [
+    encodeScope({ type: 'user.edit', options: { accessLevel: 'location' } })
+  ])
   const otherOfficeId = locations[1].id
 
   await expect(
     client.user.update({
-      ...makeUpdateInput(user),
+      ...generateUpdateInput(user),
       primaryOfficeId: otherOfficeId
     })
   ).rejects.toMatchObject({ code: 'FORBIDDEN' })
 })
 
-test('allows changing primaryOfficeId when user has config.update-all scope', async () => {
+test('allows changing primaryOfficeId when user.edit scope is unrestricted', async () => {
   const { user, locations } = await setupTestCase()
-  const client = createTestClient(user, [
-    USER_EDIT_SCOPE,
-    CONFIG_UPDATE_ALL_SCOPE
-  ])
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
   const otherOfficeId = locations[1].id
 
   const updatedUser = await client.user.update({
-    ...makeUpdateInput(user),
+    ...generateUpdateInput(user),
     primaryOfficeId: otherOfficeId
   })
 
   expect(updatedUser.primaryOfficeId).toBe(otherOfficeId)
 })
 
+test('Prevents changing user who is located outside callers jurisdiction', async () => {
+  const { user, seed } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.edit',
+      options: {
+        accessLevel: 'location'
+      }
+    })
+  ])
+
+  const topLevelLocationId = getUUID()
+  await seed.locations([
+    {
+      name: 'top-level-location',
+      administrativeAreaId: null,
+      id: topLevelLocationId,
+      locationType: 'EMBASSY',
+      validUntil: null
+    }
+  ])
+
+  const newUser = await seed.user({
+    primaryOfficeId: topLevelLocationId,
+    role: TestUserRole.enum.FIELD_AGENT,
+    name: { firstname: 'Test', surname: 'User' }
+  })
+
+  await expect(
+    client.user.update({
+      id: newUser.id,
+      signature: {
+        originalFilename: 'string',
+        path: 'string',
+        type: 'string'
+      }
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+
+  await expect(
+    client.user.update({
+      id: newUser.id,
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test('Allows changing primaryOfficeId when user.edit scope covers both old and new location', async () => {
+  const { user, seed } = await setupTestCase()
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+
+  const newUser = await seed.user({
+    primaryOfficeId: user.primaryOfficeId,
+    role: TestUserRole.enum.FIELD_AGENT,
+    name: { firstname: 'Test', surname: 'User' }
+  })
+
+  const topLevelLocationId = getUUID()
+  await seed.locations([
+    {
+      name: 'top-level-location',
+      administrativeAreaId: null,
+      id: topLevelLocationId,
+      locationType: 'EMBASSY',
+      validUntil: null
+    }
+  ])
+
+  await expect(
+    client.user.update({
+      id: newUser.id,
+      primaryOfficeId: topLevelLocationId
+    })
+  ).resolves.toMatchObject({
+    primaryOfficeId: topLevelLocationId
+  })
+})
+
 test('throws CONFLICT with DUPLICATE_PHONE if mobile is already in use by another user', async () => {
   const { user, users } = await setupTestCase()
   const [, secondUser] = users
 
-  await updateUserById(secondUser.id, { mobile: '+254700000001' })
+  await updateUserById(secondUser.id, { mobile: '01712345678' })
 
   const client = createTestClient(user, [USER_EDIT_SCOPE])
 
   await expect(
     client.user.update({
-      ...makeUpdateInput(user),
-      mobile: '+254700000001'
+      ...generateUpdateInput(user),
+      mobile: '01712345678'
     })
   ).rejects.toMatchObject(
     new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_PHONE' })
@@ -96,7 +173,7 @@ test('throws CONFLICT with DUPLICATE_EMAIL if email is already in use by another
 
   await expect(
     client.user.update({
-      ...makeUpdateInput(user),
+      ...generateUpdateInput(user),
       email: duplicateEmail
     })
   ).rejects.toMatchObject(
@@ -106,14 +183,14 @@ test('throws CONFLICT with DUPLICATE_EMAIL if email is already in use by another
 
 test("allows update when mobile is the same user's own mobile", async () => {
   const { user } = await setupTestCase()
-  await updateUserById(user.id, { mobile: '+254700000002' })
+  await updateUserById(user.id, { mobile: '01812345678' })
 
   const client = createTestClient(user, [USER_EDIT_SCOPE])
 
   await expect(
     client.user.update({
-      ...makeUpdateInput(user),
-      mobile: '+254700000002'
+      ...generateUpdateInput(user),
+      mobile: '01812345678'
     })
   ).resolves.not.toThrow()
 })
@@ -122,7 +199,9 @@ test("allows update when email is the same user's own email", async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [USER_EDIT_SCOPE])
 
-  await expect(client.user.update(makeUpdateInput(user))).resolves.not.toThrow()
+  await expect(
+    client.user.update(generateUpdateInput(user))
+  ).resolves.not.toThrow()
 })
 
 test('successfully updates user fields and returns updated user', async () => {
@@ -130,17 +209,17 @@ test('successfully updates user fields and returns updated user', async () => {
   const client = createTestClient(user, [USER_EDIT_SCOPE])
 
   const updatedUser = await client.user.update({
-    ...makeUpdateInput(user),
-    name: [{ use: 'en', given: ['Jane'], family: 'Smith' }],
+    ...generateUpdateInput(user),
+    name: { firstname: 'Jane', surname: 'Smith' },
     email: `updated-${user.id}@test.example`,
-    mobile: '+254700000099'
+    mobile: '01912345678'
   })
 
   expect(updatedUser).toMatchObject({
     id: user.id,
-    name: [{ use: 'en', given: ['Jane'], family: 'Smith' }],
+    name: { firstname: 'Jane', surname: 'Smith' },
     email: `updated-${user.id}@test.example`,
-    mobile: '+254700000099',
+    mobile: '01912345678',
     primaryOfficeId: user.primaryOfficeId
   })
 })
@@ -151,7 +230,7 @@ test('persists data payload when updating a user', async () => {
 
   const data = { employeeId: 'EMP-002', department: 'Vital Events' }
   const updatedUser = await client.user.update({
-    ...makeUpdateInput(user),
+    ...generateUpdateInput(user),
     data
   })
 
@@ -182,7 +261,7 @@ test('preserves existing data when data is omitted from update', async () => {
   const client = createTestClient(user, [USER_EDIT_SCOPE])
 
   // Update without supplying data — should leave existing data untouched
-  await client.user.update(makeUpdateInput(user))
+  await client.user.update(generateUpdateInput(user))
 
   const dbUser = await eventsDb
     .selectFrom('users')
@@ -207,7 +286,7 @@ test('overwrites data when an explicit data object is supplied on update', async
   const newData = { employeeId: 'NEW-001', region: 'North' }
 
   const updatedUser = await client.user.update({
-    ...makeUpdateInput(user),
+    ...generateUpdateInput(user),
     data: newData
   })
 
@@ -220,6 +299,20 @@ test('overwrites data when an explicit data object is supplied on update', async
     .executeTakeFirstOrThrow()
 
   expect(dbUser.data).toEqual(newData)
+})
+
+test('Persists custom data field when updated', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+
+  const customData = { department: 'civil', badge: 'B-42' }
+
+  const updatedUser = await client.user.update({
+    id: user.id,
+    data: customData
+  })
+
+  expect(updatedUser.data).toMatchObject(customData)
 })
 
 test('toggling user status keeps other fields intact', async () => {
@@ -243,4 +336,344 @@ test('toggling user status keeps other fields intact', async () => {
   })
 
   expect(reactivatedUser).toMatchObject(userToTestWith)
+})
+
+test('Updates user when mobile matches PHONE_NUMBER_PATTERN', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+
+  await expect(
+    client.user.update({
+      ...generateUpdateInput(user),
+      // matches the test MSW mock pattern: ^01[1-9][0-9]{8}$
+      mobile: '01612345678'
+    })
+  ).resolves.toBeDefined()
+})
+
+test('Rejects user update when mobile does not match PHONE_NUMBER_PATTERN', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+
+  await expect(
+    client.user.update({
+      ...generateUpdateInput(user),
+      mobile: '12345'
+    })
+  ).rejects.toThrow(/INVALID_MOBILE/)
+})
+
+test('Updates user when no mobile is provided, skipping phone format validation', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+
+  await expect(
+    client.user.update(generateUpdateInput(user))
+  ).resolves.toBeDefined()
+})
+
+test('Prevents update when changing user\s role to something not in scope', async () => {
+  const { user, seed } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.edit',
+      options: {
+        role: [TestUserRole.enum.FIELD_AGENT]
+      }
+    })
+  ])
+
+  const newFieldAgent = await seed.user({
+    primaryOfficeId: user.primaryOfficeId,
+    role: TestUserRole.enum.FIELD_AGENT,
+    name: { firstname: 'Test', surname: 'User' }
+  })
+
+  await expect(
+    client.user.update({
+      id: newFieldAgent.id,
+      role: TestUserRole.enum.COMMUNITY_LEADER
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test('Allows changing user\s role to one within one of the scopes', async () => {
+  const { user, seed } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.edit',
+      options: {
+        role: [TestUserRole.enum.FIELD_AGENT]
+      }
+    }),
+    encodeScope({
+      type: 'user.edit',
+      options: {
+        role: [
+          TestUserRole.enum.FIELD_AGENT,
+          TestUserRole.enum.COMMUNITY_LEADER
+        ]
+      }
+    }),
+    encodeScope({
+      type: 'user.edit',
+      options: {
+        role: [
+          TestUserRole.enum.COMMUNITY_LEADER,
+          TestUserRole.enum.NATIONAL_REGISTRAR
+        ]
+      }
+    })
+  ])
+
+  const newFieldAgent = await seed.user({
+    primaryOfficeId: user.primaryOfficeId,
+    role: TestUserRole.enum.FIELD_AGENT,
+    name: { firstname: 'Test', surname: 'User' }
+  })
+
+  await expect(
+    client.user.update({
+      id: newFieldAgent.id,
+      role: TestUserRole.enum.COMMUNITY_LEADER
+    })
+  ).resolves.toBeDefined()
+})
+
+test("Prevents changing user's role to one not allowed within scope's jurisdiction", async () => {
+  // 1. Setup test fixture with a known set of users, administrative areas and locations.
+  const { users, locations } = await setupHierarchyWithUsers()
+  const seed = seeder()
+
+  const provinceAOffice = locations.find(
+    (loc) => loc.name === 'Province A CRVS Office'
+  )
+  // 1. Create user in province A office.
+
+  if (!provinceAOffice) {
+    throw new Error('Test setup failed: ProvinceA Office not found')
+  }
+
+  const provinceAUser = users.find(
+    (u) => u.primaryOfficeId === provinceAOffice.id
+  )
+
+  if (!provinceAUser) {
+    throw new Error('Test setup failed: User for ProvinceA Office not found')
+  }
+
+  const provinceAFieldAgent = await seed.user({
+    primaryOfficeId: provinceAOffice.id,
+    role: TestUserRole.enum.FIELD_AGENT,
+    name: { firstname: 'provinceA', surname: 'Field' }
+  })
+
+  // 2. Create users with different roles under the same administrative area.
+  const villageAOffice = locations.find(
+    (loc) => loc.name === 'Village A CRVS Office'
+  )
+
+  if (!villageAOffice) {
+    throw new Error('Test setup failed: Village A Office not found')
+  }
+
+  // 3. Create country level user.
+  const countryLevelOffice = locations.find(
+    (loc) => loc.name === 'Country-level CRVS Office'
+  )
+
+  if (!countryLevelOffice) {
+    throw new Error('Test setup failed: Country-Level Office not found')
+  }
+
+  const countryLevelUser = await seed.user({
+    role: TestUserRole.enum.FIELD_AGENT,
+    name: { firstname: 'Jane', surname: 'Doe' },
+    primaryOfficeId: countryLevelOffice.id
+  })
+
+  const villageAFieldAgent = await seed.user({
+    role: TestUserRole.enum.FIELD_AGENT,
+    name: { firstname: 'John', surname: 'Doe' },
+    primaryOfficeId: villageAOffice.id
+  })
+
+  const villageASocialWorker = await seed.user({
+    role: TestUserRole.enum.SOCIAL_WORKER,
+    name: { firstname: 'Jonny2', surname: 'Doe' },
+    primaryOfficeId: provinceAOffice.id
+  })
+
+  const client = createTestClient(provinceAUser, [
+    encodeScope({
+      type: 'user.edit',
+      options: {
+        accessLevel: 'all',
+        role: [TestUserRole.enum.FIELD_AGENT]
+      }
+    }),
+    encodeScope({
+      type: 'user.edit',
+      options: {
+        accessLevel: 'administrativeArea',
+        role: [
+          TestUserRole.enum.FIELD_AGENT,
+          TestUserRole.enum.COMMUNITY_LEADER
+        ]
+      }
+    }),
+    encodeScope({
+      type: 'user.edit',
+      options: {
+        accessLevel: 'location',
+        role: [
+          TestUserRole.enum.FIELD_AGENT,
+          TestUserRole.enum.NATIONAL_REGISTRAR
+        ]
+      }
+    })
+  ])
+
+  // 4. User at the same location can be changed to roles within all scopes.
+  await expect(
+    client.user.update({
+      id: provinceAFieldAgent.id,
+      role: TestUserRole.enum.COMMUNITY_LEADER
+    })
+  ).resolves.toBeDefined()
+
+  await expect(
+    client.user.update({
+      id: provinceAFieldAgent.id,
+      role: TestUserRole.enum.FIELD_AGENT
+    })
+  ).resolves.toBeDefined()
+
+  await expect(
+    client.user.update({
+      id: provinceAFieldAgent.id,
+      role: TestUserRole.enum.NATIONAL_REGISTRAR
+    })
+  ).resolves.toBeDefined()
+
+  // 4. Field agent under the administrative area can be changed to roles within administrative area scopes
+  await expect(
+    client.user.update({
+      id: villageAFieldAgent.id,
+      role: TestUserRole.enum.COMMUNITY_LEADER
+    })
+  ).resolves.toBeDefined()
+
+  await expect(
+    client.user.update({
+      id: villageAFieldAgent.id,
+      role: TestUserRole.enum.FIELD_AGENT
+    })
+  ).resolves.toBeDefined()
+
+  await expect(
+    client.user.update({
+      id: villageAFieldAgent.id,
+      role: TestUserRole.enum.NATIONAL_REGISTRAR
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+
+  // 5. Social worker under the same administrative area can't be changed at all.
+  await expect(
+    client.user.update({
+      id: villageASocialWorker.id,
+      role: TestUserRole.enum.COMMUNITY_LEADER
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+
+  await expect(
+    client.user.update({
+      id: villageASocialWorker.id,
+      role: TestUserRole.enum.FIELD_AGENT
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+
+  await expect(
+    client.user.update({
+      id: villageASocialWorker.id,
+      role: TestUserRole.enum.NATIONAL_REGISTRAR
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+
+  // 6. Country level user role can't be changed but other details can be updated.
+  await expect(
+    client.user.update({
+      id: countryLevelUser.id,
+      role: TestUserRole.enum.COMMUNITY_LEADER
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+
+  await expect(
+    client.user.update({
+      id: countryLevelUser.id,
+      role: TestUserRole.enum.NATIONAL_REGISTRAR
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+
+  await expect(
+    client.user.update({
+      id: countryLevelUser.id,
+      role: TestUserRole.enum.FIELD_AGENT
+    })
+  ).resolves.toBeDefined()
+})
+
+test('Persists all update-endpoint fields to database', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+  const eventsDb = getClient()
+
+  const updated = await client.user.update({
+    id: user.id,
+    name: { firstname: 'Updated', surname: 'User' },
+    role: user.role,
+    primaryOfficeId: user.primaryOfficeId,
+    mobile: '01922345678',
+    email: 'all-fields-update@opencrvs.org',
+    fullHonorificName: 'Prof. Updated User',
+    device: 'Samsung Galaxy S24',
+    data: { updatedKey: 'updatedValue' },
+    signature: {
+      originalFilename: 'updated-sig.png',
+      path: 'signatures/updated-sig.png',
+      type: 'image/png'
+    }
+  })
+
+  expect(updated).toMatchObject({
+    id: user.id,
+    name: { firstname: 'Updated', surname: 'User' },
+    role: user.role,
+    primaryOfficeId: user.primaryOfficeId,
+    mobile: '01922345678',
+    email: 'all-fields-update@opencrvs.org',
+    fullHonorificName: 'Prof. Updated User',
+    device: 'Samsung Galaxy S24',
+    data: { updatedKey: 'updatedValue' },
+    signature: 'signatures/updated-sig.png'
+  })
+
+  const dbUser = await eventsDb
+    .selectFrom('users')
+    .selectAll()
+    .where('id', '=', user.id)
+    .executeTakeFirstOrThrow()
+
+  expect(dbUser).toMatchObject({
+    firstname: 'Updated',
+    surname: 'User',
+    role: user.role,
+    officeId: user.primaryOfficeId,
+    mobile: '01922345678',
+    email: 'all-fields-update@opencrvs.org',
+    fullHonorificName: 'Prof. Updated User',
+    device: 'Samsung Galaxy S24',
+    data: { updatedKey: 'updatedValue' },
+    signaturePath: 'signatures/updated-sig.png'
+  })
 })

@@ -28,34 +28,6 @@ CREATE SCHEMA app;
 ALTER SCHEMA app OWNER TO events_migrator;
 
 --
--- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
-
-
---
--- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: 
---
-
-COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
-
-
---
--- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
-
-
---
--- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
---
-
-COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
-
-
---
 -- Name: action_status; Type: TYPE; Schema: app; Owner: events_migrator
 --
 
@@ -426,8 +398,8 @@ ALTER TABLE app.user_credentials OWNER TO events_migrator;
 CREATE TABLE app.users (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     legacy_id text,
-    firstname text,
-    surname text,
+    firstname text NOT NULL,
+    surname text NOT NULL,
     full_honorific_name text,
     role text NOT NULL,
     status text NOT NULL,

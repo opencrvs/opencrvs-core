@@ -25,8 +25,6 @@
 
 import { Project, SyntaxKind, Node } from 'ts-morph'
 import path from 'path'
-import { getCwd } from '.'
-
 const INHERENT_FLAGS_ENUM_NAME = 'InherentFlags'
 const PENDING_CERTIFICATION_MEMBER = 'PENDING_CERTIFICATION'
 
@@ -65,7 +63,7 @@ function processFile(filePath: string, project: Project): number {
       array.removeElement(index)
       removedCount++
       console.log(
-        `  [${path.relative(getCwd(), filePath)}] Removed InherentFlags.PENDING_CERTIFICATION from array`
+        `  [${path.relative(process.cwd(), filePath)}] Removed InherentFlags.PENDING_CERTIFICATION from array`
       )
     }
   }
@@ -74,7 +72,7 @@ function processFile(filePath: string, project: Project): number {
 }
 
 async function main() {
-  const srcDir = path.join(getCwd(), 'src')
+  const srcDir = path.join(process.cwd(), 'src')
   console.log(
     `Scanning for InherentFlags.PENDING_CERTIFICATION array elements in: ${srcDir}\n`
   )
@@ -116,7 +114,7 @@ async function main() {
   for (const filePath of modifiedFiles) {
     const sourceFile = project.getSourceFileOrThrow(filePath)
     await sourceFile.save()
-    console.log(`  Saved: ${path.relative(getCwd(), filePath)}`)
+    console.log(`  Saved: ${path.relative(process.cwd(), filePath)}`)
   }
 
   console.log(

@@ -2,6 +2,10 @@
 
 ## 2.0.0 Release Candidate
 
+### Upgrade guidance
+
+To ensure a smooth upgrade to 2.0, we recommend upgrading to **v1.9.14** first before upgrading to 2.0. v1.9.14 includes fixes that allow the client to gracefully handle the transition window between versions, preventing users from seeing a blank screen or errors during the upgrade.
+
 ### Breaking changes
 
 #### Scheduler service removed
@@ -47,6 +51,20 @@ V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
 
 ### New features
 
+#### Rich text support in MessageDescriptor.defaultMessage
+
+`TranslationTextWithFormatModifier` — use inline HTML-like tags directly in a `MessageDescriptor.defaultMessage` and render rich text via this component instead of wiring `intl.formatMessage` handlers manually. Supported tags: `<strong>`, `<b>`, `<em>`, `<i>`, `<u>`, `<mark>`, `<small>`, `<sub>`, `<sup>`, `<del>`, `<ins>`, `<code>`, `<kbd>`, `<q>`, `<br></br>`, `<tab></tab>`. Example message:
+
+```
+{
+  id: 'id',
+  description: 'Rich text example in translation',
+  defaultMessage: '<strong>WARNING!</strong>: Record will be <strong>legally registered</strong> via the outbox.<br></br>Further amends require a legal correction process.'
+}
+```
+
+Currently used to render `supportingCopy` in the action confirmation dialog (`useQuickActionModal`). [#12441](https://github.com/opencrvs/opencrvs-core/issues/12441)
+
 #### Autocomplete Input
 
 A select component enhanced with suggestions based on user search input. Works in conjunction with a countryconfig endpoint that returns suggestions based on user input. The list of suggestions are fetched from a table in the reference_data schema in events database.
@@ -74,6 +92,36 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - Added OAuth2 support for `application/x-www-form-urlencoded` content type in auth-service access token endpoints, maintaining backwards compatibility with query parameters. [#11590](https://github.com/opencrvs/opencrvs-core/pull/11590)
 - Change reindex call to make operation non-destructive. Create endpoint to track progress of reindex. [#11877](https://github.com/opencrvs/opencrvs-core/issues/11877)
 - Fixed vulnerabilities on CSP HTTP Header for login page [#12094](https://github.com/opencrvs/opencrvs-core/issues/12094)
+- Merged Helm charts as part of Monorepo [#12679](https://github.com/opencrvs/opencrvs-core/issues/12679)
+## 1.9.13
+
+### Breaking changes
+
+- Redundant `defaultValue` removed from BULLET_LIST, FORM_HEADER and PARAGRAPH field types.
+- `action.reject(...)` now by default unassigns the event from the last assigned user. To keep assignment, `keepAssignment: true` option must be explicitly passed when rejecting an action.
+
+### New features
+
+- Action confirmation tokens are now scoped with `record.read` access for the specific event, enabling the confirmation flow to fetch event data via the `event.get` tRPC endpoint. [#12350](https://github.com/opencrvs/opencrvs-core/issues/12350)
+- Within a form page, `defaultValue` resolution is now ordered: each field can reference the resolved values of fields above it, enabling intra-page derived defaults. [#12350](https://github.com/opencrvs/opencrvs-core/issues/12350)
+- 
+
+### Bug fixes
+
+- Two mutually exclusive form pages can now share field IDs. Previously a field that appeared on a hidden page was always stripped from the event data, even if an identically-named field on a different visible page had a value. The system now only omits a field when it is hidden on every page it appears on. [#12350](https://github.com/opencrvs/opencrvs-core/issues/12350)
+- Navigating to the next form page now uses the values the user just entered, not the previous render's state. This prevented correct page routing when the next page's visibility depended on a field filled on the current page. [#12350](https://github.com/opencrvs/opencrvs-core/issues/12350)
+- Switching between form pages no longer briefly flashes stale values from the previous page. The Formik instance is now remounted on page change instead of being reset via a `useEffect`. [#12350](https://github.com/opencrvs/opencrvs-core/issues/12350)
+- `CHECKBOX` and `BUTTON` field default values (booleans, numbers) are no longer silently dropped during form initialisation. [#12350](https://github.com/opencrvs/opencrvs-core/issues/12350)
+- The `DATA` field now uses the first visible field config when multiple fields share the same ID, ensuring the correct field is displayed when fields are mutually exclusive. [#12350](https://github.com/opencrvs/opencrvs-core/issues/12350)
+- Address field defaults no longer set `administrativeArea` to an empty string when the user reference cannot be resolved. This prevents empty address submission errors and correctly enables optional address sub-fields. [#12350](https://github.com/opencrvs/opencrvs-core/issues/12350)
+- Health facilities and other non-administrative locations are no longer included in the administrative area hierarchy when resolving location ancestry. [#12485](https://github.com/opencrvs/opencrvs-core/issues/12485)
+- The work queue list now automatically refreshes after a new event is created, without requiring a manual page reload. Previously the sidebar count updated immediately but the list itself stayed stale. [#12103](https://github.com/opencrvs/opencrvs-core/issues/12103)
+
+### Improvements
+
+- The sidebar navigation footer now displays the user's assigned office alongside their name and role. [#11421](https://github.com/opencrvs/opencrvs-core/issues/11421)
+- The client now periodically polls `api/ping` every 5 seconds until all services are reachable, so users automatically recover from offline to online without a page reload. A `ConnectionStatus` indicator in the sidebar reflects real-time connectivity state. [#12055](https://github.com/opencrvs/opencrvs-core/issues/12055)
+- Allow assignment to be controlled when rejecting an action both synchronously and asynchronously by passing an optional `keepAssignment` parameter to response body (during synchronous rejection) or to the `action.reject` function (during asynchronous rejection). [#12347](https://github.com/opencrvs/opencrvs-core/issues/12347)
 
 ## 1.9.12
 

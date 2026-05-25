@@ -77,7 +77,9 @@ test('Returns 200 when accessed with proper internal token', async () => {
       email: 'authtest@example.com',
       role: 'REGISTRATION_AGENT',
       status: 'active',
-      officeId: locations[0].id
+      officeId: locations[0].id,
+      firstname: '',
+      surname: ''
     })
     .execute()
 
@@ -129,7 +131,9 @@ test('returns UNAUTHORIZED when password does not match', async () => {
       mobile: '+447700900010',
       role: 'REGISTRATION_AGENT',
       status: 'active',
-      officeId: locations[0].id
+      officeId: locations[0].id,
+      firstname: '',
+      surname: ''
     })
     .execute()
 
@@ -201,5 +205,5 @@ test('returns user info when credentials are valid', async () => {
   expect(result.role).toBe('REGISTRATION_AGENT')
   expect(result.mobile).toBe('+447700900011')
   expect(result.email).toBe('john.doe@example.com')
-  expect(result.name).toEqual([{ use: 'en', given: ['John'], family: 'Doe' }])
+  expect(result.name).toEqual({ firstname: 'John', surname: 'Doe' })
 })

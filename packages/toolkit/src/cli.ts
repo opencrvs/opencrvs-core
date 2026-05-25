@@ -23,6 +23,20 @@ Commands:
 Run 'opencrvs <command> --help' for more information on a command.
 `.trim()
 
+const UPGRADE_USAGE = `
+Usage: opencrvs upgrade [options]
+
+Upgrade the country config in the current working directory to the next
+major version of OpenCRVS.
+
+Options:
+  --docker-swarm   Keep and merge the 'infrastructure/' directory with
+                   upstream changes. Use this if your country deploys
+                   OpenCRVS via Docker Swarm. When omitted, the
+                   'infrastructure/' directory is deleted (default).
+  -h, --help       Show this message.
+`.trim()
+
 function main() {
   const command = args[0]
 
@@ -73,10 +87,28 @@ Subcommands:
 }
 
 async function handleUpgrade() {
+  const upgradeArgs = args.slice(1)
+
+  if (upgradeArgs.includes('--help') || upgradeArgs.includes('-h')) {
+    console.log(UPGRADE_USAGE)
+    process.exit(0)
+  }
+
+  const KNOWN_FLAGS = new Set(['--docker-swarm'])
+  const unknownFlags = upgradeArgs.filter(
+    (arg) => arg.startsWith('-') && !KNOWN_FLAGS.has(arg)
+  )
+  if (unknownFlags.length > 0) {
+    console.error(`Unknown option(s): ${unknownFlags.join(', ')}\n`)
+    console.log(UPGRADE_USAGE)
+    process.exit(1)
+  }
+
+  const dockerSwarm = upgradeArgs.includes('--docker-swarm')
+
   console.log('Initiating upgrade...')
   try {
-    const pathToCountryconfig: string | undefined = args[1]
-    await runUpgrade(pathToCountryconfig)
+    await runUpgrade(dockerSwarm)
     console.log('Upgrade completed successfully!')
   } catch (error) {
     console.error('Upgrade failed:', error)

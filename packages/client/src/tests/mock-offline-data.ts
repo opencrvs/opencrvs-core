@@ -21,7 +21,7 @@ import {
 import forms from './forms.json'
 import languages from './languages.json'
 import templates from './templates.json'
-import { FieldType } from '@opencrvs/commons/client'
+import { ApplicationConfig, FieldType } from '@opencrvs/commons/client'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
@@ -459,8 +459,10 @@ export const mockOfflineData = {
     BIRTH_REGISTRATION_TARGET: 45,
     DEATH_REGISTRATION_TARGET: 45,
     SENTRY: 'https://sentry.com',
-    USER_NOTIFICATION_DELIVERY_METHOD: 'email',
-    INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'email',
+    USER_NOTIFICATION_DELIVERY_METHOD:
+      'email' as ApplicationConfig['USER_NOTIFICATION_DELIVERY_METHOD'],
+    INFORMANT_NOTIFICATION_DELIVERY_METHOD:
+      'email' as ApplicationConfig['INFORMANT_NOTIFICATION_DELIVERY_METHOD'],
     SYSTEM_IANA_TIMEZONE: 'Asia/Dhaka',
     SEARCH_DEFAULT_CRITERIA: 'TRACKING_ID' as const,
     ADDITIONAL_USER_FIELDS: [

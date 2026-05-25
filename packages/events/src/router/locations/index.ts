@@ -68,7 +68,7 @@ export const locationRouter = router({
         description: 'Retrieve a list of locations based on provided filters.',
         method: 'GET',
         path: '/locations',
-        tags: ['locations'],
+        tags: ['Locations'],
         protect: true
       }
     })
