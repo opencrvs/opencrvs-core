@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -64,6 +63,8 @@ import {
 } from './FieldValue'
 import { subDays, subYears, format } from 'date-fns'
 import { FieldType } from './FieldType'
+
+/* eslint-disable max-lines */
 
 export function ageToDate(age: number, asOfDate: PlainDate) {
   const date = plainDateToLocalDate(asOfDate)

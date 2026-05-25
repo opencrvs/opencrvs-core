@@ -23,6 +23,10 @@ import {
   isNonInteractiveFieldType,
   InteractiveFieldType,
   FieldReference,
+  isCodeToEvaluate,
+  buildClientFunctionContext,
+  runClientFunction,
+  ClientFunctionContext,
   isFieldEnabled,
   ValidatorContext,
   isFieldVisible,
@@ -213,7 +217,8 @@ export function FormSectionComponent({
   /** Sets the value for fields that listen to another field via `parent` and `value` properties */
   const setValueForListenerField = (
     [path, listenerField]: [string[], InteractiveFieldType],
-    fieldValues: Record<string, FieldValue>
+    fieldValues: Record<string, FieldValue>,
+    clientFunctionContext: ClientFunctionContext
   ) => {
     // this can be any field. Even though we call this only when parent triggers the change.
     const formikCompatibleListenerFieldPath = path.map(
@@ -222,11 +227,20 @@ export function FormSectionComponent({
 
     const firstNonFalsyValue = resolveSyncedFieldValue(
       listenerField,
-      (syncRef) =>
-        get(
+      (syncRef) => {
+        if (isCodeToEvaluate(syncRef)) {
+          const fieldValue = get(fieldValues, syncRef.$$field)
+          return runClientFunction(
+            syncRef.$$code,
+            fieldValue,
+            clientFunctionContext
+          )
+        }
+        return get(
           fieldValues,
           flattenFieldReference(syncRef).map(makeFormFieldIdFormikCompatible)
         )
+      }
     )
 
     if (firstNonFalsyValue) {
@@ -256,7 +270,7 @@ export function FormSectionComponent({
       return
     }
 
-    const defaultValue = getDefaultValue(listenerField)
+    const defaultValue = getDefaultValue(listenerField, fieldValues)
 
     set(fieldValues, formikCompatibleListenerFieldPath, defaultValue)
 
@@ -279,8 +293,16 @@ export function FormSectionComponent({
     // update the value of the field that was changed
     set(updatedFormikPageForm, formikFieldId, value)
 
+    const clientFunctionContext = buildClientFunctionContext({
+      form: updatedFormikPageForm,
+      validatorContext
+    })
     for (const listenerField of interactiveListenerFields) {
-      setValueForListenerField(listenerField, updatedFormikPageForm)
+      setValueForListenerField(
+        listenerField,
+        updatedFormikPageForm,
+        clientFunctionContext
+      )
     }
 
     if (eventConfig) {
@@ -324,6 +346,10 @@ export function FormSectionComponent({
     const updatedValues = cloneDeep(formikPageForm)
     const updatedTouched = cloneDeep(touched)
 
+    const clientFunctionContext = buildClientFunctionContext({
+      form: updatedValues,
+      validatorContext
+    })
     for (const { name: formikFieldId, value } of newValues) {
       set(updatedValues, formikFieldId, value)
 
@@ -335,7 +361,11 @@ export function FormSectionComponent({
       )
 
       for (const listenerField of interactiveListenerFields) {
-        setValueForListenerField(listenerField, updatedValues)
+        setValueForListenerField(
+          listenerField,
+          updatedValues,
+          clientFunctionContext
+        )
         unset(
           updatedTouched,
           listenerField[0].map(makeFormFieldIdFormikCompatible)

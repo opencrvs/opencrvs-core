@@ -14,14 +14,15 @@ flowchart TD
     subgraph CORE["Core"]
         C1["Verify CHANGELOG.md + package.json match release version"]
         C2["git tag vX.Y.Z\ngit push origin tag vX.Y.Z"]
-        C3["⚡ Pipeline + npm publish triggered automatically"]
+        C3["⚡ Pipeline triggered automatically\n(docker images)"]
         C4["Verify docker images published\nCompare size vs previous — report unusual increases"]
         C5[Create draft release]
         C6[Paste CHANGELOG.md to GitHub release]
         C7["Paste copy items to release notes\n(generate with notebook)"]
         C8[Publish GitHub release]
-        C9[Verify toolkit version visible on npm]
-        C1 --> C2 --> C3 --> C4 --> C5 --> C6 --> C7 --> C8 --> C9
+        C9["⚡ npm publish for toolkit triggered automatically"]
+        C10[Verify toolkit version visible on npm]
+        C1 --> C2 --> C3 --> C4 --> C5 --> C6 --> C7 --> C8 --> C9 --> C10
     end
 
     subgraph CC["CountryConfig — after Core visible on npm"]
@@ -34,6 +35,26 @@ flowchart TD
         CC1 --> CC2 --> CC3 --> CC4 --> CC5 --> CC6
     end
 
+    subgraph HC["Helm Charts"]
+        HC1["Bump helm chart `version` and `appVersion`"]
+        HC2["git tag vX.Y.Z\ngit push origin tag vX.Y.Z"]
+        HC3[Create draft release]
+        HC4[Paste CHANGELOG.md to GitHub release]
+        HC5["Paste copy items to release notes\n(generate with notebook)"]
+        HC6[Publish GitHub release]
+        HC1 --> HC2 --> HC3 --> HC4 --> HC5 --> HC6
+    end
+
+    subgraph IF["Infrastructure"]
+        IF1["Update reference to helm chart `version` in workflows"]
+        IF2["git tag vX.Y.Z\ngit push origin tag vX.Y.Z"]
+        IF3[Create draft release]
+        IF4[Paste CHANGELOG.md to GitHub release]
+        IF5["Paste copy items to release notes\n(generate with notebook)"]
+        IF6[Publish GitHub release]
+        IF1 --> IF2 --> IF3 --> IF4 --> IF5 --> IF6
+    end
+
     subgraph POST["Post-release"]
         POST1[Merge both release branches into master + develop simultaneously]
         POST2["Create release/X.Y.Z+1 from release/X.Y.Z in both repos"]
@@ -44,7 +65,9 @@ flowchart TD
 
     PRE --> CORE
     CORE --> CC
-    CC --> POST
+    CC --> HC
+    HC --> IF
+    IF --> POST
 ```
 
 ## Links
