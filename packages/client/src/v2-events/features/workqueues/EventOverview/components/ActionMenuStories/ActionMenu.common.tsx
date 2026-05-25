@@ -177,7 +177,15 @@ function getMockActions(createdBy: string) {
       ...actionProps,
       createdBy,
       id: generateUuid(rng),
-      type: ActionType.DUPLICATE_DETECTED
+      type: ActionType.DUPLICATE_DETECTED,
+      content: {
+        duplicates: [
+          {
+            id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' as UUID,
+            trackingId: 'AB1234'
+          }
+        ]
+      }
     },
     [ActionType.MARK_AS_NOT_DUPLICATE]: {
       ...actionProps,
@@ -280,7 +288,6 @@ export const getHiddenActions = () =>
     (acc, action) => {
       const label = actionLabels[action as keyof typeof actionLabels]
 
-       
       if (!label) {
         return acc
       }
