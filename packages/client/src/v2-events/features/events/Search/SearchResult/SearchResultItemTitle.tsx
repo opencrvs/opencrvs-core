@@ -17,23 +17,23 @@ import { Link as TextButton } from '@opencrvs/components'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { IconWithNameEvent } from '@client/v2-events/components/IconWithNameEvent'
 import { ROUTES } from '@client/v2-events/routes'
+import { useCurrentBackTo } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEventTitle } from '../../useEvents/useEventTitle'
 import { ExtendedEventStatuses } from './utils'
 
 export function SearchResultItemTitle({
   event,
   localEventStatus,
-  eventConfig,
-  redirectParam
+  eventConfig
 }: {
   event: EventIndex
   localEventStatus: EventIndex['status'] | keyof typeof ExtendedEventStatuses
   eventConfig: EventConfig
-  redirectParam?: string
 }) {
   const theme = useTheme()
   const { width } = useWindowSize()
   const navigate = useNavigate()
+  const backTo = useCurrentBackTo()
   const { getEventTitle } = useEventTitle()
   const { title, useFallbackTitle } = getEventTitle(eventConfig, event)
 
@@ -59,10 +59,7 @@ export function SearchResultItemTitle({
       color={useFallbackTitle ? 'red' : 'primary'}
       onClick={() => {
         navigate(
-          ROUTES.V2.EVENTS.EVENT.buildPath(
-            { eventId: event.id },
-            { workqueue: redirectParam }
-          )
+          ROUTES.V2.EVENTS.EVENT.buildPath({ eventId: event.id }, { backTo })
         )
       }}
     >

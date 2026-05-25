@@ -291,12 +291,8 @@ export function ReviewCorrection({
             requestId: correctionRequestAction.id,
             annotation
           })
-          if (searchParams.workqueue) {
-            return navigate(
-              ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
-                slug: searchParams.workqueue
-              })
-            )
+          if (searchParams.backTo) {
+            return navigate(searchParams.backTo)
           } else {
             return navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
           }
@@ -317,17 +313,13 @@ export function ReviewCorrection({
             annotation,
             content: { reason }
           })
-          if (searchParams.workqueue) {
-            return navigate(
-              ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
-                slug: searchParams.workqueue
-              })
-            )
+          if (searchParams.backTo) {
+            return navigate(searchParams.backTo)
           } else {
             return navigate(
               ROUTES.V2.EVENTS.EVENT.buildPath(
                 { eventId },
-                { workqueue: searchParams.workqueue }
+                { backTo: searchParams.backTo }
               )
             )
           }

@@ -216,7 +216,7 @@ export function useQuickActionModal(
 
   const onQuickAction = async (
     actionType: keyof typeof quickActions,
-    workqueue?: string
+    backTo?: string
   ) => {
     const config = quickActions[actionType]
     const label = actionLabels[actionType]
@@ -249,8 +249,8 @@ export function useQuickActionModal(
         isActionAllowed
       })
 
-      if (workqueue) {
-        navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue }))
+      if (backTo) {
+        navigate(backTo)
       } else {
         navigate(ROUTES.V2.buildPath({}))
       }
@@ -279,7 +279,7 @@ export function useCustomActionModal(
 
   const onCustomAction = async (
     actionConfig: CustomActionConfig,
-    workqueue?: string
+    backTo?: string
   ) => {
     const modalResult = await openModal<ModalResult>((close) => (
       <QuickActionModal
@@ -305,8 +305,8 @@ export function useCustomActionModal(
         annotation: modalResult.values
       })
 
-      if (workqueue) {
-        navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue }))
+      if (backTo) {
+        navigate(backTo)
       } else {
         navigate(ROUTES.V2.buildPath({}))
       }

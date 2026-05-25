@@ -85,12 +85,12 @@ export function sortActions(
 function ActionMenuItems({
   items,
   eventConfiguration,
-  redirectParam,
+  backTo,
   onAction
 }: {
   items: ActionMenuItem[]
   eventConfiguration: EventConfig
-  redirectParam?: string
+  backTo?: string
   onAction?: () => void
 }) {
   const sortedActions = sortActions(items, eventConfiguration)
@@ -112,7 +112,7 @@ function ActionMenuItems({
         }
         disabled={'disabled' in action ? action.disabled : false}
         onClick={async () => {
-          await action.onClick(redirectParam)
+          await action.onClick(backTo)
           onAction?.()
         }}
       >
@@ -131,7 +131,7 @@ export function ActionMenu({
   onAction?: () => void
 }) {
   const intl = useIntl()
-  const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
+  const [{ backTo }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
   const { getUsers } = useUsers()
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
@@ -202,9 +202,9 @@ export function ActionMenu({
             </>
           )}
           <ActionMenuItems
+            backTo={backTo}
             eventConfiguration={eventConfiguration}
             items={actionMenuItems}
-            redirectParam={workqueue}
             onAction={onAction}
           />
         </DropdownMenu.Content>
