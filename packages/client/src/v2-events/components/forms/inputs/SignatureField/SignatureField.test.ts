@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { DocumentPath } from '@opencrvs/commons/client'
 import { SignatureField } from './SignatureField'
 
 describe('SignatureField.toCertificateVariables', () => {
@@ -27,7 +28,7 @@ describe('SignatureField.toCertificateVariables', () => {
 
   it('returns a URL string when given a valid FileFieldValue', () => {
     const fileValue = {
-      path: '/ocrvs/signature-123.png',
+      path: '/ocrvs/signature-123.png' as DocumentPath,
       originalFilename: 'signature.png',
       type: 'image/png'
     }
@@ -70,7 +71,7 @@ describe('SignatureField.toCertificateVariables', () => {
     window.config.MINIO_BASE_URL = 'https://minio.example.com'
 
     const fileValue = {
-      path: '/bucket/signature.png',
+      path: '/bucket/signature.png' as DocumentPath,
       originalFilename: 'signature.png',
       type: 'image/png'
     }

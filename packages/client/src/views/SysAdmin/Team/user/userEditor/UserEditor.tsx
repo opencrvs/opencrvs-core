@@ -256,7 +256,7 @@ const EditUserComponent = () => {
     >
       <PagesComponent
         attachmentPath={`users/${userId}/`}
-        showReviewButton={false}
+        hideBackToReview={true}
         eventConfig={eventConfig}
         formData={formState as Record<string, FieldValue>}
         formPages={formConfig.pages}
