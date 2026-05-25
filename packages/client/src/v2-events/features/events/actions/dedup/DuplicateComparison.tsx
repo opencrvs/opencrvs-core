@@ -35,7 +35,6 @@ import { summaryMessages } from '@client/v2-events/features/workqueues/EventOver
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { noop } from '@client/v2-events'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
@@ -389,11 +388,9 @@ export function DuplicateComparison({
               </Text>
               <DocumentViewer
                 comparisonView={true}
-                disabled={true}
                 form={originalDeclaration}
                 formConfig={eventConfiguration.declaration}
                 showInMobile={false}
-                onEdit={noop}
               />
               <MobileOnly>
                 <SupportingDocumentList
@@ -408,11 +405,9 @@ export function DuplicateComparison({
               </Text>
               <DocumentViewer
                 comparisonView={true}
-                disabled={true}
                 form={potentialDuplicateDeclaration}
                 formConfig={eventConfiguration.declaration}
                 showInMobile={false}
-                onEdit={noop}
               />
               <MobileOnly>
                 <SupportingDocumentList
