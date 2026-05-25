@@ -581,14 +581,7 @@ function ReviewComponent({
       </LeftColumn>
       {pageIdsWithFile.length > 0 && (
         <RightColumn>
-          <DocumentViewer
-            disabled={readonlyMode || isCorrection || isReviewCorrection}
-            form={form}
-            formConfig={formConfig}
-            onEdit={() =>
-              onEdit({ pageId: pageIdsWithFile[0], confirmation: true })
-            }
-          />
+          <DocumentViewer form={form} formConfig={formConfig} />
         </RightColumn>
       )}
     </Row>

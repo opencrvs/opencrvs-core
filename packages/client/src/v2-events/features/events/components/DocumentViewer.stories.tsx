@@ -11,7 +11,6 @@
 
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
-import { noop } from 'lodash'
 import {
   tennisClubMembershipEvent,
   generateTranslationConfig,
@@ -38,7 +37,6 @@ export const EmptyDocumentViewer: StoryObj<typeof DocumentViewer> = {
       <DocumentViewer
         form={{}}
         formConfig={getDeclaration(tennisClubMembershipEvent)}
-        onEdit={noop}
       />
     )
   }
@@ -134,7 +132,6 @@ export const DocumentViewerWithFiles: StoryObj<typeof DocumentViewer> = {
           ],
           label: generateTranslationConfig('form label')
         })}
-        onEdit={noop}
       />
     )
   }
@@ -242,7 +239,6 @@ export const SameOptionsForDifferentFields: StoryObj<typeof DocumentViewer> = {
           ],
           label: generateTranslationConfig('form label')
         })}
-        onEdit={noop}
       />
     )
   }
