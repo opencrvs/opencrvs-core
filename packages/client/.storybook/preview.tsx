@@ -19,6 +19,7 @@ import { I18nContainer } from '@client/i18n/components/I18nContainer'
 import { createStore } from '@client/store'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { queryClient, TRPCProvider } from '@client/v2-events/trpc'
+import { AdministrativeAreasProvider } from '@client/v2-events/hooks/useAdministrativeAreas'
 import { Provider, useSelector } from 'react-redux'
 import {
   createMemoryRouter,
@@ -98,33 +99,35 @@ function Wrapper({ store, router, initialPath, children }: WrapperProps) {
       <Provider store={store}>
         <I18nContainer>
           <TRPCProvider>
-            <RouterProvider
-              router={createMemoryRouter(
-                [
+            <AdministrativeAreasProvider>
+              <RouterProvider
+                router={createMemoryRouter(
+                  [
+                    {
+                      path: '/',
+                      element: (
+                        <Page>
+                          <NavigationHistoryProvider>
+                            <WaitForUserDetails>
+                              <Outlet />
+                            </WaitForUserDetails>
+                          </NavigationHistoryProvider>
+                        </Page>
+                      ),
+                      children: [
+                        router || {
+                          path: initialPath,
+                          element: children
+                        }
+                      ]
+                    }
+                  ],
                   {
-                    path: '/',
-                    element: (
-                      <Page>
-                        <NavigationHistoryProvider>
-                          <WaitForUserDetails>
-                            <Outlet />
-                          </WaitForUserDetails>
-                        </NavigationHistoryProvider>
-                      </Page>
-                    ),
-                    children: [
-                      router || {
-                        path: initialPath,
-                        element: children
-                      }
-                    ]
+                    initialEntries: [initialPath]
                   }
-                ],
-                {
-                  initialEntries: [initialPath]
-                }
-              )}
-            ></RouterProvider>
+                )}
+              ></RouterProvider>
+            </AdministrativeAreasProvider>
           </TRPCProvider>
         </I18nContainer>
       </Provider>
