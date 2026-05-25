@@ -177,7 +177,7 @@ function getMockActions(createdBy: string) {
       ...actionProps,
       createdBy,
       id: generateUuid(rng),
-      type: ActionType.MARK_AS_DUPLICATE
+      type: ActionType.DUPLICATE_DETECTED
     },
     [ActionType.MARK_AS_NOT_DUPLICATE]: {
       ...actionProps,
@@ -280,7 +280,7 @@ export const getHiddenActions = () =>
     (acc, action) => {
       const label = actionLabels[action as keyof typeof actionLabels]
 
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+       
       if (!label) {
         return acc
       }
