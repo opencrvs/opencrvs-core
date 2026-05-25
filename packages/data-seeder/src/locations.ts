@@ -29,16 +29,7 @@ const LocationSchema = z.array(
     name: z.string(),
     alias: z.string().optional(),
     partOf: z.string(),
-    locationType: z.enum(LOCATION_TYPES),
-    jurisdictionType: z
-      .enum([
-        'STATE',
-        'DISTRICT',
-        'LOCATION_LEVEL_3',
-        'LOCATION_LEVEL_4',
-        'LOCATION_LEVEL_5'
-      ])
-      .optional()
+    locationType: z.enum(LOCATION_TYPES)
   })
 )
 
