@@ -38,7 +38,7 @@ import {
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
-import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
+import { AsyncActionInput } from '@events/router/event/actions'
 import { getUserOrSystem } from '../../../service/users/api'
 import { isLocationUnderJurisdiction } from '../../../storage/postgres/events/locations'
 
@@ -274,7 +274,7 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
   OpenApiMeta,
   TrpcContext,
   TrpcContext,
-  AsyncActionConfirmationResponseSchema
+  AsyncActionInput
 > = async ({ next, ctx, input }) => {
   const {
     eventId: grantedEventId,
@@ -316,6 +316,13 @@ export const userCanReadEvent: MiddlewareFunction<
   TrpcContext & { event: EventDocument },
   UUID
 > = async ({ next, ctx, input }) => {
+  const { eventId: grantedEventId } = getTokenPayload(ctx.token)
+  if (grantedEventId && grantedEventId !== input) {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message: 'Token does not grant access to this event'
+    })
+  }
   const event = await getEventById(input)
 
   const createAction = event.actions.find(

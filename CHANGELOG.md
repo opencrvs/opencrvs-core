@@ -1,5 +1,71 @@
 # Changelog
 
+## 1.9.14
+
+### New features
+
+- Two new toolkit methods allow country configurations to implement custom client-side logic that goes beyond the predefined `field()` methods. [#11653](https://github.com/opencrvs/opencrvs-core/issues/11653)
+
+  **`field('id').customClientValidator(fn)`** — validate a field with an arbitrary inline function. The function is serialised into the form configuration and executed just-in-time during validation. All logic must be self-contained — external references such as lodash are not available — so the validator stays portable wherever the schema is evaluated.
+
+  ```ts
+  field('nid').customClientValidator((value) => {
+    // LUHN check — all logic must be inline
+    const digits = String(value).split('').reverse().map(Number)
+    let sum = 0
+    digits.forEach((d, i) => {
+      const n = i % 2 === 0 ? d : d * 2
+      sum += n > 9 ? n - 9 : n
+    })
+    return sum % 10 === 0
+  })
+  ```
+
+  The result is a `JSONSchema` and can be used anywhere a conditional validator is accepted (field `validation[]`, page conditionals, etc.).
+
+  **`field('id').customClientEvaluation(fn)`** — compute a derived value from one field and the full form context. Returns a `CodeToEvaluate` descriptor usable as `value`, `defaultValue`, or a `DATA` component entry.
+
+  ```ts
+  field('quantity').customClientEvaluation(
+    (qty, ctx) => Number(qty) * Number(ctx.$form['unitPrice'])
+  )
+  ```
+
+- Always display a "Go to review" button on every page of declaration form to allow easier navigation between the preview and the form fields. [#10132](https://github.com/opencrvs/opencrvs-core/issues/10132)
+
+### Bug fixes
+
+- Signature fields referenced in certificate templates via Handlebars now resolve correctly. Signatures captured during registration and on the review page were previously not rendered in printed certificates even when the template referenced them. [#12277](https://github.com/opencrvs/opencrvs-core/issues/12277)
+
+## 1.9.13
+
+### Breaking changes
+
+- Redundant `defaultValue` removed from BULLET_LIST, FORM_HEADER and PARAGRAPH field types.
+- `action.reject(...)` now by default unassigns the event from the last assigned user. To keep assignment, `keepAssignment: true` option must be explicitly passed when rejecting an action.
+
+### New features
+
+- Action confirmation tokens are now scoped with `record.read` access for the specific event, enabling the confirmation flow to fetch event data via the `event.get` tRPC endpoint. [#12350](https://github.com/opencrvs/opencrvs-core/issues/12350)
+- Within a form page, `defaultValue` resolution is now ordered: each field can reference the resolved values of fields above it, enabling intra-page derived defaults. [#12350](https://github.com/opencrvs/opencrvs-core/issues/12350)
+
+### Bug fixes
+
+- Two mutually exclusive form pages can now share field IDs. Previously a field that appeared on a hidden page was always stripped from the event data, even if an identically-named field on a different visible page had a value. The system now only omits a field when it is hidden on every page it appears on. [#12350](https://github.com/opencrvs/opencrvs-core/issues/12350)
+- Navigating to the next form page now uses the values the user just entered, not the previous render's state. This prevented correct page routing when the next page's visibility depended on a field filled on the current page. [#12350](https://github.com/opencrvs/opencrvs-core/issues/12350)
+- Switching between form pages no longer briefly flashes stale values from the previous page. The Formik instance is now remounted on page change instead of being reset via a `useEffect`. [#12350](https://github.com/opencrvs/opencrvs-core/issues/12350)
+- `CHECKBOX` and `BUTTON` field default values (booleans, numbers) are no longer silently dropped during form initialisation. [#12350](https://github.com/opencrvs/opencrvs-core/issues/12350)
+- The `DATA` field now uses the first visible field config when multiple fields share the same ID, ensuring the correct field is displayed when fields are mutually exclusive. [#12350](https://github.com/opencrvs/opencrvs-core/issues/12350)
+- Address field defaults no longer set `administrativeArea` to an empty string when the user reference cannot be resolved. This prevents empty address submission errors and correctly enables optional address sub-fields. [#12350](https://github.com/opencrvs/opencrvs-core/issues/12350)
+- Health facilities and other non-administrative locations are no longer included in the administrative area hierarchy when resolving location ancestry. [#12485](https://github.com/opencrvs/opencrvs-core/issues/12485)
+- The work queue list now automatically refreshes after a new event is created, without requiring a manual page reload. Previously the sidebar count updated immediately but the list itself stayed stale. [#12103](https://github.com/opencrvs/opencrvs-core/issues/12103)
+
+### Improvements
+
+- The sidebar navigation footer now displays the user's assigned office alongside their name and role. [#11421](https://github.com/opencrvs/opencrvs-core/issues/11421)
+- The client now periodically polls `api/ping` every 5 seconds until all services are reachable, so users automatically recover from offline to online without a page reload. A `ConnectionStatus` indicator in the sidebar reflects real-time connectivity state. [#12055](https://github.com/opencrvs/opencrvs-core/issues/12055)
+- Allow assignment to be controlled when rejecting an action both synchronously and asynchronously by passing an optional `keepAssignment` parameter to response body (during synchronous rejection) or to the `action.reject` function (during asynchronous rejection). [#12347](https://github.com/opencrvs/opencrvs-core/issues/12347)
+
 ## 1.9.12
 
 ### Infrastructure

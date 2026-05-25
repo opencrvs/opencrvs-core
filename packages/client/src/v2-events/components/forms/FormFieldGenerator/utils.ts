@@ -8,12 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { get } from 'lodash'
+import { compact, get } from 'lodash'
 import {
-  FieldReference,
+  buildClientFunctionContext,
+  runClientFunction,
   FieldValue,
+  FieldReference,
   HttpField,
   IndexMap,
+  isCodeToEvaluate,
   isFieldReference
 } from '@opencrvs/commons/client'
 import {
@@ -50,32 +53,51 @@ export function makeFormikFieldIdsOpenCRVSCompatible<T>(
   )
 }
 
+/**
+ * Resolves a field's synced value by looking up its `value` references in order,
+ * returning the first non-falsy match.
+ */
+export function resolveSyncedFieldValue(
+  field: { value?: FieldReference | FieldReference[] },
+  getValue: (ref: FieldReference) => FieldValue | undefined
+): FieldValue | undefined {
+  const refs = ([] as FieldReference[]).concat(field.value ?? [])
+  return compact(refs.map(getValue))[0]
+}
+
 export function parseFieldReferenceToValue(
   fieldReference: FieldReference,
   fieldValues: Record<string, FieldValue>
-) {
-  return fieldReference.$$subfield.length > 0
-    ? get(fieldValues[fieldReference.$$field], fieldReference.$$subfield)
-    : fieldValues[fieldReference.$$field]
+): FieldValue {
+  const fieldValue =
+    fieldReference.$$subfield.length > 0
+      ? get(fieldValues[fieldReference.$$field], fieldReference.$$subfield)
+      : fieldValues[fieldReference.$$field]
+  if (isCodeToEvaluate(fieldReference)) {
+    return runClientFunction(
+      fieldReference.$$code,
+      fieldValue,
+      buildClientFunctionContext({ form: fieldValues })
+    ) as FieldValue
+  }
+  return fieldValue
 }
 
 export function parseFieldReferencesInConfiguration(
   configuration: HttpField['configuration'],
   form: Record<string, FieldValue>
-) {
-  const result = {
+): Omit<HttpField['configuration'], 'trigger'> {
+  return {
     ...configuration,
     params: configuration.params
-      ? Object.fromEntries(
+      ? (Object.fromEntries(
           Object.entries(configuration.params).map(([key, value]) => [
             key,
             isFieldReference(value)
               ? parseFieldReferenceToValue(value, form)
               : value
           ])
-        )
+        ) as HttpField['configuration']['params'])
       : undefined
   }
-
-  return result
 }

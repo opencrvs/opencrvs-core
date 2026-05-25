@@ -16,7 +16,6 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import {
-  ActionType,
   getDeclarationPages,
   isNonInteractiveFieldType,
   PageConfig
@@ -85,14 +84,12 @@ export function Pages() {
     <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
       {modal}
       <PagesComponent
-        actionType={ActionType.REQUEST_CORRECTION}
         eventConfig={configuration}
         formData={form}
         formPages={correctablePages}
         isCorrection={true}
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}
-        showReviewButton={searchParams.from === 'review'}
         validatorContext={validatorContext}
         onPageChange={(nextPageId: string) =>
           navigate(

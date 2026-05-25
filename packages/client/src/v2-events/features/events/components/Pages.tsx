@@ -27,13 +27,12 @@ import {
 import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
-import { AvailableActionTypes } from './Action/utils'
 
 interface PagesProps {
   formData: EventState
   setFormData: (form: EventState) => void
   pageId: string
-  showReviewButton?: boolean
+  hideBackToReview?: boolean
   formPages: PageConfig[]
   onPageChange: (nextPageId: string) => void
   onSubmit: () => void
@@ -43,21 +42,13 @@ interface PagesProps {
   isCorrection?: boolean
 }
 
-type DeclarationProps =
-  | {
-      actionType: AvailableActionTypes
-      declaration?: undefined
-    }
-  | {
-      declaration: EventState
-    }
 /**
  *
  * Reusable component for rendering a form with pagination. Used by different action forms
  */
 export function Pages({
   formData,
-  showReviewButton,
+  hideBackToReview = false,
   formPages,
   onPageChange,
   onSubmit,
@@ -65,11 +56,10 @@ export function Pages({
   continueButtonText,
   setFormData,
   eventConfig,
-  declaration,
   // When isCorrection is true, we should disabled fields with 'uncorrectable' set to true, or skip pages where all fields have 'uncorrectable' set to true
   isCorrection = false,
   validatorContext
-}: PagesProps & DeclarationProps) {
+}: PagesProps) {
   const intl = useIntl()
   const visiblePages = formPages.filter((page) =>
     isPageVisible(page, formData, validatorContext)
@@ -86,10 +76,16 @@ export function Pages({
     document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
   }, [pageId])
 
-  function switchToNextPage() {
-    const nextPageIdx = pageIdx + 1
+  function switchToNextPage(formValues: EventState = formData) {
+    const currentVisiblePages = formPages.filter((p) =>
+      isPageVisible(p, formValues, validatorContext)
+    )
+    const currentPageIdx = currentVisiblePages.findIndex((p) => p.id === pageId)
+    const nextPageIdx = currentPageIdx + 1
     const nextPage =
-      nextPageIdx < visiblePages.length ? visiblePages[nextPageIdx] : undefined
+      nextPageIdx < currentVisiblePages.length
+        ? currentVisiblePages[nextPageIdx]
+        : undefined
 
     // If there is a next page on the form available, navigate to it.
     // Otherwise, submit the form.
@@ -121,7 +117,7 @@ export function Pages({
   const wizardProps = {
     currentPage: pageIdx,
     pageTitle: intl.formatMessage(page.title),
-    showReviewButton,
+    showReviewButton: !hideBackToReview,
     onNextPage,
     onPreviousPage,
     onSubmit
@@ -132,9 +128,6 @@ export function Pages({
       ref={formRef}
       eventConfig={eventConfig}
       fields={page.fields}
-      // This makes the declaration available in the validations/conditionals of
-      // the form without bleeding into the current form values
-      formContext={declaration}
       formTouched={formTouched}
       formValues={formData}
       id="pagesSection"

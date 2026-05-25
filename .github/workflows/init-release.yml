@@ -6,19 +6,43 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-name: Release - Start a new release 
+
+# Gitflow release initialisation workflow.
+#
+# Triggered manually with a semver version string (e.g. 1.7.2).
+#
+# What this workflow does, in order:
+#   1. Derives the base branch:
+#        - patch release (z > 0)  → release/<x>.<y>.<z-1>
+#        - minor/major (z = 0)    → develop
+#   2. Creates a release branch (release/<version>) from the base branch.
+#   3. Bumps every package.json via lerna and prepends a CHANGELOG section,
+#      then pushes both commits to the release branch.
+#   4. Opens two PRs — both PRs already contain the version-bump commits:
+#        a. release/<version> → master                          (the release PR)
+#        b. merge-back/release-<version>-to-develop → develop  (merge-back PR)
+#           A dedicated branch is used so that conflict-resolution commits
+#           stay off the release branch.
+#   5. Triggers the same init-release workflow in opencrvs-countryconfig and
+#      opencrvs-farajaland so all three repos move in lockstep.
+#   6. Creates a draft GitHub release and immediately deletes the backing tag
+#      (the tag will be re-created by the publish workflow after the PR merges).
+name: Release - Start a new release
 on:
   workflow_dispatch:
     inputs:
       version:
         type: string
         required: true
-        description: "Version to release"
-  
+        description: 'Version to release'
+
 jobs:
   release_workflow:
     runs-on: ubuntu-latest
     steps:
+      # Derive base_branch and target_branch from the version number.
+      #   - patch (z > 0): base = release/<x>.<y>.<z-1>, target = master
+      #   - minor/major (z = 0): base = develop, target = master
       - name: Determine the Base Branch
         id: get_base_branch
         run: |
@@ -39,83 +63,45 @@ jobs:
           fi
           echo "target_branch=master" >> $GITHUB_OUTPUT
           echo "base_branch=$base_branch" >> $GITHUB_OUTPUT
-                 
-      - name: Start a new release ${{ inputs.version }} from ${{ steps.get_base_branch.outputs.base_branch }}
-        uses: hoangvvo/gitflow-workflow-action@0.3.8
-        with:
-          develop_branch: ${{ steps.get_base_branch.outputs.base_branch }}
-          main_branch: ${{ steps.get_base_branch.outputs.target_branch }}
-          merge_back_from_main: false
-          version: ${{ inputs.version }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Trigger workflow in opencrvs-countryconfig
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GH_TOKEN }}
-          script: |
-            github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: 'opencrvs-countryconfig',
-              workflow_id: 'init-release.yml',
-              ref: context.ref,
-              inputs: {
-                version: '${{ inputs.version }}'
-              }
-            })
-      
-      - name: Trigger workflow in opencrvs-farajaland
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GH_TOKEN }}
-          script: |
-            github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: 'opencrvs-farajaland',
-              workflow_id: 'init-release.yml',
-              ref: context.ref,
-              inputs: {
-                version: '${{ inputs.version }}'
-              }
-            })
-
-      - name: Checkout the release branch
+      # Full history is required so lerna can traverse the commit graph.
+      - name: Checkout ${{ steps.get_base_branch.outputs.base_branch }}
         uses: actions/checkout@v4
         with:
-          ref: "release/${{ inputs.version }}"
+          ref: ${{ steps.get_base_branch.outputs.base_branch }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Clear auto-generated PR comment
+      - name: Check if release branch already exists
+        id: check_branch
         run: |
-          REPO="${{ github.repository }}"
-          PR_BRANCH="release/${{ inputs.version }}"
-          PR_NUMBER=$(gh pr list --head "$PR_BRANCH" --repo "$REPO" --json number -q '.[0].number')
-          cd "$GITHUB_WORKSPACE"
-          if [ -f .github/TEMPLATES/RELEASE_PR_TEMPLATE.md ]; then
-            BODY=$(jq -Rs . < .github/TEMPLATES/RELEASE_PR_TEMPLATE.md)
+          if git ls-remote --exit-code --heads origin "release/${{ inputs.version }}" > /dev/null 2>&1; then
+            echo "Branch release/${{ inputs.version }} already exists, skipping creation."
+            echo "exists=true" >> $GITHUB_OUTPUT
           else
-            BODY=$(jq -n --arg body "" '$body')
+            echo "exists=false" >> $GITHUB_OUTPUT
           fi
-          echo "{\"body\": $BODY}" > body.json
-          gh api \
-            --method PATCH \
-            -H "Accept: application/vnd.github.v3+json" \
-            /repos/"$REPO"/issues/"$PR_NUMBER" \
-            --input body.json 
-          rm body.json
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
-      - name: Update version numbers and CHANGELOG
+
+      # Create the release branch, bump all package versions, and update the
+      # CHANGELOG — then push. The PRs are opened only after these commits exist
+      # on the remote, so both PRs immediately include the version-bump commits.
+      # Skipped if the release branch was already created by a previous run.
+      - name: Create release branch and update version numbers and CHANGELOG
+        if: steps.check_branch.outputs.exists == 'false'
         run: |
-          cd "$GITHUB_WORKSPACE"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          npx lerna exec 'yarn version --new-version ${{ inputs.version }} --no-git-tag-version'
+          git checkout -b "release/${{ inputs.version }}"
+
+          # Bump all workspace package.json files and the root in one command.
+          npm version ${{ inputs.version }} --no-git-tag-version --workspaces --include-workspace-root
           git add .
           git commit -m "chore: update version to ${{ inputs.version }}"
 
+          # Prepend a new "Release Candidate" section to the top of CHANGELOG.md.
+          # sed removes the existing "# Changelog" header (lines 1-2) so we can
+          # rewrite it with the new section underneath.
           sed -i '1,2d' CHANGELOG.md
           cp CHANGELOG.md COPY_CHANGELOG.md
           {
@@ -123,30 +109,158 @@ jobs:
             echo ""
             echo "## ${{ inputs.version }} Release Candidate"
             echo ""
-            cat COPY_CHANGELOG.md 
+            cat COPY_CHANGELOG.md
           } > CHANGELOG.md
+          rm COPY_CHANGELOG.md
           git add CHANGELOG.md
           git commit -m "docs: update changelog for ${{ inputs.version }} release candidate"
+
           git push origin "release/${{ inputs.version }}"
 
+      # A dedicated merge-back branch is used for the develop PR so that any
+      # conflict-resolution commits do not land on the release branch itself.
+      - name: Create merge-back branch for develop PR
+        run: |
+          VERSION_NO_DOTS=$(echo "${{ inputs.version }}" | tr -d '.')
+          MERGEBACK_BRANCH="merge-back/release-${VERSION_NO_DOTS}-into-develop"
+          if git ls-remote --exit-code --heads origin "$MERGEBACK_BRANCH" > /dev/null 2>&1; then
+            echo "Branch $MERGEBACK_BRANCH already exists, skipping."
+          else
+            git fetch origin "release/${{ inputs.version }}"
+            git checkout -b "$MERGEBACK_BRANCH" "origin/release/${{ inputs.version }}"
+            git push origin "$MERGEBACK_BRANCH"
+          fi
+
+      # Two PRs are always created:
+      #
+      #   PR 1 — release/<version> → master
+      #     The release PR. Merging this ships the version to production and
+      #     is what triggers the publish workflow.
+      #
+      #   PR 2 — merge-back/release-<version-no-dots>-into-develop → develop
+      #     Uses a dedicated branch so conflict-resolution commits stay off
+      #     the release branch. Carries the version-bump commits (and any fixes
+      #     cherry-picked onto the release branch) back into develop.
+      #       - z=0 (base is develop): carries only the two bump commits, clean diff.
+      #       - z>0 (base is a prior release branch): also backports any patch fixes.
+      #     Note: dots are stripped from the version (e.g. 1.9.14 → 1914) so the
+      #     branch name passes the '^[a-z][a-z0-9\/\-]{1,44}$' validation in core.
+      # Each PR is checked individually — one may already exist while the other
+      # does not, so both are always evaluated.
+      - name: Create Pull Requests
+        run: |
+          PR_BRANCH="release/${{ inputs.version }}"
+          VERSION_NO_DOTS=$(echo "${{ inputs.version }}" | tr -d '.')
+          MERGEBACK_BRANCH="merge-back/release-${VERSION_NO_DOTS}-into-develop"
+          TARGET_BRANCH="${{ steps.get_base_branch.outputs.target_branch }}"
+
+          if [ -f .github/TEMPLATES/RELEASE_PR_TEMPLATE.md ]; then
+            BODY=$(cat .github/TEMPLATES/RELEASE_PR_TEMPLATE.md)
+          else
+            BODY=""
+          fi
+
+          EXISTING_MASTER_PR=$(gh pr list --head "$PR_BRANCH" --base "$TARGET_BRANCH" --state open --json number --jq '.[0].number // ""')
+          if [ -z "$EXISTING_MASTER_PR" ]; then
+            gh pr create \
+              --base "$TARGET_BRANCH" \
+              --head "$PR_BRANCH" \
+              --title "Release v${{ inputs.version }}" \
+              --body "$BODY"
+          else
+            echo "PR $PR_BRANCH → $TARGET_BRANCH already exists (#$EXISTING_MASTER_PR), skipping."
+          fi
+
+          EXISTING_DEVELOP_PR=$(gh pr list --head "$MERGEBACK_BRANCH" --base "develop" --state open --json number --jq '.[0].number // ""')
+          if [ -z "$EXISTING_DEVELOP_PR" ]; then
+            gh pr create \
+              --base "develop" \
+              --head "$MERGEBACK_BRANCH" \
+              --title "chore: merge release v${{ inputs.version }} back to develop" \
+              --body "Merge release branch back to develop to include version bump and changelog updates."
+          else
+            echo "PR $MERGEBACK_BRANCH → develop already exists (#$EXISTING_DEVELOP_PR), skipping."
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Mirror this release initialisation in the companion repositories so all
+      # three repos create their release branches and PRs at the same time.
+      # ${{ github.ref_name }} resolves to the branch name selected in the
+      # "Run workflow" dropdown (e.g. "master"), not the full ref path
+      # ("refs/heads/master") that context.ref carries. The workflow dispatch
+      # API requires a plain branch name, so ref_name is the correct value.
+      - name: Trigger workflow in opencrvs-countryconfig
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.COUNTRYCONFIG_WORKFLOW_TOKEN }}
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: 'opencrvs-countryconfig',
+              workflow_id: 'init-release.yml',
+              ref: '${{ github.ref_name }}',
+              inputs: {
+                version: '${{ inputs.version }}'
+              }
+            })
+      - name: Trigger workflow in infrastructure
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.INFRASTRUCTURE_WORKFLOW_TOKEN }}
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: 'infrastructure',
+              workflow_id: 'init-release.yml',
+              ref: '${{ github.ref_name }}',
+              inputs: {
+                version: '${{ inputs.version }}'
+              }
+            })
+      - name: Trigger workflow in opencrvs-farajaland
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.FARAJALAND_WORKFLOW_TOKEN }}
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: 'opencrvs-farajaland',
+              workflow_id: 'init-release.yml',
+              ref: '${{ github.ref_name }}',
+              inputs: {
+                version: '${{ inputs.version }}'
+              }
+            })
+
+      # Create a draft release so the release notes page exists immediately.
+      # The tag is deleted right after: the publish workflow re-creates it when
+      # the release PR is merged into master, which is the canonical tag point.
+      # Skipped if a release for this version already exists from a previous run.
       - name: Create a draft release
         run: |
-          cd "$GITHUB_WORKSPACE"
           TAG_NAME="v${{ inputs.version }}"
-          TITLE="OpenCRVS - $TAG_NAME"
-          NOTES="Release notes for version ${{ inputs.version }}"
-          git tag "$TAG_NAME"
-          git push origin "$TAG_NAME"
-          gh release create "$TAG_NAME" \
-            --title "$TITLE" \
-            --notes "$NOTES" \
-            --draft 
+          if gh release view "$TAG_NAME" > /dev/null 2>&1; then
+            echo "Release $TAG_NAME already exists, skipping."
+          else
+            TITLE="OpenCRVS - $TAG_NAME"
+            NOTES="Release notes for version ${{ inputs.version }}"
+            git tag "$TAG_NAME"
+            git push origin "$TAG_NAME"
+            gh release create "$TAG_NAME" \
+              --title "$TITLE" \
+              --notes "$NOTES" \
+              --draft
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Delete the tag
-        run: | 
+        run: |
           TAG_NAME="v${{ inputs.version }}"
-          git tag -d "$TAG_NAME"
-          git push origin ":refs/tags/$TAG_NAME"
-          
+          if git ls-remote --exit-code --tags origin "$TAG_NAME" > /dev/null 2>&1; then
+            git tag -d "$TAG_NAME" 2>/dev/null || true
+            git push origin ":refs/tags/$TAG_NAME"
+          else
+            echo "Tag $TAG_NAME does not exist on remote, skipping."
+          fi

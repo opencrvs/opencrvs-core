@@ -98,15 +98,17 @@ export function Onboarding() {
       title={intl.formatMessage(messages.title)}
     >
       <PagesComponent
+        hideBackToReview
         continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
-        declaration={eventIndex.declaration}
         eventConfig={configuration}
         formData={annotation}
         formPages={formPages}
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
-        showReviewButton={false}
-        validatorContext={validatorContext}
+        validatorContext={{
+          ...validatorContext,
+          baseFormState: eventIndex.declaration
+        }}
         onPageChange={(nextPageId: string) => {
           return navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath(

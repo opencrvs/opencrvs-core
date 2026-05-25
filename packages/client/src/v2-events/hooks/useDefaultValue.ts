@@ -10,22 +10,30 @@
  */
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
+import { get } from 'lodash'
 import {
+  ActionUpdate,
   FieldConfig,
   SystemVariables,
-  InteractiveFieldType,
   SerializedUserField,
+  isCodeToEvaluate,
+  buildClientFunctionContext,
+  runClientFunction,
   isNonInteractiveFieldType,
   Location,
   FieldType,
   FieldValue,
   EventState,
-  buildFormState
+  buildFormState,
+  FieldGroup,
+  TextField,
+  FieldConfigDefaultValue,
+  isFieldValueWithoutTemplates,
+  isTemplateVariable,
+  mapFieldTypeToZod,
+  compositeFieldTypes
 } from '@opencrvs/commons/client'
-import {
-  getAdminLevelHierarchy,
-  replacePlaceholders
-} from '@client/v2-events/utils'
+import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { useSystemVariables } from './useSystemVariables'
 import { useLocations } from './useLocations'
@@ -33,6 +41,107 @@ import { useLocations } from './useLocations'
 interface Context extends SystemVariables {
   locations: Location[]
   adminLevelIds: string[]
+  form: EventState | ActionUpdate
+}
+
+type FieldsWithDefaultValue =
+  | Extract<FieldConfig, { defaultValue?: unknown }>
+  | FieldGroup
+
+function isFieldWithDefaultValue(
+  field: FieldConfig
+): field is FieldsWithDefaultValue {
+  return 'defaultValue' in field || field.type === FieldType.FIELD_GROUP
+}
+
+function isTextField(field: FieldConfig): field is TextField {
+  return field.type === FieldType.TEXT
+}
+
+/**
+ *
+ * @param fieldType: The type of the field.
+ * @param currentValue: The current value of the field.
+ * @param defaultValue: Configured default value from the country configuration.
+ * @param meta: Metadata fields such as '$user', '$event', and others.
+ *
+ * @returns Resolves template variables in the default value and returns the resolved value.
+ */
+function replacePlaceholders({
+  field,
+  currentValue,
+  defaultValue,
+  systemVariables
+}: {
+  field: FieldsWithDefaultValue
+  currentValue?: FieldValue
+  defaultValue?: FieldConfigDefaultValue
+  systemVariables: SystemVariables
+}): FieldValue | undefined {
+  if (currentValue) {
+    return currentValue
+  }
+
+  if (!defaultValue) {
+    return undefined
+  }
+
+  if (isFieldValueWithoutTemplates(defaultValue)) {
+    return defaultValue
+  }
+
+  if (isTemplateVariable(defaultValue)) {
+    const resolvedValue = get(systemVariables, defaultValue)
+    const validator = mapFieldTypeToZod(field)
+
+    const parsedValue = validator.safeParse(resolvedValue)
+
+    if (parsedValue.success) {
+      return parsedValue.data as FieldValue
+    }
+
+    throw new Error(`Could not resolve ${defaultValue}: ${parsedValue.error}`)
+  }
+
+  if (
+    compositeFieldTypes.some((ft) => ft === field.type) &&
+    typeof defaultValue === 'object'
+  ) {
+    /**
+     * defaultValue is typically an ADDRESS, FILE, or FILE_WITH_OPTIONS.
+     * Some STRING values within the defaultValue object may contain template variables (prefixed with $).
+     */
+    const result = { ...defaultValue }
+
+    // @TODO: This resolves template variables in the first level of the object. In the future, we might need to extend it to arbitrary depth.
+    for (const [key, val] of Object.entries(result)) {
+      if (val && isTemplateVariable(val) && isTextField(field)) {
+        const resolvedValue = get(systemVariables, val)
+        // For now, we only support resolving template variables for text fields.
+        const validator = mapFieldTypeToZod(field)
+        const parsedValue = validator.safeParse(resolvedValue)
+        if (parsedValue.success && parsedValue.data) {
+          result[key] = resolvedValue
+        } else {
+          throw new Error(`Could not resolve ${key}: ${parsedValue.error}`)
+        }
+      }
+    }
+
+    const resultValidator = mapFieldTypeToZod(field)
+    const parsedResult = resultValidator.safeParse(result)
+    if (parsedResult.success) {
+      return result as FieldValue
+    }
+    throw new Error(
+      `Could not resolve ${field.type}: ${JSON.stringify(
+        defaultValue
+      )}. Error: ${parsedResult.error}`
+    )
+  }
+  throw new Error(
+    `Could not resolve ${field.type}: ${JSON.stringify(defaultValue)}`
+  )
 }
 
 function isSerializedUserField(value: unknown): value is SerializedUserField {
@@ -66,7 +175,7 @@ function resolveSerializedUserField(
 }
 
 export function mapFieldToDefaultValue(
-  field: InteractiveFieldType,
+  field: FieldsWithDefaultValue,
   context: Context
 ): FieldValue | undefined {
   if (field.type === FieldType.FIELD_GROUP) {
@@ -77,9 +186,23 @@ export function mapFieldToDefaultValue(
       return mapFieldToDefaultValue(subfield, context)
     })
   }
+  if (isCodeToEvaluate(field.defaultValue)) {
+    return runClientFunction(
+      field.defaultValue.$$code,
+      undefined,
+      buildClientFunctionContext({
+        form: context.form,
+        systemVariables: context,
+        locations: context.locations,
+        adminLevelIds: context.adminLevelIds
+      })
+    ) as FieldValue
+  }
+
   if (field.defaultValue === undefined) {
     return
   }
+
   switch (field.type) {
     case FieldType.NAME: {
       return {
@@ -95,12 +218,16 @@ export function mapFieldToDefaultValue(
       }
     }
     case FieldType.ADDRESS: {
-      return {
-        ...field.defaultValue,
-        administrativeArea: resolveSerializedUserField(
+      const resolvedAdministrativeArea =
+        field.defaultValue.administrativeArea &&
+        resolveSerializedUserField(
           field.defaultValue.administrativeArea,
           context
         )
+      return {
+        ...field.defaultValue,
+        // valid administrativeArea or undefined (don't allow empty string)
+        administrativeArea: resolvedAdministrativeArea || undefined
       }
     }
     case FieldType.DATE: {
@@ -124,6 +251,18 @@ export function mapFieldToDefaultValue(
 
       return `${hours}:${minutes}`
     }
+    case FieldType.AGE: {
+      return {
+        age: field.defaultValue,
+        asOfDateRef: field.configuration.asOfDate.$$field
+      }
+    }
+    // `replacePlaceholders` returns undefined for falsy values e.g. 0, false
+    case FieldType.CHECKBOX:
+    case FieldType.NUMBER:
+    case FieldType.BUTTON: {
+      return field.defaultValue
+    }
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
     case FieldType.LOCATION:
@@ -133,32 +272,27 @@ export function mapFieldToDefaultValue(
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
-    case FieldType.NUMBER:
     case FieldType.NUMBER_WITH_UNIT:
     case FieldType.EMAIL:
-    case FieldType.AGE:
-    case FieldType.CHECKBOX:
     case FieldType.DATE_RANGE:
     case FieldType.SELECT_DATE_RANGE:
     case FieldType.PHONE:
-    case FieldType.BUTTON:
     case FieldType.SEARCH:
     case FieldType.ID:
     case FieldType.VERIFICATION_STATUS:
     case FieldType.QR_READER:
+    case FieldType.HTTP:
     case FieldType.ID_READER:
     case FieldType.SIGNATURE:
     case FieldType.FILE:
     case FieldType.FILE_WITH_OPTIONS:
-      const defaultValue = field.defaultValue
-
-      if (isSerializedUserField(defaultValue)) {
-        return resolveSerializedUserField(defaultValue, context)
+      if (isSerializedUserField(field.defaultValue)) {
+        return resolveSerializedUserField(field.defaultValue, context)
       }
 
       return replacePlaceholders({
         field,
-        defaultValue,
+        defaultValue: field.defaultValue,
         systemVariables: context
       })
   }
@@ -173,23 +307,31 @@ export function useDefaultValue() {
     () => config.ADMIN_STRUCTURE.map((level) => level.id),
     [config.ADMIN_STRUCTURE]
   )
-  function getDefaultValue(field: FieldConfig): FieldValue | undefined
-  function getDefaultValue(fields: FieldConfig[]): EventState
   function getDefaultValue(
-    fieldOrFields: FieldConfig | FieldConfig[]
+    field: FieldConfig,
+    form: EventState | ActionUpdate
+  ): FieldValue | undefined
+  function getDefaultValue(
+    fields: FieldConfig[],
+    form: EventState | ActionUpdate
+  ): EventState
+  function getDefaultValue(
+    fieldOrFields: FieldConfig | FieldConfig[],
+    form: EventState | ActionUpdate
   ): FieldValue | EventState | undefined {
     if (Array.isArray(fieldOrFields)) {
       const fields = fieldOrFields
-      return buildFormState(fields, (field) => getDefaultValue(field))
+      return buildFormState(fields, (field) => getDefaultValue(field, form))
     }
     const field = fieldOrFields
-    if (isNonInteractiveFieldType(field)) {
+    if (!isFieldWithDefaultValue(field)) {
       return
     }
     return mapFieldToDefaultValue(field, {
       ...systemVariables,
       locations,
-      adminLevelIds
+      adminLevelIds,
+      form
     })
   }
   return getDefaultValue

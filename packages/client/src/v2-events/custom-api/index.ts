@@ -52,6 +52,13 @@ function hasPotentialDuplicates(
   return eventIndex.potentialDuplicates.length > 0
 }
 
+function wasRejected(event: EventDocument, actionType: ActionType): boolean {
+  return (
+    event.actions.filter((a) => a.type === actionType).at(-1)?.status ===
+    ActionStatus.Rejected
+  )
+}
+
 /**
  * Runs a sequence of actions from declare to register.
  *
@@ -70,10 +77,13 @@ export async function registerOnDeclare({
     annotation,
     eventId,
     transactionId,
-    keepAssignment: true
+    keepAssignmentIfAccepted: true
   })
 
-  if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
+  if (
+    hasPotentialDuplicates(declaredEvent, eventConfiguration) ||
+    wasRejected(declaredEvent, ActionType.DECLARE)
+  ) {
     return declaredEvent
   }
 
@@ -84,11 +94,14 @@ export async function registerOnDeclare({
       annotation,
       eventId,
       transactionId,
-      keepAssignment: true
+      keepAssignmentIfAccepted: true
     }
   )
 
-  if (hasPotentialDuplicates(validatedEvent, eventConfiguration)) {
+  if (
+    hasPotentialDuplicates(validatedEvent, eventConfiguration) ||
+    wasRejected(validatedEvent, ActionType.VALIDATE)
+  ) {
     return validatedEvent
   }
 
@@ -122,10 +135,13 @@ export async function validateOnDeclare({
     annotation,
     eventId,
     transactionId,
-    keepAssignment: true
+    keepAssignmentIfAccepted: true
   })
 
-  if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
+  if (
+    hasPotentialDuplicates(declaredEvent, eventConfiguration) ||
+    wasRejected(declaredEvent, ActionType.DECLARE)
+  ) {
     return declaredEvent
   }
 
@@ -155,17 +171,21 @@ export async function registerOnValidate({
   declaration,
   annotation
 }: CustomMutationParams) {
-  const maybeDuplicateEvent =
-    await trpcClient.event.actions.validate.request.mutate({
+  const validatedEvent = await trpcClient.event.actions.validate.request.mutate(
+    {
       declaration,
       annotation,
       eventId,
       transactionId,
-      keepAssignment: true
-    })
+      keepAssignmentIfAccepted: true
+    }
+  )
 
-  if (hasPotentialDuplicates(maybeDuplicateEvent, eventConfiguration)) {
-    return maybeDuplicateEvent
+  if (
+    hasPotentialDuplicates(validatedEvent, eventConfiguration) ||
+    wasRejected(validatedEvent, ActionType.VALIDATE)
+  ) {
+    return validatedEvent
   }
 
   const latestResponse = await trpcClient.event.actions.register.request.mutate(
@@ -252,8 +272,12 @@ export async function makeCorrectionOnRequest({
       declaration,
       transactionId,
       annotation,
-      keepAssignment: true
+      keepAssignmentIfAccepted: true
     })
+
+  if (wasRejected(response, ActionType.REQUEST_CORRECTION)) {
+    return response
+  }
 
   const requestId = response.actions.find(
     (a) =>

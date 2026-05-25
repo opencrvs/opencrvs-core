@@ -17,8 +17,12 @@ on:
   push:
     branches:
       - '*'
-    tags:
-      - '*'
+  release:
+    types: [published]
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   publish:
@@ -32,11 +36,16 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           registry-url: 'https://registry.npmjs.org/'
+          package-manager-cache: false
+
+      - name: Update npm for OIDC trusted publishing
+        run: npm install -g npm@latest
 
       - name: Check if version exists on npm
         id: check-version
         run: |
           PACKAGE_VERSION=$(node -p "require('../../package.json').version")
+          MAJOR_MINOR=$(echo "$PACKAGE_VERSION" | cut -d. -f1,2)
           if [ "$GITHUB_REF_TYPE" = "tag" ]; then
             TAG_NAME="$GITHUB_REF_NAME"
             if [[ "$TAG_NAME" =~ ([0-9]+)\.([0-9]+)\.([0-9]+)([-+][A-Za-z0-9.-]+)?$ ]]; then
@@ -46,8 +55,10 @@ jobs:
               echo "❌ Tag '$TAG_NAME' is not a valid semantic version (expected something like 1.2.3 or v1.2.3)"
               exit 1
             fi
+            echo "npm-tag=v$MAJOR_MINOR-latest" >> $GITHUB_OUTPUT
           else
             TOOLKIT_VERSION="$PACKAGE_VERSION-rc.$(git rev-parse --short=7 HEAD)"
+            echo "npm-tag=v$MAJOR_MINOR-next" >> $GITHUB_OUTPUT
           fi
           if npm view @opencrvs/toolkit@$TOOLKIT_VERSION > /dev/null 2>&1; then
           echo "Version $TOOLKIT_VERSION already exists on npm."
@@ -69,11 +80,6 @@ jobs:
         run: yarn build:all
         working-directory: packages/toolkit
 
-      - name: Authenticate to npm
-        if: steps.check-version.outputs.version-exists == 'false'
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-        working-directory: packages/toolkit
-
       - name: Update package.json version
         if: steps.check-version.outputs.version-exists == 'false'
         run: |
@@ -83,7 +89,5 @@ jobs:
 
       - name: Publish to npm
         if: steps.check-version.outputs.version-exists == 'false'
-        run: npm publish --access public
+        run: npm publish --provenance --access public --tag ${{ steps.check-version.outputs.npm-tag }}
         working-directory: packages/toolkit
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

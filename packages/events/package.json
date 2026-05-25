@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/events",
-  "version": "1.9.12",
+  "version": "1.9.14",
   "description": "OpenCRVS Events service",
   "license": "MPL-2.0",
   "private": true,
@@ -23,12 +23,13 @@
     "@trpc/server": "11.4.3",
     "@types/luxon": "^3.6.2",
     "@types/pg": "^8.15.4",
+    "@types/pg-cursor": "^2.7.2",
     "app-module-path": "^2.2.0",
     "envalid": "^8.0.0",
     "json-stream-stringify": "^3.1.6",
     "jsonwebtoken": "^9.0.0",
     "kysely": "^0.28.2",
-    "lodash": "^4.17.21",
+    "lodash": "^4.18.1",
     "luxon": "^3.6.1",
     "msw": "^2.7.3",
     "node-fetch": "^2.6.7",
@@ -39,7 +40,6 @@
     "trpc-to-openapi": "^2.1.5",
     "tsconfig-paths": "^3.13.0",
     "zod": "^3.23.8",
-    "@types/pg-cursor": "^2.7.2",
     "zod-openapi": "^4.2.4"
   },
   "devDependencies": {

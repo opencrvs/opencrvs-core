@@ -266,9 +266,9 @@ export const FormFieldParentChildReset: Story = {
             async (payload) => {
               await expect(payload.declaration).toEqual({
                 'recommender.relation': 'FRIEND',
+                'recommender.dob': null,
                 'recommender.name': {
                   firstname: 'John',
-                  middlename: '',
                   surname: 'Doe'
                 },
                 'recommender.dobUnknown': true,
@@ -341,9 +341,9 @@ export const FormFieldParentChildReset: Story = {
       await userEvent.type(canvas.getByTestId('text__recommender____age'), '36')
     })
 
-    await step('Go back to review', async () => {
+    await step('Go to review', async () => {
       await userEvent.click(
-        canvas.getByRole('button', { name: 'Back to review' })
+        canvas.getByRole('button', { name: 'Go to review' })
       )
 
       await expect(
