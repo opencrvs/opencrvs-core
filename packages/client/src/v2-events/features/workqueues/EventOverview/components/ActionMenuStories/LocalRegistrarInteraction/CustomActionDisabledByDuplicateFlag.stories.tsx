@@ -208,9 +208,9 @@ export const ApproveActionStateTransitions: StoryObj = {
           await canvas.findByRole('button', { name: 'Action' })
         )
         const confirmItem = await canvas.findByText('Confirm')
-        await waitFor(() =>
-          expect(confirmItem.closest('li')).toHaveAttribute('disabled')
-        )
+        await waitFor(async () => {
+          await expect(confirmItem.closest('li')).toHaveAttribute('disabled')
+        })
         await userEvent.keyboard('{Escape}')
       }
     )
@@ -235,9 +235,9 @@ export const ApproveActionStateTransitions: StoryObj = {
         await canvas.findByText('Unassign')
 
         const confirmItem = canvas.getByText('Confirm')
-        await waitFor(() =>
-          expect(confirmItem.closest('li')).toHaveAttribute('disabled')
-        )
+        await waitFor(async () => {
+          await expect(confirmItem.closest('li')).toHaveAttribute('disabled')
+        })
         await userEvent.keyboard('{Escape}')
       }
     )
@@ -272,10 +272,12 @@ export const ApproveActionStateTransitions: StoryObj = {
         await userEvent.click(
           await canvas.findByRole('button', { name: 'Action' })
         )
-        await waitFor(() => {
+        await waitFor(async () => {
           const confirmItem = canvas.queryByText('Confirm')
-          expect(confirmItem).toBeInTheDocument()
-          expect(confirmItem?.closest('li')).not.toHaveAttribute('disabled')
+          await expect(confirmItem).toBeInTheDocument()
+          await expect(confirmItem?.closest('li')).not.toHaveAttribute(
+            'disabled'
+          )
         })
       }
     )

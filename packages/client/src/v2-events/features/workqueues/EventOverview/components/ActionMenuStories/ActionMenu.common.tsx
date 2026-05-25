@@ -286,12 +286,10 @@ type ActionLabel =
 export const getHiddenActions = () =>
   Object.values(ActionTypes.enum).reduce(
     (acc, action) => {
-      const label = actionLabels[action as keyof typeof actionLabels]
-
-      if (!label) {
+      if (!(action in actionLabels)) {
         return acc
       }
-
+      const label = actionLabels[action as keyof typeof actionLabels]
       acc[label.defaultMessage] = AssertType.HIDDEN
       return acc
     },
