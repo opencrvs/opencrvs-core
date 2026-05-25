@@ -178,12 +178,18 @@ export const AdvancedSearchField = z
 
 export type AdvancedSearchField = z.infer<typeof AdvancedSearchField>
 
-export const AdvancedSearchConfig = z.object({
-  title: TranslationConfig.describe('Advanced search tab title'),
-  fields: z
-    .array(AdvancedSearchField)
-    .describe('Advanced search fields within the tab.')
-})
+export const AdvancedSearchConfig = z
+  .object({
+    title: TranslationConfig.describe('Advanced search tab title'),
+    fields: z
+      .array(AdvancedSearchField)
+      .describe('Advanced search fields within the tab.')
+  })
+  .meta({
+    id: 'AdvancedSearchConfig',
+    description:
+      'Configuration of one advanced search tab. Each tab has a title and a list of searchable fields — either declaration fields (via `field()`) or event metadata (via `event()`).'
+  })
 
 export type AdvancedSearchConfig = z.infer<typeof AdvancedSearchConfig>
 export type AdvancedSearchConfigWithFieldsResolved = Omit<

@@ -36,8 +36,7 @@ import {
   canAccessUserWithScopes,
   canCreateUserWithScopes,
   canSearchUsers,
-  canUpdateUserLocation,
-  canUpdateUserRole,
+  canUpdateUser,
   userCanReadOtherUser
 } from '@events/router/middleware'
 import {
@@ -309,9 +308,7 @@ export const userRouter = router({
     .mutation(async ({ input, ctx }) => handleCreateUser(input, ctx)),
   update: userAndSystemProcedure
     .input(UpdateUserInput)
-    .use(canUpdateUserLocation)
-    .use(canUpdateUserRole)
-    .use(canAccessUserWithScopes(['user.edit']))
+    .use(canUpdateUser)
     .output(User)
     .mutation(async ({ input, ctx }) => {
       if (input.mobile) {

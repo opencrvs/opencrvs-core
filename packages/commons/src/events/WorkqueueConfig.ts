@@ -73,8 +73,9 @@ export const WorkqueueConfigWithoutQuery = WorkqueueConfig.omit({
 export const WorkqueueConfigInput = WorkqueueConfig.extend({
   query: CountryConfigQueryInputType
 }).meta({
-  description: 'Workqueue configuration',
-  id: 'WorkqueueConfig'
+  id: 'WorkqueueConfig',
+  description:
+    'Configuration for a single workqueue. Defines the filter applied to the event index, the quick-action button, the columns shown on each row, and the message rendered when the queue is empty.'
 })
 
 export type WorkqueueConfig = z.infer<typeof WorkqueueConfig>

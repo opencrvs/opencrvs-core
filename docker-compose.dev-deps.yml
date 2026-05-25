@@ -10,9 +10,9 @@ services:
   # For dependencies, expose ports locally for dev
   mongo1:
     ports:
-      - '27017:27017'
+      - "27017:27017"
     volumes:
-      - './data/mongo:/data/db'
+      - "./data/mongo:/data/db"
 
   postgres:
     image: docker.io/chumaky/postgres_mongo_fdw:17.6_fdw5.5.2
@@ -23,28 +23,29 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
       - ./packages/migration/src/migrations/postgres/0001_init.sql:/docker-entrypoint-initdb.d/0001_init.sql
 
   redis:
     ports:
-      - '6379:6379'
+      - "6379:6379"
 
   elasticsearch:
     ports:
-      - '9200:9200'
-      - '9300:9300'
+      - "9200:9200"
+      - "9300:9300"
     volumes:
-      - './data/elasticsearch:/usr/share/elasticsearch/data'
-      - './data/backups/elasticsearch:/data/backups/elasticsearch'
+      - "./data/elasticsearch:/usr/share/elasticsearch/data"
+      - "./data/backups/elasticsearch:/data/backups/elasticsearch"
     environment:
-      - 'discovery.type=single-node'
-      - 'cluster.routing.allocation.disk.watermark.enable_for_single_data_node=true'
-      - 'cluster.routing.allocation.disk.threshold_enabled=false'
+      - "discovery.type=single-node"
+      - "cluster.routing.allocation.disk.watermark.enable_for_single_data_node=\
+        true"
+      - "cluster.routing.allocation.disk.threshold_enabled=false"
       - path.repo=/data/backups/elasticsearch
-      - 'ES_JAVA_OPTS=-Xms1024m -Xmx1024m'
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
       - xpack.security.enabled=false # elasticsearch >8.x defaults to true
       # - http.port=9200
       # - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358
@@ -52,27 +53,18 @@ services:
       # - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
       # - http.cors.allow-credentials=true
 
-  # elasticsearch browser.  Uncomment during development, along with the environment variables for elastic above, to browse Elastic via a GUI at http://localhost:1358/
-  #dejavu:
-  #  image: appbaseio/dejavu:3.2.3
-  #  container_name: dejavu
-  #  ports:
-  #    - '1358:1358'
-  #  links:
-  #    - elasticsearch
+      # elasticsearch browser.  Uncomment during development, along with the environment variables for elastic above, to browse Elastic via a GUI at http://localhost:1358/
+      #dejavu:
+      #  image: appbaseio/dejavu:3.2.3
+      #  container_name: dejavu
+      #  ports:
+      #    - '1358:1358'
+      #  links:
+      #    - elasticsearch
   minio:
     ports:
-      - '3535:3535'
-      - '3536:3536'
+      - "3535:3535"
+      - "3536:3536"
     volumes:
-      - './data/minio:/data'
+      - "./data/minio:/data"
     command: server --address ":3535" --console-address ":3536" /data
-
-  influxdb:
-    ports:
-      - '8086:8086'
-    volumes:
-      - './data/influxdb:/var/lib/influxdb'
-      - './data/backups/influxdb:/data/backups/influxdb'
-      - './infrastructure/influxdb.conf:/etc/influxdb/influxdb.conf'
-      # Expose dev secrets as a plain volume - these will use docker secrets in staging and prod

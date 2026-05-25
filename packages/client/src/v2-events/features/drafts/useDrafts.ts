@@ -60,10 +60,12 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
       .map(async (draft) =>
         queryClient.prefetchQuery({
           queryKey: trpcOptionsProxy.event.get.queryKey({
-            eventId: draft.eventId
+            eventId: draft.eventId,
+            waitFor: false
           }),
           queryFn: trpcOptionsProxy.event.get.queryOptions({
-            eventId: draft.eventId
+            eventId: draft.eventId,
+            waitFor: false
           }).queryFn
         })
       )

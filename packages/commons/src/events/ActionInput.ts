@@ -29,7 +29,12 @@ export const BaseActionInput = z.object({
   keepAssignment: z.boolean().optional(),
   keepAssignmentIfAccepted: z.boolean().optional(),
   keepAssignmentIfRejected: z.boolean().optional(),
-  waitFor: z.boolean().optional(),
+  waitFor: z
+    .boolean()
+    .default(true)
+    .describe(
+      'Whether action waits for the indexing before returning. Defaults to true. Setting this to to false completes faster but might lead to stale data in the client if the client tries to read the event immediately after performing the action. Use with care.'
+    ),
   // For normal users, the createdAtLocation is resolved on the backend from the user's primaryOfficeId.
   // @TODO: createdAtLocation should be limited to actions that system users can perform. For normal users, it should not be part of the base action.
   createdAtLocation: UUID.nullish().describe(

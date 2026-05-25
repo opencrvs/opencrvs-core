@@ -12,11 +12,7 @@
 import type { Meta, StoryFn, StoryObj } from '@storybook/react'
 import React from 'react'
 import styled from 'styled-components'
-import {
-  field,
-  FieldType,
-  ConditionalType
-} from '@opencrvs/commons/client'
+import { field, FieldType, ConditionalType } from '@opencrvs/commons/client'
 import {
   FormFieldGenerator,
   FormFieldGeneratorPropsWithoutRef
@@ -68,9 +64,9 @@ export const ICD: Story = {
             },
             required: true,
             placeholder: {
-              id: 'storybook.duration.placeholder',
-              defaultMessage: 'Time Unit',
-              description: 'This is the placeholder for the duration input'
+              id: 'storybook.autocomplete.placeholder',
+              defaultMessage: 'Search for condition...',
+              description: 'This is the placeholder for the autocomplete input'
             },
             configuration: {
               url: '/api/causes-of-death?terms=',
