@@ -392,8 +392,8 @@ export async function indexEventsInBulk(
         error: item.index?.error
       }))
     logger.error(
-      `Bulk indexing had ${failures.length} failure(s) out of ${batch.length} documents`,
-      { failures }
+      `Bulk indexing had ${failures.length} failure(s) out of ${batch.length} documents.` +
+        ` Failures: ${JSON.stringify(failures, null, 2)}`
     )
   }
 
