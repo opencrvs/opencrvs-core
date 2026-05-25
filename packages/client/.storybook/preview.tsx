@@ -99,35 +99,37 @@ function Wrapper({ store, router, initialPath, children }: WrapperProps) {
       <Provider store={store}>
         <I18nContainer>
           <TRPCProvider>
-            <AdministrativeAreasProvider>
-              <RouterProvider
-                router={createMemoryRouter(
-                  [
+            <React.Suspense fallback={null}>
+              <AdministrativeAreasProvider>
+                <RouterProvider
+                  router={createMemoryRouter(
+                    [
+                      {
+                        path: '/',
+                        element: (
+                          <Page>
+                            <NavigationHistoryProvider>
+                              <WaitForUserDetails>
+                                <Outlet />
+                              </WaitForUserDetails>
+                            </NavigationHistoryProvider>
+                          </Page>
+                        ),
+                        children: [
+                          router || {
+                            path: initialPath,
+                            element: children
+                          }
+                        ]
+                      }
+                    ],
                     {
-                      path: '/',
-                      element: (
-                        <Page>
-                          <NavigationHistoryProvider>
-                            <WaitForUserDetails>
-                              <Outlet />
-                            </WaitForUserDetails>
-                          </NavigationHistoryProvider>
-                        </Page>
-                      ),
-                      children: [
-                        router || {
-                          path: initialPath,
-                          element: children
-                        }
-                      ]
+                      initialEntries: [initialPath]
                     }
-                  ],
-                  {
-                    initialEntries: [initialPath]
-                  }
-                )}
-              ></RouterProvider>
-            </AdministrativeAreasProvider>
+                  )}
+                ></RouterProvider>
+              </AdministrativeAreasProvider>
+            </React.Suspense>
           </TRPCProvider>
         </I18nContainer>
       </Provider>
