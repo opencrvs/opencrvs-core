@@ -85,7 +85,7 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Elasticsearch port.</td>
         </tr>
         <tr>
-            <td>elasticsearch.reindex.enabled</td>
+            <td>elasticsearch.reindex_enabled</td>
             <td>true</td>
             <td>Enable elasticsearch reindex post-deploy hook</td>
         </tr>
