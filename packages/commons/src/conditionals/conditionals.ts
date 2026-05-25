@@ -151,6 +151,15 @@ export function never(): JSONSchema {
   return not(alwaysTrue())
 }
 
+/**
+ * Returns an JSON Schema object, which is treated as always valid.
+ *
+ * @returns {JSONSchema} An schema object that always evaluates to true.
+ */
+export function always(): JSONSchema {
+  return defineConditional(alwaysTrue())
+}
+
 function jsonFieldPath(field: FieldReference) {
   return [field.$$field, ...field.$$subfield].join('/')
 }
