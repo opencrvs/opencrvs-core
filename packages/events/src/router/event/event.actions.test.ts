@@ -805,7 +805,10 @@ describe('Conditionals based on user role', () => {
 
     const registrationAgent = await seed.user({
       primaryOfficeId: locations[0].id,
-      name: { firstname: 'Jane', surname: TestUserRole.enum.REGISTRATION_AGENT },
+      name: {
+        firstname: 'Jane',
+        surname: TestUserRole.enum.REGISTRATION_AGENT
+      },
       role: TestUserRole.enum.FIELD_AGENT
     })
 

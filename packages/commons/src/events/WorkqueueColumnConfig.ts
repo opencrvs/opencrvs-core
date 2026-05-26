@@ -29,10 +29,16 @@ export type WorkqueueColumnValue = z.infer<typeof WorkqueueColumnValue>
 /**
  * Configuration for column header and value of cell of workqueue.
  */
-export const WorkqueueColumn = z.object({
-  label: TranslationConfig,
-  value: WorkqueueColumnValue
-})
+export const WorkqueueColumn = z
+  .object({
+    label: TranslationConfig,
+    value: WorkqueueColumnValue
+  })
+  .meta({
+    id: 'WorkqueueColumn',
+    description:
+      'Configuration for a single workqueue column. The value references an event metadata key (e.g. `dateOfEvent`, `status`, `trackingId`).'
+  })
 export type WorkqueueColumn = z.infer<typeof WorkqueueColumn>
 export type WorkqueueColumnInput = z.infer<typeof WorkqueueColumn>
 

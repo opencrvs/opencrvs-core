@@ -183,11 +183,17 @@ export const Clause: z.ZodType<ClauseOutput, ClauseInput> = z
 
 export type Clause = z.infer<typeof Clause>
 
-export const DeduplicationConfig = z.object({
-  id: z.string(),
-  label: TranslationConfig,
-  query: Clause
-})
+export const DeduplicationConfig = z
+  .object({
+    id: z.string(),
+    label: TranslationConfig,
+    query: Clause
+  })
+  .meta({
+    id: 'DeduplicationConfig',
+    description:
+      'Configuration for duplicate detection on a declare or register action. The query is built from fuzzy / strict / date-range matchers combined with and/or/not.'
+  })
 
 export type DeduplicationConfigInput = z.input<typeof DeduplicationConfig>
 export type DeduplicationConfig = z.infer<typeof DeduplicationConfig>

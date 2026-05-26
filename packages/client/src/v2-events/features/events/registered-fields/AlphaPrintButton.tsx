@@ -63,7 +63,8 @@ export const AlphaPrintButton = {
     const intl = useIntl()
     const location = useLocation()
     const parts = location.pathname.split('/')
-    const eventId = UUID.parse(parts[3])
+    // Do not use UUID.parse(), as the value here could be a temporary ID, i.e. tmp-<uuid>
+    const eventId = parts[3] as UUID
     const { getEvent } = useEvents()
     const { certificateTemplates, language } = useAppConfig()
     const { getUsers } = useUsers()
@@ -72,7 +73,6 @@ export const AlphaPrintButton = {
     const event = getEvent.getFromCache(eventId)
     const actions = getAcceptedActions(event)
     const users = getUsers.getAllCached()
-
     const locations = getLocations.useSuspenseQuery()
     const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 

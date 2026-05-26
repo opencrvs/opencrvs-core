@@ -34,7 +34,7 @@ export const Draft = z
     'A temporary storage for an action. Stored with details of the event, creator and creation time.'
   )
 
-export const DraftInput = BaseActionInput.extend({
+export const DraftInput = BaseActionInput.omit({ waitFor: true }).extend({
   type: ActionTypes.exclude([ActionTypes.enum.DELETE]),
   status: z.enum([
     ActionStatus.Requested,
