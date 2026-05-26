@@ -47,17 +47,15 @@ export function findPendingCorrectionAction(
   let correctionRequestAction: RequestedCorrectionAction | undefined
   for (let i = writeActions.length - 1; i >= 0; i--) {
     const action = writeActions[i]
-    if (action.status === ActionStatus.Accepted) {
-      if (
-        action.type === ActionType.APPROVE_CORRECTION ||
-        action.type === ActionType.REJECT_CORRECTION
-      ) {
-        break
-      }
-      if (action.type === ActionType.REQUEST_CORRECTION) {
-        correctionRequestAction = action as RequestedCorrectionAction
-        break
-      }
+    if (
+      action.type === ActionType.APPROVE_CORRECTION ||
+      action.type === ActionType.REJECT_CORRECTION
+    ) {
+      break
+    }
+    if (action.type === ActionType.REQUEST_CORRECTION) {
+      correctionRequestAction = action as RequestedCorrectionAction
+      break
     }
   }
 
@@ -80,18 +78,15 @@ function isRejected(actions: Action[]): boolean {
     ActionType.REGISTER
   ]
 
-  return actions
-    .filter(({ status }) => status === ActionStatus.Accepted)
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
-    .reduce<boolean>((prev, { type }) => {
-      if (type === ActionType.REJECT) {
-        return true
-      }
-      if (resettingActionTypes.includes(type)) {
-        return false
-      }
-      return prev
-    }, false)
+  return actions.reduce<boolean>((prev, { type }) => {
+    if (type === ActionType.REJECT) {
+      return true
+    }
+    if (resettingActionTypes.includes(type)) {
+      return false
+    }
+    return prev
+  }, false)
 }
 
 function isPotentialDuplicate(actions: Action[]): boolean {
@@ -234,19 +229,23 @@ export function getEventFlags(
       return flag satisfies Flag
     })
 
-  if (isCorrectionRequested(sortedActions)) {
+  const acceptedActions = sortedActions.filter(
+    ({ status }) => status === ActionStatus.Accepted
+  )
+
+  if (isCorrectionRequested(acceptedActions)) {
     flags.push(InherentFlags.CORRECTION_REQUESTED)
   }
-  if (isDeclarationIncomplete(sortedActions)) {
+  if (isDeclarationIncomplete(acceptedActions)) {
     flags.push(InherentFlags.INCOMPLETE)
   }
-  if (isRejected(sortedActions)) {
+  if (isRejected(acceptedActions)) {
     flags.push(InherentFlags.REJECTED)
   }
-  if (isPotentialDuplicate(sortedActions)) {
+  if (isPotentialDuplicate(acceptedActions)) {
     flags.push(InherentFlags.POTENTIAL_DUPLICATE)
   }
-  if (isEditInProgress(sortedActions)) {
+  if (isEditInProgress(acceptedActions)) {
     flags.push(InherentFlags.EDIT_IN_PROGRESS)
   }
 
