@@ -59,8 +59,33 @@ export const credentialIssuedHandler = async (
     const { token, registrationNumber } =
       getTransactionAndDiscard(transactionId);
     const { eventId, actionId } = decode(token) as TokenPayload;
-    const { actionType, eventType, requestId } =
-      await opencrvs.getEventActionType(eventId, { token });
+    const actionInfo = await opencrvs.findEventActionType(eventId, { token });
+
+    if (!actionInfo) {
+      request.log.info(
+        {
+          event: "websub.credential-issued.no-pending-action",
+          eventId,
+        },
+        "No pending action for event, skipping credential processing",
+      );
+      return reply
+        .send({
+          publisher: request.body.publisher,
+          topic: request.body.topic,
+          publishedOn: new Date().toISOString(),
+          event: {
+            id: request.body.event.id,
+            requestId: request.body.event.transactionId,
+            timestamp: new Date().toISOString(),
+            status: "RECEIVED",
+            url: "",
+          },
+        })
+        .status(200);
+    }
+
+    const { actionType, eventType, requestId } = actionInfo;
 
     if (actionType === ActionType.REGISTER && eventType === "birth") {
       await opencrvs.confirmRegistration(

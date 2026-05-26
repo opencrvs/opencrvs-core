@@ -89,7 +89,7 @@ export const confirmRegistration = (
     });
 };
 
-export const getEventActionType = async (
+export const findEventActionType = async (
   eventId: string,
   { token }: { token: string },
 ) => {
@@ -97,7 +97,13 @@ export const getEventActionType = async (
   const client = createClient(url, `Bearer ${token}`);
 
   const event = (await client.event.get.query({ eventId })) as EventDocument;
-  const action = getPendingAction(event.actions);
+
+  let action: ReturnType<typeof getPendingAction>;
+  try {
+    action = getPendingAction(event.actions);
+  } catch {
+    return null;
+  }
 
   return {
     actionType: action.type,
