@@ -2,10 +2,14 @@
 
 ## 2.0.0
 
+- Support biographic updates to MOSIP via `updateBiographics`.
+
 - Enabled `child.nid` creation support during birth correction flows.
   - To support this, the integration needs to fetch the record to know which action to confirm. Note that this adds a new record audit log row for `ActionType.VIEW`.
 
 - Handles synchronous action acceptance flows gracefully. Previously, the flow used async/202 country config action confirmation flows, but now all flows are supported.
+
+- Allow configuring which key in the verifiable credential (e.g., UIN, VID, NID) is used to populate `child.nid` in OpenCRVS.
 
 ## 1.9.0
 
