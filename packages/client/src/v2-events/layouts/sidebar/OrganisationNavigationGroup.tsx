@@ -72,7 +72,8 @@ export function OrganisationNavigationGroup({
                   locationId: '' // NOTE: Empty string is required
                 })
               )
-              menuCollapse && menuCollapse() // Collapse menu on mobile after navigation}
+              // Collapse menu on mobile after navigation}
+              menuCollapse?.()
             }}
           />
           {hasAccess(WORKQUEUE_TABS.team) && (
@@ -92,7 +93,7 @@ export function OrganisationNavigationGroup({
                     })
                   })
                 }
-                menuCollapse && menuCollapse() // Collapse menu on mobile after navigation}
+                menuCollapse?.()
               }}
             />
           )}
@@ -125,7 +126,10 @@ export function OrganisationNavigationGroup({
                     label={intl.formatMessage(
                       navigationMessages[WORKQUEUE_TABS.systems]
                     )}
-                    onClick={() => navigate(routes.SYSTEM_LIST)}
+                    onClick={() => {
+                      navigate(routes.SYSTEM_LIST)
+                      menuCollapse?.()
+                    }}
                   />
                 )}
             </>
@@ -167,7 +171,10 @@ export function OrganisationNavigationGroup({
                   label={intl.formatMessage(
                     navigationMessages[WORKQUEUE_TABS.emailAllUsers]
                   )}
-                  onClick={() => navigate(routes.ALL_USER_EMAIL)}
+                  onClick={() => {
+                    navigate(routes.ALL_USER_EMAIL)
+                    menuCollapse?.()
+                  }}
                 />
               )}
             </>
