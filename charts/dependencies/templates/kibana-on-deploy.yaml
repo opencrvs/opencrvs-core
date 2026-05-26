@@ -1,0 +1,47 @@
+{{- if .Values.monitoring.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: kibana-on-deploy
+  name: kibana-on-deploy
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "1"
+spec:
+  template:
+    metadata:
+      labels:
+        app: kibana-on-deploy
+    spec:
+      containers:
+        - name: kibana-on-deploy
+          command: ["/scripts/setup.sh"]
+          image: "bash"
+          env:
+            - name: KIBANA_URL
+              value: http://kibana.{{ .Release.Namespace }}.svc.cluster.local:5601
+            - name: ELASTICSEARCH_HOST
+              {{- $elastic_host := default (printf "elasticsearch-0.elasticsearch.%s.svc.cluster.local" $.Release.Namespace) $.Values.elasticsearch.host }}
+              value: http://{{ $elastic_host }}:9200
+            - name: ELASTICSEARCH_SUPERUSER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.elasticsearch.admin_user_secret_name }}
+                  key: ELASTIC_PASSWORD
+          volumeMounts:
+            - mountPath: /scripts
+              name: kibana-on-deploy-script
+            - mountPath: /config
+              name: kibana-configmap
+      volumes:
+        - name: kibana-on-deploy-script
+          configMap:
+            name: kibana-on-deploy-script
+            defaultMode: 0755
+        - name: kibana-configmap
+          configMap:
+            name: {{ .Values.kibana.custom_config_configmap | default "kibana-on-deploy-config" }}
+            defaultMode: 0755
+      restartPolicy: "OnFailure"
+{{- end }}

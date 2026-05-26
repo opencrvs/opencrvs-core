@@ -1,0 +1,25 @@
+{{- if .Values.postgres.enabled }}
+apiVersion: v1
+data:
+{{- range $path, $file := .Files.Glob "files/postgres/*" }}
+    {{ base $path }}: |
+{{ toString $file | indent 8 }}
+{{- end }}
+kind: ConfigMap
+metadata:
+  labels:
+    app: postgres
+  name: postgres-scripts
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-pgbackrest-config
+data:
+  pgbackrest.conf: |
+    [global]
+    log-level-console=info
+    [{{ .Values.postgres.backup.stanza }}]
+    pg1-path=/var/lib/postgresql/data
+{{- end }}

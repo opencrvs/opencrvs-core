@@ -1,0 +1,118 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: gateway-route
+spec:
+  entryPoints:
+  {{- if or .Values.ingress.ssl_enabled .Values.ingress.tls_resolver }}
+    - websecure
+  {{- end }}
+  {{- if or .Values.ingress.tls_resolver (not .Values.ingress.ssl_enabled) }}
+    - web
+  {{- end }}
+  routes:
+  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "gateway" "Values" .Values) }}`)'
+    kind: Rule
+    services:
+    - name: gateway
+      namespace: {{ .Release.Namespace }}
+      port: {{ .Values.gateway.port }}
+    middlewares:
+      - name: sts-and-basic-response-headers
+      - name: enable-compression
+  {{- if .Values.ingress.tls_resolver }}
+  tls:
+    certResolver: {{ .Values.ingress.tls_resolver }}
+  {{- else if .Values.ingress.tls_secret_name }}
+  tls:
+    secretName: {{ .Values.ingress.tls_secret_name }}
+  {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: gateway
+    service_name: opencrvs_gateway
+  name: gateway
+spec:
+  replicas: {{ .Values.gateway.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      annotations:
+        lastdeploy-timestamp: {{ now | quote }}
+      labels:
+        app: gateway
+        service.name: opencrvs_gateway
+    spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.gateway) | nindent 6 }}
+      containers:
+        - name: gateway
+          image: {{ include "opencrvs.image" (dict "root" . "service" .Values.gateway) }}
+          env:
+            - name: APN_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: CERT_PUBLIC_KEY_PATH
+              value: /secrets/public-key.pem
+            - name: DOMAIN
+              value: "*"
+            - name: HOST
+              value: "0.0.0.0"
+            - name: REDIS_HOST
+              value: {{ .Values.redis.host | quote }}
+          {{- if eq .Values.redis.auth_mode "use_secret" }}
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: GATEWAY_REDIS_PASSWORD
+                  name: {{ .Values.redis.users_secret }}
+            - name: REDIS_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: GATEWAY_REDIS_USERNAME
+                  name: {{ .Values.redis.users_secret }}
+          {{- end }}
+            - name: CLIENT_APP_URL
+              value: {{ include "render-external-url" (dict "service_name" "register" "Values" .Values) }}
+            - name: LOGIN_URL
+              value: {{ include "render-external-url" (dict "service_name" "login" "Values" .Values) }}
+            - name: AUTH_URL
+              value: http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040
+            - name: DOCUMENTS_URL
+              value: "http://documents.{{ .Release.Namespace }}.svc.cluster.local:9050"
+            - name: USER_MANAGEMENT_URL
+              value: "http://user-mgnt.{{ .Release.Namespace }}.svc.cluster.local:3030/"
+            - name: EVENTS_URL
+              value: "http://events.{{ .Release.Namespace }}.svc.cluster.local:5555/"
+            - name: COUNTRY_CONFIG_URL
+              value: http://countryconfig.{{ .Release.Namespace }}.svc.cluster.local:3040
+          {{- include "render-env-vars" (dict "service_name" "gateway" "Values" .Values) }}
+          {{- include "resources-helper" (dict "service_name" "gateway" "Values" .Values) | indent 10 }}
+          {{- include "probes-helper" (dict "service_name" "gateway" "Values" .Values) | indent 10 }}
+          ports:
+            - containerPort: {{ .Values.gateway.port }}
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /secrets/public-key.pem
+              name: public-key
+              subPath: public-key.pem
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            items:
+              - key: public-key.pem
+                path: public-key.pem
+            name: {{ .Release.Name }}-cert-tls
+          name: public-key
+
+{{- include "service-helper" (dict "service_name" "gateway" "Values" .Values) }}
+
+{{- include "hpa-helper" (dict "service_name" "gateway" "Values" .Values) }}
+
+{{- include "pdb-helper" (dict "service_name" "gateway" "Values" .Values) }}

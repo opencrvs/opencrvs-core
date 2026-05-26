@@ -1,0 +1,41 @@
+{
+  "policy": {
+    "_meta": {
+      "managed": true,
+      "description": "built-in ILM policy using the hot and warm phases with a retention of 30 days"
+    },
+    "phases": {
+      "hot": {
+        "actions": {
+          "rollover": {
+            "max_age": "1d",
+            "max_size": "2gb"
+          },
+          "set_priority": {
+            "priority": 100
+          }
+        }
+      },
+      "warm": {
+        "min_age": "2d",
+        "actions": {
+          "allocate": {
+            "number_of_replicas": 0
+          },
+          "forcemerge": {
+            "max_num_segments": 1
+          },
+          "set_priority": {
+            "priority": 50
+          }
+        }
+      },
+      "delete": {
+        "min_age": "30d",
+        "actions": {
+          "delete": {}
+        }
+      }
+    }
+  }
+}

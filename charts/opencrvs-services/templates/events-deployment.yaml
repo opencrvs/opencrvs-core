@@ -1,0 +1,134 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: events-route
+spec:
+  entryPoints:
+  {{- if or .Values.ingress.ssl_enabled .Values.ingress.tls_resolver }}
+    - websecure
+  {{- end }}
+  {{- if or .Values.ingress.tls_resolver (not .Values.ingress.ssl_enabled) }}
+    - web
+  {{- end }}
+  routes:
+  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "events" "Values" .Values) }}`)'
+    kind: Rule
+    services:
+    - name: events
+      namespace: {{ .Release.Namespace }}
+      port: {{ .Values.events.port }}
+    middlewares:
+      - name: sts-and-basic-response-headers
+  {{- if .Values.ingress.tls_resolver }}
+  tls:
+    certResolver: {{ .Values.ingress.tls_resolver }}
+  {{- else if .Values.ingress.tls_secret_name }}
+  tls:
+    secretName: {{ .Values.ingress.tls_secret_name }}
+  {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: events
+    service_name: opencrvs_events
+  name: events
+spec:
+  replicas: {{ .Values.events.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: events
+  template:
+    metadata:
+      annotations:
+        lastdeploy-timestamp: {{ now | quote }}
+      labels:
+        app: events
+        service_name: opencrvs_events
+    spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.events) | nindent 6 }}
+      containers:
+        - name: events
+          image: {{ include "opencrvs.image" (dict "root" . "service" .Values.events) }}
+          env:
+            - name: APN_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: AUTH_URL
+              value: "http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040"
+            - name: CERT_PUBLIC_KEY_PATH
+              value: /secrets/public-key.pem
+            - name: COUNTRY_CONFIG_URL
+              value: "http://countryconfig.{{ .Release.Namespace }}.svc.cluster.local:3040"
+            - name: DOCUMENTS_URL
+              value: "http://documents.{{ .Release.Namespace }}.svc.cluster.local:9050"
+          {{- if eq .Values.elasticsearch.auth_mode "disabled" }}
+            - name: ES_URL
+              value: "http://{{ .Values.elasticsearch.host }}:{{ .Values.elasticsearch.port }}"
+          {{- else if or (eq .Values.elasticsearch.auth_mode "auto") (eq .Values.elasticsearch.auth_mode "use_secret") }}
+            - name: ES_URL
+              valueFrom:
+                secretKeyRef:
+                  key: SEARCH_ELASTIC_URL
+                  name: {{ .Values.elasticsearch.urls_secret }}
+          {{- end }}
+            - name: USER_MANAGEMENT_URL
+              value: "http://user-mgnt.{{ .Release.Namespace }}.svc.cluster.local:3030/"
+          {{- if not (eq .Values.postgres.auth_mode "managed") }}
+            - name: EVENTS_POSTGRES_URL
+              valueFrom:
+                secretKeyRef:
+                  key: events_app_db_url
+                  name: {{ .Values.postgres.urls_secret }}
+          {{- end }}
+          {{- if eq .Values.mongodb.auth_mode "disabled" }}
+            - name: USER_MGNT_MONGO_URL
+              value: mongodb://{{ .Values.mongodb.host }}/user-mgnt
+            - name: EVENTS_MONGO_URL
+              value: mongodb://{{ .Values.mongodb.host }}/events
+            - name: MONGO_URL
+              value: mongodb://{{ .Values.mongodb.host }}/events
+          {{- else if or (eq .Values.mongodb.auth_mode "auto")  (eq .Values.mongodb.auth_mode "use_secret") }}
+            - name: USER_MGNT_MONGO_URL
+              valueFrom:
+                secretKeyRef:
+                  key: USER_MGNT_MONGO_URL
+                  name: {{ .Values.mongodb.urls_secret }}
+            - name: MONGO_URL
+              valueFrom:
+                secretKeyRef:
+                  key: EVENTS_MONGO_URL
+                  name: {{ .Values.mongodb.urls_secret }}
+            - name: EVENTS_MONGO_URL
+              valueFrom:
+                secretKeyRef:
+                  key: EVENTS_MONGO_URL
+                  name: {{ .Values.mongodb.urls_secret }}
+          {{- end }}
+          {{- include "render-env-vars" (dict "service_name" "events" "Values" .Values) }}
+          {{- include "resources-helper" (dict "service_name" "events" "Values" .Values) | indent 10 }}
+          {{- include "probes-helper" (dict "service_name" "events" "Values" .Values) | indent 10 }}
+          ports:
+            - containerPort: {{ .Values.events.port }}
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /secrets/public-key.pem
+              name: public-key
+              subPath: public-key.pem
+      restartPolicy: Always
+      volumes:
+        - name: public-key
+          configMap:
+            name: {{ .Release.Name }}-cert-tls
+            items:
+              - key: public-key.pem
+                path: public-key.pem
+
+{{- include "service-helper" (dict "service_name" "events" "Values" .Values) }}
+
+{{- include "hpa-helper" (dict "service_name" "events" "Values" .Values) }}
+
+{{- include "pdb-helper" (dict "service_name" "events" "Values" .Values) }}
