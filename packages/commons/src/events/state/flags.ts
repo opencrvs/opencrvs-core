@@ -229,6 +229,7 @@ export function getEventFlags(
       return flag satisfies Flag
     })
 
+  // For determining InherentFlags, we should only consider accepted actions.
   const acceptedActions = sortedActions.filter(
     ({ status }) => status === ActionStatus.Accepted
   )
