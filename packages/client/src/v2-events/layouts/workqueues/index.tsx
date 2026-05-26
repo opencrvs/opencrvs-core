@@ -32,24 +32,23 @@ import { constantsMessages } from '@client/i18n/messages/constants'
 import { Hamburger } from '../sidebar/Hamburger'
 import { Sidebar } from '../sidebar/Sidebar'
 
+export function useUserMayCreateEvents() {
+  const scopes = useSelector(getScope) ?? []
+  const eventConfigurations = useEventConfigurations()
+  return eventConfigurations.some(({ id }) => canUserCreateEvent(scopes, id))
+}
+
 export function DesktopCenter() {
   const { createNewDeclaration } = useEventFormNavigation()
-  const scopes = useSelector(getScope) ?? []
-
-  const eventConfigurations = useEventConfigurations()
-
-  const mayCreateEvents = eventConfigurations.some(({ id }) =>
-    canUserCreateEvent(scopes, id)
-  )
+  const mayCreateEvents = useUserMayCreateEvents()
 
   return (
     <Stack gap={16}>
       {mayCreateEvents && (
         <Button
-          disabled={!mayCreateEvents}
           id="header-new-event"
           type="iconPrimary"
-          onClick={() => createNewDeclaration()}
+          onClick={createNewDeclaration}
         >
           <Plus />
         </Button>

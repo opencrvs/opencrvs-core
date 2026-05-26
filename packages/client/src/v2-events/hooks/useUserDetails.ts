@@ -10,7 +10,7 @@
  */
 
 import { useIntl, defineMessages } from 'react-intl'
-import { ActionType, TokenUserType } from '@opencrvs/commons/client'
+import { ActionType } from '@opencrvs/commons/client'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { formatUserRole } from '@client/v2-events/hooks/useRoles'
@@ -36,12 +36,10 @@ export function useUserDetails() {
   const systems = getSystem.getAllCached()
 
   const getUserDetails = ({
-    createdByUserType,
     createdBy,
     type,
     createdByRole
   }: {
-    createdByUserType: TokenUserType
     createdBy: string
     type: ActionType | DECLARATION_ACTION_UPDATE
     createdByRole?: string
