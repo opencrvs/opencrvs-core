@@ -5,7 +5,7 @@ import { decode } from "jsonwebtoken";
 import * as opencrvs from "../opencrvs-api";
 import { decryptMosipCredential } from "../websub/crypto";
 import { env } from "../constants";
-import type { BirthSubject } from "../websub/verify-vc";
+import { getBirthIdentifier } from "../websub/verify-vc";
 import { ActionType } from "@opencrvs/toolkit/events";
 
 export const CredentialIssuedSchema = z.object({
@@ -23,7 +23,7 @@ export const CredentialIssuedSchema = z.object({
     data: z.object({
       registrationId: z.string(),
       credential: z.string(),
-      credentialType: z.literal("vercred"),
+      credentialType: z.literal("vercred").or(z.literal("euin")),
       protectionKey: z.string(),
     }),
   }),
@@ -68,8 +68,9 @@ export const credentialIssuedHandler = async (
           eventId,
           actionId,
           registrationNumber,
-          nationalId: (verifiableCredential.credentialSubject as BirthSubject)
-            .VID,
+          nationalId: getBirthIdentifier(
+            verifiableCredential.credentialSubject,
+          ),
         },
         { token, logger: request.log },
       );
@@ -92,8 +93,9 @@ export const credentialIssuedHandler = async (
           eventId,
           actionId,
           requestId: requestId!,
-          nationalId: (verifiableCredential.credentialSubject as BirthSubject)
-            .VID,
+          nationalId: getBirthIdentifier(
+            verifiableCredential.credentialSubject,
+          ),
         },
         { token, logger: request.log },
       );

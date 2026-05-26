@@ -55,6 +55,10 @@ export const env = cleanEnv(process.env, {
     example: "https://your-domain.com/.well-known/public-key.json",
     desc: "Comma-separated list of verifiable credential allowlist URLs. Used to verify the authenticity of the verifiable credential.",
   }),
+  MOSIP_VERIFIABLE_CREDENTIAL_NATIONAL_ID_KEY: str({
+    default: "UIN",
+    desc: "The key used to fill NATIONAL_ID field in OpenCRVS",
+  }),
   MOSIP_WEBSUB_AUTH_CLIENT_ID: str({ devDefault: "mosip-websub-client" }),
   MOSIP_WEBSUB_AUTH_CLIENT_SECRET: str({ devDefault: "abcdeABCDE123456" }),
 

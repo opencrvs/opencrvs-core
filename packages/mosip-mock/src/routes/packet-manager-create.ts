@@ -36,7 +36,7 @@ const sendVerifiableCredential = async (
           JSON.stringify(verifiableCredential),
           PRIVATE_KEY,
         ),
-        credentialType: "vercred",
+        credentialType: "euin",
         protectionKey: "275700",
       },
     },
@@ -59,14 +59,6 @@ const sendVerifiableCredential = async (
   }
 
   return response.text();
-};
-
-const maskIdentifier = (value: string) => {
-  if (value.length <= 4) {
-    return "*".repeat(value.length);
-  }
-
-  return `${"*".repeat(value.length - 4)}${value.slice(-4)}`;
 };
 
 type CrvsNewRequest = {
@@ -129,7 +121,7 @@ export const packetManagerCreateHandler: RouteHandlerMethod = async (
 
   if (isCrvsNewRequest(payload)) {
     const id = payload.request.id;
-    const VID = await createNid();
+    const UIN = await createNid();
     const birthCertificateNumber =
       payload.request.fields.birthCertificateNumber;
 
@@ -137,21 +129,21 @@ export const packetManagerCreateHandler: RouteHandlerMethod = async (
       {
         event: "packet-manager.create.birth",
         requestId: id,
-        birthCertificateNumber: maskIdentifier(birthCertificateNumber),
-        vidSuffix: VID.slice(-4),
+        birthCertificateNumber,
+        uin: UIN,
       },
       "Created mock identity",
     );
 
     await sendEmail(
       `NID created for request id ${id}`,
-      `NID: ${VID}`,
+      `NID: ${UIN}`,
       request.log,
     );
 
     sendVerifiableCredential(id, {
       birthCertificateNumber,
-      VID,
+      UIN,
       id: `http://credential.idrepo/credentials/${id}`,
       vcVer: "VC-V1",
     }).catch((e) => {

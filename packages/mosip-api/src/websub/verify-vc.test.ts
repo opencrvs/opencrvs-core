@@ -28,7 +28,7 @@ const VALID_CREDENTIAL = {
   issuanceDate: "2025-04-11T07:57:43.134Z",
   credentialSubject: {
     birthCertificateNumber: "C83B023548BST",
-    VID: "8031687218",
+    UIN: "8031687218",
     id: "http://credential.idrepo/credentials/100010033575073",
     vcVer: "VC-V1",
   },
@@ -39,7 +39,7 @@ const VALID_CREDENTIAL = {
     proofPurpose: "assertionMethod",
     verificationMethod:
       "https://legitimate.mosip.dev/.well-known/public-key.json",
-    jws: "eyJhbGciOiJQUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il0sImtpZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6MjAyNDAvLndlbGwta25vd24vcHVibGljLWtleS5qc29uIn0..ZLUWGWVP3FrwTgVbcmaM2nb_ZcW4nWTcTflf1Zh-fieudW1BpqdH2LIpzzqvOeG1M4evJZEuJH2tlf4YxxUbN06r9ckz1PyaIjauCGlrwl1YCELUlbYoaCbLjHvZ96VgSFGzkRI6f3QiAYRi_SfgoEuAdRpve1xeIUFcFhCdxV94FTHovzoSWhOgd2KO3tQC_Ae2n2iv9cF07kCguqsCtDfsoGs775USW3JQE9rFYxg02w04qXn1RbMBLjpm6JZrG-jt-_h--HvNykUVO0wnmCMWtB4Rds3yD5EGe2CWwQ94RJBON3v5phMW_G0yAQ_TMB3Ogv7DpRv-VxhfY0FpkA",
+    jws: "eyJhbGciOiJQUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il0sImtpZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6MjAyNDAvLndlbGwta25vd24vcHVibGljLWtleS5qc29uIn0..mSTm4pf8LIaxRIbocn1H8TCGT1inS543JMfvcwbnAq6TGKKRne8efwgenmh5BxqD_U7yx-zhu6tJxZ01EdEcSjfvD0DRPiySV_h2bhzk8lzhI-_LPgP3fl8DUFMqiTMcMk_eSPenLTiWAJxfMfrtTbidMIUa7o2yCEGParwHTZnGAdl4ydDvebqPEpsOuLVOh4x0MItXYxZr7_aXEd7ZIPF1-2nERXhEx9eCPD8rJsrj9r5Fz2H20ktvabiYfNcucbTmWU63nVx_b5viEf47WcGFH060_JJgoxlES2BicEUkf63F_w8OQv8iCHElY0VXDPYmk4s6MUQReDX-KgijWg",
   },
   type: ["VerifiableCredential", "MOSIPVerifiableCredential"],
   "@context": [
