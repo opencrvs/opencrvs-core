@@ -20,7 +20,7 @@ import {
 } from '../ActionDocument'
 import { ActionType, isMetaAction } from '../ActionType'
 import { EventStatus } from '../EventMetadata'
-import { InherentFlags, Flag, CustomFlag } from '../Flag'
+import { InherentFlags, Flag, CustomFlag, ActionFlag } from '../Flag'
 import { EventConfig } from '../EventConfig'
 import {
   aggregateActionAnnotations,
@@ -199,14 +199,7 @@ export function resolveEventCustomFlags(
   }, [])
 }
 
-export function getEventFlags(
-  event: EventDocument,
-  config: EventConfig
-): Flag[] {
-  const sortedActions = event.actions
-    .filter(({ type }) => !isMetaAction(type))
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
-
+function getActionStatusFlags(sortedActions: Action[]): ActionFlag[] {
   const actionStatus = sortedActions.reduce<
     Partial<Record<ActionType, ActionStatus>>
   >(
@@ -222,33 +215,65 @@ export function getEventFlags(
    *  - `ACTION:requested` : An action sent which is not yet accepted or rejected by country config.
    *  - `ACTION:rejected`  : An action which was rejected by country config.
    */
-  const flags = Object.entries(actionStatus)
+  return Object.entries(actionStatus)
     .filter(([, status]) => status !== ActionStatus.Accepted)
     .map(([type, status]) => {
       const flag = joinValues([type, status], ':').toLowerCase()
-      return flag satisfies Flag
+      return flag satisfies ActionFlag
     })
+}
 
+function getInherentFlags(sortedActions: Action[]): InherentFlags[] {
   // For determining InherentFlags, we should only consider accepted actions.
   const acceptedActions = sortedActions.filter(
     ({ status }) => status === ActionStatus.Accepted
   )
 
+  const inherentFlags: InherentFlags[] = []
+
   if (isCorrectionRequested(acceptedActions)) {
-    flags.push(InherentFlags.CORRECTION_REQUESTED)
+    inherentFlags.push(InherentFlags.CORRECTION_REQUESTED)
   }
   if (isDeclarationIncomplete(acceptedActions)) {
-    flags.push(InherentFlags.INCOMPLETE)
+    inherentFlags.push(InherentFlags.INCOMPLETE)
   }
   if (isRejected(acceptedActions)) {
-    flags.push(InherentFlags.REJECTED)
+    inherentFlags.push(InherentFlags.REJECTED)
   }
   if (isPotentialDuplicate(acceptedActions)) {
-    flags.push(InherentFlags.POTENTIAL_DUPLICATE)
+    inherentFlags.push(InherentFlags.POTENTIAL_DUPLICATE)
   }
   if (isEditInProgress(acceptedActions)) {
-    flags.push(InherentFlags.EDIT_IN_PROGRESS)
+    inherentFlags.push(InherentFlags.EDIT_IN_PROGRESS)
   }
 
-  return [...flags, ...resolveEventCustomFlags(event, config)]
+  return inherentFlags
+}
+
+/**
+ * Computes all flags (inherent, action status, and custom) that should be attached to the given event,
+ * based on its actions and event-specific configuration.
+ *
+ * Flags are determined by combining:
+ *  - Action status flags (format 'ActionType:ActionStatus')
+ *  - Inherent flags (e.g. incomplete, rejected, correction requested, potential duplicate, edit in progress)
+ *  - Event type-specific custom flags defined in the event configuration
+ *
+ * @param event - The EventDocument containing the action history and payload
+ * @param config - The EventConfig providing rules for custom flag evaluation
+ * @returns An array of flags currently relevant/applicable to the event
+ */
+export function getEventFlags(
+  event: EventDocument,
+  config: EventConfig
+): Flag[] {
+  const sortedActions = event.actions
+    .filter(({ type }) => !isMetaAction(type))
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+
+  return [
+    ...getActionStatusFlags(sortedActions),
+    ...getInherentFlags(sortedActions),
+    ...resolveEventCustomFlags(event, config)
+  ]
 }
