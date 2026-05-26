@@ -32,6 +32,10 @@ import { constantsMessages } from '@client/i18n/messages/constants'
 import { Hamburger } from '../sidebar/Hamburger'
 import { Sidebar } from '../sidebar/Sidebar'
 
+/**
+ * Checks if the user has the `record.create` scope for any event type.
+ * @returns true if the user has the `record.create` scope for any event type, false otherwise.
+ */
 export function useUserMayCreateEvents() {
   const scopes = useSelector(getScope) ?? []
   const eventConfigurations = useEventConfigurations()
