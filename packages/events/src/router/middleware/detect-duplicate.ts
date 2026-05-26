@@ -141,6 +141,7 @@ export const detectDuplicate: MiddlewareFunction<
   if (duplicates.length > 0) {
     const event = await processAction(
       {
+        waitFor: input.waitFor,
         type: ActionType.DUPLICATE_DETECTED,
         transactionId: input.transactionId,
         eventId: input.eventId,

@@ -280,6 +280,7 @@ jobs:
               inputs: {
                 'core-image-tag': '${{ env.HEAD_COMMIT_HASH }}',
                 'countryconfig-image-tag': '${{ env.FARAJALAND_COMMIT_HASH }}',
+                'core-branch': '${{ env.BRANCH_NAME }}',
                 stack: '${{ steps.generate_stack.outputs.stack }}',
                 'keep-e2e': '${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}',
                 branch: e2eBranch,
