@@ -10,6 +10,7 @@
  */
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
 import { Location, UUID } from '@opencrvs/commons/client'
 import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
@@ -23,7 +24,8 @@ setQueryDefaults(trpcOptionsProxy.locations.list, {
     if (typeof queryOptions.queryFn !== 'function') {
       throw new Error('queryFn is not a function')
     }
-    return await queryOptions.queryFn(...params)
+    const locations = await queryOptions.queryFn(...params)
+    return new Map<UUID, Location>(locations.map((l) => [l.id, l]))
   },
   staleTime: 1000 * 60 * 60 * 24 // keep it in cache 1 day
 })
@@ -85,7 +87,7 @@ export function useLocations() {
         const { queryFn, ...rest } =
           trpcOptionsProxy.locations.list.queryOptions()
 
-        const locationArray = useSuspenseQuery({
+        return useSuspenseQuery({
           ...rest,
           queryKey: trpc.locations.list.queryKey({
             isActive,
@@ -93,11 +95,6 @@ export function useLocations() {
             locationType
           })
         }).data
-
-        const locationMap = new Map<UUID, Location>(
-          locationArray.map((location) => [location.id, location])
-        )
-        return locationMap
       }
     },
     getLocation: {

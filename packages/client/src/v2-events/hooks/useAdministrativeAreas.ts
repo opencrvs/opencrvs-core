@@ -25,7 +25,13 @@ setQueryDefaults(trpcOptionsProxy.administrativeAreas.list, {
       throw new Error('queryFn is not a function')
     }
 
-    return await queryOptions.queryFn(...params)
+    const administrativeAreas = await queryOptions.queryFn(...params)
+    return new Map<UUID, AdministrativeArea>(
+      administrativeAreas.map((administrativeArea) => [
+        administrativeArea.id,
+        administrativeArea
+      ])
+    )
   },
   staleTime: 1000 * 60 * 60 * 24 // keep it in cache 1 day
 })
@@ -47,23 +53,15 @@ export function useAdministrativeAreas() {
         // Then we re-attach the queryKey explicitly so React Query can identify this cache.
 
         const { queryFn, ...rest } =
-        trpcOptionsProxy.administrativeAreas.list.queryOptions()
+          trpcOptionsProxy.administrativeAreas.list.queryOptions()
 
-        const administrativeAreas = useSuspenseQuery({
+        return useSuspenseQuery({
           ...rest,
           queryKey: trpc.administrativeAreas.list.queryKey({
             isActive,
             ids
           })
         }).data
-
-        const administrativeAreasMap = new Map<UUID, AdministrativeArea>(
-          administrativeAreas.map((administrativeArea) => [
-            administrativeArea.id,
-            administrativeArea
-          ])
-        )
-        return administrativeAreasMap
       }
     }
   }

@@ -61,6 +61,30 @@ export const throwStructuredError = ({
   throw new Error(error)
 }
 
+function clearIndexedDB(dbName: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const openReq: IDBOpenDBRequest = indexedDB.open(dbName)
+
+    openReq.onsuccess = () => {
+      const db: IDBDatabase = openReq.result
+      db.close()
+
+      const deleteReq: IDBOpenDBRequest = indexedDB.deleteDatabase(dbName)
+      deleteReq.onsuccess = () => resolve()
+      deleteReq.onerror = () => reject(deleteReq.error)
+      deleteReq.onblocked = () => {
+        console.warn('DB delete blocked. Close other tabs using this DB.')
+      }
+    }
+
+    openReq.onerror = () => reject(openReq.error)
+  })
+}
+async function clearAllIndexedDB() {
+  const databases = await indexedDB.databases()
+  return Promise.all(databases.map((db) => db.name && clearIndexedDB(db.name)))
+}
+
 function decodeStructuredError(
   message: string
 ): z.infer<typeof StructuredError> | string {
@@ -83,12 +107,13 @@ interface Props extends IntlShapeProps {
 
 interface State {
   error: Error | null
+  titleClickedTimes: number
 }
 
 class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
-    this.state = { error: null }
+    this.state = { error: null, titleClickedTimes: 0 }
   }
 
   static getDerivedStateFromError(error: Error) {
@@ -99,7 +124,23 @@ class ErrorBoundary extends Component<Props, State> {
     // eslint-disable-next-line no-console
     console.error('TRPC Error Caught:', error)
   }
-
+  onTitleClick = async () => {
+    if (this.state.titleClickedTimes >= 5) {
+      if (
+        !confirm(
+          'Do you want to clear locally stored data and reload the page?'
+        )
+      ) {
+        return
+      }
+      clearAllIndexedDB()
+      alert('Data stored locally cleared. The page will now reload.')
+      window.location.reload()
+    }
+    this.setState((prevState) => ({
+      titleClickedTimes: prevState.titleClickedTimes + 1
+    }))
+  }
   render() {
     // eslint-disable-next-line no-shadow
     const { intl, redirectToAuthentication } = this.props
@@ -165,7 +206,7 @@ class ErrorBoundary extends Component<Props, State> {
                 </>
               ) : (
                 <>
-                  <ErrorTitle>
+                  <ErrorTitle onClick={this.onTitleClick}>
                     {intl.formatMessage(errorMessages.errorTitle)}
                   </ErrorTitle>
                   <ErrorMessage>{message}</ErrorMessage>
