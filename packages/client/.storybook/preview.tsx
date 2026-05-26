@@ -38,8 +38,12 @@ import {
 } from '@client/v2-events/features/events/useEvents/api'
 import {
   ActionType,
+  ConditionalType,
   Draft,
   EventDocument,
+  InherentFlags,
+  not,
+  flag,
   tennisClubMembershipEvent,
   TestUserRole,
   TokenUserType,
@@ -179,7 +183,6 @@ const tennisClubMembershipEventWithCustomAction = {
         description:
           'This is the label to show in audit history for the confirm action'
       },
-      // @TODO: once action conditionals are implemented, add some conditional here?
       form: [
         {
           id: 'notes',
@@ -190,6 +193,12 @@ const tennisClubMembershipEventWithCustomAction = {
             description: 'This is the label for the field for a custom action',
             id: 'event.birth.custom.action.approve.field.notes.label'
           }
+        }
+      ],
+      conditionals: [
+        {
+          type: ConditionalType.ENABLE,
+          conditional: not(flag(InherentFlags.POTENTIAL_DUPLICATE))
         }
       ],
       flags: []
