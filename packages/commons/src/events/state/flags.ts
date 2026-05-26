@@ -73,7 +73,25 @@ function isDeclarationIncomplete(actions: Action[]): boolean {
 }
 
 function isRejected(actions: Action[]): boolean {
-  return actions.at(-1)?.type === ActionType.REJECT
+  const resettingActionTypes: ActionType[] = [
+    ActionType.NOTIFY,
+    ActionType.DECLARE,
+    ActionType.EDIT,
+    ActionType.REGISTER
+  ]
+
+  return actions
+    .filter(({ status }) => status === ActionStatus.Accepted)
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+    .reduce<boolean>((prev, { type }) => {
+      if (type === ActionType.REJECT) {
+        return true
+      }
+      if (resettingActionTypes.includes(type)) {
+        return false
+      }
+      return prev
+    }, false)
 }
 
 function isPotentialDuplicate(actions: Action[]): boolean {
