@@ -8,14 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ActionStatus } from '../ActionDocument'
+
+import { Action, ActionStatus } from '../ActionDocument'
 import { ActionType } from '../ActionType'
 import { EventConfig } from '../EventConfig'
 import { EventDocument } from '../EventDocument'
 import { field } from '../field'
 import { FieldType } from '../FieldType'
 import { PageTypes } from '../PageConfig'
-import { resolveEventCustomFlags } from './flags'
+import { findPendingCorrectionAction, resolveEventCustomFlags } from './flags'
 import { subDays, formatISO } from 'date-fns'
 import { not, user } from '../../conditionals/conditionals'
 
@@ -314,5 +315,54 @@ describe('resolveEventCustomFlags()', () => {
     // @ts-expect-error - allow partial actions and event config
     const flags = resolveEventCustomFlags(event, eventConfig)
     expect(flags).toEqual(['executed-by-admin-flag'])
+  })
+})
+
+describe('findPendingCorrectionAction()', () => {
+  const a = (type: ActionType, status: ActionStatus = ActionStatus.Accepted) =>
+    ({ type, status }) as Action
+
+  test('returns undefined for empty actions', () => {
+    expect(findPendingCorrectionAction([])).toBeUndefined()
+  })
+
+  test('returns the request when it is the last write action', () => {
+    const req = a(ActionType.REQUEST_CORRECTION)
+    expect(findPendingCorrectionAction([req])).toBe(req)
+  })
+
+  test('returns the request when followed by non-correction actions', () => {
+    const req = a(ActionType.REQUEST_CORRECTION)
+    expect(findPendingCorrectionAction([req, a(ActionType.CUSTOM)])).toBe(req)
+  })
+
+  test('returns undefined when the request has been approved', () => {
+    expect(
+      findPendingCorrectionAction([
+        a(ActionType.REQUEST_CORRECTION),
+        a(ActionType.APPROVE_CORRECTION)
+      ])
+    ).toBeUndefined()
+  })
+
+  test('returns undefined when the request has been rejected', () => {
+    expect(
+      findPendingCorrectionAction([
+        a(ActionType.REQUEST_CORRECTION),
+        a(ActionType.REJECT_CORRECTION)
+      ])
+    ).toBeUndefined()
+  })
+
+  test('returns the second request after a completed correction cycle', () => {
+    const secondReq = a(ActionType.REQUEST_CORRECTION)
+    expect(
+      findPendingCorrectionAction([
+        a(ActionType.REQUEST_CORRECTION),
+        a(ActionType.APPROVE_CORRECTION),
+        secondReq,
+        a(ActionType.CUSTOM)
+      ])
+    ).toBe(secondReq)
   })
 })

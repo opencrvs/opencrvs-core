@@ -12,7 +12,12 @@
 import { uniq } from 'lodash'
 import { joinValues } from '../../utils'
 import { getStatusFromActions } from '.'
-import { Action, ActionStatus, EventState } from '../ActionDocument'
+import {
+  Action,
+  ActionStatus,
+  EventState,
+  RequestedCorrectionAction
+} from '../ActionDocument'
 import { ActionType, isMetaAction } from '../ActionType'
 import { EventStatus } from '../EventMetadata'
 import { InherentFlags, Flag, CustomFlag } from '../Flag'
@@ -33,19 +38,34 @@ function isEditInProgress(actions: Action[]) {
   return actions.at(-1)?.type === ActionType.EDIT
 }
 
+// Walk from the end: the latest correction-lifecycle action determines state.
+// If it's an APPROVE/REJECT_CORRECTION, there is no pending request.
+// If it's a REQUEST_CORRECTION, that's the pending one we want.
+export function findPendingCorrectionAction(
+  writeActions: Action[]
+): RequestedCorrectionAction | undefined {
+  let correctionRequestAction: RequestedCorrectionAction | undefined
+  for (let i = writeActions.length - 1; i >= 0; i--) {
+    const action = writeActions[i]
+    if (action.status === ActionStatus.Accepted) {
+      if (
+        action.type === ActionType.APPROVE_CORRECTION ||
+        action.type === ActionType.REJECT_CORRECTION
+      ) {
+        break
+      }
+      if (action.type === ActionType.REQUEST_CORRECTION) {
+        correctionRequestAction = action as RequestedCorrectionAction
+        break
+      }
+    }
+  }
+
+  return correctionRequestAction
+}
+
 function isCorrectionRequested(actions: Action[]) {
-  return actions.reduce<boolean>((prev, { type }) => {
-    if (type === ActionType.REQUEST_CORRECTION) {
-      return true
-    }
-    if (type === ActionType.APPROVE_CORRECTION) {
-      return false
-    }
-    if (type === ActionType.REJECT_CORRECTION) {
-      return false
-    }
-    return prev
-  }, false)
+  return findPendingCorrectionAction(actions) !== undefined
 }
 
 function isDeclarationIncomplete(actions: Action[]): boolean {
@@ -119,7 +139,7 @@ export function resolveEventCustomFlags(
     .filter(({ type }) => !isMetaAction(type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
-  return actions.reduce((acc, action, idx) => {
+  return actions.reduce<CustomFlag[]>((acc, action, idx) => {
     let actionConfig
     if (isActionConfigType(action.type)) {
       actionConfig = getActionConfig({
