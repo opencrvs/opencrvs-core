@@ -61,7 +61,7 @@ export const throwStructuredError = ({
   throw new Error(error)
 }
 
-function clearIndexedDB(dbName: string): Promise<void> {
+async function clearIndexedDB(dbName: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const openReq: IDBOpenDBRequest = indexedDB.open(dbName)
 
@@ -72,9 +72,12 @@ function clearIndexedDB(dbName: string): Promise<void> {
       const deleteReq: IDBOpenDBRequest = indexedDB.deleteDatabase(dbName)
       deleteReq.onsuccess = () => resolve()
       deleteReq.onerror = () => reject(deleteReq.error)
-      deleteReq.onblocked = () => {
-        console.warn('DB delete blocked. Close other tabs using this DB.')
-      }
+      deleteReq.onblocked = () =>
+        reject(
+          new Error(
+            `Deletion of application data is blocked. Please close all other tabs of this application and try again.`
+          )
+        )
     }
 
     openReq.onerror = () => reject(openReq.error)
@@ -82,7 +85,9 @@ function clearIndexedDB(dbName: string): Promise<void> {
 }
 async function clearAllIndexedDB() {
   const databases = await indexedDB.databases()
-  return Promise.all(databases.map((db) => db.name && clearIndexedDB(db.name)))
+  return Promise.all(
+    databases.map(async (db) => db.name && clearIndexedDB(db.name))
+  )
 }
 
 function decodeStructuredError(
@@ -124,7 +129,7 @@ class ErrorBoundary extends Component<Props, State> {
     // eslint-disable-next-line no-console
     console.error('TRPC Error Caught:', error)
   }
-  onTitleClick = async () => {
+  onTitleClick = () => {
     if (this.state.titleClickedTimes >= 5) {
       if (
         !confirm(
@@ -133,7 +138,15 @@ class ErrorBoundary extends Component<Props, State> {
       ) {
         return
       }
-      clearAllIndexedDB()
+
+      clearAllIndexedDB().catch((err) => {
+        // eslint-disable-next-line no-console
+        console.error('Failed to clear IndexedDB:', err)
+        alert(
+          'Failed to clear locally stored data. Please try clearing site data from your browser settings manually.'
+        )
+        return
+      })
       alert('Data stored locally cleared. The page will now reload.')
       window.location.reload()
     }

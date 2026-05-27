@@ -10,7 +10,6 @@
  */
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
 import { Location, UUID } from '@opencrvs/commons/client'
 import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
