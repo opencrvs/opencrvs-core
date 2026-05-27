@@ -10,6 +10,7 @@
  */
 
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
 import { AdministrativeArea, UUID } from '@opencrvs/commons/client'
 import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
@@ -57,11 +58,15 @@ export function useAdministrativeAreas() {
           })
         }).data
 
-        const administrativeAreasMap = new Map<UUID, AdministrativeArea>(
-          administrativeAreas.map((administrativeArea) => [
-            administrativeArea.id,
-            administrativeArea
-          ])
+        const administrativeAreasMap = useMemo(
+          () =>
+            new Map<UUID, AdministrativeArea>(
+              administrativeAreas.map((administrativeArea) => [
+                administrativeArea.id,
+                administrativeArea
+              ])
+            ),
+          [administrativeAreas]
         )
         return administrativeAreasMap
       }
@@ -99,30 +104,25 @@ export function getLeafAdministrativeAreaIds(
   return result
 }
 
-// Ref works since arrays are compared by reference.
-let cachedAdministrativeAreasRef: unknown = null
-/** In-memory cache of leaf administrative area IDs */
+let cachedRawDataRef: AdministrativeArea[] | null = null
 let cachedLeafAdministrativeAreaIds: { id: UUID }[] | null = null
 
-/**
- * Uses in-memory caching to avoid recomputation on re-renders. Becomes costly with large datasets.
- *
- * @returns array of leaf administrative area IDs.
- */
 export function useSuspenseGetLeafAdministrativeAreaIds() {
-  const { getAdministrativeAreas } = useAdministrativeAreas()
-  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const trpc = useTRPC()
+  const { queryFn, ...rest } =
+    trpcOptionsProxy.administrativeAreas.list.queryOptions()
+  const rawData = useSuspenseQuery({
+    ...rest,
+    queryKey: trpc.administrativeAreas.list.queryKey()
+  }).data
 
-  if (
-    cachedLeafAdministrativeAreaIds &&
-    cachedAdministrativeAreasRef === administrativeAreas
-  ) {
+  if (cachedLeafAdministrativeAreaIds && cachedRawDataRef === rawData) {
     return cachedLeafAdministrativeAreaIds
   }
 
-  const leafIds = getLeafAdministrativeAreaIds(administrativeAreas)
-  cachedAdministrativeAreasRef = administrativeAreas
+  const map = new Map<UUID, AdministrativeArea>(rawData.map((a) => [a.id, a]))
+  const leafIds = getLeafAdministrativeAreaIds(map)
+  cachedRawDataRef = rawData
   cachedLeafAdministrativeAreaIds = leafIds
-
   return leafIds
 }
