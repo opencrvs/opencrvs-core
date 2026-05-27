@@ -8,11 +8,14 @@ metadata:
     app: minio
   name: minio
 spec:
+  {{- if .Values.minio.pvc.storage_class }}
+  storageClassName: {{ .Values.minio.pvc.storage_class | quote }}
+  {{- end }}
   accessModes:
-    - ReadWriteOnce
+    - {{ .Values.minio.pvc.access_mode }}
   resources:
     requests:
-      storage: {{ default "1Gi" .Values.minio.data_storage_size }}
+      storage: {{ .Values.minio.pvc.storage_size }}
 {{- end }}
 ---
 apiVersion: traefik.io/v1alpha1
