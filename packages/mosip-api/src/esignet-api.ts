@@ -37,6 +37,7 @@ type OIDPUserAddress = {
 
 type OIDPUserInfo = {
   sub: string;
+  individual_id?: string;
   name?: string;
   given_name?: string;
   family_name?: string;
@@ -177,8 +178,8 @@ const pickUserInfo = async (userInfo: OIDPUserInfo) => {
       birthDate: formatDate(userInfo.birthdate, "yyyy-MM-dd"),
     }),
     verificationStatus: "authenticated",
-    idType: null,
-    nid: null,
+    idType: userInfo.individual_id ? "NATIONAL_ID" : null,
+    nid: userInfo.individual_id ?? null,
   };
 };
 

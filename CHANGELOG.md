@@ -11,6 +11,8 @@
 
 - Allow configuring which key in the verifiable credential (e.g., UIN, VID, NID) is used to populate `child.nid` in OpenCRVS.
 
+- Allow returning `individual_id` from OIDP (E-Signet) user info response. It gets passed to `idType` as `NATIONAL_ID`, and `nid` as the individual id.
+
 ## 1.9.0
 
 Before version 1.9, communication between country-config and mosip-api was handled via FHIR and GraphQL. OpenCRVS 1.9 introduces a refactored data model, new REST APIs, and new country configuration hooks such as onRegisterHandler. These changes require updates to country configurations, as the @opencrvs/mosip package has been updated accordingly. For detailed upgrade instructions, refer to [documentation.opencrvs.org](https://documentation.opencrvs.org).
