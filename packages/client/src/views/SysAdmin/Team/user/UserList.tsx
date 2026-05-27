@@ -263,10 +263,17 @@ function UserListComponent({ userDetails }: UserListProps) {
 
   const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
 
-  const canAccessMultipleLocations = useMemo(
-    () => Array.from(locations.values()).filter(canAccessOffice).length > 1,
-    [locations, canAccessOffice]
-  )
+  let canAccessMultipleLocations = false
+  let howManyLocationsUserHasAccessTo = 0
+  for (const location of locations.values()) {
+    if (canAccessOffice(location)) {
+      howManyLocationsUserHasAccessTo++
+    }
+    if (howManyLocationsUserHasAccessTo > 1) {
+      canAccessMultipleLocations = true
+      break
+    }
+  }
 
   const {
     searchUsers,

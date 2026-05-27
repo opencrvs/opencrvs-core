@@ -23,7 +23,9 @@ import {
   canAccessOtherUserWithScopes,
   getAdministrativeAreaHierarchy,
   UserScopeV2,
-  UUID
+  UUID,
+  decodeScope,
+  Scope
 } from '@opencrvs/commons/client'
 import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
@@ -31,7 +33,9 @@ import { useAdministrativeAreas } from '../v2-events/hooks/useAdministrativeArea
 
 export function usePermissions() {
   const userScopes = useSelector(getScope) || []
-
+  const decodedUserScopes = userScopes
+    .map(decodeScope)
+    .filter((scope): scope is Scope => Boolean(scope))
   const currentUser = useSelector(getUserDetails)
   const userPrimaryOfficeId = currentUser?.primaryOfficeId
 
@@ -128,10 +132,9 @@ export function usePermissions() {
       return false
     }
 
-    const acceptedScopes = getAcceptedScopesByType({
-      acceptedScopes: ['organisation.read-locations'],
-      scopes: userScopes
-    })
+    const acceptedScopes = decodedUserScopes.filter((scope) =>
+      ['organisation.read-locations'].includes(scope.type)
+    )
 
     const accessLevels = acceptedScopes.map((s) =>
       getScopeOptionValue(s, 'accessLevel')
