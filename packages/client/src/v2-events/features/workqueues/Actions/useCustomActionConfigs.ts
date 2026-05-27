@@ -89,9 +89,10 @@ export function useCustomActionConfigs(event: EventIndex): {
         icon: isValidIcon(action.icon) ? action.icon : ('PencilLine' as const),
         onClick: async (workqueue?: string) =>
           onCustomAction(action, workqueue),
-        disabled:
-          !isDownloadedAndAssignedToUser &&
-          isActionEnabled(action, event, validatorContext),
+        disabled: !(
+          isDownloadedAndAssignedToUser &&
+          isActionEnabled(action, event, validatorContext)
+        ),
         hidden: !isActionVisible(action, event, validatorContext),
         type: ActionType.CUSTOM,
         customActionType: action.customActionType
