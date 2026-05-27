@@ -61,7 +61,7 @@ export function useAdministrativeAreas() {
             isActive,
             ids
           })
-        }).data
+        }).data as unknown as Map<UUID, AdministrativeArea>
       }
     }
   }

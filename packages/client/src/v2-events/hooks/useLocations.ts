@@ -94,7 +94,7 @@ export function useLocations() {
             locationIds,
             locationType
           })
-        }).data
+        }).data as unknown as Map<UUID, Location>
       }
     },
     getLocation: {
