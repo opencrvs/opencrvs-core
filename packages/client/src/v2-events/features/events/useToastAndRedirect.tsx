@@ -17,20 +17,23 @@ import { Toast, ToastType } from '@opencrvs/components'
 import { TranslationConfig, UUID } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 
-export function showToast({
-  message,
-  toastType,
-  toastId,
-  intl,
-  messageOpts
-}: {
+interface ToastProps {
   message: TranslationConfig
   toastType: ToastType
   toastId: string
-  intl: ReturnType<typeof useIntl>
   messageOpts?: Record<string, string>
-}) {
-  toast.custom(
+}
+
+function ToastWithIntl({
+  message,
+  toastType,
+  toastId,
+  messageOpts
+}: ToastProps) {
+  const intl = useIntl()
+
+  console.log(intl.messages)
+  return (
     <Toast
       data-testid={toastId}
       duration={null}
@@ -38,9 +41,12 @@ export function showToast({
       onClose={() => toast.remove(toastId)}
     >
       {intl.formatMessage(message, messageOpts)}
-    </Toast>,
-    { id: toastId }
+    </Toast>
   )
+}
+
+export function showToast(props: ToastProps) {
+  toast.custom(<ToastWithIntl {...props} />, { id: props.toastId })
 }
 
 /**
@@ -48,7 +54,6 @@ export function showToast({
  * Behavior varies based on route context (declare, edit, delete, etc.)
  */
 export function useToastAndRedirect() {
-  const intl = useIntl()
   const navigate = useNavigate()
 
   function redirectToEventOverviewPage({
@@ -60,7 +65,7 @@ export function useToastAndRedirect() {
     message: TranslationConfig
     eventId: UUID
   }) {
-    showToast({ message, toastType: 'warning', toastId, intl })
+    showToast({ message, toastType: 'warning', toastId })
     return navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }), {
       replace: true
     })

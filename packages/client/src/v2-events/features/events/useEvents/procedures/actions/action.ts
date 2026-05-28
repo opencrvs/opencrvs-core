@@ -10,7 +10,6 @@
  */
 
 import { MutationKey, useMutation, useQueryClient } from '@tanstack/react-query'
-import { createIntl } from 'react-intl'
 import type {
   DecorateMutationProcedure,
   inferInput
@@ -56,22 +55,20 @@ import {
 } from '@client/v2-events/trpc'
 import { ToastKey } from '@client/v2-events/routes/Toaster'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+
 import { showToast } from '../../../useToastAndRedirect'
 
 function showToastOnDuplicateDetected(event: EventDocument) {
-  const intl = createIntl({ locale: navigator.language, messages: {} })
-
   showToast({
     message: {
       defaultMessage:
         '{trackingId} is a potential duplicate. Record is ready for review.',
-      id: 'declare.potentialDuplicateDetectedToast',
+      id: 'event.declaration.potentialDuplicateDetected',
       description:
-        'Toast message shown when a potential duplicate is detected after declaring an event'
+        'Notification for potential duplicate declaration. Shown when a potential duplicate is detected after declaring an event'
     },
     toastType: 'error',
     toastId: `duplicate-detected-${event.trackingId}`,
-    intl,
     messageOpts: { trackingId: event.trackingId }
   })
 }
