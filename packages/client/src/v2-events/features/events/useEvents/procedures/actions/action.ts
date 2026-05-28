@@ -10,6 +10,7 @@
  */
 
 import { MutationKey, useMutation, useQueryClient } from '@tanstack/react-query'
+import { createIntl } from 'react-intl'
 import type {
   DecorateMutationProcedure,
   inferInput
@@ -55,6 +56,25 @@ import {
 } from '@client/v2-events/trpc'
 import { ToastKey } from '@client/v2-events/routes/Toaster'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { showToast } from '../../../useToastAndRedirect'
+
+function showToastOnDuplicateDetected(event: EventDocument) {
+  const intl = createIntl({ locale: navigator.language, messages: {} })
+
+  showToast({
+    message: {
+      defaultMessage:
+        '{trackingId} is a potential duplicate. Record is ready for review.',
+      id: 'declare.potentialDuplicateDetectedToast',
+      description:
+        'Toast message shown when a potential duplicate is detected after declaring an event'
+    },
+    toastType: 'error',
+    toastId: `duplicate-detected-${event.trackingId}`,
+    intl,
+    messageOpts: { trackingId: event.trackingId }
+  })
+}
 
 function retryUnlessConflict(
   _failureCount: number,
@@ -147,7 +167,10 @@ setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: deleteLocalEvent,
+  onSuccess: (event) => {
+    deleteLocalEvent(event)
+    showToastOnDuplicateDetected(event)
+  },
   onError: errorToastOnConflict,
   onMutate: updateEventOptimistically(
     ActionType.DECLARE,
@@ -174,7 +197,10 @@ setMutationDefaults(trpcOptionsProxy.event.actions.register.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: deleteLocalEvent,
+  onSuccess: (event) => {
+    deleteLocalEvent(event)
+    showToastOnDuplicateDetected(event)
+  },
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.REGISTER }
 })
@@ -495,10 +521,15 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   }
 
   return {
-    mutate: (params: ActionMutationInput) =>
-      mutation.mutate(getMutationPayload(params)),
-    mutateAsync: async (params: ActionMutationInput) =>
-      mutation.mutateAsync(getMutationPayload(params)),
+    mutate: (
+      params: ActionMutationInput,
+      options?: Parameters<typeof useMutation>[0]
+    ) => mutation.mutate(getMutationPayload(params), options),
+
+    mutateAsync: async (
+      params: ActionMutationInput,
+      options?: Parameters<typeof useMutation>[0]
+    ) => mutation.mutateAsync(getMutationPayload(params), options),
     isPending: mutation.isPending
   }
 }

@@ -20,7 +20,9 @@ import {
   tennisClubMembershipEvent,
   generateEventDocument,
   generateEventDraftDocument,
-  getCurrentEventState
+  getCurrentEventState,
+  generateActionDocument,
+  getUUID
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -620,5 +622,161 @@ export const MobileReviewShowsActionMenuAndExitsUndeclaredDraft: Story = {
         ).toBeInTheDocument()
       }
     )
+  }
+}
+
+export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    addLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(createdEventDocument.id, createdEventDocument)
+  },
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: createdEventDocument.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [
+              generateEventDraftDocument({
+                eventId,
+                actionType: ActionType.DECLARE
+              })
+            ]
+          })
+        ],
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.get.query(() => {
+            return eventDocument
+          }),
+          tRPCMsw.event.actions.declare.request.mutation((action) => {
+            return {
+              ...eventDocument,
+              action: [
+                ...eventDocument.actions,
+                action,
+                generateActionDocument({
+                  configuration: tennisClubMembershipEvent,
+                  action: ActionType.DUPLICATE_DETECTED,
+                  defaults: {
+                    content: {
+                      duplicates: [{ id: getUUID(), trackingId: '0R1G1NAL' }]
+                    }
+                  }
+                })
+              ]
+            }
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Declare duplicate', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Action' })
+      )
+      await userEvent.click(await canvas.findByText('Declare'))
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Declare' })
+      )
+    })
+
+    await step('Toast is shown with duplicate detected message', async () => {
+      await canvas.findByText(
+        '111111 is a potential duplicate. Record is ready for review.'
+      )
+    })
+  }
+}
+
+export const ShowToastOnDuplicateDetectedOnRegister: Story = {
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    addLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(createdEventDocument.id, createdEventDocument)
+  },
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: createdEventDocument.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [
+              generateEventDraftDocument({
+                eventId,
+                actionType: ActionType.DECLARE
+              })
+            ]
+          })
+        ],
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.get.query(() => {
+            return eventDocument
+          }),
+          tRPCMsw.event.actions.declare.request.mutation((action) => {
+            return {
+              ...eventDocument,
+              action: [
+                ...eventDocument.actions,
+                action,
+                generateActionDocument({
+                  configuration: tennisClubMembershipEvent,
+                  action: ActionType.DUPLICATE_DETECTED,
+                  defaults: {
+                    content: {
+                      duplicates: [{ id: getUUID(), trackingId: '0R1G1NAL' }]
+                    }
+                  }
+                })
+              ]
+            }
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Declare duplicate', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Action' })
+      )
+      await userEvent.click(await canvas.findByText('Register'))
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Register' })
+      )
+    })
+
+    await step('Toast is shown with duplicate detected message', async () => {
+      await canvas.findByText(
+        '111111 is a potential duplicate. Record is ready for review.'
+      )
+    })
   }
 }
