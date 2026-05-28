@@ -166,7 +166,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   retry: retryUnlessConflict,
   retryDelay,
   onSuccess: (event) => {
-    deleteLocalEvent(event)
+    void deleteLocalEvent(event)
     showToastOnDuplicateDetected(event)
   },
   onError: errorToastOnConflict,
@@ -196,7 +196,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.register.request, {
   retry: retryUnlessConflict,
   retryDelay,
   onSuccess: (event) => {
-    deleteLocalEvent(event)
+    void deleteLocalEvent(event)
     showToastOnDuplicateDetected(event)
   },
   onError: errorToastOnConflict,
