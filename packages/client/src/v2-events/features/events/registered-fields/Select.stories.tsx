@@ -18,7 +18,9 @@ import {
   ConditionalType,
   FieldType,
   not,
-  alwaysTrue
+  alwaysTrue,
+  generateTranslationConfig,
+  defineConditional
 } from '@opencrvs/commons/client'
 import {
   FormFieldGenerator,
@@ -195,6 +197,90 @@ export const WithDisabledOption: Story = {
                 }
               }
             ]
+          }
+        ]}
+        id="my-form"
+      />
+    )
+  }
+}
+
+export const OptionsHideUnderlyingElement: Story = {
+  parameters: {
+    layout: 'centered'
+  },
+  play: async ({ canvasElement }) => {
+    const control = await waitFor(() => {
+      const el = canvasElement.querySelector('.react-select__control')
+      if (!el) {
+        throw new Error('Dropdown not found')
+      }
+      return el
+    })
+    await userEvent.click(control)
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={[
+          {
+            id: 'storybook.select',
+            type: FieldType.SELECT,
+            label: {
+              id: 'storybook.select.label',
+              defaultMessage: 'Favourite fruit',
+              description: 'The label for the select input'
+            },
+            options: [
+              {
+                value: 'apple',
+                label: generateTranslationConfig('Apple')
+              },
+              {
+                value: 'banana',
+                label: generateTranslationConfig('Banana')
+              },
+              {
+                value: 'cherry',
+                label: generateTranslationConfig('Cherry')
+              },
+              {
+                value: 'Citrus',
+                label: generateTranslationConfig('Citrus')
+              },
+              {
+                value: 'Pear',
+                label: generateTranslationConfig('Pear')
+              },
+              {
+                value: 'Strawberry',
+                label: generateTranslationConfig('Strawberry')
+              }
+            ]
+          },
+          {
+            id: 'child.brn-search',
+            type: FieldType.SEARCH,
+            label: generateTranslationConfig('Farmer id'),
+            placeholder: generateTranslationConfig('Enter farmer id'),
+            helperText: generateTranslationConfig('Enter a 10-digit farmer id'),
+            configuration: {
+              validation: {
+                validator: defineConditional({
+                  type: 'string',
+                  pattern: '^[0-9]{10}$',
+                  description: 'Must be numeric and 10 digits long'
+                }),
+                message: generateTranslationConfig('Invalid value')
+              },
+              query: {
+                type: 'or' as const,
+                clauses: []
+              },
+              limit: 10,
+              offset: 0
+            }
           }
         ]}
         id="my-form"
