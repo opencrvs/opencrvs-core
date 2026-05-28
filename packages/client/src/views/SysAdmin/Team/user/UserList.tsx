@@ -232,8 +232,13 @@ function UserListComponent({ userDetails }: UserListProps) {
 
   const [showActivationToggleError, setShowActivationToggleError] =
     useState(false)
-  const { canReadUser, canEditUser, canAddOfficeUsers, canAccessOffice } =
-    usePermissions()
+  const {
+    canReadUser,
+    canEditUser,
+    canAddOfficeUsers,
+    canAccessOffice,
+    canAccessMultipleLocations
+  } = usePermissions()
 
   const { locationId } = parse(location.search, {
     ignoreQueryPrefix: true
@@ -263,17 +268,7 @@ function UserListComponent({ userDetails }: UserListProps) {
 
   const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
 
-  let canAccessMultipleLocations = false
-  let howManyLocationsUserHasAccessTo = 0
-  for (const location of locations.values()) {
-    if (canAccessOffice(location)) {
-      howManyLocationsUserHasAccessTo++
-    }
-    if (howManyLocationsUserHasAccessTo > 1) {
-      canAccessMultipleLocations = true
-      break
-    }
-  }
+  const hasAccessToMultipleLocations = canAccessMultipleLocations()
 
   const {
     searchUsers,
@@ -575,7 +570,7 @@ function UserListComponent({ userDetails }: UserListProps) {
 
   const LocationButton = (locationId: UUID) => {
     const buttons: React.ReactElement[] = []
-    if (canAccessMultipleLocations) {
+    if (hasAccessToMultipleLocations) {
       buttons.push(
         <LocationPicker
           key={`location-picker-${locationId}`}

@@ -23,9 +23,7 @@ import {
   canAccessOtherUserWithScopes,
   getAdministrativeAreaHierarchy,
   UserScopeV2,
-  UUID,
-  decodeScope,
-  Scope
+  UUID
 } from '@opencrvs/commons/client'
 import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
@@ -201,6 +199,19 @@ export function usePermissions() {
     return false
   }
 
+  const canAccessMultipleLocations = () => {
+    let howManyLocationsUserHasAccessTo = 0
+    for (const location of locations.values()) {
+      if (canAccessOffice(location)) {
+        howManyLocationsUserHasAccessTo++
+      }
+      if (howManyLocationsUserHasAccessTo > 1) {
+        return true
+      }
+    }
+    return false
+  }
+
   return {
     hasScope,
     hasAnyScope,
@@ -209,6 +220,7 @@ export function usePermissions() {
     canEditUser,
     canCreateUser,
     canAccessOffice,
-    canAddOfficeUsers
+    canAddOfficeUsers,
+    canAccessMultipleLocations
   }
 }
