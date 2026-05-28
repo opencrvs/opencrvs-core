@@ -70,7 +70,6 @@ const MobileLeft = styled.div`
   flex-direction: row;
   align-items: center;
   gap: 16px;
-  grid-column: 1;
   overflow: hidden;
   min-width: 0;
 `
@@ -79,9 +78,8 @@ const MobileCenter = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  flex: 1;
   gap: 16px;
-  grid-column: 1;
+  min-width: 0;
 `
 
 const MobileRight = styled.div<{ $flex?: '1' | 'none' }>`
@@ -89,7 +87,8 @@ const MobileRight = styled.div<{ $flex?: '1' | 'none' }>`
   gap: 8px;
   flex-direction: row;
   align-items: center;
-  justify-self: right;
+  grid-column: 3;
+  justify-self: end;
   flex: ${({ $flex }) => $flex ?? '1'};
 `
 const Title = styled(Text)`

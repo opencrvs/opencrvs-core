@@ -12,10 +12,15 @@
 import { uniq } from 'lodash'
 import { joinValues } from '../../utils'
 import { getStatusFromActions } from '.'
-import { Action, ActionStatus, EventState } from '../ActionDocument'
+import {
+  Action,
+  ActionStatus,
+  EventState,
+  RequestedCorrectionAction
+} from '../ActionDocument'
 import { ActionType, isMetaAction } from '../ActionType'
 import { EventStatus } from '../EventMetadata'
-import { InherentFlags, Flag, CustomFlag } from '../Flag'
+import { InherentFlags, Flag, CustomFlag, ActionFlag } from '../Flag'
 import { EventConfig } from '../EventConfig'
 import {
   aggregateActionAnnotations,
@@ -33,19 +38,32 @@ function isEditInProgress(actions: Action[]) {
   return actions.at(-1)?.type === ActionType.EDIT
 }
 
+// Walk from the end: the latest correction-lifecycle action determines state.
+// If it's an APPROVE/REJECT_CORRECTION, there is no pending request.
+// If it's a REQUEST_CORRECTION, that's the pending one we want.
+export function findPendingCorrectionAction(
+  writeActions: Action[]
+): RequestedCorrectionAction | undefined {
+  let correctionRequestAction: RequestedCorrectionAction | undefined
+  for (let i = writeActions.length - 1; i >= 0; i--) {
+    const action = writeActions[i]
+    if (
+      action.type === ActionType.APPROVE_CORRECTION ||
+      action.type === ActionType.REJECT_CORRECTION
+    ) {
+      break
+    }
+    if (action.type === ActionType.REQUEST_CORRECTION) {
+      correctionRequestAction = action as RequestedCorrectionAction
+      break
+    }
+  }
+
+  return correctionRequestAction
+}
+
 function isCorrectionRequested(actions: Action[]) {
-  return actions.reduce<boolean>((prev, { type }) => {
-    if (type === ActionType.REQUEST_CORRECTION) {
-      return true
-    }
-    if (type === ActionType.APPROVE_CORRECTION) {
-      return false
-    }
-    if (type === ActionType.REJECT_CORRECTION) {
-      return false
-    }
-    return prev
-  }, false)
+  return findPendingCorrectionAction(actions) !== undefined
 }
 
 function isDeclarationIncomplete(actions: Action[]): boolean {
@@ -53,7 +71,22 @@ function isDeclarationIncomplete(actions: Action[]): boolean {
 }
 
 function isRejected(actions: Action[]): boolean {
-  return actions.at(-1)?.type === ActionType.REJECT
+  const resettingActionTypes: ActionType[] = [
+    ActionType.NOTIFY,
+    ActionType.DECLARE,
+    ActionType.EDIT,
+    ActionType.REGISTER
+  ]
+
+  return actions.reduce<boolean>((prev, { type }) => {
+    if (type === ActionType.REJECT) {
+      return true
+    }
+    if (resettingActionTypes.includes(type)) {
+      return false
+    }
+    return prev
+  }, false)
 }
 
 export function isPotentialDuplicate(actions: Action[]): boolean {
@@ -119,7 +152,7 @@ export function resolveEventCustomFlags(
     .filter(({ type }) => !isMetaAction(type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
-  return actions.reduce((acc, action, idx) => {
+  return actions.reduce<CustomFlag[]>((acc, action, idx) => {
     let actionConfig
     if (isActionConfigType(action.type)) {
       actionConfig = getActionConfig({
@@ -166,14 +199,7 @@ export function resolveEventCustomFlags(
   }, [])
 }
 
-export function getEventFlags(
-  event: EventDocument,
-  config: EventConfig
-): Flag[] {
-  const sortedActions = event.actions
-    .filter(({ type }) => !isMetaAction(type))
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
-
+function getActionStatusFlags(sortedActions: Action[]): ActionFlag[] {
   const actionStatus = sortedActions.reduce<
     Partial<Record<ActionType, ActionStatus>>
   >(
@@ -189,28 +215,65 @@ export function getEventFlags(
    *  - `ACTION:requested` : An action sent which is not yet accepted or rejected by country config.
    *  - `ACTION:rejected`  : An action which was rejected by country config.
    */
-  const flags = Object.entries(actionStatus)
+  return Object.entries(actionStatus)
     .filter(([, status]) => status !== ActionStatus.Accepted)
     .map(([type, status]) => {
       const flag = joinValues([type, status], ':').toLowerCase()
-      return flag satisfies Flag
+      return flag satisfies ActionFlag
     })
+}
 
-  if (isCorrectionRequested(sortedActions)) {
-    flags.push(InherentFlags.CORRECTION_REQUESTED)
+function getInherentFlags(sortedActions: Action[]): InherentFlags[] {
+  // For determining InherentFlags, we should only consider accepted actions.
+  const acceptedActions = sortedActions.filter(
+    ({ status }) => status === ActionStatus.Accepted
+  )
+
+  const inherentFlags: InherentFlags[] = []
+
+  if (isCorrectionRequested(acceptedActions)) {
+    inherentFlags.push(InherentFlags.CORRECTION_REQUESTED)
   }
-  if (isDeclarationIncomplete(sortedActions)) {
-    flags.push(InherentFlags.INCOMPLETE)
+  if (isDeclarationIncomplete(acceptedActions)) {
+    inherentFlags.push(InherentFlags.INCOMPLETE)
   }
-  if (isRejected(sortedActions)) {
-    flags.push(InherentFlags.REJECTED)
+  if (isRejected(acceptedActions)) {
+    inherentFlags.push(InherentFlags.REJECTED)
   }
-  if (isPotentialDuplicate(sortedActions)) {
-    flags.push(InherentFlags.POTENTIAL_DUPLICATE)
+  if (isPotentialDuplicate(acceptedActions)) {
+    inherentFlags.push(InherentFlags.POTENTIAL_DUPLICATE)
   }
-  if (isEditInProgress(sortedActions)) {
-    flags.push(InherentFlags.EDIT_IN_PROGRESS)
+  if (isEditInProgress(acceptedActions)) {
+    inherentFlags.push(InherentFlags.EDIT_IN_PROGRESS)
   }
 
-  return [...flags, ...resolveEventCustomFlags(event, config)]
+  return inherentFlags
+}
+
+/**
+ * Computes all flags (inherent, action status, and custom) that should be attached to the given event,
+ * based on its actions and event-specific configuration.
+ *
+ * Flags are determined by combining:
+ *  - Action status flags (format 'ActionType:ActionStatus')
+ *  - Inherent flags (e.g. incomplete, rejected, correction requested, potential duplicate, edit in progress)
+ *  - Event type-specific custom flags defined in the event configuration
+ *
+ * @param event - The EventDocument containing the action history and payload
+ * @param config - The EventConfig providing rules for custom flag evaluation
+ * @returns An array of flags currently relevant/applicable to the event
+ */
+export function getEventFlags(
+  event: EventDocument,
+  config: EventConfig
+): Flag[] {
+  const sortedActions = event.actions
+    .filter(({ type }) => !isMetaAction(type))
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+
+  return [
+    ...getActionStatusFlags(sortedActions),
+    ...getInherentFlags(sortedActions),
+    ...resolveEventCustomFlags(event, config)
+  ]
 }
