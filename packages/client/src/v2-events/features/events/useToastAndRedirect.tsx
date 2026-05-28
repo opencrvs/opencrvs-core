@@ -32,7 +32,6 @@ function ToastWithIntl({
 }: ToastProps) {
   const intl = useIntl()
 
-  console.log(intl.messages)
   return (
     <Toast
       data-testid={toastId}
