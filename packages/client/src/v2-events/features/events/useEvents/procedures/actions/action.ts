@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines  */
 import { MutationKey, useMutation, useQueryClient } from '@tanstack/react-query'
 import type {
   DecorateMutationProcedure,
@@ -65,7 +66,7 @@ function showToastOnDuplicateDetected(event: EventDocument) {
         '{trackingId} is a potential duplicate. Record is ready for review.',
       id: 'event.declaration.potentialDuplicateDetected',
       description:
-        'Notification for potential duplicate declaration. Shown when a potential duplicate is detected after declaring an event'
+        'Notification for potential duplicate declaration. Shown when a potential duplicate is detected after declaring an event.'
     },
     toastType: 'error',
     toastId: `duplicate-detected-${event.trackingId}`,
