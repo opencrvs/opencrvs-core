@@ -69,8 +69,10 @@ This section allows you to configure the postgres deployment within your infrast
 |--------------------------|---------|----|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | enabled | bool | true | Enable or disable the Postgres deployment. |
 | use_default_credentials | bool | true | If true, deploys Postgres with default user/password: postgres/postgres |
-| data_storage_size | string | 1Gi | Persistent volume claim size for Postgres data volume |
-| storage_type | string | `pvc` | Kubernetes storage type, available options are `pvc` or `host_path`. More information are at [Storage Configuration](#storage-configuration) |
+| storage_type | string | `n/a` | Kubernetes storage type, available options are `pvc` or `host_path`. More information are at [Storage Configuration](#storage-configuration) |
+| pvc.storage_class | string | `n/a` | StorageClass name used for dynamic volume provisioning |
+| pvc.storage_size | string | 10Gi | Persistent volume claim size for Postgres data volume |
+| pvc.access_mode | string | ReadWriteOnce | Kubernetes PVC access mode |
 | host_data_path | string | `/data/postgres` | Path to persistent data on VM (host) |
 | node_selector | dict | `{}` | Label selector for datastore nodes, usually used to keep data persistent |
 | backup.{} | dict | `{}` | Backup configuration section, for more information please check `values.yaml` and **Backup section** in this README |
@@ -98,8 +100,10 @@ This section allows you to configure the deployment and authentication settings 
 | ----------------------- | ------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | enabled                 | boolean | true                  | Enable or disable the Elasticsearch deployment.                                                                                              |
 | use_default_credentials | boolean | true                  | Deploy Elasticsearch without enabled authentication.                                                                                         |
-| data_storage_size       | string  | 5Gi                   | Persistent volume claim size for Elasticsearch data volume                                                                                   |
 | storage_type            | string  | `pvc`                 | Kubernetes storage type, available options are `pvc` or `host_path`. More information are at [Storage Configuration](#storage-configuration) |
+| pvc.storage_class | string | `n/a` | StorageClass name used for dynamic volume provisioning |
+| pvc.storage_size | string | 10Gi | Persistent volume claim size for Postgres data volume |
+| pvc.access_mode | string | ReadWriteOnce | Kubernetes PVC access mode |
 | host_data_path          | string  | `/data/elasticsearch` | Path to persistent data on VM (host)                                                                                                         |
 | node_selector           | dict    | `{}`                  | Label selector for datastore nodes, usually used to keep data persistent                                                                     |
 
@@ -111,8 +115,10 @@ This section allows you to configure the deployment and authentication settings 
 | ----------------------- | ------ | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | enabled                 | bool   | true                            | Enable or disable minio service                                                                                                              |
 | use_default_credentials | bool   | true                            | Default credentials for MinIO are username `minioadmin` and password `minioadmin`.                                                           |
-| data_storage_size       | string | 1Gi                             | Persistent volume claim size                                                                                                                 |
 | storage_type            | string | `pvc`                           | Kubernetes storage type, available options are `pvc` or `host_path`. More information are at [Storage Configuration](#storage-configuration) |
+| pvc.storage_class | string | `n/a` | StorageClass name used for dynamic volume provisioning |
+| pvc.storage_size | string | 10Gi | Persistent volume claim size for Postgres data volume |
+| pvc.access_mode | string | ReadWriteOnce | Kubernetes PVC access mode |
 | host_data_path          | string | `/data/minio`                   | Path to persistent data on VM (host)                                                                                                         |
 | node_selector           | dict   | `{}`                            | Label selector for datastore nodes, usually used to keep data persistent                                                                     |
 | backup.{}               | dict   | `{}`                            | Backup configuration section, for more information please check `values.yaml` and **Backup section** in this README                          |
@@ -251,7 +257,10 @@ You control persistence using the `storage_type` option, which can be set **glob
 - **`storage_type`**, available options:
   - **`pvc`** – Use the default Kubernetes StorageClass to create a PersistentVolumeClaim.
   - **`host_path`** – Use a directory on the Kubernetes node for persistence. The directory must be created with the appropriate permissions. This option is the default for legacy VMs running Docker Swarm that have been migrated to Kubernetes.
-- **`data_storage_size`** – Define the size of the PVC claim per datastore/service. Please check the Values file for supported keys.
+- **`pvc`**:
+  - `storage_class`: StorageClass name used for dynamic volume provisioning
+  - `storage_size`: Persistent volume claim size for Postgres data volume
+  - `access_mode`: Kubernetes PVC access mode
 - **`host_data_path`** – Optionally specify data path per datastore/service. For example, Elasticsearch use the `host_data_path` property to specify where data should be stored. If the directory does not exist, it will be created during deployment.
 - **`node_selector`** – Use a node selector to control where the pod is scheduled. This option can be defined globally or per service.
 
@@ -263,9 +272,10 @@ You control persistence using the `storage_type` option, which can be set **glob
 
 ```yaml
 elasticsearch:
-  # storage_type: pvc  # Not required; pvc is default
-  data_storage_size: 5Gi
-  storage_class_name: "" # Optional: specify a StorageClass or leave as "" for default
+  storage_type: pvc  # Not required; pvc is default
+  pvc:
+    storage_size: 5Gi
+    storage_class: "azurefile-premium" # Optional: specify a StorageClass or leave as "" for default
 ```
 
 #### Use hostPath for MinIO data (legacy volumes, on-prem, etc):
