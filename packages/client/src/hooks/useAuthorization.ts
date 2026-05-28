@@ -23,9 +23,7 @@ import {
   canAccessOtherUserWithScopes,
   getAdministrativeAreaHierarchy,
   UserScopeV2,
-  UUID,
-  decodeScope,
-  Scope
+  UUID
 } from '@opencrvs/commons/client'
 import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
