@@ -249,8 +249,9 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     msw
   },
   play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
     await step('User can declare', async () => {
-      const canvas = within(canvasElement)
       await userEvent.click(
         await canvas.findByRole('button', { name: 'Action' })
       )
@@ -278,6 +279,17 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
           'event.actions.register.request': false
         })
       })
+
+      await waitFor(
+        () => {
+          expect(
+            canvas.queryByText(
+              '111111 is a potential duplicate. Record is ready for review.'
+            )
+          ).toBeNull()
+        },
+        { timeout: 3000 } // We are testing negative, so intentional await to ensure we do not assert too fast.
+      )
     })
   }
 }

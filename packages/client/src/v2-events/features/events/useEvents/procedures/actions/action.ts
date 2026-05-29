@@ -30,7 +30,8 @@ import {
   EventState,
   EventConfig,
   getCurrentEventState,
-  ValidatorContext
+  ValidatorContext,
+  isPotentialDuplicate
 } from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
@@ -60,18 +61,20 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { showToast } from '../../../useToastAndRedirect'
 
 function showToastOnDuplicateDetected(event: EventDocument) {
-  showToast({
-    message: {
-      defaultMessage:
-        '{trackingId} is a potential duplicate. Record is ready for review.',
-      id: 'event.declaration.potentialDuplicateDetected',
-      description:
-        'Notification for potential duplicate declaration. Shown when a potential duplicate is detected after declaring an event.'
-    },
-    toastType: 'error',
-    toastId: `duplicate-detected-${event.trackingId}`,
-    messageOpts: { trackingId: event.trackingId }
-  })
+  if (isPotentialDuplicate(event.actions)) {
+    showToast({
+      message: {
+        defaultMessage:
+          '{trackingId} is a potential duplicate. Record is ready for review.',
+        id: 'event.declaration.potentialDuplicateDetected',
+        description:
+          'Notification for potential duplicate declaration. Shown when a potential duplicate is detected after declaring an event.'
+      },
+      toastType: 'error',
+      toastId: `duplicate-detected-${event.trackingId}`,
+      messageOpts: { trackingId: event.trackingId }
+    })
+  }
 }
 
 function retryUnlessConflict(
