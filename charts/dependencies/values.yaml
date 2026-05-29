@@ -66,6 +66,29 @@ postgres:
   # admin user name is postgres, define password here:
   # admin_user_password:
 
+  # Persistent Volume Claim (PVC) configuration
+  # NOTE: This configuration is used only when `storage_type` is set to `pvc`.
+  # For `host_path` storage, data is stored on the host filesystem at the path defined in `postgres.host_data_path`.
+  pvc:
+
+    # StorageClass name used for dynamic volume provisioning.
+    # Set to:
+    # - a specific StorageClass name (e.g. gp3, standard, managed-csi)
+    # - "default" to use the cluster default StorageClass
+    # - "" to disable dynamic provisioning / default StorageClass usage
+    # storage_class: "default"
+
+    # Kubernetes PVC access mode.
+    # Common values:
+    # - ReadWriteOnce (RWO)  : mounted read-write by a single node
+    # - ReadOnlyMany (ROX)   : mounted read-only by multiple nodes
+    # - ReadWriteMany (RWX)  : mounted read-write by multiple nodes
+    access_mode: "ReadWriteOnce"
+
+    # Requested persistent storage size
+    storage_size: "10Gi"
+
+
   # Backup section
   backup:
     # Enable/Disable backup
@@ -141,9 +164,17 @@ elasticsearch:
     - KIBANA_SYSTEM:kibana_system
     - METRICBEAT:beats_system
     - APM:apm_system
-  # TEMPORAL SECRET TO STORE ELASTICSEARCH USERS
+
+  # Secret to store OpenCRVS users credentials:
   users_secret: elasticsearch-opencrvs-users
   urls_secret: elasticsearch-opencrvs-urls
+
+  # PVC Configuration
+  pvc:
+    # storage_class: "default"
+    access_mode: "ReadWriteOnce"
+    storage_size: "10Gi"
+
   resources:
     memoryRequest: "2Gi"
     cpuRequest: "2"
@@ -201,6 +232,11 @@ minio:
   use_default_credentials: true
 
   # storage_type: host_path
+  # PVC Configuration
+  pvc:
+    # storage_class: "default"
+    access_mode: "ReadWriteOnce"
+    storage_size: "10Gi"
 
   # Path to persistent data on the VM (when storage_type is host_path).
   host_data_path: /data/minio
