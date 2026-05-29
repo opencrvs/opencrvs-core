@@ -15,10 +15,26 @@ export class MOSIPError extends Error {
   }
 }
 
+function fetchWithLog(url: string, options?: RequestInit): Promise<Response> {
+  // NOTE! Be cautious with UNSAFE_DEBUG_LOG as it may log sensitive information. Make sure to disable it in production or when handling real data.
+  if (env.UNSAFE_DEBUG_LOG) {
+    console.log(`[MOSIP-API] Request URL: ${url}`);
+    if (options?.body) {
+      console.log(`[MOSIP-API] Request Body: ${options.body}`);
+    }
+    if (options?.headers) {
+      console.log(
+        `[MOSIP-API] Request Headers: ${JSON.stringify(options.headers)}`,
+      );
+    }
+  }
+  return fetch(url, options);
+}
+
 export type AuthType = "PACKET" | "WEBSUB";
 
 export async function getMosipAuthToken(authType: AuthType) {
-  const response = await fetch(env.MOSIP_AUTH_URL, {
+  const response = await fetchWithLog(env.MOSIP_AUTH_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -115,7 +131,7 @@ export const postBirthRecord = async ({
   const authToken = await getMosipAuthToken("PACKET");
 
   // packet manager: create packet
-  const createPacketResponse = await fetch(env.MOSIP_CREATE_PACKET_URL, {
+  const createPacketResponse = await fetchWithLog(env.MOSIP_CREATE_PACKET_URL, {
     method: "PUT",
     body: requestBody,
     headers: {
@@ -154,14 +170,17 @@ export const postBirthRecord = async ({
     2,
   );
 
-  const processPacketResponse = await fetch(env.MOSIP_PROCESS_PACKET_URL, {
-    method: "POST",
-    body: processPacketRequestBody,
-    headers: {
-      "Content-Type": "application/json",
-      Cookie: `Authorization=${authToken};`,
+  const processPacketResponse = await fetchWithLog(
+    env.MOSIP_PROCESS_PACKET_URL,
+    {
+      method: "POST",
+      body: processPacketRequestBody,
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: `Authorization=${authToken};`,
+      },
     },
-  });
+  );
 
   if (!processPacketResponse.ok) {
     throw new Error(
@@ -223,14 +242,17 @@ export const postDeathRecord = async ({
   );
 
   // packet manager: deactivate packet
-  const deactivatePacketResponse = await fetch(env.MOSIP_CREATE_PACKET_URL, {
-    method: "PUT",
-    body: deactivatePacketRequestBody,
-    headers: {
-      "Content-Type": "application/json",
-      Cookie: `Authorization=${authToken};`,
+  const deactivatePacketResponse = await fetchWithLog(
+    env.MOSIP_CREATE_PACKET_URL,
+    {
+      method: "PUT",
+      body: deactivatePacketRequestBody,
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: `Authorization=${authToken};`,
+      },
     },
-  });
+  );
 
   if (!deactivatePacketResponse.ok) {
     throw new Error(
@@ -262,14 +284,17 @@ export const postDeathRecord = async ({
     2,
   );
 
-  const processPacketResponse = await fetch(env.MOSIP_PROCESS_PACKET_URL, {
-    method: "POST",
-    body: processPacketRequestBody,
-    headers: {
-      "Content-Type": "application/json",
-      Cookie: `Authorization=${authToken};`,
+  const processPacketResponse = await fetchWithLog(
+    env.MOSIP_PROCESS_PACKET_URL,
+    {
+      method: "POST",
+      body: processPacketRequestBody,
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: `Authorization=${authToken};`,
+      },
     },
-  });
+  );
 
   if (!processPacketResponse.ok) {
     throw new Error(
@@ -328,7 +353,7 @@ export const postDemographicUpdateRecord = async ({
     2,
   );
 
-  const updatePacketResponse = await fetch(env.MOSIP_CREATE_PACKET_URL, {
+  const updatePacketResponse = await fetchWithLog(env.MOSIP_CREATE_PACKET_URL, {
     method: "PUT",
     body: updatePacketRequestBody,
     headers: {
@@ -366,14 +391,17 @@ export const postDemographicUpdateRecord = async ({
     2,
   );
 
-  const processPacketResponse = await fetch(env.MOSIP_PROCESS_PACKET_URL, {
-    method: "POST",
-    body: processPacketRequestBody,
-    headers: {
-      "Content-Type": "application/json",
-      Cookie: `Authorization=${authToken};`,
+  const processPacketResponse = await fetchWithLog(
+    env.MOSIP_PROCESS_PACKET_URL,
+    {
+      method: "POST",
+      body: processPacketRequestBody,
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: `Authorization=${authToken};`,
+      },
     },
-  });
+  );
 
   if (!processPacketResponse.ok) {
     throw new Error(

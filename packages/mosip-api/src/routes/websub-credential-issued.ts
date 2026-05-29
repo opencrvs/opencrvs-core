@@ -47,6 +47,17 @@ export const credentialIssuedHandler = async (
       request.body.event.data.credential,
     );
 
+    // NOTE! Be cautious with UNSAFE_DEBUG_LOG as it may log sensitive information. Make sure to disable it in production or when handling real data.
+    if (env.UNSAFE_DEBUG_LOG) {
+      request.log.info(
+        {
+          event: "websub.credential-issued.debug",
+          verifiableCredential,
+        },
+        "Decrypted verifiable credential",
+      );
+    }
+
     // commented out for now, as there is an issue when verifying the VC, likely due to canonicalization differences
     // await verifyCredentialOrThrow(verifiableCredential, {
     //   allowList: MOSIP_VERIFIABLE_CREDENTIAL_ALLOWED_URLS,

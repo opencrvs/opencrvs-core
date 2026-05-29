@@ -1,4 +1,4 @@
-import { cleanEnv, str, port, url } from "envalid";
+import { bool, cleanEnv, str, port, url } from "envalid";
 import { join } from "node:path";
 
 export const env = cleanEnv(process.env, {
@@ -120,6 +120,12 @@ export const env = cleanEnv(process.env, {
   }),
   MOSIP_MACHINE_ID: str({
     devDefault: "10004",
+  }),
+
+  // Debug
+  UNSAFE_DEBUG_LOG: bool({
+    default: false,
+    desc: "Enable debug logging for requests and payloads",
   }),
 });
 
