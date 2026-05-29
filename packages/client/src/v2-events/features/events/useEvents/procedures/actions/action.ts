@@ -61,20 +61,18 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { showToast } from '../../../useToastAndRedirect'
 
 function showToastOnDuplicateDetected(event: EventDocument) {
-  if (isPotentialDuplicate(event.actions)) {
-    showToast({
-      message: {
-        defaultMessage:
-          '{trackingId} is a potential duplicate. Record is ready for review.',
-        id: 'event.declaration.potentialDuplicateDetected',
-        description:
-          'Notification for potential duplicate declaration. Shown when a potential duplicate is detected after declaring an event.'
-      },
-      toastType: 'error',
-      toastId: `duplicate-detected-${event.trackingId}`,
-      messageOpts: { trackingId: event.trackingId }
-    })
-  }
+  showToast({
+    message: {
+      defaultMessage:
+        '{trackingId} is a potential duplicate. Record is ready for review.',
+      id: 'event.declaration.potentialDuplicateDetected',
+      description:
+        'Notification for potential duplicate declaration. Shown when a potential duplicate is detected after declaring an event.'
+    },
+    toastType: 'error',
+    toastId: `duplicate-detected-${event.trackingId}`,
+    messageOpts: { trackingId: event.trackingId }
+  })
 }
 
 function retryUnlessConflict(
@@ -170,7 +168,10 @@ setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   retryDelay,
   onSuccess: (event) => {
     void deleteLocalEvent(event)
-    showToastOnDuplicateDetected(event)
+
+    if (isPotentialDuplicate(event.actions)) {
+      showToastOnDuplicateDetected(event)
+    }
   },
   onError: errorToastOnConflict,
   onMutate: updateEventOptimistically(
@@ -200,7 +201,10 @@ setMutationDefaults(trpcOptionsProxy.event.actions.register.request, {
   retryDelay,
   onSuccess: (event) => {
     void deleteLocalEvent(event)
-    showToastOnDuplicateDetected(event)
+
+    if (isPotentialDuplicate(event.actions)) {
+      showToastOnDuplicateDetected(event)
+    }
   },
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.REGISTER }

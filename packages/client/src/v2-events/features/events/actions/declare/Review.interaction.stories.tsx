@@ -281,8 +281,8 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
       })
 
       await waitFor(
-        () => {
-          expect(
+        async () => {
+          await expect(
             canvas.queryByText(
               '111111 is a potential duplicate. Record is ready for review.'
             )
