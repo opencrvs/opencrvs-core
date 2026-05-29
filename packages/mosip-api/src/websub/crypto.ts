@@ -112,7 +112,8 @@ export function decryptMosipCredential(
   // NOTE! Be cautious with UNSAFE_DEBUG_LOG as it may log sensitive information. Make sure to disable it in production or when handling real data.
   if (env.UNSAFE_DEBUG_LOG) {
     console.log(
-      "[MOSIP-API] Decrypted verifiable credential: " + decryptedJson,
+      "[MOSIP-API] Decrypted verifiable credential: " +
+        decrypted.toString("utf-8"),
     );
   }
 
