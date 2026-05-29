@@ -1,7 +1,7 @@
 {
   "name": "@opencrvs/esignet-mock",
   "license": "MPL-2.0",
-  "version": "2.0.0-rc.8",
+  "version": "2.0.0-rc.9",
   "main": "index.js",
   "scripts": {
     "dev": "NODE_ENV=development tsx watch src/index.ts",
