@@ -67,19 +67,22 @@ export function sortActions(
     return sortedByDefault
   }
 
-  return sortedByDefault.sort((a, b) => {
-    const aIndex =
-      'customActionType' in a && a.customActionType
-        ? actionOrder.indexOf(a.customActionType)
-        : actionOrder.indexOf(a.type)
+  const getActionIndex = (item: ActionMenuItem) => {
+    // `REVIEW_CORRECTION_REQUEST` is a client-specific action that is not part
+    // of `actionOrder`. Since it and `REQUEST_CORRECTION` are never available
+    // at the same time, sort it at the same position as `REQUEST_CORRECTION`.
+    if (item.type === ClientSpecificAction.REVIEW_CORRECTION_REQUEST) {
+      return actionOrder.indexOf(ActionType.REQUEST_CORRECTION)
+    }
 
-    const bIndex =
-      'customActionType' in b && b.customActionType
-        ? actionOrder.indexOf(b.customActionType)
-        : actionOrder.indexOf(b.type)
+    if ('customActionType' in item && item.customActionType) {
+      return actionOrder.indexOf(item.customActionType)
+    }
 
-    return aIndex - bIndex
-  })
+    return actionOrder.indexOf(item.type)
+  }
+
+  return sortedByDefault.sort((a, b) => getActionIndex(a) - getActionIndex(b))
 }
 
 function ActionMenuItems({
