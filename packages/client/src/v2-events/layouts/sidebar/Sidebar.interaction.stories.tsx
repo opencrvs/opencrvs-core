@@ -13,7 +13,11 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { expect, userEvent, waitFor, within } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { generateWorkqueues, TestUserRole } from '@opencrvs/commons/client'
+import {
+  generateWorkqueues,
+  TestUserRole,
+  V2_DEFAULT_MOCK_LOCATIONS
+} from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { WorkqueueIndex } from '@client/v2-events/features/workqueues'
@@ -49,7 +53,15 @@ const meta: Meta<typeof WorkqueueIndex> = {
           ),
           tRPCMsw.workqueue.count.query(() => ({ recent: 0 }))
         ],
-        event: [tRPCMsw.event.search.query(() => ({ results: [], total: 0 }))]
+        event: [tRPCMsw.event.search.query(() => ({ results: [], total: 0 }))],
+        locations: [
+          tRPCMsw.locations.get.query((input) => {
+            return (
+              V2_DEFAULT_MOCK_LOCATIONS.find((l) => l.id === input.id) ??
+              V2_DEFAULT_MOCK_LOCATIONS[0]
+            )
+          })
+        ]
       }
     }
   }
@@ -71,18 +83,27 @@ export const UserNameVisibleAfterOpen: Story = {
     })
 
     await step('sidebar is not visible', async () => {
-      await expect(canvas.queryByTestId('expanding-menu')).not.toBeInTheDocument()
+      await expect(
+        canvas.queryByTestId('expanding-menu')
+      ).not.toBeInTheDocument()
     })
 
     await step('Open mobile menu', async () => {
-      await userEvent.click(
-        await canvas.findByRole('button', { name: 'Toggle menu' })
-      )
+      await userEvent.click(await canvas.findByTestId('toggle-menu'))
     })
 
     await step('sidebar is visible', async () => {
-      await expect(canvas.queryByTestId('expanding-menu')).toBeInTheDocument()
-      await expect(await canvas.findByTestId('expanding-menu')).toBeVisible()
+      await waitFor(
+        async () => {
+          await expect(
+            canvas.queryByTestId('expanding-menu')
+          ).toBeInTheDocument()
+          await expect(
+            await canvas.findByTestId('expanding-menu')
+          ).toBeVisible()
+        },
+        { timeout: 2000 }
+      )
     })
   }
 }
@@ -102,11 +123,12 @@ export const OrganisationNavCollapsesMobileMenu: Story = {
     })
 
     await step('Open mobile menu', async () => {
-      await expect(canvas.queryByTestId('expanding-menu')).not.toBeInTheDocument()
+      await expect(
+        canvas.queryByTestId('expanding-menu')
+      ).not.toBeInTheDocument()
 
-      await userEvent.click(
-        await canvas.findByRole('button', { name: 'Toggle menu' })
-      )
+      await userEvent.click(await canvas.findByTestId('toggle-menu'))
+
       await expect(canvas.queryByTestId('expanding-menu')).toBeInTheDocument()
       await expect(await canvas.findByTestId('expanding-menu')).toBeVisible()
     })
@@ -116,7 +138,14 @@ export const OrganisationNavCollapsesMobileMenu: Story = {
     })
 
     await step('Menu is collapsed (ExpandingMenu unmounts)', async () => {
-      await expect(canvas.queryByTestId('expanding-menu')).not.toBeInTheDocument()
+      await waitFor(
+        async () => {
+          await expect(
+            canvas.queryByTestId('expanding-menu')
+          ).not.toBeInTheDocument()
+        },
+        { timeout: 2000 }
+      )
     })
   }
 }
