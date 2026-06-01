@@ -9236,7 +9236,22 @@ components:
           $ref: "#/components/schemas/TranslationConfig"
         defaultValue:
           anyOf:
-            - type: string
+            - type: object
+              properties:
+                path:
+                  type: string
+                  description: A relative path within the S3 bucket, never starting with /. e.g.
+                    document-id.jpg or directory/document-id.jpg. The document
+                    service constructs the full /bucket/path internally.
+                originalFilename:
+                  type: string
+                type:
+                  type: string
+              required:
+                - path
+                - originalFilename
+                - type
+              additionalProperties: false
             - type: object
               properties:
                 $$code:
