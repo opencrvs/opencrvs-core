@@ -50,7 +50,7 @@ import { Toast } from '@opencrvs/components/lib/Toast'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { parse } from 'qs'
 import { stringify } from 'querystring'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
@@ -232,8 +232,13 @@ function UserListComponent({ userDetails }: UserListProps) {
 
   const [showActivationToggleError, setShowActivationToggleError] =
     useState(false)
-  const { canReadUser, canEditUser, canAddOfficeUsers, canAccessOffice } =
-    usePermissions()
+  const {
+    canReadUser,
+    canEditUser,
+    canAddOfficeUsers,
+    canAccessOffice,
+    canAccessMultipleLocations
+  } = usePermissions()
 
   const { locationId } = parse(location.search, {
     ignoreQueryPrefix: true
@@ -263,10 +268,7 @@ function UserListComponent({ userDetails }: UserListProps) {
 
   const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
 
-  const canAccessMultipleLocations = useMemo(
-    () => Array.from(locations.values()).filter(canAccessOffice).length > 1,
-    [locations, canAccessOffice]
-  )
+  const hasAccessToMultipleLocations = canAccessMultipleLocations()
 
   const {
     searchUsers,
@@ -568,7 +570,7 @@ function UserListComponent({ userDetails }: UserListProps) {
 
   const LocationButton = (locationId: UUID) => {
     const buttons: React.ReactElement[] = []
-    if (canAccessMultipleLocations) {
+    if (hasAccessToMultipleLocations) {
       buttons.push(
         <LocationPicker
           key={`location-picker-${locationId}`}

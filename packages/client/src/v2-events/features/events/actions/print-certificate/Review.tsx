@@ -147,7 +147,7 @@ function getPrintForm(configuration: EventConfig) {
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW)
-  const [{ templateId, workqueue: slug }] = useTypedSearchParams(
+  const [{ templateId, backTo }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW
   )
 
@@ -246,7 +246,7 @@ export function Review() {
       <Navigate
         to={ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
           { eventId },
-          { workqueue: slug }
+          { backTo }
         )}
       />
     )
@@ -258,10 +258,7 @@ export function Review() {
 
   const handleCorrection = () =>
     navigate(
-      ROUTES.V2.EVENTS.REQUEST_CORRECTION.buildPath(
-        { eventId },
-        { workqueue: slug }
-      )
+      ROUTES.V2.EVENTS.REQUEST_CORRECTION.buildPath({ eventId }, { backTo })
     )
 
   const handlePrint = async () => {
@@ -330,9 +327,11 @@ export function Review() {
           }
         )
 
-        slug
-          ? navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
-          : navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
+        if (backTo) {
+          navigate(backTo)
+        } else {
+          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
+        }
       } catch (error) {
         // TODO: add notification alert
         // eslint-disable-next-line no-console

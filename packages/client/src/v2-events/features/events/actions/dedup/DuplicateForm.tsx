@@ -41,7 +41,7 @@ const SubPageContent = styled(Content)`
 export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
 
-  const [{ workqueue: slug }] = useTypedSearchParams(
+  const [{ backTo }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE
   )
 
@@ -119,8 +119,8 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
             declaration: {}
           })
 
-          if (slug) {
-            navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
+          if (backTo) {
+            navigate(backTo)
           } else {
             navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
           }

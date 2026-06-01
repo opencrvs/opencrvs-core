@@ -314,14 +314,12 @@ function buildAvailableActionComponents({
   event,
   localEventStatus,
   action,
-  isWideScreen,
-  redirectParam
+  isWideScreen
 }: {
   event: EventIndex
   localEventStatus: EventIndex['status'] | keyof typeof ExtendedEventStatuses
   action?: { type: WorkqueueActionType }
   isWideScreen: boolean
-  redirectParam: string
 }) {
   const actionConfigs: Array<{ actionComponent: () => React.ReactNode }> = []
 
@@ -333,7 +331,6 @@ function buildAvailableActionComponents({
             key={'ActionCta-' + event.id}
             actionType={action.type}
             event={event}
-            redirectParam={redirectParam}
           />
         )
       })
@@ -412,7 +409,6 @@ export function processEventsToRows({
   eventConfigs,
   outbox,
   action,
-  redirectParam,
   isWideScreen,
   isOnline,
   intl
@@ -424,7 +420,6 @@ export function processEventsToRows({
   eventConfigs: EventConfig[]
   outbox: OutboxEventIndex[]
   action?: { type: WorkqueueActionType }
-  redirectParam: string
   isWideScreen: boolean
   isOnline: boolean
   intl: IntlShape
@@ -436,8 +431,7 @@ export function processEventsToRows({
       event: enrichedEvent,
       localEventStatus,
       action,
-      isWideScreen,
-      redirectParam
+      isWideScreen
     })
 
     const outboxMeta = outbox.find((o) => o.id === enrichedEvent.id)?.meta
@@ -457,7 +451,6 @@ export function processEventsToRows({
           event={enrichedEvent}
           eventConfig={eventConfig}
           localEventStatus={localEventStatus}
-          redirectParam={redirectParam}
         />
       ),
       outbox: intl.formatMessage(

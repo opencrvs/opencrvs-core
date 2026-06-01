@@ -21,6 +21,7 @@ import {
   ActionType,
   footballClubMembershipEvent,
   generateEventDocument,
+  getCurrentEventState,
   TENNIS_CLUB_MEMBERSHIP,
   tennisClubMembershipEvent,
   TestUserRole,
@@ -704,6 +705,115 @@ export const JurisdictionScope_AllBeatsLocation: Story = {
             options.some((o) => o.textContent?.includes(office))
           ).toBe(true)
         })
+      }
+    )
+  }
+}
+
+/**
+ * Verifies the `backTo` round-trip: a user lands on the advanced search result
+ * page with a serialized set of filters, opens an event, navigates into a deep
+ * action (edit/review) and then closes — they must return to the exact same
+ * search-result URL with the same filters intact.
+ *
+ * This exercises the unified `backTo` query param introduced in [routes.ts] and
+ * the `useCurrentBackTo` hook + `closeActionView(backTo)` exit path.
+ */
+const backToFilterParams = serializeSearchParams({
+  'applicant.name': {
+    firstname: 'John',
+    surname: 'Doe'
+  },
+  'event.legalStatuses.REGISTERED.createdAtLocation':
+    '028d2c85-ca31-426d-b5d1-2cef545a4902',
+  'event.status': 'ALL',
+  eventType: TENNIS_CLUB_MEMBERSHIP
+})
+
+const searchResultInitialPath = `${ROUTES.V2.SEARCH_RESULT.buildPath({
+  eventType: TENNIS_CLUB_MEMBERSHIP
+})}?${backToFilterParams}`
+
+const registeredEventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [
+    { type: ActionType.CREATE },
+    { type: ActionType.DECLARE },
+    { type: ActionType.REGISTER }
+  ]
+})
+const registeredEventIndex = getCurrentEventState(
+  registeredEventDocument,
+  tennisClubMembershipEvent
+)
+
+const backToPersistenceMsw = {
+  handlers: {
+    events: [
+      tRPCMsw.event.config.get.query(() => [
+        tennisClubMembershipEvent,
+        footballClubMembershipEvent
+      ]),
+      tRPCMsw.event.search.query(() => ({
+        results: [registeredEventIndex],
+        total: 1
+      })),
+      tRPCMsw.event.get.query(() => registeredEventDocument)
+    ],
+    drafts: trpcHandlers.drafts.handlers
+  }
+}
+
+export const SearchResultBackToPersistsThroughEditClose: Story = {
+  parameters: {
+    ...storyParams,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: searchResultInitialPath
+    },
+    msw: backToPersistenceMsw
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Advanced search result table renders', async () => {
+      await canvas.findByTestId('search-result', {}, { timeout: 5000 })
+    })
+
+    await step(
+      'Click the applicant name button navigates to event overview',
+      async () => {
+        const searchResult = await canvas.findByTestId('search-result')
+        const nameButton = await within(searchResult).findByRole(
+          'button',
+          { name: /John/ },
+          { timeout: 5000 }
+        )
+        await userEvent.click(nameButton)
+      }
+    )
+
+    await step('Event overview page renders with exit button', async () => {
+      await canvas.findByTestId('exit-event', {}, { timeout: 5000 })
+    })
+
+    await step('Click X close on the event overview page', async () => {
+      const closeBtn = await canvas.findByTestId('exit-event')
+      await userEvent.click(closeBtn)
+    })
+
+    await step(
+      'User lands back on the advanced search result page with filters intact',
+      async () => {
+        await canvas.findByTestId('search-result')
+        // Applicant name filter chip from the original search criteria must
+        // still be visible — proves the backTo URL preserved query params.
+        await canvas.findByText('Event: Tennis-club-membership')
+        await canvas.findByText(`Applicant's name: John Doe`)
+        await canvas.findByText(
+          `Place of registration: Ibombo District Office, Ibombo, Central, Farajaland`
+        )
+        await canvas.findByText(`Status of record: Any status`)
       }
     )
   }

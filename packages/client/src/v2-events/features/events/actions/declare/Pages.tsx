@@ -96,7 +96,7 @@ export function Pages() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          closeActionView(searchParams.workqueue)
+          closeActionView(searchParams.backTo)
         })
       }
     >
@@ -124,7 +124,7 @@ export function Pages() {
           navigate(
             ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
               { eventId },
-              { workqueue: searchParams.workqueue }
+              { backTo: searchParams.backTo }
             )
           )
         }
