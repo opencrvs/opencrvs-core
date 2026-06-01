@@ -27,9 +27,23 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+const MOBILE_WIDTH = 375
+
 const meta: Meta<typeof WorkqueueIndex> = {
   title: 'Sidebar/Interaction',
   component: WorkqueueIndex,
+  // AppBar gates the Hamburger on window.innerWidth via useWindowSize(). The
+  // Storybook viewport parameter resizes the iframe CSS but does not change
+  // window.innerWidth in all environments (e.g. Chromatic). Force it here so
+  // the mobile layout — and the toggle-menu button — always renders.
+  beforeEach: () => {
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: MOBILE_WIDTH
+    })
+    window.dispatchEvent(new Event('resize'))
+  },
   decorators: [
     (Story) => (
       <TRPCProvider>
