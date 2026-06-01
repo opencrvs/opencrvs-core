@@ -159,9 +159,7 @@ function useEditActions(event: EventDocument) {
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const navigate = useNavigate()
   const { isActionAllowed } = useUserAllowedActions(eventIndex)
-  const [{ workqueue: slug }] = useTypedSearchParams(
-    ROUTES.V2.EVENTS.EDIT.REVIEW
-  )
+  const [{ backTo }] = useTypedSearchParams(ROUTES.V2.EVENTS.EDIT.REVIEW)
   const { getAnnotation } = useActionAnnotation()
   const canDirectlyRegister = useCanDirectlyRegister(event)
   const { closeActionView } = useEventFormNavigation()
@@ -245,7 +243,7 @@ function useEditActions(event: EventDocument) {
               content: { comment }
             })
 
-            closeActionView(slug)
+            closeActionView(backTo)
           }
         },
         disabled:
@@ -277,7 +275,7 @@ function useEditActions(event: EventDocument) {
               content: { comment }
             })
 
-            closeActionView(slug)
+            closeActionView(backTo)
           }
         },
         disabled: hasValidationErrors || !anyValuesHaveChanged,
@@ -308,7 +306,7 @@ function useEditActions(event: EventDocument) {
               content: { comment }
             })
 
-            closeActionView(slug)
+            closeActionView(backTo)
           }
         },
         disabled: !anyValuesHaveChanged,
