@@ -92,7 +92,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
         icon: isValidIcon(actionConfig?.icon)
           ? actionConfig.icon
           : actionIcons[actionType],
-        onClick: async (workqueue?: string) => onClick(actionType, workqueue),
+        onClick: async (backTo?: string) => onClick(actionType, backTo),
         disabled: !enabled,
         hidden: !visible
       }

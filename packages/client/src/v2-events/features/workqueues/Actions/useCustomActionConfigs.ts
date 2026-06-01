@@ -87,8 +87,7 @@ export function useCustomActionConfigs(event: EventIndex): {
       .map((action) => ({
         label: action.label,
         icon: isValidIcon(action.icon) ? action.icon : ('PencilLine' as const),
-        onClick: async (workqueue?: string) =>
-          onCustomAction(action, workqueue),
+        onClick: async (backTo?: string) => onCustomAction(action, backTo),
         disabled: !(
           isDownloadedAndAssignedToUser &&
           isActionEnabled(action, event, validatorContext)
