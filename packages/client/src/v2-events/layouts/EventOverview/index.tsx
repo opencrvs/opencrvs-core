@@ -92,7 +92,7 @@ function EventOverviewTabs() {
   const navigate = useNavigate()
   const location = useLocation()
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT)
-  const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
+  const [{ backTo }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
   const { canAccessEventWithScopes } = useCanAccessEventWithScopes(eventId, [
     'record.read'
   ])
@@ -106,7 +106,7 @@ function EventOverviewTabs() {
       <Tab
         className={isActive(ROUTES.V2.EVENTS.EVENT.path) ? 'active' : ''}
         onClick={() => {
-          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { workqueue }))
+          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { backTo }))
         }}
       >
         {intl.formatMessage(messages.summary)}
@@ -118,10 +118,7 @@ function EventOverviewTabs() {
           }
           onClick={() => {
             navigate(
-              ROUTES.V2.EVENTS.EVENT.RECORD.buildPath(
-                { eventId },
-                { workqueue }
-              )
+              ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { backTo })
             )
           }}
         >
@@ -132,7 +129,7 @@ function EventOverviewTabs() {
         className={isActive(ROUTES.V2.EVENTS.EVENT.AUDIT.path) ? 'active' : ''}
         onClick={() => {
           navigate(
-            ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({ eventId }, { workqueue })
+            ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({ eventId }, { backTo })
           )
         }}
       >
@@ -148,7 +145,7 @@ export function EventOverviewLayout({
   children: React.ReactNode
 }) {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT)
-  const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
+  const [{ backTo }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
   const { searchEventById } = useEvents()
   const { getRemoteDraftByEventId } = useDrafts()
   const draft = getRemoteDraftByEventId(eventId)
@@ -177,8 +174,8 @@ export function EventOverviewLayout({
   const isDraft = event.status === EventStatus.enum.CREATED
 
   const exit = () => {
-    if (workqueue) {
-      navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue }))
+    if (backTo) {
+      navigate(backTo)
       return
     }
 

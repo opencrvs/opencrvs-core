@@ -36,7 +36,7 @@ import { hasDeclarationFieldChanged } from '../utils'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
-  const [{ workqueue: slug }] = useTypedSearchParams(
+  const [{ backTo }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW
   )
   const intl = useIntl()
@@ -106,7 +106,7 @@ export function Review() {
               { pageId, eventId },
               {
                 from: 'review',
-                workqueue: slug
+                backTo
               },
               fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
             )
@@ -121,7 +121,7 @@ export function Review() {
             navigate(
               ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath(
                 { eventId },
-                { workqueue: slug }
+                { backTo }
               )
             )
           }}

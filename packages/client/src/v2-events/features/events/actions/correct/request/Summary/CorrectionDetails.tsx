@@ -185,12 +185,12 @@ interface CorrectionDetail {
  * a table with the corrected fields.
  */
 export function CorrectionDetails({
+  backTo,
   event,
   form,
   annotation,
   requesting,
   editable = false,
-  workqueue,
   correctionRequestAction,
   validatorContext
 }: {
@@ -200,7 +200,7 @@ export function CorrectionDetails({
   requesting: boolean
   correctionRequestAction?: RequestedCorrectionAction
   editable?: boolean
-  workqueue?: string
+  backTo?: string
   validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
@@ -279,7 +279,7 @@ export function CorrectionDetails({
                         pageId,
                         eventId: event.id
                       },
-                      { workqueue },
+                      { backTo },
                       id ? makeFormFieldIdFormikCompatible(id) : undefined
                     )
                   )
