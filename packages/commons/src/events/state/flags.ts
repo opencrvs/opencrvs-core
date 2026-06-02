@@ -89,7 +89,7 @@ function isRejected(actions: Action[]): boolean {
   }, false)
 }
 
-function isPotentialDuplicate(actions: Action[]): boolean {
+export function isPotentialDuplicate(actions: Action[]): boolean {
   return actions.reduce<boolean>((prev, { type }) => {
     if (type === ActionType.DUPLICATE_DETECTED) {
       return true
