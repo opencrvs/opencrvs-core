@@ -30,6 +30,7 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
 import { setEventData, addLocalEventConfig } from '../../useEvents/api'
+import { ActionDocument } from '../../../../../../../commons/build/dist/common/client'
 import { ReviewIndex } from './Review'
 
 const generator = testDataGenerator()
@@ -687,7 +688,7 @@ export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
                     }
                   }
                 })
-              ]
+              ] as ActionDocument[]
             }
           })
         ]
@@ -753,7 +754,7 @@ export const ShowToastOnDuplicateDetectedOnRegister: Story = {
           tRPCMsw.event.actions.declare.request.mutation((action) => {
             return {
               ...eventDocument,
-              actions: [...eventDocument.actions, action]
+              actions: [...eventDocument.actions, action] as ActionDocument[]
             }
           }),
           tRPCMsw.event.actions.register.request.mutation((action) => {
@@ -771,7 +772,7 @@ export const ShowToastOnDuplicateDetectedOnRegister: Story = {
                     }
                   }
                 })
-              ]
+              ] as ActionDocument[]
             }
           })
         ]
