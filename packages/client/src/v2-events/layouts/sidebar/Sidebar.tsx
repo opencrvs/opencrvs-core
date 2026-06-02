@@ -219,6 +219,7 @@ function SidebarComponent({
       </NavigationGroup>
       <OrganisationNavigationGroup
         currentWorkqueueSlug={workqueueSlug}
+        menuCollapse={menuCollapse}
         primaryOfficeId={userDetails?.primaryOfficeId}
       />
       <PerformanceNavigationGroup currentWorkqueueSlug={workqueueSlug} />

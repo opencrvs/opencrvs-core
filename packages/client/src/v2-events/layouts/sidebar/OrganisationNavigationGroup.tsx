@@ -39,10 +39,12 @@ const communicationTab = [
  * */
 export function OrganisationNavigationGroup({
   currentWorkqueueSlug,
-  primaryOfficeId
+  primaryOfficeId,
+  menuCollapse
 }: {
   currentWorkqueueSlug?: string
   primaryOfficeId: string | undefined
+  menuCollapse?: () => void // Only relevant for mobile view
 }) {
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const [isCommunicationExpanded, setIsCommunicationExpanded] =
@@ -64,13 +66,15 @@ export function OrganisationNavigationGroup({
             label={intl.formatMessage(
               navigationMessages[WORKQUEUE_TABS.organisation]
             )}
-            onClick={() =>
+            onClick={() => {
               navigate(
                 formatUrl(routes.ORGANISATIONS_INDEX, {
                   locationId: '' // NOTE: Empty string is required
                 })
               )
-            }
+              // Collapse menu on mobile after navigation}
+              menuCollapse?.()
+            }}
           />
           {hasAccess(WORKQUEUE_TABS.team) && (
             <NavigationItem
@@ -89,6 +93,7 @@ export function OrganisationNavigationGroup({
                     })
                   })
                 }
+                menuCollapse?.()
               }}
             />
           )}
@@ -121,7 +126,10 @@ export function OrganisationNavigationGroup({
                     label={intl.formatMessage(
                       navigationMessages[WORKQUEUE_TABS.systems]
                     )}
-                    onClick={() => navigate(routes.SYSTEM_LIST)}
+                    onClick={() => {
+                      navigate(routes.SYSTEM_LIST)
+                      menuCollapse?.()
+                    }}
                   />
                 )}
             </>
@@ -163,7 +171,10 @@ export function OrganisationNavigationGroup({
                   label={intl.formatMessage(
                     navigationMessages[WORKQUEUE_TABS.emailAllUsers]
                   )}
-                  onClick={() => navigate(routes.ALL_USER_EMAIL)}
+                  onClick={() => {
+                    navigate(routes.ALL_USER_EMAIL)
+                    menuCollapse?.()
+                  }}
                 />
               )}
             </>
