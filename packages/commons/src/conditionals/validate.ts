@@ -122,6 +122,8 @@ export type ClientFunctionContext = {
   $window?: SystemVariables['$window']
   locations?: Location[]
   adminLevelIds?: string[]
+  $flags?: string[]
+  $status?: string
 }
 
 // `data` is `FieldValue | undefined` because validators receive the field
@@ -425,13 +427,16 @@ export function isConditionMet(
   // @TODO: should this be non-optional
   eventIndex?: EventIndex
 ) {
-  return validate(
-    conditional,
-    buildClientFunctionContext({
+  return validate(conditional, {
+    ...buildClientFunctionContext({
       form: mergeWithBaseFormState(values, context),
       validatorContext: context
+    }),
+    ...(eventIndex && {
+      $flags: eventIndex.flags,
+      $status: eventIndex.status
     })
-  )
+  })
 }
 
 function getConditionalActionsForField(
