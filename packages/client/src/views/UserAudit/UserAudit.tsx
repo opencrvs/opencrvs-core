@@ -200,6 +200,7 @@ export const UserAudit = () => {
         <Content
           title={userName}
           icon={() => <UserAvatar name={userName} avatar={user.avatar} />}
+          showTitleOnMobile
           topActionButtons={
             userDetails && scope
               ? [
