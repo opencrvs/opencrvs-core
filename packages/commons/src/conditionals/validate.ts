@@ -423,20 +423,15 @@ export function isOnline() {
 export function isConditionMet(
   conditional: JSONSchema,
   values: EventState | ActionUpdate,
-  context: ValidatorContext,
-  // @TODO: should this be non-optional
-  eventIndex?: EventIndex
+  context: ValidatorContext
 ) {
-  return validate(conditional, {
-    ...buildClientFunctionContext({
+  return validate(
+    conditional,
+    buildClientFunctionContext({
       form: mergeWithBaseFormState(values, context),
       validatorContext: context
-    }),
-    ...(eventIndex && {
-      $flags: eventIndex.flags,
-      $status: eventIndex.status
     })
-  })
+  )
 }
 
 function getConditionalActionsForField(
@@ -456,10 +451,10 @@ export function areConditionsMet(
   conditions: FieldConditional[],
   values: Record<string, FieldValue>,
   context: ValidatorContext,
-  event: EventIndex
+  _event: EventIndex
 ) {
   return conditions.every((condition) =>
-    isConditionMet(condition.conditional, values, context, event)
+    isConditionMet(condition.conditional, values, context)
   )
 }
 
@@ -553,7 +548,14 @@ function isActionConditionMet(
     return true
   }
 
-  return isConditionMet(rule.conditional, event.declaration, context, event)
+  return validate(rule.conditional, {
+    ...buildClientFunctionContext({
+      form: mergeWithBaseFormState(event.declaration, context),
+      validatorContext: context
+    }),
+    $flags: event.flags,
+    $status: event.status
+  })
 }
 
 export function isActionEnabled(
