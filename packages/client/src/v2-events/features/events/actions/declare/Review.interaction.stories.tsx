@@ -675,7 +675,7 @@ export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
           tRPCMsw.event.actions.declare.request.mutation((action) => {
             return {
               ...eventDocument,
-              action: [
+              actions: [
                 ...eventDocument.actions,
                 action,
                 generateActionDocument({
@@ -753,7 +753,13 @@ export const ShowToastOnDuplicateDetectedOnRegister: Story = {
           tRPCMsw.event.actions.declare.request.mutation((action) => {
             return {
               ...eventDocument,
-              action: [
+              actions: [...eventDocument.actions, action]
+            }
+          }),
+          tRPCMsw.event.actions.register.request.mutation((action) => {
+            return {
+              ...eventDocument,
+              actions: [
                 ...eventDocument.actions,
                 action,
                 generateActionDocument({
