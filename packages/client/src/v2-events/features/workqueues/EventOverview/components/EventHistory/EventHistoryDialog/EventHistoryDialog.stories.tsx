@@ -1328,9 +1328,7 @@ export const RecordCorrected: Story = {
           id: generateUuid(prng),
           type: ActionType.APPROVE_CORRECTION,
           requestId: requestCorrectionAction.id,
-          annotation: {
-            isImmediateCorrection: true
-          }
+          content: { immediateCorrection: true }
         }
       ],
       trackingId: 'ABCD123',
