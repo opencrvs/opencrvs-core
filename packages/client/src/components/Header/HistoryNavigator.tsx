@@ -11,7 +11,6 @@
 import React from 'react'
 import { Button } from '@opencrvs/components/lib/Button'
 import { useNavigate, useNavigationType } from 'react-router-dom'
-
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { useHomePage } from '@client/hooks/useHomePage'
 

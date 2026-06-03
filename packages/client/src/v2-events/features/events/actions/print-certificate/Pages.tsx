@@ -118,7 +118,7 @@ export function Pages() {
                 eventId,
                 pageId: nextPageId
               },
-              { workqueue: searchParams.workqueue }
+              { backTo: searchParams.backTo }
             )
           )
         }}
@@ -128,7 +128,7 @@ export function Pages() {
               { eventId },
               {
                 templateId: String(annotation[CERT_TEMPLATE_ID]),
-                workqueue: searchParams.workqueue
+                backTo: searchParams.backTo
               }
             )
           )

@@ -174,6 +174,7 @@ const SearchWrapper = styled.div`
   position: relative;
   display: flex;
   width: 100%;
+  z-index: 1;
   align-items: stretch;
 `
 

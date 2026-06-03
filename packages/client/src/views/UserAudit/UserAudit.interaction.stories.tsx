@@ -67,6 +67,23 @@ const meta: Meta<typeof UserAudit> = {
 export default meta
 type Story = StoryObj<typeof UserAudit>
 
+export const TitleVisibleOnMobile: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile' },
+    msw: {
+      handlers: {
+        userGet: [tRPCMsw.user.get.query(() => kennedy)]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    await step('User name title is visible on mobile', async () => {
+      expect(await canvas.findByText('Kennedy Mweene')).toBeVisible()
+    })
+  }
+}
+
 /**
  * Regression test for: deactivating an active user from the audit page must
  * open the UserActivationModal and the success toast must surface after
