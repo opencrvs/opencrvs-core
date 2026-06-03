@@ -596,6 +596,7 @@ export async function sendResetPasswordInvite(
   const temporaryPassword = generateRandomPassword()
   const { hash, salt } = await generateSaltedHash(temporaryPassword)
   await updatePasswordHashAndSalt(userId, hash, salt)
+  await updateUserById(userId, { status: 'pending' })
 
   try {
     await triggerUserEventNotification({
