@@ -397,7 +397,6 @@ events:
     name: ocrvs-events
   env:
     ES_INDEX_PREFIX: events
-    DEFAULT_USER_PASSWORD: "test"
     TWO_FA_ENABLED: true
   probes:
     liveness:
