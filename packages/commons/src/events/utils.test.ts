@@ -849,7 +849,7 @@ describe('getCompleteActionContent', () => {
       action: ActionType.APPROVE_CORRECTION,
       defaults: {
         status: ActionStatus.Requested,
-        content: { immediateCorrection: false, fromOriginal: true }
+        content: { immediateCorrection: false }
       }
     })
 
@@ -866,7 +866,8 @@ describe('getCompleteActionContent', () => {
 
     const result = getCompleteActionContent(event, action)
 
-    expect(result).toEqual({ immediateCorrection: true, fromOriginal: true })
+    // current action wins: true overrides false from the original
+    expect(result).toEqual({ immediateCorrection: true })
   })
 
   it('inherits content from Requested original action when own content is absent', () => {
