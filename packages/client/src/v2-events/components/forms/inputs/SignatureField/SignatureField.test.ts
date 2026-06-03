@@ -13,20 +13,7 @@ import { DocumentPath } from '@opencrvs/commons/client'
 import { SignatureField } from './SignatureField'
 
 describe('SignatureField.toCertificateVariables', () => {
-  const originalConfig = window.config
-
-  beforeEach(() => {
-    window.config = {
-      ...originalConfig,
-      MINIO_BASE_URL: 'http://localhost:9000'
-    }
-  })
-
-  afterEach(() => {
-    window.config = originalConfig
-  })
-
-  it('returns a URL string when given a valid FileFieldValue', () => {
+  it('returns an absolute URL string when given a valid FileFieldValue', () => {
     const fileValue = {
       path: '/ocrvs/signature-123.png' as DocumentPath,
       originalFilename: 'signature.png',
@@ -35,7 +22,7 @@ describe('SignatureField.toCertificateVariables', () => {
 
     const result = SignatureField.toCertificateVariables(fileValue)
 
-    expect(result).toBe('http://localhost:9000/ocrvs/signature-123.png')
+    expect(result).toBe('/ocrvs/signature-123.png')
   })
 
   it('returns an empty string when value is undefined', () => {
@@ -67,21 +54,7 @@ describe('SignatureField.toCertificateVariables', () => {
     expect(result).toBe('')
   })
 
-  it('correctly resolves Minio URL with different base URLs', () => {
-    window.config.MINIO_BASE_URL = 'https://minio.example.com'
-
-    const fileValue = {
-      path: '/bucket/signature.png' as DocumentPath,
-      originalFilename: 'signature.png',
-      type: 'image/png'
-    }
-
-    const result = SignatureField.toCertificateVariables(fileValue)
-
-    expect(result).toBe('https://minio.example.com/bucket/signature.png')
-  })
-
-  it('handles paths without leading slash', () => {
+  it('prepends a leading slash to paths that lack one', () => {
     const fileValue = {
       path: 'ocrvs/signature.png' as DocumentPath,
       originalFilename: 'signature.png',
@@ -90,6 +63,6 @@ describe('SignatureField.toCertificateVariables', () => {
 
     const result = SignatureField.toCertificateVariables(fileValue)
 
-    expect(result).toBe('http://localhost:9000/ocrvs/signature.png')
+    expect(result).toBe('/ocrvs/signature.png')
   })
 })

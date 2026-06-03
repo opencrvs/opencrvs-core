@@ -229,7 +229,7 @@ function toCertificateVariables(value: FileFieldValue | undefined) {
   const parsed = FileFieldValue.safeParse(value)
 
   if (parsed.success) {
-    return new URL(parsed.data.path, window.config.MINIO_BASE_URL).href
+    return toFileUrl(parsed.data.path)
   }
 
   return ''

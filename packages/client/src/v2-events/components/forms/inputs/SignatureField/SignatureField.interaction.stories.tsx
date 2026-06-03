@@ -556,7 +556,7 @@ export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
     const canvas = within(canvasElement)
 
     await expect(await canvas.findByTestId('with-value')).toHaveTextContent(
-      'http://localhost:3535/events/birth-123/signature.png'
+      '/events/birth-123/signature.png'
     )
     await expect(await canvas.findByTestId('with-undefined')).toHaveTextContent(
       ''
