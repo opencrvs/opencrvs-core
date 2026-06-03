@@ -278,7 +278,7 @@ platform:
 auth:
   port: 4040
   env:
-    TWO_FA_ENABLED: false
+    TWO_FA_ENABLED: true
   image:
     name: ocrvs-auth
     # optional overrides:
@@ -342,29 +342,12 @@ documents:
   image:
     name: ocrvs-documents
 
-events:
-  port: 5555
-  image:
-    name: ocrvs-events
-  env:
-    ES_INDEX_PREFIX: events
-  probes:
-    liveness:
-      path: /health/ready
-      timeoutSeconds: 10
-    readiness:
-      path: /health/ready
-      timeoutSeconds: 10
-    startup:
-      path: /health/ready
-
 gateway:
   port: 7070
   image:
     name: ocrvs-gateway
 
   env:
-    TWO_FA_ENABLED: false
     CHECK_INVALID_TOKEN: "true"
     CONFIG_SMS_CODE_EXPIRY_SECONDS: "600"
     CONFIG_TOKEN_EXPIRY_SECONDS: "604800"
@@ -408,14 +391,13 @@ login:
       httpGet:
         path: /health/ready
 
-
 events:
   port: 5555
   image:
     name: ocrvs-events
   env:
-    DEFAULT_USER_PASSWORD: "test"
-    TWO_FA_ENABLED: false
+    ES_INDEX_PREFIX: events
+    TWO_FA_ENABLED: true
   probes:
     liveness:
       path: /health/ready
