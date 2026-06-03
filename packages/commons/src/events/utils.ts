@@ -778,6 +778,40 @@ export function getCompleteActionAnnotation(
   return action.annotation ?? {}
 }
 
+/**
+ * Resolves the complete content for an action, inheriting from its original
+ * Requested action when the Accepted action carries no content of its own.
+ *
+ * Mirrors the same "originalActionId → merge from Requested" pattern used by
+ * getCompleteActionAnnotation and getCompleteActionDeclaration.
+ */
+export function getCompleteActionContent(
+  event: EventDocument,
+  action: ActionDocument
+): Record<string, unknown> | null | undefined {
+  const currentContent = ('content' in action ? action.content : undefined) as
+    | Record<string, unknown>
+    | null
+    | undefined
+
+  if (!action.originalActionId) {
+    return currentContent
+  }
+
+  const originalAction = event.actions.find(
+    ({ id }) => id === action.originalActionId
+  )
+
+  if (originalAction && 'content' in originalAction && originalAction.content) {
+    return {
+      ...(originalAction.content as Record<string, unknown>),
+      ...(currentContent ?? {})
+    }
+  }
+
+  return currentContent
+}
+
 export function getCompleteActionDeclaration<
   T extends EventState | ActionUpdate
 >(declaration: T, event: EventDocument, action: ActionDocument): T {
