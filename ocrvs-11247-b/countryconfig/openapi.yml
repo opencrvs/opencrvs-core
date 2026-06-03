@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Countryconfig implementation requirements
-  version: 1.8.0
+  version: 2.0.0
   description: Country specific configuration server for OpenCRVS
 paths:
   /events:
@@ -2104,87 +2104,8 @@ components:
           description: Fallback title shown when the main title resolves to an empty value.
           $ref: "#/components/schemas/TranslationConfig"
         summary:
-          type: object
-          properties:
-            fields:
-              type: array
-              items:
-                anyOf:
-                  - type: object
-                    properties:
-                      emptyValueMessage:
-                        description: Default message displayed when the field value is empty.
-                        $ref: "#/components/schemas/TranslationConfig"
-                      conditionals:
-                        default: []
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            type:
-                              type: string
-                              const: SHOW
-                            conditional:
-                              $ref: "#/components/schemas/Conditional"
-                          required:
-                            - type
-                            - conditional
-                          additionalProperties: false
-                          description: If 'SHOW' conditional is defined, the component is shown to the
-                            user only if the condition is met
-                      id:
-                        type: string
-                        description: Identifier of the summary field.
-                      value:
-                        description: Field value template supporting variables from configuration and
-                          EventMetadata (e.g. "{informant.phoneNo}
-                          {informant.email}").
-                        $ref: "#/components/schemas/TranslationConfig"
-                      label:
-                        $ref: "#/components/schemas/TranslationConfig"
-                    required:
-                      - id
-                      - value
-                      - label
-                    additionalProperties: false
-                    description: Custom field defined for the summary view.
-                  - type: object
-                    properties:
-                      emptyValueMessage:
-                        description: Default message displayed when the field value is empty.
-                        $ref: "#/components/schemas/TranslationConfig"
-                      conditionals:
-                        default: []
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            type:
-                              type: string
-                              const: SHOW
-                            conditional:
-                              $ref: "#/components/schemas/Conditional"
-                          required:
-                            - type
-                            - conditional
-                          additionalProperties: false
-                          description: If 'SHOW' conditional is defined, the component is shown to the
-                            user only if the condition is met
-                      fieldId:
-                        type: string
-                      label:
-                        description: Overrides the default label from the referenced field when
-                          provided.
-                        $ref: "#/components/schemas/TranslationConfig"
-                    required:
-                      - fieldId
-                    additionalProperties: false
-                    description: Field referencing existing event data by field ID.
-              description: Fields displayed in the event summary view.
-          required:
-            - fields
-          additionalProperties: false
           description: Summary information displayed in the event overview.
+          $ref: "#/components/schemas/SummaryConfig"
         label:
           description: Human-readable label for the event type.
           $ref: "#/components/schemas/TranslationConfig"
@@ -2207,536 +2128,7 @@ components:
           description: Configuration of fields available in the advanced search feature.
           type: array
           items:
-            type: object
-            properties:
-              title:
-                description: Advanced search tab title
-                $ref: "#/components/schemas/TranslationConfig"
-              fields:
-                type: array
-                items:
-                  oneOf:
-                    - type: object
-                      properties:
-                        config:
-                          type: object
-                          properties:
-                            type:
-                              type: string
-                              enum:
-                                - fuzzy
-                                - exact
-                                - range
-                                - within
-                              description: Determines the search type of field. How to match value.
-                            searchFields:
-                              description: "
-
-                                \      Defines
-                                multiple form fields that should be searched
-                                when this field has a value.
-
-                                \      All
-                                specified fields will be combined using OR
-                                logic.
-
-
-                                \      Example:
-                                { searchFields: ['mother.name', 'father.name',
-                                'informant.name'] }
-
-                                \      Will
-                                search all fields and return a record if any of
-                                the fields match the search value.    \ 
-
-                                \      "
-                              type: array
-                              items:
-                                type: string
-                          required:
-                            - type
-                          additionalProperties: false
-                        type:
-                          description: "
-
-                            \      Explicitly
-                            specify the field type for searchFields.
-
-                            \      This is required
-                            when searchFields is defined, to show the correct
-                            control in the UI.
-
-                            \       \ 
-
-                            \      Example:
-                            FieldType.NAME for name fields, FieldType.TEXT for
-                            text fields, FieldType.DATE for date fields, etc.
-
-                            \      "
-                          type: string
-                          enum:
-                            - NAME
-                            - PHONE
-                            - ID
-                            - ADDRESS
-                            - TEXT
-                            - NUMBER
-                            - NUMBER_WITH_UNIT
-                            - TEXTAREA
-                            - EMAIL
-                            - DATE
-                            - AGE
-                            - DATE_RANGE
-                            - SELECT_DATE_RANGE
-                            - TIME
-                            - IMAGE_VIEW
-                            - PARAGRAPH
-                            - HEADING
-                            - PAGE_HEADER
-                            - RADIO_GROUP
-                            - FIELD_GROUP
-                            - FILE
-                            - FILE_WITH_OPTIONS
-                            - BULLET_LIST
-                            - CHECKBOX
-                            - SELECT
-                            - COUNTRY
-                            - LOCATION
-                            - DIVIDER
-                            - ADMINISTRATIVE_AREA
-                            - FACILITY
-                            - OFFICE
-                            - SIGNATURE
-                            - DATA
-                            - BUTTON
-                            - AUTOCOMPLETE
-                            - SEARCH
-                            - ALPHA_PRINT_BUTTON
-                            - HTTP
-                            - LINK_BUTTON
-                            - VERIFICATION_STATUS
-                            - QUERY_PARAM_READER
-                            - QR_READER
-                            - ID_READER
-                            - LOADER
-                            - ALPHA_HIDDEN
-                            - USER_ROLE
-                            - CUSTOM
-                        label:
-                          description: "
-
-                            \      Explicitly
-                            specify the label for searchFields.
-
-                            \      This is required
-                            when searchFields is defined.           \ 
-
-                            \      "
-                          $ref: "#/components/schemas/TranslationConfig"
-                        options:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              value:
-                                type: string
-                                description: The value of the option
-                              label:
-                                anyOf:
-                                  - type: string
-                                  - $ref: "#/components/schemas/TranslationConfig"
-                                description: The label of the option
-                              conditionals:
-                                default: []
-                                type: array
-                                items:
-                                  $ref: "#/components/schemas/ActionConditional"
-                            required:
-                              - value
-                              - label
-                            additionalProperties: false
-                        searchCriteriaLabelPrefix:
-                          description: "
-
-                            \    This property
-                            determines whether to add a prefix (such as
-                            \"Child\" or \"Applicant\") before the field label
-
-                            \    when rendering
-                            search parameter labels — for example, in the search
-                            results page to indicate which fields were used in
-                            the search.
-
-
-                            \    For example, a
-                            field config like { id: \"child.name.firstname\",
-                            label: { defaultMessage: \"First Name(s)\" } } would
-                            render as \"First Name(s)\" by default.
-
-
-                            \    A field config like
-                            { id: \"mother.firstname\", label: { defaultMessage:
-                            \"First Name(s)\" } } would also render as \"First
-                            Name(s)\" by default.
-
-
-                            \    So, if both
-                            child.name.firstname and mother.firstname are used
-                            in a search, the resulting search criteria labels
-                            would be \"First Name(s)\", \"First Name(s)\",
-
-                            \    which is ambiguous.
-
-
-                            \    Now, if we treat
-                            the field ID prefix as a label (e.g.,
-                            \"applicant.firstname\" → \"Applicant\"), and the
-                            field label is already
-
-                            \    descriptive — like
-                            { id: \"applicant.firstname\", label: {
-                            defaultMessage: \"Applicant's First Name\" } } —
-                            then the resulting
-
-                            \    label would be
-                            \"Applicant Applicant's First Name\", which is
-                            redundant and awkward.
-
-
-                            \    By setting
-                            searchCriteriaLabelPrefix to a translation config
-                            object, we can explicitly define the desired prefix
-
-                            \    in the
-                            country-config > event.advancedSearch configuration.
-                            For example: field(\"child.dob\", {
-                            searchCriteriaLabelPrefix: TranslationConfig }).
-
-                            \    "
-                          $ref: "#/components/schemas/TranslationConfig"
-                        conditionals:
-                          description: "
-
-                            \       In advanced
-                            search, we sometimes need to override the default
-                            field visibility conditionals.
-
-
-                            \       For example,
-                            Informant fields in the declaration form may have
-                            conditional logic
-
-                            \       that hides them
-                            based on other field values. Since the advanced
-                            search form reuses
-
-                            \       the declaration
-                            form config, those same conditionals would apply by
-                            default.
-
-
-                            \       However, in
-                            advanced search we often want to make all Informant
-                            fields searchable,
-
-                            \       regardless of
-                            their original visibility logic. To do this, we
-                            explicitly set their
-
-                            \       'conditionals'
-                            to an empty array ('[]') in the search config. This
-                            ensures they
-
-                            \       are always
-                            rendered in the advanced search form.
-
-                            \      "
-                          type: array
-                          items:
-                            $ref: "#/components/schemas/FieldConditional"
-                        validations:
-                          description: Option for overriding the field validations specifically for
-                            advanced search form.
-                          type: array
-                          items:
-                            $ref: "#/components/schemas/ValidationConfig"
-                        fieldId:
-                          type: string
-                        fieldType:
-                          type: string
-                          const: field
-                      required:
-                        - config
-                        - fieldId
-                        - fieldType
-                      additionalProperties: false
-                    - type: object
-                      properties:
-                        config:
-                          type: object
-                          properties:
-                            type:
-                              type: string
-                              enum:
-                                - fuzzy
-                                - exact
-                                - range
-                                - within
-                              description: Determines the search type of field. How to match value.
-                            searchFields:
-                              description: "
-
-                                \      Defines
-                                multiple form fields that should be searched
-                                when this field has a value.
-
-                                \      All
-                                specified fields will be combined using OR
-                                logic.
-
-
-                                \      Example:
-                                { searchFields: ['mother.name', 'father.name',
-                                'informant.name'] }
-
-                                \      Will
-                                search all fields and return a record if any of
-                                the fields match the search value.    \ 
-
-                                \      "
-                              type: array
-                              items:
-                                type: string
-                          required:
-                            - type
-                          additionalProperties: false
-                        type:
-                          description: "
-
-                            \      Explicitly
-                            specify the field type for searchFields.
-
-                            \      This is required
-                            when searchFields is defined, to show the correct
-                            control in the UI.
-
-                            \       \ 
-
-                            \      Example:
-                            FieldType.NAME for name fields, FieldType.TEXT for
-                            text fields, FieldType.DATE for date fields, etc.
-
-                            \      "
-                          type: string
-                          enum:
-                            - NAME
-                            - PHONE
-                            - ID
-                            - ADDRESS
-                            - TEXT
-                            - NUMBER
-                            - NUMBER_WITH_UNIT
-                            - TEXTAREA
-                            - EMAIL
-                            - DATE
-                            - AGE
-                            - DATE_RANGE
-                            - SELECT_DATE_RANGE
-                            - TIME
-                            - IMAGE_VIEW
-                            - PARAGRAPH
-                            - HEADING
-                            - PAGE_HEADER
-                            - RADIO_GROUP
-                            - FIELD_GROUP
-                            - FILE
-                            - FILE_WITH_OPTIONS
-                            - BULLET_LIST
-                            - CHECKBOX
-                            - SELECT
-                            - COUNTRY
-                            - LOCATION
-                            - DIVIDER
-                            - ADMINISTRATIVE_AREA
-                            - FACILITY
-                            - OFFICE
-                            - SIGNATURE
-                            - DATA
-                            - BUTTON
-                            - AUTOCOMPLETE
-                            - SEARCH
-                            - ALPHA_PRINT_BUTTON
-                            - HTTP
-                            - LINK_BUTTON
-                            - VERIFICATION_STATUS
-                            - QUERY_PARAM_READER
-                            - QR_READER
-                            - ID_READER
-                            - LOADER
-                            - ALPHA_HIDDEN
-                            - USER_ROLE
-                            - CUSTOM
-                        label:
-                          description: "
-
-                            \      Explicitly
-                            specify the label for searchFields.
-
-                            \      This is required
-                            when searchFields is defined.           \ 
-
-                            \      "
-                          $ref: "#/components/schemas/TranslationConfig"
-                        options:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              value:
-                                type: string
-                                description: The value of the option
-                              label:
-                                anyOf:
-                                  - type: string
-                                  - $ref: "#/components/schemas/TranslationConfig"
-                                description: The label of the option
-                              conditionals:
-                                default: []
-                                type: array
-                                items:
-                                  $ref: "#/components/schemas/ActionConditional"
-                            required:
-                              - value
-                              - label
-                            additionalProperties: false
-                        searchCriteriaLabelPrefix:
-                          description: "
-
-                            \    This property
-                            determines whether to add a prefix (such as
-                            \"Child\" or \"Applicant\") before the field label
-
-                            \    when rendering
-                            search parameter labels — for example, in the search
-                            results page to indicate which fields were used in
-                            the search.
-
-
-                            \    For example, a
-                            field config like { id: \"child.name.firstname\",
-                            label: { defaultMessage: \"First Name(s)\" } } would
-                            render as \"First Name(s)\" by default.
-
-
-                            \    A field config like
-                            { id: \"mother.firstname\", label: { defaultMessage:
-                            \"First Name(s)\" } } would also render as \"First
-                            Name(s)\" by default.
-
-
-                            \    So, if both
-                            child.name.firstname and mother.firstname are used
-                            in a search, the resulting search criteria labels
-                            would be \"First Name(s)\", \"First Name(s)\",
-
-                            \    which is ambiguous.
-
-
-                            \    Now, if we treat
-                            the field ID prefix as a label (e.g.,
-                            \"applicant.firstname\" → \"Applicant\"), and the
-                            field label is already
-
-                            \    descriptive — like
-                            { id: \"applicant.firstname\", label: {
-                            defaultMessage: \"Applicant's First Name\" } } —
-                            then the resulting
-
-                            \    label would be
-                            \"Applicant Applicant's First Name\", which is
-                            redundant and awkward.
-
-
-                            \    By setting
-                            searchCriteriaLabelPrefix to a translation config
-                            object, we can explicitly define the desired prefix
-
-                            \    in the
-                            country-config > event.advancedSearch configuration.
-                            For example: field(\"child.dob\", {
-                            searchCriteriaLabelPrefix: TranslationConfig }).
-
-                            \    "
-                          $ref: "#/components/schemas/TranslationConfig"
-                        conditionals:
-                          description: "
-
-                            \       In advanced
-                            search, we sometimes need to override the default
-                            field visibility conditionals.
-
-
-                            \       For example,
-                            Informant fields in the declaration form may have
-                            conditional logic
-
-                            \       that hides them
-                            based on other field values. Since the advanced
-                            search form reuses
-
-                            \       the declaration
-                            form config, those same conditionals would apply by
-                            default.
-
-
-                            \       However, in
-                            advanced search we often want to make all Informant
-                            fields searchable,
-
-                            \       regardless of
-                            their original visibility logic. To do this, we
-                            explicitly set their
-
-                            \       'conditionals'
-                            to an empty array ('[]') in the search config. This
-                            ensures they
-
-                            \       are always
-                            rendered in the advanced search form.
-
-                            \      "
-                          type: array
-                          items:
-                            $ref: "#/components/schemas/FieldConditional"
-                        validations:
-                          description: Option for overriding the field validations specifically for
-                            advanced search form.
-                          type: array
-                          items:
-                            $ref: "#/components/schemas/ValidationConfig"
-                        fieldId:
-                          type: string
-                          enum:
-                            - event.trackingId
-                            - event.status
-                            - event.legalStatuses.REGISTERED.acceptedAt
-                            - event.legalStatuses.REGISTERED.createdAtLocation
-                            - event.legalStatuses.REGISTERED.registrationNumber
-                            - event.updatedAt
-                        fieldType:
-                          type: string
-                          const: event
-                      required:
-                        - config
-                        - fieldId
-                        - fieldType
-                      additionalProperties: false
-                  type: object
-                description: Advanced search fields within the tab.
-            required:
-              - title
-              - fields
-            additionalProperties: false
+            $ref: "#/components/schemas/AdvancedSearchConfig"
         flags:
           default: []
           description: Configuration of custom flags associated with the actions of this
@@ -2782,6 +2174,90 @@ components:
       description: Translation configuration
     Conditional:
       description: JSON schema conditional configuration
+    SummaryConfig:
+      type: object
+      properties:
+        fields:
+          type: array
+          items:
+            anyOf:
+              - type: object
+                properties:
+                  emptyValueMessage:
+                    description: Default message displayed when the field value is empty.
+                    $ref: "#/components/schemas/TranslationConfig"
+                  conditionals:
+                    default: []
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          const: SHOW
+                        conditional:
+                          $ref: "#/components/schemas/Conditional"
+                      required:
+                        - type
+                        - conditional
+                      additionalProperties: false
+                      description: If 'SHOW' conditional is defined, the component is shown to the
+                        user only if the condition is met
+                  id:
+                    type: string
+                    description: Identifier of the summary field.
+                  value:
+                    description: Field value template supporting variables from configuration and
+                      EventMetadata (e.g. "{informant.phoneNo}
+                      {informant.email}").
+                    $ref: "#/components/schemas/TranslationConfig"
+                  label:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - id
+                  - value
+                  - label
+                additionalProperties: false
+                description: Custom field defined for the summary view.
+              - type: object
+                properties:
+                  emptyValueMessage:
+                    description: Default message displayed when the field value is empty.
+                    $ref: "#/components/schemas/TranslationConfig"
+                  conditionals:
+                    default: []
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          const: SHOW
+                        conditional:
+                          $ref: "#/components/schemas/Conditional"
+                      required:
+                        - type
+                        - conditional
+                      additionalProperties: false
+                      description: If 'SHOW' conditional is defined, the component is shown to the
+                        user only if the condition is met
+                  fieldId:
+                    type: string
+                  label:
+                    description: Overrides the default label from the referenced field when
+                      provided.
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - fieldId
+                additionalProperties: false
+                description: Field referencing existing event data by field ID.
+          description: Fields displayed in the event summary view.
+      required:
+        - fields
+      additionalProperties: false
+      description: Configuration of the event overview page. Defines which declaration
+        fields appear in the record summary, optionally with custom labels,
+        empty-value messages, and templated values.
     ActionConfig:
       oneOf:
         - $ref: "#/components/schemas/ReadActionConfig"
@@ -13070,19 +12546,7 @@ components:
           items:
             $ref: "#/components/schemas/ActionConditional"
         deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
-          additionalProperties: false
+          $ref: "#/components/schemas/DeduplicationConfig"
         type:
           type: string
           const: DECLARE
@@ -13127,6 +12591,23 @@ components:
       additionalProperties: false
       description: Configuration for the declare action. Includes review-page fields.
         Shared with the notify action (ActionType.NOTIFY).
+    DeduplicationConfig:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          $ref: "#/components/schemas/TranslationConfig"
+        query:
+          $ref: "#/components/schemas/Clause"
+      required:
+        - id
+        - label
+        - query
+      additionalProperties: false
+      description: Configuration for duplicate detection on a declare or register
+        action. The query is built from fuzzy / strict / date-range matchers
+        combined with and/or/not.
     Clause:
       oneOf:
         - type: object
@@ -13310,19 +12791,7 @@ components:
           items:
             $ref: "#/components/schemas/ActionConditional"
         deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
-          additionalProperties: false
+          $ref: "#/components/schemas/DeduplicationConfig"
         type:
           type: string
           const: REGISTER
@@ -13718,6 +13187,518 @@ components:
         - pages
       additionalProperties: false
       description: Configuration of the declaration form.
+    AdvancedSearchConfig:
+      type: object
+      properties:
+        title:
+          description: Advanced search tab title
+          $ref: "#/components/schemas/TranslationConfig"
+        fields:
+          type: array
+          items:
+            oneOf:
+              - type: object
+                properties:
+                  config:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - fuzzy
+                          - exact
+                          - range
+                          - within
+                        description: Determines the search type of field. How to match value.
+                      searchFields:
+                        description: "
+
+                          \      Defines multiple form
+                          fields that should be searched when this field has a
+                          value.
+
+                          \      All specified fields
+                          will be combined using OR logic.
+
+
+                          \      Example: {
+                          searchFields: ['mother.name', 'father.name',
+                          'informant.name'] }
+
+                          \      Will search all
+                          fields and return a record if any of the fields match
+                          the search value.    \ 
+
+                          \      "
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - type
+                    additionalProperties: false
+                  type:
+                    description: "
+
+                      \      Explicitly specify the field
+                      type for searchFields.
+
+                      \      This is required when
+                      searchFields is defined, to show the correct control in
+                      the UI.
+
+                      \       \ 
+
+                      \      Example: FieldType.NAME for
+                      name fields, FieldType.TEXT for text fields,
+                      FieldType.DATE for date fields, etc.
+
+                      \      "
+                    type: string
+                    enum:
+                      - NAME
+                      - PHONE
+                      - ID
+                      - ADDRESS
+                      - TEXT
+                      - NUMBER
+                      - NUMBER_WITH_UNIT
+                      - TEXTAREA
+                      - EMAIL
+                      - DATE
+                      - AGE
+                      - DATE_RANGE
+                      - SELECT_DATE_RANGE
+                      - TIME
+                      - IMAGE_VIEW
+                      - PARAGRAPH
+                      - HEADING
+                      - PAGE_HEADER
+                      - RADIO_GROUP
+                      - FIELD_GROUP
+                      - FILE
+                      - FILE_WITH_OPTIONS
+                      - BULLET_LIST
+                      - CHECKBOX
+                      - SELECT
+                      - COUNTRY
+                      - LOCATION
+                      - DIVIDER
+                      - ADMINISTRATIVE_AREA
+                      - FACILITY
+                      - OFFICE
+                      - SIGNATURE
+                      - DATA
+                      - BUTTON
+                      - AUTOCOMPLETE
+                      - SEARCH
+                      - ALPHA_PRINT_BUTTON
+                      - HTTP
+                      - LINK_BUTTON
+                      - VERIFICATION_STATUS
+                      - QUERY_PARAM_READER
+                      - QR_READER
+                      - ID_READER
+                      - LOADER
+                      - ALPHA_HIDDEN
+                      - USER_ROLE
+                      - CUSTOM
+                  label:
+                    description: "
+
+                      \      Explicitly specify the label
+                      for searchFields.
+
+                      \      This is required when
+                      searchFields is defined.           \ 
+
+                      \      "
+                    $ref: "#/components/schemas/TranslationConfig"
+                  options:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        value:
+                          type: string
+                          description: The value of the option
+                        label:
+                          anyOf:
+                            - type: string
+                            - $ref: "#/components/schemas/TranslationConfig"
+                          description: The label of the option
+                        conditionals:
+                          default: []
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/ActionConditional"
+                      required:
+                        - value
+                        - label
+                      additionalProperties: false
+                  searchCriteriaLabelPrefix:
+                    description: "
+
+                      \    This property determines
+                      whether to add a prefix (such as \"Child\" or
+                      \"Applicant\") before the field label
+
+                      \    when rendering search parameter
+                      labels — for example, in the search results page to
+                      indicate which fields were used in the search.
+
+
+                      \    For example, a field config
+                      like { id: \"child.name.firstname\", label: {
+                      defaultMessage: \"First Name(s)\" } } would render as
+                      \"First Name(s)\" by default.
+
+
+                      \    A field config like { id:
+                      \"mother.firstname\", label: { defaultMessage: \"First
+                      Name(s)\" } } would also render as \"First Name(s)\" by
+                      default.
+
+
+                      \    So, if both
+                      child.name.firstname and mother.firstname are used in a
+                      search, the resulting search criteria labels would be
+                      \"First Name(s)\", \"First Name(s)\",
+
+                      \    which is ambiguous.
+
+
+                      \    Now, if we treat the field ID
+                      prefix as a label (e.g., \"applicant.firstname\" →
+                      \"Applicant\"), and the field label is already
+
+                      \    descriptive — like { id:
+                      \"applicant.firstname\", label: { defaultMessage:
+                      \"Applicant's First Name\" } } — then the resulting
+
+                      \    label would be \"Applicant
+                      Applicant's First Name\", which is redundant and awkward.
+
+
+                      \    By setting
+                      searchCriteriaLabelPrefix to a translation config object,
+                      we can explicitly define the desired prefix
+
+                      \    in the country-config >
+                      event.advancedSearch configuration. For example:
+                      field(\"child.dob\", { searchCriteriaLabelPrefix:
+                      TranslationConfig }).
+
+                      \    "
+                    $ref: "#/components/schemas/TranslationConfig"
+                  conditionals:
+                    description: "
+
+                      \       In advanced search, we
+                      sometimes need to override the default field visibility
+                      conditionals.
+
+
+                      \       For example, Informant
+                      fields in the declaration form may have conditional logic
+
+                      \       that hides them based on
+                      other field values. Since the advanced search form reuses
+
+                      \       the declaration form config,
+                      those same conditionals would apply by default.
+
+
+                      \       However, in advanced search
+                      we often want to make all Informant fields searchable,
+
+                      \       regardless of their original
+                      visibility logic. To do this, we explicitly set their
+
+                      \       'conditionals' to an empty
+                      array ('[]') in the search config. This ensures they
+
+                      \       are always rendered in the
+                      advanced search form.
+
+                      \      "
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/FieldConditional"
+                  validations:
+                    description: Option for overriding the field validations specifically for
+                      advanced search form.
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ValidationConfig"
+                  fieldId:
+                    type: string
+                  fieldType:
+                    type: string
+                    const: field
+                required:
+                  - config
+                  - fieldId
+                  - fieldType
+                additionalProperties: false
+              - type: object
+                properties:
+                  config:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - fuzzy
+                          - exact
+                          - range
+                          - within
+                        description: Determines the search type of field. How to match value.
+                      searchFields:
+                        description: "
+
+                          \      Defines multiple form
+                          fields that should be searched when this field has a
+                          value.
+
+                          \      All specified fields
+                          will be combined using OR logic.
+
+
+                          \      Example: {
+                          searchFields: ['mother.name', 'father.name',
+                          'informant.name'] }
+
+                          \      Will search all
+                          fields and return a record if any of the fields match
+                          the search value.    \ 
+
+                          \      "
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - type
+                    additionalProperties: false
+                  type:
+                    description: "
+
+                      \      Explicitly specify the field
+                      type for searchFields.
+
+                      \      This is required when
+                      searchFields is defined, to show the correct control in
+                      the UI.
+
+                      \       \ 
+
+                      \      Example: FieldType.NAME for
+                      name fields, FieldType.TEXT for text fields,
+                      FieldType.DATE for date fields, etc.
+
+                      \      "
+                    type: string
+                    enum:
+                      - NAME
+                      - PHONE
+                      - ID
+                      - ADDRESS
+                      - TEXT
+                      - NUMBER
+                      - NUMBER_WITH_UNIT
+                      - TEXTAREA
+                      - EMAIL
+                      - DATE
+                      - AGE
+                      - DATE_RANGE
+                      - SELECT_DATE_RANGE
+                      - TIME
+                      - IMAGE_VIEW
+                      - PARAGRAPH
+                      - HEADING
+                      - PAGE_HEADER
+                      - RADIO_GROUP
+                      - FIELD_GROUP
+                      - FILE
+                      - FILE_WITH_OPTIONS
+                      - BULLET_LIST
+                      - CHECKBOX
+                      - SELECT
+                      - COUNTRY
+                      - LOCATION
+                      - DIVIDER
+                      - ADMINISTRATIVE_AREA
+                      - FACILITY
+                      - OFFICE
+                      - SIGNATURE
+                      - DATA
+                      - BUTTON
+                      - AUTOCOMPLETE
+                      - SEARCH
+                      - ALPHA_PRINT_BUTTON
+                      - HTTP
+                      - LINK_BUTTON
+                      - VERIFICATION_STATUS
+                      - QUERY_PARAM_READER
+                      - QR_READER
+                      - ID_READER
+                      - LOADER
+                      - ALPHA_HIDDEN
+                      - USER_ROLE
+                      - CUSTOM
+                  label:
+                    description: "
+
+                      \      Explicitly specify the label
+                      for searchFields.
+
+                      \      This is required when
+                      searchFields is defined.           \ 
+
+                      \      "
+                    $ref: "#/components/schemas/TranslationConfig"
+                  options:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        value:
+                          type: string
+                          description: The value of the option
+                        label:
+                          anyOf:
+                            - type: string
+                            - $ref: "#/components/schemas/TranslationConfig"
+                          description: The label of the option
+                        conditionals:
+                          default: []
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/ActionConditional"
+                      required:
+                        - value
+                        - label
+                      additionalProperties: false
+                  searchCriteriaLabelPrefix:
+                    description: "
+
+                      \    This property determines
+                      whether to add a prefix (such as \"Child\" or
+                      \"Applicant\") before the field label
+
+                      \    when rendering search parameter
+                      labels — for example, in the search results page to
+                      indicate which fields were used in the search.
+
+
+                      \    For example, a field config
+                      like { id: \"child.name.firstname\", label: {
+                      defaultMessage: \"First Name(s)\" } } would render as
+                      \"First Name(s)\" by default.
+
+
+                      \    A field config like { id:
+                      \"mother.firstname\", label: { defaultMessage: \"First
+                      Name(s)\" } } would also render as \"First Name(s)\" by
+                      default.
+
+
+                      \    So, if both
+                      child.name.firstname and mother.firstname are used in a
+                      search, the resulting search criteria labels would be
+                      \"First Name(s)\", \"First Name(s)\",
+
+                      \    which is ambiguous.
+
+
+                      \    Now, if we treat the field ID
+                      prefix as a label (e.g., \"applicant.firstname\" →
+                      \"Applicant\"), and the field label is already
+
+                      \    descriptive — like { id:
+                      \"applicant.firstname\", label: { defaultMessage:
+                      \"Applicant's First Name\" } } — then the resulting
+
+                      \    label would be \"Applicant
+                      Applicant's First Name\", which is redundant and awkward.
+
+
+                      \    By setting
+                      searchCriteriaLabelPrefix to a translation config object,
+                      we can explicitly define the desired prefix
+
+                      \    in the country-config >
+                      event.advancedSearch configuration. For example:
+                      field(\"child.dob\", { searchCriteriaLabelPrefix:
+                      TranslationConfig }).
+
+                      \    "
+                    $ref: "#/components/schemas/TranslationConfig"
+                  conditionals:
+                    description: "
+
+                      \       In advanced search, we
+                      sometimes need to override the default field visibility
+                      conditionals.
+
+
+                      \       For example, Informant
+                      fields in the declaration form may have conditional logic
+
+                      \       that hides them based on
+                      other field values. Since the advanced search form reuses
+
+                      \       the declaration form config,
+                      those same conditionals would apply by default.
+
+
+                      \       However, in advanced search
+                      we often want to make all Informant fields searchable,
+
+                      \       regardless of their original
+                      visibility logic. To do this, we explicitly set their
+
+                      \       'conditionals' to an empty
+                      array ('[]') in the search config. This ensures they
+
+                      \       are always rendered in the
+                      advanced search form.
+
+                      \      "
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/FieldConditional"
+                  validations:
+                    description: Option for overriding the field validations specifically for
+                      advanced search form.
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ValidationConfig"
+                  fieldId:
+                    type: string
+                    enum:
+                      - event.trackingId
+                      - event.status
+                      - event.legalStatuses.REGISTERED.acceptedAt
+                      - event.legalStatuses.REGISTERED.createdAtLocation
+                      - event.legalStatuses.REGISTERED.registrationNumber
+                      - event.updatedAt
+                  fieldType:
+                    type: string
+                    const: event
+                required:
+                  - config
+                  - fieldId
+                  - fieldType
+                additionalProperties: false
+            type: object
+          description: Advanced search fields within the tab.
+      required:
+        - title
+        - fields
+      additionalProperties: false
+      description: Configuration of one advanced search tab. Each tab has a title and
+        a list of searchable fields — either declaration fields (via `field()`)
+        or event metadata (via `event()`).
     FlagConfig:
       type: object
       properties:
