@@ -49,6 +49,14 @@ V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
 
 - The inherent flag `InherentFlags.PENDING_CERTIFICATION` has been removed. Similar logic can be implemented in the country config with a custom flag, [see example](https://github.com/opencrvs/opencrvs-countryconfig/blob/81db21f4cf9ccbba90cb2c6e48648c9b258dc905/src/form/v2/birth/index.ts#L95-L102).
 
+#### Webhook integration client removed
+
+The Webhook integration client and its `webhooks` service have been removed and are **not** migrated to v2.0 automatically. Country configurations that previously consumed webhook subscriptions must instead react to events via the country config's [Action Confirmation API](https://github.com/opencrvs/opencrvs-countryconfig/blob/develop/src/api/action-confirmation.md), which is invoked for every supported action (`NOTIFY`, `DECLARE`, `REGISTER`, `REJECT`, `ARCHIVE`, `PRINT_CERTIFICATE`). If a webhook-style fan-out to external systems is still required, implement it directly inside the country configuration code from those handlers. [#11757](https://github.com/opencrvs/opencrvs-core/issues/11757)
+
+#### Event Notification API rename
+
+`POST /api/events/events/notifications` has been renamed to `POST /api/events/events/{eventId}/notify`. The two-step "create event, then notify" flow is unchanged otherwise. A new single-request convenience endpoint `POST /api/events/events/notify` is also available for system clients that need to create and notify in one call. Integration clients must update their request paths. [#11757](https://github.com/opencrvs/opencrvs-core/issues/11757)
+
 ### New features
 
 #### Rich text support in MessageDescriptor.defaultMessage
