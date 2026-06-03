@@ -577,6 +577,11 @@ paths:
                   default: APPROVE_CORRECTION
                   type: string
                   const: APPROVE_CORRECTION
+                content:
+                  type: object
+                  properties:
+                    immediateCorrection:
+                      type: boolean
               required:
                 - transactionId
                 - requestId
@@ -14832,6 +14837,12 @@ components:
           const: APPROVE_CORRECTION
         requestId:
           type: string
+        content:
+          type: object
+          properties:
+            immediateCorrection:
+              type: boolean
+          additionalProperties: false
       required:
         - id
         - transactionId

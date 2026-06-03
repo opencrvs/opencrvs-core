@@ -1419,6 +1419,11 @@ components:
           const: APPROVE_CORRECTION
         requestId:
           type: string
+        content:
+          type: object
+          properties:
+            immediateCorrection:
+              type: boolean
       required:
         - id
         - transactionId
@@ -15710,6 +15715,12 @@ components:
           const: APPROVE_CORRECTION
         requestId:
           type: string
+        content:
+          type: object
+          properties:
+            immediateCorrection:
+              type: boolean
+          additionalProperties: false
       required:
         - id
         - transactionId
