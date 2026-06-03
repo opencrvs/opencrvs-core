@@ -114,6 +114,9 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
           if (user.type === TokenUserType.enum.system) {
             return user
           }
+          if (user.signature) {
+            await precacheFile(user.signature)
+          }
           if (user.avatar) {
             await precacheFile(user.avatar)
           }
