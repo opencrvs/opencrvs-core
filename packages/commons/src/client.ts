@@ -26,6 +26,9 @@ export * from './events/mocks.test.utils'
 export { TriggerEvent } from './notification'
 export * from './application-config'
 export * from './icons'
-export { findPendingCorrectionAction } from './events/state/flags'
+export {
+  findPendingCorrectionAction,
+  isPotentialDuplicate
+} from './events/state/flags'
 /** @knipignore */
 export { findScope } from './scopes.deprecated.do-not-use'
