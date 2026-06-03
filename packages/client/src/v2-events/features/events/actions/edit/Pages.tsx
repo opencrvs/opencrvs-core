@@ -90,7 +90,7 @@ export function Pages() {
             navigate(
               ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath(
                 { eventId },
-                { workqueue: searchParams.workqueue }
+                { backTo: searchParams.backTo }
               )
             )
           }

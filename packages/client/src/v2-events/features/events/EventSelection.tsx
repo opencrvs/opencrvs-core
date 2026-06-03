@@ -12,6 +12,7 @@
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
+import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import { Spinner } from '@opencrvs/components'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
@@ -155,6 +156,7 @@ function EventSelector() {
 export function EventSelection() {
   const intl = useIntl()
   const { closeActionView } = useEventFormNavigation()
+  const [{ backTo }] = useTypedSearchParams(ROUTES.V2.EVENTS.CREATE)
 
   return (
     <Frame
@@ -166,7 +168,7 @@ export function EventSelection() {
               id="goBack"
               size="small"
               type="secondary"
-              onClick={() => closeActionView()}
+              onClick={() => closeActionView(backTo)}
             >
               <Icon name="X" />
               {intl.formatMessage(messages.exitButton)}
@@ -175,7 +177,11 @@ export function EventSelection() {
           desktopTitle={intl.formatMessage(messages.registerNewEventTitle)}
           mobileLeft={<Icon name="Draft" size="large" />}
           mobileRight={
-            <Button size="medium" type="icon" onClick={() => closeActionView()}>
+            <Button
+              size="medium"
+              type="icon"
+              onClick={() => closeActionView(backTo)}
+            >
               <Icon name="X" />
             </Button>
           }

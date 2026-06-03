@@ -35,9 +35,7 @@ import { EditPageBanner } from './EditPageBanner'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EDIT.REVIEW)
-  const [{ workqueue: slug }] = useTypedSearchParams(
-    ROUTES.V2.EVENTS.EDIT.REVIEW
-  )
+  const [{ backTo }] = useTypedSearchParams(ROUTES.V2.EVENTS.EDIT.REVIEW)
   const events = useEvents()
   const navigate = useNavigate()
   const validatorContext = useValidatorContext()
@@ -72,7 +70,7 @@ export function Review() {
         { pageId, eventId },
         {
           from: 'review',
-          workqueue: slug
+          backTo
         },
         fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
       )

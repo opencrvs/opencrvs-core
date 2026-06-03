@@ -135,14 +135,14 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
 
 function ReadonlyView() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.RECORD)
-  const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT.RECORD)
+  const [{ backTo }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT.RECORD)
   const navigate = useNavigate()
   const { canAccessEventWithScopes } = useCanAccessEventWithScopes(eventId, [
     'record.read'
   ])
 
   if (!canAccessEventWithScopes()) {
-    navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { workqueue }))
+    navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { backTo }))
     return null
   }
 

@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines  */
 import { MutationKey, useMutation, useQueryClient } from '@tanstack/react-query'
 import type {
   DecorateMutationProcedure,
@@ -29,7 +30,8 @@ import {
   EventState,
   EventConfig,
   getCurrentEventState,
-  ValidatorContext
+  ValidatorContext,
+  isPotentialDuplicate
 } from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
@@ -55,6 +57,23 @@ import {
 } from '@client/v2-events/trpc'
 import { ToastKey } from '@client/v2-events/routes/Toaster'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+
+import { showToast } from '../../../useToastAndRedirect'
+
+function showToastOnDuplicateDetected(event: EventDocument) {
+  showToast({
+    message: {
+      defaultMessage:
+        '{trackingId} is a potential duplicate. Record is ready for review.',
+      id: 'event.declaration.potentialDuplicateDetected',
+      description:
+        'Notification for potential duplicate declaration. Shown when a potential duplicate is detected after declaring an event.'
+    },
+    toastType: 'error',
+    toastId: `duplicate-detected-${event.trackingId}`,
+    messageOpts: { trackingId: event.trackingId }
+  })
+}
 
 function retryUnlessConflict(
   _failureCount: number,
@@ -147,7 +166,13 @@ setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: deleteLocalEvent,
+  onSuccess: (event) => {
+    void deleteLocalEvent(event)
+
+    if (isPotentialDuplicate(event.actions)) {
+      showToastOnDuplicateDetected(event)
+    }
+  },
   onError: errorToastOnConflict,
   onMutate: updateEventOptimistically(
     ActionType.DECLARE,
@@ -174,7 +199,13 @@ setMutationDefaults(trpcOptionsProxy.event.actions.register.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: deleteLocalEvent,
+  onSuccess: (event) => {
+    void deleteLocalEvent(event)
+
+    if (isPotentialDuplicate(event.actions)) {
+      showToastOnDuplicateDetected(event)
+    }
+  },
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.REGISTER }
 })
@@ -495,10 +526,15 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   }
 
   return {
-    mutate: (params: ActionMutationInput) =>
-      mutation.mutate(getMutationPayload(params)),
-    mutateAsync: async (params: ActionMutationInput) =>
-      mutation.mutateAsync(getMutationPayload(params)),
+    mutate: (
+      params: ActionMutationInput,
+      options?: Parameters<typeof useMutation>[0]
+    ) => mutation.mutate(getMutationPayload(params), options),
+
+    mutateAsync: async (
+      params: ActionMutationInput,
+      options?: Parameters<typeof useMutation>[0]
+    ) => mutation.mutateAsync(getMutationPayload(params), options),
     isPending: mutation.isPending
   }
 }

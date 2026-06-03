@@ -8,11 +8,14 @@ metadata:
     app: elasticsearch
   name: elasticsearch
 spec:
+  {{- if .Values.elasticsearch.pvc.storage_class }}
+  storageClassName: {{ .Values.elasticsearch.pvc.storage_class | quote }}
+  {{- end }}
   accessModes:
-    - ReadWriteOnce
+    - {{ .Values.elasticsearch.pvc.access_mode }}
   resources:
     requests:
-      storage: {{ default "5Gi" .Values.elasticsearch.data_storage_size }}
+      storage: {{ .Values.elasticsearch.pvc.storage_size }}
 {{- end }}
 ---
 apiVersion: v1

@@ -76,7 +76,7 @@ export function Summary() {
   const { eventId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
-  const [{ workqueue }] = useTypedSearchParams(
+  const [{ backTo }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
 
@@ -158,8 +158,8 @@ export function Summary() {
       events.actions.correction.request.mutate(mutationPayload)
     }
 
-    if (workqueue) {
-      navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue }))
+    if (backTo) {
+      navigate(backTo)
     } else {
       navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
     }
@@ -176,7 +176,7 @@ export function Summary() {
     userMayCorrect,
     validatorContext,
     eventConfiguration,
-    workqueue
+    backTo
   ])
 
   return (
@@ -184,7 +184,7 @@ export function Summary() {
       <ActionPageLight
         hideBackground
         goBack={() => navigate(-1)}
-        goHome={() => eventFormNavigation.closeActionView()}
+        goHome={() => eventFormNavigation.closeActionView(backTo)}
         id="corrector_form"
         title={intl.formatMessage(correctionMessages.title)}
       >
@@ -216,7 +216,7 @@ export function Summary() {
                     {
                       eventId
                     },
-                    { workqueue }
+                    { backTo }
                   )
                 )
               }
@@ -227,12 +227,12 @@ export function Summary() {
         >
           <CorrectionDetails
             annotation={annotation}
+            backTo={backTo}
             editable={true}
             event={event}
             form={form}
             requesting={!userMayCorrect}
             validatorContext={validatorContext}
-            workqueue={workqueue}
           />
         </Content>
       </ActionPageLight>
