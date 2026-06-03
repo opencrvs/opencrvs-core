@@ -29,10 +29,27 @@ filter:
               value: 'Error while backup  '
 
 
-alert: post2
+alert: 
+  - ${NOTIFICATION_TYPE}
+
+email:
+  - ${ALERT_EMAIL}
+
 http_post2_url: '${HTTP_POST2_ALERT_URL}'
 http_post2_payload:
   subject: '{% raw %}{{DOMAIN}}{% endraw %}: {{rule.name}} 🚨'
   html: 'Reason: {{kibana.alert.context.logs__alert__document__count.conditions}}. Login to https://kibana.{% raw %}{{DOMAIN}}{% endraw %} to view the alert.'
   from: '{% raw %}{{SENDER_EMAIL_ADDRESS}}{% endraw %}'
   to: '{% raw %}{{ALERT_EMAIL}}{% endraw %}'
+
+
+# New way to define alerting action with more flexible templating:
+alert_subject: "${DOMAIN}: {{rule.name}} 🚨"
+alert_text_type: alert_text_jinja
+email_format: "html"
+
+alert_text: |
+  <p>Reason: {{kibana.alert.context.logs__alert__document__count.conditions}}.</p>
+
+  <p>Open Kibana:</p>
+  <p><a href="https://kibana.${DOMAIN}">https://kibana.${DOMAIN}</a></p>
