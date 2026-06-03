@@ -19,6 +19,7 @@ import { ROUTES } from '@client/v2-events/routes/routes'
 import { routesConfig } from '@client/v2-events/routes/config'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { UserAudit } from './UserAudit'
+import { handlers } from '../../../.storybook/default-request-handlers'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [httpLink({ url: '/api/events' })],
@@ -140,6 +141,85 @@ export const DeactivateActiveUserShowsSuccessToast: Story = {
       expect(
         document.getElementById('activation_toggle_success')?.textContent
       ).toMatch(/Updated Kennedy Mweene.s account status to "Active"/)
+    })
+  }
+}
+
+/**
+ * When a national system admin clicks Reset Password from the three-dot menu:
+ * - sendResetPasswordInvite mutation fires
+ * - user.get query is invalidated and refetched (status changes active → pending)
+ * - success toast surfaces
+ */
+export const ResetPasswordChangesStatusToPending: Story = {
+  parameters: {
+    msw: {
+      handlers: {
+        user: [
+          tRPCMsw.user.get.query((userId) => {
+            if (userId === kennedy.id) {
+              return kennedy
+            }
+            return testDataGenerator().user.nationalSystemAdmin().v2
+          }),
+          ...handlers.user
+        ],
+        userResetPassword: [
+          tRPCMsw.user.sendResetPasswordInvite.mutation(() => {
+            Object.assign(kennedy, { status: 'pending' })
+            return
+          })
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    kennedy.status = 'active'
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Wait for user audit page to load', async () => {
+      await canvas.findByText('Kennedy Mweene')
+    })
+
+    await step('Status shows Active', async () => {
+      await canvas.findByText('Active')
+    })
+
+    await step('Open header menu and click Reset Password', async () => {
+      const popover = await openHeaderMenu(canvasElement)
+      await userEvent.click(within(popover).getByText('Reset Password'))
+    })
+
+    await step('Confirmation modal is shown', async () => {
+      await canvas.findByText('Reset password?')
+    })
+
+    await step('Confirm send', async () => {
+      await userEvent.click(
+        within(document.getElementById('user-reset-password-modal')!).getByRole(
+          'button',
+          { name: 'Send' }
+        )
+      )
+    })
+
+    await step('Success toast surfaces', async () => {
+      await waitFor(() =>
+        expect(document.getElementById('reset_password_success')).not.toBeNull()
+      )
+      expect(
+        document.getElementById('reset_password_success')?.textContent
+      ).toMatch(/Temporary password sent to Kennedy Mweene/)
+    })
+
+    await step('Status updates to Pending after refetch', async () => {
+      await waitFor(() => expect(canvas.queryByText('Active')).toBeNull(), {
+        timeout: 5000
+      })
+
+      await canvas.findByText('Pending')
     })
   }
 }
