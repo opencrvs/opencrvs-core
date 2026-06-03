@@ -134,5 +134,17 @@ export const messages = {
     defaultMessage: 'Updating user',
     description: 'label for updating user',
     id: 'form.field.label.updatingUser'
+  },
+  changeOfficeWarningTitle: {
+    defaultMessage: 'Change office?',
+    description:
+      'Title for the confirmation dialog when changing a user office',
+    id: 'form.field.label.changeOfficeWarningTitle'
+  },
+  changeOfficeWarningBody: {
+    defaultMessage:
+      "Changing this user's office will remove their in-progress drafts. Do you want to continue?",
+    description: 'Body for the confirmation dialog when changing a user office',
+    id: 'form.field.label.changeOfficeWarningBody'
   }
 }
