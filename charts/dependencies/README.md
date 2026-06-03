@@ -320,17 +320,46 @@ elasticsearch:
 
 ### Elastalert
 
-For backward compatibility `HTTP_POST2_ALERT_URL` environment variable needs to be added to elastalert configuration. All alerts will be send to country config service and forwarded to email address defined while SMTP server configuration.
 
-See example:
+**Notifications**
+
+ElastAlert supports two notification delivery methods configured through [values.yaml](./values.yaml):
+- `email`: Sends alerts directly to an SMTP server.
+- `post2`: Sends alerts via HTTP POST to an countryconfig service. This mode is provided for backward compatibility with Docker Swarm deployments where alerts are routed through CountryConfig.
+
+Configuration example:
 
 ```yaml
 elastalert:
   env:
-    HTTP_POST2_ALERT_URL: http://countryconfig.opencrvs-dev.svc.cluster.local:3040/email
+    NOTIFICATION_TYPE: post2
 ```
 
-> NOTE: This behavior will be changed in future releases, see [#10608](https://github.com/opencrvs/opencrvs-core/issues/10608)
+
+When using `post2`, configure the target endpoint, see example:
+
+```yaml
+elastalert:
+  env:
+    HTTP_POST2_ALERT_URL: http://countryconfig.opencrvs-qa.svc.cluster.local:3040/email
+```
+
+**Configuration options `email`**
+
+When `NOTIFICATION_TYPE` is set to `email`, ElastAlert requires an SMTP credentials secret. Configure the secret in `values.yaml` and provide the following keys:
+
+| Secret Key             | Description                                         |
+| ---------------------- | --------------------------------------------------- |
+| `ALERT_EMAIL`          | Recipient email address for alerts.                 |
+| `SENDER_EMAIL_ADDRESS` | Email address used as the sender.                   |
+| `SMTP_HOST`            | SMTP server hostname.                               |
+| `SMTP_PORT`            | SMTP server port (for example `587`).               |
+| `SMTP_USERNAME`        | SMTP authentication username.                       |
+| `SMTP_PASSWORD`        | SMTP authentication password.                       |
+| `SMTP_SECURE`          | Enables secure SMTP connection (`true` or `false`). |
+
+Refer to the `values.yaml` file for the complete configuration example.
+
 
 **Custom rules**
 
