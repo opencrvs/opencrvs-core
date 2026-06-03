@@ -17,21 +17,30 @@ export const sendEmail = async (
 
     return;
   }
+  try {
+    const emailTransport = nodemailer.createTransport({
+      host: env.SMTP_HOST,
+      port: env.SMTP_PORT,
+      secure: env.SMTP_SECURE,
+      auth: {
+        user: env.SMTP_USERNAME,
+        pass: env.SMTP_PASSWORD,
+      },
+    });
 
-  const emailTransport = nodemailer.createTransport({
-    host: env.SMTP_HOST,
-    port: env.SMTP_PORT,
-    secure: env.SMTP_SECURE,
-    auth: {
-      user: env.SMTP_USERNAME,
-      pass: env.SMTP_PASSWORD,
-    },
-  });
-
-  return emailTransport.sendMail({
-    from: env.SENDER_EMAIL_ADDRESS,
-    to: env.ALERT_EMAIL,
-    subject,
-    text,
-  });
+    return emailTransport.sendMail({
+      from: env.SENDER_EMAIL_ADDRESS,
+      to: env.ALERT_EMAIL,
+      subject,
+      text,
+    });
+  } catch (e) {
+    logger?.info(
+      {
+        event: "mailer.error",
+      },
+      "Could not send email. Usually this is because the SMTP environment variables are not set up correctly.",
+    );
+    logger?.error(e);
+  }
 };
