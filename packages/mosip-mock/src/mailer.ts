@@ -27,8 +27,8 @@ export const sendEmail = async (
         pass: env.SMTP_PASSWORD,
       },
     });
-
-    return emailTransport.sendMail({
+    // Without awaiting, error never reaches catch.
+    return await emailTransport.sendMail({
       from: env.SENDER_EMAIL_ADDRESS,
       to: env.ALERT_EMAIL,
       subject,
