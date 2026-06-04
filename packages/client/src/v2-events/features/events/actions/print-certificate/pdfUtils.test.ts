@@ -23,6 +23,7 @@ import {
   V2_DEFAULT_MOCK_LOCATIONS_MAP
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
+import { toFileUrl } from '@client/v2-events/cache'
 import {
   tennisClubMembershipEventDocument,
   tennisClubMembershipEventIndex
@@ -31,7 +32,8 @@ import {
 import {
   svgToPdfTemplate,
   stringifyEventMetadata,
-  compileSvg
+  compileSvg,
+  isFetchableHref
 } from './pdfUtils'
 
 const fetch = createFetchMock(vi)
@@ -55,6 +57,21 @@ const adminLevels = [
     }
   }
 ]
+
+describe('isFetchableHref', () => {
+  test.each([
+    ['https://example.com/logo.png', true],
+    ['http://minio.example.com/passport.jpg', true],
+    ['/users/abc123/signature.png', true],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [toFileUrl('users/abc123/signature.png' as any), true],
+    ['data:image/png;base64,ABC123', false],
+    ['blob:http://localhost/abc', false],
+    ['users/abc123/signature.png', false]
+  ])('%s → %s', (href, expected) => {
+    expect(isFetchableHref(href)).toBe(expected)
+  })
+})
 
 describe('stringifyEventMetadata', () => {
   test('Resolves event metadata', () => {

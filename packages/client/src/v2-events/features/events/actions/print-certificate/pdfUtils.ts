@@ -670,6 +670,10 @@ src: url("${url}") format("truetype");
   return serializer.serializeToString(svg)
 }
 
+export function isFetchableHref(href: string): boolean {
+  return /^https?:\/\/|^\//.test(href)
+}
+
 async function downloadAndEmbedImages(svgString: string): Promise<string> {
   const parser = new DOMParser()
   const doc = parser.parseFromString(svgString, 'image/svg+xml')
@@ -685,7 +689,7 @@ async function downloadAndEmbedImages(svgString: string): Promise<string> {
       // Matches absolute URLs (http/https) and absolute paths (/...) —
       // covers external resources (logos, passport photos) and same-origin paths
       // served by the service worker cache (e.g. /users/<id>/sig.png).
-      if (href && /^https?:\/\/|^\//.test(href)) {
+      if (href && isFetchableHref(href)) {
         const response = await fetch(href)
         const blob = await response.blob()
 
