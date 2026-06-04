@@ -52,7 +52,6 @@ export const UserSummary = User.pick({
   role: true,
   primaryOfficeId: true,
   administrativeAreaId: true,
-  signature: true,
   fullHonorificName: true,
   type: true,
   avatar: true

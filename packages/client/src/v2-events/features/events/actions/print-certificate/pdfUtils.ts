@@ -682,8 +682,7 @@ async function downloadAndEmbedImages(svgString: string): Promise<string> {
         imageElement.getAttribute('href') ||
         imageElement.getAttribute('xlink:href')
 
-      // Fetch any URL that isn't already a data URI — includes same-origin paths (e.g. /users/.../sig.png) served by the service worker cache
-      if (href && !href.startsWith('data:')) {
+      if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
         const response = await fetch(href)
         const blob = await response.blob()
 
