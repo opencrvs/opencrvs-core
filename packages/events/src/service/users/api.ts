@@ -50,6 +50,7 @@ import {
 import { generateSaltedHash, generateHash } from '@events/service/auth/hash'
 import { updatePasswordHashAndSalt } from '@events/storage/postgres/events/users'
 import { getRoles } from '../config/config'
+import * as draftsRepo from '@events/storage/postgres/events/drafts'
 
 export type UserSortBy =
   | 'createdAt'
@@ -239,6 +240,13 @@ export async function updateUser(
       : existingUser.signaturePath,
     data: input.data
   })
+
+  if (
+    input.primaryOfficeId &&
+    input.primaryOfficeId !== existingUser.officeId
+  ) {
+    await draftsRepo.deleteDraftsByUserId(input.id)
+  }
 
   if (newUsername !== oldUsername) {
     await updateUsernameById(UUID.parse(input.id), newUsername)

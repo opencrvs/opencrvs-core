@@ -29,10 +29,6 @@ import * as Sentry from '@sentry/react'
 import createSentryMiddleware from 'redux-sentry-middleware'
 
 import { persistenceMiddleware } from './utils/persistence/persistenceMiddleware'
-import {
-  IReloadModalVisibilityState,
-  reloadModalVisibilityReducer
-} from './reload/reducer'
 
 export interface IStoreState {
   profile: ProfileState
@@ -40,7 +36,6 @@ export interface IStoreState {
   notification: NotificationState
   offline: IOfflineDataState
   userForm: IUserFormState
-  reloadModalVisibility: IReloadModalVisibilityState
 }
 
 const enhancedCreateStore = createReduxStore as StoreCreator
@@ -55,8 +50,7 @@ export const createStore = (): { store: AppStore } => {
     i18n: intlReducer,
     notification: notificationReducer,
     offline: offlineDataReducer,
-    userForm: userFormReducer,
-    reloadModalVisibility: reloadModalVisibilityReducer
+    userForm: userFormReducer
   })
   // @ts-ignore
   const enhancer = compose(

@@ -113,3 +113,11 @@ export async function deleteDraftsByEventId(eventId: UUID) {
     .where('eventId', '=', eventId)
     .execute()
 }
+
+export async function deleteDraftsByUserId(userId: string) {
+  const db = getClient()
+  return db
+    .deleteFrom('eventActionDrafts')
+    .where('createdBy', '=', userId)
+    .execute()
+}
