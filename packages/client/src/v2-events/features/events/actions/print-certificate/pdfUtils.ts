@@ -58,7 +58,7 @@ type CertificateConfiguration = Partial<{
   fonts: Record<string, FontFamilyTypes>
 }>
 
-function omitFieldValuesFromDeclaration(
+function pickAnnotationFieldValues(
   annotationFields: FieldConfig[],
   values: Record<string, FieldUpdateValue>
 ) {
@@ -378,7 +378,7 @@ export function compileSvg({
           action.data.annotation != null
             ? stringifyDeclaration(
                 annotationFields,
-                omitFieldValuesFromDeclaration(
+                pickAnnotationFieldValues(
                   annotationFields,
                   action.data.annotation
                 )

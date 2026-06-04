@@ -137,6 +137,10 @@ function useCloseUserForm({
   )
 }
 
+/**
+ * Component to initiate the creation of a new user.
+ * Immediately navigates to the user editor flow, supplying a temporary user ID and "user.details" page.
+ */
 const CreateNewUserComponent = () => {
   const [{ officeId, from }] = useTypedSearchParams(
     ROUTES.V2.SETTINGS.USER.CREATE
@@ -258,14 +262,12 @@ const EditUserComponent = () => {
     >
       <PagesComponent
         attachmentPath={`users/${userId}/`}
-        showReviewButton={false}
+        hideBackToReview={true}
         eventConfig={eventConfig}
         formData={formState as Record<string, FieldValue>}
         formPages={formConfig.pages}
         pageId={pageId || eventConfig.declaration.pages[0].id}
-        setFormData={(data) => {
-          setUserForm(data)
-        }}
+        setFormData={setUserForm}
         validatorContext={{}}
         onPageChange={(nextPageId: string) =>
           navigate(
