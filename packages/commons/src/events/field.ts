@@ -14,6 +14,7 @@ import { createFieldConfig } from '../field-config/field-configuration'
 import { FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
 import { SelectOption, ValidationConfig } from './FieldConfig'
+import { JurisdictionReference } from '../users/userReferences'
 
 /**
  * Entry point for defining conditional logic or configuration for a form field.
@@ -27,6 +28,7 @@ export function field(
     conditionals?: FieldConditional[]
     validations?: ValidationConfig[]
     searchCriteriaLabelPrefix?: TranslationConfig
+    allowedLocations?: JurisdictionReference
   } = {}
 ) {
   return {

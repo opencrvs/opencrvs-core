@@ -491,7 +491,14 @@ function applySearchFieldOverridesToFieldConfig(
   }
   return {
     ...field,
-    ...commonConfig
+    ...commonConfig,
+    ...(searchField.allowedLocations && {
+      configuration: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ...(field as any).configuration,
+        allowedLocations: searchField.allowedLocations
+      }
+    })
   }
 }
 
