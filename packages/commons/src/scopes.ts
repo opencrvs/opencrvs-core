@@ -405,7 +405,16 @@ export const encodeScope = (scope: Scope): EncodedScope => {
  * @returns The encoded scope as a branded string (`EncodedScope`).
  */
 
+/**
+ * Cache for decoded scopes, for performance purposes.
+ */
+const decodedScopeCache = new Map<EncodedScope, Scope | undefined>()
+
 export const decodeScope = (query: EncodedScope) => {
+  if (decodedScopeCache.has(query)) {
+    return decodedScopeCache.get(query)
+  }
+
   const scope = qs.parse(query, {
     ignoreQueryPrefix: true,
     comma: true,
@@ -413,7 +422,9 @@ export const decodeScope = (query: EncodedScope) => {
   })
 
   const unflattenedScope = unflattenScope(scope)
-  return Scope.safeParse(unflattenedScope)?.data
+  const result = Scope.safeParse(unflattenedScope)?.data
+  decodedScopeCache.set(query, result)
+  return result
 }
 
 /** If a certain scope option is not set, we use the default value. */
