@@ -397,6 +397,11 @@ export const encodeScope = (scope: Scope): EncodedScope => {
 }
 
 /**
+ * Cache for decoded scopes, for performance purposes.
+ */
+const decodedScopeCache = new Map<EncodedScope, Scope | undefined>()
+
+/**
  * Converts a scope object into an encoded query string representation.
  *
  * @TODO scope param could be defined as EncodedScope instead of string.
@@ -404,12 +409,6 @@ export const encodeScope = (scope: Scope): EncodedScope => {
  * @param scope - The scope object to encode.
  * @returns The encoded scope as a branded string (`EncodedScope`).
  */
-
-/**
- * Cache for decoded scopes, for performance purposes.
- */
-const decodedScopeCache = new Map<EncodedScope, Scope | undefined>()
-
 export const decodeScope = (query: EncodedScope) => {
   if (decodedScopeCache.has(query)) {
     return decodedScopeCache.get(query)
