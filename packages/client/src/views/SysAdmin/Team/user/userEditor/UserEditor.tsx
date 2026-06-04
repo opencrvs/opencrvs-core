@@ -26,6 +26,8 @@ import {
   UpdateUserInput
 } from '@opencrvs/commons/client'
 import { AppBar, Frame, Spinner } from '@opencrvs/components'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
+import { Text } from '@opencrvs/components/lib/Text'
 import { Button } from '@opencrvs/components/lib/Button'
 import {
   CircleButton,
@@ -260,7 +262,7 @@ const EditUserComponent = () => {
     >
       <PagesComponent
         attachmentPath={`users/${userId}/`}
-        showReviewButton={false}
+        hideBackToReview={true}
         eventConfig={eventConfig}
         formData={formState as Record<string, FieldValue>}
         formPages={formConfig.pages}
@@ -319,12 +321,24 @@ const ReviewUserComponent = () => {
   const [showDuplicateEmailError, setShowDuplicateEmailError] =
     React.useState(false)
   const [duplicateEmail, setDuplicateEmail] = React.useState('')
+  const [pendingPayload, setPendingPayload] =
+    React.useState<UpdateUserInput | null>(null)
 
   const resetErrors = () => {
     setShowDuplicateMobileError(false)
     setDuplicatePhoneNumber('')
     setShowDuplicateEmailError(false)
     setDuplicateEmail('')
+  }
+
+  const submitUpdate = (payload: UpdateUserInput) => {
+    updateUserMutation.mutate(payload, {
+      onSuccess: (data) => {
+        clear()
+        navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId: data.id }))
+      },
+      onError: handleMutationError
+    })
   }
 
   const existingUserQuery = getUser.useQuery(userId, { enabled: !isNewUser })
@@ -581,17 +595,14 @@ const ReviewUserComponent = () => {
                 },
                 data
               }
-              updateUserMutation.mutate(payload, {
-                onSuccess: (data) => {
-                  clear()
-                  navigate(
-                    ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
-                      userId: data.id
-                    })
-                  )
-                },
-                onError: handleMutationError
-              })
+              const officeChanged =
+                targetUser?.type === TokenUserType.enum.user &&
+                payload.primaryOfficeId !== targetUser.primaryOfficeId
+              if (officeChanged) {
+                setPendingPayload(payload)
+              } else {
+                submitUpdate(payload)
+              }
             }}
             icon={() => <Check />}
             align={ICON_ALIGNMENT.LEFT}
@@ -600,6 +611,44 @@ const ReviewUserComponent = () => {
           </SuccessButton>
         )}
       </ReviewComponent.Body>
+      {pendingPayload && (
+        <Dialog
+          actions={[
+            <Button
+              key="cancel_office_change"
+              id="cancel_office_change"
+              size="medium"
+              type="tertiary"
+              onClick={() => {
+                setPendingPayload(null)
+              }}
+            >
+              {intl.formatMessage(buttonMessages.cancel)}
+            </Button>,
+            <Button
+              key="confirm_office_change"
+              id="confirm_office_change"
+              size="medium"
+              type="negative"
+              onClick={() => {
+                submitUpdate(pendingPayload)
+                setPendingPayload(null)
+              }}
+            >
+              {intl.formatMessage(buttonMessages.confirm)}
+            </Button>
+          ]}
+          isOpen={true}
+          title={intl.formatMessage(messages.changeOfficeWarningTitle)}
+          onClose={() => {
+            setPendingPayload(null)
+          }}
+        >
+          <Text color="grey500" element="p" variant="reg16">
+            {intl.formatMessage(messages.changeOfficeWarningBody)}
+          </Text>
+        </Dialog>
+      )}
     </FormLayout>
   )
 }

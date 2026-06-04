@@ -112,7 +112,7 @@ function DateRangeInput({
   value,
   ...props
 }: Omit<DateFieldProps, 'value' | 'onChange'> & {
-  onChange: (newValue: string | DateRangeFieldValue) => void
+  onChange: (newValue: string | DateRangeFieldValue | undefined) => void
   value?: string | DateRangeFieldValue
 }) {
   const intl = useIntl()
@@ -123,7 +123,7 @@ function DateRangeInput({
    * Component library returns '--' for empty dates when input has been touched.
    * We limit the behavior to this component, while still allowing partial values. (e.g. '2021-01-')
    */
-  const cleanEmpty = (val: string) => (val === EMPTY_DATE ? '' : val)
+  const cleanEmpty = (val: string) => (val === EMPTY_DATE ? undefined : val)
   const cleanOnChange = (val: string) => onChange(cleanEmpty(val))
   const [modalVisible, setModalVisible] = useState<boolean>(false)
 

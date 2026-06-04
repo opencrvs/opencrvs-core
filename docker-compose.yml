@@ -29,6 +29,7 @@ services:
       - LOGIN_URL=http://login:3020
       - AUTH_URL_INTERNAL=http://auth:4040
       - GATEWAY_URL_INTERNAL=http://gateway:7070
+      - LOGIN_URL=http://login:3020
   login:
     image: ghcr.io/opencrvs/ocrvs-login:${VERSION}
     #platform: linux/amd64
