@@ -352,7 +352,7 @@ gateway:
     CONFIG_SMS_CODE_EXPIRY_SECONDS: "600"
     CONFIG_TOKEN_EXPIRY_SECONDS: "604800"
     COUNTRY: FAR
-    DISABLE_RATE_LIMIT: "true"
+    DISABLE_RATE_LIMIT: "false"
     LANGUAGES: "en,fr"
 
 login:
@@ -439,7 +439,7 @@ data_seed:
   env:
     # When users are seeded, are they immediately active using a test password and
     # six zeros as a 2-Factor auth code. Always set to false in production and staging.
-    ACTIVATE_USERS: "true"
+    ACTIVATE_USERS: "false"
 
 on_restore_cronjob:
   enabled: false
