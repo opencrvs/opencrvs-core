@@ -423,11 +423,7 @@ export const EmptyNameAfterTouchingBlocksContinue: StoryObj = {
     await step(
       'User remains on the details page — Continue was blocked',
       async () => {
-        // The phone input only exists on user.details; still being there
-        // means we did not navigate to the next page.
-        expect(
-          canvasElement.querySelector('[data-testid="text__phoneNumber"]')
-        ).toBeInTheDocument()
+        expect(window.location.pathname).toContain('user.details')
       }
     )
   }
