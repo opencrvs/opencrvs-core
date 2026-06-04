@@ -95,3 +95,8 @@ _curl --connect-timeout 60 -u elastic:$ELASTICSEARCH_SUPERUSER_PASSWORD "$kibana
   _curl --connect-timeout 60 -X POST -H 'kbn-xsrf: true' -u elastic:$ELASTICSEARCH_SUPERUSER_PASSWORD "${KIBANA_URL}/api/alerting/rule/$id/_disable"
   _curl --connect-timeout 60 -X POST -H 'kbn-xsrf: true' -u elastic:$ELASTICSEARCH_SUPERUSER_PASSWORD "${KIBANA_URL}/api/alerting/rule/$id/_enable"
 done
+
+echo "Setting default data view to filebeat-*"
+_curl --connect-timeout 60 -X POST -H 'Content-Type: application/json' -H 'kbn-xsrf: true' -u elastic:$ELASTICSEARCH_SUPERUSER_PASSWORD "${KIBANA_URL}/api/kibana/settings/defaultIndex" -d '{"value": "filebeat-*"}' || echo "Failed to set default data view, please check Kibana configuration"
+
+echo "Kibana setup completed successfully"
