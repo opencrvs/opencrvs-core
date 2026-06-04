@@ -26,6 +26,7 @@ import {
   EventDocument,
   omitHiddenAnnotationFields,
   omitHiddenPaginatedFields,
+  deepDropNulls,
   deepMerge,
   EventState,
   EventConfig,
@@ -501,11 +502,13 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       : {}
 
     const annotation = actionConfiguration
-      ? omitHiddenAnnotationFields(
-          actionConfiguration,
-          originalDeclaration,
-          restParams.annotation,
-          {}
+      ? deepDropNulls(
+          omitHiddenAnnotationFields(
+            actionConfiguration,
+            originalDeclaration,
+            restParams.annotation,
+            {}
+          )
         )
       : {}
 

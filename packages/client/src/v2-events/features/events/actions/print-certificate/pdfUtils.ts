@@ -58,7 +58,7 @@ type CertificateConfiguration = Partial<{
   fonts: Record<string, FontFamilyTypes>
 }>
 
-function omitFieldValuesFromDeclaration(
+function pickAnnotationFieldValues(
   annotationFields: FieldConfig[],
   values: Record<string, FieldUpdateValue>
 ) {
@@ -380,7 +380,7 @@ export function compileSvg({
           action.data.annotation != null
             ? stringifyDeclaration(
                 annotationFields,
-                omitFieldValuesFromDeclaration(
+                pickAnnotationFieldValues(
                   annotationFields,
                   action.data.annotation
                 )
@@ -684,7 +684,12 @@ async function downloadAndEmbedImages(svgString: string): Promise<string> {
         imageElement.getAttribute('href') ||
         imageElement.getAttribute('xlink:href')
 
-      if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
+      if (
+        href &&
+        (href.startsWith('http://') ||
+          href.startsWith('https://') ||
+          href.startsWith('/'))
+      ) {
         const response = await fetch(href)
         const blob = await response.blob()
 

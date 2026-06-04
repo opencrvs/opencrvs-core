@@ -27,10 +27,27 @@ filter:
         rule.name.keyword:
           value: 'Error in service'
 
-alert: post2
+alert: 
+  - ${NOTIFICATION_TYPE}
+
+email:
+  - ${ALERT_EMAIL}
+
 http_post2_url: '${HTTP_POST2_ALERT_URL}'
 http_post2_payload:
   subject: '{% raw %}{{DOMAIN}}{% endraw %} {{event.kind}}: {{rule.name}} {{kibana.alert.context.apm__error_rate.serviceName}} 🚨'
   html: 'Login to https://kibana.{% raw %}{{DOMAIN}}{% endraw %}/app/apm/services/{{kibana.alert.context.apm__error_rate.serviceName}}/overview to view the alert.'
   from: '{% raw %}{{SENDER_EMAIL_ADDRESS}}{% endraw %}'
   to: '{% raw %}{{ALERT_EMAIL}}{% endraw %}'
+
+
+# New way to define alerting action with more flexible templating:
+alert_subject: "${DOMAIN}: {{event.kind}}: {{rule.name}} {{kibana.alert.context.apm__error_rate.serviceName}} 🚨"
+alert_text_type: alert_text_jinja
+email_format: "html"
+
+alert_text: |
+  <p>Reason: {{kibana.alert.context.logs__alert__document__count.conditions}}.</p>
+
+  <p>Open Kibana:</p>
+  <p><a href="https://kibana.${DOMAIN}/app/apm/services/{{kibana.alert.context.apm__error_rate.serviceName}}/overview" target="_blank">https://kibana.${DOMAIN}</a></p>

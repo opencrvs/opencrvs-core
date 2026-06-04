@@ -22,5 +22,12 @@ writeback_index: elastalert_status
 
 http_post2_url: "${HTTP_POST2_ALERT_URL}"
 
+smtp_host: "${SMTP_HOST}"
+smtp_port: "${SMTP_PORT}"
+from_addr: "${SENDER_EMAIL_ADDRESS}"
+smtp_ssl: ${SMTP_SECURE}
+smtp_starttls: ${SMTP_SECURE}
+smtp_auth_file: /opt/elastalert/smtp.auth
+
 alert_time_limit:
   days: 2

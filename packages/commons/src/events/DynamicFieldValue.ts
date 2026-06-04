@@ -29,13 +29,14 @@ import {
  */
 export function getDynamicNameValue(field: NameField) {
   const nameConfiguration = field.configuration?.name
+  // When no per-subfield required flag is supplied, a required NAME field implies that firstname and surname are required too.
+  // Without this fallback `TextValue` (`z.string()`) accepts empty strings.
+  const firstnameRequired =
+    nameConfiguration?.firstname?.required ?? field.required
+  const surnameRequired = nameConfiguration?.surname?.required ?? field.required
   return z.object({
-    firstname: nameConfiguration?.firstname?.required
-      ? NonEmptyTextValue
-      : TextValue,
-    surname: nameConfiguration?.surname?.required
-      ? NonEmptyTextValue
-      : TextValue,
+    firstname: firstnameRequired ? NonEmptyTextValue : TextValue,
+    surname: surnameRequired ? NonEmptyTextValue : TextValue,
     middlename: nameConfiguration?.middlename?.required
       ? NonEmptyTextValue
       : TextValue.optional()
