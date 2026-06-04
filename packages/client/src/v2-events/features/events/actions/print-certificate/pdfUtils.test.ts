@@ -173,6 +173,55 @@ describe('svgToPdfTemplate', () => {
     )
     expect(result.definition.pageSize).toEqual({ width: 200, height: 200 })
   })
+
+  test('replaces service-worker-cached path with base64 data', async () => {
+    const mockFiles = ['data:image/png;base64,CACHED_SIGNATURE']
+
+    fetch.mockResolvedValue({
+      blob: async () =>
+        Promise.resolve(new Blob(['fake-sig'], { type: 'image/png' }))
+    } as Response)
+
+    global.FileReader = vi.fn(() => {
+      const mockFileReader = {
+        readAsDataURL: vi.fn(),
+        result: mockFiles.shift(),
+        onload: null as null | (() => void),
+        onerror: null
+      }
+      setTimeout(() => {
+        if (mockFileReader.onload) {
+          mockFileReader.onload()
+        }
+      }, 0)
+      return mockFileReader
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }) as any
+
+    const svgString = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><image xlink:href="/users/abc123/signature.png" x="0" y="0" width="140" height="70"/></svg>`
+
+    const result = await svgToPdfTemplate(svgString, {})
+    const [content] = result.definition.content as [ContentSvg]
+
+    expect(fetch).toHaveBeenCalledWith('/users/abc123/signature.png')
+    expect(content.svg).toContain(
+      'xlink:href="data:image/png;base64,CACHED_SIGNATURE"'
+    )
+  })
+
+  test('leaves already-embedded data URIs untouched', async () => {
+    fetch.mockClear()
+
+    const svgString = `<svg xmlns="http://www.w3.org/2000/svg"><image href="data:image/png;base64,ALREADY_EMBEDDED" x="0" y="0" width="140" height="70"/></svg>`
+
+    const result = await svgToPdfTemplate(svgString, {})
+    const [content] = result.definition.content as [ContentSvg]
+
+    expect(fetch).not.toHaveBeenCalled()
+    expect(content.svg).toContain(
+      'href="data:image/png;base64,ALREADY_EMBEDDED"'
+    )
+  })
 })
 
 function expectRenderOutput(template: string, output: string) {
