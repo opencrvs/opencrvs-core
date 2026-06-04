@@ -14062,6 +14062,83 @@ components:
                     type: array
                     items:
                       $ref: "#/components/schemas/ValidationConfig"
+                  allowedLocations:
+                    description: Override the allowedLocations for a location field in advanced
+                      search. Use this when the declaration form's
+                      allowedLocations references a scope (e.g. record.create)
+                      that search-only users don't have — specify record.search
+                      scope instead.
+                    type: object
+                    properties:
+                      $jurisdiction:
+                        anyOf:
+                          - type: string
+                            enum:
+                              - administrativeArea
+                              - location
+                              - all
+                            description: Filters based on user jurisdiction relative to their office
+                              location in hierarchy.
+                          - type: object
+                            properties:
+                              $scope:
+                                type: string
+                                enum:
+                                  - organisation.read-locations
+                                  - user.read
+                                  - user.create
+                                  - user.edit
+                                  - user.search
+                                  - record.search
+                                  - record.create
+                                  - record.read
+                                  - record.declare
+                                  - record.notify
+                                  - record.edit
+                                  - record.reject
+                                  - record.archive
+                                  - record.review-duplicates
+                                  - record.register
+                                  - record.print-certified-copies
+                                  - record.request-correction
+                                  - record.correct
+                                  - record.unassign-others
+                                  - record.custom-action
+                                  - bypassratelimit
+                                  - record.reindex
+                                  - user.data-seeding
+                                  - integration.create
+                                  - record.import
+                                  - config.update-all
+                                  - attachment.upload
+                                  - profile.electronic-signature
+                                  - user.read-only-my-audit
+                                  - performance.read
+                                  - performance.read-dashboards
+                                  - performance.vital-statistics-export
+                                  - record.confirm-registration
+                                  - record.reject-registration
+                                  - workqueue
+                                  - dashboard.view
+                              $option:
+                                type: string
+                                enum:
+                                  - event
+                                  - placeOfEvent
+                                  - declaredIn
+                                  - declaredBy
+                                  - registeredIn
+                                  - registeredBy
+                                  - accessLevel
+                                  - role
+                                  - ids
+                            required:
+                              - $scope
+                              - $option
+                            additionalProperties: false
+                    required:
+                      - $jurisdiction
+                    additionalProperties: false
                   fieldId:
                     type: string
                   fieldType:
@@ -14305,6 +14382,83 @@ components:
                     type: array
                     items:
                       $ref: "#/components/schemas/ValidationConfig"
+                  allowedLocations:
+                    description: Override the allowedLocations for a location field in advanced
+                      search. Use this when the declaration form's
+                      allowedLocations references a scope (e.g. record.create)
+                      that search-only users don't have — specify record.search
+                      scope instead.
+                    type: object
+                    properties:
+                      $jurisdiction:
+                        anyOf:
+                          - type: string
+                            enum:
+                              - administrativeArea
+                              - location
+                              - all
+                            description: Filters based on user jurisdiction relative to their office
+                              location in hierarchy.
+                          - type: object
+                            properties:
+                              $scope:
+                                type: string
+                                enum:
+                                  - organisation.read-locations
+                                  - user.read
+                                  - user.create
+                                  - user.edit
+                                  - user.search
+                                  - record.search
+                                  - record.create
+                                  - record.read
+                                  - record.declare
+                                  - record.notify
+                                  - record.edit
+                                  - record.reject
+                                  - record.archive
+                                  - record.review-duplicates
+                                  - record.register
+                                  - record.print-certified-copies
+                                  - record.request-correction
+                                  - record.correct
+                                  - record.unassign-others
+                                  - record.custom-action
+                                  - bypassratelimit
+                                  - record.reindex
+                                  - user.data-seeding
+                                  - integration.create
+                                  - record.import
+                                  - config.update-all
+                                  - attachment.upload
+                                  - profile.electronic-signature
+                                  - user.read-only-my-audit
+                                  - performance.read
+                                  - performance.read-dashboards
+                                  - performance.vital-statistics-export
+                                  - record.confirm-registration
+                                  - record.reject-registration
+                                  - workqueue
+                                  - dashboard.view
+                              $option:
+                                type: string
+                                enum:
+                                  - event
+                                  - placeOfEvent
+                                  - declaredIn
+                                  - declaredBy
+                                  - registeredIn
+                                  - registeredBy
+                                  - accessLevel
+                                  - role
+                                  - ids
+                            required:
+                              - $scope
+                              - $option
+                            additionalProperties: false
+                    required:
+                      - $jurisdiction
+                    additionalProperties: false
                   fieldId:
                     type: string
                     enum:
