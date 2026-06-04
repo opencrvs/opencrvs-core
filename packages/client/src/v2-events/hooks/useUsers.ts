@@ -190,6 +190,18 @@ setMutationDefaults(trpcOptionsProxy.user.changeAvatar, {
   }
 })
 
+setMutationDefaults(trpcOptionsProxy.user.sendResetPasswordInvite, {
+  mutationFn:
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    trpcOptionsProxy.user.sendResetPasswordInvite.mutationOptions().mutationFn!,
+  retry: false,
+  onSuccess: async (data, variables) => {
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.get.queryKey(variables)
+    })
+  }
+})
+
 export function useUsers() {
   const trpc = useTRPC()
   return {
