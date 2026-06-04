@@ -16,7 +16,6 @@ import {
 import { createFieldConfig } from '../field-config/field-configuration'
 import { FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
-import { SelectOption, ValidationConfig } from './FieldConfig'
 import { JurisdictionReference } from '../users/userReferences'
 import {
   ComputedDefaultValue,
