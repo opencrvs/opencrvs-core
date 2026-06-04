@@ -402,19 +402,17 @@ export const encodeScope = (scope: Scope): EncodedScope => {
 const decodedScopeCache = new Map<EncodedScope, Scope | undefined>()
 
 /**
- * Converts a scope object into an encoded query string representation.
+ * Converts an encoded scope string into a scope object.
  *
- * @TODO scope param could be defined as EncodedScope instead of string.
- *
- * @param scope - The scope object to encode.
- * @returns The encoded scope as a branded string (`EncodedScope`).
+ * @param scope - The encoded scope string to decode.
+ * @returns The decoded scope object.
  */
-export const decodeScope = (query: EncodedScope) => {
-  if (decodedScopeCache.has(query)) {
-    return decodedScopeCache.get(query)
+export const decodeScope = (encodedScope: EncodedScope) => {
+  if (decodedScopeCache.has(encodedScope)) {
+    return decodedScopeCache.get(encodedScope)
   }
 
-  const scope = qs.parse(query, {
+  const scope = qs.parse(encodedScope, {
     ignoreQueryPrefix: true,
     comma: true,
     allowDots: true
@@ -422,7 +420,7 @@ export const decodeScope = (query: EncodedScope) => {
 
   const unflattenedScope = unflattenScope(scope)
   const result = Scope.safeParse(unflattenedScope)?.data
-  decodedScopeCache.set(query, result)
+  decodedScopeCache.set(encodedScope, result)
   return result
 }
 
