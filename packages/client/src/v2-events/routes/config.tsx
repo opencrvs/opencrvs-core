@@ -9,15 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
 
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { onlineManager } from '@tanstack/react-query'
 import { ActionType } from '@opencrvs/commons/client'
 import { APPLICATION_VERSION } from '@client/utils/constants'
-import { storeReloadModalVisibility } from '@client/reload/reducer'
-import type { AppStore } from '@client/store'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
@@ -106,14 +104,8 @@ function PrefetchQueries() {
  * Each route is defined as a child of the `ROUTES.V2` route.
  */
 
-export function useNetworkProbe({
-  onVersionMismatch
-}: { onVersionMismatch?: () => void } = {}) {
-  const onVersionMismatchRef = useRef(onVersionMismatch)
-  useEffect(() => {
-    onVersionMismatchRef.current = onVersionMismatch
-  })
-
+export function useNetworkProbe() {
+  const [versionMismatch, setVersionMismatch] = useState(false)
   useEffect(() => {
     let cancelled = false
     let intervalId: ReturnType<typeof setInterval> | null = null
@@ -139,17 +131,15 @@ export function useNetworkProbe({
         })
 
         if (!cancelled) {
-          if (!res.ok) {
-            throw new Error('Network probe failed')
-          }
-          const gatewayVersion = res.headers.get('X-version')
-          if (gatewayVersion && gatewayVersion !== APPLICATION_VERSION) {
-            onVersionMismatchRef.current?.()
-          }
-          onlineManager.setOnline(true)
-          if (intervalId !== null) {
+          onlineManager.setOnline(res.ok)
+          if (res.ok && intervalId !== null) {
             clearInterval(intervalId)
             intervalId = null
+          }
+
+          const gatewayVersion = res.headers.get('X-version')
+          if (gatewayVersion && gatewayVersion !== APPLICATION_VERSION) {
+            setVersionMismatch(true)
           }
         }
       } catch {
@@ -185,16 +175,13 @@ export function useNetworkProbe({
       }
     }
   }, [])
+
+  return { versionMismatch }
 }
 
 export const routesConfig = {
   path: ROUTES.V2.path,
   Component: () => {
-    const dispatch = useDispatch<AppStore['dispatch']>()
-    useNetworkProbe({
-      onVersionMismatch: () => dispatch(storeReloadModalVisibility(true))
-    })
-
     const currentUser = useSelector(getUserDetails)
 
     if (!currentUser) {
