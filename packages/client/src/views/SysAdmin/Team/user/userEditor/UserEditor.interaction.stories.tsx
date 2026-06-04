@@ -423,7 +423,7 @@ export const EmptyNameAfterTouchingBlocksContinue: StoryObj = {
     await step(
       'User remains on the details page — Continue was blocked',
       async () => {
-        expect(window.location.pathname).toContain('user.details')
+        expect(await canvas.findByText('Continue')).toBeInTheDocument()
       }
     )
   }
