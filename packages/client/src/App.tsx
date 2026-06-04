@@ -28,8 +28,11 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { StyledErrorBoundary } from './components/StyledErrorBoundary'
 import { I18nContainer } from './i18n/components/I18nContainer'
 import { AppStore } from './store'
-import { routesConfig as v2RoutesConfig } from './v2-events/routes/config'
-import { ReloadModal } from './views/Modals/ReloadModal'
+import {
+  routesConfig as v2RoutesConfig,
+  useNetworkProbe
+} from './v2-events/routes/config'
+import { VersionMismatchModal } from './components/VersionMismatchModal'
 
 // Injecting global styles for the body tag - used only once
 const GlobalStyle = createGlobalStyle`
@@ -59,7 +62,6 @@ export const routesConfig = [
     path: '/',
     element: (
       <ScrollToTop>
-        <ReloadModal />
         <SessionExpireConfirmation />
         <NotificationComponent>
           <Page>
@@ -93,12 +95,15 @@ interface IAppProps {
 }
 
 export function App({ store, router }: IAppProps) {
+  const { versionMismatch } = useNetworkProbe()
+
   return (
     <ErrorBoundary>
       <GlobalStyle />
       <Provider store={store}>
         <I18nContainer>
           <ThemeProvider theme={getTheme()}>
+            <VersionMismatchModal show={versionMismatch} />
             <StyledErrorBoundary>
               <RouterProvider
                 router={router}

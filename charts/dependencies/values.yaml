@@ -220,7 +220,26 @@ logstash:
 elastalert:
   # Create configmap with custom rules for elastalert
   # custom_rules_configmap:
-  env: {}
+  env:
+    # NOTIFICATION_TYPE:
+    #   - email: send email alert using configured SMTP server
+    #   - post2: send alert to external system via HTTP POST (Docker swarm backward compatible way)
+    NOTIFICATION_TYPE: post2
+
+    # HTTP_POST2_ALERT_URL: Required if NOTIFICATION_TYPE is set to post2. URL to send HTTP POST alert to.
+    # Example: http://countryconfig.opencrvs-qa.svc.cluster.local:3040/email
+
+  # Create SMTP credentials secret for elastalert
+  # Required if NOTIFICATION_TYPE is set to email. Secret should contain following keys:
+  # secrets:
+  #   smtp-config:
+  #     - ALERT_EMAIL
+  #     - SENDER_EMAIL_ADDRESS
+  #     - SMTP_HOST
+  #     - SMTP_PASSWORD
+  #     - SMTP_PORT
+  #     - SMTP_SECURE
+  #     - SMTP_USERNAME
 
 minio:
   # Enable or disable MinIO deployment.

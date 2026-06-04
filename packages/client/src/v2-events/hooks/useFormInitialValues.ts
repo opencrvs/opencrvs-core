@@ -10,6 +10,7 @@
  */
 import { get, pick } from 'lodash'
 import {
+  ActionUpdate,
   EventState,
   FieldConfig,
   FieldValue,
@@ -25,7 +26,10 @@ export function computeInitialValues(
   fields: FieldConfig[],
   values: EventState,
   context: ValidatorContext,
-  getDefaultValue: (field: FieldConfig) => FieldValue | undefined
+  getDefaultValue: (
+    field: FieldConfig,
+    form: EventState | ActionUpdate
+  ) => FieldValue | undefined
 ): EventState {
   for (const field of fields) {
     if (field.type === FieldType.FIELD_GROUP) {
@@ -54,7 +58,7 @@ export function computeInitialValues(
         : (resolveSyncedFieldValue(field, (syncRef) => {
             const key = flattenFieldReference(syncRef)
             return get(values, key) ?? get(context.baseFormState, key)
-          }) ?? getDefaultValue(field))
+          }) ?? getDefaultValue(field, values))
 
     values[field.id] = effectiveValue
   }
