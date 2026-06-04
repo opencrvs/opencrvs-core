@@ -51,11 +51,11 @@ V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
 
 #### Webhook integration client removed
 
-The Webhook integration client and its `webhooks` service have been removed and are **not** migrated to v2.0 automatically. Country configurations that previously consumed webhook subscriptions must instead react to events via the country config's [Action Confirmation API](https://github.com/opencrvs/opencrvs-countryconfig/blob/develop/src/api/action-confirmation.md), which is invoked for every supported action (`NOTIFY`, `DECLARE`, `REGISTER`, `REJECT`, `ARCHIVE`, `PRINT_CERTIFICATE`). If a webhook-style fan-out to external systems is still required, implement it directly inside the country configuration code from those handlers. [#11757](https://github.com/opencrvs/opencrvs-core/issues/11757)
+The Webhook integration client and its `webhooks` service have been removed and are **not** migrated to v2.0 automatically. Country configurations that previously consumed webhook subscriptions must instead react to events via the country config's [Action Confirmation API](https://github.com/opencrvs/opencrvs-countryconfig/blob/develop/src/api/action-confirmation.md), which is invoked for every supported action (`NOTIFY`, `DECLARE`, `REGISTER`, `REJECT`, `ARCHIVE`, `PRINT_CERTIFICATE`). If a webhook-style fan-out to external systems is still required, implement it directly inside the country configuration code from those handlers.
 
 #### Event Notification API rename
 
-`POST /api/events/events/notifications` has been renamed to `POST /api/events/events/{eventId}/notify`. The two-step "create event, then notify" flow is unchanged otherwise. A new single-request convenience endpoint `POST /api/events/events/notify` is also available for system clients that need to create and notify in one call. Integration clients must update their request paths. [#11757](https://github.com/opencrvs/opencrvs-core/issues/11757)
+`POST /api/events/events/notifications` has been renamed to `POST /api/events/events/{eventId}/notify`. The two-step "create event, then notify" flow is unchanged otherwise. A new single-request convenience endpoint `POST /api/events/events/notify` is also available for system clients that need to create and notify in one call. Integration clients must update their request paths.
 
 ### New features
 
