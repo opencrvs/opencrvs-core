@@ -682,11 +682,10 @@ async function downloadAndEmbedImages(svgString: string): Promise<string> {
         imageElement.getAttribute('href') ||
         imageElement.getAttribute('xlink:href')
 
-      // Fetch any URL that is not already a data URI — this includes same-origin
-      // paths (e.g. /users/<id>/sig.png) served by the service worker file cache,
-      // which the old http(s)-only check silently skipped, causing signatures to
-      // appear broken in generated PDFs.
-      if (href && !href.startsWith('data:')) {
+      // Matches absolute URLs (http/https) and absolute paths (/...) —
+      // covers external resources (logos, passport photos) and same-origin paths
+      // served by the service worker cache (e.g. /users/<id>/sig.png).
+      if (href && /^https?:\/\/|^\//.test(href)) {
         const response = await fetch(href)
         const blob = await response.blob()
 
