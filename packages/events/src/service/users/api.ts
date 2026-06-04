@@ -49,8 +49,8 @@ import {
 } from '@events/storage/postgres/events/users'
 import { generateSaltedHash, generateHash } from '@events/service/auth/hash'
 import { updatePasswordHashAndSalt } from '@events/storage/postgres/events/users'
-import { getRoles } from '../config/config'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
+import { getRoles } from '../config/config'
 
 export type UserSortBy =
   | 'createdAt'
@@ -513,9 +513,11 @@ export async function checkSecurityQuestionMatch({
   input: { questionKey: string; answer: string }
   salt: string
 }) {
-  const target = questions.find((q) => q.questionKey === input.questionKey)
+  const targetIndex = questions.findIndex(
+    (q) => q.questionKey === input.questionKey
+  )
 
-  if (!target) {
+  if (targetIndex === -1) {
     return {
       matched: false,
       questionKey: input.questionKey
@@ -523,17 +525,15 @@ export async function checkSecurityQuestionMatch({
   }
 
   const hash = await generateHash(input.answer.toLowerCase(), salt)
-  const matched = hash === target.answerHash
+  const matched = hash === questions[targetIndex].answerHash
 
-  // On a wrong answer, rotate to a different question so the same prompt
-  // can't be brute-forced.
-  const fallback = questions.find(
-    (q) => q.questionKey !== input.questionKey
-  )?.questionKey
+  // On a wrong answer, rotate to the next question in the user's list (or wrap around at the end).
+  const nextIndex = (targetIndex + 1) % questions.length
+  const fallbackQuestionKey = questions[nextIndex].questionKey
 
   return {
     matched,
-    questionKey: matched ? input.questionKey : (fallback ?? input.questionKey)
+    questionKey: matched ? input.questionKey : fallbackQuestionKey
   }
 }
 
