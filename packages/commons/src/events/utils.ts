@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -64,6 +63,8 @@ import {
 } from './FieldValue'
 import { subDays, subYears, format } from 'date-fns'
 import { FieldType } from './FieldType'
+
+/* eslint-disable max-lines */
 
 export function ageToDate(age: number, asOfDate: PlainDate) {
   const date = plainDateToLocalDate(asOfDate)
@@ -751,7 +752,6 @@ export function getPendingAction(actions: Action[]): ActionDocument {
 }
 
 export function getCompleteActionAnnotation(
-  annotation: ActionUpdate,
   event: EventDocument,
   action: ActionDocument
 ): ActionUpdate {
@@ -763,21 +763,19 @@ export function getCompleteActionAnnotation(
    * - The linked action (with status `Accepted`) comes from
    *   the country configuration in response to that request.
    *
-   * If we find the original action, we merge its annotation into the current one
-   * so that the current action includes the original details.
+   * If we find a `Requested` original action, we merge its annotation with
+   * the current action's annotation so that the current action includes the
+   * original details. Otherwise we return the action's own annotation as-is.
    */
   if (action.originalActionId) {
     const originalAction = event.actions.find(
       ({ id }) => id === action.originalActionId
     )
     if (originalAction?.status === ActionStatus.Requested) {
-      return deepMerge(
-        deepMerge(annotation, originalAction.annotation ?? {}),
-        action.annotation ?? {}
-      )
+      return deepMerge(originalAction.annotation ?? {}, action.annotation ?? {})
     }
   }
-  return deepMerge(annotation, action.annotation ?? {})
+  return action.annotation ?? {}
 }
 
 /**
@@ -849,7 +847,7 @@ export function getAcceptedActions(event: EventDocument): ActionDocument[] {
   return event.actions.filter(isAcceptedAction).map((action) => ({
     ...action,
     declaration: getCompleteActionDeclaration({}, event, action),
-    annotation: getCompleteActionAnnotation({}, event, action)
+    annotation: getCompleteActionAnnotation(event, action)
   }))
 }
 

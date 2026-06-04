@@ -87,6 +87,7 @@ export const ClientConfig = z.object({
   COUNTRY: z.string(),
   LANGUAGES: z.array(z.string()),
   SENTRY: z.string().optional(),
+  LOGIN_URL: z.string().optional(),
   REGISTER_BACKGROUND: BackgroundConfig,
   DASHBOARDS: z.array(
     z.object({

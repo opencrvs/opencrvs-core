@@ -115,7 +115,7 @@ export function extractHistoryActions(
       ...action,
       ...(content !== undefined ? { content } : {}),
       declaration: getCompleteActionDeclaration({}, fullEvent, action),
-      annotation: getCompleteActionAnnotation({}, fullEvent, action)
+      annotation: getCompleteActionAnnotation(fullEvent, action)
     }
   }) as ActionDocument[]
 }
