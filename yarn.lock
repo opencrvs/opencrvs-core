@@ -28363,7 +28363,7 @@ zod-validation-error@^5.0.0:
   resolved "https://registry.yarnpkg.com/zod-validation-error/-/zod-validation-error-5.0.0.tgz#96db948070b7bfcb13bfec5134113e580f9eee38"
   integrity sha512-hmk+pkyKq7Q71PiWVSDUc3VfpzpvcRHZ3QPw9yEMVvmtCekaMeOHnbr3WbxfrgEnQTv6haGP4cmv0Ojmihzsxw==
 
-zod@^3.24.4:
+zod@^3.23.8, zod@^3.24.4:
   version "3.25.76"
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.25.76.tgz#26841c3f6fd22a6a2760e7ccb719179768471e34"
   integrity sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==
