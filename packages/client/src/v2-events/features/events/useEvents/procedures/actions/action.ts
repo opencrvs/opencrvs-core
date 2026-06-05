@@ -250,7 +250,6 @@ setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.PRINT_CERTIFICATE }
 })
