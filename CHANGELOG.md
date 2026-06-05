@@ -57,6 +57,10 @@ The Webhook integration client and its `webhooks` service have been removed and 
 
 `POST /api/events/events/notifications` has been renamed to `POST /api/events/events/{eventId}/notify`. The two-step "create event, then notify" flow is unchanged otherwise. A new single-request convenience endpoint `POST /api/events/events/notify` is also available for system clients that need to create and notify in one call. Integration clients must update their request paths.
 
+#### Auth service no longer exposed on its own subdomain
+
+The public `auth.{hostname}` Traefik route has been removed — the auth service is now reachable only through the gateway proxy at `gateway.{hostname}/auth/*`. Remove the `auth.*` DNS record and TLS certificate from your deployment. The gateway's `/auth/authenticate-super-user` route is now rate limited on a constant key (it previously keyed on a `username` field that super user auth does not send).
+
 ### New features
 
 #### Rich text support in MessageDescriptor.defaultMessage
