@@ -80,7 +80,7 @@ import { UserActionsQuery } from '@events/storage/postgres/events/actions'
 import { userCanReadUserAudit } from '../middleware'
 
 // Used for changing password, since the initial password does not necessarily have to comply with the password rules.
-export const passwordSchema = z
+const PasswordSchema = z
   .string()
   .min(12, 'Password must be at least 12 characters')
   .regex(/\d/, 'Password must contain at least one number')
@@ -383,7 +383,7 @@ export const userRouter = router({
     .input(
       z.object({
         existingPassword: z.string(),
-        password: passwordSchema
+        password: PasswordSchema
       })
     )
     .mutation(async ({ input, ctx }) => {
