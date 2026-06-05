@@ -334,8 +334,8 @@ export const PrintButtonDisabledWhenGoingOffline: Story = {
         await canvas.findByRole('button', { name: 'Yes, print certificate' })
       )
       await canvas.findByText('Print certified copy?')
-      expect(canvas.getByTestId('confirm-print')).toBeEnabled()
-      expect(canvas.getByTestId('print-certificate')).toBeEnabled()
+      await expect(canvas.getByTestId('confirm-print')).toBeEnabled()
+      await expect(canvas.getByTestId('print-certificate')).toBeEnabled()
     })
 
     await step('Go offline — print button becomes disabled', async () => {
@@ -348,9 +348,9 @@ export const PrintButtonDisabledWhenGoingOffline: Story = {
       window.dispatchEvent(new Event('offline'))
 
       await waitFor(async () => {
-        expect(canvas.getByTestId('confirm-print')).toBeDisabled()
+        await expect(canvas.getByTestId('confirm-print')).toBeDisabled()
       })
-      expect(canvas.getByTestId('print-certificate')).toBeDisabled()
+      await expect(canvas.getByTestId('print-certificate')).toBeDisabled()
     })
 
     await step('Go online — print button becomes enabled', async () => {
@@ -360,10 +360,10 @@ export const PrintButtonDisabledWhenGoingOffline: Story = {
       })
       window.dispatchEvent(new Event('online'))
 
-      await waitFor(() => {
-        expect(canvas.getByTestId('confirm-print')).toBeEnabled()
+      await waitFor(async () => {
+        await expect(canvas.getByTestId('confirm-print')).toBeEnabled()
       })
-      expect(canvas.getByTestId('print-certificate')).toBeEnabled()
+      await expect(canvas.getByTestId('print-certificate')).toBeEnabled()
     })
   }
 }
