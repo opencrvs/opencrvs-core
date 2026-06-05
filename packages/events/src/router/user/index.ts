@@ -79,6 +79,14 @@ import {
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
 import { userCanReadUserAudit } from '../middleware'
 
+// Used for changing password, since the initial password does not necessarily have to comply with the password rules.
+export const passwordSchema = z
+  .string()
+  .min(12, 'Password must be at least 12 characters')
+  .regex(/\d/, 'Password must contain at least one number')
+  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+
 const UserSearch = z.object({
   username: z.string().optional(),
   mobile: z.string().optional(),
@@ -375,7 +383,7 @@ export const userRouter = router({
     .input(
       z.object({
         existingPassword: z.string(),
-        password: z.string()
+        password: passwordSchema
       })
     )
     .mutation(async ({ input, ctx }) => {

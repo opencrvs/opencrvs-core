@@ -49,8 +49,8 @@ import {
 } from '@events/storage/postgres/events/users'
 import { generateSaltedHash, generateHash } from '@events/service/auth/hash'
 import { updatePasswordHashAndSalt } from '@events/storage/postgres/events/users'
-import { getRoles } from '../config/config'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
+import { getRoles } from '../config/config'
 
 export type UserSortBy =
   | 'createdAt'
