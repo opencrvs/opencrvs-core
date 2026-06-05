@@ -529,10 +529,7 @@ export async function checkSecurityQuestionMatch({
 
   // Correct answer
   if (matched) {
-    return {
-      matched,
-      questionKey: input.questionKey
-    }
+    return { matched, questionKey: input.questionKey }
   }
 
   // On a wrong answer, rotate to the next question in the user's list (or wrap around at the end).
@@ -541,10 +538,7 @@ export async function checkSecurityQuestionMatch({
     nextIndex = 0
   }
 
-  return {
-    matched,
-    questionKey: questions[nextIndex].questionKey
-  }
+  return { matched, questionKey: questions[nextIndex].questionKey }
 }
 
 export async function verifyPasswordById(
