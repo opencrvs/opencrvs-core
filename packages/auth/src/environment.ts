@@ -19,10 +19,7 @@ export const env = cleanEnv(process.env, {
   AUTH_PORT: port({ default: 4040 }),
   EVENTS_URL: url({ devDefault: 'http://localhost:5555/' }),
   DOMAIN: str({ devDefault: '*' }),
-  COUNTRY_CONFIG_URL_EXTERNAL: url({ devDefault: 'http://localhost:3040/' }), // used for external requests (CORS whitelist)
-  COUNTRY_CONFIG_URL_INTERNAL: url({ devDefault: 'http://localhost:3040/' }), // used for internal service-to-service communication
-  LOGIN_URL: url({ devDefault: 'http://localhost:3020/' }),
-  CLIENT_APP_URL: url({ devDefault: 'http://localhost:3000/' }),
+  COUNTRY_CONFIG_URL_INTERNAL: url({ devDefault: 'http://localhost:3040/' }),
   CERT_PRIVATE_KEY_PATH: str({ devDefault: '../../.secrets/private-key.pem' }),
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
   SENTRY_DSN: str({ default: undefined }),
