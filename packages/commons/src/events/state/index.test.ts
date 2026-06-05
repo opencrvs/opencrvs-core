@@ -1005,6 +1005,160 @@ describe('correction requests', () => {
     expect(applicantName.surname).toBe('John')
   })
 
+  test('updatedAtLocation reflects the registrar who submitted REGISTER while it awaits async confirmation', () => {
+    const createAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.CREATE,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2023-01-01T00:00:00.000Z',
+        createdBy: 'user1',
+        createdByUserType: TokenUserType.enum.user,
+        createdAtLocation: 'location1' as UUID,
+        createdByRole: 'FIELD_AGENT'
+      }
+    })
+
+    const declareAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2023-02-01T00:00:00.000Z',
+        createdBy: 'user2',
+        createdByUserType: TokenUserType.enum.user,
+        createdAtLocation: 'location2' as UUID,
+        createdByRole: 'FIELD_AGENT'
+      }
+    })
+
+    // Registrar clicks Register — countryconfig returns 202, Accepted not yet written
+    const registerRequestAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.REGISTER,
+      defaults: {
+        status: ActionStatus.Requested,
+        createdAt: '2023-03-01T00:00:00.000Z',
+        createdBy: 'user3',
+        createdByUserType: TokenUserType.enum.user,
+        createdAtLocation: 'location3' as UUID,
+        createdByRole: 'LOCAL_REGISTRAR'
+      }
+    })
+
+    const event = {
+      trackingId: getUUID(),
+      type: tennisClubMembershipEvent.id,
+      id: getUUID(),
+      createdAt: '2023-01-01T00:00:00.000Z',
+      updatedAt: '2023-03-01T00:00:00.000Z',
+      actions: [createAction, declareAction, registerRequestAction]
+    }
+
+    const state = getCurrentEventState(event, tennisClubMembershipEvent)
+
+    // Still DECLARED — REGISTERED requires an Accepted REGISTER
+    expect(state.status).toBe(EventStatus.enum.DECLARED)
+
+    // Metadata reflects the registrar who submitted the request, not the 3rd party
+    expect(state.updatedBy).toBe(registerRequestAction.createdBy)
+    expect(state.updatedAtLocation).toBe(
+      registerRequestAction.createdAtLocation
+    )
+    expect(state.updatedByUserRole).toBe(registerRequestAction.createdByRole)
+
+    // REGISTERED legalStatus not set yet
+    expect(state.legalStatuses[EventStatus.enum.REGISTERED]).toBeUndefined()
+
+    // Flag marks the record as pending external validation
+    expect(state.flags).toContain('register:requested')
+  })
+
+  test('updatedAtLocation uses the Requested action metadata once REGISTER is asynchronously accepted', () => {
+    const createAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.CREATE,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2023-01-01T00:00:00.000Z',
+        createdBy: 'user1',
+        createdByUserType: TokenUserType.enum.user,
+        createdAtLocation: 'location1' as UUID,
+        createdByRole: 'FIELD_AGENT'
+      }
+    })
+
+    const declareAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2023-02-01T00:00:00.000Z',
+        createdBy: 'user2',
+        createdByUserType: TokenUserType.enum.user,
+        createdAtLocation: 'location2' as UUID,
+        createdByRole: 'FIELD_AGENT'
+      }
+    })
+
+    const registerRequestAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.REGISTER,
+      defaults: {
+        status: ActionStatus.Requested,
+        createdAt: '2023-03-01T00:00:00.000Z',
+        createdBy: 'user3',
+        createdByUserType: TokenUserType.enum.user,
+        createdAtLocation: 'location3' as UUID,
+        createdByRole: 'LOCAL_REGISTRAR'
+      }
+    })
+
+    // 3rd party accepts — carries originalActionId pointing back to the Requested action
+    const registerAcceptAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.REGISTER,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2023-04-01T00:00:00.000Z',
+        createdBy: 'system',
+        createdByUserType: TokenUserType.enum.system,
+        createdAtLocation: 'system-location' as UUID,
+        createdByRole: undefined,
+        registrationNumber: 'REG-123',
+        originalActionId: registerRequestAction.id
+      }
+    })
+
+    const event = {
+      trackingId: getUUID(),
+      type: tennisClubMembershipEvent.id,
+      id: getUUID(),
+      createdAt: '2023-01-01T00:00:00.000Z',
+      updatedAt: '2023-04-01T00:00:00.000Z',
+      actions: [
+        createAction,
+        declareAction,
+        registerRequestAction,
+        registerAcceptAction
+      ]
+    }
+
+    const state = getCurrentEventState(event, tennisClubMembershipEvent)
+
+    expect(state.status).toBe(EventStatus.enum.REGISTERED)
+
+    // Metadata should still point to the registrar, NOT the 3rd-party system
+    expect(state.updatedBy).toBe(registerRequestAction.createdBy)
+    expect(state.updatedAtLocation).toBe(
+      registerRequestAction.createdAtLocation
+    )
+    expect(state.updatedByUserRole).toBe(registerRequestAction.createdByRole)
+
+    // register:requested flag is no longer present once accepted
+    expect(state.flags).not.toContain('register:requested')
+  })
+
   test('approval declaration is merged on top of approved correction request', () => {
     const correctionRequestId = generateUuid()
     const correctionRequestAction = {
