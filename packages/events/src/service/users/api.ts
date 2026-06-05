@@ -528,12 +528,14 @@ export async function checkSecurityQuestionMatch({
   const matched = hash === questions[targetIndex].answerHash
 
   // On a wrong answer, rotate to the next question in the user's list (or wrap around at the end).
-  const nextIndex = (targetIndex + 1) % questions.length
-  const fallbackQuestionKey = questions[nextIndex].questionKey
+  let nextIndex = targetIndex + 1
+  if (nextIndex >= questions.length) {
+    nextIndex = 0
+  }
 
   return {
     matched,
-    questionKey: matched ? input.questionKey : fallbackQuestionKey
+    questionKey: matched ? input.questionKey : questions[nextIndex].questionKey
   }
 }
 
