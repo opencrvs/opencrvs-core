@@ -14,6 +14,7 @@ import { FieldConfig, SelectOption, ValidationConfig } from './FieldConfig'
 import { FieldType } from './FieldType'
 import { FieldConditional } from './Conditional'
 import { FieldValue } from './FieldValue'
+import { JurisdictionReference } from '../users/userReferences'
 
 const MatchType = z.enum(['fuzzy', 'exact', 'range', 'within'])
 
@@ -95,7 +96,10 @@ const BaseField = z.object({
     .optional()
     .describe(
       `Option for overriding the field validations specifically for advanced search form.`
-    )
+    ),
+  allowedLocations: JurisdictionReference.optional().describe(
+    `Override the allowedLocations for a location field in advanced search. Use this when the declaration form's allowedLocations references a scope (e.g. record.create) that search-only users don't have — specify record.search scope instead.`
+  )
 })
 
 export const SearchQueryParams = z
