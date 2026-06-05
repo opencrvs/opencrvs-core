@@ -14,6 +14,8 @@ on:
   push:
     branches:
       - develop
+  # Allows a user to manually trigger the workflow
+  workflow_dispatch:
 
 jobs:
   setup:
@@ -351,10 +353,7 @@ jobs:
     name: Run chromatic visual tests
     needs: prepare-client-tests
     runs-on: ubuntu-24.04
-    # Chromatic visual tests are disabled for now until we find a way to reduce the monthly costs
-    # On average, every day we create roughly 7500 - 10000 snapshots per working day
-    # Snapshots included in our plan are 35 000 per month and all exceeding snapshots are charged at $0.008 per snapshot
-    if: false
+    if: github.event_name == 'workflow_dispatch'
     steps:
       # Fresh checkout brings .git (needed by Chromatic's TurboSnap and
       # by the change-detection `git diff` below). The artifact
@@ -390,6 +389,11 @@ jobs:
         env:
           BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
         run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ -z "$BASE_SHA" ]; then
+            echo "affects=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           node .github/scripts/changed-files-affect-storybook.mjs \
             --stats packages/client/storybook-static/preview-stats.json \
             --base "$BASE_SHA"
