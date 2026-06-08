@@ -318,22 +318,13 @@ export async function defaultRequestHandler(
     declaration,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     annotation,
-    keepAssignment,
-    keepAssignmentIfAccepted,
-    keepAssignmentIfRejected,
     ...strippedInput
   } = input
-
-  const effectiveKeepAssignment =
-    status === ActionStatus.Accepted
-      ? (keepAssignmentIfAccepted ?? keepAssignment ?? false)
-      : (keepAssignmentIfRejected ?? keepAssignment ?? false)
 
   return processAction(
     {
       ...strippedInput,
       waitFor: input.waitFor,
-      keepAssignment: effectiveKeepAssignment,
       declaration: {},
       originalActionId: requestedAction.id,
       ...parsedBody
