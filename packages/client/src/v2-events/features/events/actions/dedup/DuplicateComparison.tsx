@@ -213,7 +213,6 @@ export function DuplicateComparison({
             label: intl.formatMessage(field.label),
             rightValue: (
               <Output
-                disableValueDiff={true}
                 displayEmptyAsDash={true}
                 eventConfig={eventConfiguration}
                 field={field}
@@ -224,7 +223,6 @@ export function DuplicateComparison({
             ),
             leftValue: (
               <Output
-                disableValueDiff={true}
                 displayEmptyAsDash={true}
                 eventConfig={eventConfiguration}
                 field={field}

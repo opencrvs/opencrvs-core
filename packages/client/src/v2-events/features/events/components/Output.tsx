@@ -347,8 +347,7 @@ export function Output({
   previousValue,
   formConfig,
   eventConfig,
-  displayEmptyAsDash = false,
-  disableValueDiff = false
+  displayEmptyAsDash = false
 }: {
   field: FieldConfig
   value?: FieldValue | FieldUpdateValue
@@ -358,7 +357,6 @@ export function Output({
   eventConfig?: EventConfig
   formConfig?: FormConfig
   displayEmptyAsDash?: boolean
-  disableValueDiff?: boolean
 }) {
   // Explicitly check for undefined, so that e.g. number 0 is considered a value,
   // even null is considered as value removed
@@ -366,7 +364,23 @@ export function Output({
 
   let previousValueField: FieldConfig | undefined
 
-  if (isUndefined(previousValue) && previousForm && formConfig) {
+  // When the active field already has a value AND `previousForm` carries the
+  // same value for that field, `previousForm` is the same state as the value's
+  // source (e.g. the duplicate comparison view, which passes the record's
+  // current declaration as both `value`'s source and `previousForm`). In that
+  // case the same-label sibling lookup below would surface a now-hidden
+  // sibling's historic value and treat it as a "previous".
+  const previousFormReflectsCurrentValue =
+    hasValue &&
+    previousForm !== undefined &&
+    isEqualFieldValue(previousForm[field.id] as FieldValue, value)
+
+  if (
+    isUndefined(previousValue) &&
+    previousForm &&
+    formConfig &&
+    !previousFormReflectsCurrentValue
+  ) {
     // Multiple fields can share the same label but have different IDs
     // (e.g. "child.birthLocation" and "child.address.privateHome" share the label "Location of birth").
     // In correction view, if the previous form had a value for "child.birthLocation"
@@ -407,11 +421,7 @@ export function Output({
   const hasPreviousValue = previousValue !== undefined
 
   // Note, checking for previousValue !== value is not enough, as we have composite fields.
-  if (
-    hasPreviousValue &&
-    !isEqualFieldValue(previousValue, value) &&
-    !disableValueDiff
-  ) {
+  if (hasPreviousValue && !isEqualFieldValue(previousValue, value)) {
     let valueOutput = (
       <ValueOutput config={field} eventConfig={eventConfig} value={value} />
     )
