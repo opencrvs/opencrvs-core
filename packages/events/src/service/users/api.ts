@@ -9,13 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* eslint-disable max-lines */
-import { randomBytes } from 'crypto'
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import {
   CreateUserInput,
   CreateUserInputInternal,
-  DocumentPath,
   UserName,
   TokenUserType,
   TriggerEvent,
@@ -51,6 +49,11 @@ import { generateSaltedHash, generateHash } from '@events/service/auth/hash'
 import { updatePasswordHashAndSalt } from '@events/storage/postgres/events/users'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { getRoles } from '../config/config'
+import {
+  generateRandomPassword,
+  generateUsername,
+  mapDbUserToUser
+} from './utils'
 
 export type UserSortBy =
   | 'createdAt'
@@ -75,72 +78,20 @@ export type SearchUsersPayload = {
   sortOrder: 'asc' | 'desc'
 }
 
-async function generateUsername(name: UserName, existingUserName?: string) {
-  const initials = name.firstname
-    .split(' ')
-    .map((n) => n.charAt(0))
-    .join('')
-
-  let proposedUsername = `${initials}${initials === '' ? '' : '.'}${name.surname
-    .trim()
-    .replace(/ /g, '-')}`.toLowerCase()
-
-  if (proposedUsername.length < 3) {
-    proposedUsername =
-      proposedUsername + '0'.repeat(3 - proposedUsername.length)
+async function findAvailableUsername(
+  newUsername: string,
+  existingUsername?: string,
+  i = 0
+): Promise<string> {
+  const candidate = i === 0 ? newUsername : `${newUsername}${i}`
+  if (existingUsername && existingUsername === candidate) {
+    return candidate
   }
 
-  if (existingUserName && existingUserName === proposedUsername) {
-    return proposedUsername
-  }
-
-  try {
-    let usernameTaken = await isUsernameTaken(proposedUsername)
-    let i = 1
-    const copyProposedName = proposedUsername
-    while (usernameTaken) {
-      if (existingUserName && existingUserName === proposedUsername) {
-        return proposedUsername
-      }
-      proposedUsername = copyProposedName + i
-      i += 1
-      usernameTaken = await isUsernameTaken(proposedUsername)
-    }
-  } catch (err) {
-    logger.error(`Failed username generation: ${err}`)
-    throw new Error('Failed username generation')
-  }
-
-  return proposedUsername
-}
-
-type DbUser = NonNullable<Awaited<ReturnType<typeof getUserById>>>
-
-function mapDbUserToUser(user: DbUser): User & { username: string } {
-  return {
-    type: TokenUserType.enum.user,
-    id: user.id,
-    name: {
-      firstname: user.firstname,
-      surname: user.surname
-    },
-    role: user.role,
-    email: user.email ?? undefined,
-    mobile: user.mobile ?? undefined,
-    device: user.device ?? undefined,
-    username: user.username,
-    status: user.status as User['status'],
-    signature: user.signaturePath
-      ? (user.signaturePath as DocumentPath)
-      : undefined,
-    avatar: user.profileImagePath
-      ? (user.profileImagePath as DocumentPath)
-      : undefined,
-    primaryOfficeId: user.officeId,
-    administrativeAreaId: user.administrativeAreaId ?? undefined,
-    fullHonorificName: user.fullHonorificName ?? undefined,
-    data: Object.keys(user.data).length > 0 ? user.data : undefined
-  }
+  const taken = await isUsernameTaken(candidate)
+  return taken
+    ? findAvailableUsername(newUsername, existingUsername, i + 1)
+    : candidate
 }
 
 export async function getUser(
@@ -222,9 +173,6 @@ export async function updateUser(
     surname: existingUser.surname
   }
 
-  const oldUsername = existingUser.username
-  const newUsername = await generateUsername(name, existingUser.username)
-
   await updateUserById(input.id, {
     firstname: name.firstname,
     surname: name.surname,
@@ -248,7 +196,14 @@ export async function updateUser(
     await draftsRepo.deleteDraftsByUserId(input.id)
   }
 
-  if (newUsername !== oldUsername) {
+  const oldUsername = existingUser.username
+  const newUsernameCandidate = generateUsername(name)
+
+  if (newUsernameCandidate !== oldUsername) {
+    const newUsername = await findAvailableUsername(
+      newUsernameCandidate,
+      existingUser.username
+    )
     await updateUsernameById(UUID.parse(input.id), newUsername)
     await triggerUserEventNotification({
       event: 'user-updated',
@@ -267,22 +222,6 @@ export async function updateUser(
   }
 
   return getUser(input.id)
-}
-
-function generateRandomPassword() {
-  const charset =
-    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-  const length = 12
-  // Rejection sampling eliminates modulo bias (256 % 62 = 8, so bytes 248-255 are discarded)
-  const result: string[] = []
-  const limit = 256 - (256 % charset.length)
-  while (result.length < length) {
-    const byte = randomBytes(1)[0]
-    if (byte < limit) {
-      result.push(charset[byte % charset.length])
-    }
-  }
-  return result.join('')
 }
 
 async function sendCredentialsNotification(
@@ -337,7 +276,7 @@ async function resolveCreateUserInput(
       env.DEFAULT_USER_PASSWORD ??
       generateRandomPassword(),
     status: (input as CreateUserInputInternal).status ?? 'pending',
-    username: input.username ?? (await generateUsername(input.name))
+    username: input.username
   })
 }
 
@@ -345,7 +284,9 @@ export async function createUser(
   input: CreateUserInput | CreateUserInputInternal,
   _token: string
 ) {
-  const resolvedUser = await resolveCreateUserInput(input)
+  const usernameCandidate = input.username ?? generateUsername(input.name)
+  const username = await findAvailableUsername(usernameCandidate)
+  const resolvedUser = await resolveCreateUserInput({ ...input, username })
 
   const userPayload = {
     firstname: resolvedUser.name.firstname,
