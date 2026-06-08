@@ -48,8 +48,7 @@ import {
   addAsyncRejectAction,
   throwConflictIfActionNotAllowed,
   ensureEventIndexed,
-  processAction,
-  resolveKeepAssignment
+  processAction
 } from '@events/service/events/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
@@ -326,7 +325,6 @@ export async function defaultRequestHandler(
     {
       ...strippedInput,
       waitFor: input.waitFor,
-      keepAssignment: resolveKeepAssignment(input, status),
       declaration: {},
       originalActionId: requestedAction.id,
       ...parsedBody
