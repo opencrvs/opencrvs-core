@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -546,8 +547,6 @@ suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
     const [duplicateEvent, client, generator, user] =
       await createDuplicateEvent()
 
-    // The preceding DECLARE unassigns the creator, so re-assign before the
-    // duplicate action — otherwise `requireAssignment` would reject the call.
     await client.event.actions.assignment.assign(
       generator.event.actions.assign(duplicateEvent.id, {
         assignedTo: user.id
@@ -566,8 +565,6 @@ suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
     const [duplicateEvent, client, generator, user] =
       await createDuplicateEvent()
 
-    // Same as above — re-assign before the duplicate action so it isn't
-    // rejected by `requireAssignment`.
     await client.event.actions.assignment.assign(
       generator.event.actions.assign(duplicateEvent.id, {
         assignedTo: user.id
@@ -588,9 +585,6 @@ suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
     const assignedClient = createTestClient(assignedUser)
     const unassignedClient = createTestClient(unassignedUser)
 
-    // The creator of an event is auto-assigned, so the second user is the
-    // unassigned one. requireAssignment must reject their attempt before
-    // the route reaches the action handler.
     const event = await assignedClient.event.create(generator.event.create())
 
     await expect(
