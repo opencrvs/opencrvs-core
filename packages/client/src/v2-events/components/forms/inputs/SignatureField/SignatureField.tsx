@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import * as React from 'react'
 import styled from 'styled-components'
@@ -81,7 +81,11 @@ function SignatureFieldInput({
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [signature, setSignature] = useState<FileFieldValue | undefined>(value)
-  const [touched, setTouched] = useState(false)
+  // Formik's enableReinitialize updates `value` asynchronously after mount,
+  // so useState(value) alone misses the first update. Sync explicitly here.
+  useEffect(() => {
+    setSignature(value)
+  }, [value])
 
   const { uploadFile } = useFileUpload(filePath, name, {
     onSuccess: ({ path, originalFilename, type }) => {
