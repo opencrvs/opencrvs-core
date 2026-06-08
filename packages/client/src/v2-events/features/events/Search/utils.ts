@@ -489,10 +489,22 @@ function applySearchFieldOverridesToFieldConfig(
       ...(searchField.options && { options: searchField.options })
     }
   }
-  return {
-    ...field,
-    ...commonConfig
+  if (
+    field.type === FieldType.LOCATION ||
+    field.type === FieldType.ADMINISTRATIVE_AREA
+  ) {
+    return {
+      ...field,
+      ...commonConfig,
+      ...(searchField.allowedLocations && {
+        configuration: {
+          ...field.configuration,
+          allowedLocations: searchField.allowedLocations
+        }
+      })
+    } as FieldConfig
   }
+  return { ...field, ...commonConfig }
 }
 
 /**
