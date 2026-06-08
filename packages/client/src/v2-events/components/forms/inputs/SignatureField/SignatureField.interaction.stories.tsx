@@ -606,14 +606,14 @@ export const NoDuplicateErrorAfterDelete: StoryObj<
       )
     })
 
-    await step('Trigger validation via submit', async () => {
+    await step('Trigger validation via submit', () => {
       noDuplicateErrorFormRef.current?.submit()
     })
 
     await step('Exactly one Required error — no duplicate', async () => {
-      await waitFor(() => {
+      await waitFor(async () =>
         expect(canvas.getAllByText('Required')).toHaveLength(1)
-      })
+      )
     })
   }
 }
