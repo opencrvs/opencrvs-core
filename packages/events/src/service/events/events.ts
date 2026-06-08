@@ -433,6 +433,24 @@ export async function ensureEventIndexed(
 }
 
 /**
+ * Resolves the effective `keepAssignment` for an action based on the
+ * status-specific `keepAssignmentIfAccepted` / `keepAssignmentIfRejected`
+ * flags, falling back to the catch-all `keepAssignment` flag.
+ */
+export function resolveKeepAssignment(
+  input: {
+    keepAssignment?: boolean
+    keepAssignmentIfAccepted?: boolean
+    keepAssignmentIfRejected?: boolean
+  },
+  status: ActionStatus
+): boolean {
+  return status === ActionStatus.Accepted
+    ? (input.keepAssignmentIfAccepted ?? input.keepAssignment ?? false)
+    : (input.keepAssignmentIfRejected ?? input.keepAssignment ?? false)
+}
+
+/**
  * Processes an action on an event:
  *  - Adds the given action to the event
  *  - Updates the event state accordingly
@@ -457,7 +475,12 @@ export async function processAction(
     configuration: EventConfig
   }
 ): Promise<EventDocument> {
-  const updatedEvent = await addAction(input, {
+  const resolvedInput = {
+    ...input,
+    keepAssignment: resolveKeepAssignment(input, status)
+  }
+
+  const updatedEvent = await addAction(resolvedInput, {
     eventId,
     user,
     token,
@@ -465,7 +488,7 @@ export async function processAction(
     configuration
   })
 
-  if (input.waitFor === false) {
+  if (!input.waitFor) {
     logger.debug(
       {
         transactionId: input.transactionId,

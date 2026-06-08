@@ -48,7 +48,8 @@ import {
   addAsyncRejectAction,
   throwConflictIfActionNotAllowed,
   ensureEventIndexed,
-  processAction
+  processAction,
+  resolveKeepAssignment
 } from '@events/service/events/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
@@ -318,22 +319,14 @@ export async function defaultRequestHandler(
     declaration,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     annotation,
-    keepAssignment,
-    keepAssignmentIfAccepted,
-    keepAssignmentIfRejected,
     ...strippedInput
   } = input
-
-  const effectiveKeepAssignment =
-    status === ActionStatus.Accepted
-      ? (keepAssignmentIfAccepted ?? keepAssignment ?? false)
-      : (keepAssignmentIfRejected ?? keepAssignment ?? false)
 
   return processAction(
     {
       ...strippedInput,
       waitFor: input.waitFor,
-      keepAssignment: effectiveKeepAssignment,
+      keepAssignment: resolveKeepAssignment(input, status),
       declaration: {},
       originalActionId: requestedAction.id,
       ...parsedBody
