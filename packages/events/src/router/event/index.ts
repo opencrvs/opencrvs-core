@@ -389,6 +389,7 @@ export const eventRouter = router({
     duplicate: router({
       markAsDuplicate: userOnlyProcedure
         .input(MarkAsDuplicateActionInput)
+        .use(middleware.canAccessEventWithScopes(['record.review-duplicates']))
         .use(middleware.requireAssignment)
         .use(middleware.validateAction)
         .mutation(async (options) => {
@@ -421,6 +422,7 @@ export const eventRouter = router({
         }),
       markNotDuplicate: userOnlyProcedure
         .input(MarkNotDuplicateActionInput)
+        .use(middleware.canAccessEventWithScopes(['record.review-duplicates']))
         .use(middleware.requireAssignment)
         .use(middleware.validateAction)
         .mutation(async (options) => {
