@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useRef } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
@@ -160,6 +160,8 @@ export function Review() {
   const intl = useIntl()
   const navigate = useNavigate()
   const isOnline = useOnlineStatus()
+  const isOnlineRef = useRef(isOnline)
+  isOnlineRef.current = isOnline
   const [modal, openModal] = useModal()
 
   const {
@@ -281,7 +283,7 @@ export function Review() {
           </Button>,
           <Button
             key="print-certificate"
-            disabled={!isOnline || isPending}
+            disabled={!isOnlineRef.current || isPending}
             id="print-certificate"
             type="primary"
             onClick={() => close(true)}
