@@ -531,7 +531,7 @@ suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
       })
     )
 
-    return [declaredDuplicateEvent, client, generator] as const
+    return [declaredDuplicateEvent, client, generator, user] as const
   }
 
   test(`Adds the flag after ${ActionType.DECLARE} if duplicates are detected`, async () => {
@@ -543,7 +543,16 @@ suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
   })
 
   test(`Removes the flag after ${ActionType.MARK_AS_NOT_DUPLICATE}`, async () => {
-    const [duplicateEvent, client, generator] = await createDuplicateEvent()
+    const [duplicateEvent, client, generator, user] =
+      await createDuplicateEvent()
+
+    // The preceding DECLARE unassigns the creator, so re-assign before the
+    // duplicate action — otherwise `requireAssignment` would reject the call.
+    await client.event.actions.assignment.assign(
+      generator.event.actions.assign(duplicateEvent.id, {
+        assignedTo: user.id
+      })
+    )
 
     const event = await client.event.actions.duplicate.markNotDuplicate(
       generator.event.actions.duplicate.markNotDuplicate(duplicateEvent.id)
@@ -554,7 +563,16 @@ suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
   })
 
   test(`Removes the flag after ${ActionType.MARK_AS_DUPLICATE}`, async () => {
-    const [duplicateEvent, client, generator] = await createDuplicateEvent()
+    const [duplicateEvent, client, generator, user] =
+      await createDuplicateEvent()
+
+    // Same as above — re-assign before the duplicate action so it isn't
+    // rejected by `requireAssignment`.
+    await client.event.actions.assignment.assign(
+      generator.event.actions.assign(duplicateEvent.id, {
+        assignedTo: user.id
+      })
+    )
 
     const event = await client.event.actions.duplicate.markAsDuplicate(
       generator.event.actions.duplicate.markAsDuplicate(duplicateEvent.id)
@@ -562,5 +580,38 @@ suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
     expect(
       getCurrentEventState(event, tennisClubMembershipEvent).flags
     ).not.toContain(InherentFlags.POTENTIAL_DUPLICATE)
+  })
+
+  test(`Rejects ${ActionType.MARK_AS_DUPLICATE} when the caller is not assigned to the event`, async () => {
+    const { users, generator } = await setupTestCase()
+    const [assignedUser, unassignedUser] = users
+    const assignedClient = createTestClient(assignedUser)
+    const unassignedClient = createTestClient(unassignedUser)
+
+    // The creator of an event is auto-assigned, so the second user is the
+    // unassigned one. requireAssignment must reject their attempt before
+    // the route reaches the action handler.
+    const event = await assignedClient.event.create(generator.event.create())
+
+    await expect(
+      unassignedClient.event.actions.duplicate.markAsDuplicate(
+        generator.event.actions.duplicate.markAsDuplicate(event.id)
+      )
+    ).rejects.toThrow('You are not assigned to this event')
+  })
+
+  test(`Rejects ${ActionType.MARK_AS_NOT_DUPLICATE} when the caller is not assigned to the event`, async () => {
+    const { users, generator } = await setupTestCase()
+    const [assignedUser, unassignedUser] = users
+    const assignedClient = createTestClient(assignedUser)
+    const unassignedClient = createTestClient(unassignedUser)
+
+    const event = await assignedClient.event.create(generator.event.create())
+
+    await expect(
+      unassignedClient.event.actions.duplicate.markNotDuplicate(
+        generator.event.actions.duplicate.markNotDuplicate(event.id)
+      )
+    ).rejects.toThrow('You are not assigned to this event')
   })
 })
