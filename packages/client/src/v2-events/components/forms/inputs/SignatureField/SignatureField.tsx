@@ -13,7 +13,7 @@ import { useState, useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import * as React from 'react'
 import styled from 'styled-components'
-import { ImageUploader } from '@opencrvs/components'
+import { ImageUploader, InputError } from '@opencrvs/components'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -111,7 +111,7 @@ function SignatureFieldInput({
     uploadFile(newFile)
   }
 
-  const { handleFileChange } = useOnFileChange({
+  const { error: onUploadError, handleFileChange } = useOnFileChange({
     acceptedFileTypes,
     onComplete,
     maxFileSize
@@ -159,6 +159,9 @@ function SignatureFieldInput({
         </Button>
       )}
 
+      {onUploadError && (
+        <InputError id={`${name}_error`}>{onUploadError}</InputError>
+      )}
       {isModalOpen && (
         <SignatureCanvasModal
           id={name}
