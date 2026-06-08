@@ -418,7 +418,7 @@ export const RedirectAfterPrint: Story = {
         { timeout: 7000 } // Generating the PDF takes a long time.
       )
 
-      expect(canvas.getByTestId('assignedTo-value')).toHaveTextContent(
+      await expect(canvas.getByTestId('assignedTo-value')).toHaveTextContent(
         'Not assigned'
       )
     })
