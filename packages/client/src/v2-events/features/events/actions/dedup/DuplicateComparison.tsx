@@ -208,7 +208,6 @@ export function DuplicateComparison({
             }
             return acc
           }, [])
-          .filter((field) => field.id.includes('child.birthLocation'))
           .map((field) => ({
             label: intl.formatMessage(field.label),
             rightValue: (
