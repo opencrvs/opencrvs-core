@@ -96,6 +96,9 @@ export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
 export const NumberFieldValue = z.number()
 export type NumberFieldValue = z.infer<typeof NumberFieldValue>
 
+export const SignatureFieldValue = FileFieldValue
+export type SignatureFieldValue = z.infer<typeof SignatureFieldValue>
+
 export const ButtonFieldValue = z.number()
 export type ButtonFieldValue = z.infer<typeof ButtonFieldValue>
 export const VerificationStatusValue = z.enum([
@@ -201,35 +204,26 @@ function schemaPriority(schema: z.ZodTypeAny) {
 export function safeUnion<T extends [z.ZodTypeAny, ...z.ZodTypeAny[]]>(
   schemas: T
 ) {
+  // Sort once at definition time so the first successful safeParse is always
+  // the highest-priority match. This avoids trying all schemas on every value.
+  const sortedSchemas = [...schemas].sort(
+    (a, b) => schemaPriority(a) - schemaPriority(b)
+  )
+
   return z
     .any()
     .superRefine((val, ctx) => {
-      const successful = schemas.filter((s) => s.safeParse(val).success)
-
-      if (successful.length === 1) {
-        return
+      for (const schema of sortedSchemas) {
+        if (schema.safeParse(val).success) {
+          return
+        }
       }
 
-      if (successful.length === 0) {
-        ctx.addIssue({
-          code: 'invalid_type',
-          expected: 'custom',
-          message: 'Value does not match any schema'
-        })
-        return
-      }
-
-      // Multiple matches, pick the best according to PRIORITY_ORDER
-      successful.sort((a, b) => schemaPriority(a) - schemaPriority(b))
-      const best = successful[0]
-
-      if (!best.safeParse(val).success) {
-        ctx.addIssue({
-          expected: 'custom',
-          code: 'invalid_type',
-          message: 'Value did not match the best schema'
-        })
-      }
+      ctx.addIssue({
+        code: 'invalid_type',
+        expected: 'custom',
+        message: 'Value does not match any schema'
+      })
     })
     .meta({
       description:

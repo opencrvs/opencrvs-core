@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
+
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
@@ -18,7 +20,9 @@ import {
   tennisClubMembershipEvent,
   generateEventDocument,
   generateEventDraftDocument,
-  getCurrentEventState
+  getCurrentEventState,
+  generateActionDocument,
+  getUUID
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -26,6 +30,7 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
 import { setEventData, addLocalEventConfig } from '../../useEvents/api'
+import { ActionDocument } from '../../../../../../../commons/build/dist/common/client'
 import { ReviewIndex } from './Review'
 
 const generator = testDataGenerator()
@@ -73,7 +78,8 @@ export default meta
 
 type Story = StoryObj<typeof ReviewIndex>
 
-const mockUser = generator.user.fieldAgent().v2
+const mockUser = generator.user.fieldAgent().summary
+const mockUserFull = generator.user.fieldAgent().v2
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {
@@ -146,7 +152,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
             }
           }),
           tRPCMsw.user.get.query((id) => {
-            return mockUser
+            return mockUserFull
           })
         ]
       }
@@ -211,7 +217,7 @@ const msw = {
         return [mockUser]
       }),
       tRPCMsw.user.get.query((id) => {
-        return mockUser
+        return mockUserFull
       })
     ]
   }
@@ -244,8 +250,9 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     msw
   },
   play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
     await step('User can declare', async () => {
-      const canvas = within(canvasElement)
       await userEvent.click(
         await canvas.findByRole('button', { name: 'Action' })
       )
@@ -273,6 +280,17 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
           'event.actions.register.request': false
         })
       })
+
+      await waitFor(
+        async () => {
+          await expect(
+            canvas.queryByText(
+              '111111 is a potential duplicate. Record is ready for review.'
+            )
+          ).toBeNull()
+        },
+        { timeout: 3000 } // We are testing negative, so intentional await to ensure we do not assert too fast.
+      )
     })
   }
 }
@@ -398,7 +416,7 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
             return [mockUser]
           }),
           tRPCMsw.user.get.query((id) => {
-            return mockUser
+            return mockUserFull
           })
         ]
       }
@@ -482,8 +500,8 @@ export const ReviewForIncompleteNameInteraction: Story = {
       const surnameInput = await canvas.findByTestId('text__surname')
       await userEvent.clear(surnameInput)
 
-      const backToReviewButton = await canvas.findByText('Back to review')
-      await userEvent.click(backToReviewButton)
+      const goToReviewButton = await canvas.findByText('Go to review')
+      await userEvent.click(goToReviewButton)
 
       await userEvent.click(
         await canvas.findByRole('button', { name: 'Action' })
@@ -563,13 +581,221 @@ export const ChangeFieldInReview: Story = {
     })
 
     await step('Navigate back to review', async () => {
-      const backToReviewButton = await canvas.findByText('Back to review')
-      await userEvent.click(backToReviewButton)
+      const goToReviewButton = await canvas.findByText('Go to review')
+      await userEvent.click(goToReviewButton)
 
       await waitFor(async () => {
         await expect(canvas.getByText("Applicant's name")).toBeInTheDocument()
         await expect(canvas.getByText('John Nileem-Rowa')).toBeInTheDocument()
       })
+    })
+  }
+}
+
+export const MobileReviewShowsActionMenuAndExitsUndeclaredDraft: Story = {
+  name: 'Mobile: action menu visible and X-button exits undeclared draft',
+  loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
+    async () => {
+      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
+  parameters: {
+    viewport: { defaultViewport: 'mobile' },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: createdEventDocument.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    msw
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Action menu is rendered in mobile AppBar', async () => {
+      await expect(
+        await canvas.findByRole('button', { name: 'Action' })
+      ).toBeInTheDocument()
+    })
+
+    await step(
+      'Mobile X-button opens exit-without-saving modal for undeclared draft',
+      async () => {
+        const exitButton = await canvas.findByTestId('exit-button')
+        await userEvent.click(exitButton)
+
+        await expect(
+          await canvas.findByText('Exit without saving changes?')
+        ).toBeInTheDocument()
+      }
+    )
+  }
+}
+
+export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    addLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(createdEventDocument.id, createdEventDocument)
+  },
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: createdEventDocument.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [
+              generateEventDraftDocument({
+                eventId,
+                actionType: ActionType.DECLARE
+              })
+            ]
+          })
+        ],
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.get.query(() => {
+            return eventDocument
+          }),
+          tRPCMsw.event.actions.declare.request.mutation((action) => {
+            return {
+              ...eventDocument,
+              actions: [
+                ...eventDocument.actions,
+                action,
+                generateActionDocument({
+                  configuration: tennisClubMembershipEvent,
+                  action: ActionType.DUPLICATE_DETECTED,
+                  defaults: {
+                    content: {
+                      duplicates: [{ id: getUUID(), trackingId: '0R1G1NAL' }]
+                    }
+                  }
+                })
+              ] as ActionDocument[]
+            }
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Declare duplicate', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Action' })
+      )
+      await userEvent.click(await canvas.findByText('Declare'))
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Declare' })
+      )
+    })
+
+    await step('Toast is shown with duplicate detected message', async () => {
+      await canvas.findByText(
+        '111111 is a potential duplicate. Record is ready for review.'
+      )
+    })
+  }
+}
+
+export const ShowToastOnDuplicateDetectedOnRegister: Story = {
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    addLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(createdEventDocument.id, createdEventDocument)
+  },
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: createdEventDocument.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [
+              generateEventDraftDocument({
+                eventId,
+                actionType: ActionType.DECLARE
+              })
+            ]
+          })
+        ],
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.get.query(() => {
+            return eventDocument
+          }),
+          tRPCMsw.event.actions.declare.request.mutation((action) => {
+            return {
+              ...eventDocument,
+              actions: [...eventDocument.actions, action] as ActionDocument[]
+            }
+          }),
+          tRPCMsw.event.actions.register.request.mutation((action) => {
+            return {
+              ...eventDocument,
+              actions: [
+                ...eventDocument.actions,
+                action,
+                generateActionDocument({
+                  configuration: tennisClubMembershipEvent,
+                  action: ActionType.DUPLICATE_DETECTED,
+                  defaults: {
+                    content: {
+                      duplicates: [{ id: getUUID(), trackingId: '0R1G1NAL' }]
+                    }
+                  }
+                })
+              ] as ActionDocument[]
+            }
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Declare duplicate', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Action' })
+      )
+      await userEvent.click(await canvas.findByText('Register'))
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Register' })
+      )
+    })
+
+    await step('Toast is shown with duplicate detected message', async () => {
+      await canvas.findByText(
+        '111111 is a potential duplicate. Record is ready for review.'
+      )
     })
   }
 }

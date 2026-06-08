@@ -20,6 +20,10 @@
     "build": "./build.sh",
     "build:all": "lerna run build --include-dependencies --scope @opencrvs/toolkit && ./build.sh"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/opencrvs/opencrvs-core.git"
+  },
   "dependencies": {
     "@trpc/client": "11.4.3",
     "@trpc/server": "^11.8.0",
@@ -29,7 +33,7 @@
     "jwt-decode": "^3.0.0",
     "lodash": "^4.17.10",
     "object-hash": "^3.0.0",
-    "qs": "6.14.0",
+    "qs": "6.15.2",
     "superjson": "1.9.0-0",
     "ts-morph": "^27.0.2",
     "uuid": "^9.0.0",

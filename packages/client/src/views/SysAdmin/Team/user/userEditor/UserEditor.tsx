@@ -18,7 +18,6 @@ import { Review as ReviewComponent } from '@client/v2-events/features/events/com
 import { useRoles } from '@client/v2-events/hooks/useRoles'
 import { ROUTES } from '@client/v2-events/routes/routes'
 import {
-  ActionType,
   FieldValue,
   FileFieldValue,
   TokenUserType,
@@ -27,6 +26,8 @@ import {
   UpdateUserInput
 } from '@opencrvs/commons/client'
 import { AppBar, Frame, Spinner } from '@opencrvs/components'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
+import { Text } from '@opencrvs/components/lib/Text'
 import { Button } from '@opencrvs/components/lib/Button'
 import {
   CircleButton,
@@ -84,15 +85,6 @@ type EventState = {
   [key: string]: unknown
 }
 
-interface UserFormState {
-  userId?: string
-  userForm?: EventState
-  setUserForm: (data: EventState, userId?: string) => void
-  getUserForm: (initialValues?: EventState) => EventState
-  getTouchedFields: () => Record<string, boolean>
-  clear: () => void
-}
-
 const USER_OFFICE_PAGE_ID = 'user.office'
 const UNAUTHORIZED_TOAST_ID = 'user-editor-unauthorized'
 const EMPTY_FORM: EventState = {}
@@ -145,6 +137,10 @@ function useCloseUserForm({
   )
 }
 
+/**
+ * Component to initiate the creation of a new user.
+ * Immediately navigates to the user editor flow, supplying a temporary user ID and "user.details" page.
+ */
 const CreateNewUserComponent = () => {
   const [{ officeId, from }] = useTypedSearchParams(
     ROUTES.V2.SETTINGS.USER.CREATE
@@ -266,15 +262,12 @@ const EditUserComponent = () => {
     >
       <PagesComponent
         attachmentPath={`users/${userId}/`}
-        showReviewButton={false}
-        actionType={ActionType.DECLARE}
+        hideBackToReview={true}
         eventConfig={eventConfig}
         formData={formState as Record<string, FieldValue>}
         formPages={formConfig.pages}
         pageId={pageId || eventConfig.declaration.pages[0].id}
-        setFormData={(data) => {
-          setUserForm(data)
-        }}
+        setFormData={setUserForm}
         validatorContext={{}}
         onPageChange={(nextPageId: string) =>
           navigate(
@@ -328,12 +321,24 @@ const ReviewUserComponent = () => {
   const [showDuplicateEmailError, setShowDuplicateEmailError] =
     React.useState(false)
   const [duplicateEmail, setDuplicateEmail] = React.useState('')
+  const [pendingPayload, setPendingPayload] =
+    React.useState<UpdateUserInput | null>(null)
 
   const resetErrors = () => {
     setShowDuplicateMobileError(false)
     setDuplicatePhoneNumber('')
     setShowDuplicateEmailError(false)
     setDuplicateEmail('')
+  }
+
+  const submitUpdate = (payload: UpdateUserInput) => {
+    updateUserMutation.mutate(payload, {
+      onSuccess: (data) => {
+        clear()
+        navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId: data.id }))
+      },
+      onError: handleMutationError
+    })
   }
 
   const existingUserQuery = getUser.useQuery(userId, { enabled: !isNewUser })
@@ -539,6 +544,8 @@ const ReviewUserComponent = () => {
                 // unique value, causing duplicate-key errors on the next submit.
                 mobile: formState.phoneNumber || undefined,
                 email: formState.email || undefined,
+                fullHonorificName: formState.fullHonorificName || undefined,
+                device: formState.device || undefined,
                 role: formState.role!,
                 primaryOfficeId: formState.primaryOfficeId as UUID,
                 signature: formState.signature,
@@ -577,6 +584,8 @@ const ReviewUserComponent = () => {
                 // See create payload above — same normalisation needed.
                 mobile: formState.phoneNumber || undefined,
                 email: formState.email || undefined,
+                fullHonorificName: formState.fullHonorificName || undefined,
+                device: formState.device || undefined,
                 role: formState.role!,
                 primaryOfficeId: formState.primaryOfficeId as UUID,
                 signature: formState.signature,
@@ -586,17 +595,14 @@ const ReviewUserComponent = () => {
                 },
                 data
               }
-              updateUserMutation.mutate(payload, {
-                onSuccess: (data) => {
-                  clear()
-                  navigate(
-                    ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
-                      userId: data.id
-                    })
-                  )
-                },
-                onError: handleMutationError
-              })
+              const officeChanged =
+                targetUser?.type === TokenUserType.enum.user &&
+                payload.primaryOfficeId !== targetUser.primaryOfficeId
+              if (officeChanged) {
+                setPendingPayload(payload)
+              } else {
+                submitUpdate(payload)
+              }
             }}
             icon={() => <Check />}
             align={ICON_ALIGNMENT.LEFT}
@@ -605,6 +611,44 @@ const ReviewUserComponent = () => {
           </SuccessButton>
         )}
       </ReviewComponent.Body>
+      {pendingPayload && (
+        <Dialog
+          actions={[
+            <Button
+              key="cancel_office_change"
+              id="cancel_office_change"
+              size="medium"
+              type="tertiary"
+              onClick={() => {
+                setPendingPayload(null)
+              }}
+            >
+              {intl.formatMessage(buttonMessages.cancel)}
+            </Button>,
+            <Button
+              key="confirm_office_change"
+              id="confirm_office_change"
+              size="medium"
+              type="negative"
+              onClick={() => {
+                submitUpdate(pendingPayload)
+                setPendingPayload(null)
+              }}
+            >
+              {intl.formatMessage(buttonMessages.confirm)}
+            </Button>
+          ]}
+          isOpen={true}
+          title={intl.formatMessage(messages.changeOfficeWarningTitle)}
+          onClose={() => {
+            setPendingPayload(null)
+          }}
+        >
+          <Text color="grey500" element="p" variant="reg16">
+            {intl.formatMessage(messages.changeOfficeWarningBody)}
+          </Text>
+        </Dialog>
+      )}
     </FormLayout>
   )
 }

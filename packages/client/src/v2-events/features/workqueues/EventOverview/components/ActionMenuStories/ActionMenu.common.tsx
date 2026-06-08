@@ -177,7 +177,15 @@ function getMockActions(createdBy: string) {
       ...actionProps,
       createdBy,
       id: generateUuid(rng),
-      type: ActionType.MARK_AS_DUPLICATE
+      type: ActionType.DUPLICATE_DETECTED,
+      content: {
+        duplicates: [
+          {
+            id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' as UUID,
+            trackingId: 'AB1234'
+          }
+        ]
+      }
     },
     [ActionType.MARK_AS_NOT_DUPLICATE]: {
       ...actionProps,
@@ -278,13 +286,10 @@ type ActionLabel =
 export const getHiddenActions = () =>
   Object.values(ActionTypes.enum).reduce(
     (acc, action) => {
-      const label = actionLabels[action as keyof typeof actionLabels]
-
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (!label) {
+      if (!(action in actionLabels)) {
         return acc
       }
-
+      const label = actionLabels[action as keyof typeof actionLabels]
       acc[label.defaultMessage] = AssertType.HIDDEN
       return acc
     },

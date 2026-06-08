@@ -22,20 +22,21 @@ import {
   getAcceptedScopesFromToken,
   getScopeOptionValue,
   JurisdictionFilter,
+  UserOrSystemSummary,
   logger,
   TokenWithBearer,
   User,
   UserOrSystem,
   UpdateUserInput,
-  CreateUserInputInternal
+  CreateUserInputInternal,
+  UserOrSystemSummaryWithStatus
 } from '@opencrvs/commons'
 import {
   allowedWithAnyOfScopes,
   canAccessUserWithScopes,
   canCreateUserWithScopes,
   canSearchUsers,
-  canUpdateUserLocation,
-  canUpdateUserRole,
+  canUpdateUser,
   userCanReadOtherUser
 } from '@events/router/middleware'
 import {
@@ -77,6 +78,14 @@ import {
 } from '@events/service/verifyCode'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
 import { userCanReadUserAudit } from '../middleware'
+
+// Used for changing password, since the initial password does not necessarily have to comply with the password rules.
+const PasswordSchema = z
+  .string()
+  .min(12, 'Password must be at least 12 characters')
+  .regex(/\d/, 'Password must contain at least one number')
+  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
 
 const UserSearch = z.object({
   username: z.string().optional(),
@@ -208,7 +217,7 @@ export function searchUsersRoute(
 ) {
   return procedure
     .input(UserSearch)
-    .output(z.array(UserOrSystem))
+    .output(z.array(UserOrSystemSummaryWithStatus))
     .query(async ({ input, ctx }) => {
       const primaryOfficeId = input.primaryOfficeId
         ? UUID.parse(input.primaryOfficeId)
@@ -307,9 +316,7 @@ export const userRouter = router({
     .mutation(async ({ input, ctx }) => handleCreateUser(input, ctx)),
   update: userAndSystemProcedure
     .input(UpdateUserInput)
-    .use(canUpdateUserLocation)
-    .use(canUpdateUserRole)
-    .use(canAccessUserWithScopes(['user.edit']))
+    .use(canUpdateUser)
     .output(User)
     .mutation(async ({ input, ctx }) => {
       if (input.mobile) {
@@ -360,7 +367,7 @@ export const userRouter = router({
     }),
   list: userOnlyProcedure
     .input(z.array(z.string()))
-    .output(z.array(UserOrSystem))
+    .output(z.array(UserOrSystemSummary))
     .query(async ({ input }) => getUsersById(input)),
   search: searchUsersRoute(userAndSystemProcedure.use(canSearchUsers)),
   actions: userOnlyProcedure
@@ -376,7 +383,7 @@ export const userRouter = router({
     .input(
       z.object({
         existingPassword: z.string(),
-        password: z.string()
+        password: PasswordSchema
       })
     )
     .mutation(async ({ input, ctx }) => {

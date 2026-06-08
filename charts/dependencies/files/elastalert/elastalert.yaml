@@ -1,0 +1,33 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+rules_folder: /opt/elastalert/rules
+
+run_every:
+  seconds: 10
+
+buffer_time:
+  minutes: 15
+# es_url_prefix: http
+es_host: "${ES_HOST}"
+es_port: "${ES_HOST}"
+# es_username: <passed as environment variables>
+# es_password: <passed as environment variables>
+writeback_index: elastalert_status
+
+http_post2_url: "${HTTP_POST2_ALERT_URL}"
+
+smtp_host: "${SMTP_HOST}"
+smtp_port: "${SMTP_PORT}"
+from_addr: "${SENDER_EMAIL_ADDRESS}"
+smtp_ssl: ${SMTP_SECURE}
+smtp_starttls: ${SMTP_SECURE}
+smtp_auth_file: /opt/elastalert/smtp.auth
+
+alert_time_limit:
+  days: 2

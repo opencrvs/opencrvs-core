@@ -9,14 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import { userEvent, within, expect } from '@storybook/test'
+import { userEvent, within, expect, waitFor } from '@storybook/test'
+import { onlineManager } from '@tanstack/react-query'
 import {
   ActionType,
   createPrng,
+  encodeScope,
   EventIndex,
   eventQueryDataGenerator,
   EventStatus,
@@ -30,7 +33,12 @@ import {
   tennisClubMembershipEvent,
   TestUserRole
 } from '@opencrvs/commons/client'
-import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
+import {
+  AppRouter,
+  TRPCProvider,
+  queryClient,
+  trpcOptionsProxy
+} from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { formattedDuration } from '@client/utils/date-formatting'
@@ -41,6 +49,9 @@ import { WorkqueueIndex } from './index'
 const meta: Meta<typeof WorkqueueIndex> = {
   title: 'Workqueue/Interaction',
   component: WorkqueueIndex,
+  beforeEach: () => {
+    onlineManager.setOnline(true)
+  },
   decorators: [
     (Story) => (
       <TRPCProvider>
@@ -558,6 +569,16 @@ export const DraftPaginationOffline: Story = {
     }
   },
   play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    // Wait for the initial data to load before simulating an offline transition.
+    // Dispatching the offline event before queries complete would pause them
+    // indefinitely, preventing the workqueue from rendering at all.
+    const firstPageRows = await canvas.findAllByText(
+      'Tennis club membership application'
+    )
+    await expect(firstPageRows).toHaveLength(10)
+
     Object.defineProperty(window.navigator, 'onLine', {
       configurable: true,
       get: () => false
@@ -565,14 +586,6 @@ export const DraftPaginationOffline: Story = {
 
     // Dispatch offline event so useEffect listener reacts
     window.dispatchEvent(new Event('offline'))
-
-    const canvas = within(canvasElement)
-
-    // Expect 10 elements with text 'Tennis club membership application'
-    const firstPageRows = await canvas.findAllByText(
-      'Tennis club membership application'
-    )
-    await expect(firstPageRows).toHaveLength(10)
 
     // Check that offline labels are shown
     await canvas.findAllByText('No connection')
@@ -586,5 +599,285 @@ export const DraftPaginationOffline: Story = {
       'Tennis club membership application'
     )
     await expect(secondPageRows).toHaveLength(5)
+  }
+}
+
+// ---------------------------------------------------------------------------
+// WorkqueueAutoRefreshOnCountChange
+//
+// Regression test for opencrvs/opencrvs-core#12103:
+// When the workqueue.count poll returns a higher number than before, the
+// workqueue list must auto-refresh without a manual browser reload.
+//
+// How it works:
+//   1. MSW count handler returns initialCount (3) on the first call.
+//   2. MSW search handler returns 3 events on the first call.
+//   3. The play function manually invalidates the count cache – simulating
+//      what the 20-second polling would do – and MSW now returns updatedCount (4).
+//   4. The setQueryDefaults interceptor in count.ts detects the change and
+//      calls invalidateWorkqueueSearchQueries('recent').
+//   5. MSW search handler now returns 4 events.
+//   6. The list shows 4 rows without any user interaction.
+// ---------------------------------------------------------------------------
+
+let autoRefreshDataChanged = false
+
+const autoRefreshInitialCount = 3
+const autoRefreshUpdatedCount = 4
+
+const autoRefreshInitialEvents = queryData.slice(0, autoRefreshInitialCount)
+const autoRefreshNewEvent = eventQueryDataGenerator(undefined, 7777)
+const autoRefreshUpdatedEvents = [
+  autoRefreshNewEvent,
+  ...autoRefreshInitialEvents
+]
+
+function buildFakeStorybookToken(scopes: string[]) {
+  const base64UrlEncode = (input: string) =>
+    btoa(input).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+
+  const header = base64UrlEncode(JSON.stringify({ alg: 'RS256', typ: 'JWT' }))
+  const payload = base64UrlEncode(
+    JSON.stringify({
+      scope: scopes,
+      userType: 'user',
+      role: TestUserRole.enum.FIELD_AGENT,
+      sub: '8f8b431b-ef47-4068-b678-ef2dd93e9208',
+      iat: 1487076708,
+      exp: 32503680000,
+      iss: 'opencrvs:auth-service',
+      aud: 'opencrvs:gateway-user'
+    })
+  )
+  return `${header}.${payload}.signature`
+}
+
+/**
+ * Token grants access to the `recent` workqueue but intentionally omits the
+ * `record.create` scope so `useUserMayCreateEvents` returns false.
+ */
+const tokenWithWorkqueueButNoCreate = buildFakeStorybookToken([
+  encodeScope({
+    type: 'workqueue',
+    options: {
+      ids: [
+        'all-events',
+        'assigned-to-you',
+        'recent',
+        'requires-updates',
+        'sent-for-review'
+      ]
+    }
+  }),
+  encodeScope({ type: 'record.search' }),
+  encodeScope({ type: 'record.read' })
+])
+
+export const MobileCreateEventHiddenForUnauthorizedUser: Story = {
+  parameters: {
+    userRole: TestUserRole.enum.FIELD_AGENT,
+    token: tokenWithWorkqueueButNoCreate,
+    viewport: { defaultViewport: 'mobile' },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues('recent')
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: queryData.length }
+            }, {})
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          }),
+          tRPCMsw.event.search.query((input) => {
+            return {
+              results: queryData.slice(input.offset, input.limit),
+              total: queryData.length
+            }
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Workqueue has finished loading', async () => {
+      await canvas.findByText('Farajaland CRVS', {}, { timeout: 5000 })
+      await waitFor(async () => {
+        const rows = canvasElement.querySelectorAll('div[id^="row_"]')
+        await expect(rows.length).toBeGreaterThan(0)
+      })
+    })
+
+    await step(
+      'Floating action button for new event creation is not rendered',
+      async () => {
+        const fab = canvasElement.querySelector('#new_event_declaration')
+        await expect(fab).toBeNull()
+      }
+    )
+  }
+}
+
+export const MobileCreateEventShownForAuthorizedUser: Story = {
+  parameters: {
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
+    viewport: { defaultViewport: 'mobile' },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues('recent')
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: queryData.length }
+            }, {})
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          }),
+          tRPCMsw.event.search.query((input) => {
+            return {
+              results: queryData.slice(input.offset, input.limit),
+              total: queryData.length
+            }
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Workqueue has finished loading', async () => {
+      await canvas.findByText('Farajaland CRVS', {}, { timeout: 5000 })
+      await waitFor(async () => {
+        const rows = canvasElement.querySelectorAll('div[id^="row_"]')
+        await expect(rows.length).toBeGreaterThan(0)
+      })
+    })
+
+    await step(
+      'Floating action button for new event creation is rendered',
+      async () => {
+        await waitFor(async () => {
+          const fab = canvasElement.querySelector('#new_event_declaration')
+          await expect(fab).not.toBeNull()
+        })
+      }
+    )
+  }
+}
+
+export const WorkqueueAutoRefreshOnCountChange: Story = {
+  beforeEach: () => {
+    autoRefreshDataChanged = false
+  },
+  parameters: {
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() =>
+            generateWorkqueues('recent')
+          ),
+          tRPCMsw.workqueue.count.query((input) => {
+            const count = autoRefreshDataChanged
+              ? autoRefreshUpdatedCount
+              : autoRefreshInitialCount
+            return input.reduce(
+              (acc, { slug }) => ({ ...acc, [slug]: count }),
+              {} as Record<string, number>
+            )
+          })
+        ],
+        event: [
+          tRPCMsw.event.search.query(() => ({
+            results: autoRefreshDataChanged
+              ? autoRefreshUpdatedEvents
+              : autoRefreshInitialEvents,
+            total: autoRefreshDataChanged
+              ? autoRefreshUpdatedCount
+              : autoRefreshInitialCount
+          }))
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Initial workqueue renders 3 events', async () => {
+      await canvas.findByText('Farajaland CRVS', {}, { timeout: 5000 })
+      await waitFor(async () => {
+        const rows = canvasElement.querySelectorAll('div[id^="row_"]')
+        await expect(rows).toHaveLength(autoRefreshInitialCount)
+      })
+    })
+
+    await step('Sidebar shows initial count of 3', async () => {
+      const sidebarItem = await canvas.findByTestId(
+        'navigation_workqueue_recent'
+      )
+      await expect(sidebarItem).toHaveTextContent(
+        String(autoRefreshInitialCount)
+      )
+    })
+
+    await step(
+      'After count changes workqueue list auto-refreshes to 4 rows',
+      async () => {
+        autoRefreshDataChanged = true
+
+        // Force an immediate count refetch – this is what the 20-second polling
+        // interval does naturally. The useEffect in Workqueues detects the
+        // change and triggers invalidateWorkqueueSearchQueries('recent').
+        await queryClient.invalidateQueries({
+          queryKey: trpcOptionsProxy.workqueue.count.queryKey()
+        })
+
+        // The list must update automatically – no user interaction required.
+        await waitFor(
+          async () => {
+            const rows = canvasElement.querySelectorAll('div[id^="row_"]')
+            await expect(rows).toHaveLength(autoRefreshUpdatedCount)
+          },
+          { timeout: 5000 }
+        )
+      }
+    )
+
+    await step('Sidebar reflects the updated count of 4', async () => {
+      const sidebarItem = await canvas.findByTestId(
+        'navigation_workqueue_recent'
+      )
+      await expect(sidebarItem).toHaveTextContent(
+        String(autoRefreshUpdatedCount)
+      )
+    })
   }
 }

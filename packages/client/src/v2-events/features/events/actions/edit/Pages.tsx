@@ -15,7 +15,7 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { ActionType, getDeclarationPages } from '@opencrvs/commons/client'
+import { getDeclarationPages } from '@opencrvs/commons/client'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
@@ -70,14 +70,12 @@ export function Pages() {
       <FormLayout route={ROUTES.V2.EVENTS.EDIT}>
         {modal}
         <PagesComponent
-          actionType={ActionType.EDIT}
           attachmentPath={`events/${eventId}/`}
           eventConfig={configuration}
           formData={formValues}
           formPages={declarationPages}
           pageId={currentPageId}
           setFormData={(data) => setFormValues(data)}
-          showReviewButton={searchParams.from === 'review'}
           validatorContext={validatorContext}
           onPageChange={(nextPageId: string) =>
             navigate(
@@ -91,7 +89,7 @@ export function Pages() {
             navigate(
               ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath(
                 { eventId },
-                { workqueue: searchParams.workqueue }
+                { backTo: searchParams.backTo }
               )
             )
           }

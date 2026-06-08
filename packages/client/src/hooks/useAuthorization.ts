@@ -31,7 +31,6 @@ import { useAdministrativeAreas } from '../v2-events/hooks/useAdministrativeArea
 
 export function usePermissions() {
   const userScopes = useSelector(getScope) || []
-
   const currentUser = useSelector(getUserDetails)
   const userPrimaryOfficeId = currentUser?.primaryOfficeId
 
@@ -123,29 +122,35 @@ export function usePermissions() {
     ? creatableRoleIds.length > 0
     : hasScope('user.create')
 
+  const organisationReadLocationsScopes = getAcceptedScopesByType({
+    acceptedScopes: ['organisation.read-locations'],
+    scopes: userScopes
+  })
+
+  const organisationReadAccessLevels = organisationReadLocationsScopes.map(
+    (s) => getScopeOptionValue(s, 'accessLevel')
+  )
+
   const canAccessOffice = (office: Pick<Location, 'id'>) => {
     if (!userPrimaryOfficeId) {
       return false
     }
 
-    const acceptedScopes = getAcceptedScopesByType({
-      acceptedScopes: ['organisation.read-locations'],
-      scopes: userScopes
-    })
-
-    const accessLevels = acceptedScopes.map((s) =>
-      getScopeOptionValue(s, 'accessLevel')
-    )
-
-    if (accessLevels.includes(JurisdictionFilter.enum.all)) {
+    if (organisationReadAccessLevels.includes(JurisdictionFilter.enum.all)) {
       return true
     }
 
-    if (accessLevels.includes(JurisdictionFilter.enum.location)) {
+    if (
+      organisationReadAccessLevels.includes(JurisdictionFilter.enum.location)
+    ) {
       return office.id === userPrimaryOfficeId
     }
 
-    if (accessLevels.includes(JurisdictionFilter.enum.administrativeArea)) {
+    if (
+      organisationReadAccessLevels.includes(
+        JurisdictionFilter.enum.administrativeArea
+      )
+    ) {
       return isLocationUnderJurisdiction({
         locationId: userPrimaryOfficeId,
         otherLocationId: office.id,
@@ -157,29 +162,32 @@ export function usePermissions() {
     return false
   }
 
+  const userCreateScopes = getAcceptedScopesByType({
+    acceptedScopes: ['user.create'],
+    scopes: userScopes
+  })
+
+  const userCreateReadAccessLevels = userCreateScopes.map((s) =>
+    getScopeOptionValue(s, 'accessLevel')
+  )
   const canAddOfficeUsers = (office: Pick<Location, 'id'>) => {
     if (!userPrimaryOfficeId) {
       return false
     }
 
-    const acceptedScopes = getAcceptedScopesByType({
-      acceptedScopes: ['user.create'],
-      scopes: userScopes
-    })
-
-    const accessLevels = acceptedScopes.map((s) =>
-      getScopeOptionValue(s, 'accessLevel')
-    )
-
-    if (accessLevels.includes(JurisdictionFilter.enum.all)) {
+    if (userCreateReadAccessLevels.includes(JurisdictionFilter.enum.all)) {
       return true
     }
 
-    if (accessLevels.includes(JurisdictionFilter.enum.location)) {
+    if (userCreateReadAccessLevels.includes(JurisdictionFilter.enum.location)) {
       return office.id === userPrimaryOfficeId
     }
 
-    if (accessLevels.includes(JurisdictionFilter.enum.administrativeArea)) {
+    if (
+      userCreateReadAccessLevels.includes(
+        JurisdictionFilter.enum.administrativeArea
+      )
+    ) {
       return isLocationUnderJurisdiction({
         locationId: userPrimaryOfficeId,
         otherLocationId: office.id,
@@ -188,6 +196,19 @@ export function usePermissions() {
       })
     }
 
+    return false
+  }
+
+  const canAccessMultipleLocations = () => {
+    let howManyLocationsUserHasAccessTo = 0
+    for (const location of locations.values()) {
+      if (canAccessOffice(location)) {
+        howManyLocationsUserHasAccessTo++
+      }
+      if (howManyLocationsUserHasAccessTo > 1) {
+        return true
+      }
+    }
     return false
   }
 
@@ -199,6 +220,7 @@ export function usePermissions() {
     canEditUser,
     canCreateUser,
     canAccessOffice,
-    canAddOfficeUsers
+    canAddOfficeUsers,
+    canAccessMultipleLocations
   }
 }

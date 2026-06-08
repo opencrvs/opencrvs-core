@@ -62,8 +62,15 @@ export const handlers = {
     http.get('/api/ping', () => {
       return HttpResponse.json({
         auth: true,
-        'user-mgnt': true,
         countryconfig: true
+      })
+    })
+  ],
+  nidApi: [
+    http.post('/api/events/events/search', async () => {
+      return HttpResponse.json({
+        results: [],
+        total: 0
       })
     })
   ],
@@ -1164,8 +1171,7 @@ export const handlers = {
     }),
     tRPCMsw.user.list.query(() => {
       const generator = testDataGenerator()
-
-      return [generator.user.localRegistrar().v2]
+      return [generator.user.localRegistrar().summary]
     }),
     tRPCMsw.user.get.query((userId) => {
       const generator = testDataGenerator()
@@ -2223,6 +2229,25 @@ export const handlers = {
       return HttpResponse.json(forms.forms)
     })
   ],
+  signature: [
+    http.get(
+      'http://127.0.0.1:6006/aa13a268-ae48-4a30-9450-554aebaab203/signature.png',
+      () => {
+        const base64 =
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAD0lEQVR4AQEEAPv/AHOCtQMWAasRmZgmAAAAAElFTkSuQmCC'
+        const binary = atob(base64.split(',')[1])
+        const array = new Uint8Array(binary.length)
+        for (let i = 0; i < binary.length; i++) {
+          array[i] = binary.charCodeAt(i)
+        }
+        return new HttpResponse(array.buffer, {
+          headers: {
+            'Content-Type': 'image/png'
+          }
+        })
+      }
+    )
+  ],
   avatars: [
     http.get('https://eu.ui-avatars.com/api/', ({ request }) => {
       const url = new URL(request.url)
@@ -2269,152 +2294,6 @@ export const handlers = {
         generator.user.registrationAgent().v2,
         generator.user.fieldAgent().v2
       ]
-    }),
-    graphql.query('searchUsers', () => {
-      const generator = testDataGenerator()
-
-      return HttpResponse.json({
-        data: {
-          searchUsers: {
-            totalItems: 4,
-            results: [
-              {
-                id: generator.user.localSystemAdmin().v2.id as UUID,
-                name: [
-                  {
-                    use: 'en',
-                    firstNames: 'Emmanuel',
-                    familyName: 'Mayuka',
-                    __typename: 'HumanName'
-                  }
-                ],
-                mobile: '+260921681112',
-                email: 'kalushabwalya.17@gmail.com',
-                fullHonorificName: null,
-                signature: null,
-                primaryOffice: {
-                  id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
-                  __typename: 'Location'
-                },
-                role: {
-                  id: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
-                  label: {
-                    id: 'userRole.administrator',
-                    defaultMessage: 'Administrator',
-                    description: 'Name for user role Administrator',
-                    __typename: 'I18nMessage'
-                  },
-                  __typename: 'UserRole'
-                },
-                status: 'active',
-                underInvestigation: false,
-                avatar: null,
-                __typename: 'User'
-              },
-              {
-                id: generator.user.localRegistrar().v2.id,
-                name: [
-                  {
-                    use: 'en',
-                    firstNames: 'Kennedy',
-                    familyName: 'Mweene',
-                    __typename: 'HumanName'
-                  }
-                ],
-                mobile: '+260933333333',
-                email: 'kalushabwalya1.7@gmail.com',
-                fullHonorificName: null,
-                signature: null,
-                primaryOffice: {
-                  id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
-                  __typename: 'Location'
-                },
-                role: {
-                  id: TestUserRole.enum.LOCAL_REGISTRAR,
-                  label: {
-                    id: 'userRole.localRegistrar',
-                    defaultMessage: 'Local Registrar',
-                    description: 'Name for user role Local Registrar',
-                    __typename: 'I18nMessage'
-                  },
-                  __typename: 'UserRole'
-                },
-                status: 'active',
-                underInvestigation: false,
-                avatar: null,
-                __typename: 'User'
-              },
-              {
-                id: generator.user.registrationAgent().v2.id,
-                name: [
-                  {
-                    use: 'en',
-                    firstNames: 'Felix',
-                    familyName: 'Katongo',
-                    __typename: 'HumanName'
-                  }
-                ],
-                mobile: '+260922222222',
-                email: 'kalushabwalya17+@gmail.com',
-                fullHonorificName: null,
-                signature: null,
-                primaryOffice: {
-                  id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
-                  __typename: 'Location'
-                },
-                role: {
-                  id: TestUserRole.enum.REGISTRATION_AGENT,
-                  label: {
-                    id: 'userRole.registrationOfficer',
-                    defaultMessage: 'Registration Officer',
-                    description: 'Name for user role Registration Officer',
-                    __typename: 'I18nMessage'
-                  },
-                  __typename: 'UserRole'
-                },
-                status: 'active',
-                underInvestigation: false,
-                avatar: null,
-                __typename: 'User'
-              },
-              {
-                id: generator.user.fieldAgent().v2.id,
-                name: [
-                  {
-                    use: 'en',
-                    firstNames: 'Kalusha',
-                    familyName: 'Bwalya',
-                    __typename: 'HumanName'
-                  }
-                ],
-                mobile: '+260911111111',
-                email: 'kalushabwalya17@gmail.com',
-                fullHonorificName: null,
-                signature: null,
-                primaryOffice: {
-                  id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
-                  __typename: 'Location'
-                },
-                role: {
-                  id: 'HOSPITAL_CLERK',
-                  label: {
-                    id: 'userRole.hospitalClerk',
-                    defaultMessage: 'Hospital Clerk',
-                    description: 'Name for user role Hospital Clerk',
-                    __typename: 'I18nMessage'
-                  },
-                  __typename: 'UserRole'
-                },
-                status: 'active',
-                underInvestigation: false,
-                avatar: null,
-                __typename: 'User'
-              }
-            ],
-            __typename: 'SearchUserResult'
-          }
-        }
-      })
     })
   ],
   userSettings: [

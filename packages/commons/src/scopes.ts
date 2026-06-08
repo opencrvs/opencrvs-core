@@ -397,29 +397,39 @@ export const encodeScope = (scope: Scope): EncodedScope => {
 }
 
 /**
- * Converts a scope object into an encoded query string representation.
- *
- * @TODO scope param could be defined as EncodedScope instead of string.
- *
- * @param scope - The scope object to encode.
- * @returns The encoded scope as a branded string (`EncodedScope`).
+ * Cache for decoded scopes, for performance purposes.
  */
+const decodedScopeCache = new Map<EncodedScope, Scope | undefined>()
 
-export const decodeScope = (query: EncodedScope) => {
-  const scope = qs.parse(query, {
+/**
+ * Converts an encoded scope string into a scope object.
+ *
+ * @param scope - The encoded scope string to decode.
+ * @returns The decoded scope object.
+ */
+export const decodeScope = (encodedScope: EncodedScope) => {
+  if (decodedScopeCache.has(encodedScope)) {
+    return decodedScopeCache.get(encodedScope)
+  }
+
+  const scope = qs.parse(encodedScope, {
     ignoreQueryPrefix: true,
     comma: true,
     allowDots: true
   })
 
   const unflattenedScope = unflattenScope(scope)
-  return Scope.safeParse(unflattenedScope)?.data
+  const result = Scope.safeParse(unflattenedScope)?.data
+  decodedScopeCache.set(encodedScope, result)
+  return result
 }
 
 /** If a certain scope option is not set, we use the default value. */
 const DEFAULT_SCOPE_OPTIONS: Partial<AllScopeOptions> = {
   placeOfEvent: JurisdictionFilter.enum.all,
-  accessLevel: JurisdictionFilter.enum.all
+  accessLevel: JurisdictionFilter.enum.all,
+  registeredIn: JurisdictionFilter.enum.all,
+  declaredIn: JurisdictionFilter.enum.all
 }
 
 /**

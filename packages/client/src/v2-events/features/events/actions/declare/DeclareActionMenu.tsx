@@ -72,9 +72,7 @@ function useDeclarationActions(event: EventDocument) {
   const annotation = getAnnotation()
   const [modal, openModal] = useModal()
   const canDirectlyRegister = useCanDirectlyRegister(event)
-  const [{ workqueue: slug }] = useTypedSearchParams(
-    ROUTES.V2.EVENTS.DECLARE.REVIEW
-  )
+  const [{ backTo }] = useTypedSearchParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const events = useEvents()
 
@@ -143,8 +141,8 @@ function useDeclarationActions(event: EventDocument) {
   const eventId = event.id
 
   const onDelete = useCallback(async () => {
-    await deleteDeclaration(eventId)
-  }, [eventId, deleteDeclaration])
+    await deleteDeclaration(eventId, backTo)
+  }, [eventId, deleteDeclaration, backTo])
 
   async function handleDeclaration(actionType: keyof typeof actions) {
     const action = actions[actionType]
@@ -171,7 +169,7 @@ function useDeclarationActions(event: EventDocument) {
         annotation,
         transactionId: uuid()
       })
-      return closeActionView(slug)
+      return closeActionView(backTo)
     }
   }
 
@@ -208,7 +206,7 @@ function useDeclarationActions(event: EventDocument) {
         onClick: async () =>
           handleSaveAndExit(() => {
             drafts.submitLocalDraft()
-            return closeActionView(slug)
+            return closeActionView(backTo)
           }),
         hidden: false
       },

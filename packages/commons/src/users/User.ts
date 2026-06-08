@@ -22,16 +22,9 @@ import {
 
 export const REINDEX_USER_ID = '00000000-0000-0000-0000-000000000000' as UUID
 
-/**
- * @deprecated only used in user-mgnt
- */
-export type IUserName = {
-  use: string
-  family: string
-  given: string[]
-}
-
 export const UserName = NameFieldValue.omit({ middlename: true })
+
+const UserStatus = z.enum(['active', 'deactivated', 'pending'])
 
 export const User = z.object({
   id: UUID,
@@ -48,11 +41,22 @@ export const User = z.object({
   type: TokenUserType.extract(['user']),
   mobile: z.string().optional(),
   email: EmailValue.optional(),
-  status: z.enum(['active', 'deactivated', 'pending']),
+  status: UserStatus,
   data: z.record(z.string(), FieldValue).optional()
 })
 
 export type User = z.infer<typeof User>
+export const UserSummary = User.pick({
+  id: true,
+  name: true,
+  role: true,
+  primaryOfficeId: true,
+  administrativeAreaId: true,
+  fullHonorificName: true,
+  type: true,
+  avatar: true
+})
+export type UserSummary = z.infer<typeof UserSummary>
 
 export type UserName = User['name']
 
@@ -123,10 +127,32 @@ export const System = z.object({
   legacyId: z.string().optional(),
   status: z.undefined().optional()
 })
+
 export type System = z.infer<typeof System>
+
+export const SystemSummary = System.pick({
+  id: true,
+  name: true,
+  type: true,
+  primaryOfficeId: true,
+  administrativeAreaId: true
+})
 
 export const UserOrSystem = z.discriminatedUnion('type', [User, System])
 export type UserOrSystem = z.infer<typeof UserOrSystem>
+
+export const UserOrSystemSummary = z.discriminatedUnion('type', [
+  UserSummary,
+  SystemSummary
+])
+export const UserOrSystemSummaryWithStatus = z.discriminatedUnion('type', [
+  UserSummary.extend({ status: UserStatus }),
+  SystemSummary.extend({
+    status: UserStatus.optional()
+  })
+])
+
+export type UserOrSystemSummary = z.infer<typeof UserOrSystemSummary>
 
 export const UserContext = User.pick({
   id: true,

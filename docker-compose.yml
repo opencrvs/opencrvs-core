@@ -59,7 +59,6 @@ services:
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - NODE_ENV=development
       - EVENTS_URL=http://events:5555/
-      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - AUTH_URL=http://auth:4040
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - CHECK_INVALID_TOKEN=true
@@ -77,7 +76,6 @@ services:
       - ES_URL=http://elasticsearch:9200
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - DOCUMENTS_URL=http://documents:9050
-      - USER_MANAGEMENT_URL=http://user-mgnt:3030
       - AUTH_URL=http://auth:4040
   auth:
     image: ghcr.io/opencrvs/ocrvs-auth:${VERSION}
@@ -91,25 +89,9 @@ services:
     environment:
       - REDIS_HOST=redis
       - EVENTS_URL=http://events:5555/
-      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
-  user-mgnt:
-    image: ghcr.io/opencrvs/ocrvs-user-mgnt:${VERSION}
-    #platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./packages/user-mgnt/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - base
-    environment:
-      - MONGO_URL=mongodb://mongo1/user-mgnt
-      - HOST=0.0.0.0
-      - COUNTRY_CONFIG_URL=http://countryconfig:3040
-      - DOCUMENTS_URL=http://documents:9050
-      - EVENTS_URL=http://events:5555/
   migration:
     image: ghcr.io/opencrvs/ocrvs-migration:${VERSION}
     #platform: linux/amd64

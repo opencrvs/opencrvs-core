@@ -66,34 +66,31 @@ export function useEventActionsOnClick(event: EventIndex) {
   const onClick = useCallback(
     async (
       actionType: WorkqueueActionType | ClientSpecificAction,
-      workqueue?: string
+      backTo?: string
     ) => {
       switch (actionType) {
         case ActionType.DELETE:
-          return deleteDeclaration(eventId, workqueue)
+          return deleteDeclaration(eventId, backTo)
         case ActionType.DECLARE:
           clearEphemeralFormState()
           return navigate(
-            ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
-              { eventId },
-              { workqueue }
-            )
+            ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({ eventId }, { backTo })
           )
         case ActionType.EDIT:
           clearEphemeralFormState()
           return navigate(
-            ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({ eventId }, { workqueue })
+            ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({ eventId }, { backTo })
           )
         case ActionType.REGISTER:
-          return onQuickAction(ActionType.REGISTER, workqueue)
+          return onQuickAction(ActionType.REGISTER, backTo)
         case ActionType.ARCHIVE:
-          return onQuickAction(ActionType.ARCHIVE, workqueue)
+          return onQuickAction(ActionType.ARCHIVE, backTo)
         case ActionType.PRINT_CERTIFICATE:
           clearEphemeralFormState()
           return navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
               { eventId },
-              { workqueue }
+              { backTo }
             )
           )
         case ActionType.MARK_AS_DUPLICATE:
@@ -101,7 +98,7 @@ export function useEventActionsOnClick(event: EventIndex) {
           return navigate(
             ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE.buildPath(
               { eventId },
-              { workqueue }
+              { backTo }
             )
           )
         case ActionType.REQUEST_CORRECTION: {
@@ -116,14 +113,14 @@ export function useEventActionsOnClick(event: EventIndex) {
             return navigate(
               ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
                 { eventId },
-                { workqueue }
+                { backTo }
               )
             )
           }
           return navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath(
               { eventId, pageId: correctionPages[0].id },
-              { workqueue }
+              { backTo }
             )
           )
         }
@@ -132,20 +129,16 @@ export function useEventActionsOnClick(event: EventIndex) {
           return navigate(
             ROUTES.V2.EVENTS.REVIEW_CORRECTION.REVIEW.buildPath(
               { eventId },
-              { workqueue }
+              { backTo }
             )
           )
         case ActionType.REJECT:
           return handleRejection(() =>
-            workqueue
-              ? navigate(
-                  ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue })
-                )
-              : navigate(ROUTES.V2.buildPath({}))
+            backTo ? navigate(backTo) : navigate(ROUTES.V2.buildPath({}))
           )
         case ActionType.READ:
           return navigate(
-            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
+            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { backTo })
           )
       }
     },
@@ -189,10 +182,10 @@ export function useAssignmentActions(event: EventIndex) {
   const isDownloadedAndAssignedToUser =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
   const intl = useIntl()
-  const { getUser } = useUsers()
+  const { getUsers } = useUsers()
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
-  const assignedToUser = getUser.useQuery(event.assignedTo || '', {
+  const assignedToUser = getUsers.useQueryById(event.assignedTo || '', {
     enabled: !!event.assignedTo
   })
   const assignedUserFullName = assignedToUser.data

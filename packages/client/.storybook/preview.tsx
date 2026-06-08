@@ -38,8 +38,12 @@ import {
 } from '@client/v2-events/features/events/useEvents/api'
 import {
   ActionType,
+  ConditionalType,
   Draft,
   EventDocument,
+  InherentFlags,
+  not,
+  flag,
   tennisClubMembershipEvent,
   TestUserRole,
   TokenUserType,
@@ -179,7 +183,6 @@ const tennisClubMembershipEventWithCustomAction = {
         description:
           'This is the label to show in audit history for the confirm action'
       },
-      // @TODO: once action conditionals are implemented, add some conditional here?
       form: [
         {
           id: 'notes',
@@ -190,6 +193,12 @@ const tennisClubMembershipEventWithCustomAction = {
             description: 'This is the label for the field for a custom action',
             id: 'event.birth.custom.action.approve.field.notes.label'
           }
+        }
+      ],
+      conditionals: [
+        {
+          type: ConditionalType.ENABLE,
+          conditional: not(flag(InherentFlags.POTENTIAL_DUPLICATE))
         }
       ],
       flags: []
@@ -225,7 +234,10 @@ const preview: Preview = {
       const primaryOfficeId = '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
 
       if (options.parameters.userRole === TestUserRole.enum.FIELD_AGENT) {
-        window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+        window.localStorage.setItem(
+          'opencrvs',
+          options.parameters.token ?? generator.user.token.fieldAgent
+        )
         addUserToQueryData(generator.user.fieldAgent().v2)
       } else if (
         options.parameters.userRole === TestUserRole.enum.REGISTRATION_AGENT
@@ -241,7 +253,7 @@ const preview: Preview = {
       ) {
         window.localStorage.setItem(
           'opencrvs',
-          generator.user.token.communityLeader
+          options.parameters.token ?? generator.user.token.communityLeader
         )
 
         addUserToQueryData(generator.user.communityLeader().v2)

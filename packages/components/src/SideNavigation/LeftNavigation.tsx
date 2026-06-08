@@ -11,6 +11,7 @@
 
 import * as React from 'react'
 import styled from 'styled-components'
+import { ConnectionStatus } from './ConnectionStatus'
 
 export interface ILeftNavigationProps {
   applicationName: string
@@ -19,9 +20,11 @@ export interface ILeftNavigationProps {
   avatar?: () => void
   name?: string | null
   role?: string | null
+  assignedOffice?: string | null
   warning?: JSX.Element | null
   className?: string
   applicationVersion: string
+  isOnline?: boolean
 }
 
 const LeftNavigationContainer = styled.div<{
@@ -76,11 +79,21 @@ const ApplicationName = styled.div`
   text-overflow: ellipsis;
 `
 
-const Version = styled.div`
+const VersionCard = styled.div`
   color: ${({ theme }) => theme.colors.grey400};
-  ${({ theme }) => theme.fonts.reg14};
   height: auto;
   padding: 16px;
+  background-color: ${({ theme }) => theme.colors.grey50};
+  margin: 16px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+`
+
+const VersionText = styled.span`
+  ${({ theme }) => theme.fonts.bold10};
+  text-transform: uppercase;
 `
 
 const Container = styled.div`
@@ -90,6 +103,16 @@ const Container = styled.div`
 const MenuItem = styled.div`
   flex: 1 1 auto;
   overflow-y: auto;
+`
+
+const VersionCardName = styled.span`
+  ${({ theme }) => theme.fonts.bold12};
+  color: ${({ theme }) => theme.colors.grey600};
+  display: block;
+`
+const UserDescription = styled.span`
+  ${({ theme }) => theme.fonts.reg12};
+  color: ${({ theme }) => theme.colors.grey500};
 `
 
 export const LeftNavigation = (props: ILeftNavigationProps) => {
@@ -112,10 +135,17 @@ export const LeftNavigation = (props: ILeftNavigationProps) => {
       </Container>
       <MenuItem>{props.children && props.children}</MenuItem>
       <Container>
-        <Version>
+        <VersionCard>
+          <div>
+            <VersionCardName>{props.name}</VersionCardName>
+            <UserDescription>
+              {[props.role, props.assignedOffice].filter(Boolean).join(' • ')}
+            </UserDescription>
+          </div>
+          <ConnectionStatus isOnline={props.isOnline} />
           {props.warning}
-          <span>OpenCRVS v{props.applicationVersion}</span>
-        </Version>
+          <VersionText>OpenCRVS v{props.applicationVersion}</VersionText>
+        </VersionCard>
       </Container>
     </LeftNavigationContainer>
   )

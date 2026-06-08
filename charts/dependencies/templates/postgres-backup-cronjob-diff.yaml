@@ -1,0 +1,36 @@
+{{ if and .Values.postgres.enabled (eq (include "postgres.backup_enabled" .) "true") }}
+{{- $run_as_cronjob := or .Values.backup.cronjob .Values.postgres.backup.cronjob }}
+{{- if eq .Values.postgres.backup.type "differential" }}
+---
+apiVersion: batch/v1
+{{ if $run_as_cronjob }}
+kind: CronJob
+{{- else }}
+kind: Job
+{{- end }}
+metadata:
+  name: postgres-backup-diff
+spec:
+  {{ if $run_as_cronjob }}
+  schedule: {{ .Values.postgres.backup.schedule.differential }}
+  {{- if .Values.timezone }}
+  timeZone: {{ .Values.timezone }}
+  {{- end }}
+  jobTemplate:
+    spec:
+  {{- end }}
+      template:
+        spec:
+          serviceAccountName: backup-runner
+          containers:
+            - name: runner
+              image: bitnami/kubectl:latest
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  kubectl exec -n {{ .Release.Namespace }} postgres-0 -- \
+                    pgbackrest --stanza="{{ .Values.postgres.backup.stanza }}" backup --type=diff
+          restartPolicy: OnFailure
+{{- end }}
+{{- end }}

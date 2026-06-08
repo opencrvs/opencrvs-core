@@ -1,0 +1,53 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+name: 'service alert'
+type: 'frequency'
+index: 'kibana-alert-history-services'
+is_enabled: true
+num_events: 1
+realert:
+  minutes: 5
+terms_size: 50
+timeframe:
+  minutes: 5
+timestamp_field: '@timestamp'
+timestamp_type: 'iso'
+use_strftime_index: false
+# https://github.com/Yelp/elastalert/issues/1260
+raw_count_keys: false
+filter:
+  - query:
+      term:
+        rule.name.keyword:
+          value: 'Error in service'
+
+alert: 
+  - ${NOTIFICATION_TYPE}
+
+email:
+  - ${ALERT_EMAIL}
+
+http_post2_url: '${HTTP_POST2_ALERT_URL}'
+http_post2_payload:
+  subject: '{% raw %}{{DOMAIN}}{% endraw %} {{event.kind}}: {{rule.name}} {{kibana.alert.context.apm__error_rate.serviceName}} 🚨'
+  html: 'Login to https://kibana.{% raw %}{{DOMAIN}}{% endraw %}/app/apm/services/{{kibana.alert.context.apm__error_rate.serviceName}}/overview to view the alert.'
+  from: '{% raw %}{{SENDER_EMAIL_ADDRESS}}{% endraw %}'
+  to: '{% raw %}{{ALERT_EMAIL}}{% endraw %}'
+
+
+# New way to define alerting action with more flexible templating:
+alert_subject: "${DOMAIN}: {{event.kind}}: {{rule.name}} {{kibana.alert.context.apm__error_rate.serviceName}} 🚨"
+alert_text_type: alert_text_jinja
+email_format: "html"
+
+alert_text: |
+  <p>Reason: {{kibana.alert.context.logs__alert__document__count.conditions}}.</p>
+
+  <p>Open Kibana:</p>
+  <p><a href="https://kibana.${DOMAIN}/app/apm/services/{{kibana.alert.context.apm__error_rate.serviceName}}/overview" target="_blank">https://kibana.${DOMAIN}</a></p>

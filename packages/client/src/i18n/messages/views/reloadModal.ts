@@ -15,6 +15,7 @@ interface IReloadModalMessages
   title: MessageDescriptor
   body: MessageDescriptor
   update: MessageDescriptor
+  loginAgain: MessageDescriptor
 }
 
 const messagesToDefine: IReloadModalMessages = {
@@ -33,6 +34,11 @@ const messagesToDefine: IReloadModalMessages = {
     id: 'reloadmodal.button.update',
     defaultMessage: 'Update',
     description: 'Label of update button'
+  },
+  loginAgain: {
+    id: 'reloadmodal.button.loginAgain',
+    defaultMessage: 'Log in again',
+    description: 'Label of log in again button after version update'
   }
 }
 export const messages: IReloadModalMessages = defineMessages(messagesToDefine)

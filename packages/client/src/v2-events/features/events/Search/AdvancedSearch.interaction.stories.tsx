@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -20,10 +21,14 @@ import {
   ActionType,
   footballClubMembershipEvent,
   generateEventDocument,
+  getCurrentEventState,
   TENNIS_CLUB_MEMBERSHIP,
   tennisClubMembershipEvent,
-  TestUserRole
+  TestUserRole,
+  UUID
 } from '@opencrvs/commons/client'
+import { testDataGenerator } from '@client/tests/test-data-generators'
+import { storeUserDetails } from '@client/utils/userUtils'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
@@ -505,6 +510,340 @@ export const AdvancedSearchPartialNameSearchSupport: Story = {
         await userEvent.click(accordion)
 
         await expect(searchButton).toBeEnabled()
+      }
+    )
+  }
+}
+
+const generator = testDataGenerator()
+
+async function openRegistrationLocationDropdown(
+  canvasElement: HTMLElement,
+  canvas: ReturnType<typeof within>
+) {
+  const accordion = await canvas.findByTestId(
+    'accordion-advancedSearch.form.registrationDetails'
+  )
+  await userEvent.click(within(accordion).getByRole('button', { name: 'Show' }))
+
+  const locationInput = canvasElement.querySelector(
+    '#searchable-select-event____legalStatuses____REGISTERED____createdAtLocation input'
+  )
+
+  if (!locationInput) {
+    throw new Error('Location input not found')
+  }
+
+  await userEvent.click(locationInput)
+  return canvas.findByRole('listbox')
+}
+
+const communityLeaderStoryBase = {
+  ...storyParams,
+  userRole: TestUserRole.enum.COMMUNITY_LEADER,
+  reactRouter: {
+    ...storyParams.reactRouter,
+    initialPath: ROUTES.V2.ADVANCED_SEARCH.buildPath({})
+  }
+}
+
+const mockUser = {
+  ...generator.user.communityLeader().summary,
+  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
+}
+
+const mockUserFull = {
+  ...generator.user.communityLeader().v2,
+  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
+}
+
+const mswConfig = {
+  handlers: {
+    events: [
+      tRPCMsw.event.config.get.query(() => {
+        return [tennisClubMembershipEvent]
+      })
+    ],
+    user: [
+      tRPCMsw.user.list.query(() => {
+        return [mockUser]
+      }),
+      tRPCMsw.user.get.query(() => {
+        return mockUserFull
+      })
+    ]
+  }
+}
+
+/**
+ * record.search[registeredIn=location] — dropdown restricted to the user's
+ * own office only (Ibombo District Office).
+ */
+export const JurisdictionScope_Location: Story = {
+  parameters: {
+    ...communityLeaderStoryBase,
+    token: generator.user.token.communityLeaderRegisteredInLocation,
+    msw: mswConfig
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Location dropdown shows only Ibombo District Office',
+      async () => {
+        const listbox = await openRegistrationLocationDropdown(
+          canvasElement,
+          canvas
+        )
+        const options = within(listbox).queryAllByRole('listitem')
+
+        await expect(options).toHaveLength(1)
+        await expect(options[0]).toHaveTextContent('Ibombo District Office')
+      }
+    )
+  }
+}
+
+/**
+ * record.search[registeredIn=administrativeArea] — dropdown restricted to
+ * offices within the user's administrative area (multiple offices visible).
+ */
+export const JurisdictionScope_AdministrativeArea: Story = {
+  parameters: {
+    ...communityLeaderStoryBase,
+    token: generator.user.token.communityLeaderRegisteredInAdministrativeArea,
+    msw: mswConfig
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Location dropdown shows offices in the Ibombo administrative area',
+      async () => {
+        const listbox = await openRegistrationLocationDropdown(
+          canvasElement,
+          canvas
+        )
+        const options = within(listbox).queryAllByRole('listitem')
+
+        await expect(options).toHaveLength(2)
+        await expect(options[0]).toHaveTextContent('Ibombo District Office')
+        await expect(options[1]).toHaveTextContent('Klow Village Office')
+      }
+    )
+  }
+}
+
+const allOffices = [
+  'Central Provincial Office',
+  'Ibombo District Office',
+  'Isamba District Office',
+  'Isango District Office',
+  'Sulaka Provincial Office',
+  'Ilanga District Office',
+  'Klow Village Office'
+]
+
+/**
+ * record.search (no registeredIn set) — defaults to 'all', dropdown shows
+ * every office with no jurisdiction restriction.
+ */
+export const JurisdictionScope_All: Story = {
+  parameters: {
+    ...communityLeaderStoryBase,
+    token: generator.user.token.communityLeader,
+    msw: mswConfig
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Location dropdown shows all offices when registeredIn is not set',
+      async () => {
+        const listbox = await openRegistrationLocationDropdown(
+          canvasElement,
+          canvas
+        )
+        const options = within(listbox).queryAllByRole('listitem')
+
+        await expect(options.length).toEqual(allOffices.length)
+        allOffices.forEach(async (office) => {
+          await expect(
+            options.some((o) => o.textContent?.includes(office))
+          ).toBe(true)
+        })
+      }
+    )
+  }
+}
+
+/**
+ * Two record.search scopes: no registeredIn (defaults to 'all') + registeredIn=location.
+ * Most relaxed value ('all') wins — dropdown shows every office.
+ */
+export const JurisdictionScope_AllBeatsLocation: Story = {
+  parameters: {
+    ...communityLeaderStoryBase,
+    token: generator.user.token.communityLeaderSearchAllAndLocation,
+    msw: mswConfig
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      "Location dropdown shows all offices when 'all' scope beats location restriction",
+      async () => {
+        const listbox = await openRegistrationLocationDropdown(
+          canvasElement,
+          canvas
+        )
+        const options = within(listbox).queryAllByRole('listitem')
+
+        await expect(options.length).toEqual(allOffices.length)
+        allOffices.forEach(async (office) => {
+          await expect(
+            options.some((o) => o.textContent?.includes(office))
+          ).toBe(true)
+        })
+      }
+    )
+  }
+}
+
+/**
+ * Verifies the `backTo` round-trip: a user lands on the advanced search result
+ * page with a serialized set of filters, opens an event, navigates into a deep
+ * action (edit/review) and then closes — they must return to the exact same
+ * search-result URL with the same filters intact.
+ *
+ * This exercises the unified `backTo` query param introduced in [routes.ts] and
+ * the `useCurrentBackTo` hook + `closeActionView(backTo)` exit path.
+ */
+const backToFilterParams = serializeSearchParams({
+  'applicant.name': {
+    firstname: 'John',
+    surname: 'Doe'
+  },
+  'event.legalStatuses.REGISTERED.createdAtLocation':
+    '028d2c85-ca31-426d-b5d1-2cef545a4902',
+  'event.status': 'ALL',
+  eventType: TENNIS_CLUB_MEMBERSHIP
+})
+
+const searchResultInitialPath = `${ROUTES.V2.SEARCH_RESULT.buildPath({
+  eventType: TENNIS_CLUB_MEMBERSHIP
+})}?${backToFilterParams}`
+
+const registeredEventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [
+    { type: ActionType.CREATE },
+    { type: ActionType.DECLARE },
+    { type: ActionType.REGISTER }
+  ]
+})
+const registeredEventIndex = getCurrentEventState(
+  registeredEventDocument,
+  tennisClubMembershipEvent
+)
+
+const backToPersistenceMsw = {
+  handlers: {
+    events: [
+      tRPCMsw.event.config.get.query(() => [
+        tennisClubMembershipEvent,
+        footballClubMembershipEvent
+      ]),
+      tRPCMsw.event.search.query(() => ({
+        results: [registeredEventIndex],
+        total: 1
+      })),
+      tRPCMsw.event.get.query(() => registeredEventDocument)
+    ],
+    drafts: trpcHandlers.drafts.handlers
+  }
+}
+
+export const SearchResultBackToPersistsThroughEditClose: Story = {
+  parameters: {
+    ...storyParams,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: searchResultInitialPath
+    },
+    msw: backToPersistenceMsw
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Advanced search result table renders', async () => {
+      await canvas.findByTestId('search-result', {}, { timeout: 5000 })
+    })
+
+    await step(
+      'Click the applicant name button navigates to event overview',
+      async () => {
+        const searchResult = await canvas.findByTestId('search-result')
+        const nameButton = await within(searchResult).findByRole(
+          'button',
+          { name: /John/ },
+          { timeout: 5000 }
+        )
+        await userEvent.click(nameButton)
+      }
+    )
+
+    await step('Event overview page renders with exit button', async () => {
+      await canvas.findByTestId('exit-event', {}, { timeout: 5000 })
+    })
+
+    await step('Click X close on the event overview page', async () => {
+      const closeBtn = await canvas.findByTestId('exit-event')
+      await userEvent.click(closeBtn)
+    })
+
+    await step(
+      'User lands back on the advanced search result page with filters intact',
+      async () => {
+        await canvas.findByTestId('search-result')
+        // Applicant name filter chip from the original search criteria must
+        // still be visible — proves the backTo URL preserved query params.
+        await canvas.findByText('Event: Tennis-club-membership')
+        await canvas.findByText(`Applicant's name: John Doe`)
+        await canvas.findByText(
+          `Place of registration: Ibombo District Office, Ibombo, Central, Farajaland`
+        )
+        await canvas.findByText(`Status of record: Any status`)
+      }
+    )
+  }
+}
+
+/**
+ * Two record.search scopes: registeredIn=location + registeredIn=administrativeArea.
+ * Most relaxed value (administrativeArea) wins — same result as JurisdictionScope_AdministrativeArea.
+ */
+export const JurisdictionScope_MultipleScopes_MostRelaxedWins: Story = {
+  parameters: {
+    ...communityLeaderStoryBase,
+    token: generator.user.token.communityLeaderMultipleSearchScopes,
+    msw: mswConfig
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Location dropdown applies the most relaxed scope (administrativeArea beats location)',
+      async () => {
+        const listbox = await openRegistrationLocationDropdown(
+          canvasElement,
+          canvas
+        )
+        const options = within(listbox).queryAllByRole('listitem')
+
+        await expect(options).toHaveLength(2)
+        await expect(options[0]).toHaveTextContent('Ibombo District Office')
+        await expect(options[1]).toHaveTextContent('Klow Village Office')
       }
     )
   }

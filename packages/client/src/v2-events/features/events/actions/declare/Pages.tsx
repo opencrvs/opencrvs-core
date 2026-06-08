@@ -15,7 +15,7 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { ActionType, getDeclarationPages } from '@opencrvs/commons/client'
+import { getDeclarationPages } from '@opencrvs/commons/client'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -96,20 +96,18 @@ export function Pages() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          closeActionView(searchParams.workqueue)
+          closeActionView(searchParams.backTo)
         })
       }
     >
       {modal}
       <PagesComponent
-        actionType={ActionType.DECLARE}
         attachmentPath={`events/${event.id}/`}
         eventConfig={configuration}
         formData={formValues}
         formPages={declarationPages}
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}
-        showReviewButton={searchParams.from === 'review'}
         validatorContext={validatorContext}
         onPageChange={(nextPageId: string) =>
           navigate(
@@ -126,7 +124,7 @@ export function Pages() {
           navigate(
             ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
               { eventId },
-              { workqueue: searchParams.workqueue }
+              { backTo: searchParams.backTo }
             )
           )
         }

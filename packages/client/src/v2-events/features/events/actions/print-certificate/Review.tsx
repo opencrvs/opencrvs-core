@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useRef } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
@@ -147,7 +147,7 @@ function getPrintForm(configuration: EventConfig) {
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW)
-  const [{ templateId, workqueue: slug }] = useTypedSearchParams(
+  const [{ templateId, backTo }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW
   )
 
@@ -160,6 +160,8 @@ export function Review() {
   const intl = useIntl()
   const navigate = useNavigate()
   const isOnline = useOnlineStatus()
+  const isOnlineRef = useRef(isOnline)
+  isOnlineRef.current = isOnline
   const [modal, openModal] = useModal()
 
   const { getEvent, onlineActions } = useEvents()
@@ -246,7 +248,7 @@ export function Review() {
       <Navigate
         to={ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
           { eventId },
-          { workqueue: slug }
+          { backTo }
         )}
       />
     )
@@ -258,10 +260,7 @@ export function Review() {
 
   const handleCorrection = () =>
     navigate(
-      ROUTES.V2.EVENTS.REQUEST_CORRECTION.buildPath(
-        { eventId },
-        { workqueue: slug }
-      )
+      ROUTES.V2.EVENTS.REQUEST_CORRECTION.buildPath({ eventId }, { backTo })
     )
 
   const handlePrint = async () => {
@@ -280,7 +279,7 @@ export function Review() {
           </Button>,
           <Button
             key="print-certificate"
-            disabled={!isOnline || isPending}
+            disabled={!isOnlineRef.current || isPending}
             id="print-certificate"
             type="primary"
             onClick={() => close(true)}
@@ -330,9 +329,11 @@ export function Review() {
           }
         )
 
-        slug
-          ? navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
-          : navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
+        if (backTo) {
+          navigate(backTo)
+        } else {
+          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
+        }
       } catch (error) {
         // TODO: add notification alert
         // eslint-disable-next-line no-console

@@ -9,15 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
 
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { onlineManager } from '@tanstack/react-query'
 import { ActionType } from '@opencrvs/commons/client'
 import { APPLICATION_VERSION } from '@client/utils/constants'
-import { storeReloadModalVisibility } from '@client/reload/reducer'
-import type { AppStore } from '@client/store'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
@@ -106,55 +104,84 @@ function PrefetchQueries() {
  * Each route is defined as a child of the `ROUTES.V2` route.
  */
 
-export const routesConfig = {
-  path: ROUTES.V2.path,
-  Component: () => {
-    const dispatch = useDispatch<AppStore['dispatch']>()
+export function useNetworkProbe() {
+  const [versionMismatch, setVersionMismatch] = useState(false)
+  useEffect(() => {
+    let cancelled = false
+    let intervalId: ReturnType<typeof setInterval> | null = null
+    let probeInProgress = false
+    let currentController: AbortController | null = null
+    let abortTimeoutId: ReturnType<typeof setTimeout> | null = null
 
-    useEffect(() => {
-      let cancelled = false
+    onlineManager.setOnline(false)
 
-      onlineManager.setOnline(false)
+    async function probeNetwork() {
+      if (probeInProgress) {
+        return
+      }
+      probeInProgress = true
+      try {
+        currentController = new AbortController()
+        abortTimeoutId = setTimeout(() => currentController?.abort(), 3000)
 
-      async function probeNetwork() {
-        try {
-          const controller = new AbortController()
-          setTimeout(() => controller.abort(), 3000)
+        const res = await fetch('/api/ping', {
+          method: 'GET',
+          cache: 'no-store',
+          signal: currentController.signal
+        })
 
-          const res = await fetch('/api/ping', {
-            method: 'GET',
-            cache: 'no-store',
-            signal: controller.signal
-          })
-
-          if (!res.ok) {
-            throw new Error('Network probe failed')
+        if (!cancelled) {
+          onlineManager.setOnline(res.ok)
+          if (res.ok && intervalId !== null) {
+            clearInterval(intervalId)
+            intervalId = null
           }
-
-          await res.json()
 
           const gatewayVersion = res.headers.get('X-version')
           if (gatewayVersion && gatewayVersion !== APPLICATION_VERSION) {
-            dispatch(storeReloadModalVisibility(true))
-          }
-
-          if (!cancelled) {
-            onlineManager.setOnline(true)
-          }
-        } catch {
-          if (!cancelled) {
-            onlineManager.setOnline(false)
+            setVersionMismatch(true)
           }
         }
+      } catch {
+        if (!cancelled) {
+          onlineManager.setOnline(false)
+        }
+      } finally {
+        if (abortTimeoutId !== null) {
+          clearTimeout(abortTimeoutId)
+          abortTimeoutId = null
+        }
+        probeInProgress = false
+        currentController = null
       }
+    }
 
-      void probeNetwork()
+    void probeNetwork()
 
-      return () => {
-        cancelled = true
+    intervalId = setInterval(() => {
+      if (!onlineManager.isOnline()) {
+        void probeNetwork()
       }
-    }, [dispatch])
+    }, 5000)
 
+    return () => {
+      cancelled = true
+      currentController?.abort()
+      if (abortTimeoutId !== null) {
+        clearTimeout(abortTimeoutId)
+      }
+      if (intervalId !== null) {
+        clearInterval(intervalId)
+      }
+    }
+  }, [])
+
+  return { versionMismatch }
+}
+
+export const routesConfig = {
+  path: ROUTES.V2.path,
+  Component: () => {
     const currentUser = useSelector(getUserDetails)
 
     if (!currentUser) {

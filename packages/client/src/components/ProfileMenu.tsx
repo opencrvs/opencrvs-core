@@ -100,6 +100,7 @@ const ProfileMenuComponent = ({
     <>
       <ToggleMenu
         id="ProfileMenu"
+        ariaLabel="Profile"
         toggleButton={
           <AvatarSmall
             name={getUserName(userDetails)}

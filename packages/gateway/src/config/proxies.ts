@@ -72,7 +72,9 @@ export const rateLimitedAuthProxy = {
     method: 'POST',
     path: '/auth/authenticate-super-user',
     handler: rateLimitedRoute(
-      { requestsPerMinute: 10, pathForKey: 'username' },
+      // Super user auth only sends a password, so there's no per-user field to
+      // key on — rate limit all super user attempts on a shared constant key.
+      { requestsPerMinute: 10, staticKey: 'authenticate-super-user' },
       (_, h) =>
         h.proxy({
           uri: AUTH_URL + '/authenticate-super-user'

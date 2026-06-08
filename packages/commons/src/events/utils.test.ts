@@ -19,6 +19,7 @@ import { ActionType } from './ActionType'
 import {
   findLastAssignmentAction,
   getCompleteActionAnnotation,
+  getCompleteActionContent,
   getDeclaration,
   getDeclarationFields,
   getMixedPath,
@@ -28,10 +29,13 @@ import {
 import { TokenUserType } from '../authentication'
 import {
   createPrng,
+  field,
+  FieldType,
   fieldConfigsToActionPayload,
   tennisClubMembershipEvent
 } from '../client'
-import { generateActionDocument } from './test.utils'
+import { generateActionDocument, generateTranslationConfig } from './test.utils'
+import { DeclarationFormConfig } from './FormConfig'
 
 const commonAction = {
   status: 'Requested' as const,
@@ -630,6 +634,45 @@ describe('omitHiddenPaginatedFields', () => {
     expect(missingKeys).not.toContain('recommender.name')
     expect(missingKeys).not.toContain('recommender.id')
   })
+
+  it('keeps a field that appears on both a hidden page and a visible page', () => {
+    // Page A is always visible; page B is only visible when toggle=true.
+    // Both pages declare a field with the same id 'shared.field'.
+    // When toggle is false (page B hidden), 'shared.field' must be kept because page A is visible.
+    const label = generateTranslationConfig('dummy label')
+    const sharedField = {
+      id: 'shared.field',
+      type: FieldType.TEXT,
+      required: false,
+      conditionals: [],
+      label
+    }
+    const formConfig: DeclarationFormConfig = {
+      label,
+      pages: [
+        {
+          id: 'page-a',
+          type: 'FORM',
+          title: label,
+          requireCompletionToContinue: false,
+          fields: [sharedField]
+        },
+        {
+          id: 'page-b',
+          type: 'FORM',
+          title: label,
+          requireCompletionToContinue: false,
+          conditional: field('toggle').isEqualTo('true'),
+          fields: [sharedField]
+        }
+      ]
+    }
+
+    const values = { 'shared.field': 'value', toggle: 'false' }
+    const result = omitHiddenPaginatedFields(formConfig, values, {})
+
+    expect(result).toMatchObject({ 'shared.field': 'value' })
+  })
 })
 
 describe('getCompleteActionAnnotation', () => {
@@ -649,13 +692,9 @@ describe('getCompleteActionAnnotation', () => {
       defaults: { annotation: { fieldB: 'from-action' } }
     })
 
-    const result = getCompleteActionAnnotation(
-      { fieldA: 'base' },
-      baseEvent,
-      action
-    )
+    const result = getCompleteActionAnnotation(baseEvent, action)
 
-    expect(result).toEqual({ fieldA: 'base', fieldB: 'from-action' })
+    expect(result).toEqual({ fieldB: 'from-action' })
   })
 
   it('ignores missing original action and merges annotation with action.annotation', () => {
@@ -668,13 +707,9 @@ describe('getCompleteActionAnnotation', () => {
       }
     })
 
-    const result = getCompleteActionAnnotation(
-      { fieldA: 'base' },
-      baseEvent,
-      action
-    )
+    const result = getCompleteActionAnnotation(baseEvent, action)
 
-    expect(result).toEqual({ fieldA: 'base', fieldB: 'from-action' })
+    expect(result).toEqual({ fieldB: 'from-action' })
   })
 
   it('ignores original action annotation when original status is not Requested', () => {
@@ -698,13 +733,9 @@ describe('getCompleteActionAnnotation', () => {
 
     const event: EventDocument = { ...baseEvent, actions: [originalAction] }
 
-    const result = getCompleteActionAnnotation(
-      { fieldA: 'base' },
-      event,
-      action
-    )
+    const result = getCompleteActionAnnotation(event, action)
 
-    expect(result).toEqual({ fieldA: 'base', fieldB: 'from-action' })
+    expect(result).toEqual({ fieldB: 'from-action' })
   })
 
   it('merges original action annotation when original status is Requested', () => {
@@ -728,14 +759,9 @@ describe('getCompleteActionAnnotation', () => {
 
     const event: EventDocument = { ...baseEvent, actions: [originalAction] }
 
-    const result = getCompleteActionAnnotation(
-      { fieldA: 'base' },
-      event,
-      action
-    )
+    const result = getCompleteActionAnnotation(event, action)
 
     expect(result).toEqual({
-      fieldA: 'base',
       fieldB: 'from-action',
       fieldC: 'from-original'
     })
@@ -762,8 +788,149 @@ describe('getCompleteActionAnnotation', () => {
 
     const event: EventDocument = { ...baseEvent, actions: [originalAction] }
 
-    const result = getCompleteActionAnnotation({}, event, action)
+    const result = getCompleteActionAnnotation(event, action)
 
     expect(result).toEqual({ field: 'from-action', fieldO: 'only-in-original' })
+  })
+})
+
+describe('getCompleteActionContent', () => {
+  const baseEvent: EventDocument = {
+    id: 'event-id-1' as UUID,
+    type: 'TENNIS_CLUB_MEMBERSHIP',
+    createdAt: '2023-01-01T00:00:00Z',
+    updatedAt: '2023-01-01T00:00:00Z',
+    trackingId: 'tracking-id-1',
+    actions: []
+  }
+
+  it('returns undefined for actions that have no content field', () => {
+    const action = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE
+    })
+
+    const result = getCompleteActionContent(baseEvent, action)
+
+    expect(result).toBeUndefined()
+  })
+
+  it('returns own content when action has content and no originalActionId', () => {
+    const action = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.APPROVE_CORRECTION,
+      defaults: { content: { immediateCorrection: true } }
+    })
+
+    const result = getCompleteActionContent(baseEvent, action)
+    expect(result).toEqual({ immediateCorrection: true })
+  })
+
+  it('merges own content with original content, current action wins on conflict', () => {
+    const originalAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.APPROVE_CORRECTION,
+      defaults: {
+        status: ActionStatus.Requested,
+        content: { immediateCorrection: false }
+      }
+    })
+
+    const action = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.APPROVE_CORRECTION,
+      defaults: {
+        originalActionId: originalAction.id,
+        content: { immediateCorrection: true }
+      }
+    })
+
+    const event: EventDocument = { ...baseEvent, actions: [originalAction] }
+
+    const result = getCompleteActionContent(event, action)
+
+    // current action wins: true overrides false from the original
+    expect(result).toEqual({ immediateCorrection: true })
+  })
+
+  it('inherits content from Requested original action when own content is absent', () => {
+    const originalAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.APPROVE_CORRECTION,
+      defaults: {
+        status: ActionStatus.Requested,
+        content: { immediateCorrection: true }
+      }
+    })
+
+    const action = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.APPROVE_CORRECTION,
+      defaults: { originalActionId: originalAction.id }
+    })
+
+    const event: EventDocument = { ...baseEvent, actions: [originalAction] }
+
+    const result = getCompleteActionContent(event, action)
+
+    expect(result).toEqual({ immediateCorrection: true })
+  })
+
+  it('inherits content from original action regardless of status (Accepted or Rejected)', () => {
+    const originalAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.APPROVE_CORRECTION,
+      defaults: {
+        status: ActionStatus.Accepted,
+        content: { immediateCorrection: true }
+      }
+    })
+
+    const action = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.APPROVE_CORRECTION,
+      defaults: { originalActionId: originalAction.id }
+    })
+
+    const event: EventDocument = { ...baseEvent, actions: [originalAction] }
+
+    const result = getCompleteActionContent(event, action)
+
+    expect(result).toEqual({ immediateCorrection: true })
+  })
+
+  it('inherits content from a Rejected original action', () => {
+    const originalAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.APPROVE_CORRECTION,
+      defaults: {
+        status: ActionStatus.Rejected,
+        content: { immediateCorrection: true }
+      }
+    })
+
+    const action = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.APPROVE_CORRECTION,
+      defaults: { originalActionId: originalAction.id }
+    })
+
+    const event: EventDocument = { ...baseEvent, actions: [originalAction] }
+
+    const result = getCompleteActionContent(event, action)
+
+    expect(result).toEqual({ immediateCorrection: true })
+  })
+
+  it('returns undefined when originalActionId is set but original action is not found', () => {
+    const action = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.APPROVE_CORRECTION,
+      defaults: { originalActionId: 'non-existent-id' as UUID }
+    })
+
+    const result = getCompleteActionContent(baseEvent, action)
+
+    expect(result).toBeUndefined()
   })
 })

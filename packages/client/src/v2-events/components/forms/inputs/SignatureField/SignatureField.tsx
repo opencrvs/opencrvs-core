@@ -26,6 +26,7 @@ import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages, validationMessages } from '@client/i18n/messages'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { cacheFile, toFileUrl } from '@client/v2-events/cache'
+import { setLockBypass } from '@client/utils/lockBypass'
 import { useOnFileChange } from '../FileInput/useOnFileChange'
 import { SignatureCanvasModal } from './components/SignatureCanvasModal'
 
@@ -144,7 +145,11 @@ function SignatureFieldInput({
               <Icon name="Pen" />
               {intl.formatMessage(messages.signatureOpenSignatureInput)}
             </Button>
-            <ImageUploader disabled={disabled} onChange={handleFileChange}>
+            <ImageUploader
+              disabled={disabled}
+              onChange={handleFileChange}
+              onClick={setLockBypass}
+            >
               {intl.formatMessage(buttonMessages.upload)}
             </ImageUploader>
           </Stack>
@@ -220,7 +225,18 @@ function SignatureOutput({ value }: { value?: FileFieldValue }) {
   )
 }
 
+function toCertificateVariables(value: FileFieldValue | undefined) {
+  const parsed = FileFieldValue.safeParse(value)
+
+  if (parsed.success) {
+    return toFileUrl(parsed.data.path)
+  }
+
+  return ''
+}
+
 export const SignatureField = {
   Input: SignatureFieldInput,
-  Output: SignatureOutput
+  Output: SignatureOutput,
+  toCertificateVariables
 }

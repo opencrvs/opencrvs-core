@@ -44,7 +44,7 @@
     "jose": "^4.13.1",
     "jsonwebtoken": "^9.0.0",
     "jwt-decode": "^3.0.0",
-    "lodash": "^4.17.10",
+    "lodash": "^4.18.1",
     "node-fetch": "^2.6.7",
     "pino": "^7.0.0",
     "redis": "^4.7.0",
@@ -52,7 +52,8 @@
     "tsconfig-paths": "^3.13.0",
     "uuid": "^3.2.1",
     "uuid-validate": "^0.0.3",
-    "winston": "^3.0.0"
+    "winston": "^3.0.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@hapi/lab": "^24.0.0",

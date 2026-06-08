@@ -11,7 +11,10 @@
 
 import React, { useCallback } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import {
   getCurrentEventState,
   isUndeclaredDraft
@@ -59,6 +62,7 @@ export function FormHeader({
   const events = useEvents()
 
   const { eventId } = useTypedParams(route)
+  const [{ backTo }] = useTypedSearchParams(route)
 
   if (!eventId) {
     throw new Error('Event id is required')
@@ -70,12 +74,20 @@ export function FormHeader({
   const eventIndex = getCurrentEventState(event, configuration)
 
   const onExit = useCallback(async () => {
-    await exit(eventIndex)
-  }, [eventIndex, exit])
+    await exit(eventIndex, backTo)
+  }, [eventIndex, exit, backTo])
 
   const onDelete = useCallback(async () => {
-    await deleteDeclaration(eventId)
-  }, [eventId, deleteDeclaration])
+    await deleteDeclaration(eventId, backTo)
+  }, [eventId, deleteDeclaration, backTo])
+
+  const onClose = useCallback(async () => {
+    if (isUndeclaredDraft(eventIndex.status)) {
+      await onExit()
+    } else {
+      closeActionView(backTo)
+    }
+  }, [eventIndex.status, onExit, closeActionView, backTo])
 
   const menuItems = isUndeclaredDraft(eventIndex.status)
     ? [
@@ -136,9 +148,7 @@ export function FormHeader({
           data-testid="exit-button"
           size="small"
           type="icon"
-          onClick={async () =>
-            isUndeclaredDraft(eventIndex.status) ? onExit() : closeActionView()
-          }
+          onClick={onClose}
         >
           <Icon name="X" />
         </Button>
@@ -188,13 +198,17 @@ export function FormHeader({
                 />
               </>
             ) : (
-              <Button
-                size="small"
-                type="icon"
-                onClick={() => closeActionView()}
-              >
-                <Icon name="X" />
-              </Button>
+              <>
+                {actionComponent}
+                <Button
+                  data-testid="exit-button"
+                  size="small"
+                  type="icon"
+                  onClick={onClose}
+                >
+                  <Icon name="X" />
+                </Button>
+              </>
             )}
           </>
         }

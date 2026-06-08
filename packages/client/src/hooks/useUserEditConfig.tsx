@@ -12,8 +12,7 @@ import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
-  alwaysTrue,
-  defineConditional,
+  always,
   EncodedScope,
   EventConfig,
   field,
@@ -25,6 +24,7 @@ import {
   never,
   or,
   PageTypes,
+  user,
   UserContext,
   UserScopeV2,
   UUID
@@ -113,6 +113,13 @@ export function useUserEditConfig(
                   id: 'primaryOfficeId',
                   type: FieldType.LOCATION,
                   required: true,
+                  configuration: {
+                    allowedLocations: user.jurisdiction(
+                      user
+                        .scope(isNewUser ? 'user.create' : 'user.edit')
+                        .attribute('accessLevel')
+                    )
+                  },
                   label: messages.registrationOffice
                 }
               ]
@@ -191,13 +198,13 @@ export function useUserEditConfig(
                 selectedRole?.scopes ?? [],
                 'profile.electronic-signature'
               )
-                ? defineConditional(alwaysTrue())
+                ? always()
                 : never(),
               fields: [
                 {
                   id: 'signature',
                   type: FieldType.SIGNATURE,
-                  required: false,
+                  required: true,
                   label: messages.userSignatureAttachment,
                   signaturePromptLabel: messages.userSignatureAttachment,
                   configuration: {

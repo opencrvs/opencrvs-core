@@ -1,0 +1,16 @@
+{{- if eq .Values.elasticsearch.auth_mode "auto" }}
+apiVersion: v1
+data:
+{{- range $path, $file := .Files.Glob "files/elasticsearch/*" }}
+    {{ base $path }}: |
+{{ toString $file | indent 8 }}
+{{- end }}
+kind: ConfigMap
+metadata:
+  labels:
+    app: elasticsearch
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "0"
+  name: elasticsearch-on-update-script
+{{- end }}

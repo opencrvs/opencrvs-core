@@ -20,6 +20,7 @@ import {
   ActionType,
   generateEventDocument,
   generateWorkqueues,
+  getCurrentEventState,
   tennisClubMembershipEvent,
   never
 } from '@opencrvs/commons/client'
@@ -279,6 +280,94 @@ export const ContinuingAndGoingBack: Story = {
 
 const generator = testDataGenerator()
 
+// All actions are created by the logged-in local registrar so the user is
+// present in the users list the Review page looks them up in.
+const registrar = { id: generator.user.id.localRegistrar }
+const registeredEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [
+    { type: ActionType.CREATE, user: registrar },
+    { type: ActionType.DECLARE, user: registrar },
+    { type: ActionType.REGISTER, user: registrar }
+  ]
+})
+
+export const PrintButtonDisabledWhenGoingOffline: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    test: {
+      // Since we cannot test the generated PDF, we can ignore the failed font request
+      dangerouslyIgnoreUnhandledErrors: true
+    },
+    offline: {
+      events: [registeredEvent],
+      drafts: [
+        generator.event.draft({
+          eventId: registeredEvent.id,
+          actionType: ActionType.PRINT_CERTIFICATE,
+          annotation: {
+            [CERT_TEMPLATE_ID]: 'tennis-club-membership-certified-certificate',
+            'collector.requesterId': 'INFORMANT',
+            'collector.identity.verify': true,
+            templateId: 'tennis-club-membership-certified-certificate'
+          }
+        })
+      ]
+    },
+    reactRouter: {
+      router: {
+        initialPath: '/',
+        element: <Outlet />,
+        children: [routesConfig]
+      },
+      initialPath: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.buildPath(
+        { eventId: registeredEvent.id },
+        { templateId: 'tennis-club-membership-certificate' }
+      )
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Open print confirmation modal while online', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Yes, print certificate' })
+      )
+      await canvas.findByText('Print certified copy?')
+      await expect(canvas.getByTestId('confirm-print')).toBeEnabled()
+      await expect(canvas.getByTestId('print-certificate')).toBeEnabled()
+    })
+
+    await step('Go offline — print button becomes disabled', async () => {
+      // useOnlineStatus reads navigator.onLine on the event, so the value must
+      // be stubbed before dispatching — a bare event alone keeps it online.
+      Object.defineProperty(window.navigator, 'onLine', {
+        configurable: true,
+        get: () => false
+      })
+      window.dispatchEvent(new Event('offline'))
+
+      await waitFor(async () => {
+        await expect(canvas.getByTestId('confirm-print')).toBeDisabled()
+      })
+      await expect(canvas.getByTestId('print-certificate')).toBeDisabled()
+    })
+
+    await step('Go online — print button becomes enabled', async () => {
+      Object.defineProperty(window.navigator, 'onLine', {
+        configurable: true,
+        get: () => true
+      })
+      window.dispatchEvent(new Event('online'))
+
+      await waitFor(async () => {
+        await expect(canvas.getByTestId('confirm-print')).toBeEnabled()
+      })
+      await expect(canvas.getByTestId('print-certificate')).toBeEnabled()
+    })
+  }
+}
+
 export const RedirectAfterPrint: Story = {
   parameters: {
     chromatic: {
@@ -300,6 +389,17 @@ export const RedirectAfterPrint: Story = {
                 { type: ActionType.PRINT_CERTIFICATE }
               ]
             })
+          }),
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [
+                getCurrentEventState(
+                  tennisClubMembershipEventDocument,
+                  tennisClubMembershipEvent
+                )
+              ],
+              total: 1
+            }
           })
         ],
         workqueues: [
