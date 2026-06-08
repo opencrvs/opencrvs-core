@@ -13,7 +13,7 @@ import { useState } from 'react'
 import { useIntl } from 'react-intl'
 import * as React from 'react'
 import styled from 'styled-components'
-import { ImageUploader, InputError } from '@opencrvs/components'
+import { ImageUploader } from '@opencrvs/components'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -23,7 +23,7 @@ import {
   MimeType
 } from '@opencrvs/commons/client'
 import { messages } from '@client/i18n/messages/views/review'
-import { buttonMessages, validationMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { cacheFile, toFileUrl } from '@client/v2-events/cache'
 import { setLockBypass } from '@client/utils/lockBypass'
@@ -107,25 +107,11 @@ function SignatureFieldInput({
     uploadFile(newFile)
   }
 
-  const { error: onUploadError, handleFileChange } = useOnFileChange({
+  const { handleFileChange } = useOnFileChange({
     acceptedFileTypes,
     onComplete,
     maxFileSize
   })
-
-  const errorMessage = React.useMemo(() => {
-    if (onUploadError) {
-      return onUploadError
-    }
-
-    if (!signature) {
-      return touched && required
-        ? intl.formatMessage(validationMessages.required)
-        : undefined
-    }
-
-    return undefined
-  }, [signature, touched, required, onUploadError, intl])
 
   return (
     <>
@@ -138,8 +124,6 @@ function SignatureFieldInput({
               type="secondary"
               onClick={() => {
                 setIsModalOpen(true)
-
-                setTouched(true)
               }}
             >
               <Icon name="Pen" />
@@ -165,16 +149,12 @@ function SignatureFieldInput({
           onClick={() => {
             onChange(null)
             setSignature(undefined)
-            setTouched(true)
           }}
         >
           {intl.formatMessage(messages.signatureDelete)}
         </Button>
       )}
 
-      {errorMessage && (
-        <InputError id={`${name}_error`}>{errorMessage}</InputError>
-      )}
       {isModalOpen && (
         <SignatureCanvasModal
           id={name}
