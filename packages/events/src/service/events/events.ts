@@ -437,7 +437,7 @@ export async function ensureEventIndexed(
  * status-specific `keepAssignmentIfAccepted` / `keepAssignmentIfRejected`
  * flags, falling back to the catch-all `keepAssignment` flag.
  */
-export function resolveKeepAssignment(
+function resolveKeepAssignment(
   input: {
     keepAssignment?: boolean
     keepAssignmentIfAccepted?: boolean
