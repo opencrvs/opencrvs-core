@@ -17,12 +17,16 @@ import { within, userEvent, expect, waitFor, fireEvent } from '@storybook/test'
 import { Outlet } from 'react-router-dom'
 import { http, HttpResponse } from 'msw'
 import {
+  ActionDocument,
+  ActionStatus,
   ActionType,
   generateEventDocument,
   generateWorkqueues,
   getCurrentEventState,
   tennisClubMembershipEvent,
-  never
+  never,
+  UUID,
+  generateActionDocument
 } from '@opencrvs/commons/client'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -279,6 +283,17 @@ export const ContinuingAndGoingBack: Story = {
 }
 
 const generator = testDataGenerator()
+const user = { id: generator.user.id.localRegistrar }
+
+const eventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [
+    { type: ActionType.CREATE, user },
+    { type: ActionType.ASSIGN, user },
+    { type: ActionType.DECLARE, user },
+    { type: ActionType.REGISTER, user }
+  ]
+})
 
 export const RedirectAfterPrint: Story = {
   parameters: {
@@ -292,23 +307,43 @@ export const RedirectAfterPrint: Story = {
     msw: {
       handlers: {
         event: [
+          tRPCMsw.event.actions.assignment.unassign.mutation(() => {
+            Object.assign(
+              eventDocument,
+              generateEventDocument({
+                configuration: tennisClubMembershipEvent,
+                actions: [
+                  { type: ActionType.CREATE, user },
+                  { type: ActionType.ASSIGN, user },
+                  { type: ActionType.DECLARE, user },
+                  { type: ActionType.REGISTER, user },
+                  { type: ActionType.PRINT_CERTIFICATE, user },
+                  { type: ActionType.UNASSIGN, user }
+                ]
+              })
+            )
+            return eventDocument
+          }),
           tRPCMsw.event.actions.printCertificate.request.mutation(() => {
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                { type: ActionType.DECLARE },
-                { type: ActionType.REGISTER },
-                { type: ActionType.PRINT_CERTIFICATE }
-              ]
-            })
+            Object.assign(
+              eventDocument,
+              generateEventDocument({
+                configuration: tennisClubMembershipEvent,
+                actions: [
+                  { type: ActionType.CREATE, user },
+                  { type: ActionType.ASSIGN, user },
+                  { type: ActionType.DECLARE, user },
+                  { type: ActionType.REGISTER, user },
+                  { type: ActionType.PRINT_CERTIFICATE, user }
+                ]
+              })
+            )
+            return eventDocument
           }),
           tRPCMsw.event.search.query(() => {
             return {
               results: [
-                getCurrentEventState(
-                  tennisClubMembershipEventDocument,
-                  tennisClubMembershipEvent
-                )
+                getCurrentEventState(eventDocument, tennisClubMembershipEvent)
               ],
               total: 1
             }
@@ -327,11 +362,11 @@ export const RedirectAfterPrint: Story = {
       }
     },
     offline: {
-      events: [tennisClubMembershipEventDocument],
+      events: [eventDocument],
 
       drafts: [
         generator.event.draft({
-          eventId: tennisClubMembershipEventDocument.id,
+          eventId: eventDocument.id,
           actionType: ActionType.PRINT_CERTIFICATE,
           annotation: {
             [CERT_TEMPLATE_ID]: 'tennis-club-membership-certified-certificate',
@@ -350,7 +385,7 @@ export const RedirectAfterPrint: Story = {
       },
       initialPath: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.buildPath(
         {
-          eventId: tennisClubMembershipEventDocument.id
+          eventId: eventDocument.id
         },
         {
           templateId: 'tennis-club-membership-certificate'
@@ -385,6 +420,10 @@ export const RedirectAfterPrint: Story = {
           await canvas.findByText('Certificate is ready to print')
         },
         { timeout: 7000 } // Generating the PDF takes a long time.
+      )
+
+      expect(canvas.getByTestId('assignedTo-value')).toHaveTextContent(
+        'Not assigned'
       )
     })
   }
