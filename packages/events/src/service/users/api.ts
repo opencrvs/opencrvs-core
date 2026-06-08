@@ -266,17 +266,16 @@ export const ResolvedCreateUserInput = CreateUserInput.extend({
 })
 export type ResolvedCreateUserInput = z.infer<typeof ResolvedCreateUserInput>
 
-async function resolveCreateUserInput(
+function resolveCreateUserInput(
   input: CreateUserInput | CreateUserInputInternal
-): Promise<ResolvedCreateUserInput> {
+): ResolvedCreateUserInput {
   return ResolvedCreateUserInput.parse({
     ...input,
     password:
       (input as CreateUserInputInternal).password ??
       env.DEFAULT_USER_PASSWORD ??
       generateRandomPassword(),
-    status: (input as CreateUserInputInternal).status ?? 'pending',
-    username: input.username
+    status: (input as CreateUserInputInternal).status ?? 'pending'
   })
 }
 
@@ -286,7 +285,7 @@ export async function createUser(
 ) {
   const usernameCandidate = input.username ?? generateUsername(input.name)
   const username = await findAvailableUsername(usernameCandidate)
-  const resolvedUser = await resolveCreateUserInput({ ...input, username })
+  const resolvedUser = resolveCreateUserInput({ ...input, username })
 
   const userPayload = {
     firstname: resolvedUser.name.firstname,
