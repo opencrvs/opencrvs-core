@@ -80,6 +80,15 @@ describe('special characters', () => {
     )
   })
 
+  it('strips html-like names', () => {
+    expect(
+      generateUsername({
+        firstname: '<h1>This is it<b>nam</b>',
+        surname: '<h1>This is it<b>nam</b>'
+      })
+    ).toBe('ii.h1thisisitbnamb')
+  })
+
   it('strips leading and trailing dashes from surname', () => {
     expect(generateUsername({ firstname: 'John', surname: '-Smith-' })).toBe(
       'j.smith'
