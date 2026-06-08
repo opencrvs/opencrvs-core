@@ -74,4 +74,13 @@ describe('special characters', () => {
       'j.smith'
     )
   })
+
+  it('strips leading and trailing spaces', () => {
+    expect(
+      generateUsername({
+        firstname: '  Jo   hn  ',
+        surname: '   -S  mi  th-    '
+      })
+    ).toBe('jh.smith')
+  })
 })
