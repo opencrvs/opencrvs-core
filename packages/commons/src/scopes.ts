@@ -108,7 +108,10 @@ export const SCOPES = {
   CONFIG_UPDATE_ALL: 'config.update:all',
 
   // data seeding
-  USER_DATA_SEEDING: 'user.data-seeding'
+  USER_DATA_SEEDING: 'user.data-seeding',
+
+  // bootstrap: allows countryconfig to register integrations on startup
+  INTEGRATION_CREATE: 'integration.create'
 } as const
 
 // Legacy scopes
@@ -213,6 +216,9 @@ const ConfigScope = z.literal(SCOPES.CONFIG_UPDATE_ALL)
 // Data seeding
 const DataSeedingScope = z.literal(SCOPES.USER_DATA_SEEDING)
 
+// Bootstrap scope for integration registration
+const IntegrationCreateScope = z.literal(SCOPES.INTEGRATION_CREATE)
+
 // Combine all
 const LiteralScopes = z.union([
   LegacyScopes,
@@ -231,7 +237,8 @@ const LiteralScopes = z.union([
   UserScopes,
   ConfigScope,
   DataSeedingScope,
-  InternalOperationsScopes
+  InternalOperationsScopes,
+  IntegrationCreateScope
 ])
 
 // Configurable scopes are for example:
