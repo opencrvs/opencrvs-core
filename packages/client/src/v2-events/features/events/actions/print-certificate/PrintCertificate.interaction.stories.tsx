@@ -8,6 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
+/* eslint-disable max-lines */
+
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
@@ -18,6 +21,7 @@ import { Outlet } from 'react-router-dom'
 import { http, HttpResponse } from 'msw'
 import {
   ActionType,
+  EventConfig,
   generateEventDocument,
   generateWorkqueues,
   getCurrentEventState,
@@ -29,7 +33,10 @@ import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { mockOfflineData } from '@client/tests/mock-offline-data'
+import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
 import { CERT_TEMPLATE_ID } from '../../useCertificateTemplateSelectorFieldConfig'
+import { useEventFormData } from '../../useEventFormData'
+import { useActionAnnotation } from '../../useActionAnnotation'
 import * as PrintCertificate from './index'
 
 const meta: Meta<typeof PrintCertificate.Review> = {
@@ -275,6 +282,195 @@ export const ContinuingAndGoingBack: Story = {
         await canvas.findByRole('button', { name: 'Yes, print certificate' })
       ).toBeInTheDocument()
     })
+  }
+}
+
+/**
+ * Regression test for the print-certificate file-upload bug.
+ *
+ * This event config is consists of a modified print action form, where the SOMEONE_ELSE
+ * collector has a page AFTER `collector` (collector.identity.verify) — so going Next then
+ * Back is genuine in-form navigation that re-mounts the collector page.
+ *
+ * Before the FileInput fix the uploaded affidavit vanished on Back even though
+ * the annotation store still held it; this drives that exact sequence and then
+ * opens the preview. Here, we are going to test the file persists after going back,
+ * and that clicking the link opens the preview as expected.
+ */
+const eventWithVisibleVerifyPage = {
+  ...tennisClubMembershipEvent,
+  actions: tennisClubMembershipEvent.actions.map((action) =>
+    action.type === ActionType.PRINT_CERTIFICATE
+      ? {
+          ...action,
+          printForm: {
+            ...action.printForm,
+            pages: action.printForm.pages.map((page) =>
+              page.id === 'collector.identity.verify'
+                ? (({ conditional, ...rest }) => rest)(page) // drop conditional on a copy to test back navigation doesn't lose uploaded file
+                : page
+            )
+          }
+        }
+      : action
+  )
+} as EventConfig
+
+async function createImageFile(name: string, width: number, height: number) {
+  return new Promise<File>((resolve, reject) => {
+    const c = document.createElement('canvas')
+    c.width = width
+    c.height = height
+    const ctx = c.getContext('2d')
+    if (ctx) {
+      ctx.fillStyle = '#000'
+      ctx.fillRect(0, 0, width, height)
+    }
+    c.toBlob((blob) => {
+      if (blob) {
+        resolve(new File([blob], name, { type: blob.type }))
+      } else {
+        reject(new Error('Could not create blob from canvas'))
+      }
+    }, 'image/jpeg')
+  })
+}
+
+export const UploadedFilePersistsOnBackNavigation: Story = {
+  // The annotation/form Zustand stores and the local draft are module-level
+  // singletons that survive between runs. Without resetting them, a re-run
+  // re-initialises the form from the previous run's data and the selects come
+  // back pre-populated, failing the play steps.
+  beforeEach: () => {
+    useActionAnnotation.getState().clear()
+    useEventFormData.getState().clear()
+    localDraftStore.getState().setDraft(null)
+  },
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    test: {
+      // The optimistic upload fires a background POST /api/upload that has no
+      // handler here; the value is set optimistically regardless.
+      dangerouslyIgnoreUnhandledErrors: true
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath({
+        eventId: tennisClubMembershipEventDocument.id,
+        pageId: 'collector'
+      })
+    },
+    msw: {
+      handlers: {
+        upload: [
+          http.post('/api/upload', () => {
+            return HttpResponse.text('ok')
+          })
+        ],
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [eventWithVisibleVerifyPage]
+          }),
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Fill the certificate template and requester', async () => {
+      await userEvent.click(
+        await canvas.findByTestId('select__certificateTemplateId')
+      )
+      await userEvent.click(
+        await canvas.findByText(
+          'Tennis Club Membership Certificate certified copy'
+        )
+      )
+      await userEvent.click(
+        await canvas.findByTestId('select__collector____requesterId')
+      )
+      await userEvent.click(
+        await canvas.findByText('Print and issue someone else')
+      )
+    })
+
+    await step('Fill the required "someone else" details', async () => {
+      await userEvent.click(
+        await canvas.findByTestId('select__collector____OTHER____idType')
+      )
+      await userEvent.click(await canvas.findByText('No ID'))
+
+      await userEvent.type(
+        await canvas.findByTestId('text__collector____OTHER____firstName'),
+        'Nomen'
+      )
+      await userEvent.type(
+        await canvas.findByTestId('text__collector____OTHER____lastName'),
+        'Est Omen'
+      )
+      await userEvent.type(
+        await canvas.findByTestId(
+          'text__collector____OTHER____relationshipToMember'
+        ),
+        'Best friend'
+      )
+    })
+
+    await step('Upload the signed affidavit', async () => {
+      const input = canvasElement.querySelector(
+        'input[type="file"]'
+      ) as HTMLInputElement
+
+      // accepted types vary per config; clear accept so user-event doesn't drop it
+      input.accept = ''
+      await userEvent.upload(
+        input,
+        await createImageFile('signed-affidavit.jpg', 64, 64)
+      )
+
+      // Uploaded file preview link appears
+      await canvas.findByRole('button', { name: /signed affidavit/i })
+    })
+
+    await step('Continue to the next page', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Continue' })
+      )
+      // We are now on the second page
+      await canvas.findByText('Verify their identity')
+    })
+
+    await step('Go back to the collector page', async () => {
+      await userEvent.click(await canvas.findByRole('button', { name: 'Back' }))
+      await canvas.findByTestId('select__collector____requesterId')
+    })
+
+    await step(
+      'Uploaded affidavit is still present after back-navigation',
+      async () => {
+        // Regression: before the FileInput fix this link was gone.
+        await canvas.findByRole('button', { name: /signed affidavit/i })
+      }
+    )
+
+    await step(
+      'Clicking the upload link renders the image preview',
+      async () => {
+        await userEvent.click(
+          await canvas.findByRole('button', { name: /signed affidavit/i })
+        )
+        await waitFor(async () => {
+          await expect(
+            canvasElement.querySelector('#preview_image_field')
+          ).not.toBeNull()
+        })
+        await userEvent.click(await canvas.findByTestId('preview_close'))
+      }
+    )
   }
 }
 
