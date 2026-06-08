@@ -373,7 +373,7 @@ export function Output({
   const previousFormReflectsCurrentValue =
     hasValue &&
     previousForm !== undefined &&
-    isEqualFieldValue(previousForm[field.id] as FieldValue, value)
+    isEqualFieldValue(previousForm[field.id], value)
 
   if (
     isUndefined(previousValue) &&
