@@ -56,6 +56,15 @@ function FileInput({
   maxImageSize?: FileConfig['configuration']['maxImageSize']
 }) {
   const [file, setFile] = React.useState(value)
+
+  // Keep local state in sync with the value coming from the form store.
+  // On back-navigation the field re-mounts before Formik has re-initialised, so
+  // it first renders with an empty value and only receives the real value on a
+  // later render. Without this sync the uploaded file would never re-appear.
+  React.useEffect(() => {
+    setFile(value)
+  }, [value])
+
   const [modal, openModal] = useImageEditorModal({
     targetSize: maxImageSize?.targetSize
   })
