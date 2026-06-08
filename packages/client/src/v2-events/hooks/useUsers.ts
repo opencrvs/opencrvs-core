@@ -199,6 +199,10 @@ setMutationDefaults(trpcOptionsProxy.user.sendResetPasswordInvite, {
     await queryClient.invalidateQueries({
       queryKey: trpcOptionsProxy.user.get.queryKey(variables)
     })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.search.queryKey()
+    })
   }
 })
 
