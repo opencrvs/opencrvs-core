@@ -63,7 +63,10 @@ import {
   systemSecretRequestSchema,
   resSystemSchema,
   SystemSchema,
-  deleteSystem
+  deleteSystem,
+  createIntegrationHandler,
+  createIntegrationRequestSchema,
+  createIntegrationResponseSchema
 } from '@user-mgnt/features/system/handler'
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
@@ -474,6 +477,24 @@ export const getRoutes = () => {
         },
         description:
           'Reset password via sms for given userid and make the corresponding user pending'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/createIntegration',
+      handler: createIntegrationHandler,
+      options: {
+        tags: ['api'],
+        description: 'Creates or updates an integration system client',
+        auth: {
+          scope: [SCOPES.INTEGRATION_CREATE]
+        },
+        validate: {
+          payload: createIntegrationRequestSchema
+        },
+        response: {
+          schema: createIntegrationResponseSchema
+        }
       }
     },
     {
