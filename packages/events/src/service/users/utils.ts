@@ -10,10 +10,14 @@
  */
 
 import { randomBytes } from 'crypto'
-import { DocumentPath, TokenUserType, User } from '@opencrvs/commons'
+import {
+  DocumentPath,
+  MIN_USERNAME_LENGTH,
+  TokenUserType,
+  User
+} from '@opencrvs/commons'
 import { getUserById } from '@events/storage/postgres/events/users'
 
-const MIN_USERNAME_LENGTH = 5
 function normalizeUsername(str: string): string {
   return str
     .normalize('NFD')
