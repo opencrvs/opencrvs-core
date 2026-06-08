@@ -347,7 +347,8 @@ export function Output({
   previousValue,
   formConfig,
   eventConfig,
-  displayEmptyAsDash = false
+  displayEmptyAsDash = false,
+  disableValueDiff = false
 }: {
   field: FieldConfig
   value?: FieldValue | FieldUpdateValue
@@ -357,6 +358,7 @@ export function Output({
   eventConfig?: EventConfig
   formConfig?: FormConfig
   displayEmptyAsDash?: boolean
+  disableValueDiff?: boolean
 }) {
   // Explicitly check for undefined, so that e.g. number 0 is considered a value,
   // even null is considered as value removed
@@ -405,7 +407,11 @@ export function Output({
   const hasPreviousValue = previousValue !== undefined
 
   // Note, checking for previousValue !== value is not enough, as we have composite fields.
-  if (hasPreviousValue && !isEqualFieldValue(previousValue, value)) {
+  if (
+    hasPreviousValue &&
+    !isEqualFieldValue(previousValue, value) &&
+    !disableValueDiff
+  ) {
     let valueOutput = (
       <ValueOutput config={field} eventConfig={eventConfig} value={value} />
     )

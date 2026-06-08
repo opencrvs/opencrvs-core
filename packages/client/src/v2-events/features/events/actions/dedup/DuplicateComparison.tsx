@@ -208,10 +208,12 @@ export function DuplicateComparison({
             }
             return acc
           }, [])
+          .filter((field) => field.id.includes('child.birthLocation'))
           .map((field) => ({
             label: intl.formatMessage(field.label),
             rightValue: (
               <Output
+                disableValueDiff={true}
                 displayEmptyAsDash={true}
                 eventConfig={eventConfiguration}
                 field={field}
@@ -222,6 +224,7 @@ export function DuplicateComparison({
             ),
             leftValue: (
               <Output
+                disableValueDiff={true}
                 displayEmptyAsDash={true}
                 eventConfig={eventConfiguration}
                 field={field}
