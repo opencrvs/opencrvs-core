@@ -389,6 +389,7 @@ export const eventRouter = router({
     duplicate: router({
       markAsDuplicate: userOnlyProcedure
         .input(MarkAsDuplicateActionInput)
+        .use(middleware.requireAssignment)
         .use(middleware.validateAction)
         .mutation(async (options) => {
           const { user, token } = options.ctx
@@ -420,6 +421,7 @@ export const eventRouter = router({
         }),
       markNotDuplicate: userOnlyProcedure
         .input(MarkNotDuplicateActionInput)
+        .use(middleware.requireAssignment)
         .use(middleware.validateAction)
         .mutation(async (options) => {
           const { user, token } = options.ctx
