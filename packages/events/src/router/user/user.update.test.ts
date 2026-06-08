@@ -10,11 +10,15 @@
  */
 /* eslint-disable max-lines */
 import { TRPCError } from '@trpc/server'
+import { vi } from 'vitest'
+import { http, HttpResponse } from 'msw'
 import { encodeScope, getUUID, TestUserRole } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { updateUserById } from '@events/storage/postgres/events/users'
 import { getClient } from '@events/storage/postgres/events'
 import { seeder, setupHierarchyWithUsers } from '@events/tests/generators'
+import { mswServer } from '@events/tests/msw'
+import { env } from '@events/environment'
 
 const USER_EDIT_SCOPE = encodeScope({ type: 'user.edit' })
 
@@ -299,6 +303,61 @@ test('overwrites data when an explicit data object is supplied on update', async
     .executeTakeFirstOrThrow()
 
   expect(dbUser.data).toEqual(newData)
+})
+
+test('Changes username when the name changes and notifies about it', async () => {
+  const { user, eventsDb } = await setupTestCase()
+  const client = createTestClient(user, [
+    USER_EDIT_SCOPE,
+    encodeScope({ type: 'user.search' })
+  ])
+
+  const mock = vi.fn()
+  mswServer.use(
+    http.post(
+      `${env.COUNTRY_CONFIG_URL}/triggers/user/user-updated`,
+      async ({ request }) => {
+        const req = await request.json()
+        mock(req)
+
+        return HttpResponse.json({})
+      }
+    )
+  )
+
+  const userCredentialsBefore = await eventsDb
+    .selectFrom('userCredentials')
+    .selectAll()
+    .where('userId', '=', user.id)
+    .executeTakeFirstOrThrow()
+
+  const updateInput = generateUpdateInput(user)
+  await client.user.update({
+    ...updateInput,
+    name: { firstname: 'Jane Doevette', surname: 'Blam-Smith' }
+  })
+
+  const userCredentialsAfter = await eventsDb
+    .selectFrom('userCredentials')
+    .selectAll()
+    .where('userId', '=', user.id)
+    .executeTakeFirstOrThrow()
+
+  expect(userCredentialsBefore.username).not.toBe(userCredentialsAfter.username)
+
+  expect(userCredentialsAfter.username).toBe('jd.blam-smith')
+
+  expect(mock).toHaveBeenCalledWith({
+    newUsername: 'jd.blam-smith',
+    oldUsername: userCredentialsBefore.username,
+    recipient: {
+      email: updateInput.email,
+      name: {
+        firstname: 'Jane Doevette',
+        surname: 'Blam-Smith'
+      }
+    }
+  })
 })
 
 test('Persists custom data field when updated', async () => {
