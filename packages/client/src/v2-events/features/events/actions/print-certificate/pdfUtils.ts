@@ -12,12 +12,7 @@
 /* eslint-disable no-console */
 import { IntlShape, createIntl, createIntlCache } from 'react-intl'
 import Handlebars from 'handlebars'
-import htmlToPdfmake from 'html-to-pdfmake'
-import type {
-  Content,
-  TDocumentDefinitions,
-  TFontFamilyTypes
-} from 'pdfmake/interfaces'
+import type { TDocumentDefinitions, TFontFamilyTypes } from 'pdfmake/interfaces'
 import pdfMake from 'pdfmake/build/pdfmake'
 import { isEqual, isNil } from 'lodash'
 import {
@@ -672,56 +667,156 @@ src: url("${url}") format("truetype");
   return serializer.serializeToString(svg)
 }
 
-async function downloadAndEmbedImages(svgString: string): Promise<string> {
+async function fetchAsBase64(url: string): Promise<string | null> {
+  try {
+    const response = await fetch(url)
+    if (!response.ok) {
+      return null
+    }
+    const blob = await response.blob()
+    return await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = reject
+      reader.readAsDataURL(blob)
+    })
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Inlines all external resources referenced in the SVG as base64 data URIs,
+ * handling both resource types in a single DOM pass:
+ *  - @font-face url("…") inside <style> elements
+ *  - href / xlink:href on <image> elements
+ *
+ * Font and image fetches run in parallel. This is required before drawing the
+ * SVG to a canvas: when loaded via a Blob URL the browser sandboxes the SVG
+ * and blocks all external fetches, causing missing fonts and broken images.
+ */
+async function embedExternalResourcesInSvg(svgString: string): Promise<string> {
   const parser = new DOMParser()
   const doc = parser.parseFromString(svgString, 'image/svg+xml')
   const svg = doc.documentElement
-  const imageElements = svg.getElementsByTagName('image')
 
-  const imagePromises: Promise<void>[] = Array.from(imageElements).map(
-    async (imageElement) => {
+  const styleTasks = Array.from(svg.getElementsByTagName('style')).map(
+    async (styleEl) => {
+      const original = styleEl.textContent ?? ''
+      const urlRegex = /url\("([^"]+)"\)/g
+      const matches = [...original.matchAll(urlRegex)].filter(
+        ([, url]) => !url.startsWith('data:')
+      )
+
+      // Fetch all font URLs in parallel, then apply replacements sequentially
+      // to avoid concurrent writes to the same CSS string.
+      const replacements = (
+        await Promise.all(
+          matches.map(async ([fullMatch, url]) => {
+            const base64 = await fetchAsBase64(url)
+            if (!base64) {
+              console.warn(`Failed to embed font: ${url}`)
+              return null
+            }
+            return { fullMatch, base64 }
+          })
+        )
+      ).filter((r): r is { fullMatch: string; base64: string } => r !== null)
+
+      styleEl.textContent = replacements.reduce(
+        (css, { fullMatch, base64 }) =>
+          css.replaceAll(fullMatch, `url("${base64}")`),
+        original
+      )
+    }
+  )
+
+  const imageTasks = Array.from(svg.getElementsByTagName('image')).map(
+    async (imageEl) => {
       const href =
-        imageElement.getAttribute('href') ||
-        imageElement.getAttribute('xlink:href')
+        imageEl.getAttribute('href') || imageEl.getAttribute('xlink:href')
+      if (!href || !/^(https?:\/\/|\/)/.test(href)) {
+        return
+      }
 
-      if (
-        href &&
-        (href.startsWith('http://') ||
-          href.startsWith('https://') ||
-          href.startsWith('/'))
-      ) {
-        const response = await fetch(href)
-        const blob = await response.blob()
-
-        if (!response.ok) {
-          console.error('Failed to fetch image:', href)
-          console.error(
-            'Ensure the URL is correct and image is requested before cache is cleaned.'
-          )
-        }
-
-        const base64 = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader()
-          reader.onload = () => resolve(reader.result as string)
-          reader.onerror = reject
-          reader.readAsDataURL(blob)
-        })
-
-        if (imageElement.hasAttribute('href')) {
-          imageElement.setAttribute('href', base64)
-        }
-
-        if (imageElement.hasAttribute('xlink:href')) {
-          imageElement.setAttribute('xlink:href', base64)
-        }
+      const base64 = await fetchAsBase64(href)
+      if (!base64) {
+        console.error('Failed to fetch image:', href)
+        console.error(
+          'Ensure the URL is correct and image is requested before cache is cleaned.'
+        )
+        return
+      }
+      if (imageEl.hasAttribute('href')) {
+        imageEl.setAttribute('href', base64)
+      }
+      if (imageEl.hasAttribute('xlink:href')) {
+        imageEl.setAttribute('xlink:href', base64)
       }
     }
   )
 
-  await Promise.all(imagePromises)
+  await Promise.all([...styleTasks, ...imageTasks])
 
-  const serializer = new XMLSerializer()
-  return serializer.serializeToString(svg)
+  return new XMLSerializer().serializeToString(svg)
+}
+
+/**
+ * Renders a fully self-contained SVG string (all fonts and images embedded as
+ * base64) onto an off-screen canvas using the browser's own SVG renderer and
+ * returns the result as a PNG data URL.
+ *
+ * Using the browser renderer here is what makes the PDF visually identical to
+ * the on-screen preview: font shaping, glyph metrics, and clip-path behaviour
+ * are all handled by the same engine.
+ *
+ * Canvas pixel dimensions are derived from the SVG's declared size (in PDF
+ * points, 72 pts/inch) scaled up to TARGET_PRINT_DPI (300 DPI), so the
+ * formula SCALE = 300/72 ≈ 4.17 is a fixed unit-conversion constant, not a
+ * magic number — changing the SVG page size has no effect on print quality.
+ */
+async function renderSvgToDataUrl(
+  svgString: string,
+  width: number,
+  height: number
+): Promise<string> {
+  // SVG units map 1:1 to PDF points (72 pts/inch).  To hit standard print
+  // quality (300 DPI) each point must produce 300/72 ≈ 4.17 canvas pixels.
+  const PDF_POINTS_PER_INCH = 72
+  const TARGET_PRINT_DPI = 300
+  const SCALE = TARGET_PRINT_DPI / PDF_POINTS_PER_INCH
+
+  const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' })
+  const blobUrl = URL.createObjectURL(blob)
+
+  try {
+    return await new Promise<string>((resolve, reject) => {
+      const img = new Image()
+      img.onload = async () => {
+        // Await any pending font decoding before drawing. @font-face with
+        // base64 data URIs decodes synchronously in all major browsers, but
+        // this guard ensures fonts are settled before drawImage regardless.
+        await document.fonts.ready
+
+        const canvas = document.createElement('canvas')
+        canvas.width = Math.round(width * SCALE)
+        canvas.height = Math.round(height * SCALE)
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          reject(new Error('Failed to get 2D canvas context'))
+          return
+        }
+        ctx.fillStyle = '#ffffff'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+        resolve(canvas.toDataURL('image/png'))
+      }
+      img.onerror = () => reject(new Error('Failed to render SVG to canvas'))
+      img.src = blobUrl
+    })
+  } finally {
+    URL.revokeObjectURL(blobUrl)
+  }
 }
 
 export async function svgToPdfTemplate(
@@ -743,16 +838,13 @@ export async function svgToPdfTemplate(
       ...certificateFonts
     }
   }
-  /*
-   * Download and inline all image files before creating a PDF.
-   * If this is not done, the PDF will not render images correctly.
-   * Images should always already be cached in the browser, so this also works offline
-   */
-  const svgWithInlineImages = await downloadAndEmbedImages(svg)
+
+  // Inline all external resources (fonts + images) as base64 in one DOM pass.
+  const svgFullyEmbedded = await embedExternalResourcesInSvg(svg)
 
   const parser = new DOMParser()
   const svgElement = parser.parseFromString(
-    svgWithInlineImages,
+    svgFullyEmbedded,
     'image/svg+xml'
   ).documentElement
 
@@ -760,60 +852,47 @@ export async function svgToPdfTemplate(
   const widthValue = svgElement.getAttribute('width')
   const heightValue = svgElement.getAttribute('height')
 
-  if (widthValue && heightValue) {
-    const width = Number.parseInt(widthValue)
-    const height = $sections.length
-      ? Number.parseInt(heightValue) / $sections.length
-      : Number.parseInt(heightValue)
-    pdfTemplate.definition.pageSize = {
-      width,
-      height
-    }
-    if (width > height) {
-      pdfTemplate.definition.pageOrientation = 'landscape'
-    }
-  }
+  const pageWidth = widthValue ? Number.parseInt(widthValue) : 583
+  const fullHeight = heightValue ? Number.parseInt(heightValue) : 842
+  const pageHeight = $sections.length
+    ? fullHeight / $sections.length
+    : fullHeight
 
-  const foreignObjects = svgElement.getElementsByTagName('foreignObject')
-  const absolutelyPositionedHTMLs: Content[] = []
-  for (const foreignObject of foreignObjects) {
-    const width = Number.parseInt(foreignObject.getAttribute('width') ?? '0')
-    const x = Number.parseInt(foreignObject.getAttribute('x') ?? '0')
-    const y = Number.parseInt(foreignObject.getAttribute('y') ?? '0')
-    const htmlContent = foreignObject.innerHTML
-    const pdfmakeContent = htmlToPdfmake(htmlContent, {
-      ignoreStyles: ['font-family']
-    })
-    absolutelyPositionedHTMLs.push({
-      columns: [
-        {
-          width,
-          stack: pdfmakeContent
-        }
-      ],
-      absolutePosition: { x, y }
-    } as Content)
+  pdfTemplate.definition.pageSize = { width: pageWidth, height: pageHeight }
+  if (pageWidth > pageHeight) {
+    pdfTemplate.definition.pageOrientation = 'landscape'
   }
 
   if ($sections.length > 0) {
-    pdfTemplate.definition.content = [
-      ...Array.from($sections).map(($section) => {
+    const pageDataUrls = await Promise.all(
+      Array.from($sections).map(($section) => {
         const $svgWrapper = document.createElement('svg')
         ;[...svgElement.attributes].forEach((attr) => {
           $svgWrapper.setAttribute(attr.name, attr.value)
         })
+        $svgWrapper.setAttribute('height', String(pageHeight))
         $section.removeAttribute('transform')
         $svgWrapper.appendChild($section.cloneNode(true))
-        return { svg: $svgWrapper.outerHTML }
-      }),
-      ...absolutelyPositionedHTMLs
-    ]
+        return renderSvgToDataUrl($svgWrapper.outerHTML, pageWidth, pageHeight)
+      })
+    )
+    pdfTemplate.definition.content = pageDataUrls.map((dataUrl) => ({
+      image: dataUrl,
+      width: pageWidth,
+      height: pageHeight
+    }))
   } else {
+    const dataUrl = await renderSvgToDataUrl(
+      svgFullyEmbedded,
+      pageWidth,
+      pageHeight
+    )
     pdfTemplate.definition.content = [
       {
-        svg: svgWithInlineImages
-      },
-      ...absolutelyPositionedHTMLs
+        image: dataUrl,
+        width: pageWidth,
+        height: pageHeight
+      }
     ]
   }
 
