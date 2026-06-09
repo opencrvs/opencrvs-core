@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -26,7 +27,10 @@ import {
   MimeType,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormFieldGenerator,
+  type FormFieldGeneratorHandle
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { TestImage } from '@client/v2-events/features/events/fixtures'
 import { shouldBypassLock } from '@client/utils/lockBypass'
@@ -99,6 +103,8 @@ async function drawSignature(canvas: HTMLCanvasElement) {
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: '400px';
 `
+
+const noDuplicateErrorFormRef = React.createRef<FormFieldGeneratorHandle>()
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [
     httpLink({
@@ -532,6 +538,85 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
       })
     }
   }
+
+/**
+ * Regression test for: duplicate "Required" error appearing after deleting a signature.
+ *
+ * Root cause: SignatureFieldInput had its own local <InputError> that rendered
+ * "Required" when local `touched` was true (set by the delete button's onClick)
+ * and the field was empty. At the same time, InputField was already rendering
+ * "Required" from Formik's meta.error + meta.touched — producing two identical
+ * error messages simultaneously.
+ *
+ * Fix: removed all local "Required" rendering from SignatureFieldInput. InputField
+ * is now the sole error renderer for validation errors.
+ */
+export const NoDuplicateErrorAfterDelete: StoryObj<
+  typeof StyledFormFieldGenerator
+> = {
+  name: 'No duplicate "Required" error after deleting signature',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: {
+        path: '/event/:eventId',
+        element: (
+          <StyledFormFieldGenerator
+            ref={noDuplicateErrorFormRef}
+            fields={[
+              {
+                id: 'storybook.signature',
+                type: FieldType.SIGNATURE,
+                required: true,
+                configuration: {
+                  maxFileSize: 1 * 1024 * 1024,
+                  acceptedFileTypes: [MimeType.enum['image/png']]
+                },
+                signaturePromptLabel: generateTranslationConfig('Signature'),
+                label: generateTranslationConfig('Upload signature')
+              }
+            ]}
+            formTouched={{ 'storybook.signature': true }}
+            formValues={{
+              'storybook.signature': {
+                path: 'signature-test.png' as DocumentPath,
+                originalFilename: 'signature-test.png',
+                type: MimeType.enum['image/png']
+              }
+            }}
+            id="my-form"
+            validatorContext={getTestValidatorContext()}
+          />
+        )
+      },
+      initialPath: '/event/123-abcd-213'
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Signature preview is visible', async () => {
+      await canvas.findByAltText('Signature')
+    })
+
+    await step('Delete the signature', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Delete' })
+      )
+    })
+
+    await step('Trigger validation via submit', () => {
+      noDuplicateErrorFormRef.current?.submit()
+    })
+
+    await step('Exactly one Required error — no duplicate', async () => {
+      await waitFor(async () =>
+        expect(canvas.getAllByText('Required')).toHaveLength(1)
+      )
+    })
+  }
+}
 
 export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
   name: 'Certificate Variables',
