@@ -250,6 +250,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
+  // We can't delete the local event immediately
+  // because we're still on the certificate review page for a short time.
+  // It will be deleted when unassigned.
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.PRINT_CERTIFICATE }
 })
