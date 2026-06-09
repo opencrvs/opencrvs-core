@@ -34,6 +34,7 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { mockOfflineData } from '@client/tests/mock-offline-data'
 import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
+import { createImageFile } from '@client/tests/image-file'
 import { CERT_TEMPLATE_ID } from '../../useCertificateTemplateSelectorFieldConfig'
 import { useEventFormData } from '../../useEventFormData'
 import { useActionAnnotation } from '../../useActionAnnotation'
@@ -305,36 +306,18 @@ const eventWithVisibleVerifyPage = {
           ...action,
           printForm: {
             ...action.printForm,
-            pages: action.printForm.pages.map((page) =>
-              page.id === 'collector.identity.verify'
-                ? (({ conditional, ...rest }) => rest)(page) // drop conditional on a copy to test back navigation doesn't lose uploaded file
-                : page
-            )
+            pages: action.printForm.pages.map((page) => {
+              if (page.id === 'collector.identity.verify') {
+                const { conditional, ...rest } = page
+                return rest
+              }
+              return page
+            })
           }
         }
       : action
   )
 } as EventConfig
-
-async function createImageFile(name: string, width: number, height: number) {
-  return new Promise<File>((resolve, reject) => {
-    const c = document.createElement('canvas')
-    c.width = width
-    c.height = height
-    const ctx = c.getContext('2d')
-    if (ctx) {
-      ctx.fillStyle = '#000'
-      ctx.fillRect(0, 0, width, height)
-    }
-    c.toBlob((blob) => {
-      if (blob) {
-        resolve(new File([blob], name, { type: blob.type }))
-      } else {
-        reject(new Error('Could not create blob from canvas'))
-      }
-    }, 'image/jpeg')
-  })
-}
 
 export const UploadedFilePersistsOnBackNavigation: Story = {
   // The annotation/form Zustand stores and the local draft are module-level
@@ -353,6 +336,9 @@ export const UploadedFilePersistsOnBackNavigation: Story = {
       // handler here; the value is set optimistically regardless.
       dangerouslyIgnoreUnhandledErrors: true
     },
+    offline: {
+      configs: [eventWithVisibleVerifyPage]
+    },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath({
@@ -368,9 +354,6 @@ export const UploadedFilePersistsOnBackNavigation: Story = {
           })
         ],
         events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [eventWithVisibleVerifyPage]
-          }),
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
           })
