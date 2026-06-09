@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import * as React from 'react'
 import styled from 'styled-components'
@@ -23,7 +23,7 @@ import {
   MimeType
 } from '@opencrvs/commons/client'
 import { messages } from '@client/i18n/messages/views/review'
-import { buttonMessages, validationMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { cacheFile, toFileUrl } from '@client/v2-events/cache'
 import { setLockBypass } from '@client/utils/lockBypass'
@@ -81,7 +81,11 @@ function SignatureFieldInput({
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [signature, setSignature] = useState<FileFieldValue | undefined>(value)
-  const [touched, setTouched] = useState(false)
+  // Formik's enableReinitialize updates `value` asynchronously after mount,
+  // so useState(value) alone misses the first update. Sync explicitly here.
+  useEffect(() => {
+    setSignature(value)
+  }, [value])
 
   const { uploadFile } = useFileUpload(filePath, name, {
     onSuccess: ({ path, originalFilename, type }) => {
@@ -113,20 +117,6 @@ function SignatureFieldInput({
     maxFileSize
   })
 
-  const errorMessage = React.useMemo(() => {
-    if (onUploadError) {
-      return onUploadError
-    }
-
-    if (!signature) {
-      return touched && required
-        ? intl.formatMessage(validationMessages.required)
-        : undefined
-    }
-
-    return undefined
-  }, [signature, touched, required, onUploadError, intl])
-
   return (
     <>
       {!signature && (
@@ -138,8 +128,6 @@ function SignatureFieldInput({
               type="secondary"
               onClick={() => {
                 setIsModalOpen(true)
-
-                setTouched(true)
               }}
             >
               <Icon name="Pen" />
@@ -165,15 +153,14 @@ function SignatureFieldInput({
           onClick={() => {
             onChange(null)
             setSignature(undefined)
-            setTouched(true)
           }}
         >
           {intl.formatMessage(messages.signatureDelete)}
         </Button>
       )}
 
-      {errorMessage && (
-        <InputError id={`${name}_error`}>{errorMessage}</InputError>
+      {onUploadError && (
+        <InputError id={`${name}_error`}>{onUploadError}</InputError>
       )}
       {isModalOpen && (
         <SignatureCanvasModal

@@ -203,6 +203,12 @@ export const TEST_USER_DEFAULT_SCOPES = [
     options: {
       event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
     }
+  }),
+  encodeScope({
+    type: 'record.review-duplicates',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
   })
 ]
 
