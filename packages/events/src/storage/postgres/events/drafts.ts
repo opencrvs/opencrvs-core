@@ -124,8 +124,3 @@ export async function deleteDraftsByUserIdInTrx(
     .where('createdBy', '=', userId)
     .execute()
 }
-
-export async function deleteDraftsByUserId(userId: string) {
-  const db = getClient()
-  return deleteDraftsByUserIdInTrx(db, userId)
-}
