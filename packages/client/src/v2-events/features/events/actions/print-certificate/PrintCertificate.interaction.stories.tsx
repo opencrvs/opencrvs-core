@@ -35,6 +35,7 @@ import { testDataGenerator } from '@client/tests/test-data-generators'
 import { mockOfflineData } from '@client/tests/mock-offline-data'
 import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
 import { createImageFile } from '@client/tests/image-file'
+import { setNavigatorOnline } from '@client/tests/storybook-utils'
 import { CERT_TEMPLATE_ID } from '../../useCertificateTemplateSelectorFieldConfig'
 import { useEventFormData } from '../../useEventFormData'
 import { useActionAnnotation } from '../../useActionAnnotation'
@@ -529,13 +530,7 @@ export const PrintButtonDisabledWhenGoingOffline: Story = {
     })
 
     await step('Go offline — print button becomes disabled', async () => {
-      // useOnlineStatus reads navigator.onLine on the event, so the value must
-      // be stubbed before dispatching — a bare event alone keeps it online.
-      Object.defineProperty(window.navigator, 'onLine', {
-        configurable: true,
-        get: () => false
-      })
-      window.dispatchEvent(new Event('offline'))
+      setNavigatorOnline(false)
 
       await waitFor(async () => {
         await expect(canvas.getByTestId('confirm-print')).toBeDisabled()
@@ -544,11 +539,7 @@ export const PrintButtonDisabledWhenGoingOffline: Story = {
     })
 
     await step('Go online — print button becomes enabled', async () => {
-      Object.defineProperty(window.navigator, 'onLine', {
-        configurable: true,
-        get: () => true
-      })
-      window.dispatchEvent(new Event('online'))
+      setNavigatorOnline(true)
 
       await waitFor(async () => {
         await expect(canvas.getByTestId('confirm-print')).toBeEnabled()

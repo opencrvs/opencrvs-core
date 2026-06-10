@@ -18,6 +18,7 @@ import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { useIntl } from 'react-intl'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { useSelector } from 'react-redux'
+import { useOnlineStatus } from '@client/utils'
 import { isAValidEmailAddressFormat } from '@client/utils/validate'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { errorMessages } from '@client/i18n/messages/errors'
@@ -41,6 +42,7 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
     setShowDuplicateEmailErrorNotification
   ] = React.useState(false)
   const userDetails = useSelector(getUserDetails)
+  const isOnline = useOnlineStatus()
   const { sendVerifyCode } = useUsers()
 
   const onChangeEmailAddress = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,7 +109,12 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
           onClick={() => {
             continueButtonHandler(emailAddress)
           }}
-          disabled={!Boolean(emailAddress.length) || isInvalidEmailAddress}
+          disabled={
+            !isOnline ||
+            sendVerifyCode.isPending ||
+            !Boolean(emailAddress.length) ||
+            isInvalidEmailAddress
+          }
         >
           {intl.formatMessage(buttonMessages.continueButton)}
         </PrimaryButton>
