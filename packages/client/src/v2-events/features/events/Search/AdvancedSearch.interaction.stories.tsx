@@ -604,6 +604,22 @@ export const JurisdictionScope_Location: Story = {
   }
 }
 
+const locationsUnderAdministration = [
+  'Ibombo District Office',
+  'Chamakubi Health Post',
+  'Ibombo Rural Health Centre',
+  'Chikobo Rural Health Centre',
+  'Chilochabalenje Health Post',
+  'Chipeso Rural Health Centre',
+  'Chisamba Rural Health Centre',
+  'Chitanda Rural Health Centre',
+  'Golden Valley Rural Health Centre',
+  'Ipongo Rural Health Centre',
+  'Itumbwe Health Post',
+  'Kabangalala Rural Health Centre',
+  'Klow Village Office'
+]
+
 /**
  * record.search[registeredIn=administrativeArea] — dropdown restricted to
  * offices within the user's administrative area (multiple offices visible).
@@ -626,21 +642,36 @@ export const JurisdictionScope_AdministrativeArea: Story = {
         )
         const options = within(listbox).queryAllByRole('listitem')
 
-        await expect(options).toHaveLength(2)
-        await expect(options[0]).toHaveTextContent('Ibombo District Office')
-        await expect(options[1]).toHaveTextContent('Klow Village Office')
+        await expect(options.length).toEqual(locationsUnderAdministration.length)
+        locationsUnderAdministration.forEach(async (office) => {
+          await expect(
+            options.some((o) => o.textContent?.includes(office))
+          ).toBe(true)
+        })
       }
     )
   }
 }
 
-const allOffices = [
+const allLocations = [
   'Central Provincial Office',
+  'Central Health Post',
   'Ibombo District Office',
   'Isamba District Office',
   'Isango District Office',
   'Sulaka Provincial Office',
   'Ilanga District Office',
+  'Chamakubi Health Post',
+  'Ibombo Rural Health Centre',
+  'Chikobo Rural Health Centre',
+  'Chilochabalenje Health Post',
+  'Chipeso Rural Health Centre',
+  'Chisamba Rural Health Centre',
+  'Chitanda Rural Health Centre',
+  'Golden Valley Rural Health Centre',
+  'Ipongo Rural Health Centre',
+  'Itumbwe Health Post',
+  'Kabangalala Rural Health Centre',
   'Klow Village Office'
 ]
 
@@ -666,8 +697,8 @@ export const JurisdictionScope_All: Story = {
         )
         const options = within(listbox).queryAllByRole('listitem')
 
-        await expect(options.length).toEqual(allOffices.length)
-        allOffices.forEach(async (office) => {
+        await expect(options.length).toEqual(allLocations.length)
+        allLocations.forEach(async (office) => {
           await expect(
             options.some((o) => o.textContent?.includes(office))
           ).toBe(true)
@@ -699,8 +730,8 @@ export const JurisdictionScope_AllBeatsLocation: Story = {
         )
         const options = within(listbox).queryAllByRole('listitem')
 
-        await expect(options.length).toEqual(allOffices.length)
-        allOffices.forEach(async (office) => {
+        await expect(options.length).toEqual(allLocations.length)
+        allLocations.forEach(async (office) => {
           await expect(
             options.some((o) => o.textContent?.includes(office))
           ).toBe(true)
@@ -841,9 +872,12 @@ export const JurisdictionScope_MultipleScopes_MostRelaxedWins: Story = {
         )
         const options = within(listbox).queryAllByRole('listitem')
 
-        await expect(options).toHaveLength(2)
-        await expect(options[0]).toHaveTextContent('Ibombo District Office')
-        await expect(options[1]).toHaveTextContent('Klow Village Office')
+        await expect(options.length).toEqual(locationsUnderAdministration.length)
+        locationsUnderAdministration.forEach(async (office) => {
+          await expect(
+            options.some((o) => o.textContent?.includes(office))
+          ).toBe(true)
+        })
       }
     )
   }

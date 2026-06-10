@@ -13,7 +13,7 @@
 {{- end }}
 {{- define "elasticsearch-reindex.initContainerSpec" -}}
 - name: copy-assets
-  image: "{{ .Values.countryconfig.image.name }}:{{ .Values.countryconfig.image.tag }}-assets"
+  image: {{ include "opencrvs.image" (dict "root" . "service" .Values.countryconfig) }}-assets
   command:
     - sh
     - -c

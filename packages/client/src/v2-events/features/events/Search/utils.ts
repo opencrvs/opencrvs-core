@@ -78,7 +78,6 @@ const defaultSearchFieldGenerator: Record<
       id: 'advancedSearch.registeredAtLocation.helperText'
     },
     configuration: {
-      locationTypes: ['ADMIN_STRUCTURE', 'CRVS_OFFICE'],
       allowedLocations: user.jurisdiction(
         user.scope('record.search').attribute('registeredIn')
       )
