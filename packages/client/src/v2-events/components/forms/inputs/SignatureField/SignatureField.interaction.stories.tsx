@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+ 
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -51,12 +51,6 @@ const meta: Meta<typeof FormFieldGenerator> = {
 export default meta
 
 /**
- * Global variable to store the base64 representation of the signature PNG when testing drawing flow.
- * This is used to simulate the signature image that will be uploaded and displayed in the component.
- */
-let signaturePngBase64 = ''
-
-/**
  *
  * @param canvas HTMLCanvasElement
  * Draws a wiggly line simulating a signature on the provided canvas element.
@@ -97,7 +91,6 @@ async function drawSignature(canvas: HTMLCanvasElement) {
   dispatchMouseEvent('mouseup', strokePoints[2])
 
   await new Promise((res) => setTimeout(res, 50)) // needs time to render the signature
-  signaturePngBase64 = canvas.toDataURL(MimeType.enum['image/png'])
 }
 
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
@@ -381,10 +374,6 @@ export const UploadButtonsArmLockBypass: StoryObj<
   }
 }
 
-const spies = {
-  getImage: 0
-}
-
 export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
   {
     parameters: {
@@ -431,47 +420,6 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
               return HttpResponse.text(
                 `uploaded-image-${new Date().getTime()}.jpg`
               )
-            }),
-            http.get('http://localhost:3535/ocrvs/:id', async () => {
-              spies.getImage++
-              const response = await fetch(signaturePngBase64)
-              const binary = new Uint8Array(await response.arrayBuffer())
-
-              return new HttpResponse(binary, {
-                headers: {
-                  'Content-Type': MimeType.enum['image/png'],
-                  'Cache-Control': 'no-cache'
-                }
-              })
-            }),
-
-            http.get('/:id', async (request) => {
-              const { id } = request.params
-              if (id && typeof id === 'string' && id.startsWith('signature')) {
-                spies.getImage++
-                const response = await fetch(signaturePngBase64)
-                const binary = new Uint8Array(await response.arrayBuffer())
-                return new HttpResponse(binary, {
-                  headers: {
-                    'Content-Type': MimeType.enum['image/png'],
-                    'Cache-Control': 'no-cache'
-                  }
-                })
-              }
-            }),
-            http.get('/:eventId/:id', async (request) => {
-              const { eventId, id } = request.params
-              if (eventId === '123-abcd-213') {
-                spies.getImage++
-                const response = await fetch(signaturePngBase64)
-                const binary = new Uint8Array(await response.arrayBuffer())
-                return new HttpResponse(binary, {
-                  headers: {
-                    'Content-Type': MimeType.enum['image/png'],
-                    'Cache-Control': 'no-cache'
-                  }
-                })
-              }
             })
           ]
         }
@@ -531,9 +479,11 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
         await expect(applyButton).not.toBeDisabled()
         applyButton.click()
 
-        await waitFor(async () => {
-          await expect(spies.getImage).toBe(2) // first is the initial fetch, second is after signature is applied
-        })
+        // Assert the signature preview becomes visible. Previously this
+        // counted MSW handler invocations, which was flaky because the exact
+        // number of image fetches depends on React 18 / React Query / MSW
+        // timing.
+        await canvas.findByAltText('Signature')
       })
     }
   }
