@@ -63,8 +63,8 @@ describe('special characters', () => {
   })
 
   it('preserves dots in surname', () => {
-    expect(generateUsername({ firstname: 'St.', surname: 'James' })).toBe(
-      's.james'
+    expect(generateUsername({ firstname: 'St.', surname: 'St.James' })).toBe(
+      's.st.james'
     )
   })
 
@@ -83,10 +83,10 @@ describe('special characters', () => {
   it('strips html-like names', () => {
     expect(
       generateUsername({
-        firstname: '<h1>This is it<b>nam</b>',
-        surname: '<h1>This is it<b>nam</b>'
+        firstname: '<h1>This is it<b>nam</b></h1>',
+        surname: '<h1>This is it<b>nam</b></h1>'
       })
-    ).toBe('ii.h1thisisitbnamb')
+    ).toBe('ii.h1thisisitbnambh1')
   })
 
   it('strips leading and trailing dashes from surname', () => {
