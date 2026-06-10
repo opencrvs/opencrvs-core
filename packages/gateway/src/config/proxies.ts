@@ -105,5 +105,120 @@ export const rateLimitedAuthProxy = {
         parse: false
       }
     }
+  },
+  verifyCode: {
+    method: 'POST',
+    path: '/auth/verifyCode',
+    handler: rateLimitedRoute(
+      // Key on the nonce so OTP brute-force is capped per login attempt.
+      { requestsPerMinute: 10, pathForKey: 'nonce' },
+      (_, h) =>
+        h.proxy({
+          uri: AUTH_URL + '/verifyCode'
+        })
+    ),
+    options: {
+      auth: false,
+      payload: {
+        output: 'data',
+        parse: false
+      }
+    }
+  },
+  resendAuthenticationCode: {
+    method: 'POST',
+    path: '/auth/resendAuthenticationCode',
+    handler: rateLimitedRoute(
+      // Key on the nonce to stop OTP message flooding (DoS) per login attempt.
+      { requestsPerMinute: 10, pathForKey: 'nonce' },
+      (_, h) =>
+        h.proxy({
+          uri: AUTH_URL + '/resendAuthenticationCode'
+        })
+    ),
+    options: {
+      auth: false,
+      payload: {
+        output: 'data',
+        parse: false
+      }
+    }
+  },
+  // Password/username retrieval flow. Every step keys on the nonce minted by
+  // verifyUser, so brute-force and SMS flooding are capped per retrieval attempt.
+  verifyNumber: {
+    method: 'POST',
+    path: '/auth/verifyNumber',
+    handler: rateLimitedRoute(
+      // OTP brute-force vector — the retrieval-flow twin of verifyCode.
+      { requestsPerMinute: 10, pathForKey: 'nonce' },
+      (_, h) =>
+        h.proxy({
+          uri: AUTH_URL + '/verifyNumber'
+        })
+    ),
+    options: {
+      auth: false,
+      payload: {
+        output: 'data',
+        parse: false
+      }
+    }
+  },
+  verifySecurityAnswer: {
+    method: 'POST',
+    path: '/auth/verifySecurityAnswer',
+    handler: rateLimitedRoute(
+      // Security-answer brute-force vector.
+      { requestsPerMinute: 10, pathForKey: 'nonce' },
+      (_, h) =>
+        h.proxy({
+          uri: AUTH_URL + '/verifySecurityAnswer'
+        })
+    ),
+    options: {
+      auth: false,
+      payload: {
+        output: 'data',
+        parse: false
+      }
+    }
+  },
+  sendUserName: {
+    method: 'POST',
+    path: '/auth/sendUserName',
+    handler: rateLimitedRoute(
+      // Sends an SMS per call — cap to prevent message flooding (DoS).
+      { requestsPerMinute: 10, pathForKey: 'nonce' },
+      (_, h) =>
+        h.proxy({
+          uri: AUTH_URL + '/sendUserName'
+        })
+    ),
+    options: {
+      auth: false,
+      payload: {
+        output: 'data',
+        parse: false
+      }
+    }
+  },
+  changePassword: {
+    method: 'POST',
+    path: '/auth/changePassword',
+    handler: rateLimitedRoute(
+      { requestsPerMinute: 10, pathForKey: 'nonce' },
+      (_, h) =>
+        h.proxy({
+          uri: AUTH_URL + '/changePassword'
+        })
+    ),
+    options: {
+      auth: false,
+      payload: {
+        output: 'data',
+        parse: false
+      }
+    }
   }
 } satisfies Record<string, ServerRoute>
