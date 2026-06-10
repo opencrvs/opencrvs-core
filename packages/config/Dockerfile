@@ -9,4 +9,4 @@ RUN yarn install --frozen-lockfile
 COPY --chown=node:node packages/config /app/packages/config
 RUN yarn build
 
-CMD [ "yarn", "start" ]
+CMD [ "yarn", "start:prod" ]
