@@ -12,6 +12,7 @@
 import { randomBytes } from 'crypto'
 import {
   DocumentPath,
+  MAX_USERNAME_LENGTH,
   MIN_USERNAME_LENGTH,
   TokenUserType,
   User
@@ -39,9 +40,11 @@ export function generateUsername(name: User['name']): string {
   const surname = normalizeUsername(name.surname)
   const separator = initials.length > 0 ? '.' : ''
   const raw = `${initials}${separator}${surname}`
-  return raw.length >= MIN_USERNAME_LENGTH
-    ? raw
-    : raw.padEnd(MIN_USERNAME_LENGTH, '0')
+  const padded =
+    raw.length >= MIN_USERNAME_LENGTH
+      ? raw
+      : raw.padEnd(MIN_USERNAME_LENGTH, '0')
+  return padded.slice(0, MAX_USERNAME_LENGTH).replace(/[.\-]+$/, '')
 }
 
 export function generateRandomPassword() {

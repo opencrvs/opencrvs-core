@@ -24,6 +24,22 @@ describe('generateUsername', () => {
       'jw.doe'
     )
   })
+
+  it('limits the length of the username to 30 characters', () => {
+    expect(
+      generateUsername({ firstname: 'A'.repeat(50), surname: 'B'.repeat(50) })
+    ).toBe('a.bbbbbbbbbbbbbbbbbbbbbbbbbbbb')
+  })
+
+  it('limits the length of the username to 30 characters while not ending to dot or dash', () => {
+    expect(
+      generateUsername({
+        firstname: 'A'.repeat(50),
+        surname:
+          '.....B.B.B.B.B.B.B..B.B.------B.B.B.B.B.B..B.B.B.B.B.B.B.B.B.B.B.B.B..B.B.B.B.B.B.B.B.B.-----B..B.B.B.B.B.B.B.B......B.B.B-----.B.B.B.B.B.B....'
+      })
+    ).toBe('a.b.b.b.b.b.b.b..b.b.------b.b')
+  })
 })
 
 describe('Pads name to minimum length', () => {
