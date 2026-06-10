@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, userEvent, waitFor } from '@storybook/test'
+import { expect, userEvent, waitFor, within } from '@storybook/test'
 import { setNavigatorOnline } from '@client/tests/storybook-utils'
 import { PasswordChangeModal } from './PasswordChangeModal'
 
@@ -31,25 +31,23 @@ type Story = StoryObj<typeof PasswordChangeModal>
 
 export const ConfirmButtonDisabledWhenGoingOffline: Story = {
   play: async ({ canvasElement, step }) => {
-    // The password inputs are type="password", which has no implicit ARIA
-    // role, so they cannot be queried through testing-library roles.
-    const input = (id: string) => {
-      const element = canvasElement.querySelector<HTMLInputElement>(`#${id}`)
-      if (!element) {
-        throw new Error(`Input #${id} not found`)
-      }
-      return element
-    }
+    const canvas = within(canvasElement)
     const confirmButton = () =>
       canvasElement.querySelector<HTMLButtonElement>('#confirm-button')
 
     await step('Enter a valid password change while online', async () => {
-      await waitFor(async () => {
-        await expect(input('currentPassword')).toBeVisible()
-      })
-      await userEvent.type(input('currentPassword'), 'CurrentPass123')
-      await userEvent.type(input('newPassword'), 'NewPassword12345')
-      await userEvent.type(input('confirmPassword'), 'NewPassword12345')
+      await userEvent.type(
+        await canvas.findByLabelText('Current password'),
+        'CurrentPass123'
+      )
+      await userEvent.type(
+        await canvas.findByLabelText('New password:'),
+        'NewPassword12345'
+      )
+      await userEvent.type(
+        await canvas.findByLabelText('Confirm new password'),
+        'NewPassword12345'
+      )
 
       await expect(confirmButton()).toBeEnabled()
     })

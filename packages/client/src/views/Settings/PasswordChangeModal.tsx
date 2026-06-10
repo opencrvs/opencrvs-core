@@ -247,6 +247,7 @@ export function PasswordChangeModal({
             <Field>
               <InputField
                 id="currentPassword"
+                htmlFor="currentPassword"
                 label={intl.formatMessage(messages.currentPassword)}
                 touched={true}
                 required={false}
@@ -267,6 +268,7 @@ export function PasswordChangeModal({
             <Field>
               <InputField
                 id="newPassword"
+                htmlFor="newPassword"
                 label={intl.formatMessage(messages.newPasswordLabel)}
                 touched={true}
                 required={false}
@@ -320,7 +322,8 @@ export function PasswordChangeModal({
             </Field>
             <Field>
               <InputField
-                id="newPassword"
+                id="confirmPassword"
+                htmlFor="confirmPassword"
                 label={intl.formatMessage(messages.confirmPasswordLabel)}
                 touched={true}
                 required={false}
