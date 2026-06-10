@@ -161,7 +161,7 @@ export function VerifyCodeView({
               email: userDetails?.email
             })
           : intl.formatMessage(messages.confirmationEmailMsg, {
-              email: email || userDetails?.email
+              email: userDetails?.email
             })}
       </Message>
       <InputField
