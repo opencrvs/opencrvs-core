@@ -447,7 +447,6 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
 
             http.get('/:id', async (request) => {
               const { id } = request.params
-              spies.getImage++
               if (id && typeof id === 'string' && id.startsWith('signature')) {
                 spies.getImage++
                 const response = await fetch(signaturePngBase64)
