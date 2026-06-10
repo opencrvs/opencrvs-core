@@ -18,6 +18,8 @@ import { storage } from '@client/storage'
 import { removeToken } from '@client/utils/authUtils'
 import { removeUserDetails } from '@client/utils/userUtils'
 import { messages as reloadModalMessages } from '@client/i18n/messages/views/reloadModal'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { removePersistedClient } from '@client/v2-events/trpc'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -35,6 +37,7 @@ export function VersionMismatchModal({ show }: { show: boolean }) {
   const appName = useSelector(
     (state: IStoreState) => state.offline.offlineData.config?.APPLICATION_NAME
   )
+  const userId = useSelector(getUserDetails)?.id
 
   const handleReLogin = async () => {
     // Unregister the SW before redirecting so it cannot intercept the
@@ -42,6 +45,11 @@ export function VersionMismatchModal({ show }: { show: boolean }) {
     if ('serviceWorker' in navigator) {
       const registration = await navigator.serviceWorker.getRegistration()
       await registration?.unregister()
+    }
+    // The new app version may expect a different shape for the persisted
+    // react-query data, so drop it and let the new version refetch.
+    if (userId) {
+      await removePersistedClient(userId)
     }
     await storage.removeItem(SCREEN_LOCK)
     await removeToken()

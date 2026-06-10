@@ -92,9 +92,28 @@ function getQueryClient() {
   })
 }
 
+function getPersistedClientKeys(storageIdentifier: string) {
+  return {
+    client: `react-query-${storageIdentifier}`,
+    largeQueries: `react-query-large-query-storage-${storageIdentifier}`
+  }
+}
+
+/**
+ * Removes the persisted react-query client (including large query storage)
+ * for the given store identifier (the user id, see TRPCProvider usage).
+ */
+export async function removePersistedClient(storageIdentifier: string) {
+  const keys = getPersistedClientKeys(storageIdentifier)
+  await storage.removeItem(keys.client)
+  await storage.removeItem(keys.largeQueries)
+}
+
 function createIDBPersister(storageIdentifier: string) {
-  const fullStorageIdentifier = `react-query-${storageIdentifier}`
-  const largeQueryStorageIdentifier = `react-query-large-query-storage-${storageIdentifier}`
+  const {
+    client: fullStorageIdentifier,
+    largeQueries: largeQueryStorageIdentifier
+  } = getPersistedClientKeys(storageIdentifier)
 
   return {
     /** By default, client is persisted whenever a query/mutation occurs */
@@ -168,8 +187,7 @@ function createIDBPersister(storageIdentifier: string) {
       return client
     },
     removeClient: async () => {
-      await storage.removeItem(fullStorageIdentifier)
-      await storage.removeItem(largeQueryStorageIdentifier)
+      await removePersistedClient(storageIdentifier)
     }
   } satisfies Persister
 }
