@@ -239,6 +239,56 @@ describe('svgToPdfTemplate', () => {
       'href="data:image/png;base64,ALREADY_EMBEDDED"'
     )
   })
+
+  test('strips clip-path from text groups but keeps it on decorative groups', async () => {
+    fetch.mockClear()
+
+    const svgString = `<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clipText)"><text x="10" y="20">Long value that would be clipped</text></g><g clip-path="url(#clipDecorative)"><path d="M0 0H10V10H0Z"/></g></svg>`
+
+    const result = await svgToPdfTemplate(svgString, {})
+    const [content] = result.definition.content as [ContentSvg]
+
+    // Text group is unclipped so PDFKit's wider metrics can't truncate it.
+    expect(content.svg).not.toContain('url(#clipText)')
+    // Decorative (no <text>) group keeps its clip so it stays bounded.
+    expect(content.svg).toContain('url(#clipDecorative)')
+  })
+
+  test('strips clip-path on a bare <text> element', async () => {
+    fetch.mockClear()
+
+    const svgString = `<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><text clip-path="url(#clipText)" x="10" y="20">Value</text></svg>`
+
+    const result = await svgToPdfTemplate(svgString, {})
+    const [content] = result.definition.content as [ContentSvg]
+
+    expect(content.svg).not.toContain('url(#clipText)')
+    expect(content.svg).toContain('Value')
+  })
+
+  test('does not strip mask attributes', async () => {
+    fetch.mockClear()
+
+    const svgString = `<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><g mask="url(#maskText)"><text x="10" y="20">Masked value</text></g></svg>`
+
+    const result = await svgToPdfTemplate(svgString, {})
+    const [content] = result.definition.content as [ContentSvg]
+
+    expect(content.svg).toContain('url(#maskText)')
+  })
+
+  test('strips clip-path from text inside [data-page] sections', async () => {
+    fetch.mockClear()
+
+    const svgString = `<svg width="200" height="400" xmlns="http://www.w3.org/2000/svg"><g data-page="1"><g clip-path="url(#clip1)"><text x="10" y="20">Page one value</text></g></g><g data-page="2"><g clip-path="url(#clip2)"><text x="10" y="20">Page two value</text></g></g></svg>`
+
+    const result = await svgToPdfTemplate(svgString, {})
+    const contents = result.definition.content as ContentSvg[]
+
+    expect(contents.length).toBe(2)
+    expect(contents[0].svg).not.toContain('url(#clip1)')
+    expect(contents[1].svg).not.toContain('url(#clip2)')
+  })
 })
 
 function expectRenderOutput(template: string, output: string) {

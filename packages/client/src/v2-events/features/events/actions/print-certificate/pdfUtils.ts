@@ -724,6 +724,31 @@ async function downloadAndEmbedImages(svgString: string): Promise<string> {
   return serializer.serializeToString(svg)
 }
 
+/**
+ * Remove `clip-path` from elements that contain text, in-place, before the SVG
+ * is handed to pdfmake/svg-to-pdfkit for PDF rendering.
+ *
+ * The on-screen preview keeps these clips and renders correctly. In the PDF,
+ * svg-to-pdfkit measures the TTF glyphs with slightly different (wider) metrics
+ * than the browser's web-font engine (and maps font-weight="600" to Bold/700),
+ * so text that fits its clip box on screen overflows it by a few points and the
+ * trailing glyph(s) get truncated. svg-to-pdfkit exposes no option to disable
+ * clipping, so the only way to recover the text is to strip the attribute here.
+ *
+ * Only text-bearing elements are unclipped: decorative/background clips (e.g. the
+ * watermark `<g clip-path="url(#background)">`, which contains no <text>) are left
+ * intact so they stay bounded to the card. SVG <text> is single-line by spec, so
+ * unclipped values extend horizontally into the empty right margin — they never
+ * wrap or bleed into the field below.
+ */
+export function stripTextClipPaths(svgElement: Element): void {
+  svgElement.querySelectorAll('[clip-path]').forEach((el) => {
+    if (el.tagName.toLowerCase() === 'text' || el.querySelector('text')) {
+      el.removeAttribute('clip-path')
+    }
+  })
+}
+
 export async function svgToPdfTemplate(
   svg: string,
   certificateFonts: CertificateConfiguration
@@ -755,6 +780,11 @@ export async function svgToPdfTemplate(
     svgWithInlineImages,
     'image/svg+xml'
   ).documentElement
+
+  // Remove clip-paths from text so PDFKit's wider glyph metrics don't truncate
+  // values that fit on screen. Mutates svgElement in place, so both the
+  // multipage ($sections, cloned below) and single-page branches pick it up.
+  stripTextClipPaths(svgElement)
 
   const $sections = svgElement.querySelectorAll('[data-page]')
   const widthValue = svgElement.getAttribute('width')
@@ -811,7 +841,9 @@ export async function svgToPdfTemplate(
   } else {
     pdfTemplate.definition.content = [
       {
-        svg: svgWithInlineImages
+        // Serialize the parsed DOM (not svgWithInlineImages) so the in-place
+        // clip-path stripping above is reflected in the rendered SVG.
+        svg: new XMLSerializer().serializeToString(svgElement)
       },
       ...absolutelyPositionedHTMLs
     ]
