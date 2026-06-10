@@ -276,6 +276,44 @@ test('preserves existing data when data is omitted from update', async () => {
   expect(dbUser.data).toEqual(initialData)
 })
 
+test('Does not trigger username change when name is not provided', async () => {
+  const { user, eventsDb } = await setupTestCase()
+  const client = createTestClient(user, [USER_EDIT_SCOPE])
+
+  const userCredentialsBefore = await eventsDb
+    .selectFrom('userCredentials')
+    .selectAll()
+    .where('userId', '=', user.id)
+    .executeTakeFirstOrThrow()
+
+  const mock = vi.fn()
+  mswServer.use(
+    http.post(
+      `${env.COUNTRY_CONFIG_URL}/triggers/user/user-updated`,
+      async ({ request }) => {
+        const req = await request.json()
+        mock(req)
+
+        return HttpResponse.json({})
+      }
+    )
+  )
+
+  await client.user.update({
+    id: user.id,
+    fullHonorificName: 'MR DR'
+  })
+
+  const userCredentialsAfter = await eventsDb
+    .selectFrom('userCredentials')
+    .selectAll()
+    .where('userId', '=', user.id)
+    .executeTakeFirstOrThrow()
+
+  expect(mock).toHaveBeenCalledTimes(0)
+  expect(userCredentialsBefore.username).toBe(userCredentialsAfter.username)
+})
+
 test('overwrites data when an explicit data object is supplied on update', async () => {
   const { user } = await setupTestCase()
 

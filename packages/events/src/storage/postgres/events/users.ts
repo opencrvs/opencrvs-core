@@ -51,9 +51,8 @@ export async function getUserByMobileOrEmail(
     .executeTakeFirst()
 }
 
-export async function getUserById(userId: UUID) {
-  const db = getClient()
-  return db
+export async function getUserByIdInTrx(trx: Kysely<Schema>, userId: UUID) {
+  return trx
     .selectFrom('users')
     .innerJoin('userCredentials', 'userCredentials.userId', 'users.id')
     .innerJoin('locations', 'locations.id', 'users.officeId')
@@ -76,6 +75,11 @@ export async function getUserById(userId: UUID) {
     ])
     .where('users.id', '=', userId)
     .executeTakeFirst()
+}
+
+export async function getUserById(userId: UUID) {
+  const db = getClient()
+  return getUserByIdInTrx(db, userId)
 }
 
 export async function getUserCredentialsByUsername(username: string) {
@@ -304,21 +308,40 @@ export async function isUsernameTaken(username: string) {
   return !!user
 }
 
-export async function updateUserById(userId: UUID, fields: UsersUpdate) {
-  const db = getClient()
+export async function updateUserByIdInTrx(
+  trx: Kysely<Schema>,
+  userId: UUID,
+  fields: UsersUpdate
+) {
   if (fields.email) {
     fields.email = fields.email.toLowerCase()
   }
-  return db.updateTable('users').set(fields).where('id', '=', userId).execute()
+
+  return trx.updateTable('users').set(fields).where('id', '=', userId).execute()
 }
 
-export async function updateUsernameById(userId: UUID, username: string) {
+export async function updateUserById(userId: UUID, fields: UsersUpdate) {
   const db = getClient()
-  return db
+
+  return updateUserByIdInTrx(db, userId, fields)
+}
+
+export async function updateUsernameByIdInTrx(
+  trx: Kysely<Schema>,
+  userId: UUID,
+  username: string
+) {
+  return trx
     .updateTable('userCredentials')
     .set({ username })
     .where('userId', '=', userId)
     .execute()
+}
+
+export async function updateUsernameById(userId: UUID, username: string) {
+  const db = getClient()
+
+  return updateUsernameByIdInTrx(db, userId, username)
 }
 
 export async function getUsersAndSystemsByIds(ids: string[]) {

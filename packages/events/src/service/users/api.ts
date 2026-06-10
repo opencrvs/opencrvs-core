@@ -11,6 +11,7 @@
 /* eslint-disable max-lines */
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
+import { Kysely } from 'kysely'
 import {
   CreateUserInput,
   CreateUserInputInternal,
@@ -38,16 +39,20 @@ import {
   searchAllUsersWithInput,
   activateUserWithCredentials,
   updateUserById,
-  updateUsernameById,
   isUsernameTaken,
   getUserCredentialsByUserId,
   SecurityQuestion,
   getUserByMobileOrEmail,
-  resetUserCredentialsAndStatus
+  resetUserCredentialsAndStatus,
+  getUserByIdInTrx,
+  updateUserByIdInTrx,
+  updateUsernameByIdInTrx
 } from '@events/storage/postgres/events/users'
 import { generateSaltedHash, generateHash } from '@events/service/auth/hash'
 import { updatePasswordHashAndSalt } from '@events/storage/postgres/events/users'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
+import { getClient } from '@events/storage/postgres/events'
+import Schema from '@events/storage/postgres/events/schema/Database'
 import { getRoles } from '../config/config'
 import {
   generateRandomPassword,
@@ -155,73 +160,108 @@ export async function searchUsersAll(
   return results.map(mapDbUserToUser)
 }
 
+async function handleUsernameUpdate(
+  trx: Kysely<Schema>,
+  {
+    userId,
+    oldUsername,
+    incomingName,
+    input,
+    token
+  }: {
+    userId: UUID
+    oldUsername: string
+    incomingName: UserName
+    input: Pick<UpdateUserInput, 'email' | 'mobile'>
+    token: string
+  }
+) {
+  const newUsernameCandidate = generateUsername(incomingName)
+
+  if (newUsernameCandidate === oldUsername) {
+    return
+  }
+
+  const newUsername = await findAvailableUsername(
+    newUsernameCandidate,
+    oldUsername
+  )
+
+  await updateUsernameByIdInTrx(trx, userId, newUsername)
+
+  await triggerUserEventNotification({
+    event: 'user-updated',
+    payload: {
+      recipient: {
+        name: incomingName,
+        email: input.email,
+        mobile: input.mobile
+      },
+      oldUsername,
+      newUsername
+    },
+    countryConfigUrl: env.COUNTRY_CONFIG_URL,
+    authHeader: { Authorization: token }
+  })
+}
+
 export async function updateUser(
   input: UpdateUserInput,
   token: string
 ): Promise<User> {
-  const existingUser = await getUserById(input.id)
+  const db = getClient()
 
-  if (!existingUser) {
-    throw new TRPCError({
-      code: 'NOT_FOUND',
-      message: `User not found: ${input.id}`
+  const {
+    id: userId,
+    name: incomingName,
+    signature,
+    primaryOfficeId: incomingOfficeId,
+    ...otherFields
+  } = input
+
+  const dbUser = await db.transaction().execute(async (trx) => {
+    const existingUser = await getUserByIdInTrx(trx, userId)
+
+    if (!existingUser) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: `User not found: ${userId}`
+      })
+    }
+
+    await updateUserByIdInTrx(trx, userId, {
+      ...otherFields,
+      firstname: incomingName?.firstname,
+      surname: incomingName?.surname,
+      signaturePath: signature?.path,
+      officeId: incomingOfficeId
     })
-  }
 
-  const name: UserName = input.name ?? {
-    firstname: existingUser.firstname,
-    surname: existingUser.surname
-  }
+    if (incomingOfficeId && incomingOfficeId !== existingUser.officeId) {
+      await draftsRepo.deleteDraftsByUserIdInTrx(trx, userId)
+    }
 
-  await updateUserById(input.id, {
-    firstname: name.firstname,
-    surname: name.surname,
-    fullHonorificName: input.fullHonorificName,
-    email: input.email,
-    mobile: input.mobile,
-    device: input.device,
-    status: input.status,
-    role: input.role,
-    officeId: input.primaryOfficeId,
-    signaturePath: input.signature
-      ? input.signature.path
-      : existingUser.signaturePath,
-    data: input.data
+    if (incomingName) {
+      await handleUsernameUpdate(trx, {
+        userId,
+        incomingName,
+        oldUsername: existingUser.username,
+        input,
+        token
+      })
+    }
+
+    return getUserByIdInTrx(trx, userId)
   })
 
-  if (
-    input.primaryOfficeId &&
-    input.primaryOfficeId !== existingUser.officeId
-  ) {
-    await draftsRepo.deleteDraftsByUserId(input.id)
-  }
-
-  const oldUsername = existingUser.username
-  const newUsernameCandidate = generateUsername(name)
-
-  if (newUsernameCandidate !== oldUsername) {
-    const newUsername = await findAvailableUsername(
-      newUsernameCandidate,
-      existingUser.username
-    )
-    await updateUsernameById(UUID.parse(input.id), newUsername)
-    await triggerUserEventNotification({
-      event: 'user-updated',
-      payload: {
-        recipient: {
-          name,
-          email: input.email,
-          mobile: input.mobile
-        },
-        oldUsername,
-        newUsername
-      },
-      countryConfigUrl: env.COUNTRY_CONFIG_URL,
-      authHeader: { Authorization: token }
+  if (!dbUser) {
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'User updated does not exist'
     })
   }
 
-  return getUser(input.id)
+  return mapDbUserToUser(dbUser)
 }
 
 async function sendCredentialsNotification(
