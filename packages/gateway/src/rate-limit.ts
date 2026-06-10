@@ -65,6 +65,7 @@ interface RateLimitedRouteOptions {
   /** e.g. "username" or "user.name" */
   pathForKey: string
   pathOptionsForKey?: never
+  staticKey?: never
 }
 
 interface RateLimitedRouteMultipleOptions {
@@ -72,6 +73,18 @@ interface RateLimitedRouteMultipleOptions {
   pathForKey?: never
   /** Works the same as `pathForKey` but uses the first value that gets resolved of the keys */
   pathOptionsForKey: string[]
+  staticKey?: never
+}
+
+interface RateLimitedRouteStaticKeyOptions {
+  requestsPerMinute: number
+  pathForKey?: never
+  pathOptionsForKey?: never
+  /**
+   * A constant key to rate limit on, used when the payload has no
+   * per-user field to key on (e.g. super user auth only sends a password).
+   */
+  staticKey: string
 }
 
 export const rateLimitedRoute =
@@ -84,8 +97,12 @@ export const rateLimitedRoute =
     {
       requestsPerMinute,
       pathForKey,
-      pathOptionsForKey
-    }: RateLimitedRouteOptions | RateLimitedRouteMultipleOptions,
+      pathOptionsForKey,
+      staticKey
+    }:
+      | RateLimitedRouteOptions
+      | RateLimitedRouteMultipleOptions
+      | RateLimitedRouteStaticKeyOptions,
     fn: (...args: A) => R
   ) =>
   (...args: A) => {
@@ -96,9 +113,20 @@ export const rateLimitedRoute =
       return fn(...args)
     }
 
+    const route = args[1].request.path
+
+    if (staticKey) {
+      return withRateLimit(
+        {
+          key: `${staticKey}:${route}`,
+          requestsPerMinute
+        },
+        fn
+      )(...args)
+    }
+
     if (pathForKey) pathOptionsForKey = [pathForKey]
 
-    const route = args[1].request.path
     const payload = JSON.parse(args[0].payload.toString())
 
     const key = pathOptionsForKey!.find(

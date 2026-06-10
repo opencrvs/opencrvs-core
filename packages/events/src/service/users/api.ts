@@ -49,6 +49,7 @@ import {
 } from '@events/storage/postgres/events/users'
 import { generateSaltedHash, generateHash } from '@events/service/auth/hash'
 import { updatePasswordHashAndSalt } from '@events/storage/postgres/events/users'
+import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { getRoles } from '../config/config'
 
 export type UserSortBy =
@@ -239,6 +240,13 @@ export async function updateUser(
       : existingUser.signaturePath,
     data: input.data
   })
+
+  if (
+    input.primaryOfficeId &&
+    input.primaryOfficeId !== existingUser.officeId
+  ) {
+    await draftsRepo.deleteDraftsByUserId(input.id)
+  }
 
   if (newUsername !== oldUsername) {
     await updateUsernameById(UUID.parse(input.id), newUsername)
@@ -505,9 +513,11 @@ export async function checkSecurityQuestionMatch({
   input: { questionKey: string; answer: string }
   salt: string
 }) {
-  const target = questions.find((q) => q.questionKey === input.questionKey)
+  const targetIndex = questions.findIndex(
+    (q) => q.questionKey === input.questionKey
+  )
 
-  if (!target) {
+  if (targetIndex === -1) {
     return {
       matched: false,
       questionKey: input.questionKey
@@ -515,18 +525,20 @@ export async function checkSecurityQuestionMatch({
   }
 
   const hash = await generateHash(input.answer.toLowerCase(), salt)
-  const matched = hash === target.answerHash
+  const matched = hash === questions[targetIndex].answerHash
 
-  // On a wrong answer, rotate to a different question so the same prompt
-  // can't be brute-forced.
-  const fallback = questions.find(
-    (q) => q.questionKey !== input.questionKey
-  )?.questionKey
-
-  return {
-    matched,
-    questionKey: matched ? input.questionKey : (fallback ?? input.questionKey)
+  // Correct answer
+  if (matched) {
+    return { matched, questionKey: input.questionKey }
   }
+
+  // On a wrong answer, rotate to the next question in the user's list (or wrap around at the end).
+  let nextIndex = targetIndex + 1
+  if (nextIndex >= questions.length) {
+    nextIndex = 0
+  }
+
+  return { matched, questionKey: questions[nextIndex].questionKey }
 }
 
 export async function verifyPasswordById(
@@ -596,6 +608,7 @@ export async function sendResetPasswordInvite(
   const temporaryPassword = generateRandomPassword()
   const { hash, salt } = await generateSaltedHash(temporaryPassword)
   await updatePasswordHashAndSalt(userId, hash, salt)
+  await updateUserById(userId, { status: 'pending' })
 
   try {
     await triggerUserEventNotification({

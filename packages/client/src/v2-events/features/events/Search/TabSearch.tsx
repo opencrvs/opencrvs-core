@@ -165,7 +165,8 @@ export function TabSearch({
    */
   const [formValues, setFormValues] = useState<EventState>(() => {
     const defaultValues = getDefaultValues(
-      sections.flatMap((sec) => sec.fields)
+      sections.flatMap((sec) => sec.fields),
+      fieldValues
     )
     return { ...defaultValues, ...fieldValues }
   })

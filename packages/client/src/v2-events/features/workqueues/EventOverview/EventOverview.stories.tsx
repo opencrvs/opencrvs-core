@@ -930,3 +930,101 @@ export const WithAnnotationChangeOnRegister: Story = {
     }
   }
 }
+
+/**
+ * Demonstrates the pagination bug with immediate corrections.
+ *
+ * The history table paginates against `visibleHistoryWithClientSpecificActions.length`
+ * (11 items) but the paired APPROVE_CORRECTION is then filtered out of the displayed
+ * rows, leaving only 10 real rows. The pagination control incorrectly shows 2 pages
+ * even though all content fits on page 1 — and page 2 is empty.
+ */
+const requestCorrectionId = getUUID()
+
+const immediateCorrectionsAtPageBoundaryEvent = {
+  id: getUUID() as UUID,
+  type: 'tennis-club-membership',
+  trackingId: generateTrackingId(createPrng(99)),
+  createdAt: actionDefaults.createdAt,
+  updatedAt: actionDefaults.createdAt,
+  actions: [
+    // Not visible — filtered out by the CREATE check
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.CREATE,
+      defaults: actionDefaults
+    }),
+    // Required so the audit view is accessible (unassigned records show a skeleton)
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.ASSIGN,
+      defaults: {
+        ...actionDefaults,
+        assignedTo: refData.user.id.localRegistrar
+      }
+    }),
+    // 8 READ actions + ASSIGN above = 9 visible rows before the correction pair
+    ...Array.from({ length: 8 }, () =>
+      generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.READ,
+        defaults: actionDefaults
+      })
+    ),
+    // Immediate correction pair — counts as 2 in visibleHistoryWithClientSpecificActions
+    // but renders as 1 "Record corrected" row after APPROVE_CORRECTION is filtered out.
+    // visibleHistoryWithClientSpecificActions.length = 11 → pagination shows 2 pages
+    // historyRows.length (after filter) = 10 → page 2 is empty
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.REQUEST_CORRECTION,
+      defaults: { ...actionDefaults, id: requestCorrectionId as UUID }
+    }),
+    {
+      id: getUUID() as UUID,
+      type: ActionType.APPROVE_CORRECTION,
+      requestId: requestCorrectionId,
+      content: { immediateCorrection: true },
+      status: ActionStatus.Accepted,
+      createdAt: actionDefaults.createdAt,
+      createdBy: actionDefaults.createdBy,
+      createdByRole: actionDefaults.createdByRole,
+      createdByUserType: 'user' as const,
+      createdAtLocation: actionDefaults.createdAtLocation,
+      transactionId: getUUID(),
+      declaration: {},
+      annotation: {}
+    }
+  ]
+}
+
+export const ImmediateCorrectionAtPageBoundary: Story = {
+  parameters: {
+    offline: {
+      events: [immediateCorrectionsAtPageBoundaryEvent]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({
+        eventId: immediateCorrectionsAtPageBoundaryEvent.id
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [
+                getCurrentEventState(
+                  immediateCorrectionsAtPageBoundaryEvent,
+                  tennisClubMembershipEvent
+                )
+              ],
+              total: 1
+            }
+          })
+        ]
+      }
+    }
+  }
+}

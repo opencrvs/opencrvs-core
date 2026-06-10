@@ -32,7 +32,10 @@ export const createInitialisationClient = (token: string) => {
 }
 
 async function getToken(): Promise<string> {
-  const authUrl = new URL('authenticate-super-user', env.AUTH_HOST).toString()
+  const authUrl = new URL(
+    '/auth/authenticate-super-user',
+    env.GATEWAY_HOST
+  ).toString()
   const res = await fetch(authUrl, {
     method: 'POST',
     body: JSON.stringify({

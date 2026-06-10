@@ -214,7 +214,10 @@ export const ApproveCorrectionActionInput = BaseActionInput.extend(
     requestId: z.string(),
     type: z
       .literal(ActionType.APPROVE_CORRECTION)
-      .default(ActionType.APPROVE_CORRECTION)
+      .default(ActionType.APPROVE_CORRECTION),
+    content: z
+      .object({ immediateCorrection: z.boolean().optional() })
+      .optional()
   }).shape
 )
 

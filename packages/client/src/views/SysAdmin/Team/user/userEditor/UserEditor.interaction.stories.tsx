@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { within, expect, fn, waitFor } from '@storybook/test'
 import { userEvent } from '@storybook/testing-library'
@@ -32,7 +31,6 @@ import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 
 import { useUserFormState } from './useUserFormState'
 import { EditUser } from './UserEditor'
-import { useResolveAssignmentActionConditionals } from '@client/v2-events/features/workqueues/Actions/useActionConfigurationResolver'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [httpLink({ url: '/api/events' })],
@@ -366,6 +364,68 @@ export const InvalidPhoneNumberShowsValidationError: StoryObj = {
         ).toHaveTextContent('Not a valid mobile number')
       )
     })
+  }
+}
+
+export const EmptyNameAfterTouchingBlocksContinue: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.details'
+      })
+    }
+  },
+  beforeEach: () => {
+    // Pre-seed every other required field so that only the name validation
+    // can block navigation.
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      phoneNumber: '01712345678',
+      email: 'test@opencrvs.org'
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Type a first name, then clear it', async () => {
+      const firstnameInput = await canvas.findByTestId('text__firstname')
+      await userEvent.type(firstnameInput, 'Test')
+      await userEvent.clear(firstnameInput)
+    })
+
+    await step('Type a last name, then clear it', async () => {
+      const surnameInput = await canvas.findByTestId('text__surname')
+      await userEvent.type(surnameInput, 'User')
+      await userEvent.clear(surnameInput)
+    })
+
+    await step('Click Continue', async () => {
+      await userEvent.click(await canvas.findByText('Continue'))
+    })
+
+    await step('Validation errors appear for both name subfields', async () => {
+      await waitFor(() =>
+        expect(
+          canvasElement.querySelector('#firstname_error')
+        ).toBeInTheDocument()
+      )
+      await waitFor(() =>
+        expect(
+          canvasElement.querySelector('#surname_error')
+        ).toBeInTheDocument()
+      )
+    })
+
+    await step(
+      'User remains on the details page — Continue was blocked',
+      async () => {
+        expect(await canvas.findByText('Continue')).toBeInTheDocument()
+      }
+    )
   }
 }
 
@@ -741,6 +801,90 @@ export const SignatureRequiredForRegistrar: StoryObj = {
       async () => {
         await userEvent.click(await canvas.findByText('Continue'))
         await expect(canvas.findByText('Required')).resolves.toBeInTheDocument()
+      }
+    )
+  }
+}
+
+/**
+ * Regression test for: signature preview disappearing after navigating back
+ * from user.signature to user.details and then returning.
+ *
+ * Root cause: SignatureFieldInput initialised local `signature` state from the
+ * `value` prop on mount. Formik's enableReinitialize fires asynchronously, so
+ * on the first render after navigation the prop was still undefined — the local
+ * state was frozen at that wrong initial value and never recovered even though
+ * the prop was subsequently corrected.
+ *
+ * Fix: a useEffect that syncs `value` → local `signature` state whenever the
+ * prop changes, so the async Formik reinitialise is picked up correctly.
+ */
+export const SignaturePreviewRestoredAfterBackNavigation: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.details'
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [
+          tRPCMsw.user.roles.list.query(() => rolesWithSignatureScopes)
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.LOCAL_REGISTRAR,
+      name: { firstname: 'Test', surname: 'User' },
+      email: 'test@opencrvs.org',
+      'user.staffId': 'test-staff-001',
+      signature: {
+        path: 'signature-test.png' as DocumentPath,
+        originalFilename: 'signature-test.png',
+        type: 'image/png'
+      }
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Navigate to the signature page', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Continue' })
+      )
+    })
+
+    await step(
+      'Signature preview is visible on the signature page',
+      async () => {
+        await canvas.findByAltText(/signature/i)
+      }
+    )
+
+    await step('Navigate back to the user details page', async () => {
+      await userEvent.click(await canvas.findByRole('button', { name: 'Back' }))
+    })
+
+    await step('Navigate forward to the signature page again', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Continue' })
+      )
+    })
+
+    await step(
+      'Signature preview is still visible after back-navigation',
+      async () => {
+        await waitFor(async () => {
+          await expect(
+            canvas.findByAltText(/signature/i)
+          ).resolves.toBeInTheDocument()
+        })
       }
     )
   }

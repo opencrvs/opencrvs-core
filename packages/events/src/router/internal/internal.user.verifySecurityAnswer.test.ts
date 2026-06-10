@@ -197,6 +197,41 @@ test('returns matched: false and rotates to fallback question when answer is wro
   expect(result.questionKey).toBe('FIRST_CHILD_NAME')
 })
 
+test('rotates sequentially through every configured question on consecutive wrong answers', async () => {
+  const { eventsDb, user } = await setupTestCase()
+  const { salt } = await generateSaltedHash('irrelevant')
+  const wrongHash = 'never-going-to-match'
+
+  await eventsDb
+    .updateTable('userCredentials')
+    .set({
+      salt,
+      securityQuestions: sql`cast (${JSON.stringify([
+        { questionKey: 'BIRTH_TOWN', answerHash: wrongHash },
+        { questionKey: 'FIRST_CHILD_NAME', answerHash: wrongHash },
+        { questionKey: 'MOTHER_NAME', answerHash: wrongHash }
+      ])} as jsonb)` as unknown as Record<string, unknown>
+    })
+    .where('userId', '=', user.id)
+    .execute()
+
+  const askInOrder = async (questionKey: string) => {
+    const r = await caller.user.verifySecurityAnswer({
+      userId: user.id,
+      questionKey,
+      answer: 'wrong'
+    })
+    expect(r.matched).toBe(false)
+    return r.questionKey
+  }
+
+  // Start on BIRTH_TOWN (index 0). Each wrong answer must advance one step.
+  expect(await askInOrder('BIRTH_TOWN')).toBe('FIRST_CHILD_NAME')
+  expect(await askInOrder('FIRST_CHILD_NAME')).toBe('MOTHER_NAME')
+  // Wrap around to the start.
+  expect(await askInOrder('MOTHER_NAME')).toBe('BIRTH_TOWN')
+})
+
 test('returns matched: true when answer is correct', async () => {
   const { eventsDb, user } = await setupTestCase()
   const { salt } = await generateSaltedHash('irrelevant')

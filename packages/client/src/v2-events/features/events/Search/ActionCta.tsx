@@ -53,4 +53,4 @@ function ActionCtaComponent({
   )
 }
 
-export const ActionCta = withSuspense(ActionCtaComponent)
+export const ActionCta = withSuspense(React.memo(ActionCtaComponent))

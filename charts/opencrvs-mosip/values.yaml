@@ -5,15 +5,15 @@ mosip_mock:
   enabled: true
   image:
     repository: ghcr.io/opencrvs/mosip-mock
-    tag: 2.0.0-rc.6
+    tag: 2.0.0-rc.11
   env:
     FOO: bar
-    SENDER_EMAIL_ADDRESS: "test@opencrvs.org"
-    ALERT_EMAIL: "test@opencrvs.org"
-    SMTP_HOST: ""
+    SENDER_EMAIL_ADDRESS: 'test@opencrvs.org'
+    ALERT_EMAIL: 'test@opencrvs.org'
+    SMTP_HOST: ''
     SMTP_PORT: 575
     SMTP_USERNAME: opencrvs
-    SMTP_PASSWORD: ""
+    SMTP_PASSWORD: ''
     SMTP_SECURE: true
     MOSIP_WEBSUB_TOPIC: CREDENTIAL_ISSUED
 
@@ -21,7 +21,7 @@ esignet_mock:
   enabled: true
   image:
     repository: ghcr.io/opencrvs/esignet-mock
-    tag: 2.0.0-rc.6
+    tag: 2.0.0-rc.11
   env:
     OIDP_CLIENT_PRIVATE_KEY_PATH: /certs/esignet-jwk.txt
 
@@ -29,7 +29,7 @@ mosip_api:
   enabled: true
   image:
     repository: ghcr.io/opencrvs/mosip-api
-    tag: 2.0.0-rc.6
+    tag: 2.0.0-rc.11
   env:
     LOCALE: en
     OIDP_CLIENT_PRIVATE_KEY_PATH: /certs/esignet-jwk.txt

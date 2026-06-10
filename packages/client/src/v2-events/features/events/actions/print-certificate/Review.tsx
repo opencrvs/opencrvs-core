@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useRef } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
@@ -160,9 +160,15 @@ export function Review() {
   const intl = useIntl()
   const navigate = useNavigate()
   const isOnline = useOnlineStatus()
+  const isOnlineRef = useRef(isOnline)
+  isOnlineRef.current = isOnline
   const [modal, openModal] = useModal()
 
-  const { getEvent, onlineActions } = useEvents()
+  const {
+    getEvent,
+    onlineActions,
+    actions: { assignment }
+  } = useEvents()
   const fullEvent = getEvent.getFromCache(eventId)
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
   const fullEventIndex = getCurrentEventState(fullEvent, eventConfiguration)
@@ -277,7 +283,7 @@ export function Review() {
           </Button>,
           <Button
             key="print-certificate"
-            disabled={!isOnline || isPending}
+            disabled={!isOnlineRef.current || isPending}
             id="print-certificate"
             type="primary"
             onClick={() => close(true)}
@@ -303,6 +309,7 @@ export function Review() {
         const printCertificate = await preparePdfCertificate(fullEvent)
 
         await onlineActions.printCertificate.mutateAsync({
+          keepAssignment: true,
           eventId: fullEvent.id,
           fullEvent,
           declaration: {},
@@ -313,6 +320,11 @@ export function Review() {
         })
 
         printCertificate()
+
+        await assignment.unassign.mutateAsync({
+          eventId,
+          transactionId: getUUID()
+        })
 
         toast.custom(
           <Toast
@@ -328,9 +340,11 @@ export function Review() {
         )
 
         if (backTo) {
-          navigate(backTo)
+          navigate(backTo, { replace: true })
         } else {
-          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
+          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }), {
+            replace: true
+          })
         }
       } catch (error) {
         // TODO: add notification alert

@@ -108,7 +108,6 @@ export function Pages() {
         formPages={declarationPages}
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}
-        showReviewButton={searchParams.from === 'review'}
         validatorContext={validatorContext}
         onPageChange={(nextPageId: string) =>
           navigate(

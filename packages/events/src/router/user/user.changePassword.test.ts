@@ -25,7 +25,7 @@ test('returns UNAUTHORIZED when user not found', async () => {
   await expect(
     client.user.changePassword({
       existingPassword: 'test',
-      password: 'newpassword'
+      password: '1new2Password'
     })
   ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
 })
@@ -43,7 +43,7 @@ test('updates the password hash without existingPassword (reset flow)', async ()
 
   await client.user.changePassword({
     existingPassword: 'oldpassword',
-    password: 'newpassword'
+    password: '1new2Password'
   })
 
   const updated = await eventsDb
@@ -52,7 +52,7 @@ test('updates the password hash without existingPassword (reset flow)', async ()
     .where('userId', '=', user.id)
     .executeTakeFirstOrThrow()
 
-  const expectedHash = await generateHash('newpassword', updated.salt)
+  const expectedHash = await generateHash('1new2Password', updated.salt)
   expect(updated.passwordHash).toBe(expectedHash)
   // Salt must not change
   expect(updated.salt).toBe(salt)
@@ -71,7 +71,7 @@ test('updates the password when existingPassword matches (change flow)', async (
 
   await client.user.changePassword({
     existingPassword: 'oldpassword',
-    password: 'newpassword'
+    password: '1new2Password'
   })
 
   const updated = await eventsDb
@@ -80,7 +80,7 @@ test('updates the password when existingPassword matches (change flow)', async (
     .where('userId', '=', user.id)
     .executeTakeFirstOrThrow()
 
-  const expectedHash = await generateHash('newpassword', salt)
+  const expectedHash = await generateHash('1new2Password', salt)
   expect(updated.passwordHash).toBe(expectedHash)
 })
 
@@ -98,7 +98,7 @@ test('returns UNAUTHORIZED when existingPassword does not match', async () => {
   await expect(
     client.user.changePassword({
       existingPassword: 'wrongpassword',
-      password: 'newpassword'
+      password: '1new2Password'
     })
   ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
 })
@@ -123,7 +123,62 @@ test('returns UNAUTHORIZED when user is not active and existingPassword is provi
   await expect(
     client.user.changePassword({
       existingPassword: 'password',
-      password: 'newpassword'
+      password: '1new2Password'
     })
   ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+})
+
+test('Returns BAD_REQUEST when the password does not meet the requirements', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user)
+
+  // 1. too short.
+  await expect(
+    client.user.changePassword({
+      existingPassword: 'oldpassword',
+      password: '1newPasswor'
+    })
+  ).rejects.toMatchObject({
+    code: 'BAD_REQUEST',
+    message: expect.stringContaining('Password must be at least 12 characters')
+  })
+
+  // 2. missing uppercase letter.
+  await expect(
+    client.user.changePassword({
+      existingPassword: 'oldpassword',
+      password: '1new2password3'
+    })
+  ).rejects.toMatchObject({
+    code: 'BAD_REQUEST',
+    message: expect.stringContaining(
+      'Password must contain at least one uppercase letter'
+    )
+  })
+
+  // 3. missing number.
+  await expect(
+    client.user.changePassword({
+      existingPassword: 'oldpassword',
+      password: 'newPasswordWithoutNumber'
+    })
+  ).rejects.toMatchObject({
+    code: 'BAD_REQUEST',
+    message: expect.stringContaining(
+      'Password must contain at least one number'
+    )
+  })
+
+  // 4. missing lowercase letter.
+  await expect(
+    client.user.changePassword({
+      existingPassword: 'oldpassword',
+      password: '1NEW2PASSWORD3'
+    })
+  ).rejects.toMatchObject({
+    code: 'BAD_REQUEST',
+    message: expect.stringContaining(
+      'Password must contain at least one lowercase letter'
+    )
+  })
 })

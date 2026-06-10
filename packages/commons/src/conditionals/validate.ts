@@ -44,6 +44,8 @@ import { ActionType } from '../events/ActionType'
 import { EventConfig } from '../events/EventConfig'
 import { EventDocument } from '../events/EventDocument'
 import { EventIndex } from '../events/EventIndex'
+import { Location } from '../events/locations'
+import { SystemVariables } from '../events/TemplateConfig'
 
 const ajv = new Ajv({
   $data: true,
@@ -97,8 +99,97 @@ function resolveDataPath(
   return current
 }
 
+/** Returns today's date as an ISO date string (YYYY-MM-DD). */
+export function todayISO(): string {
+  return formatISO(new Date(), { representation: 'date' })
+}
+
+/**
+ * Context passed to every serialised client-side function ({@link runClientFunction}).
+ *
+ * `$user` (full {@link ITokenPayload}, validator paths) and `user` (a
+ * {@link SystemVariables} subset for template substitution, default-value
+ * path) are distinct sources, not duplicates.
+ */
+export type ClientFunctionContext = {
+  $form: EventState | ActionUpdate
+  $now: string
+  $online: boolean
+  $user?: ITokenPayload
+  $event?: EventDocument
+  $leafAdminStructureLocationIds: Array<{ id: UUID }>
+  user?: SystemVariables['user']
+  $window?: SystemVariables['$window']
+  locations?: Location[]
+  adminLevelIds?: string[]
+  $flags?: string[]
+  $status?: string
+}
+
+// `data` is `FieldValue | undefined` because validators receive the field
+// value being validated, while default-value evaluators receive `undefined`.
+type CompiledClientFunction = (
+  data: FieldValue | undefined,
+  context: ClientFunctionContext
+) => unknown
+
+const compiledFunctionCache = new Map<string, CompiledClientFunction>()
+
+/**
+ * Deserialises a serialised function string (produced by `.toString()`) into a callable.
+ * Results are cached by code string so each unique function body is compiled at most once.
+ * Runs in a clean scope — no access to outer closures or external imports.
+ */
+export function compileClientFunction(code: string): CompiledClientFunction {
+  let fn = compiledFunctionCache.get(code)
+  if (!fn) {
+    fn = new Function(`return (${code})`)() as CompiledClientFunction
+    compiledFunctionCache.set(code, fn)
+  }
+  return fn
+}
+
 // https://ajv.js.org/packages/ajv-formats.html
 addFormats(ajv)
+
+// `$now` / `$online` are sampled fresh on each call — callers that care
+// about a stable timestamp/online flag should snapshot it themselves.
+export function buildClientFunctionContext(input: {
+  form: EventState | ActionUpdate
+  validatorContext?: ValidatorContext
+  systemVariables?: SystemVariables
+  /**
+   * In real use cases, there can be hundreds of thousands of locations.
+   * Make sure that the context contains only the locations that are needed for validation.
+   * E.g. if the user is a leaf admin, only the leaf locations under their admin structure are needed.
+   * Loading few megabytes of locations to memory just for validation is not efficient and will choke the application.
+   */
+  locations?: Location[]
+  adminLevelIds?: string[]
+}): ClientFunctionContext {
+  return {
+    $form: input.form,
+    $now: todayISO(),
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    $online: isOnline(),
+    $user: input.validatorContext?.user,
+    $event: input.validatorContext?.event,
+    $leafAdminStructureLocationIds:
+      input.validatorContext?.leafAdminStructureLocationIds ?? [],
+    user: input.systemVariables?.user,
+    $window: input.systemVariables?.$window,
+    locations: input.locations,
+    adminLevelIds: input.adminLevelIds
+  }
+}
+
+export function runClientFunction(
+  code: string,
+  data: FieldValue | undefined,
+  context: ClientFunctionContext
+): unknown {
+  return compileClientFunction(code)(data, context)
+}
 
 /*
  * Custom keyword validator for date strings so the dates could be validated dynamically
@@ -200,7 +291,7 @@ ajv.addKeyword({
   $data: true,
   errors: true,
   // @ts-ignore -- Force type. We will move this away from AJV next. Parsing the array will take seconds and is only called by core.
-  validate(schema: {}, data: string, _: unknown, dataContext?: DataContext) {
+  validate(_schema: {}, data: string, _: unknown, dataContext?: DataContext) {
     const locationIdInput = data
     const locations = dataContext?.rootData.$leafAdminStructureLocationIds ?? []
 
@@ -250,6 +341,31 @@ function mergeWithBaseFormState(
 ) {
   return { ...context.baseFormState, ...values }
 }
+
+ajv.addKeyword({
+  keyword: 'customClientValidator',
+  schemaType: 'object',
+  errors: true,
+  // @ts-expect-error -- AJV's public types don't expose `rootData`. All
+  // `validate()` callers build root data via `buildClientFunctionContext`,
+  // so the cast holds.
+  validate(
+    schema: { code: string },
+    data: FieldValue,
+    _: unknown,
+    dataContext?: { rootData: ClientFunctionContext; instancePath: string }
+  ) {
+    // External references (lodash etc.) are intentionally unavailable — validators must be
+    // self-contained so they survive serialisation into JSONSchema and transmission to core.
+    return Boolean(
+      runClientFunction(
+        schema.code,
+        data,
+        dataContext?.rootData ?? buildClientFunctionContext({ form: {} })
+      )
+    )
+  }
+})
 
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
   const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
@@ -307,20 +423,15 @@ export function isOnline() {
 export function isConditionMet(
   conditional: JSONSchema,
   values: EventState | ActionUpdate,
-  context: ValidatorContext,
-  // @TODO: should this be non-optional
-  eventIndex?: EventIndex
+  context: ValidatorContext
 ) {
-  return validate(conditional, {
-    $form: mergeWithBaseFormState(values, context),
-    $now: formatISO(new Date(), { representation: 'date' }),
-    $online: isOnline(),
-    $user: context.user,
-    $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? [],
-    $flags: eventIndex?.flags ?? [],
-    $status: eventIndex?.status,
-    $event: context.event
-  })
+  return validate(
+    conditional,
+    buildClientFunctionContext({
+      form: mergeWithBaseFormState(values, context),
+      validatorContext: context
+    })
+  )
 }
 
 function getConditionalActionsForField(
@@ -340,10 +451,10 @@ export function areConditionsMet(
   conditions: FieldConditional[],
   values: Record<string, FieldValue>,
   context: ValidatorContext,
-  event: EventIndex
+  _event: EventIndex
 ) {
   return conditions.every((condition) =>
-    isConditionMet(condition.conditional, values, context, event)
+    isConditionMet(condition.conditional, values, context)
   )
 }
 
@@ -368,14 +479,13 @@ function isFieldConditionMet(
     return true
   }
 
-  const validConditionals = getConditionalActionsForField(field, {
-    $form: mergeWithBaseFormState(form, context),
-    $now: formatISO(new Date(), { representation: 'date' }),
-    $online: isOnline(),
-    $user: context.user,
-    $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? [],
-    $event: context.event
-  })
+  const validConditionals = getConditionalActionsForField(
+    field,
+    buildClientFunctionContext({
+      form: mergeWithBaseFormState(form, context),
+      validatorContext: context
+    })
+  )
 
   return validConditionals.includes(conditionalType)
 }
@@ -438,7 +548,14 @@ function isActionConditionMet(
     return true
   }
 
-  return isConditionMet(rule.conditional, event.declaration, context, event)
+  return validate(rule.conditional, {
+    ...buildClientFunctionContext({
+      form: mergeWithBaseFormState(event.declaration, context),
+      validatorContext: context
+    }),
+    $flags: event.flags,
+    $status: event.status
+  })
 }
 
 export function isActionEnabled(
@@ -696,19 +813,21 @@ export function runFieldValidations({
   if (!isFieldVisible(field.config, form, context)) {
     return []
   }
-  const conditionalParameters = {
-    $form: mergeWithBaseFormState(form, context),
-    $now: formatISO(new Date(), { representation: 'date' }),
-    /**
-     * In real use cases, there can be hundreds of thousands of locations.
-     * Make sure that the context contains only the locations that are needed for validation.
-     * E.g. if the user is a leaf admin, only the leaf locations under their admin structure are needed.
-     * Loading few megabytes of locations to memory just for validation is not efficient and will choke the application.
-     */
-    $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? [],
-    $online: isOnline(),
-    $user: context.user
-  }
+  /**
+   * Built via the shared helper so every site that compiles a serialised
+   * client function (AJV `customClientValidator`, sync-listener evaluator,
+   * default-value evaluator, HTTP field-param resolver) feeds the function
+   * the same {@link ClientFunctionContext} shape.
+   *
+   * Note on locations: `validatorContext.leafAdminStructureLocationIds` must
+   * already be narrowed (e.g. to the user's admin scope) by the caller — there
+   * can be hundreds of thousands of locations in real deployments and
+   * loading them all into memory chokes the app.
+   */
+  const conditionalParameters = buildClientFunctionContext({
+    form: mergeWithBaseFormState(form, context),
+    validatorContext: context
+  })
 
   if (isFieldGroupFieldType(field)) {
     const subfieldErrors: FormState<Array<{ message: TranslationConfig }>> =
