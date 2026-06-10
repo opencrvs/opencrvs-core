@@ -43,6 +43,7 @@ import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { faker } from '@client/tests/test-data-generators'
+import { setNavigatorOnline } from '@client/tests/storybook-utils'
 import { Name } from '../events/registered-fields'
 import { WorkqueueIndex } from './index'
 
@@ -579,13 +580,7 @@ export const DraftPaginationOffline: Story = {
     )
     await expect(firstPageRows).toHaveLength(10)
 
-    Object.defineProperty(window.navigator, 'onLine', {
-      configurable: true,
-      get: () => false
-    })
-
-    // Dispatch offline event so useEffect listener reacts
-    window.dispatchEvent(new Event('offline'))
+    setNavigatorOnline(false)
 
     // Check that offline labels are shown
     await canvas.findAllByText('No connection')
@@ -599,6 +594,10 @@ export const DraftPaginationOffline: Story = {
       'Tennis club membership application'
     )
     await expect(secondPageRows).toHaveLength(5)
+
+    // Restore online status so the stubbed offline state does not leak into
+    // stories rendered after this one in the same preview iframe
+    setNavigatorOnline(true)
   }
 }
 

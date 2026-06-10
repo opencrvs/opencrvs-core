@@ -23,6 +23,7 @@ import {
 import { Stack } from '@opencrvs/components'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { setNavigatorOnline } from '@client/tests/storybook-utils'
 import { getTestValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta = {
@@ -184,7 +185,7 @@ const authenticationStatusField: FieldConfig = {
 function AuthenticationStateStory({
   fields,
   initialValues,
-  initialTouched,
+  initialTouched
 }: {
   fields: FieldConfig[]
   initialValues?: Record<string, FieldValue>
@@ -242,29 +243,10 @@ export const Default: StoryObj = {
 
 function OfflineBrowserMock({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
-    const originalDescriptor = Object.getOwnPropertyDescriptor(
-      window.navigator,
-      'onLine'
-    )
-
-    Object.defineProperty(window.navigator, 'onLine', {
-      configurable: true,
-      get: () => false
-    })
-
-    window.dispatchEvent(new Event('offline'))
+    setNavigatorOnline(false)
 
     return () => {
-      if (originalDescriptor) {
-        Object.defineProperty(window.navigator, 'onLine', originalDescriptor)
-      } else {
-        Object.defineProperty(window.navigator, 'onLine', {
-          configurable: true,
-          get: () => true
-        })
-      }
-
-      window.dispatchEvent(new Event('online'))
+      setNavigatorOnline(true)
     }
   }, [])
 
@@ -274,9 +256,7 @@ function OfflineBrowserMock({ children }: { children: React.ReactNode }) {
 export const Offline: StoryObj = {
   render: () => (
     <OfflineBrowserMock>
-      <AuthenticationStateStory
-        fields={[idReaderWithAuth]}
-      />
+      <AuthenticationStateStory fields={[idReaderWithAuth]} />
     </OfflineBrowserMock>
   )
 }

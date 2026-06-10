@@ -16,6 +16,7 @@ import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { useIntl } from 'react-intl'
+import { useOnlineStatus } from '@client/utils'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
@@ -41,6 +42,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
   const [unknownError, setUnknownError] = React.useState(false)
   const [isInvalidPhoneNumber, setIsInvalidPhoneNumber] = React.useState(false)
   const { currentUser } = useCurrentUser()
+  const isOnline = useOnlineStatus()
   const [
     showDuplicateMobileErrorNotification,
     setShowDuplicateMobileErrorNotification
@@ -115,7 +117,12 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
             )
             continueButtonHandler(internationalFormat)
           }}
-          disabled={!Boolean(phoneNumber.length) || isInvalidPhoneNumber}
+          disabled={
+            !isOnline ||
+            sendVerifyCode.isPending ||
+            !Boolean(phoneNumber.length) ||
+            isInvalidPhoneNumber
+          }
         >
           {intl.formatMessage(buttonMessages.continueButton)}
         </PrimaryButton>

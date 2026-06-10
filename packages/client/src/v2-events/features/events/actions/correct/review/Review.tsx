@@ -19,7 +19,7 @@ import {
   ActionDocument,
   getAcceptedActions,
   getCurrentEventState,
-  findPendingCorrectionAction,
+  findPendingCorrectionAction
 } from '@opencrvs/commons/client'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
