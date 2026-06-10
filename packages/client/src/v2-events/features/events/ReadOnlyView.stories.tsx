@@ -24,9 +24,14 @@ import {
   tennisClubMembershipEvent,
   TestUserRole
 } from '@opencrvs/commons/client'
-import { AppRouter } from '@client/v2-events/trpc'
+import {
+  AppRouter,
+  queryClient,
+  trpcOptionsProxy
+} from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
+import { setNavigatorOnline } from '@client/tests/storybook-utils'
 import { ReadonlyViewIndex } from './ReadOnlyView'
 
 const generator = testDataGenerator()
@@ -188,5 +193,85 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
         ]
       }
     }
+  }
+}
+
+/**
+ * Regression test for opencrvs/opencrvs-core#12922:
+ *
+ * When the user opens the Record page for an event they have not previously
+ * downloaded while offline, React Query pauses the fetch indefinitely and the
+ * page used to show a spinner that never disappears. The fix renders an
+ * explicit offline message instead.
+ *
+ * To reproduce the user flow in storybook we pre-populate the local event
+ * index (so EventOverviewLayout can render) but remove the full event
+ * document from React Query's cache to simulate "never downloaded". Going
+ * offline then triggers the new message.
+ */
+export const ShowsOfflineMessageWhenRecordNotCached: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({
+        eventId: eventDocument.id
+      })
+    },
+    offline: {
+      events: [eventDocument]
+    },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => generateWorkqueues()),
+          tRPCMsw.workqueue.count.query((input) =>
+            input.reduce((acc, { slug }) => ({ ...acc, [slug]: 0 }), {})
+          )
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => eventDocument),
+          tRPCMsw.event.search.query(() => ({
+            total: 1,
+            results: [
+              getCurrentEventState(eventDocument, tennisClubMembershipEvent)
+            ]
+          }))
+        ],
+        drafts: [tRPCMsw.event.draft.list.query(() => [])],
+        user: [
+          tRPCMsw.user.list.query(() => [
+            generator.user.localRegistrar().summary
+          ]),
+          tRPCMsw.user.get.query(() => generator.user.localRegistrar().v2)
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    // The `offline.events` setup pre-caches the full event document for the
+    // Storybook user. Clear it to simulate a record that the user has never
+    // downloaded — the EventOverviewLayout still works because the local
+    // event index used by `searchEventById` is unaffected.
+    queryClient.removeQueries({
+      queryKey: trpcOptionsProxy.event.get.queryKey({
+        eventId: eventDocument.id,
+        waitFor: false
+      })
+    })
+    queryClient.removeQueries({ queryKey: [['view-event', eventDocument.id]] })
+
+    setNavigatorOnline(false)
+
+    // Without the fix this assertion times out — the page shows a spinner
+    // that never resolves because React Query pauses the fetch when offline.
+    await canvas.findByTestId('record-offline-message')
+    await expect(await canvas.findByText('No connection')).toBeVisible()
+
+    // Restore so the stubbed offline state does not leak into other stories
+    // rendered in the same preview iframe.
+    setNavigatorOnline(true)
   }
 }
