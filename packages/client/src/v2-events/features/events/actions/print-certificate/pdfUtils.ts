@@ -309,7 +309,6 @@ export function compileSvg({
    * @example {{ $actions "PRINT_CERTIFICATE" }}
    */
   function $actionsFn(actionType: string) {
-    console.log($actions.filter((a) => a.type === actionType))
     return $actions.filter((a) => a.type === actionType)
   }
 
@@ -327,7 +326,6 @@ export function compileSvg({
    */
 
   function $action(actionType: string) {
-    console.log($actions.findLast((a) => a.type === actionType))
     return $actions.findLast((a) => a.type === actionType)
   }
 
@@ -672,6 +670,10 @@ src: url("${url}") format("truetype");
   return serializer.serializeToString(svg)
 }
 
+export function isFetchableHref(href: string): boolean {
+  return /^https?:\/\/|^\//.test(href)
+}
+
 async function downloadAndEmbedImages(svgString: string): Promise<string> {
   const parser = new DOMParser()
   const doc = parser.parseFromString(svgString, 'image/svg+xml')
@@ -684,12 +686,10 @@ async function downloadAndEmbedImages(svgString: string): Promise<string> {
         imageElement.getAttribute('href') ||
         imageElement.getAttribute('xlink:href')
 
-      if (
-        href &&
-        (href.startsWith('http://') ||
-          href.startsWith('https://') ||
-          href.startsWith('/'))
-      ) {
+      // Matches absolute URLs (http/https) and absolute paths (/...) —
+      // covers external resources (logos, passport photos) and same-origin paths
+      // served by the service worker cache (e.g. /users/<id>/sig.png).
+      if (href && isFetchableHref(href)) {
         const response = await fetch(href)
         const blob = await response.blob()
 

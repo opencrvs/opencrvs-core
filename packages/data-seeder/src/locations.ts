@@ -9,31 +9,29 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import * as _ from 'lodash'
 import { env } from './environment'
-import { TypeOf, z } from 'zod'
+import { z } from 'zod'
 import { raise } from './utils'
 import { fromZodError } from 'zod-validation-error'
 import { getUUID } from '@opencrvs/commons'
 import { createInitialisationClient } from './index'
 
-const LOCATION_TYPES = [
-  'ADMIN_STRUCTURE',
-  'HEALTH_FACILITY',
-  'CRVS_OFFICE'
-] as const
-
-const LocationSchema = z.array(
+const RawLocationSchema =
   z.object({
     id: z.string(),
     name: z.string(),
-    alias: z.string().optional(),
     partOf: z.string(),
-    locationType: z.enum(LOCATION_TYPES)
+    locationType: z.string()
   })
-)
 
-function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
+const RawAdministrativeAreaSchema = RawLocationSchema.omit({ locationType: true })
+
+const CountryConfigLocationResponse = z.object({
+  locations: z.array(RawLocationSchema),
+  administrativeAreas: z.array(RawAdministrativeAreaSchema)
+})
+
+function validateAdminStructure(locations: z.output<typeof CountryConfigLocationResponse>['administrativeAreas']) {
   const locationsMap = new Map(
     locations.map((loc) => {
       return [loc.id, loc]
@@ -68,37 +66,38 @@ async function getLocations() {
     raise(`Expected to get the locations from ${url}`)
   }
 
-  const parsedLocations = LocationSchema.safeParse(await res.json())
-  if (!parsedLocations.success) {
+  const parsedResponse = CountryConfigLocationResponse.safeParse(await res.json())
+  if (!parsedResponse.success) {
     raise(
-      fromZodError(parsedLocations.error, {
+      fromZodError(parsedResponse.error, {
         prefix: `Error validating locations data returned from ${url}`
       })
     )
   }
 
-  const [administrativeAreas, locations] = _.partition(
-    parsedLocations.data,
-    ({ locationType }) => locationType === 'ADMIN_STRUCTURE'
-  )
+  const {administrativeAreas, locations} = parsedResponse.data
 
   const administrativeAreaMap = validateAdminStructure(administrativeAreas)
 
   const NULL_ADMINISTRATIVE_AREA_ID = '0'
-  locations.forEach((facilityOrOffice) => {
-    const administrativeAreaId = facilityOrOffice.partOf.split('/')[1]
+  locations.forEach((location) => {
+    const administrativeAreaId = location.partOf.split('/')[1]
     if (
       !administrativeAreaMap.get(administrativeAreaId) &&
       administrativeAreaId !== NULL_ADMINISTRATIVE_AREA_ID
     ) {
       raise(
-        `Parent location "${facilityOrOffice.partOf}" not found for ${facilityOrOffice.name}`
+        `Parent location "${location.partOf}" not found for ${location.name}`
       )
     }
   })
 
   const administrativeHierarchyIdMap = new Map(
-    parsedLocations.data.map(({ id }) => [id, getUUID()])
+    administrativeAreas.map(({ id }) => [id, getUUID()])
+  )
+
+  const locationIdMap = new Map(
+    locations.map(({ id }) => [id, getUUID()])
   )
 
   return {
@@ -111,7 +110,7 @@ async function getLocations() {
       validUntil: null
     })),
     locations: locations.map((loc) => ({
-      id: administrativeHierarchyIdMap.get(loc.id)!,
+      id: locationIdMap.get(loc.id)!,
       name: loc.name,
       administrativeAreaId:
         administrativeHierarchyIdMap.get(loc.partOf.split('/')[1]) || null,

@@ -32,6 +32,39 @@ V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
 - **events-service location APIs changes**
   Administrative areas (v1 `locationType: 'ADMIN_STRUCTURE'`) are exposed from a separate endpoint. See the [definition of the administrative hierarchy](/ADMINISTRATIVE-HIERARCHY.md) 2.0.0 onwards.
 
+#### Country config `GET /config/locations` response shape
+
+The data-seeder now expects `GET /config/locations` to return a structured object instead of a flat array. Country configuration's locations endpoint needs to be updated accordingly.
+
+**Before:**
+
+```ts
+Array<{
+  id: string
+  name: string
+  alias?: string
+  partOf: string
+  locationType: 'ADMIN_STRUCTURE' | 'HEALTH_FACILITY' | 'CRVS_OFFICE'
+}>
+```
+
+**After:**
+
+```ts
+{
+  administrativeAreas: Array<{ id: string; name: string; partOf: string }>
+  locations: Array<{
+    id: string
+    name: string
+    partOf: string
+    locationType: string
+  }>
+}
+```
+
+- `alias` has been removed and is no longer accepted.
+- `locationType` in the `locations` array is now a free-form `string` — country configurations are no longer restricted to the three built-in values and may define custom location types.
+
 #### Workqueue configurations
 
 - `actions: [{ type: CtaActionType }]`. is deprecated in favor of `action: { type: CtaActionType }`
