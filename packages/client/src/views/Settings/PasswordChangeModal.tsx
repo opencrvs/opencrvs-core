@@ -16,6 +16,7 @@ import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { userMessages as messages } from '@client/i18n/messages'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import styled from 'styled-components'
+import { useOnlineStatus } from '@client/utils'
 import { EMPTY_STRING } from '@client/utils/constants'
 import * as React from 'react'
 import { useIntl } from 'react-intl'
@@ -111,6 +112,7 @@ export function PasswordChangeModal({
 }: IProps) {
   const intl = useIntl()
   const userDetails = useSelector(getUserDetails)
+  const isOnline = useOnlineStatus()
   const { changePassword: changePasswordMutation } = useUsers()
 
   const [currentPassword, setCurrentPasswordValue] =
@@ -209,6 +211,8 @@ export function PasswordChangeModal({
           key="confirm"
           onClick={handleChangePassword}
           disabled={
+            !isOnline ||
+            changePasswordMutation.isPending ||
             !Boolean(currentPassword.length) ||
             !hasCases ||
             !hasNumber ||
