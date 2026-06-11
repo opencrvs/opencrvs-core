@@ -164,7 +164,11 @@ export function Review() {
   isOnlineRef.current = isOnline
   const [modal, openModal] = useModal()
 
-  const { getEvent, onlineActions } = useEvents()
+  const {
+    getEvent,
+    onlineActions,
+    actions: { assignment }
+  } = useEvents()
   const fullEvent = getEvent.getFromCache(eventId)
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
   const fullEventIndex = getCurrentEventState(fullEvent, eventConfiguration)
@@ -305,6 +309,7 @@ export function Review() {
         const printCertificate = await preparePdfCertificate(fullEvent)
 
         await onlineActions.printCertificate.mutateAsync({
+          keepAssignment: true,
           eventId: fullEvent.id,
           fullEvent,
           declaration: {},
@@ -315,6 +320,11 @@ export function Review() {
         })
 
         printCertificate()
+
+        await assignment.unassign.mutateAsync({
+          eventId,
+          transactionId: getUUID()
+        })
 
         toast.custom(
           <Toast
@@ -330,9 +340,11 @@ export function Review() {
         )
 
         if (backTo) {
-          navigate(backTo)
+          navigate(backTo, { replace: true })
         } else {
-          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
+          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }), {
+            replace: true
+          })
         }
       } catch (error) {
         // TODO: add notification alert

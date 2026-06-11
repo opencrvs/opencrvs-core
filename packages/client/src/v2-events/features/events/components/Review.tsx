@@ -301,7 +301,10 @@ function FormReview({
               return { ...field, valueDisplay, errorDisplay }
             })
 
-          // Only display fields that have a non-undefined/null value or have an validation error
+          // All interactive fields are shown in review, including optional fields with no value
+          // (empty optional fields render as a blank value cell). Only non-interactive display
+          // types (DIVIDER, PAGE_HEADER, etc.) are hidden. Value-based filtering happens only in
+          // certificate printing and correction summary — not here.
           const displayedFields = fields.filter(
             ({ type }) =>
               !FieldTypesToHideInReview.some(

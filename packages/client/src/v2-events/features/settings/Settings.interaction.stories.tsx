@@ -394,6 +394,9 @@ export const ChangeEmailAddress: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
+    const newEmail = 'opencrvs@opencrvs.org'
+    const currentEmail = 'kalushabwalya1.7@gmail.com'
+
     await step('Change email address', async () => {
       const changePhoneButton = await canvas.findAllByTestId(
         'change-email-address'
@@ -411,7 +414,7 @@ export const ChangeEmailAddress: Story = {
         name: ''
       })
 
-      await userEvent.type(input, 'opencrvs@opencrvs.org')
+      await userEvent.type(input, newEmail)
 
       await userEvent.click(
         await canvas.findByRole('button', { name: 'Continue' })
@@ -420,10 +423,13 @@ export const ChangeEmailAddress: Story = {
 
     await step('Enter verification code', async () => {
       await canvas.findByText('Enter 6 digit verification code')
-
       await canvas.findByText(
-        'Verification code has been sent to opencrvs@opencrvs.org'
+        `Verification code has been sent to ${currentEmail}`
       )
+
+      await expect(
+        canvas.queryByText(`Verification code has been sent to ${newEmail}`)
+      ).not.toBeInTheDocument()
     })
 
     await expect(
