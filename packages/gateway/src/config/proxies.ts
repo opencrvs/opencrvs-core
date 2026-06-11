@@ -13,8 +13,13 @@ import { APPLICATION_CONFIG_URL, AUTH_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 import { rateLimitedRoute } from '@gateway/rate-limit'
 import { api } from '@gateway/v2-events/events/service'
+import {
+  bustLocationsCache,
+  fetchAndCache,
+  getCachedLocations
+} from '@gateway/utils/locations-cache'
 import z from 'zod'
-import { ServerRoute } from '@hapi/hapi'
+import { ServerRoute, ResponseToolkit } from '@hapi/hapi'
 
 const LegacyLocationUpdate = z.object({
   name: z.string().optional(),
@@ -32,6 +37,18 @@ const LegacyLocationUpdate = z.object({
     )
     .optional()
 })
+
+const getLocationsHandler = async (query: string, h: ResponseToolkit) => {
+  const cached = await getCachedLocations(query)
+  if (cached) return h.response(cached).type('application/json')
+
+  const body = await fetchAndCache(query, async () => {
+    const res = await fetch(`${APPLICATION_CONFIG_URL}locations${query}`)
+    return res.text()
+  })
+
+  return h.response(body).type('application/json')
+}
 
 export const catchAllProxy = {
   auth: {
@@ -54,11 +71,15 @@ export const catchAllProxy = {
   location: {
     method: '*',
     path: '/location',
-    handler: (req, h) =>
-      h.proxy({
+    handler: async (req, h) => {
+      if (req.method === 'get') return getLocationsHandler(req.url.search, h)
+
+      void bustLocationsCache()
+      return h.proxy({
         uri: `${APPLICATION_CONFIG_URL}locations${req.url.search}`,
         passThrough: true
-      }),
+      })
+    },
     options: {
       auth: false,
       payload: {
@@ -87,11 +108,7 @@ export const catchAllProxy = {
   getLocations: {
     method: 'GET',
     path: '/locations',
-    handler: (req, h) =>
-      h.proxy({
-        uri: `${APPLICATION_CONFIG_URL}locations${req.url.search}`,
-        passThrough: true
-      }),
+    handler: (req, h) => getLocationsHandler(req.url.search, h),
     options: {
       auth: false
     }
@@ -132,6 +149,8 @@ export const catchAllProxy = {
         }
       })
 
+      await bustLocationsCache()
+
       return h.response(response.body).code(response.status)
     },
     options: {
@@ -164,6 +183,8 @@ export const catchAllProxy = {
           }
         }
       })
+
+      await bustLocationsCache()
 
       return h.response({}).code(response.status)
     },
