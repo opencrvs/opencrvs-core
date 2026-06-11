@@ -44,6 +44,14 @@ function ToastWithIntl({
   )
 }
 
+/**
+ * Displays a toast using the application's standardized toast component.
+ *
+ * **Important:** Always use this function to create toasts instead of calling the `toast` library directly.
+ * This ensures consistent presentation and behavior for all notification toasts in the application.
+ *
+ * @param props - The properties for the toast, including the message, type, ID, and any interpolation options.
+ */
 export function showToast(props: ToastProps) {
   toast.custom(<ToastWithIntl {...props} />, { id: props.toastId })
 }
