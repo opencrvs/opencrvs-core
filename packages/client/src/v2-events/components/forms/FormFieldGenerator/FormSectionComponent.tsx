@@ -213,14 +213,25 @@ export function FormSectionComponent({
   const { cacheHiddenFieldValue, popHiddenFieldValue } = useEventFormData()
   const { eventId } = useParams<{ eventId?: string }>()
   const cachedEvent = eventId ? findLocalEventDocument(eventId) : undefined
-  // Committed server state used as the visibility-transition reference point.
-  // After an OAuth redirect the in-memory form (ocrvsFullForm) is wiped, so without
-  // this we miss fields that need to be nulled. Falls back to ocrvsFullForm for new
-  // declarations where no server state exists yet.
   const baseDeclaration =
     cachedEvent && eventConfig
       ? getCurrentEventState(cachedEvent, eventConfig).declaration
       : undefined
+  // Use server state as the base for visibility transition detection, then let
+  // any non-undefined in-memory value override it. After an OAuth redirect
+  // (e-Signet/MOSIP), Zustand is wiped so Formik initialises fields to
+  // undefined — those fall back to the last committed server value, allowing
+  // visible→hidden transitions to null them correctly. In the correction flow,
+  // draft values are all non-undefined and naturally override the server state,
+  // so the behaviour is unchanged from using ocrvsFullForm directly.
+  const prevFormRef = baseDeclaration
+    ? {
+        ...baseDeclaration,
+        ...Object.fromEntries(
+          Object.entries(ocrvsFullForm).filter(([, v]) => v !== undefined)
+        )
+      }
+    : ocrvsFullForm
 
   const fullFormFields = eventConfig
     ? findAllFields(eventConfig).concat(pageFields)
@@ -326,7 +337,7 @@ export function FormSectionComponent({
 
       applyVisibilityTransitions(
         eventConfig,
-        baseDeclaration ?? ocrvsFullForm,
+        prevFormRef,
         updatedFullForm,
         updatedFormikPageForm,
         validatorContext,
@@ -394,7 +405,7 @@ export function FormSectionComponent({
 
       applyVisibilityTransitions(
         eventConfig,
-        baseDeclaration ?? ocrvsFullForm,
+        prevFormRef,
         updatedFullForm,
         updatedValues,
         validatorContext,
