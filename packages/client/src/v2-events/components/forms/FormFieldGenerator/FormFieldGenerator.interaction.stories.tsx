@@ -11,7 +11,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fireEvent, userEvent, within } from '@storybook/test'
+import { expect, fireEvent, fn, userEvent, within } from '@storybook/test'
 import React, { useRef } from 'react'
 import styled from 'styled-components'
 import { noop } from 'lodash'
@@ -21,9 +21,13 @@ import {
   FieldType,
   not,
   FieldConfig,
+  EventConfig,
   EventState,
-  generateTranslationConfig
+  generateTranslationConfig,
+  tennisClubMembershipEvent,
+  ActionStatus
 } from '@opencrvs/commons/client'
+import type { EventDocument, UUID } from '@opencrvs/commons/client'
 
 import {
   FormFieldGenerator,
@@ -32,7 +36,10 @@ import {
 } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormWizard } from '@client/v2-events/features/events/components/FormWizard'
-import { withValidatorContext } from '../../../../../.storybook/decorators'
+import {
+  getTestValidatorContext,
+  withValidatorContext
+} from '../../../../../.storybook/decorators'
 
 const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'FormFieldGenerator/Interaction',
@@ -619,6 +626,143 @@ export const HiddenListenerDefaultNotPropagated: Story = {
         await expect(canvas.queryByText('address')).not.toBeInTheDocument()
         await expect(canvas.getByTestId('text__form____derivedId')).toHaveValue(
           ''
+        )
+      }
+    )
+  }
+}
+
+const nixConditionalFields = [
+  {
+    id: 'form.verified',
+    type: FieldType.CHECKBOX,
+    required: false,
+    defaultValue: false,
+    label: generateTranslationConfig('Verified')
+  },
+  {
+    id: 'form.nid',
+    type: FieldType.TEXT,
+    label: generateTranslationConfig('NID'),
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: not(field('form.verified').isEqualTo(true))
+      }
+    ]
+  }
+] satisfies FieldConfig[]
+
+// EventConfig with nixConditionalFields in declaration so omitHiddenPaginatedFields
+// can correctly evaluate form.nid / form.verified visibility.
+const nixEventConfig: EventConfig = {
+  ...tennisClubMembershipEvent,
+  declaration: {
+    ...tennisClubMembershipEvent.declaration,
+    pages: [
+      {
+        id: 'nid-test-page',
+        title: generateTranslationConfig('NID page'),
+        fields: nixConditionalFields,
+        requireCompletionToContinue: false,
+        type: 'FORM' as const
+      }
+    ]
+  }
+}
+
+const BASE_DECL_EVENT_ID = 'a1b2c3d4-e5f6-7890-abcd-ef0123456789' as UUID
+
+const mockEventWithNid: EventDocument = {
+  type: tennisClubMembershipEvent.id,
+  id: BASE_DECL_EVENT_ID,
+  trackingId: 'NIDTEST',
+  createdAt: '2025-01-01T00:00:00.000Z',
+  updatedAt: '2025-01-01T00:00:01.000Z',
+  actions: [
+    {
+      id: '00000000-0000-0000-0000-aaaaaaaaaaaa' as UUID,
+      type: 'CREATE' as const,
+      status: ActionStatus.Accepted,
+      createdAt: '2025-01-01T00:00:00.000Z',
+      createdByUserType: 'user',
+      createdBy: '00000000-0000-0000-0000-000000000001' as UUID,
+      createdByRole: 'LOCAL_REGISTRAR',
+      createdAtLocation: '00000000-0000-0000-0000-000000000002' as UUID,
+      declaration: {},
+      transactionId: 'txn-nid-create-0000001'
+    },
+    {
+      id: '00000000-0000-0000-0000-bbbbbbbbbbbb' as UUID,
+      type: 'DECLARE' as const,
+      status: ActionStatus.Accepted,
+      createdAt: '2025-01-01T00:00:01.000Z',
+      createdByUserType: 'user',
+      createdBy: '00000000-0000-0000-0000-000000000001' as UUID,
+      createdByRole: 'LOCAL_REGISTRAR',
+      createdAtLocation: '00000000-0000-0000-0000-000000000002' as UUID,
+      declaration: { 'form.nid': '12345' },
+      transactionId: 'txn-nid-declare-0000002'
+    }
+  ]
+}
+
+const onFormChangeSpy = fn<(values: EventState) => void>()
+
+/**
+ * Regression test for the bug where hidden fields were not set to null after an OAuth
+ * redirect (e-Signet/MOSIP). After the redirect, Zustand (ocrvsFullForm) is wiped, so
+ * applyVisibilityTransitions found no previous field values and never detected
+ * visible→hidden transitions. The fix reads committed server state (baseDeclaration) from
+ * the TanStack Query cache as the reference point.
+ */
+export const NullsHiddenFieldUsingServerState: Story = {
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true },
+    offline: {
+      events: [mockEventWithNid]
+    },
+    reactRouter: {
+      router: {
+        path: '/event/:eventId',
+        element: (
+          <StyledFormFieldGenerator
+            eventConfig={nixEventConfig}
+            fields={nixConditionalFields}
+            formValues={{}}
+            id="nid-oauth-form"
+            validatorContext={getTestValidatorContext()}
+            onFormChange={onFormChangeSpy}
+          />
+        )
+      },
+      initialPath: `/event/${BASE_DECL_EVENT_ID}`
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'NID field is visible and empty (formValues is {} simulating post-OAuth)',
+      async () => {
+        await expect(
+          await canvas.findByTestId('text__form____nid')
+        ).toHaveValue('')
+      }
+    )
+
+    await step(
+      'Checking Verified hides NID and sends null for it via onFormChange',
+      async () => {
+        await fireEvent.click(await canvas.findByText('Verified'))
+
+        await expect(
+          canvas.queryByTestId('text__form____nid')
+        ).not.toBeInTheDocument()
+
+        await expect(onFormChangeSpy).toHaveBeenCalledWith(
+          expect.objectContaining({ 'form.nid': null })
         )
       }
     )
