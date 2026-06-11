@@ -40,7 +40,7 @@
     "hapi-sentry": "^3.1.0",
     "hapi-swagger": "^17.3.2",
     "io-ts": "^2.2.18",
-    "joi": "^17.3.0",
+    "joi": "^18.0.0",
     "jose": "^4.13.1",
     "jsonwebtoken": "^9.0.0",
     "jwt-decode": "^3.0.0",
