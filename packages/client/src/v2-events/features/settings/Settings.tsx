@@ -25,6 +25,7 @@ import {
 import { WorkqueueLayout } from '@client/v2-events/layouts/workqueues'
 import { EmailAddress } from '@client/views/Settings/items/EmailAddress'
 import { AssignedOffice } from '@client/views/Settings/items/AssignedOffice'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 
 const settingsTitle = {
   id: 'home.header.settingsTitle',
@@ -32,7 +33,7 @@ const settingsTitle = {
   description: 'settings title'
 }
 
-export function SettingsPage() {
+function SettingsPageComponent() {
   const intl = useIntl()
   return (
     <WorkqueueLayout title={intl.formatMessage(settingsTitle)}>
@@ -55,3 +56,5 @@ export function SettingsPage() {
     </WorkqueueLayout>
   )
 }
+
+export const SettingsPage = withSuspense(SettingsPageComponent)

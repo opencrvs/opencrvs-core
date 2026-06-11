@@ -88,6 +88,7 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
+        hideBackToReview
         attachmentPath={`events/${eventId}/`}
         eventConfig={configuration}
         formData={annotation}
@@ -106,7 +107,6 @@ export function Pages() {
         })}
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
-        showReviewButton={searchParams.from === 'review'}
         validatorContext={{
           ...validatorContext,
           baseFormState: eventIndex.declaration
@@ -118,7 +118,7 @@ export function Pages() {
                 eventId,
                 pageId: nextPageId
               },
-              { workqueue: searchParams.workqueue }
+              { backTo: searchParams.backTo }
             )
           )
         }}
@@ -128,7 +128,7 @@ export function Pages() {
               { eventId },
               {
                 templateId: String(annotation[CERT_TEMPLATE_ID]),
-                workqueue: searchParams.workqueue
+                backTo: searchParams.backTo
               }
             )
           )

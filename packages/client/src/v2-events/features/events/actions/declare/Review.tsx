@@ -32,9 +32,7 @@ import { DeclareActionMenu } from './DeclareActionMenu'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
-  const [{ workqueue: slug }] = useTypedSearchParams(
-    ROUTES.V2.EVENTS.DECLARE.REVIEW
-  )
+  const [{ backTo }] = useTypedSearchParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
@@ -77,7 +75,7 @@ export function Review() {
           { pageId, eventId },
           {
             from: 'review',
-            workqueue: slug
+            backTo
           },
           fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
         )

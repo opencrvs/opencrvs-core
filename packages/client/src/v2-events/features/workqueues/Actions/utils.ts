@@ -118,7 +118,7 @@ export interface ActionCtaConfig<T extends DisplayableAction> {
   label: TranslationConfig
   icon: IconProps['name']
   /** onClick is used when clicking an action menu item. */
-  onClick: (workqueue?: string) => Promise<void> | void
+  onClick: (backTo?: string) => Promise<void> | void
   disabled?: boolean
   hidden?: boolean
   customActionType?: string

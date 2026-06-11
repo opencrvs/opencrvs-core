@@ -75,20 +75,11 @@ export type AuthServer = {
 }
 
 export async function createServer() {
-  let whitelist: string[] = [env.DOMAIN]
-  if (env.DOMAIN[0] !== '*') {
-    whitelist = [
-      env.COUNTRY_CONFIG_URL_EXTERNAL,
-      env.LOGIN_URL,
-      env.CLIENT_APP_URL
-    ]
-  }
-  logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
   const server = new Hapi.Server({
     host: env.AUTH_HOST,
     port: env.AUTH_PORT,
     routes: {
-      cors: { origin: whitelist },
+      cors: false,
       payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT },
       response: {
         failAction: async (req, _2, err: Error | undefined) => {

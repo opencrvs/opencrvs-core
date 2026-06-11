@@ -94,7 +94,7 @@ export const eventRouter = router({
             'Triggers reindexing of search, workqueues and notifies country config',
           method: 'POST',
           path: '/events/reindex',
-          tags: ['events']
+          tags: ['Events']
         }
       })
       .mutation(async ({ ctx, input }) => {
@@ -112,7 +112,7 @@ export const eventRouter = router({
           summary: 'Returns the status of current and past reindexing calls',
           method: 'GET',
           path: '/events/reindex',
-          tags: ['events']
+          tags: ['Events']
         }
       })
       .use(middleware.allowedWithAnyOfScopes(['record.reindex']))
@@ -135,7 +135,7 @@ export const eventRouter = router({
           summary: 'List event configurations',
           method: 'GET',
           path: '/config',
-          tags: ['events'],
+          tags: ['Events'],
           protect: true
         }
       })
@@ -151,7 +151,7 @@ export const eventRouter = router({
         summary: 'Create event',
         method: 'POST',
         path: '/events',
-        tags: ['events'],
+        tags: ['Events'],
         protect: true
       }
     })
@@ -197,7 +197,7 @@ export const eventRouter = router({
         summary: 'Fetch full event document',
         method: 'GET',
         path: '/events/{eventId}',
-        tags: ['events'],
+        tags: ['Events'],
         protect: true
       }
     })
@@ -389,6 +389,8 @@ export const eventRouter = router({
     duplicate: router({
       markAsDuplicate: userOnlyProcedure
         .input(MarkAsDuplicateActionInput)
+        .use(middleware.canAccessEventWithScopes(['record.review-duplicates']))
+        .use(middleware.requireAssignment)
         .use(middleware.validateAction)
         .mutation(async (options) => {
           const { user, token } = options.ctx
@@ -420,6 +422,8 @@ export const eventRouter = router({
         }),
       markNotDuplicate: userOnlyProcedure
         .input(MarkNotDuplicateActionInput)
+        .use(middleware.canAccessEventWithScopes(['record.review-duplicates']))
+        .use(middleware.requireAssignment)
         .use(middleware.validateAction)
         .mutation(async (options) => {
           const { user, token } = options.ctx

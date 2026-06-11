@@ -8,7 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ActionType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  ClientSpecificAction,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { ActionMenuItem } from '../../Actions/utils'
 import { sortActions } from './ActionMenu'
 
@@ -67,6 +71,53 @@ describe('sortActions()', () => {
       { type: ActionType.REJECT },
       { type: ActionType.EDIT },
       { type: ActionType.REGISTER }
+    ])
+  })
+
+  it('should sort REVIEW_CORRECTION_REQUEST right after REQUEST_CORRECTION using default action order', () => {
+    const availableActions = [
+      { type: ActionType.UNASSIGN },
+      { type: ClientSpecificAction.REVIEW_CORRECTION_REQUEST },
+      { type: ActionType.PRINT_CERTIFICATE },
+      { type: ActionType.REGISTER }
+    ] as ActionMenuItem[]
+
+    const sortedActions = sortActions(
+      availableActions,
+      tennisClubMembershipEvent
+    )
+
+    expect(sortedActions).toEqual([
+      { type: ActionType.REGISTER },
+      { type: ActionType.PRINT_CERTIFICATE },
+      { type: ClientSpecificAction.REVIEW_CORRECTION_REQUEST },
+      { type: ActionType.UNASSIGN }
+    ])
+  })
+
+  it('should sort REVIEW_CORRECTION_REQUEST at the same position as REQUEST_CORRECTION in the configured action order', () => {
+    const availableActions = [
+      { type: ActionType.UNASSIGN },
+      { type: ClientSpecificAction.REVIEW_CORRECTION_REQUEST },
+      { type: ActionType.REGISTER },
+      { type: ActionType.EDIT }
+    ] as ActionMenuItem[]
+
+    const sortedActions = sortActions(availableActions, {
+      ...tennisClubMembershipEvent,
+      actionOrder: [
+        ActionType.REGISTER,
+        ActionType.REQUEST_CORRECTION,
+        ActionType.EDIT,
+        ActionType.UNASSIGN
+      ]
+    })
+
+    expect(sortedActions).toEqual([
+      { type: ActionType.REGISTER },
+      { type: ClientSpecificAction.REVIEW_CORRECTION_REQUEST },
+      { type: ActionType.EDIT },
+      { type: ActionType.UNASSIGN }
     ])
   })
 

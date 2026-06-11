@@ -33,47 +33,47 @@ export const ROUTES = {
             {
               params: { eventId: uuid().defined() },
               searchParams: {
-                workqueue: string()
+                backTo: string()
               }
             },
             {
               RECORD: route('record', {
                 searchParams: {
-                  workqueue: string()
+                  backTo: string()
                 }
               }),
               AUDIT: route('audit', {
                 searchParams: {
-                  workqueue: string()
+                  backTo: string()
                 }
               })
             }
           ),
           CREATE: route('create', {
             searchParams: {
-              workqueue: string()
+              backTo: string()
             }
           }),
           DELETE: route('delete/:eventId', {
             searchParams: {
-              workqueue: string()
+              backTo: string()
             }
           }),
           DECLARE: route(
             'declare/:eventId',
             {
               params: { eventId: uuid().defined() },
-              searchParams: { workqueue: string() }
+              searchParams: { backTo: string() }
             },
             {
               REVIEW: route('review', {
-                searchParams: { workqueue: string() }
+                searchParams: { backTo: string() }
               }),
               PAGES: route('pages/:pageId', {
                 params: { pageId: string() },
                 searchParams: {
                   from: string(),
-                  workqueue: string()
+                  backTo: string()
                 },
                 hash: hashValues()
               })
@@ -83,15 +83,18 @@ export const ROUTES = {
             'edit/:eventId',
             {
               params: { eventId: uuid().defined() },
-              searchParams: { workqueue: string() }
+              searchParams: { backTo: string() }
             },
             {
               REVIEW: route('review', {
-                searchParams: { workqueue: string() }
+                searchParams: { backTo: string() }
               }),
               PAGES: route('pages/:pageId', {
                 params: { pageId: string() },
-                searchParams: { from: string(), workqueue: string() },
+                searchParams: {
+                  from: string(),
+                  backTo: string()
+                },
                 hash: hashValues()
               })
             }
@@ -101,7 +104,7 @@ export const ROUTES = {
             {
               params: { eventId: uuid().defined() },
               searchParams: {
-                workqueue: string()
+                backTo: string()
               }
             },
             {
@@ -109,14 +112,14 @@ export const ROUTES = {
                 params: { pageId: string() },
                 searchParams: {
                   from: string(),
-                  workqueue: string()
+                  backTo: string()
                 },
                 hash: hashValues()
               }),
               REVIEW: route('review', {
                 searchParams: {
                   templateId: string(),
-                  workqueue: string()
+                  backTo: string()
                 }
               })
             }
@@ -124,7 +127,7 @@ export const ROUTES = {
           REVIEW_POTENTIAL_DUPLICATE: route('review-duplicate/:eventId', {
             params: { eventId: uuid().defined() },
             searchParams: {
-              workqueue: string()
+              backTo: string()
             }
           }),
           REQUEST_CORRECTION: correctionRequestRoutes,

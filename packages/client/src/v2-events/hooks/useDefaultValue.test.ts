@@ -15,6 +15,7 @@ import {
   AgeField,
   ButtonField,
   DateField,
+  EventState,
   FieldType,
   generateTranslationConfig,
   InteractiveFieldType,
@@ -59,6 +60,7 @@ const mockAdminLevelIds = ['province', 'district']
 const mockContext: SystemVariables & {
   administrativeAreas: Map<UUID, AdministrativeArea>
   adminLevelIds: string[]
+  form: EventState
 } = {
   user: {
     id: 'user-id',
@@ -79,7 +81,8 @@ const mockContext: SystemVariables & {
     }
   },
   administrativeAreas: mockAdministrativeAreas,
-  adminLevelIds: mockAdminLevelIds
+  adminLevelIds: mockAdminLevelIds,
+  form: {}
 }
 
 const textField = {

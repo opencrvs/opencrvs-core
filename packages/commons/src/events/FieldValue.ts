@@ -43,7 +43,7 @@ export { PlainDate, plainDateToLocalDate }
 
 export const TextValue = z.string()
 export const HiddenFieldValue = z.string()
-export const NonEmptyTextValue = TextValue.min(1)
+export const NonEmptyTextValue = z.string().trim().min(1)
 
 export const DateValue = z.iso.date().describe('Date in the format YYYY-MM-DD')
 
@@ -95,6 +95,9 @@ export const CheckboxFieldValue = z.boolean()
 export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
 export const NumberFieldValue = z.number()
 export type NumberFieldValue = z.infer<typeof NumberFieldValue>
+
+export const SignatureFieldValue = FileFieldValue
+export type SignatureFieldValue = z.infer<typeof SignatureFieldValue>
 
 export const ButtonFieldValue = z.number()
 export type ButtonFieldValue = z.infer<typeof ButtonFieldValue>

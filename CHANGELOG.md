@@ -32,6 +32,39 @@ V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
 - **events-service location APIs changes**
   Administrative areas (v1 `locationType: 'ADMIN_STRUCTURE'`) are exposed from a separate endpoint. See the [definition of the administrative hierarchy](/ADMINISTRATIVE-HIERARCHY.md) 2.0.0 onwards.
 
+#### Country config `GET /config/locations` response shape
+
+The data-seeder now expects `GET /config/locations` to return a structured object instead of a flat array. Country configuration's locations endpoint needs to be updated accordingly.
+
+**Before:**
+
+```ts
+Array<{
+  id: string
+  name: string
+  alias?: string
+  partOf: string
+  locationType: 'ADMIN_STRUCTURE' | 'HEALTH_FACILITY' | 'CRVS_OFFICE'
+}>
+```
+
+**After:**
+
+```ts
+{
+  administrativeAreas: Array<{ id: string; name: string; partOf: string }>
+  locations: Array<{
+    id: string
+    name: string
+    partOf: string
+    locationType: string
+  }>
+}
+```
+
+- `alias` has been removed and is no longer accepted.
+- `locationType` in the `locations` array is now a free-form `string` — country configurations are no longer restricted to the three built-in values and may define custom location types.
+
 #### Workqueue configurations
 
 - `actions: [{ type: CtaActionType }]`. is deprecated in favor of `action: { type: CtaActionType }`
@@ -48,6 +81,18 @@ V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
 #### Inherent flags
 
 - The inherent flag `InherentFlags.PENDING_CERTIFICATION` has been removed. Similar logic can be implemented in the country config with a custom flag, [see example](https://github.com/opencrvs/opencrvs-countryconfig/blob/81db21f4cf9ccbba90cb2c6e48648c9b258dc905/src/form/v2/birth/index.ts#L95-L102).
+
+#### Webhook integration client removed
+
+The Webhook integration client and its `webhooks` service have been removed and are **not** migrated to v2.0 automatically. Country configurations that previously consumed webhook subscriptions must instead react to events via the country config's [Action Confirmation API](https://github.com/opencrvs/opencrvs-countryconfig/blob/develop/src/api/action-confirmation.md), which is invoked for every supported action (`NOTIFY`, `DECLARE`, `REGISTER`, `REJECT`, `ARCHIVE`, `PRINT_CERTIFICATE`). If a webhook-style fan-out to external systems is still required, implement it directly inside the country configuration code from those handlers.
+
+#### Event Notification API rename
+
+`POST /api/events/events/notifications` has been renamed to `POST /api/events/events/{eventId}/notify`. The two-step "create event, then notify" flow is unchanged otherwise. A new single-request convenience endpoint `POST /api/events/events/notify` is also available for system clients that need to create and notify in one call. Integration clients must update their request paths.
+
+#### Auth service no longer exposed on its own subdomain
+
+The public `auth.{hostname}` Traefik route has been removed — the auth service is now reachable only through the gateway proxy at `gateway.{hostname}/auth/*`. Remove the `auth.*` DNS record and TLS certificate from your deployment. The gateway's `/auth/authenticate-super-user` route is now rate limited on a constant key (it previously keyed on a `username` field that super user auth does not send).
 
 ### New features
 
@@ -93,6 +138,44 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - Change reindex call to make operation non-destructive. Create endpoint to track progress of reindex. [#11877](https://github.com/opencrvs/opencrvs-core/issues/11877)
 - Fixed vulnerabilities on CSP HTTP Header for login page [#12094](https://github.com/opencrvs/opencrvs-core/issues/12094)
 - Merged Helm charts as part of Monorepo [#12679](https://github.com/opencrvs/opencrvs-core/issues/12679)
+
+## 1.9.14
+
+### New features
+
+- Two new toolkit methods allow country configurations to implement custom client-side logic that goes beyond the predefined `field()` methods. [#11653](https://github.com/opencrvs/opencrvs-core/issues/11653)
+
+  **`field('id').customClientValidator(fn)`** — validate a field with an arbitrary inline function. The function is serialised into the form configuration and executed just-in-time during validation. All logic must be self-contained — external references such as lodash are not available — so the validator stays portable wherever the schema is evaluated.
+
+  ```ts
+  field('nid').customClientValidator((value) => {
+    // LUHN check — all logic must be inline
+    const digits = String(value).split('').reverse().map(Number)
+    let sum = 0
+    digits.forEach((d, i) => {
+      const n = i % 2 === 0 ? d : d * 2
+      sum += n > 9 ? n - 9 : n
+    })
+    return sum % 10 === 0
+  })
+  ```
+
+  The result is a `JSONSchema` and can be used anywhere a conditional validator is accepted (field `validation[]`, page conditionals, etc.).
+
+  **`field('id').customClientEvaluation(fn)`** — compute a derived value from one field and the full form context. Returns a `CodeToEvaluate` descriptor usable as `value`, `defaultValue`, or a `DATA` component entry.
+
+  ```ts
+  field('quantity').customClientEvaluation(
+    (qty, ctx) => Number(qty) * Number(ctx.$form['unitPrice'])
+  )
+  ```
+
+- Always display a "Go to review" button on every page of declaration form to allow easier navigation between the preview and the form fields. [#10132](https://github.com/opencrvs/opencrvs-core/issues/10132)
+
+### Bug fixes
+
+- Signature fields referenced in certificate templates via Handlebars now resolve correctly. Signatures captured during registration and on the review page were previously not rendered in printed certificates even when the template referenced them. [#12277](https://github.com/opencrvs/opencrvs-core/issues/12277)
+
 ## 1.9.13
 
 ### Breaking changes
@@ -104,7 +187,7 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 
 - Action confirmation tokens are now scoped with `record.read` access for the specific event, enabling the confirmation flow to fetch event data via the `event.get` tRPC endpoint. [#12350](https://github.com/opencrvs/opencrvs-core/issues/12350)
 - Within a form page, `defaultValue` resolution is now ordered: each field can reference the resolved values of fields above it, enabling intra-page derived defaults. [#12350](https://github.com/opencrvs/opencrvs-core/issues/12350)
-- 
+-
 
 ### Bug fixes
 

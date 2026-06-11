@@ -78,7 +78,6 @@ const defaultSearchFieldGenerator: Record<
       id: 'advancedSearch.registeredAtLocation.helperText'
     },
     configuration: {
-      locationTypes: ['ADMIN_STRUCTURE', 'CRVS_OFFICE'],
       allowedLocations: user.jurisdiction(
         user.scope('record.search').attribute('registeredIn')
       )
@@ -489,10 +488,22 @@ function applySearchFieldOverridesToFieldConfig(
       ...(searchField.options && { options: searchField.options })
     }
   }
-  return {
-    ...field,
-    ...commonConfig
+  if (
+    field.type === FieldType.LOCATION ||
+    field.type === FieldType.ADMINISTRATIVE_AREA
+  ) {
+    return {
+      ...field,
+      ...commonConfig,
+      ...(searchField.allowedLocations && {
+        configuration: {
+          ...field.configuration,
+          allowedLocations: searchField.allowedLocations
+        }
+      })
+    } as FieldConfig
   }
+  return { ...field, ...commonConfig }
 }
 
 /**

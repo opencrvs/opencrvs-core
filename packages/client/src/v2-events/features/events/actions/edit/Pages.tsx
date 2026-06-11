@@ -76,7 +76,6 @@ export function Pages() {
           formPages={declarationPages}
           pageId={currentPageId}
           setFormData={(data) => setFormValues(data)}
-          showReviewButton={searchParams.from === 'review'}
           validatorContext={validatorContext}
           onPageChange={(nextPageId: string) =>
             navigate(
@@ -90,7 +89,7 @@ export function Pages() {
             navigate(
               ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath(
                 { eventId },
-                { workqueue: searchParams.workqueue }
+                { backTo: searchParams.backTo }
               )
             )
           }

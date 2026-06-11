@@ -93,7 +93,7 @@ const ACTION_PROCEDURE_CONFIG = {
         summary: 'Notify an event',
         method: 'POST',
         path: '/events/{eventId}/notify',
-        tags: ['events'],
+        tags: ['Events'],
         protect: true
       }
     }
@@ -129,7 +129,7 @@ const ACTION_PROCEDURE_CONFIG = {
         summary: 'Request correction for an event',
         method: 'POST',
         path: '/events/{eventId}/correction/request',
-        tags: ['events'],
+        tags: ['Events'],
         protect: true
       }
     }
@@ -142,7 +142,7 @@ const ACTION_PROCEDURE_CONFIG = {
         summary: 'Approve correction for an event',
         method: 'POST',
         path: '/events/{eventId}/correction/approve',
-        tags: ['events'],
+        tags: ['Events'],
         protect: true
       }
     }
@@ -155,7 +155,7 @@ const ACTION_PROCEDURE_CONFIG = {
         summary: 'Reject correction for an event',
         method: 'POST',
         path: '/events/{eventId}/correction/reject',
-        tags: ['events'],
+        tags: ['Events'],
         protect: true
       }
     }
@@ -318,22 +318,13 @@ export async function defaultRequestHandler(
     declaration,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     annotation,
-    keepAssignment,
-    keepAssignmentIfAccepted,
-    keepAssignmentIfRejected,
     ...strippedInput
   } = input
-
-  const effectiveKeepAssignment =
-    status === ActionStatus.Accepted
-      ? (keepAssignmentIfAccepted ?? keepAssignment ?? false)
-      : (keepAssignmentIfRejected ?? keepAssignment ?? false)
 
   return processAction(
     {
       ...strippedInput,
       waitFor: input.waitFor,
-      keepAssignment: effectiveKeepAssignment,
       declaration: {},
       originalActionId: requestedAction.id,
       ...parsedBody

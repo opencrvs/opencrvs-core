@@ -10,14 +10,14 @@
  */
 import { buttonMessages } from '@client/i18n/messages'
 import { messages as userSetupMessages } from '@client/i18n/messages/views/userSetup'
-import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { IStoreState } from '@client/store'
 import {
   DynamicHeightLinkButton,
   LabelContainer,
   ValueContainer
 } from '@client/views/Settings/items/components'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { UUID } from '@opencrvs/commons/client'
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import * as React from 'react'
 import { useIntl } from 'react-intl'
@@ -25,11 +25,14 @@ import { useSelector } from 'react-redux'
 
 export function AssignedOffice() {
   const intl = useIntl()
-  const officeName = useSelector<IStoreState, string>((state) => {
-    const userDetails = getUserDetails(state)
-    if (!userDetails?.primaryOfficeId) return ''
-    return getOfflineData(state).offices?.[userDetails.primaryOfficeId]?.name ?? ''
-  })
+  const userDetails = useSelector(getUserDetails)
+  const { getLocations } = useLocations()
+  const locations = getLocations.useSuspenseQuery()
+
+  const officeName = userDetails?.primaryOfficeId
+    ? (locations.get(userDetails.primaryOfficeId as UUID)?.name ?? '')
+    : ''
+
   return (
     <ListViewItemSimplified
       label={

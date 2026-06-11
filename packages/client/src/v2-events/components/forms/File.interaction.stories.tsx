@@ -17,6 +17,7 @@ import { userEvent } from '@storybook/testing-library'
 import { FieldType, MimeType, TestUserRole } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { createImageFile } from '@client/tests/image-file'
 import { getTestValidatorContext } from '../../../../.storybook/decorators'
 import { FormFieldGeneratorPropsWithoutRef } from './FormFieldGenerator/FormFieldGenerator'
 
@@ -401,27 +402,6 @@ startxref
 
     window.fetch = originalFetch
   }
-}
-
-async function createImageFile(name: string, width: number, height: number) {
-  return new Promise<File>((resolve, reject) => {
-    const canvas = document.createElement('canvas')
-    canvas.width = width
-    canvas.height = height
-    const ctx = canvas.getContext('2d')
-    if (ctx) {
-      ctx.fillStyle = '#000'
-      ctx.fillRect(0, 0, width, height)
-    }
-    canvas.toBlob((blob) => {
-      if (blob) {
-        const file = new File([blob], name, { type: blob.type })
-        resolve(file)
-      } else {
-        reject(new Error('Could not create blob from canvas'))
-      }
-    }, 'image/jpeg')
-  })
 }
 
 export const FileInputButtonMaxImage: Story = {

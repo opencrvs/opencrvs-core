@@ -278,7 +278,7 @@ platform:
 auth:
   port: 4040
   env:
-    TWO_FA_ENABLED: false
+    TWO_FA_ENABLED: true
   image:
     name: ocrvs-auth
     # optional overrides:
@@ -342,34 +342,17 @@ documents:
   image:
     name: ocrvs-documents
 
-events:
-  port: 5555
-  image:
-    name: ocrvs-events
-  env:
-    ES_INDEX_PREFIX: events
-  probes:
-    liveness:
-      path: /health/ready
-      timeoutSeconds: 10
-    readiness:
-      path: /health/ready
-      timeoutSeconds: 10
-    startup:
-      path: /health/ready
-
 gateway:
   port: 7070
   image:
     name: ocrvs-gateway
 
   env:
-    TWO_FA_ENABLED: false
     CHECK_INVALID_TOKEN: "true"
     CONFIG_SMS_CODE_EXPIRY_SECONDS: "600"
     CONFIG_TOKEN_EXPIRY_SECONDS: "604800"
     COUNTRY: FAR
-    DISABLE_RATE_LIMIT: "true"
+    DISABLE_RATE_LIMIT: "false"
     LANGUAGES: "en,fr"
 
 login:
@@ -408,20 +391,13 @@ login:
       httpGet:
         path: /health/ready
 
-user_mgnt:
-  port: 3030
-  env:
-    DEFAULT_USER_PASSWORD: "test"
-  image:
-    name: ocrvs-user-mgnt
-
 events:
   port: 5555
   image:
     name: ocrvs-events
   env:
-    DEFAULT_USER_PASSWORD: "test"
-    TWO_FA_ENABLED: false
+    ES_INDEX_PREFIX: events
+    TWO_FA_ENABLED: true
   probes:
     liveness:
       path: /health/ready
@@ -432,11 +408,6 @@ events:
     startup:
       path: /health/ready
       timeoutSeconds: 10
-user_mgnt:
-  port: 3030
-  image:
-    name: ocrvs-user-mgnt
-
 
 ##############################################################
 # One time jobs:
@@ -463,7 +434,7 @@ data_seed:
   env:
     # When users are seeded, are they immediately active using a test password and
     # six zeros as a 2-Factor auth code. Always set to false in production and staging.
-    ACTIVATE_USERS: "true"
+    ACTIVATE_USERS: "false"
 
 on_restore_cronjob:
   enabled: false
