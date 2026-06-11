@@ -111,11 +111,20 @@ export const getRoutes = () => {
         description: 'Retrieve forms'
       }
     },
-    catchAllProxy.auth,
     authProxy.token,
     rateLimitedAuthProxy.authenticate,
     rateLimitedAuthProxy.authenticateSuperUser,
     rateLimitedAuthProxy.verifyUser,
+    rateLimitedAuthProxy.verifyCode,
+    rateLimitedAuthProxy.resendAuthenticationCode,
+    rateLimitedAuthProxy.verifyNumber,
+    rateLimitedAuthProxy.verifySecurityAnswer,
+    rateLimitedAuthProxy.sendUserName,
+    rateLimitedAuthProxy.changePassword,
+    // Catch-all is fail-open: it proxies any other /auth/* request with no rate
+    // limiting. Hapi matches by specificity (literal paths beat `{suffix}`), so
+    // any new auth endpoint needs its own rate-limited route added above.
+    catchAllProxy.auth,
     ...trpcProxy
   ]
 
