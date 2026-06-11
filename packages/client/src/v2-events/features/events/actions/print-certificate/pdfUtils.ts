@@ -741,7 +741,7 @@ async function downloadAndEmbedImages(svgString: string): Promise<string> {
  * unclipped values extend horizontally into the empty right margin — they never
  * wrap or bleed into the field below.
  */
-export function stripTextClipPaths(svgElement: Element): void {
+function stripTextClipPaths(svgElement: Element): void {
   svgElement.querySelectorAll('[clip-path]').forEach((el) => {
     if (el.tagName.toLowerCase() === 'text' || el.querySelector('text')) {
       el.removeAttribute('clip-path')
