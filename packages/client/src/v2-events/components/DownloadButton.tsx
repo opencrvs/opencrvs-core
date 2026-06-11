@@ -120,6 +120,7 @@ export function DownloadButton({
           data-tip
           data-class="no-connection"
           data-for={`${id}_noConnection`}
+          data-testid="no-connection-icon"
         >
           <ConnectionError key={id} id={`${id}_noConnection`} />
         </div>
@@ -134,6 +135,7 @@ export function DownloadButton({
     return (
       <StatusIndicator
         className={className}
+        data-testid="download-loading-icon"
         id={`${id}-download-loading`}
         isLoading={true}
       >
