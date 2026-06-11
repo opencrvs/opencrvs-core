@@ -155,12 +155,12 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
           })
         ],
         files: [
-          http.get('/api/presigned-url/:filePath*', (req) => {
-            return HttpResponse.json({
-              presignedURL: `http://localhost:3535/ocrvs/${req.params.filePath}`
-            })
+          http.post('/api/upload', (req) => {
+            return HttpResponse.text(
+              `uploaded-image-${new Date().getTime()}.jpg`
+            )
           }),
-          http.get('http://localhost:3535/ocrvs/:eventId/:id', () => {
+          http.get('/:id', () => {
             return new HttpResponse(TestImage.Fish, {
               headers: {
                 'Content-Type': 'image/svg+xml',
@@ -422,50 +422,29 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
             })
           ],
           files: [
-            http.get('/api/presigned-url/:filePath*', (req) => {
-              return HttpResponse.json({
-                presignedURL: `http://localhost:3535/ocrvs/${req.params.filePath}`
-              })
-            }),
             http.post('/api/upload', () => {
               return HttpResponse.text(
                 `uploaded-image-${new Date().getTime()}.jpg`
               )
             }),
-            http.get('http://localhost:3535/ocrvs/:id', async () => {
-              spies.getImage++
-              const response = await fetch(signaturePngBase64)
-              const binary = new Uint8Array(await response.arrayBuffer())
-
-              return new HttpResponse(binary, {
-                headers: {
-                  'Content-Type': MimeType.enum['image/png'],
-                  'Cache-Control': 'no-cache'
-                }
-              })
-            }),
 
             http.get('/:id', async (request) => {
               const { id } = request.params
-              spies.getImage++
+              const response = await fetch(signaturePngBase64)
+              const binary = new Uint8Array(await response.arrayBuffer())
+
+              // condition here is just to differentiate that the same mock serves two different requests.
+              // It is hard to differentiate at path level after we removed /ocrvs/ from the url.
               if (id && typeof id === 'string' && id.startsWith('signature')) {
                 spies.getImage++
-                const response = await fetch(signaturePngBase64)
-                const binary = new Uint8Array(await response.arrayBuffer())
                 return new HttpResponse(binary, {
                   headers: {
                     'Content-Type': MimeType.enum['image/png'],
                     'Cache-Control': 'no-cache'
                   }
                 })
-              }
-            }),
-            http.get('/:eventId/:id', async (request) => {
-              const { eventId, id } = request.params
-              if (eventId === '123-abcd-213') {
+              } else {
                 spies.getImage++
-                const response = await fetch(signaturePngBase64)
-                const binary = new Uint8Array(await response.arrayBuffer())
                 return new HttpResponse(binary, {
                   headers: {
                     'Content-Type': MimeType.enum['image/png'],
