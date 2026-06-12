@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { logger } from '@opencrvs/commons'
 import { redis } from './redis'
 
 const TTL = 60 * 60 * 24 // 24 hours
@@ -22,7 +23,10 @@ export const setCachedLocations = (query: string, body: string) =>
 
 export const bustLocationsCache = async () => {
   const keys = await redis.keys(`${KEY_PREFIX}*`)
-  if (keys.length) await redis.del(keys)
+  if (keys.length) {
+    await redis.del(keys)
+    logger.info(`Locations cache busted: ${keys.length} keys cleared`)
+  }
 }
 
 export const fetchAndCache = (
