@@ -13,6 +13,7 @@ import { within, expect, fn, waitFor } from '@storybook/test'
 import { userEvent } from '@storybook/testing-library'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
+import { TRPCError } from '@trpc/server'
 import {
   DocumentPath,
   encodeScope,
@@ -1806,6 +1807,159 @@ export const InProgressEditsPreservedForSameUserThenClearedAfterSwitch: StoryObj
           expect(
             canvasElement.querySelector('[data-testid="row-value-email"]')
           ).not.toHaveTextContent(editedEmail)
+        )
+      }
+    )
+  }
+}
+
+export const CreateUserShowsSuccessToast: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: createTemporaryId()
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        createUser: [tRPCMsw.user.create.mutation(() => mockUser)]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      name: { firstname: 'Test', surname: 'User' },
+      phoneNumber: '01712345678',
+      email: 'test@opencrvs.org'
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Submit the create form', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: /create user/i })
+      )
+    })
+
+    await step('Success toast "New user created" appears', async () => {
+      // Toasts render in a portal outside canvasElement — query document.body.
+      await waitFor(() =>
+        expect(
+          within(document.body).getByText('New user created')
+        ).toBeInTheDocument()
+      )
+    })
+  }
+}
+
+export const UpdateUserShowsSuccessToast: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: mockUser.id
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        user: [tRPCMsw.user.get.query(() => mockUser)],
+        updateUser: [tRPCMsw.user.update.mutation(() => mockUser)]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm(
+      {
+        primaryOfficeId: mockUser.primaryOfficeId,
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        name: {
+          firstname: mockUser.name.firstname,
+          surname: mockUser.name.surname
+        },
+        phoneNumber: mockUser.mobile,
+        email: mockUser.email
+      },
+      mockUser.id
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Submit the update form', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: /confirm/i })
+      )
+    })
+
+    await step(
+      'Success toast "User details have been updated" appears',
+      async () => {
+        await waitFor(() =>
+          expect(
+            within(document.body).getByText('User details have been updated')
+          ).toBeInTheDocument()
+        )
+      }
+    )
+  }
+}
+
+export const CreateUserShowsErrorToastOnUnknownFailure: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: createTemporaryId()
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        createUser: [
+          tRPCMsw.user.create.mutation(() => {
+            throw new TRPCError({
+              code: 'CONFLICT',
+              message: 'UNHANDLED_CONFLICT'
+            })
+          })
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      name: { firstname: 'Test', surname: 'User' },
+      phoneNumber: '01712345678',
+      email: 'test@opencrvs.org'
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Submit the create form', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: /create user/i })
+      )
+    })
+
+    await step(
+      'Generic error toast "Sorry! Something went wrong" appears',
+      async () => {
+        await waitFor(() =>
+          expect(
+            within(document.body).getByText('Sorry! Something went wrong')
+          ).toBeInTheDocument()
         )
       }
     )
