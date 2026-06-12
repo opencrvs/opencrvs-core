@@ -21,7 +21,6 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { TriggerEvent } from '@opencrvs/commons/client'
-import { convertToMSISDN } from '@client/forms/utils'
 import { useCurrentUser } from '@client/v2-events/hooks/useCurrentUser'
 
 interface IProps {
@@ -113,11 +112,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
           id="continue-button"
           key="continue"
           onClick={() => {
-            const internationalFormat = convertToMSISDN(
-              phoneNumber,
-              window.config.COUNTRY
-            )
-            continueButtonHandler(internationalFormat)
+            continueButtonHandler(phoneNumber)
           }}
           disabled={
             !isOnline ||
