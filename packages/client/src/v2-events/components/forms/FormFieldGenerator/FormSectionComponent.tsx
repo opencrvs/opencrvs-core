@@ -147,16 +147,25 @@ function getParentsOfListenerFields(fields: FieldConfig[]) {
  * fields are not restored, and their stale cache entries are evicted so
  * intentionally invalidated values cannot resurface later.
  */
-function applyVisibilityTransitions(
-  eventConfig: EventConfig,
-  prevForm: EventState,
-  currentForm: EventState,
-  fieldValues: Record<string, FieldValue>,
-  validatorContext: ValidatorContext,
-  cacheHiddenFieldValue: (key: string, value: FieldValue) => void,
-  popHiddenFieldValue: (key: string) => FieldValue | undefined,
+function applyVisibilityTransitions({
+  eventConfig,
+  prevForm,
+  currentForm,
+  fieldValues,
+  validatorContext,
+  cacheHiddenFieldValue,
+  popHiddenFieldValue,
+  isResetEvent
+}: {
+  eventConfig: EventConfig
+  prevForm: EventState
+  currentForm: EventState
+  fieldValues: Record<string, FieldValue>
+  validatorContext: ValidatorContext
+  cacheHiddenFieldValue: (key: string, value: FieldValue) => void
+  popHiddenFieldValue: (key: string) => FieldValue | undefined
   isResetEvent: boolean
-): void {
+}): void {
   const prevCleaned = omitHiddenPaginatedFields(
     eventConfig.declaration,
     prevForm,
@@ -332,16 +341,16 @@ export function FormSectionComponent({
         ...makeFormikFieldIdsOpenCRVSCompatible(updatedFormikPageForm)
       }
 
-      applyVisibilityTransitions(
+      applyVisibilityTransitions({
         eventConfig,
-        ocrvsFullForm,
-        updatedFullForm,
-        updatedFormikPageForm,
+        prevForm: ocrvsFullForm,
+        currentForm: updatedFullForm,
+        fieldValues: updatedFormikPageForm,
         validatorContext,
         cacheHiddenFieldValue,
         popHiddenFieldValue,
         isResetEvent
-      )
+      })
     }
 
     const formikListenerFieldPaths = listenerFields.map(([p]) =>
@@ -409,16 +418,16 @@ export function FormSectionComponent({
         ...makeFormikFieldIdsOpenCRVSCompatible(updatedValues)
       }
 
-      applyVisibilityTransitions(
+      applyVisibilityTransitions({
         eventConfig,
-        ocrvsFullForm,
-        updatedFullForm,
-        updatedValues,
+        prevForm: ocrvsFullForm,
+        currentForm: updatedFullForm,
+        fieldValues: updatedValues,
         validatorContext,
         cacheHiddenFieldValue,
         popHiddenFieldValue,
         isResetEvent
-      )
+      })
     }
 
     void setValues(updatedValues)
