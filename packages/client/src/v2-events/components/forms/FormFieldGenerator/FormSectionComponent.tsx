@@ -141,6 +141,11 @@ function getParentsOfListenerFields(fields: FieldConfig[]) {
  * Applies visibility transitions to fieldValues in place.
  * Fields that became hidden are set to null (and their value cached).
  * Fields that became visible have their cached value restored.
+ *
+ * When the change carries reset semantics (`isResetEvent`), the cache is
+ * bypassed: newly hidden fields are cleared without caching, newly visible
+ * fields are not restored, and their stale cache entries are evicted so
+ * intentionally invalidated values cannot resurface later.
  */
 function applyVisibilityTransitions(
   eventConfig: EventConfig,
@@ -149,7 +154,8 @@ function applyVisibilityTransitions(
   fieldValues: Record<string, FieldValue>,
   validatorContext: ValidatorContext,
   cacheHiddenFieldValue: (key: string, value: FieldValue) => void,
-  popHiddenFieldValue: (key: string) => FieldValue | undefined
+  popHiddenFieldValue: (key: string) => FieldValue | undefined,
+  isResetEvent: boolean
 ): void {
   const prevCleaned = omitHiddenPaginatedFields(
     eventConfig.declaration,
@@ -173,7 +179,12 @@ function applyVisibilityTransitions(
   newHiddenKeys.forEach((key) => {
     const fieldValue = get(prevCleaned, key)
     if (!isNil(fieldValue)) {
-      cacheHiddenFieldValue(key, fieldValue)
+      if (isResetEvent) {
+        // Evict instead of caching — the value was intentionally invalidated
+        popHiddenFieldValue(key)
+      } else {
+        cacheHiddenFieldValue(key, fieldValue)
+      }
     }
     // Always null hidden fields — even when prevCleaned has undefined (e.g. after
     // an OAuth redirect where Zustand was wiped and Formik re-initialised the field
@@ -184,7 +195,7 @@ function applyVisibilityTransitions(
   // When a field transitions from hidden to visible, restore its cached value
   newVisibleKeys.forEach((key) => {
     const cachedValue = popHiddenFieldValue(key)
-    if (cachedValue !== undefined) {
+    if (!isResetEvent && cachedValue !== undefined) {
       set(fieldValues, makeFormFieldIdFormikCompatible(key), cachedValue)
     }
   })
@@ -293,6 +304,11 @@ export function FormSectionComponent({
         !isNonInteractiveFieldType(fieldWithPath[1])
     )
 
+    // Changing a field that has listeners (it is someone's `parent`) carries
+    // reset semantics: listener values are recomputed, so values hidden by
+    // this transition are invalidated and must not be cached or restored.
+    const isResetEvent = interactiveListenerFields.length > 0
+
     // update the value of the field that was changed
     set(updatedFormikPageForm, formikFieldId, value)
 
@@ -306,6 +322,8 @@ export function FormSectionComponent({
         updatedFormikPageForm,
         clientFunctionContext
       )
+      // Evict stale cached values of reset fields so they cannot be restored
+      popHiddenFieldValue(listenerField[0].join('.'))
     }
 
     if (eventConfig) {
@@ -321,7 +339,8 @@ export function FormSectionComponent({
         updatedFormikPageForm,
         validatorContext,
         cacheHiddenFieldValue,
-        popHiddenFieldValue
+        popHiddenFieldValue,
+        isResetEvent
       )
     }
 
@@ -353,6 +372,7 @@ export function FormSectionComponent({
       form: updatedValues,
       validatorContext
     })
+    let isResetEvent = false
     for (const { name: formikFieldId, value } of newValues) {
       set(updatedValues, formikFieldId, value)
 
@@ -362,6 +382,11 @@ export function FormSectionComponent({
         (fieldWithPath): fieldWithPath is [string[], InteractiveFieldType] =>
           !isNonInteractiveFieldType(fieldWithPath[1])
       )
+
+      // Changing a field that has listeners (it is someone's `parent`) carries
+      // reset semantics: listener values are recomputed, so values hidden by
+      // this transition are invalidated and must not be cached or restored.
+      isResetEvent = isResetEvent || interactiveListenerFields.length > 0
 
       for (const listenerField of interactiveListenerFields) {
         setValueForListenerField(
@@ -373,6 +398,8 @@ export function FormSectionComponent({
           updatedTouched,
           listenerField[0].map(makeFormFieldIdFormikCompatible)
         )
+        // Evict stale cached values of reset fields so they cannot be restored
+        popHiddenFieldValue(listenerField[0].join('.'))
       }
     }
 
@@ -389,7 +416,8 @@ export function FormSectionComponent({
         updatedValues,
         validatorContext,
         cacheHiddenFieldValue,
-        popHiddenFieldValue
+        popHiddenFieldValue,
+        isResetEvent
       )
     }
 
