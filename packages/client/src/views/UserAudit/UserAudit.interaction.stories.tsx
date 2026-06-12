@@ -330,10 +330,12 @@ export const EditDetailsDoesNotShowStaleFormState: Story = {
     const canvas = within(canvasElement)
 
     await step('Wait for user audit page to load', async () => {
-      await waitFor(() =>
-        expect(
-          canvasElement.querySelector(`#${HEADER_MENU_WRAPPER_ID}`)
-        ).not.toBeNull()
+      await waitFor(
+        () =>
+          expect(
+            canvasElement.querySelector(`#${HEADER_MENU_WRAPPER_ID}`)
+          ).not.toBeNull(),
+        { timeout: 5000 }
       )
     })
 
