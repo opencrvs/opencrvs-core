@@ -48,6 +48,8 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
     setShowDuplicateMobileErrorNotification
   ] = React.useState(false)
   const { sendVerifyCode } = useUsers()
+  const isMobileNumberUnchanged =
+    Boolean(phoneNumber) && phoneNumber === currentUser?.mobile
   const onChangePhoneNumber = (event: React.ChangeEvent<HTMLInputElement>) => {
     const phoneNumber = event.target.value
     setPhoneNumber(phoneNumber)
@@ -121,7 +123,8 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
             !isOnline ||
             sendVerifyCode.isPending ||
             !Boolean(phoneNumber.length) ||
-            isInvalidPhoneNumber
+            isInvalidPhoneNumber ||
+            isMobileNumberUnchanged
           }
         >
           {intl.formatMessage(buttonMessages.continueButton)}
@@ -149,7 +152,9 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
                   id: 'phone.start'
                 })
               })
-            : ''
+            : isMobileNumberUnchanged
+              ? intl.formatMessage(messages.mobileNumberUnchangedErrorMessege)
+              : ''
         }
       >
         <TextInput
