@@ -65,3 +65,64 @@ export const ContinueButtonDisabledWhenGoingOffline: Story = {
     })
   }
 }
+
+// The default storybook user (local registrar) has this email address.
+const currentUserEmail = 'kalushabwalya1.7@gmail.com'
+
+export const ContinueButtonDisabledWhenEmailUnchanged: Story = {
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Enter the current email — unchanged error shown, continue disabled',
+      async () => {
+        await userEvent.type(
+          await canvas.findByRole('textbox'),
+          currentUserEmail
+        )
+        await expect(
+          await canvas.findByText(
+            'This is already your email address. Please enter a different email address'
+          )
+        ).toBeVisible()
+        await expect(
+          canvas.getByRole('button', { name: 'Continue' })
+        ).toBeDisabled()
+      }
+    )
+
+    await step(
+      'Current email in a different case still counts as unchanged',
+      async () => {
+        const input = canvas.getByRole('textbox')
+        await userEvent.clear(input)
+        await userEvent.type(input, currentUserEmail.toUpperCase())
+        await expect(
+          await canvas.findByText(
+            'This is already your email address. Please enter a different email address'
+          )
+        ).toBeVisible()
+        await expect(
+          canvas.getByRole('button', { name: 'Continue' })
+        ).toBeDisabled()
+      }
+    )
+
+    await step(
+      'Enter a different email — error clears, continue enabled',
+      async () => {
+        const input = canvas.getByRole('textbox')
+        await userEvent.clear(input)
+        await userEvent.type(input, 'new.email@example.com')
+        await expect(
+          canvas.queryByText(
+            'This is already your email address. Please enter a different email address'
+          )
+        ).not.toBeInTheDocument()
+        await expect(
+          canvas.getByRole('button', { name: 'Continue' })
+        ).toBeEnabled()
+      }
+    )
+  }
+}

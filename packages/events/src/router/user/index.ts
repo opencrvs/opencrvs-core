@@ -496,6 +496,8 @@ export const userRouter = router({
         })
       }
 
+      await validateMobile(input.phoneNumber)
+
       const userWithDuplicateNumber = await searchUsers({
         mobile: input.phoneNumber,
         count: 1,

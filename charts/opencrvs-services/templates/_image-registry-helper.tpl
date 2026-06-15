@@ -50,7 +50,7 @@ ghcr.io/opencrvs/ocrvs-auth:v1.9.11
 {{- $svc := .service -}}
 
 {{- $rawTag := $svc.image.tag | default $root.Values.platform.tag | default $root.Values.image.tag -}}
-{{- $tag := kindIs "float64" $rawTag | ternary ($rawTag | int64 | toString) ($rawTag | toString) -}}
+{{- $tag := kindIs "float64" $rawTag | ternary ($rawTag | int64 | toString) ($rawTag | toString) | trim -}}
 {{- $repository := $svc.image.repository | default $root.Values.platform.repository -}}
 {{- $name := required "service image.name is required" $svc.image.name -}}
 
