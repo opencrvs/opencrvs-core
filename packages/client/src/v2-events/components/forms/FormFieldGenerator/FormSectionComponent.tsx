@@ -142,10 +142,9 @@ function getParentsOfListenerFields(fields: FieldConfig[]) {
  * Fields that became hidden are set to null (and their value cached).
  * Fields that became visible have their cached value restored.
  *
- * When the change carries reset semantics (`isResetEvent`), the cache is
- * bypassed: newly hidden fields are cleared without caching, newly visible
- * fields are not restored, and their stale cache entries are evicted so
- * intentionally invalidated values cannot resurface later.
+ * Fields in `resetFieldIds` are excluded from the cache: their values were
+ * intentionally invalidated by a parent field change, so they are cleared
+ * without caching and never restored from a stale cache entry.
  */
 function applyVisibilityTransitions({
   eventConfig,
@@ -155,7 +154,7 @@ function applyVisibilityTransitions({
   validatorContext,
   cacheHiddenFieldValue,
   popHiddenFieldValue,
-  isResetEvent
+  resetFieldIds
 }: {
   eventConfig: EventConfig
   prevForm: EventState
@@ -164,7 +163,7 @@ function applyVisibilityTransitions({
   validatorContext: ValidatorContext
   cacheHiddenFieldValue: (key: string, value: FieldValue) => void
   popHiddenFieldValue: (key: string) => FieldValue | undefined
-  isResetEvent: boolean
+  resetFieldIds: Set<string>
 }): void {
   const prevCleaned = omitHiddenPaginatedFields(
     eventConfig.declaration,
@@ -188,8 +187,8 @@ function applyVisibilityTransitions({
   newHiddenKeys.forEach((key) => {
     const fieldValue = get(prevCleaned, key)
     if (!isNil(fieldValue)) {
-      if (isResetEvent) {
-        // Evict instead of caching — the value was intentionally invalidated
+      if (resetFieldIds.has(key)) {
+        // Evict instead of caching — the value was intentionally reset by a parent change
         popHiddenFieldValue(key)
       } else {
         cacheHiddenFieldValue(key, fieldValue)
@@ -204,7 +203,7 @@ function applyVisibilityTransitions({
   // When a field transitions from hidden to visible, restore its cached value
   newVisibleKeys.forEach((key) => {
     const cachedValue = popHiddenFieldValue(key)
-    if (!isResetEvent && cachedValue !== undefined) {
+    if (cachedValue !== undefined && !resetFieldIds.has(key)) {
       set(fieldValues, makeFormFieldIdFormikCompatible(key), cachedValue)
     }
   })
@@ -313,26 +312,25 @@ export function FormSectionComponent({
         !isNonInteractiveFieldType(fieldWithPath[1])
     )
 
-    // Changing a field that has listeners (it is someone's `parent`) carries
-    // reset semantics: listener values are recomputed, so values hidden by
-    // this transition are invalidated and must not be cached or restored.
-    const isResetEvent = interactiveListenerFields.length > 0
-
     // update the value of the field that was changed
     set(updatedFormikPageForm, formikFieldId, value)
 
+    const resetFieldIds = new Set<string>()
     const clientFunctionContext = buildClientFunctionContext({
       form: updatedFormikPageForm,
       validatorContext
     })
     for (const listenerField of interactiveListenerFields) {
+      const fieldId = listenerField[0].join('.')
       setValueForListenerField(
         listenerField,
         updatedFormikPageForm,
         clientFunctionContext
       )
-      // Evict stale cached values of reset fields so they cannot be restored
-      popHiddenFieldValue(listenerField[0].join('.'))
+      // Evict stale cached value and mark the id so applyVisibilityTransitions
+      // skips caching/restoring it — the parent reset invalidated it
+      popHiddenFieldValue(fieldId)
+      resetFieldIds.add(fieldId)
     }
 
     if (eventConfig) {
@@ -349,7 +347,7 @@ export function FormSectionComponent({
         validatorContext,
         cacheHiddenFieldValue,
         popHiddenFieldValue,
-        isResetEvent
+        resetFieldIds
       })
     }
 
@@ -377,11 +375,11 @@ export function FormSectionComponent({
     const updatedValues = cloneDeep(formikPageForm)
     const updatedTouched = cloneDeep(touched)
 
+    const resetFieldIds = new Set<string>()
     const clientFunctionContext = buildClientFunctionContext({
       form: updatedValues,
       validatorContext
     })
-    let isResetEvent = false
     for (const { name: formikFieldId, value } of newValues) {
       set(updatedValues, formikFieldId, value)
 
@@ -392,12 +390,8 @@ export function FormSectionComponent({
           !isNonInteractiveFieldType(fieldWithPath[1])
       )
 
-      // Changing a field that has listeners (it is someone's `parent`) carries
-      // reset semantics: listener values are recomputed, so values hidden by
-      // this transition are invalidated and must not be cached or restored.
-      isResetEvent = isResetEvent || interactiveListenerFields.length > 0
-
       for (const listenerField of interactiveListenerFields) {
+        const fieldId = listenerField[0].join('.')
         setValueForListenerField(
           listenerField,
           updatedValues,
@@ -407,8 +401,10 @@ export function FormSectionComponent({
           updatedTouched,
           listenerField[0].map(makeFormFieldIdFormikCompatible)
         )
-        // Evict stale cached values of reset fields so they cannot be restored
-        popHiddenFieldValue(listenerField[0].join('.'))
+        // Evict stale cached value and mark the id so applyVisibilityTransitions
+        // skips caching/restoring it — the parent reset invalidated it
+        popHiddenFieldValue(fieldId)
+        resetFieldIds.add(fieldId)
       }
     }
 
@@ -426,7 +422,7 @@ export function FormSectionComponent({
         validatorContext,
         cacheHiddenFieldValue,
         popHiddenFieldValue,
-        isResetEvent
+        resetFieldIds
       })
     }
 
