@@ -199,12 +199,20 @@ export function DuplicateComparison({
             ({ type }) =>
               !hideFieldTypes.some((typeToHide) => type === typeToHide)
           )
+          // Group fields by label.id, preserving form order. Multiple fields
+          // can share the same label (e.g. "child.birthLocation" /
+          // "child.birthLocation.privateHome" / "child.birthLocation.other"
+          // all map to "Location of birth"). We render one row per unique
+          // label and pick the active field per side separately below.
           .reduce<Array<{ labelId: string; fields: FieldConfig[] }>>(
             (acc, field) => {
               const existing = acc.find((g) => g.labelId === field.label.id)
+
+              // If the field already exists, add it to the existing group
               if (existing) {
                 existing.fields.push(field)
               } else {
+                // If the field does not exist, create a new group for it
                 acc.push({ labelId: field.label.id, fields: [field] })
               }
               return acc
@@ -212,6 +220,12 @@ export function DuplicateComparison({
             []
           )
           .map(({ fields }) => {
+            // Each side may have a different field "active" — e.g. when one
+            // record uses HEALTH_FACILITY and the other was corrected to
+            // PRIVATE_HOME, the LOCATION field is active on one side and the
+            // ADDRESS field on the other. Pick the field whose conditional
+            // is satisfied per declaration so the comparison row shows the
+            // value the user actually entered, not a stale field config.
             const pickFieldForReview = (
               declaration: EventState,
               ctx: ValidatorContext
