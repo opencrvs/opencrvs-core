@@ -423,6 +423,12 @@ describe('getEventFlags() – rejected flag', () => {
     ).not.toContain(InherentFlags.REJECTED)
   })
 
+  test('is cleared when the record is archived after REJECT', () => {
+    expect(
+      getFlagsFor([ActionType.DECLARE, ActionType.REJECT, ActionType.ARCHIVE])
+    ).not.toContain(InherentFlags.REJECTED)
+  })
+
   test('persists when REJECT is followed by actions that do not reset declaration state', () => {
     expect(
       getFlagsFor([

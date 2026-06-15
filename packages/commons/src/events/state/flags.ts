@@ -75,7 +75,8 @@ function isRejected(actions: Action[]): boolean {
     ActionType.NOTIFY,
     ActionType.DECLARE,
     ActionType.EDIT,
-    ActionType.REGISTER
+    ActionType.REGISTER,
+    ActionType.ARCHIVE
   ]
 
   return actions.reduce<boolean>((prev, { type }) => {
