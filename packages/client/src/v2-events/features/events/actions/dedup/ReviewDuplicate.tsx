@@ -22,7 +22,7 @@ import {
   getCurrentEventState,
   getDeclaration
 } from '@opencrvs/commons/client'
-import { FormTabs, Frame, Icon, IFormTabs, Spinner } from '@opencrvs/components'
+import { FormTabs, Frame, Icon, IFormTabs } from '@opencrvs/components'
 import { Duplicate } from '@opencrvs/components/lib/icons'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -30,6 +30,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { SuspenseLoadingFallback } from '@client/v2-events/components/SuspenseLoadingFallback'
 import { FormHeader } from '@client/v2-events/layouts/form/FormHeader'
 import { findLocalEventDocument } from '../../useEvents/api'
 import { useValidatorContext } from '../../../../hooks/useValidatorContext'
@@ -217,7 +218,9 @@ function ReviewDuplicate() {
         />
       </TopBar>
       {selectedTab === event.trackingId ? (
-        <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
+        <React.Suspense
+          fallback={<SuspenseLoadingFallback id="event-form-spinner" />}
+        >
           <ReviewComponent.Body
             readonlyMode
             banner={<DuplicateForm eventIndex={eventState} />}
