@@ -21,7 +21,8 @@ import {
   FieldTypesToHideInReview,
   isFieldDisplayedOnReview,
   isPageVisible,
-  UUID
+  UUID,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import {
   ComparisonListView,
@@ -198,39 +199,60 @@ export function DuplicateComparison({
             ({ type }) =>
               !hideFieldTypes.some((typeToHide) => type === typeToHide)
           )
-          // Refer to 'findPreviousValueWithSameLabel' in Output.tsx for explanation
-          .reduce<FieldConfig[]>((acc, field) => {
-            const fieldWithSameLabelDontExist = !acc.find(
-              (f) => f.label.id === field.label.id
+          .reduce<Array<{ labelId: string; fields: FieldConfig[] }>>(
+            (acc, field) => {
+              const existing = acc.find((g) => g.labelId === field.label.id)
+              if (existing) {
+                existing.fields.push(field)
+              } else {
+                acc.push({ labelId: field.label.id, fields: [field] })
+              }
+              return acc
+            },
+            []
+          )
+          .map(({ fields }) => {
+            const pickFieldForReview = (
+              declaration: EventState,
+              ctx: ValidatorContext
+            ): FieldConfig =>
+              fields.find((f) =>
+                isFieldDisplayedOnReview(f, declaration, ctx)
+              ) ?? fields[0]
+
+            const leftField = pickFieldForReview(
+              originalDeclaration,
+              validatorContextOfOriginalEvent
             )
-            if (fieldWithSameLabelDontExist) {
-              acc.push(field)
+            const rightField = pickFieldForReview(
+              potentialDuplicateDeclaration,
+              validatorContextOfPotentialDuplicateEvent
+            )
+
+            return {
+              label: intl.formatMessage(fields[0].label),
+              rightValue: (
+                <Output
+                  displayEmptyAsDash={true}
+                  eventConfig={eventConfiguration}
+                  field={rightField}
+                  formConfig={eventConfiguration.declaration}
+                  previousForm={potentialDuplicateDeclaration}
+                  value={potentialDuplicateDeclaration[rightField.id]}
+                />
+              ),
+              leftValue: (
+                <Output
+                  displayEmptyAsDash={true}
+                  eventConfig={eventConfiguration}
+                  field={leftField}
+                  formConfig={eventConfiguration.declaration}
+                  previousForm={originalDeclaration}
+                  value={originalDeclaration[leftField.id]}
+                />
+              )
             }
-            return acc
-          }, [])
-          .map((field) => ({
-            label: intl.formatMessage(field.label),
-            rightValue: (
-              <Output
-                displayEmptyAsDash={true}
-                eventConfig={eventConfiguration}
-                field={field}
-                formConfig={eventConfiguration.declaration}
-                previousForm={potentialDuplicateDeclaration}
-                value={potentialDuplicateDeclaration[field.id]}
-              />
-            ),
-            leftValue: (
-              <Output
-                displayEmptyAsDash={true}
-                eventConfig={eventConfiguration}
-                field={field}
-                formConfig={eventConfiguration.declaration}
-                previousForm={originalDeclaration}
-                value={originalDeclaration[field.id]}
-              />
-            )
-          }))
+          })
       }))
       .filter(({ data }) => data.length > 0)
 
