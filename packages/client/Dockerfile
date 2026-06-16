@@ -28,4 +28,5 @@ COPY --from=0 --chown=nginx:nginx /app/packages/client/build/ /usr/share/nginx/h
 
 COPY --chmod=555 packages/client/nginx-deploy-config.sh /docker-entrypoint.d/11-nginx-deploy-config.sh
 COPY --chown=nginx:nginx packages/client/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --chown=nginx:nginx packages/client/nginx.logging.conf /etc/nginx/conf.d/logging.conf
 EXPOSE 3000
