@@ -35,6 +35,15 @@ jobs:
       - name: Extract version from package.json
         run: echo "VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
 
+      - name: Check if version tag already exists
+        id: check-existing
+        run: |
+          if docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }} > /dev/null 2>&1; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
@@ -42,7 +51,6 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=sha,prefix=
-            type=raw,value=${{ env.VERSION }}
         env:
           DOCKER_METADATA_SHORT_SHA_LENGTH: 7
 
@@ -57,3 +65,10 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Push version tag if new
+        if: steps.check-existing.outputs.skip != 'true'
+        run: |
+          docker buildx imagetools create \
+            --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }} \
+            ${{ steps.meta.outputs.tags }}
