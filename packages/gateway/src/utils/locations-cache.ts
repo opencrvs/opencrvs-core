@@ -9,33 +9,45 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { logger } from '@opencrvs/commons'
+import { promisify } from 'util'
+import { gzip as _gzip } from 'zlib'
 import { redis } from './redis'
+
+const gzip = promisify(_gzip)
 
 const TTL = 60 * 60 * 24 // 24 hours
 const MEM_TTL_MS = 60 * 1000 // 1 minute
 const KEY_PREFIX = 'locations:'
+
 // Deduplicates concurrent upstream fetches during cold-cache window. Without this,
 // N simultaneous misses on the same query each trigger a separate fetch. Once the
 // cache warms, this map is bypassed entirely.
-const inflight = new Map<string, Promise<string>>()
+const inflight = new Map<string, Promise<Buffer>>()
 
 // Redis GET allocates a new string per call. Under high concurrency, N requests
 // against a warm Redis cache = N strings in memory simultaneously. memCache keeps
-// one shared copy per query, reducing allocations to one per TTL window.
-type MemEntry = { body: string; expiresAt: number }
+// one shared compressed Buffer per query, reducing allocations to one per TTL window.
+// Stored compressed so write buffers to Traefik are smaller under high concurrency.
+type MemEntry = { compressed: Buffer; expiresAt: number }
 const memCache = new Map<string, MemEntry>()
 
-export const getCachedLocations = async (query: string) => {
+export const getCachedLocations = async (
+  query: string
+): Promise<Buffer | null> => {
   const mem = memCache.get(query)
-  if (mem && Date.now() < mem.expiresAt) return mem.body
+  if (mem && Date.now() < mem.expiresAt) return mem.compressed
 
-  const body = await redis.get(`${KEY_PREFIX}${query}`)
-  if (body) memCache.set(query, { body, expiresAt: Date.now() + MEM_TTL_MS })
-  return body
+  const stored = await redis.get(`${KEY_PREFIX}${query}`)
+  if (stored) {
+    const compressed = Buffer.from(stored, 'base64')
+    memCache.set(query, { compressed, expiresAt: Date.now() + MEM_TTL_MS })
+    return compressed
+  }
+  return null
 }
 
-export const setCachedLocations = (query: string, body: string) =>
-  redis.set(`${KEY_PREFIX}${query}`, body, { EX: TTL })
+export const setCachedLocations = (query: string, compressed: Buffer) =>
+  redis.set(`${KEY_PREFIX}${query}`, compressed.toString('base64'), { EX: TTL })
 
 export const bustLocationsCache = async () => {
   memCache.clear()
@@ -49,15 +61,16 @@ export const bustLocationsCache = async () => {
 export const fetchAndCache = (
   query: string,
   fetcher: () => Promise<string>
-): Promise<string> => {
+): Promise<Buffer> => {
   const existing = inflight.get(query)
   if (existing) return existing
 
   const promise = fetcher()
-    .then((body) => {
-      memCache.set(query, { body, expiresAt: Date.now() + MEM_TTL_MS })
-      setCachedLocations(query, body)
-      return body
+    .then(async (body) => {
+      const compressed = await gzip(body)
+      memCache.set(query, { compressed, expiresAt: Date.now() + MEM_TTL_MS })
+      setCachedLocations(query, compressed)
+      return compressed
     })
     .finally(() => inflight.delete(query))
 

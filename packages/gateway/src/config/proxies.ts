@@ -19,7 +19,11 @@ import {
   getCachedLocations
 } from '@gateway/utils/locations-cache'
 import z from 'zod'
-import { ServerRoute, ResponseToolkit } from '@hapi/hapi'
+import { promisify } from 'util'
+import { gunzip as _gunzip } from 'zlib'
+import { ServerRoute, ResponseToolkit, Request } from '@hapi/hapi'
+
+const gunzip = promisify(_gunzip)
 
 const LegacyLocationUpdate = z.object({
   name: z.string().optional(),
@@ -38,16 +42,31 @@ const LegacyLocationUpdate = z.object({
     .optional()
 })
 
-const getLocationsHandler = async (query: string, h: ResponseToolkit) => {
-  const cached = await getCachedLocations(query)
-  if (cached) return h.response(cached).type('application/json')
+const getLocationsHandler = async (req: Request, h: ResponseToolkit) => {
+  const query = req.url.search
+  const acceptsGzip: boolean =
+    req.headers['accept-encoding']?.includes('gzip') ?? false
 
-  const body = await fetchAndCache(query, async () => {
-    const res = await fetch(`${APPLICATION_CONFIG_URL}locations${query}`)
-    return res.text()
-  })
+  const compressed =
+    (await getCachedLocations(query)) ??
+    (await fetchAndCache(query, async () => {
+      const res = await fetch(`${APPLICATION_CONFIG_URL}locations${query}`)
+      return res.text()
+    }))
 
-  return h.response(body).type('application/json')
+  if (acceptsGzip) {
+    return h
+      .response(compressed)
+      .type('application/json')
+      .header('Content-Encoding', 'gzip')
+      .header('Vary', 'Accept-Encoding')
+  }
+
+  const body = await gunzip(compressed)
+  return h
+    .response(body)
+    .type('application/json')
+    .header('Vary', 'Accept-Encoding')
 }
 
 export const catchAllProxy = {
@@ -72,7 +91,7 @@ export const catchAllProxy = {
     method: '*',
     path: '/location',
     handler: async (req, h) => {
-      if (req.method === 'get') return getLocationsHandler(req.url.search, h)
+      if (req.method === 'get') return getLocationsHandler(req, h)
 
       void bustLocationsCache()
       return h.proxy({
@@ -108,7 +127,7 @@ export const catchAllProxy = {
   getLocations: {
     method: 'GET',
     path: '/locations',
-    handler: (req, h) => getLocationsHandler(req.url.search, h),
+    handler: (req, h) => getLocationsHandler(req, h),
     options: {
       auth: false
     }
