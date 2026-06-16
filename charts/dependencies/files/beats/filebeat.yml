@@ -31,19 +31,30 @@ processors:
       netinfo.enabled: true
 
   - decode_json_fields:
-      fields: ["message"]
+      fields: ["message", "msg"]
       process_array: false
       max_depth: 1
       target: ""
-      expand_keys: true
       overwrite_keys: true
-      add_error_key: true
+        
+  # DROP OpenCRVS health check logs
+  - drop_event:
+      when:
+        # URL-based filtering
+        and:
+          - equals:
+              req.url: "/ping"
+          - equals:
+              res.statusCode: 200
 
-  # Map Numeric log levels to names
+  # Map STRING log levels to names
   - script:
       lang: javascript
       source: >
         function process(event) {
+          if (event.Get("msg") !== null) {
+            event.Put("message", event.Get("msg"));
+          }
           var level = event.Get("level");
           if (level) {
             var levelNum = typeof level === "string" ? parseInt(level) : level;
@@ -56,40 +67,16 @@ processors:
               levelNum === 10 ? "trace" : "unknown";
             
             // Set the mapped fields
-            event.Put("log.level", levelName);
+            event.Put("log.level.name", levelName);
+            event.Put("log.level.value", levelNum);
+            event.Put("level_name", levelName);
+            event.Put("log.level", levelName);  // ECS standard
           }
         }
-  # Process nginx events to set log level based on HTTP status code
   - script:
       lang: javascript
       source: >
         function process(event) {
-          var status = parseInt(event.Get("http.response.status_code"), 10);
-
-          if (isNaN(status)) {
-            return;
-          }
-          var levelName = 
-            status >= 500 ? "error" :
-            status >= 400 ? "warn" : "info";
-
-          event.Put("log.level", levelName);
-        }
-  # FIXES:
-  # - message field contains not parsed JSON:
-  #   - nodejs (alls core services): Set message field to msg if present
-  #   - nginx (client, login): Set message field from url.original
-  # - Kubernetes correlation: host.name to pod name, container.name,
-  #   service.name, service.environment, and orchestrator info
-  - script:
-      lang: javascript
-      source: >
-        function process(event) {
-          if (event.Get("msg") !== null) {
-            event.Put("message", event.Get("msg"));
-          } else if (event.Get("url.original") !== null) {
-            event.Put("message", event.Get("url.original"));
-          }
           // Kubernetes correlation
           var k8s = event.Get("kubernetes");
           if (typeof k8s === 'object' && k8s !== null) {
@@ -155,4 +142,4 @@ setup.ilm.policy_file: /usr/share/filebeat/rollover-policy.json
 setup.ilm.check_exists: true
 setup.ilm.overwrite: true
 
-logging.level: info
+logging.level: error

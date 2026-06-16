@@ -382,13 +382,14 @@ login:
   # Health check probes configuration
   probes:
     liveness:
-      path: /health/ready
-      periodSeconds: 30
+      httpGet:
+        path: /health/ready
     readiness:
-      path: /health/ready
-      periodSeconds: 30
+      httpGet:
+        path: /health/ready
     startup:
-      path: /health/ready
+      httpGet:
+        path: /health/ready
 
 events:
   port: 5555
