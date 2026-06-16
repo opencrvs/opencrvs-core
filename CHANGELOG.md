@@ -138,7 +138,6 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - Change reindex call to make operation non-destructive. Create endpoint to track progress of reindex. [#11877](https://github.com/opencrvs/opencrvs-core/issues/11877)
 - Fixed vulnerabilities on CSP HTTP Header for login page [#12094](https://github.com/opencrvs/opencrvs-core/issues/12094)
 - Merged Helm charts as part of Monorepo [#12679](https://github.com/opencrvs/opencrvs-core/issues/12679)
-- Change nginx log format to json for client and login containers [#10202](https://github.com/opencrvs/opencrvs-core/issues/10202)
 
 ## 1.9.14
 
