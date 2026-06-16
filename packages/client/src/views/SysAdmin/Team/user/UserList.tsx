@@ -29,6 +29,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { ROUTES } from '@client/v2-events/routes'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { getAddressNameV2, UserStatus } from '@client/views/SysAdmin/Team/utils'
+import { useUserFormState } from '@client/views/SysAdmin/Team/user/userEditor/useUserFormState'
 import { Location, User, UUID } from '@opencrvs/commons/client'
 import { Link } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -239,7 +240,6 @@ function UserListComponent({ userDetails }: UserListProps) {
     canAccessOffice,
     canAccessMultipleLocations
   } = usePermissions()
-
   const { locationId } = parse(location.search, {
     ignoreQueryPrefix: true
   }) as unknown as SearchParams
@@ -387,6 +387,7 @@ function UserListComponent({ userDetails }: UserListProps) {
         {
           label: intl.formatMessage(messages.editUserDetailsTitle),
           handler: () => {
+            useUserFormState.getState().clear()
             navigate(
               ROUTES.V2.SETTINGS.USER.REVIEW.buildPath(
                 {
