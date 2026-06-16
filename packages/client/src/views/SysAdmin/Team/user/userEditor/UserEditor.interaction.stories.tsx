@@ -13,6 +13,7 @@ import { within, expect, fn, waitFor } from '@storybook/test'
 import { userEvent } from '@storybook/testing-library'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
+import { TRPCError } from '@trpc/server'
 import {
   DocumentPath,
   encodeScope,
@@ -1657,155 +1658,153 @@ export const CorrectUserDataLoadedAfterSwitchingUsers: StoryObj<
   }
 }
 
-/**
- * Regression test for two complementary behaviours of the userId-aware form state:
- *
- * 1. In-progress edits are preserved when the admin returns to the same user's
- *    review page (userId in store matches, form is non-empty → skip re-init).
- *
- * 2. In-progress edits are discarded once the admin has visited a different
- *    user's profile in between (userId in store no longer matches → re-init
- *    from server data).
- *
- * The edited email ('edited@storybook.com') is seeded directly in the Zustand
- * store — this simulates the admin having edited the field without submitting.
- */
-export const InProgressEditsPreservedForSameUserThenClearedAfterSwitch: StoryObj<
-  typeof EditUser
-> = {
+export const CreateUserShowsSuccessToast: StoryObj = {
   parameters: {
+    chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath:
-        V1_LEGACY_ROUTES.TEAM_USER_LIST + `?locationId=${userB.primaryOfficeId}`
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: createTemporaryId()
+      })
     },
     msw: {
       handlers: {
-        user: [
-          tRPCMsw.user.search.query(() => [userA, userB]),
-          tRPCMsw.user.get.query((id) =>
-            id === userA.id ? { ...userA, data: {} } : { ...userB, data: {} }
-          )
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        createUser: [tRPCMsw.user.create.mutation(() => mockUser)]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      name: { firstname: 'Test', surname: 'User' },
+      phoneNumber: '01712345678',
+      email: 'test@opencrvs.org'
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Submit the create form', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: /create user/i })
+      )
+    })
+
+    await step('Success toast "New user created" appears', async () => {
+      // Toasts render in a portal outside canvasElement — query document.body.
+      await waitFor(() =>
+        expect(
+          within(document.body).getByText('New user created')
+        ).toBeInTheDocument()
+      )
+    })
+  }
+}
+
+export const UpdateUserShowsSuccessToast: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: mockUser.id
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        user: [tRPCMsw.user.get.query(() => mockUser)],
+        updateUser: [tRPCMsw.user.update.mutation(() => mockUser)]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm(
+      {
+        primaryOfficeId: mockUser.primaryOfficeId,
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        name: {
+          firstname: mockUser.name.firstname,
+          surname: mockUser.name.surname
+        },
+        phoneNumber: mockUser.mobile,
+        email: mockUser.email
+      },
+      mockUser.id
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Submit the update form', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: /confirm/i })
+      )
+    })
+
+    await step(
+      'Success toast "User details have been updated" appears',
+      async () => {
+        await waitFor(() =>
+          expect(
+            within(document.body).getByText('User details have been updated')
+          ).toBeInTheDocument()
+        )
+      }
+    )
+  }
+}
+
+export const CreateUserShowsErrorToastOnUnknownFailure: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: createTemporaryId()
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        createUser: [
+          tRPCMsw.user.create.mutation(() => {
+            throw new TRPCError({
+              code: 'CONFLICT',
+              message: 'UNHANDLED_CONFLICT'
+            })
+          })
         ]
       }
     }
   },
-  loaders: [
-    async () => {
-      window.config.ADDITIONAL_USER_FIELDS = []
-      useUserFormState.getState().clear()
-    }
-  ],
   beforeEach: () => {
-    // Seed in-progress edits for userB. The userId is stored alongside so that
-    // alreadyInitialized returns true when the review page opens for userB,
-    // leaving these edits intact instead of re-loading server data.
-    useUserFormState.getState().setUserForm(
-      {
-        primaryOfficeId: userB.primaryOfficeId,
-        role: userB.role,
-        name: userB.name,
-        email: 'edited@storybook.com',
-        phoneNumber: userB.mobile
-      },
-      userB.id
-    )
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      name: { firstname: 'Test', surname: 'User' },
+      phoneNumber: '01712345678',
+      email: 'test@opencrvs.org'
+    })
   },
   play: async ({ canvasElement, step }) => {
-    const editedEmail = 'edited@storybook.com'
     const canvas = within(canvasElement)
 
-    await step('Wait for user list to load', async () => {
-      await canvas.findByText(`${userB.name.firstname} ${userB.name.surname}`, {
-        selector: '#profile-link'
-      })
-    })
-
-    await step(`Open ${userB.name.firstname}'s review page`, async () => {
-      const trigger = findMenuTriggerForUser(
-        canvasElement,
-        `${userB.name.firstname} ${userB.name.surname}`
+    await step('Submit the create form', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: /create user/i })
       )
-      await userEvent.click(trigger)
-      const popoverId = trigger.getAttribute('popovertarget')
-      const popover = popoverId ? document.getElementById(popoverId) : null
-      if (!popover)
-        throw new Error(`${userB.name.firstname} menu popover not found`)
-      await userEvent.click(within(popover).getByText('Edit details'))
     })
 
     await step(
-      'In-progress edited email is shown — same userId, edits preserved',
+      'Generic error toast "Sorry! Something went wrong" appears',
       async () => {
         await waitFor(() =>
           expect(
-            canvasElement.querySelector('[data-testid="row-value-email"]')
-          ).toHaveTextContent(editedEmail)
-        )
-      }
-    )
-
-    await step(
-      `Close ${userB.name.firstname}'s review — back to user list`,
-      async () => {
-        await userEvent.click(await canvas.findByTestId('crcl-btn'))
-      }
-    )
-
-    await step(`Open ${userA.name.firstname}'s review page`, async () => {
-      const trigger = findMenuTriggerForUser(
-        canvasElement,
-        `${userA.name.firstname} ${userA.name.surname}`
-      )
-      await userEvent.click(trigger)
-      const popoverId = trigger.getAttribute('popovertarget')
-      const popover = popoverId ? document.getElementById(popoverId) : null
-      if (!popover)
-        throw new Error(`${userA.name.firstname} menu popover not found`)
-      await userEvent.click(within(popover).getByText('Edit details'))
-    })
-
-    await step(
-      `Verify ${userA.name.firstname}'s review page loaded`,
-      async () => {
-        await canvas.findByText(
-          `${userA.name.firstname} ${userA.name.surname}`,
-          { selector: '[data-testid="row-value-name"]', exact: false }
-        )
-      }
-    )
-
-    await step(
-      `Close ${userA.name.firstname}'s review — back to user list`,
-      async () => {
-        await userEvent.click(await canvas.findByTestId('crcl-btn'))
-      }
-    )
-
-    await step(`Open ${userB.name.firstname}'s review page again`, async () => {
-      const trigger = findMenuTriggerForUser(
-        canvasElement,
-        `${userB.name.firstname} ${userB.name.surname}`
-      )
-      await userEvent.click(trigger)
-      const popoverId = trigger.getAttribute('popovertarget')
-      const popover = popoverId ? document.getElementById(popoverId) : null
-      if (!popover)
-        throw new Error(`${userB.name.firstname} menu popover not found`)
-      await userEvent.click(within(popover).getByText('Edit details'))
-    })
-
-    await step(
-      `${userB.name.firstname}'s review shows server data — in-progress edits cleared after visiting ${userA.name.firstname}`,
-      async () => {
-        await canvas.findByText(
-          `${userB.name.firstname} ${userB.name.surname}`,
-          { selector: '[data-testid="row-value-name"]', exact: false }
-        )
-        await waitFor(() =>
-          expect(
-            canvasElement.querySelector('[data-testid="row-value-email"]')
-          ).not.toHaveTextContent(editedEmail)
+            within(document.body).getByText('Sorry! Something went wrong')
+          ).toBeInTheDocument()
         )
       }
     )

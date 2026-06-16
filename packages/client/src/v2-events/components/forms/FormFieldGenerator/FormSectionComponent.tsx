@@ -177,8 +177,11 @@ function applyVisibilityTransitions(
     const fieldValue = get(prevCleaned, key)
     if (!isNil(fieldValue)) {
       cacheHiddenFieldValue(key, fieldValue)
-      set(fieldValues, makeFormFieldIdFormikCompatible(key), null)
     }
+    // Always null hidden fields — even when prevCleaned has undefined (e.g. after
+    // an OAuth redirect where Zustand was wiped and Formik re-initialised the field
+    // to undefined), the server may still hold a real value that must be cleared.
+    set(fieldValues, makeFormFieldIdFormikCompatible(key), null)
   })
 
   // When a field transitions from hidden to visible, restore its cached value

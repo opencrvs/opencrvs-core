@@ -21,7 +21,6 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { TriggerEvent } from '@opencrvs/commons/client'
-import { convertToMSISDN } from '@client/forms/utils'
 import { useCurrentUser } from '@client/v2-events/hooks/useCurrentUser'
 
 interface IProps {
@@ -48,6 +47,8 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
     setShowDuplicateMobileErrorNotification
   ] = React.useState(false)
   const { sendVerifyCode } = useUsers()
+  const isMobileNumberUnchanged =
+    Boolean(phoneNumber) && phoneNumber === currentUser?.mobile
   const onChangePhoneNumber = (event: React.ChangeEvent<HTMLInputElement>) => {
     const phoneNumber = event.target.value
     setPhoneNumber(phoneNumber)
@@ -111,17 +112,14 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
           id="continue-button"
           key="continue"
           onClick={() => {
-            const internationalFormat = convertToMSISDN(
-              phoneNumber,
-              window.config.COUNTRY
-            )
-            continueButtonHandler(internationalFormat)
+            continueButtonHandler(phoneNumber)
           }}
           disabled={
             !isOnline ||
             sendVerifyCode.isPending ||
             !Boolean(phoneNumber.length) ||
-            isInvalidPhoneNumber
+            isInvalidPhoneNumber ||
+            isMobileNumberUnchanged
           }
         >
           {intl.formatMessage(buttonMessages.continueButton)}
@@ -149,7 +147,9 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
                   id: 'phone.start'
                 })
               })
-            : ''
+            : isMobileNumberUnchanged
+              ? intl.formatMessage(messages.mobileNumberUnchangedErrorMessege)
+              : ''
         }
       >
         <TextInput

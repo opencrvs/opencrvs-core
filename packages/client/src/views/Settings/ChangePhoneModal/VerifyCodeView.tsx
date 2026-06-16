@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { convertToMSISDN } from '@client/forms/utils'
 import { buttonMessages, userMessages as messages } from '@client/i18n/messages'
 import { modifyUserDetails } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -76,7 +75,7 @@ export function VerifyCodeView({
       dispatch(
         modifyUserDetails({
           ...userDetails,
-          mobile: convertToMSISDN(phoneNumber, window.config.COUNTRY)
+          mobile: phoneNumber
         })
       )
     }
