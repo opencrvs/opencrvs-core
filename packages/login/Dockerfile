@@ -16,5 +16,6 @@ FROM nginxinc/nginx-unprivileged:1.29-alpine
 
 COPY --from=base --chown=nginx:nginx /app/packages/login/build/ /usr/share/nginx/html/
 COPY --chown=nginx:nginx packages/login/nginx.template.conf /etc/nginx/templates/default.conf.template
+COPY --chown=nginx:nginx packages/login/logging.template.conf /etc/nginx/templates/logging.conf.template
 USER nginx
 EXPOSE 3020
