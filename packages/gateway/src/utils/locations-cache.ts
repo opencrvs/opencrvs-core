@@ -46,7 +46,7 @@ export const getCachedLocations = async (
   return null
 }
 
-export const setCachedLocations = (query: string, compressed: Buffer) =>
+const setCachedLocations = (query: string, compressed: Buffer) =>
   redis.set(`${KEY_PREFIX}${query}`, compressed.toString('base64'), { EX: TTL })
 
 export const bustLocationsCache = async () => {
