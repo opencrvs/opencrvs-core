@@ -76,6 +76,14 @@ function showToastOnDuplicateDetected(event: EventDocument) {
   })
 }
 
+function deleteLocalEventAndToastOnDuplicate(event: EventDocument) {
+  void deleteLocalEvent(event)
+
+  if (isPotentialDuplicate(event.actions)) {
+    showToastOnDuplicateDetected(event)
+  }
+}
+
 function retryUnlessConflict(
   _failureCount: number,
   error: TRPCClientError<AppRouter>
@@ -167,13 +175,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: (event) => {
-    void deleteLocalEvent(event)
-
-    if (isPotentialDuplicate(event.actions)) {
-      showToastOnDuplicateDetected(event)
-    }
-  },
+  onSuccess: deleteLocalEventAndToastOnDuplicate,
   onError: errorToastOnConflict,
   onMutate: updateEventOptimistically(
     ActionType.DECLARE,
@@ -200,13 +202,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.register.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: (event) => {
-    void deleteLocalEvent(event)
-
-    if (isPotentialDuplicate(event.actions)) {
-      showToastOnDuplicateDetected(event)
-    }
-  },
+  onSuccess: deleteLocalEventAndToastOnDuplicate,
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.REGISTER }
 })
@@ -361,7 +357,7 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
   mutationFn: waitUntilEventIsCreated(customApi.registerOnDeclare),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: deleteLocalEvent,
+  onSuccess: deleteLocalEventAndToastOnDuplicate,
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.DECLARE }
 })
@@ -370,7 +366,7 @@ queryClient.setMutationDefaults(customMutationKeys.editAndRegister, {
   mutationFn: customApi.editAndRegister,
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: deleteLocalEvent,
+  onSuccess: deleteLocalEventAndToastOnDuplicate,
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.REGISTER }
 })
@@ -379,7 +375,7 @@ queryClient.setMutationDefaults(customMutationKeys.editAndDeclare, {
   mutationFn: customApi.editAndDeclare,
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: deleteLocalEvent,
+  onSuccess: deleteLocalEventAndToastOnDuplicate,
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.DECLARE }
 })
