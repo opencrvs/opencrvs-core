@@ -70,8 +70,33 @@ registerRoute(/http(.+)config$/, new NetworkFirst())
 // This caches certificates fetched from the countryconfig microservice
 registerRoute(/api\/countryconfig\/certificates/, new NetworkFirst())
 
-// This caches the minio urls
-registerRoute(MINIO_REGEX, new CacheFirst())
+/*
+ * This caches the minio urls and the file paths rendered from the runtime cache
+ * (e.g. /events/<eventId>/<file>.png).
+ *
+ * - /api/* is excluded so presigned url responses (/api/presigned-url/<file>.png
+ *   also matches MINIO_REGEX) are never served stale after the signature expires.
+ *
+ * - text/html responses are never cached: a cache miss on a same-origin file path
+ *   falls through to the SPA fallback (index.html). Caching that response would
+ *   permanently serve HTML for the image URL.
+ */
+registerRoute(
+  ({ url }) => MINIO_REGEX.test(url.href) && !url.pathname.startsWith('/api/'),
+  new CacheFirst({
+    plugins: [
+      {
+        cacheWillUpdate: async ({ response }) => {
+          if (response.status !== 200) {
+            return null
+          }
+          const contentType = response.headers.get('content-type') ?? ''
+          return contentType.includes('text/html') ? null : response
+        }
+      }
+    ]
+  })
+)
 
 /*
  *   Alternate for navigateFallback & navigateFallbackBlacklist

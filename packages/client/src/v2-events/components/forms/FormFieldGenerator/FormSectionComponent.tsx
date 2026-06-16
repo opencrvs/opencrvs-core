@@ -10,6 +10,7 @@
  */
 
 import React, { useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 import { FormikProps } from 'formik'
 import { cloneDeep, set, get, omit, unset, isNil } from 'lodash'
 import {
@@ -32,7 +33,8 @@ import {
   isFieldVisible,
   findAllFields,
   flattenFieldReference,
-  omitHiddenPaginatedFields
+  omitHiddenPaginatedFields,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import {
   makeFormFieldIdFormikCompatible,
@@ -41,6 +43,7 @@ import {
 import { useOnlineStatus } from '@client/utils'
 import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { findLocalEventDocument } from '@client/v2-events/features/events/useEvents/api'
 import {
   makeFormikFieldIdsOpenCRVSCompatible,
   resolveSyncedFieldValue
@@ -211,6 +214,27 @@ export function FormSectionComponent({
 
   const getDefaultValue = useDefaultValue()
   const { cacheHiddenFieldValue, popHiddenFieldValue } = useEventFormData()
+  const { eventId } = useParams<{ eventId?: string }>()
+  const cachedEvent = eventId ? findLocalEventDocument(eventId) : undefined
+  const baseDeclaration =
+    cachedEvent && eventConfig
+      ? getCurrentEventState(cachedEvent, eventConfig).declaration
+      : undefined
+  // Use server state as the base for visibility transition detection, then let
+  // any non-undefined in-memory value override it. After an OAuth redirect
+  // (e-Signet/MOSIP), Zustand is wiped so Formik initialises fields to
+  // undefined — those fall back to the last committed server value, allowing
+  // visible→hidden transitions to null them correctly. In the correction flow,
+  // draft values are all non-undefined and naturally override the server state,
+  // so the behaviour is unchanged from using ocrvsFullForm directly.
+  const prevFormRef = baseDeclaration
+    ? {
+        ...baseDeclaration,
+        ...Object.fromEntries(
+          Object.entries(ocrvsFullForm).filter(([, v]) => v !== undefined)
+        )
+      }
+    : ocrvsFullForm
 
   const fullFormFields = eventConfig
     ? findAllFields(eventConfig).concat(pageFields)
@@ -316,7 +340,7 @@ export function FormSectionComponent({
 
       applyVisibilityTransitions(
         eventConfig,
-        ocrvsFullForm,
+        prevFormRef,
         updatedFullForm,
         updatedFormikPageForm,
         validatorContext,
@@ -384,7 +408,7 @@ export function FormSectionComponent({
 
       applyVisibilityTransitions(
         eventConfig,
-        ocrvsFullForm,
+        prevFormRef,
         updatedFullForm,
         updatedValues,
         validatorContext,
