@@ -113,6 +113,20 @@ export function DownloadButton({
     event.id
   )
 
+  if (eventDocument.isFetching || isAssignMutationFetching) {
+    return (
+      <StatusIndicator
+        className={className}
+        data-testid="download-loading-icon"
+        id={`${id}-download-loading`}
+        isLoading={true}
+      >
+        <Spinner id={`action-loading-${id}`} size={24} />
+      </StatusIndicator>
+    )
+  }
+  const isFailed = eventDocument.isError
+
   if (!isOnline) {
     return (
       <NoConnectionViewContainer>
@@ -130,20 +144,6 @@ export function DownloadButton({
       </NoConnectionViewContainer>
     )
   }
-
-  if (eventDocument.isFetching || isAssignMutationFetching) {
-    return (
-      <StatusIndicator
-        className={className}
-        data-testid="download-loading-icon"
-        id={`${id}-download-loading`}
-        isLoading={true}
-      >
-        <Spinner id={`action-loading-${id}`} size={24} />
-      </StatusIndicator>
-    )
-  }
-  const isFailed = eventDocument.isError
 
   const isDownloadedToMe =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF &&

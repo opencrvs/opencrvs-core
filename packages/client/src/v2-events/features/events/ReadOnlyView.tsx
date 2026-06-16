@@ -62,10 +62,6 @@ const messages = defineMessages({
   }
 })
 
-const OfflineMessageWrapper = styled.div`
-  text-align: center;
-`
-
 function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   const events = useEvents()
   const event = events.getEvent.useGetOrDownloadEvent(eventId)
@@ -157,20 +153,6 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   )
 }
 
-function OfflineRecordMessage() {
-  const intl = useIntl()
-  return (
-    <Content
-      size={ContentSize.SMALL}
-      title={intl.formatMessage(messages.offlineTitle)}
-    >
-      <OfflineMessageWrapper data-testid="record-offline-message">
-        {intl.formatMessage(messages.offlineDescription)}
-      </OfflineMessageWrapper>
-    </Content>
-  )
-}
-
 function ReadonlyView() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.RECORD)
   const [{ backTo }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT.RECORD)
@@ -178,29 +160,11 @@ function ReadonlyView() {
   const { canAccessEventWithScopes } = useCanAccessEventWithScopes(eventId, [
     'record.read'
   ])
-  const isOnline = useOnlineStatus()
-  const trpc = useTRPC()
 
   if (!canAccessEventWithScopes()) {
     navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { backTo }))
     return null
   }
-
-  const isCachedAsView = queryClient.getQueryData([['view-event', eventId]])
-  const isCachedAsAssigned = queryClient.getQueryData(
-    trpc.event.get.queryKey({ eventId, waitFor: false })
-  )
-
-  // React Query pauses queries when the browser is offline, so the suspense
-  // boundary inside ReadonlyViewContent would hang on a spinner forever if
-  // the user opens a record they have not previously downloaded.
-  // Render a clear message instead — useOnlineStatus re-renders this when
-  // the connection returns, so the content loads automatically.
-  if (!isOnline && !isCachedAsView && !isCachedAsAssigned) {
-    return <OfflineRecordMessage />
-  }
-
-  return <ReadonlyViewContent eventId={eventId} />
 }
 
 export const ReadonlyViewIndex = withSuspense(ReadonlyView)
