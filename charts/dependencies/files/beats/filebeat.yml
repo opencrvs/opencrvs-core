@@ -126,7 +126,37 @@ processors:
             }
           }
         } 
-
+  - drop_fields:
+      fields:
+        - agent
+        - ecs
+        - input
+        - host.ip
+        - host.mac
+        - host.os
+        - host.architecture
+        - host.containerized
+        - log.file.device_id
+        - log.file.inode
+        - log.file.fingerprint
+        - log.offset
+        - kubernetes.node.uid
+        - kubernetes.namespace_uid
+        - kubernetes.namespace_labels
+        - kubernetes.node.labels
+        - kubernetes.pod.uid
+        - container.id
+        - stream
+        - event.timezone
+        - pid
+        - req.remotePort
+        - container.runtime
+        - time
+        - kubernetes.node.name
+        - kubernetes.container.name
+        - kubernetes.labels.pod-template-hash
+        - level
+      ignore_missing: true
 #========================== Elasticsearch output ===============================
 output.elasticsearch:
   hosts: ['${ELASTICSEARCH_HOST}']

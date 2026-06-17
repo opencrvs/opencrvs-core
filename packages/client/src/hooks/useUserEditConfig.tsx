@@ -35,7 +35,6 @@ import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { emptyMessage, isTemporaryId } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes/routes'
-import { validationMessages } from '@client/i18n/messages'
 
 export function useUserEditConfig(
   locationId: UUID | undefined,
@@ -145,7 +144,7 @@ export function useUserEditConfig(
                   label: messages.phoneNumber,
                   validation: [
                     {
-                      message: validationMessages.phoneNumberNotValid,
+                      message: messages.phoneNumberFormat,
                       validator: or(
                         field('phoneNumber').matches(
                           String(window.config.PHONE_NUMBER_PATTERN)
