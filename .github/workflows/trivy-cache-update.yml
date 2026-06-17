@@ -31,3 +31,4 @@ jobs:
         with:
           scan-type: fs
           scan-ref: .
+          exit-code: 0
