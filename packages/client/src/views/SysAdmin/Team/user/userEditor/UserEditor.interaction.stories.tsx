@@ -362,7 +362,9 @@ export const InvalidPhoneNumberShowsValidationError: StoryObj = {
       await waitFor(() =>
         expect(
           canvasElement.querySelector('#phoneNumber_error')
-        ).toHaveTextContent('Not a valid mobile number')
+        ).toHaveTextContent(
+          'Must be a valid 10 digit number that starts with 0(7|9)'
+        )
       )
     })
   }
