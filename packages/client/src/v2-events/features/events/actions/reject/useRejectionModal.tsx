@@ -47,7 +47,7 @@ export function useRejectionModal(
       )
     )
     if (confirmedRejection) {
-      const { rejectAction, message, isDuplicate } = confirmedRejection
+      const { rejectAction, message } = confirmedRejection
 
       if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
         events.actions.reject.mutate({
@@ -60,22 +60,13 @@ export function useRejectionModal(
       }
 
       if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
-        if (isDuplicate) {
-          events.customActions.archiveOnDuplicate.mutate({
-            eventId,
-            declaration: {},
-            transactionId: uuid(),
-            content: { reason: message }
-          })
-        } else {
-          events.actions.archive.mutate({
-            eventId,
-            declaration: {},
-            transactionId: uuid(),
-            annotation: {},
-            content: { reason: message }
-          })
-        }
+        events.actions.archive.mutate({
+          eventId,
+          declaration: {},
+          transactionId: uuid(),
+          annotation: {},
+          content: { reason: message }
+        })
       }
 
       onClose()
