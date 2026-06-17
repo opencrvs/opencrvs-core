@@ -18,6 +18,7 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES } from '@client/v2-events/routes/routes'
 import { routesConfig } from '@client/v2-events/routes/config'
 import { testDataGenerator } from '@client/tests/test-data-generators'
+import { useUserFormState } from '@client/views/SysAdmin/Team/user/userEditor/useUserFormState'
 import { UserAudit } from './UserAudit'
 import { handlers } from '../../../.storybook/default-request-handlers'
 
@@ -286,6 +287,66 @@ export const DeactivateActiveUserShowsErrorToast: Story = {
       ).toMatch(
         /Failed to update Kennedy Mweene.s account status to "Deactivated"/
       )
+    })
+  }
+}
+
+/**
+ * Regression test: stale form data from an abandoned edit must be discarded
+ * when "Edit details" is clicked again.
+ *
+ * Scenario: the Zustand store is pre-seeded with modified values for kennedy's
+ * userId (simulating a previous edit that was abandoned via browser back). On
+ * the next "Edit details" click the review page must show server data, not the
+ * stale edits.
+ */
+export const EditDetailsDoesNotShowStaleFormState: Story = {
+  tags: ['stale-form-regression'],
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        user: [tRPCMsw.user.get.query(() => kennedy)],
+        userRoles: [
+          tRPCMsw.user.roles.list.query(() => [
+            { id: TestUserRole.enum.LOCAL_REGISTRAR, scopes: [] }
+          ])
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    kennedy.name = { firstname: 'Kennedy', surname: 'Mweene' }
+    useUserFormState.getState().setUserForm(
+      {
+        name: { firstname: 'Kennedyaaa', surname: 'Mweeneaaa' },
+        primaryOfficeId: kennedy.primaryOfficeId,
+        role: kennedy.role
+      },
+      kennedy.id
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Wait for user audit page to load', async () => {
+      await waitFor(
+        () =>
+          expect(
+            canvasElement.querySelector(`#${HEADER_MENU_WRAPPER_ID}`)
+          ).not.toBeNull(),
+        { timeout: 5000 }
+      )
+    })
+
+    await step('Open header menu and click Edit details', async () => {
+      const popover = await openHeaderMenu(canvasElement)
+      await userEvent.click(within(popover).getByText('Edit details'))
+    })
+
+    await step('Review page loads without the stale form data', async () => {
+      await canvas.findByText("User's full name")
+      expect(canvas.queryByText('Kennedyaaa Mweeneaaa')).toBeNull()
     })
   }
 }

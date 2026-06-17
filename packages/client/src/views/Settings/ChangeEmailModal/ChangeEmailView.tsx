@@ -44,6 +44,9 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
   const userDetails = useSelector(getUserDetails)
   const isOnline = useOnlineStatus()
   const { sendVerifyCode } = useUsers()
+  const isEmailAddressUnchanged =
+    Boolean(emailAddress) &&
+    emailAddress.trim().toLowerCase() === userDetails?.email?.toLowerCase()
 
   const onChangeEmailAddress = (event: React.ChangeEvent<HTMLInputElement>) => {
     const emailAddress = event.target.value
@@ -113,7 +116,8 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
             !isOnline ||
             sendVerifyCode.isPending ||
             !Boolean(emailAddress.length) ||
-            isInvalidEmailAddress
+            isInvalidEmailAddress ||
+            isEmailAddressUnchanged
           }
         >
           {intl.formatMessage(buttonMessages.continueButton)}
@@ -131,7 +135,9 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
         error={
           isInvalidEmailAddress
             ? intl.formatMessage(messages.emailAddressChangeFormValidationMsg)
-            : ''
+            : isEmailAddressUnchanged
+              ? intl.formatMessage(messages.emailAddressUnchangedErrorMessege)
+              : ''
         }
       >
         <TextInput
