@@ -174,11 +174,6 @@ const reviewMessages = defineMessages({
     defaultMessage: 'Government',
     description: 'Header title that shows govt name'
   },
-  rejectModalArchive: {
-    id: 'rejectModal.archive',
-    defaultMessage: 'Archive',
-    description: 'The label for archive button of reject modal'
-  },
   rejectModalSendForUpdate: {
     id: 'rejectModal.sendForUpdate',
     defaultMessage: 'Send For Update',
@@ -701,10 +696,6 @@ function AcceptActionModal({
       </Stack>
     </ResponsiveModal>
   )
-}
-
-export interface RejectionState {
-  message: string
 }
 
 function RejectActionModal({
