@@ -703,30 +703,18 @@ function AcceptActionModal({
   )
 }
 
-export const REJECT_ACTIONS = {
-  ARCHIVE: 'ARCHIVE',
-  SEND_FOR_UPDATE: 'SEND_FOR_UPDATE'
-} as const
-
 export interface RejectionState {
-  rejectAction: keyof typeof REJECT_ACTIONS
   message: string
 }
 
 function RejectActionModal({
   close,
-  allowArchive = true,
   supportingCopy
 }: {
-  close: (result: RejectionState | null) => void
-  allowArchive?: boolean
+  close: (result: string | null) => void
   supportingCopy?: MessageDescriptor
 }) {
-  const [state, setState] = useState<RejectionState>({
-    rejectAction: REJECT_ACTIONS.ARCHIVE,
-    message: ''
-  })
-
+  const [message, setMessage] = useState<string>('')
   const intl = useIntl()
 
   const actions = [
@@ -740,34 +728,13 @@ function RejectActionModal({
     >
       {intl.formatMessage(buttonMessages.cancel)}
     </Button>,
-    ...(allowArchive
-      ? [
-          <Button
-            key="confirm_reject_with_archive"
-            disabled={!state.message}
-            id="confirm_reject_with_archive"
-            type="secondaryNegative"
-            onClick={() => {
-              close({
-                ...state,
-                rejectAction: REJECT_ACTIONS.ARCHIVE
-              })
-            }}
-          >
-            {intl.formatMessage(reviewMessages.rejectModalArchive)}
-          </Button>
-        ]
-      : []),
     <Button
       key="confirm_reject_with_update"
-      disabled={!state.message}
+      disabled={!message}
       id="confirm_reject_with_update"
       type="negative"
       onClick={() => {
-        close({
-          ...state,
-          rejectAction: REJECT_ACTIONS.SEND_FOR_UPDATE
-        })
+        close(message)
       }}
     >
       {intl.formatMessage(reviewMessages.rejectModalSendForUpdate)}
@@ -791,10 +758,8 @@ function RejectActionModal({
         <TextArea
           data-testid="reject-reason"
           required={true}
-          value={state.message}
-          onChange={(e) =>
-            setState((prev) => ({ ...prev, message: e.target.value }))
-          }
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
         />
       </Stack>
     </ResponsiveModal>
