@@ -242,7 +242,7 @@ export function Review() {
   const validationErrorExist = validationErrorsInActionFormExist({
     formConfig,
     form: annotation,
-    context: { ...validatorContext, baseFormState: fullEventIndex.declaration }
+    context: validatorContext
   })
 
   if (validationErrorExist) {

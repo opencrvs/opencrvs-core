@@ -196,6 +196,8 @@ export const Select = (props: ISelectProps) => {
       classNamePrefix="react-select"
       components={{ DropdownIndicator, Control: CustomControl }}
       {...props}
+      // Prevents premature Formik validation on mobile where react-select blurs the input synchronously before onChange settles
+      blurInputOnSelect={false}
       onChange={handleChange}
       isDisabled={disabled}
       isSearchable={options.length > length}
