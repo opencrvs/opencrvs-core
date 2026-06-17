@@ -778,12 +778,11 @@ function RejectActionModal({
     <ResponsiveModal
       showHeaderBorder
       actions={actions}
-      contentHeight={270}
       handleClose={() => close(null)}
       id="reject-modal"
       show={true}
       title={intl.formatMessage(reviewMessages.rejectModalTitle)}
-      width={918}
+      width={700}
     >
       <Stack alignItems="left" direction="column">
         <Text color="grey500" element="p" variant="reg16">
