@@ -632,6 +632,137 @@ export const HiddenListenerDefaultNotPropagated: Story = {
   }
 }
 
+// Fields modelling the informant.relation → idType → nid pattern from issue #12638.
+// person.nid is a listener of person.relation (reset on parent change) and is
+// conditionally shown only when idType == NATIONAL_ID.
+// person.notes is a bystander: it hides when relation == FATHER but is NOT a listener,
+// so it should still be cached and restored by the hidden-value cache.
+const listenerHiddenCacheFields = [
+  {
+    id: 'person.relation',
+    type: FieldType.SELECT,
+    required: true,
+    label: generateTranslationConfig('Relation'),
+    options: [
+      { label: generateTranslationConfig('Mother'), value: 'MOTHER' },
+      { label: generateTranslationConfig('Father'), value: 'FATHER' }
+    ]
+  },
+  {
+    id: 'person.idType',
+    type: FieldType.SELECT,
+    required: true,
+    label: generateTranslationConfig('Form of ID'),
+    parent: field('person.relation'),
+    options: [
+      { label: generateTranslationConfig('National ID'), value: 'NATIONAL_ID' },
+      { label: generateTranslationConfig('Passport'), value: 'PASSPORT' }
+    ]
+  },
+  {
+    id: 'person.nid',
+    type: FieldType.TEXT,
+    label: generateTranslationConfig('National ID no.'),
+    parent: field('person.relation'),
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: field('person.idType').isEqualTo('NATIONAL_ID')
+      }
+    ]
+  },
+  {
+    id: 'person.notes',
+    type: FieldType.TEXT,
+    label: generateTranslationConfig('Notes'),
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: field('person.relation').isEqualTo('MOTHER')
+      }
+    ]
+  }
+] satisfies FieldConfig[]
+
+/**
+ * Regression test for issue #12638.
+ * When a parent field changes, its listener fields are reset and must NOT be
+ * restored from the hidden-value cache when they become visible again.
+ * Bystander fields that merely hide conditionally (but are not listeners) must
+ * still be cached and restored as normal.
+ */
+export const ListenerFieldNotRestoredFromCacheAfterParentReset: Story = {
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={listenerHiddenCacheFields}
+        formValues={{
+          'person.relation': 'MOTHER',
+          'person.idType': 'NATIONAL_ID',
+          'person.nid': '12345678',
+          'person.notes': 'some note'
+        }}
+        id="my-form"
+      />
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Renders with initial values', async () => {
+      await expect(
+        await canvas.findByTestId('text__person____nid')
+      ).toHaveValue('12345678')
+      await expect(
+        await canvas.findByTestId('text__person____notes')
+      ).toHaveValue('some note')
+    })
+
+    await step(
+      'Change relation to Father — resets listeners, hides nid and notes',
+      async () => {
+        await userEvent.click(await canvas.findByText('Mother'))
+        await userEvent.click(await canvas.findByText('Father'))
+      }
+    )
+
+    await step('Re-select National ID as Form of ID', async () => {
+      await userEvent.click(
+        await canvas.findByTestId('select__person____idType')
+      )
+      await userEvent.click(await canvas.findByText('National ID'))
+    })
+
+    await step('NID field is empty — not restored from cache', async () => {
+      await expect(
+        await canvas.findByTestId('text__person____nid')
+      ).toHaveValue('')
+    })
+
+    await step(
+      'Change relation back to Mother — notes should restore',
+      async () => {
+        await userEvent.click(await canvas.findByText('Father'))
+        await userEvent.click(await canvas.findByText('Mother'))
+      }
+    )
+
+    await step(
+      'Notes field restores cached value — bystander cache is intact',
+      async () => {
+        await expect(
+          await canvas.findByTestId('text__person____notes')
+        ).toHaveValue('some note')
+      }
+    )
+  }
+}
+
 const nixConditionalFields = [
   {
     id: 'form.verified',
