@@ -225,7 +225,15 @@ elastalert:
     #   - email: send email alert using configured SMTP server
     #   - post2: send alert to external system via HTTP POST (Docker swarm backward compatible way)
     NOTIFICATION_TYPE: post2
-
+    # If the notification type is post2, SMTP settings are not required
+    # These are dummy values to satisfy the envsubst command.
+    ALERT_EMAIL: "dummy@example.com"
+    SENDER_EMAIL_ADDRESS: "dummy@example.com"
+    SMTP_HOST: localhost
+    SMTP_PASSWORD: dummy
+    SMTP_PORT: "25"
+    SMTP_SECURE: "false"
+    SMTP_USERNAME: dummy
     # HTTP_POST2_ALERT_URL: Required if NOTIFICATION_TYPE is set to post2. URL to send HTTP POST alert to.
     # Example: http://countryconfig.opencrvs-qa.svc.cluster.local:3040/email
 
