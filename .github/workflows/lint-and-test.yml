@@ -1,0 +1,596 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+name: Lint and run unit tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+
+jobs:
+  setup:
+    name: Setup tests
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - uses: mskelton/changelog-reminder-action@v3
+        # forked repos cannot access secrets.GITHUB_TOKEN which causes this step
+        # to fail
+        continue-on-error: true
+        if: github.event_name == 'pull_request'
+        with:
+          message: >
+            Oops! Looks like you forgot to update the changelog.
+            When updating CHANGELOG.md, please consider the following:
+              - Changelog is read by country implementors who might not always be familiar with all technical details of OpenCRVS. Keep language high-level, user friendly and avoid technical references to internals.
+              - Answer "What's new?", "Why was the change made?" and "Why should I care?" for each change.
+              - If it's a breaking change, include a migration guide answering "What do I need to do to upgrade?".
+
+      - name: Get list of packages
+        id: set-matrix
+        run: |
+          PACKAGES=$(ls -d packages/* | jq -R -s -c 'split("\n")[:-1]')
+          echo "Found packages: $PACKAGES"
+          echo "matrix=${PACKAGES}" >> $GITHUB_OUTPUT
+
+      - name: Prepare coverage explanation
+        run: |
+          echo "COVERAGE_EXPLANATION<<EOF" >> $GITHUB_ENV
+          echo "_ℹ️ Coverage metrics explained:_" >> $GITHUB_ENV
+          echo "• *Statements* — Executed code statements (basic logic lines)" >> $GITHUB_ENV
+          echo "• *Branches* — Tested decision paths (if/else, switch, ternaries)" >> $GITHUB_ENV
+          echo "• *Functions* — Functions invoked during tests" >> $GITHUB_ENV
+          echo "• *Lines* — Source lines executed" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Post coverage explanation to PR
+        if: github.event_name == 'pull_request'
+        uses: mshick/add-pr-comment@v2
+        with:
+          message-id: test-coverage-explanation
+          message: ${{ env.COVERAGE_EXPLANATION }}
+
+  test:
+    name: Test
+    needs: setup
+    runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{fromJson(needs.setup.outputs.matrix)}}
+
+    steps:
+      - name: Checking out git repo
+        uses: actions/checkout@v6
+
+      - name: Check package.json and scripts
+        id: check-scripts
+        run: |
+          if [ ! -f "${{ matrix.package }}/package.json" ]; then
+            echo "No package.json found for ${{ matrix.package }}. Stopping pipeline."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+
+            if ! grep -q "\"test\":" "${{ matrix.package }}/package.json"; then
+              echo "Test not found in ${{ matrix.package }}"
+              echo "skip-test=true" >> $GITHUB_OUTPUT
+            else
+              echo "skip=false" >> $GITHUB_OUTPUT
+            fi
+
+            if ! grep -q "\"lint\":" "${{ matrix.package }}/package.json"; then
+              echo "Lint scripts not found in ${{ matrix.package }}. Stopping pipeline."
+              echo "skip-lint=true" >> $GITHUB_OUTPUT
+            else
+              echo "skip-lint=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: Use Node.js from .nvmrc
+        if: steps.check-scripts.outputs.skip != 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      - name: Extract dependencies for ${{ matrix.package }}
+        if: steps.check-scripts.outputs.skip != 'true'
+        id: extract-dependencies
+        run: |
+          DEPENDENCIES=$(node -e "
+            const { execSync } = require('child_process');
+            const output = execSync('yarn --silent workspaces info', { encoding: 'utf-8' });
+            const json = JSON.parse(output.replaceAll('@opencrvs', 'packages'));
+
+            const getDependencies = (pkg) =>
+              json[pkg].workspaceDependencies.concat(
+                json[pkg].workspaceDependencies.flatMap(getDependencies)
+              );
+
+            console.log(
+              getDependencies('${{ matrix.package }}').join(' ')
+            );
+          ")
+          echo "DEPENDENCIES=${DEPENDENCIES}" >> $GITHUB_ENV
+          echo "Found dependencies: $DEPENDENCIES"
+
+      - name: Remove other package directories
+        if: steps.check-scripts.outputs.skip != 'true'
+        run: |
+          for dir in packages/*; do
+            if echo "${{ matrix.package }} $DEPENDENCIES" | grep -q -w "$dir"; then
+              echo "Skipping $dir"
+            else
+              echo "Removing $dir"
+              rm -rf "$dir"
+            fi
+          done
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v5
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}',matrix.package,'package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Verify every file has a license header
+        if: steps.check-scripts.outputs.skip != 'true'
+        run: npx license-check-and-add check -f license-config.json
+
+      - name: Runs dependency installation
+        if: steps.check-scripts.outputs.skip != 'true'
+        run: CI="" yarn install --frozen-lockfile
+
+      - name: Build common package
+        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/commons')
+        run: cd packages/commons && yarn build
+
+      - name: Build components
+        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/components')
+        run: |
+          cd packages/components && yarn build
+
+      - name: Build events router types
+        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/events')
+        run: cd packages/events && node_modules/.bin/tsc -p tsconfig.router.json
+
+      # TODO: should run parallel to unit tests as can take as much as unit tests
+      - name: Run linting
+        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-lint != 'true'
+        run: cd ${{ matrix.package }} && yarn lint
+
+      - name: Run Unit Test
+        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
+        run: cd ${{ matrix.package }} && yarn test
+
+      - name: Generate test coverage summary
+        if: github.event_name == 'pull_request'
+          && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
+        run: |
+          export PACKAGE_NAME=$(basename "${{ matrix.package }}")
+          export COVERAGE_FILE="./${{ matrix.package }}/coverage/coverage-summary.json"
+
+          GENERATED_REPORT=$(node -e '
+            const s = require(process.env.COVERAGE_FILE).total;
+            const title = `## 📊 ${process.env.PACKAGE_NAME} test coverage`;
+
+            console.log(
+              title + "\n\n" +
+              "```text\n" +
+              `Statements: ${s.statements.pct}%\n` +
+              `Branches:   ${s.branches.pct}%\n` +
+              `Functions:  ${s.functions.pct}%\n` +
+              `Lines:      ${s.lines.pct}%\n` +
+              `Updated at: ${new Date().toUTCString()}\n` +
+              "```"
+            );
+          ')
+
+          echo "PR_COMMENT_BODY<<EOF" >> $GITHUB_ENV
+          echo "$GENERATED_REPORT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Post test coverage to PR
+        if: github.event_name == 'pull_request'
+          && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
+        uses: mshick/add-pr-comment@v2
+        with:
+          message-id: ${{ matrix.package }}-test-coverage
+          message: ${{ env.PR_COMMENT_BODY }}
+
+  prepare-client-tests:
+    name: Prepare client tests
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: Checking out git repo
+        uses: actions/checkout@v6
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      - name: Extract dependencies for client
+        id: extract-dependencies
+        run: |
+          DEPENDENCIES=$(node -e "
+            const { execSync } = require('child_process');
+            const output = execSync('yarn --silent workspaces info', { encoding: 'utf-8' });
+            const json = JSON.parse(output.replaceAll('@opencrvs', 'packages'));
+
+            const getDependencies = (pkg) =>
+              json[pkg].workspaceDependencies.concat(
+                json[pkg].workspaceDependencies.flatMap(getDependencies)
+              );
+
+            console.log(
+              getDependencies('packages/client').join(' ')
+            );
+          ")
+          echo "DEPENDENCIES=${DEPENDENCIES}" >> $GITHUB_ENV
+          echo "Found dependencies: $DEPENDENCIES"
+
+      - name: Remove other package directories
+        run: |
+          for dir in packages/*; do
+            if echo "packages/client $DEPENDENCIES" | grep -q -w "$dir"; then
+              echo "Skipping $dir"
+            else
+              echo "Removing $dir"
+              rm -rf "$dir"
+            fi
+          done
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v5
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: CI="" yarn install --frozen-lockfile
+
+      - name: Build common package
+        run: cd packages/commons && yarn build
+
+      - name: Build components
+        run: |
+          cd packages/components && yarn build
+
+      # Build Storybook once here (with --webpack-stats-json so that
+      # `preview-stats.json` is emitted). The artifact is reused by
+      # `chromatic` (--storybook-build-dir) and `test-storybook`,
+      # avoiding duplicate Storybook builds. `preview-stats.json` is the
+      # input to the change-detection script that decides whether
+      # Chromatic must run.
+      - name: Build Storybook (with TurboSnap stats)
+        working-directory: packages/client
+        env:
+          # Why are we using NODE_ENV=production? It's recommended in Chromatic docs, to ensure webpack tree-shaking is working properly
+          # See: https://www.chromatic.com/docs/turbosnap/troubleshooting/#why-are-changes-not-being-detected-correctly
+          NODE_ENV: production
+        run: yarn run build-storybook --webpack-stats-json
+
+      - name: Upload filesystem as artifact
+        uses: actions/upload-artifact@v4.5.0
+        with:
+          name: client
+          include-hidden-files: true
+          path: |
+            .
+            !**/.git
+            !**/node_modules
+
+  lint-client:
+    name: Lint client
+    needs: prepare-client-tests
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Download filesystem artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: client
+          path: .
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v5
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: CI="" yarn install --frozen-lockfile
+
+      - name: Build events router types
+        run: cd packages/events && node_modules/.bin/tsc -p tsconfig.router.json
+
+      - name: Compile
+        run: cd packages/client && yarn test:compilation
+
+      - name: Run linting
+        run: cd packages/client && yarn lint
+
+  chromatic:
+    name: Run chromatic visual tests
+    needs: prepare-client-tests
+    runs-on: ubuntu-24.04
+    # Chromatic visual tests are disabled for now until we find a way to reduce the monthly costs
+    # On average, every day we create roughly 7500 - 10000 snapshots per working day
+    # Snapshots included in our plan are 35 000 per month and all exceeding snapshots are charged at $0.008 per snapshot
+    if: false
+    steps:
+      # Fresh checkout brings .git (needed by Chromatic's TurboSnap and
+      # by the change-detection `git diff` below). The artifact
+      # extracted on top adds the prebuilt commons/components outputs
+      # and `packages/client/storybook-static/`; source files match the
+      # current commit so overwrites are no-ops.
+      - name: Checkout PR branch (for git history)
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Download filesystem artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: client
+          path: .
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      # Decide whether the diff can affect Storybook by intersecting it
+      # with the module graph emitted by Storybook's
+      # `--webpack-stats-json`. Backend-only changes in
+      # `packages/commons` (and similar) won't appear in the graph and
+      # therefore won't trigger Chromatic. The same gate applies to
+      # pushes on `develop`: if no module in the Storybook bundle
+      # changed, no snapshot can change and the baseline is preserved
+      # by definition.
+      - name: Detect storybook-affecting changes
+        id: detect
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          node .github/scripts/changed-files-affect-storybook.mjs \
+            --stats packages/client/storybook-static/preview-stats.json \
+            --base "$BASE_SHA"
+
+      - name: Cache Node.js dependencies
+        if: steps.detect.outputs.affects == 'true'
+        uses: actions/cache@v5
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        if: steps.detect.outputs.affects == 'true'
+        run: CI="" yarn install --frozen-lockfile
+
+      - name: Run Chromatic
+        if: steps.detect.outputs.affects == 'true'
+        working-directory: packages/client
+        run: |
+          yarn run chromatic --storybook-build-dir storybook-static --diagnostics-file
+          cat chromatic-diagnostics.json
+        env:
+          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+
+  test-storybook:
+    name: Run storybook interaction tests
+    needs: prepare-client-tests
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Download filesystem artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: client
+          path: .
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v5
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: CI="" yarn install --frozen-lockfile
+
+      - name: Install Playwright
+        # Playwright is required since @storybook/test-runner depends on it
+        run: npx playwright install --with-deps
+
+      # `storybook-static/` is restored from the artifact built in
+      # `prepare-client-tests`, so we don't need to build Storybook
+      # again here.
+      - name: Serve Storybook and run tests
+        working-directory: packages/client
+        # based on https://storybook.js.org/docs/writing-tests/test-runner#run-against-non-deployed-storybooks
+        run: |
+          npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
+            "npx http-server storybook-static --port 6006 --silent" \
+            "npx wait-on tcp:127.0.0.1:6006 && yarn test-storybook"
+
+  test-client:
+    name: Test client
+    needs: prepare-client-tests
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        shards: [1, 2, 3, 4, 5]
+
+    steps:
+      - name: Download filesystem artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: client
+          path: .
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v5
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: CI="" yarn install --frozen-lockfile
+
+      - name: Run Unit Test
+        run: cd packages/client && yarn test --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}
+
+  lint-knip:
+    name: Lint unused exports with Knip
+    runs-on: ubuntu-24.04
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout base branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.base_ref }}
+          path: base
+
+      - name: Checkout the PR branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.head_ref }}
+          path: pr
+
+      - name: Use Node.js from .nvmrc from base branch
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: base/.nvmrc
+
+      - name: Install base dependencies
+        run: yarn install --ignore-scripts
+        working-directory: base
+
+      - name: Use Node.js from .nvmrc from PR branch
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: pr/.nvmrc
+
+      - name: Install PR dependencies
+        run: yarn install --ignore-scripts
+        working-directory: pr
+
+      - name: Run knip on base branch
+        id: knip_base
+        run: |
+          npx knip --tags=-knipignore --no-exit-code --exports --reporter=markdown | sed -E 's/ +/ /g' | sed -E 's/:[0-9]+:[0-9]+//' > knip_report.md
+          TOTAL=$(grep -oP '## [A-Za-z\s]+ \(\K[0-9]+' knip_report.md | awk '{sum+=$1} END {print sum}')
+          echo "Total $TOTAL issue(s) on base branch."
+          echo "total=${TOTAL}" >> $GITHUB_OUTPUT
+        working-directory: base
+
+      - name: Run knip on PR branch
+        id: knip_pr
+        run: |
+          npx knip --tags=-knipignore --no-exit-code --exports --reporter=markdown | sed -E 's/ +/ /g' | sed -E 's/:[0-9]+:[0-9]+//' > knip_report.md
+          TOTAL=$(grep -oP '## [A-Za-z\s]+ \(\K[0-9]+' knip_report.md | awk '{sum+=$1} END {print sum}')
+          echo "Total $TOTAL issue(s) on PR branch."
+          echo "total=${TOTAL}" >> $GITHUB_OUTPUT
+        working-directory: pr
+
+      - name: Compare base and PR totals
+        if: ${{ steps.knip_pr.outputs.total > steps.knip_base.outputs.total }}
+        run: |
+          echo "## ⚠️ Total issues have increased in the PR branch." >> $GITHUB_STEP_SUMMARY
+          echo "Differences:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`diff" >> $GITHUB_STEP_SUMMARY
+          diff base/knip_report.md pr/knip_report.md >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+          exit 1
+
+  build-toolkit:
+    name: Build toolkit
+    runs-on: ubuntu-24.04
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      - uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          command: yarn install --frozen-lockfile
+
+      - name: Build commons
+        run: yarn build
+        working-directory: packages/commons
+
+      - name: Build events
+        run: yarn build
+        working-directory: packages/events
+
+      - name: Build toolkit
+        run: yarn build
+        working-directory: packages/toolkit
