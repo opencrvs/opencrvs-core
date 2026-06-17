@@ -46,6 +46,8 @@ import { useEventOverviewInfo } from '../useEventOverviewInfo'
 import { UserAvatar } from './UserAvatar'
 import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
 
+// misc change
+
 const eventHistoryStatusMessage = {
   id: 'events.history.status',
   defaultMessage:
