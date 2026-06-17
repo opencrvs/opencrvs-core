@@ -11,11 +11,6 @@
 import { defineMessages } from 'react-intl'
 
 const messagesToDefine = {
-  phoneNumberNotValid: {
-    id: 'register.SelectContactPoint.phoneNoError',
-    defaultMessage: 'Not a valid mobile number',
-    description: 'Phone no error text'
-  },
   bengaliOnlyNameFormat: {
     defaultMessage: 'Must contain only Bengali characters',
     description:
