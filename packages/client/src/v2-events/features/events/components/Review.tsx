@@ -18,7 +18,6 @@ import { CountryLogo } from '@opencrvs/components/lib/icons'
 import {
   Accordion,
   Button,
-  Checkbox,
   Link,
   ListReview,
   ResponsiveModal,
@@ -189,11 +188,6 @@ const reviewMessages = defineMessages({
     id: 'rejectModal.title',
     defaultMessage: 'Reason for rejection?',
     description: 'The title for reject modal'
-  },
-  rejectModalMarkAsDuplicate: {
-    id: 'rejectModal.markAsDuplicate',
-    defaultMessage: 'Mark as a duplicate',
-    description: 'The label for mark as duplicate checkbox of reject modal'
   },
   annotationsTitle: {
     id: 'review.annotations.title',
@@ -717,7 +711,6 @@ export const REJECT_ACTIONS = {
 export interface RejectionState {
   rejectAction: keyof typeof REJECT_ACTIONS
   message: string
-  isDuplicate: boolean
 }
 
 function RejectActionModal({
@@ -731,8 +724,7 @@ function RejectActionModal({
 }) {
   const [state, setState] = useState<RejectionState>({
     rejectAction: REJECT_ACTIONS.ARCHIVE,
-    message: '',
-    isDuplicate: false
+    message: ''
   })
 
   const intl = useIntl()
@@ -768,7 +760,7 @@ function RejectActionModal({
       : []),
     <Button
       key="confirm_reject_with_update"
-      disabled={!state.message || state.isDuplicate}
+      disabled={!state.message}
       id="confirm_reject_with_update"
       type="negative"
       onClick={() => {
@@ -803,15 +795,6 @@ function RejectActionModal({
           value={state.message}
           onChange={(e) =>
             setState((prev) => ({ ...prev, message: e.target.value }))
-          }
-        />
-        <Checkbox
-          label={intl.formatMessage(reviewMessages.rejectModalMarkAsDuplicate)}
-          name={'markDuplicate'}
-          selected={state.isDuplicate}
-          value={''}
-          onChange={() =>
-            setState((prev) => ({ ...prev, isDuplicate: !prev.isDuplicate }))
           }
         />
       </Stack>
