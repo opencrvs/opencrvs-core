@@ -601,6 +601,87 @@ export const DraftPaginationOffline: Story = {
   }
 }
 
+/**
+ * Regression test for the offline-aware Suspense fallback (SuspenseLoadingFallback).
+ *
+ * Scenario: the workqueue route starts loading, the spinner shows, and the
+ * network drops *mid-load* (before the list query resolves). The fallback must
+ * swap the spinner for the "No connection" message instead of spinning forever,
+ * and return to the spinner once back online.
+ *
+ * The list query (`event.search`) never resolves, so the workqueue content stays
+ * in its Suspense (loading) state for the whole test while we toggle connectivity.
+ */
+export const WorkqueueGoesOfflineWhileLoading: Story = {
+  parameters: {
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues('recent')
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: queryData.length }
+            }, {})
+          })
+        ],
+        event: [
+          // Never resolves: keeps the workqueue content query pending so the
+          // Suspense fallback stays mounted while we toggle connectivity.
+          tRPCMsw.event.search.query(
+            async () => new Promise<never>(() => undefined)
+          )
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Loading spinner appears while the list query is in flight',
+      async () => {
+        await canvas.findAllByTestId('spinner')
+        await expect(
+          canvasElement.querySelector('#suspense-offline-message')
+        ).not.toBeInTheDocument()
+      }
+    )
+
+    await step(
+      'Network drops mid-load → offline message replaces the spinner',
+      async () => {
+        setNavigatorOnline(false)
+
+        await canvas.findAllByText('No connection')
+        await expect(
+          canvasElement.querySelector('#page-spinner')
+        ).not.toBeInTheDocument()
+      }
+    )
+
+    await step('Back online → returns to the loading spinner', async () => {
+      setNavigatorOnline(true)
+
+      await canvas.findAllByTestId('spinner')
+      await expect(
+        canvasElement.querySelector('#suspense-offline-message')
+      ).not.toBeInTheDocument()
+    })
+
+    // Restore online status so the stubbed offline state does not leak into
+    // stories rendered after this one in the same preview iframe
+    setNavigatorOnline(true)
+  }
+}
+
 // ---------------------------------------------------------------------------
 // WorkqueueAutoRefreshOnCountChange
 //
