@@ -9,9 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fireEvent, waitFor, within } from '@storybook/test'
+import { expect, fireEvent, userEvent, waitFor, within } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
+import { TRPCError } from '@trpc/server'
 import { setNavigatorOnline } from '@client/tests/storybook-utils'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -87,6 +88,63 @@ export const ContinueButtonDisabledWhenGoingOffline: Story = {
         await expect(
           canvas.getByRole('button', { name: 'Continue' })
         ).toBeEnabled()
+      })
+    })
+  }
+}
+
+export const DuplicatePhoneShowsToast: Story = {
+  parameters: {
+    msw: {
+      handlers: {
+        requestContactChange: [
+          tRPCMsw.user.requestContactChange.mutation(() => {
+            throw new TRPCError({ code: 'CONFLICT' })
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    const newPhone = '01722222222'
+
+    await step(
+      'Enter a valid new phone number and click Continue',
+      async () => {
+        await fireEvent.change(await canvas.findByRole('spinbutton'), {
+          target: { value: newPhone }
+        })
+        await expect(
+          canvas.getByRole('button', { name: 'Continue' })
+        ).toBeEnabled()
+        await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
+      }
+    )
+
+    await step('Duplicate phone toast appears', async () => {
+      await waitFor(
+        async () => {
+          await expect(
+            canvas.getByText(
+              `${newPhone} is already used by another user. Please use a different phone number`
+            )
+          ).toBeVisible()
+        },
+        { timeout: 5000 }
+      )
+    })
+
+    await step('Entering a new number dismisses the toast', async () => {
+      await fireEvent.change(canvas.getByRole('spinbutton'), {
+        target: { value: '01733333333' }
+      })
+      await waitFor(() => {
+        expect(
+          canvas.queryByText(
+            `${newPhone} is already used by another user. Please use a different phone number`
+          )
+        ).not.toBeInTheDocument()
       })
     })
   }
