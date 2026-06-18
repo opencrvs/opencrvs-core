@@ -207,6 +207,12 @@ export function TRPCProvider({
         buster: 'persisted-indexed-db',
         maxAge: Infinity,
         dehydrateOptions: {
+          shouldDehydrateQuery: (query) => {
+            if (query.meta?.noCache === true) {
+              return false
+            }
+            return query.state.status === 'success'
+          },
           shouldDehydrateMutation: (mutation) => {
             if (mutation.state.status === 'error') {
               const error = mutation.state.error
