@@ -409,7 +409,7 @@ export const userRouter = router({
         requestData: { subjectId: userId }
       })
     }),
-  sendVerifyCode: userOnlyProcedure
+  requestContactChange: userOnlyProcedure
     .input(
       z.discriminatedUnion('notificationEvent', [
         z.object({

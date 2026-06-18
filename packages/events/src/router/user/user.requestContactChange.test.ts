@@ -19,12 +19,12 @@ import {
 
 const USER_EDIT_SCOPE = encodeScope({ type: 'user.edit' })
 
-describe('user.sendVerifyCode', () => {
+describe('user.requestContactChange', () => {
   test('returns a nonce when sending verify code for change-phone-number', async () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user)
 
-    const result = await client.user.sendVerifyCode({
+    const result = await client.user.requestContactChange({
       notificationEvent: 'change-phone-number',
       phoneNumber: '0700000001'
     })
@@ -38,7 +38,7 @@ describe('user.sendVerifyCode', () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user)
 
-    const result = await client.user.sendVerifyCode({
+    const result = await client.user.requestContactChange({
       notificationEvent: 'change-email-address',
       email: 'new@test.example'
     })
@@ -52,12 +52,12 @@ describe('user.sendVerifyCode', () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user)
 
-    const result1 = await client.user.sendVerifyCode({
+    const result1 = await client.user.requestContactChange({
       notificationEvent: 'change-phone-number',
       phoneNumber: '0700000001'
     })
 
-    const result2 = await client.user.sendVerifyCode({
+    const result2 = await client.user.requestContactChange({
       notificationEvent: 'change-phone-number',
       phoneNumber: '0700000001'
     })
@@ -65,12 +65,12 @@ describe('user.sendVerifyCode', () => {
     expect(result1.nonce).not.toBe(result2.nonce)
   })
 
-  test('system client cannot call sendVerifyCode', async () => {
+  test('system client cannot call requestContactChange', async () => {
     const systemId = getUUID()
     const client = createSystemTestClient(systemId)
 
     await expect(
-      client.user.sendVerifyCode({
+      client.user.requestContactChange({
         notificationEvent: 'change-phone-number',
         phoneNumber: '0700000001'
       })
@@ -81,7 +81,7 @@ describe('user.sendVerifyCode', () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user)
 
-    const result = await client.user.sendVerifyCode({
+    const result = await client.user.requestContactChange({
       notificationEvent: 'change-phone-number',
       phoneNumber: '0700000001'
     })
@@ -96,11 +96,11 @@ describe('user.sendVerifyCode', () => {
     const client1 = createTestClient(user1)
     const client2 = createTestClient(user2)
 
-    const result1 = await client1.user.sendVerifyCode({
+    const result1 = await client1.user.requestContactChange({
       notificationEvent: 'change-phone-number',
       phoneNumber: '0700000001'
     })
-    const result2 = await client2.user.sendVerifyCode({
+    const result2 = await client2.user.requestContactChange({
       notificationEvent: 'change-phone-number',
       phoneNumber: '0700000002'
     })
@@ -112,11 +112,11 @@ describe('user.sendVerifyCode', () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user)
 
-    const phoneResult = await client.user.sendVerifyCode({
+    const phoneResult = await client.user.requestContactChange({
       notificationEvent: 'change-phone-number',
       phoneNumber: '0700000001'
     })
-    const emailResult = await client.user.sendVerifyCode({
+    const emailResult = await client.user.requestContactChange({
       notificationEvent: 'change-email-address',
       email: 'new@test.example'
     })
@@ -133,7 +133,7 @@ describe('user.sendVerifyCode', () => {
 
       const client2 = createTestClient(users[1])
       await expect(
-        client2.user.sendVerifyCode({
+        client2.user.requestContactChange({
           notificationEvent: 'change-phone-number',
           phoneNumber: PHONE_NUMBER
         })
@@ -147,7 +147,7 @@ describe('user.sendVerifyCode', () => {
 
       const client1 = createTestClient(users[0])
       await expect(
-        client1.user.sendVerifyCode({
+        client1.user.requestContactChange({
           notificationEvent: 'change-phone-number',
           phoneNumber: PHONE_NUMBER
         })
@@ -165,7 +165,7 @@ describe('user.sendVerifyCode', () => {
       const user1Email = `user-${users[0].id}@test.example`
 
       await expect(
-        client2.user.sendVerifyCode({
+        client2.user.requestContactChange({
           notificationEvent: 'change-email-address',
           email: user1Email
         })
@@ -182,7 +182,7 @@ describe('user.sendVerifyCode', () => {
 
       const client2 = createTestClient(users[1])
       await expect(
-        client2.user.sendVerifyCode({
+        client2.user.requestContactChange({
           notificationEvent: 'change-email-address',
           email: EMAIL
         })
@@ -195,7 +195,7 @@ describe('user.sendVerifyCode', () => {
 
       const ownEmail = `user-${users[0].id}@test.example`
       await expect(
-        client1.user.sendVerifyCode({
+        client1.user.requestContactChange({
           notificationEvent: 'change-email-address',
           email: ownEmail
         })

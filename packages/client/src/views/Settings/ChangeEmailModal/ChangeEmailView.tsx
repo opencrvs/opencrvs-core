@@ -43,7 +43,7 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
   ] = React.useState(false)
   const userDetails = useSelector(getUserDetails)
   const isOnline = useOnlineStatus()
-  const { sendVerifyCode } = useUsers()
+  const { requestContactChange } = useUsers()
   const isEmailAddressUnchanged =
     Boolean(emailAddress) &&
     emailAddress.trim().toLowerCase() === userDetails?.email?.toLowerCase()
@@ -70,7 +70,7 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
   }
   const continueButtonHandler = async (emailAddress: string) => {
     if (!userDetails) return
-    sendVerifyCode.mutate(
+    requestContactChange.mutate(
       {
         notificationEvent: TriggerEvent.CHANGE_EMAIL_ADDRESS,
         email: emailAddress
@@ -115,7 +115,7 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
           }}
           disabled={
             !isOnline ||
-            sendVerifyCode.isPending ||
+            requestContactChange.isPending ||
             !Boolean(emailAddress.length) ||
             isInvalidEmailAddress ||
             isEmailAddressUnchanged
