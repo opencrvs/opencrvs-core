@@ -411,12 +411,16 @@ export const userRouter = router({
     }),
   sendVerifyCode: userOnlyProcedure
     .input(
-      z.object({
-        notificationEvent: z.enum([
-          'change-phone-number',
-          'change-email-address'
-        ])
-      })
+      z.discriminatedUnion('notificationEvent', [
+        z.object({
+          notificationEvent: z.literal('change-email-address'),
+          email: z.string()
+        }),
+        z.object({
+          notificationEvent: z.literal('change-phone-number'),
+          phoneNumber: z.string()
+        })
+      ])
     )
     .output(
       z.object({
@@ -424,6 +428,32 @@ export const userRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      if (input.notificationEvent === 'change-email-address') {
+        const existing = await searchUsers({
+          email: input.email,
+          count: 1,
+          skip: 0,
+          sortBy: 'createdAt',
+          sortOrder: 'asc'
+        })
+        if (existing.length > 0 && existing[0].id !== ctx.user.id) {
+          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
+        }
+      }
+
+      if (input.notificationEvent === 'change-phone-number') {
+        const existing = await searchUsers({
+          mobile: input.phoneNumber,
+          count: 1,
+          skip: 0,
+          sortBy: 'createdAt',
+          sortOrder: 'asc'
+        })
+        if (existing.length > 0 && existing[0].id !== ctx.user.id) {
+          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_PHONE' })
+        }
+      }
+
       const nonce = generateNonce()
       const rawToken = ctx.token.replace('Bearer ', '')
       const user = await getUser(ctx.user.id)

@@ -17,7 +17,8 @@ const VERIFY_CODE = '000000'
 
 async function sendVerifyCode(client: ReturnType<typeof createTestClient>) {
   const { nonce } = await client.user.sendVerifyCode({
-    notificationEvent: 'change-phone-number'
+    notificationEvent: 'change-phone-number',
+    phoneNumber: '0700000001'
   })
   return nonce
 }

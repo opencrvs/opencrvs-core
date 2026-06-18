@@ -23,7 +23,8 @@ describe('user.sendVerifyCode', () => {
     const client = createTestClient(user)
 
     const result = await client.user.sendVerifyCode({
-      notificationEvent: 'change-phone-number'
+      notificationEvent: 'change-phone-number',
+      phoneNumber: '0700000001'
     })
 
     expect(result).toHaveProperty('nonce')
@@ -36,7 +37,8 @@ describe('user.sendVerifyCode', () => {
     const client = createTestClient(user)
 
     const result = await client.user.sendVerifyCode({
-      notificationEvent: 'change-email-address'
+      notificationEvent: 'change-email-address',
+      email: 'new@test.example'
     })
 
     expect(result).toHaveProperty('nonce')
@@ -49,11 +51,13 @@ describe('user.sendVerifyCode', () => {
     const client = createTestClient(user)
 
     const result1 = await client.user.sendVerifyCode({
-      notificationEvent: 'change-phone-number'
+      notificationEvent: 'change-phone-number',
+      phoneNumber: '0700000001'
     })
 
     const result2 = await client.user.sendVerifyCode({
-      notificationEvent: 'change-phone-number'
+      notificationEvent: 'change-phone-number',
+      phoneNumber: '0700000001'
     })
 
     expect(result1.nonce).not.toBe(result2.nonce)
@@ -65,7 +69,8 @@ describe('user.sendVerifyCode', () => {
 
     await expect(
       client.user.sendVerifyCode({
-        notificationEvent: 'change-phone-number'
+        notificationEvent: 'change-phone-number',
+        phoneNumber: '0700000001'
       })
     ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
   })
@@ -75,7 +80,8 @@ describe('user.sendVerifyCode', () => {
     const client = createTestClient(user)
 
     const result = await client.user.sendVerifyCode({
-      notificationEvent: 'change-phone-number'
+      notificationEvent: 'change-phone-number',
+      phoneNumber: '0700000001'
     })
 
     // 16 random bytes in base64 always yields 24 characters (22 data + 2 padding)
@@ -89,10 +95,12 @@ describe('user.sendVerifyCode', () => {
     const client2 = createTestClient(user2)
 
     const result1 = await client1.user.sendVerifyCode({
-      notificationEvent: 'change-phone-number'
+      notificationEvent: 'change-phone-number',
+      phoneNumber: '0700000001'
     })
     const result2 = await client2.user.sendVerifyCode({
-      notificationEvent: 'change-phone-number'
+      notificationEvent: 'change-phone-number',
+      phoneNumber: '0700000002'
     })
 
     expect(result1.nonce).not.toBe(result2.nonce)
@@ -103,10 +111,12 @@ describe('user.sendVerifyCode', () => {
     const client = createTestClient(user)
 
     const phoneResult = await client.user.sendVerifyCode({
-      notificationEvent: 'change-phone-number'
+      notificationEvent: 'change-phone-number',
+      phoneNumber: '0700000001'
     })
     const emailResult = await client.user.sendVerifyCode({
-      notificationEvent: 'change-email-address'
+      notificationEvent: 'change-email-address',
+      email: 'new@test.example'
     })
 
     expect(phoneResult.nonce).not.toBe(emailResult.nonce)
