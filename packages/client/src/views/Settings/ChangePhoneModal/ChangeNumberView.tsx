@@ -82,10 +82,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
           onSuccess(phoneNumber, data.nonce)
         },
         onError: (error) => {
-          if (
-            error.message.includes('409') ||
-            error.message.includes('duplicate')
-          ) {
+          if (error.data?.code === 'CONFLICT') {
             setShowDuplicateMobileErrorNotification(true)
           } else {
             setUnknownError(true)

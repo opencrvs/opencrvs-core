@@ -80,10 +80,7 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
           onSuccess(emailAddress, data.nonce)
         },
         onError: (error) => {
-          if (
-            error.message.includes('409') ||
-            error.message.includes('duplicate')
-          ) {
+          if (error.data?.code === 'CONFLICT') {
             setShowDuplicateEmailErrorNotification(true)
           } else {
             setUnknownError(true)
