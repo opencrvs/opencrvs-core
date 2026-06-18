@@ -10,12 +10,14 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { getUUID } from '@opencrvs/commons'
+import { encodeScope, getUUID } from '@opencrvs/commons'
 import {
   createSystemTestClient,
   createTestClient,
   setupTestCase
 } from '@events/tests/utils'
+
+const USER_EDIT_SCOPE = encodeScope({ type: 'user.edit' })
 
 describe('user.sendVerifyCode', () => {
   test('returns a nonce when sending verify code for change-phone-number', async () => {
@@ -120,5 +122,84 @@ describe('user.sendVerifyCode', () => {
     })
 
     expect(phoneResult.nonce).not.toBe(emailResult.nonce)
+  })
+
+  describe('duplicate phone number', () => {
+    const PHONE_NUMBER = '01711111111'
+    test('throws CONFLICT when another user already has the requested phone number', async () => {
+      const { users } = await setupTestCase()
+      const adminClient = createTestClient(users[0], [USER_EDIT_SCOPE])
+      await adminClient.user.update({ id: users[0].id, mobile: PHONE_NUMBER })
+
+      const client2 = createTestClient(users[1])
+      await expect(
+        client2.user.sendVerifyCode({
+          notificationEvent: 'change-phone-number',
+          phoneNumber: PHONE_NUMBER
+        })
+      ).rejects.toMatchObject({ code: 'CONFLICT' })
+    })
+
+    test('does not throw CONFLICT when the phone number belongs to the requesting user', async () => {
+      const { users } = await setupTestCase()
+      const adminClient = createTestClient(users[0], [USER_EDIT_SCOPE])
+      await adminClient.user.update({ id: users[0].id, mobile: PHONE_NUMBER })
+
+      const client1 = createTestClient(users[0])
+      await expect(
+        client1.user.sendVerifyCode({
+          notificationEvent: 'change-phone-number',
+          phoneNumber: PHONE_NUMBER
+        })
+      ).resolves.toHaveProperty('nonce')
+    })
+  })
+
+  describe('duplicate email', () => {
+    const EMAIL = 'shared@test.example'
+    test('throws CONFLICT when another user already has the requested email', async () => {
+      const { users } = await setupTestCase()
+      const client2 = createTestClient(users[1])
+
+      // seeder sets email to `user-${id}@test.example` for every user
+      const user1Email = `user-${users[0].id}@test.example`
+
+      await expect(
+        client2.user.sendVerifyCode({
+          notificationEvent: 'change-email-address',
+          email: user1Email
+        })
+      ).rejects.toMatchObject({ code: 'CONFLICT' })
+    })
+
+    test('throws CONFLICT when another user claims a freshly updated email', async () => {
+      const { users } = await setupTestCase()
+      const adminClient = createTestClient(users[0], [USER_EDIT_SCOPE])
+      await adminClient.user.update({
+        id: users[0].id,
+        email: EMAIL
+      })
+
+      const client2 = createTestClient(users[1])
+      await expect(
+        client2.user.sendVerifyCode({
+          notificationEvent: 'change-email-address',
+          email: EMAIL
+        })
+      ).rejects.toMatchObject({ code: 'CONFLICT' })
+    })
+
+    test('does not throw CONFLICT when the email belongs to the requesting user', async () => {
+      const { users } = await setupTestCase()
+      const client1 = createTestClient(users[0])
+
+      const ownEmail = `user-${users[0].id}@test.example`
+      await expect(
+        client1.user.sendVerifyCode({
+          notificationEvent: 'change-email-address',
+          email: ownEmail
+        })
+      ).resolves.toHaveProperty('nonce')
+    })
   })
 })
