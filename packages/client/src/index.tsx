@@ -76,5 +76,8 @@ console.debug('Waiting for service worker to be ready...')
 void navigator.serviceWorker.ready.then(() => {
   // eslint-disable-next-line no-console
   console.debug('Service worker is ready')
+  // Signals the inline loading script in index.html that the app has rendered,
+  // so a later reconnect no longer triggers a reload.
+  window.__OPENCRVS_APP_READY__ = true
   root.render(<App router={router} store={store} />)
 })
