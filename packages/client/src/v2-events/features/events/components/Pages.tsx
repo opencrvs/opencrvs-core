@@ -96,17 +96,19 @@ export function Pages({
 
   // values is used on the verification page wizard to set the verification page result
   function onNextPage(values?: EventState) {
+    // submit() flushes the current page values (including values computed
+    // inside FormFieldGenerator, e.g. default values) into the form state
+    // store and returns any validation errors.
     const errors = formRef.current?.submit(values) ?? []
-    // onValidSubmit (i.e. switchToNextPage) is called as part of submit only if
-    // there are no errors in the form. But if the current page doesn't require
-    // completion to continue and there are errors on the page, we manually call
-    // switchToNextPage.
-    if (!page.requireCompletionToContinue && errors.length > 0) {
+    // Navigate when the page allows incomplete values, or when the page is
+    // error-free.
+    const allowErrors = !page.requireCompletionToContinue
+    if (allowErrors || errors.length === 0) {
       switchToNextPage()
     }
   }
 
-  function onGoToReview() {
+  function handleSubmit() {
     // submit() flushes the current page values (including values computed
     // inside FormFieldGenerator, e.g. default values) into the form state
     // store. Navigating to review is allowed even when the page has errors.
@@ -130,7 +132,7 @@ export function Pages({
     showReviewButton: !hideBackToReview,
     onNextPage,
     onPreviousPage,
-    onSubmit: onGoToReview
+    onSubmit: handleSubmit
   }
   const fields = (
     <FormFieldGenerator
@@ -145,7 +147,6 @@ export function Pages({
       validatorContext={validatorContext}
       onFormChange={setFormData}
       onTouchedChange={setFormTouched}
-      onValidSubmit={switchToNextPage}
     />
   )
 
