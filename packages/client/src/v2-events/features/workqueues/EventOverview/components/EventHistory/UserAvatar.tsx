@@ -29,19 +29,16 @@ const NameAvatar = styled.div`
  */
 export function UserAvatar({
   names,
-  avatar,
-  locale
+  avatar
 }: {
   names: User['name'] | string
-  avatar?: Maybe<Avatar>
-  locale: string
+  avatar?: string | undefined | null
 }) {
-  const name =
-    typeof names === 'string' ? names : getUsersFullName(names)
+  const name = typeof names === 'string' ? names : getUsersFullName(names)
 
   return (
     <NameAvatar>
-      <AvatarSmall avatar={avatar?.data} name={name} />
+      <AvatarSmall avatar={avatar} name={name} />
       <span>{name}</span>
     </NameAvatar>
   )

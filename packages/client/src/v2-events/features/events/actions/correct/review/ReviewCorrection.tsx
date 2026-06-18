@@ -110,28 +110,16 @@ const Row = styled.div<{
 
 const StyledTextArea = styled(TextArea)`
   height: 120px;
-  width: 540px;
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    height: 100px;
-    width: 420px;
-  }
-
-  @media (max-width: 480px) {
-    width: 100%;
-  }
-`
-
-const StyledButton = styled(Button)`
-  width: 235px;
-  height: 56px;
-  @media (max-width: 480px) {
-    width: 100%;
-  }
+  width: 100%;
 `
 
 const StyledStack = styled(Stack)`
+  width: 100%;
   padding-top: 20px;
+
+  > div {
+    width: 100%;
+  }
 `
 
 function ApproveModal({
@@ -145,19 +133,21 @@ function ApproveModal({
   return (
     <Dialog
       actions={[
-        <StyledButton
+        <Button
           key="cancel_correction_approval"
           id="cancel_correction_approval"
+          size="large"
           type="tertiary"
           onClick={() => {
             close(true)
           }}
         >
           {intl.formatMessage(reviewCorrectionMessages.actionModalCancel)}
-        </StyledButton>,
-        <StyledButton
+        </Button>,
+        <Button
           key="confirm_correction"
           id="confirm_correction"
+          size="large"
           type="positive"
           onClick={() => {
             onSubmit()
@@ -165,11 +155,12 @@ function ApproveModal({
           }}
         >
           {intl.formatMessage(reviewCorrectionMessages.actionModalConfirm)}
-        </StyledButton>
+        </Button>
       ]}
       isOpen={true}
       title={intl.formatMessage(reviewCorrectionMessages.approveCorrection)}
       variant="large"
+      width={700}
       onClose={() => close(true)}
     >
       <Stack>
@@ -193,7 +184,7 @@ function RejectModal({
   return (
     <Dialog
       actions={[
-        <StyledButton
+        <Button
           key="cancel_correction_rejection"
           id="cancel_correction_rejection"
           size="large"
@@ -203,8 +194,8 @@ function RejectModal({
           }}
         >
           {intl.formatMessage(reviewCorrectionMessages.actionModalCancel)}
-        </StyledButton>,
-        <StyledButton
+        </Button>,
+        <Button
           key="reject_correction"
           disabled={!message}
           id="reject_correction"
@@ -216,11 +207,12 @@ function RejectModal({
           }}
         >
           {intl.formatMessage(reviewCorrectionMessages.actionModalConfirm)}
-        </StyledButton>
+        </Button>
       ]}
       isOpen={true}
       title={intl.formatMessage(reviewCorrectionMessages.rejectCorrection)}
       variant="large"
+      width={700}
       onClose={() => close(true)}
     >
       <Stack>
