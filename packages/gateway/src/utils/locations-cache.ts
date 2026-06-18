@@ -37,24 +37,35 @@ export const getCachedLocations = async (
   const mem = memCache.get(query)
   if (mem && Date.now() < mem.expiresAt) return mem.compressed
 
-  const stored = await redis.get(`${KEY_PREFIX}${query}`)
-  if (stored) {
-    const compressed = Buffer.from(stored, 'base64')
-    memCache.set(query, { compressed, expiresAt: Date.now() + MEM_TTL_MS })
-    return compressed
+  try {
+    const stored = await redis.get(`${KEY_PREFIX}${query}`)
+    if (stored) {
+      const compressed = Buffer.from(stored, 'base64')
+      memCache.set(query, { compressed, expiresAt: Date.now() + MEM_TTL_MS })
+      return compressed
+    }
+  } catch (e) {
+    logger.warn(`Locations Redis GET failed, falling through to upstream: ${e}`)
   }
+
   return null
 }
 
 const setCachedLocations = (query: string, compressed: Buffer) =>
-  redis.set(`${KEY_PREFIX}${query}`, compressed.toString('base64'), { EX: TTL })
+  redis
+    .set(`${KEY_PREFIX}${query}`, compressed.toString('base64'), { EX: TTL })
+    .catch((e) => logger.warn(`Locations Redis SET failed: ${e}`))
 
 export const bustLocationsCache = async () => {
   memCache.clear()
-  const keys = await redis.keys(`${KEY_PREFIX}*`)
-  if (keys.length) {
-    await redis.del(keys)
-    logger.info(`Locations cache busted: ${keys.length} keys cleared`)
+  try {
+    const keys = await redis.keys(`${KEY_PREFIX}*`)
+    if (keys.length) {
+      await redis.del(keys)
+      logger.info(`Locations cache busted: ${keys.length} keys cleared`)
+    }
+  } catch (e) {
+    logger.warn(`Locations Redis bust failed: ${e}`)
   }
 }
 

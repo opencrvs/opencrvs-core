@@ -18,6 +18,7 @@ import {
   fetchAndCache,
   getCachedLocations
 } from '@gateway/utils/locations-cache'
+import { logger } from '@opencrvs/commons'
 import z from 'zod'
 import { promisify } from 'util'
 import { gunzip as _gunzip } from 'zlib'
@@ -47,12 +48,21 @@ const getLocationsHandler = async (req: Request, h: ResponseToolkit) => {
   const acceptsGzip: boolean =
     req.headers['accept-encoding']?.includes('gzip') ?? false
 
-  const compressed =
-    (await getCachedLocations(query)) ??
-    (await fetchAndCache(query, async () => {
-      const res = await fetch(`${APPLICATION_CONFIG_URL}locations${query}`)
-      return res.text()
-    }))
+  let compressed = await getCachedLocations(query)
+
+  if (!compressed) {
+    try {
+      compressed = await fetchAndCache(query, async () => {
+        const res = await fetch(`${APPLICATION_CONFIG_URL}locations${query}`)
+        if (!res.ok)
+          throw new Error(`upstream locations returned ${res.status}`)
+        return res.text()
+      })
+    } catch (e) {
+      logger.error(`Locations fetch failed: ${e}`)
+      return h.response({ statusCode: 502, error: 'Bad Gateway' }).code(502)
+    }
+  }
 
   if (acceptsGzip) {
     return h
@@ -62,11 +72,18 @@ const getLocationsHandler = async (req: Request, h: ResponseToolkit) => {
       .header('Vary', 'Accept-Encoding')
   }
 
-  const body = await gunzip(compressed)
-  return h
-    .response(body)
-    .type('application/json')
-    .header('Vary', 'Accept-Encoding')
+  try {
+    const body = await gunzip(compressed)
+    return h
+      .response(body)
+      .type('application/json')
+      .header('Vary', 'Accept-Encoding')
+  } catch (e) {
+    logger.error(`Locations gunzip failed for query=${query}: ${e}`)
+    return h
+      .response({ statusCode: 500, error: 'Internal Server Error' })
+      .code(500)
+  }
 }
 
 export const catchAllProxy = {
