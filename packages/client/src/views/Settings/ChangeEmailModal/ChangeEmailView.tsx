@@ -72,7 +72,8 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
     if (!userDetails) return
     sendVerifyCode.mutate(
       {
-        notificationEvent: TriggerEvent.CHANGE_EMAIL_ADDRESS
+        notificationEvent: TriggerEvent.CHANGE_EMAIL_ADDRESS,
+        email: emailAddress
       },
       {
         onSuccess: (data) => {

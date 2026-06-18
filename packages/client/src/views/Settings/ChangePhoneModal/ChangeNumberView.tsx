@@ -74,7 +74,8 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
     if (!currentUser) return
     sendVerifyCode.mutate(
       {
-        notificationEvent: TriggerEvent.CHANGE_PHONE_NUMBER
+        notificationEvent: TriggerEvent.CHANGE_PHONE_NUMBER,
+        phoneNumber
       },
       {
         onSuccess: (data) => {
