@@ -38,26 +38,29 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
 
     <script>
       /*
-       * If the connection is restored while the application is still loading,
-       * reload the page to retry. When the network switches (e.g. Ethernet ->
-       * WiFi) mid-install, the service worker can stall while precaching assets
-       * and never finish activating, leaving the user stuck on the "Installing
-       * application..." screen below. The React app sets __OPENCRVS_APP_READY__
-       * once it has rendered, so a reconnect after that point is ignored here.
-       * See https://github.com/opencrvs/opencrvs-core/issues/12898
+       * If the connection is restored while the application is still loading, reload the page to retry.
+       * When the network switches (e.g. Ethernet -> WiFi) mid-install,
+       * the service worker can stall while precaching assets and never finish activating,
+       * leaving the user stuck on the "Installing application..." screen.
        */
       window.addEventListener('online', function () {
+        // The React app sets __OPENCRVS_APP_READY__ true once it has rendered,
+        // so a reconnect after that point is ignored here.
         if (window.__OPENCRVS_APP_READY__) {
           return
         }
+
         // Guard against reload loops on a flapping connection.
         var now = Date.now()
         var last = Number(
           sessionStorage.getItem('opencrvs.reloadOnReconnect') || 0
         )
+
+        // 5 seconds cooldown to prevent reload loops on a flapping connection.
         if (now - last < 5000) {
           return
         }
+
         sessionStorage.setItem('opencrvs.reloadOnReconnect', String(now))
         window.location.reload()
       })

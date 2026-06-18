@@ -17,8 +17,8 @@ declare global {
     __localeId__: string
     __WB_MANIFEST: Array<{ url: string; revision: string }>
     /**
-     * Set to `true` once the React application has been rendered. Used by the
-     * inline loading script in index.html to decide whether a reconnect should
+     * Set to `true` once the React application has been rendered.
+     * Used by the inline loading script in index.html to decide whether a reconnect should
      * reload the page (the app is still installing) or be ignored (already up).
      */
     __OPENCRVS_APP_READY__?: boolean
