@@ -34,13 +34,14 @@ describe('getAvailableActionsForEvent()', () => {
     })
   }
 
-  it(`should not allow ARCHIVE for "${EventStatus.enum.ARCHIVED}" status with ${InherentFlags.REJECTED} flag`, () => {
+  it(`should not allow ARCHIVE or EDIT for "${EventStatus.enum.ARCHIVED}" status with ${InherentFlags.REJECTED} flag`, () => {
     const actions = getAvailableActionsForEvent({
       status: EventStatus.enum.ARCHIVED,
       flags: [InherentFlags.REJECTED]
     } as EventIndex)
 
     expect(actions).not.toContain(ActionType.ARCHIVE)
+    expect(actions).not.toContain(ActionType.EDIT)
     expect(actions).toMatchSnapshot()
   })
 

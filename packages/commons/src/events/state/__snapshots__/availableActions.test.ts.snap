@@ -12,12 +12,10 @@ exports[`getAvailableActionsForEvent() returns the correct actions for "REGISTER
 ]
 `;
 
-exports[`getAvailableActionsForEvent() should not allow ARCHIVE for "ARCHIVED" status with rejected flag 1`] = `
+exports[`getAvailableActionsForEvent() should not allow ARCHIVE or EDIT for "ARCHIVED" status with rejected flag 1`] = `
 [
   "READ",
-  "NOTIFY",
   "CUSTOM",
-  "EDIT",
 ]
 `;
 
