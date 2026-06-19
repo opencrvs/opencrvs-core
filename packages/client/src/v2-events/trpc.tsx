@@ -31,6 +31,7 @@ import React from 'react'
 import superjson from 'superjson'
 import { getUUID } from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
+import { CACHE_VERSION } from '@client/utils/constants'
 import { storage } from '@client/storage'
 
 const { TRPCProvider: TRPCProviderRaw, useTRPC } =
@@ -204,7 +205,7 @@ export function TRPCProvider({
       client={queryClient}
       persistOptions={{
         persister: createIDBPersister(storeIdentifier),
-        buster: 'persisted-indexed-db',
+        buster: `persisted-indexed-db-v${CACHE_VERSION}`,
         maxAge: Infinity,
         dehydrateOptions: {
           shouldDehydrateQuery: (query) => {
