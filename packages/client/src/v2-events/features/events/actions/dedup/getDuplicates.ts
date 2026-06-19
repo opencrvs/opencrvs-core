@@ -28,7 +28,10 @@ export async function prefetchPotentialDuplicates(eventId: string) {
       setEventData(eventDocument.id, eventDocument)
     }
   } catch (error) {
-    if (error instanceof TRPCClientError && error.data?.httpStatus === 403) {
+    if (
+      error instanceof TRPCClientError &&
+      [403, 404, 401].includes(error.data?.httpStatus)
+    ) {
       // Do nothing, the user is not authorized to see duplicates
     } else {
       throw error

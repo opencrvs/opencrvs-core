@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines  */
 import { MutationKey, useMutation, useQueryClient } from '@tanstack/react-query'
 import type {
   DecorateMutationProcedure,
@@ -25,11 +26,13 @@ import {
   EventDocument,
   omitHiddenAnnotationFields,
   omitHiddenPaginatedFields,
+  deepDropNulls,
   deepMerge,
   EventState,
   EventConfig,
   getCurrentEventState,
-  ValidatorContext
+  ValidatorContext,
+  isPotentialDuplicate
 } from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
@@ -55,6 +58,31 @@ import {
 } from '@client/v2-events/trpc'
 import { ToastKey } from '@client/v2-events/routes/Toaster'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+
+import { showToast } from '../../../useToastAndRedirect'
+
+function showToastOnDuplicateDetected(event: EventDocument) {
+  showToast({
+    message: {
+      defaultMessage:
+        '{trackingId} is a potential duplicate. Record is ready for review.',
+      id: 'event.declaration.potentialDuplicateDetected',
+      description:
+        'Notification for potential duplicate declaration. Shown when a potential duplicate is detected after declaring an event.'
+    },
+    toastType: 'error',
+    toastId: `duplicate-detected-${event.trackingId}`,
+    messageOpts: { trackingId: event.trackingId }
+  })
+}
+
+function deleteLocalEventAndToastOnDuplicate(event: EventDocument) {
+  void deleteLocalEvent(event)
+
+  if (isPotentialDuplicate(event.actions)) {
+    showToastOnDuplicateDetected(event)
+  }
+}
 
 function retryUnlessConflict(
   _failureCount: number,
@@ -130,13 +158,24 @@ function getCleanedDeclarationDiff({
   )
 }
 
+setMutationDefaults(trpcOptionsProxy.event.actions.custom.request, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.custom.request
+  ),
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: deleteLocalEvent,
+  onError: errorToastOnConflict,
+  meta: { actionType: ActionType.CUSTOM }
+})
+
 setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.declare.request
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: deleteLocalEvent,
+  onSuccess: deleteLocalEventAndToastOnDuplicate,
   onError: errorToastOnConflict,
   onMutate: updateEventOptimistically(
     ActionType.DECLARE,
@@ -146,13 +185,24 @@ setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   meta: { actionType: ActionType.DECLARE }
 })
 
+setMutationDefaults(trpcOptionsProxy.event.actions.edit.request, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.edit.request
+  ),
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: deleteLocalEvent,
+  onError: errorToastOnConflict,
+  meta: { actionType: ActionType.EDIT }
+})
+
 setMutationDefaults(trpcOptionsProxy.event.actions.register.request, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.register.request
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: deleteLocalEvent,
+  onSuccess: deleteLocalEventAndToastOnDuplicate,
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.REGISTER }
 })
@@ -166,17 +216,6 @@ setMutationDefaults(trpcOptionsProxy.event.actions.notify.request, {
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.NOTIFY }
-})
-
-setMutationDefaults(trpcOptionsProxy.event.actions.validate.request, {
-  mutationFn: createEventActionMutationFn(
-    trpcOptionsProxy.event.actions.validate.request
-  ),
-  retry: retryUnlessConflict,
-  retryDelay,
-  onSuccess: deleteLocalEvent,
-  onError: errorToastOnConflict,
-  meta: { actionType: ActionType.VALIDATE }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.reject.request, {
@@ -207,7 +246,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: deleteLocalEvent,
+  // We can't delete the local event immediately
+  // because we're still on the certificate review page for a short time.
+  // It will be deleted when unassigned.
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.PRINT_CERTIFICATE }
 })
@@ -294,47 +335,58 @@ setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markNotDuplicate, {
 
 type CustomMutationKeys = keyof typeof customApi
 
-export const customMutationKeys = {
-  validateOnDeclare: [['validateOnDeclare']],
+const customMutationKeys = {
   registerOnDeclare: [['registerOnDeclare']],
-  registerOnValidate: [['registerOnValidate']],
+  editAndRegister: [['editAndRegister']],
+  editAndDeclare: [['editAndDeclare']],
+  editAndNotify: [['editAndNotify']],
   archiveOnDuplicate: [['archiveOnDuplicate']],
   makeCorrectionOnRequest: [['makeCorrectionOnRequest']]
 } satisfies Record<CustomMutationKeys, MutationKey>
 
 interface CustomMutationTypes {
-  validateOnDeclare: customApi.CustomMutationParams
   registerOnDeclare: customApi.CustomMutationParams
-  registerOnValidate: customApi.CustomMutationParams
+  editAndRegister: customApi.EditRequestParams
+  editAndDeclare: customApi.EditRequestParams
+  editAndNotify: customApi.EditRequestParams
   archiveOnDuplicate: customApi.ArchiveOnDuplicateParams
   makeCorrectionOnRequest: customApi.CorrectionRequestParams
 }
-
-queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
-  mutationFn: waitUntilEventIsCreated(customApi.validateOnDeclare),
-  retry: retryUnlessConflict,
-  retryDelay,
-  onSuccess: deleteLocalEvent,
-  onError: errorToastOnConflict,
-  meta: { actionType: ActionType.DECLARE }
-})
 
 queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
   mutationFn: waitUntilEventIsCreated(customApi.registerOnDeclare),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: deleteLocalEvent,
+  onSuccess: deleteLocalEventAndToastOnDuplicate,
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.DECLARE }
 })
 
-queryClient.setMutationDefaults(customMutationKeys.registerOnValidate, {
-  mutationFn: customApi.registerOnValidate,
+queryClient.setMutationDefaults(customMutationKeys.editAndRegister, {
+  mutationFn: customApi.editAndRegister,
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: deleteLocalEventAndToastOnDuplicate,
+  onError: errorToastOnConflict,
+  meta: { actionType: ActionType.REGISTER }
+})
+
+queryClient.setMutationDefaults(customMutationKeys.editAndDeclare, {
+  mutationFn: customApi.editAndDeclare,
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: deleteLocalEventAndToastOnDuplicate,
+  onError: errorToastOnConflict,
+  meta: { actionType: ActionType.DECLARE }
+})
+
+queryClient.setMutationDefaults(customMutationKeys.editAndNotify, {
+  mutationFn: customApi.editAndNotify,
   retry: retryUnlessConflict,
   retryDelay,
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: { actionType: ActionType.REGISTER }
+  meta: { actionType: ActionType.DECLARE }
 })
 
 queryClient.setMutationDefaults(customMutationKeys.archiveOnDuplicate, {
@@ -387,7 +439,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   trpcProcedure: P
 ) {
   const eventConfigurations = useEventConfigurations()
-  // @TODO: consider whether this should be here.
+
   const validatorContext = useValidatorContext()
 
   const allOptions = {
@@ -416,7 +468,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   type ActionMutationInput = inferInput<P> & { fullEvent?: EventDocument }
 
   function getMutationPayload(params: ActionMutationInput) {
-    const { eventId } = params
+    const { eventId, fullEvent, event, context, ...restParams } = params
     const localEvent =
       /*
        * In most cases an event should be stored in browser as a full event. This applies when:
@@ -427,7 +479,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       findLocalEventDocument(eventId) || findLocalEventIndex(eventId)
 
     const eventConfiguration = eventConfigurations.find(
-      (event) => event.id === localEvent?.type
+      (e) => e.id === localEvent?.type
     )
 
     if (!eventConfiguration) {
@@ -443,21 +495,24 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
         : action.type === actionType
     )
 
-    const originalDeclaration = params.fullEvent
-      ? getCurrentEventState(params.fullEvent, eventConfiguration).declaration
+    const originalDeclaration = fullEvent
+      ? getCurrentEventState(fullEvent, eventConfiguration).declaration
       : {}
 
     const annotation = actionConfiguration
-      ? omitHiddenAnnotationFields(
-          actionConfiguration,
-          originalDeclaration,
-          params.annotation,
-          {}
+      ? deepDropNulls(
+          omitHiddenAnnotationFields(
+            actionConfiguration,
+            originalDeclaration,
+            restParams.annotation,
+            {}
+          )
         )
       : {}
 
     return {
-      ...params,
+      ...restParams,
+      eventId,
       declaration: getCleanedDeclarationDiff({
         eventConfiguration,
         originalDeclaration,
@@ -472,10 +527,15 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   }
 
   return {
-    mutate: (params: ActionMutationInput) =>
-      mutation.mutate(getMutationPayload(params)),
-    mutateAsync: async (params: ActionMutationInput) =>
-      mutation.mutateAsync(getMutationPayload(params)),
+    mutate: (
+      params: ActionMutationInput,
+      options?: Parameters<typeof useMutation>[0]
+    ) => mutation.mutate(getMutationPayload(params), options),
+
+    mutateAsync: async (
+      params: ActionMutationInput,
+      options?: Parameters<typeof useMutation>[0]
+    ) => mutation.mutateAsync(getMutationPayload(params), options),
     isPending: mutation.isPending
   }
 }
@@ -484,7 +544,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
   mutationName: T
 ) {
   const eventConfigurations = useEventConfigurations()
-  // @TODO: consider whether this should be here.
+
   const validatorContext = useValidatorContext()
   const mutationKey = customMutationKeys[mutationName]
   const mutation = useMutation({

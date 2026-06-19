@@ -20,11 +20,12 @@ import {
   buildClientFunctionContext,
   runClientFunction,
   isNonInteractiveFieldType,
-  Location,
   FieldType,
   FieldValue,
   EventState,
   buildFormState,
+  UUID,
+  AdministrativeArea,
   FieldGroup,
   TextField,
   FieldConfigDefaultValue,
@@ -36,10 +37,10 @@ import {
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { useSystemVariables } from './useSystemVariables'
-import { useLocations } from './useLocations'
+import { useAdministrativeAreas } from './useAdministrativeAreas'
 
 interface Context extends SystemVariables {
-  locations: Location[]
+  administrativeAreas: Map<UUID, AdministrativeArea>
   adminLevelIds: string[]
   form: EventState | ActionUpdate
 }
@@ -159,13 +160,16 @@ function resolveSerializedUserField(
     return value
   }
   if (value.$location) {
-    if (value.$userField !== 'primaryOfficeId') {
+    if (
+      value.$userField !== 'primaryOfficeId' &&
+      value.$userField !== 'administrativeAreaId'
+    ) {
       return ''
     }
-    const locationId = context.user[value.$userField]
+    const locationId = context.user.administrativeAreaId
     const hierarchy = getAdminLevelHierarchy(
       locationId,
-      context.locations,
+      context.administrativeAreas,
       context.adminLevelIds
     )
 
@@ -193,7 +197,6 @@ export function mapFieldToDefaultValue(
       buildClientFunctionContext({
         form: context.form,
         systemVariables: context,
-        locations: context.locations,
         adminLevelIds: context.adminLevelIds
       })
     ) as FieldValue
@@ -271,9 +274,12 @@ export function mapFieldToDefaultValue(
     case FieldType.RADIO_GROUP:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
+    case FieldType.ALPHA_HIDDEN:
     case FieldType.OFFICE:
     case FieldType.NUMBER_WITH_UNIT:
     case FieldType.EMAIL:
+    case FieldType._EXPERIMENTAL_CUSTOM:
+    case FieldType.USER_ROLE:
     case FieldType.DATE_RANGE:
     case FieldType.SELECT_DATE_RANGE:
     case FieldType.PHONE:
@@ -281,6 +287,7 @@ export function mapFieldToDefaultValue(
     case FieldType.ID:
     case FieldType.VERIFICATION_STATUS:
     case FieldType.QR_READER:
+    case FieldType.IMAGE_VIEW:
     case FieldType.HTTP:
     case FieldType.ID_READER:
     case FieldType.SIGNATURE:
@@ -301,8 +308,8 @@ export function mapFieldToDefaultValue(
 export function useDefaultValue() {
   const systemVariables = useSystemVariables()
   const { config } = useSelector(getOfflineData)
-  const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const adminLevelIds = useMemo(
     () => config.ADMIN_STRUCTURE.map((level) => level.id),
     [config.ADMIN_STRUCTURE]
@@ -329,7 +336,7 @@ export function useDefaultValue() {
     }
     return mapFieldToDefaultValue(field, {
       ...systemVariables,
-      locations,
+      administrativeAreas,
       adminLevelIds,
       form
     })

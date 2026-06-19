@@ -20,7 +20,7 @@ import {
 import { Content } from '@opencrvs/components/lib/Content'
 import { Button } from '@opencrvs/components/src/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { EventIndex, EventStatus, getUUID } from '@opencrvs/commons/client'
+import { EventIndex, getUUID } from '@opencrvs/commons/client'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes/routes'
 import { useEventConfiguration } from '../../useEventConfiguration'
@@ -41,7 +41,7 @@ const SubPageContent = styled(Content)`
 export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
 
-  const [{ workqueue: slug }] = useTypedSearchParams(
+  const [{ backTo }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE
   )
 
@@ -71,25 +71,22 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
       id="not-a-duplicate"
       type="positive"
       onClick={async () => {
-        const marAsNotDuplicate = await openModal<boolean>((close) => (
+        const markAsNotDuplicate = await openModal<boolean>((close) => (
           <MarkAsNotDuplicateModal
             close={close}
             name={name || ''}
             trackingId={eventIndex.trackingId}
           />
         ))
-        if (marAsNotDuplicate) {
+        if (markAsNotDuplicate) {
           actions.duplicate.markNotDuplicate.mutate({
             transactionId: getUUID(),
             eventId: eventIndex.id,
-            keepAssignment: true
+            keepAssignment: true,
+            waitFor: false
           })
 
-          if (eventIndex.status === EventStatus.Values.DECLARED) {
-            navigate(ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({ eventId }))
-          } else {
-            navigate(ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({ eventId }))
-          }
+          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
         }
       }}
     >
@@ -122,10 +119,10 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
             declaration: {}
           })
 
-          if (slug) {
-            navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
+          if (backTo) {
+            navigate(backTo)
           } else {
-            navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+            navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
           }
         }
       }}

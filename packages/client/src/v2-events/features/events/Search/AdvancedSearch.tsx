@@ -30,7 +30,7 @@ import {
   deserializeSearchParams
 } from './utils'
 
-export const advancedSearchMessages = {
+const advancedSearchMessages = {
   advancedSearch: {
     id: 'config.advanced.search',
     defaultMessage: 'Advanced Search',

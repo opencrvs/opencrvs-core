@@ -12,38 +12,30 @@
 import _ from 'lodash'
 import {
   ActionDocument,
+  DocumentPath,
   Draft,
   EventDocument,
   FileFieldValue,
   FileFieldWithOptionValue,
-  FullDocumentPath,
   getAcceptedActions
 } from '@opencrvs/commons/client'
 import { removeCached } from '@client/v2-events/cache'
 import { precacheFile } from './useFileUpload'
 
-function isValidFilepath(filepath: string): filepath is FullDocumentPath {
-  try {
-    const regex = new RegExp(`^/${window.config.MINIO_BUCKET}/(.*)`)
-    return regex.test(filepath)
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(`Error matching "${filepath}" with regex`, error)
-  }
-  return false
-}
-
 export function getFilepathsFromActionDocument(
   actions: ActionDocument[] | Draft['action'][]
-): FullDocumentPath[] {
+): DocumentPath[] {
   const filepaths = actions.flatMap((action) => {
     const { declaration, annotation, ...metadata } = action
     const declarationValues = Object.values(action.declaration)
     const annotationValues = Object.values(action.annotation ?? {})
 
-    const metadataSignatureFilepaths = Object.values(metadata).filter(
-      (val) => typeof val === 'string' && isValidFilepath(val)
-    )
+    const signatureKeys = [
+      'createdBySignature'
+    ] as const satisfies readonly (keyof typeof metadata)[]
+    const metadataSignatureFilepaths = signatureKeys
+      .map((key) => metadata[key])
+      .filter((value): value is DocumentPath => !!value)
 
     const actionFilePaths = [...declarationValues, ...annotationValues].flatMap(
       (value) => {
@@ -69,15 +61,15 @@ export function getFilepathsFromActionDocument(
   return _.uniq(filepaths)
 }
 
-export async function cacheFiles(eventDocument: EventDocument) {
-  const actions = getAcceptedActions(eventDocument)
+export async function cacheFiles(event: EventDocument) {
+  const actions = getAcceptedActions(event)
   const fileNames = getFilepathsFromActionDocument(actions)
 
   return Promise.all(fileNames.map(async (filename) => precacheFile(filename)))
 }
 
-export async function removeCachedFiles(eventDocument: EventDocument) {
-  const actions = getAcceptedActions(eventDocument)
+export async function removeCachedFiles(event: EventDocument) {
+  const actions = getAcceptedActions(event)
   const fileNames = getFilepathsFromActionDocument(actions)
 
   return Promise.all(fileNames.map(removeCached))

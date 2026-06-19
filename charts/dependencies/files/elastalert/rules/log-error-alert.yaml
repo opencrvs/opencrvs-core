@@ -1,0 +1,55 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+name: 'log-error-alert'
+type: 'frequency'
+index: 'kibana-alert-history-default'
+is_enabled: true
+num_events: 1
+realert:
+  minutes: 5
+terms_size: 50
+timeframe:
+  minutes: 5
+timestamp_field: '@timestamp'
+timestamp_type: 'iso'
+use_strftime_index: false
+# https://github.com/Yelp/elastalert/issues/1260
+raw_count_keys: false
+filter:
+  - bool:
+      should:
+        - term:
+            rule.name.keyword:
+              value: 'Error while backup  '
+
+
+alert: 
+  - ${NOTIFICATION_TYPE}
+
+email:
+  - ${ALERT_EMAIL}
+
+http_post2_url: '${HTTP_POST2_ALERT_URL}'
+http_post2_payload:
+  subject: '{% raw %}{{DOMAIN}}{% endraw %}: {{rule.name}} 🚨'
+  html: 'Reason: {{kibana.alert.context.logs__alert__document__count.conditions}}. Login to https://kibana.{% raw %}{{DOMAIN}}{% endraw %} to view the alert.'
+  from: '{% raw %}{{SENDER_EMAIL_ADDRESS}}{% endraw %}'
+  to: '{% raw %}{{ALERT_EMAIL}}{% endraw %}'
+
+
+# New way to define alerting action with more flexible templating:
+alert_subject: "${DOMAIN}: {{rule.name}} 🚨"
+alert_text_type: alert_text_jinja
+email_format: "html"
+
+alert_text: |
+  <p>Reason: {{kibana.alert.context.logs__alert__document__count.conditions}}.</p>
+
+  <p>Open Kibana:</p>
+  <p><a href="https://kibana.${DOMAIN}">https://kibana.${DOMAIN}</a></p>

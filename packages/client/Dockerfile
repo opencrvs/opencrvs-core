@@ -15,6 +15,8 @@ RUN yarn install --frozen-lockfile  && yarn build
 # Variables should be substituted in docker-compose/kubernetes manifest
 ENV CONTENT_SECURITY_POLICY_WILDCARD="{{CONTENT_SECURITY_POLICY_WILDCARD}}"
 ENV COUNTRY_CONFIG_URL_INTERNAL="{{COUNTRY_CONFIG_URL_INTERNAL}}"
+ENV LOGIN_URL="{{LOGIN_URL}}"
+ENV AUTH_URL_INTERNAL="{{AUTH_URL_INTERNAL}}"
 ENV GATEWAY_URL_INTERNAL="{{GATEWAY_URL_INTERNAL}}"
 WORKDIR /app/packages/client
 COPY --chown=node:node packages/client /app/packages/client
@@ -26,4 +28,5 @@ COPY --from=0 --chown=nginx:nginx /app/packages/client/build/ /usr/share/nginx/h
 
 COPY --chmod=555 packages/client/nginx-deploy-config.sh /docker-entrypoint.d/11-nginx-deploy-config.sh
 COPY --chown=nginx:nginx packages/client/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --chown=nginx:nginx packages/client/nginx.logging.conf /etc/nginx/conf.d/logging.conf
 EXPOSE 3000

@@ -20,6 +20,7 @@ import {
   ActionType,
   EventState,
   generateTransactionId,
+  getCurrentEventState,
   RequestedCorrectionAction,
   ValidatorContext
 } from '@opencrvs/commons/client'
@@ -40,7 +41,8 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { CorrectionDetails } from '@client/v2-events/features/events/actions/correct/request/Summary/CorrectionDetails'
-import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
+import { useEventConfiguration } from '../../../useEventConfiguration'
 
 const reviewCorrectionMessages = defineMessages({
   actionModalCancel: {
@@ -51,8 +53,14 @@ const reviewCorrectionMessages = defineMessages({
   actionModalDescription: {
     id: 'actionModal.description',
     defaultMessage:
-      'The informant will be notified of this decision and a record of this decision will be recorded',
+      'The informant will be notified of this decision and a record of this decision will be recorded.',
     description: 'The description for action modal'
+  },
+  rejectModalDescription: {
+    id: 'correction.correctionReject.description',
+    defaultMessage:
+      'Rejecting this correction request will leave the original record unchanged. A reason for rejection should be provided.',
+    description: 'The description for reject correction modal'
   },
   approveCorrection: {
     id: 'modal.approveCorrection',
@@ -101,23 +109,17 @@ const Row = styled.div<{
 `
 
 const StyledTextArea = styled(TextArea)`
-  height: 100px;
-  width: 420px;
-  @media (max-width: 480px) {
-    width: 100%;
-  }
-`
-
-const StyledButton = styled(Button)`
-  width: 235px;
-  height: 56px;
-  @media (max-width: 480px) {
-    width: 100%;
-  }
+  height: 120px;
+  width: 100%;
 `
 
 const StyledStack = styled(Stack)`
+  width: 100%;
   padding-top: 20px;
+
+  > div {
+    width: 100%;
+  }
 `
 
 function ApproveModal({
@@ -131,9 +133,21 @@ function ApproveModal({
   return (
     <Dialog
       actions={[
-        <StyledButton
+        <Button
+          key="cancel_correction_approval"
+          id="cancel_correction_approval"
+          size="large"
+          type="tertiary"
+          onClick={() => {
+            close(true)
+          }}
+        >
+          {intl.formatMessage(reviewCorrectionMessages.actionModalCancel)}
+        </Button>,
+        <Button
           key="confirm_correction"
           id="confirm_correction"
+          size="large"
           type="positive"
           onClick={() => {
             onSubmit()
@@ -141,10 +155,12 @@ function ApproveModal({
           }}
         >
           {intl.formatMessage(reviewCorrectionMessages.actionModalConfirm)}
-        </StyledButton>
+        </Button>
       ]}
       isOpen={true}
       title={intl.formatMessage(reviewCorrectionMessages.approveCorrection)}
+      variant="large"
+      width={700}
       onClose={() => close(true)}
     >
       <Stack>
@@ -168,7 +184,18 @@ function RejectModal({
   return (
     <Dialog
       actions={[
-        <StyledButton
+        <Button
+          key="cancel_correction_rejection"
+          id="cancel_correction_rejection"
+          size="large"
+          type="tertiary"
+          onClick={() => {
+            close(true)
+          }}
+        >
+          {intl.formatMessage(reviewCorrectionMessages.actionModalCancel)}
+        </Button>,
+        <Button
           key="reject_correction"
           disabled={!message}
           id="reject_correction"
@@ -180,15 +207,17 @@ function RejectModal({
           }}
         >
           {intl.formatMessage(reviewCorrectionMessages.actionModalConfirm)}
-        </StyledButton>
+        </Button>
       ]}
       isOpen={true}
       title={intl.formatMessage(reviewCorrectionMessages.rejectCorrection)}
+      variant="large"
+      width={700}
       onClose={() => close(true)}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(reviewCorrectionMessages.actionModalDescription)}
+          {intl.formatMessage(reviewCorrectionMessages.rejectModalDescription)}
         </Text>
       </Stack>
       <StyledStack>
@@ -237,7 +266,9 @@ export function ReviewCorrection({
 
   const events = useEvents()
   const event = events.getEvent.getFromCache(eventId)
-  const { isActionAllowed } = useUserAllowedActions(event.type)
+  const { eventConfiguration } = useEventConfiguration(event.type)
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
+  const { isActionAllowed } = useUserAllowedActions(eventIndex)
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
 
@@ -252,14 +283,10 @@ export function ReviewCorrection({
             requestId: correctionRequestAction.id,
             annotation
           })
-          if (searchParams.workqueue) {
-            return navigate(
-              ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
-                slug: searchParams.workqueue
-              })
-            )
+          if (searchParams.backTo) {
+            return navigate(searchParams.backTo)
           } else {
-            return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+            return navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
           }
         }}
       />
@@ -278,17 +305,13 @@ export function ReviewCorrection({
             annotation,
             content: { reason }
           })
-          if (searchParams.workqueue) {
-            return navigate(
-              ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
-                slug: searchParams.workqueue
-              })
-            )
+          if (searchParams.backTo) {
+            return navigate(searchParams.backTo)
           } else {
             return navigate(
-              ROUTES.V2.EVENTS.OVERVIEW.buildPath(
+              ROUTES.V2.EVENTS.EVENT.buildPath(
                 { eventId },
-                { workqueue: searchParams.workqueue }
+                { backTo: searchParams.backTo }
               )
             )
           }

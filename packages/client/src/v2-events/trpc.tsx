@@ -31,6 +31,7 @@ import React from 'react'
 import superjson from 'superjson'
 import { getUUID } from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
+import { CACHE_VERSION } from '@client/utils/constants'
 import { storage } from '@client/storage'
 
 const { TRPCProvider: TRPCProviderRaw, useTRPC } =
@@ -39,8 +40,8 @@ const { TRPCProvider: TRPCProviderRaw, useTRPC } =
 export { AppRouter, useTRPC }
 
 function getTrpcClient() {
-  // In storybook tests, we use httpLink as msw-trpc does not support httpBatchLink
-  if (import.meta.env.STORYBOOK === 'true') {
+  // In storybook and vitest tests, we use httpLink as msw-trpc does not support httpBatchLink
+  if (import.meta.env.STORYBOOK === 'true' || import.meta.env.MODE === 'test') {
     return createTRPCClient<AppRouter>({
       links: [
         loggerLink({
@@ -204,7 +205,7 @@ export function TRPCProvider({
       client={queryClient}
       persistOptions={{
         persister: createIDBPersister(storeIdentifier),
-        buster: 'persisted-indexed-db',
+        buster: `persisted-indexed-db-v${CACHE_VERSION}`,
         maxAge: Infinity,
         dehydrateOptions: {
           shouldDehydrateMutation: (mutation) => {
@@ -237,4 +238,11 @@ export function TRPCProvider({
       </TRPCProviderRaw>
     </PersistQueryClientProvider>
   )
+}
+
+export function hasConflict(error: unknown) {
+  if (error instanceof TRPCClientError) {
+    return error.data.code === 'CONFLICT'
+  }
+  return false
 }

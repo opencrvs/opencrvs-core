@@ -18,8 +18,6 @@ import { Page } from '@client/components/Page'
 import { I18nContainer } from '@client/i18n/components/I18nContainer'
 import { createStore } from '@client/store'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { useApolloClient } from '@client/utils/apolloClient'
-import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { Provider, useSelector } from 'react-redux'
 import {
@@ -39,12 +37,18 @@ import {
   setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
 import {
+  ActionType,
+  ConditionalType,
   Draft,
   EventDocument,
+  InherentFlags,
+  not,
+  flag,
   tennisClubMembershipEvent,
   TestUserRole,
   TokenUserType,
-  UUID
+  UUID,
+  ChildOnboardingEvent
 } from '@opencrvs/commons/client'
 import {
   tennisClubMembershipEventDocument,
@@ -93,46 +97,42 @@ function WaitForUserDetails({ children }: PropsWithChildren<{}>) {
 }
 
 function Wrapper({ store, router, initialPath, children }: WrapperProps) {
-  const { client } = useApolloClient(store)
-
   return (
-    <ApolloProvider client={client}>
-      <ThemeProvider theme={getTheme}>
-        <Provider store={store}>
-          <I18nContainer>
-            <TRPCProvider>
-              <RouterProvider
-                router={createMemoryRouter(
-                  [
-                    {
-                      path: '/',
-                      element: (
-                        <Page>
-                          <NavigationHistoryProvider>
-                            <WaitForUserDetails>
-                              <Outlet />
-                            </WaitForUserDetails>
-                          </NavigationHistoryProvider>
-                        </Page>
-                      ),
-                      children: [
-                        router || {
-                          path: initialPath,
-                          element: children
-                        }
-                      ]
-                    }
-                  ],
+    <ThemeProvider theme={getTheme}>
+      <Provider store={store}>
+        <I18nContainer>
+          <TRPCProvider>
+            <RouterProvider
+              router={createMemoryRouter(
+                [
                   {
-                    initialEntries: [initialPath]
+                    path: '/',
+                    element: (
+                      <Page>
+                        <NavigationHistoryProvider>
+                          <WaitForUserDetails>
+                            <Outlet />
+                          </WaitForUserDetails>
+                        </NavigationHistoryProvider>
+                      </Page>
+                    ),
+                    children: [
+                      router || {
+                        path: initialPath,
+                        element: children
+                      }
+                    ]
                   }
-                )}
-              ></RouterProvider>
-            </TRPCProvider>
-          </I18nContainer>
-        </Provider>
-      </ThemeProvider>
-    </ApolloProvider>
+                ],
+                {
+                  initialEntries: [initialPath]
+                }
+              )}
+            ></RouterProvider>
+          </TRPCProvider>
+        </I18nContainer>
+      </Provider>
+    </ThemeProvider>
   )
 }
 
@@ -165,6 +165,47 @@ export const parameters = {
 
 const generator = testDataGenerator()
 
+const tennisClubMembershipEventWithCustomAction = {
+  ...tennisClubMembershipEvent,
+  actions: tennisClubMembershipEvent.actions.concat([
+    {
+      type: ActionType.CUSTOM,
+      customActionType: 'Approve',
+      label: {
+        id: 'event.tennis-club-membership.action.confirm.label',
+        defaultMessage: 'Confirm',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from'
+      },
+      auditHistoryLabel: {
+        id: 'event.tennis-club-membership.action.confirm.audit-history-label',
+        defaultMessage: 'Confirmed',
+        description:
+          'This is the label to show in audit history for the confirm action'
+      },
+      form: [
+        {
+          id: 'notes',
+          type: 'TEXTAREA',
+          required: true,
+          label: {
+            defaultMessage: 'Notes',
+            description: 'This is the label for the field for a custom action',
+            id: 'event.birth.custom.action.approve.field.notes.label'
+          }
+        }
+      ],
+      conditionals: [
+        {
+          type: ConditionalType.ENABLE,
+          conditional: not(flag(InherentFlags.POTENTIAL_DUPLICATE))
+        }
+      ],
+      flags: []
+    }
+  ])
+}
+
 const preview: Preview = {
   loaders: [
     mswLoader,
@@ -192,11 +233,14 @@ const preview: Preview = {
       queryClient.clear()
       const primaryOfficeId = '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
 
-      if (options.parameters.userRole === TestUserRole.Enum.FIELD_AGENT) {
-        window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+      if (options.parameters.userRole === TestUserRole.enum.FIELD_AGENT) {
+        window.localStorage.setItem(
+          'opencrvs',
+          options.parameters.token ?? generator.user.token.fieldAgent
+        )
         addUserToQueryData(generator.user.fieldAgent().v2)
       } else if (
-        options.parameters.userRole === TestUserRole.Enum.REGISTRATION_AGENT
+        options.parameters.userRole === TestUserRole.enum.REGISTRATION_AGENT
       ) {
         window.localStorage.setItem(
           'opencrvs',
@@ -205,7 +249,25 @@ const preview: Preview = {
 
         addUserToQueryData(generator.user.registrationAgent().v2)
       } else if (
-        options.parameters.userRole === TestUserRole.Enum.LOCAL_SYSTEM_ADMIN
+        options.parameters.userRole === TestUserRole.enum.COMMUNITY_LEADER
+      ) {
+        window.localStorage.setItem(
+          'opencrvs',
+          options.parameters.token ?? generator.user.token.communityLeader
+        )
+
+        addUserToQueryData(generator.user.communityLeader().v2)
+      } else if (
+        options.parameters.userRole === TestUserRole.enum.PROVINCIAL_REGISTRAR
+      ) {
+        window.localStorage.setItem(
+          'opencrvs',
+          generator.user.token.provincialRegistrar
+        )
+
+        addUserToQueryData(generator.user.provincialRegistrar().v2)
+      } else if (
+        options.parameters.userRole === TestUserRole.enum.LOCAL_SYSTEM_ADMIN
       ) {
         window.localStorage.setItem(
           'opencrvs',
@@ -214,13 +276,15 @@ const preview: Preview = {
 
         addUserToQueryData({
           id: generator.user.id.localSystemAdmin,
-          name: [{ use: 'en', given: ['Alex'], family: 'Ngonga' }],
-          role: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN,
+          name: { firstname: 'Alex', surname: 'Ngonga' },
+          role: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
           primaryOfficeId,
+          mobile: '+260978787878',
+          status: 'active',
           type: TokenUserType.enum.user
         })
       } else if (
-        options.parameters.userRole === TestUserRole.Enum.NATIONAL_SYSTEM_ADMIN
+        options.parameters.userRole === TestUserRole.enum.NATIONAL_SYSTEM_ADMIN
       ) {
         window.localStorage.setItem(
           'opencrvs',
@@ -249,7 +313,10 @@ const preview: Preview = {
        */
 
       const offlineConfigs: Array<EventConfig> = options.parameters?.offline
-        ?.configs ?? [tennisClubMembershipEvent]
+        ?.configs ?? [
+        tennisClubMembershipEventWithCustomAction,
+        ChildOnboardingEvent
+      ]
 
       offlineConfigs.forEach((config) => {
         addLocalEventConfig(config)

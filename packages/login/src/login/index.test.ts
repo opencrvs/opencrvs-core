@@ -200,6 +200,29 @@ describe('reducer', () => {
     store.dispatch(action)
     expect(store.getState().login).toEqual(expectedState)
   })
+
+  it('redirects without double slash when redirectToURL starts with a slash', async () => {
+    const assign = vi.fn()
+    vi.stubGlobal('location', { assign })
+
+    store.dispatch({
+      type: actions.CLIENT_REDIRECT_ROUTE,
+      payload: { url: '/events/abc-123' }
+    })
+    store.dispatch({
+      type: actions.VERIFY_CODE_COMPLETED,
+      payload: { token: 'test-token' }
+    })
+
+    await new Promise((resolve) => setTimeout(resolve, 0))
+
+    expect(assign).toHaveBeenCalledWith(
+      expect.stringMatching(/\/register\/events\/abc-123/)
+    )
+    expect(assign).not.toHaveBeenCalledWith(
+      expect.stringContaining('/register//events/')
+    )
+  })
 })
 
 describe('selectors', () => {

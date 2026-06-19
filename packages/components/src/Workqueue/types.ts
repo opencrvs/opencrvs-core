@@ -72,6 +72,6 @@ export interface IActionObject {
 }
 
 export interface IActionComponent {
-  actionComponent: JSX.Element
+  actionComponent: JSX.Element | (() => React.ReactElement)
 }
 export type IAction = IActionObject | IActionComponent

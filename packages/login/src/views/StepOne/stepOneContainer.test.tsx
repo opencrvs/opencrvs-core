@@ -45,12 +45,6 @@ describe('Login app step one', () => {
               fileName: 'dummy-file-name',
               file: 'dummy-logo'
             },
-
-            LOGIN_BACKGROUND: {
-              backgroundColor: 'FFF',
-              backgroundImage: '',
-              imageFit: 'FILL'
-            },
             SENTRY: '',
             USER_NOTIFICATION_DELIVERY_METHOD: 'sms',
             INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms'

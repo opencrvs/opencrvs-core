@@ -30,12 +30,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Validate branch name and check for skip-e2e label
   check_skip_e2e_label:
     runs-on: ubuntu-24.04
     outputs:
       skip_e2e: ${{ steps.set_skip_flag.outputs.SKIP_E2E }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
+
+      - name: Validate branch name
+        id: validate
+        uses: ./.github/actions/validate-branch
+        with:
+          pattern: '^[a-z][a-z0-9\/\-]{1,44}$'
 
       - name: Check for skip-e2e label
         id: set_skip_flag
@@ -70,9 +77,8 @@ jobs:
       author: ${{ steps.get_author.outputs.AUTHOR }}
       slugified_branch: ${{ steps.slugify_bname.outputs.stack }}
       e2e_branch: ${{ steps.get_e2e_branch.outputs.branch }}
-      chart_branch: ${{ steps.get_chart_branch.outputs.branch }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Get input data (when manually triggered)
         env:
@@ -142,20 +148,6 @@ jobs:
           fi
           echo "e2e branch name=${e2e_branch}"
           echo "branch=$e2e_branch" >> $GITHUB_OUTPUT
-      - name: Get chart branch
-        id: get_chart_branch
-        # ls-remote should provide list of branches. When none are found, it should be empty string.
-        run: |
-          chart_repo_url="https://github.com/opencrvs/opencrvs-helm-charts.git"
-          if [ -n "$(git ls-remote --heads "$chart_repo_url" "refs/heads/${{ github.head_ref }}")" ]; then
-            branch=${{ github.head_ref }}
-          elif [ -n "$(git ls-remote --heads "$chart_repo_url" "refs/heads/${{ github.base_ref }}")" ]; then
-            branch="${{ github.base_ref }}"
-          else
-            branch="develop"
-          fi
-          echo "chart branch name=${branch}"
-          echo "branch=$branch" >> $GITHUB_OUTPUT
       - name: Get PR Author
         id: get_author
         env:
@@ -175,7 +167,7 @@ jobs:
 
       - name: Slugify the branch name
         id: slugify_bname
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             function slugify(str) {
@@ -207,7 +199,7 @@ jobs:
       run_id: ${{ steps.dispatch_e2e.outputs.run_id }}
       deployment_link: ${{ steps.print-links.outputs.deployment_link }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       - name: Check trigger-build status and exit on non-success
         run: |
           if [ ${{ needs.trigger-build.outputs.build_status }} == 'success' ]; then
@@ -260,13 +252,12 @@ jobs:
           Farajaland Commit Hash: ${{ env.FARAJALAND_COMMIT_HASH }}
           Keep e2e: ${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}
           E2E Branch: ${{ needs.generate_stack_name_and_branch.outputs.e2e_branch }}
-          Chart Branch: ${{ needs.generate_stack_name_and_branch.outputs.chart_branch }}
           Stack: ${{ steps.generate_stack.outputs.stack }}
           """
 
       - name: Trigger E2E Workflow
         id: dispatch_e2e
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           # TODO: Replace with fine-grained e2e token
           github-token: ${{ secrets.E2E_WORKFLOWS_TOKEN }}
@@ -289,10 +280,10 @@ jobs:
               inputs: {
                 'core-image-tag': '${{ env.HEAD_COMMIT_HASH }}',
                 'countryconfig-image-tag': '${{ env.FARAJALAND_COMMIT_HASH }}',
+                'core-branch': '${{ env.BRANCH_NAME }}',
                 stack: '${{ steps.generate_stack.outputs.stack }}',
                 'keep-e2e': '${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}',
                 branch: e2eBranch,
-                'chart-branch': '${{ needs.generate_stack_name_and_branch.outputs.chart_branch }}',
                 reset: 'true',
               },
             });
@@ -336,7 +327,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Wait for Environment Deployment (Deploy Job)
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.E2E_WORKFLOWS_TOKEN }}
           script: |
@@ -388,7 +379,7 @@ jobs:
               }
             }
       - name: Update github comment on PR
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.CORE_ISSUES_PR_TOKEN }}
           script: |
@@ -416,7 +407,7 @@ jobs:
             }
 
       - name: Wait for E2E Workflow Completion
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.E2E_WORKFLOWS_TOKEN }}
           script: |

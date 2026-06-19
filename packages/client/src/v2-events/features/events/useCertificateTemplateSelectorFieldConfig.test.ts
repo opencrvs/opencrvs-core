@@ -10,6 +10,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import * as z from 'zod/v4'
 import {
   CertificateTemplateConfig,
   event,
@@ -38,6 +39,8 @@ vi.mock('@client/v2-events/hooks/useAppConfig', () => ({
 
 describe('useCertificateTemplateSelectorFieldConfig', () => {
   beforeEach(() => {
+    z.globalRegistry.clear()
+
     vi.resetModules()
     vi.clearAllMocks()
     mockTemplates = []

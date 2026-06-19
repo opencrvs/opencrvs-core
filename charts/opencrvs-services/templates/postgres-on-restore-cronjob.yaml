@@ -1,0 +1,34 @@
+
+{{- if .Values.on_restore_cronjob.enabled }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  labels:
+    app: common
+    job-type: restore
+  name: on-db-restore-cronjob
+spec:
+  schedule: "{{ .Values.on_restore_cronjob.schedule }}"
+{{- if .Values.timezone }}
+  timeZone: {{ .Values.timezone }}
+{{- end }}
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: common
+            job-type: restore
+        spec:
+          restartPolicy: OnFailure
+          initContainers:
+          {{- include "elasticsearch-reindex.initContainerSpec" . | nindent 12 }}
+          containers:
+            {{- include "postgres-on-deploy.containerSpec" . | nindent 12 }}
+            {{- include "elasticsearch-reindex.containerSpec" . | nindent 12 }}
+          volumes:
+            {{- include "postgres-on-deploy.volumes" . | nindent 10 }}
+            {{- include "elasticsearch-reindex.volumes" . | nindent 10 }}
+{{- end }}
+ 

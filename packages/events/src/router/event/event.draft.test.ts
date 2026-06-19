@@ -13,7 +13,7 @@ import {
   ActionStatus,
   ActionType,
   DraftInput,
-  FullDocumentPath,
+  DocumentPath,
   generateUuid
 } from '@opencrvs/commons'
 import { mswServer } from '@events/tests/msw'
@@ -24,6 +24,7 @@ import {
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
 import { env } from '@events/environment'
+import { updateUser } from '@events/service/users/api'
 
 test('Throws error when creating a draft against non-existent id', async () => {
   const { user } = await setupTestCase()
@@ -75,7 +76,7 @@ test('Throws error when creating a draft for invalid action', async () => {
       transactionId: 'trnx-id'
     })
   ).rejects.toThrow(
-    "Action 'REGISTER' cannot be performed on an event in 'CREATED' state with [] flags. Available actions: READ, DECLARE, NOTIFY, DELETE"
+    "Action 'REGISTER' cannot be performed on an event in 'CREATED' state with [] flags. Available actions: READ, DECLARE, NOTIFY, DELETE, CUSTOM"
   )
 })
 
@@ -145,7 +146,7 @@ test('Allows creating draft for event with actions', async () => {
 
   const draftResponse = await client.event.draft.create({
     eventId: event.id,
-    type: ActionType.VALIDATE,
+    type: ActionType.REGISTER,
     status: 'Accepted',
     transactionId: 'trnx-id'
   })
@@ -167,7 +168,7 @@ test('Creating a draft is idempotent', async () => {
 
   const firstResponse = await client.event.draft.create({
     eventId: event.id,
-    type: ActionType.VALIDATE,
+    type: ActionType.REGISTER,
     status: 'Accepted',
     transactionId: 'trnx-id',
     annotation: {
@@ -177,7 +178,7 @@ test('Creating a draft is idempotent', async () => {
 
   await client.event.draft.create({
     eventId: event.id,
-    type: ActionType.VALIDATE,
+    type: ActionType.REGISTER,
     status: 'Accepted',
     transactionId: 'trnx-id',
     annotation: {
@@ -220,7 +221,7 @@ describe('Delete document references in drafts as side-effect', () => {
           'applicant.image': {
             type: 'image/png',
             originalFilename: `${n}-abcd.png`,
-            path: `/ocrvs/${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png` as FullDocumentPath
+            path: `${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png` as DocumentPath
           }
         },
         transactionId: generateUuid(rng),
@@ -244,4 +245,26 @@ describe('Delete document references in drafts as side-effect', () => {
   afterEach(() => {
     mswServer.events.removeListener('response:mocked', mockListener)
   })
+})
+
+test('clears all drafts when user primary office changes', async () => {
+  const { user, generator, locations } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  await client.event.draft.create({
+    eventId: event.id,
+    type: ActionType.DECLARE,
+    status: 'Accepted',
+    transactionId: 'test-transaction-id'
+  })
+
+  expect(await client.event.draft.list()).toHaveLength(1)
+
+  await updateUser(
+    { id: user.id, primaryOfficeId: locations[1].id },
+    'test-token'
+  )
+
+  expect(await client.event.draft.list()).toHaveLength(0)
 })

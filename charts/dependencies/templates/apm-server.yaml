@@ -1,0 +1,60 @@
+
+{{- if .Values.monitoring.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: apm-server
+spec:
+  type: ClusterIP       # Or LoadBalancer if you need external access
+  ports:
+    - port: 8200
+      targetPort: 8200
+      protocol: TCP
+      name: http
+  selector:
+    app: apm-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apm-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apm-server
+  template:
+    metadata:
+      labels:
+        app: apm-server
+    spec:
+      containers:
+      - name: apm-server
+        image: {{ .Values.apm_server.image }}
+        args: ["-e", "-c", "/etc/apm-server.yml"]
+        ports:
+        - containerPort: 8200
+        env:
+          # Elasticsearch integration
+          - name: ELASTICSEARCH_HOST
+            {{- $elastic_host := default (printf "elasticsearch-0.elasticsearch.%s.svc.cluster.local" $.Release.Namespace) $.Values.elasticsearch.host }}
+            value: http://{{ $elastic_host }}:9200
+          - name: ELASTICSEARCH_USERNAME
+            value: 'elastic'
+          - name: ELASTICSEARCH_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.elasticsearch.admin_user_secret_name }}
+                key: ELASTIC_PASSWORD
+          - name: KIBANA_HOST
+            value: http://kibana.{{ .Release.Namespace }}.svc.cluster.local:5601
+        volumeMounts:
+        - name: config
+          mountPath: /etc/apm-server.yml
+          subPath: apm-server.yml
+      volumes:
+      - name: config
+        configMap:
+          name: {{ .Values.apm_server.custom_config_configmap | default "apm-server-config" }}
+{{- end }}

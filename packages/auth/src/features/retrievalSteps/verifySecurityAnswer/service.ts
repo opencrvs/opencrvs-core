@@ -8,9 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
-import { env } from '@auth/environment'
-import { resolve } from 'url'
+import { internalClient } from '@auth/features/authenticate/service'
 
 export interface IVerifySecurityAnswerResponse {
   matched: boolean
@@ -22,20 +20,9 @@ export async function verifySecurityAnswer(
   questionKey: string,
   answer: string
 ): Promise<IVerifySecurityAnswerResponse> {
-  const url = resolve(env.USER_MANAGEMENT_URL, '/verifySecurityAnswer')
-
-  const res = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify({ userId, questionKey, answer }),
-    headers: { 'Content-Type': 'application/json' }
+  return internalClient.user.verifySecurityAnswer.mutate({
+    userId,
+    questionKey,
+    answer
   })
-
-  if (res.status !== 200) {
-    throw Error(res.statusText)
-  }
-  const body = await res.json()
-  return {
-    matched: body.matched,
-    questionKey: body.questionKey
-  }
 }

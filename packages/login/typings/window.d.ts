@@ -8,17 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-interface Window {
-  config: {
-    AUTH_API_URL: string
-    CONFIG_API_URL: string
-    COUNTRY_CONFIG_URL: string
-    COUNTRY: string
-    LANGUAGES: string
-    USER_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
-    INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
-    CLIENT_APP_URL: string
-    PHONE_NUMBER_PATTERN: RegExp
-    SENTRY: string
+import { LoginConfig } from '@opencrvs/commons'
+
+declare global {
+  interface Window {
+    config: LoginConfig
   }
 }

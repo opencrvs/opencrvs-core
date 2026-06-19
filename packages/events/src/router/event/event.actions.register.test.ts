@@ -18,6 +18,7 @@ import {
   AddressType,
   createPrng,
   EventDocument,
+  encodeScope,
   EventIndex,
   generateActionDuplicateDeclarationInput,
   generateRegistrationNumber,
@@ -34,7 +35,9 @@ import {
   createEvent,
   createTestClient,
   createCountryConfigClient,
+  createSystemTestClient,
   setupTestCase,
+  TEST_SYSTEM_ID,
   TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
@@ -57,7 +60,10 @@ test('prevents forbidden access if missing required scope', async () => {
 test(`allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'record.register[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.register',
+      options: { event: ['birth', 'death', 'tennis-club-membership'] }
+    })
   ])
 
   await expect(
@@ -69,7 +75,10 @@ test(`allows access if required scope is present`, async () => {
 
 test('can not register an event that is not first declared and validated', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    encodeScope({ type: 'record.create' }),
+    encodeScope({ type: 'record.register' })
+  ])
   const event = await createEvent(client, generator, [])
 
   await expect(
@@ -81,7 +90,12 @@ test('can not register an event that is not first declared and validated', async
 
 test('Validation error message contains all the offending fields', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    encodeScope({ type: 'record.read' }),
+    encodeScope({ type: 'record.create' }),
+    encodeScope({ type: 'record.declare' }),
+    encodeScope({ type: 'record.register' })
+  ])
   const event = await client.event.create(generator.event.create())
 
   await client.event.actions.declare.request(
@@ -97,10 +111,6 @@ test('Validation error message contains all the offending fields', async () => {
   })
 
   await client.event.actions.assignment.assign(assignmentInput)
-
-  await client.event.actions.validate.request(
-    generator.event.actions.validate(event.id)
-  )
 
   /** Partial payload is accepted, so it should not complain about fields already send during declaration. */
   const data = generator.event.actions.register(event.id, {
@@ -123,7 +133,12 @@ test('Validation error message contains all the offending fields', async () => {
 
 test('when mandatory field is invalid, conditional hidden fields are still skipped', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    encodeScope({ type: 'record.read' }),
+    encodeScope({ type: 'record.create' }),
+    encodeScope({ type: 'record.declare' }),
+    encodeScope({ type: 'record.register' })
+  ])
   const event = await client.event.create(generator.event.create())
 
   const data = generator.event.actions.register(event.id, {
@@ -171,10 +186,14 @@ const declaration = {
 
 test('Skips required field validation when they are conditionally hidden', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    encodeScope({ type: 'record.read' }),
+    encodeScope({ type: 'record.create' }),
+    encodeScope({ type: 'record.declare' }),
+    encodeScope({ type: 'record.register' })
+  ])
   const { id: eventId } = await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.VALIDATE
+    ActionType.DECLARE
   ])
 
   const data = generator.event.actions.register(eventId)
@@ -199,7 +218,10 @@ test('Skips required field validation when they are conditionally hidden', async
 
 test('Prevents adding birth date in future', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    encodeScope({ type: 'record.create' }),
+    encodeScope({ type: 'record.register' })
+  ])
   const event = await client.event.create(generator.event.create())
 
   const form = {
@@ -252,10 +274,15 @@ describe('Request and confirmation flow', () => {
 
   test('should be able to successfully call action request multiple times, without creating duplicate request actions', async () => {
     const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
+
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.read' }),
+      encodeScope({ type: 'record.create' }),
+      encodeScope({ type: 'record.declare' }),
+      encodeScope({ type: 'record.register' })
+    ])
     const originalEvent = await createEvent(client, generator, [
-      ActionType.DECLARE,
-      ActionType.VALIDATE
+      ActionType.DECLARE
     ])
 
     const { id: eventId } = originalEvent
@@ -297,10 +324,14 @@ describe('Request and confirmation flow', () => {
   describe('Synchronous confirmation flow', () => {
     test('should mark action as accepted if notify API returns HTTP 200', async () => {
       const { user, generator } = await setupTestCase()
-      const client = createTestClient(user)
+      const client = createTestClient(user, [
+        encodeScope({ type: 'record.read' }),
+        encodeScope({ type: 'record.create' }),
+        encodeScope({ type: 'record.declare' }),
+        encodeScope({ type: 'record.register' })
+      ])
       const { id: eventId } = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
+        ActionType.DECLARE
       ])
 
       mockNotifyApi(200)
@@ -323,10 +354,14 @@ describe('Request and confirmation flow', () => {
 
     test('should not save action if notify API returns invalid registration number', async () => {
       const { user, generator } = await setupTestCase()
-      const client = createTestClient(user)
+      const client = createTestClient(user, [
+        encodeScope({ type: 'record.read' }),
+        encodeScope({ type: 'record.create' }),
+        encodeScope({ type: 'record.declare' }),
+        encodeScope({ type: 'record.register' })
+      ])
       const { id: eventId } = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
+        ActionType.DECLARE
       ])
 
       mswServer.use(
@@ -348,7 +383,7 @@ describe('Request and confirmation flow', () => {
         client.event.actions.register.request(data)
       ).rejects.matchSnapshot()
 
-      const event = await client.event.get(eventId)
+      const event = await client.event.get({ eventId })
       const registerActions = event.actions.filter(
         (action) => action.type === ActionType.REGISTER
       )
@@ -361,10 +396,13 @@ describe('Request and confirmation flow', () => {
 
     test('should mark action as rejected if notify API returns HTTP 400', async () => {
       const { user, generator } = await setupTestCase()
-      const client = createTestClient(user)
+      const client = createTestClient(user, [
+        encodeScope({ type: 'record.create' }),
+        encodeScope({ type: 'record.declare' }),
+        encodeScope({ type: 'record.register' })
+      ])
       const { id: eventId } = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
+        ActionType.DECLARE
       ])
 
       mockNotifyApi(400)
@@ -390,11 +428,15 @@ describe('Request and confirmation flow', () => {
 
     test(`should not save ${ActionStatus.Accepted} / ${ActionStatus.Rejected} action if notify API returns HTTP 500`, async () => {
       const { user, generator } = await setupTestCase()
-      const client = createTestClient(user)
+      const client = createTestClient(user, [
+        encodeScope({ type: 'record.read' }),
+        encodeScope({ type: 'record.create' }),
+        encodeScope({ type: 'record.declare' }),
+        encodeScope({ type: 'record.register' })
+      ])
 
       const { id: eventId } = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
+        ActionType.DECLARE
       ])
 
       mockNotifyApi(500)
@@ -405,7 +447,7 @@ describe('Request and confirmation flow', () => {
         )
       ).rejects.matchSnapshot()
 
-      const registeredEvent = await client.event.get(eventId)
+      const registeredEvent = await client.event.get({ eventId })
 
       const registerActions = registeredEvent.actions.filter(
         (action) => action.type === ActionType.REGISTER
@@ -421,12 +463,14 @@ describe('Request and confirmation flow', () => {
   describe('Asynchronous confirmation flow', () => {
     test('should save action in requested state if notify API returns HTTP 202', async () => {
       const { user, generator } = await setupTestCase()
-      const client = createTestClient(user)
-
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
+      const client = createTestClient(user, [
+        encodeScope({ type: 'record.read' }),
+        encodeScope({ type: 'record.create' }),
+        encodeScope({ type: 'record.declare' }),
+        encodeScope({ type: 'record.register' })
       ])
+
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       mockNotifyApi(202)
 
@@ -448,11 +492,13 @@ describe('Request and confirmation flow', () => {
     describe('Accepting', () => {
       test('should not be able to accept the action if action is not first requested', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
-        const event = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
         ])
+        const event = await createEvent(client, generator, [ActionType.DECLARE])
 
         mockNotifyApi(202)
 
@@ -479,11 +525,15 @@ describe('Request and confirmation flow', () => {
 
       test('should not be able to accept action if action is already rejected', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
+        ])
 
         const originalEvent = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
+          ActionType.DECLARE
         ])
 
         const { id: eventId } = originalEvent
@@ -542,11 +592,14 @@ describe('Request and confirmation flow', () => {
 
       test('should successfully accept a previously requested action', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
+        ])
 
         const originalEvent = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
+          ActionType.DECLARE
         ])
 
         const { id: eventId } = originalEvent
@@ -610,10 +663,14 @@ describe('Request and confirmation flow', () => {
 
       test('should be able to call accept multiple times, without creating duplicate accept actions', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
+        ])
         const originalEvent = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
+          ActionType.DECLARE
         ])
 
         const { id: eventId } = originalEvent
@@ -687,11 +744,14 @@ describe('Request and confirmation flow', () => {
 
       test('allows accepting a registration request with the same exchanged event and action id', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
+        ])
 
         const originalEvent = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
+          ActionType.DECLARE
         ])
 
         const { id: eventId } = originalEvent
@@ -755,11 +815,14 @@ describe('Request and confirmation flow', () => {
 
       test('does not allow accepting a registration request with different exchanged event and action id', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
+        ])
 
         const originalEvent = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
+          ActionType.DECLARE
         ])
 
         const { id: eventId } = originalEvent
@@ -811,11 +874,12 @@ describe('Request and confirmation flow', () => {
     describe('Rejecting', () => {
       test('should not be able to reject the action if action is not first requested', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
-        const event = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
         ])
+        const event = await createEvent(client, generator, [ActionType.DECLARE])
 
         mockNotifyApi(202)
 
@@ -841,11 +905,12 @@ describe('Request and confirmation flow', () => {
 
       test('should not be able to reject the action if action is already accepted', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
-        const event = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
         ])
+        const event = await createEvent(client, generator, [ActionType.DECLARE])
         const eventId = event.id
 
         mockNotifyApi(202)
@@ -899,11 +964,12 @@ describe('Request and confirmation flow', () => {
 
       test('should be able to call reject multiple times, without creating duplicate reject actions', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
-        const event = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
         ])
+        const event = await createEvent(client, generator, [ActionType.DECLARE])
 
         const { id: eventId } = event
 
@@ -967,11 +1033,13 @@ describe('Request and confirmation flow', () => {
 
       test('should successfully reject a previously requested action', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
-        const event = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
         ])
+        const event = await createEvent(client, generator, [ActionType.DECLARE])
 
         const { id: eventId } = event
         mockNotifyApi(202)
@@ -1025,11 +1093,15 @@ describe('Request and confirmation flow', () => {
 
       test('allows rejecting a registration request with the same exchanged event and action id', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
+        ])
 
         const originalEvent = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
+          ActionType.DECLARE
         ])
 
         const { id: eventId } = originalEvent
@@ -1088,11 +1160,15 @@ describe('Request and confirmation flow', () => {
 
       test('does not allow rejecting a registration request with different exchanged event and action id', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
+        ])
 
         const originalEvent = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
+          ActionType.DECLARE
         ])
 
         const { id: eventId } = originalEvent
@@ -1144,7 +1220,7 @@ describe('Request and confirmation flow', () => {
 
 test('deduplication check is performed before register when configured', async () => {
   mswServer.use(
-    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
       return HttpResponse.json([
         tennisClubMembershipEventWithDedupCheck(ActionType.REGISTER)
       ])
@@ -1152,7 +1228,12 @@ test('deduplication check is performed before register when configured', async (
   )
   const prng = createPrng(73)
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    encodeScope({ type: 'record.read' }),
+    encodeScope({ type: 'record.create' }),
+    encodeScope({ type: 'record.declare' }),
+    encodeScope({ type: 'record.register' })
+  ])
 
   const existingEvent = await client.event.create(generator.event.create())
   const declarationPayload = generateActionDuplicateDeclarationInput(
@@ -1178,16 +1259,6 @@ test('deduplication check is performed before register when configured', async (
       assignedTo: user.id
     })
   )
-  await client.event.actions.validate.request(
-    generator.event.actions.validate(duplicateEvent.id, {
-      declaration: declarationPayload
-    })
-  )
-  await client.event.actions.assignment.assign(
-    generator.event.actions.assign(duplicateEvent.id, {
-      assignedTo: user.id
-    })
-  )
   const stillValidated = await client.event.actions.register.request(
     generator.event.actions.register(duplicateEvent.id, {
       declaration: declarationPayload
@@ -1197,7 +1268,7 @@ test('deduplication check is performed before register when configured', async (
   expect(
     getCurrentEventState(stillValidated, tennisClubMembershipEvent)
   ).toMatchObject({
-    status: 'VALIDATED',
+    status: 'DECLARED',
     potentialDuplicates: [
       { id: existingEvent.id, trackingId: existingEvent.trackingId }
     ]
@@ -1229,23 +1300,22 @@ describe('Register action - hidden field nullification', () => {
     test('rejects hidden field with non-null value during registration', async () => {
       const client = createTestClient(user)
       const event = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
+        ActionType.DECLARE
       ])
 
-      const validatedDocument = await client.event.get(event.id)
-      const validatedCurrentEventState = getCurrentEventState(
-        validatedDocument,
+      const declaredDocument = await client.event.get({ eventId: event.id })
+      const declaredCurrentEventState = getCurrentEventState(
+        declaredDocument,
         tennisClubMembershipEvent
       )
-      expect(validatedCurrentEventState.declaration).toHaveProperty(
+      expect(declaredCurrentEventState.declaration).toHaveProperty(
         'recommender.none',
         true
       )
-      expect(validatedCurrentEventState.declaration).not.toHaveProperty(
+      expect(declaredCurrentEventState.declaration).not.toHaveProperty(
         'recommender.name'
       )
-      expect(validatedCurrentEventState.declaration).not.toHaveProperty(
+      expect(declaredCurrentEventState.declaration).not.toHaveProperty(
         'recommender.id'
       )
       const payload = generator.event.actions.register(event.id, {
@@ -1283,23 +1353,22 @@ describe('Register action - hidden field nullification', () => {
     test('rejects multiple hidden fields with non-null values during registration', async () => {
       const client = createTestClient(user)
       const event = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
+        ActionType.DECLARE
       ])
 
-      const validatedDocument = await client.event.get(event.id)
-      const validatedCurrentEventState = getCurrentEventState(
-        validatedDocument,
+      const declaredDocument = await client.event.get({ eventId: event.id })
+      const declaredCurrentEventState = getCurrentEventState(
+        declaredDocument,
         tennisClubMembershipEvent
       )
-      expect(validatedCurrentEventState.declaration).toHaveProperty(
+      expect(declaredCurrentEventState.declaration).toHaveProperty(
         'recommender.none',
         true
       )
-      expect(validatedCurrentEventState.declaration).not.toHaveProperty(
+      expect(declaredCurrentEventState.declaration).not.toHaveProperty(
         'recommender.name'
       )
-      expect(validatedCurrentEventState.declaration).not.toHaveProperty(
+      expect(declaredCurrentEventState.declaration).not.toHaveProperty(
         'recommender.id'
       )
 
@@ -1342,8 +1411,7 @@ describe('Register action - hidden field nullification', () => {
     test('rejects non-existent field during registration', async () => {
       const client = createTestClient(user)
       const event = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
+        ActionType.DECLARE
       ])
 
       const payload = generator.event.actions.register(event.id, {
@@ -1377,8 +1445,7 @@ describe('Register action - hidden field nullification', () => {
     test('rejects hidden field from conditional page during registration', async () => {
       const client = createTestClient(user)
       const event = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
+        ActionType.DECLARE
       ])
 
       const payload = generator.event.actions.register(event.id, {
@@ -1415,11 +1482,13 @@ describe('Register action - hidden field nullification', () => {
     test('accepts hidden field with null value during registration (intentional clearing)', async () => {
       const client = createTestClient(user, [
         ...TEST_USER_DEFAULT_SCOPES,
-        'search[event=tennis-club-membership,access=my-jurisdiction]'
+        encodeScope({
+          type: 'record.search',
+          options: { event: ['tennis-club-membership'], placeOfEvent: 'administrativeArea' }
+        })
       ])
       const event = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
+        ActionType.DECLARE
       ])
 
       const payload = generator.event.actions.register(event.id, {
@@ -1501,8 +1570,7 @@ describe('Register action - hidden field nullification', () => {
     test('accepts multiple hidden fields with null values during registration', async () => {
       const client = createTestClient(user)
       const event = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
+        ActionType.DECLARE
       ])
 
       const payload = generator.event.actions.register(event.id, {
@@ -1547,8 +1615,7 @@ describe('Register action - hidden field nullification', () => {
     test('accepts visible field with any value during registration', async () => {
       const client = createTestClient(user)
       const event = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
+        ActionType.DECLARE
       ])
 
       const payload = generator.event.actions.register(event.id, {
@@ -1622,15 +1689,7 @@ describe('Register action - hidden field nullification', () => {
       // Step 1: Declare with recommender.none = false (recommender.name is visible)
       await client.event.actions.declare.request(payload)
 
-      // Step 2: Validate without changes
-      const validate = generator.event.actions.validate(event.id, {
-        declaration: payload.declaration,
-        keepAssignment: true
-      })
-
-      await client.event.actions.validate.request(validate)
-
-      // Step 3: Register with the same values - senior-pass.id and senior-pass.recommender as null
+      // Step 2: Register with the same values - senior-pass.id and senior-pass.recommender as null
       const registerPayload = generator.event.actions.register(event.id, {
         declaration: {
           ...declaration,
@@ -1656,11 +1715,13 @@ describe('Register action - hidden field nullification', () => {
     test('omits hidden field when not provided during registration (default behavior)', async () => {
       const client = createTestClient(user, [
         ...TEST_USER_DEFAULT_SCOPES,
-        'search[event=tennis-club-membership,access=my-jurisdiction]'
+        encodeScope({
+          type: 'record.search',
+          options: { event: ['tennis-club-membership'], placeOfEvent: 'administrativeArea' }
+        })
       ])
       const event = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
+        ActionType.DECLARE
       ])
 
       const payload = generator.event.actions.register(event.id, {
@@ -1742,8 +1803,7 @@ describe('Register action - hidden field nullification', () => {
     test('accepts null for hidden field on hidden page during registration', async () => {
       const client = createTestClient(user)
       const event = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
+        ActionType.DECLARE
       ])
 
       const payload = generator.event.actions.register(event.id, {
@@ -1785,8 +1845,7 @@ describe('Register action - hidden field nullification', () => {
     test('mixed valid and invalid keys returns only invalid keys in error during registration', async () => {
       const client = createTestClient(user)
       const event = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
+        ActionType.DECLARE
       ])
 
       const payload = generator.event.actions.register(event.id, {
@@ -1864,14 +1923,7 @@ describe('Register action - hidden field nullification', () => {
       // Step 1: Declare with recommender.none = false (recommender.name is visible)
       await client.event.actions.declare.request(payload)
 
-      // Step 2: Validate without changes
-      const validate = generator.event.actions.validate(event.id, {
-        declaration: payload.declaration,
-        keepAssignment: true
-      })
-      await client.event.actions.validate.request(validate)
-
-      // Step 3: Register with recommender.none = true (recommender.name becomes hidden)
+      // Step 2: Register with recommender.none = true (recommender.name becomes hidden)
       // Explicitly nullify the previously declared recommender.name
       const registerPayload = generator.event.actions.register(event.id, {
         declaration: {
@@ -1917,9 +1969,14 @@ describe('Registration by different user with declaration changes', () => {
     // Registration agent with limited scopes
     const { user: agent } = await setupTestCase()
     const registrationAgentClient = createTestClient(agent, [
-      'record.create[event=birth|death|tennis-club-membership]',
-      'record.declare[event=birth|death|tennis-club-membership]',
-      'record.declared.validate[event=birth|death|tennis-club-membership]'
+      encodeScope({
+        type: 'record.create',
+        options: { event: ['birth', 'death', 'tennis-club-membership'] }
+      }),
+      encodeScope({
+        type: 'record.declare',
+        options: { event: ['birth', 'death', 'tennis-club-membership'] }
+      })
     ])
 
     // Regular client with full permissions
@@ -1931,7 +1988,6 @@ describe('Registration by different user with declaration changes', () => {
     )
 
     const payload = {
-      keepAssignment: true,
       declaration: {
         'applicant.dob': '1944-02-01', // Makes senior-pass page visible
         'applicant.dobUnknown': false,
@@ -1959,20 +2015,13 @@ describe('Registration by different user with declaration changes', () => {
       generator.event.actions.declare(event.id, payload)
     )
 
-    // Step 3: Registration agent validates
-    await registrationAgentClient.event.actions.validate.request(
-      generator.event.actions.validate(event.id, {
-        declaration: payload.declaration
-      })
-    )
-
-    // Step 4: Assign the event to registrar for registration
+    // Step 3: Assign the event to registrar for registration
     const assignmentInput = generator.event.actions.assign(event.id, {
       assignedTo: user.id
     })
     await registrarClient.event.actions.assignment.assign(assignmentInput)
 
-    // Step 5: Registrar changes dob to make senior-pass page HIDDEN and nullifies the field
+    // Step 4: Registrar changes dob to make senior-pass page HIDDEN and nullifies the field
     const registerPayload = generator.event.actions.register(event.id, {
       declaration: {
         ...payload.declaration,
@@ -2007,9 +2056,14 @@ describe('Registration by different user with declaration changes', () => {
   test('registration agent declares with recommender details, registrar nullifies hidden field when recommender.none changes', async () => {
     const { user: agent } = await setupTestCase()
     const registrationAgentClient = createTestClient(agent, [
-      'record.create[event=birth|death|tennis-club-membership]',
-      'record.declare[event=birth|death|tennis-club-membership]',
-      'record.declared.validate[event=birth|death|tennis-club-membership]'
+      encodeScope({
+        type: 'record.create',
+        options: { event: ['birth', 'death', 'tennis-club-membership'] }
+      }),
+      encodeScope({
+        type: 'record.declare',
+        options: { event: ['birth', 'death', 'tennis-club-membership'] }
+      })
     ])
 
     const registrarClient = createTestClient(user)
@@ -2020,7 +2074,6 @@ describe('Registration by different user with declaration changes', () => {
     )
 
     const payload = {
-      keepAssignment: true,
       declaration: {
         'applicant.age': 19,
         'applicant.dobUnknown': true,
@@ -2050,20 +2103,13 @@ describe('Registration by different user with declaration changes', () => {
       generator.event.actions.declare(event.id, payload)
     )
 
-    // Step 3: Registration agent validates
-    await registrationAgentClient.event.actions.validate.request(
-      generator.event.actions.validate(event.id, {
-        declaration: payload.declaration
-      })
-    )
-
-    // Step 4: Assign the event to registrar for registration
+    // Step 3: Assign the event to registrar for registration
     const assignmentInput = generator.event.actions.assign(event.id, {
       assignedTo: user.id
     })
     await registrarClient.event.actions.assignment.assign(assignmentInput)
 
-    // Step 5: Registrar changes recommender.none to true and nullifies hidden fields
+    // Step 4: Registrar changes recommender.none to true and nullifies hidden fields
     const registerPayload = generator.event.actions.register(event.id, {
       declaration: {
         ...payload.declaration,
@@ -2101,9 +2147,14 @@ describe('Registration by different user with declaration changes', () => {
   test('registration agent declares, registrar attempts to set hidden field with value - should fail', async () => {
     const { user: agent } = await setupTestCase()
     const registrationAgentClient = createTestClient(agent, [
-      'record.create[event=birth|death|tennis-club-membership]',
-      'record.declare[event=birth|death|tennis-club-membership]',
-      'record.declared.validate[event=birth|death|tennis-club-membership]'
+      encodeScope({
+        type: 'record.create',
+        options: { event: ['birth', 'death', 'tennis-club-membership'] }
+      }),
+      encodeScope({
+        type: 'record.declare',
+        options: { event: ['birth', 'death', 'tennis-club-membership'] }
+      })
     ])
 
     const registrarClient = createTestClient(user)
@@ -2114,7 +2165,6 @@ describe('Registration by different user with declaration changes', () => {
     )
 
     const payload = {
-      keepAssignment: true,
       declaration: {
         'applicant.age': 19,
         'applicant.dobUnknown': true,
@@ -2144,20 +2194,13 @@ describe('Registration by different user with declaration changes', () => {
       generator.event.actions.declare(event.id, payload)
     )
 
-    // Step 3: Registration agent validates
-    await registrationAgentClient.event.actions.validate.request(
-      generator.event.actions.validate(event.id, {
-        declaration: payload.declaration
-      })
-    )
-
-    // Step 4: Assign the event to registrar for registration
+    // Step 3: Assign the event to registrar for registration
     const assignmentInput = generator.event.actions.assign(event.id, {
       assignedTo: user.id
     })
     await registrarClient.event.actions.assignment.assign(assignmentInput)
 
-    // Step 5: Registrar changes recommender.none to true BUT tries to send a value for hidden field
+    // Step 4: Registrar changes recommender.none to true BUT tries to send a value for hidden field
     const registerPayload = generator.event.actions.register(event.id, {
       declaration: {
         ...payload.declaration,
@@ -2178,9 +2221,14 @@ describe('Registration by different user with declaration changes', () => {
   test('registration agent declares, registrar attempts to add invalid field - should fail', async () => {
     const { user: agent } = await setupTestCase()
     const registrationAgentClient = createTestClient(agent, [
-      'record.create[event=birth|death|tennis-club-membership]',
-      'record.declare[event=birth|death|tennis-club-membership]',
-      'record.declared.validate[event=birth|death|tennis-club-membership]'
+      encodeScope({
+        type: 'record.create',
+        options: { event: ['birth', 'death', 'tennis-club-membership'] }
+      }),
+      encodeScope({
+        type: 'record.declare',
+        options: { event: ['birth', 'death', 'tennis-club-membership'] }
+      })
     ])
 
     const registrarClient = createTestClient(user)
@@ -2192,7 +2240,6 @@ describe('Registration by different user with declaration changes', () => {
 
     // Step 2: Registration agent declares
     const payload = {
-      keepAssignment: true,
       declaration: {
         'applicant.age': 19,
         'applicant.dobUnknown': true,
@@ -2216,20 +2263,13 @@ describe('Registration by different user with declaration changes', () => {
       generator.event.actions.declare(event.id, payload)
     )
 
-    // Step 3: Registration agent validates
-    await registrationAgentClient.event.actions.validate.request(
-      generator.event.actions.validate(event.id, {
-        declaration: payload.declaration
-      })
-    )
-
-    // Step 4: Assign the event to registrar for registration
+    // Step 3: Assign the event to registrar for registration
     const assignmentInput = generator.event.actions.assign(event.id, {
       assignedTo: user.id
     })
     await registrarClient.event.actions.assignment.assign(assignmentInput)
 
-    // Step 5: Registrar tries to add non-existent field during registration
+    // Step 4: Registrar tries to add non-existent field during registration
     const registerPayload = generator.event.actions.register(event.id, {
       declaration: {
         ...payload.declaration,
@@ -2251,9 +2291,14 @@ describe('Registration by different user with declaration changes', () => {
   test('registration agent declares with hidden page field, registrar attempts to set different value for still-hidden field - should fail', async () => {
     const { user: agent } = await setupTestCase()
     const registrationAgentClient = createTestClient(agent, [
-      'record.create[event=birth|death|tennis-club-membership]',
-      'record.declare[event=birth|death|tennis-club-membership]',
-      'record.declared.validate[event=birth|death|tennis-club-membership]'
+      encodeScope({
+        type: 'record.create',
+        options: { event: ['birth', 'death', 'tennis-club-membership'] }
+      }),
+      encodeScope({
+        type: 'record.declare',
+        options: { event: ['birth', 'death', 'tennis-club-membership'] }
+      })
     ])
 
     const registrarClient = createTestClient(user)
@@ -2265,7 +2310,6 @@ describe('Registration by different user with declaration changes', () => {
 
     // Step 2: Registration agent declares with senior-pass page HIDDEN (dob > 1950)
     const payload = {
-      keepAssignment: true,
       declaration: {
         'applicant.dob': '2000-02-01', // senior-pass page is hidden
         'applicant.dobUnknown': false,
@@ -2289,14 +2333,7 @@ describe('Registration by different user with declaration changes', () => {
       generator.event.actions.declare(event.id, payload)
     )
 
-    // Step 3: Registration agent validates
-    await registrationAgentClient.event.actions.validate.request(
-      generator.event.actions.validate(event.id, {
-        declaration: payload.declaration
-      })
-    )
-
-    // Step 4: Registrar tries to add field from hidden page during registration
+    // Step 3: Registrar tries to add field from hidden page during registration
     const registerPayload = generator.event.actions.register(event.id, {
       declaration: {
         ...payload.declaration,
@@ -2312,9 +2349,14 @@ describe('Registration by different user with declaration changes', () => {
   test('registration agent declares minimal data, registrar completes with valid visible fields', async () => {
     const { user: agent } = await setupTestCase()
     const registrationAgentClient = createTestClient(agent, [
-      'record.create[event=birth|death|tennis-club-membership]',
-      'record.declare[event=birth|death|tennis-club-membership]',
-      'record.declared.validate[event=birth|death|tennis-club-membership]'
+      encodeScope({
+        type: 'record.create',
+        options: { event: ['birth', 'death', 'tennis-club-membership'] }
+      }),
+      encodeScope({
+        type: 'record.declare',
+        options: { event: ['birth', 'death', 'tennis-club-membership'] }
+      })
     ])
 
     const registrarClient = createTestClient(user)
@@ -2326,7 +2368,6 @@ describe('Registration by different user with declaration changes', () => {
 
     // Step 2: Registration agent declares with minimal data
     const payload = {
-      keepAssignment: true,
       declaration: {
         'applicant.age': 19,
         'applicant.dobUnknown': true,
@@ -2350,20 +2391,13 @@ describe('Registration by different user with declaration changes', () => {
       generator.event.actions.declare(event.id, payload)
     )
 
-    // Step 3: Registration agent validates
-    await registrationAgentClient.event.actions.validate.request(
-      generator.event.actions.validate(event.id, {
-        declaration: payload.declaration
-      })
-    )
-
-    // Step 4: Assign the event to registrar for registration
+    // Step 3: Assign the event to registrar for registration
     const assignmentInput = generator.event.actions.assign(event.id, {
       assignedTo: user.id
     })
     await registrarClient.event.actions.assignment.assign(assignmentInput)
 
-    // Step 5: Registrar adds additional valid visible fields during registration
+    // Step 4: Registrar adds additional valid visible fields during registration
     const registerPayload = generator.event.actions.register(event.id, {
       declaration: {
         ...payload.declaration,
@@ -2395,9 +2429,14 @@ describe('Registration by different user with declaration changes', () => {
   test('registration agent declares with visible conditional field, registrar changes condition and nullifies multiple hidden fields', async () => {
     const { user: agent } = await setupTestCase()
     const registrationAgentClient = createTestClient(agent, [
-      'record.create[event=birth|death|tennis-club-membership]',
-      'record.declare[event=birth|death|tennis-club-membership]',
-      'record.declared.validate[event=birth|death|tennis-club-membership]'
+      encodeScope({
+        type: 'record.create',
+        options: { event: ['birth', 'death', 'tennis-club-membership'] }
+      }),
+      encodeScope({
+        type: 'record.declare',
+        options: { event: ['birth', 'death', 'tennis-club-membership'] }
+      })
     ])
 
     const registrarClient = createTestClient(user)
@@ -2409,7 +2448,6 @@ describe('Registration by different user with declaration changes', () => {
 
     // Step 2: Registration agent declares with both conditional contexts visible
     const payload = {
-      keepAssignment: true,
       declaration: {
         'applicant.dob': '1944-02-01', // Makes senior-pass page visible
         'applicant.dobUnknown': false,
@@ -2440,20 +2478,13 @@ describe('Registration by different user with declaration changes', () => {
       generator.event.actions.declare(event.id, payload)
     )
 
-    // Step 3: Registration agent validates
-    await registrationAgentClient.event.actions.validate.request(
-      generator.event.actions.validate(event.id, {
-        declaration: payload.declaration
-      })
-    )
-
-    // Step 4: Assign the event to registrar for registration
+    // Step 3: Assign the event to registrar for registration
     const assignmentInput = generator.event.actions.assign(event.id, {
       assignedTo: user.id
     })
     await registrarClient.event.actions.assignment.assign(assignmentInput)
 
-    // Step 5: Registrar changes both conditions and nullifies all hidden fields
+    // Step 4: Registrar changes both conditions and nullifies all hidden fields
     const registerPayload = generator.event.actions.register(event.id, {
       declaration: {
         ...payload.declaration,
@@ -2496,4 +2527,25 @@ describe('Registration by different user with declaration changes', () => {
     expect(currentState.declaration['applicant.dob']).toBe('2000-02-01')
     expect(currentState.declaration['recommender.none']).toBe(true)
   })
+})
+
+test('System user can not register an event, even with the right scope', async () => {
+  const { generator, user } = await setupTestCase()
+
+  const humanUserClient = createTestClient(user)
+
+  const systemUserClient = createSystemTestClient(TEST_SYSTEM_ID, [
+    encodeScope({ type: 'record.register' })
+  ])
+
+  const event = await humanUserClient.event.create(generator.event.create())
+  await humanUserClient.event.actions.declare.request(
+    generator.event.actions.declare(event.id)
+  )
+
+  await expect(
+    systemUserClient.event.actions.register.request(
+      generator.event.actions.register(event.id)
+    )
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })

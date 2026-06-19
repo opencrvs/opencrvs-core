@@ -16,7 +16,10 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import { AppBar, Button, Frame, Icon, Stack } from '@opencrvs/components'
 import { Plus } from '@opencrvs/components/src/icons'
-import { ActionType, isActionInScope } from '@opencrvs/commons/client'
+import {
+  canUserCreateEvent,
+  getAcceptedScopesByType
+} from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
@@ -25,26 +28,31 @@ import { useAllWorkqueueConfigurations } from '@client/v2-events/features/events
 import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { emptyMessage } from '@client/v2-events/utils'
+import { constantsMessages } from '@client/i18n/messages/constants'
 import { Hamburger } from '../sidebar/Hamburger'
 import { Sidebar } from '../sidebar/Sidebar'
 
+/**
+ * Checks if the user has the `record.create` scope for any event type.
+ * @returns true if the user has the `record.create` scope for any event type, false otherwise.
+ */
+export function useUserMayCreateEvents() {
+  const scopes = useSelector(getScope) ?? []
+  const eventConfigurations = useEventConfigurations()
+  return eventConfigurations.some(({ id }) => canUserCreateEvent(scopes, id))
+}
+
 export function DesktopCenter() {
   const { createNewDeclaration } = useEventFormNavigation()
-  const scopes = useSelector(getScope) ?? []
-
-  const eventConfigurations = useEventConfigurations()
-  const mayCreateEvents = eventConfigurations.some(({ id }) =>
-    isActionInScope(scopes, ActionType.CREATE, id)
-  )
+  const mayCreateEvents = useUserMayCreateEvents()
 
   return (
     <Stack gap={16}>
       {mayCreateEvents && (
         <Button
-          disabled={!mayCreateEvents}
           id="header-new-event"
           type="iconPrimary"
-          onClick={() => createNewDeclaration()}
+          onClick={createNewDeclaration}
         >
           <Plus />
         </Button>
@@ -73,7 +81,11 @@ export function WorkqueueLayout({
 
   const scopes = useSelector(getScope) ?? []
 
-  const hasSearchScope = scopes.some((scope) => scope.startsWith('search'))
+  const hasSearchScope =
+    getAcceptedScopesByType({
+      acceptedScopes: ['record.search'],
+      scopes
+    }).length > 0
 
   return (
     <Frame
@@ -99,7 +111,9 @@ export function WorkqueueLayout({
         />
       }
       navigation={<Sidebar key={workqueueSlug} />}
-      skipToContentText="skip"
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
     >
       {children}
     </Frame>

@@ -23,7 +23,7 @@ interface IContentResponse {
 
 export async function loadContent(): Promise<IContentResponse> {
   return await request<IContentResponse>({
-    url: new URL('/content/login', window.config.COUNTRY_CONFIG_URL).toString(),
+    url: '/api/countryconfig/content/login',
     method: 'GET'
   })
 }

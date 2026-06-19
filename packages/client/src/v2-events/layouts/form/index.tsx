@@ -12,10 +12,11 @@
 import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
-import { Frame, Spinner } from '@opencrvs/components'
+import { Frame } from '@opencrvs/components'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { SuspenseLoadingFallback } from '@client/v2-events/components/SuspenseLoadingFallback'
 import { FormHeader } from './FormHeader'
 import { AllowedRouteWithEventId } from './utils'
 
@@ -27,12 +28,14 @@ export function FormLayout({
   route,
   children,
   onSaveAndExit,
-  appbarIcon = <DeclarationIcon />
+  appbarIcon = <DeclarationIcon />,
+  actionComponent
 }: {
   route: AllowedRouteWithEventId
   children: React.ReactNode
   onSaveAndExit?: () => void | Promise<void>
   appbarIcon?: React.ReactNode
+  actionComponent?: React.ReactNode
 }) {
   const intl = useIntl()
   const { eventId } = useTypedParams(route)
@@ -46,6 +49,7 @@ export function FormLayout({
     <Frame
       header={
         <FormHeader
+          actionComponent={actionComponent}
           appbarIcon={appbarIcon}
           label={intl.formatMessage(configuration.label)}
           route={route}
@@ -54,7 +58,9 @@ export function FormLayout({
       }
       skipToContentText="Skip to form"
     >
-      <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
+      <React.Suspense
+        fallback={<SuspenseLoadingFallback id="event-form-spinner" />}
+      >
         {children}
       </React.Suspense>
     </Frame>

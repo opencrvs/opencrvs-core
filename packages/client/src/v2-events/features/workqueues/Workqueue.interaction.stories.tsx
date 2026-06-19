@@ -19,6 +19,7 @@ import { onlineManager } from '@tanstack/react-query'
 import {
   ActionType,
   createPrng,
+  encodeScope,
   EventIndex,
   eventQueryDataGenerator,
   EventStatus,
@@ -42,6 +43,7 @@ import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { faker } from '@client/tests/test-data-generators'
+import { setNavigatorOnline } from '@client/tests/storybook-utils'
 import { Name } from '../events/registered-fields'
 import { WorkqueueIndex } from './index'
 
@@ -98,7 +100,7 @@ const downloadEvent = generateEventDocument({
 
 export const PaginationAfterDownload: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
@@ -481,10 +483,12 @@ export const DraftPagination: Story = {
         event: [
           tRPCMsw.event.draft.list.query(() => drafts),
           tRPCMsw.event.get.query((input) => {
-            const event = events.find((e) => e.event.id === input)?.event
+            const event = events.find(
+              (e) => e.event.id === input.eventId
+            )?.event
 
             if (!event) {
-              throw new Error(`Event not found with id: ${input}`)
+              throw new Error(`Event not found with id: ${input.eventId}`)
             }
 
             return event
@@ -525,6 +529,7 @@ export const DraftPagination: Story = {
 export const DraftPaginationOffline: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'draft' })
@@ -545,10 +550,12 @@ export const DraftPaginationOffline: Story = {
         event: [
           tRPCMsw.event.draft.list.query(() => drafts),
           tRPCMsw.event.get.query((input) => {
-            const event = events.find((e) => e.event.id === input)?.event
+            const event = events.find(
+              (e) => e.event.id === input.eventId
+            )?.event
 
             if (!event) {
-              throw new Error(`Event not found with id: ${input}`)
+              throw new Error(`Event not found with id: ${input.eventId}`)
             }
 
             return event
@@ -573,13 +580,7 @@ export const DraftPaginationOffline: Story = {
     )
     await expect(firstPageRows).toHaveLength(10)
 
-    Object.defineProperty(window.navigator, 'onLine', {
-      configurable: true,
-      get: () => false
-    })
-
-    // Dispatch offline event so useEffect listener reacts
-    window.dispatchEvent(new Event('offline'))
+    setNavigatorOnline(false)
 
     // Check that offline labels are shown
     await canvas.findAllByText('No connection')
@@ -593,6 +594,91 @@ export const DraftPaginationOffline: Story = {
       'Tennis club membership application'
     )
     await expect(secondPageRows).toHaveLength(5)
+
+    // Restore online status so the stubbed offline state does not leak into
+    // stories rendered after this one in the same preview iframe
+    setNavigatorOnline(true)
+  }
+}
+
+/**
+ * Regression test for the offline-aware Suspense fallback (SuspenseLoadingFallback).
+ *
+ * Scenario: the workqueue route starts loading, the spinner shows, and the
+ * network drops *mid-load* (before the list query resolves). The fallback must
+ * swap the spinner for the "No connection" message instead of spinning forever,
+ * and return to the spinner once back online.
+ *
+ * The list query (`event.search`) never resolves, so the workqueue content stays
+ * in its Suspense (loading) state for the whole test while we toggle connectivity.
+ */
+export const WorkqueueGoesOfflineWhileLoading: Story = {
+  parameters: {
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues('recent')
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: queryData.length }
+            }, {})
+          })
+        ],
+        event: [
+          // Never resolves: keeps the workqueue content query pending so the
+          // Suspense fallback stays mounted while we toggle connectivity.
+          tRPCMsw.event.search.query(
+            async () => new Promise<never>(() => undefined)
+          )
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Loading spinner appears while the list query is in flight',
+      async () => {
+        await canvas.findAllByTestId('spinner')
+        await expect(
+          canvasElement.querySelector('#suspense-offline-message')
+        ).not.toBeInTheDocument()
+      }
+    )
+
+    await step(
+      'Network drops mid-load → offline message replaces the spinner',
+      async () => {
+        setNavigatorOnline(false)
+
+        await canvas.findAllByText('No connection')
+        await expect(
+          canvasElement.querySelector('#page-spinner')
+        ).not.toBeInTheDocument()
+      }
+    )
+
+    await step('Back online → returns to the loading spinner', async () => {
+      setNavigatorOnline(true)
+
+      await canvas.findAllByTestId('spinner')
+      await expect(
+        canvasElement.querySelector('#suspense-offline-message')
+      ).not.toBeInTheDocument()
+    })
+
+    // Restore online status so the stubbed offline state does not leak into
+    // stories rendered after this one in the same preview iframe
+    setNavigatorOnline(true)
   }
 }
 
@@ -626,12 +712,168 @@ const autoRefreshUpdatedEvents = [
   ...autoRefreshInitialEvents
 ]
 
+function buildFakeStorybookToken(scopes: string[]) {
+  const base64UrlEncode = (input: string) =>
+    btoa(input).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+
+  const header = base64UrlEncode(JSON.stringify({ alg: 'RS256', typ: 'JWT' }))
+  const payload = base64UrlEncode(
+    JSON.stringify({
+      scope: scopes,
+      userType: 'user',
+      role: TestUserRole.enum.FIELD_AGENT,
+      sub: '8f8b431b-ef47-4068-b678-ef2dd93e9208',
+      iat: 1487076708,
+      exp: 32503680000,
+      iss: 'opencrvs:auth-service',
+      aud: 'opencrvs:gateway-user'
+    })
+  )
+  return `${header}.${payload}.signature`
+}
+
+/**
+ * Token grants access to the `recent` workqueue but intentionally omits the
+ * `record.create` scope so `useUserMayCreateEvents` returns false.
+ */
+const tokenWithWorkqueueButNoCreate = buildFakeStorybookToken([
+  encodeScope({
+    type: 'workqueue',
+    options: {
+      ids: [
+        'all-events',
+        'assigned-to-you',
+        'recent',
+        'requires-updates',
+        'sent-for-review'
+      ]
+    }
+  }),
+  encodeScope({ type: 'record.search' }),
+  encodeScope({ type: 'record.read' })
+])
+
+export const MobileCreateEventHiddenForUnauthorizedUser: Story = {
+  parameters: {
+    userRole: TestUserRole.enum.FIELD_AGENT,
+    token: tokenWithWorkqueueButNoCreate,
+    viewport: { defaultViewport: 'mobile' },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues('recent')
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: queryData.length }
+            }, {})
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          }),
+          tRPCMsw.event.search.query((input) => {
+            return {
+              results: queryData.slice(input.offset, input.limit),
+              total: queryData.length
+            }
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Workqueue has finished loading', async () => {
+      await canvas.findByText('Farajaland CRVS', {}, { timeout: 5000 })
+      await waitFor(async () => {
+        const rows = canvasElement.querySelectorAll('div[id^="row_"]')
+        await expect(rows.length).toBeGreaterThan(0)
+      })
+    })
+
+    await step(
+      'Floating action button for new event creation is not rendered',
+      async () => {
+        const fab = canvasElement.querySelector('#new_event_declaration')
+        await expect(fab).toBeNull()
+      }
+    )
+  }
+}
+
+export const MobileCreateEventShownForAuthorizedUser: Story = {
+  parameters: {
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
+    viewport: { defaultViewport: 'mobile' },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues('recent')
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: queryData.length }
+            }, {})
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          }),
+          tRPCMsw.event.search.query((input) => {
+            return {
+              results: queryData.slice(input.offset, input.limit),
+              total: queryData.length
+            }
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Workqueue has finished loading', async () => {
+      await canvas.findByText('Farajaland CRVS', {}, { timeout: 5000 })
+      await waitFor(async () => {
+        const rows = canvasElement.querySelectorAll('div[id^="row_"]')
+        await expect(rows.length).toBeGreaterThan(0)
+      })
+    })
+
+    await step(
+      'Floating action button for new event creation is rendered',
+      async () => {
+        await waitFor(async () => {
+          const fab = canvasElement.querySelector('#new_event_declaration')
+          await expect(fab).not.toBeNull()
+        })
+      }
+    )
+  }
+}
+
 export const WorkqueueAutoRefreshOnCountChange: Story = {
   beforeEach: () => {
     autoRefreshDataChanged = false
   },
   parameters: {
-    userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })

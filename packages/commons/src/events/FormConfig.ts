@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { TranslationConfig } from './TranslationConfig'
 import { FormPageConfig, PageConfig } from './PageConfig'
 
@@ -17,7 +17,10 @@ export const DeclarationFormConfig = z
     label: TranslationConfig.describe('Human readable description of the form'),
     pages: z.array(FormPageConfig)
   })
-  .describe('Configuration of the declaration form.')
+  .meta({
+    id: 'DeclarationFormConfig',
+    description: 'Configuration of the declaration form.'
+  })
 
 export type DeclarationFormConfig = z.infer<typeof DeclarationFormConfig>
 export type DeclarationFormConfigInput = z.input<typeof DeclarationFormConfig>

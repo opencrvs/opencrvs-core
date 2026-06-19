@@ -34,4 +34,10 @@ const meta: Meta<typeof UserAuditHistory> = {
 export default meta
 type Story = StoryObj<typeof UserAuditHistory>
 
-export const Default: Story = {}
+export const WithRecordReadScope: Story = {}
+
+export const WithoutRecordReadScope: Story = {
+  parameters: {
+    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN
+  }
+}
