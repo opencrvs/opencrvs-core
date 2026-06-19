@@ -130,13 +130,19 @@ function getAvailableActionsWithoutFlagFilters(
 
   // At some point we will refactor 'Rejected' to be a countryconfig flag, at which point we can remove this silly logic.
   if (flags.includes(InherentFlags.REJECTED)) {
-    return [
+    const rejectedActions = [
       ActionType.READ,
       ActionType.NOTIFY,
       ActionType.CUSTOM,
-      ActionType.EDIT,
-      ActionType.ARCHIVE
+      ActionType.EDIT
     ]
+
+    if (status !== EventStatus.enum.ARCHIVED) {
+      return [...rejectedActions, ActionType.ARCHIVE]
+    } else {
+      // Archived records cannot be archived again.
+      return rejectedActions
+    }
   }
 
   return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
