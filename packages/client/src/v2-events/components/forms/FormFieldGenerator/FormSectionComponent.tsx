@@ -207,6 +207,30 @@ function applyVisibilityTransitions({
       set(fieldValues, makeFormFieldIdFormikCompatible(key), cachedValue)
     }
   })
+
+  // Visible reset fields that setValueForListenerField left as undefined need
+  // explicit null so the server treats them as cleared (not as no-change) and
+  // Formik renders controlled empty inputs. Only fires when the field held a
+  // real value before the parent change — empty optional fields are left alone.
+  resetFieldIds.forEach((key) => {
+    if (newHiddenKeys.includes(key)) {
+      return
+    }
+    if (!(key in currentCleaned)) {
+      return
+    }
+    const currentFieldValue = get(
+      fieldValues,
+      makeFormFieldIdFormikCompatible(key)
+    )
+    if (currentFieldValue !== undefined) {
+      return
+    }
+    const prevValue = get(prevCleaned, key)
+    if (!isNil(prevValue)) {
+      set(fieldValues, makeFormFieldIdFormikCompatible(key), null)
+    }
+  })
 }
 
 export function FormSectionComponent({
