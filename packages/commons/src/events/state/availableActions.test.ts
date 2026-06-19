@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { ActionType } from '../ActionType'
 import { EventIndex } from '../EventIndex'
 import { EventStatus } from '../EventMetadata'
 import { InherentFlags } from '../Flag'
@@ -32,6 +33,17 @@ describe('getAvailableActionsForEvent()', () => {
       ).toMatchSnapshot()
     })
   }
+
+  it(`should not allow ARCHIVE or EDIT for "${EventStatus.enum.ARCHIVED}" status with ${InherentFlags.REJECTED} flag`, () => {
+    const actions = getAvailableActionsForEvent({
+      status: EventStatus.enum.ARCHIVED,
+      flags: [InherentFlags.REJECTED]
+    } as EventIndex)
+
+    expect(actions).not.toContain(ActionType.ARCHIVE)
+    expect(actions).not.toContain(ActionType.EDIT)
+    expect(actions).toMatchSnapshot()
+  })
 
   it(`should return the correct actions for "${EventStatus.enum.REGISTERED}" status with ${InherentFlags.CORRECTION_REQUESTED} flag`, () => {
     expect(
