@@ -108,8 +108,8 @@ import { ActionType } from './ActionType'
 import { EventConfig } from './EventConfig'
 
 type Mutable<T> = {
-  -readonly [K in keyof T]: T[K];
-};
+  -readonly [K in keyof T]: T[K]
+}
 
 /**
  * FieldTypeMapping.ts should include functions that map field types to different formats dynamically.
