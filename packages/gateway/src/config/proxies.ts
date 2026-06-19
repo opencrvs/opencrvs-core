@@ -48,7 +48,18 @@ const getLocationsHandler = async (req: Request, h: ResponseToolkit) => {
   const acceptsGzip: boolean =
     req.headers['accept-encoding']?.includes('gzip') ?? false
 
-  let compressed = await getCachedLocations(query)
+  const cacheControl = req.headers['cache-control'] ?? ''
+  const noStore = cacheControl.includes('no-store')
+  const noCache = cacheControl.includes('no-cache')
+
+  if (!query.includes('_count=0') || noStore) {
+    return h.proxy({
+      uri: `${APPLICATION_CONFIG_URL}locations${query}`,
+      passThrough: true
+    })
+  }
+
+  let compressed = noCache ? null : await getCachedLocations(query)
 
   if (!compressed) {
     try {
