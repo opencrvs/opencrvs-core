@@ -115,7 +115,7 @@ export function filterActionsByFlags(
 /**
  * A rejected record has a specific set of core actions that are available to it.
  *
- * This expansion only applies while the record is still active. Once it has
+ * This list of actions only applies while the record is still active. Once it has
  * been archived it must behave like any other archived record: it cannot be
  * edited or archived again, so we fall through to the status-based actions.
  *
