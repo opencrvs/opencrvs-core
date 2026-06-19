@@ -53,7 +53,7 @@ influxdb:
 # MinIO configuration, including the hostname and port.
 minio:
   host: minio-0.minio.opencrvs-deps-dev.svc.cluster.local
-  port: "3535"
+  port: 3535
   # external_url: external <host/ip>[:port] available for client browser to issue signed document URL.
   #                   Default: minio.<opencrvs domain>
   # external_protocol: external protocol (http or https) available for client browser. (Default: helm chart http_scheme)

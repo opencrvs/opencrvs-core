@@ -6,6 +6,11 @@
   "lockFileMaintenance": {
     "enabled": true
   },
+  "baseBranchPatterns": [
+    "develop",
+    "/^release[-\\/].*/",
+    "/^release-.*/"
+  ],
   "pruneStaleBranches": false,
   "timezone": "Europe/London",
   "schedule": [
@@ -20,8 +25,16 @@
   "osvVulnerabilityAlerts": true,
   "packageRules": [
     {
-      "updateTypes": ["patch"],
+      "matchDepTypes": ["devDependencies"],
       "enabled": false
-    }
+    },
+    {
+      "matchUpdateTypes": ["patch"],
+      "enabled": false
+    },
+    {
+      "matchDepTypes": ["dependencies"],
+      "addLabels": ["Production dependency"]
+    },
   ]
 }
