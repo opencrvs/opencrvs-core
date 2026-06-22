@@ -232,7 +232,8 @@ export async function seedLocations(token: string) {
 function getLocationsByType(type: string) {
   return fetch(`${env.GATEWAY_HOST}/locations?type=${type}&_count=0`, {
     headers: {
-      'Content-Type': 'application/fhir+json'
+      'Content-Type': 'application/fhir+json',
+      'Cache-Control': 'no-store'
     }
   })
 }

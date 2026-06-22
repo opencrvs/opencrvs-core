@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Query } from '@client/components/Query'
+import { ApolloError } from '@apollo/client'
 import {
   buttonMessages,
   constantsMessages,
@@ -55,7 +56,7 @@ import { userMutations } from '@client/user/mutations'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { ListUser } from '@opencrvs/components/lib/ListUser'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
   withOnlineStatus,
   LoadingIndicator
@@ -207,6 +208,38 @@ export const Status = (statusProps: IStatusProps) => {
         <Pill type="pending" label={intl.formatMessage(messages.pending)} />
       )
   }
+}
+
+const RATE_LIMIT_RETRY_SECONDS = 60
+
+function isRateLimitError(error: ApolloError): boolean {
+  return error.graphQLErrors?.some(
+    (e) => e.extensions?.code === 'RATE_LIMIT_EXCEEDED'
+  )
+}
+
+function RateLimitErrorPanel({ refetch }: { refetch: () => void }) {
+  const intl = useIntl()
+  const [countdown, setCountdown] = useState(RATE_LIMIT_RETRY_SECONDS)
+
+  useEffect(() => {
+    if (countdown <= 0) return
+    const timer = setTimeout(() => setCountdown((c) => c - 1), 1000)
+    return () => clearTimeout(timer)
+  }, [countdown])
+
+  return (
+    <ErrorText id="user_loading_error">
+      <>{intl.formatMessage(errorMessages.userQueryRateLimitError)}</>
+      <LinkButtonModified disabled={countdown > 0} onClick={() => refetch()}>
+        {countdown > 0
+          ? intl.formatMessage(constantsMessages.retryInSeconds, {
+              seconds: countdown
+            })
+          : intl.formatMessage(constantsMessages.refresh)}
+      </LinkButtonModified>
+    </ErrorText>
+  )
 }
 
 function UserListComponent(props: IProps) {
@@ -811,7 +844,7 @@ function UserListComponent(props: IProps) {
           }}
           fetchPolicy={'cache-and-network'}
         >
-          {({ data, loading, error }) => {
+          {({ data, loading, error, refetch }) => {
             return (
               <Content
                 title={
@@ -825,14 +858,18 @@ function UserListComponent(props: IProps) {
                 topActionButtons={LocationButton(locationId)}
               >
                 {error ? (
-                  <ErrorText id="user_loading_error">
-                    <>{intl.formatMessage(errorMessages.userQueryError)}</>
-                    <LinkButtonModified
-                      onClick={() => window.location.reload()}
-                    >
-                      {intl.formatMessage(constantsMessages.refresh)}
-                    </LinkButtonModified>
-                  </ErrorText>
+                  isRateLimitError(error) ? (
+                    <RateLimitErrorPanel refetch={refetch} />
+                  ) : (
+                    <ErrorText id="user_loading_error">
+                      <>{intl.formatMessage(errorMessages.userQueryError)}</>
+                      <LinkButtonModified
+                        onClick={() => window.location.reload()}
+                      >
+                        {intl.formatMessage(constantsMessages.refresh)}
+                      </LinkButtonModified>
+                    </ErrorText>
+                  )
                 ) : loading ? (
                   <Loading>
                     <LoadingIndicator loading={true} />

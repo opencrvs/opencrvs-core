@@ -2,6 +2,11 @@
 
 ## 1.9.15 Release Candidate
 
+### Improvements
+
+- Team page now shows a user-friendly "Too many requests" message when the `searchUsers` rate limit (20 req/min) is hit, instead of the generic query error. [#12990](https://github.com/opencrvs/opencrvs-core/issues/12990)
+- Gateway locations endpoint now serves responses from an in-process cache backed by Redis, reducing memory allocations under concurrent load. Cached payloads are gzip-compressed so write buffers to Traefik are proportionally smaller during request spikes. [#12880](https://github.com/opencrvs/opencrvs-core/issues/12880)
+
 ## 1.9.14
 
 ### New features
