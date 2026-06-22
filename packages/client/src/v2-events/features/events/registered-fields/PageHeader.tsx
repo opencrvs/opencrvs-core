@@ -10,10 +10,15 @@
  */
 
 import React from 'react'
+import styled from 'styled-components'
 import { SubHeader } from '@opencrvs/components'
 
+const StyledSubHeader = styled(SubHeader)`
+  padding-bottom: 0;
+`
+
 function PageHeaderInput({ children }: { children: React.ReactNode }) {
-  return <SubHeader>{children}</SubHeader>
+  return <StyledSubHeader>{children}</StyledSubHeader>
 }
 
 export const PageHeader = {
