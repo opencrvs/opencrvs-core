@@ -95,7 +95,8 @@ jobs:
           git checkout -b "release/${{ inputs.version }}"
 
           # Bump all workspace package.json files and the root in one command.
-          npm version ${{ inputs.version }} --no-git-tag-version --workspaces --include-workspace-root
+          npx lerna exec 'yarn version --new-version ${{ inputs.version }} --no-git-tag-version'
+          yarn version --new-version ${{ inputs.version }} --no-git-tag-version
           git add .
           git commit -m "chore: update version to ${{ inputs.version }}"
 
@@ -232,6 +233,33 @@ jobs:
                 version: '${{ inputs.version }}'
               }
             })
+
+      - name: Create release branch in e2e repo
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.E2E_WORKFLOW_TOKEN }}
+          script: |
+            const branchRef = 'refs/heads/release/${{ inputs.version }}'
+            const { data: ref } = await github.rest.git.getRef({
+              owner: context.repo.owner,
+              repo: 'e2e',
+              ref: 'heads/${{ steps.get_base_branch.outputs.base_branch }}'
+            })
+            try {
+              await github.rest.git.createRef({
+                owner: context.repo.owner,
+                repo: 'e2e',
+                ref: branchRef,
+                sha: ref.object.sha
+              })
+              console.log(`Created ${branchRef} in e2e`)
+            } catch (err) {
+              if (err.status === 422) {
+                console.log(`Branch ${branchRef} already exists in e2e, skipping.`)
+              } else {
+                throw err
+              }
+            }
 
       # Create a draft release so the release notes page exists immediately.
       # The tag is deleted right after: the publish workflow re-creates it when

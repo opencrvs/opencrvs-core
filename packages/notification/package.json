@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/notification",
-  "version": "1.9.14",
+  "version": "1.9.15",
   "description": "OpenCRVS notification service",
   "license": "MPL-2.0",
   "private": true,

@@ -392,8 +392,9 @@ export async function indexEventsInBulk(
         error: item.index?.error
       }))
     logger.error(
-      `Bulk indexing had ${failures.length} failure(s) out of ${batch.length} documents`,
-      { failures }
+      `Bulk indexing had ${failures.length} failure(s) out of ${batch.length} documents.` +
+        `Typically this is a sign of the records containing fields that do not exist in the form configuration anymore.` +
+        ` Failures: ${JSON.stringify(failures, null, 2)}`
     )
   }
 
