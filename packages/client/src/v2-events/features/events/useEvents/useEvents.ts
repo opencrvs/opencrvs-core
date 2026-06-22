@@ -38,6 +38,23 @@ import { useGetEventCountsByWorkqueue } from './procedures/count'
 import { findLocalEventDocument, findLocalEventIndex } from './api'
 import { QueryOptions } from './procedures/utils'
 
+/**
+ * Namespaces an `event.search` query key by workqueue slug.
+ */
+export function withWorkqueueSlug<T extends readonly unknown[]>(
+  baseKey: T,
+  workqueueSlug?: string
+): T {
+  return (workqueueSlug ? [...baseKey, { workqueueSlug }] : baseKey) as T
+}
+
+function getWorkqueueSlugFromMeta(
+  options: { meta?: Record<string, unknown> } = {}
+): string | undefined {
+  const slug = options.meta?.workqueueSlug
+  return typeof slug === 'string' ? slug : undefined
+}
+
 function getEventWithDraftOrThrow(
   id: string,
   eventConfigs: EventConfig[],
@@ -92,7 +109,10 @@ export function useEvents() {
       ) => {
         return useQuery({
           ...trpc.event.search.queryOptions(query),
-          queryKey: trpc.event.search.queryKey(query),
+          queryKey: withWorkqueueSlug(
+            trpc.event.search.queryKey(query),
+            getWorkqueueSlugFromMeta(options)
+          ),
           refetchOnMount: 'always',
           staleTime: 0,
           ...options
@@ -104,7 +124,10 @@ export function useEvents() {
       ) => {
         return useSuspenseQuery({
           ...trpc.event.search.queryOptions(query),
-          queryKey: trpc.event.search.queryKey(query),
+          queryKey: withWorkqueueSlug(
+            trpc.event.search.queryKey(query),
+            getWorkqueueSlugFromMeta(options)
+          ),
           refetchOnMount: 'always',
           staleTime: 0,
           ...options

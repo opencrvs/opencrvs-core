@@ -18,7 +18,10 @@ import {
 } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { useCountryConfigWorkqueueConfigurations } from '../features/events/useCountryConfigWorkqueueConfigurations'
-import { useEvents } from '../features/events/useEvents/useEvents'
+import {
+  useEvents,
+  withWorkqueueSlug
+} from '../features/events/useEvents/useEvents'
 import { queryClient, useTRPC } from '../trpc'
 import { useUsers } from './useUsers'
 
@@ -99,10 +102,13 @@ export function useWorkqueues() {
           sort: [{ field: 'updatedAt', direction: 'desc' as const }]
         }
         const options = trpc.event.search.queryOptions(searchInput)
+        const queryKey = withWorkqueueSlug(
+          options.queryKey,
+          workqueueConfig.slug
+        )
 
-        const data = queryClient.getQueryData(options.queryKey)
-        const isFetching =
-          queryClient.isFetching({ queryKey: options.queryKey }) > 0
+        const data = queryClient.getQueryData(queryKey)
+        const isFetching = queryClient.isFetching({ queryKey }) > 0
 
         if (data || isFetching) {
           return
@@ -110,6 +116,7 @@ export function useWorkqueues() {
 
         return queryClient.prefetchQuery({
           ...options,
+          queryKey,
           meta: { workqueueSlug: workqueueConfig.slug }
         })
       })
