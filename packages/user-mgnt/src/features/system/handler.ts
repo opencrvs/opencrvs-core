@@ -18,7 +18,13 @@ import {
   createFhirPractitionerRole,
   postFhir
 } from '@user-mgnt/features/createUser/service'
-import { logger, SystemRole } from '@opencrvs/commons'
+import {
+  logger,
+  RecordScope,
+  RecordScopeType,
+  stringifyScope,
+  SystemRole
+} from '@opencrvs/commons'
 import System, { WebhookPermissions } from '@user-mgnt/model/system'
 import User from '@user-mgnt/model/user'
 import { generateHash, generateSaltedHash } from '@user-mgnt/utils/hash'
@@ -347,7 +353,7 @@ export async function getSystemHandler(
   }
   const systemName = system.name
   return {
-    name: systemName || system.createdBy,
+    name: systemName || system.createdBy || '',
     createdBy: system.createdBy,
     client_id: system.client_id,
     username: system.username,
@@ -524,3 +530,103 @@ export async function deleteSystem(
     return h.response(e.message).code(400)
   }
 }
+
+interface ICreateIntegrationPayload {
+  name: string
+  scopes: RecordScope[]
+  clientId?: string
+  clientSecret?: string
+}
+
+export async function createIntegrationHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const { name, scopes, clientId, clientSecret } =
+    request.payload as ICreateIntegrationPayload
+
+  for (const scope of scopes) {
+    const parsed = RecordScopeType.safeParse(scope.type)
+    if (!parsed.success) {
+      return h
+        .response(`Invalid scope type: ${scope.type}`)
+        .code(400)
+    }
+  }
+
+  const resolvedClientId = clientId ?? uuid()
+  const resolvedClientSecret = clientSecret ?? uuid()
+  const sha_secret = uuid()
+  const { hash, salt } = generateSaltedHash(resolvedClientSecret)
+  const scopeStrings = scopes.map(stringifyScope)
+
+  try {
+    const existing = await System.findOne({ client_id: resolvedClientId })
+
+    if (existing) {
+      const { hash: newHash, salt: newSalt } =
+        generateSaltedHash(resolvedClientSecret)
+      await System.updateOne(
+        { client_id: resolvedClientId },
+        {
+          name,
+          scope: scopeStrings,
+          secretHash: newHash,
+          salt: newSalt,
+          sha_secret
+        }
+      )
+      return h
+        .response({
+          clientId: resolvedClientId,
+          clientSecret: resolvedClientSecret,
+          sha_secret
+        })
+        .code(200)
+    }
+
+    await System.create({
+      name,
+      client_id: resolvedClientId,
+      scope: scopeStrings,
+      secretHash: hash,
+      salt,
+      sha_secret,
+      status: statuses.ACTIVE,
+      settings: { dailyQuota: 0, webhook: [] }
+    })
+
+    return h
+      .response({
+        clientId: resolvedClientId,
+        clientSecret: resolvedClientSecret,
+        sha_secret
+      })
+      .code(201)
+  } catch (e) {
+    logger.error(e)
+    return h.response().code(400)
+  }
+}
+
+export const createIntegrationRequestSchema = Joi.object({
+  name: Joi.string().required(),
+  scopes: Joi.array()
+    .items(
+      Joi.object({
+        type: Joi.string().required(),
+        options: Joi.object({
+          event: Joi.array().items(Joi.string()).required()
+        }).required()
+      })
+    )
+    .required(),
+  clientId: Joi.string().uuid().optional(),
+  clientSecret: Joi.string().optional()
+})
+
+export const createIntegrationResponseSchema = Joi.object({
+  clientId: Joi.string().uuid().required(),
+  clientSecret: Joi.string().required(),
+  sha_secret: Joi.string().required()
+})

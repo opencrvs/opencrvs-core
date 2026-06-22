@@ -98,6 +98,14 @@ const getLocationsHandler = async (req: Request, h: ResponseToolkit) => {
 }
 
 export const catchAllProxy = {
+  authInternal: {
+    method: '*',
+    path: '/auth/internal/{suffix}',
+    handler: (_, h) => h.response().code(404),
+    options: {
+      auth: false
+    }
+  },
   auth: {
     method: 'POST',
     path: '/auth/{suffix}',

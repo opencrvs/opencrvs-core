@@ -13,7 +13,8 @@ import { logger } from '@opencrvs/commons'
 import '@opencrvs/commons/monitoring'
 import { env } from './environment'
 import { server } from './server'
-import { getAnonymousToken } from './service/auth'
+import fetch from 'node-fetch'
+import { getAnonymousToken, getIntegrationCreatorToken } from './service/auth'
 import { getInMemoryEventConfigurations } from './service/config/config'
 import { ensureIndexExists } from './service/indexing/indexing'
 import { ensureConnection } from './storage/postgres/events'
@@ -48,6 +49,29 @@ export async function main() {
     return
   }
   server().listen(5555)
+  void triggerSystemReady()
+}
+
+async function triggerSystemReady() {
+  try {
+    const bootstrapToken = await getIntegrationCreatorToken()
+    const res = await fetch(
+      new URL('/triggers/system/ready', env.COUNTRY_CONFIG_URL).toString(),
+      {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${bootstrapToken}` }
+      }
+    )
+    if (!res.ok) {
+      logger.warn(
+        `system/ready trigger returned ${res.status}: ${await res.text()}`
+      )
+    }
+  } catch (error) {
+    logger.warn(
+      `system/ready trigger failed: ${error instanceof Error ? error.message : error}`
+    )
+  }
 }
 
 // Execute when the file is run directly e.g. (ts-node -r tsconfig-paths/register src/index.ts)

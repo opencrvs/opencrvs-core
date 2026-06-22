@@ -14,13 +14,13 @@ import { integratingSystemTypes, types } from '@user-mgnt/utils/system'
 
 export interface ISystem {
   name: string
-  createdBy: string
-  username: string
+  createdBy?: string
+  username?: string
   client_id: string
   secretHash: string
   salt: string
   sha_secret: string
-  practitionerId: string
+  practitionerId?: string
   scope: string[]
   status: string
   settings: {
@@ -28,7 +28,7 @@ export interface ISystem {
     webhook: WebHook[]
   }
   creationDate?: number
-  type: keyof typeof types
+  type?: keyof typeof types
 }
 
 export enum EventType {
@@ -58,12 +58,12 @@ export interface ISystemModel extends ISystem, Document {}
 
 const systemSchema = new Schema({
   name: { type: String, required: true },
-  createdBy: { type: String, required: true },
-  username: { type: String, required: true },
+  createdBy: { type: String, required: false },
+  username: { type: String, required: false },
   client_id: { type: String, required: true },
   secretHash: { type: String, required: true },
   salt: { type: String, required: true },
-  practitionerId: { type: String, required: true },
+  practitionerId: { type: String, required: false },
   sha_secret: { type: String, required: true },
   scope: { type: [String], required: true },
   status: {
