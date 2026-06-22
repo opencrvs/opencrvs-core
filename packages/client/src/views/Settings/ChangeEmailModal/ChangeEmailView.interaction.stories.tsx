@@ -10,8 +10,17 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 import { expect, userEvent, waitFor, within } from '@storybook/test'
+import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
+import superjson from 'superjson'
+import { TRPCError } from '@trpc/server'
 import { setNavigatorOnline } from '@client/tests/storybook-utils'
+import { AppRouter } from '@client/v2-events/trpc'
 import { ChangeEmailView } from './ChangeEmailView'
+
+const tRPCMsw = createTRPCMsw<AppRouter>({
+  links: [httpLink({ url: '/api/events' })],
+  transformer: { input: superjson, output: superjson }
+})
 
 const meta: Meta<typeof ChangeEmailView> = {
   title: 'Settings/ChangeEmailView/Interaction',
@@ -68,6 +77,58 @@ export const ContinueButtonDisabledWhenGoingOffline: Story = {
 
 // The default storybook user (local registrar) has this email address.
 const currentUserEmail = 'kalushabwalya1.7@gmail.com'
+
+export const DuplicateEmailShowsToast: Story = {
+  parameters: {
+    msw: {
+      handlers: {
+        requestContactChange: [
+          tRPCMsw.user.requestContactChange.mutation(() => {
+            throw new TRPCError({ code: 'CONFLICT' })
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    const newEmail = 'already.taken@example.com'
+
+    await step('Enter a valid new email and click Continue', async () => {
+      await userEvent.type(await canvas.findByRole('textbox'), newEmail)
+      await expect(
+        canvas.getByRole('button', { name: 'Continue' })
+      ).toBeEnabled()
+      await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
+    })
+
+    await step('Duplicate email toast appears', async () => {
+      await waitFor(
+        async () => {
+          await expect(
+            canvas.getByText(
+              `${newEmail} is already used by another user. Please use a different email`
+            )
+          ).toBeVisible()
+        },
+        { timeout: 5000 }
+      )
+    })
+
+    await step('Typing a new email dismisses the toast', async () => {
+      const input = canvas.getByRole('textbox')
+      await userEvent.clear(input)
+      await userEvent.type(input, 'other@example.com')
+      await waitFor(() => {
+        expect(
+          canvas.queryByText(
+            `${newEmail} is already used by another user. Please use a different email`
+          )
+        ).not.toBeInTheDocument()
+      })
+    })
+  }
+}
 
 export const ContinueButtonDisabledWhenEmailUnchanged: Story = {
   play: async ({ canvasElement, step }) => {

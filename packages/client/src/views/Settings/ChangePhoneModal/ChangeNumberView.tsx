@@ -46,7 +46,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
     showDuplicateMobileErrorNotification,
     setShowDuplicateMobileErrorNotification
   ] = React.useState(false)
-  const { sendVerifyCode } = useUsers()
+  const { requestContactChange } = useUsers()
   const isMobileNumberUnchanged =
     Boolean(phoneNumber) && phoneNumber === currentUser?.mobile
   const onChangePhoneNumber = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,19 +72,17 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
   }
   const continueButtonHandler = async (phoneNumber: string) => {
     if (!currentUser) return
-    sendVerifyCode.mutate(
+    requestContactChange.mutate(
       {
-        notificationEvent: TriggerEvent.CHANGE_PHONE_NUMBER
+        notificationEvent: TriggerEvent.CHANGE_PHONE_NUMBER,
+        phoneNumber
       },
       {
         onSuccess: (data) => {
           onSuccess(phoneNumber, data.nonce)
         },
         onError: (error) => {
-          if (
-            error.message.includes('409') ||
-            error.message.includes('duplicate')
-          ) {
+          if (error.data?.code === 'CONFLICT') {
             setShowDuplicateMobileErrorNotification(true)
           } else {
             setUnknownError(true)
@@ -116,7 +114,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
           }}
           disabled={
             !isOnline ||
-            sendVerifyCode.isPending ||
+            requestContactChange.isPending ||
             !Boolean(phoneNumber.length) ||
             isInvalidPhoneNumber ||
             isMobileNumberUnchanged
