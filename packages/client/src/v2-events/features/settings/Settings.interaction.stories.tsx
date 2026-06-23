@@ -31,8 +31,8 @@ const meta: Meta<typeof SettingsPage> = {
   parameters: {
     msw: {
       handlers: {
-        sendVerifyCode: [
-          tRPCMsw.user.sendVerifyCode.mutation(() => ({
+        requestContactChange: [
+          tRPCMsw.user.requestContactChange.mutation(() => ({
             nonce: '123'
           })),
           tRPCMsw.user.changeEmail.mutation(() => {

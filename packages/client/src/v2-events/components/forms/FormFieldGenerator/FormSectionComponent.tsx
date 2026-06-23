@@ -32,7 +32,8 @@ import {
   isFieldVisible,
   findAllFields,
   flattenFieldReference,
-  omitHiddenPaginatedFields
+  omitHiddenPaginatedFields,
+  HiddenFieldTypes
 } from '@opencrvs/commons/client'
 import {
   makeFormFieldIdFormikCompatible,
@@ -513,7 +514,9 @@ export function FormSectionComponent({
         return (
           <FormItem
             key={formikFieldId}
-            ignoreBottomMargin={field.type === FieldType.PAGE_HEADER}
+            ignoreBottomMargin={HiddenFieldTypes.some(
+              (type) => type === field.type
+            )}
           >
             <GeneratedInputField
               allKnownFields={fullFormFields}
