@@ -9,11 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  AddressType,
   EventState,
   tennisClubMembershipEvent,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { getCleanedDeclarationDiff, isDeeplyEmpty } from './action'
+import {
+  getCleanedDeclarationDiff,
+  isDeeplyEmpty,
+  nullifyClearedNestedFields
+} from './declarationDiff'
 
 const eventConfiguration = tennisClubMembershipEvent
 const validatorContext: ValidatorContext = {}
@@ -39,6 +44,53 @@ describe('isDeeplyEmpty', () => {
     ['NAME-shaped value', filledName, false]
   ] as const)('returns %s for %s', (_label, value, expected) => {
     expect(isDeeplyEmpty(value)).toBe(expected)
+  })
+})
+
+describe('nullifyClearedNestedFields', () => {
+  it('nulls nested address lines omitted from a partial correction payload', () => {
+    const original = {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: 'village-1',
+      streetLevelDetails: { town: 'Springfield', residentialArea: 'North' }
+    }
+    const submitted = {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: 'village-1',
+      streetLevelDetails: {}
+    }
+
+    expect(nullifyClearedNestedFields(original, submitted)).toEqual({
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: 'village-1',
+      streetLevelDetails: null
+    })
+  })
+
+  it('nulls only the nested address lines omitted from a partial payload', () => {
+    const original = {
+      streetLevelDetails: { town: 'Springfield', residentialArea: 'North' }
+    }
+    const submitted = {
+      streetLevelDetails: { residentialArea: 'North' }
+    }
+
+    expect(nullifyClearedNestedFields(original, submitted)).toEqual({
+      streetLevelDetails: { residentialArea: 'North', town: null }
+    })
+  })
+
+  it('nulls a cleared NAME subfield omitted from the diff', () => {
+    const original = { firstname: 'Jane', surname: 'Doe' }
+    const submitted = { firstname: 'Janet' }
+
+    expect(nullifyClearedNestedFields(original, submitted)).toEqual({
+      firstname: 'Janet',
+      surname: null
+    })
   })
 })
 
@@ -174,6 +226,45 @@ describe('getCleanedDeclarationDiff', () => {
   })
 
   describe('treatMissingAsCleared = false (default, partial payloads)', () => {
+    it('emits null when a previously filled field is explicitly cleared in the diff', () => {
+      const originalDeclaration: EventState = {
+        'applicant.name': filledName,
+        'applicant.email': 'jane@example.com'
+      }
+      const declarationDiff: EventState = {
+        'applicant.email': ''
+      }
+
+      const result = getCleanedDeclarationDiff({
+        eventConfiguration,
+        originalDeclaration,
+        declarationDiff,
+        validatorContext
+      })
+
+      expect(result).toEqual({ 'applicant.email': null })
+    })
+
+    it('emits null for cleared nested NAME subfields in a partial diff', () => {
+      const originalDeclaration: EventState = {
+        'applicant.name': filledName
+      }
+      const declarationDiff: EventState = {
+        'applicant.name': { firstname: 'Janet', surname: '' }
+      }
+
+      const result = getCleanedDeclarationDiff({
+        eventConfiguration,
+        originalDeclaration,
+        declarationDiff,
+        validatorContext
+      })
+
+      expect(result).toEqual({
+        'applicant.name': { firstname: 'Janet', surname: null }
+      })
+    })
+
     it('does not emit null for keys missing from the diff', () => {
       // Correction-style partial payload: applicant.email is intentionally
       // omitted because the action does not touch it. It must NOT be

@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-/* eslint-disable max-lines  */
 import { MutationKey, useMutation, useQueryClient } from '@tanstack/react-query'
 import type {
   DecorateMutationProcedure,
@@ -18,18 +17,13 @@ import type {
 import { toast } from 'react-hot-toast'
 import { TRPCClientError } from '@trpc/client'
 import { useSyncExternalStore } from 'react'
-import { isEmpty } from 'lodash'
 import {
   ActionType,
   ActionStatus,
-  ActionUpdate,
   EventDocument,
   omitHiddenAnnotationFields,
-  omitHiddenPaginatedFields,
   deepDropNulls,
-  deepMerge,
   EventState,
-  EventConfig,
   getCurrentEventState,
   ValidatorContext,
   isPotentialDuplicate
@@ -44,6 +38,7 @@ import {
   deleteLocalEvent,
   updateLocalEvent
 } from '@client/v2-events/features/events/useEvents/api'
+import { getCleanedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
 import {
   createEventActionMutationFn,
@@ -102,112 +97,6 @@ function errorToastOnConflict(error: TRPCClientError<AppRouter>) {
   if (error.data?.httpStatus === 409) {
     toast.error(ToastKey.NOT_ASSIGNED_ERROR)
   }
-}
-
-// Merge actionUpdate with the existing declaration to avoid losing dependent fields.
-// For example: if the correction payload contains only `informant.name`, but not `informant.relation`,
-// running omitHiddenPaginatedFields on the payload alone would remove `informant.name` (since its parent `informant.relation` is missing).
-// By merging first, we preserve such dependencies, and then run a diff to keep only the valid correction fields.
-/**
- * Structurally empty: `undefined`/`null`/`''`, or an array/object whose every
- * leaf is empty. Complex fields (NAME, ADDRESS) clear to nested objects of empty
- * strings (e.g. `{ firstname: '', surname: '' }`), which a shallow truthiness
- * check would wrongly treat as filled. `0` and `false` are real values and are
- * not considered empty.
- */
-export function isDeeplyEmpty(value: unknown): boolean {
-  if (value === undefined || value === null || value === '') {
-    return true
-  }
-  if (Array.isArray(value)) {
-    return value.every(isDeeplyEmpty)
-  }
-  if (typeof value === 'object') {
-    return Object.values(value).every(isDeeplyEmpty)
-  }
-  return false
-}
-
-export function getCleanedDeclarationDiff({
-  eventConfiguration,
-  originalDeclaration,
-  declarationDiff,
-  validatorContext,
-  treatMissingAsCleared = false
-}: {
-  eventConfiguration: EventConfig
-  originalDeclaration?: EventState
-  declarationDiff?: EventState
-  validatorContext: ValidatorContext
-  /**
-   * When true (full-form actions such as edits), a field that was non-empty in
-   * the original declaration but is empty/missing in the submitted form was
-   * cleared by the user and is emitted as `null` so the aggregated declaration
-   * drops it. Must stay false for partial payloads (e.g. corrections) where a
-   * missing field simply isn't part of the payload and must not be cleared.
-   */
-  treatMissingAsCleared?: boolean
-}): ActionUpdate | undefined {
-  if (isEmpty(declarationDiff)) {
-    return declarationDiff
-  }
-
-  // If there's no original declaration, just clean the update and return it
-  if (isEmpty(originalDeclaration)) {
-    return omitHiddenPaginatedFields(
-      eventConfiguration.declaration,
-      declarationDiff,
-      validatorContext,
-      true
-    )
-  }
-
-  // Merge original + updates so we get the final event state
-  // (Needed because omitHiddenPaginatedFields func requires a full snapshot, not partial)
-  const merged = deepMerge(originalDeclaration, declarationDiff)
-
-  // Remove any hidden/paginated fields from the merged declaration
-  // But retain hidden fields with empty values indicating they should be removed.
-  // Because hidden fields with values in current event state causes confusion and bug in search endpoint
-  // (Ensures we only consider fields relevant to the event configuration)
-  const cleanedDeclarationWithHiddenFieldsWithNullValues =
-    omitHiddenPaginatedFields(
-      eventConfiguration.declaration,
-      merged,
-      validatorContext,
-      true
-    )
-
-  // From the update, keep only fields that are valid in the cleaned declaration
-  // (Prevents applying updates to hidden/invalid fields)
-  const cleanedDiff: ActionUpdate = Object.fromEntries(
-    Object.entries(declarationDiff).filter(
-      ([key]) => key in cleanedDeclarationWithHiddenFieldsWithNullValues
-    )
-  )
-
-  // For full-form actions, a field that previously held a value but is now empty
-  // or missing was cleared by the user. Emit an explicit `null` so aggregating
-  // the action declarations overwrites the stale value (a missing/`undefined`
-  // key would otherwise be ignored by the deep merge and keep the old value).
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  if (treatMissingAsCleared && originalDeclaration) {
-    for (const key of Object.keys(originalDeclaration)) {
-      if (!(key in cleanedDeclarationWithHiddenFieldsWithNullValues)) {
-        continue
-      }
-      if (isDeeplyEmpty(originalDeclaration[key])) {
-        continue
-      }
-      const submittedValue =
-        key in declarationDiff ? declarationDiff[key] : undefined
-      if (isDeeplyEmpty(submittedValue)) {
-        cleanedDiff[key] = null
-      }
-    }
-  }
-
-  return cleanedDiff
 }
 
 setMutationDefaults(trpcOptionsProxy.event.actions.custom.request, {
@@ -547,8 +436,12 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
         : action.type === actionType
     )
 
-    const originalDeclaration = fullEvent
-      ? getCurrentEventState(fullEvent, eventConfiguration).declaration
+    const localFullEvent =
+      fullEvent ??
+      (findLocalEventDocument(eventId) as EventDocument | undefined)
+
+    const originalDeclaration = localFullEvent
+      ? getCurrentEventState(localFullEvent, eventConfiguration).declaration
       : {}
 
     const annotation = actionConfiguration
@@ -617,14 +510,18 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
       }
 
       // Edit actions (editAndDeclare/editAndRegister/editAndNotify) submit the
-      // full edited form but do not carry `event` in their params. Use the
-      // locally cached full event as the original so getCleanedDeclarationDiff
-      // can detect fields the user cleared. Other custom actions (corrections,
-      // archive) submit partial payloads and must not clear missing fields.
+      // full edited form but do not carry `event` in their params. Direct
+      // correction approval (makeCorrectionOnRequest) submits a partial diff but
+      // still needs the registered declaration as the original so cleared fields
+      // in the diff are emitted as `null`. Use the locally cached full event
+      // when `event` is not in params. Other custom actions (archive) must not
+      // clear missing fields.
       const isEditAction =
         mutationName === 'editAndDeclare' ||
         mutationName === 'editAndRegister' ||
         mutationName === 'editAndNotify'
+      const isCorrectionApprovalAction =
+        mutationName === 'makeCorrectionOnRequest'
 
       let originalDeclaration: EventState = {}
       if ('event' in params) {
@@ -636,7 +533,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
           params.event as EventDocument,
           eventConfiguration
         ).declaration
-      } else if (isEditAction && localEvent) {
+      } else if ((isEditAction || isCorrectionApprovalAction) && localEvent) {
         originalDeclaration = getCurrentEventState(
           localEvent,
           eventConfiguration
