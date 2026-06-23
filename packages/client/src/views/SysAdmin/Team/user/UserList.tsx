@@ -773,6 +773,11 @@ function UserListComponent({ userDetails }: UserListProps) {
     return <Navigate to={routes.HOME} />
   }
 
+  // Block access to a location outside the user's jurisdiction
+  if (!parsedId.success || !canAccessOffice({ id: parsedId.data })) {
+    return <Navigate to={routes.HOME} replace />
+  }
+
   return (
     <>
       {isOnline ? (
