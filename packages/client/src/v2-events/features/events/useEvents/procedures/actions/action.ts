@@ -108,7 +108,7 @@ function errorToastOnConflict(error: TRPCClientError<AppRouter>) {
 // For example: if the correction payload contains only `informant.name`, but not `informant.relation`,
 // running omitHiddenPaginatedFields on the payload alone would remove `informant.name` (since its parent `informant.relation` is missing).
 // By merging first, we preserve such dependencies, and then run a diff to keep only the valid correction fields.
-function getCleanedDeclarationDiff({
+export function getCleanedDeclarationDiff({
   eventConfiguration,
   originalDeclaration,
   declarationDiff,
@@ -151,11 +151,26 @@ function getCleanedDeclarationDiff({
 
   // From the update, keep only fields that are valid in the cleaned declaration
   // (Prevents applying updates to hidden/invalid fields)
-  return Object.fromEntries(
+  const cleanedDiff: ActionUpdate = Object.fromEntries(
     Object.entries(declarationDiff).filter(
       ([key]) => key in cleanedDeclarationWithHiddenFieldsWithNullValues
     )
   )
+
+  // A field that existed in the original declaration but is no longer present
+  // in the submitted form values was cleared by the user.
+  // Emit an explicit `null` so that aggregating the action declarations
+  // (deepMerge) overwrites the previous value.
+  for (const key of Object.keys(originalDeclaration)) {
+    if (
+      !(key in declarationDiff) &&
+      key in cleanedDeclarationWithHiddenFieldsWithNullValues
+    ) {
+      cleanedDiff[key] = null
+    }
+  }
+
+  return cleanedDiff
 }
 
 setMutationDefaults(trpcOptionsProxy.event.actions.custom.request, {
@@ -564,17 +579,35 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
         throw new Error('Event configuration not found')
       }
 
-      const originalDeclaration =
-        'event' in params
-          ? getCurrentEventState(
-              /*
-               * typescript is somehow unable to infer the type of params.event to
-               * be EventDocument
-               */
-              params.event as EventDocument,
-              eventConfiguration
-            ).declaration
-          : {}
+      /*
+       * Edit actions (editAndDeclare/editAndRegister/editAndNotify) submit the
+       * edited form values but do not carry the `event` in their params. We
+       * still need the current declaration as the original so that
+       * getCleanedDeclarationDiff can detect fields the user cleared and emit an
+       * explicit `null` for them (otherwise the previous value is retained). The
+       * full event is already cached locally for the edit flow.
+       */
+      const isEditAction =
+        mutationName === 'editAndDeclare' ||
+        mutationName === 'editAndRegister' ||
+        mutationName === 'editAndNotify'
+
+      let originalDeclaration: EventState = {}
+      if ('event' in params) {
+        originalDeclaration = getCurrentEventState(
+          /*
+           * typescript is somehow unable to infer the type of params.event to
+           * be EventDocument
+           */
+          params.event as EventDocument,
+          eventConfiguration
+        ).declaration
+      } else if (isEditAction && localEvent) {
+        originalDeclaration = getCurrentEventState(
+          localEvent,
+          eventConfiguration
+        ).declaration
+      }
 
       return mutation.mutate({
         ...params,
