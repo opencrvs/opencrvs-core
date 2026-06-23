@@ -11,16 +11,19 @@
 import {
   AddressType,
   EventState,
+  getDeclarationFields,
   tennisClubMembershipEvent,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import {
+  getChangedDeclarationDiff,
   getCleanedDeclarationDiff,
   isDeeplyEmpty,
   nullifyClearedNestedFields
 } from './declarationDiff'
 
 const eventConfiguration = tennisClubMembershipEvent
+const fields = getDeclarationFields(tennisClubMembershipEvent)
 const validatorContext: ValidatorContext = {}
 
 const filledName = { firstname: 'Jane', surname: 'Doe' }
@@ -91,6 +94,44 @@ describe('nullifyClearedNestedFields', () => {
       firstname: 'Janet',
       surname: null
     })
+  })
+})
+
+describe('getChangedDeclarationDiff', () => {
+  it('includes a cleared field even when it is missing from form state', () => {
+    const previousFormValues: EventState = {
+      'applicant.email': 'jane@example.com'
+    }
+    const form: EventState = {}
+
+    const result = getChangedDeclarationDiff(
+      fields,
+      form,
+      previousFormValues,
+      eventConfiguration,
+      validatorContext
+    )
+
+    expect(result).toEqual({ 'applicant.email': null })
+  })
+
+  it('does not include unchanged fields', () => {
+    const previousFormValues: EventState = {
+      'applicant.email': 'jane@example.com'
+    }
+    const form: EventState = {
+      'applicant.email': 'jane@example.com'
+    }
+
+    const result = getChangedDeclarationDiff(
+      fields,
+      form,
+      previousFormValues,
+      eventConfiguration,
+      validatorContext
+    )
+
+    expect(result).toEqual({})
   })
 })
 
@@ -225,7 +266,7 @@ describe('getCleanedDeclarationDiff', () => {
     })
   })
 
-  describe('treatMissingAsCleared = false (default, partial payloads)', () => {
+  describe('partial declaration diffs (edits and corrections)', () => {
     it('emits null when a previously filled field is explicitly cleared in the diff', () => {
       const originalDeclaration: EventState = {
         'applicant.name': filledName,
@@ -289,55 +330,6 @@ describe('getCleanedDeclarationDiff', () => {
       })
       expect(result).not.toHaveProperty('applicant.email')
     })
-  })
-
-  describe('treatMissingAsCleared = true (full-form edits)', () => {
-    it('emits null when a previously filled simple field is cleared with an empty string', () => {
-      const originalDeclaration: EventState = {
-        'applicant.name': filledName,
-        'applicant.email': 'jane@example.com'
-      }
-      const declarationDiff: EventState = {
-        'applicant.name': filledName,
-        'applicant.email': ''
-      }
-
-      const result = getCleanedDeclarationDiff({
-        eventConfiguration,
-        originalDeclaration,
-        declarationDiff,
-        validatorContext,
-        treatMissingAsCleared: true
-      })
-
-      expect(result).toMatchObject({
-        'applicant.name': filledName,
-        'applicant.email': null
-      })
-    })
-
-    it('emits null when a previously filled key is missing from the diff', () => {
-      const originalDeclaration: EventState = {
-        'applicant.name': filledName,
-        'applicant.email': 'jane@example.com'
-      }
-      const declarationDiff: EventState = {
-        'applicant.name': { firstname: 'Janet', surname: 'Doe' }
-      }
-
-      const result = getCleanedDeclarationDiff({
-        eventConfiguration,
-        originalDeclaration,
-        declarationDiff,
-        validatorContext,
-        treatMissingAsCleared: true
-      })
-
-      expect(result).toMatchObject({
-        'applicant.name': { firstname: 'Janet', surname: 'Doe' },
-        'applicant.email': null
-      })
-    })
 
     it('emits null when a previously filled complex (NAME) field is cleared with empty subfields', () => {
       const originalDeclaration: EventState = {
@@ -351,16 +343,13 @@ describe('getCleanedDeclarationDiff', () => {
         eventConfiguration,
         originalDeclaration,
         declarationDiff,
-        validatorContext,
-        treatMissingAsCleared: true
+        validatorContext
       })
 
       expect(result).toEqual({ 'applicant.name': null })
     })
 
     it('does not emit null when the original value was already empty', () => {
-      // The user never filled applicant.email, so a missing/empty diff value
-      // is not a "clear" and must not be sent as null.
       const originalDeclaration: EventState = {
         'applicant.name': filledName,
         'applicant.email': ''
@@ -373,17 +362,13 @@ describe('getCleanedDeclarationDiff', () => {
         eventConfiguration,
         originalDeclaration,
         declarationDiff,
-        validatorContext,
-        treatMissingAsCleared: true
+        validatorContext
       })
 
       expect(result).not.toHaveProperty('applicant.email')
     })
 
     it('does not emit null for keys that become hidden in the cleaned declaration', () => {
-      // recommender.name was originally filled. Toggling recommender.none=true
-      // hides it; the field is dropped (not emitted as null) because it is no
-      // longer part of the valid declaration shape.
       const originalDeclaration: EventState = {
         'recommender.none': false,
         'recommender.name': filledName,
@@ -397,8 +382,7 @@ describe('getCleanedDeclarationDiff', () => {
         eventConfiguration,
         originalDeclaration,
         declarationDiff,
-        validatorContext,
-        treatMissingAsCleared: true
+        validatorContext
       })
 
       expect(result).toEqual({ 'recommender.none': true })
@@ -418,8 +402,7 @@ describe('getCleanedDeclarationDiff', () => {
         eventConfiguration,
         originalDeclaration,
         declarationDiff,
-        validatorContext,
-        treatMissingAsCleared: true
+        validatorContext
       })
 
       expect(result).toEqual({ 'recommender.none': false })

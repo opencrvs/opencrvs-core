@@ -25,7 +25,6 @@ import {
   deepDropNulls,
   EventState,
   getCurrentEventState,
-  ValidatorContext,
   isPotentialDuplicate
 } from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
@@ -509,18 +508,13 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
         throw new Error('Event configuration not found')
       }
 
-      // Edit actions (editAndDeclare/editAndRegister/editAndNotify) submit the
-      // full edited form but do not carry `event` in their params. Direct
-      // correction approval (makeCorrectionOnRequest) submits a partial diff but
-      // still needs the registered declaration as the original so cleared fields
-      // in the diff are emitted as `null`. Use the locally cached full event
-      // when `event` is not in params. Other custom actions (archive) must not
-      // clear missing fields.
-      const isEditAction =
+      // Edit and direct-correction actions need the registered declaration as
+      // the original so cleared fields in the diff are emitted as `null`. Use
+      // the locally cached full event when `event` is not in params.
+      const needsOriginalDeclaration =
         mutationName === 'editAndDeclare' ||
         mutationName === 'editAndRegister' ||
-        mutationName === 'editAndNotify'
-      const isCorrectionApprovalAction =
+        mutationName === 'editAndNotify' ||
         mutationName === 'makeCorrectionOnRequest'
 
       let originalDeclaration: EventState = {}
@@ -533,7 +527,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
           params.event as EventDocument,
           eventConfiguration
         ).declaration
-      } else if ((isEditAction || isCorrectionApprovalAction) && localEvent) {
+      } else if (needsOriginalDeclaration && localEvent) {
         originalDeclaration = getCurrentEventState(
           localEvent,
           eventConfiguration
@@ -547,8 +541,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
           eventConfiguration,
           originalDeclaration,
           declarationDiff: params.declaration,
-          validatorContext: { ...validatorContext, event: localEvent },
-          treatMissingAsCleared: isEditAction
+          validatorContext: { ...validatorContext, event: localEvent }
         })
       })
     }

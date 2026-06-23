@@ -9,15 +9,30 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/**
+ * Declaration diff utilities for edits and corrections.
+ *
+ * Pipeline:
+ * 1. `getChangedDeclarationDiff` — build a partial diff from the form (only
+ *    changed fields; cleared fields are included as `null`).
+ * 2. `getCleanedDeclarationDiff` — validate against the event config, strip
+ *    hidden fields, and emit `null` for cleared nested subfields (ADDRESS, NAME).
+ *
+ * Both flows share this pipeline. A field that is absent from the diff was not
+ * touched and must never be interpreted as a clear.
+ */
+
 import { isEmpty } from 'lodash'
 import {
   ActionUpdate,
   deepMerge,
   EventConfig,
   EventState,
+  FieldConfig,
   omitHiddenPaginatedFields,
   ValidatorContext
 } from '@opencrvs/commons/client'
+import { hasDeclarationFieldChanged } from '@client/v2-events/features/events/actions/correct/utils'
 
 /**
  * Structurally empty: `undefined`/`null`/`''`, or an array/object whose every
@@ -30,12 +45,15 @@ export function isDeeplyEmpty(value: unknown): boolean {
   if (value === undefined || value === null || value === '') {
     return true
   }
+
   if (Array.isArray(value)) {
     return value.every(isDeeplyEmpty)
   }
+
   if (typeof value === 'object') {
     return Object.values(value).every(isDeeplyEmpty)
   }
+
   return false
 }
 
@@ -98,6 +116,37 @@ export function nullifyClearedNestedFields(
   return result
 }
 
+/**
+ * Builds the partial declaration diff from form state.
+ * Iterates configured fields (not just keys present in the form) so cleared
+ * fields are included even when the form omits them. Empty cleared values are
+ * sent as `null` so they survive JSON serialisation.
+ */
+export function getChangedDeclarationDiff(
+  fields: FieldConfig[],
+  form: EventState,
+  previousFormValues: EventState,
+  eventConfiguration: EventConfig,
+  validatorContext: ValidatorContext
+): EventState {
+  return Object.fromEntries(
+    fields
+      .filter((field) =>
+        hasDeclarationFieldChanged(
+          field,
+          form,
+          previousFormValues,
+          eventConfiguration,
+          validatorContext
+        )
+      )
+      .map((field) => {
+        const value = form[field.id]
+        return [field.id, isDeeplyEmpty(value) ? null : value]
+      })
+  )
+}
+
 // Merge actionUpdate with the existing declaration to avoid losing dependent fields.
 // For example: if the correction payload contains only `informant.name`, but not `informant.relation`,
 // running omitHiddenPaginatedFields on the payload alone would remove `informant.name` (since its parent `informant.relation` is missing).
@@ -106,22 +155,12 @@ export function getCleanedDeclarationDiff({
   eventConfiguration,
   originalDeclaration,
   declarationDiff,
-  validatorContext,
-  treatMissingAsCleared = false
+  validatorContext
 }: {
   eventConfiguration: EventConfig
   originalDeclaration?: EventState
   declarationDiff?: EventState
   validatorContext: ValidatorContext
-  /**
-   * When true (full-form actions such as edits), a field that was non-empty in
-   * the original declaration but is missing from the submitted form was cleared
-   * by the user and is emitted as `null`. Must stay false for partial payloads
-   * (e.g. corrections) where a missing field simply isn't part of the payload.
-   * Fields explicitly present in the diff as empty are always emitted as `null`
-   * when the original held a value, regardless of this flag.
-   */
-  treatMissingAsCleared?: boolean
 }): ActionUpdate | undefined {
   if (isEmpty(declarationDiff)) {
     return declarationDiff
@@ -192,22 +231,6 @@ export function getCleanedDeclarationDiff({
       }
     } else if (isValidInCleanedDeclaration) {
       cleanedDiff[key] = valueWithClearedNests as ActionUpdate[string]
-    }
-  }
-
-  // For full-form actions, a field missing from the diff was also cleared.
-  if (treatMissingAsCleared && originalDeclaration) {
-    for (const key of Object.keys(originalDeclaration)) {
-      if (key in declarationDiff) {
-        continue
-      }
-      if (!(key in cleanedDeclarationWithHiddenFieldsWithNullValues)) {
-        continue
-      }
-      if (isDeeplyEmpty(originalDeclaration[key])) {
-        continue
-      }
-      cleanedDiff[key] = null
     }
   }
 

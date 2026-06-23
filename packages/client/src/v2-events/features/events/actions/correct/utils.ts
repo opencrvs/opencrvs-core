@@ -29,7 +29,6 @@ import {
   FieldUpdateValue,
   deepDropNulls
 } from '@opencrvs/commons/client'
-import { isDeeplyEmpty } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { EventHistoryActionDocument } from './useActionForHistory'
 
 /**
@@ -84,37 +83,6 @@ export function hasDeclarationFieldChanged(
     formWithoutHiddenFields,
     previousFormValues,
     validatorContext
-  )
-}
-
-/**
- * Builds the partial declaration payload for a correction request.
- * Iterates configured fields (not just keys present in form state) so cleared
- * fields are included even when the form omits them. Empty cleared values are
- * sent as `null` so they survive JSON serialisation and remove the stored value.
- */
-export function getChangedDeclarationDiff(
-  fields: FieldConfig[],
-  form: EventState,
-  previousFormValues: EventState,
-  eventConfiguration: EventConfig,
-  validatorContext: ValidatorContext
-): EventState {
-  return Object.fromEntries(
-    fields
-      .filter((field) =>
-        hasDeclarationFieldChanged(
-          field,
-          form,
-          previousFormValues,
-          eventConfiguration,
-          validatorContext
-        )
-      )
-      .map((field) => {
-        const value = form[field.id]
-        return [field.id, isDeeplyEmpty(value) ? null : value]
-      })
   )
 }
 
