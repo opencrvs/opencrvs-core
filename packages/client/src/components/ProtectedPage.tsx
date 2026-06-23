@@ -17,11 +17,7 @@ import IdleTimer from 'react-idle-timer'
 import { USER_DETAILS, UserDetails } from '@client/utils/userUtils'
 import { ProtectedAccount } from '@client/components/ProtectedAccount'
 import { getCurrentUserID, IUserData } from '@client/declarations'
-import { refreshToken } from '@client/utils/authUtils'
-import {
-  DESKTOP_TIME_OUT_MILLISECONDS,
-  REFRESH_TOKEN_CHECK_MILLIS
-} from '@client/utils/constants'
+import { DESKTOP_TIME_OUT_MILLISECONDS } from '@client/utils/constants'
 import { connect } from 'react-redux'
 import { refreshOfflineData } from '@client/offline/actions'
 import { PropsWithChildren } from 'react'
@@ -111,10 +107,6 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
       },
       import.meta.env.PROD ? Math.max(200, 2000 - timeSinceMount) : 0
     )
-
-    setInterval(async () => {
-      if (!(await refreshToken())) this.props.redirectToAuthentication()
-    }, REFRESH_TOKEN_CHECK_MILLIS)
 
     // Re-fetch the logged-in user's own information whenever the app regains
     // focus, so changes made by an administrator on another device (e.g. a

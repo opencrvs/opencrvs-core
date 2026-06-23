@@ -22,7 +22,9 @@ import {
   storeToken,
   getToken,
   isTokenStillValid,
-  removeToken
+  removeToken,
+  getRefreshToken,
+  storeRefreshToken
 } from '@client/utils/authUtils'
 import { queries } from '@client/profile/queries'
 import * as changeLanguageActions from '@client/i18n/actions'
@@ -93,9 +95,13 @@ export const profileReducer: LoopReducer<
       )
     case actions.CHECK_AUTH:
       const token = getToken()
+      const refreshToken = getRefreshToken()
 
-      // Remove token and language from url if these exists
-      if (window.location.search.includes('token=')) {
+      // Remove token params from the url if present
+      if (
+        window.location.search.includes('token=') ||
+        window.location.search.includes('refreshToken=')
+      ) {
         window.history.replaceState(null, '', window.location.pathname)
       }
 
@@ -121,6 +127,9 @@ export const profileReducer: LoopReducer<
           Cmd.run(() => {
             if (isTokenStillValid(payload)) {
               storeToken(token)
+              if (refreshToken) {
+                storeRefreshToken(refreshToken)
+              }
             }
           }),
           Cmd.action(actions.setInitialUserDetails())

@@ -43,6 +43,7 @@ export const client = axios.create({})
 export interface IAuthenticateResponse {
   nonce: string
   token?: string
+  refreshToken?: string
   mobile?: string
   email?: string
 }
@@ -64,6 +65,7 @@ export enum NotificationEvent {
 }
 export interface ITokenResponse {
   token: string
+  refreshToken?: string
 }
 
 const loginClientVersion = APP_VERSION

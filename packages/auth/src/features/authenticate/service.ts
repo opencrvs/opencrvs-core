@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { JWT_ISSUER } from '@auth/constants'
+import { JWT_ISSUER, REFRESH_TOKEN_AUDIENCE } from '@auth/constants'
 import { readFileSync } from 'fs'
 import { promisify } from 'util'
 import * as jwt from 'jsonwebtoken'
@@ -27,7 +27,14 @@ import {
   sendVerificationCode,
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
-import { logger, UUID, UserName } from '@opencrvs/commons'
+import {
+  logger,
+  UUID,
+  UserName,
+  fetchJSON,
+  joinUrl,
+  Roles
+} from '@opencrvs/commons'
 import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
 import {
@@ -196,6 +203,19 @@ export async function createToken(
   })
 }
 
+export async function createRefreshToken(
+  userId: string,
+  userType: TokenUserType = TokenUserType.enum.user
+): Promise<string> {
+  return sign({ userType }, cert, {
+    subject: userId,
+    algorithm: 'RS256',
+    expiresIn: env.CONFIG_REFRESH_TOKEN_EXPIRY_SECONDS,
+    audience: REFRESH_TOKEN_AUDIENCE,
+    issuer: JWT_ISSUER
+  })
+}
+
 type ActionConfirmationInput = {
   eventId: UUID
   actionId: UUID
@@ -323,6 +343,42 @@ function safeVerifyJwt(token: string) {
 
 export function verifyToken(token: string) {
   return pipe(token, safeVerifyJwt, chainW(tokenPayload.decode))
+}
+
+// `aud` is an array because createRefreshToken signs REFRESH_TOKEN_AUDIENCE (an array).
+// If that audience is ever changed to a bare string, update this decoder too.
+const refreshTokenPayload = t.type({
+  sub: t.string,
+  iat: t.number,
+  exp: t.number,
+  aud: t.array(t.string),
+  userType: t.string
+})
+
+function safeVerifyRefreshJwt(token: string) {
+  return tryCatch(
+    () =>
+      jwt.verify(token, publicCert, {
+        issuer: JWT_ISSUER,
+        audience: 'opencrvs:auth-refresh'
+      }),
+    (e) => (e instanceof Error ? e : new Error('Unknown error'))
+  )
+}
+
+export function verifyRefreshToken(token: string) {
+  return pipe(token, safeVerifyRefreshJwt, chainW(refreshTokenPayload.decode))
+}
+
+export async function getUserRoleScopeMapping() {
+  const roles = await fetchJSON<Roles>(
+    joinUrl(env.COUNTRY_CONFIG_URL_INTERNAL, '/config/roles')
+  )
+
+  return roles.reduce<Record<string, EncodedScope[]>>((acc, { id, scopes }) => {
+    acc[id] = scopes
+    return acc
+  }, {})
 }
 
 export function getPublicKey() {

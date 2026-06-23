@@ -16,8 +16,7 @@ export const SECURITY_PIN_EXPIRED_AT = 'locked_time'
 export const ALLOWED_IMAGE_TYPE = ['image/jpeg', 'image/jpg', 'image/png']
 export const ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE = ['image/svg+xml']
 
-export const REFRESH_TOKEN_CHECK_MILLIS = 4 * 60 * 1000 // 4 minutes
-export const TOKEN_EXPIRE_MILLIS = 10 * 60 * 1000 // 10 minutes
+export const ACCESS_TOKEN_REFRESH_BUFFER_MS = 60 * 1000 // refresh when < 60s remain
 
 export const AVATAR_API =
   'https://eu.ui-avatars.com/api/?background=DEE5F2&color=222&name='

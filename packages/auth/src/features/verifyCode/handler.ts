@@ -18,6 +18,7 @@ import {
 import {
   getStoredUserInformation,
   createToken,
+  createRefreshToken,
   recordUserAuditEvent
 } from '@auth/features/authenticate/service'
 import { logger, TokenUserType } from '@opencrvs/commons'
@@ -30,6 +31,7 @@ interface IVerifyPayload {
 
 interface IVerifyResponse {
   token: string
+  refreshToken: string
 }
 export default async function authenticateHandler(
   request: Hapi.Request,
@@ -53,6 +55,8 @@ export default async function authenticateHandler(
     TokenUserType.enum.user
   )
 
+  const refreshToken = await createRefreshToken(userId, TokenUserType.enum.user)
+
   await deleteUsedVerificationCode(nonce)
 
   void recordUserAuditEvent(`Bearer ${token}`, {
@@ -60,7 +64,7 @@ export default async function authenticateHandler(
     requestData: { subjectId: userId }
   })
 
-  const response: IVerifyResponse = { token }
+  const response: IVerifyResponse = { token, refreshToken }
   return response
 }
 export const requestSchema = Joi.object({
@@ -68,5 +72,6 @@ export const requestSchema = Joi.object({
   code: Joi.string()
 })
 export const responseSchma = Joi.object({
-  token: Joi.string()
+  token: Joi.string(),
+  refreshToken: Joi.string()
 })

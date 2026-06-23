@@ -8,14 +8,32 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createToken, ITokenPayload } from '@auth/features/authenticate/service'
+import {
+  createToken,
+  getUserRoleScopeMapping,
+  internalClient
+} from '@auth/features/authenticate/service'
 import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
+import { TokenUserType } from '@opencrvs/commons'
 
-export async function refreshToken(payload: ITokenPayload) {
+export class UserNotActiveError extends Error {}
+
+export async function refreshToken(userId: string) {
+  const { role, status } = await internalClient.user.getById.query(userId)
+
+  if (status !== 'active') {
+    throw new UserNotActiveError()
+  }
+
+  const roleScopeMappings = await getUserRoleScopeMapping()
+  const scopes = roleScopeMappings[role]
+
   return createToken(
-    payload.sub,
-    payload.scope,
+    userId,
+    scopes,
     WEB_USER_JWT_AUDIENCES,
-    JWT_ISSUER
+    JWT_ISSUER,
+    role,
+    TokenUserType.enum.user
   )
 }

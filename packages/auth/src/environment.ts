@@ -29,7 +29,8 @@ export const env = cleanEnv(process.env, {
     desc: 'Enable two-factor authentication. When disabled, verification codes are set to 000000.'
   }),
 
-  CONFIG_TOKEN_EXPIRY_SECONDS: num({ default: 604800 }), // 1 week
+  CONFIG_TOKEN_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes (access token)
+  CONFIG_REFRESH_TOKEN_EXPIRY_SECONDS: num({ default: 604800 }), // 1 week (refresh token)
   CONFIG_SMS_CODE_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
   CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
   CONFIG_REINDEX_TOKEN_EXPIRY_SECONDS: num({ default: 3600 }), // 1 hour

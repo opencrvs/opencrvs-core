@@ -30,7 +30,7 @@ import { partition } from 'lodash'
 import React from 'react'
 import superjson from 'superjson'
 import { getUUID } from '@opencrvs/commons/client'
-import { getToken } from '@client/utils/authUtils'
+import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
 import { storage } from '@client/storage'
 
 const { TRPCProvider: TRPCProviderRaw, useTRPC } =
@@ -49,6 +49,9 @@ function getTrpcClient() {
         httpLink({
           url: '/api/events',
           transformer: superjson,
+          // NOTE: ensureFreshAccessToken() is intentionally NOT called here — test
+          // tokens have no `exp` claim so it would always trigger forceReauthentication()
+          // and redirect tests to /login. The refresh gate lives on httpBatchLink (production).
           headers() {
             return {
               authorization: `Bearer ${getToken()}`
@@ -67,7 +70,8 @@ function getTrpcClient() {
         url: '/api/events',
         transformer: superjson,
         methodOverride: 'POST',
-        headers() {
+        async headers() {
+          await ensureFreshAccessToken()
           return {
             authorization: `Bearer ${getToken()}`
           }

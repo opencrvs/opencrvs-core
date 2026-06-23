@@ -17,7 +17,7 @@ import {
   joinUrlPaths,
   joinValues
 } from '@opencrvs/commons/client'
-import { getToken } from '@client/utils/authUtils'
+import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
 import { fetchFileFromUrl } from '@client/utils/imageUtils'
 import { cacheFile, removeCached } from '@client/v2-events/cache'
 import { queryClient } from '@client/v2-events/trpc'
@@ -36,6 +36,7 @@ async function uploadFile({
   path,
   meta
 }: UploadFileParams): Promise<{ url: string }> {
+  await ensureFreshAccessToken()
   const formData = new FormData()
   formData.append('file', file)
   formData.append('transactionId', meta.transactionId)
@@ -64,6 +65,7 @@ async function uploadFile({
  *
  */
 async function deleteFile({ filename }: { filename: string }): Promise<void> {
+  await ensureFreshAccessToken()
   const response = await fetch('/api/files/' + filename, {
     method: 'DELETE',
     headers: {
@@ -96,6 +98,7 @@ const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
 async function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
+  await ensureFreshAccessToken()
   const url = joinUrlPaths('/api/presigned-url', filePath)
 
   const response = await fetch(url, {

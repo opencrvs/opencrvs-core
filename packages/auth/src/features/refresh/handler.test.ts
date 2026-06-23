@@ -10,159 +10,112 @@
  */
 import { AuthServer } from '@auth/server'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
+import { createRefreshToken } from '@auth/features/authenticate/service'
 import { encodeScope } from '@opencrvs/commons'
 import * as fetchAny from 'jest-fetch-mock'
-import { AuthenticateResponse } from '@auth/features/authenticate/handler'
 import { DEFAULT_ROLES_DEFINITION } from '@auth/features/authenticate/handler.test'
-const fetch = fetchAny as fetchAny.FetchMock
 
-jest.mock('@auth/features/verifyCode/service', () => {
-  const actual = jest.requireActual('@auth/features/verifyCode/service')
-  return {
-    ...actual,
-    sendVerificationCode: jest.fn().mockResolvedValue(undefined)
-  }
-})
+const fetch = fetchAny as fetchAny.FetchMock
 
 jest.mock('@auth/features/authenticate/service', () => {
   const actual = jest.requireActual('@auth/features/authenticate/service')
   return {
     ...actual,
-    recordUserAuditEvent: jest.fn().mockResolvedValue(undefined)
+    internalClient: {
+      user: { getById: { query: jest.fn() } }
+    }
   }
 })
 
-describe('authenticate handler receives a request', () => {
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires */
+let internalClient =
+  require('@auth/features/authenticate/service').internalClient
+
+describe('refresh token handler', () => {
   let server: AuthServer
 
   beforeEach(async () => {
     server = await createProductionEnvironmentServer()
+    // Re-acquire internalClient after jest.resetModules() (called inside createProductionEnvironmentServer)
+    internalClient =
+      require('@auth/features/authenticate/service').internalClient
+    jest.clearAllMocks()
   })
 
-  describe('refresh expiring token', () => {
-    it('verifies a token and generates a new token', async () => {
-      fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
-        status: 200
-      })
-      /* eslint-disable @typescript-eslint/no-require-imports */
-      /* eslint-disable @typescript-eslint/no-var-requires */
-      const codeService = require('../verifyCode/service')
-
-      const authService = require('../authenticate/service')
-      const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
-      fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
-        status: 200
-      })
-      jest.spyOn(authService, 'authenticate').mockReturnValue({
-        userId: '1',
-        role: 'NATIONAL_SYSTEM_ADMIN',
-        mobile: '+345345343'
-      })
-
-      const authRes: { result?: AuthenticateResponse } =
-        await server.server.inject({
-          method: 'POST',
-          url: '/authenticate',
-          payload: {
-            username: '+345345343',
-            password: '2r23432'
-          }
-        })
-
-      expect(authRes.result).toBeDefined()
-
-      const authCode = codeSpy.mock.calls[0][0]
-      const res: { result?: { token: string } } = await server.server.inject({
-        method: 'POST',
-        url: '/verifyCode',
-        payload: {
-          nonce: authRes.result!.nonce,
-          code: authCode
-        }
-      })
-
-      expect(res.result).toBeDefined()
-
-      const refreshResponse: { result?: { token: string } } =
-        await server.server.inject({
-          method: 'POST',
-          url: '/refreshToken',
-          payload: {
-            nonce: authRes.result!.nonce,
-            token: res.result!.token
-          }
-        })
-      expect(refreshResponse.result).toBeDefined()
-
-      const { token } = refreshResponse.result!
-
-      expect(token).toBeDefined()
-      expect(token.split('.')).toHaveLength(3)
-
-      const [, payload] = token.split('.')
-      const body = JSON.parse(Buffer.from(payload, 'base64').toString())
-      expect(body.scope).toEqual([
-        encodeScope({ type: 'user.create' }),
-        encodeScope({ type: 'user.read' }),
-        encodeScope({ type: 'user.edit' }),
-        encodeScope({ type: 'organisation.read-locations' }),
-        encodeScope({ type: 'performance.read' }),
-        encodeScope({ type: 'performance.read-dashboards' }),
-        encodeScope({ type: 'performance.vital-statistics-export' })
-      ])
-      expect(body.sub).toBe('1')
+  it('mints a fresh access token with the latest scopes', async () => {
+    internalClient.user.getById.query.mockResolvedValue({
+      id: '1',
+      role: 'NATIONAL_SYSTEM_ADMIN',
+      status: 'active'
     })
-    it('refreshError returns a 401 to the client if the token is bad', async () => {
-      fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
-        status: 200
-      })
+    fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+      status: 200
+    })
 
-      const codeService = require('../verifyCode/service')
-      const authService = require('../authenticate/service')
-      const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
-      jest.spyOn(authService, 'authenticate').mockReturnValue({
-        id: '1',
-        role: 'NATIONAL_SYSTEM_ADMIN',
-        scope: [],
-        username: '+345345343'
-      })
+    const refreshToken = await createRefreshToken('1')
 
-      const authRes: { result?: AuthenticateResponse } =
-        await server.server.inject({
-          method: 'POST',
-          url: '/authenticate',
-          payload: {
-            username: '+345345343',
-            password: '2r23432'
-          }
-        })
-      const smsCode = codeSpy.mock.calls[0][1]
-
-      expect(authRes.result).toBeDefined()
-
+    const res: { result?: { token: string }; statusCode: number } =
       await server.server.inject({
         method: 'POST',
-        url: '/verifyCode',
-        payload: {
-          nonce: authRes.result!.nonce,
-          code: smsCode
-        }
-      })
-
-      const badToken = 'ilgiglig'
-
-      const refreshResponse: {
-        result?: { token: string }
-        statusCode: number
-      } = await server.server.inject({
-        method: 'POST',
         url: '/refreshToken',
-        payload: {
-          nonce: authRes.result!.nonce,
-          token: badToken
-        }
+        payload: { token: refreshToken }
       })
-      expect(refreshResponse.statusCode).toBe(401)
+
+    expect(res.statusCode).toBe(200)
+    const [, payload] = res.result!.token.split('.')
+    const body = JSON.parse(Buffer.from(payload, 'base64').toString())
+    expect(body.sub).toBe('1')
+    expect(body.scope).toEqual([
+      encodeScope({ type: 'user.create' }),
+      encodeScope({ type: 'user.read' }),
+      encodeScope({ type: 'user.edit' }),
+      encodeScope({ type: 'organisation.read-locations' }),
+      encodeScope({ type: 'performance.read' }),
+      encodeScope({ type: 'performance.read-dashboards' }),
+      encodeScope({ type: 'performance.vital-statistics-export' })
+    ])
+  })
+
+  it('returns 401 when the user is not active', async () => {
+    internalClient.user.getById.query.mockResolvedValue({
+      id: '1',
+      role: 'NATIONAL_SYSTEM_ADMIN',
+      status: 'deactivated'
     })
+    const refreshToken = await createRefreshToken('1')
+
+    const res: { statusCode: number } = await server.server.inject({
+      method: 'POST',
+      url: '/refreshToken',
+      payload: { token: refreshToken }
+    })
+    expect(res.statusCode).toBe(401)
+  })
+
+  it('returns 401 when an access token (wrong audience) is presented', async () => {
+    const authService = require('@auth/features/authenticate/service')
+    const accessToken = await authService.createToken(
+      '1',
+      [],
+      ['opencrvs:auth-user'],
+      'opencrvs:auth-service',
+      'NATIONAL_SYSTEM_ADMIN'
+    )
+
+    const res: { statusCode: number } = await server.server.inject({
+      method: 'POST',
+      url: '/refreshToken',
+      payload: { token: accessToken }
+    })
+    expect(res.statusCode).toBe(401)
+  })
+
+  it('returns 401 for a malformed token', async () => {
+    const res: { statusCode: number } = await server.server.inject({
+      method: 'POST',
+      url: '/refreshToken',
+      payload: { token: 'not-a-jwt' }
+    })
+    expect(res.statusCode).toBe(401)
   })
 })

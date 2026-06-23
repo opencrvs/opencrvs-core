@@ -79,6 +79,7 @@ describe('reducer', () => {
       submitting: false,
       submissionError: false,
       resentAuthenticationCode: false,
+      refreshToken: undefined,
       authenticationDetails: {
         nonce: '1234'
       }
@@ -187,7 +188,8 @@ describe('reducer', () => {
       ...initialState,
       stepSubmitting: false,
       token:
-        'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE1NTY3ODM5NDMsImV4cCI6MTU4ODMxOTk0MywiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsInNjb3BlIjpbIk1hbmFnZXIiLCJQcm9qZWN0IEFkbWluaXN0cmF0b3IiXX0.ggXSgfcD_OJqEd8_pmzw_AoqiqIq5sWXKtReCx6YdbQ'
+        'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE1NTY3ODM5NDMsImV4cCI6MTU4ODMxOTk0MywiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsInNjb3BlIjpbIk1hbmFnZXIiLCJQcm9qZWN0IEFkbWluaXN0cmF0b3IiXX0.ggXSgfcD_OJqEd8_pmzw_AoqiqIq5sWXKtReCx6YdbQ',
+      refreshToken: undefined
     }
 
     const action = {

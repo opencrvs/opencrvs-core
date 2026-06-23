@@ -22,6 +22,7 @@ import { IStoreState } from '@login/store'
 export type LoginState = {
   submitting: boolean
   token: string
+  refreshToken?: string
   authenticationDetails: { nonce: string; mobile?: string; email?: string }
   submissionError: boolean
   resentAuthenticationCode: boolean
@@ -35,6 +36,7 @@ export type LoginState = {
 export const initialState: LoginState = {
   submitting: false,
   token: '',
+  refreshToken: '',
   config: {},
   authenticationDetails: {
     nonce: '',
@@ -126,6 +128,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           submitting: action.payload.token ? true : false,
           submissionError: false,
           resentAuthenticationCode: false,
+          refreshToken: action.payload.refreshToken,
           authenticationDetails: {
             ...state.authenticationDetails,
             nonce: action.payload.nonce,
@@ -137,10 +140,13 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         Cmd.run(
           (getState: () => IStoreState) => {
             if (action.payload.token) {
+              const refreshParam = action.payload.refreshToken
+                ? `&refreshToken=${action.payload.refreshToken}`
+                : ''
               window.location.assign(
                 `/register/?token=${
                   action.payload.token
-                }&lang=${getState().i18n.language}`
+                }${refreshParam}&lang=${getState().i18n.language}`
               )
             } else {
               action.payload.inAppRedirect()
@@ -226,17 +232,21 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           stepSubmitting: false,
           submissionError: false,
           resentAuthenticationCode: false,
-          token: action.payload.token
+          token: action.payload.token,
+          refreshToken: action.payload.refreshToken
         },
         Cmd.run(
           (getState: () => IStoreState) => {
             const redirectToURL = getState().login.redirectToURL
+            const refreshParam = action.payload.refreshToken
+              ? `&refreshToken=${action.payload.refreshToken}`
+              : ''
             // Strip leading slash from redirectToURL to avoid double slash e.g. /register//events/...
             const fullURL = redirectToURL
-              ? `/register/${redirectToURL.replace(/^\//, '')}?token=${action.payload.token}&lang=${
+              ? `/register/${redirectToURL.replace(/^\//, '')}?token=${action.payload.token}${refreshParam}&lang=${
                   getState().i18n.language
                 }`
-              : `/register?token=${action.payload.token}&lang=${
+              : `/register?token=${action.payload.token}${refreshParam}&lang=${
                   getState().i18n.language
                 }`
 
