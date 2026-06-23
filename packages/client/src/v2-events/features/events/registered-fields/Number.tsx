@@ -85,7 +85,7 @@ export const Number = {
     return (
       <>
         {prefix && intl.formatMessage(prefix)}
-        {value ? value.toString() : ''}
+        {value.toString()}
         {postfix && intl.formatMessage(postfix)}
       </>
     )
