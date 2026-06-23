@@ -41,7 +41,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
-import { hasDeclarationFieldChanged } from '../../utils'
+import { getChangedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { CorrectionDetails } from './CorrectionDetails'
 
 const messages = defineMessages({
@@ -104,21 +104,12 @@ export function Summary() {
   const userMayCorrect = isActionAllowed(ActionType.APPROVE_CORRECTION)
 
   const submitCorrection = React.useCallback(() => {
-    const formWithOnlyChangedValues = Object.fromEntries(
-      Object.entries(form).filter(([key]) => {
-        const field = fields.find((f) => f.id === key)
-        if (!field) {
-          return false
-        }
-
-        return hasDeclarationFieldChanged(
-          field,
-          form,
-          previousFormValues,
-          eventConfiguration,
-          validatorContext
-        )
-      })
+    const formWithOnlyChangedValues = getChangedDeclarationDiff(
+      fields,
+      form,
+      previousFormValues,
+      eventConfiguration,
+      validatorContext
     )
 
     const valuesThatGotHidden = fields.filter((field) => {

@@ -44,6 +44,7 @@ import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Act
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { actionIcons } from '@client/v2-events/features/workqueues/Actions/utils'
+import { getChangedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
@@ -177,6 +178,13 @@ function useEditActions(event: EventDocument) {
   const reviewConfig = getActionReview(eventConfiguration, ActionType.DECLARE)
 
   const formFields = formConfig.pages.flatMap((page) => page.fields)
+  const declarationDiff = getChangedDeclarationDiff(
+    formFields,
+    declaration,
+    eventIndex.declaration,
+    eventConfiguration,
+    validatorContext
+  )
   const changedFields = formFields.filter((f) =>
     hasDeclarationFieldChanged(
       f,
@@ -244,7 +252,7 @@ function useEditActions(event: EventDocument) {
             events.customActions.editAndRegister.mutate({
               eventId: event.id,
               transactionId: getUUID(),
-              declaration,
+              declaration: declarationDiff,
               annotation,
               content: { comment }
             })
@@ -276,7 +284,7 @@ function useEditActions(event: EventDocument) {
             events.customActions.editAndDeclare.mutate({
               eventId: event.id,
               transactionId: getUUID(),
-              declaration,
+              declaration: declarationDiff,
               annotation,
               content: { comment }
             })
@@ -307,7 +315,7 @@ function useEditActions(event: EventDocument) {
             events.customActions.editAndNotify.mutate({
               eventId: event.id,
               transactionId: getUUID(),
-              declaration,
+              declaration: declarationDiff,
               annotation,
               content: { comment }
             })
