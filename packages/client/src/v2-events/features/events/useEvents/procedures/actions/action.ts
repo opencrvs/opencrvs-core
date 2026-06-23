@@ -108,16 +108,45 @@ function errorToastOnConflict(error: TRPCClientError<AppRouter>) {
 // For example: if the correction payload contains only `informant.name`, but not `informant.relation`,
 // running omitHiddenPaginatedFields on the payload alone would remove `informant.name` (since its parent `informant.relation` is missing).
 // By merging first, we preserve such dependencies, and then run a diff to keep only the valid correction fields.
-function getCleanedDeclarationDiff({
+/**
+ * Structurally empty: `undefined`/`null`/`''`, or an array/object whose every
+ * leaf is empty. Complex fields (NAME, ADDRESS) clear to nested objects of empty
+ * strings (e.g. `{ firstname: '', surname: '' }`), which a shallow truthiness
+ * check would wrongly treat as filled. `0` and `false` are real values and are
+ * not considered empty.
+ */
+export function isDeeplyEmpty(value: unknown): boolean {
+  if (value === undefined || value === null || value === '') {
+    return true
+  }
+  if (Array.isArray(value)) {
+    return value.every(isDeeplyEmpty)
+  }
+  if (typeof value === 'object') {
+    return Object.values(value).every(isDeeplyEmpty)
+  }
+  return false
+}
+
+export function getCleanedDeclarationDiff({
   eventConfiguration,
   originalDeclaration,
   declarationDiff,
-  validatorContext
+  validatorContext,
+  treatMissingAsCleared = false
 }: {
   eventConfiguration: EventConfig
   originalDeclaration?: EventState
   declarationDiff?: EventState
   validatorContext: ValidatorContext
+  /**
+   * When true (full-form actions such as edits), a field that was non-empty in
+   * the original declaration but is empty/missing in the submitted form was
+   * cleared by the user and is emitted as `null` so the aggregated declaration
+   * drops it. Must stay false for partial payloads (e.g. corrections) where a
+   * missing field simply isn't part of the payload and must not be cleared.
+   */
+  treatMissingAsCleared?: boolean
 }): ActionUpdate | undefined {
   if (isEmpty(declarationDiff)) {
     return declarationDiff
@@ -151,11 +180,33 @@ function getCleanedDeclarationDiff({
 
   // From the update, keep only fields that are valid in the cleaned declaration
   // (Prevents applying updates to hidden/invalid fields)
-  return Object.fromEntries(
+  const cleanedDiff: ActionUpdate = Object.fromEntries(
     Object.entries(declarationDiff).filter(
       ([key]) => key in cleanedDeclarationWithHiddenFieldsWithNullValues
     )
   )
+
+  // For full-form actions, a field that previously held a value but is now empty
+  // or missing was cleared by the user. Emit an explicit `null` so aggregating
+  // the action declarations overwrites the stale value (a missing/`undefined`
+  // key would otherwise be ignored by the deep merge and keep the old value).
+  if (treatMissingAsCleared && originalDeclaration) {
+    for (const key of Object.keys(originalDeclaration)) {
+      if (!(key in cleanedDeclarationWithHiddenFieldsWithNullValues)) {
+        continue
+      }
+      if (isDeeplyEmpty(originalDeclaration[key])) {
+        continue
+      }
+      const submittedValue =
+        key in declarationDiff ? declarationDiff[key] : undefined
+      if (isDeeplyEmpty(submittedValue)) {
+        cleanedDiff[key] = null
+      }
+    }
+  }
+
+  return cleanedDiff
 }
 
 setMutationDefaults(trpcOptionsProxy.event.actions.custom.request, {
@@ -564,17 +615,32 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
         throw new Error('Event configuration not found')
       }
 
-      const originalDeclaration =
-        'event' in params
-          ? getCurrentEventState(
-              /*
-               * typescript is somehow unable to infer the type of params.event to
-               * be EventDocument
-               */
-              params.event as EventDocument,
-              eventConfiguration
-            ).declaration
-          : {}
+      // Edit actions (editAndDeclare/editAndRegister/editAndNotify) submit the
+      // full edited form but do not carry `event` in their params. Use the
+      // locally cached full event as the original so getCleanedDeclarationDiff
+      // can detect fields the user cleared. Other custom actions (corrections,
+      // archive) submit partial payloads and must not clear missing fields.
+      const isEditAction =
+        mutationName === 'editAndDeclare' ||
+        mutationName === 'editAndRegister' ||
+        mutationName === 'editAndNotify'
+
+      let originalDeclaration: EventState = {}
+      if ('event' in params) {
+        originalDeclaration = getCurrentEventState(
+          /*
+           * typescript is somehow unable to infer the type of params.event to
+           * be EventDocument
+           */
+          params.event as EventDocument,
+          eventConfiguration
+        ).declaration
+      } else if (isEditAction && localEvent) {
+        originalDeclaration = getCurrentEventState(
+          localEvent,
+          eventConfiguration
+        ).declaration
+      }
 
       return mutation.mutate({
         ...params,
@@ -583,7 +649,8 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
           eventConfiguration,
           originalDeclaration,
           declarationDiff: params.declaration,
-          validatorContext: { ...validatorContext, event: localEvent }
+          validatorContext: { ...validatorContext, event: localEvent },
+          treatMissingAsCleared: isEditAction
         })
       })
     }

@@ -47,7 +47,6 @@ import {
   resolveSyncedFieldValue
 } from './utils'
 import { FormItem, GeneratedInputField } from './GeneratedInputField'
-import { emptyValueToNull } from './emptyValueToNull'
 
 type AllProps = {
   eventConfig?: EventConfig
@@ -296,17 +295,7 @@ export function FormSectionComponent({
 
     const defaultValue = getDefaultValue(listenerField, fieldValues)
 
-    // A reset visible listener that previously held a value is cleared to `null`
-    // (rather than its empty default) so the removal is persisted on submit.
-    set(
-      fieldValues,
-      formikCompatibleListenerFieldPath,
-      emptyValueToNull(
-        listenerField,
-        get(fieldValues, formikCompatibleListenerFieldPath),
-        defaultValue
-      )
-    )
+    set(fieldValues, formikCompatibleListenerFieldPath, defaultValue)
 
     return
   }
@@ -324,18 +313,8 @@ export function FormSectionComponent({
         !isNonInteractiveFieldType(fieldWithPath[1])
     )
 
-    // update the value of the field that was changed. Clearing a previously
-    // filled field is stored as `null` so the removal is persisted on submit.
-    const changedField = fullFormFields.find(
-      (field) => field.id === ocrvsFieldId
-    )
-    set(
-      updatedFormikPageForm,
-      formikFieldId,
-      changedField
-        ? emptyValueToNull(changedField, get(formikPageForm, formikFieldId), value)
-        : value
-    )
+    // update the value of the field that was changed
+    set(updatedFormikPageForm, formikFieldId, value)
 
     const resetFieldIds = new Set<string>()
     const clientFunctionContext = buildClientFunctionContext({
@@ -403,22 +382,9 @@ export function FormSectionComponent({
       validatorContext
     })
     for (const { name: formikFieldId, value } of newValues) {
-      const ocrvsFieldId = makeFormikFieldIdOpenCRVSCompatible(formikFieldId)
-      const changedField = fullFormFields.find(
-        (field) => field.id === ocrvsFieldId
-      )
-      set(
-        updatedValues,
-        formikFieldId,
-        changedField
-          ? emptyValueToNull(
-              changedField,
-              get(updatedValues, formikFieldId),
-              value
-            )
-          : value
-      )
+      set(updatedValues, formikFieldId, value)
 
+      const ocrvsFieldId = makeFormikFieldIdOpenCRVSCompatible(formikFieldId)
       const listenerFields = listenerFieldsByParentId[ocrvsFieldId] ?? []
       const interactiveListenerFields = listenerFields.filter(
         (fieldWithPath): fieldWithPath is [string[], InteractiveFieldType] =>
