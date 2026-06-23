@@ -190,6 +190,7 @@ export function getCleanedDeclarationDiff({
   // or missing was cleared by the user. Emit an explicit `null` so aggregating
   // the action declarations overwrites the stale value (a missing/`undefined`
   // key would otherwise be ignored by the deep merge and keep the old value).
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (treatMissingAsCleared && originalDeclaration) {
     for (const key of Object.keys(originalDeclaration)) {
       if (!(key in cleanedDeclarationWithHiddenFieldsWithNullValues)) {

@@ -13,10 +13,7 @@ import {
   tennisClubMembershipEvent,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import {
-  getCleanedDeclarationDiff,
-  isDeeplyEmpty
-} from './action'
+import { getCleanedDeclarationDiff, isDeeplyEmpty } from './action'
 
 const eventConfiguration = tennisClubMembershipEvent
 const validatorContext: ValidatorContext = {}
