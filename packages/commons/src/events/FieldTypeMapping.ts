@@ -108,8 +108,8 @@ import { ActionType } from './ActionType'
 import { EventConfig } from './EventConfig'
 
 type Mutable<T> = {
-  -readonly [K in keyof T]: T[K];
-};
+  -readonly [K in keyof T]: T[K]
+}
 
 /**
  * FieldTypeMapping.ts should include functions that map field types to different formats dynamically.
@@ -755,9 +755,7 @@ export type NonInteractiveFieldType =
   | BulletList
   | DataField
   | AlphaPrintButton
-  | HttpField
   | LinkButtonField
-  | QueryParamReaderField
   | LoaderField
   | AutocompleteField
 
@@ -774,9 +772,7 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.BULLET_LIST ||
     field.type === FieldType.DATA ||
     field.type === FieldType.ALPHA_PRINT_BUTTON ||
-    field.type === FieldType.HTTP ||
     field.type === FieldType.LINK_BUTTON ||
-    field.type === FieldType.QUERY_PARAM_READER ||
     field.type === FieldType.LOADER
   )
 }
