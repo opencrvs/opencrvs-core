@@ -32,6 +32,39 @@ V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
 - **events-service location APIs changes**
   Administrative areas (v1 `locationType: 'ADMIN_STRUCTURE'`) are exposed from a separate endpoint. See the [definition of the administrative hierarchy](/ADMINISTRATIVE-HIERARCHY.md) 2.0.0 onwards.
 
+#### Country config `GET /config/locations` response shape
+
+The data-seeder now expects `GET /config/locations` to return a structured object instead of a flat array. Country configuration's locations endpoint needs to be updated accordingly.
+
+**Before:**
+
+```ts
+Array<{
+  id: string
+  name: string
+  alias?: string
+  partOf: string
+  locationType: 'ADMIN_STRUCTURE' | 'HEALTH_FACILITY' | 'CRVS_OFFICE'
+}>
+```
+
+**After:**
+
+```ts
+{
+  administrativeAreas: Array<{ id: string; name: string; partOf: string }>
+  locations: Array<{
+    id: string
+    name: string
+    partOf: string
+    locationType: string
+  }>
+}
+```
+
+- `alias` has been removed and is no longer accepted.
+- `locationType` in the `locations` array is now a free-form `string` — country configurations are no longer restricted to the three built-in values and may define custom location types.
+
 #### Workqueue configurations
 
 - `actions: [{ type: CtaActionType }]`. is deprecated in favor of `action: { type: CtaActionType }`
@@ -105,6 +138,15 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - Change reindex call to make operation non-destructive. Create endpoint to track progress of reindex. [#11877](https://github.com/opencrvs/opencrvs-core/issues/11877)
 - Fixed vulnerabilities on CSP HTTP Header for login page [#12094](https://github.com/opencrvs/opencrvs-core/issues/12094)
 - Merged Helm charts as part of Monorepo [#12679](https://github.com/opencrvs/opencrvs-core/issues/12679)
+- Change nginx log format to json for client and login containers [#10202](https://github.com/opencrvs/opencrvs-core/issues/10202)
+- Reduce the amount of data sent to Elasticsearch by dropping unused and duplicate fields during Filebeat processing [#11232](https://github.com/opencrvs/opencrvs-core/issues/11232)
+
+## 1.9.15 Release Candidate
+
+### Improvements
+
+- Team page now shows a user-friendly "Too many requests" message when the `searchUsers` rate limit (20 req/min) is hit, instead of the generic query error. [#12990](https://github.com/opencrvs/opencrvs-core/issues/12990)
+- Gateway locations endpoint now serves responses from an in-process cache backed by Redis, reducing memory allocations under concurrent load. Cached payloads are gzip-compressed so write buffers to Traefik are proportionally smaller during request spikes. [#12880](https://github.com/opencrvs/opencrvs-core/issues/12880)
 
 ## 1.9.14
 

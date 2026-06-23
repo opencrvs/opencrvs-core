@@ -18,7 +18,6 @@ import { CountryLogo } from '@opencrvs/components/lib/icons'
 import {
   Accordion,
   Button,
-  Checkbox,
   Link,
   ListReview,
   ResponsiveModal,
@@ -175,11 +174,6 @@ const reviewMessages = defineMessages({
     defaultMessage: 'Government',
     description: 'Header title that shows govt name'
   },
-  rejectModalArchive: {
-    id: 'rejectModal.archive',
-    defaultMessage: 'Archive',
-    description: 'The label for archive button of reject modal'
-  },
   rejectModalSendForUpdate: {
     id: 'rejectModal.sendForUpdate',
     defaultMessage: 'Send For Update',
@@ -189,11 +183,6 @@ const reviewMessages = defineMessages({
     id: 'rejectModal.title',
     defaultMessage: 'Reason for rejection?',
     description: 'The title for reject modal'
-  },
-  rejectModalMarkAsDuplicate: {
-    id: 'rejectModal.markAsDuplicate',
-    defaultMessage: 'Mark as a duplicate',
-    description: 'The label for mark as duplicate checkbox of reject modal'
   },
   annotationsTitle: {
     id: 'review.annotations.title',
@@ -301,7 +290,10 @@ function FormReview({
               return { ...field, valueDisplay, errorDisplay }
             })
 
-          // Only display fields that have a non-undefined/null value or have an validation error
+          // All interactive fields are shown in review, including optional fields with no value
+          // (empty optional fields render as a blank value cell). Only non-interactive display
+          // types (DIVIDER, PAGE_HEADER, etc.) are hidden. Value-based filtering happens only in
+          // certificate printing and correction summary — not here.
           const displayedFields = fields.filter(
             ({ type }) =>
               !FieldTypesToHideInReview.some(
@@ -706,32 +698,14 @@ function AcceptActionModal({
   )
 }
 
-export const REJECT_ACTIONS = {
-  ARCHIVE: 'ARCHIVE',
-  SEND_FOR_UPDATE: 'SEND_FOR_UPDATE'
-} as const
-
-export interface RejectionState {
-  rejectAction: keyof typeof REJECT_ACTIONS
-  message: string
-  isDuplicate: boolean
-}
-
 function RejectActionModal({
   close,
-  allowArchive = true,
   supportingCopy
 }: {
-  close: (result: RejectionState | null) => void
-  allowArchive?: boolean
+  close: (result: string | null) => void
   supportingCopy?: MessageDescriptor
 }) {
-  const [state, setState] = useState<RejectionState>({
-    rejectAction: REJECT_ACTIONS.ARCHIVE,
-    message: '',
-    isDuplicate: false
-  })
-
+  const [message, setMessage] = useState<string>('')
   const intl = useIntl()
 
   const actions = [
@@ -745,34 +719,13 @@ function RejectActionModal({
     >
       {intl.formatMessage(buttonMessages.cancel)}
     </Button>,
-    ...(allowArchive
-      ? [
-          <Button
-            key="confirm_reject_with_archive"
-            disabled={!state.message}
-            id="confirm_reject_with_archive"
-            type="secondaryNegative"
-            onClick={() => {
-              close({
-                ...state,
-                rejectAction: REJECT_ACTIONS.ARCHIVE
-              })
-            }}
-          >
-            {intl.formatMessage(reviewMessages.rejectModalArchive)}
-          </Button>
-        ]
-      : []),
     <Button
       key="confirm_reject_with_update"
-      disabled={!state.message || state.isDuplicate}
+      disabled={!message}
       id="confirm_reject_with_update"
       type="negative"
       onClick={() => {
-        close({
-          ...state,
-          rejectAction: REJECT_ACTIONS.SEND_FOR_UPDATE
-        })
+        close(message)
       }}
     >
       {intl.formatMessage(reviewMessages.rejectModalSendForUpdate)}
@@ -783,12 +736,11 @@ function RejectActionModal({
     <ResponsiveModal
       showHeaderBorder
       actions={actions}
-      contentHeight={270}
       handleClose={() => close(null)}
       id="reject-modal"
       show={true}
       title={intl.formatMessage(reviewMessages.rejectModalTitle)}
-      width={918}
+      width={700}
     >
       <Stack alignItems="left" direction="column">
         <Text color="grey500" element="p" variant="reg16">
@@ -797,19 +749,8 @@ function RejectActionModal({
         <TextArea
           data-testid="reject-reason"
           required={true}
-          value={state.message}
-          onChange={(e) =>
-            setState((prev) => ({ ...prev, message: e.target.value }))
-          }
-        />
-        <Checkbox
-          label={intl.formatMessage(reviewMessages.rejectModalMarkAsDuplicate)}
-          name={'markDuplicate'}
-          selected={state.isDuplicate}
-          value={''}
-          onChange={() =>
-            setState((prev) => ({ ...prev, isDuplicate: !prev.isDuplicate }))
-          }
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
         />
       </Stack>
     </ResponsiveModal>

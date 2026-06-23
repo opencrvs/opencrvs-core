@@ -516,12 +516,26 @@ const messagesToDefine: IUserMessages = {
       'This error messege shows when user try to input already exsisted mobile number',
     id: 'system.user.duplicateMobileError'
   },
+  mobileNumberUnchangedErrorMessege: {
+    defaultMessage:
+      'This is already your phone number. Please enter a different phone number',
+    description:
+      'Error message shown when the user enters their current phone number as the new phone number',
+    id: 'system.user.mobileNumberUnchangedError'
+  },
   duplicateUserEmailErrorMessege: {
     defaultMessage:
       '{email} is already used by another user. Please use a different email',
     description:
       'This error message shows when user tries to input an already existing email',
     id: 'system.user.duplicateEmailError'
+  },
+  emailAddressUnchangedErrorMessege: {
+    defaultMessage:
+      'This is already your email address. Please enter a different email address',
+    description:
+      'Error message shown when the user enters their current email address as the new email address',
+    id: 'system.user.emailAddressUnchangedError'
   },
   enterPinLabel: {
     id: 'system.user.unlock.pinLabel',

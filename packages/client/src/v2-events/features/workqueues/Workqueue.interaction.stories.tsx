@@ -43,6 +43,7 @@ import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { faker } from '@client/tests/test-data-generators'
+import { setNavigatorOnline } from '@client/tests/storybook-utils'
 import { Name } from '../events/registered-fields'
 import { WorkqueueIndex } from './index'
 
@@ -579,13 +580,7 @@ export const DraftPaginationOffline: Story = {
     )
     await expect(firstPageRows).toHaveLength(10)
 
-    Object.defineProperty(window.navigator, 'onLine', {
-      configurable: true,
-      get: () => false
-    })
-
-    // Dispatch offline event so useEffect listener reacts
-    window.dispatchEvent(new Event('offline'))
+    setNavigatorOnline(false)
 
     // Check that offline labels are shown
     await canvas.findAllByText('No connection')
@@ -599,6 +594,91 @@ export const DraftPaginationOffline: Story = {
       'Tennis club membership application'
     )
     await expect(secondPageRows).toHaveLength(5)
+
+    // Restore online status so the stubbed offline state does not leak into
+    // stories rendered after this one in the same preview iframe
+    setNavigatorOnline(true)
+  }
+}
+
+/**
+ * Regression test for the offline-aware Suspense fallback (SuspenseLoadingFallback).
+ *
+ * Scenario: the workqueue route starts loading, the spinner shows, and the
+ * network drops *mid-load* (before the list query resolves). The fallback must
+ * swap the spinner for the "No connection" message instead of spinning forever,
+ * and return to the spinner once back online.
+ *
+ * The list query (`event.search`) never resolves, so the workqueue content stays
+ * in its Suspense (loading) state for the whole test while we toggle connectivity.
+ */
+export const WorkqueueGoesOfflineWhileLoading: Story = {
+  parameters: {
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues('recent')
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: queryData.length }
+            }, {})
+          })
+        ],
+        event: [
+          // Never resolves: keeps the workqueue content query pending so the
+          // Suspense fallback stays mounted while we toggle connectivity.
+          tRPCMsw.event.search.query(
+            async () => new Promise<never>(() => undefined)
+          )
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Loading spinner appears while the list query is in flight',
+      async () => {
+        await canvas.findAllByTestId('spinner')
+        await expect(
+          canvasElement.querySelector('#suspense-offline-message')
+        ).not.toBeInTheDocument()
+      }
+    )
+
+    await step(
+      'Network drops mid-load → offline message replaces the spinner',
+      async () => {
+        setNavigatorOnline(false)
+
+        await canvas.findAllByText('No connection')
+        await expect(
+          canvasElement.querySelector('#page-spinner')
+        ).not.toBeInTheDocument()
+      }
+    )
+
+    await step('Back online → returns to the loading spinner', async () => {
+      setNavigatorOnline(true)
+
+      await canvas.findAllByTestId('spinner')
+      await expect(
+        canvasElement.querySelector('#suspense-offline-message')
+      ).not.toBeInTheDocument()
+    })
+
+    // Restore online status so the stubbed offline state does not leak into
+    // stories rendered after this one in the same preview iframe
+    setNavigatorOnline(true)
   }
 }
 
@@ -879,5 +959,129 @@ export const WorkqueueAutoRefreshOnCountChange: Story = {
         String(autoRefreshUpdatedCount)
       )
     })
+  }
+}
+
+let switchDataChanged = false
+let switchSearchCalls = 0
+
+const switchInitialCount = 2
+const switchUpdatedCount = 3
+
+const switchInitialEvents = queryData.slice(0, switchInitialCount)
+const switchUpdatedEvents = [
+  eventQueryDataGenerator(undefined, 8888),
+  ...switchInitialEvents
+]
+
+const switchWorkqueues = [
+  ...generateWorkqueues('recent'),
+  ...generateWorkqueues('sent-for-review')
+]
+
+// The sidebar only renders workqueues whose slug is in the user's `workqueue`
+// scope ids (see useCountryConfigWorkqueueConfigurations). Grant both slugs so
+// they both appear and can be switched between. The FIELD_AGENT role is used
+// because that is the preview branch that honours a custom `token` parameter.
+const switchToken = buildFakeStorybookToken([
+  encodeScope({
+    type: 'workqueue',
+    options: { ids: ['recent', 'sent-for-review'] }
+  }),
+  encodeScope({ type: 'record.read' }),
+  encodeScope({ type: 'record.search' })
+])
+
+export const RefetchesOnWorkqueueSwitch: Story = {
+  beforeEach: () => {
+    switchDataChanged = false
+    switchSearchCalls = 0
+  },
+  parameters: {
+    userRole: TestUserRole.enum.FIELD_AGENT,
+    token: switchToken,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => switchWorkqueues),
+          tRPCMsw.workqueue.count.query((input) => {
+            const count = switchDataChanged
+              ? switchUpdatedCount
+              : switchInitialCount
+            return input.reduce(
+              (acc, { slug }) => ({ ...acc, [slug]: count }),
+              {} as Record<string, number>
+            )
+          })
+        ],
+        event: [
+          tRPCMsw.event.search.query(() => {
+            switchSearchCalls++
+            return {
+              results: switchDataChanged
+                ? switchUpdatedEvents
+                : switchInitialEvents,
+              total: switchDataChanged ? switchUpdatedCount : switchInitialCount
+            }
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Initial workqueue (recent) renders 2 events', async () => {
+      await canvas.findByText('Farajaland CRVS', {}, { timeout: 5000 })
+      await waitFor(async () => {
+        const rows = canvasElement.querySelectorAll('div[id^="row_"]')
+        await expect(rows).toHaveLength(switchInitialCount)
+      })
+    })
+
+    await step(
+      'Switching to another workqueue initiates a fresh search',
+      async () => {
+        const callsBefore = switchSearchCalls
+        await userEvent.click(
+          await canvas.findByTestId('navigation_workqueue_sent-for-review')
+        )
+        await waitFor(async () => {
+          await expect(switchSearchCalls).toBeGreaterThan(callsBefore)
+        })
+      }
+    )
+
+    await step(
+      'Switching back refetches and renders fresh data without waiting for the poll',
+      async () => {
+        // Server data changes while we are viewing the other workqueue.
+        switchDataChanged = true
+        const callsBefore = switchSearchCalls
+
+        await userEvent.click(
+          await canvas.findByTestId('navigation_workqueue_recent')
+        )
+
+        // The switch itself must initiate a new search ...
+        await waitFor(async () => {
+          await expect(switchSearchCalls).toBeGreaterThan(callsBefore)
+        })
+
+        // ... and the list must immediately reflect the fresh data.
+        await waitFor(
+          async () => {
+            const rows = canvasElement.querySelectorAll('div[id^="row_"]')
+            await expect(rows).toHaveLength(switchUpdatedCount)
+          },
+          { timeout: 5000 }
+        )
+      }
+    )
   }
 }

@@ -47,6 +47,7 @@ import { actionIcons } from '@client/v2-events/features/workqueues/Actions/utils
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
+import { TranslationTextWithFormatModifier } from '../../components/TranslationTextWithFormatModifier'
 import { useCanDirectlyRegister } from '../useCanDirectlyRegister'
 import {
   aggregateAnnotations,
@@ -137,11 +138,16 @@ function EditActionModal({
       title={intl.formatMessage(title)}
       width={800}
     >
-      <Stack>
-        <Text color="grey500" element="p" variant="reg16">
-          {supportingCopy ? intl.formatMessage(supportingCopy) : null}
-        </Text>
-      </Stack>
+      {supportingCopy && (
+        <Stack>
+          <TranslationTextWithFormatModifier
+            color="grey500"
+            element="p"
+            message={supportingCopy}
+            variant="reg16"
+          />
+        </Stack>
+      )}
       <CommentLabel element="h3" variant="bold16">
         {intl.formatMessage(commentLabel)}
       </CommentLabel>

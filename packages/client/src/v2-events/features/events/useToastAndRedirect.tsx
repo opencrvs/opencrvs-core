@@ -44,6 +44,11 @@ function ToastWithIntl({
   )
 }
 
+/**
+ * Displays a toast using the application's standardized toast component.
+ *
+ * @param props - The properties for the toast, including the message, type, ID, and any interpolation options.
+ */
 export function showToast(props: ToastProps) {
   toast.custom(<ToastWithIntl {...props} />, { id: props.toastId })
 }

@@ -73,12 +73,11 @@ export const profileReducer: LoopReducer<
             Cmd.run(
               (getState: () => IStoreState) => {
                 if (shouldRedirectBack) {
-                  const baseUrl = window.location.origin
-                  const restUrl = window.location.href.replace(baseUrl, '')
+                  const redirectUrl = window.location.pathname
                   const params =
-                    restUrl === '/'
+                    redirectUrl === '/'
                       ? `?lang=${getState().i18n.language}`
-                      : `?lang=${getState().i18n.language}&redirectTo=${restUrl}`
+                      : `?lang=${getState().i18n.language}&redirectTo=${redirectUrl}`
                   window.location.assign(`/login${params}`)
                 } else {
                   window.location.assign(

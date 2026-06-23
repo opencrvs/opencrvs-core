@@ -257,6 +257,96 @@ test('Creates user with active status when status is provided', async () => {
   expect(dbUser.status).toBe('active')
 })
 
+test('Throws error when creating user with invalid username', async () => {
+  await systemInitialisationTestSetup()
+
+  const client = createInitialisationTestClient()
+  const eventsDb = getClient()
+
+  await client.locations.set(locationPayload)
+  const location = await eventsDb
+    .selectFrom('locations')
+    .selectAll()
+    .executeTakeFirstOrThrow()
+
+  const baseUserPayload = {
+    email: 'testing+123@opencrvs.org',
+    role: 'admin',
+    name: { firstname: 'given', surname: 'family' },
+    primaryOfficeId: location.id
+  }
+
+  // 1. too short
+  await expect(
+    client.users.create({
+      ...baseUserPayload,
+      username: 'aa.3'
+    })
+  ).rejects.toMatchObject({
+    code: 'BAD_REQUEST'
+  })
+
+  // 2. includes non-latin characters
+  await expect(
+    client.users.create({
+      ...baseUserPayload,
+      username: 'äää.332'
+    })
+  ).rejects.toMatchObject({
+    code: 'BAD_REQUEST'
+  })
+
+  // 3. includes leading spaces
+  await expect(
+    client.users.create({
+      ...baseUserPayload,
+      username: '  dskdaskd'
+    })
+  ).rejects.toMatchObject({
+    code: 'BAD_REQUEST'
+  })
+
+  // 4. includes trailing spaces
+  await expect(
+    client.users.create({
+      ...baseUserPayload,
+      username: 'dskdaskd  '
+    })
+  ).rejects.toMatchObject({
+    code: 'BAD_REQUEST'
+  })
+
+  // 5. includes spaces within the username
+  await expect(
+    client.users.create({
+      ...baseUserPayload,
+      username: 'dskda skd'
+    })
+  ).rejects.toMatchObject({
+    code: 'BAD_REQUEST'
+  })
+
+  // 6. includes special characters
+  await expect(
+    client.users.create({
+      ...baseUserPayload,
+      username: 'asdas$∞∞sld'
+    })
+  ).rejects.toMatchObject({
+    code: 'BAD_REQUEST'
+  })
+
+  // 7. is too long
+  await expect(
+    client.users.create({
+      ...baseUserPayload,
+      username: 'onetwothreefourfivesixseventeightnineten11'
+    })
+  ).rejects.toMatchObject({
+    code: 'BAD_REQUEST'
+  })
+})
+
 test('Creates user with pending status when no status is provided', async () => {
   await systemInitialisationTestSetup()
   const client = createInitialisationTestClient()

@@ -53,8 +53,7 @@ export function useEventActionsOnClick(event: EventIndex) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { handleRejection, rejectionModal } = useRejectionModal(
     event.id,
-    event.type,
-    false
+    event.type
   )
   const { onQuickAction, quickActionModal } = useQuickActionModal(
     eventConfiguration,

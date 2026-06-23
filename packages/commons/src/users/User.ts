@@ -99,6 +99,11 @@ export const UpdateUserInput = User.pick({
   })
 export type UpdateUserInput = z.infer<typeof UpdateUserInput>
 
+/* alphanumeric string which may contain dots and dashes, but must start and end with an alphanumeric character */
+const USERNAME_PATTERN = /^[a-z0-9][a-z0-9.\-]*[a-z0-9]$/
+export const MIN_USERNAME_LENGTH = 5 /* arbitrary but necessary */
+export const MAX_USERNAME_LENGTH = 30 /* arbitrary but necessary */
+
 export const CreateUserInputInternal = User.pick({
   name: true,
   role: true,
@@ -107,7 +112,11 @@ export const CreateUserInputInternal = User.pick({
   email: true
 })
   .extend({
-    username: z.string(),
+    username: z
+      .string()
+      .min(MIN_USERNAME_LENGTH)
+      .max(MAX_USERNAME_LENGTH)
+      .regex(USERNAME_PATTERN),
     status: z.enum(['active']).optional(),
     password: z.string().optional()
   })

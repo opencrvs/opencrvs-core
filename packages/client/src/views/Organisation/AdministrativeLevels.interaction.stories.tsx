@@ -37,19 +37,26 @@ export const PaginationResetsOnTabNavigation: Story = {
     const canvas = within(canvasElement)
 
     await step('Navigate to Central province', async () => {
-      await userEvent.click(await canvas.findByRole('button', { name: 'Central' }))
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Central' })
+      )
     })
 
     await step('Navigate to Ibombo district', async () => {
-      await userEvent.click(await canvas.findByRole('button', { name: 'Ibombo' }))
-    })
-
-    await step('Go to page 2 (Ibombo has 12 locations, triggering pagination)', async () => {
-      // Page 2 button has id="page-number-1" (index 1). querySelector picks the desktop instance.
       await userEvent.click(
-        canvasElement.querySelector<HTMLElement>('#page-number-1')!
+        await canvas.findByRole('button', { name: 'Ibombo' })
       )
     })
+
+    await step(
+      'Go to page 2 (Ibombo has 12 locations, triggering pagination)',
+      async () => {
+        // Page 2 button has id="page-number-1" (index 1). querySelector picks the desktop instance.
+        await userEvent.click(
+          canvasElement.querySelector<HTMLElement>('#page-number-1')!
+        )
+      }
+    )
 
     await step('Click Organisation tab to navigate back to root', async () => {
       await userEvent.click(
@@ -58,8 +65,71 @@ export const PaginationResetsOnTabNavigation: Story = {
     })
 
     await step('Organisation root list should be visible', async () => {
-      await expect(await canvas.findByRole('button', { name: 'Central' })).toBeVisible()
-      await expect(await canvas.findByRole('button', { name: 'Sulaka' })).toBeVisible()
+      await expect(
+        await canvas.findByRole('button', { name: 'Central' })
+      ).toBeVisible()
+      await expect(
+        await canvas.findByRole('button', { name: 'Sulaka' })
+      ).toBeVisible()
     })
+  }
+}
+
+export const BreadcrumbHierarchy: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: formatUrl(routes.ORGANISATIONS_INDEX, { locationId: '' })
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'At the country level the breadcrumb shows the country',
+      async () => {
+        await expect(await canvas.findByText('Farajaland')).toBeVisible()
+      }
+    )
+
+    await step('Navigate into Central province', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Central' })
+      )
+    })
+
+    await step('Breadcrumb shows Farajaland / Central', async () => {
+      await expect(await canvas.findByText('Farajaland')).toBeVisible()
+      // The list now shows Central's districts, so "Central" can only be the breadcrumb.
+      await expect(await canvas.findByText('Central')).toBeVisible()
+    })
+
+    await step('Navigate into Ibombo district', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Ibombo' })
+      )
+    })
+
+    await step(
+      'Breadcrumb shows the full path Farajaland / Central / Ibombo',
+      async () => {
+        await expect(await canvas.findByText('Farajaland')).toBeVisible()
+        await expect(await canvas.findByText('Central')).toBeVisible()
+        await expect(await canvas.findByText('Ibombo')).toBeVisible()
+      }
+    )
+
+    await step(
+      'Clicking the "Central" breadcrumb navigates back up the hierarchy',
+      async () => {
+        await userEvent.click(await canvas.findByText('Central'))
+        // Back at the province level, Central's districts are listed again.
+        await expect(
+          await canvas.findByRole('button', { name: 'Ibombo' })
+        ).toBeVisible()
+      }
+    )
   }
 }

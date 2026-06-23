@@ -159,15 +159,10 @@ function User({ action }: { action: EventHistoryActionDocument }) {
         )
       }
     >
-      <UserAvatar
-        // @TODO: extend v2-events User to include avatar
-        avatar={undefined}
-        locale={intl.locale}
-        names={name}
-      />
+      <UserAvatar avatar={user.avatar} names={name} />
     </Link>
   ) : (
-    <UserAvatar avatar={undefined} locale={intl.locale} names={name} />
+    <UserAvatar avatar={user?.avatar} names={name} />
   )
 }
 
