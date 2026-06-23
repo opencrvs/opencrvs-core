@@ -8,20 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-/**
- * Declaration diff utilities for edits and corrections.
- *
- * Pipeline:
- * 1. `getChangedDeclarationDiff` — build a partial diff from the form (only
- *    changed fields; cleared fields are included as `null`).
- * 2. `getCleanedDeclarationDiff` — validate against the event config, strip
- *    hidden fields, and emit `null` for cleared nested subfields (ADDRESS, NAME).
- *
- * Both flows share this pipeline. A field that is absent from the diff was not
- * touched and must never be interpreted as a clear.
- */
-
 import { isEmpty } from 'lodash'
 import {
   ActionUpdate,
