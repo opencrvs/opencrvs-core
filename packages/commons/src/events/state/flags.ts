@@ -340,6 +340,7 @@ function getInherentFlags(
     ({ status }) => status === ActionStatus.Accepted
   )
 
+  // InherentFlags can be removed by configured actions
   return INHERENT_FLAG_RULES.filter((rule) =>
     resolveInherentFlag(rule, acceptedActions, event, eventConfiguration)
   ).map(({ flag }) => flag)
