@@ -28,6 +28,7 @@ import { routesConfig } from '@client/v2-events/routes/config'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { mockOfflineData } from '@client/tests/mock-offline-data'
 import { createTemporaryId } from '@client/v2-events/utils'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 
 import { useUserFormState } from './useUserFormState'
@@ -1669,6 +1670,52 @@ export const CorrectUserDataLoadedAfterSwitchingUsers: StoryObj<
             exact: false
           })
         ).resolves.toBeInTheDocument()
+      }
+    )
+  }
+}
+
+/**
+ * Regression test for #12530: opening the create-user form after a previous
+ * submission must not carry over stale "touched" state. The touched state lives
+ * in useEventFormData (separate from useUserFormState), so the create entry
+ * point (CreateNewUserComponent) must clear it too. Otherwise the freshly
+ * opened form shows required-field validation errors before any interaction.
+ */
+export const CreateUserStartsWithCleanFormState: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.CREATE.buildPath(
+        {},
+        { officeId: mockUser.primaryOfficeId }
+      )
+    }
+  },
+  beforeEach: () => {
+    // Simulate touched state left over from a previous user creation: the name
+    // field was touched and is now empty (what would trigger a required error).
+    useEventFormData
+      .getState()
+      .setFormTouched({ name: { firstname: true, surname: true } })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Fresh create form renders on the details page', async () => {
+      await canvas.findByTestId('text__firstname')
+    })
+
+    await step(
+      'No required-field validation error is shown before interaction',
+      async () => {
+        await waitFor(() =>
+          expect(useEventFormData.getState().formTouched).toEqual({})
+        )
+        expect(
+          canvasElement.querySelector('#firstname_error')
+        ).not.toBeInTheDocument()
       }
     )
   }
