@@ -23,6 +23,7 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { ROUTES } from '@client/v2-events/routes'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useUserFormState } from '@client/views/SysAdmin/Team/user/userEditor/useUserFormState'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
@@ -136,6 +137,7 @@ export const UserAudit = () => {
         label: intl.formatMessage(sysMessages.editUserDetailsTitle),
         handler: () => {
           useUserFormState.getState().clear()
+          useEventFormData.getState().clear()
           navigate(
             ROUTES.V2.SETTINGS.USER.REVIEW.buildPath(
               {
