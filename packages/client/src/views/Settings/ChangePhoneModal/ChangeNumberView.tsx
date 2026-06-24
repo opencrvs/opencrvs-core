@@ -20,7 +20,6 @@ import { useOnlineStatus } from '@client/utils'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { TriggerEvent } from '@opencrvs/commons/client'
 import { useCurrentUser } from '@client/v2-events/hooks/useCurrentUser'
 
 interface IProps {
@@ -46,7 +45,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
     showDuplicateMobileErrorNotification,
     setShowDuplicateMobileErrorNotification
   ] = React.useState(false)
-  const { requestContactChange } = useUsers()
+  const { requestPhoneChange } = useUsers()
   const isMobileNumberUnchanged =
     Boolean(phoneNumber) && phoneNumber === currentUser?.mobile
   const onChangePhoneNumber = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,11 +71,8 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
   }
   const continueButtonHandler = async (phoneNumber: string) => {
     if (!currentUser) return
-    requestContactChange.mutate(
-      {
-        notificationEvent: TriggerEvent.CHANGE_PHONE_NUMBER,
-        phoneNumber
-      },
+    requestPhoneChange.mutate(
+      { phoneNumber },
       {
         onSuccess: (data) => {
           onSuccess(phoneNumber, data.nonce)
@@ -114,7 +110,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
           }}
           disabled={
             !isOnline ||
-            requestContactChange.isPending ||
+            requestPhoneChange.isPending ||
             !Boolean(phoneNumber.length) ||
             isInvalidPhoneNumber ||
             isMobileNumberUnchanged
