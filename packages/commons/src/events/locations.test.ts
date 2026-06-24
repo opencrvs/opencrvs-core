@@ -246,6 +246,78 @@ describe('canAccessEventWithScope()', () => {
       ).toBe(false)
     })
   })
+
+  describe('User without an administrative area', () => {
+    // The event is in a different administrative area than the user's office,
+    // so access can only be granted by the "no administrative area" branch.
+    const eventInAnotherArea: Partial<EventIndexWithAdministrativeHierarchy> = {
+      ...registeredEvent,
+      placeOfEvent: [generateUuid(rng)],
+      legalStatuses: {
+        DECLARED: {
+          acceptedAt: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          createdBy: generateUuid(rng),
+          createdAtLocation: [generateUuid(rng)]
+        },
+        REGISTERED: {
+          acceptedAt: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          registrationNumber: '12345',
+          createdBy: generateUuid(rng),
+          createdAtLocation: [generateUuid(rng)]
+        }
+      }
+    }
+
+    const adminAreaOptions = [
+      { placeOfEvent: 'administrativeArea' },
+      { declaredIn: 'administrativeArea' },
+      { registeredIn: 'administrativeArea' }
+    ] satisfies RecordScopeV2['options'][]
+
+    const userWithNullArea = {
+      type: 'user',
+      id: createdById,
+      primaryOfficeId: officeUuid,
+      administrativeAreaId: null,
+      role: TestUserRole.enum.FIELD_AGENT
+    } satisfies UserContext
+
+    const userWithUndefinedArea = {
+      type: 'user',
+      id: createdById,
+      primaryOfficeId: officeUuid,
+      administrativeAreaId: undefined,
+      role: TestUserRole.enum.FIELD_AGENT
+    } satisfies UserContext
+
+    test.each(adminAreaOptions)(
+      'grants access when administrativeAreaId is null with scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            eventInAnotherArea,
+            { type: 'record.print-certified-copies', options },
+            userWithNullArea
+          )
+        ).toBe(true)
+      }
+    )
+
+    test.each(adminAreaOptions)(
+      'grants access when administrativeAreaId is undefined with scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            eventInAnotherArea,
+            { type: 'record.print-certified-copies', options },
+            userWithUndefinedArea
+          )
+        ).toBe(true)
+      }
+    )
+  })
 })
 
 const province: AdministrativeArea = {
