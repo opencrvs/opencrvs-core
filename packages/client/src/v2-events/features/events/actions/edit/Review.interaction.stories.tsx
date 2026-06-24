@@ -275,7 +275,7 @@ export const AlphaPrintButtonHiddenWhenEditingDeclaredRecord: Story = {
     await step(
       'Print button is absent because event already has a DECLARE action',
       async () => {
-        expect(canvas.queryByText('Print')).toBeNull()
+        await expect(canvas.queryByText('Print')).toBeNull()
       }
     )
   }
