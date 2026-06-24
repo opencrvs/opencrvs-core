@@ -12,16 +12,25 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { userEvent, within, screen } from '@storybook/test'
+import { userEvent, within, screen, expect } from '@storybook/test'
 import { toast } from 'react-hot-toast'
 import {
   ActionType,
+  and,
+  ConditionalType,
+  event,
+  EventConfig,
+  FieldConfig,
+  FieldType,
+  not,
+  TENNIS_CLUB_DECLARATION_REVIEW,
   tennisClubMembershipEvent,
   generateEventDocument,
   generateEventDraftDocument,
   getCurrentEventState,
   generateActionDocument,
-  getUUID
+  getUUID,
+  user
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -32,6 +41,43 @@ import { ActionDocument } from '../../../../../../../commons/build/dist/common/c
 import { Review as ReviewIndex } from './index'
 
 const generator = testDataGenerator()
+
+const reviewWithPrintButton = {
+  ...TENNIS_CLUB_DECLARATION_REVIEW,
+  fields: [
+    ...TENNIS_CLUB_DECLARATION_REVIEW.fields,
+    {
+      id: 'review.print',
+      type: FieldType.ALPHA_PRINT_BUTTON,
+      label: {
+        defaultMessage: 'Print certificate',
+        id: 'review.print.label',
+        description: 'Label for the print button in the review section'
+      },
+      configuration: { template: 'test-certificate' },
+      conditionals: [
+        {
+          type: ConditionalType.SHOW,
+          conditional: and(
+            user.hasRole('LOCAL_REGISTRAR'),
+            not(event.hasAction(ActionType.DECLARE)),
+            not(event.hasAction(ActionType.NOTIFY))
+          )
+        }
+      ]
+    }
+  ] as FieldConfig[]
+}
+
+export const eventConfigWithPrintButton = {
+  ...tennisClubMembershipEvent,
+  actions: tennisClubMembershipEvent.actions.map((action) =>
+    action.type === ActionType.DECLARE
+      ? { ...action, review: reviewWithPrintButton }
+      : action
+  )
+} as unknown as EventConfig
+
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [
     httpLink({
@@ -200,6 +246,38 @@ export const ShowToastOnDuplicateDetectedOnEditAndRegister: Story = {
     await step('Toast is shown with duplicate detected message', async () => {
       await assertDuplicateToast()
     })
+  }
+}
+
+export const AlphaPrintButtonHiddenWhenEditingDeclaredRecord: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({ eventId })
+    },
+    chromatic: { disableSnapshot: true },
+    test: {
+      dangerouslyIgnoreUnhandledErrors: true
+    },
+    offline: {
+      events: [eventDocument],
+      configs: [eventConfigWithPrintButton]
+    },
+    msw: { handlers: duplicateHandlers }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Review page loads for editing a declared record', async () => {
+      await canvas.findByRole('button', { name: 'Action' })
+    })
+
+    await step(
+      'Print button is absent because event already has a DECLARE action',
+      async () => {
+        await expect(canvas.queryByText('Print')).toBeNull()
+      }
+    )
   }
 }
 
