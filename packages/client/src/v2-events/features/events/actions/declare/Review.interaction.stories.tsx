@@ -30,6 +30,7 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
+import { eventConfigWithPrintButton } from '../edit/Review.interaction.stories'
 import { setEventData, addLocalEventConfig } from '../../useEvents/api'
 import { ActionDocument } from '../../../../../../../commons/build/dist/common/client'
 import { ReviewIndex } from './Review'
@@ -811,5 +812,39 @@ export const ShowToastOnDuplicateDetectedOnRegister: Story = {
         { timeout: 10000 }
       )
     })
+  }
+}
+
+export const AlphaPrintButtonShownWhenDeclaringFromScratch: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: createdEventDocument.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    test: {
+      dangerouslyIgnoreUnhandledErrors: true
+    },
+    offline: {
+      events: [createdEventDocument],
+      configs: [eventConfigWithPrintButton]
+    },
+    msw: {
+      handlers: {
+        drafts: declarationTrpcMsw.drafts.handlers,
+        events: declarationTrpcMsw.events.handlers
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    await step(
+      'Print button is visible when a registrar creates a declaration from scratch',
+      async () => {
+        const canvas = within(canvasElement)
+        await canvas.findByText('Print')
+      }
+    )
   }
 }
