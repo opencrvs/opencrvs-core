@@ -1141,6 +1141,20 @@ export const NewUserCreationBlockedOutsideJurisdiction: StoryObj = {
         userId: createTemporaryId(),
         pageId: 'user.details'
       })
+    },
+    msw: {
+      handlers: {
+        user: [
+          userGetHandler({
+            currentUserId: localSystemAdminUser.id,
+            currentUser: {
+              ...localSystemAdminUser,
+              primaryOfficeId: IBOMBO_DISTRICT_OFFICE_ID
+            },
+            targetUser: mockUser
+          })
+        ]
+      }
     }
   },
   beforeEach: () => {
