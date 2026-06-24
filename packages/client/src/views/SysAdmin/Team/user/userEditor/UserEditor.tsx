@@ -16,6 +16,7 @@ import * as routes from '@client/navigation/routes'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useRoles } from '@client/v2-events/hooks/useRoles'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { ROUTES } from '@client/v2-events/routes/routes'
 import {
   FieldValue,
@@ -151,6 +152,7 @@ const CreateNewUserComponent = () => {
   const { clear, setUserForm } = useUserFormState()
   useEffect(() => {
     clear()
+    useEventFormData.getState().clear()
     setUserForm({ primaryOfficeId: officeId })
     navigate(
       ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
