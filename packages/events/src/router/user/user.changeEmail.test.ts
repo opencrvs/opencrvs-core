@@ -15,14 +15,11 @@ import { createTestClient, setupTestCase } from '@events/tests/utils'
 // code is always the default one
 const VERIFY_CODE = '000000'
 
-async function requestContactChange(
+async function requestEmailChange(
   client: ReturnType<typeof createTestClient>,
   email: string
 ) {
-  const { nonce } = await client.user.requestContactChange({
-    notificationEvent: 'change-email-address',
-    email
-  })
+  const { nonce } = await client.user.requestEmailChange({ email })
   return nonce
 }
 
@@ -31,7 +28,7 @@ describe('user.changeEmail', () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user)
     const newEmail = 'new.address@test.example'
-    const nonce = await requestContactChange(client, newEmail)
+    const nonce = await requestEmailChange(client, newEmail)
 
     await client.user.changeEmail({
       userId: user.id,
@@ -49,7 +46,7 @@ describe('user.changeEmail', () => {
     const client = createTestClient(user)
 
     const firstEmail = 'first@test.example'
-    const nonce1 = await requestContactChange(client, firstEmail)
+    const nonce1 = await requestEmailChange(client, firstEmail)
     await client.user.changeEmail({
       userId: user.id,
       email: firstEmail,
@@ -58,7 +55,7 @@ describe('user.changeEmail', () => {
     })
 
     const secondEmail = 'second@test.example'
-    const nonce2 = await requestContactChange(client, secondEmail)
+    const nonce2 = await requestEmailChange(client, secondEmail)
     await client.user.changeEmail({
       userId: user.id,
       email: secondEmail,
@@ -74,7 +71,7 @@ describe('user.changeEmail', () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user)
     const newEmail = 'new.address@test.example'
-    const nonce = await requestContactChange(client, newEmail)
+    const nonce = await requestEmailChange(client, newEmail)
 
     await expect(
       client.user.changeEmail({
@@ -93,7 +90,7 @@ describe('user.changeEmail', () => {
     const { user, users } = await setupTestCase()
     const client = createTestClient(user)
     const newEmail = 'new.address@test.example'
-    const nonce = await requestContactChange(client, newEmail)
+    const nonce = await requestEmailChange(client, newEmail)
 
     await expect(
       client.user.changeEmail({
@@ -111,7 +108,7 @@ describe('user.changeEmail', () => {
     const client2 = createTestClient(users[1])
 
     const sharedEmail = 'shared@test.example'
-    const nonce1 = await requestContactChange(client1, sharedEmail)
+    const nonce1 = await requestEmailChange(client1, sharedEmail)
     await client1.user.changeEmail({
       userId: users[0].id,
       email: sharedEmail,
@@ -120,7 +117,7 @@ describe('user.changeEmail', () => {
     })
 
     // user2 tries to claim the same email after user1 has it
-    const nonce2 = await requestContactChange(client2, 'other@test.example')
+    const nonce2 = await requestEmailChange(client2, 'other@test.example')
     await expect(
       client2.user.changeEmail({
         userId: users[1].id,
