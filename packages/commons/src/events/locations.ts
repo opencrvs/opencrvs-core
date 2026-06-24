@@ -113,7 +113,7 @@ function matchesJurisdictionFilter(
   }
   if (filter === JurisdictionFilter.enum.administrativeArea) {
     return (
-      user.administrativeAreaId === null ||
+      !user.administrativeAreaId ||
       locationIds.some((id) => id === user.administrativeAreaId)
     )
   }
