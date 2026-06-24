@@ -82,8 +82,8 @@ export const DuplicateEmailShowsToast: Story = {
   parameters: {
     msw: {
       handlers: {
-        requestContactChange: [
-          tRPCMsw.user.requestContactChange.mutation(() => {
+        requestEmailChange: [
+          tRPCMsw.user.requestEmailChange.mutation(() => {
             throw new TRPCError({ code: 'CONFLICT' })
           })
         ]
