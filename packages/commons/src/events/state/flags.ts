@@ -11,7 +11,6 @@
 
 import { uniq } from 'lodash'
 import { joinValues } from '../../utils'
-import { getStatusFromActions } from '.'
 import {
   Action,
   ActionStatus,
@@ -19,7 +18,6 @@ import {
   RequestedCorrectionAction
 } from '../ActionDocument'
 import { ActionType, isMetaAction } from '../ActionType'
-import { EventStatus } from '../EventMetadata'
 import { InherentFlags, Flag, CustomFlag, ActionFlag } from '../Flag'
 import { EventConfig } from '../EventConfig'
 import {
@@ -33,10 +31,6 @@ import { formatISO, parseISO, isValid } from 'date-fns'
 import { EventDocument } from '../EventDocument'
 import { JSONSchema } from '../../conditionals/conditionals'
 import { validate } from '../../conditionals/validate'
-
-function isEditInProgress(actions: Action[]) {
-  return actions.at(-1)?.type === ActionType.EDIT
-}
 
 // Walk from the end: the latest correction-lifecycle action determines state.
 // If it's an APPROVE/REJECT_CORRECTION, there is no pending request.
@@ -60,33 +54,6 @@ export function findPendingCorrectionAction(
   }
 
   return correctionRequestAction
-}
-
-function isCorrectionRequested(actions: Action[]) {
-  return findPendingCorrectionAction(actions) !== undefined
-}
-
-function isDeclarationIncomplete(actions: Action[]): boolean {
-  return getStatusFromActions(actions) === EventStatus.enum.NOTIFIED
-}
-
-function isRejected(actions: Action[]): boolean {
-  const resettingActionTypes: ActionType[] = [
-    ActionType.NOTIFY,
-    ActionType.DECLARE,
-    ActionType.EDIT,
-    ActionType.REGISTER
-  ]
-
-  return actions.reduce<boolean>((prev, { type }) => {
-    if (type === ActionType.REJECT) {
-      return true
-    }
-    if (resettingActionTypes.includes(type)) {
-      return false
-    }
-    return prev
-  }, false)
 }
 
 export function isPotentialDuplicate(actions: Action[]): boolean {
@@ -126,6 +93,146 @@ function isFlagConditionMet(
       userType: action.createdByUserType
     }
   })
+}
+
+/**
+ * Returns true if the given action's configuration declares a `remove`
+ * operation for `flagId` whose conditional (if any) is met. Used to let
+ * configured actions clear inherent flags such as REJECTED.
+ */
+function actionConfigRemovesFlag(
+  action: Action,
+  flagId: Flag,
+  actionsUpToAndIncluding: Action[],
+  event: EventDocument,
+  eventConfiguration: EventConfig
+): boolean {
+  if (!isActionConfigType(action.type)) {
+    return false
+  }
+
+  const actionConfig = getActionConfig({
+    eventConfiguration,
+    actionType: action.type,
+    customActionType:
+      'customActionType' in action ? action.customActionType : undefined
+  })
+
+  const removeOperations = (actionConfig?.flags ?? []).filter(
+    ({ id, operation }) => id === flagId && operation === 'remove'
+  )
+
+  if (removeOperations.length === 0) {
+    return false
+  }
+
+  const eventUpToThisAction = { ...event, actions: actionsUpToAndIncluding }
+  const declaration = aggregateActionDeclarations(eventUpToThisAction)
+  const annotation = aggregateActionAnnotations(eventUpToThisAction)
+  const form = { ...declaration, ...annotation }
+
+  return removeOperations.some(({ conditional }) =>
+    conditional ? isFlagConditionMet(conditional, form, action) : true
+  )
+}
+
+type InherentFlagRule = {
+  flag: InherentFlags
+  /** Action types that turn the flag on. */
+  setOn: ActionType[]
+  /** Action types that turn the flag off. */
+  resetOn?: ActionType[]
+  /**
+   * When true, any action other than `setOn` turns the flag off. Used for
+   * "the latest action is X" style flags such as EDIT_IN_PROGRESS.
+   */
+  resetOnAnyOtherAction?: boolean
+}
+
+/**
+ * Declarative rules for the inherent flags. Each flag is resolved by replaying
+ * the accepted actions chronologically (see resolveInherentFlag). The order of
+ * this list determines the order of the resulting flags.
+ */
+const INHERENT_FLAG_RULES: InherentFlagRule[] = [
+  {
+    flag: InherentFlags.CORRECTION_REQUESTED,
+    setOn: [ActionType.REQUEST_CORRECTION],
+    resetOn: [ActionType.APPROVE_CORRECTION, ActionType.REJECT_CORRECTION]
+  },
+  {
+    // INCOMPLETE mirrors the NOTIFIED status: set by NOTIFY, cleared by any
+    // other status-changing action (see getStatusFromActions).
+    flag: InherentFlags.INCOMPLETE,
+    setOn: [ActionType.NOTIFY],
+    resetOn: [
+      ActionType.CREATE,
+      ActionType.DECLARE,
+      ActionType.REGISTER,
+      ActionType.ARCHIVE
+    ]
+  },
+  {
+    flag: InherentFlags.REJECTED,
+    setOn: [ActionType.REJECT],
+    resetOn: [
+      ActionType.NOTIFY,
+      ActionType.DECLARE,
+      ActionType.EDIT,
+      ActionType.REGISTER
+    ]
+  },
+  {
+    flag: InherentFlags.POTENTIAL_DUPLICATE,
+    setOn: [ActionType.DUPLICATE_DETECTED],
+    resetOn: [ActionType.MARK_AS_DUPLICATE, ActionType.MARK_AS_NOT_DUPLICATE]
+  },
+  {
+    flag: InherentFlags.EDIT_IN_PROGRESS,
+    setOn: [ActionType.EDIT],
+    resetOnAnyOtherAction: true
+  }
+]
+
+/**
+ * Resolves whether a single inherent flag is present by replaying the accepted
+ * actions chronologically. The flag is turned on by its `setOn` action types
+ * and off by its `resetOn` types (or by any other action when
+ * `resetOnAnyOtherAction` is set). In addition, any action whose configuration
+ * declares a `remove` operation for the flag clears it — so a country config can
+ * clear any inherent flag from a (custom) action (e.g. VALIDATE_DECLARATION
+ * clearing REJECTED). Because this is evaluated chronologically, a later action
+ * can re-establish a flag that an earlier configured action removed.
+ */
+function resolveInherentFlag(
+  rule: InherentFlagRule,
+  acceptedActions: Action[],
+  event: EventDocument,
+  eventConfiguration: EventConfig
+): boolean {
+  return acceptedActions.reduce<boolean>((present, action, idx) => {
+    if (rule.setOn.includes(action.type)) {
+      return true
+    }
+    if (
+      rule.resetOnAnyOtherAction ||
+      (rule.resetOn ?? []).includes(action.type)
+    ) {
+      return false
+    }
+    if (
+      actionConfigRemovesFlag(
+        action,
+        rule.flag,
+        acceptedActions.slice(0, idx + 1),
+        event,
+        eventConfiguration
+      )
+    ) {
+      return false
+    }
+    return present
+  }, false)
 }
 
 /**
@@ -223,31 +330,19 @@ function getActionStatusFlags(sortedActions: Action[]): ActionFlag[] {
     })
 }
 
-function getInherentFlags(sortedActions: Action[]): InherentFlags[] {
+function getInherentFlags(
+  sortedActions: Action[],
+  event: EventDocument,
+  eventConfiguration: EventConfig
+): InherentFlags[] {
   // For determining InherentFlags, we should only consider accepted actions.
   const acceptedActions = sortedActions.filter(
     ({ status }) => status === ActionStatus.Accepted
   )
 
-  const inherentFlags: InherentFlags[] = []
-
-  if (isCorrectionRequested(acceptedActions)) {
-    inherentFlags.push(InherentFlags.CORRECTION_REQUESTED)
-  }
-  if (isDeclarationIncomplete(acceptedActions)) {
-    inherentFlags.push(InherentFlags.INCOMPLETE)
-  }
-  if (isRejected(acceptedActions)) {
-    inherentFlags.push(InherentFlags.REJECTED)
-  }
-  if (isPotentialDuplicate(acceptedActions)) {
-    inherentFlags.push(InherentFlags.POTENTIAL_DUPLICATE)
-  }
-  if (isEditInProgress(acceptedActions)) {
-    inherentFlags.push(InherentFlags.EDIT_IN_PROGRESS)
-  }
-
-  return inherentFlags
+  return INHERENT_FLAG_RULES.filter((rule) =>
+    resolveInherentFlag(rule, acceptedActions, event, eventConfiguration)
+  ).map(({ flag }) => flag)
 }
 
 /**
@@ -273,7 +368,7 @@ export function getEventFlags(
 
   return [
     ...getActionStatusFlags(sortedActions),
-    ...getInherentFlags(sortedActions),
+    ...getInherentFlags(sortedActions, event, config),
     ...resolveEventCustomFlags(event, config)
   ]
 }
