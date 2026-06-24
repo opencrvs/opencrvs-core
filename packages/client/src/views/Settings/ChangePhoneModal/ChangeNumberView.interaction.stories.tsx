@@ -97,8 +97,8 @@ export const DuplicatePhoneShowsToast: Story = {
   parameters: {
     msw: {
       handlers: {
-        requestContactChange: [
-          tRPCMsw.user.requestContactChange.mutation(() => {
+        requestPhoneChange: [
+          tRPCMsw.user.requestPhoneChange.mutation(() => {
             throw new TRPCError({ code: 'CONFLICT' })
           })
         ]

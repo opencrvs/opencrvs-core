@@ -23,7 +23,6 @@ import { isAValidEmailAddressFormat } from '@client/utils/validate'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { TriggerEvent } from '@opencrvs/commons/client'
 
 interface IProps {
   show: boolean
@@ -43,7 +42,7 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
   ] = React.useState(false)
   const userDetails = useSelector(getUserDetails)
   const isOnline = useOnlineStatus()
-  const { requestContactChange } = useUsers()
+  const { requestEmailChange } = useUsers()
   const isEmailAddressUnchanged =
     Boolean(emailAddress) &&
     emailAddress.trim().toLowerCase() === userDetails?.email?.toLowerCase()
@@ -70,11 +69,8 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
   }
   const continueButtonHandler = async (emailAddress: string) => {
     if (!userDetails) return
-    requestContactChange.mutate(
-      {
-        notificationEvent: TriggerEvent.CHANGE_EMAIL_ADDRESS,
-        email: emailAddress
-      },
+    requestEmailChange.mutate(
+      { email: emailAddress },
       {
         onSuccess: (data) => {
           onSuccess(emailAddress, data.nonce)
@@ -112,7 +108,7 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
           }}
           disabled={
             !isOnline ||
-            requestContactChange.isPending ||
+            requestEmailChange.isPending ||
             !Boolean(emailAddress.length) ||
             isInvalidEmailAddress ||
             isEmailAddressUnchanged
