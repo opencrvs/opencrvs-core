@@ -99,6 +99,7 @@ export function Review() {
           actionConfig.label,
           previousFormValues
         )}
+        treatMissingValuesAsCleared={true}
         validatorContext={validatorContext}
         onEdit={({ pageId, fieldId }) => {
           navigate(

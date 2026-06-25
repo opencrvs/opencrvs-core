@@ -38,9 +38,9 @@ export function Review() {
   const [{ backTo }] = useTypedSearchParams(ROUTES.V2.EVENTS.EDIT.REVIEW)
   const events = useEvents()
   const navigate = useNavigate()
-  const validatorContext = useValidatorContext()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
   const event = events.getEvent.getFromCache(eventId)
+  const validatorContext = useValidatorContext(event)
   const { eventConfiguration: config } = useEventConfiguration(event.type)
   const formConfig = getDeclaration(config)
   const currentEventState = getCurrentEventState(event, config)
@@ -93,6 +93,7 @@ export function Review() {
           previousFormValues={previousFormValues}
           reviewFields={reviewConfig.fields}
           title={formatMessage(reviewConfig.title, form)}
+          treatMissingValuesAsCleared={true}
           validatorContext={validatorContext}
           onAnnotationChange={(values) => setAnnotation(values)}
           onEdit={handleEdit}

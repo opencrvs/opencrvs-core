@@ -140,6 +140,7 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - Merged Helm charts as part of Monorepo [#12679](https://github.com/opencrvs/opencrvs-core/issues/12679)
 - Change nginx log format to json for client and login containers [#10202](https://github.com/opencrvs/opencrvs-core/issues/10202)
 - Reduce the amount of data sent to Elasticsearch by dropping unused and duplicate fields during Filebeat processing [#11232](https://github.com/opencrvs/opencrvs-core/issues/11232)
+- The app now recovers automatically when the network changes (e.g. Ethernet → WiFi) or become online -> offline -> online again during app initialisation is halfway. If connectivity drops while the app is still loading and is then restored, the app reloads itself to finish loading, instead of getting stuck on the "Installing application…" screen and requiring a manual refresh. [#12898](https://github.com/opencrvs/opencrvs-core/issues/12898)
 
 ## 1.9.15 Release Candidate
 

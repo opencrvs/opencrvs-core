@@ -88,6 +88,16 @@ const eventConfig: DeepPartial<EventConfig> = {
       customActionType: 'FOOBAR',
       flags: []
     },
+    {
+      type: ActionType.CUSTOM,
+      customActionType: 'VALIDATE_DECLARATION',
+      flags: [{ id: InherentFlags.REJECTED, operation: 'remove' }]
+    },
+    {
+      type: ActionType.CUSTOM,
+      customActionType: 'COMPLETE_NOTIFICATION',
+      flags: [{ id: InherentFlags.INCOMPLETE, operation: 'remove' }]
+    },
     { type: ActionType.PRINT_CERTIFICATE, flags: [] }
   ],
   declaration: {
@@ -446,6 +456,72 @@ describe('getEventFlags() – rejected flag', () => {
     ).toContain(InherentFlags.REJECTED)
   })
 
+  test('is cleared by a custom action whose config removes the REJECTED flag', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.DECLARE,
+          declaration: {},
+          createdAt: formatISO(subDays(now, 3)),
+          status: ActionStatus.Accepted
+        },
+        {
+          type: ActionType.REJECT,
+          declaration: {},
+          createdAt: formatISO(subDays(now, 2)),
+          status: ActionStatus.Accepted
+        },
+        {
+          type: ActionType.CUSTOM,
+          customActionType: 'VALIDATE_DECLARATION',
+          declaration: {},
+          createdAt: formatISO(subDays(now, 1)),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial event document and event config
+    expect(getEventFlags(event, eventConfig)).not.toContain(
+      InherentFlags.REJECTED
+    )
+  })
+
+  test('is present again when a REJECT follows the flag-removing custom action', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.DECLARE,
+          declaration: {},
+          createdAt: formatISO(subDays(now, 4)),
+          status: ActionStatus.Accepted
+        },
+        {
+          type: ActionType.REJECT,
+          declaration: {},
+          createdAt: formatISO(subDays(now, 3)),
+          status: ActionStatus.Accepted
+        },
+        {
+          type: ActionType.CUSTOM,
+          customActionType: 'VALIDATE_DECLARATION',
+          declaration: {},
+          createdAt: formatISO(subDays(now, 2)),
+          status: ActionStatus.Accepted
+        },
+        {
+          type: ActionType.REJECT,
+          declaration: {},
+          createdAt: formatISO(subDays(now, 1)),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial event document and event config
+    expect(getEventFlags(event, eventConfig)).toContain(InherentFlags.REJECTED)
+  })
+
   test('only considers accepted actions when computing the rejected flag', () => {
     const event: DeepPartial<EventDocument> = {
       actions: [
@@ -467,6 +543,49 @@ describe('getEventFlags() – rejected flag', () => {
     // @ts-expect-error - allow partial event document and event config
     expect(getEventFlags(event, eventConfig)).not.toContain(
       InherentFlags.REJECTED
+    )
+  })
+})
+
+describe('getEventFlags() – any inherent flag is clearable by action config', () => {
+  test('INCOMPLETE is present for a notified record', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.NOTIFY,
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial event document and event config
+    expect(getEventFlags(event, eventConfig)).toContain(InherentFlags.INCOMPLETE)
+  })
+
+  test('INCOMPLETE is cleared by a custom action whose config removes it', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.NOTIFY,
+          declaration: {},
+          createdAt: formatISO(subDays(now, 1)),
+          status: ActionStatus.Accepted
+        },
+        {
+          type: ActionType.CUSTOM,
+          customActionType: 'COMPLETE_NOTIFICATION',
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial event document and event config
+    expect(getEventFlags(event, eventConfig)).not.toContain(
+      InherentFlags.INCOMPLETE
     )
   })
 })
