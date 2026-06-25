@@ -2,16 +2,25 @@
 
 ## 2.0.0
 
-- Support biographic updates to MOSIP via `updateBiographics`.
+- Support biographic updates to MOSIP via `updateBiographics`. ([#152](https://github.com/opencrvs/mosip/pull/152))
 
-- Enabled `child.nid` creation support during birth correction flows.
+- Enabled `child.nid` creation support during birth correction flows. ([#151](https://github.com/opencrvs/mosip/pull/151))
+
   - To support this, the integration needs to fetch the record to know which action to confirm. Note that this adds a new record audit log row for `ActionType.VIEW`.
 
-- Handles synchronous action acceptance flows gracefully. Previously, the flow used async/202 country config action confirmation flows, but now all flows are supported.
+- Handles synchronous action acceptance flows gracefully. Previously, the flow used async/202 country config action confirmation flows, but now all flows are supported. ([#159](https://github.com/opencrvs/mosip/pull/159))
 
-- Allow configuring which key in the verifiable credential (e.g., UIN, VID, NID) is used to populate `child.nid` in OpenCRVS.
+- Allow configuring which key in the verifiable credential (e.g., UIN, VID, NID) is used to populate `child.nid` in OpenCRVS. ([#156](https://github.com/opencrvs/mosip/pull/156))
 
 - Allow returning `individual_id` from OIDP (E-Signet) user info response. It gets passed to `idType` as `NATIONAL_ID`, and `nid` as the individual id.
+
+- Allow adding a custom `schemaJson` instead of hard-coded.
+
+- Added `jti` claim to the E-Signet request as required by E-Signet.
+
+- Aligned to E-Signet's new name handling in Collab. It now splits the name by ' ' instead of separate claims.
+
+- Aligned service logging with redaction and structured events. ([#134](https://github.com/opencrvs/mosip/pull/134))
 
 ## 1.9.0
 
