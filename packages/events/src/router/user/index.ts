@@ -297,7 +297,7 @@ const auditRouter = router({
 })
 
 export const userRouter = router({
-  get: userOnlyProcedure
+  get: userAndSystemProcedure
     .input(UUID)
     .use(userCanReadOtherUser)
     .output(UserOrSystem)
