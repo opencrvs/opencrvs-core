@@ -93,6 +93,7 @@ export function Review() {
           previousFormValues={previousFormValues}
           reviewFields={reviewConfig.fields}
           title={formatMessage(reviewConfig.title, form)}
+          treatMissingValuesAsCleared={true}
           validatorContext={validatorContext}
           onAnnotationChange={(values) => setAnnotation(values)}
           onEdit={handleEdit}

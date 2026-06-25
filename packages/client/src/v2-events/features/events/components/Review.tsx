@@ -227,6 +227,7 @@ function FormReview({
   readonlyMode,
   isCorrection = false,
   isReviewCorrection = false,
+  treatMissingValuesAsCleared = false,
   validatorContext
 }: {
   formConfig: FormConfig
@@ -238,6 +239,7 @@ function FormReview({
   readonlyMode?: boolean
   isCorrection?: boolean
   isReviewCorrection?: boolean
+  treatMissingValuesAsCleared?: boolean
 }) {
   const intl = useIntl()
 
@@ -257,6 +259,13 @@ function FormReview({
               const value = form[field.id]
               const previousValue = previousForm[field.id]
 
+              const displayValue =
+                treatMissingValuesAsCleared &&
+                value === undefined &&
+                previousValue !== undefined
+                  ? null
+                  : value
+
               // previousForm, formConfig are used to find previous values with the same label if required
               const valueDisplay = (
                 <Output
@@ -267,7 +276,7 @@ function FormReview({
                   showPreviouslyMissingValuesAsChanged={
                     showPreviouslyMissingValuesAsChanged
                   }
-                  value={value}
+                  value={displayValue}
                 />
               )
 
@@ -429,6 +438,7 @@ function ReviewComponent({
   reviewFields,
   isCorrection = false,
   isReviewCorrection = false,
+  treatMissingValuesAsCleared = false,
   banner
 }: {
   children?: React.ReactNode
@@ -452,6 +462,7 @@ function ReviewComponent({
   readonlyMode?: boolean
   isCorrection?: boolean
   isReviewCorrection?: boolean
+  treatMissingValuesAsCleared?: boolean
   banner?: React.ReactNode
 }) {
   const intl = useIntl()
@@ -496,6 +507,7 @@ function ReviewComponent({
             showPreviouslyMissingValuesAsChanged={
               showPreviouslyMissingValuesAsChanged
             }
+            treatMissingValuesAsCleared={treatMissingValuesAsCleared}
             validatorContext={validatorContext}
             onEdit={onEdit}
           />
