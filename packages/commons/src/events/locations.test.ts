@@ -14,11 +14,13 @@ import { SystemContext, UserContext } from '../users/User'
 import {
   AdministrativeArea,
   canAccessEventWithScope,
+  canAccessOtherUserWithScopes,
   EventIndexWithAdministrativeHierarchy,
   getLocationHierarchy,
-  Location
+  Location,
+  UserWithResolvedHierarchy
 } from './locations'
-import { RecordScopeV2 } from 'src/scopes'
+import { RecordScopeV2, UserScopeV2 } from 'src/scopes'
 import { UUID } from 'src/uuid'
 
 describe('canAccessEventWithScope()', () => {
@@ -317,6 +319,80 @@ describe('canAccessEventWithScope()', () => {
         ).toBe(true)
       }
     )
+  })
+})
+
+describe('canAccessOtherUserWithScopes()', () => {
+  const rng = createPrng(11111)
+  const adminAreaUuid = generateUuid(rng)
+  const officeUuid = generateUuid(rng)
+  const otherOfficeUuid = generateUuid(rng)
+
+  // The user being viewed lives in a different administrative area
+  const targetUser: UserWithResolvedHierarchy = {
+    role: TestUserRole.enum.FIELD_AGENT,
+    administrativeHierarchy: [adminAreaUuid, otherOfficeUuid],
+    primaryOfficeId: otherOfficeUuid
+  }
+
+  const scopeWithAdminAreaAccess: UserScopeV2 = {
+    type: 'user.read',
+    options: { accessLevel: 'administrativeArea' }
+  }
+
+  it('grants access when calling user has administrativeAreaId: null (root jurisdiction)', () => {
+    const callingUser: UserContext = {
+      type: 'user',
+      id: generateUuid(rng),
+      primaryOfficeId: officeUuid,
+      administrativeAreaId: null,
+      role: TestUserRole.enum.LOCAL_SYSTEM_ADMIN
+    }
+
+    expect(
+      canAccessOtherUserWithScopes({
+        scopes: [scopeWithAdminAreaAccess],
+        userToAccess: targetUser,
+        user: callingUser
+      })
+    ).toBe(true)
+  })
+
+  it('grants access when calling user has administrativeAreaId: undefined (root jurisdiction)', () => {
+    const callingUser: UserContext = {
+      type: 'user',
+      id: generateUuid(rng),
+      primaryOfficeId: officeUuid,
+      administrativeAreaId: undefined,
+      role: TestUserRole.enum.LOCAL_SYSTEM_ADMIN
+    }
+
+    expect(
+      canAccessOtherUserWithScopes({
+        scopes: [scopeWithAdminAreaAccess],
+        userToAccess: targetUser,
+        user: callingUser
+      })
+    ).toBe(true)
+  })
+
+  it('denies access when calling user has an administrativeAreaId not in the target hierarchy', () => {
+    const unrelatedAreaId = generateUuid(rng)
+    const callingUser: UserContext = {
+      type: 'user',
+      id: generateUuid(rng),
+      primaryOfficeId: officeUuid,
+      administrativeAreaId: unrelatedAreaId,
+      role: TestUserRole.enum.LOCAL_SYSTEM_ADMIN
+    }
+
+    expect(
+      canAccessOtherUserWithScopes({
+        scopes: [scopeWithAdminAreaAccess],
+        userToAccess: targetUser,
+        user: callingUser
+      })
+    ).toBe(false)
   })
 })
 
