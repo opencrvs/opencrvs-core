@@ -42,12 +42,11 @@ import {
   canAccessOtherUserWithScopes,
   UserScopeType,
   CreateUserInput,
-  getAvailableRolesForUserUpdatePayload,
-  UserContext
+  canAccessUserWithScope
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { ServiceTrpcContext, TrpcContext } from '@events/context'
-import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
+import { AsyncActionInput } from '@events/router/event/actions'
 import { getUserById } from '@events/storage/postgres/events/users'
 import { getSystemInitialisation } from '@events/service/auth'
 import { getLocationHierarchy } from '@events/service/locations/locations'
@@ -96,86 +95,59 @@ export function allowedWithAnyOfScopes(scopes: ScopeType[]) {
   return fn
 }
 
-export const canUpdateUserLocation: MiddlewareFunction<
+export const canUpdateUser: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
   TrpcContext,
   TrpcContext,
-  { id: UUID; primaryOfficeId?: string }
+  { id: UUID; primaryOfficeId?: UUID; role?: string }
 > = async (opts) => {
-  const { token } = opts.ctx
   const { input, ctx } = opts
+  const { token } = ctx
 
-  const existingUser = await getUserById(UUID.parse(input.id))
+  const existingUser = await getUserById(input.id)
   if (!existingUser) {
     throw new TRPCError({
       code: 'FORBIDDEN'
     })
   }
 
-  let officeId = existingUser.officeId
+  const scopes = getAcceptedScopesFromToken(token, ['user.edit'])
 
-  if (
-    input.primaryOfficeId !== undefined &&
-    input.primaryOfficeId !== existingUser.officeId
-  ) {
-    if (hasScope(token, 'config.update-all')) {
-      officeId = input.primaryOfficeId as UUID
-    } else {
-      throw new TRPCError({
-        code: 'FORBIDDEN',
-        message: 'Location cannot be changed by this user'
-      })
-    }
-  }
-
-  return opts.next({
-    input: { ...input, primaryOfficeId: officeId },
-    ctx: {
-      ...ctx
-    }
-  })
-}
-
-export const canUpdateUserRole: MiddlewareFunction<
-  TrpcContext,
-  OpenApiMeta,
-  TrpcContext,
-  TrpcContext,
-  { id: UUID; role?: string }
-> = async (opts) => {
-  const { token } = opts.ctx
-  const { input, ctx } = opts
-
-  const existingUser = await getUserById(UUID.parse(input.id))
-  if (!existingUser) {
-    throw new TRPCError({
-      code: 'FORBIDDEN'
-    })
-  }
-
-  if (input.role === undefined || input.role === existingUser.role) {
-    return opts.next()
-  }
-
-  const acceptedScopes = getAcceptedScopesFromToken(token, ['user.edit'])
-
-  const administrativeHierarchy = await getLocationHierarchy(
+  const currentLocationHierarchy = await getLocationHierarchy(
     existingUser.officeId
   )
 
-  const availableRoles = getAvailableRolesForUserUpdatePayload({
-    acceptedScopes,
-    // Since we are only checking if the user can update to a specific role, we can pass an array with only that role to optimize the check instead of passing all roles in the system.
-    allRoles: [input.role],
-    userLocation: {
-      primaryOfficeId: existingUser.officeId,
-      administrativeHierarchy
-    },
-    userRequesting: ctx.user as UserContext
-  })
+  const updatedLocationHierarchy = input.primaryOfficeId
+    ? await getLocationHierarchy(input.primaryOfficeId)
+    : currentLocationHierarchy
 
-  if (!availableRoles.includes(input.role)) {
+  const updatedRole = input.role ?? existingUser.role
+  const updatedOfficeId = input.primaryOfficeId ?? existingUser.officeId
+
+  const canAccessExistingAndUpdatedUser = scopes.some(
+    (scope) =>
+      canAccessUserWithScope({
+        userToAccess: {
+          role: existingUser.role,
+          primaryOfficeId: existingUser.officeId,
+          administrativeHierarchy: currentLocationHierarchy
+        },
+        scope,
+        user: ctx.user
+      }) &&
+      canAccessUserWithScope({
+        userToAccess: {
+          role: updatedRole,
+          primaryOfficeId: updatedOfficeId,
+          administrativeHierarchy: updatedLocationHierarchy
+        },
+        scope,
+        user: ctx.user
+      })
+  )
+
+  if (!canAccessExistingAndUpdatedUser) {
     throw new TRPCError({
       code: 'FORBIDDEN'
     })
@@ -188,7 +160,17 @@ export const EventIdParam = z.object({
   eventId: UUID,
   customActionType: z.string().optional()
 })
+export const EventIdParamWithWaitFor = EventIdParam.extend({
+  waitFor: z
+    .boolean()
+    .default(true)
+    .describe(
+      'Whether the action should wait for the event to be indexed before returning. Defaults to true. Setting this to false completes faster but might lead to stale data in the client if the client tries to read the event immediately after performing the action. Use with care.'
+    )
+})
+
 export type EventIdParam = z.infer<typeof EventIdParam>
+export type EventIdParamWithWaitFor = z.infer<typeof EventIdParamWithWaitFor>
 
 export const requireAssignment: MiddlewareFunction<
   TrpcContext,
@@ -279,7 +261,7 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
   OpenApiMeta,
   TrpcContext,
   TrpcContext,
-  AsyncActionConfirmationResponseSchema
+  AsyncActionInput
 > = async ({ next, ctx, input }) => {
   const { token } = ctx
   const { eventId, actionId } = getTokenPayload(token)
@@ -323,6 +305,7 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
     TrpcContext & { eventId: UUID; eventType: string },
     unknown
   > = async ({ next, ctx, getRawInput }) => {
+    const { eventId: grantedEventId } = getTokenPayload(ctx.token)
     const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
     const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
 
@@ -337,6 +320,13 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
 
     if (!input) {
       throw new TRPCError({ code: 'BAD_REQUEST' })
+    }
+
+    if (grantedEventId && grantedEventId !== input.eventId) {
+      throw new TRPCError({
+        code: 'FORBIDDEN',
+        message: 'Token does not grant access to this event'
+      })
     }
 
     const event = await getEventById(input.eventId)

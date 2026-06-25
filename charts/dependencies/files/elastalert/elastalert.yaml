@@ -14,13 +14,20 @@ run_every:
 buffer_time:
   minutes: 15
 # es_url_prefix: http
-es_host: "${ES_HOST}"
-es_port: "${ES_HOST}"
+es_host: '${ES_HOST}'
+es_port: '${ES_HOST}'
 # es_username: <passed as environment variables>
 # es_password: <passed as environment variables>
 writeback_index: elastalert_status
 
-http_post2_url: "${HTTP_POST2_ALERT_URL}"
+http_post2_url: '${HTTP_POST2_ALERT_URL}'
+
+smtp_host: '${SMTP_HOST}'
+smtp_port: '${SMTP_PORT}'
+from_addr: '${SENDER_EMAIL_ADDRESS}'
+smtp_ssl: ${SMTP_SECURE}
+smtp_starttls: ${SMTP_SECURE}
+smtp_auth_file: /opt/elastalert/smtp.auth
 
 alert_time_limit:
   days: 2

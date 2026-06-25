@@ -22,9 +22,10 @@ interface NumberInputProps
   onChange(val: number | undefined): void
   value: number | undefined
   min?: number
+  integer?: boolean
 }
 
-function NumberInput({ value, disabled, ...props }: NumberInputProps) {
+function NumberInput({ value, disabled, integer, ...props }: NumberInputProps) {
   const [inputValue, setInputValue] = React.useState(
     value && isNaN(value) ? undefined : value
   )
@@ -36,6 +37,7 @@ function NumberInput({ value, disabled, ...props }: NumberInputProps) {
   }, [value])
   return (
     <TextInputComponent
+      step={integer ? 1 : undefined}
       type={'number'}
       {...props}
       data-testid={`number__${props.id}`}
@@ -46,16 +48,23 @@ function NumberInput({ value, disabled, ...props }: NumberInputProps) {
         props.onBlur?.(e)
       }}
       onChange={(e) => {
-        // Parse the input value as a floating-point number to allow decimal values.
+        // Parse the input value. When `integer` is set only whole numbers are
+        // allowed, otherwise decimal values are accepted.
         // If the parsed value is NaN (e.g., when the input is cleared), set inputValue to undefined.
         // Otherwise, update inputValue with the parsed number.
-        const updatedValue = parseFloat(e.target.value)
+        const updatedValue = integer
+          ? parseInt(e.target.value, 10)
+          : parseFloat(e.target.value)
         isNaN(updatedValue)
           ? setInputValue(undefined)
           : setInputValue(updatedValue)
       }}
       onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
         if (allowOnlyPositive && e.key === '-') {
+          e.preventDefault()
+        }
+        // Block decimal separators and exponent notation for integer-only inputs.
+        if (integer && ['.', ',', 'e', 'E'].includes(e.key)) {
           e.preventDefault()
         }
       }}
@@ -66,7 +75,7 @@ function NumberInput({ value, disabled, ...props }: NumberInputProps) {
 export const Number = {
   Input: NumberInput,
   Output: ({ value, config }: { value?: number; config: NumberField }) => {
-    if (value === undefined) {
+    if (value == null) {
       return null
     }
 
@@ -76,7 +85,7 @@ export const Number = {
     return (
       <>
         {prefix && intl.formatMessage(prefix)}
-        {value ? value.toString() : ''}
+        {value.toString()}
         {postfix && intl.formatMessage(postfix)}
       </>
     )

@@ -13,7 +13,7 @@
 {{- end }}
 {{- define "elasticsearch-reindex.initContainerSpec" -}}
 - name: copy-assets
-  image: "{{ .Values.countryconfig.image.name }}:{{ .Values.countryconfig.image.tag }}-assets"
+  image: {{ include "opencrvs.image" (dict "root" . "service" .Values.countryconfig) }}-assets
   command:
     - sh
     - -c
@@ -23,6 +23,9 @@
   volumeMounts:
     - name: elasticsearch-assets
       mountPath: /data-assets
+{{- end }}
+{{- define "elasticsearch-reindex.imagePullSecrets" -}}
+{{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.countryconfig) }}
 {{- end }}
 {{- define "elasticsearch-reindex.volumes" -}}
 - name: elasticsearch-assets

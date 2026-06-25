@@ -38,7 +38,7 @@ export function Onboarding() {
   const { eventId, pageId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
   )
-  const [{ workqueue }] = useTypedSearchParams(
+  const [{ backTo }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
   )
 
@@ -79,11 +79,11 @@ export function Onboarding() {
           {
             eventId: event.id
           },
-          { workqueue }
+          { backTo }
         )
       )
     }
-  }, [currentPageId, navigate, event.id, workqueue])
+  }, [currentPageId, navigate, event.id, backTo])
 
   if (!currentPageId) {
     return null
@@ -93,21 +93,23 @@ export function Onboarding() {
     <ActionPageLight
       hideBackground
       goBack={() => navigate(-1)}
-      goHome={() => closeActionView()}
+      goHome={() => closeActionView(backTo)}
       id="corrector_form"
       title={intl.formatMessage(messages.title)}
     >
       <PagesComponent
+        hideBackToReview
         attachmentPath={`events/${event.id}/`}
         continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
-        declaration={eventIndex.declaration}
         eventConfig={configuration}
         formData={annotation}
         formPages={formPages}
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
-        showReviewButton={false}
-        validatorContext={validatorContext}
+        validatorContext={{
+          ...validatorContext,
+          baseFormState: eventIndex.declaration
+        }}
         onPageChange={(nextPageId: string) => {
           return navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath(
@@ -115,7 +117,7 @@ export function Onboarding() {
                 eventId,
                 pageId: nextPageId
               },
-              { workqueue }
+              { backTo }
             )
           )
         }}
@@ -123,7 +125,7 @@ export function Onboarding() {
           return navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
               { eventId },
-              { workqueue }
+              { backTo }
             )
           )
         }}

@@ -101,9 +101,9 @@ This section allows you to configure the deployment and authentication settings 
 | enabled                 | boolean | true                  | Enable or disable the Elasticsearch deployment.                                                                                              |
 | use_default_credentials | boolean | true                  | Deploy Elasticsearch without enabled authentication.                                                                                         |
 | storage_type            | string  | `pvc`                 | Kubernetes storage type, available options are `pvc` or `host_path`. More information are at [Storage Configuration](#storage-configuration) |
-| pvc.storage_class | string | `n/a` | StorageClass name used for dynamic volume provisioning |
-| pvc.storage_size | string | 10Gi | Persistent volume claim size for Postgres data volume |
-| pvc.access_mode | string | ReadWriteOnce | Kubernetes PVC access mode |
+| pvc.storage_class       | string  | `n/a`                 | StorageClass name used for dynamic volume provisioning                                                                                       |
+| pvc.storage_size        | string  | 10Gi                  | Persistent volume claim size for Postgres data volume                                                                                        |
+| pvc.access_mode         | string  | ReadWriteOnce         | Kubernetes PVC access mode                                                                                                                   |
 | host_data_path          | string  | `/data/elasticsearch` | Path to persistent data on VM (host)                                                                                                         |
 | node_selector           | dict    | `{}`                  | Label selector for datastore nodes, usually used to keep data persistent                                                                     |
 
@@ -116,9 +116,9 @@ This section allows you to configure the deployment and authentication settings 
 | enabled                 | bool   | true                            | Enable or disable minio service                                                                                                              |
 | use_default_credentials | bool   | true                            | Default credentials for MinIO are username `minioadmin` and password `minioadmin`.                                                           |
 | storage_type            | string | `pvc`                           | Kubernetes storage type, available options are `pvc` or `host_path`. More information are at [Storage Configuration](#storage-configuration) |
-| pvc.storage_class | string | `n/a` | StorageClass name used for dynamic volume provisioning |
-| pvc.storage_size | string | 10Gi | Persistent volume claim size for Postgres data volume |
-| pvc.access_mode | string | ReadWriteOnce | Kubernetes PVC access mode |
+| pvc.storage_class       | string | `n/a`                           | StorageClass name used for dynamic volume provisioning                                                                                       |
+| pvc.storage_size        | string | 10Gi                            | Persistent volume claim size for Postgres data volume                                                                                        |
+| pvc.access_mode         | string | ReadWriteOnce                   | Kubernetes PVC access mode                                                                                                                   |
 | host_data_path          | string | `/data/minio`                   | Path to persistent data on VM (host)                                                                                                         |
 | node_selector           | dict   | `{}`                            | Label selector for datastore nodes, usually used to keep data persistent                                                                     |
 | backup.{}               | dict   | `{}`                            | Backup configuration section, for more information please check `values.yaml` and **Backup section** in this README                          |
@@ -272,10 +272,10 @@ You control persistence using the `storage_type` option, which can be set **glob
 
 ```yaml
 elasticsearch:
-  storage_type: pvc  # Not required; pvc is default
+  storage_type: pvc # Not required; pvc is default
   pvc:
     storage_size: 5Gi
-    storage_class: "azurefile-premium" # Optional: specify a StorageClass or leave as "" for default
+    storage_class: 'azurefile-premium' # Optional: specify a StorageClass or leave as "" for default
 ```
 
 #### Use hostPath for MinIO data (legacy volumes, on-prem, etc):
@@ -320,17 +320,44 @@ elasticsearch:
 
 ### Elastalert
 
-For backward compatibility `HTTP_POST2_ALERT_URL` environment variable needs to be added to elastalert configuration. All alerts will be send to country config service and forwarded to email address defined while SMTP server configuration.
+**Notifications**
 
-See example:
+ElastAlert supports two notification delivery methods configured through [values.yaml](./values.yaml):
+
+- `email`: Sends alerts directly to an SMTP server.
+- `post2`: Sends alerts via HTTP POST to an countryconfig service. This mode is provided for backward compatibility with Docker Swarm deployments where alerts are routed through CountryConfig.
+
+Configuration example:
 
 ```yaml
 elastalert:
   env:
-    HTTP_POST2_ALERT_URL: http://countryconfig.opencrvs-dev.svc.cluster.local:3040/email
+    NOTIFICATION_TYPE: post2
 ```
 
-> NOTE: This behavior will be changed in future releases, see [#10608](https://github.com/opencrvs/opencrvs-core/issues/10608)
+When using `post2`, configure the target endpoint, see example:
+
+```yaml
+elastalert:
+  env:
+    HTTP_POST2_ALERT_URL: http://countryconfig.opencrvs-qa.svc.cluster.local:3040/email
+```
+
+**Configuration options `email`**
+
+When `NOTIFICATION_TYPE` is set to `email`, ElastAlert requires an SMTP credentials secret. Configure the secret in `values.yaml` and provide the following keys:
+
+| Secret Key             | Description                                         |
+| ---------------------- | --------------------------------------------------- |
+| `ALERT_EMAIL`          | Recipient email address for alerts.                 |
+| `SENDER_EMAIL_ADDRESS` | Email address used as the sender.                   |
+| `SMTP_HOST`            | SMTP server hostname.                               |
+| `SMTP_PORT`            | SMTP server port (for example `587`).               |
+| `SMTP_USERNAME`        | SMTP authentication username.                       |
+| `SMTP_PASSWORD`        | SMTP authentication password.                       |
+| `SMTP_SECURE`          | Enables secure SMTP connection (`true` or `false`). |
+
+Refer to the `values.yaml` file for the complete configuration example.
 
 **Custom rules**
 

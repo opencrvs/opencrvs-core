@@ -11,13 +11,16 @@
 
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { inferInput, inferOutput } from '@trpc/tanstack-react-query'
+import { useSelector } from 'react-redux'
 import {
   deepDropNulls,
   System,
   TokenUserType,
-  User,
-  UserOrSystem
+  UserOrSystem,
+  UserOrSystemSummary,
+  UserSummary
 } from '@opencrvs/commons/client'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import {
   hasConflict,
   queryClient,
@@ -75,39 +78,61 @@ setQueryDefaults<
 setQueryDefaults(trpcOptionsProxy.user.list, {
   queryFn: async (...params) => {
     const {
-      queryKey: [, input]
+      queryKey: [procedurePath, input]
     } = params[0]
 
-    const queryOptions = trpcOptionsProxy.user.list.queryOptions(input.input)
+    const requestedIds = input.input ?? []
 
-    if (typeof queryOptions.queryFn !== 'function') {
-      throw new Error('queryFn is not a function')
+    const cachedUserMap = new Map(
+      queryClient
+        .getQueriesData<inferOutput<typeof trpcOptionsProxy.user.list>>({
+          queryKey: trpcOptionsProxy.user.list.queryKey()
+        })
+        .flatMap(([, data]) => data ?? [])
+        .map((user) => [user.id as string, user])
+    )
+    const uncachedIds = requestedIds.filter((id) => !cachedUserMap.has(id))
+
+    if (uncachedIds.length > 0) {
+      const uncachedQueryOptions =
+        trpcOptionsProxy.user.list.queryOptions(uncachedIds)
+
+      if (typeof uncachedQueryOptions.queryFn !== 'function') {
+        throw new Error('queryFn is not a function')
+      }
+
+      // Construct a context whose queryKey input is the uncached IDs only, so
+      // the raw tRPC queryFn makes an HTTP request for only those users.
+      const freshUsers = await uncachedQueryOptions.queryFn({
+        ...params[0],
+        queryKey: [
+          procedurePath,
+          { input: uncachedIds }
+        ] as (typeof params)[0]['queryKey']
+      })
+
+      await Promise.allSettled(
+        freshUsers.map(async (user) => {
+          if (user.type === TokenUserType.enum.system) {
+            return user
+          }
+          if (user.avatar) {
+            await precacheFile(user.avatar)
+          }
+          return user
+        })
+      )
+
+      for (const user of freshUsers) {
+        cachedUserMap.set(user.id as string, user)
+      }
     }
 
-    const users = await queryOptions.queryFn(...params)
-
-    await Promise.allSettled(
-      users.map(async (user) => {
-        if (user.type === TokenUserType.enum.system) {
-          return user
-        }
-
-        if (user.signature) {
-          return precacheFile(user.signature)
-        }
-
-        if (user.avatar) {
-          return precacheFile(user.avatar)
-        }
-        return user
-      })
-    )
-
-    return users.map((user) => ({
-      ...user,
-      signature: user.signature,
-      avatar: user.avatar
-    }))
+    // Return only the originally-requested IDs from the combined map,
+    // silently dropping any IDs the server does not know about.
+    return requestedIds
+      .map((id) => cachedUserMap.get(id))
+      .filter((u): u is UserSummary => u !== undefined)
   }
 })
 
@@ -118,6 +143,14 @@ setMutationDefaults(trpcOptionsProxy.user.changePhone, {
   onSuccess: async (data, variables) => {
     await queryClient.invalidateQueries({
       queryKey: trpcOptionsProxy.user.get.queryKey(variables.userId)
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.list.queryKey()
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.search.queryKey()
     })
   }
 })
@@ -130,6 +163,14 @@ setMutationDefaults(trpcOptionsProxy.user.changeEmail, {
     await queryClient.invalidateQueries({
       queryKey: trpcOptionsProxy.user.get.queryKey(variables.userId)
     })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.list.queryKey()
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.search.queryKey()
+    })
   }
 })
 setMutationDefaults(trpcOptionsProxy.user.changeAvatar, {
@@ -139,6 +180,30 @@ setMutationDefaults(trpcOptionsProxy.user.changeAvatar, {
   onSuccess: async (data, variables) => {
     await queryClient.invalidateQueries({
       queryKey: trpcOptionsProxy.user.get.queryKey(variables.userId)
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.list.queryKey()
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.search.queryKey()
+    })
+  }
+})
+
+setMutationDefaults(trpcOptionsProxy.user.sendResetPasswordInvite, {
+  mutationFn:
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    trpcOptionsProxy.user.sendResetPasswordInvite.mutationOptions().mutationFn!,
+  retry: false,
+  onSuccess: async (data, variables) => {
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.get.queryKey(variables)
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.search.queryKey()
     })
   }
 })
@@ -153,32 +218,30 @@ export function useUsers() {
           enabled?: boolean
         }
       ) => {
+        const currentUser = useSelector(getUserDetails)
+        const isOwnUser = currentUser?.id === id
         const { queryFn, ...queryOptions } = trpc.user.get.queryOptions(id)
+        // Other users' data must not be served from IDB — stale cache seeds
+        // form state before the background refetch arrives, showing outdated values.
         return useQuery({
           ...queryOptions,
           ...options,
-          queryKey: trpc.user.get.queryKey(id)
+          queryKey: trpc.user.get.queryKey(id),
+          ...(!isOwnUser && { gcTime: 0, meta: { noCache: true } })
         })
       },
       useSuspenseQuery: (id: string) => {
+        const currentUser = useSelector(getUserDetails)
+        const isOwnUser = currentUser?.id === id
         const { queryFn, ...options } = trpc.user.get.queryOptions(id)
+        // See useQuery above — same reasoning applies.
         return [
           useSuspenseQuery({
             ...options,
-            queryKey: trpc.user.get.queryKey(id)
+            queryKey: trpc.user.get.queryKey(id),
+            ...(!isOwnUser && { gcTime: 0, meta: { noCache: true } })
           }).data
         ]
-      },
-      getAllCached: () => {
-        return queryClient
-          .getQueriesData<User>({
-            queryKey: trpc.user.get.queryKey()
-          })
-          .flatMap(([, data]) => data)
-          .filter(
-            (userOrSystem): userOrSystem is User =>
-              userOrSystem?.type === TokenUserType.enum.user
-          )
       }
     },
     createUser: ({
@@ -248,13 +311,13 @@ export function useUsers() {
     getSystem: {
       getAllCached: () => {
         return queryClient
-          .getQueriesData<System>({
-            queryKey: trpc.user.get.queryKey()
+          .getQueriesData<UserOrSystemSummary[]>({
+            queryKey: trpc.user.list.queryKey()
           })
-          .flatMap(([, data]) => data)
+          .flatMap(([, data]) => data ?? [])
           .filter(
             (userOrSystem): userOrSystem is System =>
-              userOrSystem?.type === TokenUserType.enum.system
+              userOrSystem.type === TokenUserType.enum.system
           )
       }
     },
@@ -274,6 +337,37 @@ export function useUsers() {
             queryKey: trpc.user.list.queryKey(ids)
           }).data
         ]
+      },
+      useQueryById: (
+        id: string,
+        options?: {
+          enabled?: boolean
+        }
+      ) => {
+        const ids = id ? [id] : []
+        const { queryFn, ...queryOptions } = trpc.user.list.queryOptions(ids)
+        const query = useQuery({
+          ...queryOptions,
+          ...options,
+          enabled: !!id && (options?.enabled ?? true),
+          queryKey: trpc.user.list.queryKey(ids)
+        })
+        const data = query.data
+        return {
+          ...query,
+          data: data?.[0]
+        }
+      },
+      getAllCached: () => {
+        return queryClient
+          .getQueriesData<UserOrSystemSummary[]>({
+            queryKey: trpc.user.list.queryKey()
+          })
+          .flatMap(([, data]) => data ?? [])
+          .filter(
+            (userOrSystem): userOrSystem is UserSummary =>
+              userOrSystem.type === TokenUserType.enum.user
+          )
       }
     },
     searchUsers: {
@@ -303,8 +397,11 @@ export function useUsers() {
     changePassword: useMutation(
       trpcOptionsProxy.user.changePassword.mutationOptions()
     ),
-    sendVerifyCode: useMutation(
-      trpcOptionsProxy.user.sendVerifyCode.mutationOptions()
+    requestEmailChange: useMutation(
+      trpcOptionsProxy.user.requestEmailChange.mutationOptions()
+    ),
+    requestPhoneChange: useMutation(
+      trpcOptionsProxy.user.requestPhoneChange.mutationOptions()
     ),
     changePhone: useMutation(
       trpcOptionsProxy.user.changePhone.mutationOptions()

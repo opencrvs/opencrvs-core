@@ -18,11 +18,11 @@ import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { useIntl } from 'react-intl'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { useSelector } from 'react-redux'
+import { useOnlineStatus } from '@client/utils'
 import { isAValidEmailAddressFormat } from '@client/utils/validate'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { TriggerEvent } from '@opencrvs/commons/client'
 
 interface IProps {
   show: boolean
@@ -41,7 +41,11 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
     setShowDuplicateEmailErrorNotification
   ] = React.useState(false)
   const userDetails = useSelector(getUserDetails)
-  const { sendVerifyCode } = useUsers()
+  const isOnline = useOnlineStatus()
+  const { requestEmailChange } = useUsers()
+  const isEmailAddressUnchanged =
+    Boolean(emailAddress) &&
+    emailAddress.trim().toLowerCase() === userDetails?.email?.toLowerCase()
 
   const onChangeEmailAddress = (event: React.ChangeEvent<HTMLInputElement>) => {
     const emailAddress = event.target.value
@@ -65,19 +69,14 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
   }
   const continueButtonHandler = async (emailAddress: string) => {
     if (!userDetails) return
-    sendVerifyCode.mutate(
-      {
-        notificationEvent: TriggerEvent.CHANGE_EMAIL_ADDRESS
-      },
+    requestEmailChange.mutate(
+      { email: emailAddress },
       {
         onSuccess: (data) => {
           onSuccess(emailAddress, data.nonce)
         },
         onError: (error) => {
-          if (
-            error.message.includes('409') ||
-            error.message.includes('duplicate')
-          ) {
+          if (error.data?.code === 'CONFLICT') {
             setShowDuplicateEmailErrorNotification(true)
           } else {
             setUnknownError(true)
@@ -107,7 +106,13 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
           onClick={() => {
             continueButtonHandler(emailAddress)
           }}
-          disabled={!Boolean(emailAddress.length) || isInvalidEmailAddress}
+          disabled={
+            !isOnline ||
+            requestEmailChange.isPending ||
+            !Boolean(emailAddress.length) ||
+            isInvalidEmailAddress ||
+            isEmailAddressUnchanged
+          }
         >
           {intl.formatMessage(buttonMessages.continueButton)}
         </PrimaryButton>
@@ -124,7 +129,9 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
         error={
           isInvalidEmailAddress
             ? intl.formatMessage(messages.emailAddressChangeFormValidationMsg)
-            : ''
+            : isEmailAddressUnchanged
+              ? intl.formatMessage(messages.emailAddressUnchangedErrorMessege)
+              : ''
         }
       >
         <TextInput

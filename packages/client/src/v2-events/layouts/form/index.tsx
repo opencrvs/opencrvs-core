@@ -12,10 +12,11 @@
 import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
-import { Frame, Spinner } from '@opencrvs/components'
+import { Frame } from '@opencrvs/components'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { SuspenseLoadingFallback } from '@client/v2-events/components/SuspenseLoadingFallback'
 import { FormHeader } from './FormHeader'
 import { AllowedRouteWithEventId } from './utils'
 
@@ -57,7 +58,9 @@ export function FormLayout({
       }
       skipToContentText="Skip to form"
     >
-      <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
+      <React.Suspense
+        fallback={<SuspenseLoadingFallback id="event-form-spinner" />}
+      >
         {children}
       </React.Suspense>
     </Frame>

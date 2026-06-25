@@ -192,10 +192,12 @@ function QuickActionModal({
         <FormFieldGenerator
           eventConfig={eventConfiguration}
           fields={config.fields ?? []}
-          // Pass in the complete declaration form values so that read-only declaration data is available for Data components or calculations.
-          formContext={event.declaration}
           id={'quick-action-modal-form'}
-          validatorContext={validatorContext}
+          // Pass in the complete declaration form values so that read-only declaration data is available for Data components or calculations.
+          validatorContext={{
+            ...validatorContext,
+            baseFormState: event.declaration
+          }}
           onFormChange={handleChange}
         />
       </Stack>
@@ -214,7 +216,7 @@ export function useQuickActionModal(
 
   const onQuickAction = async (
     actionType: keyof typeof quickActions,
-    workqueue?: string
+    backTo?: string
   ) => {
     const config = quickActions[actionType]
     const label = actionLabels[actionType]
@@ -247,8 +249,8 @@ export function useQuickActionModal(
         isActionAllowed
       })
 
-      if (workqueue) {
-        navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue }))
+      if (backTo) {
+        navigate(backTo)
       } else {
         navigate(ROUTES.V2.buildPath({}))
       }
@@ -277,7 +279,7 @@ export function useCustomActionModal(
 
   const onCustomAction = async (
     actionConfig: CustomActionConfig,
-    workqueue?: string
+    backTo?: string
   ) => {
     const modalResult = await openModal<ModalResult>((close) => (
       <QuickActionModal
@@ -303,8 +305,8 @@ export function useCustomActionModal(
         annotation: modalResult.values
       })
 
-      if (workqueue) {
-        navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue }))
+      if (backTo) {
+        navigate(backTo)
       } else {
         navigate(ROUTES.V2.buildPath({}))
       }

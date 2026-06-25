@@ -27,13 +27,12 @@ import {
 import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
-import { AvailableActionTypes } from './Action/utils'
 
 interface PagesProps {
   formData: EventState
   setFormData: (form: EventState) => void
   pageId: string
-  showReviewButton?: boolean
+  hideBackToReview?: boolean
   formPages: PageConfig[]
   onPageChange: (nextPageId: string) => void
   onSubmit: () => void
@@ -44,21 +43,13 @@ interface PagesProps {
   isCorrection?: boolean
 }
 
-type DeclarationProps =
-  | {
-      actionType: AvailableActionTypes
-      declaration?: undefined
-    }
-  | {
-      declaration: EventState
-    }
 /**
  *
  * Reusable component for rendering a form with pagination. Used by different action forms
  */
 export function Pages({
   formData,
-  showReviewButton,
+  hideBackToReview = false,
   attachmentPath,
   formPages,
   onPageChange,
@@ -67,11 +58,10 @@ export function Pages({
   continueButtonText,
   setFormData,
   eventConfig,
-  declaration,
   // When isCorrection is true, we should disabled fields with 'uncorrectable' set to true, or skip pages where all fields have 'uncorrectable' set to true
   isCorrection = false,
   validatorContext
-}: PagesProps & DeclarationProps) {
+}: PagesProps) {
   const intl = useIntl()
   const visiblePages = formPages.filter((page) =>
     isPageVisible(page, formData, validatorContext)
@@ -88,10 +78,16 @@ export function Pages({
     document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
   }, [pageId])
 
-  function switchToNextPage() {
-    const nextPageIdx = pageIdx + 1
+  function switchToNextPage(formValues: EventState = formData) {
+    const currentVisiblePages = formPages.filter((p) =>
+      isPageVisible(p, formValues, validatorContext)
+    )
+    const currentPageIdx = currentVisiblePages.findIndex((p) => p.id === pageId)
+    const nextPageIdx = currentPageIdx + 1
     const nextPage =
-      nextPageIdx < visiblePages.length ? visiblePages[nextPageIdx] : undefined
+      nextPageIdx < currentVisiblePages.length
+        ? currentVisiblePages[nextPageIdx]
+        : undefined
 
     // If there is a next page on the form available, navigate to it.
     // Otherwise, submit the form.
@@ -100,14 +96,24 @@ export function Pages({
 
   // values is used on the verification page wizard to set the verification page result
   function onNextPage(values?: EventState) {
+    // submit() flushes the current page values (including values computed
+    // inside FormFieldGenerator, e.g. default values) into the form state
+    // store and returns any validation errors.
     const errors = formRef.current?.submit(values) ?? []
-    // onValidSubmit (i.e. switchToNextPage) is called as part of submit only if
-    // there are no errors in the form. But if the current page doesn't require
-    // completion to continue and there are errors on the page, we manually call
-    // switchToNextPage.
-    if (!page.requireCompletionToContinue && errors.length > 0) {
+    // Navigate when the page allows incomplete values, or when the page is
+    // error-free.
+    const allowErrors = !page.requireCompletionToContinue
+    if (allowErrors || errors.length === 0) {
       switchToNextPage()
     }
+  }
+
+  function handleSubmit() {
+    // submit() flushes the current page values (including values computed
+    // inside FormFieldGenerator, e.g. default values) into the form state
+    // store. Navigating to review is allowed even when the page has errors.
+    formRef.current?.submit()
+    onSubmit()
   }
 
   function onPreviousPage() {
@@ -123,10 +129,10 @@ export function Pages({
   const wizardProps = {
     currentPage: pageIdx,
     pageTitle: intl.formatMessage(page.title),
-    showReviewButton,
+    showReviewButton: !hideBackToReview,
     onNextPage,
     onPreviousPage,
-    onSubmit
+    onSubmit: handleSubmit
   }
   const fields = (
     <FormFieldGenerator
@@ -134,9 +140,6 @@ export function Pages({
       attachmentPath={attachmentPath}
       eventConfig={eventConfig}
       fields={page.fields}
-      // This makes the declaration available in the validations/conditionals of
-      // the form without bleeding into the current form values
-      formContext={declaration}
       formTouched={formTouched}
       formValues={formData}
       id="pagesSection"
@@ -144,7 +147,6 @@ export function Pages({
       validatorContext={validatorContext}
       onFormChange={setFormData}
       onTouchedChange={setFormTouched}
-      onValidSubmit={switchToNextPage}
     />
   )
 

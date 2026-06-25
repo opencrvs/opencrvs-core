@@ -12,8 +12,7 @@ import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
-  alwaysTrue,
-  defineConditional,
+  always,
   EncodedScope,
   EventConfig,
   field,
@@ -25,6 +24,7 @@ import {
   never,
   or,
   PageTypes,
+  user,
   UserContext,
   UserScopeV2,
   UUID
@@ -35,7 +35,6 @@ import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { emptyMessage, isTemporaryId } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes/routes'
-import { validationMessages } from '@client/i18n/messages'
 
 export function useUserEditConfig(
   locationId: UUID | undefined,
@@ -113,6 +112,13 @@ export function useUserEditConfig(
                   id: 'primaryOfficeId',
                   type: FieldType.LOCATION,
                   required: true,
+                  configuration: {
+                    allowedLocations: user.jurisdiction(
+                      user
+                        .scope(isNewUser ? 'user.create' : 'user.edit')
+                        .attribute('accessLevel')
+                    )
+                  },
                   label: messages.registrationOffice
                 }
               ]
@@ -138,7 +144,7 @@ export function useUserEditConfig(
                   label: messages.phoneNumber,
                   validation: [
                     {
-                      message: validationMessages.phoneNumberNotValid,
+                      message: messages.phoneNumberFormat,
                       validator: or(
                         field('phoneNumber').matches(
                           String(window.config.PHONE_NUMBER_PATTERN)
@@ -191,13 +197,13 @@ export function useUserEditConfig(
                 selectedRole?.scopes ?? [],
                 'profile.electronic-signature'
               )
-                ? defineConditional(alwaysTrue())
+                ? always()
                 : never(),
               fields: [
                 {
                   id: 'signature',
                   type: FieldType.SIGNATURE,
-                  required: false,
+                  required: true,
                   label: messages.userSignatureAttachment,
                   signaturePromptLabel: messages.userSignatureAttachment,
                   configuration: {

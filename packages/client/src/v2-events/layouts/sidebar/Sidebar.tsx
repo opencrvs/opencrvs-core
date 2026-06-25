@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
+import { onlineManager } from '@tanstack/react-query'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
@@ -42,11 +43,20 @@ import {
 import { hasOutboxWorkqueue, WORKQUEUE_OUTBOX } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { withSuspense } from '../../components/withSuspense'
 import { OrganisationNavigationGroup } from './OrganisationNavigationGroup'
 import { PerformanceNavigationGroup } from './PerformanceNavigationGroup'
 
 const SCREEN_LOCK = 'screenLock'
+
+function subscribeOnlineStatus(cb: () => void) {
+  return onlineManager.subscribe(cb)
+}
+
+function getOnlineSnapshot() {
+  return onlineManager.isOnline()
+}
 
 function Workqueues({
   workqueues,
@@ -80,6 +90,14 @@ function Workqueues({
   ))
 }
 
+export async function logout(language?: string) {
+  await storage.removeItem(SCREEN_LOCK)
+  await removeToken()
+  await removeUserDetails()
+  // redirect is handled at nginx level.
+  window.location.assign(`/login?lang=${language ?? ''}`)
+}
+
 function SidebarComponent({
   menuCollapse,
   navigationWidth,
@@ -92,6 +110,7 @@ function SidebarComponent({
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const intl = useIntl()
   const scopes = useSelector(getScope)
+  const { getLocation } = useLocations()
 
   const { getOutbox } = useEvents()
   const outbox = getOutbox()
@@ -108,6 +127,11 @@ function SidebarComponent({
   const offlineCountryConfig = useSelector(getOfflineData)
   const userDetails = useSelector(getUserDetails)
   const language = useSelector(getLanguage)
+  const isOnline = React.useSyncExternalStore(
+    subscribeOnlineStatus,
+    getOnlineSnapshot,
+    () => true
+  )
 
   let name = ''
   if (userDetails?.name) {
@@ -126,25 +150,21 @@ function SidebarComponent({
         }
       )) ??
     ''
+  const primaryOffice = userDetails?.primaryOfficeId
+    ? getLocation.useQuery(userDetails.primaryOfficeId).data?.name
+    : undefined
 
   const avatar = <Avatar avatar={userDetails?.avatar} name={name} />
 
   const runningVer = String(localStorage.getItem('running-version'))
 
-  const logout = async () => {
-    await storage.removeItem(SCREEN_LOCK)
-    await removeToken()
-    await removeUserDetails()
-    window.location.assign(
-      `/login?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}${ROUTES.V2.buildPath({})}`
-    )
-  }
-
   return (
     <LeftNavigation
       applicationName={offlineCountryConfig.config.APPLICATION_NAME}
       applicationVersion={runningVer}
+      assignedOffice={primaryOffice}
       avatar={() => avatar}
+      isOnline={isOnline}
       name={name}
       navigationWidth={navigationWidth}
       role={role}
@@ -199,6 +219,7 @@ function SidebarComponent({
       </NavigationGroup>
       <OrganisationNavigationGroup
         currentWorkqueueSlug={workqueueSlug}
+        menuCollapse={menuCollapse}
         primaryOfficeId={userDetails?.primaryOfficeId}
       />
       <PerformanceNavigationGroup currentWorkqueueSlug={workqueueSlug} />
@@ -218,7 +239,7 @@ function SidebarComponent({
             icon={() => <LogoutNavigation />}
             id={`navigation_${WORKQUEUE_TABS.logout}`}
             label={intl.formatMessage(buttonMessages[WORKQUEUE_TABS.logout])}
-            onClick={logout}
+            onClick={async () => logout(language)}
           />
         </NavigationGroup>
       )}

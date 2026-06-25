@@ -10,12 +10,20 @@
  */
 import {
   AdministrativeArea,
+  AddressField,
   AddressType,
-  field,
+  AgeField,
+  ButtonField,
+  DateField,
+  EventState,
   FieldType,
+  generateTranslationConfig,
   InteractiveFieldType,
+  NameField,
   now,
   SystemVariables,
+  TextField,
+  TimeField,
   user,
   UUID
 } from '@opencrvs/commons/client'
@@ -52,6 +60,7 @@ const mockAdminLevelIds = ['province', 'district']
 const mockContext: SystemVariables & {
   administrativeAreas: Map<UUID, AdministrativeArea>
   adminLevelIds: string[]
+  form: EventState
 } = {
   user: {
     id: 'user-id',
@@ -72,10 +81,11 @@ const mockContext: SystemVariables & {
     }
   },
   administrativeAreas: mockAdministrativeAreas,
-  adminLevelIds: mockAdminLevelIds
+  adminLevelIds: mockAdminLevelIds,
+  form: {}
 }
 
-const TextField = {
+const textField = {
   id: 'recommender.id',
   type: FieldType.TEXT,
   defaultValue: user('name'),
@@ -86,9 +96,9 @@ const TextField = {
     description: 'This is the label for the field',
     id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.id.label'
   }
-} satisfies InteractiveFieldType
+} satisfies TextField
 
-const TimeField = {
+const timeField = {
   id: 'recommender.id',
   type: FieldType.TIME,
   defaultValue: now(),
@@ -99,9 +109,9 @@ const TimeField = {
     description: 'This is the label for the time field',
     id: 'event.tennis-club-membership.time'
   }
-} satisfies InteractiveFieldType
+} satisfies TimeField
 
-const DateField = {
+const dateField = {
   id: 'recommender.id',
   type: FieldType.DATE,
   defaultValue: now(),
@@ -112,9 +122,9 @@ const DateField = {
     description: 'This is the label for the date field',
     id: 'event.tennis-club-membership.date'
   }
-} satisfies InteractiveFieldType
+} satisfies DateField
 
-const NameField = {
+const nameField = {
   id: 'applicant.name',
   type: FieldType.NAME,
   label: {
@@ -130,193 +140,26 @@ const NameField = {
     surname: user('surname')
   },
   validation: []
-} satisfies InteractiveFieldType
-
-const AddressField = {
-  id: 'applicant.address',
-  type: FieldType.ADDRESS,
-  required: true,
-  secured: true,
-  conditionals: [],
-  label: {
-    defaultMessage: "Applicant's address",
-    description: 'This is the label for the field',
-    id: 'event.tennis-club-membership.action.declare.form.section.who.field.address.label'
-  },
-  validation: [],
-  defaultValue: {
-    country: 'FAR',
-    addressType: AddressType.DOMESTIC,
-    administrativeArea: user('primaryOfficeId').locationLevel('district')
-  },
-  configuration: {
-    streetAddressForm: [
-      {
-        id: 'town',
-        required: false,
-        parent: field('country'),
-        label: {
-          id: 'field.address.town.label',
-          defaultMessage: 'Town',
-          description: 'This is the label for the field'
-        },
-        conditionals: [],
-        type: FieldType.TEXT
-      },
-      {
-        id: 'residentialArea',
-        required: false,
-        parent: field('country'),
-        label: {
-          id: 'field.address.residentialArea.label',
-          defaultMessage: 'Residential Area',
-          description: 'This is the label for the field'
-        },
-        conditionals: [],
-        type: FieldType.TEXT
-      },
-      {
-        id: 'street',
-        required: false,
-        parent: field('country'),
-        label: {
-          id: 'field.address.street.label',
-          defaultMessage: 'Street',
-          description: 'This is the label for the field'
-        },
-        conditionals: [],
-        type: FieldType.TEXT
-      },
-      {
-        id: 'number',
-        required: false,
-        parent: field('country'),
-        label: {
-          id: 'field.address.number.label',
-          defaultMessage: 'Number',
-          description: 'This is the label for the field'
-        },
-        conditionals: [],
-        type: FieldType.TEXT
-      },
-      {
-        id: 'zipCode',
-        required: false,
-        parent: field('country'),
-        label: {
-          id: 'field.address.postcodeOrZip.label',
-          defaultMessage: 'Postcode / Zip',
-          description: 'This is the label for the field'
-        },
-        conditionals: [],
-        type: FieldType.TEXT
-      },
-      {
-        id: 'state',
-        conditionals: [],
-        parent: field('country'),
-        required: true,
-        label: {
-          id: 'field.address.state.label',
-          defaultMessage: 'State',
-          description: 'This is the label for the field'
-        },
-        type: FieldType.TEXT
-      },
-      {
-        id: 'district2',
-        parent: field('country'),
-        conditionals: [],
-        required: true,
-        label: {
-          id: 'field.address.district2.label',
-          defaultMessage: 'District',
-          description: 'This is the label for the field'
-        },
-        type: FieldType.TEXT
-      },
-      {
-        id: 'cityOrTown',
-        parent: field('country'),
-        conditionals: [],
-        required: false,
-        label: {
-          id: 'field.address.cityOrTown.label',
-          defaultMessage: 'City / Town',
-          description: 'This is the label for the field'
-        },
-        type: FieldType.TEXT
-      },
-      {
-        id: 'addressLine1',
-        parent: field('country'),
-        conditionals: [],
-        required: false,
-        label: {
-          id: 'field.address.addressLine1.label',
-          defaultMessage: 'Address Line 1',
-          description: 'This is the label for the field'
-        },
-        type: FieldType.TEXT
-      },
-      {
-        id: 'addressLine2',
-        parent: field('country'),
-        conditionals: [],
-        required: false,
-        label: {
-          id: 'field.address.addressLine2.label',
-          defaultMessage: 'Address Line 2',
-          description: 'This is the label for the field'
-        },
-        type: FieldType.TEXT
-      },
-      {
-        id: 'addressLine3',
-        parent: field('country'),
-        conditionals: [],
-        required: false,
-        label: {
-          id: 'field.address.addressLine3.label',
-          defaultMessage: 'Address Line 3',
-          description: 'This is the label for the field'
-        },
-        type: FieldType.TEXT
-      },
-      {
-        id: 'postcodeOrZip',
-        parent: field('country'),
-        conditionals: [],
-        required: false,
-        label: {
-          id: 'field.address.postcodeOrZip.label',
-          defaultMessage: 'Postcode / Zip',
-          description: 'This is the label for the field'
-        },
-        type: FieldType.TEXT
-      }
-    ]
-  }
-} satisfies InteractiveFieldType
+} satisfies NameField
 
 describe('mapFieldToDefaultValue', () => {
   it('resolves user field token for TEXT field', () => {
-    const result = mapFieldToDefaultValue(TextField, mockContext)
+    const result = mapFieldToDefaultValue(textField, mockContext)
     expect(result).toBe('John Michael Doe')
   })
 
   it('resolves now() token for TIME field', () => {
-    const result = mapFieldToDefaultValue(TimeField, mockContext)
+    const result = mapFieldToDefaultValue(timeField, mockContext)
     expect(result).toMatch(/^\d{2}:\d{2}$/)
   })
 
   it('resolves now() token for DATE field', () => {
-    const result = mapFieldToDefaultValue(DateField, mockContext)
+    const result = mapFieldToDefaultValue(dateField, mockContext)
     expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/)
   })
 
   it('resolves user field tokens for NAME field', () => {
-    const result = mapFieldToDefaultValue(NameField, mockContext)
+    const result = mapFieldToDefaultValue(nameField, mockContext)
     expect(result).toEqual({
       firstname: 'John',
       middlename: 'Michael',
@@ -324,27 +167,135 @@ describe('mapFieldToDefaultValue', () => {
     })
   })
 
-  it('resolves administrativeArea via locationLevel district for ADDRESS field', () => {
-    const result = mapFieldToDefaultValue(AddressField, mockContext)
-    expect(result).toMatchObject({ administrativeArea: DISTRICT_ID })
-  })
-
-  it('resolves administrativeArea via locationLevel province for ADDRESS field', () => {
-    const addressFieldProvince = {
-      ...AddressField,
+  it('for ADDRESS fields', () => {
+    const addressField = {
+      id: 'applicant.address',
+      type: FieldType.ADDRESS,
+      required: true,
+      secured: true,
+      conditionals: [],
+      label: {
+        defaultMessage: "Applicant's address",
+        description: 'This is the label for the field',
+        id: 'event.tennis-club-membership.action.declare.form.section.who.field.address.label'
+      },
+      validation: [],
       defaultValue: {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        administrativeArea: user('primaryOfficeId').locationLevel('province')
+        administrativeArea: user('primaryOfficeId').locationLevel('district')
       }
-    } satisfies InteractiveFieldType
+    } satisfies AddressField
 
-    const result = mapFieldToDefaultValue(addressFieldProvince, mockContext)
-    expect(result).toMatchObject({ administrativeArea: PROVINCE_ID })
+    it('resolves administrativeArea via locationLevel district', () => {
+      const result = mapFieldToDefaultValue(addressField, mockContext)
+      expect(result).toMatchObject({ administrativeArea: DISTRICT_ID })
+    })
+
+    it('resolves administrativeArea via locationLevel province', () => {
+      const addressFieldProvince = {
+        ...addressField,
+        defaultValue: {
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: user('primaryOfficeId').locationLevel('province')
+        }
+      } satisfies InteractiveFieldType
+
+      const result = mapFieldToDefaultValue(addressFieldProvince, mockContext)
+      expect(result).toMatchObject({ administrativeArea: PROVINCE_ID })
+    })
+
+    it('passes through other address fields unchanged', () => {
+      const result = mapFieldToDefaultValue(addressField, mockContext)
+      expect(result).toMatchObject({ country: 'FAR', addressType: 'DOMESTIC' })
+    })
+
+    it('returns undefined for administrativeArea when not provided in default value', () => {
+      const addressFieldProvince = {
+        ...addressField,
+        defaultValue: {
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC
+        }
+      } satisfies InteractiveFieldType
+
+      const result = mapFieldToDefaultValue(addressFieldProvince, mockContext)
+      expect(result).toMatchObject({ administrativeArea: undefined })
+    })
+
+    it("returns undefined for administrativeArea when location level not in user's hierarchy", () => {
+      const addressFieldProvince = {
+        ...addressField,
+        defaultValue: {
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: user('primaryOfficeId').locationLevel('village')
+        }
+      } satisfies InteractiveFieldType
+
+      const result = mapFieldToDefaultValue(addressFieldProvince, mockContext)
+      expect(result).toMatchObject({ administrativeArea: undefined })
+    })
   })
 
-  it('passes through other address fields unchanged', () => {
-    const result = mapFieldToDefaultValue(AddressField, mockContext)
-    expect(result).toMatchObject({ country: 'FAR', addressType: 'DOMESTIC' })
+  it('CHECKBOX with defaultValue false returns false, not undefined', () => {
+    const checkboxField = {
+      id: 'test.checkbox',
+      type: FieldType.CHECKBOX,
+      required: false,
+      defaultValue: false,
+      conditionals: [],
+      label: generateTranslationConfig('Checkbox')
+    }
+
+    const result = mapFieldToDefaultValue(checkboxField, mockContext)
+    expect(result).toBe(false)
+  })
+
+  it('BUTTON with defaultValue 0 returns 0, not undefined', () => {
+    const buttonField: ButtonField = {
+      id: 'test.button',
+      type: FieldType.BUTTON,
+      required: false,
+      conditionals: [],
+      defaultValue: 0,
+      label: generateTranslationConfig('Button'),
+      configuration: { text: generateTranslationConfig('Press me') }
+    }
+
+    const result = mapFieldToDefaultValue(buttonField, mockContext)
+    expect(result).toBe(0)
+  })
+
+  it('AGE field returns { age, asOfDateRef } from defaultValue and configuration', () => {
+    const ageField: AgeField = {
+      id: 'applicant.age',
+      type: FieldType.AGE,
+      required: false,
+      conditionals: [],
+      defaultValue: 30,
+      label: generateTranslationConfig('Age'),
+      configuration: {
+        asOfDate: { $$field: 'event.dateOfBirth', $$subfield: [] }
+      }
+    }
+
+    const result = mapFieldToDefaultValue(ageField, mockContext)
+    expect(result).toEqual({ age: 30, asOfDateRef: 'event.dateOfBirth' })
+  })
+
+  it('NUMBER with defaultValue 0 returns 0, not undefined', () => {
+    const NumberField = {
+      id: 'test.number',
+      type: FieldType.NUMBER,
+      required: false,
+      conditionals: [],
+      defaultValue: 0,
+      label: generateTranslationConfig('Number')
+    }
+
+    const result = mapFieldToDefaultValue(NumberField, mockContext)
+    expect(result).toBe(0)
   })
 })

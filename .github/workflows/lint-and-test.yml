@@ -80,7 +80,9 @@ jobs:
     steps:
       - name: Checking out git repo
         uses: actions/checkout@v6
-
+      - name: Cleanup patches directory for non-client packages
+        if: ${{ matrix.package != 'packages/client' }}
+        run: rm -rf patches
       - name: Check package.json and scripts
         id: check-scripts
         run: |
@@ -144,15 +146,13 @@ jobs:
             fi
           done
 
-      - name: Cache Node.js dependencies
-        uses: actions/cache@v5
+      - name: Restore Yarn cache
+        uses: actions/cache/restore@v5
+        id: yarn-cache
         with:
           path: |
-            **/node_modules
             ~/.cache/yarn/v6
           key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}',matrix.package,'package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Verify every file has a license header
         if: steps.check-scripts.outputs.skip != 'true'
@@ -161,6 +161,15 @@ jobs:
       - name: Runs dependency installation
         if: steps.check-scripts.outputs.skip != 'true'
         run: CI="" yarn install --frozen-lockfile
+
+      - name: Save Yarn cache
+        if: |
+          github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
+          steps.yarn-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/yarn/v6
+          key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
 
       - name: Build common package
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/commons')
@@ -264,18 +273,25 @@ jobs:
             fi
           done
 
-      - name: Cache Node.js dependencies
-        uses: actions/cache@v5
+      - name: Restore Yarn cache
+        uses: actions/cache/restore@v5
+        id: yarn-cache
         with:
           path: |
-            **/node_modules
             ~/.cache/yarn/v6
           key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
+
+      - name: Save Yarn cache
+        if: |
+          github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
+          steps.yarn-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/yarn/v6
+          key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
 
       - name: Build common package
         run: cd packages/commons && yarn build
@@ -325,18 +341,25 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      - name: Cache Node.js dependencies
-        uses: actions/cache@v5
+      - name: Restore Yarn cache
+        uses: actions/cache/restore@v5
+        id: yarn-cache
         with:
           path: |
-            **/node_modules
             ~/.cache/yarn/v6
           key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
+
+      - name: Save Yarn cache
+        if: |
+          github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
+          steps.yarn-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/yarn/v6
+          key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
 
       - name: Build events router types
         run: cd packages/events && node_modules/.bin/tsc -p tsconfig.router.json
@@ -351,7 +374,10 @@ jobs:
     name: Run chromatic visual tests
     needs: prepare-client-tests
     runs-on: ubuntu-24.04
-
+    # Chromatic visual tests are disabled for now until we find a way to reduce the monthly costs
+    # On average, every day we create roughly 7500 - 10000 snapshots per working day
+    # Snapshots included in our plan are 35 000 per month and all exceeding snapshots are charged at $0.008 per snapshot
+    if: false
     steps:
       # Fresh checkout brings .git (needed by Chromatic's TurboSnap and
       # by the change-detection `git diff` below). The artifact
@@ -391,20 +417,28 @@ jobs:
             --stats packages/client/storybook-static/preview-stats.json \
             --base "$BASE_SHA"
 
-      - name: Cache Node.js dependencies
+      - name: Restore Yarn cache
         if: steps.detect.outputs.affects == 'true'
-        uses: actions/cache@v5
+        uses: actions/cache/restore@v5
+        id: yarn-cache
         with:
           path: |
-            **/node_modules
             ~/.cache/yarn/v6
           key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Install dependencies
         if: steps.detect.outputs.affects == 'true'
         run: CI="" yarn install --frozen-lockfile
+
+      - name: Save Yarn cache
+        if: |
+          steps.detect.outputs.affects == 'true' &&
+          github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
+          steps.yarn-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/yarn/v6
+          key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
 
       - name: Run Chromatic
         if: steps.detect.outputs.affects == 'true'
@@ -432,18 +466,25 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      - name: Cache Node.js dependencies
-        uses: actions/cache@v5
+      - name: Restore Yarn cache
+        uses: actions/cache/restore@v5
+        id: yarn-cache
         with:
           path: |
-            **/node_modules
             ~/.cache/yarn/v6
           key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
+
+      - name: Save Yarn cache
+        if: |
+          github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
+          steps.yarn-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/yarn/v6
+          key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
 
       - name: Install Playwright
         # Playwright is required since @storybook/test-runner depends on it
@@ -481,18 +522,25 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      - name: Cache Node.js dependencies
-        uses: actions/cache@v5
+      - name: Restore Yarn cache
+        uses: actions/cache/restore@v5
+        id: yarn-cache
         with:
           path: |
-            **/node_modules
             ~/.cache/yarn/v6
           key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
+
+      - name: Save Yarn cache
+        if: |
+          github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
+          steps.yarn-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/yarn/v6
+          key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
 
       - name: Run Unit Test
         run: cd packages/client && yarn test --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}

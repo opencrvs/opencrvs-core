@@ -11,7 +11,7 @@
 import React, { useEffect } from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { get } from 'lodash'
+import { get, isEqual } from 'lodash'
 import {
   EventState,
   FieldProps,
@@ -24,21 +24,13 @@ import {
   EventConfig,
   getDeclarationFields,
   DataEntry,
-  FieldReference
+  isFieldReference
 } from '@opencrvs/commons/client'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { makeFormikFieldIdOpenCRVSCompatible } from '@client/v2-events/components/forms/utils'
-
-function isFieldReference(entry: unknown): entry is FieldReference {
-  return (
-    Boolean(entry) &&
-    typeof entry === 'object' &&
-    entry !== null &&
-    '$$field' in entry
-  )
-}
+import { parseFieldReferenceToValue } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
 
 function getFieldFromDataEntry({
   intl,
@@ -51,14 +43,12 @@ function getFieldFromDataEntry({
 }) {
   const { label, value: rawValue } = entry
 
-  // Resolve value if it's a message descriptor
   let formattedValue: string
 
   if (isFieldReference(rawValue)) {
-    formattedValue =
-      rawValue.$$subfield.length > 0
-        ? get(formData[rawValue.$$field], rawValue.$$subfield)
-        : formData[rawValue.$$field]
+    formattedValue = String(
+      parseFieldReferenceToValue(rawValue, formData) ?? ''
+    )
   } else {
     formattedValue =
       typeof rawValue === 'object' &&
@@ -136,62 +126,62 @@ function DataInput({
   const { subtitle, data } = configuration
   const title = label.defaultMessage ? intl.formatMessage(label) : ''
 
-  const fields = data.map((entry) => {
-    if ('fieldId' in entry) {
-      const config = allKnownFields.find((f) => f.id === entry.fieldId)
+  const fields = data
+    .map((entry) => {
+      if ('fieldId' in entry) {
+        const configs = allKnownFields.filter((f) => f.id === entry.fieldId)
 
-      if (!config) {
-        throw new Error(
-          `Configuration for field: '${entry.fieldId}' in DATA not found`
+        if (configs.length === 0) {
+          throw new Error(
+            `Configuration for field: '${entry.fieldId}' in DATA not found`
+          )
+        }
+        const visibleConfigs = configs.filter((f) =>
+          isFieldVisible(f, formData, validatorContext)
         )
+
+        // We don't want to display fields that are conditionally hidden in the original form configuration
+        if (visibleConfigs.length === 0) {
+          return null
+        }
+
+        return {
+          value: formData[entry.fieldId],
+          config: visibleConfigs[0]
+        }
       }
 
-      return {
-        value: formData[entry.fieldId],
-        config
+      const value = entry.value
+
+      if (isFieldReference(value)) {
+        const resolvedValue = parseFieldReferenceToValue(value, formData)
+
+        return getFieldFromDataEntry({
+          intl,
+          formData,
+          entry: {
+            label: entry.label,
+            value: resolvedValue ? String(resolvedValue) : '',
+            id: entry.id
+          }
+        })
       }
-    }
-
-    const value = entry.value
-
-    if (isFieldReference(value)) {
-      const resolvedValue =
-        value.$$subfield.length > 0
-          ? get(formData[value.$$field], value.$$subfield)
-          : formData[value.$$field]
 
       return getFieldFromDataEntry({
         intl,
         formData,
         entry: {
           label: entry.label,
-          value: resolvedValue ? String(resolvedValue) : '',
+          value,
           id: entry.id
         }
       })
-    }
-
-    return getFieldFromDataEntry({
-      intl,
-      formData,
-      entry: {
-        label: entry.label,
-        value,
-        id: entry.id
-      }
     })
-  })
+    .filter((f) => f !== null)
 
   // When we first render the field, let's save the values of the fields to the form data.
   // This is done because we want to send the values to the backend, so that they can be displayed in the Output later.
   useEffect(() => {
-    // We keep updating until the field value is actually found in the form data.
-    // Previously we tried only updating the value during render once, but ran into issues with form state not being updated.
-    const idWithDotSeparator = makeFormikFieldIdOpenCRVSCompatible(id)
-    if (idWithDotSeparator in formData) {
-      return
-    }
-
     const value = fields.reduce((acc, f) => {
       if (f.value === null || f.value === undefined) {
         return acc
@@ -199,6 +189,13 @@ function DataInput({
 
       return { ...acc, [f.config.id]: f.value }
     }, {})
+
+    // We keep updating until the field value is actually found in the form data.
+    // Previously we tried only updating the value during render once, but ran into issues with form state not being updated.
+    const idWithDotSeparator = makeFormikFieldIdOpenCRVSCompatible(id)
+    if (isEqual(formData[idWithDotSeparator], { data: value })) {
+      return
+    }
 
     onChange({ data: value })
   }, [id, formData, onChange, fields])
@@ -208,18 +205,13 @@ function DataInput({
       {title && <label>{title}</label>}
       {subtitle && <Subtitle>{intl.formatMessage(subtitle)}</Subtitle>}
       <Summary>
-        {fields
-          // We don't want to display fields that are conditionally hidden in the original form configuration
-          .filter(({ config }) =>
-            isFieldVisible(config, formData, validatorContext)
-          )
-          .map(({ config, value }) => (
-            <Summary.Row
-              key={config.id}
-              label={intl.formatMessage(config.label)}
-              value={<Output field={config} value={value} />}
-            />
-          ))}
+        {fields.map(({ config, value }) => (
+          <Summary.Row
+            key={config.id}
+            label={intl.formatMessage(config.label)}
+            value={<Output field={config} value={value} />}
+          />
+        ))}
       </Summary>
     </Container>
   )

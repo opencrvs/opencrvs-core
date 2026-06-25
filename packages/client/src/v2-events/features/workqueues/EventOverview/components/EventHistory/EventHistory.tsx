@@ -159,15 +159,10 @@ function User({ action }: { action: EventHistoryActionDocument }) {
         )
       }
     >
-      <UserAvatar
-        // @TODO: extend v2-events User to include avatar
-        avatar={undefined}
-        locale={intl.locale}
-        names={name}
-      />
+      <UserAvatar avatar={user.avatar} names={name} />
     </Link>
   ) : (
-    <UserAvatar avatar={undefined} locale={intl.locale} names={name} />
+    <UserAvatar avatar={user?.avatar} names={name} />
   )
 }
 
@@ -323,7 +318,10 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
     ))
   }
 
-  const historyRows = visibleHistoryWithClientSpecificActions
+  // Pagination must be based on this filtered list, not visibleHistoryWithClientSpecificActions,
+  // because paired APPROVE_CORRECTION rows are removed after the filter. Using the pre-filter
+  // count would overcount the total pages and produce an empty last page.
+  const displayableHistory = visibleHistoryWithClientSpecificActions
     .map((x) => {
       if (x.type === ActionType.REQUEST_CORRECTION) {
         const immediateApprovedCorrection =
@@ -331,7 +329,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
             (h) =>
               h.type === ActionType.APPROVE_CORRECTION &&
               (h.requestId === x.id || h.requestId === x.originalActionId) &&
-              h.annotation?.isImmediateCorrection &&
+              h.content?.immediateCorrection &&
               h.createdBy === x.createdBy
           )
         // Adding flag on immediately approved REQUEST_CORRECTION to show it
@@ -346,16 +344,18 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
       return x
     })
     .filter((x) => {
-      // removing immediately APPROVED_CORRECTION to since we only show
+      // removing immediately APPROVED_CORRECTION since we only show
       // associated REQUEST_CORRECTION as 'Record corrected'
       if (
         x.type === ActionType.APPROVE_CORRECTION &&
-        x.annotation?.isImmediateCorrection
+        x.content?.immediateCorrection
       ) {
         return false
       }
       return true
     })
+
+  const historyRows = displayableHistory
     .slice(
       (currentPageNumber - 1) * DEFAULT_HISTORY_RECORD_PAGE_SIZE,
       currentPageNumber * DEFAULT_HISTORY_RECORD_PAGE_SIZE
@@ -452,13 +452,11 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
           noResultText=""
           pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
         />
-        {visibleHistoryWithClientSpecificActions.length >
-          DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
+        {displayableHistory.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
           <Pagination
             currentPage={currentPageNumber}
             totalPages={Math.ceil(
-              visibleHistoryWithClientSpecificActions.length /
-                DEFAULT_HISTORY_RECORD_PAGE_SIZE
+              displayableHistory.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
             )}
             onPageChange={(page) => setCurrentPageNumber(page)}
           />

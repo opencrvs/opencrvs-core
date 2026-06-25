@@ -41,7 +41,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
-import { hasDeclarationFieldChanged } from '../../utils'
+import { getChangedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { CorrectionDetails } from './CorrectionDetails'
 
 const messages = defineMessages({
@@ -76,7 +76,7 @@ export function Summary() {
   const { eventId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
-  const [{ workqueue }] = useTypedSearchParams(
+  const [{ backTo }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
 
@@ -104,21 +104,12 @@ export function Summary() {
   const userMayCorrect = isActionAllowed(ActionType.APPROVE_CORRECTION)
 
   const submitCorrection = React.useCallback(() => {
-    const formWithOnlyChangedValues = Object.fromEntries(
-      Object.entries(form).filter(([key]) => {
-        const field = fields.find((f) => f.id === key)
-        if (!field) {
-          return false
-        }
-
-        return hasDeclarationFieldChanged(
-          field,
-          form,
-          previousFormValues,
-          eventConfiguration,
-          validatorContext
-        )
-      })
+    const formWithOnlyChangedValues = getChangedDeclarationDiff(
+      fields,
+      form,
+      previousFormValues,
+      eventConfiguration,
+      validatorContext
     )
 
     const valuesThatGotHidden = fields.filter((field) => {
@@ -158,8 +149,8 @@ export function Summary() {
       events.actions.correction.request.mutate(mutationPayload)
     }
 
-    if (workqueue) {
-      navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue }))
+    if (backTo) {
+      navigate(backTo)
     } else {
       navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
     }
@@ -176,7 +167,7 @@ export function Summary() {
     userMayCorrect,
     validatorContext,
     eventConfiguration,
-    workqueue
+    backTo
   ])
 
   return (
@@ -184,7 +175,7 @@ export function Summary() {
       <ActionPageLight
         hideBackground
         goBack={() => navigate(-1)}
-        goHome={() => eventFormNavigation.closeActionView()}
+        goHome={() => eventFormNavigation.closeActionView(backTo)}
         id="corrector_form"
         title={intl.formatMessage(correctionMessages.title)}
       >
@@ -208,31 +199,31 @@ export function Summary() {
           title={intl.formatMessage(correctionMessages.correctionSummaryTitle)}
           topActionButtons={[
             <SecondaryButton
-              key="back-to-review"
-              id="back-to-review"
+              key="go-to-review"
+              id="go-to-review"
               onClick={() =>
                 navigate(
                   ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
                     {
                       eventId
                     },
-                    { workqueue }
+                    { backTo }
                   )
                 )
               }
             >
-              {intl.formatMessage(registerMessages.backToReviewButton)}
+              {intl.formatMessage(registerMessages.goToReviewButton)}
             </SecondaryButton>
           ]}
         >
           <CorrectionDetails
             annotation={annotation}
+            backTo={backTo}
             editable={true}
             event={event}
             form={form}
             requesting={!userMayCorrect}
             validatorContext={validatorContext}
-            workqueue={workqueue}
           />
         </Content>
       </ActionPageLight>

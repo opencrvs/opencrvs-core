@@ -192,9 +192,7 @@ export const InvalidValue_NoRecordsFound: Story = {
     searchInput.blur()
 
     await waitFor(async () =>
-      expect(
-        canvas.queryByTestId('search-input-error')
-      ).not.toBeInTheDocument()
+      expect(canvas.queryByTestId('search-input-error')).not.toBeInTheDocument()
     )
     await userEvent.click(
       await canvas.findByRole('button', { name: /Confirm/i })
@@ -323,9 +321,14 @@ export const SearchWithRegistrationNumber: Story = {
     )
 
     // names should clear because search was successfull
-    await expect(await canvas.findByTestId('text__firstname')).toHaveValue(
-      'Royal'
+    await waitFor(
+      async () =>
+        expect(await canvas.findByTestId('text__firstname')).toHaveValue(
+          'Royal'
+        ),
+      { timeout: 3000 }
     )
+
     await expect(await canvas.findByTestId('text__surname')).toHaveValue(
       'Dietrich'
     )

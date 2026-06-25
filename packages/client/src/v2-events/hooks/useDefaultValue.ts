@@ -12,9 +12,13 @@ import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { get } from 'lodash'
 import {
+  ActionUpdate,
   FieldConfig,
   SystemVariables,
   SerializedUserField,
+  isCodeToEvaluate,
+  buildClientFunctionContext,
+  runClientFunction,
   isNonInteractiveFieldType,
   FieldType,
   FieldValue,
@@ -38,9 +42,18 @@ import { useAdministrativeAreas } from './useAdministrativeAreas'
 interface Context extends SystemVariables {
   administrativeAreas: Map<UUID, AdministrativeArea>
   adminLevelIds: string[]
+  form: EventState | ActionUpdate
 }
 
-type FieldsWithDefaultValue = Extract<FieldConfig, { defaultValue?: unknown }> | FieldGroup
+type FieldsWithDefaultValue =
+  | Extract<FieldConfig, { defaultValue?: unknown }>
+  | FieldGroup
+
+function isFieldWithDefaultValue(
+  field: FieldConfig
+): field is FieldsWithDefaultValue {
+  return 'defaultValue' in field || field.type === FieldType.FIELD_GROUP
+}
 
 function isTextField(field: FieldConfig): field is TextField {
   return field.type === FieldType.TEXT
@@ -132,7 +145,6 @@ function replacePlaceholders({
   )
 }
 
-
 function isSerializedUserField(value: unknown): value is SerializedUserField {
   return !!value && typeof value === 'object' && '$userField' in value
 }
@@ -148,7 +160,10 @@ function resolveSerializedUserField(
     return value
   }
   if (value.$location) {
-    if (value.$userField !== 'primaryOfficeId' && value.$userField !== 'administrativeAreaId') {
+    if (
+      value.$userField !== 'primaryOfficeId' &&
+      value.$userField !== 'administrativeAreaId'
+    ) {
       return ''
     }
     const locationId = context.user.administrativeAreaId
@@ -172,12 +187,28 @@ export function mapFieldToDefaultValue(
       if (isNonInteractiveFieldType(subfield)) {
         return
       }
+      if (!isFieldWithDefaultValue(subfield)) {
+        return
+      }
       return mapFieldToDefaultValue(subfield, context)
     })
   }
+  if (isCodeToEvaluate(field.defaultValue)) {
+    return runClientFunction(
+      field.defaultValue.$$code,
+      undefined,
+      buildClientFunctionContext({
+        form: context.form,
+        systemVariables: context,
+        adminLevelIds: context.adminLevelIds
+      })
+    ) as FieldValue
+  }
+
   if (field.defaultValue === undefined) {
     return
   }
+
   switch (field.type) {
     case FieldType.NAME: {
       return {
@@ -193,12 +224,16 @@ export function mapFieldToDefaultValue(
       }
     }
     case FieldType.ADDRESS: {
-      return {
-        ...field.defaultValue,
-        administrativeArea: resolveSerializedUserField(
+      const resolvedAdministrativeArea =
+        field.defaultValue.administrativeArea &&
+        resolveSerializedUserField(
           field.defaultValue.administrativeArea,
           context
         )
+      return {
+        ...field.defaultValue,
+        // valid administrativeArea or undefined (don't allow empty string)
+        administrativeArea: resolvedAdministrativeArea || undefined
       }
     }
     case FieldType.DATE: {
@@ -222,6 +257,18 @@ export function mapFieldToDefaultValue(
 
       return `${hours}:${minutes}`
     }
+    case FieldType.AGE: {
+      return {
+        age: field.defaultValue,
+        asOfDateRef: field.configuration.asOfDate.$$field
+      }
+    }
+    // `replacePlaceholders` returns undefined for falsy values e.g. 0, false
+    case FieldType.CHECKBOX:
+    case FieldType.NUMBER:
+    case FieldType.BUTTON: {
+      return field.defaultValue
+    }
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
     case FieldType.LOCATION:
@@ -232,17 +279,13 @@ export function mapFieldToDefaultValue(
     case FieldType.FACILITY:
     case FieldType.ALPHA_HIDDEN:
     case FieldType.OFFICE:
-    case FieldType.NUMBER:
     case FieldType.NUMBER_WITH_UNIT:
     case FieldType.EMAIL:
-    case FieldType.AGE:
     case FieldType._EXPERIMENTAL_CUSTOM:
     case FieldType.USER_ROLE:
-    case FieldType.CHECKBOX:
     case FieldType.DATE_RANGE:
     case FieldType.SELECT_DATE_RANGE:
     case FieldType.PHONE:
-    case FieldType.BUTTON:
     case FieldType.SEARCH:
     case FieldType.ID:
     case FieldType.VERIFICATION_STATUS:
@@ -253,15 +296,13 @@ export function mapFieldToDefaultValue(
     case FieldType.SIGNATURE:
     case FieldType.FILE:
     case FieldType.FILE_WITH_OPTIONS:
-      const defaultValue = field.defaultValue
-
-      if (isSerializedUserField(defaultValue)) {
-        return resolveSerializedUserField(defaultValue, context)
+      if (isSerializedUserField(field.defaultValue)) {
+        return resolveSerializedUserField(field.defaultValue, context)
       }
 
       return replacePlaceholders({
         field,
-        defaultValue,
+        defaultValue: field.defaultValue,
         systemVariables: context
       })
   }
@@ -276,23 +317,31 @@ export function useDefaultValue() {
     () => config.ADMIN_STRUCTURE.map((level) => level.id),
     [config.ADMIN_STRUCTURE]
   )
-  function getDefaultValue(field: FieldConfig): FieldValue | undefined
-  function getDefaultValue(fields: FieldConfig[]): EventState
   function getDefaultValue(
-    fieldOrFields: FieldConfig | FieldConfig[]
+    field: FieldConfig,
+    form: EventState | ActionUpdate
+  ): FieldValue | undefined
+  function getDefaultValue(
+    fields: FieldConfig[],
+    form: EventState | ActionUpdate
+  ): EventState
+  function getDefaultValue(
+    fieldOrFields: FieldConfig | FieldConfig[],
+    form: EventState | ActionUpdate
   ): FieldValue | EventState | undefined {
     if (Array.isArray(fieldOrFields)) {
       const fields = fieldOrFields
-      return buildFormState(fields, (field) => getDefaultValue(field))
+      return buildFormState(fields, (field) => getDefaultValue(field, form))
     }
     const field = fieldOrFields
-    if (isNonInteractiveFieldType(field)) {
+    if (!isFieldWithDefaultValue(field)) {
       return
     }
     return mapFieldToDefaultValue(field, {
       ...systemVariables,
       administrativeAreas,
-      adminLevelIds
+      adminLevelIds,
+      form
     })
   }
   return getDefaultValue

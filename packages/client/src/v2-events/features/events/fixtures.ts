@@ -14,6 +14,7 @@ import {
   ActionDocument,
   ActionStatus,
   ActionType,
+  DocumentPath,
   EventDocument,
   EventIndex,
   EventStatus,
@@ -127,6 +128,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       createdAt: '2025-01-23T05:35:27.689Z',
       createdByUserType: 'user',
       createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+      createdBySignature: `${localRegistrarId}/signature.png` as DocumentPath,
       registrationNumber: 'TEST12121212',
       transactionId: 'aasdk342-asdkj3423-kn234k25'
     },
@@ -140,6 +142,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       createdByUserType: 'user',
       createdAt: '2025-01-23T05:35:27.689Z',
       createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+      createdBySignature: `${localRegistrarId}/signature.png` as DocumentPath,
       assignedTo: testDataGenerator().user.id.localRegistrar,
       transactionId: 'aasdk342-asdkj3423-kn234k26'
     }

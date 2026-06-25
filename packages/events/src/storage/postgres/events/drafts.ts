@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { sql } from 'kysely'
+import { Kysely, sql } from 'kysely'
 import * as z from 'zod/v4'
 import {
   ActionStatus,
@@ -23,6 +23,7 @@ import {
   EventActionDrafts,
   NewEventActionDrafts
 } from './schema/app/EventActionDrafts'
+import Schema from './schema/Database'
 
 function toDraftDocument(draft: EventActionDrafts): Draft {
   return Draft.parse({
@@ -111,5 +112,15 @@ export async function deleteDraftsByEventId(eventId: UUID) {
   return db
     .deleteFrom('eventActionDrafts')
     .where('eventId', '=', eventId)
+    .execute()
+}
+
+export async function deleteDraftsByUserIdInTrx(
+  trx: Kysely<Schema>,
+  userId: string
+) {
+  return trx
+    .deleteFrom('eventActionDrafts')
+    .where('createdBy', '=', userId)
     .execute()
 }

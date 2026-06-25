@@ -86,8 +86,6 @@ spec:
               value: http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040
             - name: DOCUMENTS_URL
               value: "http://documents.{{ .Release.Namespace }}.svc.cluster.local:9050"
-            - name: USER_MANAGEMENT_URL
-              value: "http://user-mgnt.{{ .Release.Namespace }}.svc.cluster.local:3030/"
             - name: EVENTS_URL
               value: "http://events.{{ .Release.Namespace }}.svc.cluster.local:5555/"
             - name: COUNTRY_CONFIG_URL

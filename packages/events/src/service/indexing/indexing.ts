@@ -67,9 +67,7 @@ function eventToEventIndex(
   return encodeEventIndex(getCurrentEventState(event, config), config)
 }
 
-/*
- * This type ensures all properties of EventIndex are present in the mapping
- */
+/* This type ensures all properties of EventIndex are present in the mapping */
 type EventIndexMapping = { [key in keyof EventIndex]: estypes.MappingProperty }
 
 async function ensureAlias(indexName: string) {
@@ -238,9 +236,7 @@ function mapFieldTypeToElasticsearch(
         type: 'object',
         enabled: false
       }
-    /**
-     * Custom fields are not indexed as their structure is unknown.
-     */
+    /** Custom fields are not indexed as their structure is unknown. */
     case FieldType._EXPERIMENTAL_CUSTOM:
       return {
         type: 'object',
@@ -313,7 +309,6 @@ export async function createIndex(
                   createdByUserType: { type: 'keyword' },
                   createdAtLocation: { type: 'keyword' },
                   createdByRole: { type: 'keyword' },
-                  createdBySignature: { type: 'keyword' },
                   acceptedAt: { type: 'date' }
                 } satisfies Record<
                   keyof ActionCreationMetadata,
@@ -328,7 +323,6 @@ export async function createIndex(
                   createdByUserType: { type: 'keyword' },
                   createdAtLocation: { type: 'keyword' },
                   createdByRole: { type: 'keyword' },
-                  createdBySignature: { type: 'keyword' },
                   acceptedAt: { type: 'date' },
                   registrationNumber: { type: 'keyword' }
                 } satisfies Record<
@@ -393,7 +387,6 @@ export type BulkResponse = estypes.BulkResponse
 export async function indexEventsInBulk(
   batch: EventDocument[],
   configs: EventConfig[],
-  locationHierarchyCache: Map<string, string[]> = new Map<string, string[]>(),
   indexNameOverrides?: Map<string, string>
 ) {
   const esClient = getOrCreateClient()
@@ -406,11 +399,7 @@ export async function indexEventsInBulk(
       const eventIndex = eventToEventIndex(doc, config)
 
       const eventIndexWithLocationHierarchy =
-        await getEventIndexWithAdministrativeHierarchy(
-          config,
-          eventIndex,
-          locationHierarchyCache
-        )
+        await getEventIndexWithAdministrativeHierarchy(config, eventIndex)
       return [
         {
           index: {
@@ -443,15 +432,20 @@ export async function indexEventsInBulk(
         error: item.index?.error
       }))
     logger.error(
-      `Bulk indexing had ${failures.length} failure(s) out of ${batch.length} documents`,
-      { failures }
+      `Bulk indexing had ${failures.length} failure(s) out of ${batch.length} documents.` +
+        `Typically this is a sign of the records containing fields that do not exist in the form configuration anymore.` +
+        ` Failures: ${JSON.stringify(failures, null, 2)}`
     )
   }
 
   return response
 }
 
-export async function indexEvent(event: EventDocument, config: EventConfig) {
+export async function indexEvent(
+  event: EventDocument,
+  config: EventConfig,
+  waitFor: boolean
+) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
   const eventIndex = eventToEventIndex(event, config)
@@ -463,7 +457,7 @@ export async function indexEvent(event: EventDocument, config: EventConfig) {
     id: event.id,
     /** We derive the full state (without nulls) from eventToEventIndex, replace instead of update. */
     document: eventIndexWithAdministrativeHierarchy,
-    refresh: 'wait_for'
+    refresh: waitFor ? 'wait_for' : false
   })
 }
 
@@ -479,9 +473,7 @@ export async function findRecordsByQuery({
   acceptedScopes: RecordScopeV2[]
 }) {
   const esClient = getOrCreateClient()
-
   const { query, limit, offset } = search
-
   const resolvedScopes = acceptedScopes.map((scope) =>
     resolveRecordActionScopeToIds(scope, user)
   )
@@ -581,9 +573,7 @@ export async function getEventCount({
 
   return responses.reduce((acc: Record<string, number>, response, index) => {
     const slug = queries[index].slug
-
     const validatedResponse = MsearchResponseSchema.safeParse(response)
-
     return {
       ...acc,
       [slug]: validatedResponse.success

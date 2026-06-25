@@ -88,7 +88,6 @@ async function reindexSearch(
   onBatchProcessed?: (count: number) => Promise<void>
 ) {
   const configurations = await getInMemoryEventConfigurations(token)
-  const locationHierarchyCache = new Map<string, string[]>()
   const indexNameOverrides = new Map(
     configurations.map((config) => [
       config.id,
@@ -110,12 +109,7 @@ async function reindexSearch(
 
     await Promise.all([
       withRetry(async () =>
-        indexEventsInBulk(
-          batch,
-          configurations,
-          locationHierarchyCache,
-          indexNameOverrides
-        )
+        indexEventsInBulk(batch, configurations, indexNameOverrides)
       ),
       withRetry(async () => reindexBatchToCountryConfig(token, batch))
     ])

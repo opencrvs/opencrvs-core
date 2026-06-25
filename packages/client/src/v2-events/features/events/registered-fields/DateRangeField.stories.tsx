@@ -37,7 +37,7 @@ const initialRangeValue: DateRangeFieldValue = {
 
 // Input Story
 export const DateRangeInput: StoryFn = (args) => {
-  const [value, setValue] = useState<string | DateRangeFieldValue>(
+  const [value, setValue] = useState<string | DateRangeFieldValue | undefined>(
     initialExactValue
   )
 

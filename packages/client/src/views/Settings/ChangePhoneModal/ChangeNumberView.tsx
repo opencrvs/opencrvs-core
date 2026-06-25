@@ -16,11 +16,10 @@ import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { useIntl } from 'react-intl'
+import { useOnlineStatus } from '@client/utils'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { TriggerEvent } from '@opencrvs/commons/client'
-import { convertToMSISDN } from '@client/forms/utils'
 import { useCurrentUser } from '@client/v2-events/hooks/useCurrentUser'
 
 interface IProps {
@@ -41,11 +40,14 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
   const [unknownError, setUnknownError] = React.useState(false)
   const [isInvalidPhoneNumber, setIsInvalidPhoneNumber] = React.useState(false)
   const { currentUser } = useCurrentUser()
+  const isOnline = useOnlineStatus()
   const [
     showDuplicateMobileErrorNotification,
     setShowDuplicateMobileErrorNotification
   ] = React.useState(false)
-  const { sendVerifyCode } = useUsers()
+  const { requestPhoneChange } = useUsers()
+  const isMobileNumberUnchanged =
+    Boolean(phoneNumber) && phoneNumber === currentUser?.mobile
   const onChangePhoneNumber = (event: React.ChangeEvent<HTMLInputElement>) => {
     const phoneNumber = event.target.value
     setPhoneNumber(phoneNumber)
@@ -69,19 +71,14 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
   }
   const continueButtonHandler = async (phoneNumber: string) => {
     if (!currentUser) return
-    sendVerifyCode.mutate(
-      {
-        notificationEvent: TriggerEvent.CHANGE_PHONE_NUMBER
-      },
+    requestPhoneChange.mutate(
+      { phoneNumber },
       {
         onSuccess: (data) => {
           onSuccess(phoneNumber, data.nonce)
         },
         onError: (error) => {
-          if (
-            error.message.includes('409') ||
-            error.message.includes('duplicate')
-          ) {
+          if (error.data?.code === 'CONFLICT') {
             setShowDuplicateMobileErrorNotification(true)
           } else {
             setUnknownError(true)
@@ -109,13 +106,15 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
           id="continue-button"
           key="continue"
           onClick={() => {
-            const internationalFormat = convertToMSISDN(
-              phoneNumber,
-              window.config.COUNTRY
-            )
-            continueButtonHandler(internationalFormat)
+            continueButtonHandler(phoneNumber)
           }}
-          disabled={!Boolean(phoneNumber.length) || isInvalidPhoneNumber}
+          disabled={
+            !isOnline ||
+            requestPhoneChange.isPending ||
+            !Boolean(phoneNumber.length) ||
+            isInvalidPhoneNumber ||
+            isMobileNumberUnchanged
+          }
         >
           {intl.formatMessage(buttonMessages.continueButton)}
         </PrimaryButton>
@@ -142,7 +141,9 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
                   id: 'phone.start'
                 })
               })
-            : ''
+            : isMobileNumberUnchanged
+              ? intl.formatMessage(messages.mobileNumberUnchangedErrorMessege)
+              : ''
         }
       >
         <TextInput

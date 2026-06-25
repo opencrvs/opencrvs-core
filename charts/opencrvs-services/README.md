@@ -85,7 +85,7 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Elasticsearch port.</td>
         </tr>
         <tr>
-            <td>elasticsearch.reindex_enabled</td>
+            <td>elasticsearch.reindex.enabled</td>
             <td>true</td>
             <td>Enable elasticsearch reindex post-deploy hook</td>
         </tr>
@@ -701,7 +701,6 @@ Summary:
    apiVersion: v1
    data:
      ES_HOST: dXNlcjpyYW5kb21wYXNzQGVsYXN0aWNzZWFyY2g6OTIwMA==
-   ...
    ```
 4. Map variable in your helm chart `values.yaml` file:
    ```yaml
@@ -709,7 +708,6 @@ Summary:
      secrets:
        elasticsearch-secret:
          - ES_HOST
-   ...
    ```
 5. Redeploy service with `helm upgrade`
 

@@ -146,7 +146,6 @@ export const SearchResultComponent = ({
       eventConfigs,
       outbox,
       action,
-      redirectParam: slug || '',
       isWideScreen,
       isOnline,
       intl
@@ -157,7 +156,6 @@ export const SearchResultComponent = ({
     drafts,
     outbox,
     action,
-    slug,
     getEventTitle,
     isWideScreen,
     isOnline,

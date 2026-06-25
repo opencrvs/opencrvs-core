@@ -27,10 +27,41 @@ filter:
         rule.name.keyword:
           value: 'Successful SSH login'
 
-alert: post2
+alert:
+  - ${NOTIFICATION_TYPE}
+
+email:
+  - ${ALERT_EMAIL}
+
+# Old way to define alerting action, kept for backward compatibility with existing rules:
 http_post2_url: '${HTTP_POST2_ALERT_URL}'
 http_post2_payload:
   subject: "{% raw %}{{DOMAIN}}{% endraw %}: Login to {{kibana.alert.context['__es-query'].hits[0]._source.user.name}} from {{kibana.alert.context['__es-query'].hits[0]._source.source.ip}} 🚨"
   html: 'Login to https://kibana.{% raw %}{{DOMAIN}}{% endraw %} to view the alert.'
   from: '{% raw %}{{SENDER_EMAIL_ADDRESS}}{% endraw %}'
   to: '{% raw %}{{ALERT_EMAIL}}{% endraw %}'
+
+# New way to define alerting action with more flexible templating:
+alert_subject: '${DOMAIN}: SSH login alert 🚨'
+alert_text_type: alert_text_jinja
+email_format: 'html'
+
+alert_text: |
+  <p>Successful SSH login detected.</p>
+
+  <table border="1" cellpadding="6" cellspacing="0">
+    <tr>
+      <th>User</th>
+      <th>Source IP</th>
+    </tr>
+
+    {% for hit in kibana["alert"]["context"]["__es-query"]["hits"] %}
+    <tr>
+      <td>{{ hit["_source"]["user"]["name"] | default("unknown") }}</td>
+      <td>{{ hit["_source"]["source"]["ip"] | default("unknown") }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <p>Open Kibana:</p>
+  <p><a href="https://kibana.${DOMAIN}">https://kibana.${DOMAIN}</a></p>

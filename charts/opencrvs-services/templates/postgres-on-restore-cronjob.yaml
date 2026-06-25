@@ -21,6 +21,7 @@ spec:
             app: common
             job-type: restore
         spec:
+          {{- include "elasticsearch-reindex.imagePullSecrets" . | nindent 10 }}
           restartPolicy: OnFailure
           initContainers:
           {{- include "elasticsearch-reindex.initContainerSpec" . | nindent 12 }}
@@ -31,4 +32,4 @@ spec:
             {{- include "postgres-on-deploy.volumes" . | nindent 10 }}
             {{- include "elasticsearch-reindex.volumes" . | nindent 10 }}
 {{- end }}
- 
+

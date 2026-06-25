@@ -8,10 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { convertToMSISDN } from '@client/forms/utils'
 import { buttonMessages, userMessages as messages } from '@client/i18n/messages'
 import { modifyUserDetails } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { useOnlineStatus } from '@client/utils'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Message } from '@client/views/Settings/items/components'
 import { InputField } from '@opencrvs/components/lib/InputField'
@@ -56,6 +56,7 @@ export function VerifyCodeView({
   const [errorOccured, setErrorOccured] =
     React.useState<TRPCClientError<AppRouter> | null>(null)
   const dispatch = useDispatch()
+  const isOnline = useOnlineStatus()
   const { changePhone, changeEmail } = useUsers()
 
   const onChangeVerifyCode = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,7 +75,7 @@ export function VerifyCodeView({
       dispatch(
         modifyUserDetails({
           ...userDetails,
-          mobile: convertToMSISDN(phoneNumber, window.config.COUNTRY)
+          mobile: phoneNumber
         })
       )
     }
@@ -146,7 +147,12 @@ export function VerifyCodeView({
           key="verify"
           id="verify-button"
           onClick={submitVerification}
-          disabled={!isValidLength}
+          disabled={
+            !isOnline ||
+            changePhone.isPending ||
+            changeEmail.isPending ||
+            !isValidLength
+          }
         >
           {intl.formatMessage(buttonMessages.continueButton)}
         </PrimaryButton>
@@ -161,7 +167,7 @@ export function VerifyCodeView({
               email: userDetails?.email
             })
           : intl.formatMessage(messages.confirmationEmailMsg, {
-              email: email || userDetails?.email
+              email: userDetails?.email
             })}
       </Message>
       <InputField

@@ -13,6 +13,7 @@ import { useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { EventIndex, WorkqueueActionType } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
+import { useCurrentBackTo } from '@client/v2-events/features/events/useEventFormNavigation'
 import { withSuspense } from '../../../components/withSuspense'
 import { useGetWorkqueueActionConfiguration } from '../../workqueues/Actions/useGetActionConfiguration'
 
@@ -31,14 +32,13 @@ const StyledButton = styled(Button)`
  */
 function ActionCtaComponent({
   event,
-  actionType,
-  redirectParam
+  actionType
 }: {
   event: EventIndex
   actionType: WorkqueueActionType
-  redirectParam?: string
 }) {
   const intl = useIntl()
+  const backTo = useCurrentBackTo()
 
   const config = useGetWorkqueueActionConfiguration(event, actionType)
 
@@ -46,11 +46,11 @@ function ActionCtaComponent({
     <StyledButton
       disabled={'disabled' in config && Boolean(config.disabled)}
       type="primary"
-      onClick={async () => config.onClick(redirectParam)}
+      onClick={async () => config.onClick(backTo)}
     >
       {intl.formatMessage(config.label)}
     </StyledButton>
   )
 }
 
-export const ActionCta = withSuspense(ActionCtaComponent)
+export const ActionCta = withSuspense(React.memo(ActionCtaComponent))

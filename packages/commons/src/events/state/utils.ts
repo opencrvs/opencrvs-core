@@ -10,7 +10,12 @@
  */
 
 import { ActionType, ActionTypes } from '../ActionType'
-import { Action, ActionStatus, RegisterAction } from '../ActionDocument'
+import {
+  Action,
+  ActionBase,
+  ActionStatus,
+  RegisterAction
+} from '../ActionDocument'
 import { EventStatus } from '../EventMetadata'
 import { getOrThrow } from '../../utils'
 import { pick } from 'lodash'
@@ -80,8 +85,6 @@ function getDeclarationActionCreationMetadata(
       requestAction?.createdAtLocation ?? acceptAction.createdAtLocation,
     acceptedAt: acceptAction.createdAt,
     createdByRole: requestAction?.createdByRole ?? acceptAction.createdByRole,
-    createdBySignature:
-      requestAction?.createdBySignature ?? acceptAction.createdBySignature,
     registrationNumber
   }
 }
@@ -97,16 +100,23 @@ const updateActions = ActionTypes.extract([
   ActionType.ARCHIVE,
   ActionType.PRINT_CERTIFICATE,
   ActionType.REQUEST_CORRECTION,
+  ActionType.APPROVE_CORRECTION,
+  ActionType.REJECT_CORRECTION,
   ActionType.CUSTOM
 ])
 
 /**
- * Given action type and actions, returns the action creation metadata for the event.
- * Since we do not consistently store the request action, we need to check if it exists.
- * @returns details of last user who triggered **Declaration** action.
- * @see EventIndex for the description of the returned object.
+ * Returns the creation metadata of the last update action (Requested or Accepted).
+ * Requested actions are included so that async flows (202) correctly reflect the
+ * metadata of the user who triggered the action before country config accepts it.
  *
- * */
+ * When an Accepted action carries an originalActionId, its metadata is sourced from
+ * the original Requested action (the human who triggered it), not from the system
+ * or 3rd party that accepted it.
+ *
+ * @returns metadata of the last user who triggered a status-changing action.
+ * @see EventIndex for the description of the returned object.
+ */
 export function getActionUpdateMetadata(actions: Action[]) {
   const createAction = getOrThrow(
     actions.find((action) => action.type === ActionType.CREATE),
@@ -119,12 +129,11 @@ export function getActionUpdateMetadata(actions: Action[]) {
     'createdByUserType',
     'createdAtLocation',
     'createdByRole'
-  ]
+  ] as const
 
   return actions
     .filter(({ type }) => updateActions.safeParse(type).success)
-    .filter(({ status }) => status === ActionStatus.Accepted)
-    .reduce(
+    .reduce<Pick<ActionBase, (typeof metadataFields)[number]>>(
       (_, action) => {
         if (action.originalActionId) {
           const originalAction =

@@ -20,6 +20,14 @@ import Schema from '../events/schema/Database'
 // "bind message has ... parameter formats but 0 parameters"
 const INSERT_MAX_CHUNK_SIZE = 1000
 
+// Process-level cache for administrative hierarchies. Invalidated whenever
+// locations or administrative areas are written.
+const administrativeHierarchyByIdCache = new Map<string, Promise<UUID[]>>()
+
+export function clearAdministrativeHierarchyCache() {
+  administrativeHierarchyByIdCache.clear()
+}
+
 export async function setLocationsInTrx(
   trx: Kysely<Schema>,
   locations: NewLocations[]
@@ -69,6 +77,7 @@ export async function setLocations(locations: NewLocations[]) {
   const db = getClient()
 
   await setLocationsInTrx(db, locations)
+  clearAdministrativeHierarchyCache()
 }
 
 export async function getLocations({
@@ -202,16 +211,25 @@ export function getAdministrativeHierarchyByIdCte(
  * @param locationId
  * @returns The list of location hierarchy ids, ex: [admin_area_1_id, admin_area_2_id, locationId]
  */
-export async function getAdministrativeHierarchyById(id: string) {
-  const db = getClient()
 
+export function getAdministrativeHierarchyById(id: string): Promise<UUID[]> {
+  const cached = administrativeHierarchyByIdCache.get(id)
+  if (cached) {
+    return cached
+  }
+
+  const db = getClient()
   const query = sql<{ ids: UUID[] }>`
     ${getAdministrativeHierarchyByIdCte(id)}
     SELECT array_agg(id ORDER BY depth DESC) AS ids FROM area_chain;
   `
 
-  const result = await db.executeQuery(query.compile(db))
-  return result.rows.length > 0 ? result.rows[0].ids : []
+  const promise = db
+    .executeQuery(query.compile(db))
+    .then((result) => (result.rows.length > 0 ? result.rows[0].ids : []))
+
+  administrativeHierarchyByIdCache.set(id, promise)
+  return promise
 }
 
 export async function isLocationUnderAdministrativeArea({

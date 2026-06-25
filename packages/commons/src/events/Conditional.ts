@@ -51,12 +51,18 @@ export const EnableConditional = z
     "If 'ENABLE' conditional is defined, the component is enabled only if the condition is met"
   )
 
-export const ActionConditional = z.discriminatedUnion('type', [
-  // Action can be shown / hidden
-  ShowConditional,
-  // Action can be shown to the user in the list but as disabled
-  EnableConditional
-])
+export const ActionConditional = z
+  .discriminatedUnion('type', [
+    // Action can be shown / hidden
+    ShowConditional,
+    // Action can be shown to the user in the list but as disabled
+    EnableConditional
+  ])
+  .meta({
+    id: 'ActionConditional',
+    description:
+      'Conditional gating whether an action is shown (SHOW) or enabled (ENABLE). When omitted from an action, the action is shown and enabled for everyone.'
+  })
 
 export type ActionConditional = z.infer<typeof ActionConditional>
 
@@ -79,8 +85,9 @@ export const FieldConditional = z
     DisplayOnReviewConditional
   ])
   .meta({
-    description: 'Field conditional configuration',
-    id: 'FieldConditional'
+    id: 'FieldConditional',
+    description:
+      'Conditional gating whether a form field is shown (SHOW), enabled (ENABLE), or displayed on the review page (DISPLAY_ON_REVIEW). When omitted, the field is shown and enabled for everyone, and is displayed on review whenever it has a value.'
   })
 
 export type FieldConditional = z.infer<typeof FieldConditional>

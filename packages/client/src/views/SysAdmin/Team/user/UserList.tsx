@@ -29,6 +29,8 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { ROUTES } from '@client/v2-events/routes'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { getAddressNameV2, UserStatus } from '@client/views/SysAdmin/Team/utils'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { useUserFormState } from '@client/views/SysAdmin/Team/user/userEditor/useUserFormState'
 import { Location, User, UUID } from '@opencrvs/commons/client'
 import { Link } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -50,7 +52,7 @@ import { Toast } from '@opencrvs/components/lib/Toast'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { parse } from 'qs'
 import { stringify } from 'querystring'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
@@ -95,6 +97,31 @@ const Header = styled.h1`
   margin: 8px 0;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
+  }
+`
+
+const MobileActionBar = styled.div`
+  display: none;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 0;
+
+    & > div:first-child {
+      flex: 1;
+      min-width: 0;
+    }
+
+    & > div:first-child > button {
+      width: 100%;
+    }
+
+    & > div:first-child > button span {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
   }
 `
 
@@ -207,9 +234,13 @@ function UserListComponent({ userDetails }: UserListProps) {
 
   const [showActivationToggleError, setShowActivationToggleError] =
     useState(false)
-  const { canReadUser, canEditUser, canAddOfficeUsers, canAccessOffice } =
-    usePermissions()
-
+  const {
+    canReadUser,
+    canEditUser,
+    canAddOfficeUsers,
+    canAccessOffice,
+    canAccessMultipleLocations
+  } = usePermissions()
   const { locationId } = parse(location.search, {
     ignoreQueryPrefix: true
   }) as unknown as SearchParams
@@ -238,10 +269,7 @@ function UserListComponent({ userDetails }: UserListProps) {
 
   const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
 
-  const canAccessMultipleLocations = useMemo(
-    () => Array.from(locations.values()).filter(canAccessOffice).length > 1,
-    [locations, canAccessOffice]
-  )
+  const hasAccessToMultipleLocations = canAccessMultipleLocations()
 
   const {
     searchUsers,
@@ -360,6 +388,8 @@ function UserListComponent({ userDetails }: UserListProps) {
         {
           label: intl.formatMessage(messages.editUserDetailsTitle),
           handler: () => {
+            useUserFormState.getState().clear()
+            useEventFormData.getState().clear()
             navigate(
               ROUTES.V2.SETTINGS.USER.REVIEW.buildPath(
                 {
@@ -543,7 +573,7 @@ function UserListComponent({ userDetails }: UserListProps) {
 
   const LocationButton = (locationId: UUID) => {
     const buttons: React.ReactElement[] = []
-    if (canAccessMultipleLocations) {
+    if (hasAccessToMultipleLocations) {
       buttons.push(
         <LocationPicker
           key={`location-picker-${locationId}`}
@@ -745,6 +775,11 @@ function UserListComponent({ userDetails }: UserListProps) {
     return <Navigate to={routes.HOME} />
   }
 
+  // Block access to a location outside the user's jurisdiction
+  if (!parsedId.success || !canAccessOffice({ id: parsedId.data })) {
+    return <Navigate to={routes.HOME} replace />
+  }
+
   return (
     <>
       {isOnline ? (
@@ -771,6 +806,7 @@ function UserListComponent({ userDetails }: UserListProps) {
           ) : searchResults ? (
             <>
               <Header id="header">{searchedLocation?.name || ''}</Header>
+              <MobileActionBar>{LocationButton(locationId)}</MobileActionBar>
               <LocationInfo>
                 {searchedLocation && (
                   <LocationInfoValue>

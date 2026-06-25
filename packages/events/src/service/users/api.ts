@@ -9,13 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* eslint-disable max-lines */
-import { randomBytes } from 'crypto'
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
+import { Kysely } from 'kysely'
 import {
   CreateUserInput,
   CreateUserInputInternal,
-  DocumentPath,
   UserName,
   TokenUserType,
   TriggerEvent,
@@ -40,16 +39,26 @@ import {
   searchAllUsersWithInput,
   activateUserWithCredentials,
   updateUserById,
-  updateUsernameById,
   isUsernameTaken,
   getUserCredentialsByUserId,
   SecurityQuestion,
   getUserByMobileOrEmail,
-  resetUserCredentialsAndStatus
+  resetUserCredentialsAndStatus,
+  getUserByIdInTrx,
+  updateUserByIdInTrx,
+  updateUsernameByIdInTrx
 } from '@events/storage/postgres/events/users'
 import { generateSaltedHash, generateHash } from '@events/service/auth/hash'
 import { updatePasswordHashAndSalt } from '@events/storage/postgres/events/users'
+import * as draftsRepo from '@events/storage/postgres/events/drafts'
+import { getClient } from '@events/storage/postgres/events'
+import Schema from '@events/storage/postgres/events/schema/Database'
 import { getRoles } from '../config/config'
+import {
+  generateRandomPassword,
+  generateUsername,
+  mapDbUserToUser
+} from './utils'
 
 export type UserSortBy =
   | 'createdAt'
@@ -74,72 +83,20 @@ export type SearchUsersPayload = {
   sortOrder: 'asc' | 'desc'
 }
 
-async function generateUsername(name: UserName, existingUserName?: string) {
-  const initials = name.firstname
-    .split(' ')
-    .map((n) => n.charAt(0))
-    .join('')
-
-  let proposedUsername = `${initials}${initials === '' ? '' : '.'}${name.surname
-    .trim()
-    .replace(/ /g, '-')}`.toLowerCase()
-
-  if (proposedUsername.length < 3) {
-    proposedUsername =
-      proposedUsername + '0'.repeat(3 - proposedUsername.length)
+async function findAvailableUsername(
+  newUsername: string,
+  existingUsername?: string,
+  i = 0
+): Promise<string> {
+  const candidate = i === 0 ? newUsername : `${newUsername}${i}`
+  if (existingUsername && existingUsername === candidate) {
+    return candidate
   }
 
-  if (existingUserName && existingUserName === proposedUsername) {
-    return proposedUsername
-  }
-
-  try {
-    let usernameTaken = await isUsernameTaken(proposedUsername)
-    let i = 1
-    const copyProposedName = proposedUsername
-    while (usernameTaken) {
-      if (existingUserName && existingUserName === proposedUsername) {
-        return proposedUsername
-      }
-      proposedUsername = copyProposedName + i
-      i += 1
-      usernameTaken = await isUsernameTaken(proposedUsername)
-    }
-  } catch (err) {
-    logger.error(`Failed username generation: ${err}`)
-    throw new Error('Failed username generation')
-  }
-
-  return proposedUsername
-}
-
-type DbUser = NonNullable<Awaited<ReturnType<typeof getUserById>>>
-
-function mapDbUserToUser(user: DbUser): User & { username: string } {
-  return {
-    type: TokenUserType.enum.user,
-    id: user.id,
-    name: {
-      firstname: user.firstname,
-      surname: user.surname
-    },
-    role: user.role,
-    email: user.email ?? undefined,
-    mobile: user.mobile ?? undefined,
-    device: user.device ?? undefined,
-    username: user.username,
-    status: user.status as User['status'],
-    signature: user.signaturePath
-      ? (user.signaturePath as DocumentPath)
-      : undefined,
-    avatar: user.profileImagePath
-      ? (user.profileImagePath as DocumentPath)
-      : undefined,
-    primaryOfficeId: user.officeId,
-    administrativeAreaId: user.administrativeAreaId ?? undefined,
-    fullHonorificName: user.fullHonorificName ?? undefined,
-    data: Object.keys(user.data).length > 0 ? user.data : undefined
-  }
+  const taken = await isUsernameTaken(candidate)
+  return taken
+    ? findAvailableUsername(newUsername, existingUsername, i + 1)
+    : candidate
 }
 
 export async function getUser(
@@ -203,78 +160,108 @@ export async function searchUsersAll(
   return results.map(mapDbUserToUser)
 }
 
+async function handleUsernameUpdate(
+  trx: Kysely<Schema>,
+  {
+    userId,
+    oldUsername,
+    incomingName,
+    input,
+    token
+  }: {
+    userId: UUID
+    oldUsername: string
+    incomingName: UserName
+    input: Pick<UpdateUserInput, 'email' | 'mobile'>
+    token: string
+  }
+) {
+  const newUsernameCandidate = generateUsername(incomingName)
+
+  if (newUsernameCandidate === oldUsername) {
+    return
+  }
+
+  const newUsername = await findAvailableUsername(
+    newUsernameCandidate,
+    oldUsername
+  )
+
+  await updateUsernameByIdInTrx(trx, userId, newUsername)
+
+  await triggerUserEventNotification({
+    event: 'user-updated',
+    payload: {
+      recipient: {
+        name: incomingName,
+        email: input.email,
+        mobile: input.mobile
+      },
+      oldUsername,
+      newUsername
+    },
+    countryConfigUrl: env.COUNTRY_CONFIG_URL,
+    authHeader: { Authorization: token }
+  })
+}
+
 export async function updateUser(
   input: UpdateUserInput,
   token: string
 ): Promise<User> {
-  const existingUser = await getUserById(input.id)
+  const db = getClient()
 
-  if (!existingUser) {
-    throw new TRPCError({
-      code: 'NOT_FOUND',
-      message: `User not found: ${input.id}`
+  const {
+    id: userId,
+    name: incomingName,
+    signature,
+    primaryOfficeId: incomingOfficeId,
+    ...otherFields
+  } = input
+
+  const dbUser = await db.transaction().execute(async (trx) => {
+    const existingUser = await getUserByIdInTrx(trx, userId)
+
+    if (!existingUser) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: `User not found: ${userId}`
+      })
+    }
+
+    await updateUserByIdInTrx(trx, userId, {
+      ...otherFields,
+      firstname: incomingName?.firstname,
+      surname: incomingName?.surname,
+      signaturePath: signature?.path,
+      officeId: incomingOfficeId
     })
-  }
 
-  const name: UserName = input.name ?? {
-    firstname: existingUser.firstname,
-    surname: existingUser.surname
-  }
+    if (incomingOfficeId && incomingOfficeId !== existingUser.officeId) {
+      await draftsRepo.deleteDraftsByUserIdInTrx(trx, userId)
+    }
 
-  const oldUsername = existingUser.username
-  const newUsername = await generateUsername(name, existingUser.username)
+    if (incomingName) {
+      await handleUsernameUpdate(trx, {
+        userId,
+        incomingName,
+        oldUsername: existingUser.username,
+        input,
+        token
+      })
+    }
 
-  await updateUserById(input.id, {
-    firstname: name.firstname,
-    surname: name.surname,
-    fullHonorificName: input.fullHonorificName,
-    email: input.email,
-    mobile: input.mobile,
-    device: input.device,
-    status: input.status,
-    role: input.role,
-    officeId: input.primaryOfficeId,
-    signaturePath: input.signature
-      ? input.signature.path
-      : existingUser.signaturePath,
-    data: input.data
+    return getUserByIdInTrx(trx, userId)
   })
 
-  if (newUsername !== oldUsername) {
-    await updateUsernameById(UUID.parse(input.id), newUsername)
-    await triggerUserEventNotification({
-      event: 'user-updated',
-      payload: {
-        recipient: {
-          name,
-          email: input.email,
-          mobile: input.mobile
-        },
-        oldUsername,
-        newUsername
-      },
-      countryConfigUrl: env.COUNTRY_CONFIG_URL,
-      authHeader: { Authorization: token }
+  if (!dbUser) {
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'User updated does not exist'
     })
   }
 
-  return getUser(input.id)
-}
-
-function generateRandomPassword() {
-  const charset =
-    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-  const length = 12
-  // Rejection sampling eliminates modulo bias (256 % 62 = 8, so bytes 248-255 are discarded)
-  const result: string[] = []
-  const limit = 256 - (256 % charset.length)
-  while (result.length < length) {
-    const byte = randomBytes(1)[0]
-    if (byte < limit) {
-      result.push(charset[byte % charset.length])
-    }
-  }
-  return result.join('')
+  return mapDbUserToUser(dbUser)
 }
 
 async function sendCredentialsNotification(
@@ -319,17 +306,16 @@ export const ResolvedCreateUserInput = CreateUserInput.extend({
 })
 export type ResolvedCreateUserInput = z.infer<typeof ResolvedCreateUserInput>
 
-async function resolveCreateUserInput(
+function resolveCreateUserInput(
   input: CreateUserInput | CreateUserInputInternal
-): Promise<ResolvedCreateUserInput> {
+): ResolvedCreateUserInput {
   return ResolvedCreateUserInput.parse({
     ...input,
     password:
       (input as CreateUserInputInternal).password ??
       env.DEFAULT_USER_PASSWORD ??
       generateRandomPassword(),
-    status: (input as CreateUserInputInternal).status ?? 'pending',
-    username: input.username ?? (await generateUsername(input.name))
+    status: (input as CreateUserInputInternal).status ?? 'pending'
   })
 }
 
@@ -337,13 +323,15 @@ export async function createUser(
   input: CreateUserInput | CreateUserInputInternal,
   _token: string
 ) {
-  const resolvedUser = await resolveCreateUserInput(input)
+  const usernameCandidate = input.username ?? generateUsername(input.name)
+  const username = await findAvailableUsername(usernameCandidate)
+  const resolvedUser = resolveCreateUserInput({ ...input, username })
 
   const userPayload = {
     firstname: resolvedUser.name.firstname,
     surname: resolvedUser.name.surname,
     // Normalise to undefined for the same reason as mobile above.
-    email: resolvedUser?.email?.toLowerCase() || undefined,
+    email: resolvedUser.email?.toLowerCase() || undefined,
     fullHonorificName: resolvedUser.fullHonorificName,
     role: resolvedUser.role,
     device: resolvedUser.device,
@@ -505,9 +493,11 @@ export async function checkSecurityQuestionMatch({
   input: { questionKey: string; answer: string }
   salt: string
 }) {
-  const target = questions.find((q) => q.questionKey === input.questionKey)
+  const targetIndex = questions.findIndex(
+    (q) => q.questionKey === input.questionKey
+  )
 
-  if (!target) {
+  if (targetIndex === -1) {
     return {
       matched: false,
       questionKey: input.questionKey
@@ -515,18 +505,20 @@ export async function checkSecurityQuestionMatch({
   }
 
   const hash = await generateHash(input.answer.toLowerCase(), salt)
-  const matched = hash === target.answerHash
+  const matched = hash === questions[targetIndex].answerHash
 
-  // On a wrong answer, rotate to a different question so the same prompt
-  // can't be brute-forced.
-  const fallback = questions.find(
-    (q) => q.questionKey !== input.questionKey
-  )?.questionKey
-
-  return {
-    matched,
-    questionKey: matched ? input.questionKey : (fallback ?? input.questionKey)
+  // Correct answer
+  if (matched) {
+    return { matched, questionKey: input.questionKey }
   }
+
+  // On a wrong answer, rotate to the next question in the user's list (or wrap around at the end).
+  let nextIndex = targetIndex + 1
+  if (nextIndex >= questions.length) {
+    nextIndex = 0
+  }
+
+  return { matched, questionKey: questions[nextIndex].questionKey }
 }
 
 export async function verifyPasswordById(
@@ -596,6 +588,7 @@ export async function sendResetPasswordInvite(
   const temporaryPassword = generateRandomPassword()
   const { hash, salt } = await generateSaltedHash(temporaryPassword)
   await updatePasswordHashAndSalt(userId, hash, salt)
+  await updateUserById(userId, { status: 'pending' })
 
   try {
     await triggerUserEventNotification({

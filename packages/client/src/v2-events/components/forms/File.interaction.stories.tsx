@@ -10,13 +10,14 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, within } from '@storybook/test'
+import { expect, waitFor, within } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { userEvent } from '@storybook/testing-library'
 import { FieldType, MimeType, TestUserRole } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { createImageFile } from '@client/tests/image-file'
 import { getTestValidatorContext } from '../../../../.storybook/decorators'
 import { FormFieldGeneratorPropsWithoutRef } from './FormFieldGenerator/FormFieldGenerator'
 
@@ -269,25 +270,138 @@ export const FileInputButton: Story = {
   }
 }
 
-async function createImageFile(name: string, width: number, height: number) {
-  return new Promise<File>((resolve, reject) => {
-    const canvas = document.createElement('canvas')
-    canvas.width = width
-    canvas.height = height
-    const ctx = canvas.getContext('2d')
-    if (ctx) {
-      ctx.fillStyle = '#000'
-      ctx.fillRect(0, 0, width, height)
+export const FileInputPdfWithPreview: Story = {
+  name: 'File input PDF with preview modal',
+  parameters: {
+    layout: 'centered',
+    reactRouter: {
+      router: {
+        path: '/event/:eventId',
+        element: (
+          <StyledFormFieldGenerator
+            fields={[
+              {
+                id: 'storybook.file',
+                type: FieldType.FILE,
+                configuration: {
+                  maxFileSize: 5 * 1024 * 1024,
+                  acceptedFileTypes: ['application/pdf'],
+                  fileName: {
+                    defaultMessage: 'Uploaded PDF document',
+                    description: 'The name for the uploaded PDF file',
+                    id: 'storybook.file.pdf.filename'
+                  }
+                },
+                label: {
+                  id: 'storybook.file.pdf.label',
+                  defaultMessage: 'Upload a PDF document',
+                  description: 'The title for the PDF file input'
+                }
+              }
+            ]}
+            id="my-form"
+            validatorContext={getTestValidatorContext(
+              TestUserRole.enum.LOCAL_REGISTRAR
+            )}
+          />
+        )
+      },
+      initialPath: '/event/123-kalsnk-213'
     }
-    canvas.toBlob((blob) => {
-      if (blob) {
-        const file = new File([blob], name, { type: blob.type })
-        resolve(file)
-      } else {
-        reject(new Error('Could not create blob from canvas'))
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await canvas.findByText('Upload a PDF document')
+
+    const input = canvasElement.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement
+
+    const pdfContent = `%PDF-1.0
+1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj
+2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj
+3 0 obj<</Type/Page/MediaBox[0 0 200 50]/Parent 2 0 R/Resources<</Font<</F1<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>>>>>/Contents 4 0 R>>endobj
+4 0 obj<</Length 44>>
+stream
+BT /F1 12 Tf 10 20 Td (pdf loaded) Tj ET
+endstream
+endobj
+xref
+0 5
+0000000000 65535 f
+0000000009 00000 n
+0000000058 00000 n
+0000000115 00000 n
+0000000266 00000 n
+trailer<</Size 5/Root 1 0 R>>
+startxref
+360
+%%EOF`
+
+    await step('Uploads a valid PDF file', async () => {
+      const pdfFile = new File([pdfContent], 'document.pdf', {
+        type: MimeType.enum['application/pdf']
+      })
+
+      // user-event v14 only treats audio/*, image/*, video/* as wildcards.
+      // application/* is not handled, so PDF files are silently dropped.
+      // Temporarily clear accept to bypass the filter.
+      const originalAccept = input.accept
+      input.accept = ''
+      await userEvent.upload(input, pdfFile)
+      input.accept = originalAccept
+
+      await canvas.findByRole('button', { name: 'Uploaded PDF document' })
+    })
+
+    // Mock fetch so PDF.js can load the file in Storybook (no service worker available)
+    const originalFetch = window.fetch
+    window.fetch = async (url, ...args) => {
+      if (String(url).includes('.pdf')) {
+        return new Response(
+          new Blob([pdfContent], { type: 'application/pdf' }),
+          {
+            status: 200,
+            headers: { 'Content-Type': 'application/pdf' }
+          }
+        )
       }
-    }, 'image/jpeg')
-  })
+      return originalFetch(url as RequestInfo, ...args)
+    }
+
+    await step(
+      'Clicking uploaded link opens PDF preview modal and shows loading state',
+      async () => {
+        const uploadedLink = await canvas.findByRole('button', {
+          name: 'Uploaded PDF document'
+        })
+        await userEvent.click(uploadedLink)
+
+        await expect(
+          canvasElement.querySelector('#preview_image_field')
+        ).not.toBeNull()
+
+        // Loading... is shown immediately while PDF.js fetches and parses the file
+        await canvas.findByText('Loading...')
+      }
+    )
+
+    await step('PDF is rendered to canvas after loading', async () => {
+      // PDF.js renders each page as a <canvas> element inside the viewer container
+      await waitFor(
+        async () => {
+          await expect(canvas.queryByText('Failed to load PDF')).toBeNull()
+          await expect(
+            canvasElement.querySelector('#preview_image_field canvas')
+          ).not.toBeNull()
+        },
+        { timeout: 10000 }
+      )
+    })
+
+    window.fetch = originalFetch
+  }
 }
 
 export const FileInputButtonMaxImage: Story = {

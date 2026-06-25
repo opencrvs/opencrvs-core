@@ -8,14 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ActionStatus } from '../ActionDocument'
+
+import { Action, ActionStatus } from '../ActionDocument'
 import { ActionType } from '../ActionType'
 import { EventConfig } from '../EventConfig'
 import { EventDocument } from '../EventDocument'
 import { field } from '../field'
 import { FieldType } from '../FieldType'
 import { PageTypes } from '../PageConfig'
-import { resolveEventCustomFlags } from './flags'
+import {
+  findPendingCorrectionAction,
+  getEventFlags,
+  resolveEventCustomFlags
+} from './flags'
+import { InherentFlags } from '../Flag'
 import { subDays, formatISO } from 'date-fns'
 import { not, user } from '../../conditionals/conditionals'
 
@@ -81,6 +87,16 @@ const eventConfig: DeepPartial<EventConfig> = {
       type: ActionType.CUSTOM,
       customActionType: 'FOOBAR',
       flags: []
+    },
+    {
+      type: ActionType.CUSTOM,
+      customActionType: 'VALIDATE_DECLARATION',
+      flags: [{ id: InherentFlags.REJECTED, operation: 'remove' }]
+    },
+    {
+      type: ActionType.CUSTOM,
+      customActionType: 'COMPLETE_NOTIFICATION',
+      flags: [{ id: InherentFlags.INCOMPLETE, operation: 'remove' }]
     },
     { type: ActionType.PRINT_CERTIFICATE, flags: [] }
   ],
@@ -314,5 +330,262 @@ describe('resolveEventCustomFlags()', () => {
     // @ts-expect-error - allow partial actions and event config
     const flags = resolveEventCustomFlags(event, eventConfig)
     expect(flags).toEqual(['executed-by-admin-flag'])
+  })
+})
+
+describe('findPendingCorrectionAction()', () => {
+  const a = (type: ActionType, status: ActionStatus = ActionStatus.Accepted) =>
+    ({ type, status }) as Action
+
+  test('returns undefined for empty actions', () => {
+    expect(findPendingCorrectionAction([])).toBeUndefined()
+  })
+
+  test('returns the request when it is the last write action', () => {
+    const req = a(ActionType.REQUEST_CORRECTION)
+    expect(findPendingCorrectionAction([req])).toBe(req)
+  })
+
+  test('returns the request when followed by non-correction actions', () => {
+    const req = a(ActionType.REQUEST_CORRECTION)
+    expect(findPendingCorrectionAction([req, a(ActionType.CUSTOM)])).toBe(req)
+  })
+
+  test('returns undefined when the request has been approved', () => {
+    expect(
+      findPendingCorrectionAction([
+        a(ActionType.REQUEST_CORRECTION),
+        a(ActionType.APPROVE_CORRECTION)
+      ])
+    ).toBeUndefined()
+  })
+
+  test('returns undefined when the request has been rejected', () => {
+    expect(
+      findPendingCorrectionAction([
+        a(ActionType.REQUEST_CORRECTION),
+        a(ActionType.REJECT_CORRECTION)
+      ])
+    ).toBeUndefined()
+  })
+
+  test('returns the second request after a completed correction cycle', () => {
+    const secondReq = a(ActionType.REQUEST_CORRECTION)
+    expect(
+      findPendingCorrectionAction([
+        a(ActionType.REQUEST_CORRECTION),
+        a(ActionType.APPROVE_CORRECTION),
+        secondReq,
+        a(ActionType.CUSTOM)
+      ])
+    ).toBe(secondReq)
+  })
+})
+
+describe('getEventFlags() – rejected flag', () => {
+  const getFlagsFor = (types: ActionType[]) => {
+    const event = {
+      actions: types.map((type, idx) => ({
+        type,
+        declaration: {},
+        createdAt: formatISO(subDays(now, types.length - idx)),
+        status: ActionStatus.Accepted
+      }))
+    }
+
+    // @ts-expect-error - allow partial event document and event config
+    return getEventFlags(event, eventConfig)
+  }
+
+  test('is not present for a fresh declaration', () => {
+    expect(getFlagsFor([ActionType.DECLARE])).not.toContain(
+      InherentFlags.REJECTED
+    )
+  })
+
+  test('is present after a REJECT', () => {
+    expect(getFlagsFor([ActionType.DECLARE, ActionType.REJECT])).toContain(
+      InherentFlags.REJECTED
+    )
+  })
+
+  test('is cleared when the record is re-declared after REJECT', () => {
+    expect(
+      getFlagsFor([ActionType.DECLARE, ActionType.REJECT, ActionType.DECLARE])
+    ).not.toContain(InherentFlags.REJECTED)
+  })
+
+  test('is cleared when the record is edited after REJECT', () => {
+    expect(
+      getFlagsFor([ActionType.DECLARE, ActionType.REJECT, ActionType.EDIT])
+    ).not.toContain(InherentFlags.REJECTED)
+  })
+
+  test('is cleared when the record is notified after REJECT', () => {
+    expect(
+      getFlagsFor([ActionType.NOTIFY, ActionType.REJECT, ActionType.NOTIFY])
+    ).not.toContain(InherentFlags.REJECTED)
+  })
+
+  test('is cleared when the record is registered after REJECT', () => {
+    expect(
+      getFlagsFor([ActionType.DECLARE, ActionType.REJECT, ActionType.REGISTER])
+    ).not.toContain(InherentFlags.REJECTED)
+  })
+
+  test('persists when REJECT is followed by actions that do not reset declaration state', () => {
+    expect(
+      getFlagsFor([
+        ActionType.DECLARE,
+        ActionType.REJECT,
+        ActionType.CUSTOM,
+        ActionType.READ,
+        ActionType.ASSIGN
+      ])
+    ).toContain(InherentFlags.REJECTED)
+  })
+
+  test('is present again after a second REJECT in the same record lifecycle', () => {
+    expect(
+      getFlagsFor([
+        ActionType.DECLARE,
+        ActionType.REJECT,
+        ActionType.DECLARE,
+        ActionType.REJECT
+      ])
+    ).toContain(InherentFlags.REJECTED)
+  })
+
+  test('is cleared by a custom action whose config removes the REJECTED flag', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.DECLARE,
+          declaration: {},
+          createdAt: formatISO(subDays(now, 3)),
+          status: ActionStatus.Accepted
+        },
+        {
+          type: ActionType.REJECT,
+          declaration: {},
+          createdAt: formatISO(subDays(now, 2)),
+          status: ActionStatus.Accepted
+        },
+        {
+          type: ActionType.CUSTOM,
+          customActionType: 'VALIDATE_DECLARATION',
+          declaration: {},
+          createdAt: formatISO(subDays(now, 1)),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial event document and event config
+    expect(getEventFlags(event, eventConfig)).not.toContain(
+      InherentFlags.REJECTED
+    )
+  })
+
+  test('is present again when a REJECT follows the flag-removing custom action', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.DECLARE,
+          declaration: {},
+          createdAt: formatISO(subDays(now, 4)),
+          status: ActionStatus.Accepted
+        },
+        {
+          type: ActionType.REJECT,
+          declaration: {},
+          createdAt: formatISO(subDays(now, 3)),
+          status: ActionStatus.Accepted
+        },
+        {
+          type: ActionType.CUSTOM,
+          customActionType: 'VALIDATE_DECLARATION',
+          declaration: {},
+          createdAt: formatISO(subDays(now, 2)),
+          status: ActionStatus.Accepted
+        },
+        {
+          type: ActionType.REJECT,
+          declaration: {},
+          createdAt: formatISO(subDays(now, 1)),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial event document and event config
+    expect(getEventFlags(event, eventConfig)).toContain(InherentFlags.REJECTED)
+  })
+
+  test('only considers accepted actions when computing the rejected flag', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.DECLARE,
+          declaration: {},
+          createdAt: formatISO(subDays(now, 1)),
+          status: ActionStatus.Accepted
+        },
+        {
+          type: ActionType.REJECT,
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Requested
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial event document and event config
+    expect(getEventFlags(event, eventConfig)).not.toContain(
+      InherentFlags.REJECTED
+    )
+  })
+})
+
+describe('getEventFlags() – any inherent flag is clearable by action config', () => {
+  test('INCOMPLETE is present for a notified record', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.NOTIFY,
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial event document and event config
+    expect(getEventFlags(event, eventConfig)).toContain(InherentFlags.INCOMPLETE)
+  })
+
+  test('INCOMPLETE is cleared by a custom action whose config removes it', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.NOTIFY,
+          declaration: {},
+          createdAt: formatISO(subDays(now, 1)),
+          status: ActionStatus.Accepted
+        },
+        {
+          type: ActionType.CUSTOM,
+          customActionType: 'COMPLETE_NOTIFICATION',
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial event document and event config
+    expect(getEventFlags(event, eventConfig)).not.toContain(
+      InherentFlags.INCOMPLETE
+    )
   })
 })

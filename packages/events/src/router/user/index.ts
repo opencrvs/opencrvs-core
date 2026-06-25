@@ -22,20 +22,21 @@ import {
   getAcceptedScopesFromToken,
   getScopeOptionValue,
   JurisdictionFilter,
+  UserOrSystemSummary,
   logger,
   TokenWithBearer,
   User,
   UserOrSystem,
   UpdateUserInput,
-  CreateUserInputInternal
+  CreateUserInputInternal,
+  UserOrSystemSummaryWithStatus
 } from '@opencrvs/commons'
 import {
   allowedWithAnyOfScopes,
   canAccessUserWithScopes,
   canCreateUserWithScopes,
   canSearchUsers,
-  canUpdateUserLocation,
-  canUpdateUserRole,
+  canUpdateUser,
   userCanReadOtherUser
 } from '@events/router/middleware'
 import {
@@ -77,6 +78,14 @@ import {
 } from '@events/service/verifyCode'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
 import { userCanReadUserAudit } from '../middleware'
+
+// Used for changing password, since the initial password does not necessarily have to comply with the password rules.
+const PasswordSchema = z
+  .string()
+  .min(12, 'Password must be at least 12 characters')
+  .regex(/\d/, 'Password must contain at least one number')
+  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
 
 const UserSearch = z.object({
   username: z.string().optional(),
@@ -208,7 +217,7 @@ export function searchUsersRoute(
 ) {
   return procedure
     .input(UserSearch)
-    .output(z.array(UserOrSystem))
+    .output(z.array(UserOrSystemSummaryWithStatus))
     .query(async ({ input, ctx }) => {
       const primaryOfficeId = input.primaryOfficeId
         ? UUID.parse(input.primaryOfficeId)
@@ -307,9 +316,7 @@ export const userRouter = router({
     .mutation(async ({ input, ctx }) => handleCreateUser(input, ctx)),
   update: userAndSystemProcedure
     .input(UpdateUserInput)
-    .use(canUpdateUserLocation)
-    .use(canUpdateUserRole)
-    .use(canAccessUserWithScopes(['user.edit']))
+    .use(canUpdateUser)
     .output(User)
     .mutation(async ({ input, ctx }) => {
       if (input.mobile) {
@@ -360,7 +367,7 @@ export const userRouter = router({
     }),
   list: userOnlyProcedure
     .input(z.array(z.string()))
-    .output(z.array(UserOrSystem))
+    .output(z.array(UserOrSystemSummary))
     .query(async ({ input }) => getUsersById(input)),
   search: searchUsersRoute(userAndSystemProcedure.use(canSearchUsers)),
   actions: userOnlyProcedure
@@ -376,7 +383,7 @@ export const userRouter = router({
     .input(
       z.object({
         existingPassword: z.string(),
-        password: z.string()
+        password: PasswordSchema
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -402,21 +409,21 @@ export const userRouter = router({
         requestData: { subjectId: userId }
       })
     }),
-  sendVerifyCode: userOnlyProcedure
-    .input(
-      z.object({
-        notificationEvent: z.enum([
-          'change-phone-number',
-          'change-email-address'
-        ])
-      })
-    )
-    .output(
-      z.object({
-        nonce: z.string()
-      })
-    )
+  requestEmailChange: userOnlyProcedure
+    .input(z.object({ email: z.string() }))
+    .output(z.object({ nonce: z.string() }))
     .mutation(async ({ input, ctx }) => {
+      const existing = await searchUsers({
+        email: input.email,
+        count: 1,
+        skip: 0,
+        sortBy: 'createdAt',
+        sortOrder: 'asc'
+      })
+      if (existing.length > 0 && existing[0].id !== ctx.user.id) {
+        throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
+      }
+
       const nonce = generateNonce()
       const rawToken = ctx.token.replace('Bearer ', '')
       const user = await getUser(ctx.user.id)
@@ -424,15 +431,43 @@ export const userRouter = router({
       await generateAndSendVerificationCode({
         nonce,
         token: rawToken,
-        notificationEvent: input.notificationEvent,
+        notificationEvent: 'change-email-address',
         recipientName: user.name,
         phoneNumber: user.mobile,
         email: user.email
       })
 
-      return {
-        nonce
+      return { nonce }
+    }),
+  requestPhoneChange: userOnlyProcedure
+    .input(z.object({ phoneNumber: z.string() }))
+    .output(z.object({ nonce: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const existing = await searchUsers({
+        mobile: input.phoneNumber,
+        count: 1,
+        skip: 0,
+        sortBy: 'createdAt',
+        sortOrder: 'asc'
+      })
+      if (existing.length > 0 && existing[0].id !== ctx.user.id) {
+        throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_PHONE' })
       }
+
+      const nonce = generateNonce()
+      const rawToken = ctx.token.replace('Bearer ', '')
+      const user = await getUser(ctx.user.id)
+
+      await generateAndSendVerificationCode({
+        nonce,
+        token: rawToken,
+        notificationEvent: 'change-phone-number',
+        recipientName: user.name,
+        phoneNumber: user.mobile,
+        email: user.email
+      })
+
+      return { nonce }
     }),
   changePhone: userOnlyProcedure
     .input(
@@ -488,6 +523,8 @@ export const userRouter = router({
           message: `Failed to change phone number: User has no email address to send verification code to`
         })
       }
+
+      await validateMobile(input.phoneNumber)
 
       const userWithDuplicateNumber = await searchUsers({
         mobile: input.phoneNumber,

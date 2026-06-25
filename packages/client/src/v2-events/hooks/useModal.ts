@@ -14,8 +14,15 @@ type CloseModal<ResultType> = (result: ResultType) => void
 
 type ModalFactory<ResultType> = (close: CloseModal<ResultType>) => ReactNode
 
+type AnyModalFactory = ModalFactory<unknown>
+
 export function useModal() {
-  const [modalNode, setModalNode] = useState<ReactNode>(null)
+  const [modalState, setModalState] = useState<{
+    factory: AnyModalFactory
+    close: CloseModal<unknown>
+  } | null>(null)
+
+  const modalNode = modalState ? modalState.factory(modalState.close) : null
 
   async function openModal<ModalResult>(
     modalFactory: ModalFactory<ModalResult>
@@ -23,10 +30,13 @@ export function useModal() {
     return new Promise<ModalResult>((resolve) => {
       function close(value: ModalResult) {
         resolve(value)
-        setModalNode(null)
+        setModalState(null)
       }
 
-      setModalNode(modalFactory(close))
+      setModalState({
+        factory: modalFactory as AnyModalFactory,
+        close: close as CloseModal<unknown>
+      })
     })
   }
 

@@ -173,4 +173,137 @@ describe('resolveJurisdictionReference()', () => {
 
     expect(result).toEqual(undefined)
   })
+
+  it('should return "all" when one placeOfEvent scope is "all" (most relaxed wins)', () => {
+    const scopeAttributeReference = user.jurisdiction(
+      user.scope('record.create').attribute('placeOfEvent')
+    )
+
+    const token = createTestToken([
+      `type=record.create&event=birth&placeOfEvent=${JurisdictionFilter.enum.administrativeArea}`,
+      `type=record.create&event=birth&placeOfEvent=${JurisdictionFilter.enum.all}`
+    ])
+
+    const result = resolveJurisdictionReference(
+      scopeAttributeReference,
+      token,
+      'birth'
+    )
+
+    expect(result).toEqual(JurisdictionFilter.enum.all)
+  })
+
+  it('should return most permissive filter when multiple registeredIn scopes present', () => {
+    const scopeAttributeReference = user.jurisdiction(
+      user.scope('record.search').attribute('registeredIn')
+    )
+
+    const token = createTestToken([
+      `type=record.search&event=birth&registeredIn=${JurisdictionFilter.enum.location}`,
+      `type=record.search&registeredIn=${JurisdictionFilter.enum.administrativeArea}`
+    ])
+
+    const result = resolveJurisdictionReference(
+      scopeAttributeReference,
+      token,
+      'birth'
+    )
+
+    expect(result).toEqual(JurisdictionFilter.enum.administrativeArea)
+  })
+
+  it('should return "all" when one registeredIn scope has no value (default "all" wins)', () => {
+    const scopeAttributeReference = user.jurisdiction(
+      user.scope('record.search').attribute('registeredIn')
+    )
+
+    const token = createTestToken([
+      `type=record.search&event=birth&registeredIn=${JurisdictionFilter.enum.location}`,
+      `type=record.search&event=birth`
+    ])
+
+    const result = resolveJurisdictionReference(
+      scopeAttributeReference,
+      token,
+      'birth'
+    )
+
+    expect(result).toEqual(JurisdictionFilter.enum.all)
+  })
+
+  it('should return most permissive filter when multiple declaredIn scopes present', () => {
+    const scopeAttributeReference = user.jurisdiction(
+      user.scope('record.edit').attribute('declaredIn')
+    )
+
+    const token = createTestToken([
+      `type=record.edit&event=birth&declaredIn=${JurisdictionFilter.enum.location}`,
+      `type=record.edit&declaredIn=${JurisdictionFilter.enum.administrativeArea}`
+    ])
+
+    const result = resolveJurisdictionReference(
+      scopeAttributeReference,
+      token,
+      'birth'
+    )
+
+    expect(result).toEqual(JurisdictionFilter.enum.administrativeArea)
+  })
+
+  it('should return "all" when one declaredIn scope has no value (default "all" wins)', () => {
+    const scopeAttributeReference = user.jurisdiction(
+      user.scope('record.edit').attribute('declaredIn')
+    )
+
+    const token = createTestToken([
+      `type=record.edit&event=birth&declaredIn=${JurisdictionFilter.enum.location}`,
+      `type=record.edit&event=birth`
+    ])
+
+    const result = resolveJurisdictionReference(
+      scopeAttributeReference,
+      token,
+      'birth'
+    )
+
+    expect(result).toEqual(JurisdictionFilter.enum.all)
+  })
+
+  it('should return most permissive filter when multiple accessLevel scopes present', () => {
+    const scopeAttributeReference = user.jurisdiction(
+      user.scope('user.read').attribute('accessLevel')
+    )
+
+    const token = createTestToken([
+      `type=user.read&accessLevel=${JurisdictionFilter.enum.location}`,
+      `type=user.read&accessLevel=${JurisdictionFilter.enum.administrativeArea}`
+    ])
+
+    const result = resolveJurisdictionReference(
+      scopeAttributeReference,
+      token,
+      'birth'
+    )
+
+    expect(result).toEqual(JurisdictionFilter.enum.administrativeArea)
+  })
+
+  it('should return "all" when one accessLevel scope has no value (default "all" wins)', () => {
+    const scopeAttributeReference = user.jurisdiction(
+      user.scope('user.read').attribute('accessLevel')
+    )
+
+    const token = createTestToken([
+      `type=user.read&accessLevel=${JurisdictionFilter.enum.location}`,
+      `type=user.read`
+    ])
+
+    const result = resolveJurisdictionReference(
+      scopeAttributeReference,
+      token,
+      'birth'
+    )
+
+    expect(result).toEqual(JurisdictionFilter.enum.all)
+  })
 })

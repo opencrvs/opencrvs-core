@@ -1,4 +1,5 @@
 {{- if .Values.monitoring.enabled }}
+{{- $elastic_host := default (printf "elasticsearch-0.elasticsearch.%s.svc.cluster.local" $.Release.Namespace) $.Values.elasticsearch.host }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -18,7 +19,6 @@ spec:
           image: appropriate/curl
           env:
             - name: ES_HOST
-              {{- $elastic_host := default (printf "elasticsearch-0.elasticsearch.%s.svc.cluster.local" $.Release.Namespace) $.Values.elasticsearch.host }}
               value: {{ $elastic_host }}
             - name: ES_PORT
               value: "9200"
@@ -52,8 +52,10 @@ spec:
         - name: setup-rules
           image: "bash"
           env:
+            - name: DOMAIN
+              value: {{ .Values.hostname }}
           {{- include "render-env-vars" (dict "service_name" "elastalert" "Values" .Values) }}
-          command: 
+          command:
             - bash
             - -c
             - |
@@ -67,7 +69,7 @@ spec:
               for f in /rules-custom/*.yaml; do
                 echo "processing file $f"
                 envsubst < "$f" > "/rules/$(basename $f)"
-              done              
+              done
           volumeMounts:
             - name: rules
               mountPath: /rules
@@ -81,8 +83,9 @@ spec:
         - name: elastalert
           image: jertel/elastalert2:2.25.0
           env:
+            - name: DOMAIN
+              value: {{ .Values.hostname }}
             - name: ES_HOST
-              {{- $elastic_host := default (printf "elasticsearch-0.elasticsearch.%s.svc.cluster.local" $.Release.Namespace) $.Values.elasticsearch.host }}
               value: {{ $elastic_host }}
             - name: ES_PORT
               value: "9200"
@@ -93,7 +96,11 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.elasticsearch.admin_user_secret_name }}
                   key: ELASTIC_PASSWORD
+          {{- include "render-env-vars" (dict "service_name" "elastalert" "Values" .Values) }}
           volumeMounts:
+            - name: config
+              mountPath: /opt/elastalert/smtp.auth
+              subPath: smtp.auth
             - name: config
               mountPath: /opt/elastalert/config.yaml
               subPath: elastalert.yaml

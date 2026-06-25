@@ -88,8 +88,8 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
+        hideBackToReview
         attachmentPath={`events/${eventId}/`}
-        declaration={eventIndex.declaration}
         eventConfig={configuration}
         formData={annotation}
         formPages={formPages.map((page) => {
@@ -107,8 +107,10 @@ export function Pages() {
         })}
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
-        showReviewButton={searchParams.from === 'review'}
-        validatorContext={validatorContext}
+        validatorContext={{
+          ...validatorContext,
+          baseFormState: eventIndex.declaration
+        }}
         onPageChange={(nextPageId: string) => {
           return navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath(
@@ -116,7 +118,7 @@ export function Pages() {
                 eventId,
                 pageId: nextPageId
               },
-              { workqueue: searchParams.workqueue }
+              { backTo: searchParams.backTo }
             )
           )
         }}
@@ -126,7 +128,7 @@ export function Pages() {
               { eventId },
               {
                 templateId: String(annotation[CERT_TEMPLATE_ID]),
-                workqueue: searchParams.workqueue
+                backTo: searchParams.backTo
               }
             )
           )

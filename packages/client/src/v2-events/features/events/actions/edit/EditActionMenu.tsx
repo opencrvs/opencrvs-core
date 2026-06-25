@@ -44,9 +44,11 @@ import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Act
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { actionIcons } from '@client/v2-events/features/workqueues/Actions/utils'
+import { getChangedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
+import { TranslationTextWithFormatModifier } from '../../components/TranslationTextWithFormatModifier'
 import { useCanDirectlyRegister } from '../useCanDirectlyRegister'
 import {
   aggregateAnnotations,
@@ -137,11 +139,16 @@ function EditActionModal({
       title={intl.formatMessage(title)}
       width={800}
     >
-      <Stack>
-        <Text color="grey500" element="p" variant="reg16">
-          {supportingCopy ? intl.formatMessage(supportingCopy) : null}
-        </Text>
-      </Stack>
+      {supportingCopy && (
+        <Stack>
+          <TranslationTextWithFormatModifier
+            color="grey500"
+            element="p"
+            message={supportingCopy}
+            variant="reg16"
+          />
+        </Stack>
+      )}
       <CommentLabel element="h3" variant="bold16">
         {intl.formatMessage(commentLabel)}
       </CommentLabel>
@@ -159,9 +166,7 @@ function useEditActions(event: EventDocument) {
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const navigate = useNavigate()
   const { isActionAllowed } = useUserAllowedActions(eventIndex)
-  const [{ workqueue: slug }] = useTypedSearchParams(
-    ROUTES.V2.EVENTS.EDIT.REVIEW
-  )
+  const [{ backTo }] = useTypedSearchParams(ROUTES.V2.EVENTS.EDIT.REVIEW)
   const { getAnnotation } = useActionAnnotation()
   const canDirectlyRegister = useCanDirectlyRegister(event)
   const { closeActionView } = useEventFormNavigation()
@@ -173,6 +178,13 @@ function useEditActions(event: EventDocument) {
   const reviewConfig = getActionReview(eventConfiguration, ActionType.DECLARE)
 
   const formFields = formConfig.pages.flatMap((page) => page.fields)
+  const declarationDiff = getChangedDeclarationDiff(
+    formFields,
+    declaration,
+    eventIndex.declaration,
+    eventConfiguration,
+    validatorContext
+  )
   const changedFields = formFields.filter((f) =>
     hasDeclarationFieldChanged(
       f,
@@ -240,12 +252,12 @@ function useEditActions(event: EventDocument) {
             events.customActions.editAndRegister.mutate({
               eventId: event.id,
               transactionId: getUUID(),
-              declaration,
+              declaration: declarationDiff,
               annotation,
               content: { comment }
             })
 
-            closeActionView(slug)
+            closeActionView(backTo)
           }
         },
         disabled:
@@ -272,12 +284,12 @@ function useEditActions(event: EventDocument) {
             events.customActions.editAndDeclare.mutate({
               eventId: event.id,
               transactionId: getUUID(),
-              declaration,
+              declaration: declarationDiff,
               annotation,
               content: { comment }
             })
 
-            closeActionView(slug)
+            closeActionView(backTo)
           }
         },
         disabled: hasValidationErrors || !anyValuesHaveChanged,
@@ -303,12 +315,12 @@ function useEditActions(event: EventDocument) {
             events.customActions.editAndNotify.mutate({
               eventId: event.id,
               transactionId: getUUID(),
-              declaration,
+              declaration: declarationDiff,
               annotation,
               content: { comment }
             })
 
-            closeActionView(slug)
+            closeActionView(backTo)
           }
         },
         disabled: !anyValuesHaveChanged,
