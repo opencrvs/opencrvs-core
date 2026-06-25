@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { ActionBase, ActionStatus } from './ActionDocument'
 import { BaseActionInput } from './ActionInput'
 import { ActionTypes } from './ActionType'
@@ -27,15 +27,15 @@ export const Draft = z
     transactionId: z.string(),
     createdAt: z.string().datetime(),
     action: ActionBase.extend({
-      type: ActionTypes.exclude([ActionTypes.Enum.DELETE])
+      type: ActionTypes.exclude([ActionTypes.enum.DELETE])
     }).omit({ id: true, createdAtLocation: true })
   })
   .describe(
     'A temporary storage for an action. Stored with details of the event, creator and creation time.'
   )
 
-export const DraftInput = BaseActionInput.extend({
-  type: ActionTypes.exclude([ActionTypes.Enum.DELETE]),
+export const DraftInput = BaseActionInput.omit({ waitFor: true }).extend({
+  type: ActionTypes.exclude([ActionTypes.enum.DELETE]),
   status: z.enum([
     ActionStatus.Requested,
     ActionStatus.Accepted,

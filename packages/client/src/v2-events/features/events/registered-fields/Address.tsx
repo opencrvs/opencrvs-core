@@ -21,24 +21,25 @@ import {
   FieldType,
   Location,
   not,
+  AdministrativeArea,
   AdministrativeAreas,
   alwaysTrue,
   AddressType,
   isFieldDisplayedOnReview,
   AddressField,
-  AdministrativeArea as AdministrativeAreaField,
+  AdministrativeAreaField,
   TextField,
-  LocationType,
   ValidatorContext,
   IndexMap,
   FormState,
-  FieldConfig
+  FieldConfig,
+  UUID
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { getOfflineData } from '@client/offline/selectors'
-import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
@@ -247,7 +248,8 @@ function generateAddressFields(
     ]
 
     const configuration: AdministrativeAreaField['configuration'] = {
-      type: AdministrativeAreas.enum.ADMIN_STRUCTURE
+      type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
+      allowedLocations: addressConfig.configuration?.allowedLocations
     }
 
     if (!isFirst && prevItem?.id) {
@@ -310,8 +312,8 @@ function getLeafAdministrativeLevel(
   return undefined
 }
 
-function getAdministrativeArea(value: AddressFieldValue) {
-  return value.addressType === AddressType.DOMESTIC
+function getAdministrativeAreaIdFromAddress(value?: AddressFieldValue) {
+  return value?.addressType === AddressType.DOMESTIC
     ? value.administrativeArea || undefined
     : undefined
 }
@@ -344,11 +346,11 @@ function getAdministrativeArea(value: AddressFieldValue) {
 function transformParentValueToNestedValue(
   value: AddressFieldValue,
   adminLevelIds: string[],
-  adminStructureLocations: Location[]
+  administrativeAreas: Map<UUID, AdministrativeArea>
 ): EventState {
   const fullAdminHierarchy = getAdminLevelHierarchy(
-    getAdministrativeArea(value),
-    adminStructureLocations,
+    getAdministrativeAreaIdFromAddress(value),
+    administrativeAreas,
     adminLevelIds
   )
 
@@ -546,10 +548,8 @@ function AddressInput(props: Props) {
     ...otherProps
   } = props
   const { config } = useSelector(getOfflineData)
-  const { getLocations } = useLocations()
-  const [adminStructureLocations] = getLocations.useSuspenseQuery({
-    locationType: LocationType.enum.ADMIN_STRUCTURE
-  })
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
 
@@ -561,7 +561,7 @@ function AddressInput(props: Props) {
   const nestedValue = transformParentValueToNestedValue(
     value,
     adminLevelIds,
-    adminStructureLocations
+    administrativeAreas
   )
   const nestedTouched = transformParentTouchedToNestedTouched(
     touched,
@@ -613,10 +613,8 @@ function AddressOutput({
   configuration: AddressField
 }) {
   const validatorContext = useValidatorContext()
-  const { getLocations } = useLocations()
-  const [adminStructureLocations] = getLocations.useSuspenseQuery({
-    locationType: LocationType.enum.ADMIN_STRUCTURE
-  })
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const { config } = useSelector(getOfflineData)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
 
@@ -629,8 +627,8 @@ function AddressOutput({
   const addressValueWithHierarchyExpanded = {
     ...value,
     ...getAdminLevelHierarchy(
-      getAdministrativeArea(value),
-      adminStructureLocations,
+      getAdministrativeAreaIdFromAddress(value),
+      administrativeAreas,
       adminLevelIds
     )
   }
@@ -638,7 +636,7 @@ function AddressOutput({
   const flattenedAddressValues = transformParentValueToNestedValue(
     value,
     adminLevelIds,
-    adminStructureLocations
+    administrativeAreas
   )
 
   const { countryField, domesticFields, streetAddressFields } =
@@ -675,7 +673,8 @@ function toCertificateVariables(
   value: AddressFieldValue,
   context: {
     intl: IntlShape
-    locations: Location[]
+    locations: Map<UUID, Location>
+    administrativeAreas: Map<UUID, AdministrativeArea>
     adminLevels?: AdminStructureItem[]
   }
 ) {
@@ -684,32 +683,60 @@ function toCertificateVariables(
    * form data stringifier so location and other form fields can handle stringifying their own data
    */
 
-  const { intl, locations, adminLevels } = context
-  const stringifier = getFormDataStringifier(intl, locations)
+  const { intl, locations, adminLevels, administrativeAreas } = context
+  const stringifier = getFormDataStringifier(
+    intl,
+    locations,
+    administrativeAreas
+  )
   const stringifiedResult = stringifier(ALL_ADDRESS_FIELDS, value as EventState)
   const { streetLevelDetails } = value
 
-  const administrativeArea = getAdministrativeArea(value)
+  const administrativeAreaId = getAdministrativeAreaIdFromAddress(value)
+
+  /*
+   * administrativeHierarchy is a convenience field for certificate templates.
+   * It provides a pre-joined string of the address's administrative context.
+   *
+   * INTERNATIONAL: country only — streetLevelDetails is free-form and
+   * country-specific, so we can't make assumptions about its contents.
+   *
+   * DOMESTIC: configured admin levels (most-specific first) joined with country,
+   * e.g. "Ibombo, Central, Farajaland". Empty levels are filtered out, so a
+   * location with no district produces "Central, Farajaland" without a leading comma.
+   *
+   * Use in SVG templates as: {{$lookup $declaration "field.address.administrativeHierarchy"}}
+   */
   if (value.addressType === AddressType.INTERNATIONAL) {
-    return { ...stringifiedResult, streetLevelDetails }
+    const administrativeHierarchy = stringifiedResult.country ?? ''
+    return { ...stringifiedResult, streetLevelDetails, administrativeHierarchy }
   }
   const appConfigAdminLevels = adminLevels?.map((level) => level.id)
 
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
-
   const adminLevelHierarchy = getAdminLevelHierarchy(
-    administrativeArea,
-    adminStructureLocations,
+    administrativeAreaId,
+    administrativeAreas,
     appConfigAdminLevels as string[],
     'withNames'
   )
 
+  // Reverse so the most specific level (e.g. district) comes first
+  const orderedAdminValues = [...(appConfigAdminLevels ?? [])]
+    .reverse()
+    .map((level) => (adminLevelHierarchy as Record<string, string>)[level])
+
+  const administrativeHierarchy = [
+    ...orderedAdminValues,
+    stringifiedResult.country
+  ]
+    .filter(Boolean)
+    .join(', ')
+
   return {
     ...stringifiedResult,
     ...adminLevelHierarchy,
-    streetLevelDetails
+    streetLevelDetails,
+    administrativeHierarchy
   }
 }
 

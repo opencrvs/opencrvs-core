@@ -8,12 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig, SelectOption, ValidationConfig } from './FieldConfig'
 import { FieldType } from './FieldType'
 import { FieldConditional } from './Conditional'
 import { FieldValue } from './FieldValue'
+import { JurisdictionReference } from '../users/userReferences'
 
 const MatchType = z.enum(['fuzzy', 'exact', 'range', 'within'])
 
@@ -75,7 +76,6 @@ const BaseField = z.object({
   ),
   conditionals: z
     .array(FieldConditional)
-    .default([])
     .optional()
     .describe(
       `
@@ -93,11 +93,13 @@ const BaseField = z.object({
     ),
   validations: z
     .array(ValidationConfig)
-    .default([])
     .optional()
     .describe(
       `Option for overriding the field validations specifically for advanced search form.`
-    )
+    ),
+  allowedLocations: JurisdictionReference.optional().describe(
+    `Override the allowedLocations for a location field in advanced search. Use this when the declaration form's allowedLocations references a scope (e.g. record.create) that search-only users don't have — specify record.search scope instead.`
+  )
 })
 
 export const SearchQueryParams = z
@@ -180,12 +182,18 @@ export const AdvancedSearchField = z
 
 export type AdvancedSearchField = z.infer<typeof AdvancedSearchField>
 
-export const AdvancedSearchConfig = z.object({
-  title: TranslationConfig.describe('Advanced search tab title'),
-  fields: z
-    .array(AdvancedSearchField)
-    .describe('Advanced search fields within the tab.')
-})
+export const AdvancedSearchConfig = z
+  .object({
+    title: TranslationConfig.describe('Advanced search tab title'),
+    fields: z
+      .array(AdvancedSearchField)
+      .describe('Advanced search fields within the tab.')
+  })
+  .meta({
+    id: 'AdvancedSearchConfig',
+    description:
+      'Configuration of one advanced search tab. Each tab has a title and a list of searchable fields — either declaration fields (via `field()`) or event metadata (via `event()`).'
+  })
 
 export type AdvancedSearchConfig = z.infer<typeof AdvancedSearchConfig>
 export type AdvancedSearchConfigWithFieldsResolved = Omit<

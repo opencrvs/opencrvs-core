@@ -22,7 +22,8 @@ import {
   generateTranslationConfig,
   ConditionalType,
   field,
-  ActionUpdate
+  ActionUpdate,
+  UUID
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { ReviewDuplicateIndex } from './ReviewDuplicate'
@@ -131,6 +132,13 @@ const actions = [
   }),
   generateActionDocument({
     configuration: overriddenEventConfig,
+    action: ActionType.REGISTER,
+    defaults: {
+      declaration: declarationObj
+    }
+  }),
+  generateActionDocument({
+    configuration: overriddenEventConfig,
     action: ActionType.DUPLICATE_DETECTED,
     defaults: {
       declaration: declarationObj, // Same as DECLARE action details
@@ -153,7 +161,16 @@ const mockOriginalEvent = {
 const mockDuplicateEvent = {
   trackingId: duplicates[0].trackingId,
   type: overriddenEventConfig.id,
-  actions: actions.slice(0, 2),
+  actions: actions.slice(0, 2).concat(
+    generateActionDocument({
+      configuration: overriddenEventConfig,
+      action: ActionType.REGISTER,
+      defaults: {
+        // Test with location id so both it and administrative area are shown in the comparison
+        createdAtLocation: '1f4a5b6c-7d8e-4312-8abc-345678901234' as UUID
+      }
+    })
+  ),
   createdAt: new Date(Date.now()).toISOString(),
   id: duplicates[0].id,
   updatedAt: new Date(Date.now()).toISOString()
@@ -211,7 +228,10 @@ export const DuplicateWithSameLabels: Story = {
         {
           ...mockOriginalEvent,
           actions: mockOriginalEvent.actions.map((x) => {
-            if (x.type === ActionType.DECLARE) {
+            if (
+              x.type === ActionType.DECLARE ||
+              x.type === ActionType.REGISTER
+            ) {
               return {
                 ...x,
                 declaration: {
@@ -227,7 +247,10 @@ export const DuplicateWithSameLabels: Story = {
         {
           ...mockDuplicateEvent,
           actions: mockDuplicateEvent.actions.map((x) => {
-            if (x.type === ActionType.DECLARE) {
+            if (
+              x.type === ActionType.DECLARE ||
+              x.type === ActionType.REGISTER
+            ) {
               return {
                 ...x,
                 declaration: {
@@ -256,7 +279,7 @@ export const DuplicateWithSameLabels: Story = {
     await expect(canvas.getByText('Email')).toBeInTheDocument()
     await expect(canvas.getByText('abc@gmail.com')).toBeInTheDocument()
 
-    await expect(canvas.getByText('Phone')).toBeInTheDocument()
-    await expect(canvas.getByText('0912345678')).toBeInTheDocument()
+    await canvas.findByText('Phone')
+    await canvas.findByText('0912345678')
   }
 }

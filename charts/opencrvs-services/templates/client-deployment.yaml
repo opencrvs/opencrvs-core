@@ -1,0 +1,102 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: client-route
+spec:
+  entryPoints:
+  {{- if or .Values.ingress.ssl_enabled .Values.ingress.tls_resolver }}
+    - websecure
+  {{- end }}
+  {{- if or .Values.ingress.tls_resolver (not .Values.ingress.ssl_enabled) }}
+    - web
+  {{- end }}
+  routes:
+  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "register" "Values" .Values) }}`) || Host(`{{ .Values.hostname }}`)'
+    kind: Rule
+    services:
+    - name: client
+      namespace: {{ .Release.Namespace }}
+      port: {{ .Values.client.port }}
+    middlewares:
+      - name: sts-and-basic-response-headers
+      - name: enable-compression
+  {{- if .Values.ingress.tls_resolver }}
+  tls:
+    certResolver: {{ .Values.ingress.tls_resolver }}
+  {{- else if .Values.ingress.tls_secret_name }}
+  tls:
+    secretName: {{ .Values.ingress.tls_secret_name }}
+  {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: client
+    service_name: opencrvs_client
+  name: client
+spec:
+  replicas: {{ .Values.client.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: client
+  template:
+    metadata:
+      annotations:
+        lastdeploy-timestamp: {{ now | quote }}
+      labels:
+        app: client
+        service_name: opencrvs_client
+    spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.client) | nindent 6 }}
+      containers:
+        - image: {{ include "opencrvs.image" (dict "root" . "service" .Values.client) }}
+          name: client
+          env:
+          {{- if and
+            (not (hasKey (.Values.client.env | default dict) "CONTENT_SECURITY_POLICY_WILDCARD"))
+            (not (hasKey (.Values.env | default dict) "CONTENT_SECURITY_POLICY_WILDCARD"))
+          }}
+            - name: CONTENT_SECURITY_POLICY_WILDCARD
+              value: "*.{{ .Values.hostname }}"
+          {{- end }}
+            - name: COUNTRY_CONFIG_URL_INTERNAL
+              value: http://countryconfig.{{ .Release.Namespace }}.svc.cluster.local:3040
+            - name: GATEWAY_URL_INTERNAL
+              value: http://gateway.{{ .Release.Namespace }}.svc.cluster.local:7070
+            - name: LOGIN_URL
+              value: {{ include "render-external-url" (dict "service_name" "login" "Values" .Values) }}
+            - name: AUTH_URL_INTERNAL
+              value: http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040
+            - name: COUNTRY_CONFIG_URL
+              value: {{ include "render-external-url" (dict "service_name" "countryconfig" "Values" .Values) }}
+          {{- include "render-env-vars" (dict "service_name" "client" "Values" .Values) }}
+          {{- include "resources-helper" (dict "service_name" "client" "Values" .Values) | indent 10 }}
+          {{- include "probes-helper" (dict "service_name" "client" "Values" .Values) | indent 10 }}
+          ports:
+            - containerPort: {{ .Values.client.port }}
+              protocol: TCP
+          {{- if .Values.client.nginx_conf_d_configmaps }}
+          volumeMounts:
+          {{- range $config_name := .Values.client.nginx_conf_d_configmaps }}
+            - name: {{ $config_name }}
+              mountPath: /etc/nginx/conf.d/{{ $config_name }}.conf
+              subPath: "{{ $config_name }}.conf"
+          {{- end }}
+          {{- end }}
+      restartPolicy: Always
+      {{- if .Values.client.nginx_conf_d_configmaps }}
+      volumes:
+      {{- range $config_name := .Values.client.nginx_conf_d_configmaps }}
+        - name: {{ $config_name }}
+          configMap:
+            name: {{ $config_name }}
+      {{- end }}
+      {{- end }}
+
+{{- include "service-helper" (dict "service_name" "client" "Values" .Values) }}
+
+{{- include "hpa-helper" (dict "service_name" "client" "Values" .Values) }}
+
+{{- include "pdb-helper" (dict "service_name" "client" "Values" .Values) }}

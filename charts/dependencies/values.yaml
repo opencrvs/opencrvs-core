@@ -1,0 +1,371 @@
+hostname: opencrvs.localhost
+
+# subdomain_separator: separator between hostname and subdomains
+# generic form: <subdomain><subdomain_separator><hostname>
+# OpenCRVS can be deployed in different ways:
+# - as set of subdomains to hostname, examples:
+#            - auth.opencrvs.localhost
+#            - register.opencrvs.localhost
+# - as set of variations to main domain,
+#   in this variant wildcard certificate is needed only to one domain, examples:
+#            - auth-opencrvs.localhost
+#            - register-opencrvs.localhost
+subdomain_separator: '.'
+
+# Access to Dependencies like MinIO is done via Traefik IngressRoutes
+ingress:
+  # Enable SSL for IngressRoutes.
+  ssl_enabled: true
+  # If traefik was deployed with custom resolver, please define resolver name here.
+  # Resolver will be attached to Traefik CRD IngressRoute
+  tls_resolver: ''
+
+# Kubernetes storage type, available options are `pvc` or `host_path`
+storage_type: pvc
+
+# timezone: You can specify a time zone for a CronJobs (backup/restore)
+# https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#time-zones
+# For CronJobs with no time zone specified, the kube-controller-manager interprets schedules relative to its local time zone.
+# Example:
+# timezone: "Etc/UTC"
+
+# FIXME: Tiltfile deploys helm chart as template. There is no way to track existing secrets on the cluster.
+# This flag was introduced to avoid secrets update (mutation) on every file change within chart directory.
+# For OpenCRVS developers there is no need to deploy dependencies helm chart as template.
+chart_dev_mode: true
+
+# Label selector for datastore nodes, usually used to keep data persistent
+node_selector: {}
+resources:
+  memoryRequest: '100Mi'
+  cpuRequest: '100m'
+  memoryLimit: '8Gi'
+  cpuLimit: '8'
+
+mongodb:
+  # Enable MongoDB deployment.
+  enabled: true
+  # MongoDB docker image version to use: https://hub.docker.com/_/mongo
+  version: 4.4
+  # By default MongoDB is deployed without authentication enabled.
+  use_default_credentials: true
+  # MongoDB databases and users to create, if `use_default_credentials` is set to `false`.
+  admin_user_secret_name: mongodb-admin-user
+  # Pass mongodb credentials over variables:
+  # admin_user_name: admin
+  # admin_user_password: password
+
+postgres:
+  # Enable postgres deployment.
+  enabled: true
+  image: chumaky/postgres_mongo_fdw:17.6_fdw5.5.2
+  # By default postgres is deployed with authentication enabled user/password: postgres/postgres
+  use_default_credentials: true
+  # postgres databases and users to create, if `use_default_credentials` is set to `false`.
+  admin_user_secret_name: postgres-admin-user
+  # admin user name is postgres, define password here:
+  # admin_user_password:
+
+  # Persistent Volume Claim (PVC) configuration
+  # NOTE: This configuration is used only when `storage_type` is set to `pvc`.
+  # For `host_path` storage, data is stored on the host filesystem at the path defined in `postgres.host_data_path`.
+  pvc:
+    # StorageClass name used for dynamic volume provisioning.
+    # Set to:
+    # - a specific StorageClass name (e.g. gp3, standard, managed-csi)
+    # - "default" to use the cluster default StorageClass
+    # - "" to disable dynamic provisioning / default StorageClass usage
+    # storage_class: "default"
+
+    # Kubernetes PVC access mode.
+    # Common values:
+    # - ReadWriteOnce (RWO)  : mounted read-write by a single node
+    # - ReadOnlyMany (ROX)   : mounted read-only by multiple nodes
+    # - ReadWriteMany (RWX)  : mounted read-write by multiple nodes
+    access_mode: 'ReadWriteOnce'
+
+    # Requested persistent storage size
+    storage_size: '10Gi'
+
+  # Backup section
+  backup:
+    # Enable/Disable backup
+    enabled: false
+
+    # Run backup jobs as cronjob
+    # Default: true
+    # If you need to run manual backup, then set this property to false
+    # and run helm template ... instead
+    cronjob: true
+
+    # Backup implementation:
+    # - dump: logical full backup using pg_dump (protocol-based, cross-version).
+    # - differential: physical backup using pgBackRest (full/diff/incr/PITR).
+    type: dump
+    # Stanza name for pgBackRest
+    stanza: main
+    # Secret that holds connection info for the backup server (SSH).
+    # Expected keys in the Secret (example):
+    # - host:   backup server hostname
+    # - user:   backup server username
+    # - ssh_key: private SSH key for passwordless connection
+    #
+    # Both dump and differential flows can reuse this Secret.
+    server_secret: backup-server-ssh-credentials
+
+    # Secret holding the pgBackRest repository encryption passphrase.
+    # Encryption is always enabled; cipher type is fixed in templates
+    # (e.g. repo1-cipher-type=aes-256-cbc).
+    #
+    # Expected key in the Secret (example):
+    # - repo1-cipher-pass: passphrase used for repo1-cipher-pass
+    encryption_secret: backup-encryption-secret
+
+    # Common scheduling layer (Cron expressions). Interpretation depends on `type`.
+    schedule:
+      # For type=dump:
+      #   - dump: single schedule for full logical dump.
+      # For type=differential:
+      #   - full:        weekly full
+      #   - differential:daily
+      dump: '0 1 * * *' # used only when type=dump
+
+      full: '0 1 * * 0' # Sunday 01:00, used when type=differential
+      differential: '0 1 * * 1-6' # Mon–Sat 01:00, used when type=differential
+
+  restore:
+    # Enable/Disable restore
+    enabled: false
+
+    # Run backup jobs as cronjob
+    # Default: true
+    # If you need to run manual restore, then set this property to false
+    # and run helm template ... instead
+    cronjob: true
+    # Restore type should be the same as backup type
+    type: dump
+    # See description within backup section
+    # schedule: "0 3 * * *"   # daily at 03:00
+    # encryption_secret: restore-encryption-secret
+    # server_secret: backup-server-ssh-credentials
+
+# Elasticsearch Configuration
+elasticsearch:
+  image: docker.elastic.co/elasticsearch/elasticsearch:8.19.15
+  # Enable Elasticsearch deployment.
+  enabled: true
+  # By default Elasticsearch is deployed without authentication enabled.
+  use_default_credentials: true
+  admin_user_secret_name: elasticsearch-admin-user
+  auth_mode: auto
+  auth_users:
+    - KIBANA_SYSTEM:kibana_system
+    - METRICBEAT:beats_system
+    - APM:apm_system
+
+  # Secret to store OpenCRVS users credentials:
+  users_secret: elasticsearch-opencrvs-users
+  urls_secret: elasticsearch-opencrvs-urls
+
+  # PVC Configuration
+  pvc:
+    # storage_class: "default"
+    access_mode: 'ReadWriteOnce'
+    storage_size: '10Gi'
+
+  resources:
+    memoryRequest: '2Gi'
+    cpuRequest: '2'
+    memoryLimit: '8Gi'
+    cpuLimit: '8'
+
+# monitoring aggregates following components:
+# - kibana
+# - metricbeat
+# - filebeat
+# - logstash
+# - elastalert
+# - elastic-apm
+monitoring:
+  enabled: false
+
+apm_server:
+  image: docker.elastic.co/apm/apm-server:8.19.15
+
+kibana:
+  image: docker.elastic.co/kibana/kibana:8.19.15
+  users_secret: kibana-users-secret
+  # Configmap for custom configuration file
+  # custom_config_configmap: kibana-custom-config
+
+metricbeat:
+  image: docker.elastic.co/beats/metricbeat:8.19.15
+  # Configmap for custom configuration file
+  # custom_config_configmap: metricbeat-config
+  # Configmap for custom index lifecycle management policy
+  # custom_ilm_configmap: metricbeat-ilm-policy
+
+filebeat:
+  image: docker.elastic.co/beats/filebeat:8.19.15
+  # Configmap for custom configuration file
+  # custom_config_configmap: filebeat-config
+  # Configmap for custom index lifecycle management policy
+  # custom_ilm_configmap: filebeat-ilm-policy
+
+logstash:
+  image: docker.elastic.co/logstash/logstash:8.19.15
+
+elastalert:
+  # Create configmap with custom rules for elastalert
+  # custom_rules_configmap:
+  env:
+    # NOTIFICATION_TYPE:
+    #   - email: send email alert using configured SMTP server
+    #   - post2: send alert to external system via HTTP POST (Docker swarm backward compatible way)
+    NOTIFICATION_TYPE: post2
+    # If the notification type is post2, SMTP settings are not required
+    # These are dummy values to satisfy the envsubst command.
+    ALERT_EMAIL: 'dummy@example.com'
+    SENDER_EMAIL_ADDRESS: 'dummy@example.com'
+    SMTP_HOST: localhost
+    SMTP_PASSWORD: dummy
+    SMTP_PORT: '25'
+    SMTP_SECURE: 'false'
+    SMTP_USERNAME: dummy
+    # HTTP_POST2_ALERT_URL: Required if NOTIFICATION_TYPE is set to post2. URL to send HTTP POST alert to.
+    # Example: http://countryconfig.opencrvs-qa.svc.cluster.local:3040/email
+
+  # Create SMTP credentials secret for elastalert
+  # Required if NOTIFICATION_TYPE is set to email. Secret should contain following keys:
+  # secrets:
+  #   smtp-config:
+  #     - ALERT_EMAIL
+  #     - SENDER_EMAIL_ADDRESS
+  #     - SMTP_HOST
+  #     - SMTP_PASSWORD
+  #     - SMTP_PORT
+  #     - SMTP_SECURE
+  #     - SMTP_USERNAME
+
+minio:
+  # Enable or disable MinIO deployment.
+  enabled: true
+
+  # Use default credentials (username: minioadmin, password: minioadmin).
+  # Highly discouraged for production environments—see official docs:
+  # https://min.io/docs/minio/linux/administration/identity-access-management/minio-user-management.html
+  use_default_credentials: true
+
+  # storage_type: host_path
+  # PVC Configuration
+  pvc:
+    # storage_class: "default"
+    access_mode: 'ReadWriteOnce'
+    storage_size: '10Gi'
+
+  # Path to persistent data on the VM (when storage_type is host_path).
+  host_data_path: /data/minio
+
+  # Node selector for MinIO pods, usually used to keep data persistent on specified nodes.
+  node_selector: {}
+
+  backup:
+    # Enable or disable backup functionality for MinIO.
+    enabled: false
+
+    # Backup type:
+    # "dump" - creates a full filesystem dump;
+    # "differential" - rsync the filesystem to a remote backup server.
+    type: dump
+
+    # Name of the Kubernetes secret containing backup server SSH credentials.
+    # server_secret: backup-server-ssh-credentials
+
+    # Cron schedule to run backup job (format: "MIN HOUR DAY MONTH WEEKDAY").
+    # schedule: "0 1 * * *"
+
+    # Directory on backup server where encrypted backups are stored.
+    # If not set, use global backup_server_dir.
+    # server_dir: "n/a"
+
+  restore:
+    # Enable or disable restore functionality for MinIO.
+    enabled: false
+
+    # Restore type:
+    # "dump" - restore from encrypted archive;
+    # "differential" - rsync filesystem from remote backup server.
+    type: dump
+
+    # Name of the Kubernetes secret containing backup server SSH credentials.
+    # server_secret: backup-server-ssh-credentials
+
+    # Cron schedule for restore job.
+    # schedule: "0 3 * * *"
+
+redis:
+  # Enable Redis deployment.
+  # Redis is built on top of bitnami/redis docker image:
+  # https://hub.docker.com/r/bitnami/redis
+  enabled: true
+  # By default Redis is deployed without authentication enabled.
+  # auth_mode:
+  #   - disabled: no authentication
+  #   - password: use password authentication
+  #   - acl: use ACL authentication
+  auth_mode: disabled
+  # List of placeholders for OpenCRVS users:
+  # Each placeholder is converted to a variables:
+  # - <PLACEHOLDER>_REDIS_USERNAME
+  # - <PLACEHOLDER>_REDIS_PASSWORD
+  # Variables are store in secret named redis-opencrvs-users
+  auth_users:
+    - GATEWAY
+    - AUTH
+
+influxdb:
+  enabled: true
+
+# Backup configuration
+backup:
+  # Enable or disable backup
+  enabled: false
+  # Run backup jobs as cronjob
+  # Default: true
+  # If you need to run manual backup, then set this property to false
+  # and run helm template ... instead
+  cronjob: true
+  # Schedule job
+  schedule: '0 1 * * *'
+  # Secret to store backup server connection configuration:
+  # - user, backup server username
+  # - host, hostname / IP of backup server
+  # - ssh_key, ssh key for passwordless connection
+  backup_server_secret: backup-server-ssh-credentials
+  backup_server_dir: /home/backup/demo
+  backup_encryption_secret: backup-encryption-secret
+
+# Restore configuration
+restore:
+  # Enable or disable restore
+  enabled: false
+  # Run backup jobs as cronjob
+  # Default: true
+  # If you need to run manual restore, then set this property to false
+  # and run helm template ... instead
+  cronjob: true
+  # Schedule job
+  schedule: '0 0 * * *'
+  # Secret to store backup server connection configuration:
+  # - user, backup server username
+  # - host, hostname / IP of backup server
+  # - ssh_key, ssh key for passwordless connection
+  backup_server_secret: backup-server-ssh-credentials
+  # backup_server_dir: /home/backup/demo
+  backup_encryption_secret: restore-encryption-secret
+
+  env: {}
+# Priority class for datastore pods to avoid eviction
+priority_class:
+  name: opencrvs-datastore-high-priority
+  enabled: false

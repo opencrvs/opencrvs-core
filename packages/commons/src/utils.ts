@@ -8,9 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { NameFieldValue } from './events/CompositeFieldValue'
-import * as z from 'zod'
+import * as z from 'zod/v4'
 import * as _ from 'lodash'
 
 export function getOrThrow<T>(x: T, message: string) {
@@ -44,14 +42,6 @@ export const FullNameV1 = z.array(
 )
 
 export type FullNameV1 = z.infer<typeof FullNameV1>
-
-export function personNameFromV1ToV2([name]: FullNameV1): NameFieldValue {
-  return {
-    firstname: name.given[0],
-    middlename: name.given.slice(1).join(' '),
-    surname: name.family
-  }
-}
 
 export function omitKeyDeep(obj: any, keyToRemove: string): any {
   if (Array.isArray(obj)) {

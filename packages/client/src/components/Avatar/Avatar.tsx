@@ -11,12 +11,13 @@
 import * as React from 'react'
 import { Avatar as DefaultAvatar } from '@opencrvs/components/lib/icons'
 import { AVATAR_API } from '@client/utils/constants'
-import { Avatar as AvatarType } from '@client/utils/gateway'
 import styled from 'styled-components'
+import { toFileUrl } from '@client/v2-events/cache'
+import { DocumentPath } from '@opencrvs/commons/client'
 
 interface IProps extends React.HTMLAttributes<Element> {
   name?: string
-  avatar?: AvatarType | undefined | null
+  avatar?: string | undefined | null
 }
 
 const AvatarImage = styled.img`
@@ -36,7 +37,7 @@ export function Avatar({ name, avatar, ...props }: IProps) {
         height={64}
         src={
           avatar
-            ? avatar.data
+            ? toFileUrl(avatar as DocumentPath)
             : `${AVATAR_API}${encodeURIComponent(name!).replace(/%20/g, '+')}`
         }
         onError={() => setError(true)}

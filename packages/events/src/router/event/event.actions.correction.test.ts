@@ -16,6 +16,7 @@ import {
   ActionType,
   AddressType,
   createPrng,
+  encodeScope,
   EventDocument,
   EventState,
   generateActionDeclarationInput,
@@ -47,7 +48,6 @@ test('REQUEST_CORRECTION allows access if required scope is present', async () =
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -75,7 +75,12 @@ test(`${ActionType.APPROVE_CORRECTION} prevents forbidden access if missing requ
 test(`${ActionType.APPROVE_CORRECTION} allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'record.registered.correct[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.correct',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   await expect(
@@ -106,7 +111,12 @@ test(`${ActionType.REJECT_CORRECTION} prevents forbidden access if missing requi
 test(`${ActionType.REJECT_CORRECTION} allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'record.registered.correct[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.correct',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   await expect(
@@ -126,7 +136,6 @@ test('a correction request can be added to a registered event', async () => {
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -154,7 +163,6 @@ test(`REQUEST_CORRECTION validation error message contains all the offending fie
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -210,7 +218,6 @@ test(`REQUEST_CORRECTION Skips required field validation when they are condition
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -292,7 +299,6 @@ test('REQUEST_CORRECTION prevents correcting a field which is configured as unco
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -317,7 +323,6 @@ describe('when a correction request exists', () => {
 
     const event = await createEvent(client, generator, [
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER
     ])
 
@@ -389,7 +394,6 @@ test(`${ActionType.APPROVE_CORRECTION} is idempotent`, async () => {
   const client = createTestClient(user)
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -428,7 +432,6 @@ test(`${ActionType.REJECT_CORRECTION} is idempotent`, async () => {
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -472,7 +475,6 @@ test('a correction request is not allowed if the event is already waiting for co
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 

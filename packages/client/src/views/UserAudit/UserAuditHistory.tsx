@@ -11,16 +11,10 @@
 import { messages } from '@client/i18n/messages/views/userSetup'
 import styled, { withTheme } from 'styled-components'
 import React, { useState } from 'react'
-import Bowser from 'bowser'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { Query } from '@client/components/Query'
-import { GET_USER_AUDIT_LOG } from '@client/user/queries'
+import { useQuery } from '@tanstack/react-query'
+
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-import type {
-  GQLUserAuditLogItemWithComposition,
-  GQLUserAuditLogResultItem,
-  GQLUserAuditLogResultSet
-} from '@client/utils/gateway-deprecated-do-not-use'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import { Table } from '@opencrvs/components/lib/Table'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
@@ -29,31 +23,46 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/Workqueue'
 import { getUserAuditDescription } from '@client/views/SysAdmin/Team/utils'
 import { orderBy } from 'lodash'
-import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
+
 import subMonths from 'date-fns/subMonths'
-import {
-  IOnlineStatusProps,
-  withOnlineStatus
-} from '@client/views/OfficeHome/LoadingIndicator'
-import {
-  GetUserAuditLogQuery,
-  UserAuditLogResultItem,
-  UserAuditLogResultSet
-} from '@client/utils/gateway'
+
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import format from '@client/utils/date-formatting'
-import { Link } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
-import { usePermissions } from '@client/hooks/useAuthorization'
-import * as routes from '@client/navigation/routes'
+import { useTRPC } from '@client/v2-events/trpc'
+import { Link } from '@opencrvs/components'
 import { useNavigate } from 'react-router-dom'
-import { formatUrl } from '@client/navigation'
-import { config } from '@client/config'
 import { ROUTES } from '@client/v2-events/routes'
-import { UUID } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  AuditLogEntry,
+  AuditLogParams,
+  EventActionAuditLog,
+  EventCustomActionAuditLog,
+  getAcceptedScopesByType,
+  getActionConfig,
+  getEventConfigById,
+  UUID
+} from '@opencrvs/commons/client'
+
+/** Audit log entries that carry a full event response summary (eventId, trackingId). */
+type EventActionLikeAuditLogParams = (
+  | EventActionAuditLog
+  | EventCustomActionAuditLog
+) &
+  Pick<AuditLogParams, 'clientId' | 'clientType'>
+import { useSelector } from 'react-redux'
+import { getScope } from '@client/profile/profileSelectors'
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 
 const DEFAULT_LIST_SIZE = 10
+
+const OPERATIONS_TO_HIDE = [
+  'event.search',
+  'event.actions.assign.request',
+  'event.actions.unassign.request'
+]
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -74,30 +83,26 @@ const AuditContent = styled.div`
   color: ${({ theme }) => theme.colors.grey600};
 `
 
-const BoldContent = styled.div`
-  color: ${({ theme }) => theme.colors.grey600};
-  ${({ theme }) => theme.fonts.bold14};
-`
 interface IBaseProp {
-  practitionerId: string
-  practitionerName: string | null | undefined
+  userId: string
+  userName: string | null | undefined
 }
 
 type Props = WrappedComponentProps &
-  IBaseProp &
-  IOnlineStatusProps & {
+  IBaseProp & {
     theme: ITheme
   }
 
 enum SORTED_COLUMN {
   ACTION = 'actionDescriptionString',
-  EVENT = 'eventType',
-  RECORD = 'trackingIdString',
-  DATE = 'auditTimeValue',
-  DEVICE = 'deviceIpAddress'
+  RECORD = 'trackingId',
+  DATE = 'auditTimeValue'
 }
 
-const ADMIN_ACTIONS = ['DEACTIVATE', 'REACTIVATE', 'EDIT_USER', 'CREATE_USER']
+enum SORT_ORDER {
+  ASCENDING = 'asc',
+  DESCENDING = 'desc'
+}
 
 type State = {
   timeStart: Date
@@ -107,18 +112,18 @@ type State = {
   sortedColumn: SORTED_COLUMN
   currentPageNumber: number
   showModal: boolean
-  actionDetailsData: UserAuditLogResultItem | null
-}
-
-const isUserAuditItemWithDeclarationDetails = (
-  item: GQLUserAuditLogResultItem
-): item is GQLUserAuditLogItemWithComposition => {
-  return 'data' in item
+  actionDetailsData: AuditLogEntry | null
 }
 
 function UserAuditHistoryComponent(props: Props) {
-  const navigate = useNavigate()
-  window.__localeId__ = props.intl.locale
+  const eventConfigurations = useEventConfigurations()
+
+  const scopes = useSelector(getScope) ?? []
+  const hasRecordRead =
+    getAcceptedScopesByType({
+      acceptedScopes: ['record.read'],
+      scopes
+    }).length > 0
 
   const [state, setState] = useState<State>({
     timeStart: subMonths(new Date(Date.now()), 1),
@@ -131,13 +136,25 @@ function UserAuditHistoryComponent(props: Props) {
     actionDetailsData: null
   })
 
-  const { canSearchRecords } = usePermissions()
+  const navigate = useNavigate()
+  const trpc = useTRPC()
+  const { data, isLoading, isError } = useQuery(
+    trpc.user.audit.list.queryOptions({
+      userId: props.userId,
+      timeStart: state.timeStart.toISOString(),
+      timeEnd: state.timeEnd.toISOString(),
+      skip: (state.currentPageNumber - 1) * DEFAULT_LIST_SIZE,
+      excludeOperations: OPERATIONS_TO_HIDE,
+      count: DEFAULT_LIST_SIZE
+    })
+  )
 
   function setDateRangePickerValues(startDate: Date, endDate: Date) {
     setState((prevState) => ({
       ...prevState,
       timeStart: startDate,
-      timeEnd: endDate
+      timeEnd: endDate,
+      currentPageNumber: 1
     }))
   }
 
@@ -157,7 +174,7 @@ function UserAuditHistoryComponent(props: Props) {
     return [
       {
         label: intl.formatMessage(messages.auditActionColumnTitle),
-        width: 25,
+        width: 40,
         isSortable: true,
         icon: <ArrowDownBlue />,
         key: 'actionDescription',
@@ -165,24 +182,15 @@ function UserAuditHistoryComponent(props: Props) {
       },
       {
         label: intl.formatMessage(messages.auditTrackingIDColumnTitle),
-        width: 25,
+        width: 30,
         isSortable: true,
         icon: <ArrowDownBlue />,
         key: 'trackingId',
         sortFunction: () => toggleSortOrder(SORTED_COLUMN.RECORD)
       },
       {
-        label: intl.formatMessage(messages.auditDeviceIpAddressColumnTitle),
-        width: 25,
-        isSortable: true,
-        icon: <ArrowDownBlue />,
-        key: 'deviceIpAddress',
-        alignment: ColumnContentAlignment.LEFT,
-        sortFunction: () => toggleSortOrder(SORTED_COLUMN.DEVICE)
-      },
-      {
         label: intl.formatMessage(messages.auditDateColumnTitle),
-        width: 25,
+        width: 30,
         key: 'auditTime',
         isSortable: true,
         isSorted: true,
@@ -193,7 +201,7 @@ function UserAuditHistoryComponent(props: Props) {
     ]
   }
 
-  const toggleActionDetails = (actionItem: UserAuditLogResultItem | null) => {
+  const toggleActionDetails = (actionItem: AuditLogEntry | null) => {
     setState((prevState) => ({
       ...prevState,
       actionDetailsData: actionItem,
@@ -201,127 +209,89 @@ function UserAuditHistoryComponent(props: Props) {
     }))
   }
 
-  function getIpAdress(auditLog: UserAuditLogResultItem) {
-    if (!auditLog.userAgent) {
-      return auditLog.ipAddress || '-'
-    }
-
-    const device = Bowser.getParser(auditLog.userAgent).getResult()
-
-    return (
-      [
-        device.platform.vendor,
-        device.os.name,
-        device.browser ? `(${device.browser.name})` : ''
-      ]
-        .filter(Boolean)
-        .join(' ') +
-      ' • ' +
-      auditLog.ipAddress
-    )
-  }
-
-  function getActionMessage(auditLog: UserAuditLogResultItem) {
-    const actionDescriptor = getUserAuditDescription(auditLog.action)
-    return actionDescriptor ? props.intl.formatMessage(actionDescriptor) : ''
-  }
-
-  function getAuditData(data: UserAuditLogResultSet) {
-    const auditList = data.results.map((userAuditItem) => {
-      if (userAuditItem === null) {
-        return {}
-      }
-      const actionMessage = getActionMessage(userAuditItem)
-
+  function getTrackingIdAndEventId(entry: AuditLogEntry) {
+    if (entry.operation === 'event.create') {
       return {
-        actionDescription: !isUserAuditItemWithDeclarationDetails(
-          userAuditItem
-        ) ? (
-          <Link
-            font="bold14"
-            onClick={() => {
-              toggleActionDetails(userAuditItem)
-            }}
-          >
-            {actionMessage}
-          </Link>
-        ) : canSearchRecords &&
-          !ADMIN_ACTIONS.includes(userAuditItem.action) ? (
-          <Link
-            font="bold14"
-            onClick={() => {
-              toggleActionDetails(userAuditItem)
-            }}
-          >
-            {actionMessage}
-          </Link>
-        ) : (
-          <BoldContent>{actionMessage}</BoldContent>
-        ),
+        trackingId: entry.responseSummary.trackingId || '-',
+        eventId: UUID.safeParse(entry.responseSummary.eventId)?.data
+      }
+    }
+    if (entry.operation === 'event.get') {
+      return {
+        trackingId: entry.responseSummary.trackingId || '-',
+        eventId: UUID.safeParse(entry.requestData.eventId)?.data
+      }
+    }
+    if (isEventActionEntry(entry)) {
+      return {
+        trackingId: entry.requestData.trackingId || '-',
+        eventId: UUID.safeParse(entry.requestData.eventId)?.data
+      }
+    }
+    return {
+      trackingId: '-'
+    }
+  }
 
-        actionDescriptionWithAuditTime:
-          isUserAuditItemWithDeclarationDetails(userAuditItem) === undefined ? (
-            <Link
-              onClick={() => {
-                toggleActionDetails(userAuditItem)
-              }}
-            >
-              {actionMessage}
-            </Link>
-          ) : canSearchRecords ? (
-            <Link
-              onClick={() => {
-                toggleActionDetails(userAuditItem)
-              }}
-            >
-              {actionMessage}
-            </Link>
-          ) : (
-            <BoldContent>{actionMessage}</BoldContent>
-          ),
-        trackingId:
-          isUserAuditItemWithDeclarationDetails(userAuditItem) &&
-          canSearchRecords ? (
+  function isEventActionEntry(
+    entry: AuditLogEntry
+  ): entry is EventActionLikeAuditLogParams & { createdAt: string } {
+    return entry.operation.startsWith('event.actions.')
+  }
+
+  function getActionMessage(entry: AuditLogEntry) {
+    if (entry.operation === 'event.actions.custom.request') {
+      const eventConfig = getEventConfigById(
+        eventConfigurations,
+        entry.requestData.eventType
+      )
+
+      const actionConfig = getActionConfig({
+        eventConfiguration: eventConfig,
+        actionType: ActionType.CUSTOM,
+        customActionType: entry.requestData.customAction
+      })
+      if (actionConfig?.type === ActionType.CUSTOM) {
+        return props.intl.formatMessage(actionConfig.auditHistoryLabel)
+      }
+      // This will not be needed once getActionConfig() returns typed config
+      return entry.requestData.customAction
+    }
+    const actionDescriptor = getUserAuditDescription(entry.operation)
+    return actionDescriptor
+      ? props.intl.formatMessage(actionDescriptor)
+      : entry.operation
+  }
+
+  function getAuditData(results: AuditLogEntry[]) {
+    return orderBy(
+      results.map((entry) => ({
+        actionDescription: (
+          <Link font="bold14" onClick={() => toggleActionDetails(entry)}>
+            {getActionMessage(entry)}
+          </Link>
+        ),
+        actionDescriptionString: getActionMessage(entry),
+        trackingId: (() => {
+          const { trackingId, eventId } = getTrackingIdAndEventId(entry)
+          if (trackingId === '-' || !eventId) return trackingId
+          if (!hasRecordRead) return trackingId
+          return (
             <Link
               font="bold14"
-              /** When running V2 first, it is impossible to get back and forth to legacy events. At this stage country has already migrated, or should have never used v1 alongside of v2 */
-              disabled={config.FEATURES.V2_EVENTS && !userAuditItem.isV2}
               onClick={() =>
-                userAuditItem.isV2
-                  ? navigate(
-                      ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-                        eventId: userAuditItem.data.compositionId as UUID
-                      })
-                    )
-                  : navigate(
-                      formatUrl(routes.DECLARATION_RECORD_AUDIT, {
-                        tab: 'printTab',
-                        declarationId: userAuditItem.data.compositionId as UUID
-                      })
-                    )
+                navigate(ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }))
               }
             >
-              {userAuditItem.data.trackingId}
+              {trackingId}
             </Link>
-          ) : isUserAuditItemWithDeclarationDetails(userAuditItem) ? (
-            <AuditContent>{userAuditItem.data.trackingId}</AuditContent>
-          ) : null,
-
-        deviceIpAddress: getIpAdress(userAuditItem),
-        trackingIdString: isUserAuditItemWithDeclarationDetails(userAuditItem)
-          ? userAuditItem.data.trackingId
-          : null,
-        auditTime: format(
-          new Date(userAuditItem.time),
-          'MMMM dd, yyyy hh:mm a'
-        ),
-        auditTimeValue: new Date(userAuditItem.time)
-      }
-    })
-    return (
-      (auditList &&
-        orderBy(auditList, [state.sortedColumn], [state.sortOrder])) ||
-      []
+          )
+        })(),
+        auditTime: format(new Date(entry.createdAt), 'MMMM dd, yyyy hh:mm a'),
+        auditTimeValue: new Date(entry.createdAt)
+      })),
+      [state.sortedColumn],
+      [state.sortOrder]
     )
   }
 
@@ -343,107 +313,69 @@ function UserAuditHistoryComponent(props: Props) {
     )
   }
 
-  const { intl, practitionerId, theme } = props
+  const { intl, theme } = props
   const { timeStart, timeEnd, currentPageNumber } = state
 
   return (
     <RecentActionsHolder id="user-audit-list">
-      <>
-        <>
-          <HistoryHeader>
-            <Text variant="h3" element="h3" color="copy">
-              {intl.formatMessage(messages.auditSectionTitle)}
-            </Text>
-            <DateRangePicker
-              startDate={timeStart}
-              endDate={timeEnd}
-              onDatesChange={({ startDate, endDate }) => {
-                setDateRangePickerValues(startDate, endDate)
-              }}
-            />
-          </HistoryHeader>
-          <>
-            <Query<GetUserAuditLogQuery>
-              query={GET_USER_AUDIT_LOG}
-              variables={{
-                practitionerId: practitionerId,
-                count: DEFAULT_LIST_SIZE,
-                skip: DEFAULT_LIST_SIZE * (currentPageNumber - 1),
-                timeStart: timeStart,
-                timeEnd: timeEnd
-              }}
-              fetchPolicy={'no-cache'}
+      <HistoryHeader>
+        <Text variant="h3" element="h3" color="copy">
+          {intl.formatMessage(messages.auditSectionTitle)}
+        </Text>
+        <DateRangePicker
+          startDate={timeStart}
+          endDate={timeEnd}
+          onDatesChange={({ startDate, endDate }) => {
+            setDateRangePickerValues(startDate, endDate)
+          }}
+        />
+      </HistoryHeader>
+      {isError || !data ? (
+        getLoadingAuditListView(isError)
+      ) : (
+        <TableDiv>
+          <Table
+            columns={getAuditColumns()}
+            content={getAuditData(data.results as AuditLogEntry[])}
+            noResultText={intl.formatMessage(messages.noAuditFound)}
+            fixedWidth={1088}
+            isLoading={isLoading}
+            hideTableHeader={state.viewportWidth <= theme.grid.breakpoints.md}
+            pageSize={DEFAULT_LIST_SIZE}
+          />
+          <Pagination
+            currentPage={currentPageNumber}
+            totalPages={Math.ceil(data.total / DEFAULT_LIST_SIZE)}
+            onPageChange={(page: number) =>
+              setState((prevState) => ({
+                ...prevState,
+                currentPageNumber: page
+              }))
+            }
+          />
+          {state.actionDetailsData && (
+            <ResponsiveModal
+              actions={[]}
+              handleClose={() => toggleActionDetails(null)}
+              show={state.showModal}
+              responsive={true}
+              title={getActionMessage(state.actionDetailsData)}
+              width={1024}
+              autoHeight={true}
             >
-              {({ data, loading, error }) => {
-                if (error || !data || !data.getUserAuditLog) {
-                  return getLoadingAuditListView(error ? true : false)
-                } else {
-                  const totalItems = Number(
-                    (data &&
-                      data.getUserAuditLog &&
-                      data.getUserAuditLog.total) ||
-                      0
-                  )
-
-                  return (
-                    <TableDiv>
-                      <Table
-                        columns={getAuditColumns()}
-                        content={getAuditData(data.getUserAuditLog)}
-                        noResultText={intl.formatMessage(messages.noAuditFound)}
-                        fixedWidth={1088}
-                        isLoading={loading}
-                        hideTableHeader={
-                          state.viewportWidth <= theme.grid.breakpoints.md
-                        }
-                        pageSize={DEFAULT_LIST_SIZE}
-                      />
-                      <Pagination
-                        currentPage={state.currentPageNumber}
-                        totalPages={Math.ceil(totalItems / DEFAULT_LIST_SIZE)}
-                        onPageChange={(page: number) =>
-                          setState((prevState) => ({
-                            ...prevState,
-                            currentPageNumber: page
-                          }))
-                        }
-                      />
-
-                      {state.actionDetailsData && (
-                        <ResponsiveModal
-                          actions={[]}
-                          handleClose={() => toggleActionDetails(null)}
-                          show={state.showModal}
-                          responsive={true}
-                          title={getActionMessage(state.actionDetailsData)}
-                          width={1024}
-                          autoHeight={true}
-                        >
-                          <>
-                            <AuditContent>
-                              {props.practitionerName} -{' '}
-                              {format(
-                                new Date(state.actionDetailsData.time),
-                                'MMMM dd, yyyy hh:mm a'
-                              )}{' '}
-                              {' | '}
-                              {getIpAdress(state.actionDetailsData)}
-                            </AuditContent>
-                          </>
-                        </ResponsiveModal>
-                      )}
-                    </TableDiv>
-                  )
-                }
-              }}
-            </Query>
-          </>
-        </>
-      </>
+              <AuditContent>
+                {props.userName} -{' '}
+                {format(
+                  new Date(state.actionDetailsData.createdAt),
+                  'MMMM dd, yyyy hh:mm a'
+                )}
+              </AuditContent>
+            </ResponsiveModal>
+          )}
+        </TableDiv>
+      )}
     </RecentActionsHolder>
   )
 }
 
-export const UserAuditHistory = withTheme(
-  injectIntl(withOnlineStatus(UserAuditHistoryComponent))
-)
+export const UserAuditHistory = withTheme(injectIntl(UserAuditHistoryComponent))

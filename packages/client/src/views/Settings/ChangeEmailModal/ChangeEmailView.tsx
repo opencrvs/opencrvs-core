@@ -17,27 +17,20 @@ import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { useIntl } from 'react-intl'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { GET_USER_BY_EMAIL } from '@client/views/Settings/queries'
-import { useDispatch, useSelector } from 'react-redux'
-import { sendVerifyCode } from '@client/profile/profileActions'
+import { useSelector } from 'react-redux'
+import { useOnlineStatus } from '@client/utils'
 import { isAValidEmailAddressFormat } from '@client/utils/validate'
-import { getLanguage } from '@client/i18n/selectors'
-import { convertToMSISDN } from '@client/forms/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { errorMessages } from '@client/i18n/messages/errors'
-import { useLazyQuery } from '@apollo/client'
-import { GetUserByEmailQuery } from '@client/utils/gateway'
-import { TriggerEvent } from '@opencrvs/commons/client'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
 
 interface IProps {
   show: boolean
-  onSuccess: (emailAddress: string) => void
+  onSuccess: (emailAddress: string, nonce: string) => void
   onClose: () => void
 }
 
 export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
-  const [fetchUserDetailsByEmail] =
-    useLazyQuery<GetUserByEmailQuery>(GET_USER_BY_EMAIL)
   const intl = useIntl()
   const [emailAddress, setEmailAddress] = React.useState(EMPTY_STRING)
   const [unknownError, setUnknownError] = React.useState(false)
@@ -47,9 +40,12 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
     showDuplicateEmailErrorNotification,
     setShowDuplicateEmailErrorNotification
   ] = React.useState(false)
-  const dispatch = useDispatch()
   const userDetails = useSelector(getUserDetails)
-  const language = useSelector(getLanguage)
+  const isOnline = useOnlineStatus()
+  const { requestEmailChange } = useUsers()
+  const isEmailAddressUnchanged =
+    Boolean(emailAddress) &&
+    emailAddress.trim().toLowerCase() === userDetails?.email?.toLowerCase()
 
   const onChangeEmailAddress = (event: React.ChangeEvent<HTMLInputElement>) => {
     const emailAddress = event.target.value
@@ -72,38 +68,22 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
     setUnknownError((prevValue) => !prevValue)
   }
   const continueButtonHandler = async (emailAddress: string) => {
-    const { data: userData, error } = await fetchUserDetailsByEmail({
-      variables: { email: emailAddress }
-    })
-    if (error) {
-      setUnknownError(true)
-      return
-    }
-    const emailExists = userData?.getUserByEmail
-
-    if (!emailExists) {
-      const notificationEvent = TriggerEvent.CHANGE_EMAIL_ADDRESS
-      dispatch(
-        sendVerifyCode(
-          [
-            {
-              use: language,
-              family: String(userDetails?.name?.[0].familyName),
-              given: [String(userDetails?.name?.[0].firstNames)]
-            }
-          ],
-          notificationEvent,
-          userDetails?.mobile
-            ? convertToMSISDN(userDetails?.mobile, window.config.COUNTRY)
-            : undefined,
-          emailAddress
-        )
-      )
-      onSuccess(emailAddress)
-    } else {
-      toggleDuplicateEmailErrorNotification()
-      setUnknownError(false)
-    }
+    if (!userDetails) return
+    requestEmailChange.mutate(
+      { email: emailAddress },
+      {
+        onSuccess: (data) => {
+          onSuccess(emailAddress, data.nonce)
+        },
+        onError: (error) => {
+          if (error.data?.code === 'CONFLICT') {
+            setShowDuplicateEmailErrorNotification(true)
+          } else {
+            setUnknownError(true)
+          }
+        }
+      }
+    )
   }
   React.useEffect(() => {
     if (!show) {
@@ -126,7 +106,13 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
           onClick={() => {
             continueButtonHandler(emailAddress)
           }}
-          disabled={!Boolean(emailAddress.length) || isInvalidEmailAddress}
+          disabled={
+            !isOnline ||
+            requestEmailChange.isPending ||
+            !Boolean(emailAddress.length) ||
+            isInvalidEmailAddress ||
+            isEmailAddressUnchanged
+          }
         >
           {intl.formatMessage(buttonMessages.continueButton)}
         </PrimaryButton>
@@ -143,7 +129,9 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
         error={
           isInvalidEmailAddress
             ? intl.formatMessage(messages.emailAddressChangeFormValidationMsg)
-            : ''
+            : isEmailAddressUnchanged
+              ? intl.formatMessage(messages.emailAddressUnchangedErrorMessege)
+              : ''
         }
       >
         <TextInput

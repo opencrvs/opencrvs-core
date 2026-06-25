@@ -8,7 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+
+import z from 'zod/v4'
 import { ActionConditional, Conditional, FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
 import { FieldType } from './FieldType'
@@ -19,13 +20,14 @@ import {
   NonEmptyTextValue,
   TextValue,
   DateRangeFieldValue,
-  SignatureFieldValue,
   SelectDateRangeValue,
   TimeValue,
   ButtonFieldValue,
-  VerificationStatusValue
+  VerificationStatusValue,
+  SignatureFieldValue
 } from './FieldValue'
 import {
+  CustomFieldValue,
   DomesticAddressFieldValue,
   FileFieldValue,
   FileFieldWithOptionValue,
@@ -34,19 +36,17 @@ import {
   NumberWithUnitFieldValue,
   QrReaderFieldValue
 } from './CompositeFieldValue'
-import { extendZodWithOpenApi } from 'zod-openapi'
 import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
 import { SearchQuery } from './EventIndex'
-import { JSONSchema } from '../client'
 import { SerializedNowDateTime } from './serializers/date/serializer'
-extendZodWithOpenApi(z)
+import { JurisdictionReference } from '../users/userReferences'
 
 /* eslint-disable max-lines */
 
 const FieldId = z
   .string()
-  .refine(
+  .superRefine((val, ctx) => {
     /*
      * Disallow underscores '_' in field ids.
      * Why? Theres two reasons:
@@ -54,11 +54,13 @@ const FieldId = z
      *   2. On Kysely-SQL queries, we use the CamelCasePlugin. This plugin transforms snake_case to camelCase also on nested (jsonb) object keys.
      *      This could be disabled via 'maintainNestedObjectKeys: true', but this would also affect SQL queries which use e.g. json_agg() or to_jsonb() to aggregate results.
      */
-    (val) => !val.includes('_'),
-    (val) => ({
-      message: `id: '${val}' must not contain underscores '_'`
-    })
-  )
+    if (val.includes('_')) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `id: '${val}' must not contain underscores '_'`
+      })
+    }
+  })
   .describe('Unique identifier for the field')
 
 /**
@@ -74,9 +76,7 @@ const FieldId = z
  */
 export const FieldReference = z
   .object({
-    $$field: FieldId.describe(
-      'Field whose value is passed as the first argument to the computation'
-    ),
+    $$field: FieldId.describe('Id of the field to reference'),
     $$subfield: z
       .array(z.string())
       .optional()
@@ -128,10 +128,20 @@ export const ComputedDefaultValue = z
 
 export type ComputedDefaultValue = z.infer<typeof ComputedDefaultValue>
 
-export const ValidationConfig = z.object({
-  validator: Conditional,
-  message: TranslationConfig
-})
+export const ValidationConfig = z
+  .object({
+    validator: Conditional.describe(
+      'Conditional expression that must hold for the field value to be considered valid.'
+    ),
+    message: TranslationConfig.describe(
+      'Error message displayed when the validator does not hold.'
+    )
+  })
+  .meta({
+    id: 'ValidationConfig',
+    description:
+      'Validation rule applied to a form field. The validator is a conditional expression that must hold for the field value to be considered valid.'
+  })
 
 export type ValidationConfig = z.infer<typeof ValidationConfig>
 const requiredSchema = z
@@ -206,6 +216,9 @@ export type BaseField = z.infer<typeof BaseField>
 
 const Divider = BaseField.extend({
   type: z.literal(FieldType.DIVIDER)
+}).meta({
+  description: 'A horizontal line divider',
+  id: 'Divider'
 })
 
 export type Divider = z.infer<typeof Divider>
@@ -224,7 +237,10 @@ export const TextField = BaseField.extend({
     })
     .default({ type: 'text' })
     .optional()
-}).describe('Text input')
+}).meta({
+  description: 'A text input field',
+  id: 'TextField'
+})
 
 export type TextField = z.infer<typeof TextField>
 
@@ -235,11 +251,18 @@ const NumberField = BaseField.extend({
     .object({
       min: z.number().optional().describe('Minimum value'),
       max: z.number().optional().describe('Maximum value'),
+      integer: z
+        .boolean()
+        .optional()
+        .describe('When true, only whole numbers are allowed'),
       prefix: TranslationConfig.optional(),
       postfix: TranslationConfig.optional()
     })
     .optional()
-}).describe('Number input')
+}).meta({
+  description: 'A number input field',
+  id: 'NumberField'
+})
 
 const TextAreaField = BaseField.extend({
   type: z.literal(FieldType.TEXTAREA),
@@ -254,7 +277,10 @@ const TextAreaField = BaseField.extend({
     })
     .default({ rows: 4 })
     .optional()
-}).describe('Multiline text input')
+}).meta({
+  description: 'A multiline text input',
+  id: 'TextAreaField'
+})
 
 export type TextAreaField = z.infer<typeof TextAreaField>
 
@@ -299,7 +325,10 @@ const SignatureField = BaseField.extend({
     .default({
       maxFileSize: DEFAULT_MAX_FILE_SIZE_BYTES
     })
-}).describe('Signature input field')
+}).meta({
+  description: 'A signature input field',
+  id: 'SignatureField'
+})
 
 export type SignatureField = z.infer<typeof SignatureField>
 
@@ -309,9 +338,12 @@ export const EmailField = BaseField.extend({
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text')
     })
-    .default({ maxLength: 10 })
+    .default({ maxLength: 255 })
     .optional(),
   defaultValue: NonEmptyTextValue.or(ComputedDefaultValue).optional()
+}).meta({
+  description: 'An email input field',
+  id: 'EmailField'
 })
 
 export type EmailField = z.infer<typeof EmailField>
@@ -321,7 +353,6 @@ const DateField = BaseField.extend({
   defaultValue: SerializedNowDateTime.or(PlainDate)
     .or(ComputedDefaultValue)
     .optional()
-    .openapi({ effectType: 'input', type: 'string' })
     .describe('Default date value(yyyy-MM-dd)'),
   configuration: z
     .object({
@@ -330,7 +361,10 @@ const DateField = BaseField.extend({
       ).optional()
     })
     .optional()
-}).describe('A single date input (yyyy-MM-dd)')
+}).meta({
+  description: 'A date input (yyyy-MM-dd)',
+  id: 'DateField'
+})
 
 export type DateField = z.infer<typeof DateField>
 
@@ -342,7 +376,10 @@ const AgeField = BaseField.extend({
     prefix: TranslationConfig.optional(),
     postfix: TranslationConfig.optional()
   })
-}).describe('An age input field which uses the current date as the asOfDate')
+}).meta({
+  description: 'An age input field which uses the current date as the asOfDate',
+  id: 'AgeField'
+})
 
 export type AgeField = z.infer<typeof AgeField>
 
@@ -351,7 +388,6 @@ const TimeField = BaseField.extend({
   defaultValue: SerializedNowDateTime.or(TimeValue)
     .or(ComputedDefaultValue)
     .optional()
-    .openapi({ effectType: 'input', type: 'object' })
     .describe('Default time value (HH-mm)'),
   configuration: z
     .object({
@@ -364,7 +400,10 @@ const TimeField = BaseField.extend({
       ).optional()
     })
     .optional()
-}).describe('A single date input (HH-mm)')
+}).meta({
+  description: 'A single time input (HH-mm)',
+  id: 'TimeField'
+})
 
 export type TimeField = z.infer<typeof TimeField>
 
@@ -378,7 +417,10 @@ const DateRangeField = BaseField.extend({
       ).optional()
     })
     .optional()
-}).describe('A date range input ({ start: yyyy-MM-dd, end: yyyy-MM-dd })')
+}).meta({
+  description: 'A date range input ({ start: yyyy-MM-dd, end: yyyy-MM-dd })',
+  id: 'DateRangeField'
+})
 
 export type DateRangeField = z.infer<typeof DateRangeField>
 
@@ -395,17 +437,19 @@ const HtmlFontVariant = z.enum([
 
 export type HtmlFontVariant = z.infer<typeof HtmlFontVariant>
 
+const ParagraphTextAlign = z.enum(['left', 'center', 'right', 'start', 'end'])
+
 const ParagraphConfiguration = z
   .object({
     styles: z
       .object({
-        fontVariant: HtmlFontVariant.optional().describe(
-          'Font variant to use for the paragraph text'
-        ),
         hint: z
           .boolean()
           .optional()
-          .describe('When true, paragraph is styled as a hint with grey color')
+          .describe('When true, paragraph is styled as a hint with grey color'),
+        textAlign: ParagraphTextAlign.optional().describe(
+          'Text alignment for the paragraph'
+        )
       })
       .optional()
   })
@@ -413,16 +457,79 @@ const ParagraphConfiguration = z
 
 export type ParagraphConfiguration = z.infer<typeof ParagraphConfiguration>
 
+const HeadingFontVariant = HtmlFontVariant.exclude(['h1', 'h2'])
+
+type HeadingFontVariant = z.infer<typeof HeadingFontVariant>
+
+const HeadingConfiguration = z
+  .object({
+    styles: z
+      .object({
+        fontVariant: HeadingFontVariant.optional().describe(
+          'Font variant to use for the paragraph text'
+        ),
+        textAlign: ParagraphTextAlign.optional().describe(
+          'Text alignment for the paragraph'
+        )
+      })
+      .optional()
+  })
+  .default({})
+
+export type HeadingConfiguration = z.infer<typeof HeadingConfiguration>
+
+const ImageConfiguration = z.object({
+  alt: z.string().optional().describe('Alternative text for the image'),
+  width: z.string().optional().describe('CSS width value for the image'),
+  height: z.string().optional().describe('CSS height value for the image'),
+  textAlign: ParagraphTextAlign.optional().describe(
+    'Text alignment for positioning the image in its container'
+  ),
+  objectFit: z
+    .enum(['contain', 'cover', 'fill', 'none', 'scale-down'])
+    .optional()
+    .describe('How the image should be resized to fit the container')
+})
+
+export type ImageConfiguration = z.infer<typeof ImageConfiguration>
+
+const ImageViewField = BaseField.extend({
+  type: z.literal(FieldType.IMAGE_VIEW),
+  defaultValue: NonEmptyTextValue.optional(),
+  configuration: ImageConfiguration
+}).meta({
+  description: 'A read-only image component for form pages',
+  id: 'ImageViewField'
+})
+
+export type ImageViewField = z.infer<typeof ImageViewField>
+
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
   configuration: ParagraphConfiguration
-}).describe('A read-only HTML <p> paragraph')
+}).meta({
+  description: 'A read-only HTML <p> paragraph',
+  id: 'Paragraph'
+})
 
 export type Paragraph = z.infer<typeof Paragraph>
 
+const Heading = BaseField.extend({
+  type: z.literal(FieldType.HEADING),
+  configuration: HeadingConfiguration
+}).meta({
+  description: 'A read-only heading component for form pages',
+  id: 'Heading'
+})
+
+export type Heading = z.infer<typeof Heading>
+
 const PageHeader = BaseField.extend({
   type: z.literal(FieldType.PAGE_HEADER)
-}).describe('A read-only header component for form pages')
+}).meta({
+  description: 'A read-only header component for form pages',
+  id: 'PageHeader'
+})
 
 export type PageHeader = z.infer<typeof PageHeader>
 
@@ -458,7 +565,10 @@ const File = BaseField.extend({
     .default({
       maxFileSize: DEFAULT_MAX_FILE_SIZE_BYTES
     })
-}).describe('File upload')
+}).meta({
+  description: 'A file upload field',
+  id: 'File'
+})
 
 export type File = z.infer<typeof File>
 
@@ -485,7 +595,10 @@ const NumberWithUnitField = BaseField.extend({
       )
     })
     .optional()
-}).describe('Number with unit input')
+}).meta({
+  description: 'A number with unit input field',
+  id: 'NumberWithUnitField'
+})
 
 const RadioGroup = BaseField.extend({
   type: z.literal(FieldType.RADIO_GROUP),
@@ -500,7 +613,10 @@ const RadioGroup = BaseField.extend({
         .optional()
     })
     .optional()
-}).describe('Grouped radio options')
+}).meta({
+  description: 'A grouped radio button field',
+  id: 'RadioGroup'
+})
 
 export type RadioGroup = z.infer<typeof RadioGroup>
 
@@ -516,7 +632,10 @@ const BulletList = BaseField.extend({
         .optional()
     })
     .default({})
-}).describe('A list of bullet points')
+}).meta({
+  description: 'A list of bullet points',
+  id: 'BulletList'
+})
 
 export type BulletList = z.infer<typeof BulletList>
 
@@ -534,7 +653,10 @@ const Select = BaseField.extend({
     { ..., defaultMessage: "'{input}' is not listed among the health facilities." }
   `
   )
-}).describe('Select input')
+}).meta({
+  description: 'A select input field',
+  id: 'Select'
+})
 
 export const SelectDateRangeOption = z.object({
   value: SelectDateRangeValue.describe('The value of the option'),
@@ -550,7 +672,10 @@ export const SelectDateRangeField = BaseField.extend({
   type: z.literal(FieldType.SELECT_DATE_RANGE),
   defaultValue: SelectDateRangeValue.or(ComputedDefaultValue).optional(),
   options: z.array(SelectDateRangeOption).describe('A list of options')
-}).describe('Select input with date range options')
+}).meta({
+  description: 'A date range selection field',
+  id: 'SelectDateRangeField'
+})
 
 export type SelectDateRangeField = z.infer<typeof SelectDateRangeField>
 
@@ -603,22 +728,34 @@ const NameField = BaseField.extend({
       }
     })
     .optional()
-}).describe('Name input field')
+}).meta({
+  description: 'A field for entering a persons name',
+  id: 'NameField'
+})
 
 const PhoneField = BaseField.extend({
   defaultValue: NonEmptyTextValue.or(ComputedDefaultValue).optional(),
   type: z.literal(FieldType.PHONE)
-}).describe('Phone input field')
+}).meta({
+  description: 'A field for entering a phone number',
+  id: 'PhoneField'
+})
 
 const IdField = BaseField.extend({
   defaultValue: NonEmptyTextValue.or(ComputedDefaultValue).optional(),
   type: z.literal(FieldType.ID)
-}).describe('ID input field')
+}).meta({
+  description: 'A field for entering an ID',
+  id: 'IdField'
+})
 
 const Checkbox = BaseField.extend({
   type: z.literal(FieldType.CHECKBOX),
   defaultValue: CheckboxFieldValue.or(ComputedDefaultValue).default(false)
-}).describe('Boolean checkbox field')
+}).meta({
+  description: 'A boolean checkbox field',
+  id: 'Checkbox'
+})
 
 export type Checkbox = z.infer<typeof Checkbox>
 
@@ -631,9 +768,16 @@ const Country = BaseField.extend({
     .describe(
       'Conditionals for specific countries. Countries not listed are always shown and enabled.'
     )
-}).describe('Country select field')
+}).meta({
+  description: 'A field for selecting a country',
+  id: 'Country'
+})
 
 export type Country = z.infer<typeof Country>
+
+const AllowedLocations = JurisdictionReference.optional().describe(
+  'Limits which location options are selectable depending on user jurisdiction and location.'
+)
 
 export const AdministrativeAreas = z.enum([
   'ADMIN_STRUCTURE',
@@ -641,30 +785,43 @@ export const AdministrativeAreas = z.enum([
   'CRVS_OFFICE'
 ])
 
-const AdministrativeAreaConfiguration = z
-  .object({
-    partOf: FieldReference.optional(),
-    type: AdministrativeAreas
-  })
-  .describe('Administrative area options')
-
-const AdministrativeArea = BaseField.extend({
+const AdministrativeAreaField = BaseField.extend({
   type: z.literal(FieldType.ADMINISTRATIVE_AREA),
   defaultValue: z
     .union([NonEmptyTextValue, SerializedUserField, ComputedDefaultValue])
     .optional(),
-  configuration: AdministrativeAreaConfiguration
-}).describe('Administrative area input field e.g. facility, office')
+  configuration: z
+    .object({
+      partOf: FieldReference.optional().describe('Parent location'),
+      type: AdministrativeAreas,
+      allowedLocations: AllowedLocations
+    })
+    .describe('Administrative area options')
+}).meta({
+  description: 'Administrative area input field',
+  id: 'AdministrativeAreaField'
+})
 
-export type AdministrativeArea = z.infer<typeof AdministrativeArea>
+export type AdministrativeAreaField = z.infer<typeof AdministrativeAreaField>
 
 const LocationInput = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
-  defaultValue: NonEmptyTextValue.or(ComputedDefaultValue).optional(),
-  configuration: z.object({
-    searchableResource: z.array(z.enum(['locations', 'facilities', 'offices']))
-  })
-}).describe('Input field for a location')
+  defaultValue: z
+    .union([NonEmptyTextValue, SerializedUserField, ComputedDefaultValue])
+    .optional(),
+  configuration: z
+    .object({
+      locationTypes: z
+        .array(z.string())
+        .optional()
+        .describe('Types of the locations that are available for selection.'),
+      allowedLocations: AllowedLocations
+    })
+    .optional()
+}).meta({
+  description: 'A field for selecting a location',
+  id: 'LocationInput'
+})
 
 export type LocationInput = z.infer<typeof LocationInput>
 
@@ -690,20 +847,31 @@ const FileUploadWithOptions = BaseField.extend({
     .default({
       maxFileSize: DEFAULT_MAX_FILE_SIZE_BYTES
     })
+}).meta({
+  description: 'A field for uploading files with file type options',
+  id: 'FileUploadWithOptions'
 })
 
 export type FileUploadWithOptions = z.infer<typeof FileUploadWithOptions>
 
+/**
+ * @deprecated Use FieldType.LOCATION with locationTypes: ['HEALTH_FACILITY']
+ */
 const Facility = BaseField.extend({
   type: z.literal(FieldType.FACILITY),
-  defaultValue: NonEmptyTextValue.or(ComputedDefaultValue).optional()
+  defaultValue: NonEmptyTextValue.or(ComputedDefaultValue).optional(),
+  configuration: z.object({ allowedLocations: AllowedLocations }).optional()
 }).describe('Input field for a facility')
 
 export type Facility = z.infer<typeof Facility>
 
+/**
+ * @deprecated Use FieldType.LOCATION with locationTypes: ['CRVS_OFFICE']
+ */
 const Office = BaseField.extend({
   type: z.literal(FieldType.OFFICE),
-  defaultValue: NonEmptyTextValue.or(ComputedDefaultValue).optional()
+  defaultValue: NonEmptyTextValue.or(ComputedDefaultValue).optional(),
+  configuration: z.object({ allowedLocations: AllowedLocations }).optional()
 }).describe('Input field for an office')
 
 export type Office = z.infer<typeof Office>
@@ -720,7 +888,7 @@ const commonDomesticFieldProps = {
   label: true,
   conditionals: true,
   required: true
-} satisfies { [key in keyof (Country | AdministrativeArea)]?: boolean }
+} satisfies { [key in keyof (Country | AdministrativeAreaField)]?: boolean }
 
 const DomesticAddressField = Country.partial()
   .pick({
@@ -729,7 +897,7 @@ const DomesticAddressField = Country.partial()
   })
   .required({ id: true, type: true })
   .or(
-    AdministrativeArea.partial()
+    AdministrativeAreaField.partial()
       .pick(commonDomesticFieldProps)
       .required({ id: true, type: true })
   )
@@ -751,11 +919,16 @@ const Address = BaseField.extend({
             parent: FieldReference.optional()
           })
         )
-        .optional()
+        .optional(),
+      allowedLocations: AllowedLocations
     })
     .optional(),
   defaultValue: DefaultAddressFieldValue.or(ComputedDefaultValue).optional()
-}).describe('Address input field – a combination of location and text fields')
+}).meta({
+  description:
+    'Address input field – a combination of location and text fields',
+  id: 'Address'
+})
 
 export const StaticDataEntry = z
   .object({
@@ -780,27 +953,53 @@ const DataField = BaseField.extend({
     subtitle: TranslationConfig.optional(),
     data: z.array(DataEntry)
   })
-}).describe('Data field for displaying read-only data')
+}).meta({
+  description: 'A field for displaying a table of read-only data',
+  id: 'DataField'
+})
 
 export type DataField = z.infer<typeof DataField>
+
+const ButtonSize = z.enum(['small', 'medium', 'large'])
+const ButtonType = z.enum([
+  'primary',
+  'secondary',
+  'tertiary',
+  'positive',
+  'negative',
+  'secondaryNegative',
+  'icon',
+  'iconPrimary'
+])
+const TextColor = z.enum(['primary', 'copy'])
+const TextVariant = z.enum(['bold14', 'reg14'])
+
+const ButtonConfiguration = z.object({
+  icon: z
+    .string()
+    .optional()
+    .describe('Icon for the button. You can find icons from OpenCRVS UI-Kit.'),
+  loading: z
+    .boolean()
+    .optional()
+    .describe('Whether the button is in a loading state and shows a spinner'),
+  buttonSize: ButtonSize.optional().describe('Size of the button.'),
+  buttonType: ButtonType.optional().describe('Type of the button.'),
+  textColor: TextColor.optional().describe('Color of the text.'),
+  textVariant: TextVariant.optional().describe('Variant of the text.'),
+  text: TranslationConfig.describe('Text to display on the button')
+})
+
+export type ButtonConfiguration = z.infer<typeof ButtonConfiguration>
 
 const ButtonField = BaseField.extend({
   type: z.literal(FieldType.BUTTON),
   defaultValue: ButtonFieldValue.or(ComputedDefaultValue).optional(),
-  configuration: z.object({
-    icon: z
-      .string()
-      .optional()
-      .describe(
-        'Icon for the button. You can find icons from OpenCRVS UI-Kit.'
-      ),
-    loading: z
-      .boolean()
-      .optional()
-      .describe('Whether the button is in a loading state and shows a spinner'),
-    text: TranslationConfig.describe('Text to display on the button')
-  })
-}).describe('Generic button without any built-in functionality')
+  configuration: ButtonConfiguration
+}).meta({
+  description: 'A generic button that can be used to trigger an action',
+  id: 'ButtonField'
+})
 
 export type ButtonField = z.infer<typeof ButtonField>
 
@@ -808,6 +1007,9 @@ const FieldGroup = BaseField.extend({
   type: z.literal(FieldType.FIELD_GROUP),
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   fields: z.lazy(() => z.array(FieldConfig))
+}).meta({
+  description: 'A group of fields that are displayed together',
+  id: 'FieldGroup'
 })
 
 // This needs to be explicit to avoid circular types
@@ -831,7 +1033,11 @@ const AlphaPrintButton = BaseField.extend({
       'Label for the print button'
     )
   })
-}).describe('Print button field for printing certificates')
+}).meta({
+  description:
+    'An experimental print button field for printing certificates during the declaration process',
+  id: 'AlphaPrintButton'
+})
 
 export type AlphaPrintButton = z.infer<typeof AlphaPrintButton>
 
@@ -839,11 +1045,13 @@ const HttpField = BaseField.extend({
   type: z.literal(FieldType.HTTP),
   defaultValue: HttpFieldValue.or(ComputedDefaultValue).optional(),
   configuration: z.object({
-    trigger: FieldReference,
+    trigger: FieldReference.optional().describe(
+      'Reference to the field that triggers the HTTP request when its value changes. If not provided, the HTTP request is triggered once on component mount.'
+    ),
     url: z.string().describe('URL to send the HTTP request to'),
     method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
-    headers: z.record(z.string()).optional(),
-    body: z.record(z.any()).optional(),
+    headers: z.record(z.string(), z.string()).optional(),
+    body: z.record(z.string(), z.any()).optional(),
     errorValue: z
       .any()
       .optional()
@@ -856,9 +1064,43 @@ const HttpField = BaseField.extend({
       .default(15000)
       .describe('Request timeout in milliseconds')
   })
-}).describe('HTTP request function triggered by a button click or other event')
+}).meta({
+  description:
+    'Makes a background HTTP request to an external service and stores the response so other fields can use it. Has no visible UI — pair with LOADER to show request status.',
+  id: 'HttpField'
+})
 
 export type HttpField = z.infer<typeof HttpField>
+
+const AutocompleteField = BaseField.extend({
+  type: z.literal(FieldType.AUTOCOMPLETE),
+  configuration: z.object({
+    url: z
+      .string()
+      .describe(
+        'URL to fetch autocomplete suggestions from. This should be a country config server endpoint.'
+      )
+      .optional(),
+    method: z.enum(['GET', 'POST']).default('GET').optional(),
+    defaultOptions: z
+      .array(
+        z.object({
+          label: z.string(),
+          value: z.string()
+        })
+      )
+      .optional()
+      .describe(
+        'Manual entry is supported through configuration, allowing users to provide values not currently represented in the dataset.'
+      )
+  })
+}).meta({
+  description:
+    'Generic autocomplete component designed for use with large dictionary-based datasets. The component supports dynamic retrieval of options from configurable data sources and is intended for datasets that may contain tens or hundreds of thousands of records.',
+  id: 'AutocompleteField'
+})
+
+export type AutocompleteField = z.infer<typeof AutocompleteField>
 
 const SearchField = HttpField.extend({
   type: z.literal(FieldType.SEARCH),
@@ -896,6 +1138,9 @@ const SearchField = HttpField.extend({
       })
       .optional()
   })
+}).meta({
+  description: 'A search input field',
+  id: 'SearchField'
 })
 
 export type SearchField = z.infer<typeof SearchField>
@@ -910,7 +1155,10 @@ const LinkButtonField = BaseField.extend({
       .optional()
       .describe('Icon for the button. You can find icons from OpenCRVS UI-Kit.')
   })
-}).describe('Button that opens a link')
+}).meta({
+  description: 'A button that opens a URL link',
+  id: 'LinkButtonField'
+})
 
 export type LinkButtonField = z.infer<typeof LinkButtonField>
 
@@ -923,6 +1171,10 @@ const VerificationStatus = BaseField.extend({
       'Explaining text on the banner in form.'
     )
   })
+}).meta({
+  description:
+    'Displays a verification state (e.g. ID verified / pending). Often paired with ID_READER — it can read its value off an ID_READER rather than holding its own.',
+  id: 'VerificationStatus'
 })
 
 export type VerificationStatus = z.infer<typeof VerificationStatus>
@@ -934,9 +1186,11 @@ const QueryParamReaderField = BaseField.extend({
       .array(z.string())
       .describe('List of query parameters to read from the URL')
   })
-}).describe(
-  'A field that maps URL query params into form values and clears them afterward'
-)
+}).meta({
+  description:
+    'A field that maps URL query params into form values and clears them afterward',
+  id: 'QueryParamReaderField'
+})
 
 export type QueryParamReaderField = z.infer<typeof QueryParamReaderField>
 
@@ -945,11 +1199,17 @@ const QrReaderField = BaseField.extend({
   defaultValue: QrReaderFieldValue.or(ComputedDefaultValue).optional(),
   configuration: z
     .object({
-      validator: z.custom<JSONSchema>(
-        (val) => typeof val === 'object' && val !== null
-      )
+      validator: z.any().meta({
+        description:
+          'JSON Schema to validate the scanned QR code data against before populating the form fields.',
+        id: 'QrReaderFieldValidator'
+      })
     })
     .optional()
+}).meta({
+  description:
+    'QR code reader field, including optional JSON Schema validator.',
+  id: 'QrReaderField'
 })
 
 export type QrReaderField = z.infer<typeof QrReaderField>
@@ -962,20 +1222,70 @@ const IdReaderField = BaseField.extend({
       .union([QrReaderField, LinkButtonField])
       .describe('Methods for reading an ID')
   )
+}).meta({
+  description:
+    'A wrapper around nested form fields, specifically QR_READER and LINK_BUTTON. It can hold the QR_READERs value.',
+  id: 'IdReaderField'
 })
 
 export type IdReaderField = z.infer<typeof IdReaderField>
 
+const CustomField = BaseField.extend({
+  type: z.literal(FieldType._EXPERIMENTAL_CUSTOM),
+  defaultValue: CustomFieldValue.optional(),
+  src: z.string().describe('Module source path for the custom field component'),
+  configuration: z.unknown().optional()
+}).meta({
+  description:
+    'An expiremental custom field that is defined by a module source path',
+  id: 'CustomField'
+})
+
+export type CustomField = z.infer<typeof CustomField>
+
+const FieldStyleVariant = z.enum(['default', 'highlighted'])
+
 const LoaderField = BaseField.extend({
   type: z.literal(FieldType.LOADER),
+  variant: FieldStyleVariant.default('default').optional(),
+  hideLabel: z
+    .boolean()
+    .default(true)
+    .optional()
+    .describe('Loader field does not show a label by default'),
   configuration: z.object({
     text: TranslationConfig.describe('Display text above the loading spinner')
   })
-}).describe(
-  'A non-interactive field that indicates an in progress operation in form'
-)
+}).meta({
+  description:
+    'A non-interactive field that indicates an in progress operation in form',
+  id: 'LoaderField'
+})
 
 export type LoaderField = z.infer<typeof LoaderField>
+
+const HiddenField = BaseField.extend({
+  type: z.literal(FieldType.ALPHA_HIDDEN),
+  required: z.boolean().default(false).optional(),
+  defaultValue: TextValue.optional()
+}).meta({
+  description:
+    'A non-interactive, hidden field that only hold a value in the form',
+  id: 'HiddenField'
+})
+
+export type HiddenField = z.infer<typeof HiddenField>
+
+const UserRoleField = BaseField.extend({
+  type: z.literal(FieldType.USER_ROLE),
+  defaultValue: TextValue.optional()
+}).meta({
+  description:
+    'A select dropdown that is automatically populated with available user roles',
+  id: 'UserRoleField'
+})
+
+export type UserRoleField = z.infer<typeof UserRoleField>
 
 /** @knipignore */
 export type FieldConfig =
@@ -990,7 +1300,9 @@ export type FieldConfig =
   | z.infer<typeof TimeField>
   | z.infer<typeof DateRangeField>
   | z.infer<typeof SelectDateRangeField>
+  | z.infer<typeof ImageViewField>
   | z.infer<typeof Paragraph>
+  | z.infer<typeof Heading>
   | z.infer<typeof RadioGroup>
   | z.infer<typeof BulletList>
   | z.infer<typeof PageHeader>
@@ -1002,7 +1314,7 @@ export type FieldConfig =
   | z.infer<typeof File>
   | z.infer<typeof FileUploadWithOptions>
   | z.infer<typeof Country>
-  | z.infer<typeof AdministrativeArea>
+  | z.infer<typeof AdministrativeAreaField>
   | z.infer<typeof Divider>
   | z.infer<typeof LocationInput>
   | z.infer<typeof Facility>
@@ -1014,12 +1326,16 @@ export type FieldConfig =
   | z.infer<typeof AlphaPrintButton>
   | z.infer<typeof HttpField>
   | z.infer<typeof SearchField>
+  | z.infer<typeof AutocompleteField>
   | z.infer<typeof LinkButtonField>
   | z.infer<typeof VerificationStatus>
   | z.infer<typeof QueryParamReaderField>
   | z.infer<typeof QrReaderField>
   | z.infer<typeof IdReaderField>
   | z.infer<typeof LoaderField>
+  | z.infer<typeof CustomField>
+  | z.infer<typeof HiddenField>
+  | z.infer<typeof UserRoleField>
 
 /** @knipignore */
 /**
@@ -1031,6 +1347,7 @@ export type FieldConfigInput =
   | z.input<typeof TextField>
   | z.input<typeof TimeField>
   | z.input<typeof SelectDateRangeField>
+  | z.input<typeof ImageViewField>
   | z.input<typeof ButtonField>
   | z.input<typeof AlphaPrintButton>
   | z.input<typeof NumberField>
@@ -1040,6 +1357,7 @@ export type FieldConfigInput =
   | z.input<typeof AgeField>
   | z.input<typeof DateRangeField>
   | z.input<typeof Paragraph>
+  | z.input<typeof Heading>
   | z.input<typeof RadioGroup>
   | z.input<typeof BulletList>
   | z.input<typeof PageHeader>
@@ -1051,7 +1369,7 @@ export type FieldConfigInput =
   | z.input<typeof File>
   | z.input<typeof FileUploadWithOptions>
   | z.input<typeof Country>
-  | z.input<typeof AdministrativeArea>
+  | z.input<typeof AdministrativeAreaField>
   | z.input<typeof Divider>
   | z.input<typeof LocationInput>
   | z.input<typeof Facility>
@@ -1061,23 +1379,23 @@ export type FieldConfigInput =
   | z.input<typeof DataField>
   | z.input<typeof HttpField>
   | z.input<typeof SearchField>
+  | z.input<typeof AutocompleteField>
   | z.input<typeof LinkButtonField>
   | z.input<typeof VerificationStatus>
   | z.input<typeof QueryParamReaderField>
   | z.input<typeof QrReaderField>
   | z.input<typeof IdReaderField>
   | z.input<typeof LoaderField>
+  | z.input<typeof CustomField>
+  | z.input<typeof HiddenField>
+  | z.input<typeof UserRoleField>
 /*
  *  Using explicit type for the FieldConfig schema intentionally as it's
  *  referenced quite extensively througout various other schemas. Leaving the
  *  type to be inferred causes typescript compiler to fail with "inferred type
- *  exeeds max lenght"
+ *  exeeds max length"
  */
-export const FieldConfig: z.ZodType<
-  FieldConfig,
-  z.ZodTypeDef,
-  FieldConfigInput
-> = z
+export const FieldConfig: z.ZodType<FieldConfig, FieldConfigInput> = z
   .discriminatedUnion('type', [
     FieldGroup,
     Address,
@@ -1090,7 +1408,9 @@ export const FieldConfig: z.ZodType<
     TimeField,
     DateRangeField,
     SelectDateRangeField,
+    ImageViewField,
     Paragraph,
+    Heading,
     RadioGroup,
     BulletList,
     PageHeader,
@@ -1101,7 +1421,7 @@ export const FieldConfig: z.ZodType<
     Checkbox,
     File,
     Country,
-    AdministrativeArea,
+    AdministrativeAreaField,
     Divider,
     LocationInput,
     Facility,
@@ -1113,17 +1433,21 @@ export const FieldConfig: z.ZodType<
     ButtonField,
     AlphaPrintButton,
     HttpField,
+    AutocompleteField,
     LinkButtonField,
     VerificationStatus,
     QrReaderField,
     IdReaderField,
     QueryParamReaderField,
     LoaderField,
-    SearchField
+    SearchField,
+    CustomField,
+    HiddenField,
+    UserRoleField
   ])
-  .openapi({
+  .meta({
     description: 'Form field configuration',
-    ref: 'FieldConfig'
+    id: 'FieldConfig'
   })
 
 export type SelectField = z.infer<typeof Select>
@@ -1140,11 +1464,8 @@ export type FieldPropsWithoutReferenceValue<T extends FieldType> = Omit<
   Extract<FieldConfig, { type: T }>,
   'value'
 >
-export type SelectOption = z.infer<typeof SelectOption>
 
-export type AdministrativeAreaConfiguration = z.infer<
-  typeof AdministrativeAreaConfiguration
->
+export type SelectOption = z.infer<typeof SelectOption>
 
 /**
  * Union of file-related fields. Using common type should help with compiler to know where to add new cases.

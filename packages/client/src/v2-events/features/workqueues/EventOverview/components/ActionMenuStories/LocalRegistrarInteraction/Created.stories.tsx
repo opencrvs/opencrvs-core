@@ -9,8 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta } from '@storybook/react'
-import { ActionType } from '@opencrvs/commons/client'
-import { AssignmentStatus } from '@client/v2-events/utils'
+import {
+  TestUserRole,
+  ActionType,
+  AssignmentStatus
+} from '@opencrvs/commons/client'
+
 import { ActionMenu } from '../../ActionMenu'
 import {
   baseMeta,
@@ -18,7 +22,6 @@ import {
   createStoriesFromScenarios,
   AssertType,
   Scenario,
-  UserRoles,
   getMockEvent,
   createdByOtherUserScenario
 } from '../ActionMenu.common'
@@ -35,30 +38,31 @@ const createdScenariosForLocalRegistrar: Scenario[] = [
     actions: [ActionType.CREATE, AssignmentStatus.ASSIGNED_TO_SELF],
     expected: {
       ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.ENABLED,
-      [ActionType.DELETE]: AssertType.ENABLED
+      ['Declare']: AssertType.ENABLED,
+      ['Delete']: AssertType.ENABLED
     }
   }
 ]
 
 const stories = createStoriesFromScenarios(
   createdScenariosForLocalRegistrar,
-  UserRoles.LOCAL_REGISTRAR
+  TestUserRole.enum.LOCAL_REGISTRAR
 )
 
 export const AssignedToSelf = stories['AssignedToSelf']
 
 // Created by some other user
-const event = getMockEvent([ActionType.CREATE], UserRoles.REGISTRATION_AGENT)
+const event = getMockEvent(
+  [ActionType.CREATE],
+  TestUserRole.enum.REGISTRATION_AGENT
+)
 
 export const CreatedByOtherUser = createdByOtherUserScenario({
   event,
-  role: UserRoles.LOCAL_REGISTRAR,
+  role: TestUserRole.enum.LOCAL_REGISTRAR,
   expected: {
     ...getHiddenActions(),
-    [ActionType.READ]: AssertType.ENABLED,
-    [ActionType.DECLARE]: AssertType.DISABLED,
-    [ActionType.DELETE]: AssertType.DISABLED
+    ['Declare']: AssertType.DISABLED,
+    ['Delete']: AssertType.DISABLED
   }
 })

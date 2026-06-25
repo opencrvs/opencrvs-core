@@ -35,7 +35,7 @@ import {
 import { useOnlineStatus } from '@client/utils'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { makeFormFieldIdsFormikCompatible } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
-import { Http, Props } from './Http'
+import { Http, Props as HttpInputProps } from './Http'
 
 const defaultIndicators = {
   loading: {
@@ -174,6 +174,7 @@ const SearchWrapper = styled.div`
   position: relative;
   display: flex;
   width: 100%;
+  z-index: 1;
   align-items: stretch;
 `
 
@@ -261,7 +262,7 @@ function SearchInput({
   label,
   helperText,
   value
-}: Omit<Props, 'configuration'> & {
+}: Omit<HttpInputProps, 'configuration' | 'trigger'> & {
   configuration: SearchField['configuration']
   value: HttpFieldValue | null | undefined
   label?: string
@@ -290,7 +291,8 @@ function SearchInput({
         error: {
           statusCode: 204,
           message: 'cleard'
-        }
+        },
+        data: undefined
       })
     }
   }
@@ -454,7 +456,7 @@ function SearchInput({
               }
             }}
             form={form}
-            parentValue={buttonPressed}
+            trigger={{ mode: 'onChange', value: buttonPressed }}
             onChange={onHTTPChange}
           />
           {isEditable && (

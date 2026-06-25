@@ -10,16 +10,6 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-export enum QUESTION_KEYS {
-  BIRTH_TOWN,
-  HIGH_SCHOOL,
-  MOTHER_NAME,
-  FAVORITE_TEACHER,
-  FAVORITE_MOVIE,
-  FAVORITE_SONG,
-  FAVORITE_FOOD,
-  FIRST_CHILD_NAME
-}
 interface IUserMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   accountTitle: MessageDescriptor
@@ -379,12 +369,12 @@ const messagesToDefine: IUserMessages = {
     id: 'phone.label.verify'
   },
   confirmationPhoneMsg: {
-    defaultMessage: 'A confirmational SMS has been sent to {num}',
+    defaultMessage: 'Verification code has been sent to {email}',
     description: 'Confirmation phone number message',
     id: 'phone.label.confirmation'
   },
   confirmationEmailMsg: {
-    defaultMessage: 'A confirmational SMS has been sent to {email}',
+    defaultMessage: 'Verification code has been sent to {email}',
     description: 'Confirmation email address message',
     id: 'email.label.confirmation'
   },
@@ -526,12 +516,26 @@ const messagesToDefine: IUserMessages = {
       'This error messege shows when user try to input already exsisted mobile number',
     id: 'system.user.duplicateMobileError'
   },
+  mobileNumberUnchangedErrorMessege: {
+    defaultMessage:
+      'This is already your phone number. Please enter a different phone number',
+    description:
+      'Error message shown when the user enters their current phone number as the new phone number',
+    id: 'system.user.mobileNumberUnchangedError'
+  },
   duplicateUserEmailErrorMessege: {
     defaultMessage:
       '{email} is already used by another user. Please use a different email',
     description:
       'This error message shows when user tries to input an already existing email',
     id: 'system.user.duplicateEmailError'
+  },
+  emailAddressUnchangedErrorMessege: {
+    defaultMessage:
+      'This is already your email address. Please enter a different email address',
+    description:
+      'Error message shown when the user enters their current email address as the new email address',
+    id: 'system.user.emailAddressUnchangedError'
   },
   enterPinLabel: {
     id: 'system.user.unlock.pinLabel',

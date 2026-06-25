@@ -59,6 +59,11 @@ export const messages = {
     description: "User's English surname",
     id: 'form.field.label.userSurname'
   },
+  fullName: {
+    defaultMessage: "User's full name",
+    description: "User's full English name",
+    id: 'form.field.label.userFullName'
+  },
   phoneNumber: {
     defaultMessage: 'Phone number',
     description: 'Input label for phone input',
@@ -129,5 +134,23 @@ export const messages = {
     defaultMessage: 'Updating user',
     description: 'label for updating user',
     id: 'form.field.label.updatingUser'
+  },
+  changeOfficeWarningTitle: {
+    defaultMessage: 'Change office?',
+    description:
+      'Title for the confirmation dialog when changing a user office',
+    id: 'form.field.label.changeOfficeWarningTitle'
+  },
+  changeOfficeWarningBody: {
+    defaultMessage:
+      "Changing this user's office will remove their in-progress drafts. Do you want to continue?",
+    description: 'Body for the confirmation dialog when changing a user office',
+    id: 'form.field.label.changeOfficeWarningBody'
+  },
+  phoneNumberFormat: {
+    id: 'validations.phoneNumberFormat',
+    defaultMessage: 'Must be a valid 10 digit number that starts with 0(7|9)',
+    description:
+      'The error message that appears on phone numbers where the first character must be a 0'
   }
 }

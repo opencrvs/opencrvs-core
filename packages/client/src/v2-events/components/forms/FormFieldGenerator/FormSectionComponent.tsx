@@ -32,7 +32,8 @@ import {
   isFieldVisible,
   findAllFields,
   flattenFieldReference,
-  omitHiddenPaginatedFields
+  omitHiddenPaginatedFields,
+  HiddenFieldTypes
 } from '@opencrvs/commons/client'
 import {
   makeFormFieldIdFormikCompatible,
@@ -53,6 +54,7 @@ type AllProps = {
   ocrvsFullForm: EventState
   className?: string
   readonlyMode?: boolean
+  attachmentPath: string
   /**
    * Update the form values in the non-formik state.
    */
@@ -140,16 +142,30 @@ function getParentsOfListenerFields(fields: FieldConfig[]) {
  * Applies visibility transitions to fieldValues in place.
  * Fields that became hidden are set to null (and their value cached).
  * Fields that became visible have their cached value restored.
+ *
+ * Fields in `resetFieldIds` are excluded from the cache: their values were
+ * intentionally invalidated by a parent field change, so they are cleared
+ * without caching and never restored from a stale cache entry.
  */
-function applyVisibilityTransitions(
-  eventConfig: EventConfig,
-  prevForm: EventState,
-  currentForm: EventState,
-  fieldValues: Record<string, FieldValue>,
-  validatorContext: ValidatorContext,
-  cacheHiddenFieldValue: (key: string, value: FieldValue) => void,
+function applyVisibilityTransitions({
+  eventConfig,
+  prevForm,
+  currentForm,
+  fieldValues,
+  validatorContext,
+  cacheHiddenFieldValue,
+  popHiddenFieldValue,
+  resetFieldIds
+}: {
+  eventConfig: EventConfig
+  prevForm: EventState
+  currentForm: EventState
+  fieldValues: Record<string, FieldValue>
+  validatorContext: ValidatorContext
+  cacheHiddenFieldValue: (key: string, value: FieldValue) => void
   popHiddenFieldValue: (key: string) => FieldValue | undefined
-): void {
+  resetFieldIds: Set<string>
+}): void {
   const prevCleaned = omitHiddenPaginatedFields(
     eventConfig.declaration,
     prevForm,
@@ -172,15 +188,23 @@ function applyVisibilityTransitions(
   newHiddenKeys.forEach((key) => {
     const fieldValue = get(prevCleaned, key)
     if (!isNil(fieldValue)) {
-      cacheHiddenFieldValue(key, fieldValue)
-      set(fieldValues, makeFormFieldIdFormikCompatible(key), null)
+      if (resetFieldIds.has(key)) {
+        // Evict instead of caching — the value was intentionally reset by a parent change
+        popHiddenFieldValue(key)
+      } else {
+        cacheHiddenFieldValue(key, fieldValue)
+      }
     }
+    // Always null hidden fields — even when prevCleaned has undefined (e.g. after
+    // an OAuth redirect where Zustand was wiped and Formik re-initialised the field
+    // to undefined), the server may still hold a real value that must be cleared.
+    set(fieldValues, makeFormFieldIdFormikCompatible(key), null)
   })
 
   // When a field transitions from hidden to visible, restore its cached value
   newVisibleKeys.forEach((key) => {
     const cachedValue = popHiddenFieldValue(key)
-    if (cachedValue !== undefined) {
+    if (cachedValue !== undefined && !resetFieldIds.has(key)) {
       set(fieldValues, makeFormFieldIdFormikCompatible(key), cachedValue)
     }
   })
@@ -198,6 +222,7 @@ export function FormSectionComponent({
   eventConfig,
   setValues,
   setTouched,
+  attachmentPath,
   isCorrection = false,
   validatorContext
 }: AllProps) {
@@ -207,7 +232,9 @@ export function FormSectionComponent({
   const getDefaultValue = useDefaultValue()
   const { cacheHiddenFieldValue, popHiddenFieldValue } = useEventFormData()
 
-  const fullFormFields = eventConfig ? findAllFields(eventConfig) : pageFields
+  const fullFormFields = eventConfig
+    ? findAllFields(eventConfig).concat(pageFields)
+    : pageFields
   const listenerFieldsByParentId = getParentsOfListenerFields(fullFormFields)
 
   /** Sets the value for fields that listen to another field via `parent` and `value` properties */
@@ -244,6 +271,28 @@ export function FormSectionComponent({
       return
     }
 
+    const formContext = {
+      ...ocrvsFullForm,
+      ...makeFormikFieldIdsOpenCRVSCompatible(fieldValues)
+    }
+
+    // Hidden listener fields are cleared to undefined so their stale values
+    // don't leak into other fields that read from them (e.g. via `value` refs).
+    // We return early to skip applying the defaultValue, which would otherwise
+    // pollute the form state for fields that aren't currently relevant.
+
+    // Must be undefined, never null:
+    // null has a specific semantic in the declaration payload — it signals an
+    // intentional field removal and is preserved by getCleanedDeclarationDiff
+    // (via omitHiddenPaginatedFields with retainNullValues=true). Sending null
+    // for fields that were never part of the current action (e.g. correction
+    // form fields appearing in a declare payload) corrupts the event state.
+    // undefined is omitted from JSON serialisation and is therefore safe.
+    if (!isFieldVisible(listenerField, formContext, validatorContext)) {
+      set(fieldValues, formikCompatibleListenerFieldPath, undefined)
+      return
+    }
+
     const defaultValue = getDefaultValue(listenerField, fieldValues)
 
     set(fieldValues, formikCompatibleListenerFieldPath, defaultValue)
@@ -267,16 +316,22 @@ export function FormSectionComponent({
     // update the value of the field that was changed
     set(updatedFormikPageForm, formikFieldId, value)
 
+    const resetFieldIds = new Set<string>()
     const clientFunctionContext = buildClientFunctionContext({
       form: updatedFormikPageForm,
       validatorContext
     })
     for (const listenerField of interactiveListenerFields) {
+      const fieldId = listenerField[0].join('.')
       setValueForListenerField(
         listenerField,
         updatedFormikPageForm,
         clientFunctionContext
       )
+      // Evict stale cached value and mark the id so applyVisibilityTransitions
+      // skips caching/restoring it — the parent reset invalidated it
+      popHiddenFieldValue(fieldId)
+      resetFieldIds.add(fieldId)
     }
 
     if (eventConfig) {
@@ -285,15 +340,16 @@ export function FormSectionComponent({
         ...makeFormikFieldIdsOpenCRVSCompatible(updatedFormikPageForm)
       }
 
-      applyVisibilityTransitions(
+      applyVisibilityTransitions({
         eventConfig,
-        ocrvsFullForm,
-        updatedFullForm,
-        updatedFormikPageForm,
+        prevForm: ocrvsFullForm,
+        currentForm: updatedFullForm,
+        fieldValues: updatedFormikPageForm,
         validatorContext,
         cacheHiddenFieldValue,
-        popHiddenFieldValue
-      )
+        popHiddenFieldValue,
+        resetFieldIds
+      })
     }
 
     const formikListenerFieldPaths = listenerFields.map(([p]) =>
@@ -320,6 +376,7 @@ export function FormSectionComponent({
     const updatedValues = cloneDeep(formikPageForm)
     const updatedTouched = cloneDeep(touched)
 
+    const resetFieldIds = new Set<string>()
     const clientFunctionContext = buildClientFunctionContext({
       form: updatedValues,
       validatorContext
@@ -335,6 +392,7 @@ export function FormSectionComponent({
       )
 
       for (const listenerField of interactiveListenerFields) {
+        const fieldId = listenerField[0].join('.')
         setValueForListenerField(
           listenerField,
           updatedValues,
@@ -344,6 +402,10 @@ export function FormSectionComponent({
           updatedTouched,
           listenerField[0].map(makeFormFieldIdFormikCompatible)
         )
+        // Evict stale cached value and mark the id so applyVisibilityTransitions
+        // skips caching/restoring it — the parent reset invalidated it
+        popHiddenFieldValue(fieldId)
+        resetFieldIds.add(fieldId)
       }
     }
 
@@ -353,15 +415,16 @@ export function FormSectionComponent({
         ...makeFormikFieldIdsOpenCRVSCompatible(updatedValues)
       }
 
-      applyVisibilityTransitions(
+      applyVisibilityTransitions({
         eventConfig,
-        ocrvsFullForm,
-        updatedFullForm,
-        updatedValues,
+        prevForm: ocrvsFullForm,
+        currentForm: updatedFullForm,
+        fieldValues: updatedValues,
         validatorContext,
         cacheHiddenFieldValue,
-        popHiddenFieldValue
-      )
+        popHiddenFieldValue,
+        resetFieldIds
+      })
     }
 
     void setValues(updatedValues)
@@ -427,10 +490,13 @@ export function FormSectionComponent({
         return (
           <FormItem
             key={formikFieldId}
-            ignoreBottomMargin={field.type === FieldType.PAGE_HEADER}
+            ignoreBottomMargin={HiddenFieldTypes.some(
+              (type) => type === field.type
+            )}
           >
             <GeneratedInputField
               allKnownFields={fullFormFields}
+              attachmentPath={attachmentPath}
               disabled={isDisabled}
               eventConfig={eventConfig}
               fieldDefinition={{ ...field, id: formikFieldId }}

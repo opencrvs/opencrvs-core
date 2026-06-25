@@ -16,14 +16,14 @@ import {
   DeclarationActionType,
   EventConfig,
   EventDocument,
-  getAcceptedActions,
   getCurrentEventState,
   UUID,
   ValidatorContext,
   DeclarationActions,
   ActionStatus,
   getCompleteActionDeclaration,
-  getCompleteActionAnnotation
+  getCompleteActionAnnotation,
+  getCompleteActionContent
 } from '@opencrvs/commons/client'
 import { hasAnnotationChanged, getDeclarationComparison } from './utils'
 
@@ -31,7 +31,7 @@ import { hasAnnotationChanged, getDeclarationComparison } from './utils'
  * Indicates that declaration action changed declaration content. Satisfies V1 spec.
  */
 export const DECLARATION_ACTION_UPDATE = 'UPDATE' as const
-type DECLARATION_ACTION_UPDATE = typeof DECLARATION_ACTION_UPDATE
+export type DECLARATION_ACTION_UPDATE = typeof DECLARATION_ACTION_UPDATE
 
 type UpdateActionDocument = Omit<ActionDocument, 'type'> & {
   type: DECLARATION_ACTION_UPDATE
@@ -109,11 +109,15 @@ export function extractHistoryActions(
     return false
   }
 
-  return fullEvent.actions.filter(isHistoryAction).map((action) => ({
-    ...action,
-    declaration: getCompleteActionDeclaration({}, fullEvent, action),
-    annotation: getCompleteActionAnnotation(fullEvent, action)
-  }))
+  return fullEvent.actions.filter(isHistoryAction).map((action) => {
+    const content = getCompleteActionContent(fullEvent, action)
+    return {
+      ...action,
+      ...(content !== undefined ? { content } : {}),
+      declaration: getCompleteActionDeclaration({}, fullEvent, action),
+      annotation: getCompleteActionAnnotation(fullEvent, action)
+    }
+  }) as ActionDocument[]
 }
 
 /**
@@ -140,7 +144,7 @@ export function expandWithClientSpecificActions(
 ): EventHistoryActionDocument[] {
   return extractHistoryActions(fullEvent).flatMap<EventHistoryActionDocument>(
     (action) => {
-      if (isDeclarationAction(action)) {
+      if (isDeclarationAction(action) && action.type !== ActionType.EDIT) {
         if (
           !hasDeclarationChanged(
             fullEvent,
@@ -184,7 +188,7 @@ export function useActionForHistory() {
           x.type === ActionType.APPROVE_CORRECTION &&
           (x.requestId === action.id ||
             x.requestId === action.originalActionId) &&
-          x.annotation?.isImmediateCorrection &&
+          x.content?.immediateCorrection &&
           x.createdBy === action.createdBy
       )
       if (approveAction) {

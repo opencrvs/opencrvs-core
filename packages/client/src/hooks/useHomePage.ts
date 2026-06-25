@@ -76,7 +76,7 @@ export const useHomePage = () => {
       path = {
         pathname: TEAM_USER_LIST,
         search: stringify({
-          locationId: userDetails?.primaryOffice.id
+          locationId: userDetails?.primaryOfficeId
         })
       }
       break
@@ -93,7 +93,7 @@ export const useHomePage = () => {
       break
     case WORKQUEUE_TABS.performance:
       path = generatePerformanceHomeUrl({
-        locationId: userDetails?.primaryOffice.id
+        locationId: userDetails?.primaryOfficeId
       })
       break
   }

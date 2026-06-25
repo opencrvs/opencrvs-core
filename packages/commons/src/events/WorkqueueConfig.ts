@@ -9,9 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { TranslationConfig } from './TranslationConfig'
-import { Conditional } from './Conditional'
 import { event } from './event'
 import {
   defineWorkqueuesColumns,
@@ -23,7 +22,7 @@ import {
 } from './CountryConfigQueryInput'
 import { AvailableIcons } from '../icons'
 import { QueryType } from './EventIndex'
-import { workqueueActions } from './ActionType'
+import { WorkqueueActionType } from './ActionType'
 
 export const mandatoryColumns = defineWorkqueuesColumns([
   {
@@ -44,15 +43,6 @@ export const mandatoryColumns = defineWorkqueuesColumns([
   }
 ])
 
-export const WorkqueueActionsWithDefault = z.enum([
-  ...workqueueActions.options,
-  'DEFAULT'
-] as const)
-
-export type WorkqueueActionsWithDefault = z.infer<
-  typeof WorkqueueActionsWithDefault
->
-
 /**
  * Configuration for workqueue. Workqueues are used to display a list of events.
  */
@@ -63,12 +53,12 @@ export const WorkqueueConfig = z
       'Title of the workflow (both in navigation and on the page)'
     ),
     query: CountryConfigQueryType,
-    actions: z.array(
-      z.object({
-        type: WorkqueueActionsWithDefault,
-        conditionals: z.array(Conditional).optional()
-      })
-    ),
+    action: z
+      .object({ type: WorkqueueActionType })
+      .optional()
+      .describe(
+        'Workqueue call-to-action button configuration. This determines the quick action button shown on each event card and the action taken when the button is clicked.'
+      ),
     columns: z.array(WorkqueueColumn).default(mandatoryColumns),
     icon: AvailableIcons,
     emptyMessage: TranslationConfig.optional()
@@ -80,27 +70,19 @@ export const WorkqueueConfigWithoutQuery = WorkqueueConfig.omit({
   columns: true
 })
 
-export const WorkqueueConfigInput = z.object({
-  slug: z.string().describe('Determines the url of the workqueue.'),
-  name: TranslationConfig.describe(
-    'Title of the workflow (both in navigation and on the page)'
-  ),
-  query: CountryConfigQueryInputType,
-  actions: z.array(
-    z.object({
-      type: WorkqueueActionsWithDefault,
-      conditionals: z.array(Conditional).optional()
-    })
-  ),
-  columns: z.array(WorkqueueColumn).default(mandatoryColumns),
-  icon: AvailableIcons,
-  emptyMessage: TranslationConfig.optional()
+export const WorkqueueConfigInput = WorkqueueConfig.extend({
+  query: CountryConfigQueryInputType
+}).meta({
+  id: 'WorkqueueConfig',
+  description:
+    'Configuration for a single workqueue. Defines the filter applied to the event index, the quick-action button, the columns shown on each row, and the message rendered when the queue is empty.'
 })
 
 export type WorkqueueConfig = z.infer<typeof WorkqueueConfig>
 export type WorkqueueConfigWithoutQuery = z.infer<
   typeof WorkqueueConfigWithoutQuery
 >
+
 export type WorkqueueConfigInput = z.input<typeof WorkqueueConfigInput>
 
 export function defineWorkqueue(workqueueInput: WorkqueueConfigInput) {
@@ -110,7 +92,32 @@ export function defineWorkqueue(workqueueInput: WorkqueueConfigInput) {
   return WorkqueueConfig.parse({ ...workqueueInput, query })
 }
 
-export function defineWorkqueues(workqueues: WorkqueueConfigInput[]) {
+function warnOnConfigurationIssues(
+  workqueue: WorkqueueConfigInputWithV19Compat
+) {
+  if (workqueue.actions) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `
+       ************** WARNING **************
+       'actions' property is deprecated, but used on workqueue: '${workqueue.slug}'.
+       Use 'action' property instead!
+       ************** WARNING **************
+      `
+    )
+  }
+}
+
+/** This is used for v1.9 to v2.0 migration to show specific migration errors. */
+type WorkqueueConfigInputWithV19Compat = WorkqueueConfigInput & {
+  /** @deprecated use 'action' property instead */
+  actions?: unknown
+}
+
+export function defineWorkqueues(
+  workqueues: WorkqueueConfigInputWithV19Compat[]
+) {
+  workqueues.forEach(warnOnConfigurationIssues)
   return workqueues.map((workqueue) => defineWorkqueue(workqueue))
 }
 

@@ -12,16 +12,44 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { InputError } from './InputError'
 import { InputLabel } from './InputLabel'
+import { InputDescriptor } from './InputDescriptor'
 
-const InputHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-`
+const InputHeader = styled.div``
 const ComponentWrapper = styled.span``
 const InputDescription = styled.p`
   ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
 `
+
+const DefaultInputWrapper = styled.div``
+const HighlightedInputWrapper = styled.div`
+  border: 1px solid ${({ theme }) => theme.colors.primary};
+  border-radius: 4px;
+  padding-bottom: 16px;
+  overflow: hidden;
+
+  label {
+    background-color: ${({ theme }) => theme.colors.primaryLighter};
+    border-bottom: ${({ theme }) => `1px solid ${theme.colors.primary}`};
+    padding: 12px 16px;
+  }
+
+  ${InputDescriptor} {
+    padding: 16px;
+    padding-bottom: 0;
+  }
+
+  ${ComponentWrapper} {
+    display: block;
+    padding: 16px;
+    padding-bottom: 0;
+  }
+
+  ${InputError} {
+    padding: 8px 16px;
+  }
+`
+
 export interface IInputFieldProps {
   id: string
   label?: string
@@ -43,6 +71,7 @@ export interface IInputFieldProps {
   hideErrorLabel?: boolean
   hideInputHeader?: boolean
   htmlFor?: string
+  variant?: 'default' | 'highlighted'
 }
 
 export const InputField = (props: IInputFieldProps) => {
@@ -59,7 +88,8 @@ export const InputField = (props: IInputFieldProps) => {
     hideErrorLabel,
     hideInputHeader = false,
     prefix,
-    htmlFor
+    htmlFor,
+    variant
   } = props
 
   const postfix = props.postfix as React.ReactNode | string
@@ -81,8 +111,11 @@ export const InputField = (props: IInputFieldProps) => {
     }
   )
 
+  const InputWrapper =
+    variant === 'highlighted' ? HighlightedInputWrapper : DefaultInputWrapper
+
   return (
-    <div id={`${id}-form-input`} className={props.className}>
+    <InputWrapper id={`${id}-form-input`} className={props.className}>
       {!hideInputHeader && (
         <InputHeader>
           {label && (
@@ -96,11 +129,16 @@ export const InputField = (props: IInputFieldProps) => {
               htmlFor={htmlFor}
               hideAsterisk={hideAsterisk}
               tooltip={tooltip}
+              variant={variant}
             >
               {label}
             </InputLabel>
           )}
         </InputHeader>
+      )}
+
+      {!hideInputHeader && label && helperText && (
+        <InputDescriptor>{helperText}</InputDescriptor>
       )}
 
       <ComponentWrapper>{children}</ComponentWrapper>
@@ -110,6 +148,6 @@ export const InputField = (props: IInputFieldProps) => {
       )}
 
       {description && <InputDescription>{description}</InputDescription>}
-    </div>
+    </InputWrapper>
   )
 }

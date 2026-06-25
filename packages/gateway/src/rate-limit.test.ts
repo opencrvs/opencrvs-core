@@ -8,290 +8,204 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { resolvers as rootResolvers } from '@gateway/features/user/root-resolvers'
-import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
-import * as fetchAny from 'jest-fetch-mock'
-import * as jwt from 'jsonwebtoken'
-import { readFileSync } from 'fs'
-import { startContainer, stopContainer } from './utils/redis-test-utils'
-import { StartedTestContainer } from 'testcontainers'
-import { savedAdministrativeLocation } from '@opencrvs/commons/fixtures'
-import { createServer } from '@gateway/server'
-import { UUID } from '@opencrvs/commons'
-import { redis } from './utils/redis'
 
-const fetch = fetchAny as any
-const resolvers = rootResolvers as any
-const locationResolvers = locationRootResolvers as any
+// Force rate limiting ON for this suite — it defaults to `true` (disabled) in
+// the dev/test environment, which would short-circuit every assertion below.
+jest.mock('@gateway/constants', () => ({
+  ...jest.requireActual('@gateway/constants'),
+  DISABLE_RATE_LIMIT: false
+}))
 
-let container: StartedTestContainer
-
-jest.mock('./constants', () => {
-  const originalModule = jest.requireActual('./constants')
+/**
+ * In-memory stand-in for the node-redis client. Faithfully models the two
+ * commands `withRateLimit` issues — `INCR` (creates the key at 1 on a miss or
+ * after expiry) and `pEXPIRE` (sets the key's expiry) — and resolves expiry
+ * against `Date.now()`, so Jest's fake timers can fast-forward past the window.
+ */
+jest.mock('@gateway/utils/redis', () => {
+  const store = new Map<string, { count: number; expiresAt: number }>()
   return {
-    __esModule: true,
-    ...originalModule,
-    DISABLE_RATE_LIMIT: false
+    redis: {
+      multi() {
+        const ops: Array<() => unknown> = []
+        const builder = {
+          incr(key: string) {
+            ops.push(() => {
+              const entry = store.get(key)
+              if (!entry || entry.expiresAt <= Date.now()) {
+                // Fresh key: INCR creates it at 1 with no expiry until pEXPIRE.
+                store.set(key, { count: 1, expiresAt: Infinity })
+                return 1
+              }
+              entry.count += 1
+              return entry.count
+            })
+            return builder
+          },
+          pExpire(key: string, ttl: number) {
+            ops.push(() => {
+              const entry = store.get(key)
+              if (entry) entry.expiresAt = Date.now() + ttl
+              return true
+            })
+            return builder
+          },
+          async exec() {
+            return ops.map((op) => op())
+          }
+        }
+        return builder
+      }
+    },
+    __resetStore: () => store.clear()
   }
 })
 
-describe('Rate limit', () => {
-  let authHeaderRegAgent: { Authorization: string }
-  let authHeaderRegAgent2: { Authorization: string }
+import { rateLimitedRoute, RateLimitError } from '@gateway/rate-limit'
 
-  beforeAll(async () => {
-    container = await startContainer()
-  })
+const resetStore = () =>
+  (
+    jest.requireMock('@gateway/utils/redis') as { __resetStore: () => void }
+  ).__resetStore()
 
-  afterAll(async () => {
-    await stopContainer(container)
-  })
+const makeArgs = (payload: unknown, path = '/auth/some-route') => {
+  const request = {
+    headers: {},
+    payload: Buffer.from(JSON.stringify(payload))
+  }
+  const h = { request: { path } }
+  // The handler is invoked by Hapi as (request, h)
+  return [request, h] as unknown as Parameters<
+    ReturnType<typeof rateLimitedRoute>
+  >
+}
 
-  beforeEach(async () => {
-    await redis.flushAll()
-    fetch.resetMocks()
+describe('rateLimitedRoute key resolution', () => {
+  beforeEach(resetStore)
 
-    const validateToken = jwt.sign(
-      { scope: [] },
-      readFileSync('./test/cert.key'),
-      {
-        subject: 'ba7022f0ff4822',
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:gateway-user'
-      }
-    )
-    authHeaderRegAgent = {
-      Authorization: `Bearer ${validateToken}`
-    }
-
-    const validateToken2 = jwt.sign(
-      { scope: [] },
-      readFileSync('./test/cert.key'),
-      {
-        subject: '5bdc55ece42c82de9a529c36',
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:gateway-user'
-      }
-    )
-    authHeaderRegAgent2 = {
-      Authorization: `Bearer ${validateToken2}`
-    }
-  })
-
-  it('allows 10 calls and then throws RateLimitError', async () => {
-    for (let i = 1; i <= 10; i++) {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          username: 'sakibal.hasan',
-          id: '123',
-          scope: [],
-          status: 'active'
-        })
-      )
-
-      await resolvers.Query.verifyPasswordById(
-        {},
-        { id: '123', password: 'test' },
-        { headers: authHeaderRegAgent },
-        { fieldName: 'verifyPasswordById' }
-      )
-    }
-
-    fetch.mockResponseOnce(
-      JSON.stringify({
-        username: 'sakibal.hasan',
-        id: '123',
-        scope: [],
-        status: 'active'
-      })
+  it('keys on a payload field when pathForKey is provided', async () => {
+    const fn = jest.fn(() => 'OK')
+    const handler = rateLimitedRoute(
+      { requestsPerMinute: 10, pathForKey: 'username' },
+      fn
     )
 
-    return expect(
-      resolvers.Query.verifyPasswordById(
-        {},
-        { id: '123', password: 'test' },
-        { headers: authHeaderRegAgent },
-        { fieldName: 'verifyPasswordById' }
-      )
-    ).rejects.toThrow(
-      'Too many requests within a minute. Please throttle your requests.'
-    )
-  })
-
-  it('does not throw RateLimitError when called exactly 10 times', async () => {
-    for (let i = 1; i <= 9; i++) {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          username: 'sakibal.hasan',
-          id: '123',
-          scope: [],
-          status: 'active'
-        })
-      )
-
-      await resolvers.Query.verifyPasswordById(
-        {},
-        { id: '123', password: 'test' },
-        { headers: authHeaderRegAgent },
-        { fieldName: 'verifyPasswordById' }
-      )
-    }
-
-    fetch.mockResponseOnce(
-      JSON.stringify({
-        username: 'sakibal.hasan',
-        id: '123',
-        scope: [],
-        status: 'active'
-      })
+    const result = await handler(
+      ...makeArgs({ username: 'alice', password: 'pw' })
     )
 
-    return expect(
-      resolvers.Query.verifyPasswordById(
-        {},
-        { id: '123', password: 'test' },
-        { headers: authHeaderRegAgent },
-        { fieldName: 'verifyPasswordById' }
-      )
-    ).resolves.not.toThrowError()
+    expect(result).toBe('OK')
+    expect(fn).toHaveBeenCalledTimes(1)
   })
 
-  it('does not throw RateLimitError when different users try to access the same route', async () => {
-    const users = [
-      { username: 'sakibal.hasan', id: '0' },
-      { username: 'p.rouvila', id: '1' }
-    ]
-
-    // Call the route 7 times for all users, it should not throw RateLimitError for this user yet
-    for (let i = 1; i <= 7; i++) {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          username: users[0].username,
-          id: users[0].id,
-          scope: [],
-          status: 'active'
-        })
-      )
-
-      await resolvers.Query.verifyPasswordById(
-        {},
-        { id: users[0].id, password: 'test' },
-        { headers: authHeaderRegAgent },
-        { fieldName: 'verifyPasswordById' }
-      )
-    }
-
-    // ...now call the same route 7 times for the second user, it should not throw RateLimitError for this user either
-    for (let i = 1; i <= 7; i++) {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          username: users[1].username,
-          id: users[1].id,
-          scope: [],
-          status: 'active'
-        })
-      )
-
-      await resolvers.Query.verifyPasswordById(
-        {},
-        { id: users[1].id, password: 'test' },
-        { headers: authHeaderRegAgent2 },
-        { fieldName: 'verifyPasswordById' }
-      )
-    }
-
-    // ...now call the same route for the first user again, it should not still throw RateLimitError
-    fetch.mockResponseOnce(
-      JSON.stringify({
-        username: users[0].username,
-        id: users[0].id,
-        scope: [],
-        status: 'active'
-      })
+  it('throws when the pathForKey field is missing from the payload', () => {
+    const fn = jest.fn(() => 'OK')
+    const handler = rateLimitedRoute(
+      { requestsPerMinute: 10, pathForKey: 'username' },
+      fn
     )
 
-    return expect(
-      resolvers.Query.verifyPasswordById(
-        {},
-        { id: users[0].id, password: 'test' },
-        { headers: authHeaderRegAgent },
-        { fieldName: 'verifyPasswordById' }
-      )
-    ).resolves.not.toThrowError()
+    // Super user auth only sends a password — this is the case that used to 500.
+    expect(() => handler(...makeArgs({ password: 'pw' }))).toThrow(
+      "Couldn't find the value for a rate limiting key in payload"
+    )
+    expect(fn).not.toHaveBeenCalled()
   })
 
-  it('does not throw RateLimitError when a non-rate-limited route is being called 20 times', async () => {
-    const resolverCalls = Array.from({ length: 20 }, async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify([
-          savedAdministrativeLocation({
-            partOf: { reference: 'Location/1' as `Location/${UUID}` }
-          })
-        ])
-      )
-      await locationResolvers.Query!.isLeafLevelLocation(
-        {},
-        { locationId: '1' },
-        { headers: authHeaderRegAgent },
-        { fieldName: 'isLeafLevelLocation' }
-      )
-    })
+  it('rate limits on a constant key without inspecting the payload when staticKey is provided', async () => {
+    const fn = jest.fn(() => 'OK')
+    const handler = rateLimitedRoute(
+      { requestsPerMinute: 10, staticKey: 'authenticate-super-user' },
+      fn
+    )
 
-    return expect(() => Promise.all(resolverCalls)).not.toThrowError()
+    // No per-user field in the payload, yet it must not throw — this is the fix
+    // that lets the data-seeder authenticate the super user through the gateway.
+    const result = await handler(
+      ...makeArgs({ password: 'pw' }, '/auth/authenticate-super-user')
+    )
+
+    expect(result).toBe('OK')
+    expect(fn).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('rateLimitedRoute enforcement', () => {
+  beforeEach(() => {
+    jest.useFakeTimers()
+    resetStore()
+  })
+  afterEach(() => jest.useRealTimers())
+
+  it('allows requestsPerMinute requests, then blocks the next one', async () => {
+    const fn = jest.fn(() => 'OK')
+    const handler = rateLimitedRoute(
+      { requestsPerMinute: 10, pathForKey: 'username' },
+      fn
+    )
+    const send = () => handler(...makeArgs({ username: 'alice' }))
+
+    for (let i = 0; i < 10; i++) {
+      await expect(send()).resolves.toBe('OK')
+    }
+
+    await expect(send()).rejects.toThrow(RateLimitError)
+    // The blocked request never reaches the wrapped handler.
+    expect(fn).toHaveBeenCalledTimes(10)
   })
 
-  it('handles multiple users authenticating with different usernames', async () => {
-    const server = await createServer()
+  it('allows requests again once the one-minute window elapses', async () => {
+    const fn = jest.fn(() => 'OK')
+    const handler = rateLimitedRoute(
+      { requestsPerMinute: 10, pathForKey: 'username' },
+      fn
+    )
+    const send = () => handler(...makeArgs({ username: 'alice' }))
 
-    // okay to go through 10 times
-    for (let i = 1; i <= 10; i++) {
-      const res = await server.app.inject({
-        method: 'POST',
-        url: '/auth/authenticate',
-        payload: {
-          username: 'test.user',
-          password: 'test'
-        }
-      })
+    for (let i = 0; i < 10; i++) await send()
+    await expect(send()).rejects.toThrow(RateLimitError)
 
-      expect((res.result as any).statusCode).not.toBe(402)
+    // Fast-forward past the 60s TTL — the counter expires and resets.
+    jest.advanceTimersByTime(60_000)
+
+    await expect(send()).resolves.toBe('OK')
+    expect(fn).toHaveBeenCalledTimes(11)
+  })
+
+  it('counts each key independently (one user hitting the limit does not block another)', async () => {
+    const fn = jest.fn(() => 'OK')
+    const handler = rateLimitedRoute(
+      { requestsPerMinute: 10, pathForKey: 'username' },
+      fn
+    )
+
+    for (let i = 0; i < 10; i++)
+      await handler(...makeArgs({ username: 'alice' }))
+    await expect(handler(...makeArgs({ username: 'alice' }))).rejects.toThrow(
+      RateLimitError
+    )
+
+    // bob has his own counter and is unaffected.
+    await expect(handler(...makeArgs({ username: 'bob' }))).resolves.toBe('OK')
+  })
+
+  it('counts the same key independently per route', async () => {
+    const fn = jest.fn(() => 'OK')
+    const handler = rateLimitedRoute(
+      { requestsPerMinute: 10, pathForKey: 'nonce' },
+      fn
+    )
+
+    for (let i = 0; i < 10; i++) {
+      await handler(...makeArgs({ nonce: 'abc' }, '/auth/verifyCode'))
     }
+    await expect(
+      handler(...makeArgs({ nonce: 'abc' }, '/auth/verifyCode'))
+    ).rejects.toThrow(RateLimitError)
 
-    // should return 402 Forbidden
-    const res = await server.app.inject({
-      method: 'POST',
-      url: '/auth/authenticate',
-      payload: {
-        username: 'test.user',
-        password: 'test'
-      }
-    })
-    expect((res.result as any).statusCode).toBe(402)
-
-    // okay to go through 10 times with a different username
-    for (let i = 1; i <= 10; i++) {
-      const res = await server.app.inject({
-        method: 'POST',
-        url: '/auth/authenticate',
-        payload: {
-          username: 'test.user2',
-          password: 'test'
-        }
-      })
-      expect((res.result as any).statusCode).not.toBe(402)
-    }
-
-    // should return 402 Forbidden
-    const res2 = await server.app.inject({
-      method: 'POST',
-      url: '/auth/authenticate',
-      payload: {
-        username: 'test.user2',
-        password: 'test'
-      }
-    })
-    expect((res2.result as any).statusCode).toBe(402)
+    // Same nonce on a different route uses a different counter.
+    await expect(
+      handler(...makeArgs({ nonce: 'abc' }, '/auth/verifyNumber'))
+    ).resolves.toBe('OK')
   })
 })

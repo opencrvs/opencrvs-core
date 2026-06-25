@@ -1,5 +1,6 @@
 {
-  "processors": ["stylelint-processor-styled-components"],
+  "customSyntax": "postcss-styled-syntax",
+
   "extends": [
     "stylelint-config-recommended",
     "stylelint-config-styled-components"
@@ -9,7 +10,11 @@
     "color-named": "never",
     "no-descending-specificity": null,
     "property-no-vendor-prefix": null,
-    "opencrvs/no-font-styles": true
+    "opencrvs/no-font-styles": true,
+    "function-no-unknown": [true, { "ignoreFunctions": ["/\\$/"] }],
+    "block-no-empty": null,
+    "no-extra-semicolons": null,
+    "annotation-no-unknown": null
   },
   "plugins": ["./no-font-styles.js"],
   "ignoreFiles": "**/*.stories.tsx"

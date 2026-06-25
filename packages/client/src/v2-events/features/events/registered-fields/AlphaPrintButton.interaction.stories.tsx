@@ -20,6 +20,7 @@ import {
   and,
   ConditionalType,
   event,
+  EventDocument,
   FieldType,
   tennisClubMembershipEvent,
   TestUserRole,
@@ -31,6 +32,7 @@ import {
 import { ROUTES } from '@client/v2-events/routes'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
+import { createTemporaryId } from '@client/v2-events/utils'
 
 import { tennisClubMembershipEventDocument } from '../fixtures'
 import { getTestValidatorContext } from '../../../../../.storybook/decorators'
@@ -115,11 +117,11 @@ export const WithEnableCondition: StoryObj<{}> = {
     {
       type: ConditionalType.ENABLE,
       conditional: and(
-        user.hasRole(TestUserRole.Enum.LOCAL_REGISTRAR),
+        user.hasRole(TestUserRole.enum.LOCAL_REGISTRAR),
         not(event.hasAction(ActionType.DECLARE))
       )
     },
-    getTestValidatorContext(TestUserRole.Enum.LOCAL_REGISTRAR, {
+    getTestValidatorContext(TestUserRole.enum.LOCAL_REGISTRAR, {
       ...tennisClubMembershipEventDocument,
       actions: tennisClubMembershipEventDocument.actions.filter(
         (action) => action.type === ActionType.CREATE
@@ -139,12 +141,12 @@ export const WithDisableCondition: StoryObj<{}> = {
     {
       type: ConditionalType.ENABLE,
       conditional: and(
-        user.hasRole(TestUserRole.Enum.LOCAL_REGISTRAR),
+        user.hasRole(TestUserRole.enum.LOCAL_REGISTRAR),
         not(event.hasAction(ActionType.DECLARE))
       )
     },
     getTestValidatorContext(
-      TestUserRole.Enum.LOCAL_REGISTRAR,
+      TestUserRole.enum.LOCAL_REGISTRAR,
       tennisClubMembershipEventDocument
     )
   ),
@@ -153,5 +155,64 @@ export const WithDisableCondition: StoryObj<{}> = {
     const button = await canvas.findByTestId('storybook____name')
 
     await expect(button).toBeDisabled()
+  }
+}
+
+/**
+ * Verifies that the AlphaPrintButton renders when the URL `eventId` is a
+ * temporary id (e.g. `tmp-<uuid>`). Before the fix, `UUID.parse()` threw on
+ * non-UUID strings and the component failed to mount on draft records.
+ */
+const temporaryEventId = createTemporaryId()
+const temporaryEventDocument: EventDocument = {
+  ...tennisClubMembershipEventDocument,
+  id: temporaryEventId
+}
+
+export const WithTemporaryEventId: StoryObj<{}> = {
+  parameters: {
+    reactRouter: {
+      router: {
+        path: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+          eventId: temporaryEventId
+        }),
+        element: (
+          <StyledFormFieldGenerator
+            fields={[
+              {
+                id: 'storybook.name',
+                type: FieldType.ALPHA_PRINT_BUTTON,
+                label: {
+                  id: 'storybook.name.label',
+                  defaultMessage: 'Name',
+                  description: 'The title for the name input'
+                },
+                configuration: {
+                  template: 'simple-certificate'
+                }
+              }
+            ]}
+            id="my-form"
+            validatorContext={getTestValidatorContext(
+              TestUserRole.enum.LOCAL_REGISTRAR,
+              temporaryEventDocument
+            )}
+          />
+        )
+      },
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: temporaryEventId
+      })
+    },
+    offline: {
+      events: [temporaryEventDocument]
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const button = await canvas.findByTestId('storybook____name')
+
+    await expect(button).toBeInTheDocument()
+    await expect(button).toBeEnabled()
   }
 }

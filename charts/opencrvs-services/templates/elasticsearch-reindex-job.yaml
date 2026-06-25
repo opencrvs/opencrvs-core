@@ -1,0 +1,26 @@
+{{- if .Values.elasticsearch.reindex_enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "4"
+  labels:
+    app: elasticsearch-reindex
+  name: elasticsearch-reindex
+  namespace: {{ .Release.Namespace }}
+spec:
+  template:
+    metadata:
+      labels:
+        app: elasticsearch-reindex
+    spec:
+      {{- include "elasticsearch-reindex.imagePullSecrets" . | nindent 6 }}
+      initContainers:
+      {{- include "elasticsearch-reindex.initContainerSpec" . | nindent 8 }}
+      containers:
+      {{- include "elasticsearch-reindex.containerSpec" . | nindent 8 }}
+      restartPolicy: "OnFailure"
+      volumes:
+      {{- include "elasticsearch-reindex.volumes" . | nindent 8 }}
+{{- end }}

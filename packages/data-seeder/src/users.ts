@@ -11,18 +11,19 @@
 import fetch from 'node-fetch'
 import { env } from './environment'
 import { z } from 'zod'
-import { parseGQLResponse, raise, delay } from './utils'
-import { print } from 'graphql'
-import gql from 'graphql-tag'
-import { EventConfig, joinUrl } from '@opencrvs/commons'
-import {
-  parseLiteralScope,
-  parseConfigurableScope
-} from '@opencrvs/commons/authentication'
-import { fromZodError } from 'zod-validation-error'
+import { raise } from './utils'
 
-const MAX_RETRY = 5
-const RETRY_DELAY_IN_MILLISECONDS = 5000
+import {
+  decodeScope,
+  EventConfig,
+  hasScope,
+  joinUrl,
+  parseConfigurableScope,
+  EncodedScope,
+  CreateUserInputInternal
+} from '@opencrvs/commons'
+import { fromZodError } from 'zod-validation-error'
+import { createInitialisationClient } from './index'
 
 const RoleSchema = (eventIds: string[]) =>
   z.array(
@@ -34,11 +35,11 @@ const RoleSchema = (eventIds: string[]) =>
         id: z.string()
       }),
       scopes: z.array(
-        z.string().superRefine((scope, ctx) => {
+        EncodedScope.superRefine((scope, ctx) => {
           const parsedConfigurableScope = parseConfigurableScope(scope)
-          const parsedLiteralScope = parseLiteralScope(scope)
+          const parsedV2Scopes = decodeScope(scope)
 
-          if (!parsedConfigurableScope && !parsedLiteralScope) {
+          if (!parsedConfigurableScope && !parsedV2Scopes) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: `Invalid scope: "${scope}"`
@@ -46,17 +47,24 @@ const RoleSchema = (eventIds: string[]) =>
             return
           }
 
-          if (parsedConfigurableScope?.type === 'search') {
-            const options = parsedConfigurableScope.options
-            const invalidEventIds = options.event.filter(
-              (id) => !eventIds.includes(id)
-            )
+          if (parsedV2Scopes?.type) {
+            if (!('options' in parsedV2Scopes)) {
+              return
+            }
 
-            if (invalidEventIds.length > 0) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: `Scope "${scope}" contains invalid event IDs: ${invalidEventIds.join(', ')}`
-              })
+            const options = parsedV2Scopes.options
+
+            if (options && 'event' in options && Array.isArray(options.event)) {
+              const invalidEventIds = options.event.filter(
+                (id) => !eventIds.includes(id)
+              )
+
+              if (invalidEventIds.length > 0) {
+                ctx.addIssue({
+                  code: z.ZodIssueCode.custom,
+                  message: `Scope "${scope}" contains invalid event IDs: ${invalidEventIds.join(', ')}`
+                })
+              }
             }
           }
         })
@@ -77,32 +85,22 @@ const UserSchema = z.array(
   WithoutContact.extend({
     mobile: z.string(),
     email: z.string().email().optional()
-  }).or(
-    WithoutContact.extend({
-      email: z.string().email(),
-      mobile: z.string().optional()
-    })
-  )
+  })
+    .or(
+      WithoutContact.extend({
+        email: z.string().email(),
+        mobile: z.string().optional()
+      })
+    )
+    .transform(({ familyName, givenNames, ...user }) => ({
+      ...user,
+      firstname: givenNames,
+      surname: familyName
+    }))
 )
 
-const searchUserQuery = print(gql`
-  query searchUsers($username: String) {
-    searchUsers(username: $username) {
-      totalItems
-    }
-  }
-`)
-
-const createUserMutation = print(gql`
-  mutation createOrUpdateUser($user: UserInput!) {
-    createOrUpdateUser(user: $user) {
-      username
-    }
-  }
-`)
-
 async function getUsers(token: string) {
-  const url = new URL('users', env.COUNTRY_CONFIG_HOST).toString()
+  const url = new URL('config/users', env.COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -110,6 +108,7 @@ async function getUsers(token: string) {
       Authorization: `Bearer ${token}`
     }
   })
+
   if (!res.ok) {
     raise(`Expected to get the users from ${url}`)
   }
@@ -126,8 +125,8 @@ async function getUsers(token: string) {
 
   const userRoles = parsedUsers.data.map((user) => user.role)
 
-  const rolesUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'roles')
-  const eventsUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'events')
+  const rolesUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/roles')
+  const eventsUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/events')
 
   const [rolesResponse, eventsResponse] = await Promise.all([
     fetch(rolesUrl),
@@ -139,34 +138,37 @@ async function getUsers(token: string) {
     })
   ])
 
-  if (!rolesResponse.ok) raise(`Error fetching roles: ${rolesResponse.status}`)
-  if (!eventsResponse.ok)
+  if (!rolesResponse.ok) {
+    raise(`Error fetching roles: ${rolesResponse.status}`)
+  }
+
+  if (!eventsResponse.ok) {
     raise(`Error fetching events: ${eventsResponse.status}`)
+  }
 
   const eventsConfig = (await eventsResponse.json()) as EventConfig[]
   const eventIds = eventsConfig.map((event) => event.id)
-
-  const parsedRoles = RoleSchema(eventIds).safeParse(await rolesResponse.json())
+  const rolesRes = await rolesResponse.json()
+  const parsedRoles = RoleSchema(eventIds).safeParse(rolesRes)
 
   if (!parsedRoles.success) {
     raise(
-      fromZodError(parsedRoles.error, {
-        prefix: `Validation failed for roles returned from ${rolesUrl}`
-      }).message
+      `Validation failed for roles returned from ${rolesUrl}:\n${parsedRoles.error.toString()}`
     )
   }
 
   const allRoles = parsedRoles.data
-
   let isConfigUpdateAllScopeAvailable = false
-  const configScope = 'config.update:all' as const
 
   for (const userRole of userRoles) {
     const currRole = allRoles.find((role) => role.id === userRole)
-    if (!currRole)
+    if (!currRole) {
       raise(`Role with id ${userRole} is not found in roles.ts file`)
-    if (currRole.scopes.includes(configScope))
+    }
+
+    if (hasScope(currRole.scopes, 'config.update-all')) {
       isConfigUpdateAllScopeAvailable = true
+    }
   }
 
   const seen = new Set<string>()
@@ -185,7 +187,9 @@ async function getUsers(token: string) {
   }
 
   if (!isConfigUpdateAllScopeAvailable) {
-    raise(`At least one user with ${configScope} scope must be created`)
+    raise(
+      `At least one user with 'type=config.update-all' scope must be created`
+    )
   }
   return parsedUsers.data
 }
@@ -194,61 +198,21 @@ async function userAlreadyExists(
   token: string,
   username: string
 ): Promise<boolean> {
-  const searchResponse = await fetch(`${env.GATEWAY_HOST}/graphql`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({
-      query: searchUserQuery,
-      variables: {
-        username
-      }
-    })
+  const client = createInitialisationClient(token)
+
+  const res = await client.users.search.query({
+    username,
+    count: 1,
+    skip: 0,
+    sortOrder: 'asc'
   })
-  const parsedSearchResponse = parseGQLResponse<{
-    searchUsers: { totalItems?: number }
-  }>(await searchResponse.json())
-  return Boolean(parsedSearchResponse.searchUsers.totalItems)
+
+  return Boolean(res.length)
 }
 
-async function getOfficeIdFromIdentifier(identifier: string) {
-  const response = await fetch(
-    `${env.GATEWAY_HOST}/location?identifier=${identifier}`,
-    {
-      headers: {
-        'Content-Type': 'application/fhir+json'
-      }
-    }
-  )
-  if (!response.ok) {
-    // eslint-disable-next-line no-console
-    console.error(
-      `Error fetching location with identifier ${identifier}`,
-      response.statusText
-    )
-    throw new Error('Error fetching location')
-  }
-  const locationBundle: fhir3.Bundle<fhir3.Location> = await response.json()
-
-  return locationBundle.entry?.[0]?.resource?.id
-}
-
-async function callCreateUserMutation(token: string, userPayload: unknown) {
-  return fetch(`${env.GATEWAY_HOST}/graphql`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({
-      query: createUserMutation,
-      variables: {
-        user: userPayload
-      }
-    })
-  })
+async function createUser(token: string, userPayload: CreateUserInputInternal) {
+  const client = createInitialisationClient(token)
+  return client.users.create.mutate(userPayload)
 }
 
 export async function seedUsers(token: string) {
@@ -256,8 +220,8 @@ export async function seedUsers(token: string) {
 
   for (const userMetadata of rawUsers) {
     const {
-      givenNames,
-      familyName,
+      firstname,
+      surname,
       primaryOfficeId: officeIdentifier,
       username,
       ...user
@@ -271,47 +235,25 @@ export async function seedUsers(token: string) {
       continue
     }
 
-    const primaryOffice = await getOfficeIdFromIdentifier(officeIdentifier)
-    if (!primaryOffice) {
-      // eslint-disable-next-line no-console
-      console.log(
-        `No office found with id ${officeIdentifier}. Skipping user "${username}"`
-      )
-      continue
-    }
+    const externalId = officeIdentifier.split('_').at(-1)
+
+    const client = createInitialisationClient(token)
+
+    const [primaryOffice] = await client.locations.list.query({
+      externalId
+    })
 
     const userPayload = {
       ...user,
-      name: [
-        {
-          use: 'en',
-          familyName,
-          firstNames: givenNames
-        }
-      ],
-      ...(env.ACTIVATE_USERS && { status: 'active' }),
-      primaryOffice,
+      name: {
+        firstname,
+        surname
+      },
+      ...(env.ACTIVATE_USERS && { status: 'active' as const }),
+      primaryOfficeId: primaryOffice.id,
       username
     }
-    let tryNumber = 0
-    let jsonRes
-    let res
 
-    do {
-      ++tryNumber
-      if (tryNumber > 1) {
-        await delay(RETRY_DELAY_IN_MILLISECONDS)
-        // eslint-disable-next-line no-console
-        console.log('Trying again for time: ', tryNumber)
-      }
-      res = await callCreateUserMutation(token, userPayload)
-      jsonRes = await res.json()
-    } while (
-      tryNumber < MAX_RETRY &&
-      'errors' in jsonRes &&
-      jsonRes.errors[0].extensions?.code === 'INTERNAL_SERVER_ERROR'
-    )
-
-    parseGQLResponse(jsonRes)
+    await createUser(token, userPayload)
   }
 }

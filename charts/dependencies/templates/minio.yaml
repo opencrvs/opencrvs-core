@@ -1,0 +1,206 @@
+{{ if .Values.minio.enabled }}
+{{- $storageType := default .Values.storage_type .Values.minio.storage_type | default "pvc" }}
+{{- if eq $storageType "pvc" }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: minio
+  name: minio
+spec:
+  {{- if .Values.minio.pvc.storage_class }}
+  storageClassName: {{ .Values.minio.pvc.storage_class | quote }}
+  {{- end }}
+  accessModes:
+    - {{ .Values.minio.pvc.access_mode }}
+  resources:
+    requests:
+      storage: {{ .Values.minio.pvc.storage_size }}
+{{- end }}
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: minio-route
+spec:
+  entryPoints:
+  {{- if .Values.ingress.ssl_enabled }}
+    - websecure
+  {{- end }}
+  {{- if or .Values.ingress.tls_resolver (not .Values.ingress.ssl_enabled) }}
+    - web
+  {{- end }}
+  routes:
+  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "minio" "Values" .Values) }}`)'
+    kind: Rule
+    services:
+    - name: minio
+      namespace: {{ .Release.Namespace }}
+      port: 3535
+  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "minio-console" "Values" .Values) }}`)'
+    kind: Rule
+    services:
+    - name: minio
+      namespace: {{ .Release.Namespace }}
+      port: 3536
+  {{- if .Values.ingress.tls_resolver }}
+  tls:
+    certResolver: {{ .Values.ingress.tls_resolver }}
+  {{- else if .Values.ingress.tls_secret_name }}
+  tls:
+    secretName: {{ .Values.ingress.tls_secret_name }}
+  {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: minio
+  name: minio
+spec:
+  clusterIP: None
+  ports:
+    - name: '3535'
+      port: 3535
+      targetPort: 3535
+    - name: '3536'
+      port: 3536
+      targetPort: 3536
+  selector:
+    app: minio
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: minio
+  name: minio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  serviceName: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+    {{- if .Values.priority_class.enabled }}
+      priorityClassName: {{ .Values.priority_class.name }}
+    {{- end }}
+    {{- $node_selector := default .Values.node_selector .Values.minio.node_selector }}
+    {{- if $node_selector }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+            {{- range $k, $v := $node_selector }}
+              - key: {{ $k }}
+                operator: In
+                values:
+                - {{ $v }}
+            {{- end }}
+    {{- end }}
+      containers:
+        - args:
+            - server
+            - --address
+            - :3535
+            - --console-address
+            - :3536
+            - /data
+          image: quay.io/minio/minio:RELEASE.2025-06-13T11-33-47Z
+          name: minio
+          env:
+            - name: MINIO_BROWSER_REDIRECT_URL
+              value: {{ include "render-external-url" (dict "service_name" "minio-console" "Values" .Values) }}
+            - name: MINIO_DOMAIN
+              value: {{ include "render-external-url" (dict "service_name" "minio" "Values" .Values) }}
+            - name: MINIO_API_CORS_ALLOW_ORIGIN
+              value: '*'
+          {{- if not .Values.minio.use_default_credentials }}
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: minio-opencrvs-users
+                  key: MINIO_ROOT_USER
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: minio-opencrvs-users
+                  key: MINIO_ROOT_PASSWORD
+          {{- end }}
+          {{- include "render-env-vars" (dict "service_name" "minio" "Values" .Values) }}
+          ports:
+            - containerPort: 3535
+              protocol: TCP
+            - containerPort: 3536
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /data
+              name: minio
+      {{- if eq (include "minio.use_rsync" .) "true" }}
+        - image: eeacms/rsync:3.0
+          name: rsync
+          command: ["sleep", "infinity"]
+          env:
+            - name: BACKUP_USER
+              valueFrom:
+                secretKeyRef:
+                {{- if (eq (include "minio.backup_enabled" .) "true") }}
+                  name: {{ default .Values.backup.backup_server_secret .Values.minio.backup.server_secret}}
+                {{- else }}
+                  name: {{ default .Values.restore.backup_server_secret .Values.minio.restore.server_secret}}
+                {{- end }}
+                  key: user
+            - name: BACKUP_HOST
+              valueFrom:
+                secretKeyRef:
+                {{- if (eq (include "minio.backup_enabled" .) "true") }}
+                  name: {{ default .Values.backup.backup_server_secret .Values.minio.backup.server_secret}}
+                {{- else }}
+                  name: {{ default .Values.restore.backup_server_secret .Values.minio.restore.server_secret}}
+                {{- end }}
+                  key: host
+            - name: BACKUP_REMOTE_DIR
+              {{- if (eq (include "minio.backup_enabled" .) "true") }}
+              value: {{ default .Values.backup.backup_server_dir .Values.minio.backup.server_dir }}
+              {{- else }}
+              value: {{ default .Values.restore.backup_server_dir .Values.minio.restore.server_dir }}
+              {{- end }}
+          volumeMounts:
+            - mountPath: /data
+              name: minio
+            - name: backup-ssh-key
+              mountPath: /root/.ssh
+              readOnly: true
+      {{- end }}
+      restartPolicy: Always
+      volumes:
+        - name: minio
+      {{- if eq $storageType "pvc" }}
+          persistentVolumeClaim:
+            claimName: minio
+      {{- else if eq $storageType "host_path" }}
+          hostPath:
+            path: {{ .Values.minio.host_data_path | default "/data/minio" }}
+            type: DirectoryOrCreate
+      {{- end }}
+      {{- if eq (include "minio.use_rsync" .) "true" }}
+      # If backup or restore enabled -> Define key for backup
+      {{- $ssh_secret := default .Values.backup.backup_server_secret .Values.minio.backup.server_secret }}
+      # If restore enabled -> use key for restore
+      {{- if (eq (include "minio.restore_enabled" .) "true") }}
+      {{- $ssh_secret = default .Values.restore.backup_server_secret .Values.minio.restore.server_secret }}
+      {{- end }}
+        - name: backup-ssh-key
+          secret:
+            secretName: {{ $ssh_secret }}
+            defaultMode: 0400
+            items:
+              - key: ssh_key
+                path: id_rsa
+      {{- end }}
+{{- end }}

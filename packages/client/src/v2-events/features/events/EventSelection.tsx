@@ -12,8 +12,8 @@
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
+import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
-import { Spinner } from '@opencrvs/components'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -22,11 +22,11 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
-import { ActionType, isActionInScope } from '@opencrvs/commons/client'
+import { canUserCreateEvent } from '@opencrvs/commons/client'
+import { SuspenseLoadingFallback } from '@client/v2-events/components/SuspenseLoadingFallback'
 import { ROUTES } from '@client/v2-events/routes'
-
 import { createTemporaryId } from '@client/v2-events/utils'
-import { getScope } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { useEventConfigurations } from './useEventConfiguration'
 import { useEventFormData } from './useEventFormData'
 import { useEventFormNavigation } from './useEventFormNavigation'
@@ -81,9 +81,10 @@ function EventSelector() {
   const clearForm = useEventFormData((state) => state.clear)
   const clearAnnotation = useActionAnnotation((state) => state.clear)
   const createEvent = events.createEvent()
+  const user = useSelector(getUserDetails)
 
   const allowedEventConfigurations = eventConfigurations.filter(({ id }) =>
-    isActionInScope(scopes, ActionType.CREATE, id)
+    canUserCreateEvent(scopes, id)
   )
 
   function handleContinue() {
@@ -91,7 +92,9 @@ function EventSelector() {
       return setNoEventSelectedError(true)
     }
     const transactionId = createTemporaryId()
-    const eventConfig = eventConfigurations.find(({ id }) => id === eventType)
+    const eventConfig = allowedEventConfigurations.find(
+      ({ id }) => id === eventType
+    )
 
     if (!eventConfig) {
       throw new Error(`Configuration for event '${eventType}' not found`)
@@ -99,7 +102,8 @@ function EventSelector() {
 
     createEvent.mutate({
       type: eventType,
-      transactionId
+      transactionId,
+      createdAtLocation: user?.primaryOfficeId
     })
 
     clearForm()
@@ -152,6 +156,7 @@ function EventSelector() {
 export function EventSelection() {
   const intl = useIntl()
   const { closeActionView } = useEventFormNavigation()
+  const [{ backTo }] = useTypedSearchParams(ROUTES.V2.EVENTS.CREATE)
 
   return (
     <Frame
@@ -163,7 +168,7 @@ export function EventSelection() {
               id="goBack"
               size="small"
               type="secondary"
-              onClick={() => closeActionView()}
+              onClick={() => closeActionView(backTo)}
             >
               <Icon name="X" />
               {intl.formatMessage(messages.exitButton)}
@@ -172,7 +177,11 @@ export function EventSelection() {
           desktopTitle={intl.formatMessage(messages.registerNewEventTitle)}
           mobileLeft={<Icon name="Draft" size="large" />}
           mobileRight={
-            <Button size="medium" type="icon" onClick={() => closeActionView()}>
+            <Button
+              size="medium"
+              type="icon"
+              onClick={() => closeActionView(backTo)}
+            >
               <Icon name="X" />
             </Button>
           }
@@ -187,7 +196,9 @@ export function EventSelection() {
         size={ContentSize.SMALL}
         title={intl.formatMessage(messages.registerNewEventHeading)}
       >
-        <React.Suspense fallback={<Spinner id="event-selector-spinner" />}>
+        <React.Suspense
+          fallback={<SuspenseLoadingFallback id="event-selector-spinner" />}
+        >
           <EventSelector />
         </React.Suspense>
       </Content>

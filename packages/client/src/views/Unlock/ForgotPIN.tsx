@@ -8,36 +8,36 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, {
-  ChangeEvent,
-  FocusEventHandler,
-  useCallback,
-  useState
-} from 'react'
-import styled from 'styled-components'
-import { useDispatch, useSelector } from 'react-redux'
-import { storage } from '@client/storage'
+import { AvatarLarge } from '@client/components/Avatar'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
-import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
-import { redirectToAuthentication } from '@client/profile/profileActions'
-import { Button } from '@opencrvs/components/lib/Button'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { PasswordInput } from '@opencrvs/components/lib/PasswordInput'
-import { injectIntl, useIntl, WrappedComponentProps } from 'react-intl'
 import {
   buttonMessages,
   constantsMessages,
   errorMessages,
   userMessages
 } from '@client/i18n/messages'
-import { userQueries } from '@client/user/queries'
-import { AvatarLarge } from '@client/components/Avatar'
-import { getUserName } from '@client/utils/userUtils'
 import { getLanguage } from '@client/i18n/selectors'
-import { Box, Link, Stack, Toast } from '@opencrvs/components'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import { redirectToAuthentication } from '@client/profile/profileActions'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { storage } from '@client/storage'
+import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
+import { getUserName } from '@client/utils/userUtils'
+import { trpcOptionsProxy } from '@client/v2-events/trpc'
 import { BackgroundWrapper } from '@client/views/common/Common'
+import { Box, Link, Stack, Toast } from '@opencrvs/components'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { InputField } from '@opencrvs/components/lib/InputField'
+import { PasswordInput } from '@opencrvs/components/lib/PasswordInput'
+import React, {
+  ChangeEvent,
+  FocusEventHandler,
+  useCallback,
+  useState
+} from 'react'
+import { injectIntl, useIntl, WrappedComponentProps } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
+import styled from 'styled-components'
 
 interface IForgotPINProps {
   goBack: () => void
@@ -87,7 +87,7 @@ const Password = injectIntl(
   }
 )
 
-export function ForgotPIN(props: IForgotPINProps) {
+export function ForgotPIN({ goBack, onVerifyPassword }: IForgotPINProps) {
   const [password, setPassword] = useState<string>('')
   const [touched, setTouched] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
@@ -106,9 +106,7 @@ export function ForgotPIN(props: IForgotPINProps) {
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       e.preventDefault()
       logout()
-      window.location.assign(
-        window.config.LOGIN_URL + `/forgotten-item?lang=${language}`
-      )
+      window.location.assign(`/login/forgotten-item?lang=${language}`)
     },
     [language, logout]
   )
@@ -123,23 +121,25 @@ export function ForgotPIN(props: IForgotPINProps) {
         return
       }
 
+      if (!userDetails?.id) {
+        logout()
+        return
+      }
+
       setVerifyingPassword(true)
 
-      const id = (userDetails && userDetails.userMgntUserID) || ''
       try {
-        const { data } = await userQueries.verifyPasswordById(id, password)
-
-        if (data && data.verifyPasswordById) {
-          setVerifyingPassword(false)
-          setError('')
-          props.onVerifyPassword()
-        }
+        await trpcOptionsProxy.user.verifyLoggedInUserPassword.mutationOptions()
+          .mutationFn!({ password })
+        setVerifyingPassword(false)
+        setError('')
+        onVerifyPassword()
       } catch (e) {
         setVerifyingPassword(false)
         setError(intl.formatMessage(errorMessages.passwordSubmissionError))
       }
     },
-    [password, userDetails, intl, props]
+    [password, userDetails, intl, onVerifyPassword, logout]
   )
 
   const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -154,7 +154,7 @@ export function ForgotPIN(props: IForgotPINProps) {
     <BackgroundWrapper id="forgotPinPage">
       <Box id="Box">
         <Stack direction="row" justifyContent="space-between">
-          <Button type="icon" id="action_back" onClick={props.goBack}>
+          <Button type="icon" id="action_back" onClick={goBack}>
             <Icon name="ArrowLeft" />
           </Button>
           <Button type="icon" onClick={logout} id="logout">

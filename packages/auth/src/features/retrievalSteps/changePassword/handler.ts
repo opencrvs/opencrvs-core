@@ -40,17 +40,7 @@ export default async function changePasswordHandler(
     return h.response().code(401)
   }
 
-  const remoteAddress =
-    request.headers['x-real-ip'] || request.info.remoteAddress
-  const userAgent =
-    request.headers['x-real-user-agent'] || request.headers['user-agent']
-
-  await changePassword(
-    retrievalStepInformation.userId,
-    payload.newPassword,
-    remoteAddress,
-    userAgent
-  )
+  await changePassword(retrievalStepInformation.userId, payload.newPassword)
   await deleteRetrievalStepInformation(payload.nonce)
   return h.response().code(200)
 }

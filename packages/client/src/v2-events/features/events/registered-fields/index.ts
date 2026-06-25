@@ -28,6 +28,7 @@ import { NumberWithUnit } from './NumberWithUnit'
 import { PageHeader } from './PageHeader'
 import { AgeField } from './AgeField'
 import { Paragraph } from './Paragraph'
+import { Heading } from './Heading'
 import { RadioGroup } from './RadioGroup'
 import { RegisteredFieldModule } from './RegisteredField'
 import { Select } from './Select'
@@ -40,6 +41,9 @@ import { AlphaPrintButton } from './AlphaPrintButton'
 import { LinkButton } from './LinkButton'
 import { VerificationStatus } from './VerificationStatus'
 import { QueryParamReader } from './QueryParamReader'
+import { Autocomplete } from './Autocomplete'
+import { ImageView } from './ImageView'
+import { UserRole } from './UserRole'
 
 export * from './Address'
 export * from './AdministrativeArea'
@@ -56,6 +60,7 @@ export * from './Number'
 export * from './NumberWithUnit'
 export * from './PageHeader'
 export * from './Paragraph'
+export * from './Heading'
 export * from './RadioGroup'
 export * from './Select'
 export * from './SelectCountry'
@@ -65,6 +70,9 @@ export * from './TimeField'
 export * from './AlphaPrintButton'
 export * from './LinkButton'
 export * from './VerificationStatus'
+export * from './Autocomplete'
+export * from './ImageView'
+export * from './UserRole'
 
 export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
   type: T
@@ -87,10 +95,10 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
     case FieldType.ALPHA_PRINT_BUTTON:
       return AlphaPrintButton
     case FieldType.ADMINISTRATIVE_AREA:
-    case FieldType.FACILITY:
-    case FieldType.OFFICE:
       return AdministrativeArea
     case FieldType.LOCATION:
+    case FieldType.FACILITY: // @deprecated
+    case FieldType.OFFICE: // @deprecated
       return LocationSearch
     case FieldType.RADIO_GROUP:
       return RadioGroup
@@ -110,6 +118,10 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return PageHeader
     case FieldType.PARAGRAPH:
       return Paragraph
+    case FieldType.HEADING:
+      return Heading
+    case FieldType.IMAGE_VIEW:
+      return ImageView
     case FieldType.NAME:
       return Name
     case FieldType.SELECT_DATE_RANGE:
@@ -118,6 +130,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return Search
     case FieldType.HTTP:
       return Http
+    case FieldType.AUTOCOMPLETE:
+      return Autocomplete
     case FieldType.LINK_BUTTON:
       return LinkButton
     case FieldType.VERIFICATION_STATUS:
@@ -126,6 +140,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return QueryParamReader
     case FieldType.AGE:
       return AgeField
+    case FieldType.USER_ROLE:
+      return UserRole
     case FieldType.FILE:
       return File
     case FieldType.FILE_WITH_OPTIONS:

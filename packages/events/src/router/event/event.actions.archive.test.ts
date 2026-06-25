@@ -10,7 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, getUUID } from '@opencrvs/commons'
+import { ActionType, encodeScope, getUUID } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test(`prevents forbidden access if missing required scope`, async () => {
@@ -27,7 +27,12 @@ test(`prevents forbidden access if missing required scope`, async () => {
 test(`allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'record.declared.archive[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.archive',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   await expect(

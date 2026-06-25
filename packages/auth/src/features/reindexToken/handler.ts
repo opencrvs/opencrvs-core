@@ -8,11 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
 import { createToken } from '@auth/features/authenticate/service'
-import { REINDEX_USER_ID, TokenUserType } from '@opencrvs/commons'
-import { env } from '@auth/environment'
+import * as Hapi from '@hapi/hapi'
+import { encodeScope, REINDEX_USER_ID, TokenUserType } from '@opencrvs/commons'
+import * as Joi from 'joi'
 
 interface IAuthResponse {
   token: string
@@ -24,13 +23,11 @@ export default async function reindexingTokenHandler(
 ): Promise<IAuthResponse> {
   const token = await createToken(
     REINDEX_USER_ID,
-    ['record.reindex'],
+    [encodeScope({ type: 'record.reindex' })],
     ['opencrvs:gateway-user', 'opencrvs:events-user'],
     'opencrvs:auth-service',
     undefined,
-    true,
-    TokenUserType.enum.system,
-    env.CONFIG_REINDEX_TOKEN_EXPIRY_SECONDS
+    TokenUserType.enum.system
   )
   return { token }
 }
