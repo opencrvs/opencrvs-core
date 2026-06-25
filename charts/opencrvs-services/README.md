@@ -701,7 +701,6 @@ Summary:
    apiVersion: v1
    data:
      ES_HOST: dXNlcjpyYW5kb21wYXNzQGVsYXN0aWNzZWFyY2g6OTIwMA==
-   ...
    ```
 4. Map variable in your helm chart `values.yaml` file:
    ```yaml
@@ -709,7 +708,6 @@ Summary:
      secrets:
        elasticsearch-secret:
          - ES_HOST
-   ...
    ```
 5. Redeploy service with `helm upgrade`
 
