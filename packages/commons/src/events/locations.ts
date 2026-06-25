@@ -276,7 +276,7 @@ export function canAccessUserWithScope({
   const hasAdministrativeAreaInHierarchy =
     userToAccess.administrativeHierarchy.some(
       (id) => user.administrativeAreaId === id
-    ) || user.administrativeAreaId === null // user with null administrative area has access to all administrative areas
+    ) || !user.administrativeAreaId // user with no administrative area has access to all administrative areas
 
   if (
     opts?.accessLevel === JurisdictionFilter.enum.administrativeArea &&
