@@ -45,6 +45,14 @@ import { main as fixAcceptRequestedRegistrationFunctionType } from './fix-accept
 const NON_SWARM_INFRA_SUBDIRS = ['postgres', 'metabase']
 
 /**
+ * Top-level subdirectories of `infrastructure/` that non-Swarm deployments
+ * still need (e.g. Postgres init scripts, Metabase config). Everything else
+ * under `infrastructure/` is deleted, and these subdirectories are then
+ * merged with upstream so the country config picks up the v2.0 changes.
+ */
+const NON_SWARM_INFRA_SUBDIRS = ['postgres', 'metabase']
+
+/**
  * Run the upgrade process for the country config in the current working
  * directory.
  *
