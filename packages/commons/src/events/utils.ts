@@ -169,7 +169,7 @@ export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
     return actionConfig.form
   }
 
-  if ('review' in actionConfig) {
+  if ('review' in actionConfig && actionConfig.review != null) {
     return actionConfig.review.fields
   }
 
