@@ -69,7 +69,7 @@ const ReadActionConfig = ActionConfigBase.extend(
   }).shape
 )
 
-const NotifyConfig = DeclarationActionBase.extend(
+const NotifyConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.NOTIFY)
   }).shape
