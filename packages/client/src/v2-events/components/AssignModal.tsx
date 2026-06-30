@@ -22,20 +22,20 @@ export function AssignModal({ close }: { close: (result: boolean) => void }) {
       isOpen
       actions={[
         <Button
-          key="assign-btn"
-          id="assign"
-          type="positive"
-          onClick={() => close(true)}
-        >
-          {intl.formatMessage(buttonMessages.assign)}
-        </Button>,
-        <Button
           key="cancel-btn"
           id="cancel"
           type="tertiary"
           onClick={() => close(false)}
         >
           {intl.formatMessage(buttonMessages.cancel)}
+        </Button>,
+        <Button
+          key="assign-btn"
+          id="assign"
+          type="positive"
+          onClick={() => close(true)}
+        >
+          {intl.formatMessage(buttonMessages.assign)}
         </Button>
       ]}
       id="assignment"
