@@ -12328,11 +12328,45 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionConditional"
+        type:
+          type: string
+          const: NOTIFY
+      required:
+        - label
+        - flags
+        - type
+      additionalProperties: false
+      description: Configuration for the notify action. When present, NOTIFY uses this
+        config independently from DECLARE. When absent, NOTIFY falls back to the
+        DeclareActionConfig.
+    DeclareActionConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the action
+          $ref: "#/components/schemas/TranslationConfigOutput"
+        flags:
+          default: []
+          description: Flag actions which are executed when the action is performed.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation dialog
+          $ref: "#/components/schemas/TranslationConfigOutput"
+        icon:
+          type: string
+          description: Icon representing the action
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionConditional"
         deduplication:
           $ref: "#/components/schemas/DeduplicationConfig"
         type:
           type: string
-          const: NOTIFY
+          const: DECLARE
         review:
           type: object
           properties:
@@ -12349,14 +12383,32 @@ components:
             - fields
           additionalProperties: false
           description: Configuration of the review page fields.
+        dialogCopy:
+          type: object
+          properties:
+            notify:
+              description: Confirmation text for the notify action
+              $ref: "#/components/schemas/TranslationConfigOutput"
+            declare:
+              description: Confirmation text for the declare action
+              $ref: "#/components/schemas/TranslationConfigOutput"
+            register:
+              description: Confirmation text for the register action
+              $ref: "#/components/schemas/TranslationConfigOutput"
+          required:
+            - notify
+            - declare
+            - register
+          additionalProperties: false
       required:
         - label
         - flags
         - type
+        - review
       additionalProperties: false
-      description: Configuration for the notify action. When present, NOTIFY uses this
-        config independently from DECLARE. When absent, NOTIFY falls back to the
-        DeclareActionConfig.
+      description: Configuration for the declare action. Includes review-page fields.
+        NOTIFY falls back to this config when no dedicated NotifyActionConfig is
+        provided.
     DeduplicationConfig:
       type: object
       properties:
@@ -12501,76 +12553,6 @@ components:
             - type
           additionalProperties: false
       type: object
-    DeclareActionConfig:
-      type: object
-      properties:
-        label:
-          description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfigOutput"
-        flags:
-          default: []
-          description: Flag actions which are executed when the action is performed.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
-        icon:
-          type: string
-          description: Icon representing the action
-        conditionals:
-          description: Conditionals which can disable or hide actions.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionConditional"
-        deduplication:
-          $ref: "#/components/schemas/DeduplicationConfig"
-        type:
-          type: string
-          const: DECLARE
-        review:
-          type: object
-          properties:
-            title:
-              description: Title of the review page
-              $ref: "#/components/schemas/TranslationConfigOutput"
-            fields:
-              type: array
-              items:
-                $ref: "#/components/schemas/FieldConfig"
-              description: Fields displayed on the review page for annotations.
-          required:
-            - title
-            - fields
-          additionalProperties: false
-          description: Configuration of the review page fields.
-        dialogCopy:
-          type: object
-          properties:
-            notify:
-              description: Confirmation text for the notify action
-              $ref: "#/components/schemas/TranslationConfigOutput"
-            declare:
-              description: Confirmation text for the declare action
-              $ref: "#/components/schemas/TranslationConfigOutput"
-            register:
-              description: Confirmation text for the register action
-              $ref: "#/components/schemas/TranslationConfigOutput"
-          required:
-            - notify
-            - declare
-            - register
-          additionalProperties: false
-      required:
-        - label
-        - flags
-        - type
-        - review
-      additionalProperties: false
-      description: Configuration for the declare action. Includes review-page fields.
-        NOTIFY falls back to this config when no dedicated NotifyActionConfig is
-        provided.
     RejectActionConfig:
       type: object
       properties:
