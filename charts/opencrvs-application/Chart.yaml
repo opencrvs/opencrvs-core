@@ -6,4 +6,4 @@ description: |
   charts by providing common configurations and templates.
 type: application
 version: v2.0.0
-appVersion: "v2.0.0"
+appVersion: 'v2.0.0'

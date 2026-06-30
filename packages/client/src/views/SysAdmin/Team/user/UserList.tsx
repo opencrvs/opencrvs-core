@@ -29,6 +29,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { ROUTES } from '@client/v2-events/routes'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { getAddressNameV2, UserStatus } from '@client/views/SysAdmin/Team/utils'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useUserFormState } from '@client/views/SysAdmin/Team/user/userEditor/useUserFormState'
 import { Location, User, UUID } from '@opencrvs/commons/client'
 import { Link } from '@opencrvs/components'
@@ -388,6 +389,7 @@ function UserListComponent({ userDetails }: UserListProps) {
           label: intl.formatMessage(messages.editUserDetailsTitle),
           handler: () => {
             useUserFormState.getState().clear()
+            useEventFormData.getState().clear()
             navigate(
               ROUTES.V2.SETTINGS.USER.REVIEW.buildPath(
                 {
@@ -771,6 +773,11 @@ function UserListComponent({ userDetails }: UserListProps) {
    */
   if (!locationId) {
     return <Navigate to={routes.HOME} />
+  }
+
+  // Block access to a location outside the user's jurisdiction
+  if (!parsedId.success || !canAccessOffice({ id: parsedId.data })) {
+    return <Navigate to={routes.HOME} replace />
   }
 
   return (

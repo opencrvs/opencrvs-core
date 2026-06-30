@@ -397,8 +397,11 @@ export function useUsers() {
     changePassword: useMutation(
       trpcOptionsProxy.user.changePassword.mutationOptions()
     ),
-    requestContactChange: useMutation(
-      trpcOptionsProxy.user.requestContactChange.mutationOptions()
+    requestEmailChange: useMutation(
+      trpcOptionsProxy.user.requestEmailChange.mutationOptions()
+    ),
+    requestPhoneChange: useMutation(
+      trpcOptionsProxy.user.requestPhoneChange.mutationOptions()
     ),
     changePhone: useMutation(
       trpcOptionsProxy.user.changePhone.mutationOptions()

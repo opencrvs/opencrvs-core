@@ -178,7 +178,11 @@ export function isLocationUnderJurisdiction({
   const officeAdministrativeAreaId = location?.administrativeAreaId
   const otherLocationAdministrativeAreaId = otherLocation?.administrativeAreaId
 
-  if (!officeAdministrativeAreaId || !otherLocationAdministrativeAreaId) {
+  if (!officeAdministrativeAreaId) {
+    return true
+  }
+
+  if (!otherLocationAdministrativeAreaId) {
     return false
   }
 

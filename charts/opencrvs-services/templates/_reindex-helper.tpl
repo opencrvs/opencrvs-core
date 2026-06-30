@@ -24,6 +24,9 @@
     - name: elasticsearch-assets
       mountPath: /data-assets
 {{- end }}
+{{- define "elasticsearch-reindex.imagePullSecrets" -}}
+{{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.countryconfig) }}
+{{- end }}
 {{- define "elasticsearch-reindex.volumes" -}}
 - name: elasticsearch-assets
   emptyDir: {}

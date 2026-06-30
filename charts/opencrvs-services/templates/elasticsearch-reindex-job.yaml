@@ -15,6 +15,7 @@ spec:
       labels:
         app: elasticsearch-reindex
     spec:
+      {{- include "elasticsearch-reindex.imagePullSecrets" . | nindent 6 }}
       initContainers:
       {{- include "elasticsearch-reindex.initContainerSpec" . | nindent 8 }}
       containers:
