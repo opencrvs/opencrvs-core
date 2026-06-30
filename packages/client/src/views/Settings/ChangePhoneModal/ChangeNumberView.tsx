@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import * as React from 'react'
 import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
@@ -94,9 +94,9 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
   }, [show])
 
   return (
-    <ResponsiveModal
+    <Dialog
       id="ChangePhoneNumberModal"
-      show={show}
+      isOpen={show}
       title={intl.formatMessage(messages.changePhoneLabel)}
       actions={[
         <TertiaryButton key="cancel" id="modal_cancel" onClick={onClose}>
@@ -119,9 +119,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
           {intl.formatMessage(buttonMessages.continueButton)}
         </PrimaryButton>
       ]}
-      handleClose={onClose}
-      contentHeight={150}
-      contentScrollableY={true}
+      onClose={onClose}
     >
       <InputField
         id="phoneNumber"
@@ -175,6 +173,6 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
           {intl.formatMessage(errorMessages.unknownErrorTitle)}
         </Toast>
       )}
-    </ResponsiveModal>
+    </Dialog>
   )
 }

@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { ResponsiveModal, Button } from '@opencrvs/components'
+import { Dialog, Button } from '@opencrvs/components'
 import { buttonMessages } from '@client/i18n/messages'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 
@@ -18,10 +18,8 @@ export function AssignModal({ close }: { close: (result: boolean) => void }) {
   const intl = useIntl()
 
   return (
-    <ResponsiveModal
-      autoHeight
-      preventClickOnParent
-      show
+    <Dialog
+      isOpen
       actions={[
         <Button
           key="assign-btn"
@@ -40,12 +38,11 @@ export function AssignModal({ close }: { close: (result: boolean) => void }) {
           {intl.formatMessage(buttonMessages.cancel)}
         </Button>
       ]}
-      handleClose={() => close(false)}
       id="assignment"
-      responsive={false}
       title={intl.formatMessage(conflictsMessages.assignTitle)}
+      onClose={() => close(false)}
     >
       {intl.formatMessage(conflictsMessages.assignDesc)}
-    </ResponsiveModal>
+    </Dialog>
   )
 }

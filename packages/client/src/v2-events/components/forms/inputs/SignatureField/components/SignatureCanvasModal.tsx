@@ -13,7 +13,7 @@ import { useState } from 'react'
 import { useIntl } from 'react-intl'
 import * as React from 'react'
 import styled from 'styled-components'
-import { ResponsiveModal } from '@opencrvs/components'
+import { Dialog } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages } from '@client/i18n/messages'
@@ -25,6 +25,7 @@ const SignatureDescription = styled.p`
   margin-top: 0;
   ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.grey500};
+  padding-bottom: 24px;
 `
 
 interface SignatureInputModalProps {
@@ -44,7 +45,8 @@ export function SignatureCanvasModal({
   const [signature, setSignature] = useState<string | undefined>(undefined)
 
   return (
-    <ResponsiveModal
+    <Dialog
+      isOpen
       actions={[
         <Button
           key="cancel"
@@ -70,13 +72,11 @@ export function SignatureCanvasModal({
           {intl.formatMessage(buttonMessages.apply)}
         </Button>
       ]}
-      autoHeight={true}
-      handleClose={onClose}
       id={`${id}_modal`}
-      show={true}
       title={title}
-      titleHeightAuto={true}
+      variant="large"
       width={600}
+      onClose={onClose}
     >
       <SignatureDescription>
         {intl.formatMessage(messages.signatureInputDescription)}
@@ -87,6 +87,6 @@ export function SignatureCanvasModal({
           setSignature(base64Src)
         }}
       />
-    </ResponsiveModal>
+    </Dialog>
   )
 }

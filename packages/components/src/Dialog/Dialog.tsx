@@ -18,7 +18,7 @@ export interface IDialogProps {
   id?: string
   titleIcon?: React.ReactNode
   title: string
-  isOpen: boolean
+  isOpen?: boolean
   children?: React.ReactNode
   actions: JSX.Element[]
   onClose?: () => void
@@ -85,9 +85,15 @@ const DialogTitle = styled.div`
 `
 
 const DialogContent = styled.div`
+  ${({ theme }) => theme.fonts.reg16};
+  color: ${({ theme }) => theme.colors.supportingCopy};
   padding: 24px 32px;
   flex-grow: 1;
   overflow-y: auto;
+  text-align: left;
+  text-wrap: wrap;
+  display: flex;
+  flex-direction: column;
 `
 
 const DialogFooter = styled.div`
@@ -103,7 +109,7 @@ export function Dialog({
   id,
   title,
   onClose,
-  isOpen,
+  isOpen = true,
   children,
   actions,
   variant = 'small',

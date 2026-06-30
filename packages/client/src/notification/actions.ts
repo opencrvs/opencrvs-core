@@ -21,7 +21,6 @@ export const CONFIGURATION_ERROR = 'FORM_VALIDATION_ERROR'
 
 export const SHOW_CONFIG_ERROR = 'SHOW_CONFIG_ERROR'
 export const HIDE_CONFIG_ERROR = 'HIDE_CONFIG_ERROR'
-export const SESSION_EXPIRED = 'AUTH/SESSION_EXPIRED'
 export const TOGGLE_DRAFT_SAVED_NOTIFICATION = 'TOGGLE_DRAFT_SAVED_NOTIFICATION'
 
 export const SHOW_SUBMIT_FORM_SUCCESS_TOAST = 'SUBMIT_FORM_SUCCESS_TOAST'
@@ -173,10 +172,6 @@ type HideUserReconnectedToastAction = {
   type: typeof HIDE_USER_RECONNECTED_TOAST
 }
 
-type SessionExpiredAction = {
-  type: typeof SESSION_EXPIRED
-}
-
 export interface ShowUnassignedPayload extends Record<string, string> {
   trackingId: string
 }
@@ -201,10 +196,6 @@ export const showUserReconnectedToast = (): ShowUserReconnectedToastAction => ({
 
 export const hideUserReconnectedToast = (): HideUserReconnectedToastAction => ({
   type: HIDE_USER_RECONNECTED_TOAST
-})
-
-export const showSessionExpireConfirmation = (): SessionExpiredAction => ({
-  type: SESSION_EXPIRED
 })
 
 export const showSubmitFormSuccessToast = (
@@ -314,7 +305,6 @@ export const toggleEmailAllUsersFeedbackToast = (
 })
 
 export type Action =
-  | SessionExpiredAction
   | ConfigurationErrorAction
   | ShowConfigurationErrorAction
   | HideConfigurationErrorAction

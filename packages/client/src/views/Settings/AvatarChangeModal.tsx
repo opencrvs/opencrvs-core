@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { useIntl } from 'react-intl'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
 import {
@@ -213,11 +213,11 @@ function AvatarChangeModalComp({
   }
 
   return (
-    <ResponsiveModal
+    <Dialog
       id="ChangeAvatarModal"
+      variant="large"
       width={1080}
-      autoHeight
-      show={showChangeAvatar}
+      isOpen={showChangeAvatar}
       title={intl.formatMessage(messages.changeAvatar)}
       actions={[
         <TertiaryButton key="cancel" id="modal_cancel" onClick={handleCancel}>
@@ -232,7 +232,7 @@ function AvatarChangeModalComp({
           {intl.formatMessage(buttonMessages.apply)}
         </PrimaryButton>
       ]}
-      handleClose={handleCancel}
+      onClose={handleCancel}
     >
       <Description>
         {!error && intl.formatMessage(messages.resizeAvatar)}
@@ -280,7 +280,7 @@ function AvatarChangeModalComp({
           />
         </>
       )}
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 
