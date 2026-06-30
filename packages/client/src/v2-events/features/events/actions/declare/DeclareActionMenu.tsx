@@ -19,7 +19,8 @@ import {
   getCurrentEventState,
   getActionReview,
   getAvailableActionsForEvent,
-  getActionConfig
+  getActionConfig,
+  isValidIcon
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
@@ -81,6 +82,11 @@ function useDeclarationActions(event: EventDocument) {
     actionType: ActionType.DECLARE
   })
 
+  const notifyActionConfig = getActionConfig({
+    eventConfiguration,
+    actionType: ActionType.NOTIFY
+  })
+
   const dialogCopy =
     actionConfig && 'dialogCopy' in actionConfig
       ? actionConfig.dialogCopy
@@ -89,7 +95,7 @@ function useDeclarationActions(event: EventDocument) {
   const actions = {
     [ActionType.NOTIFY]: {
       mutate: events.actions.notify.mutate,
-      supportingCopy: dialogCopy?.notify,
+      supportingCopy: notifyActionConfig?.supportingCopy ?? dialogCopy?.notify,
       title: {
         id: 'review.declare.incomplete.confirmModal.title',
         defaultMessage: 'Notify the {event}?',
@@ -193,7 +199,9 @@ function useDeclarationActions(event: EventDocument) {
         disabled: hasValidationErrors
       },
       {
-        icon: actionIcons[ActionType.DECLARE],
+        icon: isValidIcon(notifyActionConfig?.icon)
+          ? notifyActionConfig.icon
+          : actionIcons[ActionType.DECLARE],
         label: actionLabels[ActionType.NOTIFY],
         onClick: async () => handleDeclaration(ActionType.NOTIFY),
         hidden:
