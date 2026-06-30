@@ -17,10 +17,6 @@
       "Bash(wget:*)",
       "Bash(sudo:*)",
       "Bash(ssh:*)"
-    ],
-    "ask": [
-      "Write(**)",
-      "Edit(**)"
     ]
   }
 }
