@@ -82,6 +82,7 @@ const DialogTitle = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
+  height: 40px;
 `
 
 const DialogContent = styled.div`
@@ -154,14 +155,16 @@ export function Dialog({
                   {title}
                 </Text>
               </DialogTitle>
-              <Button
-                data-testid="close-dialog"
-                type="icon"
-                size="medium"
-                onClick={handleClose}
-              >
-                <Icon name="X" size="large" weight="bold" />
-              </Button>
+              {onClose && (
+                <Button
+                  data-testid="close-dialog"
+                  type="icon"
+                  size="medium"
+                  onClick={handleClose}
+                >
+                  <Icon name="X" size="large" weight="bold" />
+                </Button>
+              )}
             </DialogHeader>
             <DialogContent>{children}</DialogContent>
             {hasActions && <DialogFooter>{actions}</DialogFooter>}
