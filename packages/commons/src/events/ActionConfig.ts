@@ -71,10 +71,7 @@ const ReadActionConfig = ActionConfigBase.extend(
 
 const NotifyConfig = DeclarationActionBase.extend(
   z.object({
-    type: z.literal(ActionType.NOTIFY),
-    review: DeclarationReviewConfig.describe(
-      'Configuration of the review page fields.'
-    ).optional()
+    type: z.literal(ActionType.NOTIFY)
   }).shape
 )
 

@@ -143,9 +143,9 @@ export function getAnnotationComparisonForField(
 }
 
 function getReviewForm(configuration: EventConfig) {
-  return configuration.actions.flatMap((action) =>
-    'review' in action && action.review != null ? [action.review] : []
-  )
+  return configuration.actions
+    .filter((action) => 'review' in action)
+    .map((action) => action.review)
 }
 
 export function getReviewFormFields(configuration: EventConfig) {
