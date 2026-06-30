@@ -202,9 +202,9 @@ describe('audit log', () => {
   })
 
   describe('integrations.create', () => {
-    test('writes an audit log entry when a system client creates an integration', async () => {
-      const systemId = TEST_SYSTEM_ID
-      const client = createSystemTestClient(systemId, [
+    test('writes an audit log entry when a user creates an integration', async () => {
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [
         encodeScope({ type: 'integration.create' })
       ])
 
@@ -217,7 +217,7 @@ describe('audit log', () => {
       const logs = await db
         .selectFrom('auditLog')
         .selectAll()
-        .where('clientId', '=', systemId)
+        .where('clientId', '=', user.id)
         .execute()
 
       expect(logs).toHaveLength(1)
@@ -232,8 +232,8 @@ describe('audit log', () => {
     })
 
     test('does not include credentials in audit log response summary', async () => {
-      const systemId = TEST_SYSTEM_ID
-      const client = createSystemTestClient(systemId, [
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [
         encodeScope({ type: 'integration.create' })
       ])
 
@@ -246,7 +246,7 @@ describe('audit log', () => {
       const logs = await db
         .selectFrom('auditLog')
         .selectAll()
-        .where('clientId', '=', systemId)
+        .where('clientId', '=', user.id)
         .execute()
 
       expect(logs[0].responseSummary).not.toHaveProperty('shaSecret')

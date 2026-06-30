@@ -4,7 +4,7 @@
 
 
 -- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
--- Dumped by pg_dump version 17.6 (Debian 17.6-1.pgdg13+1)
+-- Dumped by pg_dump version 17.6 (Debian 17.6-2.pgdg13+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -26,6 +26,34 @@ CREATE SCHEMA app;
 
 
 ALTER SCHEMA app OWNER TO events_migrator;
+
+--
+-- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
+
+
+--
+-- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
+
 
 --
 -- Name: action_status; Type: TYPE; Schema: app; Owner: events_migrator
@@ -337,7 +365,7 @@ CREATE TABLE app.system_clients (
     legacy_id text,
     name text NOT NULL,
     scopes jsonb DEFAULT '[]'::jsonb NOT NULL,
-    created_by text NOT NULL,
+    created_by uuid NOT NULL,
     secret_hash text NOT NULL,
     salt text NOT NULL,
     sha_secret text NOT NULL,
@@ -762,6 +790,14 @@ ALTER TABLE ONLY app.event_actions
 
 ALTER TABLE ONLY app.event_actions
     ADD CONSTRAINT event_actions_original_action_id_fkey FOREIGN KEY (original_action_id) REFERENCES app.event_actions(id);
+
+
+--
+-- Name: system_clients fk_system_clients_created_by; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.system_clients
+    ADD CONSTRAINT fk_system_clients_created_by FOREIGN KEY (created_by) REFERENCES app.users(id);
 
 
 --
