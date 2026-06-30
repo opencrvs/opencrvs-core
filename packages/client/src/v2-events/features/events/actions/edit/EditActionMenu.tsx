@@ -234,38 +234,6 @@ function useEditActions(event: EventDocument) {
     actions: [
       {
         icon: actionIcons[ActionType.EDIT],
-        label: messages.editAndRegisterLabel,
-        onClick: async () => {
-          const { confirmed, comment } = await openModal<EditActionModalResult>(
-            (close) => {
-              return (
-                <EditActionModal
-                  close={close}
-                  supportingCopy={dialogCopy?.register}
-                  title={messages.editAndRegisterLabel}
-                />
-              )
-            }
-          )
-
-          if (confirmed) {
-            events.customActions.editAndRegister.mutate({
-              eventId: event.id,
-              transactionId: getUUID(),
-              declaration: declarationDiff,
-              annotation,
-              content: { comment }
-            })
-
-            closeActionView(backTo)
-          }
-        },
-        disabled:
-          hasValidationErrors || !anyValuesHaveChanged || !canDirectlyRegister,
-        hidden: !isActionAllowed(ActionType.REGISTER)
-      },
-      {
-        icon: actionIcons[ActionType.EDIT],
         label: messages.editAndDeclareLabel,
         onClick: async () => {
           const { confirmed, comment } = await openModal<EditActionModalResult>(
