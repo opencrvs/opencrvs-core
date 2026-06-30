@@ -140,7 +140,7 @@ export function Dialog({
   return (
     <>
       {isOpen && (
-        <DialogWrapper onClick={handleClickOutside}>
+        <DialogWrapper onClick={handleClickOutside} data-testid={id}>
           <DialogContainer
             id={id}
             width={width}
