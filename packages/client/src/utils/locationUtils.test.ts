@@ -229,6 +229,61 @@ describe('isLocationUnderJurisdiction', () => {
       })
     ).toEqual(false)
   })
+
+  // A location without an administrative area is treated as the root: every
+  // other location falls under its jurisdiction.
+  it('returns true if the reference location has no administrative area (root jurisdiction)', () => {
+    const rootLocationId = UUID.parse('00000000-0000-4000-8000-000000000000')
+    const otherLocationId = UUID.parse(
+      V2_DEFAULT_MOCK_LOCATIONS.find((l) => l.name === 'Ibombo District Office')
+        ?.id
+    )
+    const locations = new Map(V2_DEFAULT_MOCK_LOCATIONS_MAP)
+    locations.set(rootLocationId, {
+      id: rootLocationId,
+      name: 'Root Office',
+      locationType: 'CRVS_OFFICE',
+      administrativeAreaId: null,
+      validUntil: null
+    })
+
+    expect(
+      isLocationUnderJurisdiction({
+        locationId: rootLocationId,
+        otherLocationId,
+        locations,
+        administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+      })
+    ).toEqual(true)
+  })
+
+  // The reference location has a jurisdiction, but the other location has no
+  // administrative area, so it cannot fall under that jurisdiction.
+  it('returns false if the other location has no administrative area', () => {
+    const locationId = UUID.parse(
+      V2_DEFAULT_MOCK_LOCATIONS.find(
+        (l) => l.name === 'Central Provincial Office'
+      )?.id
+    )
+    const otherLocationId = UUID.parse('11111111-1111-4111-8111-111111111111')
+    const locations = new Map(V2_DEFAULT_MOCK_LOCATIONS_MAP)
+    locations.set(otherLocationId, {
+      id: otherLocationId,
+      name: 'Floating Office',
+      locationType: 'CRVS_OFFICE',
+      administrativeAreaId: null,
+      validUntil: null
+    })
+
+    expect(
+      isLocationUnderJurisdiction({
+        locationId,
+        otherLocationId,
+        locations,
+        administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+      })
+    ).toEqual(false)
+  })
 })
 
 describe('createSearchOptions', () => {

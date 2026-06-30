@@ -11,7 +11,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fireEvent, userEvent, within } from '@storybook/test'
+import { expect, fireEvent, fn, userEvent, within } from '@storybook/test'
 import React, { useRef } from 'react'
 import styled from 'styled-components'
 import { noop } from 'lodash'
@@ -21,9 +21,13 @@ import {
   FieldType,
   not,
   FieldConfig,
+  EventConfig,
   EventState,
-  generateTranslationConfig
+  generateTranslationConfig,
+  tennisClubMembershipEvent,
+  ActionStatus
 } from '@opencrvs/commons/client'
+import type { EventDocument, UUID } from '@opencrvs/commons/client'
 
 import {
   FormFieldGenerator,
@@ -32,7 +36,10 @@ import {
 } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormWizard } from '@client/v2-events/features/events/components/FormWizard'
-import { withValidatorContext } from '../../../../../.storybook/decorators'
+import {
+  getTestValidatorContext,
+  withValidatorContext
+} from '../../../../../.storybook/decorators'
 
 const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'FormFieldGenerator/Interaction',
@@ -625,6 +632,274 @@ export const HiddenListenerDefaultNotPropagated: Story = {
   }
 }
 
+// Fields modelling the informant.relation → idType → nid pattern from issue #12638.
+// person.nid is a listener of person.relation (reset on parent change) and is
+// conditionally shown only when idType == NATIONAL_ID.
+// person.notes is a bystander: it hides when relation == FATHER but is NOT a listener,
+// so it should still be cached and restored by the hidden-value cache.
+const listenerHiddenCacheFields = [
+  {
+    id: 'person.relation',
+    type: FieldType.SELECT,
+    required: true,
+    label: generateTranslationConfig('Relation'),
+    options: [
+      { label: generateTranslationConfig('Mother'), value: 'MOTHER' },
+      { label: generateTranslationConfig('Father'), value: 'FATHER' }
+    ]
+  },
+  {
+    id: 'person.idType',
+    type: FieldType.SELECT,
+    required: true,
+    label: generateTranslationConfig('Form of ID'),
+    parent: field('person.relation'),
+    options: [
+      { label: generateTranslationConfig('National ID'), value: 'NATIONAL_ID' },
+      { label: generateTranslationConfig('Passport'), value: 'PASSPORT' }
+    ]
+  },
+  {
+    id: 'person.nid',
+    type: FieldType.TEXT,
+    label: generateTranslationConfig('National ID no.'),
+    parent: field('person.relation'),
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: field('person.idType').isEqualTo('NATIONAL_ID')
+      }
+    ]
+  },
+  {
+    id: 'person.notes',
+    type: FieldType.TEXT,
+    label: generateTranslationConfig('Notes'),
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: field('person.relation').isEqualTo('MOTHER')
+      }
+    ]
+  }
+] satisfies FieldConfig[]
+
+/**
+ * Regression test for issue #12638.
+ * When a parent field changes, its listener fields are reset and must NOT be
+ * restored from the hidden-value cache when they become visible again.
+ * Bystander fields that merely hide conditionally (but are not listeners) must
+ * still be cached and restored as normal.
+ */
+export const ListenerFieldNotRestoredFromCacheAfterParentReset: Story = {
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={listenerHiddenCacheFields}
+        formValues={{
+          'person.relation': 'MOTHER',
+          'person.idType': 'NATIONAL_ID',
+          'person.nid': '12345678',
+          'person.notes': 'some note'
+        }}
+        id="my-form"
+      />
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Renders with initial values', async () => {
+      await expect(
+        await canvas.findByTestId('text__person____nid')
+      ).toHaveValue('12345678')
+      await expect(
+        await canvas.findByTestId('text__person____notes')
+      ).toHaveValue('some note')
+    })
+
+    await step(
+      'Change relation to Father — resets listeners, hides nid and notes',
+      async () => {
+        await userEvent.click(await canvas.findByText('Mother'))
+        await userEvent.click(await canvas.findByText('Father'))
+      }
+    )
+
+    await step('Re-select National ID as Form of ID', async () => {
+      await userEvent.click(
+        await canvas.findByTestId('select__person____idType')
+      )
+      await userEvent.click(await canvas.findByText('National ID'))
+    })
+
+    await step('NID field is empty — not restored from cache', async () => {
+      await expect(
+        await canvas.findByTestId('text__person____nid')
+      ).toHaveValue('')
+    })
+
+    await step(
+      'Change relation back to Mother — notes should restore',
+      async () => {
+        await userEvent.click(await canvas.findByText('Father'))
+        await userEvent.click(await canvas.findByText('Mother'))
+      }
+    )
+
+    await step(
+      'Notes field restores cached value — bystander cache is intact',
+      async () => {
+        await expect(
+          await canvas.findByTestId('text__person____notes')
+        ).toHaveValue('some note')
+      }
+    )
+  }
+}
+
+const nixConditionalFields = [
+  {
+    id: 'form.verified',
+    type: FieldType.CHECKBOX,
+    required: false,
+    defaultValue: false,
+    label: generateTranslationConfig('Verified')
+  },
+  {
+    id: 'form.nid',
+    type: FieldType.TEXT,
+    label: generateTranslationConfig('NID'),
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: not(field('form.verified').isEqualTo(true))
+      }
+    ]
+  }
+] satisfies FieldConfig[]
+
+// EventConfig with nixConditionalFields in declaration so omitHiddenPaginatedFields
+// can correctly evaluate form.nid / form.verified visibility.
+const nixEventConfig: EventConfig = {
+  ...tennisClubMembershipEvent,
+  declaration: {
+    ...tennisClubMembershipEvent.declaration,
+    pages: [
+      {
+        id: 'nid-test-page',
+        title: generateTranslationConfig('NID page'),
+        fields: nixConditionalFields,
+        requireCompletionToContinue: false,
+        type: 'FORM' as const
+      }
+    ]
+  }
+}
+
+const BASE_DECL_EVENT_ID = 'a1b2c3d4-e5f6-7890-abcd-ef0123456789' as UUID
+
+const mockEventWithNid: EventDocument = {
+  type: tennisClubMembershipEvent.id,
+  id: BASE_DECL_EVENT_ID,
+  trackingId: 'NIDTEST',
+  createdAt: '2025-01-01T00:00:00.000Z',
+  updatedAt: '2025-01-01T00:00:01.000Z',
+  actions: [
+    {
+      id: '00000000-0000-0000-0000-aaaaaaaaaaaa' as UUID,
+      type: 'CREATE' as const,
+      status: ActionStatus.Accepted,
+      createdAt: '2025-01-01T00:00:00.000Z',
+      createdByUserType: 'user',
+      createdBy: '00000000-0000-0000-0000-000000000001' as UUID,
+      createdByRole: 'LOCAL_REGISTRAR',
+      createdAtLocation: '00000000-0000-0000-0000-000000000002' as UUID,
+      declaration: {},
+      transactionId: 'txn-nid-create-0000001'
+    },
+    {
+      id: '00000000-0000-0000-0000-bbbbbbbbbbbb' as UUID,
+      type: 'DECLARE' as const,
+      status: ActionStatus.Accepted,
+      createdAt: '2025-01-01T00:00:01.000Z',
+      createdByUserType: 'user',
+      createdBy: '00000000-0000-0000-0000-000000000001' as UUID,
+      createdByRole: 'LOCAL_REGISTRAR',
+      createdAtLocation: '00000000-0000-0000-0000-000000000002' as UUID,
+      declaration: { 'form.nid': '12345' },
+      transactionId: 'txn-nid-declare-0000002'
+    }
+  ]
+}
+
+const onFormChangeSpy = fn<(values: EventState) => void>()
+
+/**
+ * Regression test for the bug where hidden fields were not set to null after an OAuth
+ * redirect (e-Signet/MOSIP). After the redirect, Zustand (ocrvsFullForm) is wiped, so
+ * applyVisibilityTransitions found no previous field values and never detected
+ * visible→hidden transitions. The fix reads committed server state (baseDeclaration) from
+ * the TanStack Query cache as the reference point.
+ */
+export const NullsHiddenFieldUsingServerState: Story = {
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true },
+    offline: {
+      events: [mockEventWithNid]
+    },
+    reactRouter: {
+      router: {
+        path: '/event/:eventId',
+        element: (
+          <StyledFormFieldGenerator
+            eventConfig={nixEventConfig}
+            fields={nixConditionalFields}
+            formValues={{}}
+            id="nid-oauth-form"
+            validatorContext={getTestValidatorContext()}
+            onFormChange={onFormChangeSpy}
+          />
+        )
+      },
+      initialPath: `/event/${BASE_DECL_EVENT_ID}`
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'NID field is visible and empty (formValues is {} simulating post-OAuth)',
+      async () => {
+        await expect(
+          await canvas.findByTestId('text__form____nid')
+        ).toHaveValue('')
+      }
+    )
+
+    await step(
+      'Checking Verified hides NID and sends null for it via onFormChange',
+      async () => {
+        await fireEvent.click(await canvas.findByText('Verified'))
+
+        await expect(
+          canvas.queryByTestId('text__form____nid')
+        ).not.toBeInTheDocument()
+
+        await expect(onFormChangeSpy).toHaveBeenCalledWith(
+          expect.objectContaining({ 'form.nid': null })
+        )
+      }
+    )
+  }
+}
+
 export const CustomRequiredValidationMessage: Story = {
   name: 'Custom required validation message',
   parameters: {
@@ -717,6 +992,153 @@ export const TrimsWhitespaceOnSubmit: Story = {
         )
         await userEvent.click(await canvas.findByText('Name'))
         await canvas.findByText('Required')
+      }
+    )
+  }
+}
+
+// Minimal field set mimicking the MOSIP / E-Signet authenticated-informant scenario.
+// informant.http-fetch (HTTP type) holds MOSIP response data and is a listener of
+// informant.relation. informant.verified/name/dob read from http-fetch via their
+// `value` expressions and are listeners of both http-fetch and relation.
+//
+// When informant.relation changes:
+//   1. http-fetch resets (now interactive — HTTP removed from NonInteractiveFieldType)
+//   2. verified/name/dob re-evaluate resolveSyncedFieldValue → see null http-fetch → undefined
+//   3. applyVisibilityTransitions sweep converts undefined → null for fields that had prior values
+//
+// The HTTP trigger points at a field not present in this minimal set so the fetch
+// never fires automatically — the initial formValues simulate a completed MOSIP auth.
+const mosipLikeFields = [
+  {
+    id: 'informant.relation',
+    type: FieldType.SELECT,
+    label: generateTranslationConfig('Informant type'),
+    options: [
+      { label: generateTranslationConfig('Mother'), value: 'MOTHER' },
+      { label: generateTranslationConfig('Father'), value: 'FATHER' }
+    ]
+  },
+  {
+    id: 'informant.http-fetch',
+    type: FieldType.HTTP,
+    label: generateTranslationConfig('Identity fetch'),
+    parent: field('informant.relation'),
+    configuration: {
+      trigger: field('informant.query-params'),
+      url: 'http://localhost/noop',
+      method: 'GET' as const,
+      timeout: 0
+    }
+  },
+  {
+    id: 'informant.verified',
+    type: FieldType.TEXT,
+    label: generateTranslationConfig('Identity status'),
+    parent: [field('informant.http-fetch'), field('informant.relation')],
+    value: field('informant.http-fetch').get('data.verificationStatus')
+  },
+  {
+    id: 'informant.name',
+    type: FieldType.TEXT,
+    label: generateTranslationConfig('Full name'),
+    parent: [field('informant.http-fetch'), field('informant.relation')],
+    value: field('informant.http-fetch').get('data.name')
+  },
+  {
+    id: 'informant.dob',
+    type: FieldType.TEXT,
+    label: generateTranslationConfig('Date of birth'),
+    parent: [field('informant.http-fetch'), field('informant.relation')],
+    value: field('informant.http-fetch').get('data.dob')
+  }
+] satisfies FieldConfig[]
+
+const mosipEventConfig: EventConfig = {
+  ...tennisClubMembershipEvent,
+  declaration: {
+    ...tennisClubMembershipEvent.declaration,
+    pages: [
+      {
+        id: 'mosip-test-page',
+        title: generateTranslationConfig('MOSIP test page'),
+        fields: mosipLikeFields,
+        requireCompletionToContinue: false,
+        type: 'FORM' as const
+      }
+    ]
+  }
+}
+
+/**
+ * Regression test for issue #12638 (MOSIP case): changing informant type after
+ * E-Signet authentication must clear the PII fields populated from the MOSIP response,
+ * not re-apply them from stale HTTP data.
+ *
+ * The fix removes HttpField from NonInteractiveFieldType so the HTTP fetch field
+ * participates in the listener reset loop and clears when its parent changes.
+ * The visible-reset sweep in applyVisibilityTransitions then converts the resulting
+ * undefined values to null so Formik renders controlled empty inputs.
+ */
+export const MosipFieldsClearedOnInformantTypeChange: Story = {
+  name: 'MOSIP-populated fields clear when informant type changes',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        eventConfig={mosipEventConfig}
+        fields={mosipLikeFields}
+        formValues={{
+          'informant.relation': 'MOTHER',
+          'informant.http-fetch': {
+            data: {
+              name: 'Mary Smith',
+              dob: '1990-01-01',
+              verificationStatus: 'authenticated'
+            }
+          },
+          'informant.verified': 'authenticated',
+          'informant.name': 'Mary Smith',
+          'informant.dob': '1990-01-01'
+        }}
+        id="mosip-form"
+      />
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Renders with MOSIP-authenticated initial values', async () => {
+      await expect(
+        await canvas.findByTestId('text__informant____verified')
+      ).toHaveValue('authenticated')
+      await expect(
+        await canvas.findByTestId('text__informant____name')
+      ).toHaveValue('Mary Smith')
+      await expect(
+        await canvas.findByTestId('text__informant____dob')
+      ).toHaveValue('1990-01-01')
+    })
+
+    await step(
+      'Changing informant type clears MOSIP-populated fields',
+      async () => {
+        await userEvent.click(await canvas.findByText('Mother'))
+        await userEvent.click(await canvas.findByText('Father'))
+
+        await expect(
+          await canvas.findByTestId('text__informant____verified')
+        ).toHaveValue('')
+        await expect(
+          await canvas.findByTestId('text__informant____name')
+        ).toHaveValue('')
+        await expect(
+          await canvas.findByTestId('text__informant____dob')
+        ).toHaveValue('')
       }
     )
   }

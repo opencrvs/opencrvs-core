@@ -14,7 +14,8 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { userEvent, within, expect, waitFor } from '@storybook/test'
+import { userEvent, within, expect, waitFor, screen } from '@storybook/test'
+import { toast } from 'react-hot-toast'
 import {
   ActionType,
   tennisClubMembershipEvent,
@@ -29,6 +30,7 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
+import { eventConfigWithPrintButton } from '../edit/Review.interaction.stories'
 import { setEventData, addLocalEventConfig } from '../../useEvents/api'
 import { ActionDocument } from '../../../../../../../commons/build/dist/common/client'
 import { ReviewIndex } from './Review'
@@ -640,6 +642,9 @@ export const MobileReviewShowsActionMenuAndExitsUndeclaredDraft: Story = {
 
 export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
   beforeEach: () => {
+    // Clear any toast left over from a previous story so this test only
+    // asserts on toasts raised by its own play function.
+    toast.remove()
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
@@ -709,8 +714,13 @@ export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
     })
 
     await step('Toast is shown with duplicate detected message', async () => {
-      await canvas.findByText(
-        '111111 is a potential duplicate. Record is ready for review.'
+      // The toast renders via the global Toaster, which may live outside the
+      // story canvas (e.g. after the register flow navigates), so query the
+      // whole document rather than the canvas.
+      await screen.findByText(
+        '111111 is a potential duplicate. Record is ready for review.',
+        undefined,
+        { timeout: 10000 }
       )
     })
   }
@@ -718,6 +728,9 @@ export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
 
 export const ShowToastOnDuplicateDetectedOnRegister: Story = {
   beforeEach: () => {
+    // Clear any toast left over from a previous story so this test only
+    // asserts on toasts raised by its own play function.
+    toast.remove()
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
@@ -751,18 +764,15 @@ export const ShowToastOnDuplicateDetectedOnRegister: Story = {
           tRPCMsw.event.get.query(() => {
             return eventDocument
           }),
-          tRPCMsw.event.actions.declare.request.mutation((action) => {
-            return {
-              ...eventDocument,
-              actions: [...eventDocument.actions, action] as ActionDocument[]
-            }
-          }),
-          tRPCMsw.event.actions.register.request.mutation((action) => {
+          tRPCMsw.event.actions.declare.request.mutation(() => {
             return {
               ...eventDocument,
               actions: [
                 ...eventDocument.actions,
-                action,
+                generateActionDocument({
+                  configuration: tennisClubMembershipEvent,
+                  action: ActionType.DECLARE
+                }),
                 generateActionDocument({
                   configuration: tennisClubMembershipEvent,
                   action: ActionType.DUPLICATE_DETECTED,
@@ -793,9 +803,48 @@ export const ShowToastOnDuplicateDetectedOnRegister: Story = {
     })
 
     await step('Toast is shown with duplicate detected message', async () => {
-      await canvas.findByText(
-        '111111 is a potential duplicate. Record is ready for review.'
+      // The toast renders via the global Toaster, which may live outside the
+      // story canvas (e.g. after the register flow navigates), so query the
+      // whole document rather than the canvas.
+      await screen.findByText(
+        '111111 is a potential duplicate. Record is ready for review.',
+        undefined,
+        { timeout: 10000 }
       )
     })
+  }
+}
+
+export const AlphaPrintButtonShownWhenDeclaringFromScratch: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: createdEventDocument.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    test: {
+      dangerouslyIgnoreUnhandledErrors: true
+    },
+    offline: {
+      events: [createdEventDocument],
+      configs: [eventConfigWithPrintButton]
+    },
+    msw: {
+      handlers: {
+        drafts: declarationTrpcMsw.drafts.handlers,
+        events: declarationTrpcMsw.events.handlers
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    await step(
+      'Print button is visible when a registrar creates a declaration from scratch',
+      async () => {
+        const canvas = within(canvasElement)
+        await canvas.findByText('Print')
+      }
+    )
   }
 }

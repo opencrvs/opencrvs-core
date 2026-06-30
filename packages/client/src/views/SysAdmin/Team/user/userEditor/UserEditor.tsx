@@ -16,6 +16,7 @@ import * as routes from '@client/navigation/routes'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useRoles } from '@client/v2-events/hooks/useRoles'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { ROUTES } from '@client/v2-events/routes/routes'
 import {
   FieldValue,
@@ -52,6 +53,8 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import toast from 'react-hot-toast'
+import { showToast } from '@client/v2-events/features/events/useToastAndRedirect'
+import { messages as notificationMessages } from '@client/i18n/messages/views/notifications'
 import { useUserEditConfig } from '@client/hooks/useUserEditConfig'
 import { useUserFormState } from './useUserFormState'
 
@@ -149,6 +152,7 @@ const CreateNewUserComponent = () => {
   const { clear, setUserForm } = useUserFormState()
   useEffect(() => {
     clear()
+    useEventFormData.getState().clear()
     setUserForm({ primaryOfficeId: officeId })
     navigate(
       ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
@@ -335,6 +339,11 @@ const ReviewUserComponent = () => {
     updateUserMutation.mutate(payload, {
       onSuccess: (data) => {
         clear()
+        showToast({
+          message: notificationMessages.userFormUpdateSuccess,
+          toastType: 'success',
+          toastId: 'user-update-success'
+        })
         navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId: data.id }))
       },
       onError: handleMutationError
@@ -403,6 +412,12 @@ const ReviewUserComponent = () => {
         return
       }
     }
+
+    showToast({
+      message: notificationMessages.userFormFail,
+      toastType: 'error',
+      toastId: 'user-form-error'
+    })
   }
 
   const handleClose = useCloseUserForm({
@@ -558,6 +573,11 @@ const ReviewUserComponent = () => {
               createUserMutation.mutate(payload, {
                 onSuccess: () => {
                   clear()
+                  showToast({
+                    message: notificationMessages.userFormSuccess,
+                    toastType: 'success',
+                    toastId: 'user-create-success'
+                  })
                   navigate(
                     `${routes.TEAM_USER_LIST}?locationId=${payload.primaryOfficeId}`
                   )

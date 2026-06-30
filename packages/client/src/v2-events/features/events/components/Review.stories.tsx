@@ -32,7 +32,7 @@ import {
   getTestValidatorContext,
   withValidatorContext
 } from '../../../../../.storybook/decorators'
-import { RejectionState, Review } from './Review'
+import { Review } from './Review'
 
 /* eslint-disable max-lines */
 const mockDeclaration = {
@@ -184,7 +184,7 @@ export const ReviewWithValidationErrors: Story = {
     const [modal, openModal] = useModal()
 
     async function handleRejection() {
-      await openModal<RejectionState | null>((close) => (
+      await openModal<string | null>((close) => (
         <Review.ActionModal.Reject close={close} />
       ))
     }

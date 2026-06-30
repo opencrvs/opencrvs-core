@@ -262,7 +262,7 @@ jobs:
             .trivyignore.yaml
           sparse-checkout-cone-mode: false
       - name: Gather Trivy output from base branch image
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: "ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ github.event.pull_request.base.ref }}"
           trivy-config: trivy.yaml
@@ -271,7 +271,7 @@ jobs:
           output: "./trivy-results-base.sarif"
           exit-code: "0"
       - name: Gather Trivy output from newly build image
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: "ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}"
           trivy-config: trivy.yaml
@@ -303,7 +303,7 @@ jobs:
             .trivyignore.yaml
           sparse-checkout-cone-mode: false
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: "ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}"
           trivy-config: trivy.yaml

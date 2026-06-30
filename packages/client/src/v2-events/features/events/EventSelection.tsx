@@ -14,7 +14,6 @@ import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
-import { Spinner } from '@opencrvs/components'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -24,6 +23,7 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { canUserCreateEvent } from '@opencrvs/commons/client'
+import { SuspenseLoadingFallback } from '@client/v2-events/components/SuspenseLoadingFallback'
 import { ROUTES } from '@client/v2-events/routes'
 import { createTemporaryId } from '@client/v2-events/utils'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
@@ -196,7 +196,9 @@ export function EventSelection() {
         size={ContentSize.SMALL}
         title={intl.formatMessage(messages.registerNewEventHeading)}
       >
-        <React.Suspense fallback={<Spinner id="event-selector-spinner" />}>
+        <React.Suspense
+          fallback={<SuspenseLoadingFallback id="event-selector-spinner" />}
+        >
           <EventSelector />
         </React.Suspense>
       </Content>

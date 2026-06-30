@@ -138,6 +138,16 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - Change reindex call to make operation non-destructive. Create endpoint to track progress of reindex. [#11877](https://github.com/opencrvs/opencrvs-core/issues/11877)
 - Fixed vulnerabilities on CSP HTTP Header for login page [#12094](https://github.com/opencrvs/opencrvs-core/issues/12094)
 - Merged Helm charts as part of Monorepo [#12679](https://github.com/opencrvs/opencrvs-core/issues/12679)
+- Change nginx log format to json for client and login containers [#10202](https://github.com/opencrvs/opencrvs-core/issues/10202)
+- Reduce the amount of data sent to Elasticsearch by dropping unused and duplicate fields during Filebeat processing [#11232](https://github.com/opencrvs/opencrvs-core/issues/11232)
+- The app now recovers automatically when the network changes (e.g. Ethernet → WiFi) or become online -> offline -> online again during app initialisation is halfway. If connectivity drops while the app is still loading and is then restored, the app reloads itself to finish loading, instead of getting stuck on the "Installing application…" screen and requiring a manual refresh. [#12898](https://github.com/opencrvs/opencrvs-core/issues/12898)
+
+## 1.9.15 Release Candidate
+
+### Improvements
+
+- Team page now shows a user-friendly "Too many requests" message when the `searchUsers` rate limit (20 req/min) is hit, instead of the generic query error. [#12990](https://github.com/opencrvs/opencrvs-core/issues/12990)
+- Gateway locations endpoint now serves responses from an in-process cache backed by Redis, reducing memory allocations under concurrent load. Cached payloads are gzip-compressed so write buffers to Traefik are proportionally smaller during request spikes. [#12880](https://github.com/opencrvs/opencrvs-core/issues/12880)
 
 ## 1.9.14
 

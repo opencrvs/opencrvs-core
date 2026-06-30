@@ -18,7 +18,7 @@ elasticsearch:
   reindex_enabled: true
   cronjob:
     enabled: false
-    schedule: "0 2 * * *"
+    schedule: '0 2 * * *'
   # auth_mode:
   # - disabled: No authentication enabled for MongoDB, password-less access to databases
   # - auto: Users are managed by OpenCRVS helm chart, this mode requires secret to be created with MongoDB admin user
@@ -53,7 +53,7 @@ influxdb:
 # MinIO configuration, including the hostname and port.
 minio:
   host: minio-0.minio.opencrvs-deps-dev.svc.cluster.local
-  port: "3535"
+  port: '3535'
   # external_url: external <host/ip>[:port] available for client browser to issue signed document URL.
   #                   Default: minio.<opencrvs domain>
   # external_protocol: external protocol (http or https) available for client browser. (Default: helm chart http_scheme)
@@ -152,7 +152,7 @@ postgres:
   events_analytics: analytics
   on_restore_cronjob:
     enabled: false
-    schedule: "0 2 * * *"
+    schedule: '0 2 * * *'
 ###############################################################################
 # Application configuration
 ###############################################################################
@@ -171,15 +171,17 @@ hostname: opencrvs.localhost
 #   in this variant wildcard certificate is needed only to one domain, examples:
 #            - auth-opencrvs.localhost
 #            - register-opencrvs.localhost
-subdomain_separator: "."
+subdomain_separator: '.'
 
 # This section allows manually define credentials
-credentials: {}
+credentials:
+  {}
   # super_user_password: Define super user password from stdin
 
 # WARNING: Use only with Tilt
 # Define path to static files internal OpenCRVS certificates
-certs: {}
+certs:
+  {}
   # cert_file: File with certificate
   # key_file: File with key
 
@@ -188,7 +190,7 @@ ingress:
   # For example, https://farajaland.org/
   ssl_enabled: true
   # Generate SSL Certificate by TLS resolver instead of using default traefik Certificate
-  tls_resolver: ""
+  tls_resolver: ''
 
 # See kubernetes documentation for more information on service types:
 # https://kubernetes.io/docs/concepts/services-networking/service/
@@ -230,10 +232,10 @@ pdb:
 
 # Resources allocated to OpenCRVS microservices (Kubernetes PODs):
 resources:
-  memoryRequest: "128Mi"
-  cpuRequest: "100m"
-  memoryLimit: "2Gi"
-  cpuLimit: "2"
+  memoryRequest: '128Mi'
+  cpuRequest: '100m'
+  memoryLimit: '2Gi'
+  cpuLimit: '2'
 
 # Global environment variables applied to
 # all OpenCRVS microservices (Kubernetes PODs):
@@ -332,10 +334,10 @@ dashboards:
     OPENCRVS_METABASE_SITE_NAME: OpenCRVS Dashboards
   # For stable work we need at least 4Gi of memory (check metabase logs at startup)
   resources:
-    memoryRequest: "2Gi"
-    cpuRequest: "250m"
-    memoryLimit: "2Gi"
-    cpuLimit: "2"
+    memoryRequest: '2Gi'
+    cpuRequest: '250m'
+    memoryLimit: '2Gi'
+    cpuLimit: '2'
 
 documents:
   port: 9050
@@ -348,12 +350,12 @@ gateway:
     name: ocrvs-gateway
 
   env:
-    CHECK_INVALID_TOKEN: "true"
-    CONFIG_SMS_CODE_EXPIRY_SECONDS: "600"
-    CONFIG_TOKEN_EXPIRY_SECONDS: "604800"
+    CHECK_INVALID_TOKEN: 'true'
+    CONFIG_SMS_CODE_EXPIRY_SECONDS: '600'
+    CONFIG_TOKEN_EXPIRY_SECONDS: '604800'
     COUNTRY: FAR
-    DISABLE_RATE_LIMIT: "false"
-    LANGUAGES: "en,fr"
+    DISABLE_RATE_LIMIT: 'false'
+    LANGUAGES: 'en,fr'
 
 login:
   port: 3020
@@ -382,14 +384,13 @@ login:
   # Health check probes configuration
   probes:
     liveness:
-      httpGet:
-        path: /health/ready
+      path: /health/ready
+      periodSeconds: 30
     readiness:
-      httpGet:
-        path: /health/ready
+      path: /health/ready
+      periodSeconds: 30
     startup:
-      httpGet:
-        path: /health/ready
+      path: /health/ready
 
 events:
   port: 5555
@@ -434,8 +435,8 @@ data_seed:
   env:
     # When users are seeded, are they immediately active using a test password and
     # six zeros as a 2-Factor auth code. Always set to false in production and staging.
-    ACTIVATE_USERS: "false"
+    ACTIVATE_USERS: 'false'
 
 on_restore_cronjob:
   enabled: false
-  schedule: "0 3 * * *"
+  schedule: '0 3 * * *'

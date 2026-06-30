@@ -6,11 +6,11 @@ hostname: opencrvs.localhost
 # - as set of subdomains to hostname, examples:
 #            - auth.opencrvs.localhost
 #            - register.opencrvs.localhost
-# - as set of variations to main domain, 
+# - as set of variations to main domain,
 #   in this variant wildcard certificate is needed only to one domain, examples:
 #            - auth-opencrvs.localhost
 #            - register-opencrvs.localhost
-subdomain_separator: "."
+subdomain_separator: '.'
 
 # Access to Dependencies like MinIO is done via Traefik IngressRoutes
 ingress:
@@ -18,7 +18,7 @@ ingress:
   ssl_enabled: true
   # If traefik was deployed with custom resolver, please define resolver name here.
   # Resolver will be attached to Traefik CRD IngressRoute
-  tls_resolver: ""
+  tls_resolver: ''
 
 # Kubernetes storage type, available options are `pvc` or `host_path`
 storage_type: pvc
@@ -37,10 +37,10 @@ chart_dev_mode: true
 # Label selector for datastore nodes, usually used to keep data persistent
 node_selector: {}
 resources:
-  memoryRequest: "100Mi"
-  cpuRequest: "100m"
-  memoryLimit: "8Gi"
-  cpuLimit: "8"
+  memoryRequest: '100Mi'
+  cpuRequest: '100m'
+  memoryLimit: '8Gi'
+  cpuLimit: '8'
 
 mongodb:
   # Enable MongoDB deployment.
@@ -70,7 +70,6 @@ postgres:
   # NOTE: This configuration is used only when `storage_type` is set to `pvc`.
   # For `host_path` storage, data is stored on the host filesystem at the path defined in `postgres.host_data_path`.
   pvc:
-
     # StorageClass name used for dynamic volume provisioning.
     # Set to:
     # - a specific StorageClass name (e.g. gp3, standard, managed-csi)
@@ -83,11 +82,10 @@ postgres:
     # - ReadWriteOnce (RWO)  : mounted read-write by a single node
     # - ReadOnlyMany (ROX)   : mounted read-only by multiple nodes
     # - ReadWriteMany (RWX)  : mounted read-write by multiple nodes
-    access_mode: "ReadWriteOnce"
+    access_mode: 'ReadWriteOnce'
 
     # Requested persistent storage size
-    storage_size: "10Gi"
-
+    storage_size: '10Gi'
 
   # Backup section
   backup:
@@ -130,10 +128,10 @@ postgres:
       # For type=differential:
       #   - full:        weekly full
       #   - differential:daily
-      dump: "0 1 * * *" # used only when type=dump
+      dump: '0 1 * * *' # used only when type=dump
 
-      full: "0 1 * * 0" # Sunday 01:00, used when type=differential
-      differential: "0 1 * * 1-6" # Mon–Sat 01:00, used when type=differential
+      full: '0 1 * * 0' # Sunday 01:00, used when type=differential
+      differential: '0 1 * * 1-6' # Mon–Sat 01:00, used when type=differential
 
   restore:
     # Enable/Disable restore
@@ -172,14 +170,14 @@ elasticsearch:
   # PVC Configuration
   pvc:
     # storage_class: "default"
-    access_mode: "ReadWriteOnce"
-    storage_size: "10Gi"
+    access_mode: 'ReadWriteOnce'
+    storage_size: '10Gi'
 
   resources:
-    memoryRequest: "2Gi"
-    cpuRequest: "2"
-    memoryLimit: "8Gi"
-    cpuLimit: "8"
+    memoryRequest: '2Gi'
+    cpuRequest: '2'
+    memoryLimit: '8Gi'
+    cpuLimit: '8'
 
 # monitoring aggregates following components:
 # - kibana
@@ -225,7 +223,15 @@ elastalert:
     #   - email: send email alert using configured SMTP server
     #   - post2: send alert to external system via HTTP POST (Docker swarm backward compatible way)
     NOTIFICATION_TYPE: post2
-
+    # If the notification type is post2, SMTP settings are not required
+    # These are dummy values to satisfy the envsubst command.
+    ALERT_EMAIL: 'dummy@example.com'
+    SENDER_EMAIL_ADDRESS: 'dummy@example.com'
+    SMTP_HOST: localhost
+    SMTP_PASSWORD: dummy
+    SMTP_PORT: '25'
+    SMTP_SECURE: 'false'
+    SMTP_USERNAME: dummy
     # HTTP_POST2_ALERT_URL: Required if NOTIFICATION_TYPE is set to post2. URL to send HTTP POST alert to.
     # Example: http://countryconfig.opencrvs-qa.svc.cluster.local:3040/email
 
@@ -254,8 +260,8 @@ minio:
   # PVC Configuration
   pvc:
     # storage_class: "default"
-    access_mode: "ReadWriteOnce"
-    storage_size: "10Gi"
+    access_mode: 'ReadWriteOnce'
+    storage_size: '10Gi'
 
   # Path to persistent data on the VM (when storage_type is host_path).
   host_data_path: /data/minio
@@ -330,7 +336,7 @@ backup:
   # and run helm template ... instead
   cronjob: true
   # Schedule job
-  schedule: "0 1 * * *"
+  schedule: '0 1 * * *'
   # Secret to store backup server connection configuration:
   # - user, backup server username
   # - host, hostname / IP of backup server
@@ -349,7 +355,7 @@ restore:
   # and run helm template ... instead
   cronjob: true
   # Schedule job
-  schedule: "0 0 * * *"
+  schedule: '0 0 * * *'
   # Secret to store backup server connection configuration:
   # - user, backup server username
   # - host, hostname / IP of backup server
