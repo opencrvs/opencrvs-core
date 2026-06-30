@@ -19,7 +19,7 @@ Lerna + Yarn workspaces monorepo (`packages/*`). **Node** version pinned in `.nv
 | `gateway`         | API gateway — Hapi + GraphQL; fronts the backend services                                                                                                                 |
 | `auth`            | Authentication / token issuance (Hapi, Redis)                                                                                                                             |
 | `events`          | **Main event service** — tRPC, Postgres (Kysely, `kanel`-generated types), Elasticsearch. Current DB schema snapshot: `packages/events/src/tests/postgres-migrations.sql` |
-| `documents`       | Document storage                                                                                                                                                          |
+| `documents`       | Hapi-service. Document storage                                                                                                                                            |
 | `commons`         | Shared library (`@opencrvs/commons`) used across packages                                                                                                                 |
 | `toolkit`         | SDK for building country configurations (tRPC); includes `create-countryconfig`                                                                                           |
 | `data-seeder`     | Seeds reference data with Farajaland (synthetic) data                                                                                                                     |
@@ -57,7 +57,7 @@ This is production civil-registration software. **Treat all registration data as
 - **Never read** secret/PII paths — these are blocked by deny rules and must stay that way:
   `.env` / `.env.*`, `**/.secrets/**`, `**/credentials/**`, `**/data-seeding/**`, `**/*.pem`, `**/*.key`, `**/id_rsa`, `**/id_ed25519`.
 - **Never** output, log, paste, or commit real personal data. Use **synthetic data only** (the Farajaland reference configuration).
-- Avoid `curl`, `wget`, `sudo`, and `ssh` — these are blocked. File writes and edits require explicit approval.
+- **Never** `sudo` or `ssh` — these are blocked.
 - Do not commit secrets, credentials, or PII. The repo ships nothing sensitive in tracked files — keep it that way.
 - Report security vulnerabilities per `SECURITY.md` (email `team@opencrvs.org`); do not disclose them publicly or in commits/PRs.
 
