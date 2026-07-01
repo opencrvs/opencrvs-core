@@ -97,6 +97,23 @@ jobs:
           # Bump all workspace package.json files and the root in one command.
           npx lerna exec 'yarn version --new-version ${{ inputs.version }} --no-git-tag-version'
           yarn version --new-version ${{ inputs.version }} --no-git-tag-version
+          # Bump helm chart version without creating a git tag.
+          find charts/ -name Chart.yaml -exec yq -i ".version = \"v$VERSION\"" {} \;
+          find charts/ -name Chart.yaml -exec yq -i ".appVersion = \"v$VERSION\"" {} \;
+          # Bump version in default values.yaml for opencrvs-services
+          # TODO: yq is not relaiable for this case, check if we can use ruamel.yaml (python) library
+          sed -i.bak -E '
+          /^platform:/,/^[^[:space:]]/ {
+            s/^([[:space:]]*tag:[[:space:]]*).*/\1'"$VERSION"'/
+          }
+          /^countryconfig:/,/^[^[:space:]]/ {
+            /^[[:space:]]*image:/,/^[[:space:]]{2}[a-zA-Z0-9_-]+:/ {
+              s/^([[:space:]]*tag:[[:space:]]*).*/\1'"$VERSION"'/
+            }
+          }
+          ' charts/opencrvs-services/values.yaml
+          rm charts/opencrvs-services/values.yaml.bak
+
           git add .
           git commit -m "chore: update version to ${{ inputs.version }}"
 
@@ -233,6 +250,33 @@ jobs:
                 version: '${{ inputs.version }}'
               }
             })
+
+      - name: Create release branch in e2e repo
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.E2E_WORKFLOW_TOKEN }}
+          script: |
+            const branchRef = 'refs/heads/release/${{ inputs.version }}'
+            const { data: ref } = await github.rest.git.getRef({
+              owner: context.repo.owner,
+              repo: 'e2e',
+              ref: 'heads/${{ steps.get_base_branch.outputs.base_branch }}'
+            })
+            try {
+              await github.rest.git.createRef({
+                owner: context.repo.owner,
+                repo: 'e2e',
+                ref: branchRef,
+                sha: ref.object.sha
+              })
+              console.log(`Created ${branchRef} in e2e`)
+            } catch (err) {
+              if (err.status === 422) {
+                console.log(`Branch ${branchRef} already exists in e2e, skipping.`)
+              } else {
+                throw err
+              }
+            }
 
       # Create a draft release so the release notes page exists immediately.
       # The tag is deleted right after: the publish workflow re-creates it when

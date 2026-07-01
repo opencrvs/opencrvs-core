@@ -31,13 +31,22 @@ const meta: Meta<typeof SettingsPage> = {
   parameters: {
     msw: {
       handlers: {
-        sendVerifyCode: [
-          tRPCMsw.user.sendVerifyCode.mutation(() => ({
+        requestEmailChange: [
+          tRPCMsw.user.requestEmailChange.mutation(() => ({
             nonce: '123'
-          })),
+          }))
+        ],
+        requestPhoneChange: [
+          tRPCMsw.user.requestPhoneChange.mutation(() => ({
+            nonce: '123'
+          }))
+        ],
+        changeEmail: [
           tRPCMsw.user.changeEmail.mutation(() => {
             return
-          }),
+          })
+        ],
+        changePhone: [
           tRPCMsw.user.changePhone.mutation(() => {
             return
           })
@@ -184,7 +193,7 @@ export const ChangePasswordStateClears: Story = {
 
     await step('Close modal', async () => {
       await userEvent.click(
-        canvasElement.querySelector('#close-btn') as HTMLElement
+        canvasElement.querySelector('#close-dialog') as HTMLElement
       )
     })
 

@@ -11,6 +11,7 @@
 
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { inferInput, inferOutput } from '@trpc/tanstack-react-query'
+import { useSelector } from 'react-redux'
 import {
   deepDropNulls,
   System,
@@ -19,6 +20,7 @@ import {
   UserOrSystemSummary,
   UserSummary
 } from '@opencrvs/commons/client'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import {
   hasConflict,
   queryClient,
@@ -216,19 +218,28 @@ export function useUsers() {
           enabled?: boolean
         }
       ) => {
+        const currentUser = useSelector(getUserDetails)
+        const isOwnUser = currentUser?.id === id
         const { queryFn, ...queryOptions } = trpc.user.get.queryOptions(id)
+        // Other users' data must not be served from IDB — stale cache seeds
+        // form state before the background refetch arrives, showing outdated values.
         return useQuery({
           ...queryOptions,
           ...options,
-          queryKey: trpc.user.get.queryKey(id)
+          queryKey: trpc.user.get.queryKey(id),
+          ...(!isOwnUser && { gcTime: 0, meta: { noCache: true } })
         })
       },
       useSuspenseQuery: (id: string) => {
+        const currentUser = useSelector(getUserDetails)
+        const isOwnUser = currentUser?.id === id
         const { queryFn, ...options } = trpc.user.get.queryOptions(id)
+        // See useQuery above — same reasoning applies.
         return [
           useSuspenseQuery({
             ...options,
-            queryKey: trpc.user.get.queryKey(id)
+            queryKey: trpc.user.get.queryKey(id),
+            ...(!isOwnUser && { gcTime: 0, meta: { noCache: true } })
           }).data
         ]
       }
@@ -386,8 +397,11 @@ export function useUsers() {
     changePassword: useMutation(
       trpcOptionsProxy.user.changePassword.mutationOptions()
     ),
-    sendVerifyCode: useMutation(
-      trpcOptionsProxy.user.sendVerifyCode.mutationOptions()
+    requestEmailChange: useMutation(
+      trpcOptionsProxy.user.requestEmailChange.mutationOptions()
+    ),
+    requestPhoneChange: useMutation(
+      trpcOptionsProxy.user.requestPhoneChange.mutationOptions()
     ),
     changePhone: useMutation(
       trpcOptionsProxy.user.changePhone.mutationOptions()

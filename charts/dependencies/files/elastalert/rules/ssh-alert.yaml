@@ -27,7 +27,7 @@ filter:
         rule.name.keyword:
           value: 'Successful SSH login'
 
-alert: 
+alert:
   - ${NOTIFICATION_TYPE}
 
 email:
@@ -42,9 +42,9 @@ http_post2_payload:
   to: '{% raw %}{{ALERT_EMAIL}}{% endraw %}'
 
 # New way to define alerting action with more flexible templating:
-alert_subject: "${DOMAIN}: SSH login alert 🚨"
+alert_subject: '${DOMAIN}: SSH login alert 🚨'
 alert_text_type: alert_text_jinja
-email_format: "html"
+email_format: 'html'
 
 alert_text: |
   <p>Successful SSH login detected.</p>
