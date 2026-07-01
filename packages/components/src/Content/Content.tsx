@@ -11,9 +11,7 @@
 import * as React from 'react'
 import { ReactElement } from 'react'
 import styled from 'styled-components'
-import { ICON_ALIGNMENT, TertiaryButton } from '../buttons'
 import { colors } from '../colors'
-import { BackArrow } from '../icons'
 
 const Container = styled.div<{ size: ContentSize }>`
   position: relative;
@@ -174,8 +172,6 @@ export enum ContentSize {
 interface IProps {
   id?: string
   icon?: () => React.ReactNode
-  backButtonLabel?: string
-  backButtonAction?: () => void
   title?: string | React.ReactNode
   titleColor?: keyof typeof colors
   showTitleOnMobile?: boolean
@@ -193,8 +189,6 @@ interface IProps {
 
 export const UnstyledContent = ({
   icon,
-  backButtonLabel,
-  backButtonAction,
   title,
   titleColor,
   showTitleOnMobile,
@@ -211,17 +205,6 @@ export const UnstyledContent = ({
 }: IProps) => (
   <Container size={size} className={className}>
     <Header>
-      {backButtonLabel && (
-        <BackButtonContainer>
-          <TertiaryButton
-            align={ICON_ALIGNMENT.LEFT}
-            icon={() => <BackArrow />}
-            onClick={backButtonAction}
-          >
-            {backButtonLabel}
-          </TertiaryButton>
-        </BackButtonContainer>
-      )}
       {(icon || title || topActionButtons) && (
         <TopBar keepShowing={showTitleOnMobile}>
           <TitleContainer titleColor={titleColor}>
