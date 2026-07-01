@@ -58,9 +58,7 @@
     "packages/events/src/tests/extract-dump.sh",
     ".kube",
     ".claude",
-    "packages/api-docs/public-key.pem",
-    ".gitattributes",
-    ".github/workflows/**/*.lock.yml"
+    "packages/api-docs/public-key.pem"
   ],
   "license": "license-header.txt",
   "licenseFormats": {
