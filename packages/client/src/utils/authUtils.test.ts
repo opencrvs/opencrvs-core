@@ -19,6 +19,7 @@ import {
 } from 'vitest'
 import {
   ensureFreshAccessToken,
+  getRefreshToken,
   getToken,
   getTokenPayload,
   storeRefreshToken,
@@ -128,6 +129,24 @@ describe('ensureFreshAccessToken', () => {
     expect(assign).toHaveBeenCalledWith('/login')
     expect(localStorage.getItem('opencrvs')).toBeNull()
     expect(localStorage.getItem('opencrvs-refresh')).toBeNull()
+  })
+
+  it('stores both the rotated access and refresh tokens', async () => {
+    storeToken(makeJwt(-10))
+    // Use a distinct expiry so oldRefresh !== newRefresh even within the same second
+    storeRefreshToken(makeJwt(60 * 60 * 24))
+    const newAccess = makeJwt(60 * 60)
+    const newRefresh = makeJwt(60 * 60 * 48) // 48 h — different from the stored 24 h token
+    const fetchSpy = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ token: newAccess, refreshToken: newRefresh })
+    })
+    vi.stubGlobal('fetch', fetchSpy)
+
+    await ensureFreshAccessToken()
+
+    expect(getToken()).toBe(newAccess)
+    expect(localStorage.getItem('opencrvs-refresh')).toBe(newRefresh)
   })
 })
 

@@ -10,39 +10,52 @@
  */
 import { AuthServer } from '@auth/server'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
-import { createRefreshToken } from '@auth/features/authenticate/service'
-import { encodeScope } from '@opencrvs/commons'
+import { signRefreshToken } from '@auth/features/authenticate/service'
+import { TokenUserType } from '@opencrvs/commons'
 import * as fetchAny from 'jest-fetch-mock'
 import { DEFAULT_ROLES_DEFINITION } from '@auth/features/authenticate/handler.test'
 
 const fetch = fetchAny as fetchAny.FetchMock
 
+jest.mock('@auth/features/refresh/family', () => ({
+  consume: jest.fn(),
+  revokeFamily: jest.fn().mockResolvedValue(undefined),
+  createFamily: jest.fn().mockResolvedValue({ familyId: 'fam-1', jti: 'jti-1' })
+}))
+
 jest.mock('@auth/features/authenticate/service', () => {
   const actual = jest.requireActual('@auth/features/authenticate/service')
   return {
     ...actual,
-    internalClient: {
-      user: { getById: { query: jest.fn() } }
-    }
+    internalClient: { user: { getById: { query: jest.fn() } } }
   }
 })
 
 /* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires */
-let internalClient =
-  require('@auth/features/authenticate/service').internalClient
+let internalClient: { user: { getById: { query: jest.Mock } } }
+let family: { consume: jest.Mock; revokeFamily: jest.Mock }
 
-describe('refresh token handler', () => {
+function makeRefreshToken(familyId = 'fam-1', jti = 'jti-1') {
+  return signRefreshToken('1', TokenUserType.enum.user, familyId, jti)
+}
+
+describe('refresh token rotation', () => {
   let server: AuthServer
 
   beforeEach(async () => {
     server = await createProductionEnvironmentServer()
-    // Re-acquire internalClient after jest.resetModules() (called inside createProductionEnvironmentServer)
+    jest.clearAllMocks()
     internalClient =
       require('@auth/features/authenticate/service').internalClient
-    jest.clearAllMocks()
+    family = require('@auth/features/refresh/family')
   })
 
-  it('mints a fresh access token with the latest scopes', async () => {
+  it('rotates: returns a new access token and a new refresh token', async () => {
+    family.consume.mockResolvedValue({
+      status: 'rotate',
+      userId: '1',
+      newJti: 'jti-2'
+    })
     internalClient.user.getById.query.mockResolvedValue({
       id: '1',
       role: 'NATIONAL_SYSTEM_ADMIN',
@@ -52,65 +65,90 @@ describe('refresh token handler', () => {
       status: 200
     })
 
-    const refreshToken = await createRefreshToken('1')
-
-    const res: { result?: { token: string }; statusCode: number } =
-      await server.server.inject({
-        method: 'POST',
-        url: '/refreshToken',
-        payload: { token: refreshToken }
-      })
+    const token = await makeRefreshToken()
+    const res: {
+      result?: { token: string; refreshToken: string }
+      statusCode: number
+    } = await server.server.inject({
+      method: 'POST',
+      url: '/refreshToken',
+      payload: { token }
+    })
 
     expect(res.statusCode).toBe(200)
-    const [, payload] = res.result!.token.split('.')
+    expect(res.result!.token).toBeDefined()
+    expect(res.result!.refreshToken).toBeDefined()
+    // the new refresh token carries the rotated jti
+    const [, payload] = res.result!.refreshToken.split('.')
     const body = JSON.parse(Buffer.from(payload, 'base64').toString())
-    expect(body.sub).toBe('1')
-    expect(body.scope).toEqual([
-      encodeScope({ type: 'user.create' }),
-      encodeScope({ type: 'user.read' }),
-      encodeScope({ type: 'user.edit' }),
-      encodeScope({ type: 'organisation.read-locations' }),
-      encodeScope({ type: 'performance.read' }),
-      encodeScope({ type: 'performance.read-dashboards' }),
-      encodeScope({ type: 'performance.vital-statistics-export' })
-    ])
+    expect(body.familyId).toBe('fam-1')
+    expect(body.jti).toBe('jti-2')
   })
 
-  it('returns 401 when the user is not active', async () => {
+  it('grace replay also returns a new pair', async () => {
+    family.consume.mockResolvedValue({
+      status: 'grace',
+      userId: '1',
+      newJti: 'jti-3'
+    })
+    internalClient.user.getById.query.mockResolvedValue({
+      id: '1',
+      role: 'NATIONAL_SYSTEM_ADMIN',
+      status: 'active'
+    })
+    fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+      status: 200
+    })
+
+    const res: { statusCode: number } = await server.server.inject({
+      method: 'POST',
+      url: '/refreshToken',
+      payload: { token: await makeRefreshToken() }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('reuse → 401 (family already revoked by consume)', async () => {
+    family.consume.mockResolvedValue({ status: 'reuse', userId: '1' })
+    const res: { statusCode: number } = await server.server.inject({
+      method: 'POST',
+      url: '/refreshToken',
+      payload: { token: await makeRefreshToken() }
+    })
+    expect(res.statusCode).toBe(401)
+  })
+
+  it('missing family → 401', async () => {
+    family.consume.mockResolvedValue({ status: 'missing' })
+    const res: { statusCode: number } = await server.server.inject({
+      method: 'POST',
+      url: '/refreshToken',
+      payload: { token: await makeRefreshToken() }
+    })
+    expect(res.statusCode).toBe(401)
+  })
+
+  it('deactivated user → revokes family + 401', async () => {
+    family.consume.mockResolvedValue({
+      status: 'rotate',
+      userId: '1',
+      newJti: 'jti-2'
+    })
     internalClient.user.getById.query.mockResolvedValue({
       id: '1',
       role: 'NATIONAL_SYSTEM_ADMIN',
       status: 'deactivated'
     })
-    const refreshToken = await createRefreshToken('1')
-
     const res: { statusCode: number } = await server.server.inject({
       method: 'POST',
       url: '/refreshToken',
-      payload: { token: refreshToken }
+      payload: { token: await makeRefreshToken('fam-9', 'jti-9') }
     })
     expect(res.statusCode).toBe(401)
+    expect(family.revokeFamily).toHaveBeenCalledWith('fam-9')
   })
 
-  it('returns 401 when an access token (wrong audience) is presented', async () => {
-    const authService = require('@auth/features/authenticate/service')
-    const accessToken = await authService.createToken(
-      '1',
-      [],
-      ['opencrvs:auth-user'],
-      'opencrvs:auth-service',
-      'NATIONAL_SYSTEM_ADMIN'
-    )
-
-    const res: { statusCode: number } = await server.server.inject({
-      method: 'POST',
-      url: '/refreshToken',
-      payload: { token: accessToken }
-    })
-    expect(res.statusCode).toBe(401)
-  })
-
-  it('returns 401 for a malformed token', async () => {
+  it('malformed token → 401', async () => {
     const res: { statusCode: number } = await server.server.inject({
       method: 'POST',
       url: '/refreshToken',

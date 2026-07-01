@@ -112,6 +112,9 @@ async function performRefresh(): Promise<void> {
 
   const data = await res.json()
   storeToken(data.token)
+  if (data.refreshToken) {
+    storeRefreshToken(data.refreshToken)
+  }
 }
 
 let inFlightRefresh: Promise<void> | null = null

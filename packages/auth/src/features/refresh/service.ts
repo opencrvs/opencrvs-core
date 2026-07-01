@@ -11,24 +11,45 @@
 import {
   createToken,
   getUserRoleScopeMapping,
-  internalClient
+  internalClient,
+  signRefreshToken
 } from '@auth/features/authenticate/service'
+import { consume, revokeFamily } from '@auth/features/refresh/family'
 import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
-import { TokenUserType } from '@opencrvs/commons'
+import { TokenUserType, logger } from '@opencrvs/commons'
 
-export class UserNotActiveError extends Error {}
+export class RefreshTokenError extends Error {}
 
-export async function refreshToken(userId: string) {
+export async function refreshToken(
+  userId: string,
+  userType: TokenUserType,
+  familyId: string,
+  jti: string
+): Promise<{ token: string; refreshToken: string }> {
+  const consumed = await consume(familyId, jti)
+
+  if (consumed.status === 'missing') {
+    throw new RefreshTokenError('refresh family not found')
+  }
+
+  if (consumed.status === 'reuse') {
+    logger.error(
+      `Refresh token reuse detected: familyId=${familyId} sub=${userId}. Family revoked.`
+    )
+    throw new RefreshTokenError('refresh token reuse detected')
+  }
+  // consumed.status is 'rotate' or 'grace' here (missing/reuse already threw)
+
   const { role, status } = await internalClient.user.getById.query(userId)
-
   if (status !== 'active') {
-    throw new UserNotActiveError()
+    await revokeFamily(familyId)
+    throw new RefreshTokenError('user not active')
   }
 
   const roleScopeMappings = await getUserRoleScopeMapping()
   const scopes = roleScopeMappings[role]
 
-  return createToken(
+  const token = await createToken(
     userId,
     scopes,
     WEB_USER_JWT_AUDIENCES,
@@ -36,4 +57,12 @@ export async function refreshToken(userId: string) {
     role,
     TokenUserType.enum.user
   )
+  const refreshToken = await signRefreshToken(
+    userId,
+    userType,
+    familyId,
+    consumed.newJti
+  )
+
+  return { token, refreshToken }
 }

@@ -47,6 +47,7 @@ const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
 import { AppRouter, InternalRouter } from '@opencrvs/events/src/router'
+import { createFamily } from '@auth/features/refresh/family'
 
 const cert = readFileSync(env.CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(env.CERT_PUBLIC_KEY_PATH)
@@ -203,17 +204,27 @@ export async function createToken(
   })
 }
 
-export async function createRefreshToken(
+export async function signRefreshToken(
   userId: string,
-  userType: TokenUserType = TokenUserType.enum.user
+  userType: TokenUserType,
+  familyId: string,
+  jti: string
 ): Promise<string> {
-  return sign({ userType }, cert, {
+  return sign({ userType, familyId, jti }, cert, {
     subject: userId,
     algorithm: 'RS256',
     expiresIn: env.CONFIG_REFRESH_TOKEN_EXPIRY_SECONDS,
     audience: REFRESH_TOKEN_AUDIENCE,
     issuer: JWT_ISSUER
   })
+}
+
+export async function createRefreshToken(
+  userId: string,
+  userType: TokenUserType = TokenUserType.enum.user
+): Promise<string> {
+  const { familyId, jti } = await createFamily(userId)
+  return signRefreshToken(userId, userType, familyId, jti)
 }
 
 type ActionConfirmationInput = {
@@ -345,14 +356,14 @@ export function verifyToken(token: string) {
   return pipe(token, safeVerifyJwt, chainW(tokenPayload.decode))
 }
 
-// `aud` is an array because createRefreshToken signs REFRESH_TOKEN_AUDIENCE (an array).
-// If that audience is ever changed to a bare string, update this decoder too.
 const refreshTokenPayload = t.type({
   sub: t.string,
   iat: t.number,
   exp: t.number,
   aud: t.array(t.string),
-  userType: t.string
+  userType: t.string,
+  familyId: t.string,
+  jti: t.string
 })
 
 function safeVerifyRefreshJwt(token: string) {

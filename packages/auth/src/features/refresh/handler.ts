@@ -11,7 +11,7 @@
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
-import { logger } from '@opencrvs/commons'
+import { TokenUserType, logger } from '@opencrvs/commons'
 import { verifyRefreshToken } from '@auth/features/authenticate/service'
 import { refreshToken } from '@auth/features/refresh/service'
 
@@ -27,9 +27,16 @@ export default async function refreshHandler(request: Hapi.Request) {
     return unauthorized()
   }
 
+  const { sub, userType, familyId, jti } = decodedOrError.right
+
   try {
-    const newToken = await refreshToken(decodedOrError.right.sub)
-    return { token: newToken }
+    const tokens = await refreshToken(
+      sub,
+      userType as TokenUserType,
+      familyId,
+      jti
+    )
+    return tokens
   } catch (err) {
     logger.error(`Failed to refresh token: ${err}`)
     return unauthorized()
@@ -40,5 +47,6 @@ export const requestSchema = Joi.object({
   token: Joi.string()
 })
 export const responseSchma = Joi.object({
-  token: Joi.string()
+  token: Joi.string(),
+  refreshToken: Joi.string()
 })
