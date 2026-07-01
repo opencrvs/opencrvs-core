@@ -24,7 +24,6 @@ import { CircleButton } from '@opencrvs/components/lib/buttons'
 import { colors } from '@opencrvs/components/lib/colors'
 import {
   PickerButton,
-  ContentWrapper,
   ModalContainer as CommonModalContainer,
   ModalHeader,
   TitleContent,
@@ -149,17 +148,14 @@ export function LocationPicker({
         id="location-range-picker-action"
         onClick={() => setModalVisible(true)}
         disabled={disabled}
-        type="primary"
-        size="large"
+        type="secondary"
       >
-        <ContentWrapper>
-          <span>
-            {(selectedSearchedLocation &&
-              selectedSearchedLocation.displayLabel) ||
-              ''}
-          </span>
-          <MapPin color={disabled ? colors.grey200 : undefined} />
-        </ContentWrapper>
+        <span>
+          {(selectedSearchedLocation &&
+            selectedSearchedLocation.displayLabel) ||
+            ''}
+        </span>
+        <MapPin color={disabled ? colors.grey200 : undefined} />
       </PickerButton>
       {modalVisible && (
         <>

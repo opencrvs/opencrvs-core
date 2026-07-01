@@ -112,8 +112,8 @@ interface MonthSelectorProps {
 }
 
 export const PickerButton = styled(Button)`
-  margin: 12px 0;
-  height: 32px;
+  margin: 0;
+  height: 40px;
 `
 export const ContentWrapper = styled.div`
   display: flex;
