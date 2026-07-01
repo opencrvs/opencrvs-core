@@ -74,7 +74,7 @@ const DialogContainer = styled.div<{
 `
 const DialogHeader = styled.div`
   display: flex;
-  padding: 10px 32px;
+  padding: 12px 32px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   justify-content: space-between;
 `
@@ -82,7 +82,6 @@ const DialogTitle = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  height: 40px;
 `
 
 const DialogContent = styled.div`
@@ -98,7 +97,7 @@ const DialogContent = styled.div`
 `
 
 const DialogFooter = styled.div`
-  padding: 24px 32px;
+  padding: 18px 32px;
   align-items: center;
   display: flex;
   gap: 8px;
