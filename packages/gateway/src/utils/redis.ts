@@ -11,14 +11,14 @@
 import { REDIS_HOST, REDIS_PASSWORD, REDIS_USERNAME } from '@gateway/constants'
 import { createClient } from 'redis'
 
-export let redis: ReturnType<typeof createClient>
+export let redis: ReturnType<typeof createClient<{}, {}, {}, 3>>
 
 export async function stop() {
   redis.quit()
 }
 
 export async function start(host = REDIS_HOST, port?: number) {
-  redis = createClient({
+  const client = createClient({
     username: REDIS_USERNAME,
     password: REDIS_PASSWORD,
     socket: {
@@ -27,5 +27,6 @@ export async function start(host = REDIS_HOST, port?: number) {
     }
   })
 
-  await redis.connect()
+  await client.connect()
+  redis = client
 }
