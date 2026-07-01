@@ -2270,6 +2270,7 @@ components:
     ActionConfig:
       oneOf:
         - $ref: "#/components/schemas/ReadActionConfig"
+        - $ref: "#/components/schemas/NotifyActionConfig"
         - $ref: "#/components/schemas/DeclareActionConfig"
         - $ref: "#/components/schemas/RejectActionConfig"
         - $ref: "#/components/schemas/RegisterActionConfig"
@@ -2286,6 +2287,7 @@ components:
         propertyName: type
         mapping:
           READ: "#/components/schemas/ReadActionConfig"
+          NOTIFY: "#/components/schemas/NotifyActionConfig"
           DECLARE: "#/components/schemas/DeclareActionConfig"
           REJECT: "#/components/schemas/RejectActionConfig"
           REGISTER: "#/components/schemas/RegisterActionConfig"
@@ -4078,6 +4080,9 @@ components:
             max:
               description: Maximum value
               type: number
+            integer:
+              description: When true, only whole numbers are allowed
+              type: boolean
             prefix:
               $ref: "#/components/schemas/TranslationConfig"
             postfix:
@@ -13154,6 +13159,40 @@ components:
       additionalProperties: false
       description: A select dropdown that is automatically populated with available
         user roles
+    NotifyActionConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the action
+          $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          default: []
+          description: Flag actions which are executed when the action is performed.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation dialog
+          $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          type: string
+          description: Icon representing the action
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionConditional"
+        type:
+          type: string
+          const: NOTIFY
+      required:
+        - label
+        - flags
+        - type
+      additionalProperties: false
+      description: Configuration for the notify action. When present, NOTIFY uses this
+        config independently from DECLARE. When absent, NOTIFY falls back to the
+        DeclareActionConfig.
     DeclareActionConfig:
       type: object
       properties:
@@ -13222,7 +13261,8 @@ components:
         - review
       additionalProperties: false
       description: Configuration for the declare action. Includes review-page fields.
-        Shared with the notify action (ActionType.NOTIFY).
+        NOTIFY falls back to this config when no dedicated NotifyActionConfig is
+        provided.
     DeduplicationConfig:
       type: object
       properties:
