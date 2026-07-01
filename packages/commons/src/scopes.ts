@@ -101,6 +101,8 @@ const scopeOptionsPlaceEvent = z
 
 const scopeOptionsDeclared = scopeOptionsPlaceEvent
   .extend({
+    notifiedIn: JurisdictionFilter.optional(),
+    notifiedBy: UserFilter.optional(),
     declaredIn: JurisdictionFilter.optional(),
     declaredBy: UserFilter.optional()
   })
@@ -164,6 +166,8 @@ const ResolvedScopeOptionsPlaceEvent = z
   )
 
 const ResolvedScopeOptionsDeclared = ResolvedScopeOptionsPlaceEvent.extend({
+  notifiedIn: UUID.nullish(),
+  notifiedBy: z.string().optional(),
   declaredIn: UUID.nullish(),
   declaredBy: z.string().optional()
 }).describe(
@@ -428,8 +432,9 @@ export const decodeScope = (encodedScope: EncodedScope) => {
 const DEFAULT_SCOPE_OPTIONS: Partial<AllScopeOptions> = {
   placeOfEvent: JurisdictionFilter.enum.all,
   accessLevel: JurisdictionFilter.enum.all,
-  registeredIn: JurisdictionFilter.enum.all,
-  declaredIn: JurisdictionFilter.enum.all
+  notifiedIn: JurisdictionFilter.enum.all,
+  declaredIn: JurisdictionFilter.enum.all,
+  registeredIn: JurisdictionFilter.enum.all
 }
 
 /**
