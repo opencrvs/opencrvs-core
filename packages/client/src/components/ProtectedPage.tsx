@@ -24,10 +24,7 @@ import { PropsWithChildren } from 'react'
 import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { showPINUpdateSuccessToast } from '@client/notification/actions'
 import { CreatePin } from '@client/views/PIN/CreatePin'
-import {
-  redirectToAuthentication,
-  setInitialUserDetails
-} from '@client/profile/profileActions'
+import { redirectToAuthentication } from '@client/profile/profileActions'
 import { LoadingBar } from '@opencrvs/components/src/LoadingBar/LoadingBar'
 import { RouteComponentProps, withRouter } from './WithRouterProps'
 import { getAuthenticated } from '@client/profile/profileSelectors'
@@ -41,7 +38,6 @@ type DispatchProps = {
   onNumPadVisible: () => void
   showPINUpdateSuccessToast: typeof showPINUpdateSuccessToast
   redirectToAuthentication: typeof redirectToAuthentication
-  setInitialUserDetails: typeof setInitialUserDetails
 }
 interface IProtectPageState {
   loading: boolean
@@ -71,7 +67,6 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
       passwordVerified: false
     }
     this.handleVisibilityChange = this.handleVisibilityChange.bind(this)
-    this.handleWindowFocus = this.handleWindowFocus.bind(this)
     this.markAsSecured = this.markAsSecured.bind(this)
     this.onIdle = this.onIdle.bind(this)
   }
@@ -107,41 +102,6 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
       },
       import.meta.env.PROD ? Math.max(200, 2000 - timeSinceMount) : 0
     )
-
-    // Re-fetch the logged-in user's own information whenever the app regains
-    // focus, so changes made by an administrator on another device (e.g. a
-    // new office/location) are reflected without requiring a re-login.
-    window.addEventListener('focus', this.handleWindowFocus)
-    document.addEventListener('visibilitychange', this.handleWindowFocus)
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    // Re-fetch the logged-in user's own information on every in-app navigation,
-    // so an administrator's change (e.g. a new office/location) is reflected as
-    // soon as the user moves around the app.
-    const prev = prevProps.router.location
-    const next = this.props.router.location
-    if (
-      prev &&
-      next &&
-      (prev.pathname !== next.pathname || prev.search !== next.search)
-    ) {
-      this.props.setInitialUserDetails()
-    }
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('focus', this.handleWindowFocus)
-    document.removeEventListener('visibilitychange', this.handleWindowFocus)
-  }
-
-  handleWindowFocus() {
-    if (document.visibilityState === 'hidden') {
-      return
-    }
-    // Re-runs the cache-read + server-refetch chain. Fails gracefully when
-    // offline and retries on the next focus once back online.
-    this.props.setInitialUserDetails()
   }
 
   async handleVisibilityChange(isVisible: boolean) {
@@ -287,8 +247,7 @@ const mapStateToProps = (store: IStoreState) => {
 const mapDispatchToProps = {
   onNumPadVisible: refreshOfflineData,
   showPINUpdateSuccessToast,
-  redirectToAuthentication,
-  setInitialUserDetails
+  redirectToAuthentication
 }
 
 export const ProtectedPage = withRouter(
