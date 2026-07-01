@@ -24,7 +24,8 @@ import {
   isTokenStillValid,
   removeToken,
   getRefreshToken,
-  storeRefreshToken
+  storeRefreshToken,
+  ensureFreshAccessToken
 } from '@client/utils/authUtils'
 import { queries } from '@client/profile/queries'
 import * as changeLanguageActions from '@client/i18n/actions'
@@ -93,48 +94,56 @@ export const profileReducer: LoopReducer<
           { sequence: true }
         )
       )
-    case actions.CHECK_AUTH:
-      const token = getToken()
+    case actions.CHECK_AUTH: {
       const refreshToken = getRefreshToken()
-
-      // Remove token params from the url if present
+      // strip token params from the url if present
       if (
         window.location.search.includes('token=') ||
         window.location.search.includes('refreshToken=')
       ) {
         window.history.replaceState(null, '', window.location.pathname)
       }
-
+      return loop(
+        state,
+        Cmd.run(
+          async () => {
+            if (refreshToken) {
+              storeRefreshToken(refreshToken)
+            }
+            // mints + stores an access token from the refresh token
+            // (no-op if a fresh access token already exists)
+            await ensureFreshAccessToken()
+            return getToken()
+          },
+          {
+            successActionCreator: (token: string) =>
+              actions.checkAuthComplete(token),
+            failActionCreator: () => actions.redirectToAuthentication(true)
+          }
+        )
+      )
+    }
+    case actions.CHECK_AUTH_COMPLETE: {
+      const token = action.payload.token
       const payload = getTokenPayload(token)
-
       if (!payload) {
         return loop(
-          {
-            ...state,
-            authenticated: false
-          },
+          { ...state, authenticated: false },
           Cmd.action(actions.redirectToAuthentication(true))
         )
       }
-
       return loop(
-        {
-          ...state,
-          authenticated: true,
-          tokenPayload: payload
-        },
+        { ...state, authenticated: true, tokenPayload: payload },
         Cmd.list([
           Cmd.run(() => {
             if (isTokenStillValid(payload)) {
               storeToken(token)
-              if (refreshToken) {
-                storeRefreshToken(refreshToken)
-              }
             }
           }),
           Cmd.action(actions.setInitialUserDetails())
         ])
       )
+    }
     case actions.SET_USER_DETAILS:
       const userDetails = action.payload
       return loop(

@@ -140,13 +140,10 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         Cmd.run(
           (getState: () => IStoreState) => {
             if (action.payload.token) {
-              const refreshParam = action.payload.refreshToken
-                ? `&refreshToken=${action.payload.refreshToken}`
-                : ''
               window.location.assign(
-                `/register/?token=${
-                  action.payload.token
-                }${refreshParam}&lang=${getState().i18n.language}`
+                `/register/?refreshToken=${
+                  action.payload.refreshToken
+                }&lang=${getState().i18n.language}`
               )
             } else {
               action.payload.inAppRedirect()
@@ -238,15 +235,12 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         Cmd.run(
           (getState: () => IStoreState) => {
             const redirectToURL = getState().login.redirectToURL
-            const refreshParam = action.payload.refreshToken
-              ? `&refreshToken=${action.payload.refreshToken}`
-              : ''
             // Strip leading slash from redirectToURL to avoid double slash e.g. /register//events/...
             const fullURL = redirectToURL
-              ? `/register/${redirectToURL.replace(/^\//, '')}?token=${action.payload.token}${refreshParam}&lang=${
+              ? `/register/${redirectToURL.replace(/^\//, '')}?refreshToken=${action.payload.refreshToken}&lang=${
                   getState().i18n.language
                 }`
-              : `/register?token=${action.payload.token}${refreshParam}&lang=${
+              : `/register?refreshToken=${action.payload.refreshToken}&lang=${
                   getState().i18n.language
                 }`
 
@@ -261,7 +255,13 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           ...state
         },
         Cmd.run(() => {
-          window.location.assign(`/register/?token=${state.token}`)
+          if (state.refreshToken) {
+            window.location.assign(
+              `/register/?refreshToken=${state.refreshToken}`
+            )
+          } else {
+            window.location.assign('/login')
+          }
         })
       )
     case actions.RELOAD_MODAL_VISIBILITY:
