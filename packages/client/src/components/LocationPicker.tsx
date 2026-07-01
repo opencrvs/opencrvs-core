@@ -149,6 +149,8 @@ export function LocationPicker({
         id="location-range-picker-action"
         onClick={() => setModalVisible(true)}
         disabled={disabled}
+        type="primary"
+        size="large"
       >
         <ContentWrapper>
           <span>
