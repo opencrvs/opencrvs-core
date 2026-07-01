@@ -14,16 +14,17 @@ on:
   issue_comment:
     types: [created]
 
+permissions:
+  id-token: write
+  contents: read
+  issues: write
+
 jobs:
-  critique:
+  plan:
     if: |
-      (github.event.issue.user.login == 'rikukissa' || github.event.issue.user.login == 'naftis') &&
-      (github.event_name != 'issue_comment' || github.event.comment.user.login != 'github-actions[bot]')
+      (github.event_name == 'issues' && (github.event.issue.author_association == 'MEMBER' || github.event.issue.author_association == 'OWNER')) ||
+      (github.event_name == 'issue_comment' && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER') && github.event.comment.user.login != 'github-actions[bot]')
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-      issues: write
     steps:
       - uses: actions/checkout@v6
         with:
@@ -33,18 +34,23 @@ jobs:
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
         with:
           model: opencode/deepseek-v4-flash
+          agent: build
           use_github_token: true
           prompt: |
-            Read the issue title, description, and all comments using the `read` tool.
+            You are a ticket reviewer. Do NOT implement. Do NOT write code. Do NOT create branches or PRs.
 
-            Critique the completeness of this task using the "grilling" technique:
+            Read the title, description, and all comments.
 
-            - Interview the issue author relentlessly about every aspect of their plan until a shared understanding is reached.
-            - Walk down each branch of the design tree, resolving dependencies between decisions one-by-one.
-            - For each question, provide your recommended answer.
-            - Ask questions ONE AT A TIME — wait for feedback before continuing. Asking multiple questions at once is bewildering.
-            - If a question can be answered by exploring the codebase, explore the codebase instead.
+            Is there enough information to implement this with no obvious pitfalls?
+            1. If yes — update the issue description via:
+               `gh issue edit $ISSUE_NUMBER --repo opencrvs/opencrvs-core --body '...'`
+               Construct the body by appending the refined scope (decisions, affected files, approach) to the original description. Then stop.
+            2. If no — ask the author specific unanswered questions with your recommended answer. Do nothing else.
 
-            Post your first question as a comment on the issue. If the conversation has clarified important details, update the issue description to reflect the refined understanding.
+            Rules:
+            - Explore the codebase to answer your own questions first.
+            - Keep questions concise, focused on blocking gaps only.
+            - Do NOT ask about implementation details that can be decided during development.
