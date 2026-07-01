@@ -11,7 +11,7 @@
 import * as React from 'react'
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { useIntl, FormattedMessage } from 'react-intl'
 import {
   userMessages,
@@ -112,10 +112,10 @@ export function Language() {
           </DynamicHeightLinkButton>
         }
       />
-      <ResponsiveModal
+      <Dialog
         id="ChangeLanguageModal"
         title={intl.formatMessage(userMessages.changeLanguageTitle)}
-        show={showModal}
+        isOpen={showModal}
         actions={[
           <TertiaryButton
             key="cancel"
@@ -128,9 +128,7 @@ export function Language() {
             {intl.formatMessage(buttonMessages.apply)}
           </PrimaryButton>
         ]}
-        handleClose={cancelLanguageSettings}
-        contentHeight={175}
-        contentScrollableY={true}
+        onClose={cancelLanguageSettings}
       >
         <Message>
           {intl.formatMessage(userMessages.changeLanguageMessege)}
@@ -145,7 +143,7 @@ export function Language() {
           options={langChoice}
           placeholder=""
         />
-      </ResponsiveModal>
+      </Dialog>
       {showSuccessNotification && (
         <Toast type="success" onClose={toggleSuccessNotification}>
           <FormattedMessage {...userMessages.changeLanguageSuccessMessage} />

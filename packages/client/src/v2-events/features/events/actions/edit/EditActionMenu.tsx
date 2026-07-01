@@ -29,7 +29,7 @@ import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import {
   Icon,
-  ResponsiveModal,
+  Dialog,
   Button,
   Stack,
   Text,
@@ -113,10 +113,8 @@ function EditActionModal({
   const [comment, setComment] = useState('')
 
   return (
-    <ResponsiveModal
-      autoHeight
-      show
-      showHeaderBorder
+    <Dialog
+      isOpen
       actions={[
         <Button
           key={'cancel_edit'}
@@ -135,9 +133,10 @@ function EditActionModal({
           {intl.formatMessage(messages.confirm)}
         </Button>
       ]}
-      handleClose={() => close({ confirmed: false })}
       title={intl.formatMessage(title)}
+      variant="large"
       width={800}
+      onClose={() => close({ confirmed: false })}
     >
       {supportingCopy && (
         <Stack>
@@ -157,7 +156,7 @@ function EditActionModal({
         value={comment}
         onChange={(e) => setComment(e.target.value)}
       />
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 

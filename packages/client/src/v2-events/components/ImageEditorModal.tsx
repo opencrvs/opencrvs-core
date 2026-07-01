@@ -13,7 +13,7 @@ import { useIntl } from 'react-intl'
 import Cropper from 'react-easy-crop'
 import type { Area, Point, Size } from 'react-easy-crop'
 import styled, { useTheme } from 'styled-components'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { Button, Link } from '@opencrvs/components'
 import { buttonMessages } from '@client/i18n/messages'
 import { useModal } from '@client/hooks/useModal'
@@ -144,8 +144,7 @@ function ImageEditorModal({
 
   const cropSize = useCropSize(theme.grid.breakpoints.md)
   return (
-    <ResponsiveModal
-      autoHeight
+    <Dialog
       actions={[
         <Button key="cancel" type="tertiary" onClick={() => onClose(null)}>
           {intl.formatMessage(buttonMessages.cancel)}
@@ -154,11 +153,11 @@ function ImageEditorModal({
           {intl.formatMessage(buttonMessages.apply)}
         </Button>
       ]}
-      handleClose={() => onClose(null)}
       id="ImageEditorModal"
-      show={true}
       title={intl.formatMessage(messages.title)}
+      variant="large"
       width={1080}
+      onClose={() => onClose(null)}
     >
       <Description>
         {error ? (
@@ -198,7 +197,7 @@ function ImageEditorModal({
           <Slider value={zoom} onChange={(val) => setZoom(+val)} />
         </>
       )}
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 
