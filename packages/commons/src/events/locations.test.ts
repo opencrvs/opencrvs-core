@@ -32,10 +32,26 @@ describe('canAccessEventWithScope()', () => {
   const officeUuid = generateUuid(rng)
   const createdById = generateUuid(rng)
 
+  const notifiedEvent: Partial<EventIndexWithAdministrativeHierarchy> = {
+    type: 'birth',
+    placeOfEvent: [provinceUuid, districtUuid, officeUuid],
+    legalStatuses: {
+      NOTIFIED: {
+        acceptedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        createdBy: createdById,
+        createdAtLocation: [provinceUuid, districtUuid, officeUuid]
+      },
+      DECLARED: undefined,
+      REGISTERED: undefined
+    }
+  }
+
   const declaredEvent: Partial<EventIndexWithAdministrativeHierarchy> = {
     type: 'birth',
     placeOfEvent: [provinceUuid, districtUuid, officeUuid],
     legalStatuses: {
+      NOTIFIED: undefined,
       DECLARED: {
         acceptedAt: new Date().toISOString(),
         createdAt: new Date().toISOString(),
@@ -49,6 +65,7 @@ describe('canAccessEventWithScope()', () => {
   const registeredEvent: Partial<EventIndexWithAdministrativeHierarchy> = {
     ...declaredEvent,
     legalStatuses: {
+      NOTIFIED: undefined,
       DECLARED: {
         acceptedAt: new Date().toISOString(),
         createdAt: new Date().toISOString(),
@@ -92,6 +109,11 @@ describe('canAccessEventWithScope()', () => {
   const registeredOnlyOptions = [
     { registeredIn: 'location' },
     { registeredBy: 'user' }
+  ] satisfies RecordScopeV2['options'][]
+
+  const notifiedOnlyOptions = [
+    { notifiedIn: 'location' },
+    { notifiedBy: 'user' }
   ] satisfies RecordScopeV2['options'][]
 
   const eventOptions = [
@@ -140,6 +162,29 @@ describe('canAccessEventWithScope()', () => {
           canAccessEventWithScope(
             declaredEvent,
             { type: 'record.print-certified-copies', options },
+            systemContext
+          )
+        ).toBe(false)
+      }
+    )
+
+    test('should access notified event with notifiedBy:user scope', () => {
+      expect(
+        canAccessEventWithScope(
+          notifiedEvent,
+          { type: 'record.edit', options: { notifiedBy: 'user' } },
+          systemContext
+        )
+      ).toBe(true)
+    })
+
+    test.each(notifiedOnlyOptions)(
+      'should not access an unnotified event with notified scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            declaredEvent,
+            { type: 'record.edit', options },
             systemContext
           )
         ).toBe(false)
@@ -200,6 +245,32 @@ describe('canAccessEventWithScope()', () => {
       }
     )
 
+    test.each(notifiedOnlyOptions)(
+      'should access notified event with notified scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            notifiedEvent,
+            { type: 'record.edit', options },
+            userContext
+          )
+        ).toBe(true)
+      }
+    )
+
+    test.each(notifiedOnlyOptions)(
+      'should not access an unnotified event with notified scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            declaredEvent,
+            { type: 'record.edit', options },
+            userContext
+          )
+        ).toBe(false)
+      }
+    )
+
     test.each(eventOptions)(
       'should access event with event type-based scope %j',
       (options) => {
@@ -227,6 +298,9 @@ describe('canAccessEventWithScope()', () => {
     const singleOptions = [
       { placeOfEvent: 'location' },
       { placeOfEvent: 'administrativeArea' },
+      { notifiedIn: 'location' },
+      { notifiedIn: 'administrativeArea' },
+      { notifiedBy: 'user' },
       { declaredIn: 'location' },
       { declaredIn: 'administrativeArea' },
       { registeredIn: 'location' },
@@ -256,6 +330,12 @@ describe('canAccessEventWithScope()', () => {
       ...registeredEvent,
       placeOfEvent: [generateUuid(rng)],
       legalStatuses: {
+        NOTIFIED: {
+          acceptedAt: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          createdBy: generateUuid(rng),
+          createdAtLocation: [generateUuid(rng)]
+        },
         DECLARED: {
           acceptedAt: new Date().toISOString(),
           createdAt: new Date().toISOString(),
@@ -274,6 +354,7 @@ describe('canAccessEventWithScope()', () => {
 
     const adminAreaOptions = [
       { placeOfEvent: 'administrativeArea' },
+      { notifiedIn: 'administrativeArea' },
       { declaredIn: 'administrativeArea' },
       { registeredIn: 'administrativeArea' }
     ] satisfies RecordScopeV2['options'][]

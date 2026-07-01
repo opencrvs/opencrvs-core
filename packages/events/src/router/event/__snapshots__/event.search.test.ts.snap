@@ -876,7 +876,15 @@ exports[`User with "location" scope only sees events created by system user to t
     "health-worker-notified",
   ],
   "id": "[sanitized]",
-  "legalStatuses": {},
+  "legalStatuses": {
+    "NOTIFIED": {
+      "acceptedAt": "[sanitized]",
+      "createdAt": "[sanitized]",
+      "createdAtLocation": "[sanitized]",
+      "createdBy": "[sanitized]",
+      "createdByUserType": "[sanitized]",
+    },
+  },
   "placeOfEvent": "[sanitized]",
   "potentialDuplicates": [],
   "status": "NOTIFIED",
