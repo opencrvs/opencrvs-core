@@ -18,7 +18,7 @@ export interface IDialogProps {
   id?: string
   titleIcon?: React.ReactNode
   title: string
-  isOpen: boolean
+  isOpen?: boolean
   children?: React.ReactNode
   actions: JSX.Element[]
   onClose?: () => void
@@ -74,7 +74,7 @@ const DialogContainer = styled.div<{
 `
 const DialogHeader = styled.div`
   display: flex;
-  padding: 10px 32px;
+  padding: 12px 32px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   justify-content: space-between;
 `
@@ -85,13 +85,19 @@ const DialogTitle = styled.div`
 `
 
 const DialogContent = styled.div`
+  ${({ theme }) => theme.fonts.reg16};
+  color: ${({ theme }) => theme.colors.supportingCopy};
   padding: 24px 32px;
   flex-grow: 1;
   overflow-y: auto;
+  text-align: left;
+  text-wrap: wrap;
+  display: flex;
+  flex-direction: column;
 `
 
 const DialogFooter = styled.div`
-  padding: 24px 32px;
+  padding: 18px 32px;
   align-items: center;
   display: flex;
   gap: 8px;
@@ -103,7 +109,7 @@ export function Dialog({
   id,
   title,
   onClose,
-  isOpen,
+  isOpen = true,
   children,
   actions,
   variant = 'small',
@@ -140,6 +146,7 @@ export function Dialog({
             variant={variant}
             ref={dialogRef}
             role="dialog"
+            data-testid={id}
           >
             <DialogHeader>
               <DialogTitle>
@@ -148,14 +155,17 @@ export function Dialog({
                   {title}
                 </Text>
               </DialogTitle>
-              <Button
-                data-testid="close-dialog"
-                type="icon"
-                size="medium"
-                onClick={handleClose}
-              >
-                <Icon name="X" size="large" weight="bold" />
-              </Button>
+              {onClose && (
+                <Button
+                  id="close-dialog"
+                  data-testid="close-dialog"
+                  type="icon"
+                  size="medium"
+                  onClick={handleClose}
+                >
+                  <Icon name="X" size="large" weight="bold" />
+                </Button>
+              )}
             </DialogHeader>
             <DialogContent>{children}</DialogContent>
             {hasActions && <DialogFooter>{actions}</DialogFooter>}

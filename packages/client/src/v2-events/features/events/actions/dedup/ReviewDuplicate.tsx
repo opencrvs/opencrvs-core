@@ -108,6 +108,12 @@ export const duplicateMessages = {
     id: 'duplicates.content.registeredBy',
     defaultMessage: 'Registered by',
     description: 'Registered by label for duplicates comparison'
+  },
+  notDuplicateContentConfirmationDescription: {
+    id: 'duplicates.content.notDuplicateContentConfirmationDescription',
+    defaultMessage:
+      'By clicking "Confirm", the event will be marked as not a duplicate.',
+    description: 'Not a duplicate content confirmation description message'
   }
 }
 
