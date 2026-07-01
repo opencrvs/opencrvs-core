@@ -1,0 +1,51 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+name: AI Task Critique
+on:
+  issues:
+    types: [opened]
+  issue_comment:
+    types: [created]
+
+permissions:
+  id-token: write
+  contents: read
+  issues: write
+
+jobs:
+  plan:
+    if: |
+      (github.event_name == 'issues' && (github.event.issue.author_association == 'MEMBER' || github.event.issue.author_association == 'OWNER')) ||
+      (github.event_name == 'issue_comment' && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER') && github.event.comment.user.login != 'github-actions[bot]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - uses: anomalyco/opencode/github@latest
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          model: opencode/deepseek-v4-flash
+          agent: plan
+          use_github_token: true
+          prompt: |
+            Read the issue title, description, and ALL comments using the `read` tool.
+
+            Critique the completeness of this task using the "grilling" technique:
+
+            - Interview the issue author relentlessly about every aspect of their plan until a shared understanding is reached.
+            - Walk down each branch of the design tree, resolving dependencies between decisions one-by-one.
+            - Only ask questions the author hasn't already answered in prior comments.
+            - If a question can be answered by exploring the codebase, explore the codebase instead.
+            - For each question, provide your recommended answer.
+            - Once the description is complete, update it to reflect the shared understanding.
