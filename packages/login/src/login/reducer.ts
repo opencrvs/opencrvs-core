@@ -140,6 +140,10 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         Cmd.run(
           (getState: () => IStoreState) => {
             if (action.payload.token) {
+              if (!action.payload.refreshToken) {
+                window.location.assign('/login')
+                return
+              }
               window.location.assign(
                 `/register/?refreshToken=${
                   action.payload.refreshToken
@@ -234,6 +238,10 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         },
         Cmd.run(
           (getState: () => IStoreState) => {
+            if (!action.payload.refreshToken) {
+              window.location.assign('/login')
+              return
+            }
             const redirectToURL = getState().login.redirectToURL
             // Strip leading slash from redirectToURL to avoid double slash e.g. /register//events/...
             const fullURL = redirectToURL

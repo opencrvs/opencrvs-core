@@ -213,7 +213,7 @@ describe('reducer', () => {
     })
     store.dispatch({
       type: actions.VERIFY_CODE_COMPLETED,
-      payload: { token: 'test-token' }
+      payload: { token: 'test-token', refreshToken: 'test-refresh-token' }
     })
 
     await new Promise((resolve) => setTimeout(resolve, 0))
@@ -224,6 +224,44 @@ describe('reducer', () => {
     expect(assign).not.toHaveBeenCalledWith(
       expect.stringContaining('/register//events/')
     )
+  })
+
+  describe('GOTO_APP', () => {
+    it('redirects to /register/?refreshToken=<token> when state.refreshToken is set', async () => {
+      const assign = vi.fn()
+      vi.stubGlobal('location', { assign })
+
+      // Seed refreshToken into state via AUTHENTICATION_COMPLETED with no token
+      // (no-token branch calls inAppRedirect, not window.location.assign)
+      store.dispatch({
+        type: actions.AUTHENTICATION_COMPLETED,
+        payload: {
+          nonce: 'abc',
+          refreshToken: 'my-refresh-token',
+          inAppRedirect: () => {}
+        }
+      })
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      assign.mockClear()
+
+      store.dispatch({ type: actions.GOTO_APP, payload: '' })
+      await new Promise((resolve) => setTimeout(resolve, 0))
+
+      expect(assign).toHaveBeenCalledWith(
+        '/register/?refreshToken=my-refresh-token'
+      )
+    })
+
+    it('redirects to /login when state.refreshToken is falsy', async () => {
+      const assign = vi.fn()
+      vi.stubGlobal('location', { assign })
+
+      // Fresh store has refreshToken = '' (falsy)
+      store.dispatch({ type: actions.GOTO_APP, payload: '' })
+      await new Promise((resolve) => setTimeout(resolve, 0))
+
+      expect(assign).toHaveBeenCalledWith('/login')
+    })
   })
 })
 
