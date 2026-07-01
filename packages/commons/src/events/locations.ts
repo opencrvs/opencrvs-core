@@ -83,6 +83,9 @@ export type EventIndexWithAdministrativeHierarchy = Omit<
   'legalStatuses'
 > & {
   legalStatuses: {
+    NOTIFIED:
+      | ToArrayFields<ActionCreationMetadata, 'createdAtLocation'>
+      | undefined
     DECLARED:
       | ToArrayFields<ActionCreationMetadata, 'createdAtLocation'>
       | undefined
@@ -166,6 +169,34 @@ export function canAccessEventWithScope(
 
   if (scopeUsesDeclaredOptions(scope)) {
     const { options } = scope
+
+    if (options?.notifiedBy === UserFilter.enum.user) {
+      if (event.legalStatuses?.NOTIFIED?.createdBy !== user.id) {
+        return false
+      }
+    }
+
+    if (
+      options?.notifiedIn === JurisdictionFilter.enum.location &&
+      !matchesJurisdictionFilter(
+        event.legalStatuses?.NOTIFIED?.createdAtLocation,
+        JurisdictionFilter.enum.location,
+        user
+      )
+    ) {
+      return false
+    }
+
+    if (
+      options?.notifiedIn === JurisdictionFilter.enum.administrativeArea &&
+      !matchesJurisdictionFilter(
+        event.legalStatuses?.NOTIFIED?.createdAtLocation,
+        JurisdictionFilter.enum.administrativeArea,
+        user
+      )
+    ) {
+      return false
+    }
 
     if (options?.declaredBy === UserFilter.enum.user) {
       if (event.legalStatuses?.DECLARED?.createdBy !== user.id) {

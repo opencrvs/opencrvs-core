@@ -360,6 +360,21 @@ export function withJurisdictionFilters({
               term: { placeOfEvent: value }
             })
             break
+
+          case 'notifiedIn':
+            must.push({
+              term: {
+                'legalStatuses.NOTIFIED.createdAtLocation': value
+              }
+            })
+            break
+
+          case 'notifiedBy':
+            must.push({
+              term: { 'legalStatuses.NOTIFIED.createdBy': value }
+            })
+            break
+
           case 'declaredIn':
             must.push({
               term: {
