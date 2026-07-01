@@ -10,7 +10,7 @@ Core actions, as the name suggests, are defined within the core and are availabl
 - `READ`
 - `ASSIGN` & `UNASSIGN`
 - `DELETE`
-- `NOTIFY`
+- `NOTIFY`\*
 - `DECLARE`\*, `VALIDATE`\* & `REGISTER`\*
 - `REJECT`\*
 - `ARCHIVE`
@@ -43,6 +43,8 @@ All custom actions are configurable.
 All custom actions and certain core actions are configurable.
 
 Actions are configured on a per–event-type basis, meaning different event types do not share action configurations.
+
+> [!NOTE] > `NOTIFY` has a special fallback behaviour: if no `NOTIFY` action config is defined, it inherits the `DECLARE` action config (label, flags, icon, conditionals). When a `NOTIFY` config is present, it is used independently — flag operations on `NOTIFY` do not affect `DECLARE` and vice versa. The `review` field on `NOTIFY` config is optional; when omitted, the `DECLARE` review page is used.
 
 Below we describe two configuration options: flag configurations and action conditionals. It is important to note that additional configuration options are available and that many core actions have configuration options specific to their action type.
 

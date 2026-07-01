@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ResponsiveModal } from '@opencrvs/components'
+import { Dialog } from '@opencrvs/components'
 import { PrimaryButton } from '@opencrvs/components/src/buttons'
 import React from 'react'
 import { useSelector } from 'react-redux'
@@ -50,20 +50,16 @@ export const ReloadModal = () => {
   }
 
   return (
-    <ResponsiveModal
+    <Dialog
       title={intl.formatMessage(messages.title)}
-      responsive={false}
-      showCloseButton={false}
-      autoHeight={true}
-      titleHeightAuto={true}
       actions={[
         <PrimaryButton key="reload" id="reload" onClick={handleReload}>
           {intl.formatMessage(messages.update)}
         </PrimaryButton>
       ]}
-      show={visibility}
+      isOpen={visibility}
     >
       {intl.formatMessage(messages.body, { app_name: app_name })}
-    </ResponsiveModal>
+    </Dialog>
   )
 }

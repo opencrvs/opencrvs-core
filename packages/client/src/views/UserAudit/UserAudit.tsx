@@ -33,7 +33,7 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Loader } from '@opencrvs/components/lib/Loader'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
@@ -280,10 +280,10 @@ export const UserAudit = () => {
               }}
             />
           )}
-          <ResponsiveModal
+          <Dialog
             id="username-reminder-modal"
-            show={toggleUsernameReminder}
-            handleClose={() => toggleUsernameReminderModal()}
+            isOpen={toggleUsernameReminder}
+            onClose={() => toggleUsernameReminderModal()}
             title={intl.formatMessage(
               sysMessages.sendUsernameReminderInviteModalTitle
             )}
@@ -310,8 +310,6 @@ export const UserAudit = () => {
                 {intl.formatMessage(buttonMessages.send)}
               </Button>
             ]}
-            responsive={false}
-            autoHeight={true}
           >
             {intl.formatMessage(
               sysMessages.sendUsernameReminderInviteModalMessage,
@@ -320,11 +318,11 @@ export const UserAudit = () => {
                 deliveryMethod
               }
             )}
-          </ResponsiveModal>
-          <ResponsiveModal
+          </Dialog>
+          <Dialog
             id="user-reset-password-modal"
-            show={toggleResetPassword}
-            handleClose={() => toggleUserResetPasswordModal()}
+            isOpen={toggleResetPassword}
+            onClose={() => toggleUserResetPasswordModal()}
             title={intl.formatMessage(sysMessages.resetUserPasswordModalTitle)}
             actions={[
               <Button
@@ -349,14 +347,12 @@ export const UserAudit = () => {
                 {intl.formatMessage(buttonMessages.send)}
               </Button>
             ]}
-            responsive={false}
-            autoHeight={true}
           >
             {intl.formatMessage(sysMessages.resetUserPasswordModalMessage, {
               deliveryMethod,
               recipient: deliveryMethod === 'sms' ? user.mobile : user.email
             })}
-          </ResponsiveModal>
+          </Dialog>
           {showResendInviteSuccess && (
             <Toast
               id="resend_invite_success"

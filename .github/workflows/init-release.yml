@@ -97,6 +97,23 @@ jobs:
           # Bump all workspace package.json files and the root in one command.
           npx lerna exec 'yarn version --new-version ${{ inputs.version }} --no-git-tag-version'
           yarn version --new-version ${{ inputs.version }} --no-git-tag-version
+          # Bump helm chart version without creating a git tag.
+          find charts/ -name Chart.yaml -exec yq -i ".version = \"v$VERSION\"" {} \;
+          find charts/ -name Chart.yaml -exec yq -i ".appVersion = \"v$VERSION\"" {} \;
+          # Bump version in default values.yaml for opencrvs-services
+          # TODO: yq is not relaiable for this case, check if we can use ruamel.yaml (python) library
+          sed -i.bak -E '
+          /^platform:/,/^[^[:space:]]/ {
+            s/^([[:space:]]*tag:[[:space:]]*).*/\1'"$VERSION"'/
+          }
+          /^countryconfig:/,/^[^[:space:]]/ {
+            /^[[:space:]]*image:/,/^[[:space:]]{2}[a-zA-Z0-9_-]+:/ {
+              s/^([[:space:]]*tag:[[:space:]]*).*/\1'"$VERSION"'/
+            }
+          }
+          ' charts/opencrvs-services/values.yaml
+          rm charts/opencrvs-services/values.yaml.bak
+
           git add .
           git commit -m "chore: update version to ${{ inputs.version }}"
 

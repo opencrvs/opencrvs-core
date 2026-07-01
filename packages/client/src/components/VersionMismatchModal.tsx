@@ -12,7 +12,7 @@ import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { IStoreState } from '@client/store'
 import { storage } from '@client/storage'
 import { removeToken } from '@client/utils/authUtils'
@@ -51,20 +51,16 @@ export function VersionMismatchModal({ show }: { show: boolean }) {
   }
 
   return (
-    <ResponsiveModal
+    <Dialog
       title={intl.formatMessage(reloadModalMessages.title)}
-      responsive={false}
-      showCloseButton={false}
-      autoHeight={true}
-      titleHeightAuto={true}
       actions={[
         <PrimaryButton key="login" id="login" onClick={handleReLogin}>
           {intl.formatMessage(reloadModalMessages.loginAgain)}
         </PrimaryButton>
       ]}
-      show={show}
+      isOpen={show}
     >
       {intl.formatMessage(reloadModalMessages.body, { app_name: appName })}
-    </ResponsiveModal>
+    </Dialog>
   )
 }

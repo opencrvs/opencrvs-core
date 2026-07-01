@@ -13,7 +13,7 @@ import { defineMessages, useIntl } from 'react-intl'
 import { EventState, VerificationPageConfig } from '@opencrvs/commons/client'
 import { Check, Cross } from '@opencrvs/components/lib/icons'
 import {
-  ResponsiveModal,
+  Dialog,
   Text,
   Frame,
   Icon,
@@ -55,8 +55,8 @@ export const VerificationWizard = ({
 
   const onCancelButtonClick = () => {
     void openCancelModal<void>((close) => (
-      <ResponsiveModal
-        autoHeight
+      <Dialog
+        isOpen
         actions={[
           <Button
             key="cancel"
@@ -77,17 +77,15 @@ export const VerificationWizard = ({
             {intl.formatMessage(messages.confirm)}
           </Button>
         ]}
-        handleClose={() => close()}
-        responsive={false}
-        show={true}
         title={intl.formatMessage(pageConfig.actions.cancel.confirmation.title)}
+        onClose={() => close()}
       >
         <Stack>
           <Text color="grey500" element="p" variant="reg16">
             {intl.formatMessage(pageConfig.actions.cancel.confirmation.body)}
           </Text>
         </Stack>
-      </ResponsiveModal>
+      </Dialog>
     ))
   }
 
