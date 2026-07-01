@@ -11,6 +11,21 @@
 import { ColumnContentAlignment } from './Workqueue'
 import * as React from 'react'
 
+enum GQLRegStatus {
+  DECLARED = 'DECLARED',
+  REGISTERED = 'REGISTERED',
+  CERTIFIED = 'CERTIFIED',
+  REJECTED = 'REJECTED'
+}
+
+export interface IStatus {
+  type: GQLRegStatus | null
+  practitionerName: string
+  timestamp: string | null
+  practitionerRole: string
+  officeName: string | Array<string | null> | null
+}
+
 export interface IColumn {
   label?: string | React.ReactNode
   /** Width in percentage */
@@ -40,6 +55,7 @@ export interface IDynamicValues {
     | boolean
     | IAction[]
     | Array<string | null>
+    | IStatus[]
     | React.ReactNode[]
     | JSX.Element
     | Date
@@ -55,7 +71,7 @@ export interface IActionObject {
   disabled?: boolean
 }
 
-interface IActionComponent {
+export interface IActionComponent {
   actionComponent: JSX.Element | (() => React.ReactElement)
 }
 export type IAction = IActionObject | IActionComponent
