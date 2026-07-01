@@ -34,7 +34,7 @@ jobs:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          model: zen/deepseek-v4-flash
+          model: opencode/deepseek-v4-flash
           use_github_token: true
           prompt: |
             Read the issue title, description, and all comments using the `read` tool.
