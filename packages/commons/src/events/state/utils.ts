@@ -152,6 +152,10 @@ export function getActionUpdateMetadata(actions: Action[]) {
  */
 export function getLegalStatuses(actions: Action[]) {
   return {
+    [EventStatus.enum.NOTIFIED]: getDeclarationActionCreationMetadata(
+      ActionType.NOTIFY,
+      actions
+    ),
     [EventStatus.enum.DECLARED]: getDeclarationActionCreationMetadata(
       ActionType.DECLARE,
       actions
