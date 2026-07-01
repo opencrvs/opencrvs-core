@@ -181,6 +181,12 @@ export function getEventIndexWithoutLocationHierarchy(
   event.updatedAtLocation = takeLast(event.updatedAtLocation)
   event.placeOfEvent = takeLast(event.placeOfEvent)
 
+  if (event.legalStatuses.NOTIFIED) {
+    event.legalStatuses.NOTIFIED.createdAtLocation = takeLast(
+      event.legalStatuses.NOTIFIED.createdAtLocation
+    )
+  }
+
   if (event.legalStatuses.DECLARED) {
     event.legalStatuses.DECLARED.createdAtLocation = takeLast(
       event.legalStatuses.DECLARED.createdAtLocation
@@ -271,6 +277,13 @@ export async function getEventIndexWithAdministrativeHierarchy(
     tempEvent.updatedAtLocation = await buildAdministrativeHierarchyById(
       event.updatedAtLocation
     )
+  }
+
+  if (event.legalStatuses.NOTIFIED?.createdAtLocation) {
+    tempEvent.legalStatuses.NOTIFIED.createdAtLocation =
+      await buildAdministrativeHierarchyById(
+        event.legalStatuses.NOTIFIED.createdAtLocation
+      )
   }
 
   if (event.legalStatuses.DECLARED?.createdAtLocation) {

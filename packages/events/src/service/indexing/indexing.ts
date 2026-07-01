@@ -301,6 +301,20 @@ export async function createIndex(
           legalStatuses: {
             type: 'object',
             properties: {
+              [EventStatus.enum.NOTIFIED]: {
+                type: 'object',
+                properties: {
+                  createdAt: { type: 'date' },
+                  createdBy: { type: 'keyword' },
+                  createdByUserType: { type: 'keyword' },
+                  createdAtLocation: { type: 'keyword' },
+                  createdByRole: { type: 'keyword' },
+                  acceptedAt: { type: 'date' }
+                } satisfies Record<
+                  keyof ActionCreationMetadata,
+                  estypes.MappingProperty
+                >
+              },
               [EventStatus.enum.DECLARED]: {
                 type: 'object',
                 properties: {
