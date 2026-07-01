@@ -16,7 +16,6 @@ export const dimensionsMap = {
 
 export type IButtonSize = 'small' | 'medium' | 'large'
 
-export * from './Action'
 export * from './Button'
 export * from './PrimaryButton'
 export * from './SecondaryButton'
