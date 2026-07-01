@@ -20,7 +20,7 @@ import {
   getDeclaration,
   getCurrentEventState
 } from '@opencrvs/commons/client'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components'
 import { buttonMessages } from '@client/i18n/messages'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -114,10 +114,12 @@ export function Review() {
           )
         }}
       >
-        <PrimaryButton
+        <Button
           key="continue_button"
           disabled={!anyValuesHaveChanged || incomplete}
           id="continue_button"
+          size="large"
+          type="primary"
           onClick={() => {
             navigate(
               ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath(
@@ -128,7 +130,7 @@ export function Review() {
           }}
         >
           {intl.formatMessage(buttonMessages.continueButton)}
-        </PrimaryButton>
+        </Button>
       </ReviewComponent.Body>
     </FormLayout>
   )
