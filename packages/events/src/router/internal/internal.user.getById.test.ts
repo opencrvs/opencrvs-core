@@ -52,11 +52,12 @@ test('returns NOT_FOUND for a system client id — system clients are in a separ
   // System clients live in `systemClients`, not `users`. Passing a system
   // client id to getById must never return a result; the users-table query
   // excludes them by construction.
+  const { user } = await setupTestCase()
   const systemId = getUUID()
   await createSystemClient({
     id: systemId,
     name: 'Test System Client',
-    createdBy: getUUID(),
+    createdBy: user.id,
     secretHash: 'hash',
     salt: 'salt',
     shaSecret: 'shaSecret'

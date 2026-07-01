@@ -18,7 +18,7 @@ import { consume, revokeFamily } from '@auth/features/refresh/family'
 import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
 import { TokenUserType, logger } from '@opencrvs/commons'
 
-export class RefreshTokenError extends Error {}
+class RefreshTokenError extends Error {}
 
 export async function refreshToken(
   userId: string,

@@ -59,7 +59,7 @@ export function storeRefreshToken(token: string) {
   localStorage.setItem('opencrvs-refresh', token)
 }
 
-export function removeRefreshToken() {
+function removeRefreshToken() {
   localStorage.removeItem('opencrvs-refresh')
 }
 
