@@ -8,10 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { InputField } from '@opencrvs/components/lib/InputField'
+import {
+  Button,
+  InputField,
+  Dialog,
+  ErrorMessage,
+  PasswordInput
+} from '@opencrvs/components'
 import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
-import { ErrorMessage, Dialog } from '@opencrvs/components'
 import { userMessages as messages } from '@client/i18n/messages'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import styled from 'styled-components'
@@ -21,7 +25,6 @@ import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { PasswordInput } from '@opencrvs/components'
 
 const Message = styled.div`
   margin-bottom: 16px;
@@ -204,7 +207,9 @@ export function PasswordChangeModal({
       title={intl.formatMessage(messages.changePassword)}
       isOpen={true}
       actions={[
-        <PrimaryButton
+        <Button
+          size="large"
+          type="primary"
           id="confirm-button"
           key="confirm"
           onClick={handleChangePassword}
@@ -219,7 +224,7 @@ export function PasswordChangeModal({
           }
         >
           {intl.formatMessage(messages.confirmButtonLabel)}
-        </PrimaryButton>
+        </Button>
       ]}
       width={1000}
       variant="large"

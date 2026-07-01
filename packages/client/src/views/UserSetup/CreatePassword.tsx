@@ -11,19 +11,23 @@
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
-import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
 import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
+import {
+  Button,
+  WarningMessage,
+  TextInput,
+  InputField,
+  ActionPageLight,
+  Content,
+  ContentSize
+} from '@opencrvs/components'
 import {
   ProtectedAccoutStep,
   IProtectedAccountSetupData
 } from '@client/components/ProtectedAccount'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { buttonMessages } from '@client/i18n/messages'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+
 import { EMPTY_STRING } from '@client/utils/constants'
 
 const GlobalError = styled.div`
@@ -124,13 +128,14 @@ export function CreatePassword({ setupData, goToStep }: IProps) {
   }
 
   const continueActionButton = (
-    <PrimaryButton
+    <Button
+      type="primary"
       id="Continue"
       onClick={whatNext}
       disabled={!hasCases || !hasNumber || !validLength}
     >
       {intl.formatMessage(buttonMessages.continueButton)}
-    </PrimaryButton>
+    </Button>
   )
 
   return (
