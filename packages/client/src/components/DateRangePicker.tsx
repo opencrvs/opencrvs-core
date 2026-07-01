@@ -368,7 +368,7 @@ export const CancelableArea = styled.div`
     opacity: 0.5;
   }
 `
-const StyledPrimaryButton = styled(Button)`
+const StyledButton = styled(Button)`
   padding: 8px 16px;
   height: auto;
 `
@@ -740,7 +740,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
               {routes[activeRoute].renderComponent()}
             </ModalBodyMobile>
             <ModalFooter>
-              <StyledPrimaryButton
+              <StyledButton
                 type="primary"
                 id="date-range-confirm-action"
                 onClick={() => {
@@ -754,7 +754,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
                 disabled={isAfter(startDate, endDate)}
               >
                 {intl.formatMessage(buttonMessages.select)}
-              </StyledPrimaryButton>
+              </StyledButton>
             </ModalFooter>
           </ModalContainer>
           <CancelableArea

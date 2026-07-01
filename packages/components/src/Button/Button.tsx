@@ -15,7 +15,7 @@ import { Spinner } from '../Spinner'
 import * as styles from './Button.styles'
 
 type ButtonSize = 'small' | 'medium' | 'large'
-type ButtonType =
+export type ButtonType =
   | 'primary'
   | 'secondary'
   | 'tertiary'

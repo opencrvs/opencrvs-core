@@ -13,7 +13,7 @@ import { QuickActionConfig } from './useQuickActionModal'
 
 export const archive: QuickActionConfig = {
   modal: {
-    confirmButtonType: 'danger',
+    confirmButtonType: 'negative',
     confirmButtonLabel: {
       id: 'buttons.archive',
       defaultMessage: 'Archive',
