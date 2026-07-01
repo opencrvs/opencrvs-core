@@ -22,11 +22,13 @@ export async function start() {
   logger.info(`REDIS_HOST, ${JSON.stringify(env.REDIS_HOST)}`)
   logger.info(`REDIS_USERNAME, ${JSON.stringify(env.REDIS_USERNAME)}`)
 
-  redis = await createClient({
+  redis = createClient({
     username: env.REDIS_USERNAME,
     password: env.REDIS_PASSWORD,
     socket: {
       host: env.REDIS_HOST
     }
-  }).connect()
+  })
+
+  await redis.connect()
 }

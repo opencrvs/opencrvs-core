@@ -18,12 +18,14 @@ export async function stop() {
 }
 
 export async function start(host = REDIS_HOST, port?: number) {
-  redis = await createClient({
+  redis = createClient({
     username: REDIS_USERNAME,
     password: REDIS_PASSWORD,
     socket: {
       host,
       port
     }
-  }).connect()
+  })
+
+  await redis.connect()
 }
