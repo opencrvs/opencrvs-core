@@ -1,22 +1,51 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
+    // opt for "auto" mode instead of "bypassPermissions"
+    "disableBypassPermissionsMode": "disable",
     "deny": [
+      // secrets: block reading AND writing
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(**/.env)",
       "Read(**/.env.*)",
-      "Read(**/data-seeding/**)",
-      "Read(**/credentials/**)",
-      "Read(**/secrets/**)",
+      "Edit(**/.env)",
+      "Edit(**/.env.*)",
+      "Read(**/.secrets/**)",
       "Read(**/*.pem)",
       "Read(**/*.key)",
       "Read(**/id_rsa)",
       "Read(**/id_ed25519)",
+      // dangerous commands
+      "Bash(sudo:*)",
+      "Bash(ssh:*)",
+      "Bash(git push:*)",
+      "Bash(git push --force:*)",
+      "Bash(docker push:*)",
+      "Bash(kubectl:*)",
+      "Bash(rm -rf /:*)"
+    ],
+    "ask": [
+      // network access: sometimes legit in dev, so always ask instead of hard-block
       "Bash(curl:*)",
       "Bash(wget:*)",
-      "Bash(sudo:*)",
-      "Bash(ssh:*)"
+      "WebFetch",
+      "Bash(docker:*)",
+      "Bash(git commit:*)"
+    ],
+    "allow": [
+      // the repetitive safe stuff in this repo
+      "Bash(yarn test:*)",
+      "Bash(yarn lint:*)",
+      "Bash(yarn build:*)",
+      "Bash(yarn tsc:*)",
+      "Bash(yarn typecheck:*)",
+      "Bash(yarn workspace:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Edit(packages/**)"
     ]
   }
 }
