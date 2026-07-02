@@ -1,0 +1,77 @@
+all:
+  vars:
+    # single_node:
+    # For development/qa/testing/staging keep true
+    # For production keep false
+    # Defaults production configuration:
+    # - master node
+    # - 2 worker nodes
+    single_node: false
+
+    # Domain/IP address for remote access to your cluster API
+    # Domain/IP address will be added as main endpoint to your ~/.kube/config
+    # - If you are behind VPN, use private IP address
+    # - If your server is exposed (not recommeded), use public IP address
+    # - If you would like to run kubectl commands from the remote server, leave this field empty
+
+    # IMPORTANT: If master VM has multiple ethernet interfaces, put private IP address at kube_api_host
+    # kube_api_host: 10.10.10.10
+    kube_api_host: ''
+
+    # Default ansible provision user, keep as is
+    ansible_user: provision
+
+    # users: Add as many users as you wish
+    # Configuration example
+    # - name: <login>
+    #   ssh_keys:
+    #     - <public ssh key 1>
+    #     - <public ssh key 2>
+    #   state: present
+    #   role: admin
+    # Allowed roles:
+    # - operator: grant read only access to OS and full access to kubernetes cluster
+    # - admin: grant full access to OS and kubernetes cluster
+    # Allowed states:
+    # - present: user is allowed to login
+    # - absent: user account is disabled
+    users: []
+
+  children:
+    master:
+      hosts:
+        # Replace master with value returned by command: hostname 
+        master:
+          # Keep values (ansible_host, ansible_connection) as is
+          # Ansible is executed on master node
+          ansible_host: localhost
+          ansible_connection: local
+          labels:
+            # traefik-role label is used to identify where to deploy traefik
+            traefik-role: ingress
+
+    # Workers section is optional, for single node cluster feel free to remove this section
+    # section can be added later
+    # more workers can be added later as well
+    workers:
+      hosts:
+        # Replace worker0 with value returned by command: hostname
+        worker0:
+          # Put internal IP address here
+          ansible_host: 10.10.10.10
+          labels:
+            # By default all datastores are deployed to worker node with role data1
+            role: data1
+        # Replace worker0 with value returned by command: hostname
+        worker1:
+           # Put internal IP address here
+          ansible_host: 10.10.10.11
+
+    # backup section is optional, feel free to remove if backups are not enabled
+    # section can be added later
+    backup:
+      hosts:
+        # Replace backup-01 with value returned by command: hostname
+        backup-01:
+          # Put internal IP address here
+          ansible_host: 10.10.10.12
