@@ -22,6 +22,7 @@ import {
   getRefreshToken,
   getToken,
   getTokenPayload,
+  removeAccessToken,
   storeRefreshToken,
   storeToken
 } from './authUtils'
@@ -147,6 +148,39 @@ describe('ensureFreshAccessToken', () => {
 
     expect(getToken()).toBe(newAccess)
     expect(localStorage.getItem('opencrvs-refresh')).toBe(newRefresh)
+  })
+
+  it('removeAccessToken clears only the access token, leaving the refresh token', () => {
+    storeToken(makeJwt(60 * 60))
+    storeRefreshToken(makeJwt(60 * 60 * 24))
+
+    removeAccessToken()
+
+    expect(getToken()).toBe('')
+    expect(getRefreshToken()).not.toBe('')
+  })
+
+  it('a stale-but-fresh access token no longer suppresses a refresh once cleared (user-switch handoff)', async () => {
+    // Simulates the URL-handoff fix: even though a still-fresh access token is
+    // present, clearing it forces ensureFreshAccessToken to mint from the
+    // (newly handed) refresh token instead of reusing the old user's token.
+    storeToken(makeJwt(60 * 60)) // fresh AT for the previous user
+    storeRefreshToken(makeJwt(60 * 60 * 24)) // just-handed RT for the new user
+    const newAccess = makeJwt(60 * 60)
+    const fetchSpy = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        token: newAccess,
+        refreshToken: makeJwt(60 * 60 * 24)
+      })
+    })
+    vi.stubGlobal('fetch', fetchSpy)
+
+    removeAccessToken()
+    await ensureFreshAccessToken()
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+    expect(getToken()).toBe(newAccess)
   })
 })
 

@@ -23,6 +23,7 @@ import {
   getToken,
   isTokenStillValid,
   removeToken,
+  removeAccessToken,
   getRefreshToken,
   storeRefreshToken,
   ensureFreshAccessToken
@@ -96,6 +97,11 @@ export const profileReducer: LoopReducer<
       )
     case actions.CHECK_AUTH: {
       const refreshToken = getRefreshToken()
+      // A refresh token in the URL is an explicit (re)authentication handoff —
+      // possibly for a different user than the one whose access token is still
+      // in localStorage.
+      const refreshTokenFromUrl =
+        window.location.search.includes('refreshToken=')
       // strip token params from the url if present
       if (
         window.location.search.includes('token=') ||
@@ -109,6 +115,13 @@ export const profileReducer: LoopReducer<
           async () => {
             if (refreshToken) {
               storeRefreshToken(refreshToken)
+            }
+            // On an explicit URL handoff, discard any still-fresh access token
+            // so it can't short-circuit the refresh — the access token must be
+            // minted from the just-handed refresh token (which may be a
+            // different user).
+            if (refreshTokenFromUrl) {
+              removeAccessToken()
             }
             // mints + stores an access token from the refresh token
             // (no-op if a fresh access token already exists)

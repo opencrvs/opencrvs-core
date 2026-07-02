@@ -27,6 +27,17 @@ export function storeToken(token: string) {
   localStorage.setItem('opencrvs', token)
 }
 
+/**
+ * Discards only the stored access token (not the refresh token). Used when a
+ * fresh refresh token is handed off via the URL so the stale access token
+ * cannot short-circuit the refresh — otherwise a still-fresh previous user's
+ * access token would keep the client authenticated as that user until it
+ * expired, ignoring the just-handed refresh token.
+ */
+export function removeAccessToken() {
+  localStorage.removeItem('opencrvs')
+}
+
 export async function removeToken() {
   const token = getToken()
   const refresh = getRefreshToken()
