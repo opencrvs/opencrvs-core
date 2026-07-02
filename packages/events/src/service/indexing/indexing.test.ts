@@ -70,6 +70,85 @@ test('records are not indexed when they are created', async () => {
   expect(body.hits.hits).toHaveLength(0)
 })
 
+test('legalStatuses.NOTIFIED is indexed with full location hierarchy after a notify action', async () => {
+  const { user, generator, seed } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({
+      type: 'record.search',
+      options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+    })
+  ])
+  const esClient = getOrCreateClient()
+
+  const locationRng = createPrng(843)
+
+  const parentAdministrativeArea = {
+    ...generator.administrativeAreas.set(1, locationRng)[0],
+    name: 'Administrative Area'
+  }
+  const childAdministrativeArea = {
+    validUntil: null,
+    externalId: null,
+    name: 'Child Administrative Area',
+    id: user.administrativeAreaId as UUID,
+    parentId: parentAdministrativeArea.id
+  }
+  const childLocation = {
+    ...generator.locations.set(1, locationRng)[0],
+    id: user.primaryOfficeId,
+    administrativeAreaId: childAdministrativeArea.id,
+    name: 'Child location',
+    locationType: 'CRVS_OFFICE'
+  } satisfies Location
+
+  await seed.administrativeAreas([
+    parentAdministrativeArea,
+    childAdministrativeArea
+  ])
+  await seed.locations([childLocation])
+
+  const createdEvent = await client.event.create(
+    generator.event.create({ type: TENNIS_CLUB_MEMBERSHIP })
+  )
+
+  await client.event.actions.notify.request(
+    generator.event.actions.notify(createdEvent.id)
+  )
+
+  // ES document must contain the full administrative hierarchy for NOTIFIED
+  const esResponse = await esClient.search({
+    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+    body: { query: { match_all: {} } }
+  })
+
+  expect(esResponse.hits.hits).toHaveLength(1)
+  expect(esResponse.hits.hits[0]._source).toMatchObject({
+    id: createdEvent.id,
+    status: 'NOTIFIED',
+    legalStatuses: {
+      NOTIFIED: {
+        createdAtLocation: [
+          parentAdministrativeArea.id,
+          childAdministrativeArea.id,
+          childLocation.id
+        ]
+      }
+    }
+  })
+
+  // Search API must return only the leaf-level location (no hierarchy)
+  const { results } = await client.event.search({
+    query: { type: 'and', clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }] }
+  })
+
+  expect(results).toHaveLength(1)
+  expect(results[0].legalStatuses.NOTIFIED?.createdAtLocation).toEqual(
+    childLocation.id
+  )
+})
+
 test('records are indexed with full location hierarchy', async () => {
   const { user, generator, seed } = await setupTestCase()
 

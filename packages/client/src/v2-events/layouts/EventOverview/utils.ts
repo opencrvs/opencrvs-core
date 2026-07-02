@@ -27,6 +27,7 @@ import {
  * - `createdAtLocation`
  * - `updatedAtLocation`
  * - `placeOfEvent`
+ * - `legalStatuses.NOTIFIED.createdAtLocation`
  * - `legalStatuses.DECLARED.createdAtLocation`
  * - `legalStatuses.REGISTERED.createdAtLocation`
  */
@@ -46,6 +47,13 @@ export function buildEventIndexWithHierarchy(
     updatedAtLocation: resolve(event.updatedAtLocation) ?? [],
     placeOfEvent: resolve(event.placeOfEvent),
     legalStatuses: {
+      NOTIFIED: event.legalStatuses.NOTIFIED
+        ? {
+            ...event.legalStatuses.NOTIFIED,
+            createdAtLocation:
+              resolve(event.legalStatuses.NOTIFIED.createdAtLocation) ?? []
+          }
+        : undefined,
       DECLARED: event.legalStatuses.DECLARED
         ? {
             ...event.legalStatuses.DECLARED,
