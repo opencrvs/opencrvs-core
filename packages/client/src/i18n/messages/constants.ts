@@ -1001,7 +1001,10 @@ const dynamicConstantsMessages: Record<
   MessageDescriptor
 > = defineMessages(dynamicMessagesToDefine)
 
-export const countryMessages = defineMessages({
+export const countryMessages: Record<
+  string | number | symbol,
+  MessageDescriptor
+> = defineMessages({
   AFG: {
     id: 'countries.AFG',
     defaultMessage: 'Afghanistan',
