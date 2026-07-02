@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -547,6 +548,91 @@ describe('getEventFlags() – rejected flag', () => {
   })
 })
 
+describe('resolveEventCustomFlags() – NOTIFY config isolation', () => {
+  const configWithNotify: DeepPartial<EventConfig> = {
+    actions: [
+      {
+        type: ActionType.NOTIFY,
+        flags: [{ id: 'notify-only-flag', operation: 'add' }]
+      },
+      {
+        type: ActionType.DECLARE,
+        flags: [{ id: 'declare-only-flag', operation: 'add' }]
+      }
+    ],
+    declaration: {
+      label: { id: '', defaultMessage: '', description: '' },
+      pages: []
+    }
+  }
+
+  const configWithoutNotify: DeepPartial<EventConfig> = {
+    actions: [
+      {
+        type: ActionType.DECLARE,
+        flags: [{ id: 'declare-only-flag', operation: 'add' }]
+      }
+    ],
+    declaration: {
+      label: { id: '', defaultMessage: '', description: '' },
+      pages: []
+    }
+  }
+
+  test('NOTIFY action uses NOTIFY flags when NOTIFY config is present', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.NOTIFY,
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, configWithNotify)
+    expect(flags).toContain('notify-only-flag')
+    expect(flags).not.toContain('declare-only-flag')
+  })
+
+  test('DECLARE action uses DECLARE flags when NOTIFY config is also present', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.DECLARE,
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, configWithNotify)
+    expect(flags).toContain('declare-only-flag')
+    expect(flags).not.toContain('notify-only-flag')
+  })
+
+  test('NOTIFY action falls back to DECLARE flags when no NOTIFY config is present', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.NOTIFY,
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, configWithoutNotify)
+    expect(flags).toContain('declare-only-flag')
+  })
+})
+
 describe('getEventFlags() – any inherent flag is clearable by action config', () => {
   test('INCOMPLETE is present for a notified record', () => {
     const event: DeepPartial<EventDocument> = {
@@ -561,7 +647,9 @@ describe('getEventFlags() – any inherent flag is clearable by action config', 
     }
 
     // @ts-expect-error - allow partial event document and event config
-    expect(getEventFlags(event, eventConfig)).toContain(InherentFlags.INCOMPLETE)
+    expect(getEventFlags(event, eventConfig)).toContain(
+      InherentFlags.INCOMPLETE
+    )
   })
 
   test('INCOMPLETE is cleared by a custom action whose config removes it', () => {

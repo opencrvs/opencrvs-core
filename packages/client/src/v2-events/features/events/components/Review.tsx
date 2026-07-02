@@ -20,7 +20,7 @@ import {
   Button,
   Link,
   ListReview,
-  ResponsiveModal,
+  Dialog,
   Stack,
   Text,
   TextArea
@@ -605,9 +605,8 @@ function EditModal({
 }) {
   const intl = useIntl()
   return (
-    <ResponsiveModal
-      autoHeight
-      showHeaderBorder
+    <Dialog
+      isOpen
       actions={[
         <Button
           key="cancel_edit"
@@ -632,10 +631,8 @@ function EditModal({
           )}
         </Button>
       ]}
-      handleClose={() => close(null)}
-      responsive={false}
-      show={true}
       title={intl.formatMessage(copy?.title || reviewMessages.changeModalTitle)}
+      onClose={() => close(null)}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
@@ -644,7 +641,7 @@ function EditModal({
           )}
         </Text>
       </Stack>
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 
@@ -666,9 +663,8 @@ function AcceptActionModal({
   const intl = useIntl()
 
   return (
-    <ResponsiveModal
-      autoHeight
-      show
+    <Dialog
+      isOpen
       actions={[
         <Button
           key={'cancel_' + action}
@@ -691,10 +687,10 @@ function AcceptActionModal({
           {intl.formatMessage(copy.onConfirm)}
         </Button>
       ]}
-      handleClose={() => close(null)}
-      showHeaderBorder={!!copy.supportingCopy}
       title={intl.formatMessage(copy.title, { event: eventType })}
+      variant="large"
       width={600}
+      onClose={() => close(null)}
     >
       <Stack>
         {copy.supportingCopy && (
@@ -706,7 +702,7 @@ function AcceptActionModal({
           />
         )}
       </Stack>
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 
@@ -745,14 +741,14 @@ function RejectActionModal({
   ]
 
   return (
-    <ResponsiveModal
-      showHeaderBorder
+    <Dialog
+      isOpen
       actions={actions}
-      handleClose={() => close(null)}
       id="reject-modal"
-      show={true}
       title={intl.formatMessage(reviewMessages.rejectModalTitle)}
+      variant="large"
       width={700}
+      onClose={() => close(null)}
     >
       <Stack alignItems="left" direction="column">
         <Text color="grey500" element="p" variant="reg16">
@@ -765,7 +761,7 @@ function RejectActionModal({
           onChange={(e) => setMessage(e.target.value)}
         />
       </Stack>
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 
