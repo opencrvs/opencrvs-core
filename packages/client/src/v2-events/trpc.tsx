@@ -50,10 +50,8 @@ function getTrpcClient() {
         httpLink({
           url: '/api/events',
           transformer: superjson,
-          // NOTE: ensureFreshAccessToken() is intentionally NOT called here — test
-          // tokens have no `exp` claim so it would always trigger forceReauthentication()
-          // and redirect tests to /login. The refresh gate lives on httpBatchLink (production).
-          headers() {
+          async headers() {
+            await ensureFreshAccessToken()
             return {
               authorization: `Bearer ${getToken()}`
             }
