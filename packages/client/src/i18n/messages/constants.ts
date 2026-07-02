@@ -10,7 +10,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-const countryMessages = defineMessages({
+const constantsMessages = defineMessages({
   action: {
     defaultMessage: 'Action',
     description: 'Action Label',
@@ -825,16 +825,9 @@ const countryMessages = defineMessages({
     description: 'A localized order of the full name',
     id: 'constants.humanName'
   }
-}
-export const constantsMessages: Record<
-  string | number | symbol,
-  MessageDescriptor
-> = defineMessages(messagesToDefine)
+})
 
-const dynamicMessagesToDefine: Record<
-  string | number | symbol,
-  MessageDescriptor
-> = {
+const dynamicMessagesToDefine = {
   draft: {
     id: 'constants.draft',
     defaultMessage: 'Draft',
@@ -1008,10 +1001,7 @@ const dynamicConstantsMessages: Record<
   MessageDescriptor
 > = defineMessages(dynamicMessagesToDefine)
 
-const countryMessagesToDefine: Record<
-  string | number | symbol,
-  MessageDescriptor
-> = {
+export const countryMessages = defineMessages({
   AFG: {
     id: 'countries.AFG',
     defaultMessage: 'Afghanistan',
@@ -2259,4 +2249,3 @@ const countryMessagesToDefine: Record<
     description: 'ISO Country ZWE'
   }
 })
-
