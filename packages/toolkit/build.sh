@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -6,8 +8,6 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-
-#!/bin/bash
 
 set -e
 
@@ -64,6 +64,7 @@ fi
 
 # Build CLI
 npx esbuild src/cli.ts --bundle --format=cjs --outdir=./dist --allow-overwrite --packages=external --banner:js="#!/usr/bin/env node"
+cp -R src/environment/templates dist/templates
 chmod +x ./dist/cli.js
 
 echo "Build completed successfully."

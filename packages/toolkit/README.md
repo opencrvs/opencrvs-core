@@ -14,6 +14,20 @@ src/
 
 ## Getting started
 
+### Manage GitHub environments
+
+All commands should be executed within infrastructure repository.
+
+Run `opencrvs environment init` from the root of a infrastructure
+repository to create new GitHub environment. Command requires valid GitHub token.
+
+Other environment operations are available as separate commands:
+```sh
+opencrvs environment update-workflows
+opencrvs environment users
+opencrvs environment swarm-to-k8s
+```
+
 ### Development using yarn link
 
 ```
