@@ -30,7 +30,7 @@
     "hapi-pino": "^9.0.0",
     "hapi-sentry": "^3.1.0",
     "io-ts": "^2.2.18",
-    "joi": "^17.3.0",
+    "joi": "^18.0.0",
     "jsonwebtoken": "^9.0.0",
     "node-fetch": "^2.6.7",
     "pino": "^7.0.0",
