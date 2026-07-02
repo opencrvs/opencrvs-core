@@ -8,10 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { Dialog } from '@opencrvs/components/lib/Dialog'
 import * as React from 'react'
-import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button, Toast, Dialog } from '@opencrvs/components'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
@@ -99,11 +97,19 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
       isOpen={show}
       title={intl.formatMessage(messages.changePhoneLabel)}
       actions={[
-        <TertiaryButton key="cancel" id="modal_cancel" onClick={onClose}>
+        <Button
+          size="large"
+          type="tertiary"
+          key="cancel"
+          id="modal_cancel"
+          onClick={onClose}
+        >
           {intl.formatMessage(buttonMessages.cancel)}
-        </TertiaryButton>,
-        <PrimaryButton
+        </Button>,
+        <Button
+          type="primary"
           id="continue-button"
+          size="large"
           key="continue"
           onClick={() => {
             continueButtonHandler(phoneNumber)
@@ -117,7 +123,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
           }
         >
           {intl.formatMessage(buttonMessages.continueButton)}
-        </PrimaryButton>
+        </Button>
       ]}
       onClose={onClose}
     >

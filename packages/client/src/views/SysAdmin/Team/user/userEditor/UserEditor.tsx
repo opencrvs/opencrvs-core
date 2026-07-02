@@ -26,18 +26,18 @@ import {
   CreateUserInput,
   UpdateUserInput
 } from '@opencrvs/commons/client'
-import { AppBar, Frame, Spinner } from '@opencrvs/components'
-import { Dialog } from '@opencrvs/components/lib/Dialog'
-import { Text } from '@opencrvs/components/lib/Text'
-import { Button } from '@opencrvs/components/lib/Button'
 import {
-  CircleButton,
-  ICON_ALIGNMENT,
-  SuccessButton
-} from '@opencrvs/components/lib/buttons'
+  AppBar,
+  Frame,
+  Spinner,
+  Toast,
+  ActionPageLight,
+  Button,
+  Dialog,
+  Text
+} from '@opencrvs/components'
 import { Check, Cross } from '@opencrvs/components/lib/icons'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { Toast } from '@opencrvs/components/lib/Toast'
+import { CircleButton } from '@opencrvs/components/lib/buttons'
 import { TRPCClientError } from '@trpc/client'
 import React, { useCallback, useEffect } from 'react'
 import { useIntl } from 'react-intl'
@@ -589,7 +589,9 @@ const ReviewUserComponent = () => {
             {intl.formatMessage(buttonMessages.createUser)}
           </Button>
         ) : (
-          <SuccessButton
+          <Button
+            type="positive"
+            size="large"
             id="submit-edit-user-form"
             onClick={() => {
               resetErrors()
@@ -624,11 +626,9 @@ const ReviewUserComponent = () => {
                 submitUpdate(payload)
               }
             }}
-            icon={() => <Check />}
-            align={ICON_ALIGNMENT.LEFT}
           >
-            {intl.formatMessage(buttonMessages.confirm)}
-          </SuccessButton>
+            <Check /> {intl.formatMessage(buttonMessages.confirm)}
+          </Button>
         )}
       </ReviewComponent.Body>
       {pendingPayload && (

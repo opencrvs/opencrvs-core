@@ -77,6 +77,7 @@ const DialogHeader = styled.div`
   padding: 12px 32px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   justify-content: space-between;
+  min-height: 40px;
 `
 const DialogTitle = styled.div`
   display: flex;

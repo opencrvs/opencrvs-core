@@ -28,7 +28,6 @@ import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content } from '@opencrvs/components/lib/Content'
 import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
-import { SecondaryButton } from '@opencrvs/components/lib/buttons'
 import { Check } from '@opencrvs/components/lib/icons'
 import { Text } from '@opencrvs/components/lib/Text'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
@@ -198,9 +197,10 @@ export function Summary() {
           showTitleOnMobile={true}
           title={intl.formatMessage(correctionMessages.correctionSummaryTitle)}
           topActionButtons={[
-            <SecondaryButton
+            <Button
               key="go-to-review"
               id="go-to-review"
+              type="secondary"
               onClick={() =>
                 navigate(
                   ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
@@ -213,7 +213,7 @@ export function Summary() {
               }
             >
               {intl.formatMessage(registerMessages.goToReviewButton)}
-            </SecondaryButton>
+            </Button>
           ]}
         >
           <CorrectionDetails
