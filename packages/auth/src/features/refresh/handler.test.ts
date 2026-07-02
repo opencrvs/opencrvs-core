@@ -148,6 +148,36 @@ describe('refresh token rotation', () => {
     expect(family.revokeFamily).toHaveBeenCalledWith('fam-9')
   })
 
+  it('pending user (mid-onboarding) → rotates, not revoked', async () => {
+    family.consume.mockResolvedValue({
+      status: 'rotate',
+      userId: '1',
+      newJti: 'jti-2'
+    })
+    internalClient.user.getById.query.mockResolvedValue({
+      id: '1',
+      role: 'NATIONAL_SYSTEM_ADMIN',
+      status: 'pending'
+    })
+    fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+      status: 200
+    })
+
+    const res: {
+      result?: { token: string; refreshToken: string }
+      statusCode: number
+    } = await server.server.inject({
+      method: 'POST',
+      url: '/refreshToken',
+      payload: { token: await makeRefreshToken('fam-5', 'jti-5') }
+    })
+
+    expect(res.statusCode).toBe(200)
+    expect(res.result!.token).toBeDefined()
+    expect(res.result!.refreshToken).toBeDefined()
+    expect(family.revokeFamily).not.toHaveBeenCalled()
+  })
+
   it('malformed token → 401', async () => {
     const res: { statusCode: number } = await server.server.inject({
       method: 'POST',

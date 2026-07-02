@@ -41,9 +41,13 @@ export async function refreshToken(
   // consumed.status is 'rotate' or 'grace' here (missing/reuse already threw)
 
   const { role, status } = await internalClient.user.getById.query(userId)
-  if (status !== 'active') {
+  // Mirror the login rule: only a deactivated user is blocked. A `pending` user
+  // is mid-onboarding and must be able to refresh (otherwise the 10-min access
+  // token expiring — or the refresh-only handoff itself — kicks them to /login
+  // before they can finish account setup). `active` is the normal case.
+  if (status === 'deactivated') {
     await revokeFamily(familyId)
-    throw new RefreshTokenError('user not active')
+    throw new RefreshTokenError('user is deactivated')
   }
 
   const roleScopeMappings = await getUserRoleScopeMapping()
