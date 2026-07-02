@@ -61,7 +61,7 @@ jobs:
 
       - name: Post coverage explanation to PR
         if: github.event_name == 'pull_request'
-        uses: mshick/add-pr-comment@v2
+        uses: mshick/add-pr-comment@v3
         with:
           message-id: test-coverage-explanation
           message: ${{ env.COVERAGE_EXPLANATION }}
@@ -223,7 +223,7 @@ jobs:
       - name: Post test coverage to PR
         if: github.event_name == 'pull_request'
           && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
-        uses: mshick/add-pr-comment@v2
+        uses: mshick/add-pr-comment@v3
         with:
           message-id: ${{ matrix.package }}-test-coverage
           message: ${{ env.PR_COMMENT_BODY }}
@@ -315,7 +315,7 @@ jobs:
         run: yarn run build-storybook --webpack-stats-json
 
       - name: Upload filesystem as artifact
-        uses: actions/upload-artifact@v4.5.0
+        uses: actions/upload-artifact@v7
         with:
           name: client
           include-hidden-files: true
@@ -622,7 +622,7 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      - uses: nick-fields/retry@v3
+      - uses: nick-fields/retry@v4
         with:
           timeout_minutes: 10
           max_attempts: 3
