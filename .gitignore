@@ -13,7 +13,6 @@ build
 # misc
 .claude/*
 !.claude/settings.json
-CLAUDE.md
 .claude-working/
 .DS_Store
 .env*
