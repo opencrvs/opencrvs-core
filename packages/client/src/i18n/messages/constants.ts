@@ -10,7 +10,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-const constantsMessages = defineMessages({
+export const constantsMessages = defineMessages({
   action: {
     defaultMessage: 'Action',
     description: 'Action Label',
