@@ -116,7 +116,6 @@ export function WorkqueueContainer() {
   return (
     <>
       <WorkqueueContent />
-      FOOBAR
       {mayCreateEvents && (
         <FabContainer>
           <FloatingActionButton
