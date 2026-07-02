@@ -12604,6 +12604,22 @@ components:
                       - edit-in-progress
               - type: string
                 description: Custom flag identifier defined by the country config.
+        allOf:
+          type: array
+          items:
+            anyOf:
+              - anyOf:
+                  - type: string
+                    pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                  - type: string
+                    enum:
+                      - incomplete
+                      - rejected
+                      - correction-requested
+                      - potential-duplicate
+                      - edit-in-progress
+              - type: string
+                description: Custom flag identifier defined by the country config.
       additionalProperties: false
     QueryInput:
       anyOf:
