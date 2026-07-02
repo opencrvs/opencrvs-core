@@ -18,6 +18,8 @@ export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:documents-user'
 ]
 
+export const REFRESH_TOKEN_AUDIENCE = ['opencrvs:auth-refresh']
+
 export const JWT_ISSUER = 'opencrvs:auth-service'
 export const INVALID_TOKEN_NAMESPACE = 'invalidToken'
 export const DEFAULT_TIMEOUT = 600000

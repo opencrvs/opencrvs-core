@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { JWT_ISSUER } from '@auth/constants'
+import { JWT_ISSUER, REFRESH_TOKEN_AUDIENCE } from '@auth/constants'
 import { readFileSync } from 'fs'
 import { promisify } from 'util'
 import * as jwt from 'jsonwebtoken'
@@ -27,7 +27,14 @@ import {
   sendVerificationCode,
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
-import { logger, UUID, UserName } from '@opencrvs/commons'
+import {
+  logger,
+  UUID,
+  UserName,
+  fetchJSON,
+  joinUrl,
+  Roles
+} from '@opencrvs/commons'
 import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
 import {
@@ -40,6 +47,7 @@ const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
 import { AppRouter, InternalRouter } from '@opencrvs/events/src/router'
+import { createFamily } from '@auth/features/refresh/family'
 
 const cert = readFileSync(env.CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(env.CERT_PUBLIC_KEY_PATH)
@@ -196,6 +204,29 @@ export async function createToken(
   })
 }
 
+export async function signRefreshToken(
+  userId: string,
+  userType: TokenUserType,
+  familyId: string,
+  jti: string
+): Promise<string> {
+  return sign({ userType, familyId, jti }, cert, {
+    subject: userId,
+    algorithm: 'RS256',
+    expiresIn: env.CONFIG_REFRESH_TOKEN_EXPIRY_SECONDS,
+    audience: REFRESH_TOKEN_AUDIENCE,
+    issuer: JWT_ISSUER
+  })
+}
+
+export async function createRefreshToken(
+  userId: string,
+  userType: TokenUserType = TokenUserType.enum.user
+): Promise<string> {
+  const { familyId, jti } = await createFamily(userId)
+  return signRefreshToken(userId, userType, familyId, jti)
+}
+
 type ActionConfirmationInput = {
   eventId: UUID
   actionId: UUID
@@ -323,6 +354,42 @@ function safeVerifyJwt(token: string) {
 
 export function verifyToken(token: string) {
   return pipe(token, safeVerifyJwt, chainW(tokenPayload.decode))
+}
+
+const refreshTokenPayload = t.type({
+  sub: t.string,
+  iat: t.number,
+  exp: t.number,
+  aud: t.array(t.string),
+  userType: t.string,
+  familyId: t.string,
+  jti: t.string
+})
+
+function safeVerifyRefreshJwt(token: string) {
+  return tryCatch(
+    () =>
+      jwt.verify(token, publicCert, {
+        issuer: JWT_ISSUER,
+        audience: 'opencrvs:auth-refresh'
+      }),
+    (e) => (e instanceof Error ? e : new Error('Unknown error'))
+  )
+}
+
+export function verifyRefreshToken(token: string) {
+  return pipe(token, safeVerifyRefreshJwt, chainW(refreshTokenPayload.decode))
+}
+
+export async function getUserRoleScopeMapping() {
+  const roles = await fetchJSON<Roles>(
+    joinUrl(env.COUNTRY_CONFIG_URL_INTERNAL, '/config/roles')
+  )
+
+  return roles.reduce<Record<string, EncodedScope[]>>((acc, { id, scopes }) => {
+    acc[id] = scopes
+    return acc
+  }, {})
 }
 
 export function getPublicKey() {

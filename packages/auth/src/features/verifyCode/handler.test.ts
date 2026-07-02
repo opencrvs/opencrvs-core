@@ -100,6 +100,41 @@ describe('authenticate handler receives a request', () => {
       expect(body.sub).toBe('1')
     })
   })
+  it('returns both an access token and a refresh token', async () => {
+    fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+      status: 200
+    })
+    const authService = require('../authenticate/service')
+    const codeService = require('./service')
+    const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
+    jest.spyOn(authService, 'authenticate').mockReturnValue({
+      userId: '1',
+      role: 'NATIONAL_SYSTEM_ADMIN',
+      mobile: '+345345343'
+    })
+
+    const authRes: { result?: { nonce: string } } = await server.server.inject({
+      method: 'POST',
+      url: '/authenticate',
+      payload: { username: '+345345343', password: '2r23432' }
+    })
+    const code = codeSpy.mock.calls[0][0]
+
+    const res: { result?: { token: string; refreshToken: string } } =
+      await server.server.inject({
+        method: 'POST',
+        url: '/verifyCode',
+        payload: { nonce: authRes.result!.nonce, code }
+      })
+
+    expect(res.result!.token).toBeDefined()
+    expect(res.result!.refreshToken).toBeDefined()
+    const [, payload] = res.result!.refreshToken.split('.')
+    const body = JSON.parse(Buffer.from(payload, 'base64').toString())
+    expect(body.aud).toContain('opencrvs:auth-refresh')
+    expect(body.sub).toBe('1')
+  })
+
   describe('user auth service says credentials are invalid', () => {
     it('returns a 401 if the code is bad', async () => {
       const authService = require('../authenticate/service')
