@@ -42,5 +42,6 @@
       "Bash(git branch:*)",
       "Edit(packages/**)"
     ]
-  }
+  },
+  "includeCoAuthoredBy": true
 }
