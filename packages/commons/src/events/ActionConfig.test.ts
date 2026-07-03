@@ -38,15 +38,30 @@ describe('DuplicateDetectedConfig', () => {
     }
   })
 
-  it('strips unsupported fields like label, since it is never rendered', () => {
-    const res = ActionConfig.safeParse({
-      type: ActionType.DUPLICATE_DETECTED,
-      flags: [],
-      label
-    })
+  it('rejects a label, icon, or conditionals, since it is never rendered', () => {
+    expect(
+      ActionConfig.safeParse({
+        type: ActionType.DUPLICATE_DETECTED,
+        flags: [],
+        label
+      }).success
+    ).toBe(false)
 
-    expect(res.success).toBe(true)
-    expect(res.data).not.toHaveProperty('label')
+    expect(
+      ActionConfig.safeParse({
+        type: ActionType.DUPLICATE_DETECTED,
+        flags: [],
+        icon: 'Trash'
+      }).success
+    ).toBe(false)
+
+    expect(
+      ActionConfig.safeParse({
+        type: ActionType.DUPLICATE_DETECTED,
+        flags: [],
+        conditionals: [{ type: 'SHOW', conditional: true }]
+      }).success
+    ).toBe(false)
   })
 
   it('requires a type', () => {

@@ -75,16 +75,30 @@ const NotifyConfig = ActionConfigBase.extend(
   }).shape
 )
 
-const DuplicateDetectedConfig = z.object({
-  type: z.literal(ActionType.DUPLICATE_DETECTED),
-  flags: ActionConfigBase.shape.flags,
-  conditionals: z
-    .never()
-    .optional()
-    .describe(
-      'DUPLICATE_DETECTED is system-generated and never shown as a button, so it cannot be disabled or hidden with conditionals.'
-    )
-})
+const DuplicateDetectedConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.DUPLICATE_DETECTED),
+    label: z
+      .never()
+      .optional()
+      .describe(
+        'DUPLICATE_DETECTED is system-generated and never shown as a button, so it has no label.'
+      ),
+    supportingCopy: z.never().optional(),
+    icon: z
+      .never()
+      .optional()
+      .describe(
+        'DUPLICATE_DETECTED is system-generated and never shown as a button, so it has no icon.'
+      ),
+    conditionals: z
+      .never()
+      .optional()
+      .describe(
+        'DUPLICATE_DETECTED is system-generated and never shown as a button, so it cannot be disabled or hidden with conditionals.'
+      )
+  }).shape
+)
 
 const MarkAsDuplicateConfig = ActionConfigBase.extend(
   z.object({
@@ -199,7 +213,7 @@ const RejectCorrectionConfig = ActionConfigBase.extend(
   }).shape
 )
 
-const CustomActionConfig = ActionConfigBase.merge(
+const CustomActionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.CUSTOM),
     customActionType: z
@@ -214,7 +228,7 @@ const CustomActionConfig = ActionConfigBase.merge(
     auditHistoryLabel: TranslationConfig.describe(
       'The label to show in audit history for this action. For example "Approved".'
     )
-  })
+  }).shape
 )
 
 export type CustomActionConfig = z.infer<typeof CustomActionConfig>
