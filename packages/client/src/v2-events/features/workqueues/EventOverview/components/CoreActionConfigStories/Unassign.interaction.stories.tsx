@@ -92,7 +92,8 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 export const unassignLabelAndIconAreConfigurable: StoryObj<typeof ActionMenu> =
   {
     parameters: {
-      chromatic: { disableSnapshot: true },
+      // Snapshot enabled here to visually verify the configured icon.
+      chromatic: { disableSnapshot: false },
       userRole: TestUserRole.enum.REGISTRATION_AGENT,
       layout: 'centered',
       reactRouter: {

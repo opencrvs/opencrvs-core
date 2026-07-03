@@ -74,7 +74,8 @@ export const approveRejectCorrectionLabelsAreConfigurable: Story = {
     }
   ],
   parameters: {
-    chromatic: { disableSnapshot: true },
+    // Snapshot enabled here to visually verify the configured icon.
+    chromatic: { disableSnapshot: false },
     // `.storybook/preview.tsx`'s global loader seeds the query cache directly
     // (bypassing MSW) with a default config unless `offline.configs` is set
     // here, so mocking `event.config.get` via MSW alone is not enough.

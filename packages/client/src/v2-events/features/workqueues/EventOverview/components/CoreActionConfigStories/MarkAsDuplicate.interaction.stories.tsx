@@ -97,7 +97,8 @@ export const markAsDuplicateLabelAndIconAreConfigurable: StoryObj<
   typeof ActionMenu
 > = {
   parameters: {
-    chromatic: { disableSnapshot: true },
+    // Snapshot enabled here to visually verify the configured icon.
+    chromatic: { disableSnapshot: false },
     // Requires `record.review-duplicates`, which REGISTRATION_AGENT lacks
     // in the test scope fixtures — LOCAL_REGISTRAR has it.
     userRole: TestUserRole.enum.LOCAL_REGISTRAR,
