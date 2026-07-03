@@ -52,7 +52,6 @@ done
 dirs=(
   "data/elasticsearch"
   "data/mongo"
-  "data/influxdb"
   "data/minio"
   "data/backups"
   "data/postgres"

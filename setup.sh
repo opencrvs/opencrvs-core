@@ -349,8 +349,6 @@ chmod 775 data/elasticsearch
 
 mkdir -p data/mongo
 chmod 775 data/mongo
-mkdir -p data/influxdb
-chmod 775 data/influxdb
 mkdir -p data/minio
 chmod 775 data/minio
 mkdir -p data/postgres
