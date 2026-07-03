@@ -695,7 +695,8 @@ export const WorkqueueGoesOfflineWhileLoading: Story = {
 //   3. The play function manually invalidates the count cache – simulating
 //      what the 20-second polling would do – and MSW now returns updatedCount (4).
 //   4. The setQueryDefaults interceptor in count.ts detects the change and
-//      calls invalidateWorkqueueSearchQueries('recent').
+//      calls invalidateWorkqueueSearchQueries('recent'), which invalidates the
+//      scoped ['event','search','workqueue','recent'] cache entry.
 //   5. MSW search handler now returns 4 events.
 //   6. The list shows 4 rows without any user interaction.
 // ---------------------------------------------------------------------------
@@ -934,7 +935,8 @@ export const WorkqueueAutoRefreshOnCountChange: Story = {
 
         // Force an immediate count refetch – this is what the 20-second polling
         // interval does naturally. The useEffect in Workqueues detects the
-        // change and triggers invalidateWorkqueueSearchQueries('recent').
+        // change and triggers invalidateWorkqueueSearchQueries('recent'), which
+        // invalidates the scoped ['event','search','workqueue','recent'] entry.
         await queryClient.invalidateQueries({
           queryKey: trpcOptionsProxy.workqueue.count.queryKey()
         })

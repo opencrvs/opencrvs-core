@@ -185,6 +185,22 @@ export const trpcOptionsProxy = createTRPCOptionsProxy({
   client: trpcClient
 })
 
+/**
+ * One-shot purge of old-shape (pre-scoped) event.search cache entries restored
+ * from IndexedDB. Old keys are exactly [['event','search'], …] (path length 2);
+ * scoped keys are [['event','search', <scope>…], …] (path length ≥ 3). Because
+ * gcTime is Infinity, restored old-shape entries would otherwise never GC and
+ * findLocalEventIndex would prefix-scan stale duplicates forever. We deliberately
+ * do NOT bump CACHE_VERSION: that busts the whole client and discards the offline
+ * mutation outbox (unsynced registrations). Removable in a later release.
+ */
+export function purgeLegacySearchQueries(client: QueryClient) {
+  client.removeQueries({
+    queryKey: [['event', 'search']],
+    predicate: (query) => (query.queryKey[0] as string[]).length < 3
+  })
+}
+
 export function TRPCProvider({
   children,
   waitForClientRestored = true,
@@ -238,6 +254,8 @@ export function TRPCProvider({
         }
       }}
       onSuccess={async () => {
+        purgeLegacySearchQueries(queryClient)
+
         setQueriesRestored(true)
         await queryClient.resumePausedMutations()
 

@@ -26,6 +26,7 @@ import {
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { removeCachedFiles } from '../../files/cache'
 import { MutationType } from './procedures/utils'
+import { searchKeys } from './procedures/search'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getQueryData<T extends DecorateQueryProcedure<any>>(
@@ -107,15 +108,10 @@ function setEventSearchQuery(updatedEventIndex: EventIndex | undefined) {
   if (!updatedEventIndex) {
     return
   }
-  queryClient.setQueryData(
-    trpcOptionsProxy.event.search.queryKey({
-      query: {
-        type: 'and',
-        clauses: [{ id: updatedEventIndex.id }]
-      }
-    }),
-    () => ({ results: [updatedEventIndex], total: 1 })
-  )
+  queryClient.setQueryData(searchKeys.byId(updatedEventIndex.id), () => ({
+    results: [updatedEventIndex],
+    total: 1
+  }))
 }
 
 export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
@@ -134,15 +130,10 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
    * Ensure there exists a local cached search query for this event
    */
 
-  queryClient.setQueryData(
-    trpcOptionsProxy.event.search.queryKey({
-      query: {
-        type: 'and',
-        clauses: [{ id }]
-      }
-    }),
-    () => ({ results: [updatedEventIndex], total: 1 })
-  )
+  queryClient.setQueryData(searchKeys.byId(id), () => ({
+    results: [updatedEventIndex],
+    total: 1
+  }))
 
   /**
    * Keeps the cache in sync when an event is updated.
@@ -236,45 +227,43 @@ export function setEventData(id: string, data: EventDocument) {
 
 export async function refetchSearchQuery(eventId: string) {
   await queryClient.refetchQueries({
-    queryKey: trpcOptionsProxy.event.search.queryKey({
-      query: {
-        type: 'and',
-        clauses: [{ id: eventId }]
-      }
-    })
+    queryKey: searchKeys.filters.byId(eventId)
   })
 }
-export async function refetchAllSearchQueries() {
-  /*
-   * Invalidate search queries
-   */
+
+/**
+ * After a mutation that changes which records exist (create/delete/draft):
+ * - refetch the by-id search entries for the affected event id(s) — active
+ *   observers refresh immediately, and seeded by-id entries are now refetchable
+ *   thanks to the setQueryDefaults shim.
+ * - invalidate (not refetch) all workqueue searches: active observers refetch
+ *   immediately, inactive ones just go stale — refetching inactive queries was
+ *   pure wasted network. Ad-hoc searches are intentionally left alone; they use
+ *   staleTime:0 + refetchOnMount:'always' so they refresh on next mount anyway.
+ */
+export async function refetchAffectedSearchQueries(...eventIds: string[]) {
   await Promise.all(
-    getQueriesData(trpcOptionsProxy.event.search).map(async ([queryKey]) => {
-      return queryClient.refetchQueries({
-        queryKey
-      })
-    })
+    eventIds.map(async (eventId) =>
+      queryClient.refetchQueries({ queryKey: searchKeys.filters.byId(eventId) })
+    )
   )
+  await queryClient.invalidateQueries({
+    queryKey: searchKeys.filters.allWorkqueues()
+  })
 }
 
 /**
  * Invalidate search queries for a specific workqueue identified by its slug.
- * Queries are tagged with { workqueueSlug } in meta by useWorkqueue → getResult.
+ * Queries are keyed under the ['workqueue', slug] scope via searchKeys.workqueue.
  *
  * For active observers (workqueue page mounted) this triggers an immediate
  * background refetch. For inactive queries it marks them stale so the next
  * mount fetches fresh data — no unnecessary network requests are fired.
  */
 export async function invalidateWorkqueueSearchQueries(slug: string) {
-  const queries = queryClient.getQueryCache().findAll({
-    queryKey: trpcOptionsProxy.event.search.queryKey(),
-    predicate: (query) => query.meta?.workqueueSlug === slug
+  await queryClient.invalidateQueries({
+    queryKey: searchKeys.filters.workqueue(slug)
   })
-  await Promise.all(
-    queries.map(async (query) =>
-      queryClient.invalidateQueries({ queryKey: query.queryKey, exact: true })
-    )
-  )
 }
 
 async function deleteEventData(updatedEvent: EventDocument) {
@@ -304,7 +293,7 @@ export function updateLocalEvent(data: EventDocument) {
 export async function deleteLocalEvent(updatedEvent: EventDocument) {
   await deleteEventData(updatedEvent)
   await invalidateWorkqueues()
-  return refetchAllSearchQueries()
+  await refetchAffectedSearchQueries(updatedEvent.id)
 }
 
 export async function onAssign(updatedEvent: EventDocument) {

@@ -13,7 +13,7 @@ import { useMutation } from '@tanstack/react-query'
 import {
   clearPendingDraftCreationRequests,
   deleteDraft,
-  refetchAllSearchQueries,
+  refetchAffectedSearchQueries,
   refetchSearchQuery,
   setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
@@ -29,7 +29,7 @@ setMutationDefaults(trpcOptionsProxy.event.delete, {
   },
   retryDelay: 10000,
   onSuccess: ({ id }) => {
-    void refetchAllSearchQueries()
+    void refetchAffectedSearchQueries(id)
     deleteDraft(id)
   },
   onMutate: ({ eventId }) => {

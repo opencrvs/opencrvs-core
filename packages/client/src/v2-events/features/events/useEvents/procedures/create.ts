@@ -26,7 +26,7 @@ import {
 } from '@opencrvs/commons/client'
 
 import {
-  refetchAllSearchQueries,
+  refetchAffectedSearchQueries,
   setEventData
 } from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
@@ -116,7 +116,9 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
   onSuccess: async (response, _variables, context) => {
     setEventData(response.id, response)
     setEventData(context.transactionId, response)
-    await refetchAllSearchQueries()
+    // Both ids were seeded by the setEventData calls above: response.id is the
+    // canonical id, context.transactionId is the temporary id used offline.
+    await refetchAffectedSearchQueries(response.id, context.transactionId)
   },
   meta: { actionType: ActionType.CREATE }
 })

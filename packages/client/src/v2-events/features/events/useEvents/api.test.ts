@@ -20,6 +20,7 @@ import {
   deleteLocalEvent,
   updateLocalEventIndex
 } from './api'
+import { searchKeys } from './procedures/search'
 
 describe('deleteLocalEvent', () => {
   const eventDocument = tennisClubMembershipEventDocument
@@ -68,10 +69,13 @@ describe('updateLocalEventIndex', () => {
   it('preserves total count in cached queries after update', () => {
     const eventDocument = tennisClubMembershipEventDocument
 
-    // Prepare a cached query simulating a workqueue result
-    const queryKey = trpcOptionsProxy.event.search.queryKey({
-      query: { type: 'and', clauses: [{ status: 'PENDING' }] }
-    })
+    // Prepare a cached query simulating a workqueue result, keyed with the
+    // scoped shape. Proves the [['event','search']] prefix scan in
+    // updateLocalEventIndex still matches merged (scoped) keys.
+    const queryKey = searchKeys.workqueue(
+      { query: { type: 'and', clauses: [{ status: 'PENDING' }] } },
+      'recent'
+    )
 
     queryClient.setQueryData(queryKey, {
       total: 13,

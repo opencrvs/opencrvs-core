@@ -74,14 +74,17 @@ export const SearchResultIndex = () => {
    * useSuspenseQuery unmounts the component causing the searchQuery to be
    * re-evaluated, which leads to an infinite loop.
    */
-  const queryData = searchEvent.useQuery({
-    query: toAdvancedSearchQueryType(
-      searchQuery,
-      eventConfig.advancedSearch.flatMap((section) => section.fields),
-      eventType
-    ),
-    ...typedSearchParams
-  }).data ?? {
+  const queryData = searchEvent.useQuery(
+    {
+      query: toAdvancedSearchQueryType(
+        searchQuery,
+        eventConfig.advancedSearch.flatMap((section) => section.fields),
+        eventType
+      ),
+      ...typedSearchParams
+    },
+    ['adhoc']
+  ).data ?? {
     results: [],
     total: 0
   }

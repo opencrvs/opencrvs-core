@@ -146,7 +146,7 @@ export function setMutationDefaults<
 }
 
 /**
- * Sets the default options for a mutation procedure.
+ * Sets the default options for a query procedure.
  */
 export function setQueryDefaults<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
