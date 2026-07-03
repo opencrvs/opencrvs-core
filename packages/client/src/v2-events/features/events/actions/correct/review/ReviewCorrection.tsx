@@ -20,7 +20,11 @@ import {
   ActionType,
   EventState,
   generateTransactionId,
+  getActionConfig,
   getCurrentEventState,
+  isActionEnabled,
+  isActionVisible,
+  isValidIcon,
   RequestedCorrectionAction,
   ValidatorContext
 } from '@opencrvs/commons/client'
@@ -124,10 +128,12 @@ const StyledStack = styled(Stack)`
 
 function ApproveModal({
   close,
-  onSubmit
+  onSubmit,
+  title
 }: {
   close: (result: boolean | null) => void
   onSubmit: () => void
+  title: string
 }) {
   const intl = useIntl()
   return (
@@ -158,7 +164,7 @@ function ApproveModal({
         </Button>
       ]}
       isOpen={true}
-      title={intl.formatMessage(reviewCorrectionMessages.approveCorrection)}
+      title={title}
       variant="large"
       width={700}
       onClose={() => close(true)}
@@ -174,10 +180,12 @@ function ApproveModal({
 
 function RejectModal({
   close,
-  onSubmit
+  onSubmit,
+  title
 }: {
   close: (result: boolean | null) => void
   onSubmit: (message: string) => void
+  title: string
 }) {
   const intl = useIntl()
   const [message, setMessage] = React.useState('')
@@ -210,7 +218,7 @@ function RejectModal({
         </Button>
       ]}
       isOpen={true}
-      title={intl.formatMessage(reviewCorrectionMessages.rejectCorrection)}
+      title={title}
       variant="large"
       width={700}
       onClose={() => close(true)}
@@ -272,10 +280,58 @@ export function ReviewCorrection({
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
 
+  const approveActionConfig = getActionConfig({
+    eventConfiguration,
+    actionType: ActionType.APPROVE_CORRECTION
+  })
+  const rejectActionConfig = getActionConfig({
+    eventConfiguration,
+    actionType: ActionType.REJECT_CORRECTION
+  })
+
+  const approveVisible = approveActionConfig
+    ? isActionVisible(approveActionConfig, eventIndex, validatorContext)
+    : true
+  const approveEnabled = approveActionConfig
+    ? isActionEnabled(approveActionConfig, eventIndex, validatorContext)
+    : true
+  const rejectVisible = rejectActionConfig
+    ? isActionVisible(rejectActionConfig, eventIndex, validatorContext)
+    : true
+  const rejectEnabled = rejectActionConfig
+    ? isActionEnabled(rejectActionConfig, eventIndex, validatorContext)
+    : true
+
+  const approveLabel = approveActionConfig?.label
+    ? intl.formatMessage(approveActionConfig.label)
+    : intl.formatMessage(buttonMessages.approve)
+  const rejectLabel = rejectActionConfig?.label
+    ? intl.formatMessage(rejectActionConfig.label)
+    : intl.formatMessage(buttonMessages.reject)
+
+  const approveIcon = isValidIcon(approveActionConfig?.icon)
+    ? approveActionConfig.icon
+    : 'Check'
+  const rejectIcon = isValidIcon(rejectActionConfig?.icon)
+    ? rejectActionConfig.icon
+    : 'X'
+
+  // Default modal titles ("Approve correction?") are kept distinct from the
+  // generic button word ("Approve") so behaviour is unchanged when no label
+  // is configured; a configured label overrides both, matching the pattern
+  // used for quick-action modals (see useQuickActionModal.tsx).
+  const approveModalTitle = approveActionConfig?.label
+    ? `${intl.formatMessage(approveActionConfig.label)}?`
+    : intl.formatMessage(reviewCorrectionMessages.approveCorrection)
+  const rejectModalTitle = rejectActionConfig?.label
+    ? `${intl.formatMessage(rejectActionConfig.label)}?`
+    : intl.formatMessage(reviewCorrectionMessages.rejectCorrection)
+
   const openApproveModal = async () => {
     await openModal((close) => (
       <ApproveModal
         close={close}
+        title={approveModalTitle}
         onSubmit={() => {
           events.actions.correction.approve.mutate({
             transactionId: generateTransactionId(),
@@ -297,6 +353,7 @@ export function ReviewCorrection({
     await openModal((close) => (
       <RejectModal
         close={close}
+        title={rejectModalTitle}
         onSubmit={(reason) => {
           events.actions.correction.reject.mutate({
             transactionId: generateTransactionId(),
@@ -320,29 +377,31 @@ export function ReviewCorrection({
     ))
   }
 
-  const rejectButton = (
+  const rejectButton = rejectVisible && (
     <Button
+      disabled={!rejectEnabled}
       fullWidth={true}
       id="rejectCorrectionBtn"
       size="large"
       type="negative"
       onClick={openRejectModal}
     >
-      <Icon name="X" />
-      {intl.formatMessage(buttonMessages.reject)}
+      <Icon name={rejectIcon} />
+      {rejectLabel}
     </Button>
   )
 
-  const approveButton = (
+  const approveButton = approveVisible && (
     <Button
+      disabled={!approveEnabled}
       fullWidth={true}
       id="ApproveCorrectionBtn"
       size="large"
       type="positive"
       onClick={openApproveModal}
     >
-      <Icon name="Check" />
-      {intl.formatMessage(buttonMessages.approve)}
+      <Icon name={approveIcon} />
+      {approveLabel}
     </Button>
   )
 
