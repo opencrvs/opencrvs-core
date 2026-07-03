@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Choice } from 'prompts';
+import { Choice } from 'prompts'
 
 async function input(options: any): Promise<string> {
   const inquirer = await import('@inquirer/prompts')
@@ -20,7 +20,6 @@ async function select<Value = string>(options: any): Promise<Value> {
   const inquirer = await import('@inquirer/prompts')
   return inquirer.select(options)
 }
-
 
 export function getIndexFromChoices(choices: Choice[], value: string) {
   let idx = 0
@@ -34,47 +33,47 @@ export function getIndexFromChoices(choices: Choice[], value: string) {
 }
 
 type SelectWithCustomOptions = {
-    message: string;
-    choices: readonly { name: string; value: string }[];
-    customLabel?: string;
-    customInputMessage?: string;
-    initial?: string;
-};
+  message: string
+  choices: readonly { name: string; value: string }[]
+  customLabel?: string
+  customInputMessage?: string
+  initial?: string
+}
 
 export async function selectWithCustom(
-    config: SelectWithCustomOptions
+  config: SelectWithCustomOptions
 ): Promise<string> {
-    const {
-        message,
-        choices,
-        initial = undefined,
-        customLabel = 'Other...',
-        customInputMessage = 'Enter custom value:',
-    } = config;
+  const {
+    message,
+    choices,
+    initial = undefined,
+    customLabel = 'Other...',
+    customInputMessage = 'Enter custom value:'
+  } = config
 
-    const CUSTOM = '__custom__' as const;
+  const CUSTOM = '__custom__' as const
 
-    const selected = await select<string>({
-        message,
-        choices: [
-            ...choices,
-            {
-                value: CUSTOM,
-                name: customLabel,
-            },
-        ],
-        default: initial,
-    });
+  const selected = await select<string>({
+    message,
+    choices: [
+      ...choices,
+      {
+        value: CUSTOM,
+        name: customLabel
+      }
+    ],
+    default: initial
+  })
 
-    if (selected === CUSTOM) {
-        const customValue = await input({
-            message: customInputMessage,
-            validate: (value: string) =>
-                value.trim().length > 0 ? true : 'Value cannot be empty',
-        });
+  if (selected === CUSTOM) {
+    const customValue = await input({
+      message: customInputMessage,
+      validate: (value: string) =>
+        value.trim().length > 0 ? true : 'Value cannot be empty'
+    })
 
-        return customValue;
-    }
+    return customValue
+  }
 
-    return selected;
+  return selected
 }

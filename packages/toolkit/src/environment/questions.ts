@@ -13,7 +13,6 @@ import kleur from 'kleur'
 import { generateLongPassword } from './utils'
 import { getRepoInfo } from './git'
 
-
 const notEmpty = (value: string | number) =>
   value.toString().trim().length > 0 ? true : 'Please enter a value'
 
@@ -47,7 +46,6 @@ function validateCIDRs(input: string): true | string {
 
   return true
 }
-
 
 export const dockerhubQuestions = [
   {
@@ -109,7 +107,7 @@ export const githubQuestions = [
     validate: notEmpty,
     initial: process.env.GITHUB_REPOSITORY || getRepoInfo().repository,
     scope: 'REPOSITORY' as const
-  },
+  }
 ]
 export const githubOtherQuestions = [
   {
@@ -124,7 +122,8 @@ export const githubOtherQuestions = [
   {
     name: 'approvalRequired',
     type: 'select' as const,
-    message: 'Would you like to enable approvals process for GitHub action workflows?',
+    message:
+      'Would you like to enable approvals process for GitHub action workflows?',
     choices: [
       {
         title: 'True',
@@ -140,7 +139,7 @@ export const githubOtherQuestions = [
     valueLabel: 'APPROVAL_REQUIRED',
     initial: process.env.APPROVAL_REQUIRED,
     scope: 'ENVIRONMENT' as const
-  },
+  }
 ]
 export const githubTokenQuestion = [
   {
@@ -182,8 +181,7 @@ export const infrastructureQuestions = [
   {
     name: 'kubeAPIHost',
     type: 'text' as const,
-    message: 
-      `Kubernetes API endpoint (default: auto-detect)`,
+    message: `Kubernetes API endpoint (default: auto-detect)`,
     valueType: 'VARIABLE' as const,
     // validate: notEmpty,
     valueLabel: 'KUBE_API_HOST',
@@ -193,33 +191,30 @@ export const infrastructureQuestions = [
   {
     name: 'kubeApiAllowedCidrs',
     type: 'text' as const,
-    message:
-      `Allowed CIDRs for Kubernetes API access (default: KUBE_API_HOST)`,
+    message: `Allowed CIDRs for Kubernetes API access (default: KUBE_API_HOST)`,
     valueType: 'VARIABLE' as const,
     validate: validateCIDRs,
     valueLabel: 'KUBE_API_ALLOWED_CIDRS',
-    initial: process.env.KUBE_API_ALLOWED_CIDRS || "",
-    scope: 'ENVIRONMENT' as const,
+    initial: process.env.KUBE_API_ALLOWED_CIDRS || '',
+    scope: 'ENVIRONMENT' as const
   },
   {
     name: 'kubeWorkerNodes',
     type: 'text' as const,
-    message:
-      `Kubernetes worker node hostnames or IPs (comma-separated, default: no worker nodes)`,
+    message: `Kubernetes worker node hostnames or IPs (comma-separated, default: no worker nodes)`,
     valueType: 'VARIABLE' as const,
     // validate: notEmpty,
     valueLabel: 'KUBE_WORKER_NODES',
     initial: process.env.KUBE_WORKER_NODES || '',
-    scope: 'ENVIRONMENT' as const,
-  },
+    scope: 'ENVIRONMENT' as const
+  }
 ]
 
 export const staticSSLCertQuestions = [
   {
     name: 'sslCrt',
     type: 'text' as const,
-    message:
-      'Provide SSL Certificate or Certificate chain:',
+    message: 'Provide SSL Certificate or Certificate chain:',
     valueType: 'SECRET' as const,
     validate: notEmpty,
     valueLabel: 'SSL_CRT',
@@ -229,38 +224,35 @@ export const staticSSLCertQuestions = [
   {
     name: 'sslKey',
     type: 'text' as const,
-    message:
-      'Provide SSL Certificate key',
+    message: 'Provide SSL Certificate key',
     valueType: 'SECRET' as const,
     validate: notEmpty,
     valueLabel: 'SSL_KEY',
     initial: process.env.SSL_KEY,
     scope: 'ENVIRONMENT' as const
-  },
+  }
 ]
 
 export const backupQuestions = [
   {
     name: 'backupHost',
     type: 'text' as const,
-    message:
-      `Please enter backup server host/IP address, (default: no backup):`,
+    message: `Please enter backup server host/IP address, (default: no backup):`,
     valueType: 'VARIABLE' as const,
     // validate: notEmpty,
     valueLabel: 'BACKUP_HOST',
     initial: process.env.BACKUP_HOST || '',
-    scope: 'ENVIRONMENT' as const,
+    scope: 'ENVIRONMENT' as const
   },
   {
     name: 'backupUser',
     type: 'text' as const,
-    message:
-      `Please enter backup server user name:`,
+    message: `Please enter backup server user name:`,
     valueType: 'SECRET' as const,
     validate: notEmpty,
     valueLabel: 'BACKUP_SERVER_USER',
     initial: process.env.BACKUP_SERVER_USER || 'backup',
-    scope: 'ENVIRONMENT' as const,
+    scope: 'ENVIRONMENT' as const
   },
   {
     name: 'backupType',
@@ -280,8 +272,8 @@ export const backupQuestions = [
     validate: notEmpty,
     valueLabel: 'BACKUP_ENVIRONMENT_MODE',
     initial: process.env.BACKUP_ENVIRONMENT_MODE,
-    scope: 'ENVIRONMENT' as const,
-  },
+    scope: 'ENVIRONMENT' as const
+  }
 ]
 
 export const diskQuestions = [
@@ -295,8 +287,8 @@ export const diskQuestions = [
     validate: notEmpty,
     valueLabel: 'DISK_SPACE',
     initial: process.env.DISK_SPACE || '200g',
-    scope: 'ENVIRONMENT' as const,
-  },
+    scope: 'ENVIRONMENT' as const
+  }
 ]
 
 export const databaseAndMonitoringQuestions = [

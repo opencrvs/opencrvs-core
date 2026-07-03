@@ -10,10 +10,7 @@
  */
 
 import prompts, { PromptObject } from 'prompts'
-import {
-    Secret,
-    Variable
-} from './github'
+import { Secret, Variable } from './github'
 
 export type Question<T extends string> = PromptObject<T> & {
   name: T

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-const sodium = require('libsodium-wrappers')
+import sodium from 'libsodium-wrappers'
 import { Octokit } from '@octokit/core'
 import { error } from './logger'
 
@@ -251,17 +251,19 @@ export async function getRepositoryEnvironments(
   githubOrganisation: string,
   repository: string
 ): Promise<string[]> {
-
-  const response = await octokit.request('GET /repos/{githubOrganisation}/{repository}/environments', {
-    githubOrganisation,
-    repository,
-  });
+  const response = await octokit.request(
+    'GET /repos/{githubOrganisation}/{repository}/environments',
+    {
+      githubOrganisation,
+      repository
+    }
+  )
 
   // Safe access with fallback to empty array if undefined
   const environments = (response.data.environments ?? []).map(
     (env: { name: string }) => env.name
-  );
-  return environments;
+  )
+  return environments
 }
 
 export async function createEnvironment(
@@ -368,9 +370,10 @@ export async function listEnvironmentVariables(
       type: 'VARIABLE' as const,
       scope: 'ENVIRONMENT' as const
     }))
-    .filter((variable: { name: string }) => variable.name !== 'ACTIONS_RUNNER_DEBUG')
+    .filter(
+      (variable: { name: string }) => variable.name !== 'ACTIONS_RUNNER_DEBUG'
+    )
 }
-
 
 export async function listRepositoryVariables(
   octokit: Octokit,

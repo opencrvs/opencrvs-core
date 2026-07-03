@@ -163,5 +163,5 @@ export const derivedVariables = [
     valueType: 'VARIABLE',
     type: 'disabled',
     scope: 'ENVIRONMENT'
-  },
-] as const;
+  }
+] as const

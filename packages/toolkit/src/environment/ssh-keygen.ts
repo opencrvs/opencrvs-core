@@ -9,9 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { utils } from "ssh2";
+import { utils } from 'ssh2'
 
-export function generateSSHKeyPair(): { publicKey: string; privateKey: string } {
-  let keys = utils.generateKeyPairSync('ed25519');
-  return { publicKey: keys.public.toString(), privateKey: keys.private.toString() };
+export function generateSSHKeyPair(): {
+  publicKey: string
+  privateKey: string
+} {
+  const keys = utils.generateKeyPairSync('ed25519')
+  return {
+    publicKey: keys.public.toString(),
+    privateKey: keys.private.toString()
+  }
 }

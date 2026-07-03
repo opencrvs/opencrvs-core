@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable no-console */
 import { runUpgrade } from './migrations/v2.0'
 import {
   runEnvironmentInit,
