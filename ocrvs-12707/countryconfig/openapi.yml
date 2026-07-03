@@ -13538,22 +13538,32 @@ components:
     DuplicateDetectedActionConfig:
       type: object
       properties:
-        type:
-          type: string
-          const: DUPLICATE_DETECTED
+        label:
+          description: DUPLICATE_DETECTED is system-generated and never shown as a button,
+            so it has no label.
+          not: {}
         flags:
           default: []
           description: Flag actions which are executed when the action is performed.
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          not: {}
+        icon:
+          description: DUPLICATE_DETECTED is system-generated and never shown as a button,
+            so it has no icon.
+          not: {}
         conditionals:
           description: DUPLICATE_DETECTED is system-generated and never shown as a button,
             so it cannot be disabled or hidden with conditionals.
           not: {}
+        type:
+          type: string
+          const: DUPLICATE_DETECTED
       required:
-        - type
         - flags
+        - type
       additionalProperties: false
       description: Configuration for the system-generated duplicate-detection action.
         Never shown as a button, so it only supports flags — not label, icon, or
