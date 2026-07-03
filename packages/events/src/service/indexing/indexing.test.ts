@@ -277,6 +277,30 @@ const anyOfStatusPayload: QueryType = {
   ]
 }
 
+const allOfFlagsPayload: QueryType = {
+  type: 'and',
+  clauses: [
+    {
+      flags: {
+        allOf: ['validated', 'approval-required-for-late-registration']
+      }
+    }
+  ]
+}
+
+const combinedFlagsPayload: QueryType = {
+  type: 'and',
+  clauses: [
+    {
+      flags: {
+        anyOf: ['approval-required-for-late-registration'],
+        noneOf: ['potential-duplicate'],
+        allOf: ['validated', 'approval-required-for-late-registration']
+      }
+    }
+  ]
+}
+
 const fullAndPayload: QueryType = {
   type: 'and',
   clauses: [
@@ -435,6 +459,62 @@ describe('test buildElasticQueryFromSearchPayload', () => {
           {
             bool: {
               must: [{ terms: { status: ['REGISTERED', 'DECLARED'] } }],
+              should: undefined
+            }
+          }
+        ],
+        should: undefined
+      }
+    })
+  })
+
+  test('builds query with allOf flags', async () => {
+    const result = await buildElasticQueryFromSearchPayload(allOfFlagsPayload, [
+      tennisClubMembershipEvent
+    ])
+    expect(result).toEqual({
+      bool: {
+        must: [
+          {
+            bool: {
+              must: [
+                { term: { flags: 'validated' } },
+                { term: { flags: 'approval-required-for-late-registration' } }
+              ],
+              should: undefined
+            }
+          }
+        ],
+        should: undefined
+      }
+    })
+  })
+
+  test('builds query with anyOf, noneOf and allOf flags combined', async () => {
+    const result = await buildElasticQueryFromSearchPayload(
+      combinedFlagsPayload,
+      [tennisClubMembershipEvent]
+    )
+    expect(result).toEqual({
+      bool: {
+        must: [
+          {
+            bool: {
+              must: [
+                {
+                  terms: { flags: ['approval-required-for-late-registration'] }
+                },
+                {
+                  bool: {
+                    must_not: {
+                      terms: { flags: ['potential-duplicate'] }
+                    },
+                    should: undefined
+                  }
+                },
+                { term: { flags: 'validated' } },
+                { term: { flags: 'approval-required-for-late-registration' } }
+              ],
               should: undefined
             }
           }

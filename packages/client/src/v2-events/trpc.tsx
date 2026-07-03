@@ -30,7 +30,7 @@ import { partition } from 'lodash'
 import React from 'react'
 import superjson from 'superjson'
 import { getUUID } from '@opencrvs/commons/client'
-import { getToken } from '@client/utils/authUtils'
+import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
 import { CACHE_VERSION } from '@client/utils/constants'
 import { storage } from '@client/storage'
 
@@ -50,7 +50,8 @@ function getTrpcClient() {
         httpLink({
           url: '/api/events',
           transformer: superjson,
-          headers() {
+          async headers() {
+            await ensureFreshAccessToken()
             return {
               authorization: `Bearer ${getToken()}`
             }
@@ -68,7 +69,8 @@ function getTrpcClient() {
         url: '/api/events',
         transformer: superjson,
         methodOverride: 'POST',
-        headers() {
+        async headers() {
+          await ensureFreshAccessToken()
           return {
             authorization: `Bearer ${getToken()}`
           }

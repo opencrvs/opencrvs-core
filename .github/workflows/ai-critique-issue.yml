@@ -34,21 +34,23 @@ jobs:
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
         with:
           model: opencode/deepseek-v4-flash
           agent: build
           use_github_token: true
           prompt: |
-            You are a ticket reviewer. Your ONLY job is to refine the issue so it's ready to implement. You do NOT implement, you do NOT write code, you do NOT create branches or PRs.
+            You are a ticket reviewer. Do NOT implement. Do NOT write code. Do NOT create branches or PRs.
 
             Read the title, description, and all comments.
 
-            Is there enough information for someone to implement this ticket with no obvious pitfalls?
-            1. If yes — update the issue description with the refined understanding and stop.
-            2. If no — ask the author specific, unanswered questions. Provide your recommended answer for each. Do nothing else.
+            Is there enough information to implement this with no obvious pitfalls?
+            1. If yes — update the issue description via:
+               `gh issue edit $ISSUE_NUMBER --repo opencrvs/opencrvs-core --body '...'`
+               Construct the body by appending the refined scope (decisions, affected files, approach) to the original description. Then stop.
+            2. If no — ask the author specific unanswered questions with your recommended answer. Do nothing else.
 
             Rules:
-            - Explore the codebase to answer your own questions before asking the author.
-            - Keep questions concise and focused on blocking gaps only.
+            - Explore the codebase to answer your own questions first.
+            - Keep questions concise, focused on blocking gaps only.
             - Do NOT ask about implementation details that can be decided during development.
-            - Do NOT offer to implement. Do NOT generate code. Do NOT create branches.
