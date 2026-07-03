@@ -10,7 +10,15 @@
 
 
 set -o pipefail
-apk add curl jq grep
+missing=""
+for utility in curl jq grep; do
+  command -v "$utility" >/dev/null 2>&1 || missing="$missing $utility"
+done
+if [ -n "$missing" ] && ! apk add --no-cache curl jq grep; then
+  echo "[ERROR] Missing utilities:$missing" >&2
+  echo "[ERROR] Automatic installation failed. Ensure the container can access its package repositories, or include the required packages in the base image for air-gapped deployments." >&2
+  exit 1
+fi
 
 # Define common variables
 kibana_alerting_api_url="${KIBANA_URL}/api/alerting/rules/_find?page=1&per_page=100&default_search_operator=AND&sort_field=name&sort_order=asc"

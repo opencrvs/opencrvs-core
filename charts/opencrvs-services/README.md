@@ -598,7 +598,7 @@ search:search@elasticsearch.opencrvs-deps-dev.svc.cluster.local:9200
 `SEARCH_ELASTIC_URL` value example:
 
 ```
-http://search:search@elasticsearch.opencrvs-deps-dev.svc.cluster.local:9200pigeon@godlike-laptop:~$
+http://search:search@elasticsearch.opencrvs-deps-dev.svc.cluster.local:9200
 ```
 
 ### Minio Secret (minio.users_secret)

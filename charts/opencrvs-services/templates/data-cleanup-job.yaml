@@ -12,9 +12,10 @@ spec:
       labels:
         app: data-cleanup
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.mongodb) | nindent 6 }}
       containers:
         - name: cleanup-mongo
-          image: "mongo:4.4"
+          image: {{ include "opencrvs.imageReference" .Values.mongodb }}
           command: ["/bin/bash", "-c"]
           args:
             - |
@@ -51,7 +52,7 @@ spec:
           {{- end }}
           {{- include "render-env-vars" (dict "service_name" "data_cleanup" "Values" .Values) }}
         - name: cleanup-postgres
-          image: {{ .Values.postgres.image }}
+          image: {{ include "opencrvs.imageReference" .Values.postgres }}
           command: ["/bin/bash", "-c"]
           args:
             - |
@@ -100,7 +101,7 @@ spec:
                   name: {{ .Values.postgres.users_secret }}
                   key: EVENTS_MIGRATOR_POSTGRES_USER
         - name: cleanup-minio
-          image: "minio/mc"
+          image: {{ include "opencrvs.imageReference" .Values.minio }}
           command: ["/bin/bash", "-c"]
           args:
             - |
@@ -130,7 +131,7 @@ spec:
           {{- end }}
           {{- include "render-env-vars" (dict "service_name" "data_cleanup" "Values" .Values) }}
         - name: cleanup-elasticsearch
-          image: "appropriate/curl"
+          image: {{ include "opencrvs.image" (dict "root" . "service" .Values.utilities) }}
           command: ["/bin/sh", "-c"]
           args:
             - |

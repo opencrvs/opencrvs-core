@@ -12,7 +12,11 @@
 set -eu
 set -o pipefail
 
-apk add curl
+if ! command -v curl >/dev/null 2>&1 && ! apk add --no-cache curl; then
+  echo "[ERROR] Missing utility: curl" >&2
+  echo "[ERROR] Automatic installation failed. Ensure the container can access its package repositories, or include the required package in the base image for air-gapped deployments." >&2
+  exit 1
+fi
 
 bash "$(dirname "${BASH_SOURCE[0]}")/setup-users.sh"
 bash "$(dirname "${BASH_SOURCE[0]}")/setup-settings.sh"

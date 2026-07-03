@@ -47,6 +47,7 @@ spec:
       labels:
         app: mongodb
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.mongodb) | nindent 6 }}
     {{- if .Values.priority_class.enabled }}
       priorityClassName: datastore-high-priority
     {{- end }}
@@ -65,7 +66,7 @@ spec:
             {{- end }}
       {{- end }}
       containers:
-        - image: mongo:4.4
+        - image: {{ include "opencrvs.imageReference" .Values.mongodb }}
           {{- if not .Values.mongodb.use_default_credentials }}
           env:
             - name: MONGO_INITDB_ROOT_USERNAME

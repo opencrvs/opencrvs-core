@@ -44,7 +44,7 @@ spec:
                 echo "Running ${script}"
                 "${script}"
               done
-          image: {{ .Values.postgres.image }}
+          image: {{ include "opencrvs.imageReference" .Values.postgres }}
           env:
             - name: POSTGRES_HOST
               value: {{ .Values.postgres.host }}

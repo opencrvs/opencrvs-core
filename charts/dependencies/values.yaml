@@ -34,6 +34,10 @@ storage_type: pvc
 # For OpenCRVS developers there is no need to deploy dependencies helm chart as template.
 chart_dev_mode: true
 
+platform:
+  # Secrets used to pull images from private registries, if needed.
+  imagePullSecrets: []
+
 # Label selector for datastore nodes, usually used to keep data persistent
 node_selector: {}
 resources:
@@ -45,8 +49,9 @@ resources:
 mongodb:
   # Enable MongoDB deployment.
   enabled: true
-  # MongoDB docker image version to use: https://hub.docker.com/_/mongo
-  version: 4.4
+  image:
+    repository: mongo
+    tag: '4.4'
   # By default MongoDB is deployed without authentication enabled.
   use_default_credentials: true
   # MongoDB databases and users to create, if `use_default_credentials` is set to `false`.
@@ -58,7 +63,9 @@ mongodb:
 postgres:
   # Enable postgres deployment.
   enabled: true
-  image: chumaky/postgres_mongo_fdw:17.6_fdw5.5.2
+  image:
+    repository: chumaky/postgres_mongo_fdw
+    tag: '17.6_fdw5.5.2'
   # By default postgres is deployed with authentication enabled user/password: postgres/postgres
   use_default_credentials: true
   # postgres databases and users to create, if `use_default_credentials` is set to `false`.
@@ -151,7 +158,9 @@ postgres:
 
 # Elasticsearch Configuration
 elasticsearch:
-  image: docker.elastic.co/elasticsearch/elasticsearch:8.19.15
+  image:
+    repository: docker.elastic.co/elasticsearch/elasticsearch
+    tag: 8.19.15
   # Enable Elasticsearch deployment.
   enabled: true
   # By default Elasticsearch is deployed without authentication enabled.
@@ -190,32 +199,45 @@ monitoring:
   enabled: false
 
 apm_server:
-  image: docker.elastic.co/apm/apm-server:8.19.15
+  image:
+    repository: docker.elastic.co/apm/apm-server
+    tag: 8.19.15
 
 kibana:
-  image: docker.elastic.co/kibana/kibana:8.19.15
+  image:
+    repository: docker.elastic.co/kibana/kibana
+    tag: 8.19.15
   users_secret: kibana-users-secret
   # Configmap for custom configuration file
   # custom_config_configmap: kibana-custom-config
 
 metricbeat:
-  image: docker.elastic.co/beats/metricbeat:8.19.15
+  image:
+    repository: docker.elastic.co/beats/metricbeat
+    tag: 8.19.15
   # Configmap for custom configuration file
   # custom_config_configmap: metricbeat-config
   # Configmap for custom index lifecycle management policy
   # custom_ilm_configmap: metricbeat-ilm-policy
 
 filebeat:
-  image: docker.elastic.co/beats/filebeat:8.19.15
+  image:
+    repository: docker.elastic.co/beats/filebeat
+    tag: 8.19.15
   # Configmap for custom configuration file
   # custom_config_configmap: filebeat-config
   # Configmap for custom index lifecycle management policy
   # custom_ilm_configmap: filebeat-ilm-policy
 
 logstash:
-  image: docker.elastic.co/logstash/logstash:8.19.15
+  image:
+    repository: docker.elastic.co/logstash/logstash
+    tag: 8.19.15
 
 elastalert:
+  image:
+    repository: jertel/elastalert2
+    tag: 2.25.0
   # Create configmap with custom rules for elastalert
   # custom_rules_configmap:
   env:
@@ -250,6 +272,9 @@ elastalert:
 minio:
   # Enable or disable MinIO deployment.
   enabled: true
+  image:
+    repository: quay.io/minio/minio
+    tag: RELEASE.2025-06-13T11-33-47Z
 
   # Use default credentials (username: minioadmin, password: minioadmin).
   # Highly discouraged for production environments—see official docs:
@@ -308,6 +333,9 @@ redis:
   # Redis is built on top of bitnami/redis docker image:
   # https://hub.docker.com/r/bitnami/redis
   enabled: true
+  image:
+    repository: redis
+    tag: '8'
   # By default Redis is deployed without authentication enabled.
   # auth_mode:
   #   - disabled: no authentication
@@ -366,3 +394,8 @@ restore:
 priority_class:
   name: opencrvs-datastore-high-priority
   enabled: false
+
+utilities:
+  image:
+    repository: ghcr.io/opencrvs/ocrvs-utilities
+    tag: v2.1.0
