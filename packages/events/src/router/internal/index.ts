@@ -15,6 +15,7 @@ import { UserName, UserAuditRecordInput, UUID } from '@opencrvs/commons'
 import { internalProcedure, serviceRouter } from '@events/router/trpc'
 import {
   getUserCredentialsByUsername,
+  getUserRoleAndStatus,
   updatePasswordHash
 } from '@events/storage/postgres/events/users'
 import { generateHash } from '@events/service/auth/hash'
@@ -48,6 +49,17 @@ export const internalUserRouter = serviceRouter({
     .output(z.string())
     .query(({ input }) => {
       return `pong: ${input}`
+    }),
+  getById: internalProcedure
+    .input(UUID)
+    .output(z.object({ id: z.string(), role: z.string(), status: z.string() }))
+    // System clients live in a separate table; querying `users` already excludes them.
+    .query(async ({ input }) => {
+      const user = await getUserRoleAndStatus(input)
+      if (!user) {
+        throw new TRPCError({ code: 'NOT_FOUND' })
+      }
+      return user
     }),
   verifyPassword: internalProcedure
     .input(

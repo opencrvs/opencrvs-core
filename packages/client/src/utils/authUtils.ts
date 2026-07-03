@@ -10,7 +10,7 @@
  */
 import decode from 'jwt-decode'
 import * as Sentry from '@sentry/react'
-import { TOKEN_EXPIRE_MILLIS } from './constants'
+import { ACCESS_TOKEN_REFRESH_BUFFER_MS } from './constants'
 import { authApi } from '@client/utils/authApi'
 import { ITokenPayload } from '@opencrvs/commons/client'
 
@@ -27,8 +27,20 @@ export function storeToken(token: string) {
   localStorage.setItem('opencrvs', token)
 }
 
+/**
+ * Discards only the stored access token (not the refresh token). Used when a
+ * fresh refresh token is handed off via the URL so the stale access token
+ * cannot short-circuit the refresh — otherwise a still-fresh previous user's
+ * access token would keep the client authenticated as that user until it
+ * expired, ignoring the just-handed refresh token.
+ */
+export function removeAccessToken() {
+  localStorage.removeItem('opencrvs')
+}
+
 export async function removeToken() {
   const token = getToken()
+  const refresh = getRefreshToken()
   if (token) {
     try {
       await authApi.invalidateToken(token)
@@ -36,7 +48,30 @@ export async function removeToken() {
       Sentry.captureException(err)
     }
   }
+  if (refresh) {
+    try {
+      await authApi.invalidateToken(refresh)
+    } catch (err) {
+      Sentry.captureException(err)
+    }
+  }
   localStorage.removeItem('opencrvs')
+  removeRefreshToken()
+}
+
+export function getRefreshToken(): string {
+  const params = new URLSearchParams(window.location.search)
+  return (
+    params.get('refreshToken') || localStorage.getItem('opencrvs-refresh') || ''
+  )
+}
+
+export function storeRefreshToken(token: string) {
+  localStorage.setItem('opencrvs-refresh', token)
+}
+
+function removeRefreshToken() {
+  localStorage.removeItem('opencrvs-refresh')
 }
 
 export const getTokenPayload = (token: string) => {
@@ -54,33 +89,58 @@ export const getTokenPayload = (token: string) => {
   return decoded
 }
 
-function isTokenAboutToExpire(token: string) {
-  const payload = token && getTokenPayload(token)
-  const payloadExpMillis = Number(payload && payload.exp) * 1000
-  return payloadExpMillis - Date.now() <= TOKEN_EXPIRE_MILLIS
+function isAccessTokenFresh(token: string): boolean {
+  const payload = getTokenPayload(token)
+  if (!payload) {
+    return false
+  }
+  const expMillis = Number(payload.exp) * 1000
+  return expMillis - Date.now() > ACCESS_TOKEN_REFRESH_BUFFER_MS
 }
 
-export async function refreshToken() {
-  const token = getToken()
-  if (isTokenAboutToExpire(token)) {
-    const refreshUrl = new URL('refreshToken', '/api/auth')
-    const res = await fetch(refreshUrl.toString(), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        token
-      })
-    })
+function forceReauthentication(): never {
+  localStorage.removeItem('opencrvs')
+  removeRefreshToken()
+  window.location.assign('/login')
+  throw new Error('Authentication required')
+}
 
-    if (!res.ok) {
-      return false
-    } else {
-      const data = await res.json()
-      removeToken()
-      storeToken(data.token)
-    }
+async function performRefresh(): Promise<void> {
+  const refresh = getRefreshToken()
+  if (!refresh) {
+    forceReauthentication()
   }
-  return true
+
+  const res = await fetch('/api/auth/refreshToken', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: refresh })
+  })
+
+  if (!res.ok) {
+    forceReauthentication()
+  }
+
+  const data = await res.json()
+  storeToken(data.token)
+  if (data.refreshToken) {
+    storeRefreshToken(data.refreshToken)
+  }
+}
+
+let inFlightRefresh: Promise<void> | null = null
+
+export async function ensureFreshAccessToken(): Promise<void> {
+  const token = getToken()
+  if (token && isAccessTokenFresh(token)) {
+    return
+  }
+
+  if (!inFlightRefresh) {
+    inFlightRefresh = performRefresh().finally(() => {
+      inFlightRefresh = null
+    })
+  }
+
+  return inFlightRefresh
 }
