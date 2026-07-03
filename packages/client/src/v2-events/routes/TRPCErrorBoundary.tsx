@@ -15,9 +15,7 @@ import styled from 'styled-components'
 import { TRPCClientError } from '@trpc/client'
 import { connect } from 'react-redux'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { PageWrapper } from '@opencrvs/components/lib/PageWrapper'
-import { TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { Box } from '@opencrvs/components/lib/Box'
+import { Button, Box, PageWrapper } from '@opencrvs/components'
 import { errorMessages, buttonMessages } from '@client/i18n/messages'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 
@@ -210,12 +208,14 @@ class ErrorBoundary extends Component<Props, State> {
                   <ErrorMessage>
                     {intl.formatMessage(errorMessages.errorCodeUnauthorized)}
                   </ErrorMessage>
-                  <TertiaryButton
+                  <Button
                     id="GoToLoginPage"
+                    size="large"
+                    type="tertiary"
                     onClick={() => redirectToAuthentication(true)}
                   >
                     {intl.formatMessage(buttonMessages.login)}
-                  </TertiaryButton>
+                  </Button>
                 </>
               ) : (
                 <>
@@ -223,12 +223,14 @@ class ErrorBoundary extends Component<Props, State> {
                     {intl.formatMessage(errorMessages.errorTitle)}
                   </ErrorTitle>
                   <ErrorMessage>{message}</ErrorMessage>
-                  <TertiaryButton
+                  <Button
                     id="GoToHomepage"
+                    size="large"
+                    type="tertiary"
                     onClick={() => (window.location.href = buttonPath)}
                   >
                     {buttonLabel}
-                  </TertiaryButton>
+                  </Button>
                 </>
               )}
             </ErrorContainer>

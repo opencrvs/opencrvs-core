@@ -13,7 +13,7 @@ import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button, Content, ContentSize } from '@opencrvs/components'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import {
   Page,
@@ -26,7 +26,6 @@ import { messages } from '@client/i18n/messages/views/userSetup'
 import { buttonMessages } from '@client/i18n/messages'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 
 const TitleHolder = styled.div`
   ${({ theme }) => theme.fonts.h1};
@@ -36,7 +35,7 @@ const InstructionHolder = styled.div`
   ${({ theme }) => theme.fonts.reg16};
   padding: 40px 60px 30px 60px;
 `
-const LoginButton = styled(PrimaryButton)`
+const LoginButton = styled(Button)`
   box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.27);
 `
 
@@ -68,6 +67,8 @@ export function SetupConfirmationPage() {
           <LoginButton
             id="setup-login-button"
             onClick={() => dispatch(redirectToAuthentication())}
+            type="primary"
+            size="large"
           >
             {intl.formatMessage(buttonMessages.login)}
           </LoginButton>

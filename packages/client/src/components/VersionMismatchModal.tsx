@@ -11,7 +11,7 @@
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components'
 import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { IStoreState } from '@client/store'
 import { storage } from '@client/storage'
@@ -54,9 +54,15 @@ export function VersionMismatchModal({ show }: { show: boolean }) {
     <Dialog
       title={intl.formatMessage(reloadModalMessages.title)}
       actions={[
-        <PrimaryButton key="login" id="login" onClick={handleReLogin}>
+        <Button
+          size="large"
+          type="primary"
+          key="login"
+          id="login"
+          onClick={handleReLogin}
+        >
           {intl.formatMessage(reloadModalMessages.loginAgain)}
-        </PrimaryButton>
+        </Button>
       ]}
       isOpen={show}
     >
