@@ -47,8 +47,7 @@ const configuration = {
         defaultMessage: 'Put back',
         description: 'Country-configured label for the unassign action'
       },
-      icon: 'SignOut',
-      flags: []
+      icon: 'SignOut'
     }
   ]
 }

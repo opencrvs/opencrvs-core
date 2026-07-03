@@ -114,13 +114,25 @@ const MarkAsNotDuplicateConfig = ActionConfigBase.extend(
 
 const AssignConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.ASSIGN)
+    type: z.literal(ActionType.ASSIGN),
+    flags: z
+      .never()
+      .optional()
+      .describe(
+        'ASSIGN is a meta action excluded from flag resolution, so flags configured here would never apply.'
+      )
   }).shape
 )
 
 const UnassignConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.UNASSIGN)
+    type: z.literal(ActionType.UNASSIGN),
+    flags: z
+      .never()
+      .optional()
+      .describe(
+        'UNASSIGN is a meta action excluded from flag resolution, so flags configured here would never apply.'
+      )
   }).shape
 )
 

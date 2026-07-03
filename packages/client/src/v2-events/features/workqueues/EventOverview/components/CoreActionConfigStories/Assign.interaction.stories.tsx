@@ -47,8 +47,7 @@ const configuration = {
         defaultMessage: 'Pick up record',
         description: 'Country-configured label for the assign action'
       },
-      icon: 'Handshake',
-      flags: []
+      icon: 'Handshake'
     }
   ]
 }
