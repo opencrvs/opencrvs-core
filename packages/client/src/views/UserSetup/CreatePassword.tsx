@@ -17,9 +17,11 @@ import {
   WarningMessage,
   TextInput,
   InputField,
-  ActionPageLight,
+  Frame,
   Content,
-  ContentSize
+  ContentSize,
+  AppBar,
+  Icon
 } from '@opencrvs/components'
 import {
   ProtectedAccoutStep,
@@ -130,6 +132,7 @@ export function CreatePassword({ setupData, goToStep }: IProps) {
   const continueActionButton = (
     <Button
       type="primary"
+      size="large"
       id="Continue"
       onClick={whatNext}
       disabled={!hasCases || !hasNumber || !validLength}
@@ -140,12 +143,33 @@ export function CreatePassword({ setupData, goToStep }: IProps) {
 
   return (
     <>
-      <ActionPageLight
-        title={intl.formatMessage(messages.newPassword)}
-        hideBackground
-        goBack={() => {
-          goToStep(ProtectedAccoutStep.LANDING, setupData)
-        }}
+      <Frame
+        header={
+          <AppBar
+            desktopLeft={
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={() => goToStep(ProtectedAccoutStep.LANDING, setupData)}
+              >
+                <Icon name="ArrowLeft" />
+              </Button>
+            }
+            mobileLeft={
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={() => goToStep(ProtectedAccoutStep.LANDING, setupData)}
+              >
+                <Icon name="ArrowLeft" />
+              </Button>
+            }
+            desktopTitle={intl.formatMessage(messages.newPassword)}
+            mobileTitle={intl.formatMessage(messages.newPassword)}
+          />
+        }
       >
         <Content
           size={ContentSize.SMALL}
@@ -234,7 +258,7 @@ export function CreatePassword({ setupData, goToStep }: IProps) {
             )}
           </PasswordContents>
         </Content>
-      </ActionPageLight>
+      </Frame>
     </>
   )
 }

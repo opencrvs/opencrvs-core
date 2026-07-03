@@ -31,7 +31,6 @@ import {
   Frame,
   Spinner,
   Toast,
-  ActionPageLight,
   Button,
   Dialog,
   Text
@@ -237,19 +236,19 @@ const EditUserComponent = () => {
     }
   }, [formState, navigate, userId, pageId, searchParams, isUnauthorized])
 
+  const title = isNewUser
+    ? intl.formatMessage(messages.userFormTitle)
+    : intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
+
   if (userQuery.isLoading) {
     return (
-      <ActionPageLight
-        title={intl.formatMessage(sysAdminMessages.editUserDetailsTitle)}
-        goBack={() => navigate(-1)}
-        hideBackground={true}
-      >
+      <Frame header={<FormHeader label={title} onClose={() => navigate(-1)} />}>
         <Container>
           <SpinnerWrapper>
             <Spinner id="user-form-loading-spinner" size={25} />
           </SpinnerWrapper>
         </Container>
-      </ActionPageLight>
+      </Frame>
     )
   }
 
@@ -258,11 +257,7 @@ const EditUserComponent = () => {
       onClose={handleClose}
       isUnauthorized={isUnauthorized}
       userId={userId}
-      title={
-        isNewUser
-          ? intl.formatMessage(messages.userFormTitle)
-          : intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
-      }
+      title={title}
     >
       <PagesComponent
         attachmentPath={`users/${userId}/`}
@@ -448,44 +443,24 @@ const ReviewUserComponent = () => {
   const isSubmitting =
     createUserMutation.isPending || updateUserMutation.isPending
 
-  if (existingUserQuery.isLoading) {
-    return (
-      <ActionPageLight
-        title={intl.formatMessage(sysAdminMessages.editUserDetailsTitle)}
-        goBack={() => navigate(-1)}
-        hideBackground={true}
-      >
-        <Container>
-          <SpinnerWrapper>
-            <Spinner id="user-form-submitting-spinner" size={25} />
-          </SpinnerWrapper>
-        </Container>
-      </ActionPageLight>
-    )
-  }
+  if (existingUserQuery.isLoading || isSubmitting) {
+    const title = isNewUser
+      ? intl.formatMessage(messages.userFormTitle)
+      : intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
 
-  if (isSubmitting) {
+    const submittingText = isNewUser
+      ? intl.formatMessage(messages.creatingNewUser)
+      : intl.formatMessage(messages.updatingUser)
+
     return (
-      <ActionPageLight
-        title={
-          isNewUser
-            ? intl.formatMessage(messages.userFormTitle)
-            : intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
-        }
-        goBack={() => navigate(-1)}
-        hideBackground={true}
-      >
+      <Frame header={<FormHeader label={title} onClose={() => navigate(-1)} />}>
         <Container>
           <SpinnerWrapper>
             <Spinner id="user-form-submitting-spinner" size={25} />
-            <p>
-              {isNewUser
-                ? intl.formatMessage(messages.creatingNewUser)
-                : intl.formatMessage(messages.updatingUser)}
-            </p>
+            {isSubmitting && <p>{submittingText}</p>}
           </SpinnerWrapper>
         </Container>
-      </ActionPageLight>
+      </Frame>
     )
   }
 

@@ -16,12 +16,16 @@ import {
   userMessages
 } from '@client/i18n/messages'
 import styled from 'styled-components'
-import { InputError } from '@opencrvs/components/lib/InputField'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
-import { Select } from '@opencrvs/components/lib/Select'
+import {
+  Icon,
+  InputError,
+  TextInput,
+  Select,
+  Frame,
+  AppBar,
+  Button
+} from '@opencrvs/components'
 import { find, at } from 'lodash'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { Button } from '@opencrvs/components/lib/Button'
 import {
   ProtectedAccoutStep,
   IProtectedAccountSetupData,
@@ -322,17 +326,40 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { intl } = this.props
+    const { intl, goToStep, setupData } = this.props
+    const title = intl.formatMessage(messages.userFormSecurityQuestionsTitle)
     return (
-      <ActionPageLight
-        hideBackground
-        goBack={() => {
-          this.props.goToStep(
-            ProtectedAccoutStep.PASSWORD,
-            this.props.setupData
-          )
-        }}
-        title={intl.formatMessage(messages.userFormSecurityQuestionsTitle)}
+      <Frame
+        header={
+          <AppBar
+            desktopLeft={
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={() =>
+                  goToStep(ProtectedAccoutStep.PASSWORD, setupData)
+                }
+              >
+                <Icon name="ArrowLeft" />
+              </Button>
+            }
+            mobileLeft={
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={() =>
+                  goToStep(ProtectedAccoutStep.PASSWORD, setupData)
+                }
+              >
+                <Icon name="ArrowLeft" />
+              </Button>
+            }
+            desktopTitle={title}
+            mobileTitle={title}
+          />
+        }
       >
         <Content
           size={ContentSize.SMALL}
@@ -344,7 +371,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
         >
           {this.showQuestionnaire()}
         </Content>
-      </ActionPageLight>
+      </Frame>
     )
   }
 }
