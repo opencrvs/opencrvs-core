@@ -100,6 +100,21 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
     ? markAsNotDuplicateActionConfig.icon
     : 'NotePencil'
 
+  // `archiveOnDuplicate` is a client-side combinator that fires the core
+  // MARK_AS_DUPLICATE action (then ARCHIVE) — see custom-api/index.ts — so
+  // this button's label/icon read from the same MARK_AS_DUPLICATE config as
+  // the menu entry point that navigates here, not a separate custom action.
+  const markAsDuplicateActionConfig = getActionConfig({
+    eventConfiguration: configuration,
+    actionType: ActionType.MARK_AS_DUPLICATE
+  })
+  const markAsDuplicateLabel = markAsDuplicateActionConfig?.label
+    ? intl.formatMessage(markAsDuplicateActionConfig.label)
+    : intl.formatMessage(duplicateMessages.markAsDuplicateButton)
+  const markAsDuplicateIcon = isValidIcon(markAsDuplicateActionConfig?.icon)
+    ? markAsDuplicateActionConfig.icon
+    : 'Archive'
+
   const notADuplicateButton = notADuplicateVisible && (
     <Button
       key="btn-not-a-duplicate"
@@ -164,8 +179,8 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
         }
       }}
     >
-      <Icon name="Archive" />
-      {intl.formatMessage(duplicateMessages.markAsDuplicateButton)}
+      <Icon name={markAsDuplicateIcon} />
+      {markAsDuplicateLabel}
     </Button>
   )
   return (
