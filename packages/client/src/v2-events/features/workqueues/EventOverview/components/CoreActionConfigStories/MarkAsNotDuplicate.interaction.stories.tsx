@@ -42,10 +42,14 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 })
 
 /**
- * A country config for MARK_AS_NOT_DUPLICATE, overriding the hardcoded
- * default label/icon (`duplicateMessages.notDuplicateButton`/`NotePencil` in
- * ReviewDuplicate.tsx / DuplicateForm.tsx) to prove the button reads from
- * ActionConfig when present.
+ * A country config for MARK_AS_NOT_DUPLICATE and MARK_AS_DUPLICATE,
+ * overriding the hardcoded default label/icon
+ * (`duplicateMessages.notDuplicateButton`/`markAsDuplicateButton` and
+ * `NotePencil`/`Archive` in ReviewDuplicate.tsx / DuplicateForm.tsx) to prove
+ * both buttons on this screen read from ActionConfig when present.
+ * `archiveOnDuplicate` (the mutation the "mark as duplicate" button fires)
+ * is a client-side combinator over the core MARK_AS_DUPLICATE action — see
+ * custom-api/index.ts — so it shares this same config, not a separate one.
  */
 const configuration = {
   ...tennisClubMembershipEvent,
@@ -60,6 +64,16 @@ const configuration = {
           'Country-configured label for the mark-as-not-duplicate action'
       },
       icon: 'MagnifyingGlass',
+      flags: []
+    },
+    {
+      type: ActionType.MARK_AS_DUPLICATE,
+      label: {
+        id: 'storybook.action.mark-as-duplicate.custom-label',
+        defaultMessage: 'Compare duplicates',
+        description: 'Country-configured label for the mark-as-duplicate action'
+      },
+      icon: 'Copy',
       flags: []
     }
   ]
@@ -180,8 +194,18 @@ export const markAsNotDuplicateLabelAndIconAreConfigurable: Story = {
     const notADuplicateButton = await canvas.findByRole('button', {
       name: /Confirm no duplicate/i
     })
-
     await expect(notADuplicateButton).toBeVisible()
     await expect(canvas.queryByText(/Not a duplicate/i)).not.toBeInTheDocument()
+    // Icon identity can't be asserted from the DOM (phosphor-react renders
+    // plain <svg> geometry with no name-identifying attribute) — just confirm
+    // one rendered alongside the configured label.
+    await expect(notADuplicateButton.querySelector('svg')).toBeInTheDocument()
+
+    const markAsDuplicateButton = await canvas.findByRole('button', {
+      name: /Compare duplicates/i
+    })
+    await expect(markAsDuplicateButton).toBeVisible()
+    await expect(canvas.queryByText(/^Archive$/i)).not.toBeInTheDocument()
+    await expect(markAsDuplicateButton.querySelector('svg')).toBeInTheDocument()
   }
 }
