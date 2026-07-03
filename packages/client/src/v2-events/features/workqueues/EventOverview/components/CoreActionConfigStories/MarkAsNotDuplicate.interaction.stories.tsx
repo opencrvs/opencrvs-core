@@ -14,9 +14,12 @@ import superjson from 'superjson'
 import { within, expect } from '@storybook/test'
 import {
   ActionType,
+  ConditionalType,
   createPrng,
+  flag,
   generateActionDocument,
   generateUuid,
+  not,
   tennisClubMembershipEvent,
   generateTrackingId
 } from '@opencrvs/commons/client'
@@ -154,6 +157,55 @@ const mockDuplicateEvent = {
   updatedAt: new Date(Date.now()).toISOString()
 }
 
+// A separate config (DUPLICATE_DETECTED already supports `flags`, so no
+// CUSTOM action is needed) with a SHOW conditional on MARK_AS_NOT_DUPLICATE.
+const configurationWithConditional = {
+  ...tennisClubMembershipEvent,
+  actions: [
+    ...tennisClubMembershipEvent.actions,
+    {
+      type: ActionType.MARK_AS_NOT_DUPLICATE,
+      label: {
+        id: 'storybook.action.mark-as-not-duplicate.custom-label',
+        defaultMessage: 'Confirm no duplicate',
+        description:
+          'Country-configured label for the mark-as-not-duplicate action'
+      },
+      icon: 'MagnifyingGlass',
+      flags: [],
+      conditionals: [
+        {
+          type: ConditionalType.SHOW,
+          conditional: not(flag('locked-for-review'))
+        }
+      ]
+    },
+    {
+      type: ActionType.DUPLICATE_DETECTED,
+      flags: [{ id: 'locked-for-review', operation: 'add' as const }]
+    }
+  ]
+}
+
+const lockedActions = [
+  generateActionDocument({
+    configuration: configurationWithConditional,
+    action: ActionType.CREATE
+  }),
+  actions[1],
+  generateActionDocument({
+    configuration: configurationWithConditional,
+    action: ActionType.DUPLICATE_DETECTED,
+    defaults: { content: { duplicates } }
+  })
+]
+
+const lockedEvent = {
+  ...mockOriginalEvent,
+  id: generateUuid(prng),
+  actions: lockedActions
+}
+
 export const markAsNotDuplicateLabelAndIconAreConfigurable: Story = {
   parameters: {
     mockingDate: new Date(),
@@ -208,5 +260,29 @@ export const markAsNotDuplicateLabelAndIconAreConfigurable: Story = {
     await expect(markAsDuplicateButton).toBeVisible()
     await expect(canvas.queryByText(/^Archive$/i)).not.toBeInTheDocument()
     await expect(markAsDuplicateButton.querySelector('svg')).toBeInTheDocument()
+  }
+}
+
+export const markAsNotDuplicateIsHiddenWhenConditionalIsNotMet: Story = {
+  parameters: {
+    mockingDate: new Date(),
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE.buildPath({
+        eventId: lockedEvent.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    offline: {
+      configs: [configurationWithConditional],
+      events: [lockedEvent, mockDuplicateEvent]
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await expect(
+      canvas.queryByRole('button', { name: /Confirm no duplicate/i })
+    ).not.toBeInTheDocument()
   }
 }

@@ -14,10 +14,13 @@ import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {
   ActionType,
+  ConditionalType,
   createPrng,
+  flag,
   generateEventDocument,
   generateTrackingId,
   getCurrentEventState,
+  not,
   tennisClubMembershipEvent,
   TestUserRole
 } from '@opencrvs/commons/client'
@@ -47,7 +50,31 @@ const configuration = {
         defaultMessage: 'Put back',
         description: 'Country-configured label for the unassign action'
       },
-      icon: 'SignOut'
+      icon: 'SignOut',
+      conditionals: [
+        {
+          type: ConditionalType.SHOW,
+          conditional: not(flag('locked-for-review'))
+        }
+      ]
+    },
+    // UNASSIGN doesn't support `flags` (meta action), so use a CUSTOM action
+    // to seed the flag the conditional above checks.
+    {
+      type: ActionType.CUSTOM,
+      customActionType: 'CUSTOM_ACTION_TYPE',
+      label: {
+        id: 'storybook.action.lock.label',
+        defaultMessage: 'Lock',
+        description: 'x'
+      },
+      form: [],
+      auditHistoryLabel: {
+        id: 'storybook.action.lock.audit',
+        defaultMessage: 'Locked',
+        description: 'x'
+      },
+      flags: [{ id: 'locked-for-review', operation: 'add' as const }]
     }
   ]
 }
@@ -78,6 +105,25 @@ const createdEventDocument = generateEventDocument({
 })
 
 const eventState = getCurrentEventState(createdEventDocument, configuration)
+
+// Same history plus the CUSTOM action that locks the record for review.
+const lockedEventDocument = generateEventDocument({
+  configuration,
+  actions: [
+    { type: ActionType.CREATE, user: { id: registrationAgentId } },
+    { type: ActionType.NOTIFY, user: { id: registrationAgentId } },
+    {
+      type: ActionType.ASSIGN,
+      user: { id: registrationAgentId, assignedTo: registrationAgentId }
+    },
+    { type: ActionType.CUSTOM, user: { id: registrationAgentId } }
+  ],
+  defaults: { trackingId: generateTrackingId(createPrng(1234)) }
+})
+const lockedEventState = getCurrentEventState(
+  lockedEventDocument,
+  configuration
+)
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [
@@ -148,3 +194,46 @@ export const unassignLabelAndIconAreConfigurable: StoryObj<typeof ActionMenu> =
       )
     }
   }
+
+export const unassignIsHiddenWhenConditionalIsNotMet: StoryObj<
+  typeof ActionMenu
+> = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.REGISTRATION_AGENT,
+    layout: 'centered',
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({
+        eventId: lockedEventDocument.id
+      })
+    },
+    offline: { configs: [configuration] },
+    msw: {
+      events: [
+        tRPCMsw.event.search.query(() => ({
+          results: [lockedEventState],
+          total: 1
+        }))
+      ]
+    }
+  },
+  beforeEach: () => {
+    setEventData(lockedEventDocument.id, lockedEventDocument)
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+    void canvas.getByTestId('action-dropdownMenu').click()
+
+    const list = await waitFor(() =>
+      document.querySelector('#action-Dropdown-Content')
+    )
+    const items = Array.from(list?.querySelectorAll('li') ?? [])
+
+    await expect(
+      items.find((item) => item.textContent?.includes('Put back'))
+    ).toBeUndefined()
+  }
+}

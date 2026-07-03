@@ -14,10 +14,13 @@ import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {
   ActionType,
+  ConditionalType,
   createPrng,
+  flag,
   generateEventDocument,
   generateTrackingId,
   getCurrentEventState,
+  not,
   tennisClubMembershipEvent,
   TestUserRole
 } from '@opencrvs/commons/client'
@@ -83,6 +86,53 @@ const createdEventDocument = generateEventDocument({
 })
 
 const eventState = getCurrentEventState(createdEventDocument, configuration)
+
+// A separate config (DUPLICATE_DETECTED already supports `flags`, so no
+// CUSTOM action is needed here) with a SHOW conditional on MARK_AS_DUPLICATE.
+const configurationWithConditional = {
+  ...tennisClubMembershipEvent,
+  actions: [
+    ...tennisClubMembershipEvent.actions,
+    {
+      type: ActionType.MARK_AS_DUPLICATE,
+      label: {
+        id: 'storybook.action.mark-as-duplicate.custom-label',
+        defaultMessage: 'Compare duplicates',
+        description: 'Country-configured label for the mark-as-duplicate action'
+      },
+      icon: 'Copy',
+      flags: [],
+      conditionals: [
+        {
+          type: ConditionalType.SHOW,
+          conditional: not(flag('locked-for-review'))
+        }
+      ]
+    },
+    {
+      type: ActionType.DUPLICATE_DETECTED,
+      flags: [{ id: 'locked-for-review', operation: 'add' as const }]
+    }
+  ]
+}
+
+const lockedEventDocument = generateEventDocument({
+  configuration: configurationWithConditional,
+  actions: [
+    { type: ActionType.CREATE, user: { id: localRegistrarId } },
+    { type: ActionType.NOTIFY, user: { id: localRegistrarId } },
+    {
+      type: ActionType.ASSIGN,
+      user: { id: localRegistrarId, assignedTo: localRegistrarId }
+    },
+    { type: ActionType.DUPLICATE_DETECTED, user: { id: localRegistrarId } }
+  ],
+  defaults: { trackingId: generateTrackingId(createPrng(1234)) }
+})
+const lockedEventState = getCurrentEventState(
+  lockedEventDocument,
+  configurationWithConditional
+)
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [
@@ -159,5 +209,48 @@ export const markAsDuplicateLabelAndIconAreConfigurable: StoryObj<
         ).toBe(false)
       }
     )
+  }
+}
+
+export const markAsDuplicateIsHiddenWhenConditionalIsNotMet: StoryObj<
+  typeof ActionMenu
+> = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
+    layout: 'centered',
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({
+        eventId: lockedEventDocument.id
+      })
+    },
+    offline: { configs: [configurationWithConditional] },
+    msw: {
+      events: [
+        tRPCMsw.event.search.query(() => ({
+          results: [lockedEventState],
+          total: 1
+        }))
+      ]
+    }
+  },
+  beforeEach: () => {
+    setEventData(lockedEventDocument.id, lockedEventDocument)
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+    void canvas.getByTestId('action-dropdownMenu').click()
+
+    const list = await waitFor(() =>
+      document.querySelector('#action-Dropdown-Content')
+    )
+    const items = Array.from(list?.querySelectorAll('li') ?? [])
+
+    await expect(
+      items.find((item) => item.textContent?.includes('Compare duplicates'))
+    ).toBeUndefined()
   }
 }
