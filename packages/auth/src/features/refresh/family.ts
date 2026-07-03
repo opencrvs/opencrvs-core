@@ -57,7 +57,7 @@ export async function consume(
   }
   const record: FamilyRecord = JSON.parse(raw)
 
-  const rotate = async (status: 'rotate' | 'grace'): Promise<ConsumeResult> => {
+  const rotate = async (): Promise<ConsumeResult> => {
     const newJti = getUUID()
     const updated: FamilyRecord = {
       userId: record.userId,
@@ -68,11 +68,11 @@ export async function consume(
     await redis.set(familyKey(familyId), JSON.stringify(updated), {
       EX: env.CONFIG_REFRESH_TOKEN_EXPIRY_SECONDS
     })
-    return { status, userId: record.userId, newJti }
+    return { status: 'rotate', userId: record.userId, newJti }
   }
 
   if (jti === record.currentJti) {
-    return rotate('rotate')
+    return rotate()
   }
 
   const withinGrace =
@@ -81,7 +81,12 @@ export async function consume(
       env.CONFIG_REFRESH_TOKEN_GRACE_SECONDS * 1000
 
   if (withinGrace) {
-    return rotate('grace')
+    // Idempotent grace: a retry of the just-rotated token gets the same current
+    // jti back and the record is left untouched. Rotating here would (a) reset
+    // rotatedAt, sliding the fixed grace window forward on every replay, and
+    // (b) overwrite currentJti, orphaning the already-issued rotated token so
+    // its next legitimate use trips reuse-detection and revokes the family.
+    return { status: 'grace', userId: record.userId, newJti: record.currentJti }
   }
 
   await revokeFamily(familyId)

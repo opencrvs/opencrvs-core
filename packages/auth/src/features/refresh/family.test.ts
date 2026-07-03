@@ -62,12 +62,52 @@ test('consume with the current jti rotates and advances the pointer', async () =
   expect(record.currentJti).not.toBe(jti)
 })
 
-test('consume with the previous jti within grace is allowed (grace rotation)', async () => {
+test('grace replay is idempotent: returns the current jti and leaves the record unchanged', async () => {
   const { familyId, jti } = await createFamily('user-1')
-  await consume(familyId, jti) // jti is now prevJti, rotatedAt = now
-  const result = await consume(familyId, jti)
-  expect(result.status).toBe('grace')
-  // family still exists (not revoked)
+  const rotated = await consume(familyId, jti) // jti is now prevJti
+  const before = store.get(`refresh_family:${familyId}`)!
+
+  const grace = await consume(familyId, jti)
+
+  expect(grace.status).toBe('grace')
+  // hands back the already-issued rotated jti, not a fresh one
+  expect((grace as { newJti: string }).newJti).toBe(
+    (rotated as { newJti: string }).newJti
+  )
+  // family still exists (not revoked) and the record is untouched
+  expect(store.get(`refresh_family:${familyId}`)).toBe(before)
+})
+
+test('grace does not slide the window: reuse is measured from the original rotation', async () => {
+  const nowSpy = jest.spyOn(Date, 'now')
+  nowSpy.mockReturnValue(1_000_000)
+  const { familyId, jti } = await createFamily('user-1')
+  await consume(familyId, jti) // rotate at T0 = 1_000_000
+
+  // grace replay at T0 + 59s (within the 60s window)
+  nowSpy.mockReturnValue(1_000_000 + 59_000)
+  const grace = await consume(familyId, jti)
+  expect(grace.status).toBe('grace')
+  const record = JSON.parse(store.get(`refresh_family:${familyId}`)!)
+  expect(record.rotatedAt).toBe(1_000_000) // NOT slid forward
+
+  // at T0 + 61s the original window has elapsed → reuse (window did not slide)
+  nowSpy.mockReturnValue(1_000_000 + 61_000)
+  const reuse = await consume(familyId, jti)
+  expect(reuse.status).toBe('reuse')
+  expect(store.has(`refresh_family:${familyId}`)).toBe(false)
+})
+
+test('a grace replay of the old token does not invalidate the already-rotated token', async () => {
+  const { familyId, jti } = await createFamily('user-1')
+  const rotated = await consume(familyId, jti) // client now holds newJti
+  const currentJti = (rotated as { newJti: string }).newJti
+
+  await consume(familyId, jti) // grace replay of the old token
+
+  // the legit rotated token must still rotate, not be seen as reuse
+  const result = await consume(familyId, currentJti)
+  expect(result.status).toBe('rotate')
   expect(store.has(`refresh_family:${familyId}`)).toBe(true)
 })
 
