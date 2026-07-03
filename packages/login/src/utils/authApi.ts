@@ -65,7 +65,7 @@ export enum NotificationEvent {
 }
 export interface ITokenResponse {
   token: string
-  refreshToken?: string
+  refreshToken: string
 }
 
 const loginClientVersion = APP_VERSION

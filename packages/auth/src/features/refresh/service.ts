@@ -59,7 +59,7 @@ export async function refreshToken(
     WEB_USER_JWT_AUDIENCES,
     JWT_ISSUER,
     role,
-    TokenUserType.enum.user
+    userType
   )
   const refreshToken = await signRefreshToken(
     userId,
