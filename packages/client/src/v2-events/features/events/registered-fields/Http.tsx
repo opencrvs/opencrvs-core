@@ -21,7 +21,7 @@ import {
   isTemplateVariable,
   SystemVariables
 } from '@opencrvs/commons/client'
-import { getToken } from '@client/utils/authUtils'
+import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
 import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
 import { parseFieldReferenceToValue } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
 
@@ -29,6 +29,7 @@ async function fetchWithTimeout(
   input: RequestInfo | URL,
   init: RequestInit & { timeout?: number } = {}
 ) {
+  await ensureFreshAccessToken()
   const { timeout, headers, ...rest } = init
   const controller = new AbortController()
   const id = timeout ? setTimeout(() => controller.abort(), timeout) : null

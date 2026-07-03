@@ -9,12 +9,180 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  getTokenPayload,
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+  type Mock
+} from 'vitest'
+import {
+  ensureFreshAccessToken,
+  getRefreshToken,
   getToken,
-  refreshToken
-} from '@client/utils/authUtils'
-import createFetchMock from 'vitest-fetch-mock'
-import { vi, Mock } from 'vitest'
+  getTokenPayload,
+  removeAccessToken,
+  storeRefreshToken,
+  storeToken
+} from './authUtils'
+
+function makeJwt(expSecondsFromNow: number) {
+  const header = btoa(JSON.stringify({ alg: 'RS256', typ: 'JWT' }))
+  const payload = btoa(
+    JSON.stringify({
+      sub: '1',
+      exp: Math.floor(Date.now() / 1000) + expSecondsFromNow
+    })
+  )
+  return `${header}.${payload}.sig`
+}
+
+/**
+ * setupTests.ts globally stubs localStorage with vi.fn() mocks that don't
+ * actually store data. Replace them with a real in-memory store for these tests.
+ */
+function makeRealLocalStorage() {
+  const store: Record<string, string> = {}
+  return {
+    getItem: (key: string) => store[key] ?? null,
+    setItem: (key: string, value: string) => {
+      store[key] = value
+    },
+    removeItem: (key: string) => {
+      delete store[key]
+    },
+    clear: () => {
+      Object.keys(store).forEach((k) => delete store[k])
+    }
+  }
+}
+
+describe('ensureFreshAccessToken', () => {
+  // vitest 0.25.5: vi.unstubAllGlobals not available; restore originals manually
+  const originalFetch = globalThis.fetch
+  const originalLocation = globalThis.location
+
+  beforeEach(() => {
+    vi.stubGlobal('localStorage', makeRealLocalStorage())
+    vi.restoreAllMocks()
+  })
+
+  afterEach(() => {
+    globalThis.fetch = originalFetch
+    if (originalLocation !== undefined) {
+      globalThis.location = originalLocation
+    }
+  })
+
+  it('does nothing when the access token is still fresh', async () => {
+    storeToken(makeJwt(60 * 60))
+    const fetchSpy = vi.fn()
+    vi.stubGlobal('fetch', fetchSpy)
+
+    await ensureFreshAccessToken()
+
+    expect(fetchSpy).not.toHaveBeenCalled()
+  })
+
+  it('refreshes and stores a new access token when expired', async () => {
+    storeToken(makeJwt(-10))
+    storeRefreshToken(makeJwt(60 * 60 * 24))
+    const newToken = makeJwt(60 * 60)
+    const fetchSpy = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ token: newToken })
+    })
+    vi.stubGlobal('fetch', fetchSpy)
+
+    await ensureFreshAccessToken()
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+    expect(getToken()).toBe(newToken)
+  })
+
+  it('dedupes concurrent callers into a single refresh (single-flight)', async () => {
+    storeToken(makeJwt(-10))
+    storeRefreshToken(makeJwt(60 * 60 * 24))
+    const fetchSpy = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ token: makeJwt(60 * 60) })
+    })
+    vi.stubGlobal('fetch', fetchSpy)
+
+    await Promise.all([
+      ensureFreshAccessToken(),
+      ensureFreshAccessToken(),
+      ensureFreshAccessToken()
+    ])
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('redirects to /login when refresh fails', async () => {
+    storeToken(makeJwt(-10))
+    storeRefreshToken(makeJwt(60 * 60 * 24))
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }))
+    const assign = vi.fn()
+    vi.stubGlobal('location', { assign } as unknown as Location)
+
+    await expect(ensureFreshAccessToken()).rejects.toThrow()
+    expect(assign).toHaveBeenCalledWith('/login')
+    expect(localStorage.getItem('opencrvs')).toBeNull()
+    expect(localStorage.getItem('opencrvs-refresh')).toBeNull()
+  })
+
+  it('stores both the rotated access and refresh tokens', async () => {
+    storeToken(makeJwt(-10))
+    // Use a distinct expiry so oldRefresh !== newRefresh even within the same second
+    storeRefreshToken(makeJwt(60 * 60 * 24))
+    const newAccess = makeJwt(60 * 60)
+    const newRefresh = makeJwt(60 * 60 * 48) // 48 h — different from the stored 24 h token
+    const fetchSpy = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ token: newAccess, refreshToken: newRefresh })
+    })
+    vi.stubGlobal('fetch', fetchSpy)
+
+    await ensureFreshAccessToken()
+
+    expect(getToken()).toBe(newAccess)
+    expect(localStorage.getItem('opencrvs-refresh')).toBe(newRefresh)
+  })
+
+  it('removeAccessToken clears only the access token, leaving the refresh token', () => {
+    storeToken(makeJwt(60 * 60))
+    storeRefreshToken(makeJwt(60 * 60 * 24))
+
+    removeAccessToken()
+
+    expect(getToken()).toBe('')
+    expect(getRefreshToken()).not.toBe('')
+  })
+
+  it('a stale-but-fresh access token no longer suppresses a refresh once cleared (user-switch handoff)', async () => {
+    // Simulates the URL-handoff fix: even though a still-fresh access token is
+    // present, clearing it forces ensureFreshAccessToken to mint from the
+    // (newly handed) refresh token instead of reusing the old user's token.
+    storeToken(makeJwt(60 * 60)) // fresh AT for the previous user
+    storeRefreshToken(makeJwt(60 * 60 * 24)) // just-handed RT for the new user
+    const newAccess = makeJwt(60 * 60)
+    const fetchSpy = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        token: newAccess,
+        refreshToken: makeJwt(60 * 60 * 24)
+      })
+    })
+    vi.stubGlobal('fetch', fetchSpy)
+
+    removeAccessToken()
+    await ensureFreshAccessToken()
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+    expect(getToken()).toBe(newAccess)
+  })
+})
 
 describe('authUtils tests', () => {
   describe('getAuthorizedToken', () => {
@@ -27,6 +195,11 @@ describe('authUtils tests', () => {
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       ;(window as any).localStorage = storage
     })
+
+    afterEach(() => {
+      window.history.replaceState({}, '', '/')
+    })
+
     describe('when token is in local storage', () => {
       describe("when it's valid", () => {
         const token =
@@ -56,9 +229,6 @@ describe('authUtils tests', () => {
     })
 
     describe('when token is in url', () => {
-      afterEach(() => {
-        window.history.replaceState({}, '', '/')
-      })
       describe("when it's valid", () => {
         const token =
           'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
@@ -82,31 +252,6 @@ describe('authUtils tests', () => {
 
         it('returns null', () => {
           expect(getTokenPayload(getToken())).toBe(null)
-        })
-      })
-
-      describe('refresh token', () => {
-        const token =
-          'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJkZWNsYXJlIiwiZGVtbyJdLCJpYXQiOjE1NzU0NDI0NjgsImV4cCI6MTU3NjA0NzI2OCwiYXVkIjpbIm9wZW5jcnZzOmF1dGgtdXNlciIsIm9wZW5jcnZzOnVzZXItbWdudC11c2VyIiwib3BlbmNydnM6aGVhcnRoLXVzZXIiLCJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJvcGVuY3J2czpub3RpZmljYXRpb24tdXNlciIsIm9wZW5jcnZzOndvcmtmbG93LXVzZXIiLCJvcGVuY3J2czpzZWFyY2gtdXNlciIsIm9wZW5jcnZzOm1ldHJpY3MtdXNlciIsIm9wZW5jcnZzOnJlc291cmNlcy11c2VyIl0sImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6IjVkYjlmM2ZjZDJjZTI4ZTRlMmRhMWE3NyJ9.T0DsYHDtsgyJGNuBXzLadYB3WjprZS9ELPPCKpoTvhmplXpi_rZNWWKFT7Czta7uCR0Ve4tvigo-v_jJwZ57LgceOm5UbI7oyHEpe6Jn1_9uICMSgTYQypMW3_Hkbs4lL_lxJci5oTPy22Rs_3xzn-XsH_WkxNLffiGp5S_4gnvDb315Qz72gMUsb6e9OKDkBTDpMG2QzEckENbxSfA7hGSsnZog-laxGWcgEF10mUB-GBZgJ2vt6B5eUkZ_GVQ2MEJScPUQPRKt12j1yfYFCvYhgIzdkI-vMF7fE5V0yNrl2CAuO4_hHTFLpOy9l7_9eyrJrpahKsvJPqYMCGUL9g'
-
-        const fetch = createFetchMock(vi)
-        fetch.enableMocks()
-
-        beforeEach(() => {
-          fetch.resetMocks()
-          ;(window.localStorage.getItem as Mock).mockReturnValue(token)
-        })
-        const mockFetchResponse = {
-          token:
-            'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
-        }
-
-        it('fetch new token', async () => {
-          const authUtils = await import('./authUtils')
-          fetch.mockResponseOnce(JSON.stringify(mockFetchResponse))
-          const spy = vi.spyOn(authUtils, 'refreshToken')
-          refreshToken()
-          expect(spy).toHaveBeenCalled()
         })
       })
     })
