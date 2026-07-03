@@ -82,12 +82,11 @@ describe.each([
   ActionType.MARK_AS_DUPLICATE,
   ActionType.MARK_AS_NOT_DUPLICATE
 ])('%s action config', (type) => {
-  it('accepts label, flags, icon and conditionals', () => {
+  it('accepts label, icon and conditionals', () => {
     const res = ActionConfig.safeParse({
       type,
       label,
       icon: 'Trash',
-      flags: [{ id: 'custom-flag', operation: 'add' }],
       conditionals: [{ type: 'SHOW', conditional: true }]
     })
 
@@ -106,3 +105,36 @@ describe.each([
     expect(res.success).toBe(false)
   })
 })
+
+describe.each([
+  ActionType.DELETE,
+  ActionType.APPROVE_CORRECTION,
+  ActionType.REJECT_CORRECTION,
+  ActionType.MARK_AS_DUPLICATE,
+  ActionType.MARK_AS_NOT_DUPLICATE
+])('%s action config flags', (type) => {
+  it('accepts flags', () => {
+    const res = ActionConfig.safeParse({
+      type,
+      label,
+      flags: [{ id: 'custom-flag', operation: 'add' }]
+    })
+
+    expect(res.success).toBe(true)
+  })
+})
+
+describe.each([ActionType.ASSIGN, ActionType.UNASSIGN])(
+  '%s action config flags',
+  (type) => {
+    it('rejects flags, since it is a meta action excluded from flag resolution', () => {
+      const res = ActionConfig.safeParse({
+        type,
+        label,
+        flags: [{ id: 'custom-flag', operation: 'add' }]
+      })
+
+      expect(res.success).toBe(false)
+    })
+  }
+)
