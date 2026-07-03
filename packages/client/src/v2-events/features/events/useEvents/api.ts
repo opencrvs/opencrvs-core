@@ -28,6 +28,7 @@ import {
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { removeCachedFiles } from '../../files/cache'
 import { MutationType } from './procedures/utils'
+import { searchKeys } from './procedures/search'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getQueryData<T extends DecorateQueryProcedure<any>>(
@@ -106,15 +107,10 @@ export function findLocalEventIndex(id: string): EventIndex | undefined {
 }
 
 function setLocalEventIndexById(id: string, eventIndex: EventIndex) {
-  queryClient.setQueryData(
-    trpcOptionsProxy.event.search.queryKey({
-      query: {
-        type: 'and',
-        clauses: [{ id }]
-      }
-    }),
-    () => ({ results: [eventIndex], total: 1 })
-  )
+  queryClient.setQueryData(searchKeys.byId(id), () => ({
+    results: [eventIndex],
+    total: 1
+  }))
 }
 
 /**
@@ -239,45 +235,43 @@ export function setEventData(id: string, data: EventDocument) {
 
 export async function refetchSearchQuery(eventId: string) {
   await queryClient.refetchQueries({
-    queryKey: trpcOptionsProxy.event.search.queryKey({
-      query: {
-        type: 'and',
-        clauses: [{ id: eventId }]
-      }
-    })
+    queryKey: searchKeys.filters.byId(eventId)
   })
 }
-export async function refetchAllSearchQueries() {
-  /*
-   * Invalidate search queries
-   */
+
+/**
+ * After a mutation that changes which records exist (create/delete/draft):
+ * - refetch the by-id search entries for the affected event id(s) — active
+ *   observers refresh immediately, and seeded by-id entries are now refetchable
+ *   thanks to the setQueryDefaults shim.
+ * - invalidate (not refetch) all workqueue searches: active observers refetch
+ *   immediately, inactive ones just go stale — refetching inactive queries was
+ *   pure wasted network. Ad-hoc searches are intentionally left alone; they use
+ *   staleTime:0 + refetchOnMount:'always' so they refresh on next mount anyway.
+ */
+export async function refetchAffectedSearchQueries(...eventIds: string[]) {
   await Promise.all(
-    getQueriesData(trpcOptionsProxy.event.search).map(async ([queryKey]) => {
-      return queryClient.refetchQueries({
-        queryKey
-      })
-    })
+    eventIds.map(async (eventId) =>
+      queryClient.refetchQueries({ queryKey: searchKeys.filters.byId(eventId) })
+    )
   )
+  await queryClient.invalidateQueries({
+    queryKey: searchKeys.filters.allWorkqueues()
+  })
 }
 
 /**
  * Invalidate search queries for a specific workqueue identified by its slug.
- * Queries are tagged with { workqueueSlug } in meta by useWorkqueue → getResult.
+ * Queries are keyed under the ['workqueue', slug] scope via searchKeys.workqueue.
  *
  * For active observers (workqueue page mounted) this triggers an immediate
  * background refetch. For inactive queries it marks them stale so the next
  * mount fetches fresh data — no unnecessary network requests are fired.
  */
 export async function invalidateWorkqueueSearchQueries(slug: string) {
-  const queries = queryClient.getQueryCache().findAll({
-    queryKey: trpcOptionsProxy.event.search.queryKey(),
-    predicate: (query) => query.meta?.workqueueSlug === slug
+  await queryClient.invalidateQueries({
+    queryKey: searchKeys.filters.workqueue(slug)
   })
-  await Promise.all(
-    queries.map(async (query) =>
-      queryClient.invalidateQueries({ queryKey: query.queryKey, exact: true })
-    )
-  )
 }
 
 async function deleteEventData(updatedEvent: EventDocument) {
@@ -296,21 +290,15 @@ async function deleteEventData(updatedEvent: EventDocument) {
    *  IF you need to change this, ensure it works for both actions performed on overview page and through declaration flow.
    */
   await Promise.all([
-    queryClient.resetQueries({
-      queryKey: trpcOptionsProxy.event.search.queryKey({
-        query: {
-          type: 'and',
-          clauses: [{ id }]
-        }
-      })
-    }),
+    queryClient.resetQueries({ queryKey: searchKeys.filters.byId(id) }),
     removeCachedFiles(updatedEvent)
   ])
 }
 
 export async function deleteLocalEvent(updatedEvent: EventDocument) {
   await deleteEventData(updatedEvent)
-  await Promise.all([invalidateWorkqueues(), refetchAllSearchQueries()])
+  await invalidateWorkqueues()
+  await refetchAffectedSearchQueries(updatedEvent.id)
 }
 
 export async function onMarkNotDuplicate(data: EventDocument) {
