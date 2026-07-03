@@ -118,14 +118,6 @@ export function getActionConfig({
       return a.customActionType === customActionType
     }
 
-    // For correction approval/rejection, we use the correction request action config
-    if (
-      actionType === ActionType.APPROVE_CORRECTION ||
-      actionType === ActionType.REJECT_CORRECTION
-    ) {
-      return a.type === ActionType.REQUEST_CORRECTION
-    }
-
     return a.type === actionType
   })
 }
