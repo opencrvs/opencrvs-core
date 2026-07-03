@@ -92,7 +92,9 @@ export function isActionConfigType(
   return actionConfigTypes.has(type as any)
 }
 
-// @TODO: refactor this function to return typed ActionConfig depending on given actionType. Perhaps this function should also throw an error if the action config is not found.
+// @TODO: see if we can make this function generic so it returns a typed ActionConfig based on the given actionType (e.g. `Extract<ActionConfig, { type: T }>`),
+// instead of the current wide `ActionConfig | undefined`. Note NOTIFY's fallback to DECLARE needs special-casing in the return type, since it can resolve to a DeclareConfig.
+// Perhaps this function should also throw an error if the action config is not found.
 export function getActionConfig({
   eventConfiguration,
   actionType,
