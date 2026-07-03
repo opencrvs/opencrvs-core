@@ -13198,11 +13198,9 @@ components:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
         flags:
-          default: []
-          description: Flag actions which are executed when the action is performed.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionFlagConfig"
+          description: ASSIGN is a meta action excluded from flag resolution, so flags
+            configured here would never apply.
+          not: {}
         supportingCopy:
           description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
@@ -13219,7 +13217,6 @@ components:
           const: ASSIGN
       required:
         - label
-        - flags
         - type
       additionalProperties: false
       description: Configuration for assigning a record to the current user.
@@ -13230,11 +13227,9 @@ components:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
         flags:
-          default: []
-          description: Flag actions which are executed when the action is performed.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionFlagConfig"
+          description: UNASSIGN is a meta action excluded from flag resolution, so flags
+            configured here would never apply.
+          not: {}
         supportingCopy:
           description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
@@ -13251,7 +13246,6 @@ components:
           const: UNASSIGN
       required:
         - label
-        - flags
         - type
       additionalProperties: false
       description: Configuration for unassigning a record from its current assignee.
