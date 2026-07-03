@@ -9,14 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { useIntl } from 'react-intl'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
-import {
-  PrimaryButton,
-  TertiaryButton,
-  LinkButton
-} from '@opencrvs/components/lib/buttons'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { Button, ITheme, Dialog } from '@opencrvs/components'
 import Cropper from 'react-easy-crop'
 import type { Point, Area, Size } from 'react-easy-crop'
 import styled, { useTheme } from 'styled-components'
@@ -25,7 +21,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { ImageLoader } from './ImageLoader'
 import { getCroppedImage, IImage } from '@client/utils/imageUtils'
 
-import { ITheme } from '@opencrvs/components/lib/theme'
 import { Square } from '@opencrvs/components/lib/icons'
 import { useOnlineStatus } from '@client/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
@@ -220,17 +215,25 @@ function AvatarChangeModalComp({
       isOpen={showChangeAvatar}
       title={intl.formatMessage(messages.changeAvatar)}
       actions={[
-        <TertiaryButton key="cancel" id="modal_cancel" onClick={handleCancel}>
+        <Button
+          type="tertiary"
+          key="cancel"
+          id="modal_cancel"
+          onClick={handleCancel}
+          size="large"
+        >
           {intl.formatMessage(buttonMessages.cancel)}
-        </TertiaryButton>,
-        <PrimaryButton
+        </Button>,
+        <Button
+          type="primary"
           key="apply"
           id="apply_change"
           disabled={!isOnline || !!error}
           onClick={handleApply}
+          size="large"
         >
           {intl.formatMessage(buttonMessages.apply)}
-        </PrimaryButton>
+        </Button>
       ]}
       onClose={handleCancel}
     >
