@@ -26,6 +26,8 @@ export interface FrameProps {
   skipToContentText?: string
   /** The content to display inside the frame. */
   children: React.ReactNode
+  /** The ID for the frame element. */
+  id?: string
 }
 
 const FrameGrid = styled.div`
@@ -57,10 +59,11 @@ export function Frame({
   header,
   navigation,
   skipToContentText,
+  id,
   children
 }: FrameProps) {
   return (
-    <FrameGrid>
+    <FrameGrid id={id}>
       {skipToContentText && <SkipToContent>{skipToContentText}</SkipToContent>}
       <FrameNavigation>{navigation}</FrameNavigation>
       <FrameHeader id="page-title">{header}</FrameHeader>

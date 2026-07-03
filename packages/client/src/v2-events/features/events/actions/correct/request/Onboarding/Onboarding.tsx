@@ -16,7 +16,7 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { Frame, Button, Icon, AppBar } from '@opencrvs/components'
 import { buttonMessages } from '@client/i18n/messages'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -89,13 +89,55 @@ export function Onboarding() {
     return null
   }
 
+  const title = intl.formatMessage(messages.title)
+
   return (
-    <ActionPageLight
-      hideBackground
-      goBack={() => navigate(-1)}
-      goHome={() => closeActionView(backTo)}
+    <Frame
+      header={
+        <AppBar
+          desktopLeft={
+            <Button
+              aria-label="Go back"
+              size="medium"
+              type="icon"
+              onClick={() => navigate(-1)}
+            >
+              <Icon name="ArrowLeft" />
+            </Button>
+          }
+          desktopRight={
+            <Button
+              size="medium"
+              type="icon"
+              onClick={() => closeActionView(backTo)}
+            >
+              <Icon color="primary" name="X" />
+            </Button>
+          }
+          desktopTitle={title}
+          mobileLeft={
+            <Button
+              aria-label="Go back"
+              size="medium"
+              type="icon"
+              onClick={() => navigate(-1)}
+            >
+              <Icon name="ArrowLeft" />
+            </Button>
+          }
+          mobileRight={
+            <Button
+              size="medium"
+              type="icon"
+              onClick={() => closeActionView(backTo)}
+            >
+              <Icon color="primary" name="X" />
+            </Button>
+          }
+          mobileTitle={title}
+        />
+      }
       id="corrector_form"
-      title={intl.formatMessage(messages.title)}
     >
       <PagesComponent
         hideBackToReview
@@ -130,6 +172,6 @@ export function Onboarding() {
           )
         }}
       />
-    </ActionPageLight>
+    </Frame>
   )
 }
