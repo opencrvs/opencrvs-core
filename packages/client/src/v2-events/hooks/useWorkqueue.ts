@@ -19,6 +19,7 @@ import {
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { useCountryConfigWorkqueueConfigurations } from '../features/events/useCountryConfigWorkqueueConfigurations'
 import { useEvents } from '../features/events/useEvents/useEvents'
+import { searchKeys } from '../features/events/useEvents/procedures/search'
 import { queryClient, useTRPC } from '../trpc'
 import { useUsers } from './useUsers'
 
@@ -60,15 +61,15 @@ export const useWorkqueue = (workqueueSlug: string) => {
       }
       return {
         useSuspenseQuery: () =>
-          searchEvent.useSuspenseQuery(searchInput, {
-            // Tag with workqueueSlug in meta so invalidateWorkqueueSearchQueries()
-            // can target this query without extending the cache key.
-            meta: { workqueueSlug },
-            refetchInterval: 20000
-          }),
+          searchEvent.useSuspenseQuery(
+            searchInput,
+            ['workqueue', workqueueSlug],
+            {
+              refetchInterval: 20000
+            }
+          ),
         useQuery: () =>
-          searchEvent.useQuery(searchInput, {
-            meta: { workqueueSlug },
+          searchEvent.useQuery(searchInput, ['workqueue', workqueueSlug], {
             refetchInterval: 10000
           })
       }
@@ -98,11 +99,12 @@ export function useWorkqueues() {
           limit: 10,
           sort: [{ field: 'updatedAt', direction: 'desc' as const }]
         }
-        const options = trpc.event.search.queryOptions(searchInput)
+        const { queryFn: _queryFn, ...options } =
+          trpc.event.search.queryOptions(searchInput)
+        const queryKey = searchKeys.workqueue(searchInput, workqueueConfig.slug)
 
-        const data = queryClient.getQueryData(options.queryKey)
-        const isFetching =
-          queryClient.isFetching({ queryKey: options.queryKey }) > 0
+        const data = queryClient.getQueryData(queryKey)
+        const isFetching = queryClient.isFetching({ queryKey }) > 0
 
         if (data || isFetching) {
           return
@@ -110,7 +112,7 @@ export function useWorkqueues() {
 
         return queryClient.prefetchQuery({
           ...options,
-          meta: { workqueueSlug: workqueueConfig.slug }
+          queryKey
         })
       })
     )

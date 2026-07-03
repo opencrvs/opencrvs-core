@@ -26,7 +26,7 @@ import {
 } from '@opencrvs/commons/client'
 
 import {
-  refetchAllSearchQueries,
+  refetchAffectedSearchQueries,
   setEventData,
   updateLocalEventIndex
 } from '@client/v2-events/features/events/useEvents/api'
@@ -125,7 +125,9 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
     updateLocalEventIndex(response.id, response)
     updateLocalEventIndex(context.transactionId, response)
 
-    await refetchAllSearchQueries()
+    // response.id is the canonical id, context.transactionId the temporary id
+    // used offline; the two index entries seeded above are the affected ones.
+    await refetchAffectedSearchQueries(response.id, context.transactionId)
   },
   meta: { actionType: ActionType.CREATE }
 })

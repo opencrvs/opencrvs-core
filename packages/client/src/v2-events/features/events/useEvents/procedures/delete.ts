@@ -14,7 +14,7 @@ import * as z from 'zod'
 import {
   clearPendingDraftCreationRequests,
   deleteDraft,
-  refetchAllSearchQueries,
+  refetchAffectedSearchQueries,
   refetchDraftsList,
   refetchSearchQuery,
   setDraftData
@@ -31,7 +31,7 @@ setMutationDefaults(trpcOptionsProxy.event.delete, {
   },
   retryDelay: 10000,
   onSuccess: async ({ id }) => {
-    void refetchAllSearchQueries()
+    void refetchAffectedSearchQueries(id)
     deleteDraft(id)
     /*
      * The drafts list may have a fetch in flight that started before the event was
