@@ -23,10 +23,6 @@ services:
     environment:
       - discovery.type=single-node
 
-  influxdb:
-    image: influxdb:1.8.10
-    restart: unless-stopped
-
   minio:
     image: quay.io/minio/minio:RELEASE.2025-06-13T11-33-47Z
     restart: unless-stopped
