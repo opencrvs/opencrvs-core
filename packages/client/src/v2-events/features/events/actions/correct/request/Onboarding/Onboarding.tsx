@@ -127,6 +127,7 @@ export function Onboarding() {
           }
           mobileRight={
             <Button
+              data-testid="close-button"
               size="medium"
               type="icon"
               onClick={() => closeActionView(backTo)}

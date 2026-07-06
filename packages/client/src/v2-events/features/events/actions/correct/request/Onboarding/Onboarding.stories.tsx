@@ -57,7 +57,7 @@ export const Onboarding: Story = {
       await userEvent.click(canvas.getByText('Continue', { exact: true }))
       await userEvent.click(canvas.getByText('Verified', { exact: true }))
       await userEvent.click(canvas.getByText('Continue', { exact: true }))
-      await userEvent.click(canvas.getByTestId('crcl-btn'))
+      await userEvent.click(canvas.getByTestId('close-button'))
       await expect(
         await canvas.findByTestId('navigation_workqueue_outbox')
       ).toBeInTheDocument()
