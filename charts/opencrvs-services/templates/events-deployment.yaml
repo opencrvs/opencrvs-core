@@ -82,30 +82,6 @@ spec:
                   key: events_app_db_url
                   name: {{ .Values.postgres.urls_secret }}
           {{- end }}
-          {{- if eq .Values.mongodb.auth_mode "disabled" }}
-            - name: USER_MGNT_MONGO_URL
-              value: mongodb://{{ .Values.mongodb.host }}/user-mgnt
-            - name: EVENTS_MONGO_URL
-              value: mongodb://{{ .Values.mongodb.host }}/events
-            - name: MONGO_URL
-              value: mongodb://{{ .Values.mongodb.host }}/events
-          {{- else if or (eq .Values.mongodb.auth_mode "auto")  (eq .Values.mongodb.auth_mode "use_secret") }}
-            - name: USER_MGNT_MONGO_URL
-              valueFrom:
-                secretKeyRef:
-                  key: USER_MGNT_MONGO_URL
-                  name: {{ .Values.mongodb.urls_secret }}
-            - name: MONGO_URL
-              valueFrom:
-                secretKeyRef:
-                  key: EVENTS_MONGO_URL
-                  name: {{ .Values.mongodb.urls_secret }}
-            - name: EVENTS_MONGO_URL
-              valueFrom:
-                secretKeyRef:
-                  key: EVENTS_MONGO_URL
-                  name: {{ .Values.mongodb.urls_secret }}
-          {{- end }}
           {{- include "render-env-vars" (dict "service_name" "events" "Values" .Values) }}
           {{- include "resources-helper" (dict "service_name" "events" "Values" .Values) | indent 10 }}
           {{- include "probes-helper" (dict "service_name" "events" "Values" .Values) | indent 10 }}
