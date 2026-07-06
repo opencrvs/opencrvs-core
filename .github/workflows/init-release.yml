@@ -254,7 +254,7 @@ jobs:
       - name: Create release branch in e2e repo
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.E2E_WORKFLOW_TOKEN }}
+          github-token: ${{ secrets.E2E_WORKFLOWS_TOKEN }}
           script: |
             const branchRef = 'refs/heads/release/${{ inputs.version }}'
             const { data: ref } = await github.rest.git.getRef({
