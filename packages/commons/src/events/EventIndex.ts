@@ -101,7 +101,8 @@ export const Range = z
 export const ContainsFlags = z
   .object({
     anyOf: z.array(Flag).optional(),
-    noneOf: z.array(Flag).optional()
+    noneOf: z.array(Flag).optional(),
+    allOf: z.array(Flag).optional()
   })
   .meta({
     id: 'ContainsFlags'

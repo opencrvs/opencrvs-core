@@ -40,19 +40,3 @@ services:
   #links:
   #  - elasticsearch
 
-  # grafana browser.  Uncomment during development, to browse Influxdb via a GUI at http://localhost:4000/
-  # influx will be running on http://influxdb:8086
-  #grafana:
-  #image: grafana/grafana:5.1.0
-  #ports:
-  #  - "4000:3000"
-  #volumes:
-  #  - ./grafana:/var/lib/grafana
-
-  influxdb:
-    ports:
-      - '8086:8086'
-    volumes:
-      - './data/influxdb:/var/lib/influxdb'
-    logging:
-      driver: 'none'

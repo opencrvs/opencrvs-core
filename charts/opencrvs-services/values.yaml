@@ -44,11 +44,6 @@ elasticsearch:
     - SEARCH:search
   # TEMPORAL SECRET TO STORE ELASTICSEARCH USERS
   users_secret: elasticsearch-opencrvs-users
-# InfluxDB configuration, including the hostname, port, and database name.
-influxdb:
-  host: influxdb-0.influxdb.opencrvs-deps-dev.svc.cluster.local
-  port: 8086
-  db: ocrvs
 
 # MinIO configuration, including the hostname and port.
 minio:

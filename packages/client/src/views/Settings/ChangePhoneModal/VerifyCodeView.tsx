@@ -14,10 +14,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { useOnlineStatus } from '@client/utils'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Message } from '@client/views/Settings/items/components'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { Dialog } from '@opencrvs/components/lib/Dialog'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
-import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button, Dialog, TextInput, InputField } from '@opencrvs/components'
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
@@ -140,10 +137,18 @@ export function VerifyCodeView({
       isOpen={show}
       title={intl.formatMessage(messages.verifyPhoneLabel)}
       actions={[
-        <TertiaryButton key="cancel" id="modal_cancel" onClick={onClose}>
+        <Button
+          size="large"
+          type="tertiary"
+          key="cancel"
+          id="modal_cancel"
+          onClick={onClose}
+        >
           {intl.formatMessage(buttonMessages.cancel)}
-        </TertiaryButton>,
-        <PrimaryButton
+        </Button>,
+        <Button
+          size="large"
+          type="primary"
           key="verify"
           id="verify-button"
           onClick={submitVerification}
@@ -155,7 +160,7 @@ export function VerifyCodeView({
           }
         >
           {intl.formatMessage(buttonMessages.continueButton)}
-        </PrimaryButton>
+        </Button>
       ]}
       onClose={onClose}
     >

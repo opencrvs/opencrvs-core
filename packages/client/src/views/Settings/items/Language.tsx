@@ -10,8 +10,7 @@
  */
 import * as React from 'react'
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { Dialog } from '@opencrvs/components/lib/Dialog'
+import { Button, Dialog, Toast } from '@opencrvs/components'
 import { useIntl, FormattedMessage } from 'react-intl'
 import {
   userMessages,
@@ -26,7 +25,6 @@ import {
   Label
 } from '@client/views/Settings/items/components'
 import { useSelector, useDispatch } from 'react-redux'
-import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Select } from '@opencrvs/components/lib/Select'
 import { getAvailableLanguages } from '@client/i18n/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -117,16 +115,24 @@ export function Language() {
         title={intl.formatMessage(userMessages.changeLanguageTitle)}
         isOpen={showModal}
         actions={[
-          <TertiaryButton
+          <Button
+            size="large"
+            type="tertiary"
             key="cancel"
             id="modal_cancel"
             onClick={cancelLanguageSettings}
           >
             {intl.formatMessage(buttonMessages.cancel)}
-          </TertiaryButton>,
-          <PrimaryButton key="apply" id="apply_change" onClick={changeLanguage}>
+          </Button>,
+          <Button
+            size="large"
+            type="primary"
+            key="apply"
+            id="apply_change"
+            onClick={changeLanguage}
+          >
             {intl.formatMessage(buttonMessages.apply)}
-          </PrimaryButton>
+          </Button>
         ]}
         onClose={cancelLanguageSettings}
       >

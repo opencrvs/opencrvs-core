@@ -249,6 +249,9 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
             }
           })
         }
+        if (value.allOf) {
+          must.push(...value.allOf.map((flag) => ({ term: { flags: flag } })))
+        }
         break
       }
       default:
