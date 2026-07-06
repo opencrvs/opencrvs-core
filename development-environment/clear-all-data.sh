@@ -15,14 +15,6 @@ print_usage_and_exit () {
 DIR=$(pwd)
 
 # It's fine if these fail as it might be that the databases do not exist at this point
-docker run --rm --network=opencrvs_default mongo:4.4 mongo --host mongo1 --eval "\
-db.getSiblingDB('hearth-dev').dropDatabase();\
-db.getSiblingDB('events').dropDatabase();\
-db.getSiblingDB('openhim-dev').dropDatabase();\
-db.getSiblingDB('user-mgnt').dropDatabase();\
-db.getSiblingDB('metrics').dropDatabase();\
-db.getSiblingDB('performance').dropDatabase();"
-
 curl -s "http://localhost:9200/_cat/indices?h=index" | while read -r index; do
   echo "Deleting index: $index"
   docker run --rm --network=opencrvs_default appropriate/curl \
