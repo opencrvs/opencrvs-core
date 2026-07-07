@@ -108,6 +108,12 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
     eventConfiguration: configuration,
     actionType: ActionType.MARK_AS_DUPLICATE
   })
+  const markAsDuplicateVisible = markAsDuplicateActionConfig
+    ? isActionVisible(markAsDuplicateActionConfig, eventIndex, validatorContext)
+    : true
+  const markAsDuplicateEnabled = markAsDuplicateActionConfig
+    ? isActionEnabled(markAsDuplicateActionConfig, eventIndex, validatorContext)
+    : true
   const markAsDuplicateLabel = markAsDuplicateActionConfig?.label
     ? intl.formatMessage(markAsDuplicateActionConfig.label)
     : intl.formatMessage(duplicateMessages.markAsDuplicateButton)
@@ -147,10 +153,11 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
     </Button>
   )
 
-  const markAsDuplicateButton = (
+  const markAsDuplicateButton = markAsDuplicateVisible && (
     <Button
       key="btn-mark-as-duplicate"
       fullWidth
+      disabled={!markAsDuplicateEnabled}
       id="mark-as-duplicate"
       type="negative"
       onClick={async () => {

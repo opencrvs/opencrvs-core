@@ -158,7 +158,8 @@ const mockDuplicateEvent = {
 }
 
 // A separate config (DUPLICATE_DETECTED already supports `flags`, so no
-// CUSTOM action is needed) with a SHOW conditional on MARK_AS_NOT_DUPLICATE.
+// CUSTOM action is needed) with a SHOW conditional on both
+// MARK_AS_NOT_DUPLICATE and MARK_AS_DUPLICATE.
 const configurationWithConditional = {
   ...tennisClubMembershipEvent,
   actions: [
@@ -172,6 +173,22 @@ const configurationWithConditional = {
           'Country-configured label for the mark-as-not-duplicate action'
       },
       icon: 'MagnifyingGlass',
+      flags: [],
+      conditionals: [
+        {
+          type: ConditionalType.SHOW,
+          conditional: not(flag('locked-for-review'))
+        }
+      ]
+    },
+    {
+      type: ActionType.MARK_AS_DUPLICATE,
+      label: {
+        id: 'storybook.action.mark-as-duplicate.custom-label',
+        defaultMessage: 'Compare duplicates',
+        description: 'Country-configured label for the mark-as-duplicate action'
+      },
+      icon: 'Copy',
       flags: [],
       conditionals: [
         {
@@ -281,8 +298,22 @@ export const markAsNotDuplicateIsHiddenWhenConditionalIsNotMet: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
 
+    // DuplicateForm sits behind a Suspense boundary — wait for it to mount
+    // before asserting on button absence, so a still-loading tree can't
+    // false-pass as "correctly hidden".
+    await canvas.findByText(/a duplicate\?/i)
+
+    // Querying by testid (Button forwards `id` as `data-testid`), not by
+    // label text, so this can't false-pass on a label that fails to match.
     await expect(
-      canvas.queryByRole('button', { name: /Confirm no duplicate/i })
+      canvas.queryByTestId('not-a-duplicate')
+    ).not.toBeInTheDocument()
+
+    // Exposes a bug: DuplicateForm.tsx never gates `markAsDuplicateButton` on
+    // MARK_AS_DUPLICATE's conditionals, unlike the not-a-duplicate button
+    // above, so this currently fails — see PR #13095 review discussion.
+    await expect(
+      canvas.queryByTestId('mark-as-duplicate')
     ).not.toBeInTheDocument()
   }
 }
