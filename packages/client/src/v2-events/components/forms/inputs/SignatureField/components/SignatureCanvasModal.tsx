@@ -60,7 +60,7 @@ export function SignatureCanvasModal({
           key="apply"
           disabled={!signature}
           id="apply_change"
-          type="positive"
+          type="primary"
           onClick={() => {
             if (!signature) {
               return
