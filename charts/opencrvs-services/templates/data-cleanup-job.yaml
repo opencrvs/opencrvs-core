@@ -14,43 +14,6 @@ spec:
     spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.mongodb) | nindent 6 }}
       containers:
-        - name: cleanup-mongo
-          image: {{ include "opencrvs.imageReference" .Values.mongodb }}
-          command: ["/bin/bash", "-c"]
-          args:
-            - |
-              echo "Running mongo cleanup script..."
-              DATABASES=(
-                {{- range $.Values.mongodb.databases }}
-                  {{ .db }}
-                {{- end }}
-              )
-              if [ ! -z ${MONGODB_ADMIN_USER+x} ] && [ ! -z ${MONGODB_ADMIN_PASSWORD+x} ]; then
-                AUTH="--username $MONGODB_ADMIN_USER --password $MONGODB_ADMIN_PASSWORD --authenticationDatabase admin";
-              else
-                AUTH="";
-              fi
-              for DB in "${DATABASES[@]}"; do
-                echo "Dropping database: $DB"
-                mongo $AUTH --host $MONGO_HOST --eval "db.getSiblingDB('$DB').dropDatabase()"
-              done
-              echo "Cleanup complete!"
-          env:
-            - name: MONGO_HOST
-              value: {{ .Values.mongodb.host }}
-          {{- if or (eq .Values.mongodb.auth_mode "auto") (eq .Values.mongodb.auth_mode "use_secret") }}
-            - name: MONGODB_ADMIN_USER
-              valueFrom:
-                secretKeyRef:
-                  key: MONGODB_ADMIN_USER
-                  name: {{ .Values.mongodb.admin_user_secret_name }}
-            - name: MONGODB_ADMIN_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  key: MONGODB_ADMIN_PASSWORD
-                  name: {{ .Values.mongodb.admin_user_secret_name }}
-          {{- end }}
-          {{- include "render-env-vars" (dict "service_name" "data_cleanup" "Values" .Values) }}
         - name: cleanup-postgres
           image: {{ include "opencrvs.imageReference" .Values.postgres }}
           command: ["/bin/bash", "-c"]
@@ -106,7 +69,7 @@ spec:
           args:
             - |
               MINIO_BUCKET=${MINIO_BUCKET:-ocrvs}
-              echo "Running mongo cleanup script..."
+              echo "Running minio cleanup script..."
               mc alias set myminio http://$MINIO_HOST:$MINIO_PORT ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD:-minioadmin}
               mc rm --recursive --force myminio/$MINIO_BUCKET
               mc rb myminio/$MINIO_BUCKET
@@ -144,7 +107,7 @@ spec:
               for index in $indices; do
                 for approved in $approved_words; do
                   case "$index" in
-                    "$approved"*) 
+                    "$approved"*)
                       echo "Delete index $index..."
                       curl -sS -XDELETE "http://$ELASTICSEARCH_HOST/$index"
                       break

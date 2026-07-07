@@ -5,7 +5,6 @@ Helm chart does deployment of OpenCRVS dependencies including monitoring stack. 
 > NOTE: See [values.yaml](values.yaml) for exact versions
 
 - Datastores:
-  - MongoDB
   - Postgres
   - Elasticsearch
   - Redis
@@ -44,24 +43,6 @@ Any particular service within this helm chart can be disabled by setting `<servi
 | restore.enabled         | bool   | `true`         | Enable or disable data restore. Please check [Restore configuration](#restore-configuration) for more options. Usually this option is enabled on Staging environment                           |
 | utilities.image.repository | string | `ghcr.io/opencrvs/ocrvs-utilities` | Shared utilities image repository used by helper jobs and init containers.                                                                                     |
 | utilities.image.tag     | string | `v2.1.0`       | Shared utilities image tag used by helper jobs and init containers.                                                                                                                            |
-
-## MongoDB
-
-MongoDB configuration section for Helm values.yaml
-
-This section allows you to configure the deployment of MongoDB within your infrastructure.
-| Parameter | Type | Default | Description |
-|--------------------------|---------|----|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| enabled | bool | true | Enable or disable the MongoDB deployment. |
-| image.repository | string | `mongo` | MongoDB Docker image repository. |
-| image.tag | string | `4.4` | MongoDB Docker image tag. See: https://hub.docker.com/_/mongo |
-| use_default_credentials | bool | true | If true, deploys MongoDB without authentication. If false, custom databases and users are created as specified below. |
-| storage_type | string | `global storage_type` | Optional MongoDB-specific override for the Kubernetes storage type. Available options are `pvc` or `host_path`. If not set, the global `storage_type` value is used. |
-| host_data_path | string | `/data/mongo` | Path to persistent data on the host when `storage_type` is `host_path`. |
-| node_selector | dict | `{}` | Label selector for datastore nodes, usually used to keep data persistent |
-| backup_schedule | string | `global backup.schedule` | Optional MongoDB-specific backup cron schedule. If not set, the global `backup.schedule` value is used. |
-| backup_server_dir | string | `global backup.backup_server_dir` | Optional MongoDB-specific directory for encrypted backups on the backup server. If not set, the global `backup.backup_server_dir` value is used. |
-
 ## Postgres
 
 Postgres configuration section for Helm values.yaml
@@ -286,7 +267,7 @@ After publishing the custom images, point the chart to them through:
 
 ## Storage Configuration
 
-This chart supports flexible data persistence for **Elasticsearch, MongoDB, Postgres, and MinIO**.  
+This chart supports flexible data persistence for **Elasticsearch, Postgres, and MinIO**.  
 You control persistence using the `storage_type` option, which can be set **globally** (`storage_type`) or per datastore (e.g. `elasticsearch.storage_type`).
 
 - **`storage_type`**, available options:
@@ -505,7 +486,6 @@ The dependencies chart includes a built-in backup feature that supports automate
 Supported datastores:
 
 - Elasticsearch
-- MongoDB
 - PostgreSQL
 - MinIO
 

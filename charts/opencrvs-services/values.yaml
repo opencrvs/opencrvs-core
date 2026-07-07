@@ -20,9 +20,9 @@ elasticsearch:
     enabled: false
     schedule: '0 2 * * *'
   # auth_mode:
-  # - disabled: No authentication enabled for MongoDB, password-less access to databases
-  # - auto: Users are managed by OpenCRVS helm chart, this mode requires secret to be created with MongoDB admin user
-  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by MongoDB administrator, but helm
+  # - disabled: No authentication enabled, password-less access to databases
+  # - auto: Users are managed by OpenCRVS helm chart, this mode requires secret to be created with Elasticsearch admin user
+  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by the datastore administrator, but helm
   #               will pick up data from users_secret and urls_secret
   # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
   #            please check README.md
@@ -53,8 +53,8 @@ minio:
   #                   Default: minio.<opencrvs domain>
   # external_protocol: external protocol (http or https) available for client browser. (Default: helm chart http_scheme)
   # auth_mode:
-  # - disabled: No authentication enabled for MongoDB, password-less access to databases
-  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by MongoDB administrator, but helm
+  # - disabled: No authentication enabled, password-less access to databases
+  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by the datastore administrator, but helm
   #               will pick up data from users_secret
   # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
   #            please check README.md
@@ -69,65 +69,13 @@ minio:
 redis:
   host: redis-0.redis.opencrvs-deps-dev.svc.cluster.local
   # auth_mode:
-  # - disabled: No authentication enabled for MongoDB, password-less access to databases
-  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by MongoDB administrator, but helm
+  # - disabled: No authentication enabled, password-less access to databases
+  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by the datastore administrator, but helm
   #               will pick up data from users_secret
   # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
   #            please check README.md
   auth_mode: disabled
   users_secret: redis-opencrvs-users
-
-mongodb:
-  # MongoDB hostname configuration.
-  host: mongodb-0.mongodb.opencrvs-deps-dev.svc.cluster.local
-  # auth_mode:
-  # - disabled: No authentication enabled for MongoDB, password-less access to databases
-  # - auto: Users are managed by OpenCRVS helm chart, this mode requires secret to be created with MongoDB admin user
-  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by MongoDB administrator, but helm
-  #               will pick up data from users_secret and urls_secret
-  # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
-  #            please check README.md
-  # It is recommended to setup auto or use_secret values for server environment
-  auth_mode: disabled
-
-  # MongoDB databases and users to create, if `use_default_credentials` is set to `false`.
-  admin_user_secret_name: mongodb-admin-user
-  users_secret: mongo-opencrvs-users
-  urls_secret: mongodb-urls
-
-  # Image used as client to run OpenCRVS configuration scripts
-  image:
-    repository: mongo
-    tag: "4.4"
-  # INTERNAL USAGE ONLY: DON'T MODIFY THIS SECTION
-  # Mapping users to databases
-  databases:
-    # prefix: <PLACEHOLDER> to generate variable names:
-    # - <PLACEHOLDER>_DB, database name from `db` field
-    # - <PLACEHOLDER>_MONGODB_USER, user name from `user` field
-    # - <PLACEHOLDER>_MONGODB_PASSWORD, random password for user
-    # - <PLACEHOLDER>_MONGODB_ROLES, roles for user in JSON format
-    # db: Name of MongoDB database to create.
-    # user: Name of MongoDB user to create and attach to database.
-    # roles: JSON string with roles to assign to user.
-    #        If not provided, then user is created with `readWrite` role on the database.
-    #        If roles are provided, please add explicitly `readWrite` role for the database.
-    #        For example:
-    #        [{ role: 'readWrite', db: 'user-mgnt' }, ...]
-    - prefix: USER_MGNT
-      db: user-mgnt
-      user: user-mgnt
-    - prefix: HEARTH
-      db: hearth-dev
-      user: hearth
-      roles: "[{ role: 'readWrite', db: 'hearth' }, { role: 'readWrite', db: 'performance' }, { role: 'readWrite', db: 'hearth-dev' }]"
-    - prefix: PERFORMANCE
-      db: performance
-      user: performance
-    - prefix: EVENTS
-      db: events
-      user: events
-      roles: "[{ role: 'readWrite', db: 'events' }, {role: 'read', db: 'user-mgnt'}]"
 
 postgres:
   # Postgres hostname configuration
@@ -151,10 +99,10 @@ postgres:
 
   # Image used as client to run OpenCRVS configuration scripts
   image:
-    repository: chumaky/postgres_mongo_fdw
-    tag: 17.6_fdw5.5.2
+    repository: postgres
+    tag: 17.6
 
-  # FIXME: Refactor like mongodb in the future when we get more databases
+  # FIXME: Refactor this in the future when we get more databases
   events_db: events
   events_migrator: events_migrator
   events_app: events_app
@@ -440,9 +388,6 @@ events:
 data_migration:
   image:
     name: ocrvs-migration
-
-data_migration_legacy:
-  enabled: true
 
 # data_cleanup: Wipe all persistent data from datastores including users
 # By running this job on production environment all data will be lost
