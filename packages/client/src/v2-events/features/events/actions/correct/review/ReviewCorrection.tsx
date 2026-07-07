@@ -148,7 +148,7 @@ function ApproveModal({
           key="confirm_correction"
           id="confirm_correction"
           size="large"
-          type="positive"
+          type="primary"
           onClick={() => {
             onSubmit()
             close(true)

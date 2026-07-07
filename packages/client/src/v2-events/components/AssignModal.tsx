@@ -32,7 +32,7 @@ export function AssignModal({ close }: { close: (result: boolean) => void }) {
         <Button
           key="assign-btn"
           id="assign"
-          type="positive"
+          type="primary"
           onClick={() => close(true)}
         >
           {intl.formatMessage(buttonMessages.assign)}

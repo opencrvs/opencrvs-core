@@ -28,13 +28,17 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getOrThrow } from '@opencrvs/commons/client'
-import { ErrorText } from '@opencrvs/components/lib/'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Content } from '@opencrvs/components/lib/Content'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { Loader } from '@opencrvs/components/lib/Loader'
-import { DataRow, IDataProps } from '@opencrvs/components/lib/ViewData'
+import {
+  ErrorText,
+  Button,
+  Content,
+  Icon,
+  AppBar,
+  Frame,
+  Loader,
+  DataRow,
+  IDataProps
+} from '@opencrvs/components'
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
@@ -142,13 +146,43 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
     ...answeredQuestions
   ]
 
+  const title = intl.formatMessage(messages.userSetupRevieTitle)
+
   return (
-    <ActionPageLight
-      title={intl.formatMessage(messages.userSetupRevieTitle)}
-      hideBackground
-      goBack={() => {
-        goToStep(ProtectedAccoutStep.SECURITY_QUESTION, setupData)
-      }}
+    <Frame
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
+      header={
+        <AppBar
+          desktopLeft={
+            <Button
+              aria-label="Go back"
+              size="medium"
+              type="icon"
+              onClick={() =>
+                goToStep(ProtectedAccoutStep.SECURITY_QUESTION, setupData)
+              }
+            >
+              <Icon name="ArrowLeft" />
+            </Button>
+          }
+          mobileLeft={
+            <Button
+              aria-label="Go back"
+              size="medium"
+              type="icon"
+              onClick={() =>
+                goToStep(ProtectedAccoutStep.SECURITY_QUESTION, setupData)
+              }
+            >
+              <Icon name="ArrowLeft" />
+            </Button>
+          }
+          desktopTitle={title}
+          mobileTitle={title}
+        />
+      }
     >
       {activateUserUserMutation.isPending ? (
         <Content>
@@ -195,6 +229,6 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
           </div>
         </Content>
       )}
-    </ActionPageLight>
+    </Frame>
   )
 }

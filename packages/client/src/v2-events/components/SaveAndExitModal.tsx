@@ -52,19 +52,15 @@ export function useSaveAndExitModal() {
             key="cancel_save_exit"
             id="cancel_save_exit"
             type="tertiary"
-            onClick={() => {
-              close(null)
-            }}
+            onClick={() => close(null)}
           >
             {intl.formatMessage(saveAndExitModalMessages.cancel)}
           </Button>,
           <Button
             key="confirm_save_exit"
             id="confirm_save_exit"
-            type="positive"
-            onClick={() => {
-              close(true)
-            }}
+            type="primary"
+            onClick={() => close(true)}
           >
             {intl.formatMessage(saveAndExitModalMessages.confirm)}
           </Button>
