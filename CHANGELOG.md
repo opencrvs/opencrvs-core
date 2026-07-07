@@ -8,6 +8,11 @@
 
 InfluxDB, the InfluxDB Helm resources (StatefulSet, backup/restore/cleanup jobs), Docker services, and the one-time user-audit InfluxDB→Postgres migration have all been removed. No replacement is needed.
 
+### Improvements
+
+- Private docker image registry support for Dependencies helm chart [#13090](https://github.com/opencrvs/opencrvs-core/issues/13090)
+- Added infrastructure management script to toolkit [#12941](https://github.com/opencrvs/opencrvs-core/issues/12941)
+
 ## 2.0.0
 
 ### Upgrade guidance
