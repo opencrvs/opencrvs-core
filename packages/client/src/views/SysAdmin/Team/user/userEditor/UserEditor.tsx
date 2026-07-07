@@ -8,8 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { buttonMessages, errorMessages } from '@client/i18n/messages'
-import { userMessages } from '@client/i18n/messages'
+import {
+  buttonMessages,
+  constantsMessages,
+  errorMessages,
+  userMessages
+} from '@client/i18n/messages'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { messages } from '@client/i18n/messages/views/userForm'
 import * as routes from '@client/navigation/routes'
@@ -31,7 +35,6 @@ import {
   Frame,
   Spinner,
   Toast,
-  ActionPageLight,
   Button,
   Dialog,
   Text
@@ -161,7 +164,8 @@ const CreateNewUserComponent = () => {
           pageId: 'user.details'
         },
         { from }
-      )
+      ),
+      { replace: true }
     )
   }, [clear, navigate, officeId, setUserForm, from])
   return <div />
@@ -237,19 +241,24 @@ const EditUserComponent = () => {
     }
   }, [formState, navigate, userId, pageId, searchParams, isUnauthorized])
 
+  const title = isNewUser
+    ? intl.formatMessage(messages.userFormTitle)
+    : intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
+
   if (userQuery.isLoading) {
     return (
-      <ActionPageLight
-        title={intl.formatMessage(sysAdminMessages.editUserDetailsTitle)}
-        goBack={() => navigate(-1)}
-        hideBackground={true}
+      <Frame
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
+        header={<FormHeader label={title} onClose={() => navigate(-1)} />}
       >
         <Container>
           <SpinnerWrapper>
             <Spinner id="user-form-loading-spinner" size={25} />
           </SpinnerWrapper>
         </Container>
-      </ActionPageLight>
+      </Frame>
     )
   }
 
@@ -258,11 +267,7 @@ const EditUserComponent = () => {
       onClose={handleClose}
       isUnauthorized={isUnauthorized}
       userId={userId}
-      title={
-        isNewUser
-          ? intl.formatMessage(messages.userFormTitle)
-          : intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
-      }
+      title={title}
     >
       <PagesComponent
         attachmentPath={`users/${userId}/`}
@@ -448,44 +453,29 @@ const ReviewUserComponent = () => {
   const isSubmitting =
     createUserMutation.isPending || updateUserMutation.isPending
 
-  if (existingUserQuery.isLoading) {
-    return (
-      <ActionPageLight
-        title={intl.formatMessage(sysAdminMessages.editUserDetailsTitle)}
-        goBack={() => navigate(-1)}
-        hideBackground={true}
-      >
-        <Container>
-          <SpinnerWrapper>
-            <Spinner id="user-form-submitting-spinner" size={25} />
-          </SpinnerWrapper>
-        </Container>
-      </ActionPageLight>
-    )
-  }
+  if (existingUserQuery.isLoading || isSubmitting) {
+    const title = isNewUser
+      ? intl.formatMessage(messages.userFormTitle)
+      : intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
 
-  if (isSubmitting) {
+    const submittingText = isNewUser
+      ? intl.formatMessage(messages.creatingNewUser)
+      : intl.formatMessage(messages.updatingUser)
+
     return (
-      <ActionPageLight
-        title={
-          isNewUser
-            ? intl.formatMessage(messages.userFormTitle)
-            : intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
-        }
-        goBack={() => navigate(-1)}
-        hideBackground={true}
+      <Frame
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
+        header={<FormHeader label={title} onClose={() => navigate(-1)} />}
       >
         <Container>
           <SpinnerWrapper>
             <Spinner id="user-form-submitting-spinner" size={25} />
-            <p>
-              {isNewUser
-                ? intl.formatMessage(messages.creatingNewUser)
-                : intl.formatMessage(messages.updatingUser)}
-            </p>
+            {isSubmitting && <p>{submittingText}</p>}
           </SpinnerWrapper>
         </Container>
-      </ActionPageLight>
+      </Frame>
     )
   }
 
@@ -728,7 +718,9 @@ function FormLayout({
           onClose={onClose ? () => onClose() : undefined}
         />
       }
-      skipToContentText="Skip to form"
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
     >
       <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
         {children}
