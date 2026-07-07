@@ -11,9 +11,9 @@
 import {
   buttonMessages,
   constantsMessages,
-  errorMessages
+  errorMessages,
+  userMessages
 } from '@client/i18n/messages'
-import { userMessages } from '@client/i18n/messages'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { messages } from '@client/i18n/messages/views/userForm'
 import * as routes from '@client/navigation/routes'
@@ -164,7 +164,8 @@ const CreateNewUserComponent = () => {
           pageId: 'user.details'
         },
         { from }
-      )
+      ),
+      { replace: true }
     )
   }, [clear, navigate, officeId, setUserForm, from])
   return <div />
