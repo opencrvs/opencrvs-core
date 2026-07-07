@@ -22,8 +22,8 @@ export interface FrameProps {
   header: React.ReactNode
   /** Accepts a navigation component that will be rendered in the left sidebar of an application frame */
   navigation?: React.ReactNode
-  /** Text inside skip to content -link. Example: "Skip to main content" */
-  skipToContentText?: string
+  /** Text inside skip to content -link. Example: "Skip to main content". Important for a11y purposes. */
+  skipToContentText: string
   /** The content to display inside the frame. */
   children: React.ReactNode
   /** The ID for the frame element. */
@@ -64,7 +64,7 @@ export function Frame({
 }: FrameProps) {
   return (
     <FrameGrid id={id}>
-      {skipToContentText && <SkipToContent>{skipToContentText}</SkipToContent>}
+      <SkipToContent>{skipToContentText}</SkipToContent>
       <FrameNavigation>{navigation}</FrameNavigation>
       <FrameHeader id="page-title">{header}</FrameHeader>
       <FrameMainContent id={MAIN_CONTENT_ANCHOR_ID}>

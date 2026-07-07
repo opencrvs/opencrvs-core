@@ -8,7 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { buttonMessages, errorMessages } from '@client/i18n/messages'
+import {
+  buttonMessages,
+  constantsMessages,
+  errorMessages
+} from '@client/i18n/messages'
 import { userMessages } from '@client/i18n/messages'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { messages } from '@client/i18n/messages/views/userForm'
@@ -242,7 +246,12 @@ const EditUserComponent = () => {
 
   if (userQuery.isLoading) {
     return (
-      <Frame header={<FormHeader label={title} onClose={() => navigate(-1)} />}>
+      <Frame
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
+        header={<FormHeader label={title} onClose={() => navigate(-1)} />}
+      >
         <Container>
           <SpinnerWrapper>
             <Spinner id="user-form-loading-spinner" size={25} />
@@ -453,7 +462,12 @@ const ReviewUserComponent = () => {
       : intl.formatMessage(messages.updatingUser)
 
     return (
-      <Frame header={<FormHeader label={title} onClose={() => navigate(-1)} />}>
+      <Frame
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
+        header={<FormHeader label={title} onClose={() => navigate(-1)} />}
+      >
         <Container>
           <SpinnerWrapper>
             <Spinner id="user-form-submitting-spinner" size={25} />
@@ -703,7 +717,9 @@ function FormLayout({
           onClose={onClose ? () => onClose() : undefined}
         />
       }
-      skipToContentText="Skip to form"
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
     >
       <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
         {children}
