@@ -163,20 +163,5 @@ spec:
                   name: {{ .Values.elasticsearch.urls_secret }}
           {{- end }}
           {{- include "render-env-vars" (dict "service_name" "data_cleanup" "Values" .Values) }}
-        - name: cleanup-influxdb
-          image: "appropriate/curl"
-          command: ["/bin/sh", "-c"]
-          args:
-            - |
-              echo "Running elasticsearch cleanup script..."
-              curl -X POST http://$HOST:$PORT/query?db=$DB --data-urlencode "q=DROP SERIES FROM /.*/"
-          env:
-            - name: HOST
-              value: {{ .Values.influxdb.host }}
-            - name: PORT
-              value: {{ .Values.influxdb.port | quote }}
-            - name: DB
-              value: {{ .Values.influxdb.db }}
-          {{- include "render-env-vars" (dict "service_name" "data_cleanup" "Values" .Values) }}
       restartPolicy: "OnFailure"
 {{- end }}
