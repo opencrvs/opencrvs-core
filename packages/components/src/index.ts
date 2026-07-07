@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export * from './Accordion'
-export * from './ActionPageLight'
 export * from './Alert'
 export * from './AppBar'
 export * from './Bar'
