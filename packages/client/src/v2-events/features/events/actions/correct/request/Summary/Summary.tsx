@@ -179,9 +179,6 @@ export function Summary() {
   return (
     <>
       <Frame
-        skipToContentText={intl.formatMessage(
-          constantsMessages.skipToMainContent
-        )}
         header={
           <AppBar
             desktopLeft={
@@ -227,6 +224,9 @@ export function Summary() {
           />
         }
         id="corrector_form"
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
       >
         <Content
           bottomActionButtons={[

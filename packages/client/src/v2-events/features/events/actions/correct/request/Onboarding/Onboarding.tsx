@@ -93,9 +93,6 @@ export function Onboarding() {
 
   return (
     <Frame
-      skipToContentText={intl.formatMessage(
-        constantsMessages.skipToMainContent
-      )}
       header={
         <AppBar
           desktopLeft={
@@ -142,6 +139,9 @@ export function Onboarding() {
         />
       }
       id="corrector_form"
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
     >
       <PagesComponent
         hideBackToReview
