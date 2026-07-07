@@ -36,6 +36,7 @@ import {
 import { Check } from '@opencrvs/components/lib/icons'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
+import { constantsMessages } from '@client/i18n/messages'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
@@ -178,6 +179,9 @@ export function Summary() {
   return (
     <>
       <Frame
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
         header={
           <AppBar
             desktopLeft={

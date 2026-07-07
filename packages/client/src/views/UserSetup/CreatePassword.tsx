@@ -28,7 +28,7 @@ import {
   IProtectedAccountSetupData
 } from '@client/components/ProtectedAccount'
 import { messages } from '@client/i18n/messages/views/userSetup'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 
 import { EMPTY_STRING } from '@client/utils/constants'
 
@@ -144,6 +144,9 @@ export function CreatePassword({ setupData, goToStep }: IProps) {
   return (
     <>
       <Frame
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
         header={
           <AppBar
             desktopLeft={

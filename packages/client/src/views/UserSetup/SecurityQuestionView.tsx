@@ -13,7 +13,8 @@ import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import {
   formMessages as messages,
   buttonMessages,
-  userMessages
+  userMessages,
+  constantsMessages
 } from '@client/i18n/messages'
 import styled from 'styled-components'
 import {
@@ -330,6 +331,9 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
     const title = intl.formatMessage(messages.userFormSecurityQuestionsTitle)
     return (
       <Frame
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
         header={
           <AppBar
             desktopLeft={

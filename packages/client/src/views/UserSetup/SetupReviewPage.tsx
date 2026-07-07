@@ -150,6 +150,9 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
 
   return (
     <Frame
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
       header={
         <AppBar
           desktopLeft={

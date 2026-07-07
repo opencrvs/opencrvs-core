@@ -17,7 +17,7 @@ import {
 } from 'react-router-typesafe-routes/dom'
 import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
 import { Frame, Button, Icon, AppBar } from '@opencrvs/components'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
@@ -93,6 +93,9 @@ export function Onboarding() {
 
   return (
     <Frame
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
       header={
         <AppBar
           desktopLeft={
