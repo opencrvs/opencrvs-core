@@ -2,7 +2,7 @@
 
 Guidance for AI coding agents working in this Node.js monorepo.
 
-Docs: https://documentation.opencrvs.org
+Docs: https://github.com/opencrvs/documentation
 
 Prefer the existing docs for key concepts instead of re-deriving:
 
