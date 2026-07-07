@@ -2,7 +2,20 @@
 
 ## 2.1.0 Release Candidate
 
+### Upgrade guidance
+
+#### MongoDB fully removed — pass through v2.0.0 first
+
+This release deletes the last MongoDB-aware code (the legacy-data migration tooling, its `mongo_fdw` SQL, and the `data-migration-legacy` Helm job/dependency chart/Swarm compose service). That tooling performed the one-time migration of MongoDB collections into PostgreSQL, and it only ships in **v2.0.0** — there is no later opportunity to run it.
+
+- **Helm/Kubernetes deployments**: it ran automatically as a `pre-install,pre-upgrade` hook (`data_migration_legacy.enabled: true` by default) on every `helm upgrade`. Deployments that upgraded to v2.0.0 with the default enabled have nothing to do — the migration already ran. Deployments that disabled `data_migration_legacy` must upgrade through v2.0.0 with it re-enabled before going to 2.1.0.
+- **Docker Swarm deployments** (country-config/Farajaland `docker-compose.deploy.yml`): also automatic, by a different mechanism — `deploy.sh` runs `docker stack deploy --prune -c ...`, which creates and runs any service new to the compose file. Since `legacy-data-migration` first appeared in the v2.0.0 compose file, the first Swarm deploy to v2.0.0 created and ran it once, same as Helm. Deployments that skipped v2.0.0 entirely, or pruned/removed that service before it ran, must upgrade through v2.0.0 first — the compose service has since been deleted from `develop`, so it would need restoring from the v2.0.0 tag to run manually.
+
 ### Breaking changes
+
+#### MongoDB removed
+
+MongoDB, the `mongodb`/`mongoose` dependencies, the MongoDB Helm resources and dependency chart, and all MongoDB references in compose files, dev scripts, and CI have been removed. See "Upgrade guidance" above for the required upgrade path.
 
 #### InfluxDB removed
 
