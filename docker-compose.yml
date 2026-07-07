@@ -102,14 +102,8 @@ services:
     depends_on:
       - base
     environment:
-      - USER_MGNT_MONGO_URL=mongodb://mongo1/user-mgnt
-      - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
-      - DASHBOARD_MONGO_URL=mongodb://mongo1/performance
-      - EVENTS_MONGO_URL=mongodb://mongo1/events
       - ES_HOST=elasticsearch:9200
-      - MONGO_HOST=mongo1
-      - MONGO_PORT=27017
-      - WAIT_HOSTS=mongo1:27017,minio:9000,elasticsearch:9200
+      - WAIT_HOSTS=minio:9000,elasticsearch:9200
   documents:
     image: ghcr.io/opencrvs/ocrvs-documents:${VERSION}
     #platform: linux/amd64
