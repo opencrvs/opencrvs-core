@@ -27,24 +27,6 @@ spec:
                 secretKeyRef:
                   key: SUPER_USER_PASSWORD
                   name: opencrvs-superuser
-          {{- if eq .Values.elasticsearch.auth_mode "disabled" }}
-            - name: ES_HOST
-              value: "{{ .Values.elasticsearch.host }}:{{ .Values.elasticsearch.port }}"
-          {{- else if or (eq .Values.elasticsearch.auth_mode "auto") (eq .Values.elasticsearch.auth_mode "use_secret") }}
-            - name: ES_HOST
-              valueFrom:
-                secretKeyRef:
-                  key: SEARCH_ELASTIC_HOST
-                  name: {{ .Values.elasticsearch.urls_secret }}
-          {{- end }}
-            - name: EVENTS_URL
-              value: http://events.{{ .Release.Namespace }}.svc.cluster.local:5555/
-            - name: AUTH_URL
-              value: http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040/
-            - name: MINIO_HOST
-              value: {{ .Values.minio.host | quote }}
-            - name: MINIO_PORT
-              value: {{ .Values.minio.port | quote }}
           {{- if or (eq .Values.postgres.auth_mode "auto") (eq .Values.postgres.auth_mode "disabled") }}
             - name: EVENTS_POSTGRES_URL
               valueFrom:
@@ -57,20 +39,7 @@ spec:
                   key: EVENTS_APP_POSTGRES_USER
                   name: {{ .Values.postgres.users_secret }}
           {{- end }}
-
-          {{- if or (eq .Values.minio.auth_mode "auto") (eq .Values.minio.auth_mode "use_secret") }}
-            - name: MINIO_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: MINIO_ACCESS_KEY
-                  name: {{ .Values.minio.users_secret }}
-            - name: MINIO_SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: MINIO_SECRET_KEY
-                  name: {{ .Values.minio.users_secret }}
-          {{- end }}
             - name: WAIT_HOSTS
-              value: "{{ .Values.postgres.host }}:{{ .Values.postgres.port }},{{ .Values.minio.host }}:{{ .Values.minio.port }},{{ .Values.elasticsearch.host }}:{{ .Values.elasticsearch.port }}"
+              value: "{{ .Values.postgres.host }}:{{ .Values.postgres.port }}"
           {{- include "render-env-vars" (dict "service_name" "data_migration" "Values" .Values) }}
       restartPolicy: "OnFailure"

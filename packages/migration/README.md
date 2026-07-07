@@ -3,7 +3,7 @@
 This package migrates data and database schemas between versions.
 
 > [!NOTE]
-> Requires `mongodb` and `postgres` dependencies to be running.
+> Requires the `postgres` dependency to be running.
 
 ## Usage
 
@@ -18,11 +18,7 @@ e.g. `yarn create:events migration-name`
 This will create a new migration named `migration-name` prepended with the current
 timestamp in the migrations/<package> folder.
 
-With **Mongo**, the created scripts will have 2 functions exported, `up` and
-`down`. We need to write the new migration procedure in the `up` function and a
-procedure to revert those changes in `down`.
-
-With **Postgres**, it's similar but the migrations are written in SQL instead of TypeScript and they are separated with `-- Up Migration` and `-- Down Migration`.
+With **Postgres**, the migrations are written in SQL and separated with `-- Up Migration` and `-- Down Migration`. Write the new migration procedure under `-- Up Migration` and a procedure to revert those changes under `-- Down Migration`.
 
 - #### `yarn status:<package>`
 
