@@ -290,7 +290,7 @@ export function Summary() {
             key="continue"
             id="send"
             size="medium"
-            type="positive"
+            type="primary"
             onClick={submitCorrection}
           >
             {intl.formatMessage(
