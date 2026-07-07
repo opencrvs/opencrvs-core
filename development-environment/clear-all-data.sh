@@ -14,7 +14,6 @@ print_usage_and_exit () {
 
 DIR=$(pwd)
 
-# It's fine if these fail as it might be that the databases do not exist at this point
 curl -s "http://localhost:9200/_cat/indices?h=index" | while read -r index; do
   echo "Deleting index: $index"
   docker run --rm --network=opencrvs_default appropriate/curl \

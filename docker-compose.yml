@@ -102,7 +102,6 @@ services:
     depends_on:
       - base
     environment:
-      - ES_HOST=elasticsearch:9200
       - WAIT_HOSTS=minio:9000,elasticsearch:9200
   documents:
     image: ghcr.io/opencrvs/ocrvs-documents:${VERSION}
