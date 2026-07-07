@@ -29,7 +29,6 @@ curl -s "http://localhost:9200/_cat/indices?h=index" | while read -r index; do
     curl -XDELETE "http://elasticsearch:9200/$index" -v
 done
 
-docker run --rm --network=opencrvs_default appropriate/curl curl -X POST 'http://influxdb:8086/query?db=ocrvs' --data-urlencode "q=DROP SERIES FROM /.*/" -v
 PATH_TO_MINIO_DIR="$DIR/data/minio/ocrvs"
 # Clear Minio Data
 if [ -d $PATH_TO_MINIO_DIR ] ; then

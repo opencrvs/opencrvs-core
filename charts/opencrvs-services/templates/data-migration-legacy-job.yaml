@@ -43,12 +43,6 @@ spec:
               value: http://events.{{ .Release.Namespace }}.svc.cluster.local:5555/
             - name: AUTH_URL
               value: http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040/
-            - name: INFLUX_DB
-              value: {{ .Values.influxdb.db | quote }}
-            - name: INFLUX_HOST
-              value: {{ .Values.influxdb.host | quote }}
-            - name: INFLUX_PORT
-              value: {{ .Values.influxdb.port | quote }}
             - name: MINIO_HOST
               value: {{ .Values.minio.host | quote }}
             - name: MINIO_PORT
@@ -129,7 +123,7 @@ spec:
                   name: {{ .Values.minio.users_secret }}
           {{- end }}
             - name: WAIT_HOSTS
-              value: "{{ .Values.postgres.host }}:{{ .Values.postgres.port }},{{ .Values.mongodb.host }}:27017,{{ .Values.influxdb.host }}:{{ .Values.influxdb.port }},{{ .Values.minio.host }}:{{ .Values.minio.port }},{{ .Values.elasticsearch.host }}:{{ .Values.elasticsearch.port }}"
+              value: "{{ .Values.postgres.host }}:{{ .Values.postgres.port }},{{ .Values.mongodb.host }}:27017,{{ .Values.minio.host }}:{{ .Values.minio.port }},{{ .Values.elasticsearch.host }}:{{ .Values.elasticsearch.port }}"
           {{- include "render-env-vars" (dict "service_name" "data_migration" "Values" .Values) }}
       restartPolicy: "OnFailure"
 {{- end }}

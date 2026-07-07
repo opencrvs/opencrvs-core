@@ -1,6 +1,14 @@
 # Changelog
 
-## 2.0.0 Release Candidate
+## 2.1.0 Release Candidate
+
+### Breaking changes
+
+#### InfluxDB removed
+
+InfluxDB, the InfluxDB Helm resources (StatefulSet, backup/restore/cleanup jobs), Docker services, and the one-time user-audit InfluxDB→Postgres migration have all been removed. No replacement is needed.
+
+## 2.0.0
 
 ### Upgrade guidance
 

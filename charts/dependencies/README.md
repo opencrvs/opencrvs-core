@@ -10,7 +10,6 @@ Helm chart does deployment of OpenCRVS dependencies including monitoring stack. 
   - Elasticsearch
   - Redis
   - MinIO
-  - InfluxDB
 - Observability (Monitoring and Logging):
   - Kibana
   - Logstash
@@ -242,16 +241,9 @@ If you need any specific configuration for ACL (read-only, command limit, etc) p
 
 More details about ACL support can be found at https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/
 
-## InfluxDB
-
-| Key               | Type    | Example | Description                                           |
-| ----------------- | ------- | ------- | ----------------------------------------------------- |
-| enabled           | boolean | true    | Enable or disable the Elasticsearch deployment.       |
-| data_storage_size | string  | 5Gi     | Persistent volume claim size for InfluxDB data volume |
-
 ## Storage Configuration
 
-This chart supports flexible data persistence for **Elasticsearch, MongoDB, Postgres, MinIO, and InfluxDB**.  
+This chart supports flexible data persistence for **Elasticsearch, MongoDB, Postgres, and MinIO**.  
 You control persistence using the `storage_type` option, which can be set **globally** (`storage_type`) or per datastore (e.g. `elasticsearch.storage_type`).
 
 - **`storage_type`**, available options:
@@ -473,7 +465,6 @@ Supported datastores:
 - MongoDB
 - PostgreSQL
 - MinIO
-- InfluxDB
 
 Each datastore has its own backup job, configured as a Kubernetes `CronJob`.
 Backup settings are defined in the `backup` section of the chart values.
