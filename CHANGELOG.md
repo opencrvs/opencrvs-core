@@ -12,6 +12,11 @@ InfluxDB, the InfluxDB Helm resources (StatefulSet, backup/restore/cleanup jobs)
 
 - Private docker image registry support for Dependencies helm chart [#13090](https://github.com/opencrvs/opencrvs-core/issues/13090)
 - Added infrastructure management script to toolkit [#12941](https://github.com/opencrvs/opencrvs-core/issues/12941)
+### New features
+
+#### Notification-based scope filtering
+
+Added `notifiedIn` and `notifiedBy` scope options for record scopes (`record.read`, `record.edit`, `record.search`, etc.), mirroring the existing `declaredIn`/`declaredBy` and `registeredIn`/`registeredBy` patterns — enables role configurations to restrict access based on where or by whom an event was notified. [#11875](https://github.com/opencrvs/opencrvs-core/issues/11875)
 
 ## 2.0.0
 

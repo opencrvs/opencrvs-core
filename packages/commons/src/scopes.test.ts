@@ -115,6 +115,48 @@ describe('getScopeOptionValue()', () => {
 
     expect(result).toEqual(JurisdictionFilter.enum.location)
   })
+
+  it('should return "all" for notifiedIn when not set', () => {
+    const result = getScopeOptionValue(
+      { type: 'record.edit', options: {} },
+      'notifiedIn'
+    )
+
+    expect(result).toEqual(JurisdictionFilter.enum.all)
+  })
+
+  it('should return undefined for notifiedBy when not set', () => {
+    const result = getScopeOptionValue(
+      { type: 'record.edit', options: {} },
+      'notifiedBy'
+    )
+
+    expect(result).toBeUndefined()
+  })
+
+  it('should return set value for notifiedIn over default', () => {
+    const result = getScopeOptionValue(
+      {
+        type: 'record.edit',
+        options: { notifiedIn: JurisdictionFilter.enum.location }
+      },
+      'notifiedIn'
+    )
+
+    expect(result).toEqual(JurisdictionFilter.enum.location)
+  })
+
+  it('should return set value for notifiedBy', () => {
+    const result = getScopeOptionValue(
+      {
+        type: 'record.search',
+        options: { notifiedBy: 'user' as const }
+      },
+      'notifiedBy'
+    )
+
+    expect(result).toEqual('user')
+  })
 })
 
 describe('2.0 scopes', () => {
@@ -126,6 +168,8 @@ describe('2.0 scopes', () => {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
           // @ts-expect-error - intentionally include irrelevant options to test that they are stripped out
+          notifiedBy: 'user' as const,
+          notifiedIn: 'administrativeArea' as const,
           declaredBy: 'user' as const,
           declaredIn: 'administrativeArea' as const,
           registeredBy: 'user' as const,
@@ -157,6 +201,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location' as const,
+          notifiedBy: 'user' as const,
+          notifiedIn: 'administrativeArea' as const,
           declaredBy: 'user' as const,
           declaredIn: 'administrativeArea' as const,
           // @ts-expect-error - intentionally include irrelevant options to test that they are stripped out
@@ -172,6 +218,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
           declaredIn: 'administrativeArea',
           declaredBy: 'user'
         }
@@ -181,6 +229,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
           declaredIn: 'administrativeArea',
           declaredBy: 'user'
         }
@@ -190,6 +240,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
           declaredIn: 'administrativeArea',
           declaredBy: 'user'
         }
@@ -199,6 +251,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
           declaredIn: 'administrativeArea',
           declaredBy: 'user'
         }
@@ -208,6 +262,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
           declaredIn: 'administrativeArea',
           declaredBy: 'user'
         }
@@ -222,6 +278,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location' as const,
+          notifiedBy: 'user' as const,
+          notifiedIn: 'administrativeArea' as const,
           declaredBy: 'user' as const,
           declaredIn: 'administrativeArea' as const,
           registeredBy: 'user' as const,
@@ -236,6 +294,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
           declaredIn: 'administrativeArea',
           declaredBy: 'user',
           registeredIn: 'administrativeArea',
@@ -247,6 +307,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
           declaredIn: 'administrativeArea',
           declaredBy: 'user',
           registeredIn: 'administrativeArea',
@@ -258,6 +320,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
           declaredIn: 'administrativeArea',
           declaredBy: 'user',
           registeredIn: 'administrativeArea',
@@ -269,6 +333,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
           declaredIn: 'administrativeArea',
           declaredBy: 'user',
           registeredIn: 'administrativeArea',
@@ -280,6 +346,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
           declaredIn: 'administrativeArea',
           declaredBy: 'user',
           registeredIn: 'administrativeArea',
