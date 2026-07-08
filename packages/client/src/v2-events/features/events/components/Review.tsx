@@ -26,12 +26,15 @@ import {
   TextArea
 } from '@opencrvs/components'
 import {
+  EventConfig,
   EventState,
   FieldConfig,
   FieldType,
+  FieldUpdateValue,
   FormConfig,
   isFieldDisplayedOnReview,
   isPageVisible,
+  omitHiddenFields,
   runFieldValidations,
   FieldTypesToHideInReview,
   ValidatorContext,
@@ -43,6 +46,7 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { buttonMessages } from '@client/i18n/messages'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 import { TranslationTextWithFormatModifier } from './TranslationTextWithFormatModifier'
@@ -645,22 +649,53 @@ function EditModal({
   )
 }
 
+export interface AcceptActionModalResult {
+  values: Record<string, FieldUpdateValue>
+}
+
 function AcceptActionModal({
   copy,
   close,
   action,
-  eventType
+  eventType,
+  fields = [],
+  eventConfiguration,
+  declaration
 }: {
   copy: {
     onConfirm: MessageDescriptor
     title: MessageDescriptor
     supportingCopy?: MessageDescriptor
   }
-  close: (result: boolean | null) => void
+  close: (result: AcceptActionModalResult | null) => void
   action: string
   eventType: string
+  fields?: FieldConfig[]
+  eventConfiguration: EventConfig
+  declaration: EventState
 }) {
   const intl = useIntl()
+  const validatorContext = useValidatorContext()
+  const [modalValues, setModalValues] = useState<EventState>({})
+  // Controlled form state: values and touched are passed back into
+  // FormFieldGenerator so it reinitialises and revalidates against the
+  // committed values. Blur-committing inputs (e.g. TEXT) otherwise leave a
+  // stale required-error behind, since touch-triggered validation runs
+  // before the value lands in the form state.
+  const [modalTouched, setModalTouched] = useState<
+    IndexMap<FormState<boolean>>
+  >({})
+
+  const errorsOnField = fields.flatMap((field) =>
+    flattenFormState(
+      runFieldValidations({
+        field,
+        form: modalValues,
+        value: modalValues[field.id],
+        context: validatorContext
+      })
+    ).flatMap(([, errs]) => errs)
+  )
 
   return (
     <Dialog
@@ -678,10 +713,13 @@ function AcceptActionModal({
         </Button>,
         <Button
           key={'confirm_' + action}
+          disabled={errorsOnField.length > 0}
           id={'confirm_' + action}
           type="primary"
           onClick={() => {
-            close(true)
+            close({
+              values: omitHiddenFields(fields, modalValues, validatorContext)
+            })
           }}
         >
           {intl.formatMessage(copy.onConfirm)}
@@ -692,7 +730,7 @@ function AcceptActionModal({
       width={600}
       onClose={() => close(null)}
     >
-      <Stack>
+      <Stack alignItems="left" direction="column" gap={16}>
         {copy.supportingCopy && (
           <TranslationTextWithFormatModifier
             color="supportingCopy"
@@ -701,20 +739,64 @@ function AcceptActionModal({
             variant="reg16"
           />
         )}
+        {fields.length > 0 && (
+          <FormFieldGenerator
+            eventConfig={eventConfiguration}
+            fields={fields}
+            formTouched={modalTouched}
+            formValues={modalValues}
+            id={`accept-action-modal-form-${action}`}
+            validatorContext={{
+              ...validatorContext,
+              baseFormState: declaration
+            }}
+            onFormChange={(values) =>
+              setModalValues((prev) => ({ ...prev, ...values }))
+            }
+            onTouchedChange={setModalTouched}
+          />
+        )}
       </Stack>
     </Dialog>
   )
 }
 
+export interface RejectActionModalResult {
+  reason: string
+  values: Record<string, FieldUpdateValue>
+}
+
 function RejectActionModal({
   close,
-  supportingCopy
+  supportingCopy,
+  fields = [],
+  eventConfiguration
 }: {
-  close: (result: string | null) => void
+  close: (result: RejectActionModalResult | null) => void
   supportingCopy?: MessageDescriptor
+  fields?: FieldConfig[]
+  eventConfiguration: EventConfig
 }) {
   const [message, setMessage] = useState<string>('')
+  const [modalValues, setModalValues] = useState<EventState>({})
+  // Controlled form state — see AcceptActionModal for why values and touched
+  // are fed back into FormFieldGenerator.
+  const [modalTouched, setModalTouched] = useState<
+    IndexMap<FormState<boolean>>
+  >({})
   const intl = useIntl()
+  const validatorContext = useValidatorContext()
+
+  const errorsOnField = fields.flatMap((field) =>
+    flattenFormState(
+      runFieldValidations({
+        field,
+        form: modalValues,
+        value: modalValues[field.id],
+        context: validatorContext
+      })
+    ).flatMap(([, errs]) => errs)
+  )
 
   const actions = [
     <Button
@@ -729,11 +811,14 @@ function RejectActionModal({
     </Button>,
     <Button
       key="confirm_reject_with_update"
-      disabled={!message}
+      disabled={!message || errorsOnField.length > 0}
       id="confirm_reject_with_update"
       type="negative"
       onClick={() => {
-        close(message)
+        close({
+          reason: message,
+          values: omitHiddenFields(fields, modalValues, validatorContext)
+        })
       }}
     >
       {intl.formatMessage(reviewMessages.rejectModalSendForUpdate)}
@@ -760,6 +845,20 @@ function RejectActionModal({
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
+        {fields.length > 0 && (
+          <FormFieldGenerator
+            eventConfig={eventConfiguration}
+            fields={fields}
+            formTouched={modalTouched}
+            formValues={modalValues}
+            id="reject-action-modal-form"
+            validatorContext={validatorContext}
+            onFormChange={(values) =>
+              setModalValues((prev) => ({ ...prev, ...values }))
+            }
+            onTouchedChange={setModalTouched}
+          />
+        )}
       </Stack>
     </Dialog>
   )

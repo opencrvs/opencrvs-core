@@ -11,10 +11,18 @@
 
 import React from 'react'
 import { v4 as uuid } from 'uuid'
-import { UUID, getActionConfig, ActionType } from '@opencrvs/commons/client'
+import {
+  UUID,
+  getActionConfig,
+  getActionFormFields,
+  ActionType
+} from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
+import {
+  Review as ReviewComponent,
+  RejectActionModalResult
+} from '@client/v2-events/features/events/components/Review'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 
 export function useRejectionModal(eventId: UUID, eventType: string) {
@@ -27,22 +35,27 @@ export function useRejectionModal(eventId: UUID, eventType: string) {
   })
 
   const supportingCopy = rejectActionConfig?.supportingCopy
+  const fields = getActionFormFields(eventConfiguration, ActionType.REJECT)
 
   async function handleRejection(onClose: () => void) {
-    const confirmedRejection = await openModal<string | null>((close) => (
-      <ReviewComponent.ActionModal.Reject
-        close={close}
-        supportingCopy={supportingCopy}
-      />
-    ))
+    const modalResult = await openModal<RejectActionModalResult | null>(
+      (close) => (
+        <ReviewComponent.ActionModal.Reject
+          close={close}
+          eventConfiguration={eventConfiguration}
+          fields={fields}
+          supportingCopy={supportingCopy}
+        />
+      )
+    )
 
-    if (confirmedRejection) {
+    if (modalResult) {
       events.actions.reject.mutate({
         eventId,
         declaration: {},
         transactionId: uuid(),
-        annotation: {},
-        content: { reason: confirmedRejection }
+        annotation: modalResult.values,
+        content: { reason: modalResult.reason }
       })
 
       onClose()

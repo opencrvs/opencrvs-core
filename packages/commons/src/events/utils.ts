@@ -138,7 +138,34 @@ export function getCustomActionFields(
     actionType: ActionType.CUSTOM
   })
 
-  if (!actionConfig || !('form' in actionConfig)) {
+  if (!actionConfig || actionConfig.type !== ActionType.CUSTOM) {
+    return []
+  }
+
+  return actionConfig.form
+}
+
+/**
+ * Returns the fields configured for an action's confirmation dialog.
+ *
+ * Unlike review fields and supporting copy, NOTIFY does NOT fall back to the
+ * DECLARE config here: dialog fields always come from the action's own
+ * configuration entry.
+ */
+export function getActionFormFields(
+  eventConfiguration: EventConfig,
+  actionType: ActionType,
+  customActionType?: string
+): FieldConfig[] {
+  const actionConfig = eventConfiguration.actions.find((a) => {
+    if (a.type === ActionType.CUSTOM && customActionType) {
+      return a.customActionType === customActionType
+    }
+
+    return a.type === actionType
+  })
+
+  if (!actionConfig || !('form' in actionConfig) || actionConfig.form == null) {
     return []
   }
 
@@ -165,15 +192,15 @@ export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
     return actionConfig.printForm.pages.flatMap(({ fields }) => fields)
   }
 
-  if (actionConfig.type === ActionType.CUSTOM) {
-    return actionConfig.form
-  }
+  const reviewFields =
+    'review' in actionConfig && actionConfig.review != null
+      ? actionConfig.review.fields
+      : []
 
-  if ('review' in actionConfig && actionConfig.review != null) {
-    return actionConfig.review.fields
-  }
+  const formFields =
+    'form' in actionConfig && actionConfig.form != null ? actionConfig.form : []
 
-  return []
+  return [...reviewFields, ...formFields]
 }
 
 function getAllAnnotationFields(config: EventConfig): FieldConfig[] {

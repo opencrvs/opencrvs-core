@@ -21,7 +21,9 @@ import {
   ActionType,
   ActionStatus,
   EventDocument,
-  omitHiddenAnnotationFields,
+  getActionAnnotationFields,
+  getActionFormFields,
+  omitHiddenFields,
   deepDropNulls,
   EventState,
   getCurrentEventState,
@@ -443,16 +445,29 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       ? getCurrentEventState(localFullEvent, eventConfiguration).declaration
       : {}
 
-    const annotation = actionConfiguration
-      ? deepDropNulls(
-          omitHiddenAnnotationFields(
-            actionConfiguration,
-            originalDeclaration,
-            restParams.annotation,
-            {}
+    const annotationFields = [
+      ...(actionConfiguration
+        ? getActionAnnotationFields(actionConfiguration)
+        : []),
+      // NOTIFY dialog fields come from the NOTIFY config itself; the DECLARE
+      // fallback above only covers review fields.
+      ...(actionType === ActionType.NOTIFY
+        ? getActionFormFields(eventConfiguration, ActionType.NOTIFY)
+        : [])
+    ]
+
+    // Action types with no config entry at all (ASSIGN, UNASSIGN, duplicate
+    // and correction actions, ...) get their annotation cleared, as before.
+    // Types with a config entry keep pass-through semantics even with zero
+    // configured fields — EDIT's annotation carries review-page values.
+    const annotation =
+      actionConfiguration || annotationFields.length > 0
+        ? deepDropNulls(
+            omitHiddenFields(annotationFields, restParams.annotation ?? {}, {
+              baseFormState: originalDeclaration
+            })
           )
-        )
-      : {}
+        : {}
 
     return {
       ...restParams,

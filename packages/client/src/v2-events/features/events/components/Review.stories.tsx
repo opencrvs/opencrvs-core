@@ -10,7 +10,14 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import { fireEvent, within, expect } from '@storybook/test'
+import {
+  fireEvent,
+  within,
+  expect,
+  fn,
+  userEvent,
+  waitFor
+} from '@storybook/test'
 import React from 'react'
 import superjson from 'superjson'
 import { noop } from 'lodash'
@@ -23,7 +30,9 @@ import {
   FieldConfig,
   FieldType,
   DocumentPath,
-  TENNIS_CLUB_DECLARATION_FORM
+  generateTranslationConfig,
+  TENNIS_CLUB_DECLARATION_FORM,
+  tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
@@ -32,7 +41,11 @@ import {
   getTestValidatorContext,
   withValidatorContext
 } from '../../../../../.storybook/decorators'
-import { Review } from './Review'
+import {
+  AcceptActionModalResult,
+  Review,
+  RejectActionModalResult
+} from './Review'
 
 /* eslint-disable max-lines */
 const mockDeclaration = {
@@ -184,8 +197,11 @@ export const ReviewWithValidationErrors: Story = {
     const [modal, openModal] = useModal()
 
     async function handleRejection() {
-      await openModal<string | null>((close) => (
-        <Review.ActionModal.Reject close={close} />
+      await openModal<RejectActionModalResult | null>((close) => (
+        <Review.ActionModal.Reject
+          close={close}
+          eventConfiguration={tennisClubMembershipEvent}
+        />
       ))
     }
     return (
@@ -615,5 +631,174 @@ export const ReadonlyAnnotationWithSignature: Story = {
         originalFilename: 'signature-review____signature-1773128010978.png'
       }
     }
+  }
+}
+
+const modalCommentsField: FieldConfig = {
+  id: 'comments',
+  type: FieldType.TEXTAREA,
+  conditionals: [],
+  label: generateTranslationConfig('Comments')
+}
+
+const modalCategoryField: FieldConfig = {
+  id: 'category',
+  type: FieldType.SELECT,
+  conditionals: [],
+  label: generateTranslationConfig('Category'),
+  options: [
+    { value: 'option-a', label: generateTranslationConfig('Option A') },
+    { value: 'option-b', label: generateTranslationConfig('Option B') }
+  ]
+}
+
+const acceptModalRequiredField: FieldConfig = {
+  id: 'required-comment',
+  type: FieldType.TEXT,
+  required: true,
+  conditionals: [],
+  label: generateTranslationConfig('Required comment')
+}
+
+/**
+ * AcceptActionModal (Review.ActionModal.Accept) renders configurable form fields
+ * via FormFieldGenerator. With no required fields present, there are no
+ * validation errors, so the confirm button starts out enabled.
+ */
+export const AcceptModalWithFormFields: Story = {
+  render: function Component() {
+    return (
+      <Review.ActionModal.Accept
+        action="Declare"
+        close={fn()}
+        copy={{
+          title: generateTranslationConfig('Declare this event?'),
+          onConfirm: generateTranslationConfig('Confirm')
+        }}
+        declaration={{}}
+        eventConfiguration={tennisClubMembershipEvent}
+        eventType="Tennis club membership"
+        fields={[modalCommentsField, modalCategoryField]}
+      />
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await expect(await canvas.findByText('Comments')).toBeInTheDocument()
+    await expect(await canvas.findByText('Category')).toBeInTheDocument()
+
+    const confirmButton = await canvas.findByRole('button', {
+      name: 'Confirm'
+    })
+    await expect(confirmButton).toBeEnabled()
+  }
+}
+
+const acceptModalRequiredFieldClose =
+  fn<(result: AcceptActionModalResult | null) => void>()
+
+/**
+ * When a configured field is required, the confirm button is disabled until
+ * the field has a valid value. Confirming afterwards resolves `close` with
+ * the entered value.
+ */
+export const AcceptModalWithRequiredField: Story = {
+  render: function Component() {
+    return (
+      <Review.ActionModal.Accept
+        action="Declare"
+        close={acceptModalRequiredFieldClose}
+        copy={{
+          title: generateTranslationConfig('Declare this event?'),
+          onConfirm: generateTranslationConfig('Confirm')
+        }}
+        declaration={{}}
+        eventConfiguration={tennisClubMembershipEvent}
+        eventType="Tennis club membership"
+        fields={[acceptModalRequiredField]}
+      />
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    const confirmButton = await canvas.findByRole('button', {
+      name: 'Confirm'
+    })
+    await expect(confirmButton).toBeDisabled()
+
+    const input = await canvas.findByTestId('text__required-comment')
+    await userEvent.type(input, 'Looks good to me')
+    await userEvent.tab()
+
+    await expect(confirmButton).toBeEnabled()
+
+    // The required-field error must clear once the committed value is valid
+    await waitFor(() =>
+      expect(canvas.queryByText('Required')).not.toBeInTheDocument()
+    )
+
+    await userEvent.click(confirmButton)
+
+    await waitFor(() =>
+      expect(acceptModalRequiredFieldClose).toHaveBeenCalledWith({
+        values: { 'required-comment': 'Looks good to me' }
+      })
+    )
+  }
+}
+
+const rejectModalWithFormFieldsClose =
+  fn<(result: RejectActionModalResult | null) => void>()
+
+/**
+ * RejectActionModal already has a core-defined form: the rejection reason
+ * textarea. Config-defined fields render below it, and their values are
+ * resolved alongside the reason on confirm.
+ */
+export const RejectModalWithFormFields: Story = {
+  render: function Component() {
+    return (
+      <Review.ActionModal.Reject
+        close={rejectModalWithFormFieldsClose}
+        eventConfiguration={tennisClubMembershipEvent}
+        fields={[modalCommentsField, modalCategoryField]}
+      />
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    // Core-defined reason field and config-defined fields render together
+    const reasonInput = await canvas.findByTestId('reject-reason')
+    await expect(await canvas.findByText('Comments')).toBeInTheDocument()
+    await expect(await canvas.findByText('Category')).toBeInTheDocument()
+
+    const confirmButton = await canvas.findByRole('button', {
+      name: 'Send For Update'
+    })
+    // The core reason field gates the confirm button
+    await expect(confirmButton).toBeDisabled()
+
+    await userEvent.type(reasonInput, 'Missing supporting documents')
+    await expect(confirmButton).toBeEnabled()
+
+    const commentsInput = canvasElement.querySelector('textarea#comments')
+    await expect(commentsInput).toBeInTheDocument()
+    await userEvent.type(
+      commentsInput as HTMLTextAreaElement,
+      'Please attach the certificate'
+    )
+    await userEvent.tab()
+
+    await userEvent.click(confirmButton)
+
+    await waitFor(() =>
+      expect(rejectModalWithFormFieldsClose).toHaveBeenCalledWith({
+        reason: 'Missing supporting documents',
+        values: { comments: 'Please attach the certificate' }
+      })
+    )
   }
 }

@@ -71,7 +71,13 @@ const ReadActionConfig = ActionConfigBase.extend(
 
 const NotifyConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.NOTIFY)
+    type: z.literal(ActionType.NOTIFY),
+    form: z
+      .array(FieldConfig)
+      .optional()
+      .describe(
+        'Fields rendered on the action confirmation dialog. Submitted values are stored in the action annotation and shown in the audit history.'
+      )
   }).shape
 )
 
@@ -81,6 +87,12 @@ const DeclareConfig = DeclarationActionBase.extend(
     review: DeclarationReviewConfig.describe(
       'Configuration of the review page fields.'
     ),
+    form: z
+      .array(FieldConfig)
+      .optional()
+      .describe(
+        'Fields rendered on the action confirmation dialog. Submitted values are stored in the action annotation and shown in the audit history.'
+      ),
     dialogCopy: z
       .object({
         notify: TranslationConfig.describe(
@@ -99,7 +111,13 @@ const DeclareConfig = DeclarationActionBase.extend(
 
 const ArchiveConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.ARCHIVE)
+    type: z.literal(ActionType.ARCHIVE),
+    form: z
+      .array(FieldConfig)
+      .optional()
+      .describe(
+        'Fields rendered on the action confirmation dialog. Submitted values are stored in the action annotation and shown in the audit history.'
+      )
   }).shape
 )
 
@@ -122,13 +140,25 @@ const EditActionConfig = ActionConfigBase.extend(
 
 const RejectConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.REJECT)
+    type: z.literal(ActionType.REJECT),
+    form: z
+      .array(FieldConfig)
+      .optional()
+      .describe(
+        'Fields rendered on the action confirmation dialog. Submitted values are stored in the action annotation and shown in the audit history.'
+      )
   }).shape
 )
 
 const RegisterConfig = DeclarationActionBase.extend(
   z.object({
-    type: z.literal(ActionType.REGISTER)
+    type: z.literal(ActionType.REGISTER),
+    form: z
+      .array(FieldConfig)
+      .optional()
+      .describe(
+        'Fields rendered on the action confirmation dialog. Submitted values are stored in the action annotation and shown in the audit history.'
+      )
   }).shape
 )
 

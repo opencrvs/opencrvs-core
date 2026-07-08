@@ -25,7 +25,9 @@ import {
   generateEventDocument,
   TestUserRole,
   generateRandomDatetime,
-  DocumentPath
+  DocumentPath,
+  FieldType,
+  generateTranslationConfig
 } from '@opencrvs/commons/client'
 import {
   DECLARATION_ACTION_UPDATE,
@@ -918,6 +920,79 @@ export const RegisteredOnDeclarationUpdate: Story = {
     title: 'Updated',
     fullEvent: eventWhenRegisterUpdatesDeclaration,
     action: updateActionForRegister
+  }
+}
+
+// #11305: core actions (NOTIFY/DECLARE/REGISTER/ARCHIVE/REJECT) can configure
+// a confirmation-dialog `form`; submitted values persist as the action's
+// `annotation` and are rendered in the audit history dialog by
+// `ActionFormContent`. This is the only story exercising that populated path.
+const registerDialogCommentsField = {
+  id: 'register.dialog.comments',
+  type: FieldType.TEXTAREA,
+  required: true,
+  label: generateTranslationConfig('Comments')
+}
+
+const eventConfigurationWithRegisterForm = {
+  ...tennisClubMembershipEvent,
+  actions: tennisClubMembershipEvent.actions.map((action) =>
+    action.type === ActionType.REGISTER
+      ? { ...action, form: [registerDialogCommentsField] }
+      : action
+  )
+}
+
+const registerActionWithDialogFormAnnotation = {
+  ...actionBase,
+  id: generateUuid(prng),
+  type: ActionType.REGISTER,
+  declaration,
+  annotation: {
+    'register.dialog.comments': 'Reviewed all supporting documents'
+  }
+}
+
+const eventWithRegisterDialogFormAnnotation = {
+  id: getUUID(),
+  type: 'tennis-club-membership',
+  actions: [
+    {
+      ...actionBase,
+      id: generateUuid(prng),
+      type: ActionType.CREATE
+    },
+    {
+      ...actionBase,
+      id: generateUuid(prng),
+      type: ActionType.DECLARE,
+      declaration
+    },
+    registerActionWithDialogFormAnnotation
+  ],
+  trackingId: 'ABCD123',
+  updatedAt: '2021-01-01',
+  createdAt: '2021-01-01'
+}
+
+export const RegisteredWithDialogFormValues: Story = {
+  args: {
+    ...argbase,
+    title: 'Registered',
+    fullEvent: eventWithRegisterDialogFormAnnotation,
+    action: registerActionWithDialogFormAnnotation
+  },
+  parameters: {
+    offline: {
+      configs: [eventConfigurationWithRegisterForm]
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.findByText('Comments')).resolves.toBeInTheDocument()
+    await expect(
+      canvas.findByText('Reviewed all supporting documents')
+    ).resolves.toBeInTheDocument()
   }
 }
 

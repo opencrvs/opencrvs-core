@@ -68,12 +68,14 @@ export interface QuickActionConfig {
     eventId,
     actions,
     customActions,
-    isActionAllowed
+    isActionAllowed,
+    formValues
   }: {
     eventId: UUID
     actions: ReturnType<typeof useEvents>['actions']
     customActions: ReturnType<typeof useEvents>['customActions']
     isActionAllowed: (action: ActionType) => boolean
+    formValues: Record<string, FieldUpdateValue>
   }) => void | Promise<void>
 }
 
@@ -223,7 +225,7 @@ export function useQuickActionModal(
     const actionConfig = getActionConfig({ actionType, eventConfiguration })
     const supportingCopy = actionConfig?.supportingCopy
 
-    const { result } = await openModal<ModalResult>((close) => (
+    const { result, values } = await openModal<ModalResult>((close) => (
       <QuickActionModal
         close={close}
         config={{
@@ -231,6 +233,10 @@ export function useQuickActionModal(
           actionType,
           icon: isValidIcon(actionConfig?.icon) ? actionConfig.icon : undefined,
           supportingCopy,
+          fields:
+            actionConfig && 'form' in actionConfig
+              ? actionConfig.form
+              : undefined,
           ...config.modal
         }}
         eventConfiguration={eventConfiguration}
@@ -246,7 +252,8 @@ export function useQuickActionModal(
         eventId: eventIndex.id,
         actions,
         customActions,
-        isActionAllowed
+        isActionAllowed,
+        formValues: values ?? {}
       })
 
       if (backTo) {
