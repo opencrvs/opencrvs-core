@@ -170,8 +170,8 @@ spec:
             items:
               - key: postgres-backup-config.sh
                 path: postgres-backup-config.sh
-              - key: ensure-utilities.sh
-                path: ensure-utilities.sh
+              - key: ensure-deb-utils.sh
+                path: ensure-deb-utils.sh
         - name: postgres-run
           emptyDir: {}
         - name: data

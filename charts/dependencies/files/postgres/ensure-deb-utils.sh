@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # Ensure commands are available, installing their packages only when required.
-# Usage: ensure_utilities "<packages>" <command>...
-ensure_utilities() {
+# Usage: ensure_deb_utils "<packages>" <command>...
+ensure_deb_utils() {
   local packages="$1"
   shift
 

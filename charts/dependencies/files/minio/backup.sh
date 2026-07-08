@@ -10,7 +10,7 @@
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
 . /scripts/backup-functions.sh
-. /scripts/ensure-utilities.sh
+. /scripts/ensure-alpine-utils.sh
 
 # Initial variables configuration
 # Today's date is used for filenames if LABEL is not provided
@@ -27,7 +27,7 @@ REMOTE_DIR="${BACKUP_REMOTE_DIR:-"/home/$BACKUP_USER"}/$BACKUP_DATE"
 # Number of retries for backup creation
 MAX_RETRIES=10
 
-ensure_utilities || exit 1
+ensure_alpine_utils || exit 1
 
 # Check backup encryption password
 if [ -z "$ENCRYPT_PASS" ]; then

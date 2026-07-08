@@ -11,10 +11,10 @@
 
 set -e
 
-. "$(dirname "${BASH_SOURCE[0]}")/ensure-utilities.sh"
+. "$(dirname "${BASH_SOURCE[0]}")/ensure-deb-utils.sh"
 
 common_config(){
-ensure_utilities "pgbackrest openssh-client" pgbackrest ssh || exit 1
+ensure_deb_utils "pgbackrest openssh-client" pgbackrest ssh || exit 1
 # Common configuration for backup and restore
 # Temporal directory required for pushing WAL files
 echo "Create pgbackrest temp directory with correct permissions"

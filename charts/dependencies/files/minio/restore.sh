@@ -12,9 +12,9 @@
 set -e
 
 . /scripts/backup-functions.sh
-. /scripts/ensure-utilities.sh
+. /scripts/ensure-alpine-utils.sh
 
-ensure_utilities || exit 1
+ensure_alpine_utils || exit 1
 
 
 # Initial configuration

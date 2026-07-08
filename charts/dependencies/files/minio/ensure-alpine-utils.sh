@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ensure_utilities() {
+ensure_alpine_utils() {
   local missing=""
   local utility
   for utility in bash curl openssl ssh jq rsync mcli; do

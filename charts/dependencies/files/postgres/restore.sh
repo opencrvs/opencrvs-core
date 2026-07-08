@@ -9,7 +9,7 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
-. "$(dirname "${BASH_SOURCE[0]}")/ensure-utilities.sh"
+. "$(dirname "${BASH_SOURCE[0]}")/ensure-deb-utils.sh"
 . /scripts/backup-functions.sh
 # Databases backup list, space (" ") separated list, only events database needs to be backed up
 DATABASES=${DATABASES:-"events"}
@@ -23,7 +23,7 @@ REMOTE_DIR="${BACKUP_REMOTE_DIR:-"/home/$BACKUP_USER"}/$RESTORE_DATE"
 ARCHIVE_NAME="postgres_backup_${RESTORE_DATE}.tar.gz"
 ARCHIVE_PATH="/tmp/$ARCHIVE_NAME"
 
-ensure_utilities "openssh-client rsync" ssh rsync || exit 1
+ensure_deb_utils "openssh-client rsync" ssh rsync || exit 1
 
 if [ -z "$ENCRYPT_PASS" ]; then
   echo "[$(date +%F\ %H:%M:%S)] [ERROR] Must provide ENCRYPT_PASS environment variable"

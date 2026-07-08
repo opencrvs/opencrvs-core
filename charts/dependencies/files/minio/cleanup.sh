@@ -9,9 +9,9 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
-. /scripts/ensure-utilities.sh
+. /scripts/ensure-alpine-utils.sh
 
-ensure_utilities || exit 1
+ensure_alpine_utils || exit 1
 MINIO_ALIAS=local-cleanup
 
 mcli alias set "$MINIO_ALIAS" http://minio:3535 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD"
