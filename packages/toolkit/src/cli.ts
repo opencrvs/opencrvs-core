@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { runUpgrade } from './migrations/v2.0'
+import { runUpgrade } from './migrations/v2.1'
 
 const args = process.argv.slice(2)
 

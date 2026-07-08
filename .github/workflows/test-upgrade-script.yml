@@ -6,7 +6,7 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-name: Test v1.9 -> v2.0 Upgrade Script
+name: Test v2.0 -> v2.1 Upgrade Script
 
 on:
   pull_request:
@@ -14,7 +14,7 @@ on:
     inputs:
       countryconfig-branch:
         description: countryconfig branch name
-        default: release-v1.9.12
+        default: release/2.0.0
         required: true
       ref:
         description: Commit SHA / branch / tag to checkout (optional)
@@ -24,7 +24,7 @@ jobs:
   test-upgrade-script:
     runs-on: ubuntu-24.04
     env:
-      COUNTRYCONFIG_BRANCH: ${{ github.event.inputs.countryconfig-branch || 'release-v1.9.11' }}
+      COUNTRYCONFIG_BRANCH: ${{ github.event.inputs.countryconfig-branch || 'release/2.0.0' }}
     steps:
       - name: Checkout opencrvs-core repository
         uses: actions/checkout@v6
