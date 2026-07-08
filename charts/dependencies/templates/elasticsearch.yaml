@@ -54,6 +54,7 @@ spec:
       labels:
         app: elasticsearch
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.elasticsearch) | nindent 6 }}
     {{- if .Values.priority_class.enabled }}
       priorityClassName: {{ .Values.priority_class.name }}
     {{- end }}
@@ -112,7 +113,7 @@ spec:
           {{- if or .Values.elasticsearch.secrets .Values.elasticsearch.env .Values.env }}
           {{- include "render-env-vars" (dict "service_name" "elasticsearch" "Values" .Values) }}
           {{- end }}
-          image: {{ .Values.elasticsearch.image }}
+          image: {{ include "opencrvs.imageReference" .Values.elasticsearch }}
           name: elasticsearch
           {{ include "resources-helper" (dict "service_name" "elasticsearch" "Values" .Values) | indent 10 }}
           ports:
@@ -135,7 +136,7 @@ spec:
             claimName: elasticsearch
       {{- else if eq $storageType "host_path" }}
           hostPath:
-            path: {{ .Values.elasticsearch.host_data_path | default "/data/elasticsearch" }}
+            path: {{ .Values.elasticsearch.host_data_path }}
             type: DirectoryOrCreate
       {{- end }}
 {{- end }}

@@ -27,11 +27,12 @@ spec:
             app: minio
             job-type: backup
         spec:
+          {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.minio) | nindent 10 }}
           restartPolicy: OnFailure
           containers:
             - name: backup
               command: ["/scripts/backup.sh"]
-              image: "bash"
+              image: {{ include "opencrvs.imageReference" .Values.utilities }}
               env:
               {{- if not .Values.minio.use_default_credentials }}
                 - name: MINIO_ROOT_USER
@@ -103,10 +104,11 @@ spec:
   {{- end }}
       template:
         spec:
+          {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.minio) | nindent 10 }}
           serviceAccountName: backup-runner
           containers:
             - name: runner
-              image: bitnami/kubectl:latest
+              image: {{ include "opencrvs.imageReference" .Values.utilities }}
               command:
                 - /bin/sh
                 - -c

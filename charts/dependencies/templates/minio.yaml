@@ -86,6 +86,7 @@ spec:
       labels:
         app: minio
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.minio) | nindent 6 }}
     {{- if .Values.priority_class.enabled }}
       priorityClassName: {{ .Values.priority_class.name }}
     {{- end }}
@@ -111,7 +112,7 @@ spec:
             - --console-address
             - :3536
             - /data
-          image: quay.io/minio/minio:RELEASE.2025-06-13T11-33-47Z
+          image: {{ include "opencrvs.imageReference" .Values.minio }}
           name: minio
           env:
             - name: MINIO_BROWSER_REDIRECT_URL
@@ -142,7 +143,7 @@ spec:
             - mountPath: /data
               name: minio
       {{- if eq (include "minio.use_rsync" .) "true" }}
-        - image: eeacms/rsync:3.0
+        - image: {{ include "opencrvs.imageReference" .Values.utilities }}
           name: rsync
           command: ["sleep", "infinity"]
           env:
@@ -185,7 +186,7 @@ spec:
             claimName: minio
       {{- else if eq $storageType "host_path" }}
           hostPath:
-            path: {{ .Values.minio.host_data_path | default "/data/minio" }}
+            path: {{ .Values.minio.host_data_path }}
             type: DirectoryOrCreate
       {{- end }}
       {{- if eq (include "minio.use_rsync" .) "true" }}
