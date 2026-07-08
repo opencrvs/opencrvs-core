@@ -1269,6 +1269,22 @@ components:
                       - edit-in-progress
               - type: string
                 description: Custom flag identifier defined by the country config.
+        allOf:
+          type: array
+          items:
+            anyOf:
+              - anyOf:
+                  - type: string
+                    pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                  - type: string
+                    enum:
+                      - incomplete
+                      - rejected
+                      - correction-requested
+                      - potential-duplicate
+                      - edit-in-progress
+              - type: string
+                description: Custom flag identifier defined by the country config.
     QueryInput:
       anyOf:
         - oneOf:
@@ -1753,6 +1769,7 @@ components:
     ActionConfig:
       oneOf:
         - $ref: "#/components/schemas/ReadActionConfig"
+        - $ref: "#/components/schemas/NotifyActionConfig"
         - $ref: "#/components/schemas/DeclareActionConfig"
         - $ref: "#/components/schemas/RejectActionConfig"
         - $ref: "#/components/schemas/RegisterActionConfig"
@@ -1769,6 +1786,7 @@ components:
         propertyName: type
         mapping:
           READ: "#/components/schemas/ReadActionConfig"
+          NOTIFY: "#/components/schemas/NotifyActionConfig"
           DECLARE: "#/components/schemas/DeclareActionConfig"
           REJECT: "#/components/schemas/RejectActionConfig"
           REGISTER: "#/components/schemas/RegisterActionConfig"
@@ -3561,6 +3579,9 @@ components:
             max:
               description: Maximum value
               type: number
+            integer:
+              description: When true, only whole numbers are allowed
+              type: boolean
             prefix:
               $ref: "#/components/schemas/TranslationConfigOutput"
             postfix:
@@ -12300,6 +12321,40 @@ components:
       additionalProperties: false
       description: A select dropdown that is automatically populated with available
         user roles
+    NotifyActionConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the action
+          $ref: "#/components/schemas/TranslationConfigOutput"
+        flags:
+          default: []
+          description: Flag actions which are executed when the action is performed.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation dialog
+          $ref: "#/components/schemas/TranslationConfigOutput"
+        icon:
+          type: string
+          description: Icon representing the action
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionConditional"
+        type:
+          type: string
+          const: NOTIFY
+      required:
+        - label
+        - flags
+        - type
+      additionalProperties: false
+      description: Configuration for the notify action. When present, NOTIFY uses this
+        config independently from DECLARE. When absent, NOTIFY falls back to the
+        DeclareActionConfig.
     DeclareActionConfig:
       type: object
       properties:
@@ -12368,7 +12423,8 @@ components:
         - review
       additionalProperties: false
       description: Configuration for the declare action. Includes review-page fields.
-        Shared with the notify action (ActionType.NOTIFY).
+        NOTIFY falls back to this config when no dedicated NotifyActionConfig is
+        provided.
     DeduplicationConfig:
       type: object
       properties:
@@ -16932,6 +16988,22 @@ components:
               - type: string
                 description: Custom flag identifier defined by the country config.
         noneOf:
+          type: array
+          items:
+            anyOf:
+              - anyOf:
+                  - type: string
+                    pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                  - type: string
+                    enum:
+                      - incomplete
+                      - rejected
+                      - correction-requested
+                      - potential-duplicate
+                      - edit-in-progress
+              - type: string
+                description: Custom flag identifier defined by the country config.
+        allOf:
           type: array
           items:
             anyOf:
