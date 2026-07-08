@@ -55,10 +55,11 @@ spec:
       labels:
         app: kibana
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.kibana) | nindent 6 }}
       initContainers:
         - name: elasticsearch-on-deploy
           command: ["/scripts/setup.sh"]
-          image: "bash"
+          image: {{ include "opencrvs.imageReference" .Values.utilities }}
           env:
             - name: ELASTICSEARCH_HOST
               value: {{ .Values.elasticsearch.host }}
@@ -112,7 +113,7 @@ spec:
               name: elasticsearch-scripts
       containers:
         - name: kibana
-          image: {{ .Values.kibana.image }}
+          image: {{ include "opencrvs.imageReference" .Values.kibana }}
           env:
             - name: PUBLIC_BASE_URL
               value: {{ include "render-external-url" (dict "service_name" "kibana" "Values" .Values) }}

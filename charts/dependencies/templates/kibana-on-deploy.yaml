@@ -14,10 +14,11 @@ spec:
       labels:
         app: kibana-on-deploy
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.kibana) | nindent 6 }}
       containers:
         - name: kibana-on-deploy
           command: ["/scripts/setup.sh"]
-          image: "bash"
+          image: {{ include "opencrvs.imageReference" .Values.utilities }}
           env:
             - name: KIBANA_URL
               value: http://kibana.{{ .Release.Namespace }}.svc.cluster.local:5601

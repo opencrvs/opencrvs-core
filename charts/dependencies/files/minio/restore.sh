@@ -10,14 +10,15 @@
 # Copyright (C) The OpenCRVS Authors
 
 set -e
-# Install necessary tools (if running in an Alpine-based container)
-apk add --no-cache bash curl openssl openssh jq rsync minio-client coreutils
+
+. /scripts/backup-functions.sh
+. /scripts/ensure-alpine-utils.sh
+
+ensure_alpine_utils || exit 1
 
 
 # Initial configuration
 RESTORE_DATE=${RESTORE_DATE:-$(date -d "yesterday" +%Y-%m-%d)}
-# Mount directory to restore into (typically /data)
-RESTORE_DIR="/data"
 # Temporary work directory
 WORK_PATH="/tmp/minio-restore"
 mkdir -p "$WORK_PATH"
@@ -35,56 +36,40 @@ fi
 
 echo "[$(date +%F\ %H:%M:%S)] Starting MinIO restore operation"
 
-# Decrypt backup
-decrypt_backup() {
-  echo "[$(date +%F\ %H:%M:%S)] Decrypting backup file"
-  openssl enc -d -aes-256-cbc -pbkdf2 -salt -in "${ARCHIVE_PATH}.enc" -out "$ARCHIVE_PATH" -pass env:ENCRYPT_PASS
-  echo "[$(date +%F\ %H:%M:%S)] Decrypted archive at $ARCHIVE_PATH"
+validate_restore_contents() {
+  shopt -s nullglob
+  local bucket_dirs=("$WORK_PATH"/*)
+  shopt -u nullglob
+
+  if [ "${#bucket_dirs[@]}" -eq 0 ]; then
+    echo "[$(date +%F\ %H:%M:%S)] [ERROR] Extracted MinIO backup is empty" >&2
+    return 1
+  fi
 }
 
 # Restore using MinIO mirror (bucket by bucket)
 restore_mirror() {
   MINIO_ALIAS=local-restore
-  mcli alias set $MINIO_ALIAS http://minio:3535 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
-
-  echo "[$(date +%F\ %H:%M:%S)] Extracting archive to $WORK_PATH"
-  mkdir -p "$WORK_PATH"
-  tar -zxvf "$ARCHIVE_PATH" -C "$WORK_PATH"
+  mcli alias set "$MINIO_ALIAS" http://minio:3535 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD"
 
   # Restore each bucket
   for bucket_dir in "$WORK_PATH"/*; do
     bucket=$(basename "$bucket_dir")
     echo "[$(date +%F\ %H:%M:%S)] Restoring bucket: $bucket"
     # Make sure bucket exists
-    mcli mb --ignore-existing $MINIO_ALIAS/"$bucket"
+    mcli mb --ignore-existing "$MINIO_ALIAS/$bucket"
     # Mirror bucket data back
-    mcli mirror --overwrite "$bucket_dir" $MINIO_ALIAS/"$bucket"
+    mcli mirror --overwrite "$bucket_dir" "$MINIO_ALIAS/$bucket"
   done
 
   echo "[$(date +%F\ %H:%M:%S)] MinIO mirror restore complete"
 }
 
-
-transfer_from_backup_host(){
-  echo "[$(date +%F\ %H:%M:%S)] Transfer backup from remote host"
-if rsync -avz \
-  -e "ssh -i /ssh/ssh_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
-  "${BACKUP_USER}@${BACKUP_HOST}:${REMOTE_DIR}/${ARCHIVE_NAME}.enc" "${ARCHIVE_PATH}.enc"; then
-  echo "[$(date +%F\ %H:%M:%S)] Encrypted backup file ${ARCHIVE_PATH}.enc transferred from backup host ${BACKUP_HOST}:${REMOTE_DIR}"
-else
-  echo "[$(date +%F\ %H:%M:%S)] [ERROR] Failed to transfer file ${ARCHIVE_PATH}.enc from backup host ${BACKUP_HOST}:${REMOTE_DIR}" >&2
-  exit 1
-fi
-  
-}
-
-# Cleanup minio before restore
+transfer_from_backup_host "$REMOTE_DIR/${ARCHIVE_NAME}.enc" "${ARCHIVE_PATH}.enc" "$BACKUP_USER" "$BACKUP_HOST"
+decrypt_backup "${ARCHIVE_PATH}.enc" "$ARCHIVE_PATH"
+extract_archive "$ARCHIVE_PATH" "$WORK_PATH"
+validate_restore_contents
 /scripts/cleanup.sh
-
-transfer_from_backup_host
-
-decrypt_backup
-
 restore_mirror
 
 echo "[$(date +%F\ %H:%M:%S)] MinIO restore process completed successfully"

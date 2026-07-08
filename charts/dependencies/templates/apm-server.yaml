@@ -29,9 +29,10 @@ spec:
       labels:
         app: apm-server
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.apm_server) | nindent 6 }}
       containers:
       - name: apm-server
-        image: {{ .Values.apm_server.image }}
+        image: {{ include "opencrvs.imageReference" .Values.apm_server }}
         args: ["-e", "-c", "/etc/apm-server.yml"]
         ports:
         - containerPort: 8200
