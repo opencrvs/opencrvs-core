@@ -299,12 +299,12 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         </tr>
         <tr>
         <td>platform.tag</td>
-        <td>v1.9.11</td>
+        <td>v2.1.0</td>
         <td>Defines the default image tag for all OpenCRVS services.</td>
         </tr>
         <tr>
         <td>platform.repository</td>
-        <td>opencrvs</td>
+        <td>ghcr.io/opencrvs</td>
         <td>Defines the repository used for OpenCRVS service images. Can be overridden at service level.</td>
         </tr>
         <tr>
@@ -330,7 +330,7 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <tr>
         <td>image.name</td>
         <td>-</td>
-        <td>Name of the container image (for example <code>ocrvs-auth</code>). Combined with registry and repository to form the full image reference.</td>
+        <td>Name of the container image without repository and tag. For example, if the full image is <code>ghcr.io/opencrvs/ocrvs-auth:v2.1.0</code>, then <code>image.name</code> is <code>ocrvs-auth</code>.</td>
         </tr>
         <tr>
         <td>image.tag</td>
@@ -598,7 +598,7 @@ search:search@elasticsearch.opencrvs-deps-dev.svc.cluster.local:9200
 `SEARCH_ELASTIC_URL` value example:
 
 ```
-http://search:search@elasticsearch.opencrvs-deps-dev.svc.cluster.local:9200pigeon@godlike-laptop:~$
+http://search:search@elasticsearch.opencrvs-deps-dev.svc.cluster.local:9200
 ```
 
 ### Minio Secret (minio.users_secret)

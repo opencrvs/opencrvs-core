@@ -31,9 +31,10 @@ spec:
       labels:
         app: logstash
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.logstash) | nindent 6 }}
       containers:
       - name: logstash
-        image: {{ .Values.logstash.image }}
+        image: {{ include "opencrvs.imageReference" .Values.logstash }}
         command: ["logstash", "-f", "/etc/logstash/logstash.conf", "--verbose"]
         ports:
         - containerPort: 12201

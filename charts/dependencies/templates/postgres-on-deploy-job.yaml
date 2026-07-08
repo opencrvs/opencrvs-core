@@ -11,10 +11,11 @@ metadata:
 spec:
   template:
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.postgres) | nindent 6 }}
       serviceAccountName: backup-runner
       containers:
         - name: stanza
-          image: bitnami/kubectl:latest
+          image: {{ include "opencrvs.imageReference" .Values.utilities }}
           env:
             - name: PGBACKREST_STANZA
               value: main

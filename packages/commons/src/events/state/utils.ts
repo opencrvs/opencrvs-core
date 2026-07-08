@@ -54,7 +54,7 @@ function getActionRequests(actionType: ActionType, actions: Action[]) {
 /**
  * Given action type and actions, returns the action creation metadata for the event.
  * Since we do not consistently store the request action, we need to check if it exists.
- * * @returns details of the user who created the first **Declaration** action of that type.
+ * @returns details of the user who created the latest **Declaration** action of that type.
  *
  */
 function getDeclarationActionCreationMetadata(
@@ -152,6 +152,10 @@ export function getActionUpdateMetadata(actions: Action[]) {
  */
 export function getLegalStatuses(actions: Action[]) {
   return {
+    [EventStatus.enum.NOTIFIED]: getDeclarationActionCreationMetadata(
+      ActionType.NOTIFY,
+      actions
+    ),
     [EventStatus.enum.DECLARED]: getDeclarationActionCreationMetadata(
       ActionType.DECLARE,
       actions

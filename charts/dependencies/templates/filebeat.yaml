@@ -14,11 +14,12 @@ spec:
       labels:
         app: filebeat
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.filebeat) | nindent 6 }}
       serviceAccountName: filebeat
       terminationGracePeriodSeconds: 30
       initContainers:
         - name: wait-kibana
-          image: curlimages/curl
+          image: {{ include "opencrvs.imageReference" .Values.utilities }}
           command: ["sh", "-c"]
           args:
             - |
@@ -34,7 +35,7 @@ spec:
         securityContext:
           runAsUser: 0
           privileged: false
-        image: {{ .Values.filebeat.image }}
+        image: {{ include "opencrvs.imageReference" .Values.filebeat }}
         args: [
           "-c", "/etc/filebeat.yml",
           "-e"

@@ -47,7 +47,7 @@ spec:
       labels:
         app: dashboards
     spec:
-      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.countryconfig) | nindent 6 }}
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.dashboards) | nindent 6 }}
       initContainers:
         - name: copy-assets
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.countryconfig) }}-assets
@@ -62,7 +62,7 @@ spec:
               mountPath: /data-assets
       containers:
         - name: dashboards
-          image: metabase/metabase:v0.56.4
+          image: {{ include "opencrvs.image" (dict "root" . "service" .Values.dashboards) }}
           command: ["/assets/run.sh"]
           env:
             - name: METABASE_DATABASE_HOST
