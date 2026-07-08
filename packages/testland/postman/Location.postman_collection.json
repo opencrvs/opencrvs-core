@@ -1,0 +1,393 @@
+{
+	"info": {
+		"_postman_id": "402e279a-c0cb-4440-937a-8db61e30bfa6",
+		"name": "Location",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get all administrative locations",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{gateway}}/location?type=ADMIN_STRUCTURE&_count=0&status=active",
+					"host": [
+						"{{gateway}}"
+					],
+					"path": [
+						"location"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "ADMIN_STRUCTURE"
+						},
+						{
+							"key": "_count",
+							"value": "0"
+						},
+						{
+							"key": "status",
+							"value": "active"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a single administrative location by statisticalID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{gateway}}/location?identifier=ADMIN_STRUCTURE_{{statisticalID}}",
+					"host": [
+						"{{gateway}}"
+					],
+					"path": [
+						"location"
+					],
+					"query": [
+						{
+							"key": "identifier",
+							"value": "ADMIN_STRUCTURE_{{statisticalID}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a single health facility by statisticalID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{gateway}}/location?identifier=HEALTH_FACILITY_{{statisticalID}}",
+					"host": [
+						"{{gateway}}"
+					],
+					"path": [
+						"location"
+					],
+					"query": [
+						{
+							"key": "identifier",
+							"value": "HEALTH_FACILITY_{{statisticalID}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a single CR office by statisticalID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{gateway}}/location?identifier=CRVS_OFFICE_{{statisticalID}}",
+					"host": [
+						"{{gateway}}"
+					],
+					"path": [
+						"location"
+					],
+					"query": [
+						{
+							"key": "identifier",
+							"value": "CRVS_OFFICE_{{statisticalID}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a single location by FHIR ID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{gateway}}/location/{{fhirID}}",
+					"host": [
+						"{{gateway}}"
+					],
+					"path": [
+						"location",
+						"{{fhirID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all CR office locations",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{gateway}}/location?type=CRVS_OFFICE&_count=0&status=active",
+					"host": [
+						"{{gateway}}"
+					],
+					"path": [
+						"location"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "CRVS_OFFICE"
+						},
+						{
+							"key": "_count",
+							"value": "0"
+						},
+						{
+							"key": "status",
+							"value": "active"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all Health Facility locations",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{gateway}}/location?type=HEALTH_FACILITY&_count=0&status=active",
+					"host": [
+						"{{gateway}}"
+					],
+					"path": [
+						"location"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "HEALTH_FACILITY"
+						},
+						{
+							"key": "_count",
+							"value": "0"
+						},
+						{
+							"key": "status",
+							"value": "active"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get location(s) by name",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{gateway}}/location?name=Ibombo&type=ADMIN_STRUCTURE",
+					"host": [
+						"{{gateway}}"
+					],
+					"path": [
+						"location"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "Ibombo"
+						},
+						{
+							"key": "type",
+							"value": "ADMIN_STRUCTURE"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create administrative location",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{natsysadmin-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"statisticalID\": \"TEST_LOCATION\",\n  \"name\": \"My name\",\n  \"alias\": \"My alias\",\n  \"partOf\": \"Location/0\",\n  \"code\": \"ADMIN_STRUCTURE\",\n  \"jurisdictionType\": \"STATE\",\n  \"statistics\": [\n    {\n      \"year\": 0,\n      \"male_population\": 0,\n      \"female_population\": 0,\n      \"population\": 0,\n      \"crude_birth_rate\": 0\n    }\n  ]\n}"
+				},
+				"url": {
+					"raw": "{{gateway}}/location",
+					"host": [
+						"{{gateway}}"
+					],
+					"path": [
+						"location"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update administrative location",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{natsysadmin-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"My new name\",\n  \"alias\": \"My new alias\",\n  \"status\": \"active\",\n  \"statistics\": \n    {\n      \"year\": 0,\n      \"male_population\": 0,\n      \"female_population\": 0,\n      \"population\": 0,\n      \"crude_birth_rate\": 0\n    }\n  \n}"
+				},
+				"url": {
+					"raw": "{{gateway}}/location/{{fhirID}}",
+					"host": [
+						"{{gateway}}"
+					],
+					"path": [
+						"location",
+						"{{fhirID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create CR office",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{natsysadmin-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"statisticalID\": \"TEST_OFFICE_LOCATION\",\n  \"name\": \"My office\",\n  \"alias\": \"My office alias\",\n  \"partOf\": \"Location/0\",\n  \"code\": \"CRVS_OFFICE\"\n}"
+				},
+				"url": {
+					"raw": "{{gateway}}/location",
+					"host": [
+						"{{gateway}}"
+					],
+					"path": [
+						"location"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create health facility",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{natsysadmin-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"statisticalID\": \"TEST_HEALTH_LOCATION\",\n  \"name\": \"My hospital\",\n  \"alias\": \"My hospital alias\",\n  \"partOf\": \"Location/0\",\n  \"code\": \"HEALTH_FACILITY\"\n}"
+				},
+				"url": {
+					"raw": "{{gateway}}/location",
+					"host": [
+						"{{gateway}}"
+					],
+					"path": [
+						"location"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

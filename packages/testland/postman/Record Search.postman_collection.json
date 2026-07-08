@@ -1,0 +1,72 @@
+{
+	"info": {
+		"_postman_id": "7d11e74a-1f7b-4eb1-81bf-9025f3d7e481",
+		"name": "Record Search",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24617079"
+	},
+	"item": [
+		{
+			"name": "Record Search",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "Bearer {{integration-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"operationName\": \"searchEvents\",\n    \"query\": \"query searchEvents($advancedSearchParameters: AdvancedSearchParametersInput!, $sort: String, $count: Int, $skip: Int) {\\nsearchEvents(\\n  advancedSearchParameters: $advancedSearchParameters\\n  sort: $sort\\n  count: $count\\n  skip: $skip\\n) {\\n  totalItems\\n  results {\\n    id\\n    type\\n    registration {\\n      status\\n      contactNumber\\n      trackingId\\n      registrationNumber\\n      registeredLocationId\\n      duplicates\\n      assignment {\\n        practitionerId\\n        firstName\\n        lastName\\n        officeName\\n        __typename\\n      }\\n      createdAt\\n      modifiedAt\\n      __typename\\n    }\\n    operationHistories {\\n      operationType\\n      operatedOn\\n      operatorRole\\n      operatorName {\\n        firstNames\\n        familyName\\n        use\\n        __typename\\n      }\\n      operatorOfficeName\\n      operatorOfficeAlias\\n      notificationFacilityName\\n      notificationFacilityAlias\\n      rejectReason\\n      rejectComment\\n      __typename\\n    }\\n    ... on BirthEventSearchSet {\\n      dateOfBirth\\n      childName {\\n        firstNames\\n        familyName\\n        use\\n        __typename\\n      }\\n      __typename\\n    }\\n    ... on DeathEventSearchSet {\\n      dateOfDeath\\n      deceasedName {\\n        firstNames\\n        familyName\\n        use\\n        __typename\\n      }\\n      __typename\\n    }\\n    __typename\\n  }\\n  __typename\\n}}\",\n    \"variables\": {\n        \"advancedSearchParameters\": {\n            \"event\": \"birth\",\n            \"registrationStatuses\": [\n                \"REGISTERED\"\n            ],\n            \"childGender\": \"male\",\n            \"dateOfRegistrationEnd\": \"2022-12-31T23:59:59.999Z\",\n            \"dateOfRegistrationStart\": \"2021-11-01T00:00:00.000Z\",\n            \"declarationJurisdictionId\": \"{{officeLocationId}}\",\n            \"eventLocationId\": \"{{facilityId}}\",\n            \"fatherFirstNames\": \"Dad\",\n            \"motherFirstNames\": \"Mom\"\n        },\n        \"count\": 10,\n        \"skip\": 0\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{gateway}}/graphql",
+					"host": [
+						"{{gateway}}"
+					],
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "officeLocationId",
+			"value": "c24c0b72-11b5-4c1a-bbb7-61112fa6f481"
+		},
+		{
+			"key": "facilityId",
+			"value": "d89c1114-eddc-4dca-8352-4d2105c876f8"
+		}
+	]
+}

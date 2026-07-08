@@ -1,0 +1,49 @@
+{
+	"id": "75693ed2-e7c4-461f-8dff-3c3dbfa69864",
+	"values": [
+		{
+			"key": "integration-token",
+			"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJuYXRpb25hbElkIiwiZGVtbyJdLCJpYXQiOjE2NzA5NTEwNDQsImV4cCI6MTY3MDk1MTY0NCwiYXVkIjpbIm9wZW5jcnZzOmF1dGgtdXNlciIsIm9wZW5jcnZzOnVzZXItbWdudC11c2VyIiwib3BlbmNydnM6aGVhcnRoLXVzZXIiLCJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJvcGVuY3J2czpub3RpZmljYXRpb24tdXNlciIsIm9wZW5jcnZzOndvcmtmbG93LXVzZXIiLCJvcGVuY3J2czpzZWFyY2gtdXNlciIsIm9wZW5jcnZzOm1ldHJpY3MtdXNlciIsIm9wZW5jcnZzOmNvdW50cnljb25maWctdXNlciIsIm9wZW5jcnZzOndlYmhvb2tzLXVzZXIiLCJvcGVuY3J2czpjb25maWctdXNlciIsIm9wZW5jcnZzOmRvY3VtZW50cy11c2VyIiwib3BlbmNydnM6bmF0aW9uYWxJZC1hcGktdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2Mzk4NjFmMThjMTg1MGVlMzlkYzJlYmMifQ.b6Xg7qoMQqBkpU-7ifH7K0TVrncVlK14Pm1X9RPp5w6gUis_ycbZjhsPR42G0-Ml316-HmCm-WKpeCJn5Tf0oopyYG8D7Og159GX_XeCRwyRWOUcv3qGQTV5OxCeR9BzG33ESEQYvQXO9NINX1JKVqNJzXKwJ5VhQrn0e0LhEXiOJEYjybbnuy0PZgTnbeBft5QEUMCgktu3EOFZkUkZhyej2QSeYxXEZAvi1NZDk9OJVA4i77PxmGytJW5-Zj_VWm-njHZB5-tkeRFHBLDFqNWhmuK5ydHuVet7L6z2pY1m4Vr_kwmuZBmWbafbySJfbo-BUmu1tx2F-OFfRRfnPw",
+			"enabled": true
+		},
+		{
+			"key": "client_id",
+			"value": "aeb05860-3d82-4987-8411-8433a2231019",
+			"enabled": true
+		},
+		{
+			"key": "client_secret",
+			"value": "15787ac4-3858-4ba0-854d-63fde599df8a",
+			"enabled": true
+		},
+		{
+			"key": "sha_secret",
+			"value": "c3bb2093-f0d1-4556-9832-ab1d209413af",
+			"enabled": true
+		},
+		{
+			"key": "callback",
+			"value": "https://myurl.com",
+			"enabled": true
+		},
+		{
+			"key": "natsysadmin-token",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "statisticalID",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "fhirID",
+			"value": "da30f792-d28c-4a92-bb2f-43d6a8ef9254",
+			"enabled": true
+		}
+	],
+	"name": "OpenCRVS Globals",
+	"_postman_variable_scope": "globals",
+	"_postman_exported_at": "2022-12-13T17:09:37.907Z",
+	"_postman_exported_using": "Postman/8.12.1"
+}

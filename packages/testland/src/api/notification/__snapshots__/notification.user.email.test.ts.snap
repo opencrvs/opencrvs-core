@@ -1,0 +1,591 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`User notification - Email > 2fa 1`] = `
+{
+  "from": "",
+  "html": "<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" />
+    <style type="text/css">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            color: #222;
+            padding: 16px 24px;
+        }
+
+        h1 {
+            font-size: 21px;
+            margin-top: 32px;
+            margin-bottom: 36px;
+            font-weight: 700;
+        }
+
+        p {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        i {
+            color: #666;
+            font-weight: 400;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="http://localhost:3040/content/country-logo" alt="country_logo" style="max-height: 88px;
+                max-width: 100%;">
+    <h1>2-factor authentication</h1>
+    <p>
+        Hello John,
+    </p>
+    <p>
+        To complete sign in, enter the authentication code: <strong>102030</strong>
+    </p>
+    <p>
+        This code expires in 10 minutes.
+    </p>
+    </br>
+    <p>
+        Best regards, <br />
+        Farajaland CRS Team
+    </p>
+</body>
+
+</html>",
+  "subject": "Two factor authentication",
+  "to": "john.doe@gmail.com",
+}
+`;
+
+exports[`User notification - Email > change-email-address 1`] = `
+{
+  "from": "",
+  "html": "<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" />
+    <style type="text/css">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            color: #222;
+            padding: 16px 24px;
+        }
+
+        h1 {
+            font-size: 21px;
+            margin-top: 32px;
+            margin-bottom: 36px;
+            font-weight: 700;
+        }
+
+        p {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        i {
+            color: #666;
+            font-weight: 400;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="http://localhost:3040/content/country-logo" alt="country_logo" style="max-height: 88px;
+        max-width: 100%;">
+    <h1>Change email address</h1>
+    <p>
+        Hello John,
+    </p>
+    <p>
+        You recently requested to change your email address for your Farajaland CRS account.
+    </p>
+    <p>
+        To confirm this change, use the code: <strong>654321</strong>
+    </p>
+    </br>
+    <p>
+        Best regards, <br />
+        Farajaland CRS Team
+    </p>
+</body>
+
+</html>",
+  "subject": "Email address change request",
+  "to": "john.doe@gmail.com",
+}
+`;
+
+exports[`User notification - Email > change-phone-number 1`] = `
+{
+  "from": "",
+  "html": "<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" />
+    <style type="text/css">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            color: #222;
+            padding: 16px 24px;
+        }
+
+        h1 {
+            font-size: 21px;
+            margin-top: 32px;
+            margin-bottom: 36px;
+            font-weight: 700;
+        }
+
+        p {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        i {
+            color: #666;
+            font-weight: 400;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="http://localhost:3040/content/country-logo" alt="country_logo" style="max-height: 88px;
+            max-width: 100%;">
+    <h1>Change phone number</h1>
+    <p>
+        Hello John,
+    </p>
+    <p>
+        You recently requested to change your phone number for your Farajaland CRS account.
+    </p>
+    <p>
+        To confirm this change, use the code: <strong>123456</strong>
+    </p>
+    </br>
+    <p>
+        Best regards, <br />
+        Farajaland CRS Team
+    </p>
+</body>
+
+</html>",
+  "subject": "Phone number change request",
+  "to": "john.doe@gmail.com",
+}
+`;
+
+exports[`User notification - Email > resend-invite 1`] = `
+{
+  "from": "",
+  "html": "<!doctype html>
+<html>
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style type="text/css">
+      body {
+        font-family: 'Noto Sans', sans-serif;
+        color: #222;
+        padding: 16px 24px;
+      }
+
+      h1 {
+        font-size: 21px;
+        margin-top: 32px;
+        margin-bottom: 36px;
+        font-weight: 700;
+      }
+
+      p {
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 1.8;
+        margin-bottom: 24px;
+      }
+
+      i {
+        color: #666;
+        font-weight: 400;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <img
+      src="http://localhost:3040/content/country-logo"
+      alt="country_logo"
+      style="max-height: 88px; max-width: 100%"
+    />
+    <h1>Your Farajaland CRS account invitation</h1>
+    <p>Hello John,</p>
+    <p>Your account invitation has been resent. Please use the following credentials to access your account:</p>
+    <p>
+      Username: <strong>j.doe</strong><br />
+      Password: <strong>TempPass123!</strong>
+    </p>
+    <p>
+      Please click the link below to complete your account setup and start using
+      Farajaland CRS.
+    </p>
+
+    <div style="margin-top: 32px; margin-bottom: 32px">
+      <a href="http://localhost:3020/">Complete setup</a>
+    </div>
+    <br />
+    <p>
+      Best regards, <br />
+      Farajaland CRS Team
+    </p>
+  </body>
+</html>
+",
+  "subject": "Your OpenCRVS account invitation",
+  "to": "john.doe@gmail.com",
+}
+`;
+
+exports[`User notification - Email > reset-password 1`] = `
+{
+  "from": "",
+  "html": "<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" />
+    <style type="text/css">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            color: #222;
+            padding: 16px 24px;
+        }
+
+        h1 {
+            font-size: 21px;
+            margin-top: 32px;
+            margin-bottom: 36px;
+            font-weight: 700;
+        }
+
+        p {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        i {
+            color: #666;
+            font-weight: 400;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="http://localhost:3040/content/country-logo" alt="country_logo" style="max-height: 88px;
+            max-width: 100%;">
+    <h1>Password reset</h1>
+    <p>
+        Hello John,
+    </p>
+    <p>
+        You recently requested to reset your password for your Farajaland CRS account.
+    </p>
+    <p>
+        To reset your password, use the code: <strong>112233</strong>
+    </p>
+    <p>
+        This code expires in 10 minutes.
+    </p>
+    </br>
+    <p>
+        Best regards, <br />
+        Farajaland CRS Team
+    </p>
+</body>
+
+</html>",
+  "subject": "Account password reset request",
+  "to": "john.doe@gmail.com",
+}
+`;
+
+exports[`User notification - Email > reset-password-by-admin 1`] = `
+{
+  "from": "",
+  "html": "<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" />
+    <style type="text/css">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            color: #222;
+            padding: 16px 24px;
+        }
+
+        h1 {
+            font-size: 21px;
+            margin-top: 32px;
+            margin-bottom: 36px;
+            font-weight: 700;
+        }
+
+        p {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        i {
+            color: #666;
+            font-weight: 400;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="http://localhost:3040/content/country-logo" alt="country_logo" style="max-height: 88px;
+                max-width: 100%;">
+    <h1>Password reset</h1>
+    <p>
+        Hello John,
+    </p>
+    <p>
+        Your password was reset by the system administrator.
+    </p>
+    <p>
+        You can now login with the temporary password: <strong>tempPass123</strong>
+    </p>
+    </br>
+    <p>
+        Best regards, <br />
+        Farajaland CRS Team
+    </p>
+</body>
+
+</html>",
+  "subject": "Account password reset invitation",
+  "to": "john.doe@gmail.com",
+}
+`;
+
+exports[`User notification - Email > user-created 1`] = `
+{
+  "from": "",
+  "html": "<!doctype html>
+<html>
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style type="text/css">
+      body {
+        font-family: 'Noto Sans', sans-serif;
+        color: #222;
+        padding: 16px 24px;
+      }
+
+      h1 {
+        font-size: 21px;
+        margin-top: 32px;
+        margin-bottom: 36px;
+        font-weight: 700;
+      }
+
+      p {
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 1.8;
+        margin-bottom: 24px;
+      }
+
+      i {
+        color: #666;
+        font-weight: 400;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <img
+      src="http://localhost:3040/content/country-logo"
+      alt="country_logo"
+      style="max-height: 88px; max-width: 100%"
+    />
+    <h1>Welcome to Farajaland CRS</h1>
+    <p>Hello John,</p>
+    <p>An account has been created for you with the following details:</p>
+    <p>
+      Username: <strong>j.doe</strong><br />
+      Password: <strong>TempPass123!</strong>
+    </p>
+    <p>
+      Please click the link below to complete your account setup and start using
+      Farajaland CRS.
+    </p>
+
+    <div style="margin-top: 32px; margin-bottom: 32px">
+      <a href="http://localhost:3020/">Complete setup</a>
+    </div>
+    <br />
+    <p>
+      Best regards, <br />
+      Farajaland CRS Team
+    </p>
+  </body>
+</html>
+",
+  "subject": "Welcome to OpenCRVS!",
+  "to": "john.doe@gmail.com",
+}
+`;
+
+exports[`User notification - Email > user-updated 1`] = `
+{
+  "from": "",
+  "html": "<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" />
+    <style type="text/css">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            color: #222;
+            padding: 16px 24px;
+        }
+
+        h1 {
+            font-size: 21px;
+            margin-top: 32px;
+            margin-bottom: 36px;
+            font-weight: 700;
+        }
+
+        p {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        i {
+            color: #666;
+            font-weight: 400;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="http://localhost:3040/content/country-logo" alt="country_logo" style="max-height: 88px;
+            max-width: 100%;">
+    <h1>Username updated</h1>
+    <p>
+        Hello John,
+    </p>
+    <p>
+        You username has been updated. 
+    </p>
+    <p>
+        Your new username is: <strong>j.doe</strong>
+    </p>
+    </br>
+    <p>
+        Best regards, <br />
+        Farajaland CRS Team
+    </p>
+</body>
+
+</html>",
+  "subject": "Account username updated",
+  "to": "john.doe@gmail.com",
+}
+`;
+
+exports[`User notification - Email > username-reminder 1`] = `
+{
+  "from": "",
+  "html": "<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" />
+    <style type="text/css">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            color: #222;
+            padding: 16px 24px;
+        }
+
+        h1 {
+            font-size: 21px;
+            margin-top: 32px;
+            margin-bottom: 36px;
+            font-weight: 700;
+        }
+
+        p {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        i {
+            color: #666;
+            font-weight: 400;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="http://localhost:3040/content/country-logo" alt="country_logo" style="max-height: 88px;
+            max-width: 100%;">
+    <h1>Username reminder</h1>
+    <p>
+        Hello John,
+    </p>
+    <p>
+        You recently requested a username reminder for your Farajaland CRS account.
+    </p>
+    <p>
+        Your username is: <strong>j.doe</strong>
+    </p>
+    </br>
+    <p>
+        Best regards, <br />
+        Farajaland CRS Team
+    </p>
+</body>
+
+</html>",
+  "subject": "Account username reminder",
+  "to": "john.doe@gmail.com",
+}
+`;

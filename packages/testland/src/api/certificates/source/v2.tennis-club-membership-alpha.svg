@@ -1,0 +1,12 @@
+<svg width="583" height="842" viewBox="0 0 583 842" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="white" />
+  <text x="50%" y="50%" 
+        font-family="Arial, sans-serif" 
+        font-size="24" 
+        font-weight="bold" 
+        fill="black" 
+        text-anchor="middle" 
+        dominant-baseline="middle">
+    ALPHA_PRINT_BUTTON testing!
+  </text>
+</svg>

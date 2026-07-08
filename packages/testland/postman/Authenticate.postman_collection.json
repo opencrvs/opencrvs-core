@@ -1,0 +1,66 @@
+{
+	"info": {
+		"_postman_id": "b2d6dcf5-489d-429a-bec1-710e92127707",
+		"name": "Authenticate",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45309915",
+		"_collection_link": "https://cihan-9849515.postman.co/workspace/Cihan's-Workspace~db6108ac-6e74-457b-8888-2b0eef6473f3/collection/45309915-b2d6dcf5-489d-429a-bec1-710e92127707?action=share&source=collection_link&creator=45309915"
+	},
+	"item": [
+		{
+			"name": "Request an access token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"",
+							"// Test for setting environment variable",
+							"pm.test(\"Set integration_token environment variable\", function () {",
+							"    const response = pm.response.json();",
+							"    pm.environment.set(\"integration-token\", response.access_token);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{auth}}/token?client_id={{client_id}}&client_secret={{client_secret}}&grant_type=client_credentials",
+					"host": [
+						"{{auth}}"
+					],
+					"path": [
+						"token"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "{{client_id}}"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{client_secret}}"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

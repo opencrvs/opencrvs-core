@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="/client-config.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+      integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <title>Print all registrations</title>
+    <style>
+      a[href='#list']:target {
+        font-weight: bold;
+        bottom: -1px;
+        z-index: 1;
+        border-bottom: 2px solid #a1a1a1;
+      }
+      a[href='#print']:target {
+        font-weight: bold;
+        bottom: -1px;
+        z-index: 1;
+        border-bottom: 2px solid #a1a1a1;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <div class="">
+        <header
+          class="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 border-b border-gray-200 relative"
+        >
+          <div class="sm:flex sm:items-center">
+            <div class="sm:flex-auto">
+              <h1 class="text-base font-semibold leading-6 text-gray-900">
+                Print all registrations
+              </h1>
+              <p class="mt-2 text-sm text-gray-700">
+                List of births registered between
+                <strong
+                  ><input
+                    type="date"
+                    id="start-date"
+                    value="2024-08-01"
+                    min="2022-01-01"
+                    max="2024-09-31"
+                    class="bg-white p-1 border border-gray-200 rounded-md"
+                  />
+                </strong>
+                and
+                <strong
+                  ><input
+                    type="date"
+                    id="end-date"
+                    value="2024-08-31"
+                    min="2022-01-01"
+                    max="2024-09-31"
+                    class="bg-white p-1 border border-gray-200 rounded-md"
+                /></strong>
+              </p>
+              <button
+                type="button"
+                class="block mt-4 rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                onclick="window.printAll()"
+              >
+                Print all
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <section id="list-view">
+          <div class="px-4 sm:px-6 lg:px-8 mt-8 flow-root">
+            <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+              <div
+                class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"
+              >
+                <table class="min-w-full divide-y divide-gray-300">
+                  <thead>
+                    <tr>
+                      <th
+                        scope="col"
+                        class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+                      >
+                        Tracking ID
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
+                        Registration number
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
+                        Registered at
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
+                        Birth date
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
+                        Name
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="results" class="divide-y divide-gray-200"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <script src="./main.js"></script>
+  </body>
+</html>
