@@ -8,9 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as _ from 'lodash'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
-/** @knipignore */
-export function noop() {
-  return _.noop()
+interface IIssueMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
 }
+
+const messagesToDefine: IIssueMessages = {
+}
+
+export const issueMessages: Record<
+  string | number | symbol,
+  MessageDescriptor
+> = defineMessages(messagesToDefine)

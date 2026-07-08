@@ -35,7 +35,6 @@ interface IUserSetupMessages
   validationMsg: MessageDescriptor
   waiting: MessageDescriptor
   assignedOffice: MessageDescriptor
-  roleType: MessageDescriptor
   phoneNumber: MessageDescriptor
   userName: MessageDescriptor
   nid: MessageDescriptor
@@ -43,8 +42,6 @@ interface IUserSetupMessages
   auditSectionTitle: MessageDescriptor
   auditActionColumnTitle: MessageDescriptor
   auditTrackingIDColumnTitle: MessageDescriptor
-  auditDeviceIpAddressColumnTitle: MessageDescriptor
-  auditEventTypeColumnTitle: MessageDescriptor
   auditDateColumnTitle: MessageDescriptor
   noAuditFound: MessageDescriptor
   inProgressAuditAction: MessageDescriptor
@@ -54,11 +51,8 @@ interface IUserSetupMessages
   registeredAuditAction: MessageDescriptor
   rejectedAuditAction: MessageDescriptor
   certifiedAuditAction: MessageDescriptor
-  issuedAuditAction: MessageDescriptor
-  showMoreAuditList: MessageDescriptor
   assignedAuditAction: MessageDescriptor
   unAssignedAuditAction: MessageDescriptor
-  correctedAuditAction: MessageDescriptor
   requestedCorrectionAuditAction: MessageDescriptor
   approvedCorrectionAuditAction: MessageDescriptor
   rejectedCorrectedAuditAction: MessageDescriptor
@@ -77,12 +71,8 @@ interface IUserSetupMessages
   passwordResetByAdmin: MessageDescriptor
   resendInviteAuditAction: MessageDescriptor
   userNameReminderAuditAction: MessageDescriptor
-  retrievedAuditAction: MessageDescriptor
   viewedAuditAction: MessageDescriptor
   reInstatedInProgressAuditAction: MessageDescriptor
-  reInstatedInReviewAuditAction: MessageDescriptor
-  reInStatedRejectedAuditAction: MessageDescriptor
-  sentForApprovalAuditAction: MessageDescriptor
   markedAsDuplicate: MessageDescriptor
   markedAsNotDuplicate: MessageDescriptor
 }
@@ -205,11 +195,6 @@ const messagesToDefine: IUserSetupMessages = {
     description: 'Title for assigned office field',
     id: 'user.profile.assignedOffice'
   },
-  roleType: {
-    defaultMessage: 'Role/Type',
-    description: 'Title for roleType field',
-    id: 'user.profile.roleType'
-  },
   phoneNumber: {
     defaultMessage: 'Phone number',
     description: 'Title for phoneNumber field',
@@ -244,16 +229,6 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Record',
     description: 'Title for audit tracking id column',
     id: 'user.profile.audit.column.trackingId'
-  },
-  auditDeviceIpAddressColumnTitle: {
-    defaultMessage: 'Device/IP Address',
-    description: 'Title for audit Device/IP Address column',
-    id: 'user.profile.audit.column.deviceIPAddress'
-  },
-  auditEventTypeColumnTitle: {
-    defaultMessage: 'Event',
-    description: 'Title for audit event type column',
-    id: 'user.profile.audit.column.eventType'
   },
   auditDateColumnTitle: {
     defaultMessage: 'Date',
@@ -300,16 +275,6 @@ const messagesToDefine: IUserSetupMessages = {
     description: 'Description for certified declaration',
     id: 'user.profile.audit.description.certified'
   },
-  issuedAuditAction: {
-    defaultMessage: 'Issued',
-    description: 'Description for Issued declaration',
-    id: 'user.profile.audit.description.issued'
-  },
-  showMoreAuditList: {
-    defaultMessage: 'Show next {pageSize} of {totalItems}',
-    description: 'Label for show more link',
-    id: 'user.profile.auditList.showMore'
-  },
   assignedAuditAction: {
     defaultMessage: 'Assigned',
     description: 'Description for declaration assignment',
@@ -319,11 +284,6 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Unassigned',
     description: 'Description for declaration not assigned to self',
     id: 'user.profile.auditList.unAssigned'
-  },
-  correctedAuditAction: {
-    defaultMessage: 'Corrected Record',
-    description: 'Description for declaration corrected',
-    id: 'user.profile.auditList.corrected'
   },
   requestedCorrectionAuditAction: {
     defaultMessage: 'Requested correction',
@@ -415,11 +375,6 @@ const messagesToDefine: IUserSetupMessages = {
     description: 'Description for send username reminder audit action',
     id: 'user.profile.auditList.usernameReminderByAdmin'
   },
-  retrievedAuditAction: {
-    defaultMessage: 'Retrieved',
-    description: 'Description for declaration retrieved audit action',
-    id: 'user.profile.auditList.retrieved'
-  },
   viewedAuditAction: {
     defaultMessage: 'Viewed',
     description: 'Description for declaration viewed audit action',
@@ -430,24 +385,6 @@ const messagesToDefine: IUserSetupMessages = {
     description:
       'Description for sending registration from Reinstated to In progress audit action',
     id: 'user.profile.auditList.reInstatedToInProgress'
-  },
-  reInstatedInReviewAuditAction: {
-    defaultMessage: 'Reinstated to ready for review',
-    description:
-      'Description for sending registration from Reinstated to In review audit action',
-    id: 'user.profile.auditList.reInstatedToInReview'
-  },
-  reInStatedRejectedAuditAction: {
-    defaultMessage: 'Reinstated to requires updates',
-    description:
-      'Description for sending registration from Reinstated to require updates audit action',
-    id: 'user.profile.auditList.reInstatedToUpdate'
-  },
-  sentForApprovalAuditAction: {
-    defaultMessage: 'Sent for approval',
-    description:
-      'Description for sending registration for approval audit action',
-    id: 'user.profile.auditList.sentForApproval'
   },
   markedAsDuplicate: {
     defaultMessage: 'Marked as duplicate',

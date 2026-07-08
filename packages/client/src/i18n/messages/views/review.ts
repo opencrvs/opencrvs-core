@@ -16,11 +16,6 @@ const messagesToDefine = {
     description: 'Button to hide section',
     id: 'form.field.hideLabel'
   },
-  showLabel: {
-    defaultMessage: 'Show',
-    description: 'Button to show section',
-    id: 'form.field.showLabel'
-  },
   validateCompleteDeclarationActionTitle: {
     id: 'validate.complete.declaration.action.title',
     defaultMessage: 'Send for approval or reject?'
@@ -39,44 +34,7 @@ const messagesToDefine = {
     defaultMessage:
       'This declaration will be sent for approval prior to registration.'
   },
-  informantsSignature: {
-    defaultMessage: 'Signature of informant',
-    description: 'Label for informants signature input',
-    id: 'review.inputs.informantsSignature'
-  },
-  brideSignature: {
-    defaultMessage: 'Signature of Bride',
-    description: 'Label for informants signature input',
-    id: 'review.inputs.brideSignature'
-  },
-  groomSignature: {
-    defaultMessage: 'Signature of Groom',
-    description: 'Label for informants signature input',
-    id: 'review.inputs.groomSignature'
-  },
-  witnessOneSignature: {
-    defaultMessage: 'Signature of Witness 1',
-    description: 'Label for informants signature input',
-    id: 'review.inputs.witnessOneSignature'
-  },
-  witnessTwoSignature: {
-    defaultMessage: 'Signature of Witness 2',
-    description: 'Label for informants signature input',
-    id: 'review.inputs.witnessTwoSignature'
-  },
 
-  terms: {
-    defaultMessage:
-      'We, the undersigned declare under penalty of perjury under the laws of Farajaland that the forgoing information is true and correct to the best of our knowledge and belief. We further declare that no legal objections to the marriage is known and hereby apply for a certificate of marriage',
-    description: 'Label for signature terms',
-    id: 'review.inputs.terms'
-  },
-  signatureDescription: {
-    defaultMessage:
-      'I, the undersigned, hereby declare that the particulars in this form are true and correct to the best of my knowledge.',
-    description: 'Label acknowledging the correctness of the declaration',
-    id: 'review.signature.description'
-  },
   signatureInputDescription: {
     defaultMessage:
       'By signing this document with an electronic signature, I agree that such signature will be valid as handwritten signatures to the extent allowed by the laws of Farajaland.',
@@ -190,13 +148,6 @@ const messagesToDefine = {
     description:
       'Description for review action component when incomplete declaration',
     id: 'review.actions.description.confirmInComplete'
-  },
-  reviewActionDescriptionForErrors: {
-    defaultMessage:
-      'Please ensure all fields are either empty or have a valid value in them.',
-    description:
-      'Description for review action component when declaration has errors on fields',
-    id: 'review.actions.description.hasError'
   },
   reviewActionTitle: {
     defaultMessage:

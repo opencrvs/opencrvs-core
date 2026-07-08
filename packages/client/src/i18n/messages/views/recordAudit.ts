@@ -13,33 +13,14 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IRecordAuditMessages
   extends Record<string | number | symbol, MessageDescriptor> {
-  archived: MessageDescriptor
-  sentNotification: MessageDescriptor
-  started: MessageDescriptor
   confirmationBody: MessageDescriptor
-  confirmationTitle: MessageDescriptor
   status: MessageDescriptor
   type: MessageDescriptor
   trackingId: MessageDescriptor
   dateOfBirth: MessageDescriptor
-  dateOfDeath: MessageDescriptor
   dateOfMarriage: MessageDescriptor
   placeOfBirth: MessageDescriptor
-  placeOfDeath: MessageDescriptor
-  placeOfMarriage: MessageDescriptor
-  rn: MessageDescriptor
   noName: MessageDescriptor
-  noStatus: MessageDescriptor
-  noType: MessageDescriptor
-  noTrackingId: MessageDescriptor
-  noDateOfBirth: MessageDescriptor
-  noDateOfDeath: MessageDescriptor
-  noPlaceOfBirth: MessageDescriptor
-  noPlaceOfDeath: MessageDescriptor
-  reinstateDeclarationDialogTitle: MessageDescriptor
-  reinstateDeclarationDialogCancel: MessageDescriptor
-  reinstateDeclarationDialogConfirm: MessageDescriptor
-  reinstateDeclarationDialogDescription: MessageDescriptor
   markAsDuplicate: MessageDescriptor
 }
 
@@ -49,36 +30,11 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage: 'Contact',
     description: 'Contact for record audit'
   },
-  noContact: {
-    id: 'recordAudit.noContact',
-    defaultMessage: 'No contact details provided',
-    description: 'No contact for record audit'
-  },
-  archived: {
-    id: 'recordAudit.archive.status',
-    defaultMessage: 'Archived',
-    description: 'Archived status'
-  },
-  sentNotification: {
-    id: 'recordAudit.regStatus.declared.sentNotification',
-    defaultMessage: 'Sent notification for review',
-    description: 'Field agent sent notification'
-  },
-  started: {
-    id: 'recordAudit.history.started',
-    defaultMessage: 'Started',
-    description: 'Declaration Started'
-  },
   confirmationBody: {
     id: 'recordAudit.archive.confirmation.body',
     defaultMessage:
       'This will remove the declaration from the workqueue and change the status to Archive. To revert this change you will need to search for the declaration.',
     description: 'Confirmation body for archiving a declaration'
-  },
-  confirmationTitle: {
-    id: 'recordAudit.archive.confirmation.title',
-    defaultMessage: 'Archive declaration?',
-    description: 'Confirmation title for archiving a declaration'
   },
   status: {
     id: 'recordAudit.status',
@@ -100,11 +56,6 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage: 'Date of birth',
     description: 'Label for date of birth'
   },
-  dateOfDeath: {
-    id: 'recordAudit.dateOfDeath',
-    defaultMessage: 'Date of death',
-    description: 'Label for date of death'
-  },
   dateOfMarriage: {
     id: 'recordAudit.dateOfMarriage',
     defaultMessage: 'Date of marriage',
@@ -115,97 +66,10 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage: 'Place of birth',
     description: 'Label for place of birth'
   },
-  placeOfDeath: {
-    id: 'recordAudit.placeOfDeath',
-    defaultMessage: 'Place of death',
-    description: 'Label for place of death'
-  },
-  placeOfMarriage: {
-    id: 'recordAudit.placeOfMarriage',
-    defaultMessage: 'Place of marriage',
-    description: 'Label for place of marriage'
-  },
-  rn: {
-    id: 'recordAudit.rn',
-    defaultMessage: 'Registration no.',
-    description: 'Label for Birth Registration Number'
-  },
-  registrationNo: {
-    id: 'recordAudit.registrationNo',
-    defaultMessage: 'Registration No',
-    description: 'Label for Event Registration Number'
-  },
-  noStatus: {
-    id: 'recordAudit.noStatus',
-    defaultMessage: 'No status',
-    description: 'Label for status not available'
-  },
   noName: {
     id: 'recordAudit.noName',
     defaultMessage: 'No name provided',
     description: 'Label for name not available'
-  },
-  noType: {
-    id: 'recordAudit.noType',
-    defaultMessage: 'No event',
-    description: 'Label for type of event not available'
-  },
-  noTrackingId: {
-    id: 'recordAudit.noTrackingId',
-    defaultMessage: 'No tracking id',
-    description: 'Label for tracking id not available'
-  },
-  noDateOfBirth: {
-    id: 'recordAudit.noDateOfBirth',
-    defaultMessage: 'No date of birth',
-    description: 'Label for date of birth not available'
-  },
-  noDateOfDeath: {
-    id: 'recordAudit.noDateOfDeath',
-    defaultMessage: 'No date of death',
-    description: 'Label for date of death not available'
-  },
-  noDateOfMarriage: {
-    id: 'recordAudit.noDateOfMarriage',
-    defaultMessage: 'No date of marriage',
-    description: 'Label for date of marriage not available'
-  },
-  noPlaceOfBirth: {
-    id: 'recordAudit.noPlaceOfBirth',
-    defaultMessage: 'No place of birth',
-    description: 'Label for place of birth not available'
-  },
-  noPlaceOfDeath: {
-    id: 'recordAudit.noPlaceOfDeath',
-    defaultMessage: 'No place of death',
-    description: 'Label for place of death not availale'
-  },
-  noPlaceOfMarriage: {
-    id: 'recordAudit.noPlaceOfMarriage',
-    defaultMessage: 'No place of marriage',
-    description: 'Label for place of marriage not availale'
-  },
-  reinstateDeclarationDialogTitle: {
-    id: 'recordAudit.declaration.reinstateDialogTitle',
-    defaultMessage: 'Reinstate declaration?',
-    description: 'Title for the dialog when reinstate declaration'
-  },
-  reinstateDeclarationDialogCancel: {
-    id: 'recordAudit.declaration.reinstateDialog.actions.cancel',
-    defaultMessage: 'Cancel',
-    description: 'Button label for the dialog when cancel reinstate declaration'
-  },
-  reinstateDeclarationDialogConfirm: {
-    id: 'recordAudit.declaration.reinstateDialog.actions.confirm',
-    defaultMessage: 'Confirm',
-    description:
-      'Button label for the dialog when confirm reinstate declaration'
-  },
-  reinstateDeclarationDialogDescription: {
-    id: 'recordAudit.declaration.reinstateDialogDescription',
-    defaultMessage:
-      'This will revert the application back to its original status and add it to your workqueue.',
-    description: 'Description for the dialog when reinstate declaration'
   },
   markAsDuplicate: {
     id: 'recordAudit.declaration.markAsDuplicate',
@@ -214,6 +78,22 @@ const messagesToDefine: IRecordAuditMessages = {
 }
 
 const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
+  MARKED_AS_DUPLICATE: {
+    id: 'recordAudit.regAction.markedAsDuplicate',
+    defaultMessage: 'Marked as a duplicate',
+    description: 'Marked as a duplicate status message for record audit'
+  },
+  MARKED_AS_NOT_DUPLICATE: {
+    id: 'recordAudit.regAction.markedAsNotDuplicate',
+    defaultMessage: 'Marked not a duplicate',
+    description: 'Marked not a duplicate status message for record audit'
+  },
+  FLAGGED_AS_POTENTIAL_DUPLICATE: {
+    id: 'recordAudit.regAction.flaggedAsPotentialDuplicate',
+    defaultMessage: 'Flagged as potential duplicate',
+    description:
+      'Flagged as potential duplicate status message for record audit'
+  },
   [RegAction.Downloaded]: {
     id: 'recordAudit.regAction.downloaded',
     defaultMessage: 'Retrieved',
@@ -265,22 +145,6 @@ const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
     defaultMessage: 'Viewed',
     description: 'Viewed Record action'
   },
-  MARKED_AS_DUPLICATE: {
-    id: 'recordAudit.regAction.markedAsDuplicate',
-    defaultMessage: 'Marked as a duplicate',
-    description: 'Marked as a duplicate status message for record audit'
-  },
-  MARKED_AS_NOT_DUPLICATE: {
-    id: 'recordAudit.regAction.markedAsNotDuplicate',
-    defaultMessage: 'Marked not a duplicate',
-    description: 'Marked not a duplicate status message for record audit'
-  },
-  FLAGGED_AS_POTENTIAL_DUPLICATE: {
-    id: 'recordAudit.regAction.flaggedAsPotentialDuplicate',
-    defaultMessage: 'Flagged as potential duplicate',
-    description:
-      'Flagged as potential duplicate status message for record audit'
-  }
 }
 
 const regStatusMessagesToDefine: Record<RegStatus, MessageDescriptor> = {

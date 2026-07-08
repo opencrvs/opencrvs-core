@@ -12,7 +12,6 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IOfficeHomeMessages
   extends Record<string | number | symbol, MessageDescriptor> {
-  certified: MessageDescriptor
   dataTableResults: MessageDescriptor
   inProgress: MessageDescriptor
   inProgressFieldAgents: MessageDescriptor
@@ -24,33 +23,13 @@ interface IOfficeHomeMessages
   readyForReview: MessageDescriptor
   readyToPrint: MessageDescriptor
   registrationNumber: MessageDescriptor
-  requestedCorrection: MessageDescriptor
   sentForApprovals: MessageDescriptor
   sentForUpdates: MessageDescriptor
-  sentForExternalValidation: MessageDescriptor
   validatedDeclarationTooltipForRegistrar: MessageDescriptor
   validatedDeclarationTooltipForRegistrationAgent: MessageDescriptor
-  waitingForExternalValidation: MessageDescriptor
-  archived: MessageDescriptor
-  issued: MessageDescriptor
 }
 
 const messagesToDefine: IOfficeHomeMessages = {
-  issued: {
-    defaultMessage: 'Issued',
-    description: 'Label for registration status issued',
-    id: 'regHome.issued'
-  },
-  certified: {
-    defaultMessage: 'Certified',
-    description: 'Label for registration status certified',
-    id: 'regHome.certified'
-  },
-  archived: {
-    defaultMessage: 'Archived',
-    description: 'Label for registration status archived',
-    id: 'regHome.archived'
-  },
   dataTableResults: {
     defaultMessage: 'Results',
     description: 'Results label at the top of the data table component',
@@ -106,20 +85,10 @@ const messagesToDefine: IOfficeHomeMessages = {
     description: 'The heading of registration no. column',
     id: 'regHome.registrationNumber'
   },
-  requestedCorrection: {
-    defaultMessage: 'Requested correction',
-    description: 'Label for registration status requested correction',
-    id: 'regHome.requestedCorrection'
-  },
   sentForApprovals: {
     defaultMessage: 'Sent for approval',
     description: 'The title of sent for approvals tab',
     id: 'regHome.sentForApprovals'
-  },
-  sentForExternalValidation: {
-    defaultMessage: 'Sent for ext. validation',
-    description: 'The label for external validation waiting duration column',
-    id: 'regHome.sentForExternalValidation'
   },
   sentForUpdates: {
     defaultMessage: 'Sent for updates',
@@ -136,11 +105,6 @@ const messagesToDefine: IOfficeHomeMessages = {
     description: 'Text to display for validated declaration as tooltip',
     id: 'regHome.val.regAgent.tooltip'
   },
-  waitingForExternalValidation: {
-    defaultMessage: 'Waiting for ext. validation',
-    description: 'The title of waiting for external validation',
-    id: 'regHome.waitingForExternalValidation'
-  }
 }
 
 export const messages: IOfficeHomeMessages = defineMessages(messagesToDefine)

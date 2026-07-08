@@ -39,21 +39,6 @@ const messagesToDefine = {
     description: 'Declaration processing text',
     id: 'misc.notif.processingText'
   },
-  statusArchiving: {
-    defaultMessage: 'Archiving...',
-    description: 'Label for application status Archiving',
-    id: 'regHome.outbox.statusArchiving'
-  },
-  statusCertifying: {
-    defaultMessage: 'Certifying...',
-    description: 'Label for declaration status Certifying',
-    id: 'regHome.outbox.statusCertifying'
-  },
-  statusIssuing: {
-    defaultMessage: 'Issuing...',
-    description: 'Label for declaration status Issuing',
-    id: 'regHome.outbox.statusIssuing'
-  },
   statusRegistering: {
     defaultMessage: 'Registering...',
     description: 'Label for declaration status Registering',
@@ -64,50 +49,10 @@ const messagesToDefine = {
     description: 'Label for declaration status Rejecting',
     id: 'regHome.outbox.statusRejecting'
   },
-  statusReinstating: {
-    defaultMessage: 'Reinstating...',
-    description: 'Label for application status Reinstating',
-    id: 'regHome.outbox.statusReinstating'
-  },
-  statusRequestingCorrection: {
-    defaultMessage: 'Correcting...',
-    description: 'Label for declaration status Requesting correction',
-    id: 'regHome.outbox.statusRequestingCorrection'
-  },
   statusSubmitting: {
     defaultMessage: 'Sending...',
     description: 'Label for declaration status submitting',
     id: 'regHome.outbox.statusSubmitting'
-  },
-  statusSendingForApproval: {
-    defaultMessage: 'Sending for approval...',
-    description: 'Label for declaration status waiting for validate',
-    id: 'regHome.outbox.statusSendingForApproval'
-  },
-  statusWaitingToBeArchived: {
-    defaultMessage: 'Waiting to be archived',
-    description: 'Label for application status waiting to be archived',
-    id: 'regHome.outbox.statusWaitingToBeArchived'
-  },
-  statusWaitingToBeReinstated: {
-    defaultMessage: 'Waiting to be reinstated',
-    description: 'Label for application status waiting to be reinstated',
-    id: 'regHome.outbox.statusWaitingToBeReinstated'
-  },
-  statusWaitingToCertify: {
-    defaultMessage: 'Waiting to certify',
-    description: 'Label for declaration status waiting for certify',
-    id: 'regHome.outbox.statusWaitingToCertify'
-  },
-  statusWaitingToIssue: {
-    defaultMessage: 'Waiting to issue',
-    description: 'Label for declaration status waiting for certify',
-    id: 'regHome.outbox.statusWaitingToIssue'
-  },
-  statusWaitingToValidate: {
-    defaultMessage: 'Waiting to send for approval',
-    description: 'Label for declaration status waiting for validate',
-    id: 'regHome.outbox.statusWaitingToValidate'
   },
   statusWaitingToRegister: {
     defaultMessage: 'Waiting to register',
@@ -118,11 +63,6 @@ const messagesToDefine = {
     defaultMessage: 'Waiting to send for updates',
     description: 'Label for declaration status waiting for reject',
     id: 'regHome.outbox.statusWaitingToReject'
-  },
-  statusWaitingToRequestCorrection: {
-    defaultMessage: 'Waiting to correct',
-    description: 'Label for declaration status waiting for request correction',
-    id: 'regHome.outbox.statusWaitingToRequestCorrection'
   },
   statusWaitingToSubmit: {
     defaultMessage: 'Waiting to send',

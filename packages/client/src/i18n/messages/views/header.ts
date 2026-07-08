@@ -16,11 +16,6 @@ export const messages = defineMessages({
     defaultMessage: 'Email',
     description: 'Search email type'
   },
-  typeRN: {
-    id: 'home.header.typeRN',
-    defaultMessage: 'Registration no.',
-    description: 'Search menu brn drn type'
-  },
   typePhone: {
     id: 'home.header.typePhone',
     defaultMessage: 'Phone No.',
@@ -40,16 +35,6 @@ export const messages = defineMessages({
     id: 'home.header.placeHolderPhone',
     defaultMessage: 'Search for a phone No.',
     description: 'Search menu phone no place holder'
-  },
-  placeholderId: {
-    id: 'home.header.placeHolderId',
-    defaultMessage: 'Search for an ID.',
-    description: 'Search menu ID place holder'
-  },
-  placeHolderEmail: {
-    id: 'home.header.placeHolderEmail',
-    defaultMessage: 'Search for an email.',
-    description: 'Search menu email place holder'
   },
   teamTitle: {
     id: 'home.header.teamTitle',

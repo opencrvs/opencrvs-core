@@ -46,22 +46,6 @@ const messagesToDefine = {
     description: 'Label for reinstate record button in dropdown menu',
     id: 'action.reinstate'
   },
-  reviewCorrection: {
-    defaultMessage: 'Review correction request',
-    description: 'Label for review correction request button in dropdown menu',
-    id: 'action.review.correction'
-  },
-  reviewDeclaration: {
-    defaultMessage:
-      'Review {isDuplicate, select, true{potential duplicate} other{declaration}}',
-    description: 'Label for review record button in dropdown menu',
-    id: 'action.review.declaration'
-  },
-  updateDeclaration: {
-    defaultMessage: 'Update declaration',
-    description: 'Label for update record button in dropdown menu',
-    id: 'action.update'
-  },
   printDeclaration: {
     defaultMessage: 'Print certified copy',
     description: 'Label for print certified copy in dropdown menu',

@@ -52,13 +52,6 @@ const messagesToDefine = {
     description: 'The label for collect payment paragraph',
     id: 'print.certificate.collectPayment'
   },
-  correctorIDCheckDialogDescription: {
-    id: 'correction.corrector.description',
-    defaultMessage:
-      'Please be aware that if you proceed, you will be responsible for making a change to this record without the necessary proof of identification',
-    description:
-      'The description for the dialog when details of the corrector not verified'
-  },
   dateOfBirth: {
     defaultMessage: 'Date of Birth',
     description: 'Parent Date of Birth',
@@ -114,12 +107,6 @@ const messagesToDefine = {
     description:
       'The title for the dialog when details of the collector not verified',
     id: 'print.certificate.collector.idCheckDialog.title'
-  },
-  idCheckForCorrectionTitle: {
-    id: 'correction.summary.idCheckForCorrection',
-    defaultMessage: 'Correct without proof of ID?',
-    description:
-      'The title for the dialog when details of the collector not verified for correction'
   },
   idCheckTitle: {
     defaultMessage: 'Verify their identity',
@@ -193,11 +180,6 @@ const messagesToDefine = {
     defaultMessage: 'Collect payment',
     description: 'The title for payment section',
     id: 'print.certificate.payment'
-  },
-  noPayment: {
-    defaultMessage: 'No payment required',
-    description: 'The title for no payment section',
-    id: 'print.certificate.noPayment'
   },
   paymentInstruction: {
     defaultMessage:
@@ -339,11 +321,6 @@ const messagesToDefine = {
     description: 'Form level error for collector form',
     id: 'print.certificate.collector.form.error'
   },
-  certificateCollectorTemplateError: {
-    defaultMessage: 'Please select certificate type',
-    description: 'Form level error for collector certificate template',
-    id: 'print.certificate.collector.form.error.template'
-  },
   certificateOtherCollectorInfoError: {
     defaultMessage: 'Complete all the mandatory fields',
     description: 'Form level error for other collector information form',
@@ -389,22 +366,6 @@ const messagesToDefine = {
     description: 'File label for signed affidavit',
     id: 'print.cert.coll.other.aff.label'
   },
-  printedOnCollection: {
-    defaultMessage: 'Printed on collection',
-    description: 'Table column header showing collector info in record audit',
-    id: 'record.certificate.collector'
-  },
-  printedOnAdvance: {
-    defaultMessage: 'Printed in advance by',
-    description: 'Table column header showing collector info in record audit',
-    id: 'record.certificate.collectedInAdvance'
-  },
-  collectorIDCheck: {
-    defaultMessage: 'ID Check',
-    description:
-      'Table column header showing collector ID verification info in record audit',
-    id: 'correction.summary.idCheck'
-  }
 }
 
 interface IDynamicCertificateMessages {
@@ -424,38 +385,15 @@ const dynamicMessagesToDefine = {
       'Service: <strong>Death registration after {service} of D.o.D.</strong><br/>Amount Due:',
     description: 'Amount due on certificate for death label'
   },
-  birthServiceBefore: {
-    id: 'certificate.receipt.birthService.before',
-    defaultMessage: 'Birth registration before {target} days of date of birth',
-    description: 'Amount due on certificate for birth label before target days'
-  },
   birthServiceAfter: {
     id: 'certificate.receipt.birthService.after',
     defaultMessage: 'Birth registration after {target} days of date of birth',
     description: 'Amount due on certificate for birth label'
   },
-  deathServiceBefore: {
-    id: 'certificate.receipt.deathService.before',
-    defaultMessage: 'Death registration before {target} days of date of death',
-    description: 'Amount due on certificate for death label before target days'
-  },
   deathServiceAfter: {
     id: 'certificate.receipt.deathService.after',
     defaultMessage: 'Death registration after {target} days of date of death',
     description: 'Amount due on certificate for death label'
-  },
-  marriageServiceBefore: {
-    id: 'certificate.receipt.marriageService.before',
-    defaultMessage:
-      'Marriage registration before {target} days of date of marriage',
-    description:
-      'Amount due on certificate for marriage label before target days'
-  },
-  marriageServiceAfter: {
-    id: 'certificate.receipt.marriageService.after',
-    defaultMessage:
-      'Marriage registration after {target} days of date of marriage',
-    description: 'Amount due on certificate for marriage label'
   },
   birthServiceBetween: {
     id: 'certificate.receipt.birthService.between',
