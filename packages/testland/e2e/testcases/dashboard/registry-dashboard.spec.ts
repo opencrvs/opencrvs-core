@@ -1,0 +1,62 @@
+import { expect, test } from '@playwright/test'
+
+import { login } from '../../helpers'
+import { CLIENT_URL, CREDENTIALS } from '../../constants'
+import {
+  expectBirthsTabSelected,
+  expectNoBrokenCards,
+  populateDashboardRecords
+} from './utils'
+
+// The Births tab has a single record-table card and no untitled cards
+const EXPECTED_CARD_TITLES = ['Birth records (no PII)']
+
+test('Registry dashboard cards render and survive filtering', async ({
+  page
+}) => {
+  await populateDashboardRecords(page)
+
+  await login(page, CREDENTIALS.REGISTRAR)
+  await page.goto(`${CLIENT_URL}/performance/dashboard/registry`)
+  const frame = page.frameLocator('iframe')
+
+  // The record table's sortable column headers ("Created at location", …)
+  // also expose role=button, so scope filter clicks to the filter bar
+  const filterBar = frame.getByTestId('fixed-width-filters')
+
+  await test.step('All cards render without errors on the Births tab', async () => {
+    await expectBirthsTabSelected(frame)
+    await expectNoBrokenCards(frame, EXPECTED_CARD_TITLES)
+  })
+
+  await test.step('Location filter does not break any card', async () => {
+    await filterBar.getByRole('button', { name: 'Location' }).click()
+    await frame.getByTestId('Ibombo District Office-filter-value').click()
+    await frame.getByRole('button', { name: 'Add filter' }).click()
+
+    await expect(
+      frame.getByText('Location: Ibombo District Office')
+    ).toBeVisible()
+    await expectNoBrokenCards(frame, EXPECTED_CARD_TITLES)
+  })
+
+  await test.step('Time period filter does not break any card', async () => {
+    // No default value; selecting a relative range applies it immediately
+    // without a confirm button
+    await filterBar.getByRole('button', { name: 'Time period' }).click()
+    await frame.getByText('Previous 30 days', { exact: true }).click()
+
+    await expect(frame.getByText('Time period: Previous 30 days')).toBeVisible()
+    await expectNoBrokenCards(frame, EXPECTED_CARD_TITLES)
+  })
+
+  await test.step('Clearing the time period filter does not break any card', async () => {
+    await frame
+      .locator('[data-testid="parameter-widget"]', { hasText: 'Time period' })
+      .getByRole('button', { name: /reset filter|clear/i })
+      .click()
+
+    await expect(frame.getByText('Time period: Previous 30 days')).toBeHidden()
+    await expectNoBrokenCards(frame, EXPECTED_CARD_TITLES)
+  })
+})
