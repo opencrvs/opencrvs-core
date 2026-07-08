@@ -113,7 +113,7 @@ function matchesJurisdictionFilter(
   }
   if (filter === JurisdictionFilter.enum.administrativeArea) {
     return (
-      user.administrativeAreaId === null ||
+      !user.administrativeAreaId ||
       locationIds.some((id) => id === user.administrativeAreaId)
     )
   }
@@ -276,7 +276,7 @@ export function canAccessUserWithScope({
   const hasAdministrativeAreaInHierarchy =
     userToAccess.administrativeHierarchy.some(
       (id) => user.administrativeAreaId === id
-    ) || user.administrativeAreaId === null // user with null administrative area has access to all administrative areas
+    ) || !user.administrativeAreaId // user with no administrative area has access to all administrative areas
 
   if (
     opts?.accessLevel === JurisdictionFilter.enum.administrativeArea &&

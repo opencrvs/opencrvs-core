@@ -15,9 +15,11 @@ import { UUID } from '../uuid'
 import { cloneDeep, difference } from 'lodash'
 import { Action, ActionDocument, ActionStatus } from './ActionDocument'
 import { EventDocument } from './EventDocument'
+import { EventConfig } from './EventConfig'
 import { ActionType } from './ActionType'
 import {
   findLastAssignmentAction,
+  getActionConfig,
   getCompleteActionAnnotation,
   getCompleteActionContent,
   getDeclaration,
@@ -931,6 +933,64 @@ describe('getCompleteActionContent', () => {
 
     const result = getCompleteActionContent(baseEvent, action)
 
+    expect(result).toBeUndefined()
+  })
+})
+
+describe('getActionConfig() – NOTIFY fallback and isolation', () => {
+  const configWithoutNotify = {
+    actions: [
+      {
+        type: ActionType.DECLARE,
+        label: { id: 'declare', defaultMessage: 'Declare', description: '' }
+      }
+    ]
+  }
+
+  const configWithNotify = {
+    actions: [
+      {
+        type: ActionType.NOTIFY,
+        label: { id: 'notify', defaultMessage: 'Notify', description: '' }
+      },
+      {
+        type: ActionType.DECLARE,
+        label: { id: 'declare', defaultMessage: 'Declare', description: '' }
+      }
+    ]
+  }
+
+  const configWithoutEither = { actions: [] }
+
+  it('falls back to DECLARE config when no NOTIFY config is present', () => {
+    const result = getActionConfig({
+      eventConfiguration: configWithoutNotify as unknown as EventConfig,
+      actionType: ActionType.NOTIFY
+    })
+    expect(result?.type).toBe(ActionType.DECLARE)
+  })
+
+  it('returns NOTIFY config when present', () => {
+    const result = getActionConfig({
+      eventConfiguration: configWithNotify as unknown as EventConfig,
+      actionType: ActionType.NOTIFY
+    })
+    expect(result?.type).toBe(ActionType.NOTIFY)
+  })
+
+  it('returns DECLARE config independently when NOTIFY config is also present', () => {
+    const result = getActionConfig({
+      eventConfiguration: configWithNotify as unknown as EventConfig,
+      actionType: ActionType.DECLARE
+    })
+    expect(result?.type).toBe(ActionType.DECLARE)
+  })
+
+  it('returns undefined when neither NOTIFY nor DECLARE config exists', () => {
+    const result = getActionConfig({
+      eventConfiguration: configWithoutEither as unknown as EventConfig,
+      actionType: ActionType.NOTIFY
+    })
     expect(result).toBeUndefined()
   })
 })

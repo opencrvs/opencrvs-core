@@ -14,18 +14,10 @@ import { v4 as uuid } from 'uuid'
 import { UUID, getActionConfig, ActionType } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import {
-  REJECT_ACTIONS,
-  RejectionState,
-  Review as ReviewComponent
-} from '@client/v2-events/features/events/components/Review'
+import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 
-export function useRejectionModal(
-  eventId: UUID,
-  eventType: string,
-  allowArchive = true
-) {
+export function useRejectionModal(eventId: UUID, eventType: string) {
   const [modal, openModal] = useModal()
   const events = useEvents()
   const { eventConfiguration } = useEventConfiguration(eventType)
@@ -37,46 +29,21 @@ export function useRejectionModal(
   const supportingCopy = rejectActionConfig?.supportingCopy
 
   async function handleRejection(onClose: () => void) {
-    const confirmedRejection = await openModal<RejectionState | null>(
-      (close) => (
-        <ReviewComponent.ActionModal.Reject
-          allowArchive={allowArchive}
-          close={close}
-          supportingCopy={supportingCopy}
-        />
-      )
-    )
+    const confirmedRejection = await openModal<string | null>((close) => (
+      <ReviewComponent.ActionModal.Reject
+        close={close}
+        supportingCopy={supportingCopy}
+      />
+    ))
+
     if (confirmedRejection) {
-      const { rejectAction, message, isDuplicate } = confirmedRejection
-
-      if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
-        events.actions.reject.mutate({
-          eventId,
-          declaration: {},
-          transactionId: uuid(),
-          annotation: {},
-          content: { reason: message }
-        })
-      }
-
-      if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
-        if (isDuplicate) {
-          events.customActions.archiveOnDuplicate.mutate({
-            eventId,
-            declaration: {},
-            transactionId: uuid(),
-            content: { reason: message }
-          })
-        } else {
-          events.actions.archive.mutate({
-            eventId,
-            declaration: {},
-            transactionId: uuid(),
-            annotation: {},
-            content: { reason: message }
-          })
-        }
-      }
+      events.actions.reject.mutate({
+        eventId,
+        declaration: {},
+        transactionId: uuid(),
+        annotation: {},
+        content: { reason: confirmedRejection }
+      })
 
       onClose()
       return

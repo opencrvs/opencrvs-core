@@ -113,12 +113,23 @@ export function filterActionsByFlags(
 }
 
 /**
- * Bases available actions on previous status without the REJECTED flag if the current flags contain REJECTED.
- * 1. This is to ensure that the user can still perform actions on the event after rejection.
- * 2. In 1.9 we allow rejecting event in rejected state. No filtering of previous actions needed.
- * (NOTIFIED & DECLARED) + REJECTED are an exception to this as we want to allow all the
- * actions available to CREATED minus DELETE plus ARCHIVE
+ * A rejected record has a specific set of core actions that are available to it.
+ *
+ * This list of actions only applies while the record is still active. Once it has
+ * been archived it must behave like any other archived record: it cannot be
+ * edited or archived again, so we fall through to the status-based actions.
+ *
+ * At some point we will refactor 'Rejected' to be a countryconfig flag, at
+ * which point we can remove this special case.
  */
+const REJECTED_ACTIONS: DisplayableAction[] = [
+  ActionType.READ,
+  ActionType.NOTIFY,
+  ActionType.CUSTOM,
+  ActionType.EDIT,
+  ActionType.ARCHIVE
+]
+
 function getAvailableActionsWithoutFlagFilters(
   status: EventStatus,
   flags: Flag[]
@@ -128,15 +139,11 @@ function getAvailableActionsWithoutFlagFilters(
     return [ActionType.NOTIFY, ActionType.DECLARE, ActionType.REGISTER]
   }
 
-  // At some point we will refactor 'Rejected' to be a countryconfig flag, at which point we can remove this silly logic.
-  if (flags.includes(InherentFlags.REJECTED)) {
-    return [
-      ActionType.READ,
-      ActionType.NOTIFY,
-      ActionType.CUSTOM,
-      ActionType.EDIT,
-      ActionType.ARCHIVE
-    ]
+  if (
+    flags.includes(InherentFlags.REJECTED) &&
+    status !== EventStatus.enum.ARCHIVED
+  ) {
+    return REJECTED_ACTIONS
   }
 
   return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]

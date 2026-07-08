@@ -8,13 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import * as React from 'react'
-import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
+import {
+  Toast,
+  Dialog,
+  Button,
+  InputField,
+  TextInput
+} from '@opencrvs/components'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { useIntl } from 'react-intl'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { useSelector } from 'react-redux'
@@ -23,7 +25,6 @@ import { isAValidEmailAddressFormat } from '@client/utils/validate'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { TriggerEvent } from '@opencrvs/commons/client'
 
 interface IProps {
   show: boolean
@@ -43,7 +44,7 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
   ] = React.useState(false)
   const userDetails = useSelector(getUserDetails)
   const isOnline = useOnlineStatus()
-  const { sendVerifyCode } = useUsers()
+  const { requestEmailChange } = useUsers()
   const isEmailAddressUnchanged =
     Boolean(emailAddress) &&
     emailAddress.trim().toLowerCase() === userDetails?.email?.toLowerCase()
@@ -70,19 +71,14 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
   }
   const continueButtonHandler = async (emailAddress: string) => {
     if (!userDetails) return
-    sendVerifyCode.mutate(
-      {
-        notificationEvent: TriggerEvent.CHANGE_EMAIL_ADDRESS
-      },
+    requestEmailChange.mutate(
+      { email: emailAddress },
       {
         onSuccess: (data) => {
           onSuccess(emailAddress, data.nonce)
         },
         onError: (error) => {
-          if (
-            error.message.includes('409') ||
-            error.message.includes('duplicate')
-          ) {
+          if (error.data?.code === 'CONFLICT') {
             setShowDuplicateEmailErrorNotification(true)
           } else {
             setUnknownError(true)
@@ -98,15 +94,23 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
   }, [show])
 
   return (
-    <ResponsiveModal
+    <Dialog
       id="ChangeEmailAddressModal"
-      show={show}
+      isOpen={show}
       title={intl.formatMessage(messages.changeEmailLabel)}
       actions={[
-        <TertiaryButton key="cancel" id="modal_cancel" onClick={onClose}>
+        <Button
+          size="large"
+          type="tertiary"
+          key="cancel"
+          id="modal_cancel"
+          onClick={onClose}
+        >
           {intl.formatMessage(buttonMessages.cancel)}
-        </TertiaryButton>,
-        <PrimaryButton
+        </Button>,
+        <Button
+          size="large"
+          type="primary"
           id="continue-button"
           key="continue"
           onClick={() => {
@@ -114,18 +118,16 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
           }}
           disabled={
             !isOnline ||
-            sendVerifyCode.isPending ||
+            requestEmailChange.isPending ||
             !Boolean(emailAddress.length) ||
             isInvalidEmailAddress ||
             isEmailAddressUnchanged
           }
         >
           {intl.formatMessage(buttonMessages.continueButton)}
-        </PrimaryButton>
+        </Button>
       ]}
-      handleClose={onClose}
-      contentHeight={150}
-      contentScrollableY={true}
+      onClose={onClose}
     >
       <InputField
         id="emailAddress"
@@ -168,6 +170,6 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
           {intl.formatMessage(errorMessages.unknownErrorTitle)}
         </Toast>
       )}
-    </ResponsiveModal>
+    </Dialog>
   )
 }

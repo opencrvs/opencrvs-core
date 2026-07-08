@@ -18,6 +18,7 @@ import {
   EventState,
   FieldTypesToHideInReview,
   getDeclaration,
+  getDeclarationFields,
   isFieldDisplayedOnReview,
   ValidatorContext
 } from '@opencrvs/commons/client'
@@ -37,6 +38,7 @@ import {
   EventHistoryDocument,
   getCurrentEventStateSafe
 } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
+import { getChangedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 
 const TableHeader = styled.th`
   text-transform: uppercase;
@@ -137,22 +139,32 @@ function DeclarationComparisonTableComponent({
     eventConfiguration
   )
 
-  // `action.declaration` is extracted to be merged by applyDeclarationToEventIndex to get latest EventIndex
-  const formWithOnlyChangedValues = form ?? action?.declaration
-
-  // When form is provided, we apply it on top of the current state to get the latest declaration
-  const latestDeclaration = formWithOnlyChangedValues
-    ? applyDeclarationToEventIndex(
-        currentState,
-        formWithOnlyChangedValues,
-        eventConfiguration
-      ).declaration
-    : currentState.declaration
-
   const previousDeclaration = getCurrentEventStateSafe(
     eventBeforeUpdate,
     eventConfiguration
   ).declaration
+
+  // When `form` is provided (live correction summary), compute a clean diff and spread it over
+  // previousDeclaration. We avoid applyDeclarationToEventIndex here because it uses deepMerge
+  // internally: deepMerge skips `undefined` (cleared NUMBER fields) and cannot clear nested
+  // object sub-keys when the incoming value is an empty object (cleared ADDRESS street fields).
+  // Spreading the diff replaces each changed field wholesale, which handles both cases correctly.
+  const latestDeclaration = form
+    ? {
+        ...previousDeclaration,
+        ...getChangedDeclarationDiff(
+          getDeclarationFields(eventConfiguration),
+          form,
+          previousDeclaration,
+          eventConfiguration,
+          validatorContext
+        )
+      }
+    : applyDeclarationToEventIndex(
+        currentState,
+        action?.declaration ?? {},
+        eventConfiguration
+      ).declaration
 
   // Collect all changed review fields once
   const changedAnnotationFields = reviewFormFields

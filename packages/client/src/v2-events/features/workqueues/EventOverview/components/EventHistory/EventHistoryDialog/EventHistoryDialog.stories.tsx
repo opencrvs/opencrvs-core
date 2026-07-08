@@ -10,6 +10,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
+import { expect } from '@storybook/test'
+import { within } from '@storybook/testing-library'
 import addDays from 'date-fns/addDays'
 import {
   ActionType,
@@ -1385,5 +1387,58 @@ export const Unassigned: Story = {
       id: generateUuid(prng),
       type: ActionType.UNASSIGN
     }
+  }
+}
+
+// Regression: #13029 — Number.Output crashed with "Cannot read properties of null
+// (reading 'toString')" when a number field was cleared during an edit action.
+const editActionClearingAge = {
+  ...actionBase,
+  id: generateUuid(prng),
+  type: ActionType.EDIT,
+  declaration: { 'applicant.age': null },
+  content: {}
+}
+
+const eventWithEditClearingNumberField = {
+  id: getUUID(),
+  type: 'tennis-club-membership',
+  actions: [
+    {
+      ...actionBase,
+      id: generateUuid(prng),
+      type: ActionType.CREATE
+    },
+    {
+      ...actionBase,
+      id: generateUuid(prng),
+      type: ActionType.NOTIFY,
+      declaration: {
+        'applicant.name': { firstname: 'Jane', surname: 'Doe', middlename: '' },
+        'applicant.dobUnknown': true,
+        'applicant.age': 42,
+        'recommender.none': true
+      }
+    },
+    editActionClearingAge
+  ],
+  trackingId: 'EDIT123',
+  updatedAt: '2021-01-01',
+  createdAt: '2021-01-01'
+}
+
+export const EditClearsNumberField: Story = {
+  name: 'Edit clears a number field — shows previous value (regression: #13029)',
+  args: {
+    ...argbase,
+    title: 'Edited',
+    action: editActionClearingAge,
+    fullEvent: eventWithEditClearingNumberField
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    // Previous value must be visible in the comparison table.
+    // Before the fix, Number.Output crashed on null and this assertion times out.
+    await expect(canvas.findByText('42')).resolves.toBeInTheDocument()
   }
 }

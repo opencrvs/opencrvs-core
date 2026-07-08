@@ -30,7 +30,8 @@ import { partition } from 'lodash'
 import React from 'react'
 import superjson from 'superjson'
 import { getUUID } from '@opencrvs/commons/client'
-import { getToken } from '@client/utils/authUtils'
+import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
+import { CACHE_VERSION } from '@client/utils/constants'
 import { storage } from '@client/storage'
 
 const { TRPCProvider: TRPCProviderRaw, useTRPC } =
@@ -49,7 +50,8 @@ function getTrpcClient() {
         httpLink({
           url: '/api/events',
           transformer: superjson,
-          headers() {
+          async headers() {
+            await ensureFreshAccessToken()
             return {
               authorization: `Bearer ${getToken()}`
             }
@@ -67,7 +69,8 @@ function getTrpcClient() {
         url: '/api/events',
         transformer: superjson,
         methodOverride: 'POST',
-        headers() {
+        async headers() {
+          await ensureFreshAccessToken()
           return {
             authorization: `Bearer ${getToken()}`
           }
@@ -204,9 +207,15 @@ export function TRPCProvider({
       client={queryClient}
       persistOptions={{
         persister: createIDBPersister(storeIdentifier),
-        buster: 'persisted-indexed-db',
+        buster: `persisted-indexed-db-v${CACHE_VERSION}`,
         maxAge: Infinity,
         dehydrateOptions: {
+          shouldDehydrateQuery: (query) => {
+            if (query.meta?.noCache === true) {
+              return false
+            }
+            return query.state.status === 'success'
+          },
           shouldDehydrateMutation: (mutation) => {
             if (mutation.state.status === 'error') {
               const error = mutation.state.error

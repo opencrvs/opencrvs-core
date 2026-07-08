@@ -27,7 +27,7 @@ filter:
         rule.name.keyword:
           value: 'Error in service'
 
-alert: 
+alert:
   - ${NOTIFICATION_TYPE}
 
 email:
@@ -40,11 +40,10 @@ http_post2_payload:
   from: '{% raw %}{{SENDER_EMAIL_ADDRESS}}{% endraw %}'
   to: '{% raw %}{{ALERT_EMAIL}}{% endraw %}'
 
-
 # New way to define alerting action with more flexible templating:
-alert_subject: "${DOMAIN}: {{event.kind}}: {{rule.name}} {{kibana.alert.context.apm__error_rate.serviceName}} 🚨"
+alert_subject: '${DOMAIN}: {{event.kind}}: {{rule.name}} {{kibana.alert.context.apm__error_rate.serviceName}} 🚨'
 alert_text_type: alert_text_jinja
-email_format: "html"
+email_format: 'html'
 
 alert_text: |
   <p>Reason: {{kibana.alert.context.logs__alert__document__count.conditions}}.</p>

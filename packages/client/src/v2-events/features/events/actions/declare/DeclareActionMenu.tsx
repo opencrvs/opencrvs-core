@@ -19,9 +19,10 @@ import {
   getCurrentEventState,
   getActionReview,
   getAvailableActionsForEvent,
-  getActionConfig
+  getActionConfig,
+  isValidIcon
 } from '@opencrvs/commons/client'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { Icon } from '@opencrvs/components'
@@ -81,6 +82,11 @@ function useDeclarationActions(event: EventDocument) {
     actionType: ActionType.DECLARE
   })
 
+  const notifyActionConfig = getActionConfig({
+    eventConfiguration,
+    actionType: ActionType.NOTIFY
+  })
+
   const dialogCopy =
     actionConfig && 'dialogCopy' in actionConfig
       ? actionConfig.dialogCopy
@@ -89,7 +95,7 @@ function useDeclarationActions(event: EventDocument) {
   const actions = {
     [ActionType.NOTIFY]: {
       mutate: events.actions.notify.mutate,
-      supportingCopy: dialogCopy?.notify,
+      supportingCopy: notifyActionConfig?.supportingCopy ?? dialogCopy?.notify,
       title: {
         id: 'review.declare.incomplete.confirmModal.title',
         defaultMessage: 'Notify the {event}?',
@@ -193,7 +199,9 @@ function useDeclarationActions(event: EventDocument) {
         disabled: hasValidationErrors
       },
       {
-        icon: actionIcons[ActionType.DECLARE],
+        icon: isValidIcon(notifyActionConfig?.icon)
+          ? notifyActionConfig.icon
+          : actionIcons[ActionType.DECLARE],
         label: actionLabels[ActionType.NOTIFY],
         onClick: async () => handleDeclaration(ActionType.NOTIFY),
         hidden:
@@ -232,13 +240,13 @@ export function DeclareActionMenu({ event }: { event: EventDocument }) {
     <>
       <DropdownMenu id="action">
         <DropdownMenu.Trigger asChild>
-          <PrimaryButton
+          <Button
             data-testid="action-dropdownMenu"
-            icon={() => <CaretDown />}
             size="medium"
+            type="primary"
           >
-            {intl.formatMessage(messages.action)}
-          </PrimaryButton>
+            {intl.formatMessage(messages.action)} <CaretDown />
+          </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
           {actions.map(({ onClick, icon, label, disabled }, index) => (

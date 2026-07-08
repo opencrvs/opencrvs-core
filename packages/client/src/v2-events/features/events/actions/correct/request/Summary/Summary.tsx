@@ -24,15 +24,19 @@ import {
   getCurrentEventState,
   ActionType
 } from '@opencrvs/commons/client'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Content } from '@opencrvs/components/lib/Content'
-import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
-import { SecondaryButton } from '@opencrvs/components/lib/buttons'
+import {
+  Button,
+  Content,
+  Dialog,
+  Text,
+  AppBar,
+  Frame,
+  Icon
+} from '@opencrvs/components'
 import { Check } from '@opencrvs/components/lib/icons'
-import { Text } from '@opencrvs/components/lib/Text'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
+import { constantsMessages } from '@client/i18n/messages'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
@@ -41,7 +45,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
-import { hasDeclarationFieldChanged } from '../../utils'
+import { getChangedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { CorrectionDetails } from './CorrectionDetails'
 
 const messages = defineMessages({
@@ -104,21 +108,12 @@ export function Summary() {
   const userMayCorrect = isActionAllowed(ActionType.APPROVE_CORRECTION)
 
   const submitCorrection = React.useCallback(() => {
-    const formWithOnlyChangedValues = Object.fromEntries(
-      Object.entries(form).filter(([key]) => {
-        const field = fields.find((f) => f.id === key)
-        if (!field) {
-          return false
-        }
-
-        return hasDeclarationFieldChanged(
-          field,
-          form,
-          previousFormValues,
-          eventConfiguration,
-          validatorContext
-        )
-      })
+    const formWithOnlyChangedValues = getChangedDeclarationDiff(
+      fields,
+      form,
+      previousFormValues,
+      eventConfiguration,
+      validatorContext
     )
 
     const valuesThatGotHidden = fields.filter((field) => {
@@ -179,14 +174,59 @@ export function Summary() {
     backTo
   ])
 
+  const title = intl.formatMessage(correctionMessages.title)
+
   return (
     <>
-      <ActionPageLight
-        hideBackground
-        goBack={() => navigate(-1)}
-        goHome={() => eventFormNavigation.closeActionView(backTo)}
+      <Frame
+        header={
+          <AppBar
+            desktopLeft={
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={() => navigate(-1)}
+              >
+                <Icon name="ArrowLeft" />
+              </Button>
+            }
+            desktopRight={
+              <Button
+                size="medium"
+                type="icon"
+                onClick={() => eventFormNavigation.closeActionView(backTo)}
+              >
+                <Icon color="primary" name="X" />
+              </Button>
+            }
+            desktopTitle={title}
+            mobileLeft={
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={() => navigate(-1)}
+              >
+                <Icon name="ArrowLeft" />
+              </Button>
+            }
+            mobileRight={
+              <Button
+                size="medium"
+                type="icon"
+                onClick={() => eventFormNavigation.closeActionView(backTo)}
+              >
+                <Icon color="primary" name="X" />
+              </Button>
+            }
+            mobileTitle={title}
+          />
+        }
         id="corrector_form"
-        title={intl.formatMessage(correctionMessages.title)}
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
       >
         <Content
           bottomActionButtons={[
@@ -207,9 +247,10 @@ export function Summary() {
           showTitleOnMobile={true}
           title={intl.formatMessage(correctionMessages.correctionSummaryTitle)}
           topActionButtons={[
-            <SecondaryButton
+            <Button
               key="go-to-review"
               id="go-to-review"
+              type="secondary"
               onClick={() =>
                 navigate(
                   ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
@@ -222,7 +263,7 @@ export function Summary() {
               }
             >
               {intl.formatMessage(registerMessages.goToReviewButton)}
-            </SecondaryButton>
+            </Button>
           ]}
         >
           <CorrectionDetails
@@ -235,7 +276,7 @@ export function Summary() {
             validatorContext={validatorContext}
           />
         </Content>
-      </ActionPageLight>
+      </Frame>
       <Dialog
         actions={[
           <Button
@@ -253,7 +294,7 @@ export function Summary() {
             key="continue"
             id="send"
             size="medium"
-            type="positive"
+            type="primary"
             onClick={submitCorrection}
           >
             {intl.formatMessage(

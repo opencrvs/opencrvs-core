@@ -10,7 +10,6 @@ Helm chart does deployment of OpenCRVS dependencies including monitoring stack. 
   - Elasticsearch
   - Redis
   - MinIO
-  - InfluxDB
 - Observability (Monitoring and Logging):
   - Kibana
   - Logstash
@@ -101,9 +100,9 @@ This section allows you to configure the deployment and authentication settings 
 | enabled                 | boolean | true                  | Enable or disable the Elasticsearch deployment.                                                                                              |
 | use_default_credentials | boolean | true                  | Deploy Elasticsearch without enabled authentication.                                                                                         |
 | storage_type            | string  | `pvc`                 | Kubernetes storage type, available options are `pvc` or `host_path`. More information are at [Storage Configuration](#storage-configuration) |
-| pvc.storage_class | string | `n/a` | StorageClass name used for dynamic volume provisioning |
-| pvc.storage_size | string | 10Gi | Persistent volume claim size for Postgres data volume |
-| pvc.access_mode | string | ReadWriteOnce | Kubernetes PVC access mode |
+| pvc.storage_class       | string  | `n/a`                 | StorageClass name used for dynamic volume provisioning                                                                                       |
+| pvc.storage_size        | string  | 10Gi                  | Persistent volume claim size for Postgres data volume                                                                                        |
+| pvc.access_mode         | string  | ReadWriteOnce         | Kubernetes PVC access mode                                                                                                                   |
 | host_data_path          | string  | `/data/elasticsearch` | Path to persistent data on VM (host)                                                                                                         |
 | node_selector           | dict    | `{}`                  | Label selector for datastore nodes, usually used to keep data persistent                                                                     |
 
@@ -116,9 +115,9 @@ This section allows you to configure the deployment and authentication settings 
 | enabled                 | bool   | true                            | Enable or disable minio service                                                                                                              |
 | use_default_credentials | bool   | true                            | Default credentials for MinIO are username `minioadmin` and password `minioadmin`.                                                           |
 | storage_type            | string | `pvc`                           | Kubernetes storage type, available options are `pvc` or `host_path`. More information are at [Storage Configuration](#storage-configuration) |
-| pvc.storage_class | string | `n/a` | StorageClass name used for dynamic volume provisioning |
-| pvc.storage_size | string | 10Gi | Persistent volume claim size for Postgres data volume |
-| pvc.access_mode | string | ReadWriteOnce | Kubernetes PVC access mode |
+| pvc.storage_class       | string | `n/a`                           | StorageClass name used for dynamic volume provisioning                                                                                       |
+| pvc.storage_size        | string | 10Gi                            | Persistent volume claim size for Postgres data volume                                                                                        |
+| pvc.access_mode         | string | ReadWriteOnce                   | Kubernetes PVC access mode                                                                                                                   |
 | host_data_path          | string | `/data/minio`                   | Path to persistent data on VM (host)                                                                                                         |
 | node_selector           | dict   | `{}`                            | Label selector for datastore nodes, usually used to keep data persistent                                                                     |
 | backup.{}               | dict   | `{}`                            | Backup configuration section, for more information please check `values.yaml` and **Backup section** in this README                          |
@@ -242,16 +241,9 @@ If you need any specific configuration for ACL (read-only, command limit, etc) p
 
 More details about ACL support can be found at https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/
 
-## InfluxDB
-
-| Key               | Type    | Example | Description                                           |
-| ----------------- | ------- | ------- | ----------------------------------------------------- |
-| enabled           | boolean | true    | Enable or disable the Elasticsearch deployment.       |
-| data_storage_size | string  | 5Gi     | Persistent volume claim size for InfluxDB data volume |
-
 ## Storage Configuration
 
-This chart supports flexible data persistence for **Elasticsearch, MongoDB, Postgres, MinIO, and InfluxDB**.  
+This chart supports flexible data persistence for **Elasticsearch, MongoDB, Postgres, and MinIO**.  
 You control persistence using the `storage_type` option, which can be set **globally** (`storage_type`) or per datastore (e.g. `elasticsearch.storage_type`).
 
 - **`storage_type`**, available options:
@@ -272,10 +264,10 @@ You control persistence using the `storage_type` option, which can be set **glob
 
 ```yaml
 elasticsearch:
-  storage_type: pvc  # Not required; pvc is default
+  storage_type: pvc # Not required; pvc is default
   pvc:
     storage_size: 5Gi
-    storage_class: "azurefile-premium" # Optional: specify a StorageClass or leave as "" for default
+    storage_class: 'azurefile-premium' # Optional: specify a StorageClass or leave as "" for default
 ```
 
 #### Use hostPath for MinIO data (legacy volumes, on-prem, etc):
@@ -320,10 +312,10 @@ elasticsearch:
 
 ### Elastalert
 
-
 **Notifications**
 
 ElastAlert supports two notification delivery methods configured through [values.yaml](./values.yaml):
+
 - `email`: Sends alerts directly to an SMTP server.
 - `post2`: Sends alerts via HTTP POST to an countryconfig service. This mode is provided for backward compatibility with Docker Swarm deployments where alerts are routed through CountryConfig.
 
@@ -334,7 +326,6 @@ elastalert:
   env:
     NOTIFICATION_TYPE: post2
 ```
-
 
 When using `post2`, configure the target endpoint, see example:
 
@@ -359,7 +350,6 @@ When `NOTIFICATION_TYPE` is set to `email`, ElastAlert requires an SMTP credenti
 | `SMTP_SECURE`          | Enables secure SMTP connection (`true` or `false`). |
 
 Refer to the `values.yaml` file for the complete configuration example.
-
 
 **Custom rules**
 
@@ -475,7 +465,6 @@ Supported datastores:
 - MongoDB
 - PostgreSQL
 - MinIO
-- InfluxDB
 
 Each datastore has its own backup job, configured as a Kubernetes `CronJob`.
 Backup settings are defined in the `backup` section of the chart values.

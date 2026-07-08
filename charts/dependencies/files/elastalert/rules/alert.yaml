@@ -35,7 +35,7 @@ filter:
               value: 'Low on available disk space in data partition'
       minimum_should_match: 1
 
-alert: 
+alert:
   - ${NOTIFICATION_TYPE}
 
 email:
@@ -48,11 +48,10 @@ http_post2_payload:
   from: '{% raw %}{{SENDER_EMAIL_ADDRESS}}{% endraw %}'
   to: '{% raw %}{{ALERT_EMAIL}}{% endraw %}'
 
-
 # New way to define alerting action with more flexible templating:
-alert_subject: "${DOMAIN}: {{kibana.alert.context.metrics__alert__inventory__threshold.alertState}}: {{rule.name}} 🚨"
+alert_subject: '${DOMAIN}: {{kibana.alert.context.metrics__alert__inventory__threshold.alertState}}: {{rule.name}} 🚨'
 alert_text_type: alert_text_jinja
-email_format: "html"
+email_format: 'html'
 
 alert_text: |
   <p>Reason: {{kibana.alert.context.metrics__alert__inventory__threshold.reason}}.</p>

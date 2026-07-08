@@ -251,6 +251,10 @@ const NumberField = BaseField.extend({
     .object({
       min: z.number().optional().describe('Minimum value'),
       max: z.number().optional().describe('Maximum value'),
+      integer: z
+        .boolean()
+        .optional()
+        .describe('When true, only whole numbers are allowed'),
       prefix: TranslationConfig.optional(),
       postfix: TranslationConfig.optional()
     })

@@ -1250,6 +1250,160 @@ describe('correction requests', () => {
     expect(applicantName.firstname).toBe('Jane')
     expect(applicantName.surname).toBe('Smith')
   })
+
+  test('APPROVE_CORRECTION by a different user updates updatedBy/updatedAt to the reviewer', () => {
+    const ro = {
+      id: 'ro-user-id',
+      role: 'REGISTRATION_AGENT',
+      location: getUUID()
+    }
+    const registrar = {
+      id: 'registrar-user-id',
+      role: 'LOCAL_REGISTRAR',
+      location: getUUID()
+    }
+
+    const correctionRequestAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.REQUEST_CORRECTION,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2025-01-23T02:21:41.206Z',
+        createdBy: ro.id,
+        createdByRole: ro.role,
+        createdByUserType: TokenUserType.enum.user,
+        createdAtLocation: ro.location
+      }
+    })
+
+    const approveCorrectionAction = {
+      ...generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.APPROVE_CORRECTION,
+        defaults: {
+          status: ActionStatus.Accepted,
+          createdAt: '2025-01-23T02:21:42.230Z',
+          createdBy: registrar.id,
+          createdByRole: registrar.role,
+          createdByUserType: TokenUserType.enum.user,
+          createdAtLocation: registrar.location
+        }
+      }),
+      requestId: correctionRequestAction.id
+    }
+
+    const event = {
+      type: TENNIS_CLUB_MEMBERSHIP,
+      id: generateUuid(),
+      trackingId: 'TEST12',
+      createdAt: '2025-01-23T02:21:38.343Z',
+      updatedAt: '2025-01-23T02:21:42.230Z',
+      actions: [
+        generateActionDocument({
+          configuration: tennisClubMembershipEvent,
+          action: ActionType.CREATE,
+          defaults: {
+            status: ActionStatus.Accepted,
+            createdAt: '2025-01-23T02:21:38.343Z'
+          }
+        }),
+        generateActionDocument({
+          configuration: tennisClubMembershipEvent,
+          action: ActionType.REGISTER,
+          defaults: {
+            status: ActionStatus.Accepted,
+            createdAt: '2025-01-23T02:21:40.182Z'
+          }
+        }),
+        correctionRequestAction,
+        approveCorrectionAction
+      ]
+    }
+
+    const state = getCurrentEventState(event, tennisClubMembershipEvent)
+
+    expect(state.updatedBy).toBe(registrar.id)
+    expect(state.updatedAt).toBe(approveCorrectionAction.createdAt)
+    expect(state.updatedAtLocation).toBe(registrar.location)
+    expect(state.updatedByUserRole).toBe(registrar.role)
+  })
+
+  test('REJECT_CORRECTION by a different user updates updatedBy/updatedAt to the reviewer', () => {
+    const ro = {
+      id: 'ro-user-id',
+      role: 'REGISTRATION_AGENT',
+      location: getUUID()
+    }
+    const registrar = {
+      id: 'registrar-user-id',
+      role: 'LOCAL_REGISTRAR',
+      location: getUUID()
+    }
+
+    const correctionRequestAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.REQUEST_CORRECTION,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2025-01-23T02:21:41.206Z',
+        createdBy: ro.id,
+        createdByRole: ro.role,
+        createdByUserType: TokenUserType.enum.user,
+        createdAtLocation: ro.location
+      }
+    })
+
+    const rejectCorrectionAction = {
+      ...generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.REJECT_CORRECTION,
+        defaults: {
+          status: ActionStatus.Accepted,
+          createdAt: '2025-01-23T02:21:42.230Z',
+          createdBy: registrar.id,
+          createdByRole: registrar.role,
+          createdByUserType: TokenUserType.enum.user,
+          createdAtLocation: registrar.location
+        }
+      }),
+      requestId: correctionRequestAction.id
+    }
+
+    const event = {
+      type: TENNIS_CLUB_MEMBERSHIP,
+      id: generateUuid(),
+      trackingId: 'TEST12',
+      createdAt: '2025-01-23T02:21:38.343Z',
+      updatedAt: '2025-01-23T02:21:42.230Z',
+      actions: [
+        generateActionDocument({
+          configuration: tennisClubMembershipEvent,
+          action: ActionType.CREATE,
+          defaults: {
+            status: ActionStatus.Accepted,
+            createdAt: '2025-01-23T02:21:38.343Z'
+          }
+        }),
+        generateActionDocument({
+          configuration: tennisClubMembershipEvent,
+          action: ActionType.REGISTER,
+          defaults: {
+            status: ActionStatus.Accepted,
+            createdAt: '2025-01-23T02:21:40.182Z'
+          }
+        }),
+        correctionRequestAction,
+        rejectCorrectionAction
+      ]
+    }
+
+    const state = getCurrentEventState(event, tennisClubMembershipEvent)
+
+    expect(state.updatedBy).toBe(registrar.id)
+    expect(state.updatedAt).toBe(rejectCorrectionAction.createdAt)
+    expect(state.updatedAtLocation).toBe(registrar.location)
+    expect(state.updatedByUserRole).toBe(registrar.role)
+  })
 })
 
 describe('address state transitions', () => {

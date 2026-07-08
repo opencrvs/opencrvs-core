@@ -15,9 +15,9 @@ import { createTestClient, setupTestCase } from '@events/tests/utils'
 // code is always the default one
 const VERIFY_CODE = '000000'
 
-async function sendVerifyCode(client: ReturnType<typeof createTestClient>) {
-  const { nonce } = await client.user.sendVerifyCode({
-    notificationEvent: 'change-phone-number'
+async function requestPhoneChange(client: ReturnType<typeof createTestClient>) {
+  const { nonce } = await client.user.requestPhoneChange({
+    phoneNumber: '0700000001'
   })
   return nonce
 }
@@ -26,7 +26,7 @@ describe('user.changePhone', () => {
   test('updates the phone number when given a number in local format', async () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user)
-    const nonce = await sendVerifyCode(client)
+    const nonce = await requestPhoneChange(client)
 
     // Matches the PHONE_NUMBER_PATTERN (^01[1-9][0-9]{8}$) served by the
     // mocked country config
@@ -46,7 +46,7 @@ describe('user.changePhone', () => {
   test('rejects a phone number in international (MSISDN) format', async () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user)
-    const nonce = await sendVerifyCode(client)
+    const nonce = await requestPhoneChange(client)
 
     await expect(
       client.user.changePhone({
@@ -64,7 +64,7 @@ describe('user.changePhone', () => {
   test('rejects a phone number that does not match the configured pattern', async () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user)
-    const nonce = await sendVerifyCode(client)
+    const nonce = await requestPhoneChange(client)
 
     await expect(
       client.user.changePhone({
@@ -79,7 +79,7 @@ describe('user.changePhone', () => {
   test('rejects an incorrect verification code', async () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user)
-    const nonce = await sendVerifyCode(client)
+    const nonce = await requestPhoneChange(client)
 
     await expect(
       client.user.changePhone({
@@ -94,7 +94,7 @@ describe('user.changePhone', () => {
   test("cannot change another user's phone number", async () => {
     const { user, users } = await setupTestCase()
     const client = createTestClient(user)
-    const nonce = await sendVerifyCode(client)
+    const nonce = await requestPhoneChange(client)
 
     await expect(
       client.user.changePhone({

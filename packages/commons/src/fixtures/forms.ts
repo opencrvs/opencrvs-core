@@ -720,6 +720,11 @@ export const TENNIS_CLUB_DECLARATION_REVIEW = {
         id: 'signature.upload.modal.title',
         defaultMessage: 'Draw signature',
         description: 'Title for the modal to draw signature'
+      },
+      // Zod applies the schema default at parse time, but this fixture bypasses
+      // parsing — GeneratedInputField accesses configuration.maxFileSize directly.
+      configuration: {
+        maxFileSize: 5 * 1024 * 1024
       }
     }
   ]

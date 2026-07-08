@@ -29,7 +29,12 @@ import { usePermissions } from '@client/hooks/useAuthorization'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'querystring'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { AdministrativeArea, Location, UUID } from '@opencrvs/commons/client'
+import {
+  AdministrativeArea,
+  getAdministrativeAreaHierarchy,
+  Location,
+  UUID
+} from '@opencrvs/commons/client'
 import { useAdministrativeAreas } from '../../v2-events/hooks/useAdministrativeAreas'
 
 const DEFAULT_PAGINATION_LIST_SIZE = 10
@@ -85,24 +90,15 @@ export function AdministrativeLevels() {
     ]
 
     if (currentlySelectedLocationId) {
-      let currentLocationId: UUID | null = currentlySelectedLocationId
-      const locationBreadCrumb: IBreadCrumbData[] | null = []
-      do {
-        const currentOffice = locations.get(currentLocationId)
+      const locationBreadCrumb: IBreadCrumbData[] =
+        getAdministrativeAreaHierarchy(
+          currentlySelectedLocationId,
+          administrativeAreas
+        )
+          .reverse()
+          .map((area) => ({ label: area.name, paramId: area.id }))
 
-        if (currentOffice) {
-          locationBreadCrumb.push({
-            label: currentOffice.name,
-            paramId: currentOffice.id
-          })
-
-          currentLocationId = currentOffice.administrativeAreaId
-        } else {
-          currentLocationId = null
-        }
-      } while (currentLocationId !== null)
-
-      dataOfBreadCrumb = [...dataOfBreadCrumb, ...locationBreadCrumb.reverse()]
+      dataOfBreadCrumb = [...dataOfBreadCrumb, ...locationBreadCrumb]
     }
 
     return {
@@ -112,7 +108,6 @@ export function AdministrativeLevels() {
   }
 
   const dataLocations = getNewLevel(UUID.safeParse(locationId).data ?? null)
-
   const totalNumber = dataLocations.childLocations.length
   const [currentPageNumber, setCurrentPageNumber] = React.useState<number>(1)
 

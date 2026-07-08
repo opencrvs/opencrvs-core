@@ -21,7 +21,7 @@ helm upgrade --install traefik oci://ghcr.io/traefik/helm/traefik \
 
 **2. Install the OpenCRVS Dependencies Chart (Database & Storage Components)**
 
-OpenCRVS requires supporting services (MongoDB, Postgres, MinIO, InfluxDB, Elasticsearch, Redis):
+OpenCRVS requires supporting services (MongoDB, Postgres, MinIO, Elasticsearch, Redis):
 
 ```
 helm upgrade --install opencrvs-deps oci://ghcr.io/opencrvs/opencrvs-dependencies-chart \
@@ -119,26 +119,6 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>elasticsearch.urls_secret</td>
             <td>elasticsearch-opencrvs-urls</td>
             <td>Secret to store Elasticsearch URLs with usernames and passwords. Secret is created by OpenCRVS installation automatically with <code>auth_mode: auto</code> and needs to be created manually by Operator (DevOps) with <code>auth_mode: managed</code> or <code>use_secret</code>. For more information how to create secret manually please check <a href="#authentication-configuration">Authentication configuration</a> section.</td>
-        </tr>
-       <tr>
-            <th>influxdb.{}</th>
-            <th></th>
-            <th></th>
-        </tr>
-        <tr>
-            <td>influxdb.host</td>
-            <td>influxdb-0.influxdb.opencrvs-deps-dev.svc.cluster.local</td>
-            <td>InfluxDB hostname configuration.</td>
-        </tr>
-        <tr>
-            <td>influxdb.port</td>
-            <td>8086</td>
-            <td>InfluxDB port configuration.</td>
-        </tr>
-        <tr>
-            <td>influxdb.db</td>
-            <td>ocrvs</td>
-            <td>InfluxDB database name.</td>
         </tr>
        <tr>
             <th>minio.{}</th>
@@ -701,7 +681,6 @@ Summary:
    apiVersion: v1
    data:
      ES_HOST: dXNlcjpyYW5kb21wYXNzQGVsYXN0aWNzZWFyY2g6OTIwMA==
-   ...
    ```
 4. Map variable in your helm chart `values.yaml` file:
    ```yaml
@@ -709,7 +688,6 @@ Summary:
      secrets:
        elasticsearch-secret:
          - ES_HOST
-   ...
    ```
 5. Redeploy service with `helm upgrade`
 
@@ -887,13 +865,12 @@ The generated credentials can be accessed from the `elasticsearch-opencrvs-users
 Helm chart has following pre-install/upgrade hooks:
 
 - elasticsearch-on-deploy: create elasticsearch users and configure permissions, see `elasticsearch` configuration options for more details how to configure users and permissions
-- influxdb-on-deploy: create database
 - mongo-on-deploy: create databases and users with correct permissions, see `mongodb` configuration options for more details how to configure users and permissions
 - postgres-on-deploy: create database, schemas and users with correct permissions
 
 Helm chart has following post-install/upgrade hooks:
 
-- data-migration: apply data migrations to postgres, mongodb, influxdb
+- data-migration: apply data migrations to postgres, mongodb
 - data-migration-analytics: apply data migrations to postgres, this hook use Countryconfig assets docker image, see documentation on how to create own analytics dashboards.
 - data-seed: initial data seed, runs only on post-install
 - elasticsearch-reindex: reindex data after deployment

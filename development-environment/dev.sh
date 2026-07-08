@@ -52,7 +52,6 @@ done
 dirs=(
   "data/elasticsearch"
   "data/mongo"
-  "data/influxdb"
   "data/minio"
   "data/backups"
   "data/postgres"
@@ -108,7 +107,7 @@ fi
 
 
 echo
-openCRVSPorts=( 3447 9200 27017 6379 8086 4444 3040 5050 2020 7070 1050 3030 3000 3020 2525 2021 3535 3536 9050)
+openCRVSPorts=( 3447 9200 27017 6379 4444 3040 5050 2020 7070 1050 3030 3000 3020 2525 2021 3535 3536 9050)
 for x in "${openCRVSPorts[@]}"
 do
    :

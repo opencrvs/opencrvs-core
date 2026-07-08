@@ -102,15 +102,18 @@ export function getActionConfig({
   actionType: DisplayableAction
   customActionType?: string
 }): ActionConfig | undefined {
+  // Notify uses its own config when present, otherwise falls back to declare
+  if (actionType === ActionType.NOTIFY) {
+    return (
+      eventConfiguration.actions.find((a) => a.type === ActionType.NOTIFY) ??
+      eventConfiguration.actions.find((a) => a.type === ActionType.DECLARE)
+    )
+  }
+
   return eventConfiguration.actions.find((a) => {
     // We can have multiple custom actions configured, we specify the custom action with 'customActionType'
     if (a.type === ActionType.CUSTOM && customActionType) {
       return a.customActionType === customActionType
-    }
-
-    // Notify uses the declare action config
-    if (actionType === ActionType.NOTIFY) {
-      return a.type === ActionType.DECLARE
     }
 
     // For correction approval/rejection, we use the correction request action config
@@ -166,7 +169,7 @@ export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
     return actionConfig.form
   }
 
-  if ('review' in actionConfig) {
+  if ('review' in actionConfig && actionConfig.review != null) {
     return actionConfig.review.fields
   }
 

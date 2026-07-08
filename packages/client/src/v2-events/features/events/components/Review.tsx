@@ -18,10 +18,9 @@ import { CountryLogo } from '@opencrvs/components/lib/icons'
 import {
   Accordion,
   Button,
-  Checkbox,
   Link,
   ListReview,
-  ResponsiveModal,
+  Dialog,
   Stack,
   Text,
   TextArea
@@ -175,11 +174,6 @@ const reviewMessages = defineMessages({
     defaultMessage: 'Government',
     description: 'Header title that shows govt name'
   },
-  rejectModalArchive: {
-    id: 'rejectModal.archive',
-    defaultMessage: 'Archive',
-    description: 'The label for archive button of reject modal'
-  },
   rejectModalSendForUpdate: {
     id: 'rejectModal.sendForUpdate',
     defaultMessage: 'Send For Update',
@@ -189,11 +183,6 @@ const reviewMessages = defineMessages({
     id: 'rejectModal.title',
     defaultMessage: 'Reason for rejection?',
     description: 'The title for reject modal'
-  },
-  rejectModalMarkAsDuplicate: {
-    id: 'rejectModal.markAsDuplicate',
-    defaultMessage: 'Mark as a duplicate',
-    description: 'The label for mark as duplicate checkbox of reject modal'
   },
   annotationsTitle: {
     id: 'review.annotations.title',
@@ -238,6 +227,7 @@ function FormReview({
   readonlyMode,
   isCorrection = false,
   isReviewCorrection = false,
+  treatMissingValuesAsCleared = false,
   validatorContext
 }: {
   formConfig: FormConfig
@@ -249,6 +239,7 @@ function FormReview({
   readonlyMode?: boolean
   isCorrection?: boolean
   isReviewCorrection?: boolean
+  treatMissingValuesAsCleared?: boolean
 }) {
   const intl = useIntl()
 
@@ -268,6 +259,13 @@ function FormReview({
               const value = form[field.id]
               const previousValue = previousForm[field.id]
 
+              const displayValue =
+                treatMissingValuesAsCleared &&
+                value === undefined &&
+                previousValue !== undefined
+                  ? null
+                  : value
+
               // previousForm, formConfig are used to find previous values with the same label if required
               const valueDisplay = (
                 <Output
@@ -278,7 +276,7 @@ function FormReview({
                   showPreviouslyMissingValuesAsChanged={
                     showPreviouslyMissingValuesAsChanged
                   }
-                  value={value}
+                  value={displayValue}
                 />
               )
 
@@ -440,6 +438,7 @@ function ReviewComponent({
   reviewFields,
   isCorrection = false,
   isReviewCorrection = false,
+  treatMissingValuesAsCleared = false,
   banner
 }: {
   children?: React.ReactNode
@@ -463,6 +462,7 @@ function ReviewComponent({
   readonlyMode?: boolean
   isCorrection?: boolean
   isReviewCorrection?: boolean
+  treatMissingValuesAsCleared?: boolean
   banner?: React.ReactNode
 }) {
   const intl = useIntl()
@@ -507,6 +507,7 @@ function ReviewComponent({
             showPreviouslyMissingValuesAsChanged={
               showPreviouslyMissingValuesAsChanged
             }
+            treatMissingValuesAsCleared={treatMissingValuesAsCleared}
             validatorContext={validatorContext}
             onEdit={onEdit}
           />
@@ -604,9 +605,8 @@ function EditModal({
 }) {
   const intl = useIntl()
   return (
-    <ResponsiveModal
-      autoHeight
-      showHeaderBorder
+    <Dialog
+      isOpen
       actions={[
         <Button
           key="cancel_edit"
@@ -631,10 +631,8 @@ function EditModal({
           )}
         </Button>
       ]}
-      handleClose={() => close(null)}
-      responsive={false}
-      show={true}
       title={intl.formatMessage(copy?.title || reviewMessages.changeModalTitle)}
+      onClose={() => close(null)}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
@@ -643,7 +641,7 @@ function EditModal({
           )}
         </Text>
       </Stack>
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 
@@ -665,9 +663,8 @@ function AcceptActionModal({
   const intl = useIntl()
 
   return (
-    <ResponsiveModal
-      autoHeight
-      show
+    <Dialog
+      isOpen
       actions={[
         <Button
           key={'cancel_' + action}
@@ -690,10 +687,10 @@ function AcceptActionModal({
           {intl.formatMessage(copy.onConfirm)}
         </Button>
       ]}
-      handleClose={() => close(null)}
-      showHeaderBorder={!!copy.supportingCopy}
       title={intl.formatMessage(copy.title, { event: eventType })}
+      variant="large"
       width={600}
+      onClose={() => close(null)}
     >
       <Stack>
         {copy.supportingCopy && (
@@ -705,36 +702,18 @@ function AcceptActionModal({
           />
         )}
       </Stack>
-    </ResponsiveModal>
+    </Dialog>
   )
-}
-
-export const REJECT_ACTIONS = {
-  ARCHIVE: 'ARCHIVE',
-  SEND_FOR_UPDATE: 'SEND_FOR_UPDATE'
-} as const
-
-export interface RejectionState {
-  rejectAction: keyof typeof REJECT_ACTIONS
-  message: string
-  isDuplicate: boolean
 }
 
 function RejectActionModal({
   close,
-  allowArchive = true,
   supportingCopy
 }: {
-  close: (result: RejectionState | null) => void
-  allowArchive?: boolean
+  close: (result: string | null) => void
   supportingCopy?: MessageDescriptor
 }) {
-  const [state, setState] = useState<RejectionState>({
-    rejectAction: REJECT_ACTIONS.ARCHIVE,
-    message: '',
-    isDuplicate: false
-  })
-
+  const [message, setMessage] = useState<string>('')
   const intl = useIntl()
 
   const actions = [
@@ -748,34 +727,13 @@ function RejectActionModal({
     >
       {intl.formatMessage(buttonMessages.cancel)}
     </Button>,
-    ...(allowArchive
-      ? [
-          <Button
-            key="confirm_reject_with_archive"
-            disabled={!state.message}
-            id="confirm_reject_with_archive"
-            type="secondaryNegative"
-            onClick={() => {
-              close({
-                ...state,
-                rejectAction: REJECT_ACTIONS.ARCHIVE
-              })
-            }}
-          >
-            {intl.formatMessage(reviewMessages.rejectModalArchive)}
-          </Button>
-        ]
-      : []),
     <Button
       key="confirm_reject_with_update"
-      disabled={!state.message || state.isDuplicate}
+      disabled={!message}
       id="confirm_reject_with_update"
       type="negative"
       onClick={() => {
-        close({
-          ...state,
-          rejectAction: REJECT_ACTIONS.SEND_FOR_UPDATE
-        })
+        close(message)
       }}
     >
       {intl.formatMessage(reviewMessages.rejectModalSendForUpdate)}
@@ -783,15 +741,14 @@ function RejectActionModal({
   ]
 
   return (
-    <ResponsiveModal
-      showHeaderBorder
+    <Dialog
+      isOpen
       actions={actions}
-      contentHeight={270}
-      handleClose={() => close(null)}
       id="reject-modal"
-      show={true}
       title={intl.formatMessage(reviewMessages.rejectModalTitle)}
-      width={918}
+      variant="large"
+      width={700}
+      onClose={() => close(null)}
     >
       <Stack alignItems="left" direction="column">
         <Text color="grey500" element="p" variant="reg16">
@@ -800,22 +757,11 @@ function RejectActionModal({
         <TextArea
           data-testid="reject-reason"
           required={true}
-          value={state.message}
-          onChange={(e) =>
-            setState((prev) => ({ ...prev, message: e.target.value }))
-          }
-        />
-        <Checkbox
-          label={intl.formatMessage(reviewMessages.rejectModalMarkAsDuplicate)}
-          name={'markDuplicate'}
-          selected={state.isDuplicate}
-          value={''}
-          onChange={() =>
-            setState((prev) => ({ ...prev, isDuplicate: !prev.isDuplicate }))
-          }
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
         />
       </Stack>
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 

@@ -31,10 +31,10 @@ processors:
       netinfo.enabled: true
 
   - decode_json_fields:
-      fields: ["message"]
+      fields: ['message']
       process_array: false
       max_depth: 1
-      target: ""
+      target: ''
       expand_keys: true
       overwrite_keys: true
       add_error_key: true
@@ -47,14 +47,14 @@ processors:
           var level = event.Get("level");
           if (level) {
             var levelNum = typeof level === "string" ? parseInt(level) : level;
-            var levelName = 
+            var levelName =
               levelNum === 30 ? "info" :
               levelNum === 50 ? "error" :
               levelNum === 40 ? "warn" :
               levelNum === 20 ? "debug" :
               levelNum === 60 ? "fatal" :
               levelNum === 10 ? "trace" : "unknown";
-            
+
             // Set the mapped fields
             event.Put("log.level", levelName);
           }
@@ -69,7 +69,7 @@ processors:
           if (isNaN(status)) {
             return;
           }
-          var levelName = 
+          var levelName =
             status >= 500 ? "error" :
             status >= 400 ? "warn" : "info";
 
@@ -125,7 +125,7 @@ processors:
               event.Put("log.level", level);
             }
           }
-        } 
+        }
   - drop_fields:
       fields:
         - agent

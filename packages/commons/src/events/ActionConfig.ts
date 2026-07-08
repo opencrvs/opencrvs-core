@@ -69,6 +69,12 @@ const ReadActionConfig = ActionConfigBase.extend(
   }).shape
 )
 
+const NotifyConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.NOTIFY)
+  }).shape
+)
+
 const DeclareConfig = DeclarationActionBase.extend(
   z.object({
     type: z.literal(ActionType.DECLARE),
@@ -171,10 +177,15 @@ export const ActionConfig = z
       description:
         'Configuration for the read action — defines the record-tab content displayed on the event overview page.'
     }),
+    NotifyConfig.meta({
+      id: 'NotifyActionConfig',
+      description:
+        'Configuration for the notify action. When present, NOTIFY uses this config independently from DECLARE. When absent, NOTIFY falls back to the DeclareActionConfig.'
+    }),
     DeclareConfig.meta({
       id: 'DeclareActionConfig',
       description:
-        'Configuration for the declare action. Includes review-page fields. Shared with the notify action (ActionType.NOTIFY).'
+        'Configuration for the declare action. Includes review-page fields. NOTIFY falls back to this config when no dedicated NotifyActionConfig is provided.'
     }),
     RejectConfig.meta({
       id: 'RejectActionConfig',
@@ -196,8 +207,7 @@ export const ActionConfig = z
     }),
     EditActionConfig.meta({
       id: 'EditActionConfig',
-      description:
-        'Configuration for editing a record before registration.'
+      description: 'Configuration for editing a record before registration.'
     }),
     ArchiveConfig.meta({
       id: 'ArchiveActionConfig',
@@ -225,8 +235,8 @@ export const actionConfigTypes: Set<ActionConfigTypes> = new Set(
  *
  * These are not the same as the broader workflow `action.type` values.
  * `ActionConfigTypes` includes only the action kinds that can be defined
- * in the country configuration (e.g. DECLARE, VALIDATE, CUSTOM), and
- * excludes workflow-only types such as CREATE or NOTIFY.
+ * in the country configuration (e.g. NOTIFY, DECLARE, VALIDATE, CUSTOM), and
+ * excludes workflow-only types such as CREATE.
  */
 export type ActionConfigTypes = ActionConfig['type']
 

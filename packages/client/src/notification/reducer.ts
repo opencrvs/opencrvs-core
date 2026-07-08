@@ -100,11 +100,6 @@ export const notificationReducer: LoopReducer<
   action: actions.Action
 ): NotificationState | Loop<NotificationState, actions.Action> => {
   switch (action.type) {
-    case actions.SESSION_EXPIRED:
-      return {
-        ...state,
-        sessionExpired: true
-      }
     case actions.CONFIGURATION_ERROR:
       return {
         ...state,

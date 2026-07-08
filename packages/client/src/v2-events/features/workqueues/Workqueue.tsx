@@ -102,7 +102,12 @@ function WorkqueueContent() {
   if (workqueueSlug === CoreWorkqueues.DRAFT) {
     return <Draft />
   }
-  return <ConfigurableWorkqueue workqueueSlug={workqueueSlug} />
+  /*
+   * Key by slug so switching workqueues remounts the data component and the search query.
+   */
+  return (
+    <ConfigurableWorkqueue key={workqueueSlug} workqueueSlug={workqueueSlug} />
+  )
 }
 
 export function WorkqueueContainer() {

@@ -55,7 +55,7 @@ spec:
             - name: DOMAIN
               value: {{ .Values.hostname }}
           {{- include "render-env-vars" (dict "service_name" "elastalert" "Values" .Values) }}
-          command: 
+          command:
             - bash
             - -c
             - |
@@ -69,7 +69,7 @@ spec:
               for f in /rules-custom/*.yaml; do
                 echo "processing file $f"
                 envsubst < "$f" > "/rules/$(basename $f)"
-              done              
+              done
           volumeMounts:
             - name: rules
               mountPath: /rules

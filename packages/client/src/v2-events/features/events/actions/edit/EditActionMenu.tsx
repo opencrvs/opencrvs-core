@@ -24,16 +24,15 @@ import {
   getActionConfig,
   getAcceptedActions
 } from '@opencrvs/commons/client'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import {
   Icon,
-  ResponsiveModal,
-  Button,
+  Dialog,
   Stack,
   Text,
-  TextArea
+  TextArea,
+  Button
 } from '@opencrvs/components'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { messages as actionMessages } from '@client/i18n/messages/views/action'
@@ -44,9 +43,11 @@ import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Act
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { actionIcons } from '@client/v2-events/features/workqueues/Actions/utils'
+import { getChangedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
+import { TranslationTextWithFormatModifier } from '../../components/TranslationTextWithFormatModifier'
 import { useCanDirectlyRegister } from '../useCanDirectlyRegister'
 import {
   aggregateAnnotations,
@@ -111,10 +112,8 @@ function EditActionModal({
   const [comment, setComment] = useState('')
 
   return (
-    <ResponsiveModal
-      autoHeight
-      show
-      showHeaderBorder
+    <Dialog
+      isOpen
       actions={[
         <Button
           key={'cancel_edit'}
@@ -133,15 +132,21 @@ function EditActionModal({
           {intl.formatMessage(messages.confirm)}
         </Button>
       ]}
-      handleClose={() => close({ confirmed: false })}
       title={intl.formatMessage(title)}
+      variant="large"
       width={800}
+      onClose={() => close({ confirmed: false })}
     >
-      <Stack>
-        <Text color="grey500" element="p" variant="reg16">
-          {supportingCopy ? intl.formatMessage(supportingCopy) : null}
-        </Text>
-      </Stack>
+      {supportingCopy && (
+        <Stack>
+          <TranslationTextWithFormatModifier
+            color="grey500"
+            element="p"
+            message={supportingCopy}
+            variant="reg16"
+          />
+        </Stack>
+      )}
       <CommentLabel element="h3" variant="bold16">
         {intl.formatMessage(commentLabel)}
       </CommentLabel>
@@ -150,7 +155,7 @@ function EditActionModal({
         value={comment}
         onChange={(e) => setComment(e.target.value)}
       />
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 
@@ -171,6 +176,13 @@ function useEditActions(event: EventDocument) {
   const reviewConfig = getActionReview(eventConfiguration, ActionType.DECLARE)
 
   const formFields = formConfig.pages.flatMap((page) => page.fields)
+  const declarationDiff = getChangedDeclarationDiff(
+    formFields,
+    declaration,
+    eventIndex.declaration,
+    eventConfiguration,
+    validatorContext
+  )
   const changedFields = formFields.filter((f) =>
     hasDeclarationFieldChanged(
       f,
@@ -238,7 +250,7 @@ function useEditActions(event: EventDocument) {
             events.customActions.editAndRegister.mutate({
               eventId: event.id,
               transactionId: getUUID(),
-              declaration,
+              declaration: declarationDiff,
               annotation,
               content: { comment }
             })
@@ -270,7 +282,7 @@ function useEditActions(event: EventDocument) {
             events.customActions.editAndDeclare.mutate({
               eventId: event.id,
               transactionId: getUUID(),
-              declaration,
+              declaration: declarationDiff,
               annotation,
               content: { comment }
             })
@@ -301,7 +313,7 @@ function useEditActions(event: EventDocument) {
             events.customActions.editAndNotify.mutate({
               eventId: event.id,
               transactionId: getUUID(),
-              declaration,
+              declaration: declarationDiff,
               annotation,
               content: { comment }
             })
@@ -337,13 +349,13 @@ export function EditActionMenu({ event }: { event: EventDocument }) {
     <>
       <DropdownMenu id="action">
         <DropdownMenu.Trigger asChild>
-          <PrimaryButton
+          <Button
             data-testid="action-dropdownMenu"
-            icon={() => <CaretDown />}
             size="medium"
+            type="primary"
           >
-            {intl.formatMessage(actionMessages.action)}
-          </PrimaryButton>
+            {intl.formatMessage(actionMessages.action)} <CaretDown />
+          </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
           {actions.map(({ onClick, icon, label, disabled }, index) => (

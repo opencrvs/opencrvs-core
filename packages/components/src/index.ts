@@ -9,10 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export * from './Accordion'
-export * from './ActionPageLight'
 export * from './Alert'
 export * from './AppBar'
-export * from './AppHeader'
 export * from './Bar'
 export * from './Banner'
 export * from './Box'
@@ -59,7 +57,6 @@ export * from './PasswordInput'
 export * from './Pill'
 export * from './ProgressBar'
 export * from './Radio'
-export * from './ResponsiveModal'
 export * from './SearchTool'
 export * from './Select'
 export * from './SideNavigation'

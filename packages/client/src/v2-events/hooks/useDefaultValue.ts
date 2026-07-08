@@ -187,6 +187,9 @@ export function mapFieldToDefaultValue(
       if (isNonInteractiveFieldType(subfield)) {
         return
       }
+      if (!isFieldWithDefaultValue(subfield)) {
+        return
+      }
       return mapFieldToDefaultValue(subfield, context)
     })
   }
