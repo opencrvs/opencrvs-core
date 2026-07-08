@@ -235,6 +235,8 @@ resources:
 # Global environment variables applied to
 # all OpenCRVS microservices (Kubernetes PODs):
 env:
+  # OPENCRVS_ENVIRONMENT: explicit environment detection in employee seeder
+  OPENCRVS_ENVIRONMENT: production
   NODE_ENV: production
   MINIO_BUCKET: ocrvs
   # LOG_LEVEL: debug
