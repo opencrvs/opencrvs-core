@@ -30,12 +30,13 @@ spec:
       labels:
         app: redis
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" .) | nindent 6 }}
       securityContext:
         runAsUser: 999
         runAsGroup: 999
         fsGroup: 999
       containers:
-        - image: redis:8
+        - image: {{ include "opencrvs.imageReference" .Values.redis }}
           {{- if eq .Values.redis.auth_mode "acl" }}
           command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
           {{- end }}

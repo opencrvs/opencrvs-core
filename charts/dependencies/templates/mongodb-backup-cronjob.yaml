@@ -26,10 +26,11 @@ spec:
             app: mongodb
             job-type: backup
         spec:
+          {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.mongodb) | nindent 10 }}
           restartPolicy: OnFailure
           containers:
             - name: backup
-              image: mongo:4.4
+              image: {{ include "opencrvs.imageReference" .Values.mongodb }}
               env:
                 - name: MONGODB_HOST
                   value: mongodb-0.mongodb.{{ .Release.Namespace }}.svc.cluster.local:27017
