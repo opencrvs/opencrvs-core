@@ -186,7 +186,7 @@ spec:
             claimName: minio
       {{- else if eq $storageType "host_path" }}
           hostPath:
-            path: {{ .Values.minio.host_data_path | default "/data/minio" }}
+            path: {{ .Values.minio.host_data_path }}
             type: DirectoryOrCreate
       {{- end }}
       {{- if eq (include "minio.use_rsync" .) "true" }}

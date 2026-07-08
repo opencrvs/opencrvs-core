@@ -180,7 +180,7 @@ spec:
             claimName: postgres-data
       {{- else if eq $storageType "host_path" }}
           hostPath:
-            path: {{ .Values.postgres.host_data_path | default "/data/postgres" }}
+            path: {{ .Values.postgres.host_data_path }}
             type: DirectoryOrCreate
       {{- end }}
       {{- if (eq (include "postgres.use_pgBackRest" .) "true") }}

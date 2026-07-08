@@ -286,6 +286,10 @@ platform:
   #   - name: registry-secret
   imagePullSecrets: []
 
+# Shared utilities image used by helper jobs and init containers.
+# Full image reference is resolved the same way as for application images:
+# <platform.repository>/<utilities.image.name>:<platform.tag>
+# Override repository or tag here only if the utilities image is published separately.
 utilities:
   image:
     name: ocrvs-utilities

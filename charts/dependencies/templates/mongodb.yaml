@@ -95,7 +95,7 @@ spec:
             claimName: mongodb
       {{- else if eq $storageType "host_path" }}
           hostPath:
-            path: {{ .Values.mongodb.host_data_path | default "/data/mongo" }}
+            path: {{ .Values.mongodb.host_data_path }}
             type: DirectoryOrCreate
       {{- end }}
 {{- end }}

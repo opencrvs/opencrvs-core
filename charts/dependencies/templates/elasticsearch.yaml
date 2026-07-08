@@ -136,7 +136,7 @@ spec:
             claimName: elasticsearch
       {{- else if eq $storageType "host_path" }}
           hostPath:
-            path: {{ .Values.elasticsearch.host_data_path | default "/data/elasticsearch" }}
+            path: {{ .Values.elasticsearch.host_data_path }}
             type: DirectoryOrCreate
       {{- end }}
 {{- end }}

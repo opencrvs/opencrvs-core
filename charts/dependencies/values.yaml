@@ -60,6 +60,9 @@ mongodb:
   # admin_user_name: admin
   # admin_user_password: password
 
+  # Storage configuration:
+  # Path to persistent data on the VM (when storage_type is host_path).
+  host_data_path: /data/mongo
 postgres:
   # Enable postgres deployment.
   enabled: true
@@ -73,6 +76,9 @@ postgres:
   # admin user name is postgres, define password here:
   # admin_user_password:
 
+  # Storage configuration:
+  # Path to persistent data on the VM (when storage_type is host_path).
+  host_data_path: /data/postgres
   # Persistent Volume Claim (PVC) configuration
   # NOTE: This configuration is used only when `storage_type` is set to `pvc`.
   # For `host_path` storage, data is stored on the host filesystem at the path defined in `postgres.host_data_path`.
@@ -176,6 +182,9 @@ elasticsearch:
   users_secret: elasticsearch-opencrvs-users
   urls_secret: elasticsearch-opencrvs-urls
 
+  # Storage configuration:
+  # Path to persistent data on the VM (when storage_type is host_path).
+  host_data_path: /data/elasticsearch
   # PVC Configuration
   pvc:
     # storage_class: "default"
@@ -288,6 +297,7 @@ minio:
     access_mode: 'ReadWriteOnce'
     storage_size: '10Gi'
 
+  # Storage configuration:
   # Path to persistent data on the VM (when storage_type is host_path).
   host_data_path: /data/minio
 
@@ -395,6 +405,9 @@ priority_class:
   name: opencrvs-datastore-high-priority
   enabled: false
 
+# Shared utilities image used by helper jobs and init containers.
+# This image is expected to include common tools such as curl, jq, rsync and kubectl.
+# Override repository or tag if you mirror OpenCRVS images into a private registry.
 utilities:
   image:
     repository: ghcr.io/opencrvs/ocrvs-utilities
