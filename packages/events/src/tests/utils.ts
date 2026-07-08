@@ -709,6 +709,8 @@ function eventMatchesScope({
   eventIndex,
   user,
   placeOfEvent,
+  notifiedBy,
+  notifiedIn,
   declaredBy,
   registeredBy,
   declaredIn,
@@ -721,6 +723,8 @@ function eventMatchesScope({
     | { id: UUID; primaryOfficeId: UUID; administrativeAreaId: UUID | null }
     | CreatedUser
   placeOfEvent?: JurisdictionFilter
+  notifiedBy?: UserFilter
+  notifiedIn?: JurisdictionFilter
   declaredBy?: UserFilter
   registeredBy?: UserFilter
   declaredIn?: JurisdictionFilter
@@ -731,6 +735,37 @@ function eventMatchesScope({
     adminAreaId: UUID | null
   ) => boolean
 }): boolean {
+  if (notifiedBy === UserFilter.enum.user) {
+    if (eventIndex.legalStatuses.NOTIFIED?.createdBy !== user.id) {
+      return false
+    }
+  }
+
+  if (notifiedIn === JurisdictionFilter.enum.location) {
+    if (
+      eventIndex.legalStatuses.NOTIFIED?.createdAtLocation !==
+      user.primaryOfficeId
+    ) {
+      return false
+    }
+  }
+
+  if (notifiedIn === JurisdictionFilter.enum.administrativeArea) {
+    const notifiedLocation =
+      eventIndex.legalStatuses.NOTIFIED?.createdAtLocation
+    if (!notifiedLocation) {
+      return false
+    }
+    if (
+      !isUnderAdministrativeArea(
+        UUID.parse(notifiedLocation),
+        user.administrativeAreaId || null
+      )
+    ) {
+      return false
+    }
+  }
+
   if (declaredBy === UserFilter.enum.user) {
     if (eventIndex.legalStatuses.DECLARED?.createdBy !== user.id) {
       return false
@@ -1058,6 +1093,8 @@ export function assertScopeResult(
     event,
     placeOfEvent,
     isUnderAdministrativeArea,
+    notifiedBy,
+    notifiedIn,
     declaredBy,
     declaredIn,
     registeredBy,
@@ -1070,6 +1107,8 @@ export function assertScopeResult(
       locationId: UUID,
       adminAreaId: UUID | null
     ) => boolean
+    notifiedBy?: UserFilter
+    notifiedIn?: JurisdictionFilter
     declaredBy?: UserFilter
     registeredBy?: UserFilter
     declaredIn?: JurisdictionFilter
@@ -1086,6 +1125,8 @@ export function assertScopeResult(
   const isAccessibleWithScope = eventMatchesScope({
     eventIndex,
     user,
+    notifiedBy,
+    notifiedIn,
     declaredBy,
     registeredBy,
     declaredIn,
