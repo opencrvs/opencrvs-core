@@ -38,7 +38,6 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messa
 import { ROUTES } from '@client/v2-events/routes'
 import { flattenEventIndex } from '@client/v2-events/utils'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
-import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { EventOverviewProvider } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
 import { constantsMessages } from '@client/i18n/messages/constants'
@@ -139,6 +138,12 @@ function EventOverviewTabs() {
   )
 }
 
+const noNameMessage = {
+  id: 'recordAudit.noName',
+  defaultMessage: 'No name provided',
+  description: 'Label for name not available'
+}
+
 export function EventOverviewLayout({
   children
 }: {
@@ -211,7 +216,7 @@ export function EventOverviewLayout({
             flattenedIntl.formatMessage(
               eventConfiguration.title,
               flattenEventIndex(deepDropNulls(eventIndexWithDraftApplied))
-            ) || intl.formatMessage(recordAuditMessages.noName)
+            ) || intl.formatMessage(noNameMessage)
           }
           mobileRight={
             <>
@@ -238,7 +243,7 @@ export function EventOverviewLayout({
             flattenedIntl.formatMessage(
               eventConfiguration.title,
               flattenEventIndex(deepDropNulls(eventIndexWithDraftApplied))
-            ) || intl.formatMessage(recordAuditMessages.noName)
+            ) || intl.formatMessage(noNameMessage)
           }
         />
       }

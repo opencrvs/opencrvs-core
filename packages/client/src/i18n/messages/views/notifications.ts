@@ -11,63 +11,16 @@
 import { defineMessages } from 'react-intl'
 
 const messagesToDefine = {
-  declarationsSynced: {
-    defaultMessage:
-      'As you have connectivity, we can synchronize your declarations.',
-    description:
-      'The message that appears in notification when background sync takes place',
-    id: 'misc.notif.declarationsSynced'
-  },
   draftsSaved: {
     defaultMessage: 'Your draft has been saved',
     description:
       'The message that appears in notification when save drafts button is clicked',
     id: 'misc.notif.draftsSaved'
   },
-  outboxText: {
-    defaultMessage: 'Outbox({num})',
-    description: 'Declaration outbox text',
-    id: 'misc.notif.outboxText'
-  },
   updatePINSuccess: {
     defaultMessage: 'Your pin has been successfully updated',
     description: 'Label for update PIN success notification toast',
     id: 'misc.notif.updatePINSuccess'
-  },
-  processingText: {
-    defaultMessage: '{num} declaration processing...',
-    description: 'Declaration processing text',
-    id: 'misc.notif.processingText'
-  },
-  statusRegistering: {
-    defaultMessage: 'Registering...',
-    description: 'Label for declaration status Registering',
-    id: 'regHome.outbox.statusRegistering'
-  },
-  statusRejecting: {
-    defaultMessage: 'Sending for updates...',
-    description: 'Label for declaration status Rejecting',
-    id: 'regHome.outbox.statusRejecting'
-  },
-  statusSubmitting: {
-    defaultMessage: 'Sending...',
-    description: 'Label for declaration status submitting',
-    id: 'regHome.outbox.statusSubmitting'
-  },
-  statusWaitingToRegister: {
-    defaultMessage: 'Waiting to register',
-    description: 'Label for declaration status waiting for register',
-    id: 'regHome.outbox.statusWaitingToRegister'
-  },
-  statusWaitingToReject: {
-    defaultMessage: 'Waiting to send for updates',
-    description: 'Label for declaration status waiting for reject',
-    id: 'regHome.outbox.statusWaitingToReject'
-  },
-  statusWaitingToSubmit: {
-    defaultMessage: 'Waiting to send',
-    description: 'Label for declaration status waiting for reject',
-    id: 'regHome.outbox.statusWaitingToSubmit'
   },
   retry: {
     id: 'regHome.outbox.retry',
@@ -104,11 +57,6 @@ const messagesToDefine = {
     description:
       'The message that appears in notification when user details have been updated',
     id: 'misc.notif.userFormUpdateSuccess'
-  },
-  waitingToRetry: {
-    defaultMessage: 'Waiting to retry',
-    description: 'Label for declaration status waiting for connection',
-    id: 'regHome.outbox.waitingToRetry'
   },
   failed: {
     defaultMessage: 'Failed to send',

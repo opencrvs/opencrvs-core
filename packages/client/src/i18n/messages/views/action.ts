@@ -10,7 +10,7 @@
  */
 import { defineMessages } from 'react-intl'
 
-const messagesToDefine = {
+export const messages = defineMessages({
   action: {
     defaultMessage: 'Action',
     description: 'Label for action button in dropdown menu',
@@ -36,25 +36,4 @@ const messagesToDefine = {
     description: 'Label for correct record button in dropdown menu',
     id: 'action.correct'
   },
-  archiveRecord: {
-    defaultMessage: 'Archive Record',
-    description: 'Label for archive record button in dropdown menu',
-    id: 'action.archive'
-  },
-  reinstateRecord: {
-    defaultMessage: 'Reinstate Record',
-    description: 'Label for reinstate record button in dropdown menu',
-    id: 'action.reinstate'
-  },
-  printDeclaration: {
-    defaultMessage: 'Print certified copy',
-    description: 'Label for print certified copy in dropdown menu',
-    id: 'action.print'
-  },
-  issueCertificate: {
-    defaultMessage: 'Issue certificate',
-    description: 'Label for issue certificate in dropdown menu',
-    id: 'action.issue'
-  }
-}
-export const messages = defineMessages(messagesToDefine)
+})

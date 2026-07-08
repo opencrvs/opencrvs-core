@@ -11,11 +11,6 @@
 import { defineMessages } from 'react-intl'
 
 const messagesToDefine = {
-  requestedCorrection: {
-    id: 'correction.request',
-    defaultMessage: 'Requested correction',
-    description: 'Status for application being requested for correction'
-  },
   whoRequestedCorrection: {
     id: 'correction.corrector.title',
     defaultMessage: 'Who is requesting a change to this record?',
@@ -61,11 +56,6 @@ const messagesToDefine = {
     id: 'correction.reason.title',
     defaultMessage: 'What was the reason for making a correction?',
     description: 'The title for the correction reason form'
-  },
-  otherReason: {
-    id: 'correction.reason.other',
-    defaultMessage: 'Other',
-    description: 'Label for other for correction reason form'
   },
   correctionSummaryTitle: {
     id: 'correction.summary.title',

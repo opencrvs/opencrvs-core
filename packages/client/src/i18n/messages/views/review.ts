@@ -16,24 +16,6 @@ const messagesToDefine = {
     description: 'Button to hide section',
     id: 'form.field.hideLabel'
   },
-  validateCompleteDeclarationActionTitle: {
-    id: 'validate.complete.declaration.action.title',
-    defaultMessage: 'Send for approval or reject?'
-  },
-  validateCompleteDeclarationActionDescription: {
-    id: 'validate.complete.declaration.action.description',
-    defaultMessage:
-      'By sending for approval you confirm that the declaration is ready for approval'
-  },
-  validateDeclarationActionModalTitle: {
-    id: 'validate.declaration.action.modal.title',
-    defaultMessage: 'Send for approval?'
-  },
-  validateDeclarationActionModalDescription: {
-    id: 'validate.declaration.action.modal.description',
-    defaultMessage:
-      'This declaration will be sent for approval prior to registration.'
-  },
 
   signatureInputDescription: {
     defaultMessage:
@@ -51,158 +33,10 @@ const messagesToDefine = {
     description: 'Label for button that deletes signature',
     id: 'review.signature.delete'
   },
-  additionalComments: {
-    defaultMessage: 'Any additional comments?',
-    description: 'Label for input Additional comments',
-    id: 'review.inputs.additionalComments'
-  },
-  backToPreview: {
-    defaultMessage: 'Back to Preview',
-    description: 'Preview button on edit modal',
-    id: 'review.edit.modal.backToPreview'
-  },
-  editDeclarationConfirmationTitle: {
-    defaultMessage: 'Edit declaration?',
-    description: 'Edit modal confirmation title',
-    id: 'review.edit.modal.confirmationTitle'
-  },
-  editDeclarationConfirmation: {
-    defaultMessage: 'A record will be created of any changes you make.',
-    description: 'Edit modal confirmation text',
-    id: 'review.edit.modal.confirmationText'
-  },
-  headerSubjectWithName: {
-    defaultMessage:
-      '{name} {eventType, select, birth {Birth} death {Death} other {Marriage} } declaration',
-    description:
-      'Header subject that shows which declaration type to review with informant name',
-    id: 'review.header.subject.subjectWitName'
-  },
-  headerSubjectWithoutName: {
-    defaultMessage:
-      '{eventType, select, birth {Birth} death {Death} other {Marriage}} declaration',
-    description: 'Header subject that shows which declaration type to review',
-    id: 'review.header.subject.subjectWithoutName'
-  },
-  previewName: {
-    defaultMessage: 'Preview',
-    description: 'Form section name for Preview',
-    id: 'register.form.section.preview.name'
-  },
-  previewTitle: {
-    defaultMessage: 'Preview',
-    description: 'Form section title for Preview',
-    id: 'register.form.section.preview.title'
-  },
-  registerActionDescription: {
-    defaultMessage:
-      'By registering you confirm that you have reviewed this declaration and satisfied it fulfils requirements required for registration. ',
-    id: 'review.actions.description'
-  },
-  registerActionDescriptionComplete: {
-    defaultMessage:
-      'By clicking register, you confirm that the information is correct and has been reviewed by the informant. The informant understands that it will be used to register the {eventType, select, birth {birth declaration} death {death declaration}} and for planning purposes.\n\nBy registering this {eventType, select, birth {birth declaration} death {death declaration}}, a {eventType, select, birth {birth} death {death}} certificate will be generated with your signature for issuance.',
-    id: 'review.actions.desc.regConfComp'
-  },
-  registerActionDescriptionIncomplete: {
-    defaultMessage:
-      'Mandatory information is missing. Please add this information so that you can complete the registration process.',
-    id: 'review.actions.desc.regConfInComp'
-  },
-  registerActionTitle: {
-    defaultMessage: 'Register event',
-    id: 'review.actions.title.registerActionTitle'
-  },
-  registerConfirmationTitle: {
-    defaultMessage: 'Register the {event}?',
-    description: 'Title for register confirmation modal',
-    id: 'review.modal.title.registerConfirmation'
-  },
-  approvalActionDescriptionComplete: {
-    defaultMessage:
-      'By sending for approval you confirm that the declaration is ready for approval.',
-    description:
-      'Description for review action component when complete declaration',
-    id: 'misc.description.Complete'
-  },
-  approvalActionDescriptionIncomplete: {
-    defaultMessage:
-      'Mandatory information is missing. Please add this information so that you can send for approval.',
-    id: 'misc.description.inComplete'
-  },
-  approvalActionTitle: {
-    defaultMessage: 'Send for approval?',
-    description: 'Title for review action component',
-    id: 'misc.title.declarationStatus'
-  },
-  reviewActionDescriptionComplete: {
-    defaultMessage:
-      'By sending this declaration for review you confirm that the information has been reviewed by the informant and that they are aware that they will receive an {deliveryMethod} with a tracking ID and details of how to collect the {eventType, select, birth {birth} death {death}} certificate',
-    description:
-      'Description for review action component when complete declaration',
-    id: 'review.actions.description.confirmComplete'
-  },
-  reviewActionDescriptionIncomplete: {
-    defaultMessage:
-      'The informant will receive an {deliveryMethod} with a tracking ID that they can use to provide the additional mandatory information required for registration.',
-    description:
-      'Description for review action component when incomplete declaration',
-    id: 'review.actions.description.confirmInComplete'
-  },
-  reviewActionTitle: {
-    defaultMessage:
-      'Declaration {completeDeclaration, select, true {complete} false {incomplete}}',
-    description: 'Title for review action component',
-    id: 'review.actions.title.declarationStatus'
-  },
-  reviewName: {
-    defaultMessage: 'Review',
-    description: 'Form section name for Review',
-    id: 'review.form.section.review.name'
-  },
-  reviewTitle: {
-    defaultMessage: 'Review',
-    description: 'Form section title for Review',
-    id: 'review.form.section.review.title'
-  },
-  submitConfirmationDesc: {
-    defaultMessage:
-      '{completeDeclaration, select, true {This declaration will be sent to the registrar for them to review.} false {This declaration will be sent to the Registrar for completion. Please inform the Informant that they will need to visit the office with the missing information and supporting documents.}}',
-    description: 'Submit description text on modal',
-    id: 'review.modal.desc.submitConfirmation'
-  },
-  submitConfirmationTitle: {
-    defaultMessage:
-      '{completeDeclaration, select, true {Send declaration for review?} false {Send incomplete declaration?}}',
-    description: 'Submit title text on modal',
-    id: 'review.modal.title.submitConfirmation'
-  },
   supportingDocuments: {
     defaultMessage: 'Supporting documents',
     description: 'Section heading title for supporting documents',
     id: 'review.inputs.supportingDocuments'
-  },
-  validateConfirmationDesc: {
-    defaultMessage:
-      'This declaration will be sent for approval prior to registration.',
-    description: 'Description for validate confirmation modal',
-    id: 'register.form.modal.desc.validateConfirmation'
-  },
-  validateConfirmationTitle: {
-    defaultMessage: 'Send for approval?',
-    description: 'Title for validate confirmation modal',
-    id: 'register.form.modal.title.validateConfirmation'
-  },
-  valueApprove: {
-    defaultMessage: 'Send for approval',
-    description: 'Label for Send For Approval button',
-    id: 'review.button.approve'
-  },
-  zeroDocumentsText: {
-    defaultMessage:
-      'No supporting documents for {section, select, child {child} mother {mother} father {father} deceased {deceased} informant {informant} primaryCaregiver {parents}}',
-    description: 'Zero documents text',
-    id: 'review.documents.zeroDocumentsText'
   },
   zeroDocumentsTextForAnySection: {
     defaultMessage: 'No supporting documents',
@@ -219,11 +53,6 @@ const messagesToDefine = {
     description: 'Label for button that clear signature input',
     id: 'review.signature.clear'
   },
-  documentViewerTitle: {
-    id: 'review.documentViewer.title',
-    defaultMessage: 'Supporting documents',
-    description: 'Label for Supporting documents section'
-  }
 }
 
 export const messages = defineMessages(messagesToDefine)

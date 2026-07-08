@@ -18,7 +18,6 @@ interface IUserSetupMessages
   header: MessageDescriptor
   instruction: MessageDescriptor
   labelAssignedOffice: MessageDescriptor
-  labelBanglaName: MessageDescriptor
   labelEnglishName: MessageDescriptor
   match: MessageDescriptor
   minLength: MessageDescriptor
@@ -30,7 +29,6 @@ interface IUserSetupMessages
   userSetupIntroduction: MessageDescriptor
   userSetupRevieTitle: MessageDescriptor
   userSetupReviewHeader: MessageDescriptor
-  userSetupReviewInstruction: MessageDescriptor
   userSetupWelcomeTitle: MessageDescriptor
   validationMsg: MessageDescriptor
   waiting: MessageDescriptor
@@ -108,10 +106,6 @@ const messagesToDefine: IUserSetupMessages = {
     description: 'Assigned office',
     id: 'settings.user.label.assignedOffice'
   },
-  labelBanglaName: {
-    defaultMessage: 'Bengali name',
-    id: 'settings.user.label.nameBN'
-  },
   labelEnglishName: {
     defaultMessage: 'Full name',
     id: 'settings.user.label.nameEN'
@@ -167,12 +161,6 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Confirm your details',
     description: 'User setup review page subtitle',
     id: 'userSetup.review.header'
-  },
-  userSetupReviewInstruction: {
-    defaultMessage:
-      'Check the details below to confirm your account details are correct. and make annecessary changes to confirm your account details are correct.',
-    description: 'User setup review page instruction',
-    id: 'userSetup.instruction'
   },
   userSetupWelcomeTitle: {
     defaultMessage: 'Welcome to {applicationName}',

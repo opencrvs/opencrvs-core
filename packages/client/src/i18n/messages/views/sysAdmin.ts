@@ -12,16 +12,9 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface ISysAdminMessages
   extends Record<string | number | symbol, MessageDescriptor> {
-  overviewTab: MessageDescriptor
-  officesTab: MessageDescriptor
-  usersTab: MessageDescriptor
   deactivate: MessageDescriptor
   deactivateUserTitle: MessageDescriptor
   deactivateUserSubtitle: MessageDescriptor
-  devicesTab: MessageDescriptor
-  networkTab: MessageDescriptor
-  configTab: MessageDescriptor
-  systemTitle: MessageDescriptor
   editUserDetailsTitle: MessageDescriptor
   reactivate: MessageDescriptor
   reactivateUserTitle: MessageDescriptor
@@ -46,21 +39,6 @@ interface ISysAdminMessages
 }
 
 const messagesToDefine: ISysAdminMessages = {
-  overviewTab: {
-    id: 'sysAdHome.overview',
-    defaultMessage: 'Overview',
-    description: 'The title of overview tab'
-  },
-  officesTab: {
-    id: 'sysAdHome.offices',
-    defaultMessage: 'Offices',
-    description: 'The title of offices tab'
-  },
-  usersTab: {
-    id: 'sysAdHome.users',
-    defaultMessage: 'Users',
-    description: 'The title of users tab'
-  },
   deactivate: {
     defaultMessage: 'Deactivate',
     description: 'Label for toggle menu option deactivate',
@@ -76,26 +54,6 @@ const messagesToDefine: ISysAdminMessages = {
     defaultMessage:
       'This will revoke {name}’s ability to login and access the system. The account can be reactivated at a later date.',
     description: 'The subtitle of user deactivation confirmation modal'
-  },
-  devicesTab: {
-    id: 'sysAdHome.devices',
-    defaultMessage: 'Devices',
-    description: 'The title of devices tab'
-  },
-  networkTab: {
-    id: 'sysAdHome.network',
-    defaultMessage: 'Network',
-    description: 'The title of network tab'
-  },
-  configTab: {
-    id: 'sysAdHome.config',
-    defaultMessage: 'Config',
-    description: 'The title of config tab'
-  },
-  systemTitle: {
-    id: 'home.header.systemTitle',
-    defaultMessage: 'System',
-    description: 'System title'
   },
   editUserDetailsTitle: {
     defaultMessage: 'Edit details',
