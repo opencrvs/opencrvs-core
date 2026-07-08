@@ -95,7 +95,9 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
     setupData.securityQuestionAnswers.forEach((e) => {
       answeredQuestions.push({
         id: `Question_${e.questionKey}`,
-        label: intl.formatMessage(userMessages[e.questionKey]),
+        label: intl.formatMessage(
+          userMessages[e.questionKey as keyof typeof userMessages]
+        ),
         value: e.answer,
         action: {
           id: `Question_Action_${e.questionKey}`,

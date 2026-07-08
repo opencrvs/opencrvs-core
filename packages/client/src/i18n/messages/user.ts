@@ -8,96 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
+import { defineMessages } from 'react-intl'
 
-interface IUserMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  accountTitle: MessageDescriptor
-  BIRTH_TOWN: MessageDescriptor
-  CHA: MessageDescriptor
-  CHAIRMAN: MessageDescriptor
-  changeLanguageMessege: MessageDescriptor
-  changeLanguageSuccessMessage: MessageDescriptor
-  changeLanguageTitle: MessageDescriptor
-  DATA_ENTRY_CLERK: MessageDescriptor
-  DISTRICT_REGISTRAR: MessageDescriptor
-  ENTREPENEUR: MessageDescriptor
-  FAVORITE_FOOD: MessageDescriptor
-  FAVORITE_MOVIE: MessageDescriptor
-  FAVORITE_SONG: MessageDescriptor
-  FAVORITE_TEACHER: MessageDescriptor
-  FIRST_CHILD_NAME: MessageDescriptor
-  HEALTH_DIVISION: MessageDescriptor
-  HIGH_SCHOOL: MessageDescriptor
-  HOSPITAL: MessageDescriptor
-  healthSystem: MessageDescriptor
-  system: MessageDescriptor
-  labelEnglishName: MessageDescriptor
-  LOCAL_REGISTRAR: MessageDescriptor
-  LOCAL_SYSTEM_ADMIN: MessageDescriptor
-  MAYOR: MessageDescriptor
-  MOTHER_NAME: MessageDescriptor
-  NATIONAL_REGISTRAR: MessageDescriptor
-  NATIONAL_SYSTEM_ADMIN: MessageDescriptor
-  ORG_DIVISION: MessageDescriptor
-  PERFORMANCE_MANAGEMENT: MessageDescriptor
-  profileTitle: MessageDescriptor
-  REGISTRATION_AGENT: MessageDescriptor
-  SECRETARY: MessageDescriptor
-  securityTitle: MessageDescriptor
-  settingsTitle: MessageDescriptor
-  STATE_REGISTRAR: MessageDescriptor
-  API_USER: MessageDescriptor
-  NOTIFICATION_API_USER: MessageDescriptor
-  VALIDATOR_API_USER: MessageDescriptor
-  AGE_VERIFICATION_API_USER: MessageDescriptor
-  systemTitle: MessageDescriptor
-  FIELD_AGENT: MessageDescriptor
-  currentPassword: MessageDescriptor
-  changePassword: MessageDescriptor
-  changePasswordMessage: MessageDescriptor
-  changePhoneTitle: MessageDescriptor
-  verifyPhoneTitle: MessageDescriptor
-  changePhoneLabel: MessageDescriptor
-  changeEmailLabel: MessageDescriptor
-  verifyPhoneLabel: MessageDescriptor
-  confirmationPhoneMsg: MessageDescriptor
-  confirmationEmailMsg: MessageDescriptor
-  phoneNumberChangeFormValidationMsg: MessageDescriptor
-  emailAddressChangeFormValidationMsg: MessageDescriptor
-  changeAvatar: MessageDescriptor
-  changeImage: MessageDescriptor
-  resizeAvatar: MessageDescriptor
-  newPasswordLabel: MessageDescriptor
-  passwordUpdateFormValidationMsg: MessageDescriptor
-  passwordLengthCharacteristicsForPasswordUpdateForm: MessageDescriptor
-  passwordCaseCharacteristicsForPasswordUpdateForm: MessageDescriptor
-  passwordNumberCharacteristicsForPasswordUpdateForm: MessageDescriptor
-  confirmPasswordLabel: MessageDescriptor
-  matchedPasswordMsg: MessageDescriptor
-  mismatchedPasswordMsg: MessageDescriptor
-  confirmButtonLabel: MessageDescriptor
-  requiredfield: MessageDescriptor
-  incorrectPassword: MessageDescriptor
-  incorrectVerifyCode: MessageDescriptor
-  passwordUpdated: MessageDescriptor
-  phoneNumberUpdated: MessageDescriptor
-  emailAddressUpdated: MessageDescriptor
-  avatarUpdating: MessageDescriptor
-  avatarUpdated: MessageDescriptor
-  name: MessageDescriptor
-  systemLanguage: MessageDescriptor
-  profileImage: MessageDescriptor
-  duplicateUserMobileErrorMessege: MessageDescriptor
-  duplicateUserEmailErrorMessege: MessageDescriptor
-  enterPinLabel: MessageDescriptor
-}
-interface IDynamicUserMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  [key: string]: MessageDescriptor
-}
-
-const messagesToDefine: IUserMessages = {
+export const userMessages = defineMessages({
   accountTitle: {
     defaultMessage: 'Account',
     description: 'Account header',
@@ -389,6 +302,12 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'Must be a valid email address',
     description: 'Phone number validation message'
   },
+  avatarProcessingError: {
+    id: 'settings.changeAvatar.avatarProcessingError',
+    defaultMessage:
+      'There was an error processing the image. Please try again.',
+    description: 'Avatar processing error message'
+  },
   changeAvatar: {
     id: 'settings.changeAvatar',
     defaultMessage: 'Change profile image',
@@ -542,7 +461,4 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'Enter your pin',
     description: 'Label for entering unlock user profile'
   }
-}
-
-export const userMessages: IUserMessages | IDynamicUserMessages =
-  defineMessages(messagesToDefine)
+})
