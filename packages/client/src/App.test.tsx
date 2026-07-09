@@ -32,11 +32,11 @@ beforeEach(() => {
 
 beforeAll(() => {
   delete (window as { location?: Location }).location
-  window.location = { ...realLocation, assign }
+  window.location = { ...realLocation, assign } as unknown as string & Location
 })
 
 afterAll(() => {
-  window.location = realLocation
+  window.location = realLocation as unknown as string & Location
 })
 
 it('renders without crashing', () =>

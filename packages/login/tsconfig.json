@@ -18,7 +18,8 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react",
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "types": ["vitest/globals"]
   },
   "include": [
     "src",
@@ -30,7 +31,8 @@
     "scripts",
     "acceptance-tests",
     "webpack",
-    "coverage"
+    "coverage",
+    "src/extract-translations.ts"
   ],
   "extends": "./tsconfig.paths.json"
 }

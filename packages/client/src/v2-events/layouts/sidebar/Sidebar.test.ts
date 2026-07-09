@@ -16,13 +16,12 @@ const assignMock = vi.fn()
 beforeAll(() => {
   // @ts-ignore
   delete window.location
-  // @ts-ignore
   window.location = {
     assign: assignMock,
     replace: vi.fn(),
     href: '',
     origin: 'http://localhost'
-  }
+  } as unknown as string & Location
 })
 
 afterAll(() => {

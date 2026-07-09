@@ -3,8 +3,9 @@
   "compilerOptions": {
     "paths": {
       "@client/*": ["./src/*"],
-      "@gateway/*": ["../../gateway/src/*"],
-      "@events/*": ["../../events/src/*"]
+      "@gateway/*": ["../gateway/src/*"],
+      "@events/*": ["../events/src/*"]
     }
-  }
+  },
+  "exclude": ["src/extract-translations.ts"]
 }
