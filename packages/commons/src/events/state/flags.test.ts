@@ -652,6 +652,46 @@ describe('getEventFlags() – any inherent flag is clearable by action config', 
     )
   })
 
+  test('INCOMPLETE survives an archive/unarchive round trip back to NOTIFIED', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        ActionType.NOTIFY,
+        ActionType.ARCHIVE,
+        ActionType.UNARCHIVE
+      ].map((type, idx) => ({
+        type,
+        declaration: {},
+        createdAt: formatISO(subDays(now, 3 - idx)),
+        status: ActionStatus.Accepted
+      }))
+    }
+
+    // @ts-expect-error - allow partial event document and event config
+    expect(getEventFlags(event, eventConfig)).toContain(
+      InherentFlags.INCOMPLETE
+    )
+  })
+
+  test('INCOMPLETE stays absent when a declared record is archived and unarchived', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        ActionType.DECLARE,
+        ActionType.ARCHIVE,
+        ActionType.UNARCHIVE
+      ].map((type, idx) => ({
+        type,
+        declaration: {},
+        createdAt: formatISO(subDays(now, 3 - idx)),
+        status: ActionStatus.Accepted
+      }))
+    }
+
+    // @ts-expect-error - allow partial event document and event config
+    expect(getEventFlags(event, eventConfig)).not.toContain(
+      InherentFlags.INCOMPLETE
+    )
+  })
+
   test('INCOMPLETE is cleared by a custom action whose config removes it', () => {
     const event: DeepPartial<EventDocument> = {
       actions: [
