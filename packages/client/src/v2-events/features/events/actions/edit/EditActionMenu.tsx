@@ -22,7 +22,8 @@ import {
   getCurrentEventState,
   EventStatus,
   getActionConfig,
-  getAcceptedActions
+  getAcceptedActions,
+  isActionEnabled
 } from '@opencrvs/commons/client'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
@@ -214,6 +215,14 @@ function useEditActions(event: EventDocument) {
     actionType: ActionType.EDIT
   })
 
+  // The edit-then-{register,declare,notify} paths must honor the *target* action's ENABLE conditionals
+  const isTargetActionEnabled = (actionType: ActionType) => {
+    const targetConfig = getActionConfig({ eventConfiguration, actionType })
+    return targetConfig
+      ? isActionEnabled(targetConfig, eventIndex, validatorContext)
+      : true
+  }
+
   const hasValidationErrors = validationErrorsInActionFormExist({
     formConfig,
     form: declaration,
@@ -259,7 +268,10 @@ function useEditActions(event: EventDocument) {
           }
         },
         disabled:
-          hasValidationErrors || !anyValuesHaveChanged || !canDirectlyRegister,
+          hasValidationErrors ||
+          !anyValuesHaveChanged ||
+          !canDirectlyRegister ||
+          !isTargetActionEnabled(ActionType.REGISTER),
         hidden: !isActionAllowed(ActionType.REGISTER)
       },
       {
@@ -290,7 +302,10 @@ function useEditActions(event: EventDocument) {
             closeActionView(backTo)
           }
         },
-        disabled: hasValidationErrors || !anyValuesHaveChanged,
+        disabled:
+          hasValidationErrors ||
+          !anyValuesHaveChanged ||
+          !isTargetActionEnabled(ActionType.DECLARE),
         hidden: !isActionAllowed(ActionType.DECLARE)
       },
       {
@@ -321,7 +336,8 @@ function useEditActions(event: EventDocument) {
             closeActionView(backTo)
           }
         },
-        disabled: !anyValuesHaveChanged,
+        disabled:
+          !anyValuesHaveChanged || !isTargetActionEnabled(ActionType.NOTIFY),
         hidden:
           !isActionAllowed(ActionType.NOTIFY) ||
           eventIndex.status !== EventStatus.enum.NOTIFIED
