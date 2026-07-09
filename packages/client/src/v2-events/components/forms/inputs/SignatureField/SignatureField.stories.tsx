@@ -11,8 +11,8 @@
 
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
+import { noop } from 'lodash'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { noop } from '@client/v2-events'
 import { SignatureField } from './SignatureField'
 
 const meta: Meta<typeof SignatureField> = {
