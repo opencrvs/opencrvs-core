@@ -486,6 +486,11 @@ function actionToClientAction(
         client.event.actions.archive.request(
           generator.event.actions.archive(eventId, { keepAssignment: true })
         )
+    case ActionType.UNARCHIVE:
+      return async (eventId: string) =>
+        client.event.actions.unarchive.request(
+          generator.event.actions.unarchive(eventId, { keepAssignment: true })
+        )
     case ActionType.REGISTER:
       return async (eventId: string) =>
         client.event.actions.register.request(

@@ -70,6 +70,7 @@ const EventActionEntrySchema = AuditLogEntryBase.extend({
     'event.actions.unassign.request',
     'event.actions.read.request',
     'event.actions.archive.request',
+    'event.actions.unarchive.request',
     'event.actions.reinstate.request',
     'event.actions.print_certificate.request',
     'event.actions.correction.request.request',
