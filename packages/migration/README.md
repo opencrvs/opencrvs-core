@@ -20,8 +20,6 @@ timestamp in the migrations/<package> folder.
 
 With **Postgres**, the migrations are written in SQL and separated with `-- Up Migration` and `-- Down Migration`. Write the new migration procedure under `-- Up Migration` and a procedure to revert those changes under `-- Down Migration`.
 
-- #### `yarn status:<package>`
+- #### `yarn revert`
 
-e.g. `yarn status:events`
-
-This will show status for the migration scripts defined in the migrations/<package> folder.
+This will revert all the events migrations one step at a time.
