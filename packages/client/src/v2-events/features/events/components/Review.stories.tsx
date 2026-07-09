@@ -735,13 +735,13 @@ export const AcceptModalWithRequiredField: Story = {
     await expect(confirmButton).toBeEnabled()
 
     // The required-field error must clear once the committed value is valid
-    await waitFor(() =>
+    await waitFor(async () =>
       expect(canvas.queryByText('Required')).not.toBeInTheDocument()
     )
 
     await userEvent.click(confirmButton)
 
-    await waitFor(() =>
+    await waitFor(async () =>
       expect(acceptModalRequiredFieldClose).toHaveBeenCalledWith({
         values: { 'required-comment': 'Looks good to me' }
       })
@@ -794,7 +794,7 @@ export const RejectModalWithFormFields: Story = {
 
     await userEvent.click(confirmButton)
 
-    await waitFor(() =>
+    await waitFor(async () =>
       expect(rejectModalWithFormFieldsClose).toHaveBeenCalledWith({
         reason: 'Missing supporting documents',
         values: { comments: 'Please attach the certificate' }
