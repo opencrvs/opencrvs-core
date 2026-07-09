@@ -17,7 +17,7 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
-    "types": ["fhir", "jest"]
+    "types": ["jest"]
   },
   "include": ["src/**/*.ts", "typings", "tslint-rules"],
   "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]
