@@ -20,7 +20,7 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
-    "types": ["fhir"],
+    "types": [],
     "resolveJsonModule": true
   },
   "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.json"],

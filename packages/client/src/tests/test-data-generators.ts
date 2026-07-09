@@ -21,7 +21,7 @@ import {
   UserSummary,
   UUID
 } from '@opencrvs/commons/client'
-import { FetchUserQuery, Status } from '@client/utils/gateway'
+import { FetchUserQuery, Status } from '@client/utils/gateway-types'
 import { Faker, en } from '@faker-js/faker'
 
 // Initialize faker with seed, so that the test data stays consistent
