@@ -96,6 +96,8 @@ function useDeclarationActions(event: EventDocument) {
       ? actionConfig.dialogCopy
       : null
 
+  const eventId = event.id
+
   const actions = {
     [ActionType.NOTIFY]: {
       supportingCopy: notifyActionConfig?.supportingCopy ?? dialogCopy?.notify,
@@ -104,7 +106,14 @@ function useDeclarationActions(event: EventDocument) {
         id: 'review.declare.incomplete.confirmModal.title',
         defaultMessage: 'Notify the {event}?',
         description: 'The title for review action modal when declaring'
-      }
+      },
+      onConfirm: (values: AcceptActionModalResult['values']) =>
+        events.actions.notify.mutate({
+          eventId,
+          declaration,
+          annotation: { ...annotation, ...values },
+          transactionId: uuid()
+        })
     },
     [ActionType.DECLARE]: {
       supportingCopy: dialogCopy?.declare,
@@ -113,7 +122,14 @@ function useDeclarationActions(event: EventDocument) {
         id: 'review.declare.confirmModal.title',
         defaultMessage: 'Declare the {event}?',
         description: 'The title for review action modal when declaring'
-      }
+      },
+      onConfirm: (values: AcceptActionModalResult['values']) =>
+        events.actions.declare.mutate({
+          eventId,
+          declaration,
+          annotation: { ...annotation, ...values },
+          transactionId: uuid()
+        })
     },
     [ActionType.REGISTER]: {
       supportingCopy: dialogCopy?.register,
@@ -123,7 +139,16 @@ function useDeclarationActions(event: EventDocument) {
         id: 'review.register.confirmModal.title',
         defaultMessage: 'Register the {event}?',
         description: 'The title for review action modal when registering'
-      }
+      },
+      // Combined flow: dialog values belong to the final REGISTER action only
+      onConfirm: (values: AcceptActionModalResult['values']) =>
+        events.customActions.registerOnDeclare.mutate({
+          eventId,
+          declaration,
+          annotation,
+          targetActionAnnotation: values,
+          transactionId: uuid()
+        })
     }
   }
 
@@ -149,7 +174,6 @@ function useDeclarationActions(event: EventDocument) {
 
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { isActionAllowed } = useUserAllowedActions(eventIndex)
-  const eventId = event.id
 
   const onDelete = useCallback(async () => {
     await deleteDeclaration(eventId, backTo)
@@ -179,30 +203,7 @@ function useDeclarationActions(event: EventDocument) {
     )
 
     if (modalResult) {
-      if (actionType === ActionType.REGISTER) {
-        // Combined flow: dialog values belong to the final REGISTER action only
-        events.customActions.registerOnDeclare.mutate({
-          eventId,
-          declaration,
-          annotation,
-          targetActionAnnotation: modalResult.values,
-          transactionId: uuid()
-        })
-      } else if (actionType === ActionType.NOTIFY) {
-        events.actions.notify.mutate({
-          eventId,
-          declaration,
-          annotation: { ...annotation, ...modalResult.values },
-          transactionId: uuid()
-        })
-      } else {
-        events.actions.declare.mutate({
-          eventId,
-          declaration,
-          annotation: { ...annotation, ...modalResult.values },
-          transactionId: uuid()
-        })
-      }
+      action.onConfirm(modalResult.values)
       return closeActionView(backTo)
     }
   }
