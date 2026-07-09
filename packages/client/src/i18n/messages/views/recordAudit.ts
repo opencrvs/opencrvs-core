@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { RegAction, RegStatus } from '@client/utils/gateway'
+import { RegAction, RegStatus } from '@client/utils/gateway-types'
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IRecordAuditMessages

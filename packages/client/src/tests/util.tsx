@@ -11,7 +11,7 @@
 import { App, routesConfig } from '@client/App'
 import { offlineDataReady } from '@client/offline/actions'
 import { AppStore, createStore, IStoreState } from '@client/store'
-import { EventType } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway-types'
 import { UserDetails } from '@client/utils/userUtils'
 import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
 import { TestUserRole, TokenUserType, UUID } from '@opencrvs/commons/client'
