@@ -102,7 +102,7 @@ services:
     depends_on:
       - base
     environment:
-      - WAIT_HOSTS=minio:9000,elasticsearch:9200
+      - WAIT_HOSTS=postgres:5432
   documents:
     image: ghcr.io/opencrvs/ocrvs-documents:${VERSION}
     #platform: linux/amd64
