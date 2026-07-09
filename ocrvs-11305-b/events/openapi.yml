@@ -1590,6 +1590,8 @@ components:
                   enum:
                     - createdAt
                     - updatedAt
+                    - legalStatuses.NOTIFIED.createdAt
+                    - legalStatuses.NOTIFIED.acceptedAt
                     - legalStatuses.DECLARED.createdAt
                     - legalStatuses.DECLARED.acceptedAt
                     - legalStatuses.REGISTERED.createdAt
@@ -2146,6 +2148,8 @@ components:
                               enum:
                                 - event
                                 - placeOfEvent
+                                - notifiedIn
+                                - notifiedBy
                                 - declaredIn
                                 - declaredBy
                                 - registeredIn
@@ -2408,6 +2412,8 @@ components:
                               enum:
                                 - event
                                 - placeOfEvent
+                                - notifiedIn
+                                - notifiedBy
                                 - declaredIn
                                 - declaredBy
                                 - registeredIn
@@ -3064,6 +3070,8 @@ components:
                           enum:
                             - event
                             - placeOfEvent
+                            - notifiedIn
+                            - notifiedBy
                             - declaredIn
                             - declaredBy
                             - registeredIn
@@ -8096,6 +8104,8 @@ components:
                           enum:
                             - event
                             - placeOfEvent
+                            - notifiedIn
+                            - notifiedBy
                             - declaredIn
                             - declaredBy
                             - registeredIn
@@ -8555,6 +8565,8 @@ components:
                           enum:
                             - event
                             - placeOfEvent
+                            - notifiedIn
+                            - notifiedBy
                             - declaredIn
                             - declaredBy
                             - registeredIn
@@ -13345,6 +13357,8 @@ components:
                                 enum:
                                   - event
                                   - placeOfEvent
+                                  - notifiedIn
+                                  - notifiedBy
                                   - declaredIn
                                   - declaredBy
                                   - registeredIn
@@ -13653,6 +13667,8 @@ components:
                                 enum:
                                   - event
                                   - placeOfEvent
+                                  - notifiedIn
+                                  - notifiedBy
                                   - declaredIn
                                   - declaredBy
                                   - registeredIn
@@ -15724,6 +15740,47 @@ components:
         legalStatuses:
           type: object
           properties:
+            NOTIFIED:
+              anyOf:
+                - type: object
+                  properties:
+                    createdAt:
+                      type: string
+                      format: date-time
+                      pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                      description: The timestamp when the action request was created.
+                    createdBy:
+                      type: string
+                      description: ID of the user who created the action request.
+                    createdAtLocation:
+                      description: Location of the user who created the action request.
+                      anyOf:
+                        - type: string
+                          format: uuid
+                          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                        - type: "null"
+                    createdByUserType:
+                      description: Whether the user is a normal user or a system.
+                      anyOf:
+                        - type: string
+                          enum:
+                            - user
+                            - system
+                        - type: "null"
+                    acceptedAt:
+                      type: string
+                      format: date-time
+                      pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                      description: Timestamp when the action request was accepted.
+                    createdByRole:
+                      description: Role of the user at the time of action request creation.
+                      type: string
+                  required:
+                    - createdAt
+                    - createdBy
+                    - acceptedAt
+                  additionalProperties: false
+                - type: "null"
             DECLARED:
               anyOf:
                 - type: object
