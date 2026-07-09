@@ -202,8 +202,7 @@
     "stylelint-config-recommended": "^9.0.0",
     "stylelint-config-styled-components": "^0.1.1",
     "traverse": "^0.6.6",
-    "ts-node": "^7.0.1",
-    "typescript": "5.6.3",
+    "typescript": "^7.0.2",
     "vite-plugin-pwa": "^0.20.0",
     "vitest": "0.25.5",
     "vitest-fetch-mock": "^0.2.1"

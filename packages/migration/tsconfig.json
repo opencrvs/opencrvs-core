@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
     "paths": {
-      "@migration/*": ["./*"]
+      "@migration/*": ["./src/*"]
     },
     "allowJs": true,
     "moduleResolution": "node16",

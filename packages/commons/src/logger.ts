@@ -15,11 +15,11 @@ function filterHealthCheckLogs(this: Logger, args: unknown[], method: LogFn) {
   for (const arg of args) {
     if (typeof arg === 'string' && arg.includes('get /ping 200')) {
       if (logger.debug) {
-        return logger.debug(...args)
+        return logger.debug(...(args as [string, ...unknown[]]))
       }
     }
   }
-  return method.apply(this, args)
+  return method.apply(this, args as [string, ...unknown[]])
 }
 
 export const logger =

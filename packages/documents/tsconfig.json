@@ -1,14 +1,13 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
-    "paths": { "@documents/*": ["./*"] },
+    "paths": { "@documents/*": ["./src/*"] },
     "target": "es6",
     "module": "commonjs",
     "outDir": "build/dist",
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "rootDir": ".",
     "lib": ["esnext.asynciterable", "es6", "es2019"],
     "forceConsistentCasingInFileNames": true,

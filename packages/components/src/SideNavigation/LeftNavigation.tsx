@@ -17,7 +17,7 @@ export interface ILeftNavigationProps {
   applicationName: string
   children?: React.ReactNode
   navigationWidth?: number
-  avatar?: () => void
+  avatar?: () => React.ReactNode
   name?: string | null
   role?: string | null
   assignedOffice?: string | null

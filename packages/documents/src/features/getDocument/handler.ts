@@ -34,8 +34,8 @@ export function createPreSignedUrl(
   try {
     const presignedURL = signFileUrl(`/${MINIO_BUCKET}/${filePath}`)
     return h.response({ presignedURL }).code(200)
-  } catch (error) {
-    return h.response(error).code(400)
+  } catch (error: unknown) {
+    return h.response(String(error)).code(400)
   }
 }
 

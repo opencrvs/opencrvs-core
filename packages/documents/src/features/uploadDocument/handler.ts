@@ -106,8 +106,8 @@ export async function fileExistsHandler(
 
   try {
     stat = await minioClient.statObject(MINIO_BUCKET, documentPath)
-  } catch (error) {
-    if (error.code === 'NotFound') {
+  } catch (error: unknown) {
+    if ((error as any).code === 'NotFound') {
       return h
         .response(
           `request failed: document ${documentPath} does not exist in bucket ${MINIO_BUCKET}`
@@ -152,7 +152,7 @@ export async function documentUploadHandler(
     return h
       .response({ refUrl: `/${MINIO_BUCKET}/${generateFileName}` })
       .code(200)
-  } catch (error) {
-    return Promise.reject(new Error(`request failed: ${error.message}`))
+  } catch (error: unknown) {
+    return Promise.reject(new Error(`request failed: ${(error as Error).message}`))
   }
 }

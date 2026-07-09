@@ -43,19 +43,19 @@ SearchToolView.args = {
       icon: <Icon name="Target" size="small" />,
       label: 'Tracking ID',
       placeHolderText: 'Search',
-      value: 'Tracking ID'
+      name: 'TRACKING_ID'
     },
     {
       icon: <Icon name="Medal" size="small" />,
       label: 'Registration No.',
       placeHolderText: 'Search',
-      value: 'Registration No.'
+      name: 'REGISTRATION_NUMBER'
     },
     {
       icon: <Icon name="Phone" size="small" />,
       label: 'Phone no.',
       placeHolderText: 'Search',
-      value: 'Phone no.'
+      name: 'PHONE_NUMBER'
     }
   ],
   searchHandler: (searchText: string, searchType: string) => alert(searchText),

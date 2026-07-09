@@ -102,7 +102,8 @@ export const InputField = (props: IInputFieldProps) => {
   }
 
   const children = React.Children.map(
-    props.children,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    props.children as any,
     (node: React.ReactElement) => {
       if (!node) return
       return isDomElement(node.type)

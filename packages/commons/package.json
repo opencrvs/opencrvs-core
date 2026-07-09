@@ -85,7 +85,7 @@
     "pino": "^7.0.0",
     "pkg-up": "^3.1.0",
     "qs": "6.15.2",
-    "typescript": "5.6.3",
+    "typescript": "^7.0.2",
     "uuid": "^9.0.0",
     "wireit": "^0.14.12",
     "zod": "^4.2.1",
@@ -105,7 +105,8 @@
     "jest-fetch-mock": "^2.1.2",
     "jsonwebtoken": "^9.0.2",
     "pino-pretty": "^11.0.0",
-    "ts-jest": "29.2.5"
+    "@swc/core": "^1.15.43",
+    "@swc/jest": "^0.2.39"
   },
   "lint-staged": {
     "src/**/*.ts": [
@@ -115,13 +116,23 @@
   },
   "jest": {
     "transform": {
-      "^.+\\.tsx?$": [
-        "ts-jest",
-        {
-          "tsconfig": "tsconfig-tests.json",
-          "isolatedModules": true
+      "^.+\\.tsx?$": ["@swc/jest", {
+        "jsc": {
+          "parser": {
+            "syntax": "typescript",
+            "tsx": true,
+            "decorators": true
+          },
+          "transform": {
+            "legacyDecorator": true,
+            "decoratorMetadata": true
+          },
+          "target": "es2020"
+        },
+        "module": {
+          "type": "commonjs"
         }
-      ]
+      }]
     },
     "coverageReporters": [
       "json",

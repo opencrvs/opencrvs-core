@@ -27,7 +27,7 @@ import { logger, validateFunc } from '@opencrvs/commons'
 import { readFileSync } from 'fs'
 
 import * as redis from '@gateway/utils/redis'
-import { badRequest, Boom, isBoom } from '@hapi/boom'
+import { badRequest, isBoom } from '@hapi/boom'
 import { RateLimitError } from './rate-limit'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
@@ -44,14 +44,14 @@ export async function createServer() {
     routes: {
       cors: { origin: whitelist },
       validate: {
-        failAction: async (_, _2, err: Boom) => {
+        failAction: async (_, _2, err: Error | undefined) => {
           if (process.env.NODE_ENV === 'production') {
             // In prod, log a limited error message and throw the default Bad Request error.
-            logger.error(`ValidationError: ${err.message}`)
+            logger.error(`ValidationError: ${err?.message}`)
             throw badRequest(`Invalid request payload input`)
           } else {
             // During development, log and respond with the full error.
-            logger.error(err.message)
+            logger.error(err?.message)
             throw err
           }
         }

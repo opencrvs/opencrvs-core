@@ -35,7 +35,7 @@ export async function vsExportUploaderHandler(
     return h
       .response({ refUrl: `/${MINIO_BUCKET}/${generateFileName}` })
       .code(200)
-  } catch (error) {
-    return h.response(error).code(400)
+  } catch (error: unknown) {
+    return h.response(String(error)).code(400)
   }
 }

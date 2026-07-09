@@ -203,15 +203,15 @@ class LineChartComponent extends React.Component<IProps> {
               dataKey={dataKeys[2]}
               stroke={theme.colors.teal}
               dot={false}
-              activeDot={(dotProps: ICustomisedDot) => (
-                <CustomizedDot {...dotProps} theme={theme} />
+              activeDot={(dotProps: any) => (
+                <CustomizedDot {...(dotProps as ICustomisedDot)} theme={theme} />
               )}
               strokeWidth={3}
             />
 
             <Tooltip
               cursor={{ stroke: theme.colors.yellow }}
-              content={tooltipContent}
+              content={tooltipContent as any}
             />
 
             <Legend
