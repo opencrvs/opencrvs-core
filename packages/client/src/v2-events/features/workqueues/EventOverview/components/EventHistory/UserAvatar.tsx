@@ -11,7 +11,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { User } from '@opencrvs/commons/client'
-import { Avatar, Maybe } from '@client/utils/gateway'
+import { Avatar, Maybe } from '@client/utils/gateway-types'
 import { AvatarSmall } from '@client/components/Avatar'
 import { getUsersFullName } from '@client/v2-events/utils'
 
