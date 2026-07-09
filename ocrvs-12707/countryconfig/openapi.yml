@@ -2073,6 +2073,8 @@ components:
                   enum:
                     - createdAt
                     - updatedAt
+                    - legalStatuses.NOTIFIED.createdAt
+                    - legalStatuses.NOTIFIED.acceptedAt
                     - legalStatuses.DECLARED.createdAt
                     - legalStatuses.DECLARED.acceptedAt
                     - legalStatuses.REGISTERED.createdAt
@@ -2663,6 +2665,8 @@ components:
                               enum:
                                 - event
                                 - placeOfEvent
+                                - notifiedIn
+                                - notifiedBy
                                 - declaredIn
                                 - declaredBy
                                 - registeredIn
@@ -2925,6 +2929,8 @@ components:
                               enum:
                                 - event
                                 - placeOfEvent
+                                - notifiedIn
+                                - notifiedBy
                                 - declaredIn
                                 - declaredBy
                                 - registeredIn
@@ -3581,6 +3587,8 @@ components:
                           enum:
                             - event
                             - placeOfEvent
+                            - notifiedIn
+                            - notifiedBy
                             - declaredIn
                             - declaredBy
                             - registeredIn
@@ -8615,6 +8623,8 @@ components:
                           enum:
                             - event
                             - placeOfEvent
+                            - notifiedIn
+                            - notifiedBy
                             - declaredIn
                             - declaredBy
                             - registeredIn
@@ -9074,6 +9084,8 @@ components:
                           enum:
                             - event
                             - placeOfEvent
+                            - notifiedIn
+                            - notifiedBy
                             - declaredIn
                             - declaredBy
                             - registeredIn
@@ -14449,6 +14461,8 @@ components:
                                 enum:
                                   - event
                                   - placeOfEvent
+                                  - notifiedIn
+                                  - notifiedBy
                                   - declaredIn
                                   - declaredBy
                                   - registeredIn
@@ -14769,6 +14783,8 @@ components:
                                 enum:
                                   - event
                                   - placeOfEvent
+                                  - notifiedIn
+                                  - notifiedBy
                                   - declaredIn
                                   - declaredBy
                                   - registeredIn
