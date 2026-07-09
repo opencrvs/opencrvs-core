@@ -12,7 +12,7 @@
 import { ILanguage } from '@client/i18n/reducer'
 import { AdminStructure, CRVSOffice, Facility } from '@client/offline/reducer'
 import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
-import { EventType } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway-types'
 import { cacheFile } from '@client/v2-events/cache'
 import { ApplicationConfig, TranslationConfig } from '@opencrvs/commons/client'
 import { IntlShape } from 'react-intl'
