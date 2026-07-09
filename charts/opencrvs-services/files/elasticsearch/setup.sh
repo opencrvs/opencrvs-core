@@ -12,7 +12,5 @@
 set -eu
 set -o pipefail
 
-apk add curl
-
 bash "$(dirname "${BASH_SOURCE[0]}")/setup-users.sh"
 bash "$(dirname "${BASH_SOURCE[0]}")/setup-settings.sh"

@@ -31,7 +31,7 @@ export type UserFilter = z.infer<typeof UserFilter>
  * The different types of scopes that can be used to control access to records. Each type has different options that can be used to further filter the records that the scope applies to.
  * When adding new scope types, they should be added to the appropriate section based on the options they require.
  *
- * @see scopeOptionsPlaceEvent @see scopeOptionsDeclared @see scopeOptionsFull
+ * @see scopeOptionsPlaceEvent @see scopeOptionsDeclaredOrNotified @see scopeOptionsFull
  */
 export const RecordScopeTypeV2 = z.enum([
   'record.search',
@@ -99,14 +99,16 @@ const scopeOptionsPlaceEvent = z
   })
   .describe('Options applicable to all record scopes.')
 
-const scopeOptionsDeclared = scopeOptionsPlaceEvent
+const scopeOptionsDeclaredOrNotified = scopeOptionsPlaceEvent
   .extend({
+    notifiedIn: JurisdictionFilter.optional(),
+    notifiedBy: UserFilter.optional(),
     declaredIn: JurisdictionFilter.optional(),
     declaredBy: UserFilter.optional()
   })
   .describe('Options applicable to actions that may take place after DECLARE')
 
-const AllRecordScopeOptions = scopeOptionsDeclared
+const AllRecordScopeOptions = scopeOptionsDeclaredOrNotified
   .extend({
     registeredIn: JurisdictionFilter.optional(),
     registeredBy: UserFilter.optional()
@@ -164,6 +166,8 @@ const ResolvedScopeOptionsPlaceEvent = z
   )
 
 const ResolvedScopeOptionsDeclared = ResolvedScopeOptionsPlaceEvent.extend({
+  notifiedIn: UUID.nullish(),
+  notifiedBy: z.string().optional(),
   declaredIn: UUID.nullish(),
   declaredBy: z.string().optional()
 }).describe(
@@ -219,7 +223,7 @@ export const RecordScopeV2 = z
     }),
     z.object({
       type: ScopesWithDeclaredOptions,
-      options: scopeOptionsDeclared.optional()
+      options: scopeOptionsDeclaredOrNotified.optional()
     }),
     z.object({
       type: ScopesWithFullOptions,
@@ -428,8 +432,9 @@ export const decodeScope = (encodedScope: EncodedScope) => {
 const DEFAULT_SCOPE_OPTIONS: Partial<AllScopeOptions> = {
   placeOfEvent: JurisdictionFilter.enum.all,
   accessLevel: JurisdictionFilter.enum.all,
-  registeredIn: JurisdictionFilter.enum.all,
-  declaredIn: JurisdictionFilter.enum.all
+  notifiedIn: JurisdictionFilter.enum.all,
+  declaredIn: JurisdictionFilter.enum.all,
+  registeredIn: JurisdictionFilter.enum.all
 }
 
 /**

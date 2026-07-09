@@ -1,7 +1,7 @@
 {{- define "elasticsearch-reindex.containerSpec" -}}
 - name: elasticsearch-reindex
-  command: ["sh", "-c", "apk add --no-cache curl jq && /data-assets/reindex.sh"]
-  image: "alpine"
+  command: ["sh", "-c", "/data-assets/reindex.sh"]
+  image: {{ include "opencrvs.image" (dict "root" . "service" .Values.utilities) }}
   env:
     - name: AUTH_URL
       value: "http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040"

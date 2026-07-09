@@ -16,6 +16,7 @@ import {
   JurisdictionFilter,
   TENNIS_CLUB_MEMBERSHIP,
   UserFilter,
+  createPrng,
   encodeScope,
   getDeclarationFields
 } from '@opencrvs/commons'
@@ -23,8 +24,13 @@ import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   assertScopeResult,
   createTestClient,
-  setupScopeTestFixture
+  setupScopeTestFixture,
+  TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
+import {
+  payloadGenerator,
+  setupHierarchyWithUsers
+} from '@events/tests/generators'
 import { createIndex } from '@events/service/indexing/indexing'
 import { getEventIndexName } from '@events/storage/elasticsearch'
 import { EventNotFoundError } from '../../service/events/events'
@@ -118,3 +124,79 @@ test('Check scopes against event.get', async () => {
     { numRuns: 40 }
   )
 })
+
+test('Check notifiedIn and notifiedBy scopes against event.get', async () => {
+  const rng = createPrng(55667788)
+  const generator = payloadGenerator(rng)
+
+  const { users, isUnderAdministrativeArea } = await setupHierarchyWithUsers()
+
+  // Each user creates and notifies one event so every office/user combo is represented.
+  const eventIds: string[] = []
+  for (const user of users) {
+    const testClient = createTestClient(user, TEST_USER_DEFAULT_SCOPES)
+    const event = await testClient.event.create(generator.event.create())
+    await testClient.event.actions.notify.request(
+      generator.event.actions.notify(event.id)
+    )
+    eventIds.push(event.id)
+  }
+
+  const clientReadingAllEvents = createTestClient(users[0], [
+    encodeScope({ type: 'record.read' })
+  ])
+
+  const jurisdictionOptions = fc.option(
+    fc.constantFrom(...JurisdictionFilter.options),
+    { nil: undefined }
+  )
+
+  const userOptions = fc.option(fc.constant(UserFilter.enum.user), {
+    nil: undefined
+  })
+
+  const combinations = fc.record({
+    user: fc.constantFrom(...users),
+    notifiedIn: jurisdictionOptions,
+    notifiedBy: userOptions
+  })
+
+  await fc.assert(
+    fc.asyncProperty(combinations, async ({ user, notifiedIn, notifiedBy }) => {
+      const scope = encodeScope({
+        type: 'record.read',
+        options: { notifiedIn, notifiedBy }
+      })
+
+      const randomIndex = Math.floor(Math.random() * eventIds.length)
+      const [eventId] = eventIds.splice(randomIndex, 1)
+
+      const testClient = createTestClient(user, [scope])
+
+      let result: { success: boolean; event: EventDocument }
+      try {
+        const eventFetchedAsUser = await testClient.event.get({ eventId })
+        result = { success: true, event: eventFetchedAsUser }
+      } catch (error) {
+        if (error instanceof EventNotFoundError) {
+          const eventFetchedAsAdmin = await clientReadingAllEvents.event.get({
+            eventId
+          })
+          result = { success: false, event: eventFetchedAsAdmin }
+        } else {
+          throw error
+        }
+      }
+
+      assertScopeResult(result, {
+        user,
+        event: undefined,
+        placeOfEvent: undefined,
+        isUnderAdministrativeArea,
+        notifiedIn,
+        notifiedBy
+      })
+    }),
+    { numRuns: 20 }
+  )
+}, 120000)

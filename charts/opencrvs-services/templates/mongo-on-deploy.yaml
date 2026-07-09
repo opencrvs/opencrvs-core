@@ -14,10 +14,11 @@ spec:
       labels:
         app: mongo-on-deploy
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.mongodb) | nindent 6 }}
       containers:
         - name: mongo-on-deploy
           command: ["/bin/bash", "/on-deploy.sh"]
-          image: "mongo:4.4"
+          image: {{ include "opencrvs.imageReference" .Values.mongodb }}
           env:
             - name: MONGODB_HOSTNAME
               value: {{ .Values.mongodb.host }}
