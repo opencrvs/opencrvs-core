@@ -14,9 +14,10 @@ spec:
       labels:
         app: elastalert
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.elastalert) | nindent 6 }}
       initContainers:
         - name: setup-indices
-          image: appropriate/curl
+          image: {{ include "opencrvs.imageReference" .Values.utilities }}
           env:
             - name: ES_HOST
               value: {{ $elastic_host }}
@@ -50,7 +51,7 @@ spec:
                 exit 1
               fi
         - name: setup-rules
-          image: "bash"
+          image: {{ include "opencrvs.imageReference" .Values.utilities }}
           env:
             - name: DOMAIN
               value: {{ .Values.hostname }}
@@ -59,7 +60,11 @@ spec:
             - bash
             - -c
             - |
-              apk add envsubst
+              if ! command -v envsubst >/dev/null 2>&1 && ! apk add --no-cache envsubst; then
+                echo "[ERROR] Missing utility: envsubst" >&2
+                echo "[ERROR] Automatic installation failed. Ensure the container can access its package repositories, or include the required package in the base image for air-gapped deployments." >&2
+                exit 1
+              fi
               mkdir -p /rules
               for f in /rules-templates/*.yaml; do
                 echo "processing file $f"
@@ -81,7 +86,7 @@ spec:
           {{- end }}
       containers:
         - name: elastalert
-          image: jertel/elastalert2:2.25.0
+          image: {{ include "opencrvs.imageReference" .Values.elastalert }}
           env:
             - name: DOMAIN
               value: {{ .Values.hostname }}

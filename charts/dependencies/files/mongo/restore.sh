@@ -9,6 +9,8 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
+. /scripts/backup-functions.sh
+
 echo "Running restore"
 DATABASES=${DATABASES:-"hearth-dev events user-mgnt metrics performance"}
 
@@ -21,40 +23,24 @@ REMOTE_DIR="${BACKUP_REMOTE_DIR:-"/home/$BACKUP_USER"}/$RESTORE_DATE"
 ARCHIVE_NAME="mongo_backup_${RESTORE_DATE}.tar.gz"
 ARCHIVE_PATH="/tmp/$ARCHIVE_NAME"
 
-# Install required software to transfer backup on remote host
-rm /etc/apt/sources.list.d/mongodb-org.list
-apt-get update
-apt-get install -y openssh-client rsync
+# Install required tools only when the image does not already provide them.
+missing=""
+for utility in ssh rsync; do
+  command -v "$utility" >/dev/null 2>&1 || missing="$missing $utility"
+done
+if [ -n "$missing" ]; then
+  rm -f /etc/apt/sources.list.d/mongodb-org.list
+  if ! apt-get update || ! apt-get install -y openssh-client rsync; then
+    echo "[ERROR] Missing utilities:$missing" >&2
+    echo "[ERROR] Automatic installation failed. Ensure the container can access its package repositories, or include the required packages in the base image for air-gapped deployments." >&2
+    exit 1
+  fi
+fi
 
 if [ -z "$ENCRYPT_PASS" ]; then
   echo "[$(date +%F\ %H:%M:%S)] [ERROR] Must provide ENCRYPT_PASS environment variable"
   exit 1
 fi
-
-transfer_from_backup_host(){
-  echo "[$(date +%F\ %H:%M:%S)] Transfer backup from remote host"
-if rsync -avz \
-  -e "ssh -i /ssh/ssh_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
-  "${BACKUP_USER}@${BACKUP_HOST}:${REMOTE_DIR}/${ARCHIVE_NAME}.enc" "${ARCHIVE_PATH}.enc"; then
-  echo "[$(date +%F\ %H:%M:%S)] Encrypted backup file ${ARCHIVE_PATH}.enc transferred from backup host ${BACKUP_HOST}:${REMOTE_DIR}"
-else
-  echo "[$(date +%F\ %H:%M:%S)] [ERROR] Failed to transfer file ${ARCHIVE_PATH}.enc from backup host ${BACKUP_HOST}:${REMOTE_DIR}" >&2
-  exit 1
-fi
-  
-}
-
-decrypt_backup() {
-  echo "[$(date +%F\ %H:%M:%S)] Decrypting backup file"
-  openssl enc -d -aes-256-cbc -pbkdf2 -salt -in "${ARCHIVE_PATH}.enc" -out "$ARCHIVE_PATH" -pass env:ENCRYPT_PASS
-  echo "[$(date +%F\ %H:%M:%S)] Decrypted archive at $ARCHIVE_PATH"
-}
-extract_backup(){
-  mkdir -p "$WORK_PATH"
-  tar -zxvf "$ARCHIVE_PATH" -C "$WORK_PATH"
-  echo "[$(date +%F\ %H:%M:%S)] Archive $ARCHIVE_PATH extracted into $WORK_PATH"
-  ls -hl $WORK_PATH
-}
 
 restore_databases() {
   echo "[$(date +%F\ %H:%M:%S)] Running restore databases"
@@ -81,12 +67,8 @@ restore_databases() {
 
 echo "[$(date +%F\ %H:%M:%S)] Running restore"
 
-transfer_from_backup_host
-
-decrypt_backup
-
-extract_backup
-
+transfer_from_backup_host "$REMOTE_DIR/${ARCHIVE_NAME}.enc" "${ARCHIVE_PATH}.enc" "$BACKUP_USER" "$BACKUP_HOST" || exit 1
+decrypt_backup "${ARCHIVE_PATH}.enc" "$ARCHIVE_PATH" || exit 1
+extract_archive "$ARCHIVE_PATH" "$WORK_PATH" || exit 1
 /scripts/cleanup.sh
-
 restore_databases

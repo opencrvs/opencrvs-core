@@ -1,7 +1,7 @@
 {{- define "postgres-on-deploy.containerSpec" -}}
 - name: postgres-on-deploy
   command: ["bash", "-c", "/scripts/on-deploy.sh"]
-  image: {{ .Values.postgres.image }}
+  image: {{ include "opencrvs.imageReference" .Values.postgres }}
   volumeMounts:
     - mountPath: /scripts
       name: postgres-on-deploy-script

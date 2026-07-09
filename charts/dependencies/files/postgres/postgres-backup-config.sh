@@ -11,11 +11,10 @@
 
 set -e
 
+. "$(dirname "${BASH_SOURCE[0]}")/ensure-deb-utils.sh"
 
 common_config(){
-apt update -q
-apt upgrade -y -q
-apt install -y -q pgbackrest openssh-client
+ensure_deb_utils "pgbackrest openssh-client" pgbackrest ssh || exit 1
 # Common configuration for backup and restore
 # Temporal directory required for pushing WAL files
 echo "Create pgbackrest temp directory with correct permissions"
@@ -105,4 +104,3 @@ case "${DB_TYPE:-standalone}" in
     exit 1
     ;;
 esac
-

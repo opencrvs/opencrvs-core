@@ -28,10 +28,11 @@ spec:
             app: postgres
             job-type: backup
         spec:
+          {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.postgres) | nindent 10 }}
           restartPolicy: OnFailure
           containers:
             - name: backup
-              image: {{ .Values.postgres.image }}
+              image: {{ include "opencrvs.imageReference" .Values.postgres }}
               env:
                 - name: POSTGRES_HOST
                   value: postgres-0.postgres.{{ .Release.Namespace }}.svc.cluster.local
