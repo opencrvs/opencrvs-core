@@ -39,7 +39,7 @@ jobs:
           package-manager-cache: false
 
       - name: Update npm for OIDC trusted publishing
-        run: npm install -g npm@latest
+        run: npm install -g npm@11
 
       - name: Check if version exists on npm
         id: check-version
