@@ -24,7 +24,7 @@ export default async function integrationCreatorTokenHandler(
   const token = await createToken(
     'opencrvs:countryconfig-service',
     [SCOPES.INTEGRATION_CREATE],
-    ['opencrvs:auth-user'],
+    ['opencrvs:countryconfig-user', 'opencrvs:user-mgnt-user'],
     'opencrvs:auth-service',
     undefined,
     true,

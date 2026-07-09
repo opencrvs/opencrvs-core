@@ -473,7 +473,7 @@ export interface GQLSystem {
   shaSecret: string
   status: GQLSystemStatus
   name: string
-  type: GQLSystemType
+  type?: GQLSystemType
   integratingSystemType?: GQLIntegratingSystemType
   settings?: GQLSystemSettings
 }

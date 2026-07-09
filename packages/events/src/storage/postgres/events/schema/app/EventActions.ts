@@ -30,7 +30,7 @@ export default interface EventActionsTable {
 
   createdBy: ColumnType<string, string, string>
 
-  createdByRole: ColumnType<string, string, string>
+  createdByRole: ColumnType<string | null, string | null, string | null>
 
   createdBySignature: ColumnType<string | null, string | null, string | null>
 

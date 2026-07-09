@@ -534,60 +534,44 @@ export async function deleteSystem(
 interface ICreateIntegrationPayload {
   name: string
   scopes: RecordScope[]
-  clientId?: string
-  clientSecret?: string
 }
 
 export async function createIntegrationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { name, scopes, clientId, clientSecret } =
-    request.payload as ICreateIntegrationPayload
+  const { name, scopes } = request.payload as ICreateIntegrationPayload
 
   for (const scope of scopes) {
     const parsed = RecordScopeType.safeParse(scope.type)
     if (!parsed.success) {
-      return h
-        .response(`Invalid scope type: ${scope.type}`)
-        .code(400)
+      return h.response(`Invalid scope type: ${scope.type}`).code(400)
     }
   }
 
-  const resolvedClientId = clientId ?? uuid()
-  const resolvedClientSecret = clientSecret ?? uuid()
-  const sha_secret = uuid()
-  const { hash, salt } = generateSaltedHash(resolvedClientSecret)
   const scopeStrings = scopes.map(stringifyScope)
 
   try {
-    const existing = await System.findOne({ client_id: resolvedClientId })
+    const existing = await System.findOne({ name })
 
     if (existing) {
-      const { hash: newHash, salt: newSalt } =
-        generateSaltedHash(resolvedClientSecret)
-      await System.updateOne(
-        { client_id: resolvedClientId },
-        {
-          name,
-          scope: scopeStrings,
-          secretHash: newHash,
-          salt: newSalt,
-          sha_secret
-        }
-      )
+      await System.updateOne({ name }, { scope: scopeStrings })
       return h
         .response({
-          clientId: resolvedClientId,
-          clientSecret: resolvedClientSecret,
-          sha_secret
+          clientId: existing.client_id,
+          sha_secret: existing.sha_secret
         })
         .code(200)
     }
 
+    const clientId = uuid()
+    const clientSecret = uuid()
+    const sha_secret = uuid()
+    const { hash, salt } = generateSaltedHash(clientSecret)
+
     await System.create({
       name,
-      client_id: resolvedClientId,
+      client_id: clientId,
       scope: scopeStrings,
       secretHash: hash,
       salt,
@@ -596,13 +580,7 @@ export async function createIntegrationHandler(
       settings: { dailyQuota: 0, webhook: [] }
     })
 
-    return h
-      .response({
-        clientId: resolvedClientId,
-        clientSecret: resolvedClientSecret,
-        sha_secret
-      })
-      .code(201)
+    return h.response({ clientId, sha_secret }).code(201)
   } catch (e) {
     logger.error(e)
     return h.response().code(400)
@@ -620,13 +598,10 @@ export const createIntegrationRequestSchema = Joi.object({
         }).required()
       })
     )
-    .required(),
-  clientId: Joi.string().uuid().optional(),
-  clientSecret: Joi.string().optional()
+    .required()
 })
 
 export const createIntegrationResponseSchema = Joi.object({
   clientId: Joi.string().uuid().required(),
-  clientSecret: Joi.string().required(),
   sha_secret: Joi.string().required()
 })
