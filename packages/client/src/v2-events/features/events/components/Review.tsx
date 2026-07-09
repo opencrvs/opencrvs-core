@@ -47,6 +47,7 @@ import { getCountryLogoFile } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { buttonMessages } from '@client/i18n/messages'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useDialogFormState } from '@client/v2-events/hooks/useDialogFormState'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 import { TranslationTextWithFormatModifier } from './TranslationTextWithFormatModifier'
@@ -676,15 +677,8 @@ function AcceptActionModal({
 }) {
   const intl = useIntl()
   const validatorContext = useValidatorContext()
-  const [modalValues, setModalValues] = useState<EventState>({})
-  // Controlled form state: values and touched are passed back into
-  // FormFieldGenerator so it reinitialises and revalidates against the
-  // committed values. Blur-committing inputs (e.g. TEXT) otherwise leave a
-  // stale required-error behind, since touch-triggered validation runs
-  // before the value lands in the form state.
-  const [modalTouched, setModalTouched] = useState<
-    IndexMap<FormState<boolean>>
-  >({})
+  const dialogForm = useDialogFormState()
+  const modalValues = dialogForm.formValues
 
   const errorsOnField = fields.flatMap((field) =>
     flattenFormState(
@@ -741,19 +735,14 @@ function AcceptActionModal({
         )}
         {fields.length > 0 && (
           <FormFieldGenerator
+            {...dialogForm}
             eventConfig={eventConfiguration}
             fields={fields}
-            formTouched={modalTouched}
-            formValues={modalValues}
             id={`accept-action-modal-form-${action}`}
             validatorContext={{
               ...validatorContext,
               baseFormState: declaration
             }}
-            onFormChange={(values) =>
-              setModalValues((prev) => ({ ...prev, ...values }))
-            }
-            onTouchedChange={setModalTouched}
           />
         )}
       </Stack>
@@ -778,12 +767,8 @@ function RejectActionModal({
   eventConfiguration: EventConfig
 }) {
   const [message, setMessage] = useState<string>('')
-  const [modalValues, setModalValues] = useState<EventState>({})
-  // Controlled form state — see AcceptActionModal for why values and touched
-  // are fed back into FormFieldGenerator.
-  const [modalTouched, setModalTouched] = useState<
-    IndexMap<FormState<boolean>>
-  >({})
+  const dialogForm = useDialogFormState()
+  const modalValues = dialogForm.formValues
   const intl = useIntl()
   const validatorContext = useValidatorContext()
 
@@ -847,16 +832,11 @@ function RejectActionModal({
         />
         {fields.length > 0 && (
           <FormFieldGenerator
+            {...dialogForm}
             eventConfig={eventConfiguration}
             fields={fields}
-            formTouched={modalTouched}
-            formValues={modalValues}
             id="reject-action-modal-form"
             validatorContext={validatorContext}
-            onFormChange={(values) =>
-              setModalValues((prev) => ({ ...prev, ...values }))
-            }
-            onTouchedChange={setModalTouched}
           />
         )}
       </Stack>

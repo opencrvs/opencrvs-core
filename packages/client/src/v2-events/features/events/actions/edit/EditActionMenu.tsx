@@ -43,6 +43,7 @@ import {
   Button
 } from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { useDialogFormState } from '@client/v2-events/hooks/useDialogFormState'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { messages as actionMessages } from '@client/i18n/messages/views/action'
 import { ROUTES } from '@client/v2-events/routes'
@@ -127,9 +128,8 @@ function EditActionModal({
   const intl = useIntl()
   const [comment, setComment] = useState('')
   const validatorContext = useValidatorContext()
-  const [modalValues, setModalValues] = useState<
-    Record<string, FieldUpdateValue>
-  >({})
+  const dialogForm = useDialogFormState()
+  const modalValues = dialogForm.formValues
 
   const errorsOnField = fields.flatMap((field) =>
     flattenFormState(
@@ -195,13 +195,11 @@ function EditActionModal({
       />
       {fields.length > 0 && (
         <FormFieldGenerator
+          {...dialogForm}
           eventConfig={eventConfiguration}
           fields={fields}
           id="edit-action-modal-form"
           validatorContext={{ ...validatorContext, baseFormState: declaration }}
-          onFormChange={(values) =>
-            setModalValues((prev) => ({ ...prev, ...values }))
-          }
         />
       )}
     </Dialog>
