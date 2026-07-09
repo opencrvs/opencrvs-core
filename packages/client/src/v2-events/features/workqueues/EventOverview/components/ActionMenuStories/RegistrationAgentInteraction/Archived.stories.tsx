@@ -42,7 +42,8 @@ const archivedScenariosForRegistrationAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      ['Assign']: AssertType.ENABLED
+      ['Assign']: AssertType.ENABLED,
+      ['Unarchive']: AssertType.DISABLED
     }
   },
   {
@@ -58,7 +59,8 @@ const archivedScenariosForRegistrationAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      ['Unassign']: AssertType.ENABLED
+      ['Unassign']: AssertType.ENABLED,
+      ['Unarchive']: AssertType.ENABLED
     }
   },
   {
@@ -73,7 +75,8 @@ const archivedScenariosForRegistrationAgent: Scenario[] = [
       AssignmentStatus.ASSIGNED_TO_OTHERS
     ],
     expected: {
-      ...getHiddenActions()
+      ...getHiddenActions(),
+      ['Unarchive']: AssertType.DISABLED
     }
   }
 ]
