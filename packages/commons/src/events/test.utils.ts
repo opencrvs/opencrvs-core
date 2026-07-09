@@ -35,6 +35,7 @@ import {
   RejectCorrectionActionInput,
   RejectDeclarationActionInput,
   RequestCorrectionActionInput,
+  UnarchiveActionInput,
   UnassignActionInput
 } from './ActionInput'
 import { ActionType, DeclarationUpdateActions } from './ActionType'
@@ -620,6 +621,22 @@ export function eventPayloadGenerator(
         content: {
           reason: `${ActionType.ARCHIVE}`
         },
+        ...input
+      }),
+      unarchive: (
+        eventId: string,
+        input: Partial<
+          Pick<
+            UnarchiveActionInput,
+            'transactionId' | 'declaration' | 'keepAssignment'
+          >
+        > = {}
+      ) => ({
+        type: ActionType.UNARCHIVE,
+        transactionId: input.transactionId ?? getUUID(),
+        declaration: {},
+        annotation: {},
+        eventId,
         ...input
       }),
       reject: (
