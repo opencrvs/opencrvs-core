@@ -268,10 +268,7 @@ function useEditActions(event: EventDocument) {
           }
         },
         disabled:
-          hasValidationErrors ||
-          !anyValuesHaveChanged ||
-          !canDirectlyRegister ||
-          !isTargetActionEnabled(ActionType.REGISTER),
+          hasValidationErrors || !anyValuesHaveChanged || !canDirectlyRegister,
         hidden: !isActionAllowed(ActionType.REGISTER)
       },
       {

@@ -41,6 +41,19 @@ export function useCanDirectlyRegister(event: EventDocument) {
     return false
   }
 
+  const currentEventIndex = getCurrentEventState(event, eventConfiguration)
+  const declareActionConfig = getActionConfig({
+    eventConfiguration,
+    actionType: ActionType.DECLARE
+  })
+
+  if (
+    !declareActionConfig ||
+    !isActionAvailable(declareActionConfig, currentEventIndex, validatorContext)
+  ) {
+    return false
+  }
+
   const eventAfterDeclare = {
     ...event,
     actions: event.actions.concat({
