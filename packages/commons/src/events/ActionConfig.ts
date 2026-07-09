@@ -103,6 +103,12 @@ const ArchiveConfig = ActionConfigBase.extend(
   }).shape
 )
 
+const UnarchiveConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.UNARCHIVE)
+  }).shape
+)
+
 const EditActionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.EDIT),
@@ -212,6 +218,10 @@ export const ActionConfig = z
     ArchiveConfig.meta({
       id: 'ArchiveActionConfig',
       description: 'Configuration for archiving a record.'
+    }),
+    UnarchiveConfig.meta({
+      id: 'UnarchiveActionConfig',
+      description: 'Configuration for unarchiving a record.'
     }),
     CustomActionConfig.meta({
       id: 'CustomActionConfig',
