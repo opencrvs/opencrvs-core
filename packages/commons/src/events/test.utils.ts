@@ -882,6 +882,7 @@ export function generateActionDocument<T extends ActionType>({
     case ActionType.NOTIFY:
     case ActionType.REGISTER:
     case ActionType.REQUEST_CORRECTION:
+    case ActionType.UNARCHIVE:
       return { ...actionBase, type: action }
     case ActionType.EDIT:
       return {
