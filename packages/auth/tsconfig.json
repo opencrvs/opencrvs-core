@@ -20,7 +20,7 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
-    "types": ["fhir", "jest"]
+    "types": ["jest"]
   },
   "include": ["resources/**/*.ts", "src/**/*.ts", "typings"],
   "exclude": [
