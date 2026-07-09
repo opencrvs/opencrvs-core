@@ -846,7 +846,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 1649c73d-e212-4195-ae43-fb363ec8af76
+                transactionId: c0aacecf-9217-4d82-97de-d6ea2dc7758b
                 type: birth
       responses:
         "200":
@@ -936,7 +936,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 883a349c-76c5-446e-bf30-7357529ad956
+                transactionId: fb8cd2e4-2715-4fd3-bca3-753b62e0b499
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1444,7 +1444,6 @@ paths:
                           - createdByUserType
                           - createdAt
                           - createdBy
-                          - createdByRole
                           - status
                           - type
                   description: Ordered list of actions associated with the event.
@@ -12945,7 +12944,6 @@ components:
                   - createdByUserType
                   - createdAt
                   - createdBy
-                  - createdByRole
                   - status
                   - type
           description: Ordered list of actions associated with the event.
@@ -13066,7 +13064,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13135,7 +13132,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13213,7 +13209,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13301,7 +13296,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13371,7 +13365,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13448,7 +13441,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13526,7 +13518,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13596,7 +13587,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13669,7 +13659,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13738,7 +13727,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13810,7 +13798,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13880,7 +13867,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13951,7 +13937,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -14032,7 +14017,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -14103,7 +14087,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -14178,7 +14161,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -14247,7 +14229,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -14336,7 +14317,6 @@ components:
                 - createdAt
                 - createdBy
                 - acceptedAt
-                - createdByRole
             REGISTERED:
               type: object
               nullable: true
@@ -14380,7 +14360,6 @@ components:
                 - createdAt
                 - createdBy
                 - acceptedAt
-                - createdByRole
                 - registrationNumber
           description: Metadata related to the legal registration of the event, such as
             who registered it and when.
