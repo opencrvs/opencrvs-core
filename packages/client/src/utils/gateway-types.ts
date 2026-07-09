@@ -13,49 +13,10 @@
  * Hand-written replacements for the handful of types that used to be
  * generated from the gateway GraphQL schema (src/utils/gateway.ts).
  */
-
-export type Maybe<T> = T | null
-
-export type Avatar = {
-  __typename?: 'Avatar'
-  data: string
-  type: string
-}
-
 export enum EventType {
   Birth = 'birth',
   Death = 'death',
   Marriage = 'marriage'
-}
-
-export enum RegAction {
-  ApprovedCorrection = 'APPROVED_CORRECTION',
-  Assigned = 'ASSIGNED',
-  Corrected = 'CORRECTED',
-  Downloaded = 'DOWNLOADED',
-  FlaggedAsPotentialDuplicate = 'FLAGGED_AS_POTENTIAL_DUPLICATE',
-  MarkedAsDuplicate = 'MARKED_AS_DUPLICATE',
-  MarkedAsNotDuplicate = 'MARKED_AS_NOT_DUPLICATE',
-  Reinstated = 'REINSTATED',
-  RejectedCorrection = 'REJECTED_CORRECTION',
-  RequestedCorrection = 'REQUESTED_CORRECTION',
-  Unassigned = 'UNASSIGNED',
-  Verified = 'VERIFIED',
-  Viewed = 'VIEWED'
-}
-
-export enum RegStatus {
-  Archived = 'ARCHIVED',
-  Certified = 'CERTIFIED',
-  CorrectionRequested = 'CORRECTION_REQUESTED',
-  DeclarationUpdated = 'DECLARATION_UPDATED',
-  Declared = 'DECLARED',
-  InProgress = 'IN_PROGRESS',
-  Issued = 'ISSUED',
-  Registered = 'REGISTERED',
-  Rejected = 'REJECTED',
-  Validated = 'VALIDATED',
-  WaitingValidation = 'WAITING_VALIDATION'
 }
 
 export enum Status {

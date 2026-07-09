@@ -19,7 +19,7 @@ import { sortBy } from 'lodash'
 import ts from 'typescript'
 import { MessageDescriptor } from 'react-intl'
 
-export async function writeJSONToCSV(
+async function writeJSONToCSV(
   filename: string,
   data: Array<Record<string, any>>
 ) {
