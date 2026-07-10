@@ -25,6 +25,7 @@ import {
 import { forbidden, unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
+import { maskEmail, maskSms } from '@opencrvs/commons'
 
 interface IAuthPayload {
   username: string
@@ -59,8 +60,8 @@ export default async function authenticateHandler(
 
   const nonce = generateNonce()
   const response: IAuthResponse = {
-    mobile: result.mobile,
-    email: result.email,
+    mobile: result.mobile && maskSms(result.mobile),
+    email: result.email && maskEmail(result.email),
     status: result.status,
     nonce
   }
