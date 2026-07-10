@@ -87,7 +87,7 @@
     }
   },
   "lint-staged": {
-    "src/**/*.{ts,graphql}": [
+    "src/**/*.ts": [
       "prettier --write",
       "eslint -c eslint.config.js --fix"
     ]

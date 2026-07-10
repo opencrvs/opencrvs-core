@@ -73,7 +73,7 @@ const config = {
 vi.stubGlobal('config', config)
 
 /*
- * GraphQL Queries
+ * Profile queries
  */
 import { queries } from './profile/queries'
 

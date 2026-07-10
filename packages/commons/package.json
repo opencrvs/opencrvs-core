@@ -65,7 +65,6 @@
   },
   "private": true,
   "dependencies": {
-    "@types/fhir": "^0.0.37",
     "@types/hapi__hapi": "^20.0.0",
     "@types/jest": "^26.0.14",
     "@types/jwt-decode": "^2.2.1",
