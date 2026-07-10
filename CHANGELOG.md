@@ -4,12 +4,16 @@
 
 ### Upgrade guidance
 
-#### MongoDB fully removed — pass through v2.0.0 first
+#### MongoDB fully removed — countries upgrading from 1.9.x must go through v2.0.0
 
-This release deletes the last MongoDB-aware code (the legacy-data migration tooling, its `mongo_fdw` SQL, and the `data-migration-legacy` Helm job/dependency chart/Swarm compose service). That tooling performed the one-time migration of MongoDB collections into PostgreSQL, and it only ships in **v2.0.0** — there is no later opportunity to run it.
+**Upgrading from v2.0.0 → 2.1.0: nothing to do.** Your data was already migrated from MongoDB to PostgreSQL during the v2.0.0 upgrade, and this release simply deletes the now-unused MongoDB code.
 
-- **Helm/Kubernetes deployments**: it ran automatically as a `pre-install,pre-upgrade` hook (`data_migration_legacy.enabled: true` by default) on every `helm upgrade`. Deployments that upgraded to v2.0.0 with the default enabled have nothing to do — the migration already ran. Deployments that disabled `data_migration_legacy` must upgrade through v2.0.0 with it re-enabled before going to 2.1.0.
-- **Docker Swarm deployments** (country-config/Farajaland `docker-compose.deploy.yml`): also automatic, by a different mechanism — `deploy.sh` runs `docker stack deploy --prune -c ...`, which creates and runs any service new to the compose file. Since `legacy-data-migration` first appeared in the v2.0.0 compose file, the first Swarm deploy to v2.0.0 created and ran it once, same as Helm. Deployments that skipped v2.0.0 entirely, or pruned/removed that service before it ran, must upgrade through v2.0.0 first — the compose service has since been deleted from `develop`, so it would need restoring from the v2.0.0 tag to run manually.
+**Upgrading from 1.9.x: you cannot skip straight to 2.1.0.** You must first upgrade to **v2.0.0**, which performs the one-time migration of MongoDB collections into PostgreSQL, and only then upgrade to 2.1.0. This release deletes the migration tooling (the legacy-data migration, its `mongo_fdw` SQL, and the `data-migration-legacy` Helm job/dependency chart/Swarm compose service), so v2.0.0 is the only release that can migrate your data.
+
+How the migration runs during the v2.0.0 upgrade:
+
+- **Helm/Kubernetes deployments**: automatically, as a `pre-install,pre-upgrade` hook (`data_migration_legacy.enabled: true` by default) on `helm upgrade`. If you disabled `data_migration_legacy`, re-enable it while on v2.0.0 before going to 2.1.0.
+- **Docker Swarm deployments** (Countryconfig/Farajaland `docker-compose.deploy.yml`): also automatically — `deploy.sh` runs `docker stack deploy --prune -c ...`, which creates and runs the `legacy-data-migration` service the first time you deploy v2.0.0. If that service was pruned/removed before it ran, restore it from the v2.0.0 tag and run it manually while still on v2.0.0.
 
 ### Breaking changes
 
@@ -59,13 +63,13 @@ The `scheduler` package and its Docker service have been removed. The service ra
 #### Location APIs
 
 - **Removed following endpoints from gateway:**
-  | Path | Method |
-  |--------------------|--------|
-  | `/location` | `*` |
-  | `/location/{id}` | `*` |
-  | `/locations` | `GET` |
-  | `/locations` | `POST` |
-  | `/locations/{id}` | `*` |
+  | Path              | Method |
+  | ----------------- | ------ |
+  | `/location`       | `*`    |
+  | `/location/{id}`  | `*`    |
+  | `/locations`      | `GET`  |
+  | `/locations`      | `POST` |
+  | `/locations/{id}` | `*`    |
 
 V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
 
@@ -1243,9 +1247,9 @@ To see Events V2 in action, check out the example configurations in the **countr
 - **Check your Metabase map file.** For Metabase configuration, we renamed `farajaland-map.geojson` to `map.geojson` to not tie implementations into example country naming conventions.
 - **Feature flags** In order to make application config settings more readable, we re-organised `src/api/application/application-config-default.ts` with a clear feature flag block like so. These are then used across the front and back end of the application to control configurable functionality. New feature flags DEATH_REGISTRATION allow you to optionally run off death registration if your country doesnt want to run its first pilot including death and PRINT_DECLARATION (see New Features) have been added.
   `FEATURES: {
-  DEATH_REGISTRATION: true,
-  MARRIAGE_REGISTRATION: false,
-  ...
+DEATH_REGISTRATION: true,
+MARRIAGE_REGISTRATION: false,
+...
 } `
 - **Improve rendering of addresses in review page where addresses match** When entering father's address details, some countries make use of a checkbox which says "Address is the same as the mothers. " which, when selected, makes the mother's address and fathers address the same. The checkbox has a programatic value of "Yes" or "No". As a result on the review page, the value "Yes" was displayed which didn't make grammatical sense as a response. We decided to use a custom label: "Same as mother's", which is what was asked on the form. This requires some code changes in the src/form/addresses/index.ts file to pull in the `hideInPreview` prop which will hide the value "Yes" on the review page and replace with a content managed label. Associated bug [#5086](https://github.com/opencrvs/opencrvs-core/issues/5086)
 
