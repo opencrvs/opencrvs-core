@@ -128,10 +128,6 @@ exports[`transform legacy scope to v2 1`] = `
       "v2": "type=user.read&accessLevel=administrativeArea",
     },
     {
-      "v1": "user.update:my-jurisdiction",
-      "v2": "type=user.edit&accessLevel=administrativeArea",
-    },
-    {
       "v1": "organisation.read-locations:my-jurisdiction",
       "v2": "type=organisation.read-locations&accessLevel=administrativeArea",
     },
@@ -172,10 +168,6 @@ exports[`transform legacy scope to v2 1`] = `
     {
       "v1": "user.create:all",
       "v2": "type=user.create",
-    },
-    {
-      "v1": "user.update:all",
-      "v2": "type=user.edit",
     },
     {
       "v1": "user.read:all",
