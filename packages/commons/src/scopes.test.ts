@@ -468,7 +468,6 @@ it('transform legacy scope to v2', () => {
     localSystemAdmin: [
       'user.read:my-office',
       'user.read:my-jurisdiction',
-      'user.update:my-jurisdiction',
       'organisation.read-locations:my-jurisdiction',
       'performance.read',
       'performance.read-dashboards',
@@ -481,7 +480,6 @@ it('transform legacy scope to v2', () => {
       'config.update-all',
       'organisation.read-locations',
       'user.create:all',
-      'user.update:all',
       'user.read:all',
       'performance.read',
       'performance.read-dashboards',
@@ -514,7 +512,6 @@ it('migrate legacy scopes to v2', () => {
     'performance.read-dashboards',
     'user.read:my-office',
     'user.read:my-jurisdiction',
-    'user.update:my-jurisdiction',
     'organisation.read-locations:my-jurisdiction',
     'user.read:only-my-audit',
     'organisation.read-locations:my-office',
@@ -536,17 +533,16 @@ it('migrate legacy scopes to v2', () => {
     'record.declared.review-duplicates[event=birth|death|tennis-club-membership]'
   ]
 
-  expect(v1Scopes).toHaveLength(24)
+  expect(v1Scopes).toHaveLength(23)
 
   const v2Scopes = migrateLegacyScopesToV2(v1Scopes)
-  expect(v2Scopes).toHaveLength(24)
+  expect(v2Scopes).toHaveLength(23)
 
   expect(v2Scopes).toEqual([
     'type=performance.read',
     'type=performance.read-dashboards',
     'type=user.read&accessLevel=location',
     'type=user.read&accessLevel=administrativeArea',
-    'type=user.edit&accessLevel=administrativeArea',
     'type=organisation.read-locations&accessLevel=administrativeArea',
     'type=user.read-only-my-audit',
     'type=organisation.read-locations&accessLevel=location',
