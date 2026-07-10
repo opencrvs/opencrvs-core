@@ -215,7 +215,7 @@ function useEditActions(event: EventDocument) {
     actionType: ActionType.EDIT
   })
 
-  // The edit-then-{register,declare,notify} paths must honor the *target* action's ENABLE conditionals
+  // Ensure that the target action (Notify, Declare, Register) conditions are met
   const isTargetActionEnabled = (actionType: ActionType) => {
     const targetConfig = getActionConfig({ eventConfiguration, actionType })
     return targetConfig
