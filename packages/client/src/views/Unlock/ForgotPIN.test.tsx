@@ -116,7 +116,7 @@ describe('ForgotPIN tests', () => {
     window.location = {
       ...originalLocation,
       assign: vi.fn()
-    }
+    } as unknown as string & Location
 
     const forgotPasswordButton = await waitForElement(
       component,
@@ -131,6 +131,6 @@ describe('ForgotPIN tests', () => {
     expect(window.location.assign).toBeCalledWith(
       '/login/forgotten-item?lang=en'
     )
-    window.location = originalLocation
+    window.location = originalLocation as unknown as string & Location
   })
 })

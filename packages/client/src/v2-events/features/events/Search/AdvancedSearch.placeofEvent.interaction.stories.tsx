@@ -181,11 +181,11 @@ export const PlaceOfEventScope_AdministrativeArea: Story = {
         await expect(options).toHaveLength(11)
         await expect(
           options.some((o) =>
-            o.textContent?.includes('Ibombo Rural Health Centre')
+            o.textContent.includes('Ibombo Rural Health Centre')
           )
         ).toBe(true)
         await expect(
-          options.some((o) => o.textContent?.includes('Central Health Post'))
+          options.some((o) => o.textContent.includes('Central Health Post'))
         ).toBe(false)
       }
     )
@@ -244,11 +244,11 @@ export const PlaceOfEventScope_NoRestriction: Story = {
         await expect(options).toHaveLength(12)
         await expect(
           options.some((o) =>
-            o.textContent?.includes('Ibombo Rural Health Centre')
+            o.textContent.includes('Ibombo Rural Health Centre')
           )
         ).toBe(true)
         await expect(
-          options.some((o) => o.textContent?.includes('Central Health Post'))
+          options.some((o) => o.textContent.includes('Central Health Post'))
         ).toBe(true)
       }
     )

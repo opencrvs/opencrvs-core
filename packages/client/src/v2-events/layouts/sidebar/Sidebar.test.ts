@@ -22,7 +22,7 @@ beforeAll(() => {
     replace: vi.fn(),
     href: '',
     origin: 'http://localhost'
-  }
+  } as unknown as string & Location
 })
 
 afterAll(() => {
