@@ -115,7 +115,8 @@ export const PickerButton = styled(Button)`
   margin: 0;
   height: 40px;
 `
-export const ContentWrapper = styled.div`
+
+const ContentWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;

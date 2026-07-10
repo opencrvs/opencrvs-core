@@ -23,26 +23,10 @@ export const isAValidPhoneNumberFormat = (value: string): boolean => {
   const pattern = window.config.PHONE_NUMBER_PATTERN
   return new RegExp(pattern).test(value)
 }
+
 const isAValidEmailAddressFormat = (value: string): boolean => {
   return validateEmail(value)
 }
-
-export const requiredSymbol: Validation = (value: string) =>
-  value ? undefined : { message: messages.requiredSymbol }
-
-export const required: Validation = (value: string) =>
-  value ? undefined : { message: messages.required }
-
-export const minLength = (min: number) => (value: string) => {
-  return value && value.length < min
-    ? { message: messages.minLength, props: { min } }
-    : undefined
-}
-
-export const isNumber: Validation = (value: string) =>
-  value && isNaN(Number(value))
-    ? { message: messages.numberRequired }
-    : undefined
 
 export const phoneNumberFormat: Validation = (value: string) => {
   const trimmedValue = value === undefined || value === null ? '' : value.trim()

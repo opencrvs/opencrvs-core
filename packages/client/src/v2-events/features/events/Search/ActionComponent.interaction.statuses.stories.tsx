@@ -118,7 +118,7 @@ export const DirectsCreatedToDeclare: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const actionButton = await canvas.findByRole('button', {
-      name: 'Declare'
+      name: 'Send an application'
     })
 
     await userEvent.click(actionButton)
@@ -261,7 +261,7 @@ export const directsRegisteredToPrint: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const actionButton = await canvas.findByRole('button', {
-      name: 'Print'
+      name: 'Print certificate'
     })
 
     await userEvent.click(actionButton)

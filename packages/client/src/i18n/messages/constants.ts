@@ -21,55 +21,20 @@ export const constantsMessages = defineMessages({
     description: 'Label for address',
     id: 'constants.address'
   },
-  allEvents: {
-    defaultMessage: 'All events',
-    description: 'Label for select option All events',
-    id: 'constants.allEvents'
-  },
-  allStatuses: {
-    defaultMessage: 'All statuses',
-    description: 'Label for select option All statuses',
-    id: 'constants.allStatuses'
-  },
-  applicationName: {
-    defaultMessage: 'OpenCRVS',
-    description: 'Declaration name of CRVS',
-    id: 'constants.applicationName'
-  },
-  applicationTitle: {
-    defaultMessage: 'Application',
-    description: 'Application title',
-    id: 'constants.application.title'
-  },
   assignRecord: {
     defaultMessage: 'Assign record',
     description: 'A label for the Assign record -button',
     id: 'constants.assignRecord'
-  },
-  averageRateOfRegistrations: {
-    defaultMessage: 'avg. {amount}%',
-    description: 'A label for Average rate of registrations',
-    id: 'constants.averageRateOfRegistrations'
   },
   birth: {
     defaultMessage: 'Birth',
     description: 'A label from the birth event',
     id: 'constants.birth'
   },
-  births: {
-    defaultMessage: 'Births',
-    description: 'A label from the births event',
-    id: 'constants.births'
-  },
   by: {
     defaultMessage: 'By',
     description: 'Label for By (the person who performed the action)',
     id: 'constants.by'
-  },
-  certificateTitle: {
-    defaultMessage: 'Certificate',
-    description: 'Certificate title',
-    id: 'constants.certificate.title'
   },
   certificationPaymentTitle: {
     defaultMessage:
@@ -122,20 +87,10 @@ export const constantsMessages = defineMessages({
     description: 'A label from the death event',
     id: 'constants.death'
   },
-  deaths: {
-    defaultMessage: 'Deaths',
-    description: 'A label from the deaths event',
-    id: 'constants.deaths'
-  },
   declaration: {
     defaultMessage: 'declaration',
     description: 'A label for declaration',
     id: 'constants.declaration'
-  },
-  declarationArchivedOn: {
-    defaultMessage: 'Application archived on',
-    description: 'Label for the workflow timestamp when the status is archived',
-    id: 'constants.declrationArchivedOn'
   },
   declarationCollectedOn: {
     defaultMessage: 'Certificate collected on',
@@ -164,17 +119,6 @@ export const constantsMessages = defineMessages({
     description: 'Label for the workflow timestamp when the status is rejected',
     id: 'constants.declarationRejectedOn'
   },
-  declarationRequestedCorrectionOn: {
-    defaultMessage: 'Declaration requested correction on',
-    description:
-      'Label for the workflow timestamp when the status is requested correction',
-    id: 'constants.declarationRequestedCorrectionOn'
-  },
-  declarations: {
-    defaultMessage: 'Declarations ({totalItems})',
-    description: 'A label for declarations count',
-    id: 'constants.declarationsCount'
-  },
   declarationSentForExternalValidationOn: {
     defaultMessage: 'Declaration sent for external validation on',
     description:
@@ -185,11 +129,6 @@ export const constantsMessages = defineMessages({
     defaultMessage: 'Started',
     description: 'Label for table header column Declaration started',
     id: 'constants.declarationStarted'
-  },
-  declarationStartedBy: {
-    defaultMessage: 'Started by',
-    description: 'Label for table header column Started by',
-    id: 'constants.declarationStartedBy'
   },
   declarationStartedOn: {
     defaultMessage: 'Started on',
@@ -265,22 +204,6 @@ export const constantsMessages = defineMessages({
     description: 'Label for email subject input',
     id: 'constants.emailSubject'
   },
-  estimatedNumberOfEvents: {
-    defaultMessage:
-      'Estimated no. of {eventType, select, birth {birth} death {death} other {birth}}s',
-    description: 'A label for Estimated number of events',
-    id: 'constants.estimatedNumberOfEvents'
-  },
-  estimatedNumberOfRegistartion: {
-    defaultMessage: 'Estimated no. of registrations',
-    description: 'A label for estimated no. of registrations',
-    id: 'constants.estimatedNumberOfRegistartion'
-  },
-  estimatedTargetDaysRegistrationTitle: {
-    defaultMessage: `Estimated vs total registered in {registrationTargetDays} days`,
-    description: `A label for estimated vs total registered in {registrationTargetDays} days`,
-    id: 'constants.estimatedTargetDaysRegistrationTitle'
-  },
   event: {
     defaultMessage: 'Event',
     description: 'Label for Event of event in work queue list item',
@@ -316,11 +239,6 @@ export const constantsMessages = defineMessages({
     description: 'Label for femaleUnder18',
     id: 'constants.femaleUnder18'
   },
-  formDeclarationTitle: {
-    defaultMessage: 'Declaration forms',
-    description: 'Form Declaration title',
-    id: 'constants.form.title'
-  },
   from: {
     defaultMessage: 'From',
     description: 'Label for text From',
@@ -341,25 +259,10 @@ export const constantsMessages = defineMessages({
     description: 'ID Label',
     id: 'constants.id'
   },
-  incompleteStatus: {
-    defaultMessage: 'Incomplete',
-    description: 'A label for Incomplete',
-    id: 'constants.incomplete.status'
-  },
   informantContactNumber: {
     defaultMessage: 'Informant contact number',
     description: 'The title of contact number label',
     id: 'constants.informantContactNumber'
-  },
-  inReviewStatus: {
-    defaultMessage: 'In Review',
-    description: 'A label for In Review',
-    id: 'constants.inReview.status'
-  },
-  integrationTitle: {
-    defaultMessage: 'Integrations',
-    description: 'Integration title',
-    id: 'constants.integrations'
   },
   issuedBy: {
     defaultMessage: 'Issued by',
@@ -395,11 +298,6 @@ export const constantsMessages = defineMessages({
     defaultMessage: 'Role',
     description: 'Role label',
     id: 'constants.role'
-  },
-  labelSystemRole: {
-    defaultMessage: 'System Role',
-    description: 'System Role label',
-    id: 'constants.systemrole'
   },
   last12Months: {
     defaultMessage: 'Last 12 months',
@@ -441,11 +339,6 @@ export const constantsMessages = defineMessages({
     description: 'A label from the marriage event',
     id: 'constants.marriage'
   },
-  marriages: {
-    defaultMessage: 'Marriages',
-    description: 'A label from the marriages event',
-    id: 'constants.marriages'
-  },
   matchedTo: {
     defaultMessage: 'Matched to',
     description: 'table header for `Matched to` in record audit',
@@ -471,11 +364,6 @@ export const constantsMessages = defineMessages({
     description: 'The title that appears for new death registrations',
     id: 'register.selectInformant.newDeathRegistration'
   },
-  newMarriageRegistration: {
-    defaultMessage: 'New marriage declaration',
-    description: 'The title that appears for new marriage registrations',
-    id: 'register.selectInformant.newMarriageRegistration'
-  },
   noConnection: {
     defaultMessage: 'No connection',
     description: 'No Connection hover text',
@@ -492,16 +380,6 @@ export const constantsMessages = defineMessages({
       'Text to display if the search return no results for the current filters',
     id: 'constants.noResults'
   },
-  noResultsOutbox: {
-    defaultMessage: 'No records require processing',
-    description: 'Text to display if there is no items in outbox',
-    id: 'constants.noResultsOutbox'
-  },
-  notificationSent: {
-    defaultMessage: 'Notification sent',
-    description: 'label for notification sent',
-    id: 'constants.notificationSent'
-  },
   over5Years: {
     defaultMessage: 'Over 5 years',
     description: 'Label for registrations over 5 years',
@@ -511,11 +389,6 @@ export const constantsMessages = defineMessages({
     defaultMessage: 'Pending connection',
     description: 'Label for declaration status Pending Connection',
     id: 'constants.pendingConnection'
-  },
-  percentageOfEstimation: {
-    defaultMessage: 'Percentage of estimate',
-    description: 'A label for percentage of estimate',
-    id: 'constants.percentageOfEstimation'
   },
   performanceTitle: {
     defaultMessage: 'Performance',
@@ -552,21 +425,6 @@ export const constantsMessages = defineMessages({
     description: 'Label for comparison row registeredBy type',
     id: 'constants.registeredBy'
   },
-  registeredInTargetd: {
-    defaultMessage: `Registered in {registrationTargetDays} days`,
-    description: `A label for Registered in {registrationTargetDays} days`,
-    id: 'constants.registeredInTargetd'
-  },
-  registeredStatus: {
-    defaultMessage: 'Registered',
-    description: 'A label for registered',
-    id: 'constants.registered.status'
-  },
-  registeredWithinTargetd: {
-    defaultMessage: `Registered within\n{registrationTargetDays} days of event`,
-    description: `A label for Registered {registrationTargetDays} within  days of event`,
-    id: 'constants.registeredWithinTargetd'
-  },
   rejected: {
     defaultMessage: 'rejected',
     description: 'A label for rejected',
@@ -581,26 +439,6 @@ export const constantsMessages = defineMessages({
     defaultMessage: 'Relationship',
     description: 'Relationship Label for death',
     id: 'constants.relationship'
-  },
-  requestedCorrection: {
-    defaultMessage: 'requested correction',
-    description: 'A label for requested correction',
-    id: 'constants.requestedCorrection'
-  },
-  requestReason: {
-    defaultMessage: 'Reason for request',
-    description: 'Label for Reason the declaration was corrected',
-    id: 'constants.requestReason'
-  },
-  requiresUpdatesStatus: {
-    defaultMessage: 'Requires updates',
-    description: 'A label for Requires updates',
-    id: 'constants.requiresUpdates.status'
-  },
-  requireUpdatesLoading: {
-    defaultMessage: 'Checking your declarations',
-    description: 'The text when all rejected declarations are loading',
-    id: 'constants.requireUpdatesLoading'
   },
   review: {
     defaultMessage: 'Review',
@@ -627,41 +465,16 @@ export const constantsMessages = defineMessages({
     description: 'label for sent for review',
     id: 'constants.sentForReview'
   },
-  sentForUpdates: {
-    defaultMessage: 'Sent for updates',
-    description: 'label for sent for updates',
-    id: 'constants.sentForUpdates'
-  },
-  sentForUpdatesOn: {
-    defaultMessage: 'Sent for updates on',
-    description: 'Label for rejection date in work queue list item',
-    id: 'constants.sentForUpdatesOn'
-  },
-  sentForValidation: {
-    defaultMessage: 'Sent for validation',
-    description: 'label for sent for validation',
-    id: 'constants.sentForValidation'
-  },
   sentOn: {
     defaultMessage: 'Sent on',
     description: 'Label for rejection date in work queue list item',
     id: 'constants.sentOn'
-  },
-  showMore: {
-    defaultMessage: 'Show next {pageSize}',
-    description: 'Label for show more link',
-    id: 'constants.showMore'
   },
   skipToMainContent: {
     defaultMessage: 'Skip to main content',
     description:
       'Label for a keyboard accessibility link which skips to the main content',
     id: 'constants.skipToMainContent'
-  },
-  startedAt: {
-    defaultMessage: 'Started',
-    description: 'Label for Started At in list item',
-    id: 'constants.startedAt'
   },
   startedBy: {
     defaultMessage: 'Started by',
@@ -684,40 +497,10 @@ export const constantsMessages = defineMessages({
     description: 'Header for tabel performance timeframs',
     id: 'constants.timeFramesTitle'
   },
-  timeInProgress: {
-    defaultMessage: 'Time in progress',
-    description: 'Label for column Time in progress',
-    id: 'constants.timeInProgress'
-  },
   timePeriod: {
     defaultMessage: 'Time period',
     description: 'A label for Time period',
     id: 'constants.timePeriod'
-  },
-  timeReadyForReview: {
-    defaultMessage: 'Time in ready for review',
-    description: 'Label for column Time in ready for review',
-    id: 'constants.timeReadyForReview'
-  },
-  timeReadyToPrint: {
-    defaultMessage: 'Time in ready to print',
-    description: 'Label for column Time in ready to print',
-    id: 'constants.timeReadyToPrint'
-  },
-  timeRequireUpdates: {
-    defaultMessage: 'Time in require updates',
-    description: 'Label for column Time in require updates',
-    id: 'constants.timeRequireUpdates'
-  },
-  timeWaitingExternalValidation: {
-    defaultMessage: 'Time in external validation',
-    description: 'Label for column Time in external validation BRIS',
-    id: 'constants.timeWaitingExternalValidation'
-  },
-  timeWatingApproval: {
-    defaultMessage: 'Time in waiting for approval',
-    description: 'Label for column Time in waiting for approval',
-    id: 'constants.timeWatingApproval'
   },
   to: {
     defaultMessage: 'to',
@@ -733,22 +516,6 @@ export const constantsMessages = defineMessages({
     defaultMessage: 'Total',
     description: 'Label for total',
     id: 'constants.total'
-  },
-  totalFileSizeExceed: {
-    defaultMessage:
-      'Total size of documents exceeds {fileSize}. Please reduce file size of your uploads',
-    description: 'Accumulated File size exceed message',
-    id: 'constants.totalFileSizeExceed'
-  },
-  totalRegistered: {
-    defaultMessage: 'Total registered',
-    description: 'A label for Total registered',
-    id: 'constants.totalRegistered'
-  },
-  totalRegisteredInTargetDays: {
-    defaultMessage: `Total registered in {registrationTargetDays} days`,
-    description: `A label for total registered in {registrationTargetDays} days`,
-    id: 'constants.totalRegisteredInTargetDays'
   },
   trackingId: {
     defaultMessage: 'Tracking ID',
@@ -779,16 +546,6 @@ export const constantsMessages = defineMessages({
     defaultMessage: 'validated',
     description: 'A label for validated',
     id: 'constants.validated'
-  },
-  viewAll: {
-    defaultMessage: 'View all',
-    description: 'Label for view all link',
-    id: 'constants.viewAll'
-  },
-  vsExportTitle: {
-    defaultMessage: 'Vital statistics',
-    description: 'Vital statistics title',
-    id: 'config.application.vsexport'
   },
   waitingToSend: {
     defaultMessage: 'Waiting to send',
@@ -848,11 +605,6 @@ const dynamicMessagesToDefine = {
     defaultMessage: 'registered',
     description: 'A label for registered'
   },
-  requestedCorrection: {
-    id: 'constants.requestedCorrection',
-    defaultMessage: 'requested correction',
-    description: 'A label for requested correction'
-  },
   certified: {
     id: 'constants.certified',
     defaultMessage: 'certified',
@@ -867,26 +619,6 @@ const dynamicMessagesToDefine = {
     defaultMessage: 'Updated',
     description: 'Application has been updated',
     id: 'constants.updated'
-  },
-  sent_incomplete: {
-    defaultMessage: 'Sent incomplete',
-    description: 'Declaration submitted without completing the required fields',
-    id: 'constants.sent_incomplete'
-  },
-  updated_declaration: {
-    defaultMessage: 'Updated declaration',
-    description: 'Declaration has been updated',
-    id: 'constants.updated_declaration'
-  },
-  archived_declaration: {
-    defaultMessage: 'Archived',
-    description: 'Application has been archived',
-    id: 'constants.archived_declaration'
-  },
-  waitingValidation: {
-    id: 'constants.waitingValidation',
-    defaultMessage: 'sent for validation',
-    description: 'A label for waitingValidation'
   },
   male: {
     id: 'constants.male',

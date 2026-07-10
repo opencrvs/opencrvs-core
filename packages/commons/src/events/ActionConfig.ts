@@ -75,6 +75,73 @@ const NotifyConfig = ActionConfigBase.extend(
   }).shape
 )
 
+const DuplicateDetectedConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.DUPLICATE_DETECTED),
+    label: z
+      .never()
+      .optional()
+      .describe(
+        'DUPLICATE_DETECTED is system-generated and never shown as a button, so it has no label.'
+      ),
+    supportingCopy: z.never().optional(),
+    icon: z
+      .never()
+      .optional()
+      .describe(
+        'DUPLICATE_DETECTED is system-generated and never shown as a button, so it has no icon.'
+      ),
+    conditionals: z
+      .never()
+      .optional()
+      .describe(
+        'DUPLICATE_DETECTED is system-generated and never shown as a button, so it cannot be disabled or hidden with conditionals.'
+      )
+  }).shape
+)
+
+const MarkAsDuplicateConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.MARK_AS_DUPLICATE)
+  }).shape
+)
+
+const MarkAsNotDuplicateConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.MARK_AS_NOT_DUPLICATE)
+  }).shape
+)
+
+const AssignConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.ASSIGN),
+    flags: z
+      .never()
+      .optional()
+      .describe(
+        'ASSIGN is a meta action excluded from flag resolution, so flags configured here would never apply.'
+      )
+  }).shape
+)
+
+const UnassignConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.UNASSIGN),
+    flags: z
+      .never()
+      .optional()
+      .describe(
+        'UNASSIGN is a meta action excluded from flag resolution, so flags configured here would never apply.'
+      )
+  }).shape
+)
+
+const DeleteConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.DELETE)
+  }).shape
+)
+
 const DeclareConfig = DeclarationActionBase.extend(
   z.object({
     type: z.literal(ActionType.DECLARE),
@@ -152,7 +219,19 @@ const RequestCorrectionConfig = ActionConfigBase.extend(
   }).shape
 )
 
-const CustomActionConfig = ActionConfigBase.merge(
+const ApproveCorrectionConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.APPROVE_CORRECTION)
+  }).shape
+)
+
+const RejectCorrectionConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.REJECT_CORRECTION)
+  }).shape
+)
+
+const CustomActionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.CUSTOM),
     customActionType: z
@@ -167,7 +246,7 @@ const CustomActionConfig = ActionConfigBase.merge(
     auditHistoryLabel: TranslationConfig.describe(
       'The label to show in audit history for this action. For example "Approved".'
     )
-  })
+  }).shape
 )
 
 export type CustomActionConfig = z.infer<typeof CustomActionConfig>
@@ -183,6 +262,19 @@ export const ActionConfig = z
       description:
         'Configuration for the read action — defines the record-tab content displayed on the event overview page.'
     }),
+    AssignConfig.meta({
+      id: 'AssignActionConfig',
+      description: 'Configuration for assigning a record to the current user.'
+    }),
+    UnassignConfig.meta({
+      id: 'UnassignActionConfig',
+      description:
+        'Configuration for unassigning a record from its current assignee.'
+    }),
+    DeleteConfig.meta({
+      id: 'DeleteActionConfig',
+      description: 'Configuration for deleting a draft record.'
+    }),
     NotifyConfig.meta({
       id: 'NotifyActionConfig',
       description:
@@ -192,6 +284,20 @@ export const ActionConfig = z
       id: 'DeclareActionConfig',
       description:
         'Configuration for the declare action. Includes review-page fields. NOTIFY falls back to this config when no dedicated NotifyActionConfig is provided.'
+    }),
+    DuplicateDetectedConfig.meta({
+      id: 'DuplicateDetectedActionConfig',
+      description:
+        'Configuration for the system-generated duplicate-detection action. Never shown as a button, so it only supports flags — not label, icon, or conditionals.'
+    }),
+    MarkAsDuplicateConfig.meta({
+      id: 'MarkAsDuplicateActionConfig',
+      description: 'Configuration for marking a record as a duplicate.'
+    }),
+    MarkAsNotDuplicateConfig.meta({
+      id: 'MarkAsNotDuplicateActionConfig',
+      description:
+        'Configuration for marking a record as not a duplicate, after it was previously flagged as one.'
     }),
     RejectConfig.meta({
       id: 'RejectActionConfig',
@@ -210,6 +316,14 @@ export const ActionConfig = z
       id: 'RequestCorrectionActionConfig',
       description:
         'Configuration for requesting a correction on a registered record.'
+    }),
+    ApproveCorrectionConfig.meta({
+      id: 'ApproveCorrectionActionConfig',
+      description: 'Configuration for approving a requested correction.'
+    }),
+    RejectCorrectionConfig.meta({
+      id: 'RejectCorrectionActionConfig',
+      description: 'Configuration for rejecting a requested correction.'
     }),
     EditActionConfig.meta({
       id: 'EditActionConfig',

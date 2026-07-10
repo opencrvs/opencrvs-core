@@ -12,32 +12,16 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface ISysAdminMessages
   extends Record<string | number | symbol, MessageDescriptor> {
-  auditReason: MessageDescriptor
-  auditReasonOther: MessageDescriptor
-  overviewTab: MessageDescriptor
-  officesTab: MessageDescriptor
-  usersTab: MessageDescriptor
-  comments: MessageDescriptor
   deactivate: MessageDescriptor
-  deactivateReasonNotEmployee: MessageDescriptor
-  deactivateReasonInvestigated: MessageDescriptor
   deactivateUserTitle: MessageDescriptor
   deactivateUserSubtitle: MessageDescriptor
-  devicesTab: MessageDescriptor
-  formError: MessageDescriptor
-  networkTab: MessageDescriptor
-  configTab: MessageDescriptor
-  systemTitle: MessageDescriptor
   editUserDetailsTitle: MessageDescriptor
-  editUserCommonTitle: MessageDescriptor
   reactivate: MessageDescriptor
   reactivateUserTitle: MessageDescriptor
   resetUserPasswordTitle: MessageDescriptor
   resetUserPasswordModalTitle: MessageDescriptor
   resetUserPasswordModalMessage: MessageDescriptor
   reactivateUserSubtitle: MessageDescriptor
-  reactivateReasonReturnedToRole: MessageDescriptor
-  reactivateReasonNoLongerInvestigated: MessageDescriptor
   resendInvite: MessageDescriptor
   resendInviteSuccess: MessageDescriptor
   resendInviteError: MessageDescriptor
@@ -48,60 +32,17 @@ interface ISysAdminMessages
   sendUsernameReminderInviteModalTitle: MessageDescriptor
   resetPasswordSuccess: MessageDescriptor
   resetPasswordError: MessageDescriptor
-  newUser: MessageDescriptor
   active: MessageDescriptor
   pending: MessageDescriptor
   disabled: MessageDescriptor
   deactivated: MessageDescriptor
-  totalUsers: MessageDescriptor
 }
 
 const messagesToDefine: ISysAdminMessages = {
-  auditReason: {
-    id: 'sysAdHome.user.audit.reason',
-    defaultMessage: 'Please provide a reason: ',
-    description: 'The label for form field deactivate reason'
-  },
-  auditReasonOther: {
-    id: 'sysAdHome.user.audit.reasonOther',
-    defaultMessage: 'Other (please provide a reason in the comments)',
-    description: 'The label for radio option other'
-  },
-  overviewTab: {
-    id: 'sysAdHome.overview',
-    defaultMessage: 'Overview',
-    description: 'The title of overview tab'
-  },
-  officesTab: {
-    id: 'sysAdHome.offices',
-    defaultMessage: 'Offices',
-    description: 'The title of offices tab'
-  },
-  usersTab: {
-    id: 'sysAdHome.users',
-    defaultMessage: 'Users',
-    description: 'The title of users tab'
-  },
-  comments: {
-    id: 'sysAdHome.user.audit.comments',
-    defaultMessage: 'Comments: ',
-    description: 'The label for form field deactivate comments'
-  },
   deactivate: {
     defaultMessage: 'Deactivate',
     description: 'Label for toggle menu option deactivate',
     id: 'sysAdHome.user.deactivate'
-  },
-  deactivateReasonNotEmployee: {
-    id: 'sysAdHome.user.audit.deactiv.reasonNotEmp',
-    defaultMessage: 'No longer an employee',
-    description: 'The label for radio option not employee'
-  },
-  deactivateReasonInvestigated: {
-    id: 'sysAdHome.user.audit.deactiv.reasonInv',
-    defaultMessage:
-      'Being investigated due to suspicious activity on their account',
-    description: 'The label for radio option being investigated'
   },
   deactivateUserTitle: {
     id: 'sysAdHome.user.audit.deactivation.title',
@@ -114,40 +55,10 @@ const messagesToDefine: ISysAdminMessages = {
       'This will revoke {name}’s ability to login and access the system. The account can be reactivated at a later date.',
     description: 'The subtitle of user deactivation confirmation modal'
   },
-  devicesTab: {
-    id: 'sysAdHome.devices',
-    defaultMessage: 'Devices',
-    description: 'The title of devices tab'
-  },
-  formError: {
-    id: 'sysAdHome.user.audit.form.error',
-    defaultMessage: 'A reason is required for {auditAction} this user',
-    description: 'The label for form error'
-  },
-  networkTab: {
-    id: 'sysAdHome.network',
-    defaultMessage: 'Network',
-    description: 'The title of network tab'
-  },
-  configTab: {
-    id: 'sysAdHome.config',
-    defaultMessage: 'Config',
-    description: 'The title of config tab'
-  },
-  systemTitle: {
-    id: 'home.header.systemTitle',
-    defaultMessage: 'System',
-    description: 'System title'
-  },
   editUserDetailsTitle: {
     defaultMessage: 'Edit details',
     description: 'Title for edit user details',
     id: 'sysAdHome.user.header'
-  },
-  editUserCommonTitle: {
-    defaultMessage: 'Edit user',
-    description: 'Common title of form view groups when edit user',
-    id: 'sysAdHome.user.edit.commonGroupTitle'
   },
   resetUserPasswordTitle: {
     defaultMessage: 'Reset Password',
@@ -180,16 +91,6 @@ const messagesToDefine: ISysAdminMessages = {
     defaultMessage: 'Reactivate',
     description: 'Label for toggle menu option reactivate',
     id: 'sysAdHome.user.reactivate'
-  },
-  reactivateReasonReturnedToRole: {
-    defaultMessage: 'Returned to their role',
-    description: 'The label for radio option Returned to role',
-    id: 'sysAdHome.user.audit.reactiv.returned'
-  },
-  reactivateReasonNoLongerInvestigated: {
-    defaultMessage: 'No longer being investigated for suspicious activity',
-    description: 'The label for radio option no longer investigated',
-    id: 'sysAdHome.user.audit.reactiv.noLongerInv'
   },
   resendInvite: {
     defaultMessage: 'Resend invite',
@@ -244,11 +145,6 @@ const messagesToDefine: ISysAdminMessages = {
       'The label for error notification of reset password sms invite',
     id: 'sysAdHome.resentPasswordError'
   },
-  newUser: {
-    defaultMessage: 'New User',
-    description: 'This text will show to create new user button',
-    id: 'system.user.newUser'
-  },
   active: {
     defaultMessage: 'Active',
     description: 'Pill label for active user',
@@ -268,11 +164,6 @@ const messagesToDefine: ISysAdminMessages = {
     defaultMessage: 'Deactivated',
     description: 'Pill label for deactivated user',
     id: 'system.user.deactivated'
-  },
-  totalUsers: {
-    id: 'system.user.total',
-    defaultMessage: '{totalUser} users',
-    description: 'User list table header text'
   },
   toggleActivateStatusSuccess: {
     defaultMessage: 'Updated {name}\'s account status to "{status}"',

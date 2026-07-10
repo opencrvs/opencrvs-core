@@ -17,10 +17,13 @@ import {
 import {
   buttonMessages,
   constantsMessages,
-  errorMessages,
-  userMessages
+  errorMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/userSetup'
+import {
+  isSecurityQuestionKey,
+  securityQuestionMessages
+} from '@client/views/UserSetup/SecurityQuestionView'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { getUserName, UserDetails } from '@client/utils/userUtils'
@@ -95,7 +98,9 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
     setupData.securityQuestionAnswers.forEach((e) => {
       answeredQuestions.push({
         id: `Question_${e.questionKey}`,
-        label: intl.formatMessage(userMessages[e.questionKey]),
+        label: isSecurityQuestionKey(e.questionKey)
+          ? intl.formatMessage(securityQuestionMessages[e.questionKey])
+          : e.questionKey,
         value: e.answer,
         action: {
           id: `Question_Action_${e.questionKey}`,

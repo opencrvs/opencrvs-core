@@ -14,11 +14,6 @@ export const messages = {
     description: 'The name of the user form',
     id: 'constants.user'
   },
-  username: {
-    defaultMessage: 'Username',
-    description: 'The name of the user name form',
-    id: 'constants.username'
-  },
   userFormTitle: {
     defaultMessage: 'Create new user',
     description: 'The title of user form',
@@ -28,16 +23,6 @@ export const messages = {
     defaultMessage: 'Please review the new users details',
     description: 'The title of the review page of the user form',
     id: 'form.section.user.preview.title'
-  },
-  assignedRegistrationOffice: {
-    defaultMessage: 'Assigned Registration Office',
-    description: 'Assigned Registration Office section',
-    id: 'form.section.assignedRegistrationOffice'
-  },
-  assignedRegistrationOfficeGroupTitle: {
-    defaultMessage: 'Assigned registration office',
-    description: 'Assigned Registration Office section',
-    id: 'form.section.assignedRegistrationOfficeGroupTitle'
   },
   registrationOffice: {
     defaultMessage: 'Registration Office',
@@ -79,11 +64,6 @@ export const messages = {
     description: 'Input label for full honorific name',
     id: 'form.field.label.fullHonorificName'
   },
-  accountDetails: {
-    defaultMessage: 'Account details',
-    description: 'Account details section',
-    id: 'form.section.accountDetails'
-  },
   labelRole: {
     defaultMessage: 'Role',
     description: 'Role label',
@@ -113,17 +93,6 @@ export const messages = {
     defaultMessage: 'User’s signature',
     description: 'Input label for user signature attachment',
     id: 'form.field.label.userSignatureAttachment'
-  },
-  userSignatureAttachmentDesc: {
-    defaultMessage:
-      'Ask the user to sign a piece of paper and then scan or take a photo.',
-    description: 'Description for user signature attachment',
-    id: 'form.field.label.userSignatureAttachmentDesc'
-  },
-  userAttachmentSection: {
-    defaultMessage: 'Attachments',
-    description: 'label for user signature attachment',
-    id: 'form.field.label.userAttachmentSection'
   },
   creatingNewUser: {
     defaultMessage: 'Creating new user',
