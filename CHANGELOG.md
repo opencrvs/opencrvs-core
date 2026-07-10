@@ -19,6 +19,14 @@ InfluxDB, the InfluxDB Helm resources (StatefulSet, backup/restore/cleanup jobs)
 
 Added `notifiedIn` and `notifiedBy` scope options for record scopes (`record.read`, `record.edit`, `record.search`, etc.), mirroring the existing `declaredIn`/`declaredBy` and `registeredIn`/`registeredBy` patterns — enables role configurations to restrict access based on where or by whom an event was notified. [#11875](https://github.com/opencrvs/opencrvs-core/issues/11875)
 
+#### `APPROVE_CORRECTION` / `REJECT_CORRECTION` no longer inherit `REQUEST_CORRECTION`'s config
+
+`getActionConfig()` used to alias `APPROVE_CORRECTION` and `REJECT_CORRECTION` to whatever was configured on `REQUEST_CORRECTION` (label, flags, conditionals). Each now resolves to its own independent config. If your country config relies on `REQUEST_CORRECTION`'s `conditionals` or `flags` also applying to approve/reject, add explicit `APPROVE_CORRECTION`/`REJECT_CORRECTION` entries with the same values.
+
+#### All core actions are independently configurable
+
+`DELETE`, `ASSIGN`, `UNASSIGN`, `MARK_AS_DUPLICATE`, `MARK_AS_NOT_DUPLICATE`, `APPROVE_CORRECTION`, `REJECT_CORRECTION`, and `DUPLICATE_DETECTED` can now be configured in `ActionConfig`, supporting `label`, `icon`, and `conditionals` (and `flags`, except on `ASSIGN`/`UNASSIGN`, which are meta actions excluded from flag resolution). See [ACTIONS.md](/ACTIONS.md).
+
 #### Configurable form fields on core action confirmation dialogs
 
 The core `NOTIFY`, `DECLARE`, `REGISTER`, `ARCHIVE` and `REJECT` actions now accept an optional `form: FieldConfig[]` in the country configuration, matching the shape already used by custom actions. Configured fields are rendered on the action's confirmation dialog at every entry point (direct actions, quick actions, and "with edits" variants — a combined action such as direct registration shows only the final action's fields). Submitted values are stored in the action's `annotation` and displayed in the record's audit history. Mandatory fields disable the dialog's primary button until completed. [#11305](https://github.com/opencrvs/opencrvs-core/issues/11305)

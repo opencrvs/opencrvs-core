@@ -997,6 +997,88 @@ describe('getActionConfig() – NOTIFY fallback and isolation', () => {
   })
 })
 
+describe('getActionConfig(): correction actions resolve independently', () => {
+  const configWithAllCorrectionActions = {
+    actions: [
+      {
+        type: ActionType.REQUEST_CORRECTION,
+        label: {
+          id: 'request-correction',
+          defaultMessage: 'Request correction',
+          description: ''
+        },
+        correctionForm: { pages: [] }
+      },
+      {
+        type: ActionType.APPROVE_CORRECTION,
+        label: {
+          id: 'approve-correction',
+          defaultMessage: 'Approve correction',
+          description: ''
+        }
+      },
+      {
+        type: ActionType.REJECT_CORRECTION,
+        label: {
+          id: 'reject-correction',
+          defaultMessage: 'Reject correction',
+          description: ''
+        }
+      }
+    ]
+  }
+
+  const configWithOnlyRequestCorrection = {
+    actions: [
+      {
+        type: ActionType.REQUEST_CORRECTION,
+        label: {
+          id: 'request-correction',
+          defaultMessage: 'Request correction',
+          description: ''
+        },
+        correctionForm: { pages: [] }
+      }
+    ]
+  }
+
+  it('returns its own config for APPROVE_CORRECTION when present', () => {
+    const result = getActionConfig({
+      eventConfiguration:
+        configWithAllCorrectionActions as unknown as EventConfig,
+      actionType: ActionType.APPROVE_CORRECTION
+    })
+    expect(result?.type).toBe(ActionType.APPROVE_CORRECTION)
+  })
+
+  it('returns its own config for REJECT_CORRECTION when present', () => {
+    const result = getActionConfig({
+      eventConfiguration:
+        configWithAllCorrectionActions as unknown as EventConfig,
+      actionType: ActionType.REJECT_CORRECTION
+    })
+    expect(result?.type).toBe(ActionType.REJECT_CORRECTION)
+  })
+
+  it('no longer aliases APPROVE_CORRECTION to REQUEST_CORRECTION when APPROVE_CORRECTION is absent', () => {
+    const result = getActionConfig({
+      eventConfiguration:
+        configWithOnlyRequestCorrection as unknown as EventConfig,
+      actionType: ActionType.APPROVE_CORRECTION
+    })
+    expect(result).toBeUndefined()
+  })
+
+  it('no longer aliases REJECT_CORRECTION to REQUEST_CORRECTION when REJECT_CORRECTION is absent', () => {
+    const result = getActionConfig({
+      eventConfiguration:
+        configWithOnlyRequestCorrection as unknown as EventConfig,
+      actionType: ActionType.REJECT_CORRECTION
+    })
+    expect(result).toBeUndefined()
+  })
+})
+
 describe('getActionFormFields()', () => {
   const commentsField = {
     id: 'register.dialog.comments',
