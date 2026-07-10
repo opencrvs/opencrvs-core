@@ -12,7 +12,7 @@ spec:
       labels:
         app: data-cleanup
     spec:
-      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.mongodb) | nindent 6 }}
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.postgres) | nindent 6 }}
       containers:
         - name: cleanup-postgres
           image: {{ include "opencrvs.imageReference" .Values.postgres }}
