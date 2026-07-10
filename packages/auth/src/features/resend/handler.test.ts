@@ -17,6 +17,7 @@ import { AuthServer, createServer } from '@auth/server'
 jest.mock('@auth/features/verifyCode/service', () => {
   const actual = jest.requireActual('@auth/features/verifyCode/service')
   return {
+    __esModule: true,
     ...actual,
     sendVerificationCode: jest.fn().mockResolvedValue(undefined)
   }
