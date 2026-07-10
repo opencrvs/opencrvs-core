@@ -121,7 +121,8 @@ export const AssignedToSelf: StoryObj<typeof ActionMenu> = {
 
     // Declare (Update) must be enabled — community leader can open the declare form
     // even though they only hold record.notify, not record.declare.
-    const declareItem = await screen.findByText('Declare')
+    // tennisClubMembershipEvent configures DECLARE's label as "Send an application".
+    const declareItem = await screen.findByText('Send an application')
     await waitFor(async () => {
       await expect(declareItem.hasAttribute('disabled')).toBe(false)
     })

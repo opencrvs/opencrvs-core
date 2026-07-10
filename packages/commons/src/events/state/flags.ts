@@ -283,7 +283,7 @@ export function resolveEventCustomFlags(
     const annotation = aggregateActionAnnotations(eventUpToThisAction)
     const form = { ...declaration, ...annotation }
 
-    const flagsWithMetConditions = actionConfig.flags.filter(
+    const flagsWithMetConditions = (actionConfig.flags ?? []).filter(
       ({ conditional }) =>
         // If conditional is not provided, the flag is resolved
         conditional ? isFlagConditionMet(conditional, form, action) : true
