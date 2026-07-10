@@ -20,7 +20,7 @@
     "strictNullChecks": true,
     "allowSyntheticDefaultImports": true,
     "noUnusedLocals": true,
-    "types": ["fhir", "jest"],
+    "types": ["jest"],
     "esModuleInterop": true
   },
   "include": ["src/**/*.ts", "typings"],

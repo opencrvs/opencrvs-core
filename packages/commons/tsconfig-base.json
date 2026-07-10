@@ -23,10 +23,7 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
-    "types": [
-      "jest",
-      "fhir"
-    ],
+    "types": ["jest"],
     "skipLibCheck": true,
     "declarationMap": true,
     "composite": true

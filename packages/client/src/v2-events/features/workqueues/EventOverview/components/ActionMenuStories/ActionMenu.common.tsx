@@ -282,6 +282,11 @@ type ActionLabel =
   | (typeof actionLabels)[keyof typeof actionLabels]['defaultMessage']
   | 'Review'
   | 'Confirm'
+  // tennisClubMembershipEvent configures its own label for these actions,
+  // which now takes precedence over the actionLabels hardcoded default.
+  | 'Send an application'
+  | 'Print certificate'
+  | 'Request correction'
 
 export const getHiddenActions = () =>
   Object.values(ActionTypes.enum).reduce(
