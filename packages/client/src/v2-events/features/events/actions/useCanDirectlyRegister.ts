@@ -47,6 +47,7 @@ export function useCanDirectlyRegister(event: EventDocument) {
     actionType: ActionType.DECLARE
   })
 
+  // If 'Declare' action conditions are not met, we should not allow the direct register
   if (
     !declareActionConfig ||
     !isActionAvailable(declareActionConfig, currentEventIndex, validatorContext)
