@@ -33,7 +33,7 @@
     "minio": "^7.0.33",
     "node-fetch": "^2.6.7",
     "pino": "^7.0.0",
-    "tsconfig-paths": "^3.13.0",
+    "tsconfig-paths": "^4.2.0",
     "uuid": "^3.2.1",
     "zod": "^4.2"
   },
