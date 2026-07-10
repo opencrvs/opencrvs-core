@@ -2371,12 +2371,20 @@ components:
     ActionConfig:
       oneOf:
         - $ref: "#/components/schemas/ReadActionConfig"
+        - $ref: "#/components/schemas/AssignActionConfig"
+        - $ref: "#/components/schemas/UnassignActionConfig"
+        - $ref: "#/components/schemas/DeleteActionConfig"
         - $ref: "#/components/schemas/NotifyActionConfig"
         - $ref: "#/components/schemas/DeclareActionConfig"
+        - $ref: "#/components/schemas/DuplicateDetectedActionConfig"
+        - $ref: "#/components/schemas/MarkAsDuplicateActionConfig"
+        - $ref: "#/components/schemas/MarkAsNotDuplicateActionConfig"
         - $ref: "#/components/schemas/RejectActionConfig"
         - $ref: "#/components/schemas/RegisterActionConfig"
         - $ref: "#/components/schemas/PrintCertificateActionConfig"
         - $ref: "#/components/schemas/RequestCorrectionActionConfig"
+        - $ref: "#/components/schemas/ApproveCorrectionActionConfig"
+        - $ref: "#/components/schemas/RejectCorrectionActionConfig"
         - $ref: "#/components/schemas/EditActionConfig"
         - $ref: "#/components/schemas/ArchiveActionConfig"
         - $ref: "#/components/schemas/UnarchiveActionConfig"
@@ -2389,12 +2397,20 @@ components:
         propertyName: type
         mapping:
           READ: "#/components/schemas/ReadActionConfig"
+          ASSIGN: "#/components/schemas/AssignActionConfig"
+          UNASSIGN: "#/components/schemas/UnassignActionConfig"
+          DELETE: "#/components/schemas/DeleteActionConfig"
           NOTIFY: "#/components/schemas/NotifyActionConfig"
           DECLARE: "#/components/schemas/DeclareActionConfig"
+          DUPLICATE_DETECTED: "#/components/schemas/DuplicateDetectedActionConfig"
+          MARK_AS_DUPLICATE: "#/components/schemas/MarkAsDuplicateActionConfig"
+          MARK_AS_NOT_DUPLICATE: "#/components/schemas/MarkAsNotDuplicateActionConfig"
           REJECT: "#/components/schemas/RejectActionConfig"
           REGISTER: "#/components/schemas/RegisterActionConfig"
           PRINT_CERTIFICATE: "#/components/schemas/PrintCertificateActionConfig"
           REQUEST_CORRECTION: "#/components/schemas/RequestCorrectionActionConfig"
+          APPROVE_CORRECTION: "#/components/schemas/ApproveCorrectionActionConfig"
+          REJECT_CORRECTION: "#/components/schemas/RejectCorrectionActionConfig"
           EDIT: "#/components/schemas/EditActionConfig"
           ARCHIVE: "#/components/schemas/ArchiveActionConfig"
           UNARCHIVE: "#/components/schemas/UnarchiveActionConfig"
@@ -13293,6 +13309,96 @@ components:
       additionalProperties: false
       description: A select dropdown that is automatically populated with available
         user roles
+    AssignActionConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the action
+          $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          description: ASSIGN is a meta action excluded from flag resolution, so flags
+            configured here would never apply.
+          not: {}
+        supportingCopy:
+          description: Text displayed on the confirmation dialog
+          $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          type: string
+          description: Icon representing the action
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionConditional"
+        type:
+          type: string
+          const: ASSIGN
+      required:
+        - label
+        - type
+      additionalProperties: false
+      description: Configuration for assigning a record to the current user.
+    UnassignActionConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the action
+          $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          description: UNASSIGN is a meta action excluded from flag resolution, so flags
+            configured here would never apply.
+          not: {}
+        supportingCopy:
+          description: Text displayed on the confirmation dialog
+          $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          type: string
+          description: Icon representing the action
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionConditional"
+        type:
+          type: string
+          const: UNASSIGN
+      required:
+        - label
+        - type
+      additionalProperties: false
+      description: Configuration for unassigning a record from its current assignee.
+    DeleteActionConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the action
+          $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          default: []
+          description: Flag actions which are executed when the action is performed.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation dialog
+          $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          type: string
+          description: Icon representing the action
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionConditional"
+        type:
+          type: string
+          const: DELETE
+      required:
+        - label
+        - flags
+        - type
+      additionalProperties: false
+      description: Configuration for deleting a draft record.
     NotifyActionConfig:
       type: object
       properties:
@@ -13541,6 +13647,104 @@ components:
             - type
           additionalProperties: false
       type: object
+    DuplicateDetectedActionConfig:
+      type: object
+      properties:
+        label:
+          description: DUPLICATE_DETECTED is system-generated and never shown as a button,
+            so it has no label.
+          not: {}
+        flags:
+          default: []
+          description: Flag actions which are executed when the action is performed.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          not: {}
+        icon:
+          description: DUPLICATE_DETECTED is system-generated and never shown as a button,
+            so it has no icon.
+          not: {}
+        conditionals:
+          description: DUPLICATE_DETECTED is system-generated and never shown as a button,
+            so it cannot be disabled or hidden with conditionals.
+          not: {}
+        type:
+          type: string
+          const: DUPLICATE_DETECTED
+      required:
+        - flags
+        - type
+      additionalProperties: false
+      description: Configuration for the system-generated duplicate-detection action.
+        Never shown as a button, so it only supports flags — not label, icon, or
+        conditionals.
+    MarkAsDuplicateActionConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the action
+          $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          default: []
+          description: Flag actions which are executed when the action is performed.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation dialog
+          $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          type: string
+          description: Icon representing the action
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionConditional"
+        type:
+          type: string
+          const: MARK_AS_DUPLICATE
+      required:
+        - label
+        - flags
+        - type
+      additionalProperties: false
+      description: Configuration for marking a record as a duplicate.
+    MarkAsNotDuplicateActionConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the action
+          $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          default: []
+          description: Flag actions which are executed when the action is performed.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation dialog
+          $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          type: string
+          description: Icon representing the action
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionConditional"
+        type:
+          type: string
+          const: MARK_AS_NOT_DUPLICATE
+      required:
+        - label
+        - flags
+        - type
+      additionalProperties: false
+      description: Configuration for marking a record as not a duplicate, after it was
+        previously flagged as one.
     RejectActionConfig:
       type: object
       properties:
@@ -13815,6 +14019,70 @@ components:
         - correctionForm
       additionalProperties: false
       description: Configuration for requesting a correction on a registered record.
+    ApproveCorrectionActionConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the action
+          $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          default: []
+          description: Flag actions which are executed when the action is performed.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation dialog
+          $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          type: string
+          description: Icon representing the action
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionConditional"
+        type:
+          type: string
+          const: APPROVE_CORRECTION
+      required:
+        - label
+        - flags
+        - type
+      additionalProperties: false
+      description: Configuration for approving a requested correction.
+    RejectCorrectionActionConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the action
+          $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          default: []
+          description: Flag actions which are executed when the action is performed.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation dialog
+          $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          type: string
+          description: Icon representing the action
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionConditional"
+        type:
+          type: string
+          const: REJECT_CORRECTION
+      required:
+        - label
+        - flags
+        - type
+      additionalProperties: false
+      description: Configuration for rejecting a requested correction.
     EditActionConfig:
       type: object
       properties:
