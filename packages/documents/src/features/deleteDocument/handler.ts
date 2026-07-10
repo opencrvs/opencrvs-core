@@ -34,7 +34,7 @@ export async function deleteDocument(
   try {
     stat = await minioClient.statObject(MINIO_BUCKET, documentPath)
   } catch (error) {
-    if (error.code === 'NotFound') {
+    if ((error as { code?: string }).code === 'NotFound') {
       return h
         .response(
           `request failed: document ${documentPath} does not exist in bucket ${MINIO_BUCKET}`
