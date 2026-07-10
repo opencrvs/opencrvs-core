@@ -6,7 +6,7 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-name: 'Trigger integration E2E tests in Farajaland development'
+name: 'Trigger integration E2E tests in Testland development'
 
 on:
 
@@ -20,11 +20,11 @@ jobs:
     steps:
       - uses: actions/github-script@v8
         with:
-          github-token: ${{ secrets.E2E_TRIGGER_GITHUB_PAT }}
+          github-token: ${{ secrets.TESTLAND_WORKFLOW_TOKEN }}
           script: |
             const result = await github.rest.repos.createDispatchEvent({
               owner: 'opencrvs',
-              repo: 'opencrvs-farajaland',
+              repo: 'opencrvs-testland',
               event_type: 'run_e2e',
               client_payload: {
                 actor: '${{ github.actor }}'

@@ -8,14 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export {
-  identityNameMapper,
-  identityHelperTextMapper,
-  identityTooltipMapper
-} from './messages'
+import { main as addExplicitCorrectionFlags } from './add-explicit-correction-flags'
 
-export {
-  getDateOfMarriageLabel,
-  getMotherDateOfBirthLabel,
-  getFatherDateOfBirthLabel
-} from './messages'
+/**
+ * Run the upgrade process for the country config in the current working
+ * directory.
+ */
+export async function runUpgrade(dockerSwarm: boolean) {
+  await addExplicitCorrectionFlags()
+}

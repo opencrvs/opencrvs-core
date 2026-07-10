@@ -87,7 +87,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
       return {
         label: replaceLabelForDeclareDraft
           ? buttonMessages.update
-          : actionLabels[actionType],
+          : (actionConfig?.label ?? actionLabels[actionType]),
         type: actionType,
         icon: isValidIcon(actionConfig?.icon)
           ? actionConfig.icon
@@ -181,7 +181,7 @@ export function useAssignmentActionConfigurationResolver(event: EventIndex) {
       const actionConfig = getActionConfig({ eventConfiguration, actionType })
 
       return {
-        label: actionLabels[actionType],
+        label: actionConfig?.label ?? actionLabels[actionType],
         type: actionType,
         icon: isValidIcon(actionConfig?.icon)
           ? actionConfig.icon

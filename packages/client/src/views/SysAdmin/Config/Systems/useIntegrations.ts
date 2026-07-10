@@ -25,7 +25,7 @@ export interface IntegrationItem {
 }
 
 /** Data shape returned by integrations.create */
-export interface CreateIntegrationResult {
+interface CreateIntegrationResult {
   clientId: string
   shaSecret: string
   clientSecret: string

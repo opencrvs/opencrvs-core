@@ -15,7 +15,7 @@ import {
   REGISTRAR_HOME_TAB,
   REGISTRAR_HOME_TAB_PAGE
 } from '@client/navigation/routes'
-import { EventType } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway-types'
 
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
