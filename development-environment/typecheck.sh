@@ -9,15 +9,15 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
-# Typecheck every package with the native TypeScript 7 compiler
-# (installed as the @typescript/native npm alias). Package builds,
-# ts-jest, ts-node and typescript-eslint stay on TypeScript 6 until
-# the TS 7.1 API lands.
+# Typecheck every package with the workspace TypeScript compiler
+# (native TypeScript 7). typescript-eslint and the translation-extraction
+# scripts keep the TypeScript 6 API via the @typescript/api alias until
+# the TS 7.1 API lands — see development-environment/link-ts6-api.js.
 
 set -e
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-TSC7="$ROOT/node_modules/@typescript/native/bin/tsc"
+TSC7="$ROOT/node_modules/typescript/bin/tsc"
 
 run() {
   local pkg="$1"

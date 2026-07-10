@@ -4,7 +4,7 @@
   "description": "OpenCRVS API Gateway",
   "license": "MPL-2.0",
   "scripts": {
-    "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
+    "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon --exec tsx src/index.ts",
     "start:prod": "TS_NODE_BASEURL=./build/dist node -r tsconfig-paths/register build/dist/src/index.js",
     "test": "yarn test:compilation && jest",
     "test:watch": "jest --watch",
@@ -57,6 +57,8 @@
   },
   "devDependencies": {
     "@hapi/lab": "^24.0.0",
+    "@swc/core": "1.10.18",
+    "@swc/jest": "^0.2.39",
     "@types/bunyan": "^1.8.4",
     "@types/code": "^4.0.3",
     "@types/dotenv": "^6.1.0",
@@ -83,10 +85,9 @@
     "nodemon": "^3.0.0",
     "opener": "^1.5.1",
     "prettier": "3.5.3",
+    "swc_mut_cjs_exports": "10.7.0",
     "testcontainers": "^9.1.1",
-    "ts-jest": "29.4.11",
-    "ts-node": "^6.1.1",
-    "typescript": "6.0.3"
+    "tsx": "^4.15.7"
   },
   "lint-staged": {
     "src/**/*.ts": [
@@ -97,18 +98,25 @@
   "jest": {
     "transform": {
       "^.+\\.tsx?$": [
-        "ts-jest"
-      ],
-      "^.+.tsx?$": [
-        "ts-jest",
+        "@swc/jest",
         {
-          "diagnostics": {
-            "ignoreCodes": [
-              2722,
-              2532,
-              2554,
-              2339
-            ]
+          "jsc": {
+            "parser": {
+              "syntax": "typescript",
+              "tsx": true
+            },
+            "target": "es2022",
+            "experimental": {
+              "plugins": [
+                [
+                  "swc_mut_cjs_exports",
+                  {}
+                ]
+              ]
+            }
+          },
+          "module": {
+            "type": "commonjs"
           }
         }
       ]

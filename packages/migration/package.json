@@ -50,8 +50,7 @@
     "eslint-plugin-prettier": "^5.2.5",
     "mongodb": "^4.17.1",
     "prettier": "3.5.3",
-    "rimraf": "^5.0.0",
-    "typescript": "6.0.3"
+    "rimraf": "^5.0.0"
   },
   "lint-staged": {
     "src/**/*.ts": [

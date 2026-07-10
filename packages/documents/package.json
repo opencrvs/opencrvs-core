@@ -5,7 +5,7 @@
   "license": "MPL-2.0",
   "private": true,
   "scripts": {
-    "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first  nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
+    "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first  nodemon --exec tsx src/index.ts",
     "start:prod": "TS_NODE_BASEURL=./build/dist node -r tsconfig-paths/register build/dist/src/index.js",
     "test": "yarn test:compilation && jest --coverage --silent --noStackTrace",
     "test:watch": "jest --watch",
@@ -38,6 +38,8 @@
     "zod": "^4.2"
   },
   "devDependencies": {
+    "@swc/core": "1.10.18",
+    "@swc/jest": "^0.2.39",
     "@types/archiver": "^3.0.0",
     "@types/hapi__boom": "^9.0.1",
     "@types/hapi__hapi": "^20.0.0",
@@ -57,9 +59,8 @@
     "jest-fetch-mock": "^2.1.2",
     "nodemon": "^3.0.0",
     "prettier": "3.5.3",
-    "ts-jest": "29.4.11",
-    "ts-node": "^6.1.1",
-    "typescript": "6.0.3"
+    "swc_mut_cjs_exports": "10.7.0",
+    "tsx": "^4.15.7"
   },
   "lint-staged": {
     "src/**/*.ts": [
@@ -69,7 +70,29 @@
   },
   "jest": {
     "transform": {
-      "^.+\\.tsx?$": "ts-jest"
+      "^.+\\.tsx?$": [
+        "@swc/jest",
+        {
+          "jsc": {
+            "parser": {
+              "syntax": "typescript",
+              "tsx": true
+            },
+            "target": "es2022",
+            "experimental": {
+              "plugins": [
+                [
+                  "swc_mut_cjs_exports",
+                  {}
+                ]
+              ]
+            }
+          },
+          "module": {
+            "type": "commonjs"
+          }
+        }
+      ]
     },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
     "moduleFileExtensions": [
