@@ -101,15 +101,15 @@ export const InputField = (props: IInputFieldProps) => {
     return typeof nodeType === 'string'
   }
 
-  const children = React.Children.map(
-    props.children,
-    (node: React.ReactElement) => {
-      if (!node) return
-      return isDomElement(node.type)
-        ? node
-        : React.cloneElement(node, { prefix, postfix, unit })
-    }
-  )
+  const children = React.Children.map(props.children, (node) => {
+    if (!React.isValidElement(node)) return node
+    return isDomElement(node.type)
+      ? node
+      : React.cloneElement(
+          node as React.ReactElement<Record<string, unknown>>,
+          { prefix, postfix, unit }
+        )
+  })
 
   const InputWrapper =
     variant === 'highlighted' ? HighlightedInputWrapper : DefaultInputWrapper
