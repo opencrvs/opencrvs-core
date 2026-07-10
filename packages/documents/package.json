@@ -46,8 +46,8 @@
     "@types/jwt-decode": "^2.2.1",
     "@types/node-fetch": "^2.5.12",
     "@types/uuid": "^3.4.3",
-    "@typescript-eslint/eslint-plugin": "8.28.0",
-    "@typescript-eslint/parser": "^8.28.0",
+    "@typescript-eslint/eslint-plugin": "8.63.0",
+    "@typescript-eslint/parser": "8.63.0",
     "cross-env": "^7.0.0",
     "eslint": "^9.23.0",
     "eslint-config-prettier": "^10.1.1",
@@ -57,9 +57,9 @@
     "jest-fetch-mock": "^2.1.2",
     "nodemon": "^3.0.0",
     "prettier": "3.5.3",
-    "ts-jest": "29.2.5",
+    "ts-jest": "29.4.11",
     "ts-node": "^6.1.1",
-    "typescript": "5.6.3"
+    "typescript": "6.0.3"
   },
   "lint-staged": {
     "src/**/*.ts": [
