@@ -318,6 +318,7 @@ export function buildAction(
     }
     case ActionType.REJECT:
     case ActionType.ARCHIVE:
+    case ActionType.UNARCHIVE:
     case ActionType.PRINT_CERTIFICATE:
     case ActionType.READ:
     case ActionType.CREATE:

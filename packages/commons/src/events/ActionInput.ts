@@ -165,6 +165,13 @@ export const ArchiveActionInput = BaseActionInput.extend(
 )
 export type ArchiveActionInput = z.infer<typeof ArchiveActionInput>
 
+export const UnarchiveActionInput = BaseActionInput.extend(
+  z.object({
+    type: z.literal(ActionType.UNARCHIVE).default(ActionType.UNARCHIVE)
+  }).shape
+)
+export type UnarchiveActionInput = z.infer<typeof UnarchiveActionInput>
+
 export const AssignActionInput = BaseActionInput.extend(
   z.object({
     type: z.literal(ActionType.ASSIGN),
@@ -271,6 +278,7 @@ export const ActionInput = z
       id: 'MarkNotDuplicateActionInput'
     }),
     ArchiveActionInput.meta({ id: 'ArchiveActionInput' }),
+    UnarchiveActionInput.meta({ id: 'UnarchiveActionInput' }),
     AssignActionInput.meta({ id: 'AssignActionInput' }),
     UnassignActionInput.meta({ id: 'UnassignActionInput' }),
     PrintCertificateActionInput.meta({ id: 'PrintCertificateActionInput' }),
