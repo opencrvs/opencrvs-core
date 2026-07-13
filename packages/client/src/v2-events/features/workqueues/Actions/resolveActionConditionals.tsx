@@ -91,6 +91,7 @@ function resolveInternalActionConditions({
         visible: true
       }
     case ActionType.ARCHIVE:
+    case ActionType.UNARCHIVE:
     case ActionType.DELETE:
     case ActionType.EDIT:
     case ActionType.REJECT:

@@ -47,10 +47,12 @@ import { useModal } from '../../../../hooks/useModal'
 import { actionLabels } from '../../../workqueues/Actions/utils'
 import { register } from './register'
 import { archive } from './archive'
+import { unarchive } from './unarchive'
 
 const quickActions = {
   [ActionType.REGISTER]: register,
-  [ActionType.ARCHIVE]: archive
+  [ActionType.ARCHIVE]: archive,
+  [ActionType.UNARCHIVE]: unarchive
 } as const satisfies Partial<Record<ActionType, QuickActionConfig>>
 
 interface ModalConfig {
@@ -89,7 +91,8 @@ interface ModalResult {
 
 const DefaultIcons = {
   [ActionType.REGISTER]: 'PencilLine',
-  [ActionType.ARCHIVE]: 'Archive'
+  [ActionType.ARCHIVE]: 'Archive',
+  [ActionType.UNARCHIVE]: 'ArchiveTray'
 } as const
 
 function QuickActionModal({

@@ -182,6 +182,17 @@ setMutationDefaults(trpcOptionsProxy.event.actions.archive.request, {
   meta: { actionType: ActionType.ARCHIVE }
 })
 
+setMutationDefaults(trpcOptionsProxy.event.actions.unarchive.request, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.unarchive.request
+  ),
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: deleteLocalEvent,
+  onError: errorToastOnConflict,
+  meta: { actionType: ActionType.UNARCHIVE }
+})
+
 setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate.request, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.printCertificate.request

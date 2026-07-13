@@ -247,6 +247,17 @@ describe('2.0 scopes', () => {
         }
       },
       {
+        type: 'record.unarchive',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user'
+        }
+      },
+      {
         type: 'record.review-duplicates',
         options: {
           event: ['birth', 'death'],
