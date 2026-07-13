@@ -43,7 +43,8 @@ const archivedScenariosForLocalRegistrar: Scenario[] = [
     expected: {
       ...getHiddenActions(),
       ['Assign']: AssertType.ENABLED,
-      ['Confirm']: AssertType.DISABLED
+      ['Confirm']: AssertType.DISABLED,
+      ['Unarchive']: AssertType.DISABLED
     }
   },
   {
@@ -59,7 +60,8 @@ const archivedScenariosForLocalRegistrar: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      ['Unassign']: AssertType.ENABLED
+      ['Unassign']: AssertType.ENABLED,
+      ['Unarchive']: AssertType.ENABLED
     }
   },
   {
@@ -76,7 +78,8 @@ const archivedScenariosForLocalRegistrar: Scenario[] = [
     expected: {
       ...getHiddenActions(),
       ['Confirm']: AssertType.DISABLED,
-      ['Unassign']: AssertType.ENABLED
+      ['Unassign']: AssertType.ENABLED,
+      ['Unarchive']: AssertType.DISABLED
     }
   }
 ]

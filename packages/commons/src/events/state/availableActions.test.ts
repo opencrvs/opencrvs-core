@@ -17,7 +17,12 @@ import { getAvailableActionsForEvent } from './availableActions'
 describe('getAvailableActionsForEvent()', () => {
   for (const status of EventStatus.options) {
     it(`should return the correct actions for "${status}" status with no flags`, () => {
-      expect(getAvailableActionsForEvent({ status: status as EventStatus, flags: [] } as unknown as EventIndex)).toMatchSnapshot()
+      expect(
+        getAvailableActionsForEvent({
+          status: status as EventStatus,
+          flags: []
+        } as unknown as EventIndex)
+      ).toMatchSnapshot()
     })
   }
 
@@ -29,7 +34,10 @@ describe('getAvailableActionsForEvent()', () => {
   for (const status of REJECTABLE_STATUSES) {
     it(`should return the correct actions for "${status}" status with ${InherentFlags.REJECTED} flag`, () => {
       expect(
-        getAvailableActionsForEvent({ status: status as EventStatus, flags: [InherentFlags.REJECTED] } as EventIndex)
+        getAvailableActionsForEvent({
+          status: status as EventStatus,
+          flags: [InherentFlags.REJECTED]
+        } as EventIndex)
       ).toMatchSnapshot()
     })
   }
@@ -42,39 +50,65 @@ describe('getAvailableActionsForEvent()', () => {
 
     expect(actions).not.toContain(ActionType.ARCHIVE)
     expect(actions).not.toContain(ActionType.EDIT)
+    expect(actions).toContain(ActionType.UNARCHIVE)
+    expect(actions).toMatchSnapshot()
+  })
+
+  it(`should allow UNARCHIVE for "${EventStatus.enum.ARCHIVED}" status with no flags`, () => {
+    const actions = getAvailableActionsForEvent({
+      status: EventStatus.enum.ARCHIVED,
+      flags: []
+    } as unknown as EventIndex)
+
+    expect(actions).toContain(ActionType.UNARCHIVE)
+  })
+
+  it(`should not allow UNARCHIVE for "${EventStatus.enum.ARCHIVED}" status while an unarchive request is pending`, () => {
+    const actions = getAvailableActionsForEvent({
+      status: EventStatus.enum.ARCHIVED,
+      flags: [(ActionType.UNARCHIVE + ':requested').toLowerCase()]
+    } as EventIndex)
+
+    expect(actions).not.toContain(ActionType.UNARCHIVE)
     expect(actions).toMatchSnapshot()
   })
 
   it(`should return the correct actions for "${EventStatus.enum.REGISTERED}" status with ${InherentFlags.CORRECTION_REQUESTED} flag`, () => {
     expect(
-      getAvailableActionsForEvent({ status: EventStatus.enum.REGISTERED, flags: [
-        InherentFlags.CORRECTION_REQUESTED
-      ] } as EventIndex)
+      getAvailableActionsForEvent({
+        status: EventStatus.enum.REGISTERED,
+        flags: [InherentFlags.CORRECTION_REQUESTED]
+      } as EventIndex)
     ).toMatchSnapshot()
   })
 
   it(`returns the correct actions for "${EventStatus.enum.REGISTERED}" status with a "registered:requested" flag`, () => {
     expect(
-      getAvailableActionsForEvent({ status: EventStatus.enum.REGISTERED, flags: [
-        (EventStatus.enum.REGISTERED + ':requested').toLowerCase()
-      ] } as EventIndex)
+      getAvailableActionsForEvent({
+        status: EventStatus.enum.REGISTERED,
+        flags: [(EventStatus.enum.REGISTERED + ':requested').toLowerCase()]
+      } as EventIndex)
     ).toMatchSnapshot()
   })
 
   it(`returns the correct actions for "${EventStatus.enum.DECLARED}" status with a "declared:requested" flag`, () => {
     expect(
-      getAvailableActionsForEvent({ status: EventStatus.enum.DECLARED, flags: [
-        (EventStatus.enum.DECLARED + ':requested').toLowerCase()
-      ] } as EventIndex)
+      getAvailableActionsForEvent({
+        status: EventStatus.enum.DECLARED,
+        flags: [(EventStatus.enum.DECLARED + ':requested').toLowerCase()]
+      } as EventIndex)
     ).toMatchSnapshot()
   })
 
   it(`should return the correct actions for "${EventStatus.enum.REGISTERED}" status with "registered:requested" ${InherentFlags.CORRECTION_REQUESTED} flag`, () => {
     expect(
-      getAvailableActionsForEvent({ status: EventStatus.enum.REGISTERED, flags: [
-        InherentFlags.CORRECTION_REQUESTED,
-        (EventStatus.enum.REGISTERED + ':requested').toLowerCase()
-      ] } as EventIndex)
+      getAvailableActionsForEvent({
+        status: EventStatus.enum.REGISTERED,
+        flags: [
+          InherentFlags.CORRECTION_REQUESTED,
+          (EventStatus.enum.REGISTERED + ':requested').toLowerCase()
+        ]
+      } as EventIndex)
     ).toMatchSnapshot()
   })
 })

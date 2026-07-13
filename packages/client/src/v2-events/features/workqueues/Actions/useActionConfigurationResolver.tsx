@@ -31,7 +31,6 @@ import {
   ActionCtaConfig,
   actionIcons,
   actionLabels,
-  ActionMenuActionType,
   ActionMenuItem
 } from './utils'
 import { resolveActionConditionals } from './resolveActionConditionals'
