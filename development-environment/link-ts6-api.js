@@ -38,6 +38,13 @@ const CONSUMERS = [
 ]
 
 if (!fs.existsSync(TS6)) {
+  // Both typescript packages are devDependencies: absent from a
+  // `yarn install --production` (Docker images), where there is no
+  // TypeScript toolchain to link and nothing to do.
+  if (!fs.existsSync(path.join(ROOT, 'node_modules', 'typescript'))) {
+    console.log('link-ts6-api: production install, no TypeScript to link')
+    process.exit(0)
+  }
   console.error(
     'link-ts6-api: @typescript/api is not installed, run yarn install'
   )
