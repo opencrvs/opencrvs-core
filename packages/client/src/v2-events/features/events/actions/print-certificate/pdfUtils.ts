@@ -347,6 +347,12 @@ export function compileSvg({
    */
   function $lookup(obj: EventMetadata | EventState, propertyPath: string) {
     function doLookup() {
+      // e.g. ($action 'REGISTER') resolves to undefined when the event has no
+      // such action. Mirror getMixedPath's missing-path semantics so templates
+      // can guard with {{#ifCond ... '!==' undefined}} instead of crashing.
+      if (obj == null) {
+        return undefined
+      }
       const resolvedMetadata = stringifyEventMetadata({
         metadata: $metadata,
         intl,
