@@ -45,6 +45,7 @@ paths:
               - MARK_AS_DUPLICATE
               - MARK_AS_NOT_DUPLICATE
               - ARCHIVE
+              - UNARCHIVE
               - PRINT_CERTIFICATE
               - REQUEST_CORRECTION
               - REJECT_CORRECTION
@@ -163,6 +164,7 @@ components:
                       - REGISTER
                       - REJECT
                       - ARCHIVE
+                      - UNARCHIVE
                       - PRINT_CERTIFICATE
                       - REQUEST_CORRECTION
                       - APPROVE_CORRECTION
@@ -195,6 +197,7 @@ components:
         - $ref: "#/components/schemas/MarkNotDuplicateAction"
         - $ref: "#/components/schemas/MarkAsDuplicateAction"
         - $ref: "#/components/schemas/ArchiveAction"
+        - $ref: "#/components/schemas/UnarchiveAction"
         - $ref: "#/components/schemas/NotifiedAction"
         - $ref: "#/components/schemas/RegisterAction"
         - $ref: "#/components/schemas/DeclareAction"
@@ -217,6 +220,7 @@ components:
           MARK_AS_NOT_DUPLICATE: "#/components/schemas/MarkNotDuplicateAction"
           MARK_AS_DUPLICATE: "#/components/schemas/MarkAsDuplicateAction"
           ARCHIVE: "#/components/schemas/ArchiveAction"
+          UNARCHIVE: "#/components/schemas/UnarchiveAction"
           NOTIFY: "#/components/schemas/NotifiedAction"
           REGISTER: "#/components/schemas/RegisterAction"
           DECLARE: "#/components/schemas/DeclareAction"
@@ -848,6 +852,101 @@ components:
         - status
         - type
         - content
+    UnarchiveAction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          description: Unique identifier of the action.
+        transactionId:
+          type: string
+          description: Unique identifier of the transaction.
+        createdByUserType:
+          type: string
+          enum:
+            - user
+            - system
+          description: Indicates whether the action was created by a human-user or by a
+            system-user.
+        createdAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+          description: Timestamp indicating when the action was created.
+        createdBy:
+          type: string
+          description: Identifier of the user who created the action.
+        createdByRole:
+          description: Role of the user who created the action.
+          type: string
+        createdBySignature:
+          description: Reference to the signature of the user who created the action.
+          anyOf:
+            - type: string
+              description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
+            - type: "null"
+        createdAtLocation:
+          description: Reference to the location of the user who created the action.
+          anyOf:
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
+        declaration:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            description: Value that matches exactly one of the possible schema types
+              (TextValue, DateValue, DateRangeFieldValue). The best matching
+              schema is chosen by priority.
+          description: Declaration data defined by the ActionConfig. Supports partial
+            updates.
+        annotation:
+          anyOf:
+            - type: object
+              propertyNames:
+                type: string
+              additionalProperties:
+                description: Value that matches exactly one of the possible schema types
+                  (TextValue, DateValue, DateRangeFieldValue). The best matching
+                  schema is chosen by priority.
+              description: Record of field-level changes made by an action. Supports partial
+                updates and nullable values.
+            - type: "null"
+          description: Action-specific metadata used to annotate the event.
+        status:
+          type: string
+          enum:
+            - Requested
+            - Accepted
+            - Rejected
+          description: Current status of the action. Actions may be validated
+            asynchronously by third-party integrations.
+        originalActionId:
+          anyOf:
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
+          description: Reference to the original action asynchronously accepted or
+            rejected by a third-party integration.
+        type:
+          type: string
+          const: UNARCHIVE
+      required:
+        - id
+        - transactionId
+        - createdByUserType
+        - createdAt
+        - createdBy
+        - declaration
+        - status
+        - type
     NotifiedAction:
       type: object
       properties:
@@ -2288,6 +2387,7 @@ components:
         - $ref: "#/components/schemas/RejectCorrectionActionConfig"
         - $ref: "#/components/schemas/EditActionConfig"
         - $ref: "#/components/schemas/ArchiveActionConfig"
+        - $ref: "#/components/schemas/UnarchiveActionConfig"
         - $ref: "#/components/schemas/CustomActionConfig"
       description: Configuration of an action available for an event. Data collected
         depends on the action type and is accessible through the annotation
@@ -2313,6 +2413,7 @@ components:
           REJECT_CORRECTION: "#/components/schemas/RejectCorrectionActionConfig"
           EDIT: "#/components/schemas/EditActionConfig"
           ARCHIVE: "#/components/schemas/ArchiveActionConfig"
+          UNARCHIVE: "#/components/schemas/UnarchiveActionConfig"
           CUSTOM: "#/components/schemas/CustomActionConfig"
     ReadActionConfig:
       type: object
@@ -2369,7 +2470,7 @@ components:
           anyOf:
             - anyOf:
                 - type: string
-                  pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                  pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|unarchive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                 - type: string
                   enum:
                     - incomplete
@@ -2637,6 +2738,7 @@ components:
                                 - record.edit
                                 - record.reject
                                 - record.archive
+                                - record.unarchive
                                 - record.review-duplicates
                                 - record.register
                                 - record.print-certified-copies
@@ -2901,6 +3003,7 @@ components:
                                 - record.edit
                                 - record.reject
                                 - record.archive
+                                - record.unarchive
                                 - record.review-duplicates
                                 - record.register
                                 - record.print-certified-copies
@@ -3559,6 +3662,7 @@ components:
                             - record.edit
                             - record.reject
                             - record.archive
+                            - record.unarchive
                             - record.review-duplicates
                             - record.register
                             - record.print-certified-copies
@@ -8595,6 +8699,7 @@ components:
                             - record.edit
                             - record.reject
                             - record.archive
+                            - record.unarchive
                             - record.review-duplicates
                             - record.register
                             - record.print-certified-copies
@@ -9056,6 +9161,7 @@ components:
                             - record.edit
                             - record.reject
                             - record.archive
+                            - record.unarchive
                             - record.review-duplicates
                             - record.register
                             - record.print-certified-copies
@@ -12606,7 +12712,7 @@ components:
             anyOf:
               - anyOf:
                   - type: string
-                    pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                    pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|unarchive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
                       - incomplete
@@ -12622,7 +12728,7 @@ components:
             anyOf:
               - anyOf:
                   - type: string
-                    pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                    pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|unarchive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
                       - incomplete
@@ -12638,7 +12744,7 @@ components:
             anyOf:
               - anyOf:
                   - type: string
-                    pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                    pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|unarchive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
                       - incomplete
@@ -14089,6 +14195,38 @@ components:
         - type
       additionalProperties: false
       description: Configuration for archiving a record.
+    UnarchiveActionConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the action
+          $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          default: []
+          description: Flag actions which are executed when the action is performed.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation dialog
+          $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          type: string
+          description: Icon representing the action
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionConditional"
+        type:
+          type: string
+          const: UNARCHIVE
+      required:
+        - label
+        - flags
+        - type
+      additionalProperties: false
+      description: Configuration for unarchiving a record.
     CustomActionConfig:
       type: object
       properties:
@@ -14463,6 +14601,7 @@ components:
                                   - record.edit
                                   - record.reject
                                   - record.archive
+                                  - record.unarchive
                                   - record.review-duplicates
                                   - record.register
                                   - record.print-certified-copies
@@ -14785,6 +14924,7 @@ components:
                                   - record.edit
                                   - record.reject
                                   - record.archive
+                                  - record.unarchive
                                   - record.review-duplicates
                                   - record.register
                                   - record.print-certified-copies
@@ -14965,6 +15105,7 @@ components:
                       - REGISTER
                       - REJECT
                       - ARCHIVE
+                      - UNARCHIVE
                       - PRINT_CERTIFICATE
                       - REQUEST_CORRECTION
                       - APPROVE_CORRECTION
@@ -14999,6 +15140,7 @@ components:
         - $ref: "#/components/schemas/MarkNotDuplicateActionOutput"
         - $ref: "#/components/schemas/MarkAsDuplicateActionOutput"
         - $ref: "#/components/schemas/ArchiveActionOutput"
+        - $ref: "#/components/schemas/UnarchiveActionOutput"
         - $ref: "#/components/schemas/NotifiedActionOutput"
         - $ref: "#/components/schemas/RegisterActionOutput"
         - $ref: "#/components/schemas/DeclareActionOutput"
@@ -15021,6 +15163,7 @@ components:
           MARK_AS_NOT_DUPLICATE: "#/components/schemas/MarkNotDuplicateActionOutput"
           MARK_AS_DUPLICATE: "#/components/schemas/MarkAsDuplicateActionOutput"
           ARCHIVE: "#/components/schemas/ArchiveActionOutput"
+          UNARCHIVE: "#/components/schemas/UnarchiveActionOutput"
           NOTIFY: "#/components/schemas/NotifiedActionOutput"
           REGISTER: "#/components/schemas/RegisterActionOutput"
           DECLARE: "#/components/schemas/DeclareActionOutput"
@@ -15662,6 +15805,102 @@ components:
         - status
         - type
         - content
+      additionalProperties: false
+    UnarchiveActionOutput:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          description: Unique identifier of the action.
+        transactionId:
+          type: string
+          description: Unique identifier of the transaction.
+        createdByUserType:
+          type: string
+          enum:
+            - user
+            - system
+          description: Indicates whether the action was created by a human-user or by a
+            system-user.
+        createdAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+          description: Timestamp indicating when the action was created.
+        createdBy:
+          type: string
+          description: Identifier of the user who created the action.
+        createdByRole:
+          description: Role of the user who created the action.
+          type: string
+        createdBySignature:
+          description: Reference to the signature of the user who created the action.
+          anyOf:
+            - type: string
+              description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
+            - type: "null"
+        createdAtLocation:
+          description: Reference to the location of the user who created the action.
+          anyOf:
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
+        declaration:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            description: Value that matches exactly one of the possible schema types
+              (TextValue, DateValue, DateRangeFieldValue). The best matching
+              schema is chosen by priority.
+          description: Declaration data defined by the ActionConfig. Supports partial
+            updates.
+        annotation:
+          anyOf:
+            - type: object
+              propertyNames:
+                type: string
+              additionalProperties:
+                description: Value that matches exactly one of the possible schema types
+                  (TextValue, DateValue, DateRangeFieldValue). The best matching
+                  schema is chosen by priority.
+              description: Record of field-level changes made by an action. Supports partial
+                updates and nullable values.
+            - type: "null"
+          description: Action-specific metadata used to annotate the event.
+        status:
+          type: string
+          enum:
+            - Requested
+            - Accepted
+            - Rejected
+          description: Current status of the action. Actions may be validated
+            asynchronously by third-party integrations.
+        originalActionId:
+          anyOf:
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
+          description: Reference to the original action asynchronously accepted or
+            rejected by a third-party integration.
+        type:
+          type: string
+          const: UNARCHIVE
+      required:
+        - id
+        - transactionId
+        - createdByUserType
+        - createdAt
+        - createdBy
+        - declaration
+        - status
+        - type
       additionalProperties: false
     NotifiedActionOutput:
       type: object
