@@ -183,6 +183,12 @@ const ArchiveAction = ActionBase.extend(
   }).shape
 )
 
+const UnarchiveAction = ActionBase.extend(
+  z.object({
+    type: z.literal(ActionType.UNARCHIVE)
+  }).shape
+)
+
 const CreatedAction = ActionBase.extend(
   z.object({
     type: z.literal(ActionType.CREATE)
@@ -270,6 +276,7 @@ export const ActionDocument = z
     MarkNotDuplicateAction.meta({ id: 'MarkNotDuplicateAction' }),
     MarkAsDuplicateAction.meta({ id: 'MarkAsDuplicateAction' }),
     ArchiveAction.meta({ id: 'ArchiveAction' }),
+    UnarchiveAction.meta({ id: 'UnarchiveAction' }),
     NotifiedAction.meta({ id: 'NotifiedAction' }),
     RegisterAction.meta({ id: 'RegisterAction' }),
     DeclareAction.meta({ id: 'DeclareAction' }),

@@ -41,6 +41,7 @@ const DEFAULT_ACTION_ORDER = [
   ActionType.EDIT,
   ActionType.REJECT,
   ActionType.ARCHIVE,
+  ActionType.UNARCHIVE,
   ActionType.DELETE,
   ActionType.MARK_AS_DUPLICATE,
   ActionType.PRINT_CERTIFICATE,
