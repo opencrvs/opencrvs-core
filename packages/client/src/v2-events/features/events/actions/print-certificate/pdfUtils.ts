@@ -345,10 +345,13 @@ export function compileSvg({
    * @example {'foo': {'bar': {'baz': 'quix'}} } // $lookup 'foo.bar.baz' => 'quix'
    * @example { 'informant.address': { 'other': { 'district': 'quix' } } } // $lookup 'informant.address.other.district' => 'quix'
    */
-  function $lookup(obj: EventMetadata | EventState, propertyPath: string) {
+  function $lookup(
+    // e.g. ($action 'REGISTER') resolves to undefined when the event has no such action
+    obj: EventMetadata | EventState | undefined,
+    propertyPath: string
+  ) {
     function doLookup() {
-      // e.g. ($action 'REGISTER') resolves to undefined when the event has no
-      // such action. Mirror getMixedPath's missing-path semantics so templates
+      // Mirror getMixedPath's missing-path semantics so templates
       // can guard with {{#ifCond ... '!==' undefined}} instead of crashing.
       if (obj == null) {
         return undefined
