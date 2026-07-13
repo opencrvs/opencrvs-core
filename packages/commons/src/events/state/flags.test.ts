@@ -99,7 +99,42 @@ const eventConfig: DeepPartial<EventConfig> = {
       customActionType: 'COMPLETE_NOTIFICATION',
       flags: [{ id: InherentFlags.INCOMPLETE, operation: 'remove' }]
     },
-    { type: ActionType.PRINT_CERTIFICATE, flags: [] }
+    { type: ActionType.PRINT_CERTIFICATE, flags: [] },
+    {
+      type: ActionType.MARK_AS_DUPLICATE,
+      flags: [
+        { id: 'reviewed-as-duplicate-flag', operation: 'add' },
+        { id: 'always-added-flag', operation: 'remove' }
+      ]
+    },
+    {
+      type: ActionType.MARK_AS_NOT_DUPLICATE,
+      flags: [
+        { id: 'cleared-as-not-duplicate-flag', operation: 'add' },
+        { id: 'always-added-flag', operation: 'remove' }
+      ]
+    },
+    {
+      type: ActionType.APPROVE_CORRECTION,
+      flags: [
+        { id: 'correction-approved-flag', operation: 'add' },
+        { id: 'always-added-flag', operation: 'remove' }
+      ]
+    },
+    {
+      type: ActionType.REJECT_CORRECTION,
+      flags: [
+        { id: 'correction-rejected-flag', operation: 'add' },
+        { id: 'always-added-flag', operation: 'remove' }
+      ]
+    },
+    {
+      type: ActionType.DUPLICATE_DETECTED,
+      flags: [
+        { id: 'flagged-for-duplicate-review-flag', operation: 'add' },
+        { id: 'always-added-flag', operation: 'remove' }
+      ]
+    }
   ],
   declaration: {
     label: { id: '', defaultMessage: '', description: '' },
@@ -206,6 +241,224 @@ describe('resolveEventCustomFlags()', () => {
     // @ts-expect-error - allow partial actions and event config
     const flags = resolveEventCustomFlags(event, eventConfig)
     expect(flags).toEqual([])
+  })
+
+  test('should add flag configured on the MARK_AS_DUPLICATE core action when accepted', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.MARK_AS_DUPLICATE,
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, eventConfig)
+    expect(flags).toEqual(['reviewed-as-duplicate-flag'])
+  })
+
+  test('should add flag configured on the MARK_AS_NOT_DUPLICATE core action when accepted', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.MARK_AS_NOT_DUPLICATE,
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, eventConfig)
+    expect(flags).toEqual(['cleared-as-not-duplicate-flag'])
+  })
+
+  test('should add flag configured on the APPROVE_CORRECTION core action when accepted', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.APPROVE_CORRECTION,
+          requestId: 'some-request-id',
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, eventConfig)
+    expect(flags).toEqual(['correction-approved-flag'])
+  })
+
+  test('should add flag configured on the REJECT_CORRECTION core action when accepted', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.REJECT_CORRECTION,
+          requestId: 'some-request-id',
+          content: { reason: 'Missing legal documentation' },
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, eventConfig)
+    expect(flags).toEqual(['correction-rejected-flag'])
+  })
+
+  test('should add flag configured on the DUPLICATE_DETECTED system action when accepted', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.DUPLICATE_DETECTED,
+          content: { duplicates: [] },
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, eventConfig)
+    expect(flags).toEqual(['flagged-for-duplicate-review-flag'])
+  })
+
+  test('should remove flag configured on the MARK_AS_DUPLICATE core action when accepted', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.CUSTOM,
+          customActionType: 'ADD_FLAG_ALWAYS',
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        },
+        {
+          type: ActionType.MARK_AS_DUPLICATE,
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, eventConfig)
+    expect(flags).toEqual(['reviewed-as-duplicate-flag'])
+    expect(flags).not.toContain('always-added-flag')
+  })
+
+  test('should remove flag configured on the MARK_AS_NOT_DUPLICATE core action when accepted', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.CUSTOM,
+          customActionType: 'ADD_FLAG_ALWAYS',
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        },
+        {
+          type: ActionType.MARK_AS_NOT_DUPLICATE,
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, eventConfig)
+    expect(flags).toEqual(['cleared-as-not-duplicate-flag'])
+    expect(flags).not.toContain('always-added-flag')
+  })
+
+  test('should remove flag configured on the APPROVE_CORRECTION core action when accepted', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.CUSTOM,
+          customActionType: 'ADD_FLAG_ALWAYS',
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        },
+        {
+          type: ActionType.APPROVE_CORRECTION,
+          requestId: 'some-request-id',
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, eventConfig)
+    expect(flags).toEqual(['correction-approved-flag'])
+    expect(flags).not.toContain('always-added-flag')
+  })
+
+  test('should remove flag configured on the REJECT_CORRECTION core action when accepted', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.CUSTOM,
+          customActionType: 'ADD_FLAG_ALWAYS',
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        },
+        {
+          type: ActionType.REJECT_CORRECTION,
+          requestId: 'some-request-id',
+          content: { reason: 'Missing legal documentation' },
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, eventConfig)
+    expect(flags).toEqual(['correction-rejected-flag'])
+    expect(flags).not.toContain('always-added-flag')
+  })
+
+  test('should remove flag configured on the DUPLICATE_DETECTED system action when accepted', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.CUSTOM,
+          customActionType: 'ADD_FLAG_ALWAYS',
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        },
+        {
+          type: ActionType.DUPLICATE_DETECTED,
+          content: { duplicates: [] },
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, eventConfig)
+    expect(flags).toEqual(['flagged-for-duplicate-review-flag'])
+    expect(flags).not.toContain('always-added-flag')
   })
 
   test('should not add flag when action does not have a flag config', () => {
@@ -648,6 +901,46 @@ describe('getEventFlags() – any inherent flag is clearable by action config', 
 
     // @ts-expect-error - allow partial event document and event config
     expect(getEventFlags(event, eventConfig)).toContain(
+      InherentFlags.INCOMPLETE
+    )
+  })
+
+  test('INCOMPLETE survives an archive/unarchive round trip back to NOTIFIED', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        ActionType.NOTIFY,
+        ActionType.ARCHIVE,
+        ActionType.UNARCHIVE
+      ].map((type, idx) => ({
+        type,
+        declaration: {},
+        createdAt: formatISO(subDays(now, 3 - idx)),
+        status: ActionStatus.Accepted
+      }))
+    }
+
+    // @ts-expect-error - allow partial event document and event config
+    expect(getEventFlags(event, eventConfig)).toContain(
+      InherentFlags.INCOMPLETE
+    )
+  })
+
+  test('INCOMPLETE stays absent when a declared record is archived and unarchived', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        ActionType.DECLARE,
+        ActionType.ARCHIVE,
+        ActionType.UNARCHIVE
+      ].map((type, idx) => ({
+        type,
+        declaration: {},
+        createdAt: formatISO(subDays(now, 3 - idx)),
+        status: ActionStatus.Accepted
+      }))
+    }
+
+    // @ts-expect-error - allow partial event document and event config
+    expect(getEventFlags(event, eventConfig)).not.toContain(
       InherentFlags.INCOMPLETE
     )
   })

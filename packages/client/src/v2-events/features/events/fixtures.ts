@@ -181,6 +181,43 @@ export const tennisClubMembershipEventWithCorrectionRequest: EventDocument = {
   ]
 }
 
+const archiveAction: ActionDocument = {
+  id: '3f1b2c3d-4e5f-4a1b-8c9d-0e1f2a3b4c5d' as UUID,
+  status: ActionStatus.Accepted,
+  declaration: {},
+  type: ActionType.ARCHIVE,
+  content: { reason: 'Archived for testing' },
+  createdBy: localRegistrarId,
+  createdByRole: 'LOCAL_REGISTRAR',
+  createdByUserType: 'user',
+  createdAt: '2025-01-24T05:35:27.689Z',
+  createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+  transactionId: 'aasdk342-asdkj3423-kn234k27'
+}
+
+const unarchiveAction: ActionDocument = {
+  id: '4a2c3d4e-5f6a-4b1c-9d0e-1f2a3b4c5d6e' as UUID,
+  status: ActionStatus.Accepted,
+  declaration: {},
+  type: ActionType.UNARCHIVE,
+  createdBy: localRegistrarId,
+  createdByRole: 'LOCAL_REGISTRAR',
+  createdByUserType: 'user',
+  createdAt: '2025-01-25T05:35:27.689Z',
+  createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+  transactionId: 'aasdk342-asdkj3423-kn234k28'
+}
+
+export const tennisClubMembershipEventWithArchiveAndUnarchive: EventDocument = {
+  ...tennisClubMembershipEventDocument,
+  id: 'a3b4c5d6-00bf-4631-89dc-89ca506c5d9d' as UUID,
+  actions: [
+    ...tennisClubMembershipEventDocument.actions,
+    archiveAction,
+    unarchiveAction
+  ]
+}
+
 export const TestImage = {
   Box: `
         <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -42,6 +42,7 @@ export const RecordScopeTypeV2 = z.enum([
   'record.edit',
   'record.reject',
   'record.archive',
+  'record.unarchive',
   'record.review-duplicates',
   'record.register',
   'record.print-certified-copies',
@@ -191,6 +192,7 @@ export const ScopesWithDeclaredOptions = RecordScopeTypeV2.extract([
   'record.edit',
   'record.reject',
   'record.archive',
+  'record.unarchive',
   'record.review-duplicates',
   'record.register'
 ])
