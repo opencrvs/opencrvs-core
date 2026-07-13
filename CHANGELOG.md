@@ -27,6 +27,10 @@ Added `notifiedIn` and `notifiedBy` scope options for record scopes (`record.rea
 
 `DELETE`, `ASSIGN`, `UNASSIGN`, `MARK_AS_DUPLICATE`, `MARK_AS_NOT_DUPLICATE`, `APPROVE_CORRECTION`, `REJECT_CORRECTION`, and `DUPLICATE_DETECTED` can now be configured in `ActionConfig`, supporting `label`, `icon`, and `conditionals` (and `flags`, except on `ASSIGN`/`UNASSIGN`, which are meta actions excluded from flag resolution). See [ACTIONS.md](/ACTIONS.md).
 
+#### Configurable form fields on core action confirmation dialogs
+
+The core `NOTIFY`, `DECLARE`, `REGISTER`, `ARCHIVE` and `REJECT` actions now accept an optional `form: FieldConfig[]` in the country configuration, matching the shape already used by custom actions. Configured fields are rendered on the action's confirmation dialog at every entry point (direct actions, quick actions, and "with edits" variants — a combined action such as direct registration shows only the final action's fields). Submitted values are stored in the action's `annotation` and displayed in the record's audit history. Mandatory fields disable the dialog's primary button until completed. [#11305](https://github.com/opencrvs/opencrvs-core/issues/11305)
+
 ## 2.0.0
 
 ### Upgrade guidance

@@ -23,6 +23,14 @@ import {
   EventStatus,
   getActionConfig,
   getAcceptedActions,
+  getActionFormFields,
+  runFieldValidations,
+  flattenFormState,
+  omitHiddenFields,
+  FieldConfig,
+  FieldUpdateValue,
+  EventState,
+  EventConfig,
   isActionEnabled
 } from '@opencrvs/commons/client'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
@@ -35,6 +43,8 @@ import {
   TextArea,
   Button
 } from '@opencrvs/components'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { useDialogFormState } from '@client/v2-events/hooks/useDialogFormState'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { messages as actionMessages } from '@client/i18n/messages/views/action'
 import { ROUTES } from '@client/v2-events/routes'
@@ -94,6 +104,7 @@ const messages = {
 interface EditActionModalResult {
   confirmed: boolean
   comment?: string
+  values?: Record<string, FieldUpdateValue>
 }
 
 const CommentLabel = styled(Text)`
@@ -103,14 +114,34 @@ const CommentLabel = styled(Text)`
 function EditActionModal({
   title,
   supportingCopy,
-  close
+  close,
+  fields = [],
+  eventConfiguration,
+  declaration
 }: {
   title: MessageDescriptor
   supportingCopy?: MessageDescriptor
   close: (result: EditActionModalResult) => void
+  fields?: FieldConfig[]
+  eventConfiguration: EventConfig
+  declaration: EventState
 }) {
   const intl = useIntl()
   const [comment, setComment] = useState('')
+  const validatorContext = useValidatorContext()
+  const dialogForm = useDialogFormState()
+  const modalValues = dialogForm.formValues
+
+  const errorsOnField = fields.flatMap((field) =>
+    flattenFormState(
+      runFieldValidations({
+        field,
+        form: modalValues,
+        value: modalValues[field.id],
+        context: validatorContext
+      })
+    ).flatMap(([, errs]) => errs)
+  )
 
   return (
     <Dialog
@@ -126,9 +157,16 @@ function EditActionModal({
         </Button>,
         <Button
           key={'confirm_edit'}
+          disabled={errorsOnField.length > 0}
           id={'confirm_edit'}
           type="primary"
-          onClick={() => close({ confirmed: true, comment })}
+          onClick={() =>
+            close({
+              confirmed: true,
+              comment,
+              values: omitHiddenFields(fields, modalValues, validatorContext)
+            })
+          }
         >
           {intl.formatMessage(messages.confirm)}
         </Button>
@@ -156,6 +194,15 @@ function EditActionModal({
         value={comment}
         onChange={(e) => setComment(e.target.value)}
       />
+      {fields.length > 0 && (
+        <FormFieldGenerator
+          {...dialogForm}
+          eventConfig={eventConfiguration}
+          fields={fields}
+          id="edit-action-modal-form"
+          validatorContext={{ ...validatorContext, baseFormState: declaration }}
+        />
+      )}
     </Dialog>
   )
 }
@@ -243,17 +290,22 @@ function useEditActions(event: EventDocument) {
         icon: actionIcons[ActionType.EDIT],
         label: messages.editAndRegisterLabel,
         onClick: async () => {
-          const { confirmed, comment } = await openModal<EditActionModalResult>(
-            (close) => {
+          const { confirmed, comment, values } =
+            await openModal<EditActionModalResult>((close) => {
               return (
                 <EditActionModal
                   close={close}
+                  declaration={declaration}
+                  eventConfiguration={eventConfiguration}
+                  fields={getActionFormFields(
+                    eventConfiguration,
+                    ActionType.REGISTER
+                  )}
                   supportingCopy={dialogCopy?.register}
                   title={messages.editAndRegisterLabel}
                 />
               )
-            }
-          )
+            })
 
           if (confirmed) {
             events.customActions.editAndRegister.mutate({
@@ -261,6 +313,7 @@ function useEditActions(event: EventDocument) {
               transactionId: getUUID(),
               declaration: declarationDiff,
               annotation,
+              targetActionAnnotation: values,
               content: { comment }
             })
 
@@ -275,17 +328,22 @@ function useEditActions(event: EventDocument) {
         icon: actionIcons[ActionType.EDIT],
         label: messages.editAndDeclareLabel,
         onClick: async () => {
-          const { confirmed, comment } = await openModal<EditActionModalResult>(
-            (close) => {
+          const { confirmed, comment, values } =
+            await openModal<EditActionModalResult>((close) => {
               return (
                 <EditActionModal
                   close={close}
+                  declaration={declaration}
+                  eventConfiguration={eventConfiguration}
+                  fields={getActionFormFields(
+                    eventConfiguration,
+                    ActionType.DECLARE
+                  )}
                   supportingCopy={dialogCopy?.declare}
                   title={messages.editAndDeclareLabel}
                 />
               )
-            }
-          )
+            })
 
           if (confirmed) {
             events.customActions.editAndDeclare.mutate({
@@ -293,6 +351,7 @@ function useEditActions(event: EventDocument) {
               transactionId: getUUID(),
               declaration: declarationDiff,
               annotation,
+              targetActionAnnotation: values,
               content: { comment }
             })
 
@@ -309,17 +368,22 @@ function useEditActions(event: EventDocument) {
         icon: actionIcons[ActionType.EDIT],
         label: messages.editAndNotifyLabel,
         onClick: async () => {
-          const { confirmed, comment } = await openModal<EditActionModalResult>(
-            (close) => {
+          const { confirmed, comment, values } =
+            await openModal<EditActionModalResult>((close) => {
               return (
                 <EditActionModal
                   close={close}
+                  declaration={declaration}
+                  eventConfiguration={eventConfiguration}
+                  fields={getActionFormFields(
+                    eventConfiguration,
+                    ActionType.NOTIFY
+                  )}
                   supportingCopy={dialogCopy?.notify}
                   title={messages.editAndNotifyLabel}
                 />
               )
-            }
-          )
+            })
 
           if (confirmed) {
             events.customActions.editAndNotify.mutate({
@@ -327,6 +391,7 @@ function useEditActions(event: EventDocument) {
               transactionId: getUUID(),
               declaration: declarationDiff,
               annotation,
+              targetActionAnnotation: values,
               content: { comment }
             })
 
