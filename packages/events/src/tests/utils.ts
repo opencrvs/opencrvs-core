@@ -175,6 +175,12 @@ export const TEST_USER_DEFAULT_SCOPES = [
     }
   }),
   encodeScope({
+    type: 'record.unarchive',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
     type: 'record.register',
     options: {
       event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
@@ -486,6 +492,11 @@ function actionToClientAction(
         client.event.actions.archive.request(
           generator.event.actions.archive(eventId, { keepAssignment: true })
         )
+    case ActionType.UNARCHIVE:
+      return async (eventId: string) =>
+        client.event.actions.unarchive.request(
+          generator.event.actions.unarchive(eventId, { keepAssignment: true })
+        )
     case ActionType.REGISTER:
       return async (eventId: string) =>
         client.event.actions.register.request(
@@ -578,6 +589,7 @@ export async function seedEvent(
       | DeclarationActionType
       | typeof ActionType.UNASSIGN
       | typeof ActionType.REQUEST_CORRECTION
+      | typeof ActionType.ARCHIVE
     )[]
     user: Omit<UserContext, 'type'>
     rng: () => number
@@ -667,6 +679,13 @@ export async function seedEvent(
                 administrativeHierarchy
               )
 
+        // ARCHIVE requires a `content.reason`, which this raw seed path doesn't
+        // otherwise populate.
+        const content =
+          actionType === ActionType.ARCHIVE
+            ? { reason: 'Seeded archive' }
+            : undefined
+
         return [
           {
             ...baseAction,
@@ -675,7 +694,8 @@ export async function seedEvent(
             transactionId: generateUuid(rng),
             status: ActionStatus.Requested,
             createdAt: new Date(baseTime + ++offset).toISOString(),
-            declaration
+            declaration,
+            content
           },
           {
             ...baseAction,
@@ -688,7 +708,8 @@ export async function seedEvent(
               actionType === ActionTypes.enum.REGISTER
                 ? generateRegistrationNumber(rng)
                 : null,
-            declaration: {}
+            declaration: {},
+            content
           }
         ]
       }
@@ -979,12 +1000,14 @@ export async function setupScopeTestFixture(
         | DeclarationActionType
         | typeof ActionType.REQUEST_CORRECTION
         | typeof ActionType.UNASSIGN
+        | typeof ActionType.ARCHIVE
       )[]
     | fc.Arbitrary<
         (
           | DeclarationActionType
           | typeof ActionType.REQUEST_CORRECTION
           | typeof ActionType.UNASSIGN
+          | typeof ActionType.ARCHIVE
         )[]
       >
 ) {

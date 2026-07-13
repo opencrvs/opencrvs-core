@@ -51,7 +51,11 @@ const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
     ActionType.CUSTOM,
     ClientSpecificAction.REVIEW_CORRECTION_REQUEST
   ],
-  [EventStatus.enum.ARCHIVED]: [ActionType.READ, ActionType.CUSTOM]
+  [EventStatus.enum.ARCHIVED]: [
+    ActionType.READ,
+    ActionType.CUSTOM,
+    ActionType.UNARCHIVE
+  ]
 } as const satisfies Record<
   EventStatus,
   Exclude<
@@ -91,6 +95,8 @@ const ACTION_FILTERS: {
     !flags.includes(InherentFlags.REJECTED) &&
     !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.ARCHIVE]: (flags) =>
+    !flags.some((flag) => flag.endsWith(':requested')),
+  [ActionType.UNARCHIVE]: (flags) =>
     !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.ASSIGN]: (flags) =>
     !flags.some((flag) => flag.endsWith(':requested')),

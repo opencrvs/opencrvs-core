@@ -16,6 +16,7 @@ import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { Button, DropdownMenu, Icon } from '@opencrvs/components'
 import {
   EventConfig,
+  EventIndex,
   getOrThrow,
   ActionType,
   ClientSpecificAction
@@ -24,10 +25,11 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { messages } from '@client/i18n/messages/views/action'
 import { useAuthentication } from '@client/utils/userUtils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { getUsersFullName } from '@client/v2-events/utils'
+import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useAllowedActionConfigurations } from '../../Actions/useAllowedActionConfigurations'
 import { ActionMenuItem } from '../../Actions/utils'
 
@@ -39,6 +41,7 @@ const DEFAULT_ACTION_ORDER = [
   ActionType.EDIT,
   ActionType.REJECT,
   ActionType.ARCHIVE,
+  ActionType.UNARCHIVE,
   ActionType.DELETE,
   ActionType.MARK_AS_DUPLICATE,
   ActionType.PRINT_CERTIFICATE,
@@ -86,16 +89,18 @@ export function sortActions(
 function ActionMenuItems({
   items,
   eventConfiguration,
+  eventIndex,
   backTo,
   onAction
 }: {
   items: ActionMenuItem[]
   eventConfiguration: EventConfig
+  eventIndex: EventIndex
   backTo?: string
   onAction?: () => void
 }) {
   const sortedActions = sortActions(items, eventConfiguration)
-  const intl = useIntl()
+  const intl = useIntlFormatMessageWithFlattenedParams()
 
   if (sortedActions.length === 0) {
     return (
@@ -118,7 +123,7 @@ function ActionMenuItems({
         }}
       >
         <Icon color="currentColor" name={action.icon} size="small" />
-        {intl.formatMessage(action.label)}
+        {intl.formatMessage(action.label, flattenEventIndex(eventIndex))}
       </DropdownMenu.Item>
     )
   })
@@ -205,6 +210,7 @@ export function ActionMenu({
           <ActionMenuItems
             backTo={backTo}
             eventConfiguration={eventConfiguration}
+            eventIndex={eventIndex}
             items={actionMenuItems}
             onAction={onAction}
           />

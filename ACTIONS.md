@@ -8,17 +8,19 @@ Core actions, as the name suggests, are defined within the core and are availabl
 
 - `CREATE`
 - `READ`
-- `ASSIGN` & `UNASSIGN`
-- `DELETE`
+- `ASSIGN`\*† & `UNASSIGN`\*†
+- `DELETE`\*
 - `NOTIFY`\*
 - `DECLARE`\*, `VALIDATE`\* & `REGISTER`\*
 - `REJECT`\*
-- `ARCHIVE`
+- `ARCHIVE`\*
 - `PRINT_CERTIFICATE`\*
-- `REQUEST_CORRECTION`\*, `APPROVE_CORRECTION` & `REJECT_CORRECTION`
-- `DUPLICATE_DETECTED`, `MARK_AS_DUPLICATE` & `MARK_AS_NOT_DUPLICATE`
+- `REQUEST_CORRECTION`\*, `APPROVE_CORRECTION`\* & `REJECT_CORRECTION`\*
+- `DUPLICATE_DETECTED`\*\*, `MARK_AS_DUPLICATE`\* & `MARK_AS_NOT_DUPLICATE`\*
 
-_\* are configurable core actions, this is related to the action configurations section below_
+_\* are configurable core actions, this is related to the action configurations section below._
+_\*\* `DUPLICATE_DETECTED` only supports `flags` — it's system-generated and never shown as a button._
+_† `ASSIGN`/`UNASSIGN` support everything except `flags` (excluded as "meta actions")._
 
 Core actions can also change the event’s status, which custom actions cannot do.  
 In v2.0, the available event statuses are:

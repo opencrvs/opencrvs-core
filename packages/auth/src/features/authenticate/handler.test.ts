@@ -256,6 +256,45 @@ describe('authenticate handler receives a request', () => {
       expect(spy.mock.calls[0]).toHaveLength(5)
       expect(spy.mock.calls[0][3]).toBe('+345345343')
     })
+    it('masks the mobile number and email in the response', async () => {
+      server = await createProductionEnvironmentServer()
+
+      /* eslint-disable @typescript-eslint/no-require-imports */
+      /* eslint-disable @typescript-eslint/no-var-requires */
+      const reloadedCodeService = require('../verifyCode/service')
+      const reloadedAuthService = require('./service')
+
+      jest.spyOn(reloadedAuthService, 'authenticate').mockResolvedValue({
+        userId: '1',
+        status: 'active',
+        role: 'NATIONAL_SYSTEM_ADMIN',
+        name: { firstname: '', surname: '' },
+        mobile: '+345345343',
+        email: 'user@example.com'
+      })
+      jest.spyOn(reloadedCodeService, 'generateNonce').mockReturnValue('12345')
+
+      fetch.mockResponse(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+        status: 200
+      })
+
+      jest
+        .spyOn(reloadedCodeService, 'sendVerificationCode')
+        .mockResolvedValue(undefined)
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/authenticate',
+        payload: {
+          username: '+345345343',
+          password: '2r23432'
+        }
+      })
+
+      const body = JSON.parse(res.payload)
+      expect(body.mobile).toBe('+34*****43')
+      expect(body.email).toBe('use*********.com')
+    })
     it('does not generate a mobile verification code for pending users', async () => {
       server = await createProductionEnvironmentServer()
 

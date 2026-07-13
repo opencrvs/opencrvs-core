@@ -23,6 +23,7 @@ import {
   RegisterActionInput,
   RejectDeclarationActionInput,
   ArchiveActionInput,
+  UnarchiveActionInput,
   PrintCertificateActionInput,
   DeclareActionInput,
   ACTION_SCOPE_MAP,
@@ -117,6 +118,10 @@ const ACTION_PROCEDURE_CONFIG = {
     ...defaultConfig,
     inputSchema: ArchiveActionInput
   },
+  [ActionType.UNARCHIVE]: {
+    ...defaultConfig,
+    inputSchema: UnarchiveActionInput
+  },
   [ActionType.PRINT_CERTIFICATE]: {
     ...defaultConfig,
     inputSchema: PrintCertificateActionInput
@@ -174,6 +179,7 @@ const AUDIT_LOG_OPERATION_MAP: Partial<
   [ActionType.REGISTER]: 'event.actions.register.request',
   [ActionType.REJECT]: 'event.actions.reject.request',
   [ActionType.ARCHIVE]: 'event.actions.archive.request',
+  [ActionType.UNARCHIVE]: 'event.actions.unarchive.request',
   [ActionType.PRINT_CERTIFICATE]: 'event.actions.print_certificate.request',
   [ActionType.EDIT]: 'event.actions.edit.request',
   [ActionType.REQUEST_CORRECTION]: 'event.actions.correction.request.request',

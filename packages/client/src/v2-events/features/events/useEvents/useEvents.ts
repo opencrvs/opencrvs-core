@@ -197,6 +197,7 @@ export function useEvents() {
       custom: useEventAction(trpc.event.actions.custom.request),
       reject: useEventAction(trpc.event.actions.reject.request),
       archive: useEventAction(trpc.event.actions.archive.request),
+      unarchive: useEventAction(trpc.event.actions.unarchive.request),
       notify: useEventAction(trpc.event.actions.notify.request),
       declare: useEventAction(trpc.event.actions.declare.request),
       register: useEventAction(trpc.event.actions.register.request),
