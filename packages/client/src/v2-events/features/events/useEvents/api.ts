@@ -330,6 +330,18 @@ export async function deleteLocalEvent(updatedEvent: EventDocument) {
   await refetchAffectedSearchQueries(updatedEvent.id)
 }
 
+/**
+ * For workqueue-affecting writes that keep the record assigned to the user
+ * (no follow-up UNASSIGN): patch the local event caches in place and run the
+ * standard search refresh. Unlike deleteLocalEvent, the full event document
+ * must survive — the user still holds the assignment, so evicting it would
+ * force a re-download and break offline availability of the assigned record.
+ */
+export async function updateLocalEvent(updatedEvent: EventDocument) {
+  setEventData(updatedEvent.id, updatedEvent)
+  await refetchAffectedSearchQueries(updatedEvent.id)
+}
+
 export async function onAssign(updatedEvent: EventDocument) {
   setEventData(updatedEvent.id, updatedEvent)
   await invalidateWorkqueues()

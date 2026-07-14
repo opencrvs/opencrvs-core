@@ -11,7 +11,12 @@
 import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-import { addLocalEventConfig, deleteLocalEvent, onAssign } from './api'
+import {
+  addLocalEventConfig,
+  deleteLocalEvent,
+  onAssign,
+  updateLocalEvent
+} from './api'
 import { searchKeys } from './procedures/search'
 
 /*
@@ -93,7 +98,9 @@ describe('per-action invalidation policy (handler map)', () => {
       const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
       const refetchSpy = vi.spyOn(queryClient, 'refetchQueries')
 
-      const onSuccess = getOnSuccess(trpcOptionsProxy.event.create.mutationKey())
+      const onSuccess = getOnSuccess(
+        trpcOptionsProxy.event.create.mutationKey()
+      )
       expect(onSuccess).toBeTypeOf('function')
 
       onSuccess?.(tennisClubMembershipEventDocument, undefined, {
@@ -113,7 +120,9 @@ describe('per-action invalidation policy (handler map)', () => {
       const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
       const refetchSpy = vi.spyOn(queryClient, 'refetchQueries')
 
-      const onSuccess = getOnSuccess(trpcOptionsProxy.event.delete.mutationKey())
+      const onSuccess = getOnSuccess(
+        trpcOptionsProxy.event.delete.mutationKey()
+      )
       expect(onSuccess).toBeTypeOf('function')
 
       onSuccess?.({ id: tennisClubMembershipEventDocument.id })
@@ -155,9 +164,16 @@ describe('per-action invalidation policy (handler map)', () => {
   })
 
   describe('workqueue-affecting actions use the standard path', () => {
-    it('MARK_AS_NOT_DUPLICATE is wired to deleteLocalEvent (standard path)', () => {
+    it('MARK_AS_NOT_DUPLICATE is wired to updateLocalEvent (standard refresh, keeps local event — record stays assigned)', () => {
       const onSuccess = getOnSuccess(
         trpcOptionsProxy.event.actions.duplicate.markNotDuplicate.mutationKey()
+      )
+      expect(onSuccess).toBe(updateLocalEvent)
+    })
+
+    it('MARK_AS_DUPLICATE stays on deleteLocalEvent (record is unassigned after)', () => {
+      const onSuccess = getOnSuccess(
+        trpcOptionsProxy.event.actions.duplicate.markAsDuplicate.mutationKey()
       )
       expect(onSuccess).toBe(deleteLocalEvent)
     })
@@ -184,7 +200,9 @@ describe('per-action invalidation policy (handler map)', () => {
           queryKey: trpcOptionsProxy.workqueue.count.queryKey()
         })
         expect(refetchSpy).toHaveBeenCalledWith({
-          queryKey: searchKeys.filters.byId(tennisClubMembershipEventDocument.id)
+          queryKey: searchKeys.filters.byId(
+            tennisClubMembershipEventDocument.id
+          )
         })
       })
     })
