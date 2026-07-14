@@ -24,7 +24,6 @@ import {
   getCurrentEventState,
   isActionEnabled,
   isActionVisible,
-  isValidIcon,
   RequestedCorrectionAction,
   ValidatorContext
 } from '@opencrvs/commons/client'
@@ -302,30 +301,15 @@ export function ReviewCorrection({
     ? isActionEnabled(rejectActionConfig, eventIndex, validatorContext)
     : true
 
-  const approveLabel = approveActionConfig?.label
-    ? intl.formatMessage(approveActionConfig.label)
-    : intl.formatMessage(buttonMessages.approve)
-  const rejectLabel = rejectActionConfig?.label
-    ? intl.formatMessage(rejectActionConfig.label)
-    : intl.formatMessage(buttonMessages.reject)
-
-  const approveIcon = isValidIcon(approveActionConfig?.icon)
-    ? approveActionConfig.icon
-    : 'Check'
-  const rejectIcon = isValidIcon(rejectActionConfig?.icon)
-    ? rejectActionConfig.icon
-    : 'X'
-
-  // Default modal titles ("Approve correction?") are kept distinct from the
-  // generic button word ("Approve") so behaviour is unchanged when no label
-  // is configured; a configured label overrides both, matching the pattern
-  // used for quick-action modals (see useQuickActionModal.tsx).
-  const approveModalTitle = approveActionConfig?.label
-    ? `${intl.formatMessage(approveActionConfig.label)}?`
-    : intl.formatMessage(reviewCorrectionMessages.approveCorrection)
-  const rejectModalTitle = rejectActionConfig?.label
-    ? `${intl.formatMessage(rejectActionConfig.label)}?`
-    : intl.formatMessage(reviewCorrectionMessages.rejectCorrection)
+  // Configured labels/icons only affect the action menu; this core-owned
+  // review page keeps hardcoded button labels/icons and modal titles, while
+  // the configs' conditionals still gate visibility/enabling.
+  const approveModalTitle = intl.formatMessage(
+    reviewCorrectionMessages.approveCorrection
+  )
+  const rejectModalTitle = intl.formatMessage(
+    reviewCorrectionMessages.rejectCorrection
+  )
 
   const openApproveModal = async () => {
     await openModal((close) => (
@@ -386,8 +370,8 @@ export function ReviewCorrection({
       type="negative"
       onClick={openRejectModal}
     >
-      <Icon name={rejectIcon} />
-      {rejectLabel}
+      <Icon name="X" />
+      {intl.formatMessage(buttonMessages.reject)}
     </Button>
   )
 
@@ -400,8 +384,8 @@ export function ReviewCorrection({
       type="positive"
       onClick={openApproveModal}
     >
-      <Icon name={approveIcon} />
-      {approveLabel}
+      <Icon name="Check" />
+      {intl.formatMessage(buttonMessages.approve)}
     </Button>
   )
 
