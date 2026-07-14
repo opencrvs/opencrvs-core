@@ -13425,6 +13425,12 @@ components:
         type:
           type: string
           const: NOTIFY
+        form:
+          description: Fields rendered on the action confirmation dialog. Submitted values
+            are stored in the action annotation and shown in the audit history.
+          type: array
+          items:
+            $ref: "#/components/schemas/FieldConfig"
       required:
         - label
         - flags
@@ -13477,6 +13483,12 @@ components:
             - fields
           additionalProperties: false
           description: Configuration of the review page fields.
+        form:
+          description: Fields rendered on the action confirmation dialog. Submitted values
+            are stored in the action annotation and shown in the audit history.
+          type: array
+          items:
+            $ref: "#/components/schemas/FieldConfig"
         dialogCopy:
           type: object
           properties:
@@ -13771,6 +13783,12 @@ components:
         type:
           type: string
           const: REJECT
+        form:
+          description: Fields rendered on the action confirmation dialog. Submitted values
+            are stored in the action annotation and shown in the audit history.
+          type: array
+          items:
+            $ref: "#/components/schemas/FieldConfig"
       required:
         - label
         - flags
@@ -13805,6 +13823,12 @@ components:
         type:
           type: string
           const: REGISTER
+        form:
+          description: Fields rendered on the action confirmation dialog. Submitted values
+            are stored in the action annotation and shown in the audit history.
+          type: array
+          items:
+            $ref: "#/components/schemas/FieldConfig"
       required:
         - label
         - flags
@@ -14159,6 +14183,12 @@ components:
         type:
           type: string
           const: ARCHIVE
+        form:
+          description: Fields rendered on the action confirmation dialog. Submitted values
+            are stored in the action annotation and shown in the audit history.
+          type: array
+          items:
+            $ref: "#/components/schemas/FieldConfig"
       required:
         - label
         - flags
