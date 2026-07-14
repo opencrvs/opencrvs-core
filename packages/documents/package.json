@@ -38,7 +38,8 @@
     "zod": "^4.2"
   },
   "devDependencies": {
-    "@swc/core": "1.10.18",
+    "@swc-contrib/mut-cjs-exports": "^14.15.0",
+    "@swc/core": "^1.15.43",
     "@swc/jest": "^0.2.39",
     "@types/archiver": "^3.0.0",
     "@types/hapi__boom": "^9.0.1",
@@ -59,7 +60,6 @@
     "jest-fetch-mock": "^2.1.2",
     "nodemon": "^3.0.0",
     "prettier": "3.5.3",
-    "swc_mut_cjs_exports": "10.7.0",
     "tsx": "^4.15.7"
   },
   "lint-staged": {
@@ -82,7 +82,7 @@
             "experimental": {
               "plugins": [
                 [
-                  "swc_mut_cjs_exports",
+                  "@swc-contrib/mut-cjs-exports",
                   {}
                 ]
               ]

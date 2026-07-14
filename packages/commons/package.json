@@ -90,7 +90,8 @@
     "zod-openapi": "^5.4.6"
   },
   "devDependencies": {
-    "@swc/core": "1.10.18",
+    "@swc-contrib/mut-cjs-exports": "^14.15.0",
+    "@swc/core": "^1.15.43",
     "@swc/jest": "^0.2.39",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/object-hash": "^3.0.6",
@@ -104,8 +105,7 @@
     "eslint-plugin-prettier": "^5.2.5",
     "jest-fetch-mock": "^2.1.2",
     "jsonwebtoken": "^9.0.2",
-    "pino-pretty": "^11.0.0",
-    "swc_mut_cjs_exports": "10.7.0"
+    "pino-pretty": "^11.0.0"
   },
   "lint-staged": {
     "src/**/*.ts": [
@@ -127,7 +127,7 @@
             "experimental": {
               "plugins": [
                 [
-                  "swc_mut_cjs_exports",
+                  "@swc-contrib/mut-cjs-exports",
                   {}
                 ]
               ]
