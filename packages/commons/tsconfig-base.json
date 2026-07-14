@@ -14,6 +14,7 @@
       "es2015",
       "es6",
       "es2019",
+      "es2022",
       "DOM"
     ],
     "forceConsistentCasingInFileNames": true,

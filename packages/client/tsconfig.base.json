@@ -17,6 +17,7 @@
     "noFallthroughCasesInSwitch": true,
     "types": ["vitest/globals"],
     "paths": {
+      "@opencrvs/client/src/*": ["./src/*"],
       "@client/*": ["./src/*"]
     }
   },
