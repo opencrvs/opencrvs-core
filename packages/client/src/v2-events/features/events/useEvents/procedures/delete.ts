@@ -14,7 +14,6 @@ import * as z from 'zod'
 import {
   clearPendingDraftCreationRequests,
   deleteDraft,
-  refetchAffectedSearchQueries,
   refetchDraftsList,
   refetchSearchQuery,
   setDraftData
@@ -31,7 +30,12 @@ setMutationDefaults(trpcOptionsProxy.event.delete, {
   },
   retryDelay: 10000,
   onSuccess: async ({ id }) => {
-    void refetchAffectedSearchQueries(id)
+    // No search/workqueue refresh: only CREATED-status events are deletable and
+    // they were never indexed server-side, so a delete cannot change any
+    // event.search / workqueue result. Only the local draft is dropped.
+    // (The refetchSearchQuery in mutationFn below is unrelated — it is the
+    // offline temporary-id -> canonical-id replacement plumbing, not a workqueue
+    // refresh.)
     deleteDraft(id)
     /*
      * The drafts list may have a fetch in flight that started before the event was
