@@ -51,7 +51,6 @@ done
 # List of directories
 dirs=(
   "data/elasticsearch"
-  "data/mongo"
   "data/minio"
   "data/backups"
   "data/postgres"
@@ -107,7 +106,7 @@ fi
 
 
 echo
-openCRVSPorts=( 3447 9200 27017 6379 4444 3040 5050 2020 7070 1050 3030 3000 3020 2525 2021 3535 3536 9050)
+openCRVSPorts=( 3447 9200 6379 4444 3040 5050 2020 7070 1050 3030 3000 3020 2525 2021 3535 3536 9050)
 for x in "${openCRVSPorts[@]}"
 do
    :
@@ -127,7 +126,7 @@ done
 echo
 echo -e "\033[32m:::::::::: STARTING OPENCRVS ::::::::::\033[0m"
 echo
-echo "If you did not previously run our setup command, Docker is downloading Mongo DB, and ElasticSearch docker images.  These are large files.  Then docker will build them.  If you did run our setup command, OpenCRVS will start much faster. Wait for the OpenCRVS stack to start up completely (output will slow and gradually stop ...), then OpenCRVS Core will be available."
+echo "If you did not previously run our setup command, Docker is downloading ElasticSearch docker images.  These are large files.  Then docker will build them.  If you did run our setup command, OpenCRVS will start much faster. Wait for the OpenCRVS stack to start up completely (output will slow and gradually stop ...), then OpenCRVS Core will be available."
 echo
 echo -e "\033[32m:::::::::: PLEASE WAIT for @opencrvs/client ::::::::::\033[0m"
 echo
