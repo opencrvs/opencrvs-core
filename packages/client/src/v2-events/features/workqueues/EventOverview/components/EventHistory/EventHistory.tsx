@@ -18,6 +18,7 @@ import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
+  ActionDocument,
   ActionType,
   isActionConfigType,
   EventDocument,
@@ -32,10 +33,7 @@ import * as routes from '@client/navigation/routes'
 import { useEventOverviewContext } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import {
-  expandWithClientSpecificActions,
-  EventHistoryActionDocument,
   useActionForHistory,
-  DECLARATION_ACTION_UPDATE,
   extractHistoryActions
 } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { usePermissions } from '@client/hooks/useAuthorization'
@@ -49,7 +47,7 @@ import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
 const eventHistoryStatusMessage = {
   id: 'events.history.status',
   defaultMessage:
-    '{status, select, Requested {Waiting for external validation} other {{action, select, CREATE {Draft} NOTIFY {Notified} EDIT {Edited} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} UNARCHIVE {Unarchived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} UPDATE {Updated} other {Unknown}}}}'
+    '{status, select, Requested {Waiting for external validation} other {{action, select, CREATE {Draft} NOTIFY {Notified} EDIT {Edited} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} UNARCHIVE {Unarchived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}}}'
 }
 
 const LargeGreyedInfo = styled.div`
@@ -126,7 +124,7 @@ const SystemName = styled.div`
   }
 `
 
-function User({ action }: { action: EventHistoryActionDocument }) {
+function User({ action }: { action: ActionDocument }) {
   const intl = useIntl()
   const { findUser } = useEventOverviewContext()
   const navigate = useNavigate()
@@ -166,7 +164,7 @@ function User({ action }: { action: EventHistoryActionDocument }) {
   )
 }
 
-function Integration({ action }: { action: EventHistoryActionDocument }) {
+function Integration({ action }: { action: ActionDocument }) {
   const { getUserDetails } = useUserDetails()
 
   const { type, name } = getUserDetails({
@@ -189,7 +187,7 @@ function Integration({ action }: { action: EventHistoryActionDocument }) {
   )
 }
 
-function ActionCreator({ action }: { action: EventHistoryActionDocument }) {
+function ActionCreator({ action }: { action: ActionDocument }) {
   const intl = useIntl()
   if (action.createdByUserType === 'system') {
     return <Integration action={action} />
@@ -207,7 +205,7 @@ function ActionCreator({ action }: { action: EventHistoryActionDocument }) {
   return <User action={action} />
 }
 
-function ActionLocation({ action }: { action: EventHistoryActionDocument }) {
+function ActionLocation({ action }: { action: ActionDocument }) {
   const { findUser, getLocation } = useEventOverviewContext()
   const { canAccessOffice } = usePermissions()
   const navigate = useNavigate()
@@ -269,12 +267,6 @@ function EventHistorySkeleton() {
   )
 }
 
-function isNotUpdateAction(
-  type: EventHistoryActionDocument['type']
-): type is Exclude<ActionType, 'DELETE'> {
-  return type !== DECLARATION_ACTION_UPDATE
-}
-
 /**
  *  Renders the event history table. Used for audit trail.
  */
@@ -290,19 +282,10 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
 
   const history = extractHistoryActions(fullEvent)
 
-  const historyWithClientSpecificActions = expandWithClientSpecificActions(
-    fullEvent,
-    validatorContext,
-    eventConfiguration
-  )
-
-  const visibleHistoryWithClientSpecificActions =
-    historyWithClientSpecificActions.filter(
-      ({ type }) => type !== ActionType.CREATE
-    )
+  const visibleHistory = history.filter(({ type }) => type !== ActionType.CREATE)
 
   const onHistoryRowClick = (
-    action: EventHistoryActionDocument,
+    action: ActionDocument,
     userName: string,
     title: string
   ) => {
@@ -318,14 +301,13 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
     ))
   }
 
-  // Pagination must be based on this filtered list, not visibleHistoryWithClientSpecificActions,
+  // Pagination must be based on this filtered list, not visibleHistory,
   // because paired APPROVE_CORRECTION rows are removed after the filter. Using the pre-filter
   // count would overcount the total pages and produce an empty last page.
-  const displayableHistory = visibleHistoryWithClientSpecificActions
+  const displayableHistory = visibleHistory
     .map((x) => {
       if (x.type === ActionType.REQUEST_CORRECTION) {
-        const immediateApprovedCorrection =
-          visibleHistoryWithClientSpecificActions.find(
+        const immediateApprovedCorrection = visibleHistory.find(
             (h) =>
               h.type === ActionType.APPROVE_CORRECTION &&
               (h.requestId === x.id || h.requestId === x.originalActionId) &&
@@ -370,7 +352,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
 
       // Only configurable action types should call getActionConfig
       let actionConfig
-      if (isNotUpdateAction(action.type) && isActionConfigType(action.type)) {
+      if (isActionConfigType(action.type)) {
         actionConfig = getActionConfig({
           eventConfiguration,
           actionType: action.type,
