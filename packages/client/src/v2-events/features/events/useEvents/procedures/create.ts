@@ -26,7 +26,6 @@ import {
 } from '@opencrvs/commons/client'
 
 import {
-  refetchAffectedSearchQueries,
   setEventData,
   updateLocalEventIndex
 } from '@client/v2-events/features/events/useEvents/api'
@@ -118,16 +117,19 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
 
     return optimisticEvent
   },
-  onSuccess: async (response, _variables, context) => {
+  onSuccess: (response, _variables, context) => {
     setEventData(response.id, response)
     setEventData(context.transactionId, response)
-    // Explicitly update local event index to make it accessible when created in offline mode.
+    // Seed the local by-id index under both ids so the record stays resolvable
+    // when it was created offline: `setEventData` only writes `event.get`.
     updateLocalEventIndex(response.id, response)
     updateLocalEventIndex(context.transactionId, response)
 
-    // response.id is the canonical id, context.transactionId the temporary id
-    // used offline; the two index entries seeded above are the affected ones.
-    await refetchAffectedSearchQueries(response.id, context.transactionId)
+    // No search/workqueue refresh: a CREATE leaves the event in CREATED status,
+    // which is never indexed server-side (isEventIndexable excludes it), so it
+    // cannot appear in any event.search / workqueue result. The draft and outbox
+    // views that surface a just-created record are client-state (event.draft.list
+    // and the pending-mutation-derived outbox), not derived from these queries.
   },
   meta: { actionType: ActionType.CREATE }
 })
