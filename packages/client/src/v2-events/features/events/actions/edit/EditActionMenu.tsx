@@ -35,12 +35,7 @@ import {
 } from '@opencrvs/commons/client'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
-import {
-  Icon,
-  Dialog,
-  Stack,
-  Button
-} from '@opencrvs/components'
+import { Icon, Dialog, Stack, Button } from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useDialogFormState } from '@client/v2-events/hooks/useDialogFormState'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
@@ -273,8 +268,8 @@ function useEditActions(event: EventDocument) {
         icon: actionIcons[ActionType.EDIT],
         label: messages.editAndRegisterLabel,
         onClick: async () => {
-          const { confirmed, values } =
-            await openModal<EditActionModalResult>((close) => {
+          const { confirmed, values } = await openModal<EditActionModalResult>(
+            (close) => {
               return (
                 <EditActionModal
                   close={close}
@@ -288,7 +283,8 @@ function useEditActions(event: EventDocument) {
                   title={messages.editAndRegisterLabel}
                 />
               )
-            })
+            }
+          )
 
           if (confirmed) {
             events.customActions.editAndRegister.mutate({
@@ -296,8 +292,7 @@ function useEditActions(event: EventDocument) {
               transactionId: getUUID(),
               declaration: declarationDiff,
               annotation,
-              targetActionAnnotation: values,
-              content: {}
+              targetActionAnnotation: values
             })
 
             closeActionView(backTo)
@@ -311,8 +306,8 @@ function useEditActions(event: EventDocument) {
         icon: actionIcons[ActionType.EDIT],
         label: messages.editAndDeclareLabel,
         onClick: async () => {
-          const { confirmed, values } =
-            await openModal<EditActionModalResult>((close) => {
+          const { confirmed, values } = await openModal<EditActionModalResult>(
+            (close) => {
               return (
                 <EditActionModal
                   close={close}
@@ -326,7 +321,8 @@ function useEditActions(event: EventDocument) {
                   title={messages.editAndDeclareLabel}
                 />
               )
-            })
+            }
+          )
 
           if (confirmed) {
             events.customActions.editAndDeclare.mutate({
@@ -334,8 +330,7 @@ function useEditActions(event: EventDocument) {
               transactionId: getUUID(),
               declaration: declarationDiff,
               annotation,
-              targetActionAnnotation: values,
-              content: {}
+              targetActionAnnotation: values
             })
 
             closeActionView(backTo)
@@ -351,8 +346,8 @@ function useEditActions(event: EventDocument) {
         icon: actionIcons[ActionType.EDIT],
         label: messages.editAndNotifyLabel,
         onClick: async () => {
-          const { confirmed, values } =
-            await openModal<EditActionModalResult>((close) => {
+          const { confirmed, values } = await openModal<EditActionModalResult>(
+            (close) => {
               return (
                 <EditActionModal
                   close={close}
@@ -366,7 +361,8 @@ function useEditActions(event: EventDocument) {
                   title={messages.editAndNotifyLabel}
                 />
               )
-            })
+            }
+          )
 
           if (confirmed) {
             events.customActions.editAndNotify.mutate({
@@ -374,8 +370,7 @@ function useEditActions(event: EventDocument) {
               transactionId: getUUID(),
               declaration: declarationDiff,
               annotation,
-              targetActionAnnotation: values,
-              content: {}
+              targetActionAnnotation: values
             })
 
             closeActionView(backTo)

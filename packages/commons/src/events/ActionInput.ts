@@ -90,9 +90,12 @@ export const DeclareActionInput = BaseActionInput.extend(
 export const EditActionInput = BaseActionInput.extend(
   z.object({
     type: z.literal(ActionType.EDIT).default(ActionType.EDIT),
-    content: z.object({
-      comment: z.string().describe('Comment for the edit action.').optional()
-    })
+    /** @deprecated Edit-action should no longer contain content. This is kept for old 2.0 edits. */
+    content: z
+      .object({
+        comment: z.string().describe('Comment for the edit action.').optional()
+      })
+      .optional()
   }).shape
 )
 
