@@ -14,6 +14,7 @@ import * as qs from 'qs'
 import { UUID } from './uuid'
 import { getScopes } from './authentication'
 import { Role } from './roles'
+import { ContainsFlags } from './events/Flag'
 
 export const JurisdictionFilter = z
   .enum(['administrativeArea', 'location', 'all'])
@@ -112,7 +113,8 @@ const scopeOptionsDeclaredOrNotified = scopeOptionsPlaceEvent
 const AllRecordScopeOptions = scopeOptionsDeclaredOrNotified
   .extend({
     registeredIn: JurisdictionFilter.optional(),
-    registeredBy: UserFilter.optional()
+    registeredBy: UserFilter.optional(),
+    flags: ContainsFlags.optional()
   })
   .describe(
     'Options applicable to actions that may take place after REGISTER, with full filtering capabilities.'
@@ -177,7 +179,8 @@ const ResolvedScopeOptionsDeclared = ResolvedScopeOptionsPlaceEvent.extend({
 
 const ResolvedScopeOptionsFull = ResolvedScopeOptionsDeclared.extend({
   registeredIn: UUID.nullish(),
-  registeredBy: z.string().optional()
+  registeredBy: z.string().optional(),
+  flags: ContainsFlags.optional()
 }).describe(
   'Resolved options applicable to actions that may take place after REGISTER, with full filtering capabilities and location/user IDs instead of filters.'
 )
@@ -396,6 +399,7 @@ export const encodeScope = (scope: Scope): EncodedScope => {
 
   return qs.stringify(flattened, {
     arrayFormat: 'comma',
+    commaRoundTrip: true,
     allowDots: true,
     addQueryPrefix: false,
     encode: false

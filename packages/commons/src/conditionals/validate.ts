@@ -169,6 +169,7 @@ export function buildClientFunctionContext(input: {
 }): ClientFunctionContext {
   return {
     $form: input.form,
+    $flags: input.form.flags === null ? [] : input.form.flags,
     $now: todayISO(),
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     $online: isOnline(),
@@ -451,10 +452,21 @@ export function areConditionsMet(
   conditions: FieldConditional[],
   values: Record<string, FieldValue>,
   context: ValidatorContext,
-  _event: EventIndex
+  event: EventIndex
 ) {
+  // Overrides `$flags`/`$status` with the real event data (same as `isActionConditionMet`)
+  // so `flag(...)`/`status(...)` conditionals work for data-display fields, e.g. in EventSummary.
+  const clientFunctionContext = {
+    ...buildClientFunctionContext({
+      form: mergeWithBaseFormState(values, context),
+      validatorContext: context
+    }),
+    $flags: event.flags,
+    $status: event.status
+  }
+
   return conditions.every((condition) =>
-    isConditionMet(condition.conditional, values, context)
+    validate(condition.conditional, clientFunctionContext)
   )
 }
 

@@ -495,7 +495,9 @@ export function resolveRecordActionScopeToIds(
         options?.declaredBy === UserFilter.enum.user ? user.id : undefined,
       registeredIn: getLocationIdsFromScopeOptions(options?.registeredIn, user),
       registeredBy:
-        options?.registeredBy === UserFilter.enum.user ? user.id : undefined
+        options?.registeredBy === UserFilter.enum.user ? user.id : undefined,
+      // `flags` requires no user-context resolution, so it's passed through unchanged.
+      flags: options?.flags
     }
   })
 

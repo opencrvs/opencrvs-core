@@ -57,6 +57,7 @@ import {
 } from './utils'
 import {
   buildElasticQueryFromSearchPayload,
+  withFlagsFilter,
   withJurisdictionFilters
 } from './query'
 
@@ -492,8 +493,11 @@ export async function findRecordsByQuery({
     resolveRecordActionScopeToIds(scope, user)
   )
 
-  const esQuery = withJurisdictionFilters({
-    query: await buildElasticQueryFromSearchPayload(query, eventConfigs),
+  const esQuery = withFlagsFilter({
+    query: withJurisdictionFilters({
+      query: await buildElasticQueryFromSearchPayload(query, eventConfigs),
+      scopesV2: resolvedScopes
+    }),
     scopesV2: resolvedScopes
   })
 
@@ -572,8 +576,11 @@ export async function getEventCount({
   )
 
   const filteredQueries = (await Promise.all(esQueries)).map((query) =>
-    withJurisdictionFilters({
-      query,
+    withFlagsFilter({
+      query: withJurisdictionFilters({
+        query,
+        scopesV2: resolvedScopes
+      }),
       scopesV2: resolvedScopes
     })
   )

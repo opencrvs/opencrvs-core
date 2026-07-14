@@ -13,8 +13,16 @@ import { FieldConfig } from '../events/FieldConfig'
 import { FieldType } from '../events/FieldType'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { errorMessages, runFieldValidations, validateFieldInput } from './validate'
+import { ConditionalType } from '../events/Conditional'
+import { eventQueryDataGenerator } from '../events/test.utils'
+import {
+  errorMessages,
+  areConditionsMet,
+  runFieldValidations,
+  validateFieldInput
+} from './validate'
 import { field } from '../events/field'
+import { flag } from './conditionals'
 /**
  * Goal of testing is to ensure right error messages are returned, and our custom logic holds.
  * We should be able to trust zod validation for the rest.
@@ -323,5 +331,24 @@ describe('runFieldValidations with customClientValidator', () => {
         }
       }
     ])
+  })
+})
+
+describe('areConditionsMet', () => {
+  const flagConditional = {
+    type: ConditionalType.SHOW,
+    conditional: flag('sealed')
+  }
+
+  it('is met when the event carries the flag', () => {
+    const eventIndex = eventQueryDataGenerator({ flags: ['sealed'] })
+
+    expect(areConditionsMet([flagConditional], {}, {}, eventIndex)).toBe(true)
+  })
+
+  it('is not met when the event does not carry the flag', () => {
+    const eventIndex = eventQueryDataGenerator({ flags: [] })
+
+    expect(areConditionsMet([flagConditional], {}, {}, eventIndex)).toBe(false)
   })
 })
