@@ -56,6 +56,9 @@ ALTER TABLE app.administrative_areas
   ADD CONSTRAINT administrative_areas_versions_nonempty
   CHECK (jsonb_typeof(versions) = 'array' AND jsonb_array_length(versions) >= 1);
 
+ALTER TABLE app.locations ALTER COLUMN versions SET NOT NULL;
+ALTER TABLE app.administrative_areas ALTER COLUMN versions SET NOT NULL;
+
 -- Down Migration
 ALTER TABLE app.locations DROP COLUMN versions;
 ALTER TABLE app.administrative_areas DROP COLUMN versions;

@@ -11,7 +11,7 @@
 
 import { Kysely, RawBuilder, sql } from 'kysely'
 import { chunk } from 'lodash'
-import { Location, logger, UUID } from '@opencrvs/commons'
+import { getUUID, Location, logger, UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import { NewLocations } from '../events/schema/app/Locations'
 import Schema from '../events/schema/Database'
@@ -28,9 +28,55 @@ export function clearAdministrativeHierarchyCache() {
   administrativeHierarchyByIdCache.clear()
 }
 
+interface InitialVersion {
+  versionId: UUID
+  effectiveFrom: string
+  name: string
+  externalId: string | null
+  status: 'active' | 'inactive'
+}
+
+/**
+ * Builds the initial `versions` jsonb value for a location or administrative
+ * area row on insert. The first version is always active from the beginning of
+ * time. If the row has `validUntil` set, an inactive version effective from
+ * that date (UTC) is appended.
+ */
+export function buildInitialVersions({
+  name,
+  externalId,
+  validUntil
+}: {
+  name: string
+  externalId?: string | null
+  validUntil?: string | null
+}): RawBuilder<InitialVersion[]> {
+  const activeVersion: InitialVersion = {
+    versionId: getUUID(),
+    effectiveFrom: '0001-01-01',
+    name,
+    externalId: externalId ?? null,
+    status: 'active'
+  }
+
+  const versions = validUntil
+    ? [
+        activeVersion,
+        {
+          ...activeVersion,
+          versionId: getUUID(),
+          effectiveFrom: new Date(validUntil).toISOString().slice(0, 10),
+          status: 'inactive' as const
+        }
+      ]
+    : [activeVersion]
+
+  return sql`cast (${JSON.stringify(versions)} as jsonb)`
+}
+
 export async function setLocationsInTrx(
   trx: Kysely<Schema>,
-  locations: NewLocations[]
+  locations: Omit<NewLocations, 'versions'>[]
 ) {
   // Insert new locations in chunks to avoid exceeding max query size
   for (const [index, batch] of chunk(
@@ -42,7 +88,13 @@ export async function setLocationsInTrx(
     )
     await trx
       .insertInto('locations')
-      .values(batch.map((loc) => ({ ...loc, deletedAt: null })))
+      .values(
+        batch.map((loc) => ({
+          ...loc,
+          deletedAt: null,
+          versions: buildInitialVersions(loc)
+        }))
+      )
       .onConflict((oc) =>
         oc.column('id').doUpdateSet({
           name: () =>
@@ -73,7 +125,9 @@ export async function setLocationsInTrx(
   }
 }
 
-export async function setLocations(locations: NewLocations[]) {
+export async function setLocations(
+  locations: Omit<NewLocations, 'versions'>[]
+) {
   const db = getClient()
 
   await setLocationsInTrx(db, locations)
@@ -212,7 +266,9 @@ export function getAdministrativeHierarchyByIdCte(
  * @returns The list of location hierarchy ids, ex: [admin_area_1_id, admin_area_2_id, locationId]
  */
 
-export async function getAdministrativeHierarchyById(id: string): Promise<UUID[]> {
+export async function getAdministrativeHierarchyById(
+  id: string
+): Promise<UUID[]> {
   const cached = administrativeHierarchyByIdCache.get(id)
   if (cached) {
     return cached
