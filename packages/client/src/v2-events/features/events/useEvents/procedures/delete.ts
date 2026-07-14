@@ -13,7 +13,6 @@ import { useMutation } from '@tanstack/react-query'
 import {
   clearPendingDraftCreationRequests,
   deleteDraft,
-  refetchAffectedSearchQueries,
   refetchSearchQuery,
   setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
@@ -29,7 +28,12 @@ setMutationDefaults(trpcOptionsProxy.event.delete, {
   },
   retryDelay: 10000,
   onSuccess: ({ id }) => {
-    void refetchAffectedSearchQueries(id)
+    // No search/workqueue refresh: only CREATED-status events are deletable and
+    // they were never indexed server-side, so a delete cannot change any
+    // event.search / workqueue result. Only the local draft is dropped.
+    // (The refetchSearchQuery in mutationFn below is unrelated — it is the
+    // offline temporary-id -> canonical-id replacement plumbing, not a workqueue
+    // refresh.)
     deleteDraft(id)
   },
   onMutate: ({ eventId }) => {

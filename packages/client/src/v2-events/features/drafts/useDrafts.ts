@@ -18,7 +18,6 @@ import {
   clearPendingDraftCreationRequests,
   findLocalEventDocument,
   refetchDraftsList,
-  refetchAffectedSearchQueries,
   setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
 import {
@@ -152,8 +151,11 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
     clearPendingDraftCreationRequests(variables.eventId)
     return optimisticDraft
   },
-  onSuccess: async (_data, variables) => {
-    await refetchAffectedSearchQueries(variables.eventId)
+  onSuccess: async () => {
+    // No search/workqueue refresh: draft saves are never indexed server-side
+    // (the draft service does not call indexEvent), so they cannot change any
+    // event.search / workqueue result. The draft is client-state surfaced via
+    // event.draft.list, so only that list is refreshed.
     await refetchDraftsList()
   },
   retryDelay: 10000

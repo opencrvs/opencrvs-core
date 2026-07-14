@@ -232,24 +232,60 @@ export async function refetchSearchQuery(eventId: string) {
 }
 
 /**
- * After a mutation that changes which records exist (create/delete/draft):
- * - refetch the by-id search entries for the affected event id(s) — active
- *   observers refresh immediately, and seeded by-id entries are now refetchable
- *   thanks to the setQueryDefaults shim.
- * - invalidate (not refetch) all workqueue searches: active observers refetch
- *   immediately, inactive ones just go stale — refetching inactive queries was
- *   pure wasted network. Ad-hoc searches are intentionally left alone; they use
- *   staleTime:0 + refetchOnMount:'always' so they refresh on next mount anyway.
+ * Standard refresh path for a workqueue-affecting write, run after the local
+ * caches have been updated/removed. It refetches the by-id search entry for the
+ * affected id(s), refetches workqueue.count, and refreshes the mounted
+ * workqueues (staling the inactive ones).
+ *
+ * The steps are ordered to deduplicate against the workqueue.count count-diff
+ * (procedures/count.ts), which would otherwise refetch a mounted queue a second
+ * time (once via the count-diff, once via the blanket here) — the suspected
+ * cause of the 4-5-request measurements:
+ *
+ * 1. Mark every workqueue search stale WITHOUT refetching (refetchType:'none').
+ *    This staleness is visible to the count-diff, which skips slugs that are
+ *    already invalidated (see hasInvalidatedWorkqueueSearchQuery) — so a
+ *    membership-changing slug is refetched once (step 3), not twice. Because
+ *    step 1 never fires a fetch, nothing clears the isInvalidated flag before
+ *    the count-diff runs, so the dedup is deterministic (no timing race).
+ * 2. Refetch the by-id entries and workqueue.count concurrently. The count-diff
+ *    now no-ops on the already-stale slugs.
+ * 3. Refetch the mounted workqueues once. Inactive queues stay marked stale from
+ *    step 1 and refresh on next mount (staleTime:0). This blanket refresh is the
+ *    reorder/same-count-swap fix and also covers assignment queues that the
+ *    count-diff skipped above.
  */
 export async function refetchAffectedSearchQueries(...eventIds: string[]) {
-  await Promise.all(
-    eventIds.map(async (eventId) =>
-      queryClient.refetchQueries({ queryKey: searchKeys.filters.byId(eventId) })
-    )
-  )
   await queryClient.invalidateQueries({
-    queryKey: searchKeys.filters.allWorkqueues()
+    queryKey: searchKeys.filters.allWorkqueues(),
+    refetchType: 'none'
   })
+  await Promise.all([
+    ...eventIds.map(async (eventId) =>
+      queryClient.refetchQueries({ queryKey: searchKeys.filters.byId(eventId) })
+    ),
+    invalidateWorkqueues()
+  ])
+  await queryClient.refetchQueries({
+    queryKey: searchKeys.filters.allWorkqueues(),
+    type: 'active'
+  })
+}
+
+/**
+ * True if any cached workqueue search query for `slug` is currently marked
+ * invalidated (stale). The workqueue.count count-diff uses this to avoid
+ * re-invalidating a queue that the blanket refresh
+ * (refetchAffectedSearchQueries) is already handling, which would otherwise
+ * refetch the mounted queue twice. Assign/unassign and the 20 s poll do not run
+ * the blanket, so their slugs are never pre-invalidated and the count-diff still
+ * fires for them.
+ */
+export function hasInvalidatedWorkqueueSearchQuery(slug: string) {
+  return queryClient
+    .getQueryCache()
+    .findAll({ queryKey: searchKeys.filters.workqueue(slug) })
+    .some((query) => query.state.isInvalidated)
 }
 
 /**
@@ -286,13 +322,11 @@ async function deleteEventData(updatedEvent: EventDocument) {
   await removeCachedFiles(updatedEvent)
 }
 
-export function updateLocalEvent(data: EventDocument) {
-  setEventData(data.id, data)
-}
-
 export async function deleteLocalEvent(updatedEvent: EventDocument) {
   await deleteEventData(updatedEvent)
-  await invalidateWorkqueues()
+  // refetchAffectedSearchQueries runs the workqueue.count refetch (via the
+  // folded-in invalidateWorkqueues) as part of the deduplicated standard path,
+  // so it is not called separately here.
   await refetchAffectedSearchQueries(updatedEvent.id)
 }
 

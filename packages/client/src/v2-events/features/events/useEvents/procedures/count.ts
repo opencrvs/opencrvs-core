@@ -13,7 +13,10 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
 import { WorkqueueCountInput } from '@opencrvs/commons/client'
 import { useTRPC, trpcOptionsProxy, queryClient } from '@client/v2-events/trpc'
-import { invalidateWorkqueueSearchQueries } from '../api'
+import {
+  hasInvalidatedWorkqueueSearchQuery,
+  invalidateWorkqueueSearchQueries
+} from '../api'
 import { setQueryDefaults } from './utils'
 
 setQueryDefaults(trpcOptionsProxy.workqueue.count, {
@@ -35,7 +38,17 @@ setQueryDefaults(trpcOptionsProxy.workqueue.count, {
       const changedSlugs = Object.keys(response).filter(
         (slug) => previousCounts[slug] !== response[slug]
       )
-      await Promise.all(changedSlugs.map(invalidateWorkqueueSearchQueries))
+      await Promise.all(
+        changedSlugs
+          // Skip slugs whose workqueue search is already marked stale: the
+          // standard write path (refetchAffectedSearchQueries) has blanket-
+          // invalidated them and will refetch the mounted queue itself, so
+          // invalidating here would refetch it a second time. Assign/unassign
+          // and the 20 s poll do not pre-invalidate, so the count-diff still
+          // fires for them.
+          .filter((slug) => !hasInvalidatedWorkqueueSearchQuery(slug))
+          .map(invalidateWorkqueueSearchQueries)
+      )
     }
 
     return response

@@ -25,10 +25,7 @@ import {
   getTokenPayload
 } from '@opencrvs/commons/client'
 
-import {
-  refetchAffectedSearchQueries,
-  setEventData
-} from '@client/v2-events/features/events/useEvents/api'
+import { setEventData } from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
 
 import { createTemporaryId } from '@client/v2-events/utils'
@@ -113,12 +110,15 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
     setEventData(newEvent.transactionId, optimisticEvent)
     return optimisticEvent
   },
-  onSuccess: async (response, _variables, context) => {
+  onSuccess: (response, _variables, context) => {
     setEventData(response.id, response)
     setEventData(context.transactionId, response)
-    // Both ids were seeded by the setEventData calls above: response.id is the
-    // canonical id, context.transactionId is the temporary id used offline.
-    await refetchAffectedSearchQueries(response.id, context.transactionId)
+    // No search/workqueue refresh: a CREATE leaves the event in CREATED status,
+    // which is never indexed server-side (isEventIndexable excludes it), so it
+    // cannot appear in any event.search / workqueue result. The draft and outbox
+    // views that surface a just-created record are client-state (event.draft.list
+    // and the pending-mutation-derived outbox), not derived from these queries.
+    // The setEventData calls above seed the local by-id index for offline use.
   },
   meta: { actionType: ActionType.CREATE }
 })

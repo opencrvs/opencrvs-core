@@ -33,8 +33,7 @@ import {
   findLocalEventDocument,
   findLocalEventIndex,
   onAssign,
-  deleteLocalEvent,
-  updateLocalEvent
+  deleteLocalEvent
 } from '@client/v2-events/features/events/useEvents/api'
 import { getCleanedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
@@ -238,7 +237,13 @@ setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markNotDuplicate, {
   retry: retryUnlessConflict,
   retryDelay,
   onMutate: updateEventOptimistically(ActionType.MARK_AS_NOT_DUPLICATE),
-  onSuccess: updateLocalEvent,
+  // Route through the standard path (deleteLocalEvent): clearing the
+  // potential-duplicate flag changes queue membership (it leaves the
+  // "potential duplicates" queue), so it needs the by-id refetch + workqueue
+  // staleness + count refetch, exactly like its sibling MARK_AS_DUPLICATE.
+  // The previous updateLocalEvent handler only patched the local row and did no
+  // workqueue refresh, leaving the queue stale until the 20 s poll.
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.MARK_AS_NOT_DUPLICATE }
 })
