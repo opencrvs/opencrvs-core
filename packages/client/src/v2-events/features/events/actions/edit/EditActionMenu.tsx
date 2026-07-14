@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState } from 'react'
+import React from 'react'
 import { useIntl, MessageDescriptor } from 'react-intl'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import styled from 'styled-components'
@@ -39,8 +39,6 @@ import {
   Icon,
   Dialog,
   Stack,
-  Text,
-  TextArea,
   Button
 } from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -103,13 +101,8 @@ const messages = {
 
 interface EditActionModalResult {
   confirmed: boolean
-  comment?: string
   values?: Record<string, FieldUpdateValue>
 }
-
-const CommentLabel = styled(Text)`
-  padding: 16px 0 4px 0;
-`
 
 function EditActionModal({
   title,
@@ -127,7 +120,6 @@ function EditActionModal({
   declaration: EventState
 }) {
   const intl = useIntl()
-  const [comment, setComment] = useState('')
   const validatorContext = useValidatorContext()
   const dialogForm = useDialogFormState()
   const modalValues = dialogForm.formValues
@@ -163,7 +155,6 @@ function EditActionModal({
           onClick={() =>
             close({
               confirmed: true,
-              comment,
               values: omitHiddenFields(fields, modalValues, validatorContext)
             })
           }
@@ -186,14 +177,6 @@ function EditActionModal({
           />
         </Stack>
       )}
-      <CommentLabel element="h3" variant="bold16">
-        {intl.formatMessage(commentLabel)}
-      </CommentLabel>
-      <TextArea
-        data-testid="edit-comment"
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-      />
       {fields.length > 0 && (
         <FormFieldGenerator
           {...dialogForm}
@@ -290,7 +273,7 @@ function useEditActions(event: EventDocument) {
         icon: actionIcons[ActionType.EDIT],
         label: messages.editAndRegisterLabel,
         onClick: async () => {
-          const { confirmed, comment, values } =
+          const { confirmed, values } =
             await openModal<EditActionModalResult>((close) => {
               return (
                 <EditActionModal
@@ -314,7 +297,7 @@ function useEditActions(event: EventDocument) {
               declaration: declarationDiff,
               annotation,
               targetActionAnnotation: values,
-              content: { comment }
+              content: {}
             })
 
             closeActionView(backTo)
@@ -328,7 +311,7 @@ function useEditActions(event: EventDocument) {
         icon: actionIcons[ActionType.EDIT],
         label: messages.editAndDeclareLabel,
         onClick: async () => {
-          const { confirmed, comment, values } =
+          const { confirmed, values } =
             await openModal<EditActionModalResult>((close) => {
               return (
                 <EditActionModal
@@ -352,7 +335,7 @@ function useEditActions(event: EventDocument) {
               declaration: declarationDiff,
               annotation,
               targetActionAnnotation: values,
-              content: { comment }
+              content: {}
             })
 
             closeActionView(backTo)
@@ -368,7 +351,7 @@ function useEditActions(event: EventDocument) {
         icon: actionIcons[ActionType.EDIT],
         label: messages.editAndNotifyLabel,
         onClick: async () => {
-          const { confirmed, comment, values } =
+          const { confirmed, values } =
             await openModal<EditActionModalResult>((close) => {
               return (
                 <EditActionModal
@@ -392,7 +375,7 @@ function useEditActions(event: EventDocument) {
               declaration: declarationDiff,
               annotation,
               targetActionAnnotation: values,
-              content: { comment }
+              content: {}
             })
 
             closeActionView(backTo)
