@@ -21,7 +21,7 @@ helm upgrade --install traefik oci://ghcr.io/traefik/helm/traefik \
 
 **2. Install the OpenCRVS Dependencies Chart (Database & Storage Components)**
 
-OpenCRVS requires supporting services (MongoDB, Postgres, MinIO, Elasticsearch, Redis):
+OpenCRVS requires supporting services (Postgres, MinIO, Elasticsearch, Redis):
 
 ```
 helm upgrade --install opencrvs-deps oci://ghcr.io/opencrvs/opencrvs-dependencies-chart \
@@ -98,9 +98,9 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>elasticsearch.auth_mode</td>
             <td>disabled</td>
             <td>  Following values are allowed
-                <li><code>disabled</code>: No authentication enabled for MongoDB, password-less access to databases</li>
-                <li><code>auto</code>: (Recommended) Users are managed by OpenCRVS helm chart, this mode requires secret to be created with MongoDB admin user</li>
-                <li><code>use_secret</code>: Kubernetes Secrets needs to be created manually, users are managed by MongoDB administrator, but helm will pick up data from users_secret and urls_secret</li>
+                <li><code>disabled</code>: No authentication enabled, password-less access to databases</li>
+                <li><code>auto</code>: (Recommended) Users are managed by OpenCRVS helm chart, this mode requires secret to be created with Elasticsearch admin user</li>
+                <li><code>use_secret</code>: Kubernetes Secrets needs to be created manually, users are managed by the datastore administrator, but helm will pick up data from users_secret and urls_secret</li>
                 <li><code>managed</code>: Kubernetes Secrets needs to be created manually and mapped manually for each service.</li>
                 It is recommended to use <code>auth_mode: auto</code> or <code>use_secret</code> for server environment. For more information please check <a href="#authentication-configuration">Authentication configuration</a> section
             </td>
@@ -149,8 +149,8 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>minio.auth_mode</td>
             <td>disabled</td>
             <td>  Following values are allowed
-                <li><code>disabled</code>: No authentication enabled for MongoDB, password-less access to databases</li>
-                <li><code>use_secret</code>: Kubernetes Secrets needs to be created manually, users are managed by MongoDB administrator, but helm will pick up data from users_secret</li>
+                <li><code>disabled</code>: No authentication enabled, password-less access to databases</li>
+                <li><code>use_secret</code>: Kubernetes Secrets needs to be created manually, users are managed by the datastore administrator, but helm will pick up data from users_secret</li>
                 <li><code>managed</code>: Kubernetes Secrets needs to be created manually and mapped manually for each service.</li>
                 It is recommended to use <code>use_secret</code> for server environment. For more information please check <a href="#authentication-configuration">Authentication configuration</a> section
             </td>
@@ -161,37 +161,6 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Secret name to store MinIO credentials, more information about credentials secret is at <a href="#authentication-configuration">Authentication configuration</a></td>
         </tr>
        <tr>
-            <th>mongodb.{}</th>
-            <th></th>
-            <th></th>
-        </tr>
-        <tr>
-            <td>mongodb.host</td>
-            <td>mongodb-0.mongodb.opencrvs-deps-dev.svc.cluster.local</td>
-            <td>MongoDB hostname.</td>
-        </tr>
-        <tr>
-            <td>mongodb.auth_mode</td>
-            <td>disabled</td>
-            <td>  Following values are allowed
-                <li><code>disabled</code>: No authentication enabled for MongoDB, password-less access to databases</li>
-                <li><code>auto</code>: (Recommended) Users are managed by OpenCRVS helm chart, this mode requires secret to be created with MongoDB admin user</li>
-                <li><code>use_secret</code>: Kubernetes Secrets needs to be created manually, users are managed by MongoDB administrator, but helm will pick up data from users_secret and urls_secret</li>
-                <li><code>managed</code>: Kubernetes Secrets needs to be created manually and mapped manually for each service.</li>
-                It is recommended to use <code>auth_mode: auto</code> or <code>use_secret</code> for server environment. For more information please check <a href="#authentication-configuration">Authentication configuration</a> section
-            </td>
-        </tr>
-        <tr>
-            <td>mongodb.admin_user_secret_name</td>
-            <td>mongodb-admin-user</td>
-            <td>Secret to store MongoDB admin user and password, If <code>auth_mode: auto</code> is configured, OpenCRVS will connect to MongoDB server and create all required for OpenCRVS databases and users.</td>
-        </tr>
-        <tr>
-            <td>mongodb.urls_secret</td>
-            <td>mongodb-urls</td>
-            <td>Secret to store MongoDB URLs with usernames and passwords. Secret is created by OpenCRVS installation automatically with <code>auth_mode: auto</code>  and needs to be created manually by Operator (DevOps) with <code>auth_mode: managed</code> or <code>use_secret</code>. For more information how to create secret manually please check <a href="#authentication-configuration">Authentication configuration</a> section.</td>
-        </tr>
-       <tr>
             <th>postgres.{}</th>
             <th></th>
             <th></th>
@@ -199,7 +168,7 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <tr>
             <td>postgres.host</td>
             <td>postgres-0.postgres.opencrvs-deps-dev.svc.cluster.local</td>
-            <td>MongoDB hostname.</td>
+            <td>Postgres hostname.</td>
         </tr>
         <tr>
             <td>postgres.auth_mode</td>
@@ -220,7 +189,7 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <tr>
             <td>postgres.urls_secret</td>
             <td>postgres-urls</td>
-            <td>Secret to store MongoDB URLs with usernames and passwords. Secret is created by OpenCRVS installation automatically with <code>auth_mode: &ltauto|disabled></code>  and needs to be created manually by Operator (DevOps) with <code>auth_mode: managed</code> or <code>use_secret</code>. For more information how to create secret manually please check <a href="#authentication-configuration">Authentication configuration</a> section.</td>
+            <td>Secret to store Postgres URLs with usernames and passwords. Secret is created by OpenCRVS installation automatically with <code>auth_mode: &ltauto|disabled></code>  and needs to be created manually by Operator (DevOps) with <code>auth_mode: managed</code> or <code>use_secret</code>. For more information how to create secret manually please check <a href="#authentication-configuration">Authentication configuration</a> section.</td>
         </tr>
        <tr>
             <th>redis.{}</th>
@@ -236,8 +205,8 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>redis.auth_mode</td>
             <td>disabled</td>
             <td>  Following values are allowed
-                <li><code>disabled</code>: No authentication enabled for MongoDB, password-less access to databases</li>
-                <li><code>use_secret</code>: Kubernetes Secrets needs to be created manually, users are managed by MongoDB administrator, but helm will pick up data from users_secret</li>
+                <li><code>disabled</code>: No authentication enabled, password-less access to databases</li>
+                <li><code>use_secret</code>: Kubernetes Secrets needs to be created manually, users are managed by the datastore administrator, but helm will pick up data from users_secret</li>
                 <li><code>managed</code>: Kubernetes Secrets needs to be created manually and mapped manually for each service.</li>
                 It is recommended to use <code>use_secret</code> for server environment. For more information please check <a href="#authentication-configuration">Authentication configuration</a> section
             </td>
@@ -444,10 +413,10 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
 
 ## General information
 
-OpenCRVS has more then 10 microservices that require authentication to multiple datastores (MongoDB, Elasticsearch, Redis and MinIO. As way to simplify configuration credentials were grouped into Kubernetes secrets per datastore. Secret specification is listed in this section. Also you have several ways to manage authentication (`auth_mode`):
+OpenCRVS has more then 10 microservices that require authentication to multiple datastores (Elasticsearch, Redis and MinIO. As way to simplify configuration credentials were grouped into Kubernetes secrets per datastore. Secret specification is listed in this section. Also you have several ways to manage authentication (`auth_mode`):
 
 - No authentication enabled (`disabled`), password-less access to datastores. MinIO will use default credentials (minioadmin/minioadmin). All other services will work without authentication.
-- Auto (`auto`) mode allows OpenCRVS chart to create users for MongoDB and Elasticsearch at installation time, but you need to provide admin credentials for those services. Mode is not supported by MinIO and Redis.
+- Auto (`auto`) mode allows OpenCRVS chart to create users for Elasticsearch at installation time, but you need to provide admin credentials for that service. Mode is not supported by MinIO and Redis.
 - In case when users are created by datastore administrator (`use_secret`) and DevOps gets those credentials, kubernetes secrets needs to be created manually as well. Check how to create secret in the section below.
 - DevOps may decide to manage secrets by own way and map to environment variables manually (`managed`). Check [Mapping secrets](#mapping-secrets) section for details. **NOTE**: This way is not recommended since we can't avoid human error and mapping secrets manually requires deep knowledge of OpenCRVS internals.
 
@@ -455,53 +424,12 @@ Table contains list of required secrets for each `auth_mode` grouped by datastor
 
 | Datastore     | auth_mode: auto        | default secret name      | auth_mode: use_secret | default secret name         |
 | ------------- | ---------------------- | ------------------------ | --------------------- | --------------------------- |
-| MongoDB       | admin_user_secret_name | mongodb-admin-user       | urls_secret           | mongodb-urls                |
 | Postgres      | admin_user_secret_name | postgres-admin-user      | urls_secret           | postgres-urls               |
 | Elasticsearch | admin_user_secret_name | elasticsearch-admin-user | urls_secret           | elasticsearch-opencrvs-urls |
 | MinIO         | not supported          |                          | users_secret          | minio-opencrvs-users        |
 | Redis         | not supported          |                          | users_secret          | redis-opencrvs-users        |
 
 ## Secrets specification
-
-### MongoDB secrets
-
-#### mongodb.admin_user_secret_name
-
-Default secret name: mongodb-admin-user
-
-**auth_mode:** auto
-
-**Keys:**
-
-- MONGODB_ADMIN_USER
-- MONGODB_ADMIN_PASSWORD
-
-#### mongodb.urls_secret
-
-**Default secret name:** mongodb-urls
-
-**auth_mode:** use_secret
-
-**Keys:**
-
-- EVENTS_MONGO_URL
-- OPENHIM_MONGO_URL
-- PERFORMANCE_MONGO_URL
-- USER_MGNT_MONGO_URL
-
-**Description:** Each key in this secrets represents connection string to MongoDB database as URL, user and database must exist. OpenCRVS will pickup correct credentials by key values and assign to appropriate microservice containers.
-
-Value format:
-
-```
-mongodb://<username>:<password>@<mongodb-hostname>:27017/<db-name>
-```
-
-Example value:
-
-```
-mongodb://user-mgnt:password@mongodb-0.mongodb.opencrvs-deps-dev.svc.cluster.local:27017/user-mgnt
-```
 
 ### Postgres secrets
 
@@ -766,56 +694,9 @@ kubectl logs job/data-cleanup -f --all-containers=true
 
 # Contributors guide
 
-## Adding MongoDB users and databases
-
-When deploying OpenCRVS with MongoDB authentication enabled (`auth_mode: auto`), you can specify custom databases and users to be created. This is done in the `values.yaml` file under the `mongodb.databases` section.
-Following table shows list of available parameters:
-
-| Parameter          | Type   | Default         | Description                                                                                                                                                                                                                                                                              |
-| ------------------ | ------ | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| databases          | list   | See values.yaml | List of databases and users to create when authentication is enabled (`auth_mode: auto`). Each item supports the following fields:                                                                                                                                                       |
-| databases[].prefix | string | -//-            | Prefix used to generate environment variable names for the database, user, password, and roles.                                                                                                                                                                                          |
-| databases[].db     | string | -//-            | Name of the MongoDB database to create.                                                                                                                                                                                                                                                  |
-| databases[].user   | string | -//-            | Name of the MongoDB user to create and assign to the database.                                                                                                                                                                                                                           |
-| databases[].roles  | string | -//-            | (Optional) JSON string specifying roles to assign to the user. If not provided, the user is granted the `readWrite` role on the specified database by default. When specifying custom roles, ensure to include `readWrite` or `read` for the database defined at `databases[].db` field. |
-
-**Example:**
-
-```yaml
-databases:
-  - prefix: APP
-    db: app-db
-    user: app-user
-  - prefix: REPORTS
-    db: reports
-    user: reports-user
-    roles: "[{ role: 'readWrite', db: 'reports' }, { role: 'read', db: 'app-db' }]"
-```
-
-In this example:
-
-- The first entry creates a database named `app-db` with a user `app-user` and grants the default `readWrite` role on `app-db`.
-- The second entry creates a database named `reports` with a user `reports-user` and assigns custom roles: `readWrite` on `reports` and `read` on `app-db`. Note, roles field must explicitly define access level for both databases.
-- The `prefix` field is used to generate environment variable names for each database and user, making it easier to reference credentials in your application configuration.
-
-The generated credentials can be accessed from the `mongo-opencrvs-users` secret.
-List of Variables Generated at helm installation time:
-
-- `<PREFIX>_DB`: Database name
-- `<PREFIX>_MONGODB_USER`: Username
-- `<PREFIX>_MONGODB_PASSWORD`: Randomly generated password
-- `<PREFIX>_MONGODB_ROLES`: Roles in JSON format
-
-Additionally secret `mongodb-urls` with all MongoDB URLs is created. Secret keys are in format
-`<PREFIX>_MONGO_URL` and can be used for OpenCRVS authentication.
-
-Notes:
-
-- The 'roles' field must be a valid JSON string.
-
 # Adding Elasticsearch users
 
-When deploying OpenCRVS with Elasticsearch authentication enabled (`auth_mode: auto`), you can specify custom databases and users to be created. This is done in the `values.yaml` file under the `mongodb.databases` section.
+When deploying OpenCRVS with Elasticsearch authentication enabled (`auth_mode: auto`), you can specify custom databases and users to be created. This is done in the `values.yaml` file under the `elasticsearch` section.
 Following table shows list of available parameters:
 
 | Parameter  | Type | Default            | Description                                                       |
@@ -865,12 +746,11 @@ The generated credentials can be accessed from the `elasticsearch-opencrvs-users
 Helm chart has following pre-install/upgrade hooks:
 
 - elasticsearch-on-deploy: create elasticsearch users and configure permissions, see `elasticsearch` configuration options for more details how to configure users and permissions
-- mongo-on-deploy: create databases and users with correct permissions, see `mongodb` configuration options for more details how to configure users and permissions
 - postgres-on-deploy: create database, schemas and users with correct permissions
 
 Helm chart has following post-install/upgrade hooks:
 
-- data-migration: apply data migrations to postgres, mongodb
+- data-migration: apply data migrations to postgres
 - data-migration-analytics: apply data migrations to postgres, this hook use Countryconfig assets docker image, see documentation on how to create own analytics dashboards.
 - data-seed: initial data seed, runs only on post-install
 - elasticsearch-reindex: reindex data after deployment

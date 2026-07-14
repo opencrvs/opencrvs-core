@@ -11,28 +11,10 @@
 set -e # fail if any of the commands fails
 
 : "${EVENTS_POSTGRES_URL:=postgres://events_migrator:migrator_password@localhost:5432/events}"
-: "${EVENTS_SUPERUSER_POSTGRES_URL:=postgres://postgres:postgres@localhost:5432/events}"
-USER_MGNT_CONFIG=./build/dist/src/migrate-mongo-config-user-mgnt.js
-PERFORMANCE_CONFIG=./build/dist/src/migrate-mongo-config-performance.js
 
 SCRIPT_PATH=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 export NODE_OPTIONS=--dns-result-order=ipv4first
-
-MIGRATE_LEGACY_DATA=false
-
-for arg in "$@"; do
-  case $arg in
-  --migrate-legacy-data)
-    MIGRATE_LEGACY_DATA=true
-    ;;
-  *)
-    # Handle unknown option
-    echo "Unknown option: $arg"
-    exit 1
-    ;;
-  esac
-done
 
 run_pg_migrations() {
   MIGRATIONS_PATH="$1"
@@ -90,41 +72,11 @@ run_pg_migrations() {
   restore_backups
 }
 
-# needed for both legacy data and events migrations
+# needed for events migrations
 export EVENTS_DB_USER="${EVENTS_DB_USER:-events_app}"
-
-# migrate legacy data (users + hearth locations); requires superuser and MongoDB credentials
-if [ $MIGRATE_LEGACY_DATA = true ]; then
-
-  # Mongo connection options — needed for FDW-based migrations
-  if [ -n "$MONGO_REPLICA_SET" ]; then
-    export MONGO_SERVER_OPTIONS="OPTIONS( address '${MONGO_HOST:-mongo1}', port '${MONGO_PORT:-27017}', replica_set '$MONGO_REPLICA_SET', authentication_database 'admin')"
-  else
-    export MONGO_SERVER_OPTIONS="OPTIONS( address '${MONGO_HOST:-mongo1}', port '${MONGO_PORT:-27017}', authentication_database 'admin')"
-  fi
-
-  if [ -n "$MONGO_USERNAME" ] && [ -n "$MONGO_PASSWORD" ]; then
-    export MONGO_USER_MAPPING_OPTIONS="OPTIONS( username '$MONGO_USERNAME', password '$MONGO_PASSWORD')"
-  fi
-
-  export EVENTS_MIGRATION_USER="${EVENTS_MIGRATION_USER:-events_migrator}"
-
-  run_pg_migrations \
-    "$SCRIPT_PATH/src/migrations/migrate-legacy-data" \
-    "$EVENTS_SUPERUSER_POSTGRES_URL" \
-    "app" \
-    "pgmigrations_legacy_data"
-
-fi
 
 # Run events migrations
 run_pg_migrations \
   "$SCRIPT_PATH/src/migrations/events" \
   "$EVENTS_POSTGRES_URL" \
   "app"
-
-# User mgnt migration
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $USER_MGNT_CONFIG
-
-# performance migration
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $PERFORMANCE_CONFIG
