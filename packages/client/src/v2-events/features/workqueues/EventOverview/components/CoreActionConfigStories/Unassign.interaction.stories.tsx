@@ -186,7 +186,7 @@ export const unassignLabelAndIconAreConfigurable: StoryObj<typeof ActionMenu> =
           }
 
           const unassignItem = Array.from(items).find((item) =>
-            item.textContent?.includes('Put back')
+            item.textContent.includes('Put back')
           )
 
           await expect(unassignItem).toBeTruthy()
@@ -233,7 +233,7 @@ export const unassignIsHiddenWhenConditionalIsNotMet: StoryObj<
     const items = Array.from(list?.querySelectorAll('li') ?? [])
 
     await expect(
-      items.find((item) => item.textContent?.includes('Put back'))
+      items.find((item) => item.textContent.includes('Put back'))
     ).toBeUndefined()
   }
 }

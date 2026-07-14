@@ -347,8 +347,6 @@ openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .se
 mkdir -p data/elasticsearch
 chmod 775 data/elasticsearch
 
-mkdir -p data/mongo
-chmod 775 data/mongo
 mkdir -p data/minio
 chmod 775 data/minio
 mkdir -p data/postgres
@@ -356,7 +354,7 @@ chmod 775 data/postgres
 
 echo -e "\033[32m:::::::::::::::::::: Building OpenCRVS dependencies ::::::::::::::::::::\033[0m"
 echo
-echo "This can take some time on slow connections.  Docker is downloading Mongo DB and ElasticSearch docker images.  These are large files.  Then it will build them."
+echo "This can take some time on slow connections.  Docker is downloading ElasticSearch docker images.  These are large files.  Then it will build them."
 echo
 if [ $OS == "MAC" ]; then
  export LOCAL_IP=host-gateway

@@ -19,7 +19,9 @@ import { EventConfig } from './EventConfig'
 import { ActionType } from './ActionType'
 import {
   findLastAssignmentAction,
+  getActionAnnotationFields,
   getActionConfig,
+  getActionFormFields,
   getCompleteActionAnnotation,
   getCompleteActionContent,
   getDeclaration,
@@ -995,7 +997,7 @@ describe('getActionConfig() – NOTIFY fallback and isolation', () => {
   })
 })
 
-describe('getActionConfig() – correction actions resolve independently', () => {
+describe('getActionConfig(): correction actions resolve independently', () => {
   const configWithAllCorrectionActions = {
     actions: [
       {
@@ -1074,5 +1076,75 @@ describe('getActionConfig() – correction actions resolve independently', () =>
       actionType: ActionType.REJECT_CORRECTION
     })
     expect(result).toBeUndefined()
+  })
+})
+
+describe('getActionFormFields()', () => {
+  const commentsField = {
+    id: 'register.dialog.comments',
+    type: FieldType.TEXTAREA,
+    required: true,
+    label: generateTranslationConfig('Comments')
+  }
+
+  const configWithRegisterForm = {
+    ...tennisClubMembershipEvent,
+    actions: tennisClubMembershipEvent.actions.map((action) =>
+      action.type === ActionType.REGISTER
+        ? { ...action, form: [commentsField] }
+        : action
+    )
+  }
+
+  it('returns the form fields configured for the action', () => {
+    expect(
+      getActionFormFields(configWithRegisterForm, ActionType.REGISTER)
+    ).toEqual([commentsField])
+  })
+
+  it('returns an empty array when the action has no form configured', () => {
+    expect(
+      getActionFormFields(tennisClubMembershipEvent, ActionType.REGISTER)
+    ).toEqual([])
+  })
+
+  it('does not fall back to DECLARE config for NOTIFY dialog fields', () => {
+    const configWithDeclareForm = {
+      ...tennisClubMembershipEvent,
+      actions: tennisClubMembershipEvent.actions.map((action) =>
+        action.type === ActionType.DECLARE
+          ? { ...action, form: [commentsField] }
+          : action
+      )
+    }
+
+    expect(
+      getActionFormFields(configWithDeclareForm, ActionType.NOTIFY)
+    ).toEqual([])
+  })
+})
+
+describe('getActionAnnotationFields() with dialog form', () => {
+  it('returns review fields and dialog form fields for DECLARE', () => {
+    const declareAction = tennisClubMembershipEvent.actions.find(
+      (action) => action.type === ActionType.DECLARE
+    )
+
+    if (!declareAction || declareAction.type !== ActionType.DECLARE) {
+      throw new Error('DECLARE action not found in fixture')
+    }
+
+    const dialogField = {
+      id: 'declare.dialog.comments',
+      type: FieldType.TEXTAREA,
+      label: generateTranslationConfig('Comments')
+    }
+
+    const fields = getActionAnnotationFields({
+      ...declareAction,
+      form: [dialogField]
+    })
+
+    expect(fields).toEqual([...declareAction.review.fields, dialogField])
   })
 })
