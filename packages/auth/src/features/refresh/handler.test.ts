@@ -26,6 +26,7 @@ jest.mock('@auth/features/refresh/family', () => ({
 jest.mock('@auth/features/authenticate/service', () => {
   const actual = jest.requireActual('@auth/features/authenticate/service')
   return {
+    __esModule: true,
     ...actual,
     internalClient: { user: { getById: { query: jest.fn() } } }
   }

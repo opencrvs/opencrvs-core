@@ -2,9 +2,8 @@
   "compilerOptions": {
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "baseUrl": "./src",
     "paths": {
-      "@data-seeder/*": ["./*"]
+      "@data-seeder/*": ["./src/*"]
     },
     "target": "es6",
     "module": "node16",

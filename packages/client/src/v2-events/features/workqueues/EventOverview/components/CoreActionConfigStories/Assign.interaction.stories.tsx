@@ -233,7 +233,7 @@ export const assignIsHiddenWhenConditionalIsNotMet: StoryObj<
     const items = Array.from(list?.querySelectorAll('li') ?? [])
 
     await expect(
-      items.find((item) => item.textContent?.includes('Pick up record'))
+      items.find((item) => item.textContent.includes('Pick up record'))
     ).toBeUndefined()
   }
 }

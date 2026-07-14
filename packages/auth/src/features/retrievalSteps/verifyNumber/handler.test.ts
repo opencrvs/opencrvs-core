@@ -16,6 +16,7 @@ import * as retrievalService from '@auth/features/retrievalSteps/verifyUser/serv
 jest.mock('@auth/features/verifyCode/service', () => {
   const actual = jest.requireActual('@auth/features/verifyCode/service')
   return {
+    __esModule: true,
     ...actual,
     sendVerificationCode: jest.fn().mockResolvedValue(undefined)
   }

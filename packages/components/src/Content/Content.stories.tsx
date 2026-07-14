@@ -71,6 +71,5 @@ Default.args = {
     >
       Press me
     </Button>
-  ],
-  size: 'normal'
+  ]
 }

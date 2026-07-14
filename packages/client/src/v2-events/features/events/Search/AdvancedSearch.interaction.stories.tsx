@@ -645,7 +645,7 @@ export const JurisdictionScope_AdministrativeArea: Story = {
         await expect(options.length).toEqual(locationsUnderAdministration.length)
         locationsUnderAdministration.forEach(async (office) => {
           await expect(
-            options.some((o) => o.textContent?.includes(office))
+            options.some((o) => o.textContent.includes(office))
           ).toBe(true)
         })
       }
@@ -700,7 +700,7 @@ export const JurisdictionScope_All: Story = {
         await expect(options.length).toEqual(allLocations.length)
         allLocations.forEach(async (office) => {
           await expect(
-            options.some((o) => o.textContent?.includes(office))
+            options.some((o) => o.textContent.includes(office))
           ).toBe(true)
         })
       }
@@ -733,7 +733,7 @@ export const JurisdictionScope_AllBeatsLocation: Story = {
         await expect(options.length).toEqual(allLocations.length)
         allLocations.forEach(async (office) => {
           await expect(
-            options.some((o) => o.textContent?.includes(office))
+            options.some((o) => o.textContent.includes(office))
           ).toBe(true)
         })
       }
@@ -875,7 +875,7 @@ export const JurisdictionScope_MultipleScopes_MostRelaxedWins: Story = {
         await expect(options.length).toEqual(locationsUnderAdministration.length)
         locationsUnderAdministration.forEach(async (office) => {
           await expect(
-            options.some((o) => o.textContent?.includes(office))
+            options.some((o) => o.textContent.includes(office))
           ).toBe(true)
         })
       }
