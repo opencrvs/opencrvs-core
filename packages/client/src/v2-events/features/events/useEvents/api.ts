@@ -339,9 +339,18 @@ export async function deleteLocalEvent(updatedEvent: EventDocument) {
   await refetchAffectedSearchQueries(updatedEvent.id)
 }
 
-export async function onMarkNotDuplicate(data: EventDocument) {
-  setEventData(data.id, data)
-  await refetchSearchQuery(data.id)
+/**
+ * MARK_AS_NOT_DUPLICATE is workqueue-affecting but keeps the record assigned to
+ * the user (no follow-up UNASSIGN), so the local event document is patched in
+ * place instead of being evicted the way deleteLocalEvent does it — evicting it
+ * would force a re-download and break offline availability of a record the user
+ * still holds. The search refresh is the standard one: by-id refetch plus
+ * workqueue staleness, not develop's by-id-only refetch, which left the
+ * potential-duplicates queue stale until the 20 s poll.
+ */
+export async function onMarkNotDuplicate(updatedEvent: EventDocument) {
+  setEventData(updatedEvent.id, updatedEvent)
+  await refetchAffectedSearchQueries(updatedEvent.id)
 }
 
 /**
