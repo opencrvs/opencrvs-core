@@ -56,6 +56,13 @@ const DeclarationActionBase = ActionConfigBase.extend({
   deduplication: DeduplicationConfig.optional()
 })
 
+const actionConfirmationForm = z
+  .array(FieldConfig)
+  .optional()
+  .describe(
+    'Fields rendered on the action confirmation dialog. Submitted values are stored in the action annotation and shown in the audit history.'
+  )
+
 const ReadActionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.READ),
@@ -71,7 +78,8 @@ const ReadActionConfig = ActionConfigBase.extend(
 
 const NotifyConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.NOTIFY)
+    type: z.literal(ActionType.NOTIFY),
+    form: actionConfirmationForm
   }).shape
 )
 
@@ -148,6 +156,7 @@ const DeclareConfig = DeclarationActionBase.extend(
     review: DeclarationReviewConfig.describe(
       'Configuration of the review page fields.'
     ),
+    form: actionConfirmationForm,
     dialogCopy: z
       .object({
         notify: TranslationConfig.describe(
@@ -166,7 +175,8 @@ const DeclareConfig = DeclarationActionBase.extend(
 
 const ArchiveConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.ARCHIVE)
+    type: z.literal(ActionType.ARCHIVE),
+    form: actionConfirmationForm
   }).shape
 )
 
@@ -195,13 +205,15 @@ const EditActionConfig = ActionConfigBase.extend(
 
 const RejectConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.REJECT)
+    type: z.literal(ActionType.REJECT),
+    form: actionConfirmationForm
   }).shape
 )
 
 const RegisterConfig = DeclarationActionBase.extend(
   z.object({
-    type: z.literal(ActionType.REGISTER)
+    type: z.literal(ActionType.REGISTER),
+    form: actionConfirmationForm
   }).shape
 )
 

@@ -17,6 +17,7 @@ import {
   getDeclaration,
   EventDocument,
   getCurrentEventState,
+  getActionFormFields,
   getActionReview,
   getAvailableActionsForEvent,
   getActionConfig,
@@ -39,7 +40,10 @@ import {
   actionLabels
 } from '@client/v2-events/features/workqueues/Actions/utils'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
-import { Review } from '@client/v2-events/features/events/components/Review'
+import {
+  AcceptActionModalResult,
+  Review
+} from '@client/v2-events/features/events/components/Review'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useCanDirectlyRegister } from '../useCanDirectlyRegister'
@@ -92,33 +96,59 @@ function useDeclarationActions(event: EventDocument) {
       ? actionConfig.dialogCopy
       : null
 
+  const eventId = event.id
+
   const actions = {
     [ActionType.NOTIFY]: {
-      mutate: events.actions.notify.mutate,
       supportingCopy: notifyActionConfig?.supportingCopy ?? dialogCopy?.notify,
+      fields: getActionFormFields(eventConfiguration, ActionType.NOTIFY),
       title: {
         id: 'review.declare.incomplete.confirmModal.title',
         defaultMessage: 'Notify the {event}?',
         description: 'The title for review action modal when declaring'
-      }
+      },
+      onConfirm: (values: AcceptActionModalResult['values']) =>
+        events.actions.notify.mutate({
+          eventId,
+          declaration,
+          annotation: { ...annotation, ...values },
+          transactionId: uuid()
+        })
     },
     [ActionType.DECLARE]: {
-      mutate: events.actions.declare.mutate,
       supportingCopy: dialogCopy?.declare,
+      fields: getActionFormFields(eventConfiguration, ActionType.DECLARE),
       title: {
         id: 'review.declare.confirmModal.title',
         defaultMessage: 'Declare the {event}?',
         description: 'The title for review action modal when declaring'
-      }
+      },
+      onConfirm: (values: AcceptActionModalResult['values']) =>
+        events.actions.declare.mutate({
+          eventId,
+          declaration,
+          annotation: { ...annotation, ...values },
+          transactionId: uuid()
+        })
     },
     [ActionType.REGISTER]: {
-      mutate: events.customActions.registerOnDeclare.mutate,
       supportingCopy: dialogCopy?.register,
+      // Combined declare+register shows only REGISTER's dialog fields
+      fields: getActionFormFields(eventConfiguration, ActionType.REGISTER),
       title: {
         id: 'review.register.confirmModal.title',
         defaultMessage: 'Register the {event}?',
         description: 'The title for review action modal when registering'
-      }
+      },
+      // Combined flow: dialog values belong to the final REGISTER action only
+      onConfirm: (values: AcceptActionModalResult['values']) =>
+        events.customActions.registerOnDeclare.mutate({
+          eventId,
+          declaration,
+          annotation,
+          targetActionAnnotation: values,
+          transactionId: uuid()
+        })
     }
   }
 
@@ -144,7 +174,6 @@ function useDeclarationActions(event: EventDocument) {
 
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { isActionAllowed } = useUserAllowedActions(eventIndex)
-  const eventId = event.id
 
   const onDelete = useCallback(async () => {
     await deleteDeclaration(eventId, backTo)
@@ -153,28 +182,28 @@ function useDeclarationActions(event: EventDocument) {
   async function handleDeclaration(actionType: keyof typeof actions) {
     const action = actions[actionType]
 
-    const confirmedDeclaration = await openModal<boolean | null>((close) => {
-      return (
-        <Review.ActionModal.Accept
-          action="Declare"
-          close={close}
-          copy={{
-            supportingCopy: action.supportingCopy,
-            title: action.title,
-            onConfirm: actionLabels[actionType]
-          }}
-          eventType={intl.formatMessage(eventConfiguration.label)}
-        />
-      )
-    })
+    const modalResult = await openModal<AcceptActionModalResult | null>(
+      (close) => {
+        return (
+          <Review.ActionModal.Accept
+            action="Declare"
+            close={close}
+            copy={{
+              supportingCopy: action.supportingCopy,
+              title: action.title,
+              onConfirm: actionLabels[actionType]
+            }}
+            declaration={declaration}
+            eventConfiguration={eventConfiguration}
+            eventType={intl.formatMessage(eventConfiguration.label)}
+            fields={action.fields}
+          />
+        )
+      }
+    )
 
-    if (confirmedDeclaration) {
-      action.mutate({
-        eventId,
-        declaration,
-        annotation,
-        transactionId: uuid()
-      })
+    if (modalResult) {
+      action.onConfirm(modalResult.values)
       return closeActionView(backTo)
     }
   }

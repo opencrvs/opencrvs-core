@@ -8,14 +8,8 @@
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 services:
   # For dependencies, expose ports locally for dev
-  mongo1:
-    ports:
-      - "27017:27017"
-    volumes:
-      - "./data/mongo:/data/db"
-
   postgres:
-    image: docker.io/chumaky/postgres_mongo_fdw:17.6_fdw5.5.2
+    image: postgres:17.6
     container_name: postgres
     restart: always
     environment:

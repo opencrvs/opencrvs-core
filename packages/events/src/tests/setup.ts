@@ -29,7 +29,6 @@ import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { mswServer } from './msw'
 import { createDatabase, initializeSchemaAccess, migrate } from './postgres'
 
-vi.mock('@events/storage/mongodb/user-mgnt')
 vi.mock('@events/storage/elasticsearch')
 
 // Tracks the unique id used by this worker's previous test run so we can

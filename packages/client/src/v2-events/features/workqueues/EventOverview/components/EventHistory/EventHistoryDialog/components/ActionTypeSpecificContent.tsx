@@ -25,6 +25,7 @@ import { DeclarationUpdate } from './DeclarationUpdate'
 import { CustomActionContent } from './CustomAction'
 import { DetectedDuplicate } from './DetectedDuplicate'
 import { Edit } from './Edit'
+import { ActionFormContent } from './ActionFormContent'
 
 const SyntheticDeclarationActionTypes = z.enum([DECLARATION_ACTION_UPDATE])
 
@@ -95,6 +96,24 @@ export function ActionTypeSpecificContent({
 
   if (type === ActionType.DUPLICATE_DETECTED) {
     return <DetectedDuplicate action={action} />
+  }
+
+  const coreDialogFormActions: string[] = [
+    ActionType.NOTIFY,
+    ActionType.DECLARE,
+    ActionType.REGISTER,
+    ActionType.ARCHIVE,
+    ActionType.REJECT
+  ]
+
+  if (coreDialogFormActions.includes(type)) {
+    return (
+      <ActionFormContent
+        action={action}
+        event={fullEvent}
+        validatorContext={validatorContext}
+      />
+    )
   }
 
   return null

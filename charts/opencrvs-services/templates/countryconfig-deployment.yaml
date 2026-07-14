@@ -97,16 +97,6 @@ spec:
               value: "http://gateway.{{ .Release.Namespace }}.svc.cluster.local:7070"
             - name: AUTH_URL
               value: "http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040"
-          {{- if eq .Values.mongodb.auth_mode "disabled" }}
-            - name: MONGO_URL
-              value: mongodb://{{ .Values.mongodb.host }}/user-mgnt
-          {{- else if or (eq .Values.mongodb.auth_mode "auto")  (eq .Values.mongodb.auth_mode "use_secret") }}
-            - name: MONGO_URL
-              valueFrom:
-                secretKeyRef:
-                  key: USER_MGNT_MONGO_URL
-                  name: {{ .Values.mongodb.urls_secret }}
-          {{- end }}
           {{- if not (eq .Values.postgres.auth_mode "managed") }}
             - name: ANALYTICS_DATABASE_URL
               valueFrom:
