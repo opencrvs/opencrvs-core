@@ -205,9 +205,11 @@ const EditAction = ActionBase.extend(
   z.object({
     type: z.literal(ActionType.EDIT),
     /** @deprecated New Edit-actions should no longer contain content. This is kept for old 2.0 edits. */
-    content: z.object({
-      comment: z.string().describe('Comment for the edit action.').optional()
-    })
+    content: z
+      .object({
+        comment: z.string().describe('Comment for the edit action.').optional()
+      })
+      .optional()
   }).shape
 )
 export type EditAction = z.infer<typeof EditAction>
