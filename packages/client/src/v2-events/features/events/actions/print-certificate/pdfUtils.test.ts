@@ -310,6 +310,18 @@ describe('SVG compiler', () => {
         '<svg><text>23 January 2025</text></svg>'
       )
     })
+    it('renders empty when the looked-up action does not exist on the event', () => {
+      expectRenderOutput(
+        '<svg><text>{{ $lookup ($action "ARCHIVE") "annotation.book-number" }}</text></svg>',
+        '<svg><text></text></svg>'
+      )
+    })
+    it('treats a lookup on a missing action as undefined in conditionals', () => {
+      expectRenderOutput(
+        '<svg>{{#ifCond ($lookup ($action "ARCHIVE") "annotation.book-number") "!==" undefined}}<text>book</text>{{/ifCond}}</svg>',
+        '<svg></svg>'
+      )
+    })
   })
   describe('$join', () => {
     // Uses the tennis club event's `applicant.address` field (ADDRESS type) with real
