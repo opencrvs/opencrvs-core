@@ -45,11 +45,13 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 })
 
 /**
- * A country config for MARK_AS_NOT_DUPLICATE and MARK_AS_DUPLICATE,
- * overriding the hardcoded default label/icon
+ * A country config for MARK_AS_NOT_DUPLICATE and MARK_AS_DUPLICATE with
+ * custom labels/icons, to prove the buttons on this core-owned review page
+ * do NOT read them: they keep the hardcoded defaults
  * (`duplicateMessages.notDuplicateButton`/`markAsDuplicateButton` and
- * `NotePencil`/`Archive` in ReviewDuplicate.tsx / DuplicateForm.tsx) to prove
- * both buttons on this screen read from ActionConfig when present.
+ * `NotePencil`/`Archive` in ReviewDuplicate.tsx / DuplicateForm.tsx).
+ * Configured labels/icons only affect the action menu entry that navigates
+ * here; the configs' conditionals still gate the buttons.
  * `archiveOnDuplicate` (the mutation the "mark as duplicate" button fires)
  * is a client-side combinator over the core MARK_AS_DUPLICATE action — see
  * custom-api/index.ts — so it shares this same config, not a separate one.
@@ -223,7 +225,7 @@ const lockedEvent = {
   actions: lockedActions
 }
 
-export const markAsNotDuplicateLabelAndIconAreConfigurable: Story = {
+export const duplicateReviewButtonsKeepHardcodedLabelsAndIcons: Story = {
   parameters: {
     mockingDate: new Date(),
     reactRouter: {
@@ -262,20 +264,24 @@ export const markAsNotDuplicateLabelAndIconAreConfigurable: Story = {
     const canvas = within(canvasElement)
 
     const notADuplicateButton = await canvas.findByRole('button', {
-      name: /Confirm no duplicate/i
+      name: /Not a duplicate/i
     })
     await expect(notADuplicateButton).toBeVisible()
-    await expect(canvas.queryByText(/Not a duplicate/i)).not.toBeInTheDocument()
+    await expect(
+      canvas.queryByText(/Confirm no duplicate/i)
+    ).not.toBeInTheDocument()
     // Icon identity can't be asserted from the DOM (phosphor-react renders
     // plain <svg> geometry with no name-identifying attribute) — just confirm
-    // one rendered alongside the configured label.
+    // one rendered alongside the hardcoded label.
     await expect(notADuplicateButton.querySelector('svg')).toBeInTheDocument()
 
     const markAsDuplicateButton = await canvas.findByRole('button', {
-      name: /Compare duplicates/i
+      name: /Mark as duplicate/i
     })
     await expect(markAsDuplicateButton).toBeVisible()
-    await expect(canvas.queryByText(/^Archive$/i)).not.toBeInTheDocument()
+    await expect(
+      canvas.queryByText(/Compare duplicates/i)
+    ).not.toBeInTheDocument()
     await expect(markAsDuplicateButton.querySelector('svg')).toBeInTheDocument()
   }
 }
