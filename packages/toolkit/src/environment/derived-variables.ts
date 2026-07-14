@@ -81,20 +81,6 @@ export const derivedVariables = [
     scope: 'ENVIRONMENT'
   },
   {
-    name: 'MONGODB_ADMIN_USER',
-    valueLabel: 'MONGODB_ADMIN_USER',
-    valueType: 'SECRET',
-    type: 'disabled',
-    scope: 'ENVIRONMENT'
-  },
-  {
-    name: 'MONGODB_ADMIN_PASSWORD',
-    valueLabel: 'MONGODB_ADMIN_PASSWORD',
-    valueType: 'SECRET',
-    type: 'disabled',
-    scope: 'ENVIRONMENT'
-  },
-  {
     name: 'POSTGRES_USER',
     valueLabel: 'POSTGRES_USER',
     valueType: 'SECRET',
