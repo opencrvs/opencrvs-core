@@ -18,7 +18,7 @@ SCRIPT_PATH=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 EVENTS_FILES=$(ls "$SCRIPT_PATH/src/migrations/events" | grep -E '\.(sql|js)$' | wc -l)
 for ((n = 0; n < EVENTS_FILES; n++)); do
   DATABASE_URL="$EVENTS_POSTGRES_URL" \
-    yarn --cwd "$SCRIPT_PATH" node-pg-migrate down \
+    pnpm --dir "$SCRIPT_PATH" exec node-pg-migrate down \
     --schema=app \
     --migrations-dir="$SCRIPT_PATH/src/migrations/events"
 done

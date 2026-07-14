@@ -62,7 +62,7 @@ run_pg_migrations() {
   # --- Run migrations ---
   echo "Running migrations for schema '$schema' in $MIGRATIONS_PATH"
   DATABASE_URL="$database_url" \
-    yarn --cwd "$SCRIPT_PATH" node-pg-migrate up \
+    pnpm --dir "$SCRIPT_PATH" exec node-pg-migrate up \
     --schema="$schema" \
     --migrations-dir="$MIGRATIONS_PATH" \
     --migrations-table="$migrations_table"
