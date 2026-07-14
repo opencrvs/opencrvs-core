@@ -26,8 +26,7 @@ import {
   getActionConfig,
   getUUID,
   isActionEnabled,
-  isActionVisible,
-  isValidIcon
+  isActionVisible
 } from '@opencrvs/commons/client'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
@@ -93,17 +92,12 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
         validatorContext
       )
     : true
-  const notADuplicateLabel = markAsNotDuplicateActionConfig?.label
-    ? intl.formatMessage(markAsNotDuplicateActionConfig.label)
-    : intl.formatMessage(duplicateMessages.notDuplicateButton)
-  const notADuplicateIcon = isValidIcon(markAsNotDuplicateActionConfig?.icon)
-    ? markAsNotDuplicateActionConfig.icon
-    : 'NotePencil'
 
   // `archiveOnDuplicate` is a client-side combinator that fires the core
-  // MARK_AS_DUPLICATE action (then ARCHIVE) — see custom-api/index.ts — so
-  // this button's label/icon read from the same MARK_AS_DUPLICATE config as
-  // the menu entry point that navigates here, not a separate custom action.
+  // MARK_AS_DUPLICATE action (then ARCHIVE) — see custom-api/index.ts.
+  // Configured labels/icons only affect the action menu entry that navigates
+  // here; this core-owned review page keeps hardcoded button labels/icons,
+  // while the configs' conditionals still gate visibility/enabling.
   const markAsDuplicateActionConfig = getActionConfig({
     eventConfiguration: configuration,
     actionType: ActionType.MARK_AS_DUPLICATE
@@ -114,12 +108,6 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
   const markAsDuplicateEnabled = markAsDuplicateActionConfig
     ? isActionEnabled(markAsDuplicateActionConfig, eventIndex, validatorContext)
     : true
-  const markAsDuplicateLabel = markAsDuplicateActionConfig?.label
-    ? intl.formatMessage(markAsDuplicateActionConfig.label)
-    : intl.formatMessage(duplicateMessages.markAsDuplicateButton)
-  const markAsDuplicateIcon = isValidIcon(markAsDuplicateActionConfig?.icon)
-    ? markAsDuplicateActionConfig.icon
-    : 'Archive'
 
   const notADuplicateButton = notADuplicateVisible && (
     <Button
@@ -148,8 +136,8 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
         }
       }}
     >
-      <Icon name={notADuplicateIcon} />
-      {notADuplicateLabel}
+      <Icon name="NotePencil" />
+      {intl.formatMessage(duplicateMessages.notDuplicateButton)}
     </Button>
   )
 
@@ -186,8 +174,8 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
         }
       }}
     >
-      <Icon name={markAsDuplicateIcon} />
-      {markAsDuplicateLabel}
+      <Icon name="Archive" />
+      {intl.formatMessage(duplicateMessages.markAsDuplicateButton)}
     </Button>
   )
   return (
