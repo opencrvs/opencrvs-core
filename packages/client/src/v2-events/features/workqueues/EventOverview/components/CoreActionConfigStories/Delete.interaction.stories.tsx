@@ -295,7 +295,7 @@ export const deleteIsHiddenWhenConditionalIsNotMet: StoryObj<
 
         const items = list?.querySelectorAll('li')
         const deleteItem = Array.from(items ?? []).find((item) =>
-          item.textContent?.includes('Discard application')
+          item.textContent.includes('Discard application')
         )
 
         await expect(deleteItem).toBeUndefined()

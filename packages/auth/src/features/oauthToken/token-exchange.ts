@@ -58,8 +58,8 @@ export async function tokenExchangeHandler(
   const { sub, userType } = decodedOrError.right
 
   const extraScopes = decodedOrError.right.scope.filter(
-    (s: EncodedScope): s is EncodedScope => {
-      const v2Scope = decodeScope(s)
+    (s): s is EncodedScope => {
+      const v2Scope = decodeScope(s as EncodedScope)
 
       const isRejectScope = v2Scope?.type === 'record.reject'
       const isReadScope = v2Scope?.type === 'record.read'

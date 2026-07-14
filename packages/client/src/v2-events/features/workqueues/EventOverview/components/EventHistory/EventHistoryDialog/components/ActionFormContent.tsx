@@ -21,10 +21,6 @@ import {
 import { ColumnContentAlignment } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { Output } from '@client/v2-events/features/events/components/Output'
-import {
-  DECLARATION_ACTION_UPDATE,
-  EventHistoryActionDocument
-} from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 
 /**
  * Renders the values submitted through a core action's configured
@@ -36,19 +32,11 @@ export function ActionFormContent({
   validatorContext
 }: {
   event: EventDocument
-  action: EventHistoryActionDocument
+  action: ActionDocument
   validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(event.type)
-
-  // The synthetic DECLARATION_ACTION_UPDATE action is client-only and never
-  // reaches this component through the dispatcher, but is part of
-  // EventHistoryActionDocument's type. Narrow it away so `action.type` is a
-  // real ActionType and `annotation` is accessible below.
-  if (action.type === DECLARATION_ACTION_UPDATE) {
-    return null
-  }
 
   const originalAction =
     event.actions.find(
