@@ -101,11 +101,6 @@
         "@swc/jest",
         {
           "jsc": {
-            "parser": {
-              "syntax": "typescript",
-              "tsx": true
-            },
-            "target": "es2022",
             "experimental": {
               "plugins": [
                 [
@@ -114,9 +109,6 @@
                 ]
               ]
             }
-          },
-          "module": {
-            "type": "commonjs"
           }
         }
       ]
