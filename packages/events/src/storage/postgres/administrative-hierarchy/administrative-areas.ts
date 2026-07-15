@@ -14,6 +14,7 @@ import { Kysely, sql } from 'kysely'
 import { AdministrativeArea, logger, UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import Schema from '../events/schema/Database'
+import { buildInitialVersions } from './locations'
 
 export async function getAdministrativeAreas({
   ids,
@@ -69,7 +70,8 @@ export async function setAdministrativeAreasInTrx(
           parentId: aa.parentId,
           validUntil: aa.validUntil,
           deletedAt: null,
-          externalId: aa.externalId
+          externalId: aa.externalId,
+          versions: buildInitialVersions(aa)
         }))
       )
       .onConflict((oc) =>

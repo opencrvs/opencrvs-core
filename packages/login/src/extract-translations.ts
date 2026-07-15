@@ -16,7 +16,7 @@ import csv2json from 'csv2json'
 import { stringify } from 'csv-stringify'
 import { promisify } from 'util'
 import { sortBy } from 'lodash'
-import ts from 'typescript'
+import ts from '@typescript/api'
 import { MessageDescriptor } from 'react-intl'
 
 export async function writeJSONToCSV(

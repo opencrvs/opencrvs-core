@@ -22,6 +22,6 @@
     "types": ["jest"],
     "esModuleInterop": true
   },
-  "include": ["src/**/*.ts", "typings"],
+  "include": ["src/**/*.ts", "typings", "test/setupJest.ts"],
   "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]
 }

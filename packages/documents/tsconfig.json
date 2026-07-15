@@ -19,6 +19,6 @@
     "noUnusedLocals": true,
     "types": ["jest"]
   },
-  "include": ["src/**/*.ts", "typings", "tslint-rules"],
+  "include": ["src/**/*.ts", "typings", "test/setupJest.ts"],
   "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]
 }
