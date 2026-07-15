@@ -37,12 +37,32 @@ export const LocationTypeV1 = z.enum([
 ])
 export type LocationTypeV1 = z.infer<typeof LocationTypeV1>
 
+export const LocationStatus = z.enum(['active', 'inactive'])
+export type LocationStatus = z.infer<typeof LocationStatus>
+
+/**
+ * A single element of the append-only `versions` history of a location or
+ * administrative area. Versions are sorted ascending by `effectiveFrom`
+ * ('0001-01-01' is used as the beginning-of-time sentinel).
+ */
+export const LocationVersion = z.object({
+  versionId: UUID,
+  effectiveFrom: z.iso.date(),
+  name: z.string(),
+  externalId: z.string().nullish(),
+  status: LocationStatus
+})
+
+export type LocationVersion = z.infer<typeof LocationVersion>
+
 export const AdministrativeArea = z.object({
   id: UUID,
   name: z.string(),
   externalId: z.string().nullish(),
   parentId: UUID.nullable(),
-  validUntil: z.iso.datetime().nullable()
+  status: LocationStatus,
+  effectiveFrom: z.iso.date(),
+  versions: z.array(LocationVersion)
 })
 
 export type AdministrativeArea = z.infer<typeof AdministrativeArea>
@@ -52,11 +72,67 @@ export const Location = z.object({
   name: z.string(),
   externalId: z.string().nullish(),
   administrativeAreaId: UUID.nullable(),
-  validUntil: z.iso.datetime().nullable(),
-  locationType: z.string().nullable()
+  locationType: z.string().nullable(),
+  status: LocationStatus,
+  effectiveFrom: z.iso.date(),
+  versions: z.array(LocationVersion)
 })
 
 export type Location = z.infer<typeof Location>
+
+/**
+ * Input payload for the locations `set` mutation. Carries only the seedable
+ * identity and hierarchy fields — version history is managed by the server.
+ */
+export const SetLocationPayload = z.object({
+  id: UUID,
+  name: z.string(),
+  externalId: z.string().nullish(),
+  administrativeAreaId: UUID.nullable(),
+  locationType: z.string().nullable()
+})
+
+export type SetLocationPayload = z.infer<typeof SetLocationPayload>
+
+/**
+ * Input payload for the administrative areas `set` mutation. Carries only the
+ * seedable identity and hierarchy fields — version history is managed by the
+ * server.
+ */
+export const SetAdministrativeAreaPayload = z.object({
+  id: UUID,
+  name: z.string(),
+  externalId: z.string().nullish(),
+  parentId: UUID.nullable()
+})
+
+export type SetAdministrativeAreaPayload = z.infer<
+  typeof SetAdministrativeAreaPayload
+>
+
+/**
+ * Resolves the version in effect at the given anchor date.
+ *
+ * Returns the element with the greatest `effectiveFrom` that is less than or
+ * equal to `anchor`, falling back to the earliest element when the anchor
+ * precedes all versions. Assumes `versions` is sorted ascending by
+ * `effectiveFrom`. Both `effectiveFrom` and `anchor` are 'YYYY-MM-DD' strings,
+ * so plain string comparison is correct.
+ */
+export function resolveVersion<T extends { effectiveFrom: string }>(
+  versions: T[],
+  anchor: string
+): T {
+  let resolved = versions[0]
+
+  for (const version of versions) {
+    if (version.effectiveFrom <= anchor) {
+      resolved = version
+    }
+  }
+
+  return resolved
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type WrapArrayPreserveNullish<V> = V extends readonly any[]
