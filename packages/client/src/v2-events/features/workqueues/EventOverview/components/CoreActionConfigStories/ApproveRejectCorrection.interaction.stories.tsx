@@ -38,10 +38,11 @@ export default meta
 type Story = StoryObj<typeof CorrectionReview>
 
 /**
- * A country config for APPROVE_CORRECTION and REJECT_CORRECTION, overriding
- * the hardcoded default label/icon (`buttonMessages.approve`/`reject` and
- * `Check`/`X` in ReviewCorrection.tsx) to prove both buttons read from
- * ActionConfig when present.
+ * A country config for APPROVE_CORRECTION and REJECT_CORRECTION with custom
+ * labels/icons, to prove the buttons on this core-owned review page do NOT
+ * read them: they keep the hardcoded defaults (`buttonMessages.approve`/
+ * `reject` and `Check`/`X` in ReviewCorrection.tsx). The configs'
+ * conditionals still gate the buttons.
  */
 const configuration = {
   ...tennisClubMembershipEvent,
@@ -142,7 +143,7 @@ const lockedEvent = {
   ]
 }
 
-export const approveRejectCorrectionLabelsAreConfigurable: Story = {
+export const correctionReviewButtonsKeepHardcodedLabelsAndIcons: Story = {
   loaders: [
     async () => {
       window.localStorage.setItem(
@@ -178,33 +179,33 @@ export const approveRejectCorrectionLabelsAreConfigurable: Story = {
 
     await waitFor(async () => {
       await expect(
-        canvas.getByRole('button', { name: /Uphold correction/i })
+        canvas.getByRole('button', { name: /^Approve$/i })
       ).toBeInTheDocument()
     })
 
     await waitFor(async () => {
       await expect(
-        canvas.getByRole('button', { name: /Decline correction/i })
+        canvas.getByRole('button', { name: /^Reject$/i })
       ).toBeInTheDocument()
     })
 
     await expect(
-      canvas.queryByRole('button', { name: /^Approve$/i })
+      canvas.queryByRole('button', { name: /Uphold correction/i })
     ).not.toBeInTheDocument()
     await expect(
-      canvas.queryByRole('button', { name: /^Reject$/i })
+      canvas.queryByRole('button', { name: /Decline correction/i })
     ).not.toBeInTheDocument()
 
     const approveButton = canvas.getByRole('button', {
-      name: /Uphold correction/i
+      name: /^Approve$/i
     })
     const rejectButton = canvas.getByRole('button', {
-      name: /Decline correction/i
+      name: /^Reject$/i
     })
 
     // Icon identity can't be asserted from the DOM (phosphor-react renders
     // plain <svg> geometry with no name-identifying attribute) — just confirm
-    // one rendered alongside each configured label.
+    // one rendered alongside each hardcoded label.
     await expect(approveButton.querySelector('svg')).toBeInTheDocument()
     await expect(rejectButton.querySelector('svg')).toBeInTheDocument()
   }
@@ -241,10 +242,10 @@ export const approveRejectCorrectionAreHiddenWhenConditionalIsNotMet: Story = {
     const canvas = within(canvasElement)
 
     await expect(
-      canvas.queryByRole('button', { name: /Uphold correction/i })
+      canvas.queryByRole('button', { name: /^Approve$/i })
     ).not.toBeInTheDocument()
     await expect(
-      canvas.queryByRole('button', { name: /Decline correction/i })
+      canvas.queryByRole('button', { name: /^Reject$/i })
     ).not.toBeInTheDocument()
   }
 }
