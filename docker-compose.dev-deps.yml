@@ -32,13 +32,11 @@ services:
       - "9300:9300"
     volumes:
       - "./data/elasticsearch:/usr/share/elasticsearch/data"
-      - "./data/backups/elasticsearch:/data/backups/elasticsearch"
     environment:
       - "discovery.type=single-node"
       - "cluster.routing.allocation.disk.watermark.enable_for_single_data_node=\
         true"
       - "cluster.routing.allocation.disk.threshold_enabled=false"
-      - path.repo=/data/backups/elasticsearch
       - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
       - xpack.security.enabled=false # elasticsearch >8.x defaults to true
       # - http.port=9200
