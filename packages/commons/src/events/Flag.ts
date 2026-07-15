@@ -25,7 +25,8 @@ export const InherentFlags = {
    *
    * We only use this flag to determine that a NOTIFY, DECLARE or REGISTER action is allowed next.
    */
-  EDIT_IN_PROGRESS: 'edit-in-progress'
+  EDIT_IN_PROGRESS: 'edit-in-progress',
+  SEALED: 'sealed'
 } as const
 
 export type InherentFlags = (typeof InherentFlags)[keyof typeof InherentFlags]

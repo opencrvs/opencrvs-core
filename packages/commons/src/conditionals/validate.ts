@@ -46,6 +46,7 @@ import { EventDocument } from '../events/EventDocument'
 import { EventIndex } from '../events/EventIndex'
 import { Location } from '../events/locations'
 import { SystemVariables } from '../events/TemplateConfig'
+import { getCurrentEventState } from '../events/state'
 
 const ajv = new Ajv({
   $data: true,
@@ -167,9 +168,15 @@ export function buildClientFunctionContext(input: {
   locations?: Location[]
   adminLevelIds?: string[]
 }): ClientFunctionContext {
+  const flags =
+    (input.validatorContext?.event &&
+      input.validatorContext?.eventConfig) ? getCurrentEventState(
+    input.validatorContext?.event,
+    input.validatorContext?.eventConfig)?.flags : []
+
   return {
     $form: input.form,
-    $flags: input.form.flags === null ? [] : input.form.flags,
+    $flags: flags,
     $now: todayISO(),
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     $online: isOnline(),
@@ -474,6 +481,7 @@ export type ValidatorContext = {
   user?: ITokenPayload
   leafAdminStructureLocationIds?: Array<{ id: UUID }>
   event?: EventDocument
+  eventConfig?: EventConfig
   baseFormState?: EventState
 }
 

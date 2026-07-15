@@ -17,6 +17,7 @@ import {
 } from '@opencrvs/commons/client'
 import { useAuthentication } from '../../utils/userUtils'
 import { useSuspenseGetLeafAdministrativeAreaIds } from './useAdministrativeAreas'
+import { useEventConfigurations } from '../features/events/useEventConfiguration'
 
 /**
  * Private hook for reading user details. Since the user is authenticated, we can assume the token is valid, and some other process throws an error when it becomes invalid.
@@ -36,10 +37,12 @@ export function useValidatorContext(event?: EventDocument): ValidatorContext {
   const leafAdminStructureLocationIds =
     useSuspenseGetLeafAdministrativeAreaIds()
   const user = useUser()
+  const configs = useEventConfigurations()
 
   return {
     user,
     leafAdminStructureLocationIds,
-    event
+    event,
+    eventConfig: configs.find((c) => c.id === event?.type) ?? undefined,
   }
 }

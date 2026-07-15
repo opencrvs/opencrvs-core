@@ -136,6 +136,8 @@ export function EventSummary({
     .filter(({ secured }) => secured)
     .map(({ id }) => id)
 
+
+
   const configuredFields = summary.fields.map((field) => {
     if (
       field.conditionals &&
