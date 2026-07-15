@@ -3,7 +3,17 @@
 exports[`User notification - Email > 2fa 1`] = `
 {
   "from": "",
-  "html": "<!DOCTYPE html>
+  "html": "<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+-->
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -66,7 +76,17 @@ exports[`User notification - Email > 2fa 1`] = `
 exports[`User notification - Email > change-email-address 1`] = `
 {
   "from": "",
-  "html": "<!DOCTYPE html>
+  "html": "<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+-->
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -129,7 +149,17 @@ exports[`User notification - Email > change-email-address 1`] = `
 exports[`User notification - Email > change-phone-number 1`] = `
 {
   "from": "",
-  "html": "<!DOCTYPE html>
+  "html": "<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+-->
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -192,7 +222,17 @@ exports[`User notification - Email > change-phone-number 1`] = `
 exports[`User notification - Email > resend-invite 1`] = `
 {
   "from": "",
-  "html": "<!doctype html>
+  "html": "<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+-->
+<!doctype html>
 <html>
   <head>
     <link
@@ -265,7 +305,17 @@ exports[`User notification - Email > resend-invite 1`] = `
 exports[`User notification - Email > reset-password 1`] = `
 {
   "from": "",
-  "html": "<!DOCTYPE html>
+  "html": "<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+-->
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -331,7 +381,17 @@ exports[`User notification - Email > reset-password 1`] = `
 exports[`User notification - Email > reset-password-by-admin 1`] = `
 {
   "from": "",
-  "html": "<!DOCTYPE html>
+  "html": "<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+-->
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -394,7 +454,17 @@ exports[`User notification - Email > reset-password-by-admin 1`] = `
 exports[`User notification - Email > user-created 1`] = `
 {
   "from": "",
-  "html": "<!doctype html>
+  "html": "<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+-->
+<!doctype html>
 <html>
   <head>
     <link
@@ -467,7 +537,17 @@ exports[`User notification - Email > user-created 1`] = `
 exports[`User notification - Email > user-updated 1`] = `
 {
   "from": "",
-  "html": "<!DOCTYPE html>
+  "html": "<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+-->
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -530,7 +610,17 @@ exports[`User notification - Email > user-updated 1`] = `
 exports[`User notification - Email > username-reminder 1`] = `
 {
   "from": "",
-  "html": "<!DOCTYPE html>
+  "html": "<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+-->
+<!DOCTYPE html>
 <html>
 
 <head>
