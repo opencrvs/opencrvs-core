@@ -22,7 +22,6 @@ import {
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { joinValues } from '@opencrvs/commons/client'
-import { EventHistoryActionDocument } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { ActionTypeSpecificContent } from './components'
 
 const messages = defineMessages({
@@ -48,7 +47,7 @@ const messages = defineMessages({
   }
 })
 
-function prepareComments(history: EventHistoryActionDocument) {
+function prepareComments(history: ActionDocument) {
   const comments: { comment: string }[] = []
 
   if (
@@ -61,7 +60,7 @@ function prepareComments(history: EventHistoryActionDocument) {
   return comments
 }
 
-function prepareReason(history: EventHistoryActionDocument) {
+function prepareReason(history: ActionDocument) {
   const reason: { message?: string } = {}
 
   if (history.type === ActionType.REJECT_CORRECTION) {
@@ -72,7 +71,7 @@ function prepareReason(history: EventHistoryActionDocument) {
 }
 
 function prepareDuplicateOf(
-  history: EventHistoryActionDocument,
+  history: ActionDocument,
   fullHistory: ActionDocument[]
 ): string | null {
   if (history.type !== ActionType.MARK_AS_DUPLICATE) {
@@ -106,7 +105,7 @@ export function EventHistoryDialog({
   validatorContext,
   title
 }: {
-  action: EventHistoryActionDocument
+  action: ActionDocument
   userName: string
   close: () => void
   fullEvent: EventDocument

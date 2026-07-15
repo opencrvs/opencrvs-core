@@ -17,6 +17,7 @@ import { DEFAULT_ROLES_DEFINITION } from '@auth/features/authenticate/handler.te
 jest.mock('@opencrvs/commons', () => {
   const actual = jest.requireActual('@opencrvs/commons')
   return {
+    __esModule: true,
     ...actual,
     triggerUserEventNotification: jest.fn()
   }

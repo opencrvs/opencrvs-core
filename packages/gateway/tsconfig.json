@@ -1,10 +1,9 @@
 {
   "compilerOptions": {
     "skipLibCheck": true,
-    "baseUrl": "./src",
     "paths": {
-      "@gateway/*": ["./*"],
-      "@events/*": ["../../events/src/*"]
+      "@gateway/*": ["./src/*"],
+      "@events/*": ["../events/src/*"]
     },
     "target": "es6",
     "module": "node16",

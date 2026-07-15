@@ -31,12 +31,14 @@ beforeEach(() => {
 })
 
 beforeAll(() => {
-  delete (window as { location?: Location }).location
-  window.location = { ...realLocation, assign }
+  vi.stubGlobal('location', {
+    ...realLocation,
+    assign
+  })
 })
 
 afterAll(() => {
-  window.location = realLocation
+  window.location = realLocation as string & Location
 })
 
 it('renders without crashing', () =>

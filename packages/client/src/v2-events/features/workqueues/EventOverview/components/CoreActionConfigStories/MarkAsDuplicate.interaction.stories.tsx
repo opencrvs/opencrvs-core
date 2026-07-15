@@ -198,13 +198,13 @@ export const markAsDuplicateLabelAndIconAreConfigurable: StoryObj<
         }
 
         const markAsDuplicateItem = Array.from(items).find((item) =>
-          item.textContent?.includes('Compare duplicates')
+          item.textContent.includes('Compare duplicates')
         )
 
         await expect(markAsDuplicateItem).toBeTruthy()
         await expect(
           Array.from(items).some((item) =>
-            item.textContent?.includes('Review potential duplicates')
+            item.textContent.includes('Review potential duplicates')
           )
         ).toBe(false)
       }
@@ -250,7 +250,7 @@ export const markAsDuplicateIsHiddenWhenConditionalIsNotMet: StoryObj<
     const items = Array.from(list?.querySelectorAll('li') ?? [])
 
     await expect(
-      items.find((item) => item.textContent?.includes('Compare duplicates'))
+      items.find((item) => item.textContent.includes('Compare duplicates'))
     ).toBeUndefined()
   }
 }

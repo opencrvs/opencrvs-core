@@ -46,7 +46,7 @@ function findMenuTriggerForUser(
     container.querySelectorAll<HTMLButtonElement>('#profile-link')
   )
   const nameCell = profileLinks.find(
-    (el) => el.textContent?.trim() === userName
+    (el) => el.textContent.trim() === userName
   )
   if (!nameCell) {
     throw new Error(`User row not found for: ${userName}`)
