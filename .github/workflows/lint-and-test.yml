@@ -131,24 +131,50 @@ jobs:
           echo "DEPENDENCIES=${DEPENDENCIES}" >> $GITHUB_ENV
           echo "Found dependencies: $DEPENDENCIES"
 
+      # Nx computation cache: dependency builds below are cache hits when
+      # their inputs match a previous develop run. Saved only from the
+      # gateway job on develop (covers commons + events types); that job
+      # deliberately skips restore so each saved cache contains only
+      # freshly built entries and never snowballs.
+      - name: Restore Nx cache
+        if: |
+          steps.check-scripts.outputs.skip != 'true' &&
+          (github.event_name == 'pull_request' || matrix.package != 'packages/gateway')
+        uses: actions/cache/restore@v5
+        id: nx-cache
+        with:
+          path: .nx/cache
+          key: nx-gateway-${{ github.sha }}
+          restore-keys: |
+            nx-gateway-
+            nx-
+
       - name: Build common package
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/commons')
-        run: cd packages/commons && pnpm build
+        run: pnpm exec lerna run build --scope @opencrvs/commons
 
       - name: Build components
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/components')
-        run: |
-          cd packages/components && pnpm build
+        run: pnpm exec lerna run build --scope @opencrvs/components
 
       - name: Build events router types
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/events')
-        run: cd packages/events && pnpm build:types
+        run: pnpm exec lerna run build:types --scope @opencrvs/events
 
       # testland consumes the workspace toolkit at runtime; build.sh needs
       # commons + events types built first (steps above).
       - name: Build toolkit
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/toolkit')
-        run: cd packages/toolkit && pnpm build
+        run: pnpm exec lerna run build --scope @opencrvs/toolkit
+
+      - name: Save Nx cache
+        if: |
+          github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
+          matrix.package == 'packages/gateway'
+        uses: actions/cache/save@v4
+        with:
+          path: .nx/cache
+          key: nx-gateway-${{ github.sha }}
 
       # TODO: should run parallel to unit tests as can take as much as unit tests
       - name: Run linting
@@ -215,12 +241,28 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build common package
-        run: cd packages/commons && pnpm build
+      # Restore only on PRs: the develop-push run builds cold and saves a
+      # cache containing only fresh entries (see gateway job note above).
+      - name: Restore Nx cache
+        if: github.event_name == 'pull_request'
+        uses: actions/cache/restore@v5
+        id: nx-cache
+        with:
+          path: .nx/cache
+          key: nx-client-prep-${{ github.sha }}
+          restore-keys: |
+            nx-client-prep-
+            nx-
 
-      - name: Build components
-        run: |
-          cd packages/components && pnpm build
+      - name: Build common package and components
+        run: pnpm exec lerna run build --scope @opencrvs/commons --scope @opencrvs/components
+
+      - name: Save Nx cache
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        uses: actions/cache/save@v4
+        with:
+          path: .nx/cache
+          key: nx-client-prep-${{ github.sha }}
 
       # Build Storybook once here (with --webpack-stats-json so that
       # `preview-stats.json` is emitted). The artifact is reused by
@@ -245,6 +287,7 @@ jobs:
             .
             !**/.git
             !**/node_modules
+            !.nx
 
   lint-client:
     name: Lint client
@@ -270,8 +313,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Restore Nx cache
+        uses: actions/cache/restore@v5
+        with:
+          path: .nx/cache
+          key: nx-gateway-${{ github.sha }}
+          restore-keys: |
+            nx-gateway-
+            nx-
+
       - name: Build events router types
-        run: cd packages/events && pnpm build:types
+        run: pnpm exec lerna run build:types --scope @opencrvs/events
 
       - name: Compile
         run: cd packages/client && pnpm test:compilation
@@ -506,14 +558,16 @@ jobs:
           max_attempts: 3
           command: pnpm install --frozen-lockfile
 
-      - name: Build commons
-        run: pnpm build
-        working-directory: packages/commons
+      - name: Restore Nx cache
+        uses: actions/cache/restore@v5
+        with:
+          path: .nx/cache
+          key: nx-gateway-${{ github.sha }}
+          restore-keys: |
+            nx-gateway-
+            nx-
 
-      - name: Build events
-        run: pnpm build
-        working-directory: packages/events
-
-      - name: Build toolkit
-        run: pnpm build
-        working-directory: packages/toolkit
+      # nx resolves the `^build` dependency of the build target, so
+      # commons and events are built first (cache hits when warm)
+      - name: Build toolkit and dependencies
+        run: pnpm exec lerna run build --scope @opencrvs/toolkit
