@@ -3,7 +3,17 @@
 exports[`Informant notification - Email > birth - DECLARE 1`] = `
 {
   "from": "",
-  "html": "<!doctype html>
+  "html": "<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+-->
+<!doctype html>
 <html>
   <head>
     <link
@@ -74,7 +84,17 @@ exports[`Informant notification - Email > birth - DECLARE 1`] = `
 exports[`Informant notification - Email > birth - NOTIFY 1`] = `
 {
   "from": "",
-  "html": "<!doctype html>
+  "html": "<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+-->
+<!doctype html>
 <html>
   <head>
     <link
@@ -144,7 +164,17 @@ exports[`Informant notification - Email > birth - NOTIFY 1`] = `
 exports[`Informant notification - Email > birth - REGISTER 1`] = `
 {
   "from": "",
-  "html": "<!doctype html>
+  "html": "<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+-->
+<!doctype html>
 <html>
   <head>
     <link
@@ -215,7 +245,17 @@ exports[`Informant notification - Email > birth - REGISTER 1`] = `
 exports[`Informant notification - Email > birth - REJECT 1`] = `
 {
   "from": "",
-  "html": "<!doctype html>
+  "html": "<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+-->
+<!doctype html>
 <html>
   <head>
     <link
@@ -285,7 +325,17 @@ exports[`Informant notification - Email > birth - REJECT 1`] = `
 exports[`Informant notification - Email > death - DECLARE 1`] = `
 {
   "from": "",
-  "html": "<!doctype html>
+  "html": "<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+-->
+<!doctype html>
 <html>
   <head>
     <link
@@ -356,7 +406,17 @@ exports[`Informant notification - Email > death - DECLARE 1`] = `
 exports[`Informant notification - Email > death - NOTIFY 1`] = `
 {
   "from": "",
-  "html": "<!doctype html>
+  "html": "<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+-->
+<!doctype html>
 <html>
   <head>
     <link
@@ -425,7 +485,17 @@ exports[`Informant notification - Email > death - NOTIFY 1`] = `
 exports[`Informant notification - Email > death - REGISTER 1`] = `
 {
   "from": "",
-  "html": "<!doctype html>
+  "html": "<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+-->
+<!doctype html>
 <html>
   <head>
     <link
@@ -497,7 +567,17 @@ exports[`Informant notification - Email > death - REGISTER 1`] = `
 exports[`Informant notification - Email > death - REJECT 1`] = `
 {
   "from": "",
-  "html": "<!doctype html>
+  "html": "<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+-->
+<!doctype html>
 <html>
   <head>
     <link
