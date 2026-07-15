@@ -2034,7 +2034,6 @@ components:
         - declaration
         - status
         - type
-        - content
     CustomAction:
       type: object
       properties:
@@ -17003,7 +17002,6 @@ components:
         - declaration
         - status
         - type
-        - content
       additionalProperties: false
     CustomActionOutput:
       type: object
