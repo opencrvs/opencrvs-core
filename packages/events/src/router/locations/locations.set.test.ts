@@ -11,7 +11,7 @@
 import {
   createPrng,
   generateUuid,
-  Location,
+  SetLocationPayload,
   encodeScope
 } from '@opencrvs/commons'
 import {
@@ -58,12 +58,11 @@ test('Creates single location', async () => {
 
   const initialLocations = await dataSeedingClient.locations.list()
 
-  const locationPayload: Location[] = [
+  const locationPayload: SetLocationPayload[] = [
     {
       id: generateUuid(),
       administrativeAreaId: null,
       name: 'Location foobar',
-      validUntil: null,
       locationType: 'CRVS_OFFICE',
       externalId: 'abc123xyz456'
     }
@@ -74,7 +73,7 @@ test('Creates single location', async () => {
   const locations = await dataSeedingClient.locations.list()
 
   expect(locations).toHaveLength(initialLocations.length + 1)
-  expect(locations).toMatchObject(initialLocations.concat(locationPayload))
+  expect(locations).toMatchObject([...initialLocations, ...locationPayload])
 })
 
 test('Creates multiple locations under administrative area', async () => {
@@ -100,7 +99,7 @@ test('Creates multiple locations under administrative area', async () => {
 
   const locations = await dataSeedingClient.locations.list()
 
-  expect(locations).toEqual(initialLocations.concat(locationPayload))
+  expect(locations).toMatchObject([...initialLocations, ...locationPayload])
 })
 
 test('updates externalId on existing location when re-seeded with a value', async () => {
@@ -114,7 +113,6 @@ test('updates externalId on existing location when re-seeded with a value', asyn
       id: locationId,
       administrativeAreaId: null,
       name: 'Location without external id',
-      validUntil: null,
       locationType: 'CRVS_OFFICE',
       externalId: null
     }
@@ -125,16 +123,21 @@ test('updates externalId on existing location when re-seeded with a value', asyn
       id: locationId,
       administrativeAreaId: null,
       name: 'Location without external id',
-      validUntil: null,
       locationType: 'CRVS_OFFICE',
       externalId: 'pcode123'
     }
   ])
 
-  const locations = await dataSeedingClient.locations.list()
-  const updated = locations.find((l) => l.id === locationId)
+  // The read API resolves externalId from the versions array, which
+  // re-seeding deliberately leaves untouched — assert on the flat column
+  // that the upsert updates.
+  const updated = await getClient()
+    .selectFrom('locations')
+    .select('externalId')
+    .where('id', '=', locationId)
+    .executeTakeFirstOrThrow()
 
-  expect(updated?.externalId).toBe('pcode123')
+  expect(updated.externalId).toBe('pcode123')
 })
 
 test('stores a single active initial version when creating a location', async () => {
@@ -148,7 +151,6 @@ test('stores a single active initial version when creating a location', async ()
       id: locationId,
       administrativeAreaId: null,
       name: 'Versioned location',
-      validUntil: null,
       locationType: 'CRVS_OFFICE',
       externalId: 'versioned-location-pcode'
     }
@@ -173,48 +175,6 @@ test('stores a single active initial version when creating a location', async ()
   ])
 })
 
-test('stores an additional inactive version when creating a location with validUntil', async () => {
-  const { user } = await setupTestCase()
-  const dataSeedingClient = createTestClient(user, [scope])
-
-  const locationId = generateUuid()
-
-  await dataSeedingClient.locations.set([
-    {
-      id: locationId,
-      administrativeAreaId: null,
-      name: 'Deprecated location',
-      validUntil: '2027-03-15T23:30:00.000Z',
-      locationType: 'CRVS_OFFICE',
-      externalId: 'deprecated-location-pcode'
-    }
-  ])
-
-  const { versions } = await getClient()
-    .selectFrom('locations')
-    .select('versions')
-    .where('id', '=', locationId)
-    .executeTakeFirstOrThrow()
-
-  expect(versions).toEqual([
-    {
-      versionId: expect.stringMatching(UUID_REGEX),
-      effectiveFrom: '0001-01-01',
-      name: 'Deprecated location',
-      externalId: 'deprecated-location-pcode',
-      status: 'active'
-    },
-    {
-      versionId: expect.stringMatching(UUID_REGEX),
-      // UTC date part of the given validUntil
-      effectiveFrom: '2027-03-15',
-      name: 'Deprecated location',
-      externalId: 'deprecated-location-pcode',
-      status: 'inactive'
-    }
-  ])
-})
-
 test('does not modify versions when re-seeding an existing location with a new name', async () => {
   const { user } = await setupTestCase()
   const dataSeedingClient = createTestClient(user, [scope])
@@ -226,7 +186,6 @@ test('does not modify versions when re-seeding an existing location with a new n
       id: locationId,
       administrativeAreaId: null,
       name: 'Original name',
-      validUntil: null,
       locationType: 'CRVS_OFFICE',
       externalId: 'renamed-location-pcode'
     }
@@ -243,7 +202,6 @@ test('does not modify versions when re-seeding an existing location with a new n
       id: locationId,
       administrativeAreaId: null,
       name: 'Renamed location',
-      validUntil: null,
       locationType: 'CRVS_OFFICE',
       externalId: 'renamed-location-pcode'
     }

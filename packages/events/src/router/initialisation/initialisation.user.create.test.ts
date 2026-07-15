@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { TRPCError } from '@trpc/server'
-import { generateUuid, Location, TokenUserType } from '@opencrvs/commons'
+import {
+  generateUuid,
+  SetLocationPayload,
+  TokenUserType
+} from '@opencrvs/commons'
 import {
   createInitialisationTestClient,
   createTestToken,
@@ -21,13 +25,12 @@ import {
 } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
 
-const locationPayload: Location[] = [
+const locationPayload: SetLocationPayload[] = [
   {
     id: generateUuid(),
     administrativeAreaId: null,
     name: 'New Administrative Area',
     locationType: 'test-location-type',
-    validUntil: null,
     externalId: 'abc123xyz456'
   }
 ]

@@ -11,7 +11,7 @@
 import {
   createPrng,
   generateUuid,
-  Location,
+  SetLocationPayload,
   encodeScope
 } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
@@ -24,12 +24,11 @@ test('Returns single location in right format', async () => {
 
   const initialLocations = await client.locations.list()
 
-  const setLocationPayload: Location[] = [
+  const setLocationPayload: SetLocationPayload[] = [
     {
       id: generateUuid(),
       administrativeAreaId: null,
       name: 'Location foobar',
-      validUntil: null,
       locationType: 'CRVS_OFFICE',
       externalId: 'abc123xyz456'
     }
@@ -40,7 +39,7 @@ test('Returns single location in right format', async () => {
   const locations = await client.locations.list()
 
   expect(locations).toHaveLength(initialLocations.length + 1)
-  expect(locations).toMatchObject(initialLocations.concat(setLocationPayload))
+  expect(locations).toMatchObject([...initialLocations, ...setLocationPayload])
 })
 
 test('Returns multiple locations', async () => {

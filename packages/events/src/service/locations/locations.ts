@@ -9,28 +9,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Location, UUID } from '@opencrvs/commons'
+import { SetLocationPayload, UUID } from '@opencrvs/commons'
 import * as locationsRepo from '@events/storage/postgres/administrative-hierarchy/locations'
 
 /**
  * Sets incoming locations in the database for events. Should be only run as part of the initial seeding.
  * @param incomingLocations - Locations to be set
  */
-export async function setLocations(locations: Location[]) {
+export async function setLocations(locations: SetLocationPayload[]) {
   await locationsRepo.setLocations(
     locations.map(
-      ({
+      ({ id, name, administrativeAreaId, locationType, externalId }) => ({
         id,
         name,
         administrativeAreaId,
-        validUntil,
-        locationType,
-        externalId
-      }) => ({
-        id,
-        name,
-        administrativeAreaId,
-        validUntil: validUntil ? new Date(validUntil).toISOString() : null,
         locationType,
         externalId
       })

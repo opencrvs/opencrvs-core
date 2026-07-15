@@ -11,10 +11,10 @@
 
 import { chunk } from 'lodash'
 import { Kysely, sql } from 'kysely'
-import { AdministrativeArea, logger, UUID } from '@opencrvs/commons'
+import { logger, SetAdministrativeAreaPayload, UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import Schema from '../events/schema/Database'
-import { buildInitialVersions } from './locations'
+import { buildInitialVersions, resolveVersionFields } from './locations'
 
 export async function getAdministrativeAreas({
   ids,
@@ -27,13 +27,8 @@ export async function getAdministrativeAreas({
 
   let query = db
     .selectFrom('administrativeAreas')
-    .select(['id', 'name', 'parentId', 'validUntil', 'externalId'])
+    .select(['id', 'parentId', 'versions'])
     .where('deletedAt', 'is', null)
-    .$narrowType<{
-      deletedAt: null
-      validUntil: AdministrativeArea['validUntil']
-      externalId: string | null
-    }>()
 
   if (ids && ids.length > 0) {
     query = query.where('id', 'in', ids)
@@ -45,14 +40,19 @@ export async function getAdministrativeAreas({
     )
   }
 
-  return query.execute()
+  const rows = await query.execute()
+
+  return rows.map(({ versions, ...row }) => ({
+    ...row,
+    ...resolveVersionFields(versions)
+  }))
 }
 
 const INSERT_MAX_CHUNK_SIZE = 1000
 
 export async function setAdministrativeAreasInTrx(
   trx: Kysely<Schema>,
-  administrativeAreas: AdministrativeArea[]
+  administrativeAreas: SetAdministrativeAreaPayload[]
 ) {
   for (const [index, batch] of chunk(
     administrativeAreas,
@@ -68,7 +68,6 @@ export async function setAdministrativeAreasInTrx(
           id: aa.id,
           name: aa.name,
           parentId: aa.parentId,
-          validUntil: aa.validUntil,
           deletedAt: null,
           externalId: aa.externalId,
           versions: buildInitialVersions(aa)
@@ -84,12 +83,6 @@ export async function setAdministrativeAreasInTrx(
            END`,
           parentId: (eb) => eb.ref('excluded.parentId'),
           updatedAt: () => sql`now()`,
-          validUntil: () =>
-            sql`CASE
-             WHEN excluded.valid_until IS NOT NULL
-             THEN excluded.valid_until
-             ELSE administrative_areas.valid_until
-           END`,
           externalId: () =>
             sql`CASE
              WHEN excluded.external_id IS NOT NULL
@@ -104,7 +97,7 @@ export async function setAdministrativeAreasInTrx(
 }
 
 export async function setAdministrativeAreas(
-  administrativeAreas: AdministrativeArea[]
+  administrativeAreas: SetAdministrativeAreaPayload[]
 ) {
   const db = getClient()
   await setAdministrativeAreasInTrx(db, administrativeAreas)

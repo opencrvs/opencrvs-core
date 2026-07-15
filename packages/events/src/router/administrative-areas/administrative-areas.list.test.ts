@@ -9,12 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  AdministrativeArea,
+  SetAdministrativeAreaPayload,
   createPrng,
   generateUuid,
   encodeScope
 } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { getClient } from '@events/storage/postgres/events'
 
 const scope = encodeScope({ type: 'user.data-seeding' })
 
@@ -24,12 +25,11 @@ test('Returns new administrative area after it has been added', async () => {
 
   const initialAdministrativeAreas = await client.administrativeAreas.list()
 
-  const setAdministrativeAreaPayload: AdministrativeArea[] = [
+  const setAdministrativeAreaPayload: SetAdministrativeAreaPayload[] = [
     {
       id: generateUuid(() => 0.1235),
       parentId: null,
       name: 'New Administrative Area',
-      validUntil: null,
       externalId: generateUuid(() => 0.1231)
     }
   ]
@@ -40,9 +40,10 @@ test('Returns new administrative area after it has been added', async () => {
   expect(administrativeAreas).toHaveLength(
     initialAdministrativeAreas.length + 1
   )
-  expect(administrativeAreas).toMatchObject(
-    initialAdministrativeAreas.concat(setAdministrativeAreaPayload)
-  )
+  expect(administrativeAreas).toMatchObject([
+    ...initialAdministrativeAreas,
+    ...setAdministrativeAreaPayload
+  ])
 })
 
 test('Returns multiple administrative areas', async () => {
@@ -88,17 +89,14 @@ test('Filters administrative areas by active status', async () => {
   expect(initialAdministrativeAreas.length).toBe(5)
 
   const administrativeAreaIdToUpdate = initialAdministrativeAreas[0].id
-  const setAdministrativeAreaPayload: AdministrativeArea[] = [
-    {
-      id: administrativeAreaIdToUpdate,
-      parentId: null,
-      name: 'not valid Administrative Area',
-      validUntil: new Date('2000-01-01T00:00:00Z').toISOString(),
-      externalId: generateUuid(() => 0.1231)
-    }
-  ]
 
-  await client.administrativeAreas.set(setAdministrativeAreaPayload)
+  // The `set` mutation no longer accepts validUntil, so mark the row
+  // inactive directly in the database to exercise the isActive filter.
+  await getClient()
+    .updateTable('administrativeAreas')
+    .set({ validUntil: new Date('2000-01-01T00:00:00Z').toISOString() })
+    .where('id', '=', administrativeAreaIdToUpdate)
+    .execute()
 
   const administrativeAreas = await client.administrativeAreas.list({
     isActive: true

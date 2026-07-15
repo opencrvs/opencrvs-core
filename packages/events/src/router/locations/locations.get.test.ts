@@ -11,7 +11,7 @@
 import {
   createPrng,
   generateUuid,
-  Location,
+  SetLocationPayload,
   encodeScope
 } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
@@ -22,11 +22,10 @@ test('Returns a single location by id', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [scope])
 
-  const location: Location = {
+  const location: SetLocationPayload = {
     id: generateUuid(),
     administrativeAreaId: null,
     name: 'Test location',
-    validUntil: null,
     locationType: 'CRVS_OFFICE'
   }
 
@@ -40,18 +39,16 @@ test('Returns the correct location when multiple exist', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [scope])
 
-  const locationA: Location = {
+  const locationA: SetLocationPayload = {
     id: generateUuid(createPrng(1)),
     administrativeAreaId: null,
     name: 'Location A',
-    validUntil: null,
     locationType: 'CRVS_OFFICE'
   }
-  const locationB: Location = {
+  const locationB: SetLocationPayload = {
     id: generateUuid(createPrng(2)),
     administrativeAreaId: null,
     name: 'Location B',
-    validUntil: null,
     locationType: 'CRVS_OFFICE'
   }
 
@@ -74,11 +71,10 @@ test('Is accessible without elevated scopes', async () => {
   const seeder = createTestClient(user, [scope])
   const reader = createTestClient(user, [])
 
-  const location: Location = {
+  const location: SetLocationPayload = {
     id: generateUuid(),
     administrativeAreaId: null,
     name: 'Test location',
-    validUntil: null,
     locationType: 'CRVS_OFFICE'
   }
 
