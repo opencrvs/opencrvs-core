@@ -16026,7 +16026,6 @@ components:
         - declaration
         - status
         - type
-        - content
       additionalProperties: false
     CustomAction:
       type: object
