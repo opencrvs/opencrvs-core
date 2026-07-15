@@ -14,7 +14,12 @@ import {
   generateUuid,
   encodeScope
 } from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createTestClient,
+  setupTestCase,
+  UUID_REGEX
+} from '@events/tests/utils'
+import { getClient } from '@events/storage/postgres/events'
 
 const scope = encodeScope({ type: 'user.data-seeding' })
 
@@ -136,6 +141,82 @@ test('updates externalId on existing administrative area when re-seeded with a v
   const updated = areas.find((a) => a.id === areaId)
 
   expect(updated?.externalId).toBe('adminpcode123')
+})
+
+test('stores a single active initial version when creating an administrative area', async () => {
+  const { user } = await setupTestCase()
+  const dataSeedingClient = createTestClient(user, [scope])
+
+  const areaId = generateUuid()
+
+  await dataSeedingClient.administrativeAreas.set([
+    {
+      id: areaId,
+      parentId: null,
+      name: 'Versioned administrative area',
+      validUntil: null,
+      externalId: 'versioned-area-pcode'
+    }
+  ])
+
+  const { versions } = await getClient()
+    .selectFrom('administrativeAreas')
+    .select('versions')
+    .where('id', '=', areaId)
+    .executeTakeFirstOrThrow()
+
+  // toEqual matches keys exactly, so this also asserts the version element
+  // contains no parent reference (parentId).
+  expect(versions).toEqual([
+    {
+      versionId: expect.stringMatching(UUID_REGEX),
+      effectiveFrom: '0001-01-01',
+      name: 'Versioned administrative area',
+      externalId: 'versioned-area-pcode',
+      status: 'active'
+    }
+  ])
+})
+
+test('stores an additional inactive version when creating an administrative area with validUntil', async () => {
+  const { user } = await setupTestCase()
+  const dataSeedingClient = createTestClient(user, [scope])
+
+  const areaId = generateUuid()
+
+  await dataSeedingClient.administrativeAreas.set([
+    {
+      id: areaId,
+      parentId: null,
+      name: 'Deprecated administrative area',
+      validUntil: '2027-03-15T23:30:00.000Z',
+      externalId: 'deprecated-area-pcode'
+    }
+  ])
+
+  const { versions } = await getClient()
+    .selectFrom('administrativeAreas')
+    .select('versions')
+    .where('id', '=', areaId)
+    .executeTakeFirstOrThrow()
+
+  expect(versions).toEqual([
+    {
+      versionId: expect.stringMatching(UUID_REGEX),
+      effectiveFrom: '0001-01-01',
+      name: 'Deprecated administrative area',
+      externalId: 'deprecated-area-pcode',
+      status: 'active'
+    },
+    {
+      versionId: expect.stringMatching(UUID_REGEX),
+      // UTC date part of the given validUntil
+      effectiveFrom: '2027-03-15',
+      name: 'Deprecated administrative area',
+      externalId: 'deprecated-area-pcode',
+      status: 'inactive'
+    }
+  ])
 })
 
 test('seeding administrative areas is additive, not destructive', async () => {
