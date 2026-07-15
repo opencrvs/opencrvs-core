@@ -21,8 +21,7 @@ import {
   ArchiveActionInput,
   MarkAsDuplicateActionInput,
   ActionStatus,
-  ValidatorContext,
-  EditActionInput
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
 
@@ -41,10 +40,6 @@ export interface CustomMutationParams {
    * another action's dialog metadata.
    */
   targetActionAnnotation?: ActionUpdate
-}
-
-export interface EditRequestParams extends CustomMutationParams {
-  content: EditActionInput['content']
 }
 
 export interface CorrectionRequestParams extends CustomMutationParams {
@@ -115,16 +110,14 @@ export async function editAndRegister({
   transactionId,
   annotation,
   targetActionAnnotation,
-  content,
   eventConfiguration
-}: EditRequestParams) {
+}: CustomMutationParams) {
   const editedEvent = await trpcClient.event.actions.edit.request.mutate({
     declaration,
     annotation,
     eventId,
     transactionId,
-    keepAssignmentIfAccepted: true,
-    content
+    keepAssignmentIfAccepted: true
   })
 
   if (wasRejected(editedEvent, ActionType.EDIT)) {
@@ -159,16 +152,14 @@ export async function editAndDeclare({
   declaration,
   transactionId,
   annotation,
-  targetActionAnnotation,
-  content
-}: EditRequestParams) {
+  targetActionAnnotation
+}: CustomMutationParams) {
   const editedEvent = await trpcClient.event.actions.edit.request.mutate({
     declaration,
     annotation,
     eventId,
     transactionId,
-    keepAssignmentIfAccepted: true,
-    content
+    keepAssignmentIfAccepted: true
   })
 
   if (wasRejected(editedEvent, ActionType.EDIT)) {
@@ -188,16 +179,14 @@ export async function editAndNotify({
   declaration,
   transactionId,
   annotation,
-  targetActionAnnotation,
-  content
-}: EditRequestParams) {
+  targetActionAnnotation
+}: CustomMutationParams) {
   const editedEvent = await trpcClient.event.actions.edit.request.mutate({
     declaration,
     annotation,
     eventId,
     transactionId,
-    keepAssignmentIfAccepted: true,
-    content
+    keepAssignmentIfAccepted: true
   })
 
   if (wasRejected(editedEvent, ActionType.EDIT)) {

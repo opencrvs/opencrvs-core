@@ -299,9 +299,9 @@ const customMutationKeys = {
 
 interface CustomMutationTypes {
   registerOnDeclare: customApi.CustomMutationParams
-  editAndRegister: customApi.EditRequestParams
-  editAndDeclare: customApi.EditRequestParams
-  editAndNotify: customApi.EditRequestParams
+  editAndRegister: customApi.CustomMutationParams
+  editAndDeclare: customApi.CustomMutationParams
+  editAndNotify: customApi.CustomMutationParams
   archiveOnDuplicate: customApi.ArchiveOnDuplicateParams
   makeCorrectionOnRequest: customApi.CorrectionRequestParams
 }
