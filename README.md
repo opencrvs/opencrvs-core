@@ -15,7 +15,6 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 - [OpenCRVS](#opencrvs)
-- [Quickstart](#quickstart)
 - [Important! Please read](#important-please-read)
 - [Become part of the OpenCRVS Community](#become-part-of-the-opencrvs-community)
 - [License](#license)
@@ -29,22 +28,6 @@
 > **We are on a mission to ensure that every individual on the planet is recognised, protected and provided for from birth.**
 
 <br>
-
-## Quickstart
-
-OpenCRVS boots from this single repository, including the bundled `testland` reference
-country configuration (served on port 3040 — the gateway consumes it automatically).
-
-```
-git clone https://github.com/opencrvs/opencrvs-core && cd opencrvs-core
-yarn install
-yarn dev          # full stack incl. testland on 3040
-yarn seed:dev     # once, after startup
-```
-
-To run against an external country-configuration checkout instead of the bundled
-testland (two-terminal workflow), start the stack with `yarn dev --no-testland` and run
-your country-config server separately.
 
 ## Important! Please read
 
