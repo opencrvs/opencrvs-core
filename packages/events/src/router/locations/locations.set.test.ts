@@ -14,7 +14,12 @@ import {
   Location,
   encodeScope
 } from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createTestClient,
+  setupTestCase,
+  UUID_REGEX
+} from '@events/tests/utils'
+import { getClient } from '@events/storage/postgres/events'
 
 const scope = encodeScope({ type: 'user.data-seeding' })
 
@@ -130,6 +135,133 @@ test('updates externalId on existing location when re-seeded with a value', asyn
   const updated = locations.find((l) => l.id === locationId)
 
   expect(updated?.externalId).toBe('pcode123')
+})
+
+test('stores a single active initial version when creating a location', async () => {
+  const { user } = await setupTestCase()
+  const dataSeedingClient = createTestClient(user, [scope])
+
+  const locationId = generateUuid()
+
+  await dataSeedingClient.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Versioned location',
+      validUntil: null,
+      locationType: 'CRVS_OFFICE',
+      externalId: 'versioned-location-pcode'
+    }
+  ])
+
+  const { versions } = await getClient()
+    .selectFrom('locations')
+    .select('versions')
+    .where('id', '=', locationId)
+    .executeTakeFirstOrThrow()
+
+  // toEqual matches keys exactly, so this also asserts the version element
+  // contains no parent reference (administrativeAreaId).
+  expect(versions).toEqual([
+    {
+      versionId: expect.stringMatching(UUID_REGEX),
+      effectiveFrom: '0001-01-01',
+      name: 'Versioned location',
+      externalId: 'versioned-location-pcode',
+      status: 'active'
+    }
+  ])
+})
+
+test('stores an additional inactive version when creating a location with validUntil', async () => {
+  const { user } = await setupTestCase()
+  const dataSeedingClient = createTestClient(user, [scope])
+
+  const locationId = generateUuid()
+
+  await dataSeedingClient.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Deprecated location',
+      validUntil: '2027-03-15T23:30:00.000Z',
+      locationType: 'CRVS_OFFICE',
+      externalId: 'deprecated-location-pcode'
+    }
+  ])
+
+  const { versions } = await getClient()
+    .selectFrom('locations')
+    .select('versions')
+    .where('id', '=', locationId)
+    .executeTakeFirstOrThrow()
+
+  expect(versions).toEqual([
+    {
+      versionId: expect.stringMatching(UUID_REGEX),
+      effectiveFrom: '0001-01-01',
+      name: 'Deprecated location',
+      externalId: 'deprecated-location-pcode',
+      status: 'active'
+    },
+    {
+      versionId: expect.stringMatching(UUID_REGEX),
+      // UTC date part of the given validUntil
+      effectiveFrom: '2027-03-15',
+      name: 'Deprecated location',
+      externalId: 'deprecated-location-pcode',
+      status: 'inactive'
+    }
+  ])
+})
+
+test('does not modify versions when re-seeding an existing location with a new name', async () => {
+  const { user } = await setupTestCase()
+  const dataSeedingClient = createTestClient(user, [scope])
+
+  const locationId = generateUuid()
+
+  await dataSeedingClient.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Original name',
+      validUntil: null,
+      locationType: 'CRVS_OFFICE',
+      externalId: 'renamed-location-pcode'
+    }
+  ])
+
+  const { versions: versionsAfterInsert } = await getClient()
+    .selectFrom('locations')
+    .select('versions')
+    .where('id', '=', locationId)
+    .executeTakeFirstOrThrow()
+
+  await dataSeedingClient.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Renamed location',
+      validUntil: null,
+      locationType: 'CRVS_OFFICE',
+      externalId: 'renamed-location-pcode'
+    }
+  ])
+
+  const updated = await getClient()
+    .selectFrom('locations')
+    .select(['name', 'versions'])
+    .where('id', '=', locationId)
+    .executeTakeFirstOrThrow()
+
+  // The flat column updates, but re-seeding deliberately leaves versions
+  // untouched: still the original single element with the original name.
+  expect(updated.name).toBe('Renamed location')
+  expect(updated.versions).toEqual(versionsAfterInsert)
+  expect(updated.versions).toEqual([
+    expect.objectContaining({ name: 'Original name', status: 'active' })
+  ])
 })
 
 test('seeding locations is additive, not destructive', async () => {

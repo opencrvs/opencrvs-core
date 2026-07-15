@@ -58,6 +58,9 @@ import {
   setupHierarchyWithUsers
 } from './generators'
 
+export const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export const TEST_SYSTEM_ID = '9f3c6b7e-2a91-4f6d-b8d2-5c0e3a4f1b72' as UUID
 export const TEST_SYSTEM_ID_2 = '4d1a8c90-7e5b-4a3f-9c2d-1f6b8e7a2c55' as UUID
 export const REINDEX_SYSTEM_ID = 'e2b7f6a1-3d94-4c8e-a5f9-6b2d0c1a9e33' as UUID
