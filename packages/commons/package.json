@@ -52,7 +52,9 @@
       "clean": "if-file-deleted",
       "files": [
         "src/**/*.test.ts",
+        "test/setupJest.ts",
         "tsconfig-commonjs.json",
+        "tsconfig-tests.json",
         "tsconfig.json"
       ],
       "output": [
