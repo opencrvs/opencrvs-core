@@ -21,6 +21,9 @@
  * resolve the root `typescript` again. Runs from the root `postinstall`.
  */
 
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable no-console */
 const fs = require('fs')
 const path = require('path')
 
