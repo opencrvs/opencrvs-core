@@ -18,12 +18,31 @@ import {
 } from '@opencrvs/commons/client'
 import { buildEventIndexWithHierarchy } from './utils'
 
+function mockVersionFields(id: UUID, name: string) {
+  return {
+    status: 'active' as const,
+    effectiveFrom: '0001-01-01',
+    versions: [
+      {
+        versionId: id,
+        effectiveFrom: '0001-01-01',
+        name,
+        externalId: null,
+        status: 'active' as const
+      }
+    ]
+  }
+}
+
 const province: AdministrativeArea = {
   id: 'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa' as UUID,
   name: 'Province',
   externalId: null,
   parentId: null,
-  validUntil: null
+  ...mockVersionFields(
+    'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa' as UUID,
+    'Province'
+  )
 }
 
 const district: AdministrativeArea = {
@@ -31,7 +50,10 @@ const district: AdministrativeArea = {
   name: 'District',
   externalId: null,
   parentId: province.id,
-  validUntil: null
+  ...mockVersionFields(
+    'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb' as UUID,
+    'District'
+  )
 }
 
 const office: Location = {
@@ -39,8 +61,11 @@ const office: Location = {
   name: 'District Office',
   externalId: null,
   administrativeAreaId: district.id,
-  validUntil: null,
-  locationType: 'CRVS_OFFICE'
+  locationType: 'CRVS_OFFICE',
+  ...mockVersionFields(
+    'cccccccc-cccc-4ccc-cccc-cccccccccccc' as UUID,
+    'District Office'
+  )
 }
 
 const officeWithoutArea: Location = {
@@ -48,8 +73,11 @@ const officeWithoutArea: Location = {
   name: 'Standalone Office',
   externalId: null,
   administrativeAreaId: null,
-  validUntil: null,
-  locationType: 'CRVS_OFFICE'
+  locationType: 'CRVS_OFFICE',
+  ...mockVersionFields(
+    'dddddddd-dddd-4ddd-dddd-dddddddddddd' as UUID,
+    'Standalone Office'
+  )
 }
 
 function buildMaps() {

@@ -244,7 +244,17 @@ describe('isLocationUnderJurisdiction', () => {
       name: 'Root Office',
       locationType: 'CRVS_OFFICE',
       administrativeAreaId: null,
-      validUntil: null
+      status: 'active' as const,
+      effectiveFrom: '0001-01-01',
+      versions: [
+        {
+          versionId: rootLocationId,
+          effectiveFrom: '0001-01-01',
+          name: 'Root Office',
+          externalId: null,
+          status: 'active' as const
+        }
+      ]
     })
 
     expect(
@@ -272,7 +282,17 @@ describe('isLocationUnderJurisdiction', () => {
       name: 'Floating Office',
       locationType: 'CRVS_OFFICE',
       administrativeAreaId: null,
-      validUntil: null
+      status: 'active' as const,
+      effectiveFrom: '0001-01-01',
+      versions: [
+        {
+          versionId: otherLocationId,
+          effectiveFrom: '0001-01-01',
+          name: 'Floating Office',
+          externalId: null,
+          status: 'active' as const
+        }
+      ]
     })
 
     expect(
