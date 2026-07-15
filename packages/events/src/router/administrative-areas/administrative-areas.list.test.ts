@@ -81,6 +81,52 @@ test('Filters administrative areas by ids', async () => {
   expect(administrativeAreas[0].id).toBe(id)
 })
 
+test('Returns the full versions array and resolves flat fields from the current version', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const areaId = generateUuid()
+
+  await client.administrativeAreas.set([
+    {
+      id: areaId,
+      parentId: null,
+      name: 'Old District',
+      externalId: 'renamed-district-pcode'
+    }
+  ])
+
+  // A past-dated rename: this version is in effect today.
+  await getClient()
+    .updateTable('administrativeAreas')
+    .set({
+      versions: sql`versions || ${JSON.stringify([
+        {
+          versionId: generateUuid(() => 0.5678),
+          effectiveFrom: '2010-06-30',
+          name: 'New District',
+          externalId: 'renamed-district-pcode',
+          status: 'active'
+        }
+      ])}::jsonb`
+    })
+    .where('id', '=', areaId)
+    .execute()
+
+  const areas = await client.administrativeAreas.list()
+  const area = areas.find((a) => a.id === areaId)
+
+  expect(area).toMatchObject({
+    name: 'New District',
+    status: 'active',
+    effectiveFrom: '2010-06-30'
+  })
+  expect(area?.versions.map((v) => v.name)).toEqual([
+    'Old District',
+    'New District'
+  ])
+})
+
 test('Filters administrative areas by active status', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [scope])
