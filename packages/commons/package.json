@@ -22,48 +22,11 @@
     "start": "pnpm build:watch",
     "test": "pnpm test:compilation && jest --coverage",
     "test:watch": "jest --watch",
-    "test:compilation": "wireit",
+    "test:compilation": "tsc -b --pretty",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
-    "postinstall": "pnpm build",
-    "build": "wireit",
-    "build:watch": "pnpm build --watch",
-    "build:clean": "rm -rf build && rm -rf ./.wireit"
-  },
-  "wireit": {
-    "build": {
-      "command": "pnpm tsc -b tsconfig.build.json --pretty",
-      "clean": "if-file-deleted",
-      "files": [
-        "src/**/*.ts",
-        "!src/**/*.test.ts",
-        "tsconfig-esm.json",
-        "tsconfig-commonjs.json",
-        "tsconfig.build.json"
-      ],
-      "output": [
-        "build/dist/common/**",
-        "build/dist/tsconfig-commonjs.tsbuildinfo",
-        "build/dist/esm/**",
-        "build/dist/tsconfig-esm.tsbuildinfo"
-      ]
-    },
-    "test:compilation": {
-      "command": "pnpm tsc -b --pretty",
-      "clean": "if-file-deleted",
-      "files": [
-        "src/**/*.test.ts",
-        "test/setupJest.ts",
-        "tsconfig-commonjs.json",
-        "tsconfig-tests.json",
-        "tsconfig.json"
-      ],
-      "output": [
-        "build/dist/common/**",
-        "build/dist/tsconfig-commonjs.tsbuildinfo",
-        "build/dist/tests/**",
-        "build/dist/tsconfig-tests.tsbuildinfo"
-      ]
-    }
+    "build": "rm -rf build && tsc -b tsconfig.build.json --pretty",
+    "build:watch": "tsc -b tsconfig.build.json --pretty --watch",
+    "build:clean": "rm -rf build"
   },
   "private": true,
   "dependencies": {
@@ -94,7 +57,6 @@
     "pkg-up": "^3.1.0",
     "qs": "6.15.2",
     "uuid": "^9.0.0",
-    "wireit": "^0.14.12",
     "yaml": "^2.7.1",
     "zod": "^4.2.1",
     "zod-openapi": "^5.4.6"

@@ -1,0 +1,46 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "useDaemonProcess": false,
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "production": [
+      "default",
+      "!{projectRoot}/**/*.test.ts",
+      "!{projectRoot}/**/*.test.tsx",
+      "!{projectRoot}/src/tests/**",
+      "!{projectRoot}/**/__mocks__/**",
+      "!{projectRoot}/**/__snapshots__/**"
+    ],
+    "sharedGlobals": [
+      "{workspaceRoot}/pnpm-lock.yaml",
+      "{workspaceRoot}/pnpm-workspace.yaml",
+      "{workspaceRoot}/patches/**"
+    ]
+  },
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["^build"],
+      "cache": true,
+      "inputs": ["production", "^production"],
+      "outputs": [
+        "{projectRoot}/build",
+        "{projectRoot}/lib",
+        "{projectRoot}/dist"
+      ]
+    },
+    "build:types": {
+      "dependsOn": ["^build"],
+      "cache": true,
+      "inputs": ["production", "^production"],
+      "outputs": ["{projectRoot}/build/types"]
+    },
+    "test:compilation": {
+      "dependsOn": ["^build"],
+      "cache": true,
+      "inputs": ["default", "^production"]
+    },
+    "test": {
+      "dependsOn": ["^build"]
+    }
+  }
+}
