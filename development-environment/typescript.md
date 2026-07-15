@@ -1,8 +1,7 @@
 # TypeScript toolchain
 
 The workspace `typescript` dependency is **TypeScript 7** (native compiler).
-Everything that typechecks or emits — package `build` scripts, `test:compilation`,
-`yarn typecheck` — runs through the native `tsc`.
+Everything that typechecks or emits — package `build` scripts, `test:compilation`.
 
 TypeScript 7.0 ships **no programmatic API** (it arrives in 7.1), so anything that
 `import`s or `require`s the TypeScript API stays on **TypeScript 6**, installed as the
