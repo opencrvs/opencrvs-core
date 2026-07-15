@@ -21,7 +21,7 @@
     "noUnusedLocals": true,
     "types": ["jest"]
   },
-  "include": ["resources/**/*.ts", "src/**/*.ts", "typings"],
+  "include": ["resources/**/*.ts", "src/**/*.ts", "typings", "test/setupJest.ts"],
   "exclude": [
     "node_modules",
     "build",
