@@ -81,12 +81,9 @@ spec:
             - -R
             - "1000:0"
             - /usr/share/elasticsearch/data
-            - /data/backups/elasticsearch
           volumeMounts:
             - name: elasticsearch
               mountPath: /usr/share/elasticsearch/data
-            - mountPath: /data/backups/elasticsearch
-              name: elasticsearch-backup
       containers:
         - env:
             # FIXME: Make fields configurable
@@ -96,8 +93,6 @@ spec:
               value: 'false'
             - name: discovery.type
               value: single-node
-            - name: path.repo
-              value: /data/backups/elasticsearch
           {{- if not .Values.elasticsearch.use_default_credentials }}
             - name: ELASTIC_PASSWORD
               valueFrom:
@@ -124,12 +119,8 @@ spec:
           volumeMounts:
             - mountPath: /usr/share/elasticsearch/data
               name: elasticsearch
-            - mountPath: /data/backups/elasticsearch
-              name: elasticsearch-backup
       restartPolicy: Always
       volumes:
-        - name: elasticsearch-backup
-          emptyDir: {}
         - name: elasticsearch
       {{- if eq $storageType "pvc" }}
           persistentVolumeClaim:
