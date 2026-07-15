@@ -1,28 +1,17 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
-    "paths": {
-      "@migration/*": ["./*"]
-    },
     "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "module": "node16",
     "moduleResolution": "node16",
     "target": "esnext",
-    "module": "node16",
     "esModuleInterop": true,
-    "rootDir": ".",
-    "outDir": "build/dist",
     "strict": true,
     "skipLibCheck": true,
-    "lib": ["esnext.asynciterable", "es6", "es2017", "dom"],
     "forceConsistentCasingInFileNames": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "noUnusedLocals": true,
-    "types": [],
     "resolveJsonModule": true
   },
-  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.json"],
+  "include": ["src/**/*.js"],
   "exclude": ["**/node_modules/**"]
 }

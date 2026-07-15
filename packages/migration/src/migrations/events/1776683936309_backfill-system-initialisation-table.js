@@ -14,13 +14,14 @@ const { genSaltSync, hashSync } = bcryptPkg
 
 const SUPER_USER_PASSWORD = process.env.SUPER_USER_PASSWORD ?? 'password'
 
+/** @param {import('node-pg-migrate').MigrationBuilder} pgm */
 export async function up(pgm) {
   const { rowCount } = await pgm.db.query('SELECT 1 FROM users LIMIT 1')
 
-  const isSystemInitialised = rowCount > 0
+  const isSystemInitialised = (rowCount ?? 0) > 0
   // If system is initialised, we do not persist the super user password hash and salt, as they will not be needed.
   const salt = isSystemInitialised ? null : genSaltSync(10)
-  const hash = isSystemInitialised ? null : hashSync(SUPER_USER_PASSWORD, salt)
+  const hash = salt === null ? null : hashSync(SUPER_USER_PASSWORD, salt)
   const completedAt = isSystemInitialised ? new Date() : null
 
   await pgm.db.query(
@@ -29,6 +30,7 @@ export async function up(pgm) {
   )
 }
 
+/** @param {import('node-pg-migrate').MigrationBuilder} pgm */
 export async function down(pgm) {
   // There should be only one record in the system_initialisation table, but we will delete by id to be safe.
   await pgm.db.query('DELETE FROM system_initialisation WHERE id = 1')

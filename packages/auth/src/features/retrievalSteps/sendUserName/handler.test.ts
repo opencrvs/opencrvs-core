@@ -20,6 +20,7 @@ const fetch = fetchAny as fetchAny.FetchMock
 jest.mock('@opencrvs/commons', () => {
   const actual = jest.requireActual('@opencrvs/commons')
   return {
+    __esModule: true,
     ...actual,
     triggerUserEventNotification: jest.fn()
   }
@@ -28,6 +29,7 @@ jest.mock('@opencrvs/commons', () => {
 jest.mock('@auth/features/authenticate/service', () => {
   const actual = jest.requireActual('@auth/features/authenticate/service')
   return {
+    __esModule: true,
     ...actual,
     recordUserAuditEvent: jest.fn().mockResolvedValue(undefined)
   }

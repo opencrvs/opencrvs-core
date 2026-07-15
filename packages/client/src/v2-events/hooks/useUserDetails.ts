@@ -14,7 +14,6 @@ import { ActionType, TokenUserType } from '@opencrvs/commons/client'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { formatUserRole } from '@client/v2-events/hooks/useRoles'
-import { DECLARATION_ACTION_UPDATE } from '../features/events/actions/correct/useActionForHistory'
 
 const messages = defineMessages({
   systemDefaultName: {
@@ -43,7 +42,7 @@ export function useUserDetails() {
   }: {
     createdByUserType: TokenUserType
     createdBy: string
-    type: ActionType | DECLARATION_ACTION_UPDATE
+    type: ActionType
     createdByRole?: string
   }): {
     type: 'user' | 'system' | 'integration'

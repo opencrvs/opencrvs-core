@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "baseUrl": "src",
     "lib": ["dom", "dom.iterable", "WebWorker", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -18,7 +17,7 @@
     "noFallthroughCasesInSwitch": true,
     "types": ["vitest/globals"],
     "paths": {
-      "@client/*": ["./*"]
+      "@client/*": ["./src/*"]
     }
   },
   "include": [

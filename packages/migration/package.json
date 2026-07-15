@@ -6,64 +6,37 @@
   "type": "module",
   "license": "MPL-2.0",
   "scripts": {
-    "start": "yarn build && ./run-migrations.sh",
+    "start": "./run-migrations.sh",
     "revert": "./revert-migrations.sh",
     "rollback:events": "DATABASE_URL=postgres://events_migrator:migrator_password@localhost:5432/events node-pg-migrate down --schema=app --migrations-dir=./src/migrations/events",
     "migrate:events": "DATABASE_URL=postgres://events_migrator:migrator_password@localhost:5432/events node-pg-migrate up --schema=app --migrations-dir=./src/migrations/events",
     "start:prod": "NODE_ENV=production ./run-migrations.sh",
     "create:events": "DATABASE_URL=postgres://events_migrator:migrator_password@localhost:5432/events yarn node-pg-migrate create --migrations-dir=./src/migrations/events --migration-file-language=sql",
-    "create:migrate-legacy-data": "DATABASE_URL=postgres://postgres:postgres@localhost:5432/events yarn node-pg-migrate create --migrations-dir=./src/migrations/migrate-legacy-data --migration-file-language=sql --migrations-table=pgmigrations_legacy_data",
-    "create:performance": "./create-mongo-migrations.sh performance",
-    "status:events": "migrate-mongo status -f ./src/migrate-mongo-config-events.js",
     "lint": "eslint -c eslint.config.cjs --max-warnings=0",
     "test:compilation": "tsc --noEmit",
-    "test": "yarn test:compilation",
-    "build": "rimraf build && tsc --noCheck"
+    "test": "yarn test:compilation"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "^8.17.0",
-    "@opencrvs/commons": "^2.0.0",
-    "@types/bcryptjs": "^2.4.2",
-    "@types/lodash-es": "^4.17.0",
-    "@types/uuid": "^3.4.3",
     "bcryptjs": "^2.4.3",
-    "date-fns": "^2.28.0",
-    "file-type": "^16.5.3",
-    "is-svg": "^4.3.2",
-    "lodash-es": "^4.18.1",
-    "migrate-mongo": "^12.0.0",
-    "minio": "^7.0.33",
-    "mongoose": "^6.13.6",
     "node-pg-migrate": "^8.0.3",
-    "pg": "^8.16.0",
-    "tsx": "^4.15.7",
-    "uuid": "^3.2.1"
+    "pg": "^8.16.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
     "@types/pg": "^8.15.1",
-    "@typescript-eslint/eslint-plugin": "^8.28.0",
-    "@typescript-eslint/parser": "^8.28.0",
+    "@typescript-eslint/eslint-plugin": "8.63.0",
+    "@typescript-eslint/parser": "8.63.0",
     "eslint": "^9.23.0",
     "eslint-config-prettier": "^10.1.1",
-    "eslint-import-resolver-typescript": "^4.2.5",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.5",
-    "mongodb": "^4.17.1",
     "prettier": "3.5.3",
-    "rimraf": "^5.0.0",
-    "typescript": "5.6.3"
+    "typescript": "6.0.3"
   },
   "lint-staged": {
-    "src/**/*.ts": [
+    "src/**/*.js": [
       "prettier --write"
     ]
-  },
-  "modulePaths": [
-    "<rootDir>"
-  ],
-  "moduleNameMapper": {
-    "@migration/(.*)": "<rootDir>/src/$1",
-    "@opencrvs/commons/(.*)": "@opencrvs/commons/build/dist/$1"
   },
   "keywords": [
     "migration",
