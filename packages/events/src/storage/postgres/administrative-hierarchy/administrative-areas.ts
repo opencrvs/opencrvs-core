@@ -34,18 +34,20 @@ export async function getAdministrativeAreas({
     query = query.where('id', 'in', ids)
   }
 
-  if (isActive) {
-    query = query.where((eb) =>
-      eb.or([eb('validUntil', 'is', null), eb('validUntil', '>', 'now()')])
-    )
-  }
-
   const rows = await query.execute()
 
-  return rows.map(({ versions, ...row }) => ({
+  const administrativeAreas = rows.map(({ versions, ...row }) => ({
     ...row,
     ...resolveVersionFields(versions)
   }))
+
+  // Active status is resolved from the versions array (the version in effect
+  // today), so the filter runs after row mapping rather than in SQL.
+  if (isActive) {
+    return administrativeAreas.filter((area) => area.status === 'active')
+  }
+
+  return administrativeAreas
 }
 
 const INSERT_MAX_CHUNK_SIZE = 1000

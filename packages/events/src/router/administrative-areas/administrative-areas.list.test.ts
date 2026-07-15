@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { sql } from 'kysely'
 import {
   SetAdministrativeAreaPayload,
   createPrng,
@@ -90,11 +91,21 @@ test('Filters administrative areas by active status', async () => {
 
   const administrativeAreaIdToUpdate = initialAdministrativeAreas[0].id
 
-  // The `set` mutation no longer accepts validUntil, so mark the row
-  // inactive directly in the database to exercise the isActive filter.
+  // Inactivation is expressed as a version element with status 'inactive',
+  // appended here directly in the database.
+  const inactiveVersion = JSON.stringify([
+    {
+      versionId: generateUuid(() => 0.4321),
+      effectiveFrom: '2000-01-01',
+      name: 'Inactivated area',
+      externalId: null,
+      status: 'inactive'
+    }
+  ])
+
   await getClient()
     .updateTable('administrativeAreas')
-    .set({ validUntil: new Date('2000-01-01T00:00:00Z').toISOString() })
+    .set({ versions: sql`versions || ${inactiveVersion}::jsonb` })
     .where('id', '=', administrativeAreaIdToUpdate)
     .execute()
 

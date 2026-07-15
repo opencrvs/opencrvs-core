@@ -162,18 +162,20 @@ export async function getLocations({
     query = query.where('id', 'in', locationIds)
   }
 
-  if (isActive) {
-    query = query.where((eb) =>
-      eb.or([eb('validUntil', 'is', null), eb('validUntil', '>', 'now()')])
-    )
-  }
-
   const rows = await query.execute()
 
-  return rows.map(({ versions, ...row }) => ({
+  const locations = rows.map(({ versions, ...row }) => ({
     ...row,
     ...resolveVersionFields(versions)
   }))
+
+  // Active status is resolved from the versions array (the version in effect
+  // today), so the filter runs after row mapping rather than in SQL.
+  if (isActive) {
+    return locations.filter((location) => location.status === 'active')
+  }
+
+  return locations
 }
 
 export async function locationExists(locationId: UUID) {
