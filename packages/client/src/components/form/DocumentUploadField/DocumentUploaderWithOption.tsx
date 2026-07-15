@@ -23,6 +23,7 @@ import { formMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/imageUpload'
 import imageCompression from 'browser-image-compression'
 import { bytesToMB } from '@client/utils/imageUtils'
+import { setLockBypass } from '@client/utils/lockBypass'
 
 const DEFAULT_MAX_SIZE_MB = 5
 
@@ -296,7 +297,13 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
         <FullWidthImageUploader
           id="upload_document"
           name={props.name}
-          onClick={(e) => !isValid() && e.preventDefault()}
+          onClick={(e) => {
+            if (!isValid()) {
+              e.preventDefault()
+              return
+            }
+            setLockBypass()
+          }}
           onChange={handleFileChange}
           disabled={filesBeingProcessed.length > 0}
         >
@@ -317,7 +324,13 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
           <DocumentUploadButton
             id="upload_document"
             name={props.name}
-            onClick={(e) => !isValid() && e.preventDefault()}
+            onClick={(e) => {
+              if (!isValid()) {
+                e.preventDefault()
+                return
+              }
+              setLockBypass()
+            }}
             onChange={handleFileChange}
             disabled={filesBeingProcessed.length > 0}
           >

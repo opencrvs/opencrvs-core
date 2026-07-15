@@ -15,6 +15,7 @@ import { MimeType, FieldValue, FileFieldValue } from '@opencrvs/commons/client'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { ImageUploader } from '@opencrvs/components/lib/ImageUploader'
 import { formMessages as messages } from '@client/i18n/messages'
+import { setLockBypass } from '@client/utils/lockBypass'
 import { DocumentPreview } from './DocumentPreview'
 import { SingleDocumentPreview } from './SingleDocumentPreview'
 import { useOnFileChange } from './useOnFileChange'
@@ -133,6 +134,7 @@ export function SimpleDocumentUploader({
         id={name}
         name={name}
         onChange={handleFileChange}
+        onClick={setLockBypass}
       >
         {intl.formatMessage(messages.uploadFile)}
       </DocumentUploader>
