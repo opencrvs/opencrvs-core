@@ -17,6 +17,10 @@ How the migration runs during the v2.0.0 upgrade:
 
 ### Breaking changes
 
+#### `validUntil` removed from location APIs
+
+The `Location` and `AdministrativeArea` wire models no longer include `validUntil`. Active/inactive state is now carried by each entity's `versions[]` array (see location versioning, [#6691](https://github.com/opencrvs/opencrvs-core/issues/6691)) and the resolved top-level `status` field. Consumers that read `validUntil` should derive end-of-validity from the `effectiveFrom` of the next version element instead.
+
 #### MongoDB removed
 
 MongoDB, the `mongodb`/`mongoose` dependencies, the MongoDB Helm resources and dependency chart, and all MongoDB references in compose files, dev scripts, and CI have been removed. See "Upgrade guidance" above for the required upgrade path.
@@ -67,13 +71,13 @@ The `scheduler` package and its Docker service have been removed. The service ra
 #### Location APIs
 
 - **Removed following endpoints from gateway:**
-  | Path              | Method |
+  | Path | Method |
   | ----------------- | ------ |
-  | `/location`       | `*`    |
-  | `/location/{id}`  | `*`    |
-  | `/locations`      | `GET`  |
-  | `/locations`      | `POST` |
-  | `/locations/{id}` | `*`    |
+  | `/location` | `*` |
+  | `/location/{id}` | `*` |
+  | `/locations` | `GET` |
+  | `/locations` | `POST` |
+  | `/locations/{id}` | `*` |
 
 V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
 
