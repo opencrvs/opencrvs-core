@@ -56,7 +56,7 @@ import {
 import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
-import { Location, AdministrativeArea } from './locations'
+import { SetLocationPayload, SetAdministrativeAreaPayload } from './locations'
 import { EventStatus } from './EventMetadata'
 import { defineWorkqueues, WorkqueueConfig } from './WorkqueueConfig'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
@@ -175,8 +175,8 @@ function mapFieldTypeToMockValue(
    * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
    */
   administrativeHierarchy?: {
-    administrativeAreas: AdministrativeArea[]
-    locations: Location[]
+    administrativeAreas: SetAdministrativeAreaPayload[]
+    locations: SetLocationPayload[]
   }
 ): FieldValue {
   const leafLevelAdministrativeAreas =
@@ -313,8 +313,8 @@ export function fieldConfigsToActionPayload(
    * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
    */
   administrativeHierarchy?: {
-    administrativeAreas: AdministrativeArea[]
-    locations: Location[]
+    administrativeAreas: SetAdministrativeAreaPayload[]
+    locations: SetLocationPayload[]
   }
 ): ActionUpdate {
   return fields.reduce(
@@ -340,8 +340,8 @@ export function generateActionDeclarationInput(
    * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
    */
   administrativeHierarchy?: {
-    administrativeAreas: AdministrativeArea[]
-    locations: Location[]
+    administrativeAreas: SetAdministrativeAreaPayload[]
+    locations: SetLocationPayload[]
   }
 ): ActionUpdate {
   const parsed = DeclarationUpdateActions.safeParse(action)

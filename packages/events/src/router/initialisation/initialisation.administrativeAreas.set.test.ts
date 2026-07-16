@@ -10,7 +10,7 @@
  */
 import { TRPCError } from '@trpc/server'
 import {
-  AdministrativeArea,
+  SetAdministrativeAreaPayload,
   createPrng,
   generateUuid,
   TokenUserType
@@ -27,12 +27,11 @@ import {
 import { getClient } from '@events/storage/postgres/events'
 import { payloadGenerator } from '@events/tests/generators'
 
-const administrativeAreaPayload: AdministrativeArea[] = [
+const administrativeAreaPayload: SetAdministrativeAreaPayload[] = [
   {
     id: generateUuid(),
     parentId: null,
     name: 'New Administrative Area',
-    validUntil: null,
     externalId: 'abc123xyz456'
   }
 ]
@@ -165,7 +164,6 @@ test('updates externalId on existing administrative area when re-seeded with a v
       id: areaId,
       parentId: null,
       name: 'Area without external id',
-      validUntil: null,
       externalId: null
     }
   ])
@@ -182,7 +180,6 @@ test('updates externalId on existing administrative area when re-seeded with a v
       id: areaId,
       parentId: null,
       name: 'Area without external id',
-      validUntil: null,
       externalId: 'adminpcode123'
     }
   ])

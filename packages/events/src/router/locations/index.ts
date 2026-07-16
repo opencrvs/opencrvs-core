@@ -10,7 +10,7 @@
  */
 
 import * as z from 'zod/v4'
-import { Location, UUID } from '@opencrvs/commons'
+import { Location, SetLocationPayload, UUID } from '@opencrvs/commons'
 import {
   internalProcedure,
   router,
@@ -53,7 +53,7 @@ export function setLocationsRoute(
   procedure: typeof internalProcedure | typeof userAndSystemProcedure
 ) {
   return procedure
-    .input(z.array(Location).min(1))
+    .input(z.array(SetLocationPayload).min(1))
     .output(z.void())
     .mutation(async ({ input }) => {
       await setLocations(input)

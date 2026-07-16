@@ -71,15 +71,14 @@ export function AdministrativeLevels() {
     currentlySelectedLocationId: UUID | null
   ): IGetNewLevel => {
     const childLocations = [...locations.values()].filter(
-      ({ administrativeAreaId, validUntil }) =>
-        (validUntil === null || new Date(validUntil) > new Date()) &&
+      ({ administrativeAreaId, status }) =>
+        status === 'active' &&
         administrativeAreaId === currentlySelectedLocationId
     )
 
     const childAdministrativeAreas = [...administrativeAreas.values()].filter(
-      ({ parentId, validUntil }) =>
-        (validUntil === null || new Date(validUntil) > new Date()) &&
-        parentId === currentlySelectedLocationId
+      ({ parentId, status }) =>
+        status === 'active' && parentId === currentlySelectedLocationId
     )
 
     let dataOfBreadCrumb: IBreadCrumbData[] = [

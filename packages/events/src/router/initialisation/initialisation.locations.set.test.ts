@@ -12,7 +12,7 @@ import { TRPCError } from '@trpc/server'
 import {
   createPrng,
   generateUuid,
-  Location,
+  SetLocationPayload,
   TokenUserType
 } from '@opencrvs/commons'
 import {
@@ -27,13 +27,12 @@ import {
 import { getClient } from '@events/storage/postgres/events'
 import { payloadGenerator } from '@events/tests/generators'
 
-const locationPayload: Location[] = [
+const locationPayload: SetLocationPayload[] = [
   {
     id: generateUuid(),
     administrativeAreaId: null,
     name: 'New Administrative Area',
     locationType: 'test-location-type',
-    validUntil: null,
     externalId: 'abc123xyz456'
   }
 ]
@@ -166,7 +165,6 @@ test('updates externalId on existing location when re-seeded with a value', asyn
       administrativeAreaId: null,
       name: 'Location without external id',
       locationType: 'CRVS_OFFICE',
-      validUntil: null,
       externalId: null
     }
   ])
@@ -184,7 +182,6 @@ test('updates externalId on existing location when re-seeded with a value', asyn
       administrativeAreaId: null,
       name: 'Location without external id',
       locationType: 'CRVS_OFFICE',
-      validUntil: null,
       externalId: 'adminpcode123'
     }
   ])

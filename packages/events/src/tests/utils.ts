@@ -18,7 +18,7 @@ import {
   ActionStatus,
   ActionType,
   ActionTypes,
-  AdministrativeArea,
+  SetAdministrativeAreaPayload,
   createPrng,
   DeclarationActionType,
   encodeScope,
@@ -33,7 +33,7 @@ import {
   getCurrentEventState,
   getUUID,
   JurisdictionFilter,
-  Location,
+  SetLocationPayload,
   TENNIS_CLUB_MEMBERSHIP,
   TokenUserType,
   TokenWithBearer,
@@ -597,8 +597,8 @@ export async function seedEvent(
     user: Omit<UserContext, 'type'>
     rng: () => number
     administrativeHierarchy?: {
-      administrativeAreas: AdministrativeArea[]
-      locations: Location[]
+      administrativeAreas: SetAdministrativeAreaPayload[]
+      locations: SetLocationPayload[]
     }
   }
 ) {
