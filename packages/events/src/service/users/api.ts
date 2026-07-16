@@ -77,8 +77,8 @@ export type SearchUsersPayload = {
   primaryOfficeId?: UUID
   administrativeAreaId?: UUID
   locationId?: UUID
-  count: number
-  skip: number
+  count?: number
+  skip?: number
   sortBy: UserSortBy
   sortOrder: 'asc' | 'desc'
 }
