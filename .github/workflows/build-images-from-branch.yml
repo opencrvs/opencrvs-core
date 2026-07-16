@@ -79,7 +79,10 @@ jobs:
         env:
           BRANCH: ${{ inputs.branch_tag_name || github.ref_name }}
         run: |
-          export VERSION=`git log -1 --pretty=format:%h`
+          # Exactly 7 chars: %h length floats with the clone's object count,
+          # and deploy-to-feature-environment.yml cuts the head sha to 7 when
+          # it dispatches the e2e workflow — the tags must line up.
+          export VERSION=$(git rev-parse HEAD | cut -c1-7)
           echo "Pushing version $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
@@ -212,43 +215,8 @@ jobs:
             cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}
             cache-to: type=inline
 
-  build-testland-assets:
-    needs: [base, merge-manifest]
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v6
-        if: github.event_name == 'workflow_dispatch'
-        with:
-          ref: '${{ github.event.inputs.branch_tag_name }}'
-
-      - uses: actions/checkout@v6
-        if: github.event_name == 'push' || github.event_name == 'pull_request'
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_PUBLISH_TOKEN }}
-
-      - name: Build and push assets image
-        uses: Wandalen/wretry.action@v3.8.0
-        with:
-          attempt_limit: 3
-          action: docker/build-push-action@v6
-          with: |
-            file: packages/testland/Dockerfile.assets
-            provenance: false
-            push: true
-            context: packages/testland
-            tags: |
-              ghcr.io/opencrvs/ocrvs-testland:${{ needs.base.outputs.version }}-assets
-              ghcr.io/opencrvs/ocrvs-testland:${{ needs.base.outputs.branch }}-assets
-
   merge-services-manifest:
-    needs: [base, build, build-testland-assets]
+    needs: [base, build, merge-testland-assets-manifest]
     if: always()
     strategy:
       fail-fast: false
@@ -279,6 +247,93 @@ jobs:
             echo "[🔁 pushing ] ${REPO_PREFIX}-${{ matrix.service }}:$TAG"
             docker manifest create ${REPO_PREFIX}-${{ matrix.service }}:$TAG $MANIFEST_LIST
             docker manifest push ${REPO_PREFIX}-${{ matrix.service }}:$TAG
+          done
+
+  # The service matrix above only builds packages/<service>/Dockerfile, so the
+  # testland companion assets image (postgres/metabase/reindex assets) needs its
+  # own step. Published as ghcr.io/opencrvs/ocrvs-testland:<tag>-assets to match
+  # the chart's `{{ opencrvs.image countryconfig }}-assets` reference. Context is
+  # packages/testland because Dockerfile.assets COPYs testland-relative paths.
+  testland-assets:
+    needs: [base]
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: ${{
+          (inputs.build_arm == true && fromJSON('["ubuntu-24.04", "ubuntu-24.04-arm"]')) ||
+          fromJSON('["ubuntu-24.04"]')
+          }}
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v6
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          ref: '${{ github.event.inputs.branch_tag_name }}'
+
+      - uses: actions/checkout@v6
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PUBLISH_TOKEN }}
+
+      - name: Set architecture label
+        id: arch_label
+        run: |
+          if [[ "${{ matrix.runner }}" == "ubuntu-24.04-arm" ]]; then
+            echo "arch=-arm64" >> $GITHUB_OUTPUT
+          else
+            echo "arch=-amd64" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push testland assets image
+        uses: Wandalen/wretry.action@v3.8.0
+        with:
+          attempt_limit: 3
+          action: docker/build-push-action@v6
+          with: |
+            file: packages/testland/Dockerfile.assets
+            provenance: false
+            push: true
+            context: packages/testland
+            tags: |
+              ghcr.io/opencrvs/ocrvs-testland:${{ needs.base.outputs.version }}${{ steps.arch_label.outputs.arch }}-assets
+              ghcr.io/opencrvs/ocrvs-testland:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}-assets
+            cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-testland:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}-assets
+            cache-to: type=inline
+
+  merge-testland-assets-manifest:
+    needs: [base, testland-assets]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PUBLISH_TOKEN }}
+
+      - name: Create and push multi-arch manifest
+        env:
+          BUILD_ARM: ${{ inputs.build_arm == true }}
+        run: |
+          REPO="ghcr.io/opencrvs/ocrvs-testland"
+
+          for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
+            if [[ "$BUILD_ARM" == "true" ]]; then
+              MANIFEST_LIST="$REPO:$TAG-amd64-assets $REPO:$TAG-arm64-assets"
+            else
+              MANIFEST_LIST="$REPO:$TAG-amd64-assets"
+            fi
+            echo "[🔁 pushing ] $REPO:$TAG-assets"
+            docker manifest create $REPO:$TAG-assets $MANIFEST_LIST
+            docker manifest push $REPO:$TAG-assets
           done
 
   security-scans-pr:
