@@ -187,6 +187,14 @@ export function useAssignmentActionConfigurationResolver(event: EventIndex) {
       const { enabled, visible } = resolveConditionals(actionType)
       const actionConfig = getActionConfig({ eventConfiguration, actionType })
 
+      // Assigning always self-assigns and requires `record.read` on the
+      // server (accounting for jurisdiction/flags scope options), so it
+      // shouldn't be offered unless the user could actually read this event.
+      const canRead =
+        actionType === ActionType.ASSIGN
+          ? resolveConditionals(ActionType.READ)
+          : { enabled: true, visible: true }
+
       return {
         label: actionConfig?.label ?? actionLabels[actionType],
         type: actionType,
@@ -197,8 +205,8 @@ export function useAssignmentActionConfigurationResolver(event: EventIndex) {
           actionType === ActionType.ASSIGN
             ? async () => onAssign()
             : async () => onUnassign(),
-        disabled: !enabled,
-        hidden: !visible
+        disabled: !(enabled && canRead.enabled),
+        hidden: !(visible && canRead.visible)
       }
     },
     [resolveConditionals, eventConfiguration, onAssign, onUnassign]
