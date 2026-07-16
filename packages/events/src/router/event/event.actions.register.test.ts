@@ -593,6 +593,7 @@ describe('Request and confirmation flow', () => {
       test('should successfully accept a previously requested action', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
           encodeScope({ type: 'record.create' }),
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })
@@ -745,6 +746,7 @@ describe('Request and confirmation flow', () => {
       test('allows accepting a registration request with the same exchanged event and action id', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
           encodeScope({ type: 'record.create' }),
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })
@@ -816,6 +818,7 @@ describe('Request and confirmation flow', () => {
       test('does not allow accepting a registration request with different exchanged event and action id', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
           encodeScope({ type: 'record.create' }),
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })
@@ -906,6 +909,7 @@ describe('Request and confirmation flow', () => {
       test('should not be able to reject the action if action is already accepted', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
           encodeScope({ type: 'record.create' }),
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })
@@ -965,6 +969,7 @@ describe('Request and confirmation flow', () => {
       test('should be able to call reject multiple times, without creating duplicate reject actions', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
           encodeScope({ type: 'record.create' }),
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })
