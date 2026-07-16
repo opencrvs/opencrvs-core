@@ -10,10 +10,16 @@
   "engines": {
     "node": "22.x.x"
   },
-  "workspaces": [
-    "packages/*",
-    "packages/toolkit/create-countryconfig"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/*",
+      "packages/toolkit/create-countryconfig"
+    ],
+    "nohoist": [
+      "**/@vitest/coverage-v8",
+      "**/@vitest/coverage-v8/**"
+    ]
+  },
   "scripts": {
     "postinstall": "patch-package && node development-environment/link-ts6-api.js",
     "start": "lerna run build --scope @opencrvs/commons && lerna run build --scope @opencrvs/components && lerna run --stream --parallel $OTHER_LERNA_FLAGS start",
