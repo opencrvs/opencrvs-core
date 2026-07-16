@@ -480,7 +480,6 @@ describe('canAccessOtherUserWithScopes()', () => {
 function mockVersionFields(id: UUID, name: string) {
   return {
     status: 'active' as const,
-    effectiveFrom: '0001-01-01',
     versions: [
       {
         versionId: id,

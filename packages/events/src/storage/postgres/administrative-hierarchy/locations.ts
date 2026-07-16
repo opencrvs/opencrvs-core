@@ -73,7 +73,6 @@ export function resolveVersionFields(rawVersions: unknown) {
     name: current.name,
     externalId: current.externalId ?? null,
     status: current.status,
-    effectiveFrom: current.effectiveFrom,
     versions
   }
 }

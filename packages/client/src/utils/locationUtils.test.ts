@@ -245,7 +245,6 @@ describe('isLocationUnderJurisdiction', () => {
       locationType: 'CRVS_OFFICE',
       administrativeAreaId: null,
       status: 'active' as const,
-      effectiveFrom: '0001-01-01',
       versions: [
         {
           versionId: rootLocationId,
@@ -283,7 +282,6 @@ describe('isLocationUnderJurisdiction', () => {
       locationType: 'CRVS_OFFICE',
       administrativeAreaId: null,
       status: 'active' as const,
-      effectiveFrom: '0001-01-01',
       versions: [
         {
           versionId: otherLocationId,

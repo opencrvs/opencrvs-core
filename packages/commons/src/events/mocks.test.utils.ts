@@ -71,7 +71,6 @@ function withVersionFields<
   return {
     ...entity,
     status: 'active' as const,
-    effectiveFrom: '0001-01-01',
     versions: [
       {
         versionId: entity.id,

@@ -99,8 +99,7 @@ test('Returns the full versions array and resolves flat fields from the current 
   // Flat fields reflect the version valid now, not the original one.
   expect(location).toMatchObject({
     name: 'Alaminos City',
-    status: 'active',
-    effectiveFrom: '2001-03-05'
+    status: 'active'
   })
 
   // The response carries every version, past and current.

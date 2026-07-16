@@ -41,7 +41,6 @@ const mockAdministrativeAreas: Map<UUID, AdministrativeArea> = new Map([
       parentId: PROVINCE_ID,
       name: 'Test District',
       status: 'active' as const,
-      effectiveFrom: '0001-01-01',
       versions: [
         {
           versionId: DISTRICT_ID,
@@ -60,7 +59,6 @@ const mockAdministrativeAreas: Map<UUID, AdministrativeArea> = new Map([
       parentId: null,
       name: 'Test Province',
       status: 'active' as const,
-      effectiveFrom: '0001-01-01',
       versions: [
         {
           versionId: PROVINCE_ID,

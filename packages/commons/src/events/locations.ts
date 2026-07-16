@@ -61,7 +61,6 @@ export const AdministrativeArea = z.object({
   externalId: z.string().nullish(),
   parentId: UUID.nullable(),
   status: LocationStatus,
-  effectiveFrom: z.iso.date(),
   versions: z.array(LocationVersion)
 })
 
@@ -74,7 +73,6 @@ export const Location = z.object({
   administrativeAreaId: UUID.nullable(),
   locationType: z.string().nullable(),
   status: LocationStatus,
-  effectiveFrom: z.iso.date(),
   versions: z.array(LocationVersion)
 })
 

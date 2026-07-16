@@ -118,8 +118,7 @@ test('Returns the full versions array and resolves flat fields from the current 
 
   expect(area).toMatchObject({
     name: 'New District',
-    status: 'active',
-    effectiveFrom: '2010-06-30'
+    status: 'active'
   })
   expect(area?.versions.map((v) => v.name)).toEqual([
     'Old District',
