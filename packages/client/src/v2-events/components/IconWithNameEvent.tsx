@@ -12,10 +12,17 @@
 import * as React from 'react'
 
 import styled from 'styled-components'
-import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
+import { DeclarationIcon, Duplicate, Box } from '@opencrvs/components/lib/icons'
 import { Stack } from '@opencrvs/components'
-import { InherentFlags } from '@opencrvs/commons/client'
-import { Flex, getIconColor, Icon, IconWithName } from './IconWithName'
+import { InherentFlags, Flag } from '@opencrvs/commons/client'
+import { Lock } from '@opencrvs/components/lib/Icon/all-icons'
+import {
+  Flex,
+  getIconColor,
+  Icon,
+  IconWithName,
+  STATUS_TO_COLOR_MAP
+} from './IconWithName'
 
 interface IconWithNameEventProps
   extends React.ComponentProps<typeof IconWithName> {
@@ -26,6 +33,49 @@ const Event = styled.div`
   color: ${({ theme }) => theme.colors.grey500};
   ${({ theme }) => theme.fonts.reg16}
 `
+const SealedContainer = styled.div`
+  position: relative;
+  display: inline-block;
+`
+
+const LockContainer = styled.div`
+  position: absolute;
+  bottom: -4px;
+  right: -7px;
+  font-size: 16px;
+`
+
+export function getEventIcon(
+  flags: Flag[] | undefined,
+  status: keyof typeof STATUS_TO_COLOR_MAP,
+  isArchived: boolean | undefined,
+  isValidatedOnReview: boolean | undefined
+) {
+  if (flags?.includes(InherentFlags.SEALED)) {
+    return (
+      <SealedContainer>
+        <DeclarationIcon
+          color={getIconColor(status, flags)}
+          isArchive={isArchived}
+          isValidatedOnReview={isValidatedOnReview}
+        />
+        <LockContainer>🔐</LockContainer>
+      </SealedContainer>
+    )
+  }
+
+  if (flags?.includes(InherentFlags.POTENTIAL_DUPLICATE)) {
+    return <Duplicate />
+  }
+
+  return (
+    <DeclarationIcon
+      color={getIconColor(status, flags)}
+      isArchive={isArchived}
+      isValidatedOnReview={isValidatedOnReview}
+    />
+  )
+}
 export function IconWithNameEvent({
   status,
   name,
@@ -37,15 +87,7 @@ export function IconWithNameEvent({
   return (
     <Flex id="flex">
       <Icon>
-        {flags?.includes(InherentFlags.POTENTIAL_DUPLICATE) ? (
-          <Duplicate />
-        ) : (
-          <DeclarationIcon
-            color={getIconColor(status, flags)}
-            isArchive={isArchived}
-            isValidatedOnReview={isValidatedOnReview}
-          />
-        )}
+        {getEventIcon(flags, status, isArchived, isValidatedOnReview)}
       </Icon>
       <Stack alignItems="flex-start" direction="column" gap={0}>
         {name}

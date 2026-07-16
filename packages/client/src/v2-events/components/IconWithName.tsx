@@ -13,6 +13,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
 import { Flag, InherentFlags } from '@opencrvs/commons/client'
+import { getEventIcon } from './IconWithNameEvent'
 
 export const Flex = styled.div`
   display: flex;
@@ -23,7 +24,7 @@ export const Flex = styled.div`
   }
 `
 
-const STATUS_TO_COLOR_MAP = {
+export const STATUS_TO_COLOR_MAP = {
   OUTBOX: 'grey',
   ARCHIVED: 'grey',
   DRAFT: 'purple',
@@ -81,15 +82,7 @@ export function IconWithName({
   return (
     <Flex id="flex">
       <Icon>
-        {flags?.includes(InherentFlags.POTENTIAL_DUPLICATE) ? (
-          <Duplicate />
-        ) : (
-          <DeclarationIcon
-            color={getIconColor(status, flags)}
-            isArchive={isArchived}
-            isValidatedOnReview={isValidatedOnReview}
-          />
-        )}
+        {getEventIcon(flags, status, isArchived, isValidatedOnReview)}
       </Icon>
       {name}
     </Flex>
