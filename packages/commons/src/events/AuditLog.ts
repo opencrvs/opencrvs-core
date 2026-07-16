@@ -138,6 +138,23 @@ const IntegrationRefreshSecretEntrySchema = AuditLogEntryBase.extend({
   responseSummary: z.object({ clientId: z.string() })
 })
 
+// ── Locations & administrative areas ──────────────────────────────────────────
+
+const LocationCreateEntrySchema = AuditLogEntryBase.extend({
+  operation: z.enum(['locations.create', 'administrativeAreas.create']),
+  requestData: z.object({
+    id: z.string(),
+    versionId: z.string(),
+    name: z.string(),
+    externalId: z.string().nullish(),
+    administrativeAreaId: z.string().nullish(), // locations only
+    parentId: z.string().nullish(), // administrative areas only
+    locationType: z.string().nullish(), // locations only
+    effectiveFrom: z.string(),
+    status: z.string()
+  })
+})
+
 // ── Attachments ────────────────────────────────────────────────────────────────
 
 const AttachmentUploadEntrySchema = AuditLogEntryBase.extend({
@@ -227,6 +244,7 @@ export const AuditLogEntrySchema = z.discriminatedUnion('operation', [
   IntegrationActivateEntrySchema,
   IntegrationDeleteEntrySchema,
   IntegrationRefreshSecretEntrySchema,
+  LocationCreateEntrySchema,
   AttachmentUploadEntrySchema,
   UserCreateEntrySchema,
   UserReasonEntrySchema,

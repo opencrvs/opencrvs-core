@@ -109,107 +109,6 @@ export type SetAdministrativeAreaPayload = z.infer<
 >
 
 /**
- * Input payload for creating a location: the identity fields (parent and
- * locationType are set once, immutable thereafter) plus the first version.
- * `id` and `versionId` may be supplied by the caller for idempotent retries.
- * `effectiveFrom` defaults to the beginning-of-time sentinel on the server.
- */
-export const CreateLocationPayload = z.object({
-  id: UUID.optional(),
-  versionId: UUID.optional(),
-  name: z.string(),
-  externalId: z.string().nullish(),
-  administrativeAreaId: UUID.nullable(),
-  locationType: z.string().nullable(),
-  effectiveFrom: z.iso.date().optional(),
-  status: LocationStatus.default('active')
-})
-
-export type CreateLocationPayload = z.infer<typeof CreateLocationPayload>
-
-/**
- * Input payload for appending a new version to a location. A full snapshot of
- * every versioned field is required — omitted does not mean unchanged. The
- * schema is strict: identity fields (`administrativeAreaId`, `locationType`)
- * are rejected rather than ignored, as they cannot change. `lastVersionId`
- * is the optimistic-concurrency check: it must be the id of the last element
- * the caller observed. `effectiveFrom` defaults to today on the server;
- * supply it explicitly for idempotent retries.
- */
-export const UpdateLocationPayload = z.strictObject({
-  id: UUID,
-  versionId: UUID.optional(),
-  name: z.string(),
-  externalId: z.string().nullish(),
-  status: LocationStatus,
-  effectiveFrom: z.iso.date().optional(),
-  lastVersionId: UUID
-})
-
-export type UpdateLocationPayload = z.infer<typeof UpdateLocationPayload>
-
-/**
- * Input payload for withdrawing a pending (future-dated) version element.
- * Only elements whose `effectiveFrom` has not yet passed can be withdrawn.
- */
-export const WithdrawLocationVersionPayload = z.object({
-  id: UUID,
-  versionId: UUID
-})
-
-export type WithdrawLocationVersionPayload = z.infer<
-  typeof WithdrawLocationVersionPayload
->
-
-/**
- * Administrative-area twin of {@link CreateLocationPayload}: `parentId`
- * instead of `administrativeAreaId`, no `locationType`.
- */
-export const CreateAdministrativeAreaPayload = z.object({
-  id: UUID.optional(),
-  versionId: UUID.optional(),
-  name: z.string(),
-  externalId: z.string().nullish(),
-  parentId: UUID.nullable(),
-  effectiveFrom: z.iso.date().optional(),
-  status: LocationStatus.default('active')
-})
-
-export type CreateAdministrativeAreaPayload = z.infer<
-  typeof CreateAdministrativeAreaPayload
->
-
-/**
- * Administrative-area twin of {@link UpdateLocationPayload} — strict for the
- * same reason: the identity field (`parentId`) is rejected, not ignored.
- */
-export const UpdateAdministrativeAreaPayload = z.strictObject({
-  id: UUID,
-  versionId: UUID.optional(),
-  name: z.string(),
-  externalId: z.string().nullish(),
-  status: LocationStatus,
-  effectiveFrom: z.iso.date().optional(),
-  lastVersionId: UUID
-})
-
-export type UpdateAdministrativeAreaPayload = z.infer<
-  typeof UpdateAdministrativeAreaPayload
->
-
-/**
- * Administrative-area twin of {@link WithdrawLocationVersionPayload}.
- */
-export const WithdrawAdministrativeAreaVersionPayload = z.object({
-  id: UUID,
-  versionId: UUID
-})
-
-export type WithdrawAdministrativeAreaVersionPayload = z.infer<
-  typeof WithdrawAdministrativeAreaVersionPayload
->
-
-/**
  * Resolves the version in effect at the given anchor date.
  *
  * Returns the element with the greatest `effectiveFrom` that is less than or
@@ -231,6 +130,25 @@ export function resolveVersion<T extends { effectiveFrom: string }>(
   }
 
   return resolved
+}
+
+/**
+ * Whether the entity holds the given externalId with active status at the
+ * anchor date or at any point after it. Used for point-in-time uniqueness of
+ * external codes: a new holder starting at `anchor` collides when an existing
+ * holder is (or is scheduled to be) active with the code from then on.
+ */
+export function hasActiveExternalIdOnOrAfter(
+  versions: LocationVersion[],
+  externalId: string,
+  anchor: string
+): boolean {
+  const inEffectAtAnchor = resolveVersion(versions, anchor)
+  const laterVersions = versions.filter((v) => v.effectiveFrom > anchor)
+
+  return [inEffectAtAnchor, ...laterVersions].some(
+    (v) => v.externalId === externalId && v.status === 'active'
+  )
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

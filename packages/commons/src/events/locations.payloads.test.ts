@@ -14,7 +14,7 @@ import {
   CreateLocationPayload,
   UpdateAdministrativeAreaPayload,
   UpdateLocationPayload
-} from './locations'
+} from './locationPayloads'
 
 describe('location write payloads', () => {
   const locationId = generateUuid(() => 0.91)
