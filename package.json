@@ -15,7 +15,7 @@
     "packages/toolkit/create-countryconfig"
   ],
   "scripts": {
-    "postinstall": "patch-package",
+    "postinstall": "patch-package && node development-environment/link-ts6-api.js",
     "start": "lerna run build --scope @opencrvs/commons && lerna run build --scope @opencrvs/components && lerna run --stream --parallel $OTHER_LERNA_FLAGS start",
     "start:prod": "yarn build && lerna run --stream --parallel --ignore @opencrvs/components $OTHER_LERNA_FLAGS start:prod",
     "dev": "bash development-environment/dev.sh",
@@ -44,11 +44,13 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@types/dotenv": "^6.1.0",
+    "@typescript/api": "npm:typescript@6.0.3",
     "concurrently": "^8.0.0",
     "husky": "^9.1.6",
     "lerna": "^8.0.0",
     "lint-staged": "^15.2.10",
-    "prettier": "3.5.3"
+    "prettier": "3.5.3",
+    "typescript": "7.0.2"
   },
   "dependencies": {
     "@types/react-signature-canvas": "^1.0.2",
@@ -67,7 +69,6 @@
     "form-data": "4.0.6",
     "sha.js": "2.4.12",
     "handlebars": "4.7.9",
-    "mongoose": "6.13.9",
     "js-yaml": "4.2.0",
     "h3": "1.15.6",
     "defu": "6.1.5",
@@ -98,7 +99,6 @@
     "form-data": "4.0.6",
     "sha.js": "2.4.12",
     "handlebars": "4.7.9",
-    "mongoose": "6.13.9",
     "js-yaml": "4.2.0",
     "h3": "1.15.6",
     "defu": "6.1.5",

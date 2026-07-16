@@ -346,3 +346,5 @@ export class LocationSearch extends React.Component<IProps, IState> {
     )
   }
 }
+
+export type { IProps as ILocationSearchProps }

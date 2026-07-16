@@ -13,7 +13,6 @@ export type { ProvidedContext } from 'vitest'
 
 declare module 'vitest' {
   export interface ProvidedContext {
-    USER_MGNT_MONGO_URI: string
     ELASTICSEARCH_URI: string
     POSTGRES_URI: string
     EVENTS_APP_POSTGRES_URI: string

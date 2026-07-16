@@ -76,7 +76,7 @@ export async function createServer() {
       await server.start()
       server.log('info', `Documents server started on ${HOST}:${PORT}`)
     } catch (error) {
-      server.log('info', `Error creating Minio Bucket! ${error.stack}`)
+      server.log('info', `Error creating Minio Bucket! ${(error as Error).stack}`)
       throw error
     }
   }

@@ -13,6 +13,8 @@ WORKDIR /app
 
 COPY --chown=node:node *.json .
 COPY --chown=node:node yarn.lock .
+# postinstall runs development-environment/link-ts6-api.js
+COPY --chown=node:node development-environment/link-ts6-api.js /app/development-environment/link-ts6-api.js
 
 RUN yarn install --production --frozen-lockfile
 

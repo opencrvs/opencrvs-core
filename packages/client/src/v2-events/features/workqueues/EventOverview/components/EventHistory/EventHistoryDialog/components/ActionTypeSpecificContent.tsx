@@ -9,50 +9,29 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { z } from 'zod'
 import {
+  ActionDocument,
   ActionType,
   EventDocument,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import {
-  DECLARATION_ACTION_UPDATE,
-  EventHistoryActionDocument
-} from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { RequestCorrection } from './RequestCorrection'
 import { PrintCertificate } from './PrintCertificate'
-import { DeclarationUpdate } from './DeclarationUpdate'
 import { CustomActionContent } from './CustomAction'
 import { DetectedDuplicate } from './DetectedDuplicate'
 import { Edit } from './Edit'
 import { ActionFormContent } from './ActionFormContent'
-
-const SyntheticDeclarationActionTypes = z.enum([DECLARATION_ACTION_UPDATE])
 
 export function ActionTypeSpecificContent({
   action,
   fullEvent,
   validatorContext
 }: {
-  action: EventHistoryActionDocument
+  action: ActionDocument
   fullEvent: EventDocument
   validatorContext: ValidatorContext
 }) {
   const { type } = action
-
-  const isDeclarationUpdate =
-    SyntheticDeclarationActionTypes.safeParse(type).success
-
-  if (isDeclarationUpdate) {
-    // We only show the updated modal for synthetic UPDATE action
-    return (
-      <DeclarationUpdate
-        action={action}
-        fullEvent={fullEvent}
-        validatorContext={validatorContext}
-      />
-    )
-  }
 
   if (type === ActionType.REQUEST_CORRECTION) {
     return (

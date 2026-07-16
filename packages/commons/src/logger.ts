@@ -19,7 +19,7 @@ function filterHealthCheckLogs(this: Logger, args: unknown[], method: LogFn) {
       }
     }
   }
-  return method.apply(this, args)
+  return method.apply(this, args as Parameters<LogFn>)
 }
 
 export const logger =

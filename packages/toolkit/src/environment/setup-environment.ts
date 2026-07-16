@@ -854,40 +854,6 @@ ALL_QUESTIONS.push(
       scope: 'ENVIRONMENT' as const
     },
     {
-      name: 'MONGODB_ADMIN_USER',
-      type: 'SECRET' as const,
-      didExist: findExistingValue(
-        'MONGODB_ADMIN_USER',
-        'SECRET',
-        'ENVIRONMENT',
-        existingValues
-      ),
-      value: findExistingOrDefine(
-        'MONGODB_ADMIN_USER',
-        'SECRET',
-        'ENVIRONMENT',
-        generateLongPassword()
-      ),
-      scope: 'ENVIRONMENT' as const
-    },
-    {
-      name: 'MONGODB_ADMIN_PASSWORD',
-      type: 'SECRET' as const,
-      didExist: findExistingValue(
-        'MONGODB_ADMIN_PASSWORD',
-        'SECRET',
-        'ENVIRONMENT',
-        existingValues
-      ),
-      value: findExistingOrDefine(
-        'MONGODB_ADMIN_PASSWORD',
-        'SECRET',
-        'ENVIRONMENT',
-        generateLongPassword()
-      ),
-      scope: 'ENVIRONMENT' as const
-    },
-    {
       name: 'POSTGRES_USER',
       type: 'SECRET' as const,
       didExist: findExistingValue(

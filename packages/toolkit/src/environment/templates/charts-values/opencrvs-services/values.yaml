@@ -36,10 +36,6 @@ minio:
   auth_mode: use_secret
   host: minio-0.minio.opencrvs-deps-{{env}}.svc.cluster.local
 
-mongodb:
-  auth_mode: auto
-  host: mongodb-0.mongodb.opencrvs-deps-{{env}}.svc.cluster.local
-
 redis:
   auth_mode: use_secret
   host: redis-0.redis.opencrvs-deps-{{env}}.svc.cluster.local

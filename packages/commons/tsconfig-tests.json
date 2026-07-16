@@ -1,7 +1,8 @@
 {
   "extends": "./tsconfig-base.json",
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "node16",
+    "rootDir": ".",
     "outDir": "build/dist/tests"
   },
   "references": [
@@ -9,8 +10,5 @@
       "path": "./tsconfig-commonjs.json"
     }
   ],
-  "include": [
-    "src/**/*.test.ts",
-    "typings"
-  ]
+  "include": ["src/**/*.test.ts", "typings", "test/setupJest.ts"]
 }

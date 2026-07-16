@@ -17,11 +17,9 @@ import { cleanEnv, str, url, bool } from 'envalid'
  */
 export const env = cleanEnv(process.env, {
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
-  EVENTS_MONGO_URL: url({ devDefault: 'mongodb://localhost/events' }),
   EVENTS_POSTGRES_URL: url({
     devDefault: 'postgres://events_app:app_password@localhost:5432/events'
   }),
-  USER_MGNT_MONGO_URL: url({ devDefault: 'mongodb://localhost/user-mgnt' }),
   ES_URL: url({ devDefault: 'http://localhost:9200' }),
   ES_INDEX_PREFIX: str({ default: 'events' }),
   ES_REINDEXING_STATUS_INDEX: str({ default: 'reindexing_status' }),
