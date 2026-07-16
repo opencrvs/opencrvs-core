@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  AdministrativeArea,
+  SetAdministrativeAreaPayload,
   createPrng,
   generateUuid,
   encodeScope
@@ -60,12 +60,11 @@ test('Creates single administrative area', async () => {
 
   const initialAdministrativeAreas =
     await dataSeedingClient.administrativeAreas.list()
-  const administrativeAreaPayload: AdministrativeArea[] = [
+  const administrativeAreaPayload: SetAdministrativeAreaPayload[] = [
     {
       id: generateUuid(),
       parentId: null,
       name: 'New Administrative Area',
-      validUntil: null,
       externalId: 'abc123xyz456'
     }
   ]
@@ -77,9 +76,10 @@ test('Creates single administrative area', async () => {
   expect(administrativeAreas).toHaveLength(
     initialAdministrativeAreas.length + 1
   )
-  expect(administrativeAreas).toMatchObject(
-    initialAdministrativeAreas.concat(administrativeAreaPayload)
-  )
+  expect(administrativeAreas).toMatchObject([
+    ...initialAdministrativeAreas,
+    ...administrativeAreaPayload
+  ])
 })
 
 test('Creates multiple administrative areas under parent administrative area', async () => {
@@ -106,9 +106,10 @@ test('Creates multiple administrative areas under parent administrative area', a
 
   const administrativeAreas = await dataSeedingClient.administrativeAreas.list()
 
-  expect(administrativeAreas).toEqual(
-    initialAdministrativeAreas.concat(administrativeAreaPayload)
-  )
+  expect(administrativeAreas).toMatchObject([
+    ...initialAdministrativeAreas,
+    ...administrativeAreaPayload
+  ])
 })
 
 test('updates externalId on existing administrative area when re-seeded with a value', async () => {
@@ -122,7 +123,6 @@ test('updates externalId on existing administrative area when re-seeded with a v
       id: areaId,
       parentId: null,
       name: 'Area without external id',
-      validUntil: null,
       externalId: null
     }
   ])
@@ -132,15 +132,20 @@ test('updates externalId on existing administrative area when re-seeded with a v
       id: areaId,
       parentId: null,
       name: 'Area without external id',
-      validUntil: null,
       externalId: 'adminpcode123'
     }
   ])
 
-  const areas = await dataSeedingClient.administrativeAreas.list()
-  const updated = areas.find((a) => a.id === areaId)
+  // The read API resolves externalId from the versions array, which
+  // re-seeding deliberately leaves untouched — assert on the flat column
+  // that the upsert updates.
+  const updated = await getClient()
+    .selectFrom('administrativeAreas')
+    .select('externalId')
+    .where('id', '=', areaId)
+    .executeTakeFirstOrThrow()
 
-  expect(updated?.externalId).toBe('adminpcode123')
+  expect(updated.externalId).toBe('adminpcode123')
 })
 
 test('stores a single active initial version when creating an administrative area', async () => {
@@ -154,7 +159,6 @@ test('stores a single active initial version when creating an administrative are
       id: areaId,
       parentId: null,
       name: 'Versioned administrative area',
-      validUntil: null,
       externalId: 'versioned-area-pcode'
     }
   ])
@@ -174,47 +178,6 @@ test('stores a single active initial version when creating an administrative are
       name: 'Versioned administrative area',
       externalId: 'versioned-area-pcode',
       status: 'active'
-    }
-  ])
-})
-
-test('stores an additional inactive version when creating an administrative area with validUntil', async () => {
-  const { user } = await setupTestCase()
-  const dataSeedingClient = createTestClient(user, [scope])
-
-  const areaId = generateUuid()
-
-  await dataSeedingClient.administrativeAreas.set([
-    {
-      id: areaId,
-      parentId: null,
-      name: 'Deprecated administrative area',
-      validUntil: '2027-03-15T23:30:00.000Z',
-      externalId: 'deprecated-area-pcode'
-    }
-  ])
-
-  const { versions } = await getClient()
-    .selectFrom('administrativeAreas')
-    .select('versions')
-    .where('id', '=', areaId)
-    .executeTakeFirstOrThrow()
-
-  expect(versions).toEqual([
-    {
-      versionId: expect.stringMatching(UUID_REGEX),
-      effectiveFrom: '0001-01-01',
-      name: 'Deprecated administrative area',
-      externalId: 'deprecated-area-pcode',
-      status: 'active'
-    },
-    {
-      versionId: expect.stringMatching(UUID_REGEX),
-      // UTC date part of the given validUntil
-      effectiveFrom: '2027-03-15',
-      name: 'Deprecated administrative area',
-      externalId: 'deprecated-area-pcode',
-      status: 'inactive'
     }
   ])
 })

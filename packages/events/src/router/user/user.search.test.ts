@@ -260,7 +260,6 @@ test('administrativeArea scope: includes users in nested sub-areas', async () =>
       name: 'Nested area',
       parentId: user.administrativeAreaId,
       id: childAreaId,
-      validUntil: null,
       externalId: 'search-nested-area-001'
     }
   ])
@@ -271,7 +270,6 @@ test('administrativeArea scope: includes users in nested sub-areas', async () =>
       administrativeAreaId: childAreaId,
       locationType: 'CRVS_OFFICE',
       id: nestedOfficeId,
-      validUntil: null,
       externalId: 'search-nested-office-001'
     }
   ])
@@ -297,7 +295,6 @@ test('location + administrativeArea: administrativeArea wins', async () => {
       administrativeAreaId: user.administrativeAreaId,
       locationType: 'CRVS_OFFICE',
       id: sameAreaOfficeId,
-      validUntil: null,
       externalId: 'same-area-office-001'
     }
   ])

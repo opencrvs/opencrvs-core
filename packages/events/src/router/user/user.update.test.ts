@@ -89,8 +89,7 @@ test('Prevents changing user who is located outside callers jurisdiction', async
       name: 'top-level-location',
       administrativeAreaId: null,
       id: topLevelLocationId,
-      locationType: 'EMBASSY',
-      validUntil: null
+      locationType: 'EMBASSY'
     }
   ])
 
@@ -135,8 +134,7 @@ test('Allows changing primaryOfficeId when user.edit scope covers both old and n
       name: 'top-level-location',
       administrativeAreaId: null,
       id: topLevelLocationId,
-      locationType: 'EMBASSY',
-      validUntil: null
+      locationType: 'EMBASSY'
     }
   ])
 
