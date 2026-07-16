@@ -504,7 +504,7 @@ export const Pagination: Story = {
       await canvas.findByText('Agent Number 01', { selector: '#profile-link' })
       await canvas.findByText('Agent Number 10', { selector: '#profile-link' })
       // The 11th user belongs to page 2 and must not be rendered yet.
-      expect(
+      await expect(
         canvas.queryByText('Agent Number 11', { selector: '#profile-link' })
       ).toBeNull()
     })
@@ -522,11 +522,11 @@ export const Pagination: Story = {
       await canvas.findByText('Agent Number 11', { selector: '#profile-link' })
       await canvas.findByText('Agent Number 15', { selector: '#profile-link' })
       // Page 1 users are no longer rendered.
-      expect(
+      await expect(
         canvas.queryByText('Agent Number 01', { selector: '#profile-link' })
       ).toBeNull()
       // Sanity check: exactly the 5 remaining users are shown on page 2.
-      expect(
+      await expect(
         canvas.getAllByText(/^Agent Number \d\d$/, {
           selector: '#profile-link'
         })
