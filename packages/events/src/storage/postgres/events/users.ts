@@ -299,11 +299,17 @@ function buildSearchUsersBaseQuery(
 }
 
 export async function searchUsersWithInput(input: SearchUsersPayload) {
-  return buildSearchUsersBaseQuery(input)
-    .orderBy(sortColumn[input.sortBy], input.sortOrder)
-    .limit(input.count)
-    .offset(input.skip)
-    .execute()
+  let query = buildSearchUsersBaseQuery(input).orderBy(
+    sortColumn[input.sortBy],
+    input.sortOrder
+  )
+  if (input.count !== undefined) {
+    query = query.limit(input.count)
+  }
+  if (input.skip) {
+    query = query.offset(input.skip)
+  }
+  return query.execute()
 }
 
 export async function searchAllUsersWithInput(
