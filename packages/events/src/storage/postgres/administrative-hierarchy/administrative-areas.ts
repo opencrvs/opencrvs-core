@@ -14,7 +14,11 @@ import { Kysely, sql } from 'kysely'
 import { logger, SetAdministrativeAreaPayload, UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import Schema from '../events/schema/Database'
-import { buildInitialVersions, resolveVersionFields } from './locations'
+import {
+  buildInitialVersions,
+  parseVersions,
+  resolveVersionFields
+} from './locations'
 
 export async function getAdministrativeAreas({
   ids,
@@ -36,10 +40,10 @@ export async function getAdministrativeAreas({
 
   const rows = await query.execute()
 
-  const administrativeAreas = rows.map(({ versions, ...row }) => ({
-    ...row,
-    ...resolveVersionFields(versions)
-  }))
+  const administrativeAreas = rows.map(({ versions: rawVersions, ...row }) => {
+    const versions = parseVersions(rawVersions, row.id)
+    return { ...row, versions, ...resolveVersionFields(versions) }
+  })
 
   // Active status is resolved from the versions array (the version in effect
   // today), so the filter runs after row mapping rather than in SQL.

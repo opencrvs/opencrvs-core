@@ -60,20 +60,34 @@ export function buildInitialVersions({
 }
 
 /**
- * Parses the `versions` jsonb column of a location or administrative area row
- * and resolves the read model fields (`name`, `externalId`, `status`,
- * `effectiveFrom`) from the version in effect today (UTC).
+ * Parses the `versions` jsonb column of a location or administrative area
+ * row, attaching the row id to the error when the content does not match the
+ * schema — a raw ZodError would not identify which row is corrupt.
  */
-export function resolveVersionFields(rawVersions: unknown) {
-  const versions = LocationVersion.array().parse(rawVersions)
+export function parseVersions(rawVersions: unknown, rowId: string) {
+  try {
+    return LocationVersion.array().parse(rawVersions)
+  } catch (error) {
+    throw new Error(
+      `Invalid versions content for row ${rowId}: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    )
+  }
+}
+
+/**
+ * Resolves the read model fields (`name`, `externalId`, `status`) from the
+ * version in effect today (UTC).
+ */
+export function resolveVersionFields(versions: LocationVersion[]) {
   const today = new Date().toISOString().slice(0, 10)
   const current = resolveVersion(versions, today)
 
   return {
     name: current.name,
     externalId: current.externalId ?? null,
-    status: current.status,
-    versions
+    status: current.status
   }
 }
 
@@ -163,10 +177,10 @@ export async function getLocations({
 
   const rows = await query.execute()
 
-  const locations = rows.map(({ versions, ...row }) => ({
-    ...row,
-    ...resolveVersionFields(versions)
-  }))
+  const locations = rows.map(({ versions: rawVersions, ...row }) => {
+    const versions = parseVersions(rawVersions, row.id)
+    return { ...row, versions, ...resolveVersionFields(versions) }
+  })
 
   // Active status is resolved from the versions array (the version in effect
   // today), so the filter runs after row mapping rather than in SQL.
@@ -206,10 +220,12 @@ export async function getLocationById(locationId: UUID) {
     return undefined
   }
 
-  const { versions, ...rest } = row
+  const { versions: rawVersions, ...rest } = row
+  const versions = parseVersions(rawVersions, rest.id)
 
   return {
     ...rest,
+    versions,
     ...resolveVersionFields(versions)
   }
 }
