@@ -33,7 +33,7 @@ export async function getAdministrativeAreas(params?: {
   return administrativeAreas
 }
 
-export async function getAdministrativeAreaById(administrativeAreaId: UUID) {
+async function getAdministrativeAreaById(administrativeAreaId: UUID) {
   const administrativeAreas =
     await administrativeAreaRepo.getAdministrativeAreas({
       ids: [administrativeAreaId]
