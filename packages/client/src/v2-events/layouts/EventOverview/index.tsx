@@ -18,6 +18,7 @@ import {
 } from 'react-router-typesafe-routes/dom'
 import styled from 'styled-components'
 import {
+  ActionType,
   applyDraftToEventIndex,
   deepDropNulls,
   EventStatus
@@ -43,6 +44,7 @@ import { EventOverviewProvider } from '@client/v2-events/features/workqueues/Eve
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
+import { useEventActionConfigurationResolver } from '@client/v2-events/features/workqueues/Actions/useActionConfigurationResolver'
 
 const Tab = styled.button`
   border: none;
@@ -164,12 +166,13 @@ export function EventOverviewLayout({
   const navigate = useNavigate()
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
-
   if (eventResults.total === 0) {
     throw new Error(`Event details with id ${eventId} not found`)
   }
 
   const event = eventResults.results[0]
+  const { resolveAction } = useEventActionConfigurationResolver(event)
+  const readActionStatus = resolveAction(ActionType.READ)
 
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndexWithDraftApplied = draft
@@ -195,11 +198,13 @@ export function EventOverviewLayout({
           desktopCenter={<EventOverviewTabs />}
           desktopRight={
             <Stack>
-              <DownloadButton
-                key={`DownloadButton-${eventId}`}
-                event={eventIndexWithDraftApplied}
-                isDraft={isDraft}
-              />
+              {!readActionStatus.hidden && (
+                <DownloadButton
+                  key={`DownloadButton-${eventId}`}
+                  event={eventIndexWithDraftApplied}
+                  isDraft={isDraft}
+                />
+              )}
               <ActionMenu eventId={eventId} />
               <DividerVertical />
               <Button
@@ -221,11 +226,13 @@ export function EventOverviewLayout({
           mobileRight={
             <>
               <Stack>
-                <DownloadButton
-                  key={`DownloadButton-${eventId}`}
-                  event={eventIndexWithDraftApplied}
-                  isDraft={isDraft}
-                />
+                {!readActionStatus.hidden && (
+                  <DownloadButton
+                    key={`DownloadButton-${eventId}`}
+                    event={eventIndexWithDraftApplied}
+                    isDraft={isDraft}
+                  />
+                )}
                 <ActionMenu eventId={eventId} />
                 <DividerVertical />
                 <Button

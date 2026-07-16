@@ -23,9 +23,11 @@ import {
   applyDraftToEventIndex,
   getEventConfigById,
   Draft,
-  WorkqueueActionType
+  WorkqueueActionType,
+  ActionType
 } from '@opencrvs/commons/client'
 
+import { useEventActionConfigurationResolver } from '@client/v2-events/features/workqueues/Actions/useActionConfigurationResolver'
 import { formattedDuration } from '../../../../../utils/date-formatting'
 import { DownloadButton } from '../../../../components/DownloadButton'
 import { ActionCta } from '../ActionCta'
@@ -322,6 +324,7 @@ function buildAvailableActionComponents({
   isWideScreen: boolean
 }) {
   const actionConfigs: Array<{ actionComponent: () => React.ReactNode }> = []
+  const { resolveAction } = useEventActionConfigurationResolver(event)
 
   if (isWideScreen) {
     if (action) {
@@ -345,15 +348,18 @@ function buildAvailableActionComponents({
     }
   }
 
-  actionConfigs.push({
-    actionComponent: () => (
-      <DownloadButton
-        key={`DownloadButton-${event.id}`}
-        event={event}
-        isDraft={localEventStatus === ExtendedEventStatuses.DRAFT}
-      />
-    )
-  })
+  const readActionStatus = resolveAction(ActionType.READ)
+  if (!readActionStatus.hidden) {
+    actionConfigs.push({
+      actionComponent: () => (
+        <DownloadButton
+          key={`DownloadButton-${event.id}`}
+          event={event}
+          isDraft={localEventStatus === ExtendedEventStatuses.DRAFT}
+        />
+      )
+    })
+  }
 
   return actionConfigs
 }
