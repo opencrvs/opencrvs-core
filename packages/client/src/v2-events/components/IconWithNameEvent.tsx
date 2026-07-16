@@ -42,6 +42,7 @@ const LockContainer = styled.div`
   position: absolute;
   bottom: -4px;
   right: -7px;
+  /* stylelint-disable-next-line opencrvs/no-font-styles */
   font-size: 16px;
 `
 

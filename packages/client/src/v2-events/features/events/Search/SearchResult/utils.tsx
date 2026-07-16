@@ -23,11 +23,9 @@ import {
   applyDraftToEventIndex,
   getEventConfigById,
   Draft,
-  WorkqueueActionType,
-  ActionType
+  WorkqueueActionType
 } from '@opencrvs/commons/client'
 
-import { useEventActionConfigurationResolver } from '@client/v2-events/features/workqueues/Actions/useActionConfigurationResolver'
 import { formattedDuration } from '../../../../../utils/date-formatting'
 import { DownloadButton } from '../../../../components/DownloadButton'
 import { ActionCta } from '../ActionCta'
@@ -324,7 +322,6 @@ function buildAvailableActionComponents({
   isWideScreen: boolean
 }) {
   const actionConfigs: Array<{ actionComponent: () => React.ReactNode }> = []
-  const { resolveAction } = useEventActionConfigurationResolver(event)
 
   if (isWideScreen) {
     if (action) {
@@ -348,18 +345,19 @@ function buildAvailableActionComponents({
     }
   }
 
-  const readActionStatus = resolveAction(ActionType.READ)
-  if (!readActionStatus.hidden) {
-    actionConfigs.push({
-      actionComponent: () => (
-        <DownloadButton
-          key={`DownloadButton-${event.id}`}
-          event={event}
-          isDraft={localEventStatus === ExtendedEventStatuses.DRAFT}
-        />
-      )
-    })
-  }
+  // `DownloadButton` resolves its own visibility (based on the READ action's
+  // conditionals) internally, since hooks can't be called from a plain
+  // function invoked per-row inside `.map()`/`useMemo` — see
+  // useResolveAssignmentActionConditionals's doc comment for why.
+  actionConfigs.push({
+    actionComponent: () => (
+      <DownloadButton
+        key={`DownloadButton-${event.id}`}
+        event={event}
+        isDraft={localEventStatus === ExtendedEventStatuses.DRAFT}
+      />
+    )
+  })
 
   return actionConfigs
 }

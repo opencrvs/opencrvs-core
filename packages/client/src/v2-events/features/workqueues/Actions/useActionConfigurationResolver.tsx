@@ -115,9 +115,12 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
 /**
  *
  * Given event,
- * @returns resolver function for assignment action configuration conditionals.
+ * @returns resolver function for assignment (and READ) action configuration conditionals.
  *
- * Separated due to limited use and poor-ish performance in list views.
+ * Separated from {@link useEventActionConfigurationResolver} due to limited
+ * use and poor-ish performance in list views — it skips the costly
+ * `useEventActionsOnClick`, so it's safe to call from components rendered
+ * per-row (e.g. `DownloadButton`), unlike the full resolver.
  */
 export function useResolveAssignmentActionConditionals(event: EventIndex) {
   const { eventConfiguration } = useEventConfiguration(event.type)
@@ -132,7 +135,12 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
   const isAssigning = events.actions.assignment.assign.isAssigning(event.id)
 
   const resolveConditionals = useCallback(
-    (actionType: typeof ActionType.ASSIGN | typeof ActionType.UNASSIGN) => {
+    (
+      actionType:
+        | typeof ActionType.ASSIGN
+        | typeof ActionType.UNASSIGN
+        | typeof ActionType.READ
+    ) => {
       const { enabled, visible } = resolveActionConditionals({
         event,
         actionType,
