@@ -202,6 +202,89 @@ export async function createLocation(location: CreateLocationRow) {
 }
 
 /**
+ * The locked row and trx-bound operations handed to the
+ * {@link withLockedVersionedRow} callback. Everything runs on the transaction
+ * connection so invariant checks and the append serialise on the row lock —
+ * and never borrow a second pool connection mid-transaction.
+ */
+export interface LockedVersionedRowContext {
+  row:
+    | {
+        id: UUID
+        deletedAt: string | null
+        versions: LocationVersion[]
+      }
+    | undefined
+  /** Appends a single element to the row's `versions` jsonb array. Touches no
+   *  other column — legacy columns stay frozen at their creation values. */
+  append: (version: LocationVersion) => Promise<void>
+  /** Trx-bound twin of `getLocationsEverHoldingExternalId` /
+   *  `getAdministrativeAreasEverHoldingExternalId` for the same table. */
+  getCandidatesEverHoldingExternalId: (
+    externalId: string
+  ) => Promise<{ id: UUID; versions: LocationVersion[] }[]>
+}
+
+/**
+ * Runs `callback` inside a transaction holding a `SELECT ... FOR UPDATE` lock
+ * on the given locations / administrative-areas row, so concurrent updates to
+ * the same row serialise: the second writer blocks until the first commits and
+ * then re-reads the committed row. The row is fetched without the soft-delete
+ * filter — soft-deleted handling is the caller's decision.
+ */
+export async function withLockedVersionedRow<T>(
+  table: 'locations' | 'administrativeAreas',
+  id: UUID,
+  callback: (context: LockedVersionedRowContext) => Promise<T>
+): Promise<T> {
+  const db = getClient()
+
+  return db.transaction().execute(async (trx) => {
+    const row = await trx
+      .selectFrom(table)
+      .select(['id', 'deletedAt', 'versions'])
+      .where('id', '=', id)
+      .forUpdate()
+      .executeTakeFirst()
+
+    return callback({
+      row: row && { ...row, versions: parseVersions(row.versions, row.id) },
+      append: async (version) => {
+        await trx
+          .updateTable(table)
+          .set({
+            versions: sql`versions || ${JSON.stringify([version])}::jsonb`
+          })
+          .where('id', '=', id)
+          .execute()
+      },
+      getCandidatesEverHoldingExternalId: async (externalId) => {
+        const rows = await trx
+          .selectFrom(table)
+          .select(['id', 'versions'])
+          .where('deletedAt', 'is', null)
+          .where(
+            sql<boolean>`versions @> ${JSON.stringify([{ externalId }])}::jsonb`
+          )
+          .execute()
+
+        return rows.map(({ versions: rawVersions, id: rowId }) => ({
+          id: rowId,
+          versions: parseVersions(rawVersions, rowId)
+        }))
+      }
+    })
+  })
+}
+
+export async function withLockedLocationRow<T>(
+  locationId: UUID,
+  callback: (context: LockedVersionedRowContext) => Promise<T>
+): Promise<T> {
+  return withLockedVersionedRow('locations', locationId, callback)
+}
+
+/**
  * Fetches a location row by id without the soft-delete filter and without
  * resolving version fields. Used by the create path to detect idempotent
  * retries against any existing row, including soft-deleted ones.

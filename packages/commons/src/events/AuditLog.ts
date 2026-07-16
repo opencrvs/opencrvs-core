@@ -155,6 +155,36 @@ const LocationCreateEntrySchema = AuditLogEntryBase.extend({
   })
 })
 
+const ChangedStringField = z.object({ from: z.string(), to: z.string() })
+const ChangedNullableStringField = z.object({
+  from: z.string().nullable(),
+  to: z.string().nullable()
+})
+
+const LocationUpdateEntrySchema = AuditLogEntryBase.extend({
+  operation: z.enum(['locations.update', 'administrativeAreas.update']),
+  /** The submitted snapshot, with server-resolved `versionId`/`effectiveFrom`. */
+  requestData: z.object({
+    id: z.string(),
+    versionId: z.string(),
+    name: z.string(),
+    externalId: z.string().nullish(),
+    status: z.string(),
+    effectiveFrom: z.string(),
+    lastVersionId: z.string()
+  }),
+  /** The diff against the previous version — only fields that changed. */
+  responseSummary: z.object({
+    previousVersionId: z.string(),
+    versionId: z.string(),
+    changed: z.object({
+      name: ChangedStringField.optional(),
+      externalId: ChangedNullableStringField.optional(),
+      status: ChangedStringField.optional()
+    })
+  })
+})
+
 // ── Attachments ────────────────────────────────────────────────────────────────
 
 const AttachmentUploadEntrySchema = AuditLogEntryBase.extend({
@@ -245,6 +275,7 @@ export const AuditLogEntrySchema = z.discriminatedUnion('operation', [
   IntegrationDeleteEntrySchema,
   IntegrationRefreshSecretEntrySchema,
   LocationCreateEntrySchema,
+  LocationUpdateEntrySchema,
   AttachmentUploadEntrySchema,
   UserCreateEntrySchema,
   UserReasonEntrySchema,

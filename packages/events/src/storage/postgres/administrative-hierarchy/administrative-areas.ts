@@ -22,9 +22,22 @@ import Schema from '../events/schema/Database'
 import {
   buildInitialVersions,
   clearAdministrativeHierarchyCache,
+  LockedVersionedRowContext,
   parseVersions,
-  resolveVersionFields
+  resolveVersionFields,
+  withLockedVersionedRow
 } from './locations'
+
+export async function withLockedAdministrativeAreaRow<T>(
+  administrativeAreaId: UUID,
+  callback: (context: LockedVersionedRowContext) => Promise<T>
+): Promise<T> {
+  return withLockedVersionedRow(
+    'administrativeAreas',
+    administrativeAreaId,
+    callback
+  )
+}
 
 export async function getAdministrativeAreas({
   ids,

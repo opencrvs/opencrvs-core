@@ -14,6 +14,7 @@ import {
   AdministrativeArea,
   CreateAdministrativeAreaPayload,
   SetAdministrativeAreaPayload,
+  UpdateAdministrativeAreaPayload,
   UUID
 } from '@opencrvs/commons'
 import {
@@ -22,10 +23,12 @@ import {
   userAndSystemProcedure
 } from '@events/router/trpc'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
+import { diffLocationVersions } from '@events/service/locations/locations'
 import {
   createAdministrativeArea,
   getAdministrativeAreas,
-  setAdministrativeAreas
+  setAdministrativeAreas,
+  updateAdministrativeArea
 } from '../../service/administrative-areas'
 import { allowedWithAnyOfScopes } from '../middleware'
 
@@ -83,6 +86,39 @@ export const administrativeAreaRouter = router({
             parentId: administrativeArea.parentId,
             effectiveFrom: initialVersion.effectiveFrom,
             status: initialVersion.status
+          }
+        })
+      }
+
+      return administrativeArea
+    }),
+  update: userAndSystemProcedure
+    .use(allowedWithAnyOfScopes(['location.edit']))
+    .input(UpdateAdministrativeAreaPayload)
+    .output(AdministrativeArea)
+    .mutation(async ({ input, ctx }) => {
+      const { administrativeArea, appended, previousVersion, newVersion } =
+        await updateAdministrativeArea(input)
+
+      // An idempotent replay appends nothing and must not be audited twice.
+      if (appended && previousVersion && newVersion) {
+        await writeAuditLog({
+          clientId: ctx.user.id,
+          clientType: ctx.user.type,
+          operation: 'administrativeAreas.update',
+          requestData: {
+            id: administrativeArea.id,
+            versionId: newVersion.versionId,
+            name: newVersion.name,
+            externalId: newVersion.externalId ?? null,
+            status: newVersion.status,
+            effectiveFrom: newVersion.effectiveFrom,
+            lastVersionId: input.lastVersionId
+          },
+          responseSummary: {
+            previousVersionId: previousVersion.versionId,
+            versionId: newVersion.versionId,
+            changed: diffLocationVersions(previousVersion, newVersion)
           }
         })
       }

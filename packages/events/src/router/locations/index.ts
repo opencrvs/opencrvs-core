@@ -14,6 +14,7 @@ import {
   CreateLocationPayload,
   Location,
   SetLocationPayload,
+  UpdateLocationPayload,
   UUID
 } from '@opencrvs/commons'
 import {
@@ -23,10 +24,12 @@ import {
 } from '@events/router/trpc'
 import {
   createLocation,
+  diffLocationVersions,
   getLocationById,
   getLocationHierarchy,
   getLocations,
-  setLocations
+  setLocations,
+  updateLocation
 } from '@events/service/locations/locations'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import { allowedWithAnyOfScopes } from '../middleware'
@@ -118,6 +121,39 @@ export const locationRouter = router({
             locationType: location.locationType,
             effectiveFrom: initialVersion.effectiveFrom,
             status: initialVersion.status
+          }
+        })
+      }
+
+      return location
+    }),
+  update: userAndSystemProcedure
+    .use(allowedWithAnyOfScopes(['location.edit']))
+    .input(UpdateLocationPayload)
+    .output(Location)
+    .mutation(async ({ input, ctx }) => {
+      const { location, appended, previousVersion, newVersion } =
+        await updateLocation(input)
+
+      // An idempotent replay appends nothing and must not be audited twice.
+      if (appended && previousVersion && newVersion) {
+        await writeAuditLog({
+          clientId: ctx.user.id,
+          clientType: ctx.user.type,
+          operation: 'locations.update',
+          requestData: {
+            id: location.id,
+            versionId: newVersion.versionId,
+            name: newVersion.name,
+            externalId: newVersion.externalId ?? null,
+            status: newVersion.status,
+            effectiveFrom: newVersion.effectiveFrom,
+            lastVersionId: input.lastVersionId
+          },
+          responseSummary: {
+            previousVersionId: previousVersion.versionId,
+            versionId: newVersion.versionId,
+            changed: diffLocationVersions(previousVersion, newVersion)
           }
         })
       }

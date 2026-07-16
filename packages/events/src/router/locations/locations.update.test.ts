@@ -1,0 +1,427 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import {
+  encodeScope,
+  generateUuid,
+  TokenUserType,
+  UUID
+} from '@opencrvs/commons'
+import {
+  createTestClient,
+  setupTestCase,
+  UUID_REGEX
+} from '@events/tests/utils'
+import { getClient } from '@events/storage/postgres/events'
+
+const scope = encodeScope({ type: 'location.edit' })
+
+async function createLocation(
+  client: ReturnType<typeof createTestClient>,
+  overrides: { name?: string; externalId?: string; effectiveFrom?: string } = {}
+) {
+  return client.locations.create({
+    name: overrides.name ?? 'Original Office',
+    externalId: overrides.externalId ?? 'update-test-pcode',
+    administrativeAreaId: null,
+    locationType: 'CRVS_OFFICE',
+    effectiveFrom: overrides.effectiveFrom ?? '2024-01-01',
+    status: 'active'
+  })
+}
+
+async function getVersionsFromDb(locationId: UUID) {
+  const row = await getClient()
+    .selectFrom('locations')
+    .select(['name', 'versions'])
+    .where('id', '=', locationId)
+    .executeTakeFirstOrThrow()
+
+  return row
+}
+
+async function getUpdateAuditEntries() {
+  return getClient()
+    .selectFrom('auditLog')
+    .selectAll()
+    .where('operation', '=', 'locations.update')
+    .execute()
+}
+
+test('prevents forbidden access if missing required scope', async () => {
+  const { user } = await setupTestCase()
+  // User missing required scope
+  const registrarClient = createTestClient(user)
+
+  await expect(
+    registrarClient.locations.update({
+      id: generateUuid(),
+      name: 'Forbidden Rename',
+      externalId: 'forbidden-update-pcode',
+      status: 'active',
+      lastVersionId: generateUuid()
+    })
+  ).rejects.toThrow('FORBIDDEN')
+})
+
+test('appends a rename version, keeps prior elements and the legacy name column intact, and writes an audit diff', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const created = await createLocation(client, {
+    name: 'Old Name',
+    externalId: 'rename-pcode'
+  })
+
+  const updated = await client.locations.update({
+    id: created.id,
+    name: 'New Name',
+    externalId: 'rename-pcode',
+    status: 'active',
+    effectiveFrom: '2025-01-01',
+    lastVersionId: created.versions[0].versionId
+  })
+
+  // Exactly one appended element; the prior element is untouched.
+  expect(updated.versions).toEqual([
+    created.versions[0],
+    {
+      versionId: expect.stringMatching(UUID_REGEX),
+      effectiveFrom: '2025-01-01',
+      name: 'New Name',
+      externalId: 'rename-pcode',
+      status: 'active'
+    }
+  ])
+
+  // The flat read-model fields resolve from the new version.
+  expect(updated.name).toBe('New Name')
+  expect(updated.externalId).toBe('rename-pcode')
+  expect(updated.status).toBe('active')
+
+  // The legacy name column stays frozen at the creation value.
+  const row = await getVersionsFromDb(created.id)
+  expect(row.name).toBe('Old Name')
+
+  const auditEntries = await getUpdateAuditEntries()
+  expect(auditEntries).toHaveLength(1)
+  expect(auditEntries[0].clientId).toBe(user.id)
+  expect(auditEntries[0].clientType).toBe(TokenUserType.enum.user)
+  expect(auditEntries[0].requestData).toEqual({
+    id: created.id,
+    versionId: updated.versions[1].versionId,
+    name: 'New Name',
+    externalId: 'rename-pcode',
+    status: 'active',
+    effectiveFrom: '2025-01-01',
+    lastVersionId: created.versions[0].versionId
+  })
+  expect(auditEntries[0].responseSummary).toEqual({
+    previousVersionId: created.versions[0].versionId,
+    versionId: updated.versions[1].versionId,
+    changed: { name: { from: 'Old Name', to: 'New Name' } }
+  })
+})
+
+test('inactivation drops the location from the active list but keeps it in the unfiltered list', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const created = await createLocation(client, {
+    name: 'Closing Office',
+    externalId: 'inactivate-pcode'
+  })
+
+  await client.locations.update({
+    id: created.id,
+    name: 'Closing Office',
+    externalId: 'inactivate-pcode',
+    status: 'inactive',
+    effectiveFrom: '2025-01-01',
+    lastVersionId: created.versions[0].versionId
+  })
+
+  const activeLocations = await client.locations.list({ isActive: true })
+  expect(activeLocations.find((l) => l.id === created.id)).toBeUndefined()
+
+  const allLocations = await client.locations.list()
+  expect(allLocations.find((l) => l.id === created.id)).toMatchObject({
+    id: created.id,
+    status: 'inactive'
+  })
+})
+
+test('rejects a payload missing a required field', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const created = await createLocation(client, {
+    externalId: 'missing-name-pcode'
+  })
+
+  await expect(
+    // @ts-expect-error - deliberately omitting the required `name`
+    client.locations.update({
+      id: created.id,
+      externalId: 'missing-name-pcode',
+      status: 'active',
+      lastVersionId: created.versions[0].versionId
+    })
+  ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
+})
+
+test('rejects a payload carrying the immutable administrativeAreaId', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const created = await createLocation(client, {
+    externalId: 'strict-schema-pcode'
+  })
+
+  await expect(
+    client.locations.update({
+      id: created.id,
+      name: 'Strict Schema Office',
+      externalId: 'strict-schema-pcode',
+      status: 'active',
+      lastVersionId: created.versions[0].versionId,
+      // @ts-expect-error - identity fields are rejected by the strict schema
+      administrativeAreaId: null
+    })
+  ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
+})
+
+test('rejects an effectiveFrom equal to an existing element with different values, writing nothing', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const created = await createLocation(client, {
+    name: 'Collision Office',
+    externalId: 'collision-pcode',
+    effectiveFrom: '2024-01-01'
+  })
+
+  await expect(
+    client.locations.update({
+      id: created.id,
+      name: 'Different Name',
+      externalId: 'collision-pcode',
+      status: 'active',
+      effectiveFrom: '2024-01-01',
+      lastVersionId: created.versions[0].versionId
+    })
+  ).rejects.toMatchObject({
+    code: 'CONFLICT',
+    message: expect.stringContaining('already exists')
+  })
+
+  const row = await getVersionsFromDb(created.id)
+  expect(row.versions).toHaveLength(1)
+
+  const auditEntries = await getUpdateAuditEntries()
+  expect(auditEntries).toHaveLength(0)
+})
+
+test('rejects an effectiveFrom earlier than the latest version, writing nothing', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const created = await createLocation(client, {
+    name: 'Forward Only Office',
+    externalId: 'forward-only-pcode',
+    effectiveFrom: '2024-06-01'
+  })
+
+  await expect(
+    client.locations.update({
+      id: created.id,
+      name: 'Past Splice',
+      externalId: 'forward-only-pcode',
+      status: 'active',
+      effectiveFrom: '2024-01-01',
+      lastVersionId: created.versions[0].versionId
+    })
+  ).rejects.toMatchObject({ code: 'UNPROCESSABLE_CONTENT' })
+
+  const row = await getVersionsFromDb(created.id)
+  expect(row.versions).toHaveLength(1)
+
+  const auditEntries = await getUpdateAuditEntries()
+  expect(auditEntries).toHaveLength(0)
+})
+
+test('rejects a stale lastVersionId, writing nothing', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const created = await createLocation(client, {
+    name: 'Stale Token Office',
+    externalId: 'stale-token-pcode'
+  })
+
+  const updated = await client.locations.update({
+    id: created.id,
+    name: 'Renamed Once',
+    externalId: 'stale-token-pcode',
+    status: 'active',
+    effectiveFrom: '2025-01-01',
+    lastVersionId: created.versions[0].versionId
+  })
+
+  // Second update presents the original, now-stale version token.
+  await expect(
+    client.locations.update({
+      id: created.id,
+      name: 'Renamed Twice',
+      externalId: 'stale-token-pcode',
+      status: 'active',
+      effectiveFrom: '2025-06-01',
+      lastVersionId: created.versions[0].versionId
+    })
+  ).rejects.toMatchObject({
+    code: 'CONFLICT',
+    message: expect.stringContaining('refresh and retry')
+  })
+
+  const row = await getVersionsFromDb(created.id)
+  expect(row.versions).toHaveLength(2)
+  expect(updated.versions).toHaveLength(2)
+})
+
+test('rejects an unknown location id', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  await expect(
+    client.locations.update({
+      id: generateUuid(),
+      name: 'Ghost Office',
+      externalId: 'ghost-pcode',
+      status: 'active',
+      lastVersionId: generateUuid()
+    })
+  ).rejects.toMatchObject({ code: 'NOT_FOUND' })
+})
+
+test('an identical replay appends nothing and audits only the first call', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const created = await createLocation(client, {
+    name: 'Replayed Office',
+    externalId: 'replay-update-pcode'
+  })
+
+  const payload = {
+    id: created.id,
+    name: 'Renamed Office',
+    externalId: 'replay-update-pcode',
+    status: 'active' as const,
+    effectiveFrom: '2025-01-01',
+    lastVersionId: created.versions[0].versionId
+  }
+
+  const first = await client.locations.update(payload)
+  // The retry carries the same, now-stale lastVersionId — still accepted.
+  const second = await client.locations.update(payload)
+
+  expect(second).toEqual(first)
+  expect(second.versions).toHaveLength(2)
+
+  const row = await getVersionsFromDb(created.id)
+  expect(row.versions).toHaveLength(2)
+
+  const auditEntries = await getUpdateAuditEntries()
+  expect(auditEntries).toHaveLength(1)
+})
+
+test('two concurrent updates with the same lastVersionId serialise: one wins, one conflicts', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const created = await createLocation(client, {
+    name: 'Contended Office',
+    externalId: 'contended-pcode'
+  })
+
+  const base = {
+    id: created.id,
+    externalId: 'contended-pcode',
+    status: 'active' as const,
+    lastVersionId: created.versions[0].versionId
+  }
+
+  const results = await Promise.allSettled([
+    client.locations.update({
+      ...base,
+      name: 'Rename A',
+      effectiveFrom: '2025-01-01'
+    }),
+    client.locations.update({
+      ...base,
+      name: 'Rename B',
+      effectiveFrom: '2025-02-01'
+    })
+  ])
+
+  const fulfilled = results.filter((r) => r.status === 'fulfilled')
+  const rejected = results.filter((r) => r.status === 'rejected')
+
+  expect(fulfilled).toHaveLength(1)
+  expect(rejected).toHaveLength(1)
+  expect((rejected[0] as PromiseRejectedResult).reason).toMatchObject({
+    code: 'CONFLICT'
+  })
+
+  const row = await getVersionsFromDb(created.id)
+  expect(row.versions).toHaveLength(2)
+})
+
+test('rejects a recode to an actively held externalId but allows a brand-new code', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const holder = await createLocation(client, {
+    name: 'Holder Office',
+    externalId: 'held-pcode'
+  })
+  const recoded = await createLocation(client, {
+    name: 'Recoded Office',
+    externalId: 'old-pcode'
+  })
+
+  await expect(
+    client.locations.update({
+      id: recoded.id,
+      name: 'Recoded Office',
+      externalId: 'held-pcode',
+      status: 'active',
+      effectiveFrom: '2025-01-01',
+      lastVersionId: recoded.versions[0].versionId
+    })
+  ).rejects.toMatchObject({
+    code: 'CONFLICT',
+    message: expect.stringContaining('held-pcode')
+  })
+
+  expect(holder.externalId).toBe('held-pcode')
+
+  const updated = await client.locations.update({
+    id: recoded.id,
+    name: 'Recoded Office',
+    externalId: 'brand-new-pcode',
+    status: 'active',
+    effectiveFrom: '2025-01-01',
+    lastVersionId: recoded.versions[0].versionId
+  })
+
+  expect(updated.externalId).toBe('brand-new-pcode')
+  expect(updated.versions).toHaveLength(2)
+})

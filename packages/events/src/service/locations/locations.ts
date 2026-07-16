@@ -15,7 +15,10 @@ import {
   getUUID,
   hasActiveExternalIdOnOrAfter,
   Location,
+  LocationStatus,
+  LocationVersion,
   SetLocationPayload,
+  UpdateLocationPayload,
   UUID
 } from '@opencrvs/commons'
 import * as locationsRepo from '@events/storage/postgres/administrative-hierarchy/locations'
@@ -164,4 +167,173 @@ export async function createLocation(
   }
 
   return { location: await getLocationById(resolved.id), created: true }
+}
+
+/** Outcome of a checked version append, consumed by the router audit log. */
+export interface VersionAppendOutcome {
+  appended: boolean
+  previousVersion?: LocationVersion
+  newVersion?: LocationVersion
+}
+
+/**
+ * Shared update core for locations and administrative areas (the payloads are
+ * structurally identical). Appends a new version element after running the
+ * invariant checks under the row lock, so concurrent updates serialise:
+ *
+ * 1. missing / soft-deleted row → NOT_FOUND
+ * 2. an element with the same `effectiveFrom` and identical values →
+ *    idempotent replay (no write); with different values → CONFLICT.
+ *    This runs before the stale-token check because a replayed request's
+ *    `lastVersionId` is legitimately stale.
+ * 3. `lastVersionId` not the latest element → CONFLICT (stale token)
+ * 4. `effectiveFrom` not strictly after the latest element →
+ *    UNPROCESSABLE_CONTENT (history is append-only, no past splices)
+ * 5. a recode (`externalId` change) colliding with another entity actively
+ *    holding the code on or after `effectiveFrom` → CONFLICT
+ */
+export async function appendVersionChecked({
+  payload,
+  entityLabel,
+  withLockedRow
+}: {
+  payload: UpdateLocationPayload
+  entityLabel: 'Location' | 'Administrative area'
+  withLockedRow: <T>(
+    id: UUID,
+    callback: (context: locationsRepo.LockedVersionedRowContext) => Promise<T>
+  ) => Promise<T>
+}): Promise<VersionAppendOutcome> {
+  const newVersion: LocationVersion = {
+    versionId: payload.versionId ?? getUUID(),
+    effectiveFrom:
+      payload.effectiveFrom ?? new Date().toISOString().slice(0, 10),
+    name: payload.name,
+    externalId: payload.externalId ?? null,
+    status: payload.status
+  }
+
+  return withLockedRow(
+    payload.id,
+    async ({ row, append, getCandidatesEverHoldingExternalId }) => {
+      if (!row || row.deletedAt !== null) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: `${entityLabel} with id ${payload.id} not found`
+        })
+      }
+
+      const { versions } = row
+      const last = versions[versions.length - 1]
+
+      const collision = versions.find(
+        (version) => version.effectiveFrom === newVersion.effectiveFrom
+      )
+
+      if (collision) {
+        const isReplay =
+          collision.name === newVersion.name &&
+          (collision.externalId ?? null) === newVersion.externalId &&
+          collision.status === newVersion.status
+
+        if (isReplay) {
+          return { appended: false }
+        }
+
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: `A version with effectiveFrom ${newVersion.effectiveFrom} already exists with different values`
+        })
+      }
+
+      if (payload.lastVersionId !== last.versionId) {
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: `${entityLabel} was modified by another request — refresh and retry`
+        })
+      }
+
+      if (newVersion.effectiveFrom <= last.effectiveFrom) {
+        throw new TRPCError({
+          code: 'UNPROCESSABLE_CONTENT',
+          message: `effectiveFrom ${newVersion.effectiveFrom} must be later than the latest version's effectiveFrom ${last.effectiveFrom}`
+        })
+      }
+
+      const externalId = newVersion.externalId ?? null
+
+      if (externalId !== null && externalId !== (last.externalId ?? null)) {
+        const candidates = await getCandidatesEverHoldingExternalId(externalId)
+
+        const collides = candidates.some(
+          (candidate) =>
+            candidate.id !== payload.id &&
+            hasActiveExternalIdOnOrAfter(
+              candidate.versions,
+              externalId,
+              newVersion.effectiveFrom
+            )
+        )
+
+        if (collides) {
+          throw new TRPCError({
+            code: 'CONFLICT',
+            message: `An active ${entityLabel.toLowerCase()} with externalId ${externalId} already exists`
+          })
+        }
+      }
+
+      await append(newVersion)
+
+      return { appended: true, previousVersion: last, newVersion }
+    }
+  )
+}
+
+/** The audit diff between two version elements — only fields that changed. */
+export interface LocationVersionDiff {
+  name?: { from: string; to: string }
+  externalId?: { from: string | null; to: string | null }
+  status?: { from: LocationStatus; to: LocationStatus }
+}
+
+export function diffLocationVersions(
+  previous: LocationVersion,
+  next: LocationVersion
+): LocationVersionDiff {
+  const diff: LocationVersionDiff = {}
+
+  if (previous.name !== next.name) {
+    diff.name = { from: previous.name, to: next.name }
+  }
+
+  const previousExternalId = previous.externalId ?? null
+  const nextExternalId = next.externalId ?? null
+
+  if (previousExternalId !== nextExternalId) {
+    diff.externalId = { from: previousExternalId, to: nextExternalId }
+  }
+
+  if (previous.status !== next.status) {
+    diff.status = { from: previous.status, to: next.status }
+  }
+
+  return diff
+}
+
+/**
+ * Appends a new version to a location after the checks documented on
+ * {@link appendVersionChecked}. Returns the location via the normal read path
+ * plus the previous/new version elements for the router's audit diff.
+ */
+export async function updateLocation(
+  payload: UpdateLocationPayload
+): Promise<{ location: Location } & VersionAppendOutcome> {
+  const outcome = await appendVersionChecked({
+    payload,
+    entityLabel: 'Location',
+    withLockedRow: locationsRepo.withLockedLocationRow
+  })
+
+  return { location: await getLocationById(payload.id), ...outcome }
 }
