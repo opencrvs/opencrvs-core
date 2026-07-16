@@ -93,8 +93,20 @@ const UserSearch = z.object({
   email: z.string().optional(),
   status: z.string().optional(),
   primaryOfficeId: z.string().optional(),
-  count: z.number().min(0),
-  skip: z.number().min(0),
+  count: z
+    .number()
+    .min(0)
+    .optional()
+    .describe(
+      'Optional count of users to return. When omitted, the endpoint returns every matching user (no limit).'
+    ),
+  skip: z
+    .number()
+    .min(0)
+    .default(0)
+    .describe(
+      'Optional skip of users to return. When omitted, the endpoint returns the first page of users.'
+    ),
   sortBy: z
     .enum([
       'createdAt',
@@ -241,7 +253,10 @@ export function searchUsersRoute(
           primaryOfficeId: primaryOfficeId,
           administrativeAreaId: ctx.user.administrativeAreaId
         })
-        return allUsers.slice(input.skip, input.skip + input.count)
+        return allUsers.slice(
+          input.skip,
+          input.count === undefined ? undefined : input.skip + input.count
+        )
       }
 
       if (accessLevel === JurisdictionFilter.enum.location) {

@@ -158,6 +158,51 @@ test('respects count and skip for pagination', async () => {
   expect(page[0].id).toBe(all[1].id)
 })
 
+test('returns all matching users (no limit) when count is omitted', async () => {
+  const { user, seed, generator } = await setupTestCase()
+  const client = createTestClient(user, withSearchAll)
+
+  const office = user.primaryOfficeId
+
+  // Seed more users
+  for (let i = 0; i < 12; i++) {
+    await seed.user(generator.user.create({ primaryOfficeId: office }))
+  }
+
+  const limited = await client.user.search({
+    ...defaultSearch,
+    primaryOfficeId: office
+  })
+
+  const unlimited = await client.user.search({
+    sortOrder: 'asc',
+    primaryOfficeId: office
+  })
+
+  // `defaultSearch` caps at count: 10, the omitted-count search returns everyone.
+  expect(limited).toHaveLength(10)
+  expect(unlimited.length).toBeGreaterThan(limited.length)
+})
+
+test('skip defaults to 0 when omitted', async () => {
+  const { user, seed, generator } = await setupTestCase()
+  const client = createTestClient(user, withSearchAll)
+
+  await seed.user(
+    generator.user.create({ primaryOfficeId: user.primaryOfficeId })
+  )
+
+  const withExplicitSkip = await client.user.search({
+    ...defaultSearch,
+    skip: 0
+  })
+  const withoutSkip = await client.user.search({ count: 10, sortOrder: 'asc' })
+
+  expect(withoutSkip.map((u) => u.id)).toEqual(
+    withExplicitSkip.map((u) => u.id)
+  )
+})
+
 test('sortOrder asc and desc by createdAt are reversed', async () => {
   const { user, seed, generator } = await setupTestCase()
   const client = createTestClient(user, withSearchAll)
