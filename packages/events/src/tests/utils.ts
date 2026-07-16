@@ -18,7 +18,7 @@ import {
   ActionStatus,
   ActionType,
   ActionTypes,
-  AdministrativeArea,
+  SetAdministrativeAreaPayload,
   createPrng,
   DeclarationActionType,
   encodeScope,
@@ -33,7 +33,7 @@ import {
   getCurrentEventState,
   getUUID,
   JurisdictionFilter,
-  Location,
+  SetLocationPayload,
   TENNIS_CLUB_MEMBERSHIP,
   TokenUserType,
   TokenWithBearer,
@@ -57,6 +57,9 @@ import {
   seeder,
   setupHierarchyWithUsers
 } from './generators'
+
+export const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 export const TEST_SYSTEM_ID = '9f3c6b7e-2a91-4f6d-b8d2-5c0e3a4f1b72' as UUID
 export const TEST_SYSTEM_ID_2 = '4d1a8c90-7e5b-4a3f-9c2d-1f6b8e7a2c55' as UUID
@@ -594,8 +597,8 @@ export async function seedEvent(
     user: Omit<UserContext, 'type'>
     rng: () => number
     administrativeHierarchy?: {
-      administrativeAreas: AdministrativeArea[]
-      locations: Location[]
+      administrativeAreas: SetAdministrativeAreaPayload[]
+      locations: SetLocationPayload[]
     }
   }
 ) {

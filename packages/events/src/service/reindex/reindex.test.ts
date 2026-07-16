@@ -105,15 +105,13 @@ beforeEach(async () => {
       name: 'Adming level 1',
       parentId: null,
       externalId: 'AS0978ASD2A',
-      id: adminLevel1Id,
-      validUntil: null
+      id: adminLevel1Id
     },
     {
       name: 'Admin level 2',
       parentId: adminLevel1Id,
       externalId: 'AS0978ASD2B',
-      id: adminLevel2Id,
-      validUntil: null
+      id: adminLevel2Id
     }
   ])
   await seed.locations([
@@ -122,8 +120,7 @@ beforeEach(async () => {
       administrativeAreaId: adminLevel2Id,
       externalId: 'AS0978ASD2C',
       locationType: 'CRVS_OFFICE',
-      id: crvsOfficeId,
-      validUntil: null
+      id: crvsOfficeId
     }
   ])
 

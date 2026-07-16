@@ -68,7 +68,9 @@ CREATE TABLE app.administrative_areas (
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     deleted_at timestamp with time zone,
     valid_until timestamp with time zone,
-    external_id text
+    external_id text,
+    versions jsonb NOT NULL,
+    CONSTRAINT administrative_areas_versions_nonempty CHECK (((jsonb_typeof(versions) = 'array'::text) AND (jsonb_array_length(versions) >= 1)))
 );
 
 
@@ -287,7 +289,9 @@ CREATE TABLE app.locations (
     location_type text,
     valid_until timestamp with time zone,
     administrative_area_id uuid,
-    external_id text
+    external_id text,
+    versions jsonb NOT NULL,
+    CONSTRAINT locations_versions_nonempty CHECK (((jsonb_typeof(versions) = 'array'::text) AND (jsonb_array_length(versions) >= 1)))
 );
 
 

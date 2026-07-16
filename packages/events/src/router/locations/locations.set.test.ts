@@ -11,10 +11,15 @@
 import {
   createPrng,
   generateUuid,
-  Location,
+  SetLocationPayload,
   encodeScope
 } from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createTestClient,
+  setupTestCase,
+  UUID_REGEX
+} from '@events/tests/utils'
+import { getClient } from '@events/storage/postgres/events'
 
 const scope = encodeScope({ type: 'user.data-seeding' })
 
@@ -53,12 +58,11 @@ test('Creates single location', async () => {
 
   const initialLocations = await dataSeedingClient.locations.list()
 
-  const locationPayload: Location[] = [
+  const locationPayload: SetLocationPayload[] = [
     {
       id: generateUuid(),
       administrativeAreaId: null,
       name: 'Location foobar',
-      validUntil: null,
       locationType: 'CRVS_OFFICE',
       externalId: 'abc123xyz456'
     }
@@ -69,7 +73,7 @@ test('Creates single location', async () => {
   const locations = await dataSeedingClient.locations.list()
 
   expect(locations).toHaveLength(initialLocations.length + 1)
-  expect(locations).toMatchObject(initialLocations.concat(locationPayload))
+  expect(locations).toMatchObject([...initialLocations, ...locationPayload])
 })
 
 test('Creates multiple locations under administrative area', async () => {
@@ -95,7 +99,7 @@ test('Creates multiple locations under administrative area', async () => {
 
   const locations = await dataSeedingClient.locations.list()
 
-  expect(locations).toEqual(initialLocations.concat(locationPayload))
+  expect(locations).toMatchObject([...initialLocations, ...locationPayload])
 })
 
 test('updates externalId on existing location when re-seeded with a value', async () => {
@@ -109,7 +113,6 @@ test('updates externalId on existing location when re-seeded with a value', asyn
       id: locationId,
       administrativeAreaId: null,
       name: 'Location without external id',
-      validUntil: null,
       locationType: 'CRVS_OFFICE',
       externalId: null
     }
@@ -120,16 +123,103 @@ test('updates externalId on existing location when re-seeded with a value', asyn
       id: locationId,
       administrativeAreaId: null,
       name: 'Location without external id',
-      validUntil: null,
       locationType: 'CRVS_OFFICE',
       externalId: 'pcode123'
     }
   ])
 
-  const locations = await dataSeedingClient.locations.list()
-  const updated = locations.find((l) => l.id === locationId)
+  // The read API resolves externalId from the versions array, which
+  // re-seeding deliberately leaves untouched — assert on the flat column
+  // that the upsert updates.
+  const updated = await getClient()
+    .selectFrom('locations')
+    .select('externalId')
+    .where('id', '=', locationId)
+    .executeTakeFirstOrThrow()
 
-  expect(updated?.externalId).toBe('pcode123')
+  expect(updated.externalId).toBe('pcode123')
+})
+
+test('stores a single active initial version when creating a location', async () => {
+  const { user } = await setupTestCase()
+  const dataSeedingClient = createTestClient(user, [scope])
+
+  const locationId = generateUuid()
+
+  await dataSeedingClient.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Versioned location',
+      locationType: 'CRVS_OFFICE',
+      externalId: 'versioned-location-pcode'
+    }
+  ])
+
+  const { versions } = await getClient()
+    .selectFrom('locations')
+    .select('versions')
+    .where('id', '=', locationId)
+    .executeTakeFirstOrThrow()
+
+  // toEqual matches keys exactly, so this also asserts the version element
+  // contains no parent reference (administrativeAreaId).
+  expect(versions).toEqual([
+    {
+      versionId: expect.stringMatching(UUID_REGEX),
+      effectiveFrom: '0001-01-01',
+      name: 'Versioned location',
+      externalId: 'versioned-location-pcode',
+      status: 'active'
+    }
+  ])
+})
+
+test('does not modify versions when re-seeding an existing location with a new name', async () => {
+  const { user } = await setupTestCase()
+  const dataSeedingClient = createTestClient(user, [scope])
+
+  const locationId = generateUuid()
+
+  await dataSeedingClient.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Original name',
+      locationType: 'CRVS_OFFICE',
+      externalId: 'renamed-location-pcode'
+    }
+  ])
+
+  const { versions: versionsAfterInsert } = await getClient()
+    .selectFrom('locations')
+    .select('versions')
+    .where('id', '=', locationId)
+    .executeTakeFirstOrThrow()
+
+  await dataSeedingClient.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Renamed location',
+      locationType: 'CRVS_OFFICE',
+      externalId: 'renamed-location-pcode'
+    }
+  ])
+
+  const updated = await getClient()
+    .selectFrom('locations')
+    .select(['name', 'versions'])
+    .where('id', '=', locationId)
+    .executeTakeFirstOrThrow()
+
+  // The flat column updates, but re-seeding deliberately leaves versions
+  // untouched: still the original single element with the original name.
+  expect(updated.name).toBe('Renamed location')
+  expect(updated.versions).toEqual(versionsAfterInsert)
+  expect(updated.versions).toEqual([
+    expect.objectContaining({ name: 'Original name', status: 'active' })
+  ])
 })
 
 test('seeding locations is additive, not destructive', async () => {

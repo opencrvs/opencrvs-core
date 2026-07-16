@@ -10,7 +10,11 @@
  */
 
 import * as z from 'zod/v4'
-import { AdministrativeArea, UUID } from '@opencrvs/commons'
+import {
+  AdministrativeArea,
+  SetAdministrativeAreaPayload,
+  UUID
+} from '@opencrvs/commons'
 import {
   internalProcedure,
   router,
@@ -26,7 +30,7 @@ export function setAdministrativeAreasRoute(
   procedure: typeof internalProcedure | typeof userAndSystemProcedure
 ) {
   return procedure
-    .input(z.array(AdministrativeArea).min(1))
+    .input(z.array(SetAdministrativeAreaPayload).min(1))
     .output(z.void())
     .mutation(async ({ input }) => setAdministrativeAreas(input))
 }

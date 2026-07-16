@@ -436,8 +436,7 @@ test('Prevents user creation when the location id is not within scope: "location
       name: 'top-level-location',
       administrativeAreaId: null,
       id: topLevelLocationId,
-      locationType: 'EMBASSY',
-      validUntil: null
+      locationType: 'EMBASSY'
     }
   ])
 
