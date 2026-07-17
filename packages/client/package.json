@@ -187,9 +187,11 @@
     "fetch-mock": "^10.0.0",
     "glob": "^7.1.2",
     "globals": "^16.0.0",
+    "http-server": "^14.1.1",
     "jsonwebtoken": "^9.0.0",
     "msw": "^2.7.0",
     "opener": "^1.5.1",
+    "playwright": "1.61.1",
     "postcss-styled-syntax": "^0.7.1",
     "prettier": "3.5.3",
     "qrcode": "^1.5.1",
@@ -204,7 +206,8 @@
     "tsx": "^4.15.7",
     "vite-plugin-pwa": "^0.20.0",
     "vitest": "0.25.5",
-    "vitest-fetch-mock": "^0.2.1"
+    "vitest-fetch-mock": "^0.2.1",
+    "wait-on": "^7.2.0"
   },
   "browserslist": {
     "production": [
