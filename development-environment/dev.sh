@@ -24,8 +24,10 @@ fi
 ####
 #
 # SUPER USER MODE
-# Using --only-dependences or --only-services will start only the dependencies or services.
-# This is done so that more experienced users could start the stack in different terminal windows
+# --only-dependencies / --only-services start only the dependencies or services,
+# so more experienced users can run the stack across different terminal windows.
+# --no-testland excludes the bundled testland countryconfig from the dev sweep,
+# for devs running against an external countryconfig checkout (two-terminal, unchanged).
 #
 ###
 dependencies=false
@@ -39,6 +41,9 @@ do
       ;;
     --only-services)
       services=true
+      ;;
+    --no-testland)
+      export OTHER_LERNA_FLAGS="--ignore @opencrvs/testland"
       ;;
     *)
       # Handle unknown option
@@ -75,7 +80,7 @@ elif $services; then
 fi
 
 echo
-echo -e "This command starts the OpenCRVS Core development environment, which consists of multiple NodeJS microservices running in parallel on many ports.  OpenCRVS requires a companion country configuration server to also be running. \n\nIf you ran our setup command, the country configuration server exists in the directory opencrvs-countryconfig alongside this directory, otherwise you may have cloned or forked it somewhere else.\n\nSo, before we start...\n\n1. Copy this command: \033[32myarn dev \033[0m\n\n2. Create another terminal window.\n\n3. cd into your country config directory and prepare to run the command in that terminal window \033[32mWHEN OPENCRVS CORE HAS FULLY STARTED UP\033[0m\n\nin order to start the country config server and be able to use OpenCRVS.\n\nOpenCRVS has started up fully when the terminal logs slow and stop. \n\nBrowse to this URL in Chrome to check the status:\033[32m\n\nhttps://is-my-opencrvs-up.netlify.app\033[0m \n\nIf your OpenCRVS database is not seeded, open another terminal window and cd into opencrvs-core.  Run this command in the opencrvs-core directory \033[32mWHEN OPENCRVS CORE HAS FULLY STARTED UP\033[0m in order to seed the database with data: \033[32m\n\nyarn seed:dev\033[0m\n\n"
+echo -e "This command starts the OpenCRVS Core development environment, which consists of multiple NodeJS microservices running in parallel on many ports.  OpenCRVS requires a companion country configuration server to also be running. \n\nCore, by default, starts the testland countryconfig bundled with the core monorepo.\n\nIf you want to run your own countryconfig instead, run this command with --no-testland flag and do the following:\n\n1. Copy this command: \033[32myarn dev \033[0m\n\n2. Create another terminal window.\n\n3. cd into your country config directory and prepare to run the command in that terminal window \033[32mWHEN OPENCRVS CORE HAS FULLY STARTED UP\033[0m\n\nin order to start the country config server and be able to use OpenCRVS.\n\nOpenCRVS has started up fully when the terminal logs slow and stop. \n\nBrowse to this URL in Chrome to check the status:\033[32m\n\nhttps://is-my-opencrvs-up.netlify.app\033[0m \n\nIf your OpenCRVS database is not seeded, open another terminal window and cd into opencrvs-core.  Run this command in the opencrvs-core directory \033[32mWHEN OPENCRVS CORE HAS FULLY STARTED UP\033[0m in order to seed the database with data: \033[32m\n\nyarn seed:dev\033[0m\n\n"
 echo
 
 sleep 3
