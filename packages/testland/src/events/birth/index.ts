@@ -58,7 +58,7 @@ export const birthEvent = defineConfig({
   icon: {
     FileLock: and(
       event.hasStatus(EventStatus.enum.REGISTERED),
-      event.hasFlag(InherentFlags.SEALED)
+      event.hasFlag('sealed')
     )
   },
   fallbackTitle: {
@@ -149,6 +149,15 @@ export const birthEvent = defineConfig({
         description: 'Flag label for corrected record'
       },
       requiresAction: false
+    },
+    {
+      id: 'sealed',
+      label: {
+        id: 'event.birth.flag.sealed',
+        defaultMessage: 'Sealed',
+        description: 'Flag label for sealed'
+      },
+      requiresAction: false
     }
   ],
   summary: {
@@ -160,7 +169,7 @@ export const birthEvent = defineConfig({
             type: ConditionalType.SHOW,
             conditional: and(
               not(field('child.nid').isFalsy()),
-              not(flag(InherentFlags.SEALED))
+              not(flag('sealed'))
             )
           }
         ]
@@ -175,7 +184,7 @@ export const birthEvent = defineConfig({
         conditionals: [
           {
             type: ConditionalType.SHOW,
-            conditional: not(flag(InherentFlags.SEALED))
+            conditional: not(flag('sealed'))
           }
         ]
       },
@@ -197,7 +206,7 @@ export const birthEvent = defineConfig({
           {
             type: ConditionalType.SHOW,
             conditional: and(
-              not(flag(InherentFlags.SEALED)),
+              not(flag('sealed')),
               field('child.placeOfBirth').isFalsy()
             )
           }
@@ -219,7 +228,7 @@ export const birthEvent = defineConfig({
           {
             type: ConditionalType.SHOW,
             conditional: and(
-              not(flag(InherentFlags.SEALED)),
+              not(flag('sealed')),
               field('child.placeOfBirth').isEqualTo(
                 PlaceOfBirth.HEALTH_FACILITY
               )
@@ -243,7 +252,7 @@ export const birthEvent = defineConfig({
           {
             type: ConditionalType.SHOW,
             conditional: and(
-              not(flag(InherentFlags.SEALED)),
+              not(flag('sealed')),
               field('child.placeOfBirth').isEqualTo(PlaceOfBirth.PRIVATE_HOME)
             )
           }
@@ -265,7 +274,7 @@ export const birthEvent = defineConfig({
           {
             type: ConditionalType.SHOW,
             conditional: and(
-              not(flag(InherentFlags.SEALED)),
+              not(flag('sealed')),
               field('child.placeOfBirth').isEqualTo(PlaceOfBirth.OTHER)
             )
           }
@@ -291,7 +300,7 @@ export const birthEvent = defineConfig({
         conditionals: [
           {
             type: ConditionalType.SHOW,
-            conditional: not(flag(InherentFlags.SEALED))
+            conditional: not(flag('sealed'))
           }
         ]
       }
@@ -1173,14 +1182,14 @@ export const birthEvent = defineConfig({
       conditionals: [
         {
           type: ConditionalType.SHOW,
-          conditional: not(flag(InherentFlags.SEALED))
+          conditional: not(flag('sealed'))
         },
         {
           type: ConditionalType.ENABLE,
-          conditional: not(flag(InherentFlags.SEALED))
+          conditional: not(flag('sealed'))
         }
       ],
-      flags: [{ id: InherentFlags.SEALED, operation: 'add' }],
+      flags: [{ id: 'sealed', operation: 'add' }],
       auditHistoryLabel: {
         defaultMessage: 'Sealed',
         description: 'The label to show in audit history for the seal action',
@@ -1224,15 +1233,15 @@ export const birthEvent = defineConfig({
           }
         }
       ],
-      flags: [{ id: InherentFlags.SEALED, operation: 'remove' }],
+      flags: [{ id: 'sealed', operation: 'remove' }],
       conditionals: [
         {
           type: ConditionalType.SHOW,
-          conditional: flag(InherentFlags.SEALED)
+          conditional: flag('sealed')
         },
         {
           type: ConditionalType.ENABLE,
-          conditional: flag(InherentFlags.SEALED)
+          conditional: flag('sealed')
         }
       ]
     }

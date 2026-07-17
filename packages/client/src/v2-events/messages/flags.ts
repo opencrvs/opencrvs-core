@@ -19,11 +19,6 @@ import {
 } from '@opencrvs/commons/client'
 
 const flagMessages = {
-  [InherentFlags.SEALED]: {
-    id: 'flags.builtin.sealed.label',
-    defaultMessage: 'Sealed',
-    description: 'Flag label for sealed'
-  },
   [InherentFlags.CORRECTION_REQUESTED]: {
     id: 'flags.builtin.correction-requested.label',
     defaultMessage: 'Correction requested',
