@@ -7,7 +7,11 @@ RUN apt-get update && apt-get upgrade -y
 RUN apt-get clean && \
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
+# The pnpm version is pinned by the packageManager field in package.json
 RUN corepack enable pnpm
+
+# Lets pnpm replace a production node_modules with a dev install without prompting
+ENV CI=true
 
 USER node
 
