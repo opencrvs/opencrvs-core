@@ -128,6 +128,17 @@ export const locationRouter = router({
       return location
     }),
   update: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'Update a location',
+        description:
+          'Append a new version to a location (rename, recode or inactivate). Prior versions are never modified.',
+        method: 'PUT',
+        path: '/locations/{id}',
+        tags: ['Locations'],
+        protect: true
+      }
+    })
     .use(allowedWithAnyOfScopes(['location.edit']))
     .input(UpdateLocationPayload)
     .output(Location)

@@ -104,6 +104,17 @@ export const administrativeAreaRouter = router({
       return administrativeArea
     }),
   update: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'Update an administrative area',
+        description:
+          'Append a new version to an administrative area (rename, recode or inactivate). Prior versions are never modified.',
+        method: 'PUT',
+        path: '/administrative-areas/{id}',
+        tags: ['Administrative areas'],
+        protect: true
+      }
+    })
     .use(allowedWithAnyOfScopes(['location.edit']))
     .input(UpdateAdministrativeAreaPayload)
     .output(AdministrativeArea)
