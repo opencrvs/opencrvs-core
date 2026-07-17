@@ -21,9 +21,9 @@ const pageInput = {
 }
 
 describe('PageConfig', () => {
-  it('defaults showClearButton to false when not provided', () => {
+  it('leaves showClearButton undefined when not provided', () => {
     const parsed = FormPageConfig.parse(pageInput)
-    expect(parsed.showClearButton).toBe(false)
+    expect(parsed.showClearButton).toBeUndefined()
   })
 
   it('allows enabling showClearButton', () => {

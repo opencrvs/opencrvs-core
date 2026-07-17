@@ -30,7 +30,7 @@ const PageConfigBase = z
       ),
     showClearButton: z
       .boolean()
-      .default(false)
+      .optional()
       .describe(
         'If true, a "Clear" button is shown at the top of the page allowing the user to reset all fields on the page to their default state'
       ),
