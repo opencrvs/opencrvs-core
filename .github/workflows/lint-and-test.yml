@@ -184,6 +184,12 @@ jobs:
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/events')
         run: cd packages/events && yarn build:types
 
+      # testland consumes the workspace toolkit at runtime; build.sh needs
+      # commons + events types built first (steps above).
+      - name: Build toolkit
+        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/toolkit')
+        run: cd packages/toolkit && yarn build
+
       # TODO: should run parallel to unit tests as can take as much as unit tests
       - name: Run linting
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-lint != 'true'
