@@ -170,6 +170,35 @@ export async function createLocation(
   return { location: await getLocationById(resolved.id), created: true }
 }
 
+/**
+ * A request collided with an existing version that has the same
+ * `effectiveFrom`. Is that version the result of this same request being
+ * sent before (a retry)?
+ *
+ * True when it sits right after the `lastVersionId` element and carries the
+ * request's values — retries are answered with success, without writing.
+ * False otherwise, e.g. when the request only mimics an old version — that
+ * is a conflict, not a retry.
+ */
+function isRetriedAppend(
+  versions: LocationVersion[],
+  collision: LocationVersion,
+  newVersion: LocationVersion,
+  lastVersionId: string
+): boolean {
+  const tokenIndex = versions.findIndex(
+    (version) => version.versionId === lastVersionId
+  )
+
+  return (
+    tokenIndex >= 0 &&
+    versions[tokenIndex + 1] === collision &&
+    collision.name === newVersion.name &&
+    (collision.externalId ?? null) === newVersion.externalId &&
+    collision.status === newVersion.status
+  )
+}
+
 /** Outcome of a checked version append, consumed by the router audit log. */
 export interface VersionAppendOutcome {
   appended: boolean
@@ -184,8 +213,8 @@ export interface VersionAppendOutcome {
  * locking: location writes are rare, single-admin operations.
  *
  * 1. missing / soft-deleted row → NOT_FOUND
- * 2. an element with the same `effectiveFrom` and identical values →
- *    idempotent replay (no write); with different values → CONFLICT.
+ * 2. an element colliding on `effectiveFrom` → idempotent replay when it is
+ *    the caller's own retried append (no write); otherwise → CONFLICT.
  *    This runs before the stale-token check because a replayed request's
  *    `lastVersionId` is legitimately stale.
  * 3. `lastVersionId` not the latest element → CONFLICT (stale token)
@@ -229,18 +258,15 @@ export async function appendVersionChecked({
   )
 
   if (collision) {
-    const isReplay =
-      collision.name === newVersion.name &&
-      (collision.externalId ?? null) === newVersion.externalId &&
-      collision.status === newVersion.status
-
-    if (isReplay) {
+    if (
+      isRetriedAppend(versions, collision, newVersion, payload.lastVersionId)
+    ) {
       return { appended: false }
     }
 
     throw new TRPCError({
       code: 'CONFLICT',
-      message: `A version with effectiveFrom ${newVersion.effectiveFrom} already exists with different values`
+      message: `A version with effectiveFrom ${newVersion.effectiveFrom} already exists`
     })
   }
 

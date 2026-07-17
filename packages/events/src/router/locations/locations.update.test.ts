@@ -527,3 +527,41 @@ test('a future-dated rename is stored but does not drive the flat fields yet', a
   // The version in effect today still drives the read model.
   expect(updated.name).toBe('Present Name')
 })
+
+test('a new request matching an OLD version must not be mistaken for a retry', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  // History: "Old Name" from 2024-01-01, then renamed to "New Name" in 2025.
+  const created = await createLocation(client, {
+    name: 'Old Name',
+    externalId: 'replay-lie-pcode',
+    effectiveFrom: '2024-01-01'
+  })
+  const renamed = await client.locations.update({
+    id: created.id,
+    name: 'New Name',
+    externalId: 'replay-lie-pcode',
+    status: 'active',
+    effectiveFrom: '2025-01-01',
+    lastVersionId: created.versions[0].versionId
+  })
+
+  // A brand-new request (fresh lastVersionId, so NOT a retry) that happens to
+  // match the old 2024 element exactly. Its date collides with an existing
+  // version, so it must be rejected — not silently reported as "already done".
+  await expect(
+    client.locations.update({
+      id: created.id,
+      name: 'Old Name',
+      externalId: 'replay-lie-pcode',
+      status: 'active',
+      effectiveFrom: '2024-01-01',
+      lastVersionId: renamed.versions[1].versionId
+    })
+  ).rejects.toMatchObject({ code: 'CONFLICT' })
+
+  // And the location must still resolve to the current name.
+  const after = await client.locations.list()
+  expect(after.find((l) => l.id === created.id)?.name).toBe('New Name')
+})
