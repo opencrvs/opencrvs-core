@@ -14,6 +14,7 @@ import {
   runEnvironmentInit,
   runEnvironmentSwarmToK8s,
   runEnvironmentUpdateWorkflows,
+  runEnvironmentUpgrade,
   runEnvironmentUsers
 } from './environment'
 
@@ -76,6 +77,7 @@ Usage: opencrvs environment <subcommand>
 
 Subcommands:
   init              Initialise a new environment
+  upgrade           Upgrade existing environment configuration
   update-workflows  Update workflow environment options
   users             Manage environment users
   swarm-to-k8s      Migrate Docker Swarm configuration to Kubernetes
@@ -87,6 +89,8 @@ Subcommands:
   switch (subcommand) {
     case 'init':
       return runEnvironmentCommand('initialisation', runEnvironmentInit)
+    case 'upgrade':
+      return runEnvironmentCommand('environment upgrade', runEnvironmentUpgrade)
     case 'update-workflows':
       return runEnvironmentCommand(
         'workflow update',

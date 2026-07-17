@@ -77,6 +77,7 @@ import {
 import { askQuestionWithEditor } from './editor-questions'
 import { selectWithCustom, getIndexFromChoices } from './questions-helper'
 import { manageUsers } from './manage-users'
+import { getEnvironmentInventoryPath } from './paths'
 
 function questionToPrompt<T extends string>({
   valueType,
@@ -464,9 +465,7 @@ ALL_QUESTIONS.push(
     : []
 
   log('\n', kleur.bold().underline('SSH Users'), '\n')
-  const users = await manageUsers(
-    `infrastructure/server-setup/inventory/${environment}.yml`
-  )
+  const users = await manageUsers(getEnvironmentInventoryPath(environment))
 
   log('\n', kleur.bold().underline('Traefik SSL Certificate'), '\n')
   const sslCertExists = findExistingValue(

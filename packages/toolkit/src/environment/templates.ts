@@ -12,6 +12,7 @@
 import fs from 'fs'
 import path from 'path'
 import { log, success, warn } from './logger'
+import { getEnvironmentInventoryPath } from './paths'
 
 import Handlebars from 'handlebars'
 
@@ -98,7 +99,7 @@ export function copyChartsValues(
 
   values['lets_encrypt'] = values['traefik_mode'] === 'lets_encrypt'
   values['static_ssl'] = values['traefik_mode'] === 'static_ssl'
-  values['opencrvs_environment'] = env;
+  values['opencrvs_environment'] = env
 
   function copyRecursive(src: string, dest: string) {
     const stat = fs.statSync(src)
@@ -152,13 +153,7 @@ export function generateInventory(env: string, values: Record<string, any>) {
     'inventory',
     'inventory.template.yml'
   )
-  const outputPath = path.join(
-    process.cwd(),
-    'infrastructure',
-    'server-setup',
-    'inventory',
-    `${env}.yml`
-  )
+  const outputPath = path.resolve(process.cwd(), getEnvironmentInventoryPath(env))
 
   const templateFile = fs.readFileSync(templatePath, 'utf-8')
   const template = Handlebars.compile(templateFile)

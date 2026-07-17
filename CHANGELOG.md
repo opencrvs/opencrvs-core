@@ -37,6 +37,7 @@ Archiving a NOTIFIED (incomplete) record used to clear `InherentFlags.INCOMPLETE
 
 - Private docker image registry support for Dependencies helm chart [#13090](https://github.com/opencrvs/opencrvs-core/issues/13090)
 - Added infrastructure management script to toolkit [#12941](https://github.com/opencrvs/opencrvs-core/issues/12941)
+- Moved Ansible inventory files into environment-specific folders so each environment is self-contained and portable [#13181](https://github.com/opencrvs/opencrvs-core/pull/13181)
 
 ### New features
 
