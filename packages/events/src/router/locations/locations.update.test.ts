@@ -565,3 +565,33 @@ test('a new request matching an OLD version must not be mistaken for a retry', a
   const after = await client.locations.list()
   expect(after.find((l) => l.id === created.id)?.name).toBe('New Name')
 })
+
+test('rejects a client-supplied versionId that already names an existing version', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const created = await createLocation(client, {
+    name: 'Duplicate Id Office',
+    externalId: 'duplicate-version-id-pcode'
+  })
+
+  await expect(
+    client.locations.update({
+      id: created.id,
+      // Reuses the initial element's versionId — every element must be
+      // uniquely addressable (withdraw targets elements by versionId).
+      versionId: created.versions[0].versionId,
+      name: 'Renamed Office',
+      externalId: 'duplicate-version-id-pcode',
+      status: 'active',
+      effectiveFrom: '2025-01-01',
+      lastVersionId: created.versions[0].versionId
+    })
+  ).rejects.toMatchObject({
+    code: 'CONFLICT',
+    message: expect.stringContaining('versionId')
+  })
+
+  const row = await getVersionsFromDb(created.id)
+  expect(row.versions).toHaveLength(1)
+})

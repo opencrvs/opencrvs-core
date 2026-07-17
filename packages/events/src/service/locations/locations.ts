@@ -271,6 +271,23 @@ function checkEffectiveFromCollision(
   })
 }
 
+/**
+ * A caller-supplied `versionId` must not already name an existing element —
+ * elements are targeted by `versionId` (e.g. by withdraw), so duplicates
+ * would make those references ambiguous.
+ */
+function assertVersionIdUnused(
+  versions: LocationVersion[],
+  newVersion: LocationVersion
+): void {
+  if (versions.some((v) => v.versionId === newVersion.versionId)) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: `A version with versionId ${newVersion.versionId} already exists`
+    })
+  }
+}
+
 /** The optimistic-concurrency check: the caller must have seen the latest version. */
 function assertLatestVersionToken(
   last: LocationVersion,
@@ -385,6 +402,7 @@ export async function appendVersionChecked({
     return { appended: false }
   }
 
+  assertVersionIdUnused(versions, newVersion)
   assertLatestVersionToken(last, payload.lastVersionId, entityLabel)
   assertForwardOnly(newVersion, last)
   await assertExternalIdAvailable({
