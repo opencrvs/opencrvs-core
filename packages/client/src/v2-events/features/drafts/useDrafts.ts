@@ -219,6 +219,14 @@ export function useDrafts() {
     return drafts.data
   }
 
+  function getRemoteDraftsWithLocalEvent(
+    additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
+  ): Draft[] {
+    return getAllRemoteDrafts(additionalOptions).filter((draft) =>
+      Boolean(findLocalEventDocument(draft.eventId))
+    )
+  }
+
   return {
     setLocalDraft: localDraftStore((drafts) => drafts.setDraft),
     getLocalDraftOrDefault,
@@ -238,6 +246,7 @@ export function useDrafts() {
     },
     isLocalDraftSubmitted: createDraft.isSuccess,
     getAllRemoteDrafts,
+    getRemoteDraftsWithLocalEvent,
     getRemoteDraftByEventId: function useDraftList(
       eventId: string,
       additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
