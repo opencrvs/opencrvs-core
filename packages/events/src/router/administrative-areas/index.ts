@@ -12,6 +12,7 @@
 import * as z from 'zod/v4'
 import {
   AdministrativeArea,
+  CreateAdministrativeAreaPayload,
   SetAdministrativeAreaPayload,
   UUID
 } from '@opencrvs/commons'
@@ -20,7 +21,9 @@ import {
   router,
   userAndSystemProcedure
 } from '@events/router/trpc'
+import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import {
+  createAdministrativeArea,
   getAdministrativeAreas,
   setAdministrativeAreas
 } from '../../service/administrative-areas'
@@ -56,5 +59,45 @@ export const administrativeAreaRouter = router({
     userAndSystemProcedure.use(
       allowedWithAnyOfScopes(['user.data-seeding', 'config.update-all'])
     )
-  )
+  ),
+  create: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'Create an administrative area',
+        description:
+          'Create a new administrative area with a single initial version.',
+        method: 'POST',
+        path: '/administrative-areas',
+        tags: ['Administrative areas'],
+        protect: true
+      }
+    })
+    .use(allowedWithAnyOfScopes(['location.edit']))
+    .input(CreateAdministrativeAreaPayload)
+    .output(AdministrativeArea)
+    .mutation(async ({ input, ctx }) => {
+      const { administrativeArea, created } =
+        await createAdministrativeArea(input)
+
+      if (created) {
+        const [initialVersion] = administrativeArea.versions
+
+        await writeAuditLog({
+          clientId: ctx.user.id,
+          clientType: ctx.user.type,
+          operation: 'administrativeAreas.create',
+          requestData: {
+            id: administrativeArea.id,
+            versionId: initialVersion.versionId,
+            name: initialVersion.name,
+            externalId: initialVersion.externalId ?? null,
+            parentId: administrativeArea.parentId,
+            effectiveFrom: initialVersion.effectiveFrom,
+            status: initialVersion.status
+          }
+        })
+      }
+
+      return administrativeArea
+    })
 })

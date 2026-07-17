@@ -13,6 +13,7 @@ import { Kysely, RawBuilder, sql } from 'kysely'
 import { chunk } from 'lodash'
 import {
   getUUID,
+  LocationStatus,
   LocationVersion,
   logger,
   resolveVersion,
@@ -36,23 +37,30 @@ export function clearAdministrativeHierarchyCache() {
 
 /**
  * Builds the initial `versions` jsonb value for a location or administrative
- * area row on insert. The initial version is always a single active element
- * effective from the beginning of time.
+ * area row on insert: a single element. By default (seeding) the element is
+ * active and effective from the beginning of time with a generated id; the
+ * create path may supply `versionId`, `effectiveFrom` and `status` explicitly.
  */
 export function buildInitialVersions({
   name,
-  externalId
+  externalId,
+  versionId,
+  effectiveFrom,
+  status
 }: {
   name: string
   externalId?: string | null
+  versionId?: UUID
+  effectiveFrom?: string
+  status?: LocationStatus
 }): RawBuilder<LocationVersion[]> {
   const versions: LocationVersion[] = [
     {
-      versionId: getUUID(),
-      effectiveFrom: '0001-01-01',
+      versionId: versionId ?? getUUID(),
+      effectiveFrom: effectiveFrom ?? '0001-01-01',
       name,
       externalId: externalId ?? null,
-      status: 'active'
+      status: status ?? 'active'
     }
   ]
 
@@ -79,15 +87,21 @@ export function parseVersions(rawVersions: unknown, rowId: string) {
 /**
  * Resolves the read model fields (`name`, `externalId`, `status`) from the
  * version in effect today (UTC).
+ *
+ * When every version is still in the future (a location that does not exist
+ * yet), `resolveVersion` falls back to the earliest element so the name still
+ * renders — but the location must not be treated as active before its first
+ * `effectiveFrom`, so `status` is forced to 'inactive'.
  */
 export function resolveVersionFields(versions: LocationVersion[]) {
   const today = new Date().toISOString().slice(0, 10)
   const current = resolveVersion(versions, today)
+  const isFuture = current.effectiveFrom > today
 
   return {
     name: current.name,
     externalId: current.externalId ?? null,
-    status: current.status
+    status: isFuture ? ('inactive' as const) : current.status
   }
 }
 
@@ -145,6 +159,76 @@ export async function setLocations(
   clearAdministrativeHierarchyCache()
 }
 
+/** The fully resolved values of a location create request. */
+export interface CreateLocationRow {
+  id: UUID
+  versionId: UUID
+  name: string
+  externalId: string | null
+  administrativeAreaId: UUID | null
+  locationType: string | null
+  effectiveFrom: string
+  status: LocationStatus
+}
+
+/**
+ * Inserts a single new location with a one-element `versions` history built
+ * from the resolved create values. Deliberately has no conflict handling —
+ * id collisions must surface to the caller.
+ *
+ * The legacy `external_id` column is intentionally NOT populated: the code
+ * lives in the versions array, and the column's absolute UNIQUE constraint
+ * would otherwise block legitimate code reuse (an inactivated location's
+ * code moving to its successor). The legacy `name` column is still written
+ * (NOT NULL) — legacy columns hold the creation-time snapshot at best.
+ */
+export async function createLocation(location: CreateLocationRow) {
+  const db = getClient()
+
+  await db
+    .insertInto('locations')
+    .values({
+      id: location.id,
+      name: location.name,
+      externalId: null,
+      administrativeAreaId: location.administrativeAreaId,
+      locationType: location.locationType,
+      deletedAt: null,
+      versions: buildInitialVersions(location)
+    })
+    .execute()
+
+  clearAdministrativeHierarchyCache()
+}
+
+/**
+ * Fetches a location row by id without the soft-delete filter and without
+ * resolving version fields. Used by the create path to detect idempotent
+ * retries against any existing row, including soft-deleted ones.
+ */
+export async function getLocationRowById(locationId: UUID) {
+  const db = getClient()
+
+  const row = await db
+    .selectFrom('locations')
+    .select([
+      'id',
+      'name',
+      'externalId',
+      'administrativeAreaId',
+      'locationType',
+      'versions'
+    ])
+    .where('id', '=', locationId)
+    .executeTakeFirst()
+
+  if (!row) {
+    return undefined
+  }
+
+  return { ...row, versions: parseVersions(row.versions, row.id) }
+}
+
 export async function getLocations({
   locationType,
   locationIds,
@@ -168,7 +252,11 @@ export async function getLocations({
   }
 
   if (externalId) {
-    query = query.where('externalId', '=', externalId)
+    // Containment only narrows to rows that carried the code at some point;
+    // the current-code match happens after row mapping below.
+    query = query.where(
+      sql<boolean>`versions @> ${JSON.stringify([{ externalId }])}::jsonb`
+    )
   }
 
   if (locationIds && locationIds.length > 0) {
@@ -177,18 +265,47 @@ export async function getLocations({
 
   const rows = await query.execute()
 
-  const locations = rows.map(({ versions: rawVersions, ...row }) => {
+  let locations = rows.map(({ versions: rawVersions, ...row }) => {
     const versions = parseVersions(rawVersions, row.id)
     return { ...row, versions, ...resolveVersionFields(versions) }
   })
 
-  // Active status is resolved from the versions array (the version in effect
-  // today), so the filter runs after row mapping rather than in SQL.
+  // externalId and active status are resolved from the versions array (the
+  // version in effect today), so both filters run after row mapping rather
+  // than in SQL.
+  if (externalId) {
+    locations = locations.filter(
+      (location) => location.externalId === externalId
+    )
+  }
+
   if (isActive) {
-    return locations.filter((location) => location.status === 'active')
+    locations = locations.filter((location) => location.status === 'active')
   }
 
   return locations
+}
+
+/**
+ * Returns all locations whose versions array carried the given externalId at
+ * any point (past, current or future) — unlike `getLocations({ externalId })`,
+ * which matches the current code only. Used by the create/update uniqueness
+ * check, which needs to inspect each candidate's whole timeline.
+ */
+export async function getLocationsEverHoldingExternalId(externalId: string) {
+  const db = getClient()
+
+  const rows = await db
+    .selectFrom('locations')
+    .select(['id', 'versions'])
+    .where('deletedAt', 'is', null)
+    .where(sql<boolean>`versions @> ${JSON.stringify([{ externalId }])}::jsonb`)
+    .execute()
+
+  return rows.map(({ versions: rawVersions, id }) => ({
+    id,
+    versions: parseVersions(rawVersions, id)
+  }))
 }
 
 export async function locationExists(locationId: UUID) {
