@@ -157,7 +157,7 @@ export async function updateAdministrativeArea(
   const outcome = await appendVersionChecked({
     payload,
     entityLabel: 'Administrative area',
-    withLockedRow: administrativeAreaRepo.withLockedAdministrativeAreaRow
+    table: 'administrativeAreas'
   })
 
   return {

@@ -22,6 +22,7 @@ import {
   UUID
 } from '@opencrvs/commons'
 import * as locationsRepo from '@events/storage/postgres/administrative-hierarchy/locations'
+import * as administrativeAreasRepo from '@events/storage/postgres/administrative-hierarchy/administrative-areas'
 
 /**
  * Narrows an unknown error to a postgres unique-violation (SQLSTATE 23505).
@@ -179,7 +180,8 @@ export interface VersionAppendOutcome {
 /**
  * Shared update core for locations and administrative areas (the payloads are
  * structurally identical). Appends a new version element after running the
- * invariant checks under the row lock, so concurrent updates serialise:
+ * invariant checks — a plain read → check → append, deliberately without
+ * locking: location writes are rare, single-admin operations.
  *
  * 1. missing / soft-deleted row → NOT_FOUND
  * 2. an element with the same `effectiveFrom` and identical values →
@@ -195,14 +197,11 @@ export interface VersionAppendOutcome {
 export async function appendVersionChecked({
   payload,
   entityLabel,
-  withLockedRow
+  table
 }: {
   payload: UpdateLocationPayload
   entityLabel: 'Location' | 'Administrative area'
-  withLockedRow: <T>(
-    id: UUID,
-    callback: (context: locationsRepo.LockedVersionedRowContext) => Promise<T>
-  ) => Promise<T>
+  table: 'locations' | 'administrativeAreas'
 }): Promise<VersionAppendOutcome> {
   const newVersion: LocationVersion = {
     versionId: payload.versionId ?? getUUID(),
@@ -213,83 +212,84 @@ export async function appendVersionChecked({
     status: payload.status
   }
 
-  return withLockedRow(
-    payload.id,
-    async ({ row, append, getCandidatesEverHoldingExternalId }) => {
-      if (!row || row.deletedAt !== null) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: `${entityLabel} with id ${payload.id} not found`
-        })
-      }
+  const row = await locationsRepo.getVersionedRowById(table, payload.id)
 
-      const { versions } = row
-      const last = versions[versions.length - 1]
+  if (!row || row.deletedAt !== null) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `${entityLabel} with id ${payload.id} not found`
+    })
+  }
 
-      const collision = versions.find(
-        (version) => version.effectiveFrom === newVersion.effectiveFrom
-      )
+  const { versions } = row
+  const last = versions[versions.length - 1]
 
-      if (collision) {
-        const isReplay =
-          collision.name === newVersion.name &&
-          (collision.externalId ?? null) === newVersion.externalId &&
-          collision.status === newVersion.status
-
-        if (isReplay) {
-          return { appended: false }
-        }
-
-        throw new TRPCError({
-          code: 'CONFLICT',
-          message: `A version with effectiveFrom ${newVersion.effectiveFrom} already exists with different values`
-        })
-      }
-
-      if (payload.lastVersionId !== last.versionId) {
-        throw new TRPCError({
-          code: 'CONFLICT',
-          message: `${entityLabel} was modified by another request — refresh and retry`
-        })
-      }
-
-      if (newVersion.effectiveFrom <= last.effectiveFrom) {
-        throw new TRPCError({
-          code: 'UNPROCESSABLE_CONTENT',
-          message: `effectiveFrom ${newVersion.effectiveFrom} must be later than the latest version's effectiveFrom ${last.effectiveFrom}`
-        })
-      }
-
-      const externalId = newVersion.externalId ?? null
-
-      if (externalId !== null && externalId !== (last.externalId ?? null)) {
-        const candidates = await getCandidatesEverHoldingExternalId(externalId)
-
-        const collides = candidates.some(
-          (candidate) =>
-            candidate.id !== payload.id &&
-            hasActiveExternalIdOnOrAfter(
-              candidate.versions,
-              externalId,
-              newVersion.effectiveFrom
-            )
-        )
-
-        if (collides) {
-          throw new TRPCError({
-            code: 'CONFLICT',
-            message: `An active ${entityLabel.toLowerCase()} with externalId ${externalId} already exists`
-          })
-        }
-      }
-
-      await append(newVersion)
-
-      return { appended: true, previousVersion: last, newVersion }
-    }
+  const collision = versions.find(
+    (version) => version.effectiveFrom === newVersion.effectiveFrom
   )
-}
 
+  if (collision) {
+    const isReplay =
+      collision.name === newVersion.name &&
+      (collision.externalId ?? null) === newVersion.externalId &&
+      collision.status === newVersion.status
+
+    if (isReplay) {
+      return { appended: false }
+    }
+
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: `A version with effectiveFrom ${newVersion.effectiveFrom} already exists with different values`
+    })
+  }
+
+  if (payload.lastVersionId !== last.versionId) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: `${entityLabel} was modified by another request — refresh and retry`
+    })
+  }
+
+  if (newVersion.effectiveFrom <= last.effectiveFrom) {
+    throw new TRPCError({
+      code: 'UNPROCESSABLE_CONTENT',
+      message: `effectiveFrom ${newVersion.effectiveFrom} must be later than the latest version's effectiveFrom ${last.effectiveFrom}`
+    })
+  }
+
+  const externalId = newVersion.externalId ?? null
+
+  if (externalId !== null && externalId !== (last.externalId ?? null)) {
+    const candidates =
+      table === 'locations'
+        ? await locationsRepo.getLocationsEverHoldingExternalId(externalId)
+        : await administrativeAreasRepo.getAdministrativeAreasEverHoldingExternalId(
+            externalId
+          )
+
+    const collides = candidates.some(
+      (candidate) =>
+        candidate.id !== payload.id &&
+        hasActiveExternalIdOnOrAfter(
+          candidate.versions,
+          externalId,
+          newVersion.effectiveFrom
+        )
+    )
+
+    if (collides) {
+      throw new TRPCError({
+        code: 'CONFLICT',
+        message: `An active ${entityLabel.toLowerCase()} with externalId ${externalId} already exists`
+      })
+    }
+  }
+
+  await locationsRepo.appendVersion(table, payload.id, newVersion)
+
+  return { appended: true, previousVersion: last, newVersion }
+}
 /** The audit diff between two version elements — only fields that changed. */
 export interface LocationVersionDiff {
   name?: { from: string; to: string }
@@ -332,7 +332,7 @@ export async function updateLocation(
   const outcome = await appendVersionChecked({
     payload,
     entityLabel: 'Location',
-    withLockedRow: locationsRepo.withLockedLocationRow
+    table: 'locations'
   })
 
   return { location: await getLocationById(payload.id), ...outcome }

@@ -346,46 +346,6 @@ test('an identical replay appends nothing and audits only the first call', async
   expect(auditEntries).toHaveLength(1)
 })
 
-test('two concurrent updates with the same lastVersionId serialise: one wins, one conflicts', async () => {
-  const { user } = await setupTestCase()
-  const client = createTestClient(user, [scope])
-
-  const created = await createArea(client, {
-    name: 'Contended District',
-    externalId: 'area-contended-pcode'
-  })
-
-  const base = {
-    id: created.id,
-    externalId: 'area-contended-pcode',
-    status: 'active' as const,
-    lastVersionId: created.versions[0].versionId
-  }
-
-  const results = await Promise.allSettled([
-    client.administrativeAreas.update({
-      ...base,
-      name: 'Rename A',
-      effectiveFrom: '2025-01-01'
-    }),
-    client.administrativeAreas.update({
-      ...base,
-      name: 'Rename B',
-      effectiveFrom: '2025-02-01'
-    })
-  ])
-
-  expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1)
-  const rejected = results.filter((r) => r.status === 'rejected')
-  expect(rejected).toHaveLength(1)
-  expect((rejected[0] as PromiseRejectedResult).reason).toMatchObject({
-    code: 'CONFLICT'
-  })
-
-  const row = await getVersionsFromDb(created.id)
-  expect(row.versions).toHaveLength(2)
-})
-
 test('rejects a recode to an actively held externalId but allows a brand-new code', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [scope])
