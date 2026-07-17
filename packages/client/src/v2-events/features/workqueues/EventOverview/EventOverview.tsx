@@ -27,6 +27,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
+import { useEventIcon } from '@client/v2-events/hooks/useEventIcon'
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
 import { EventSummary } from './components/EventSummary'
@@ -39,6 +40,7 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { status } = eventIndex
+  const iconName = useEventIcon(eventConfiguration, eventIndex)
   const { getRemoteDraftByEventId } = useDrafts()
   const draft = getRemoteDraftByEventId(eventIndex.id, {
     refetchOnMount: 'always'
@@ -79,7 +81,14 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
 
   return (
     <Content
-      icon={() => <IconWithName flags={flags} name={''} status={status} />}
+      icon={() => (
+        <IconWithName
+          flags={flags}
+          iconName={iconName}
+          name={''}
+          status={status}
+        />
+      )}
       size={ContentSize.LARGE}
       title={title}
       titleColor={event.id ? 'copy' : 'grey600'}
@@ -100,6 +109,7 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
 function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
   const { eventConfiguration } = useEventConfiguration(eventIndex.type)
   const { status } = eventIndex
+  const iconName = useEventIcon(eventConfiguration, eventIndex)
   const { getRemoteDraftByEventId } = useDrafts()
   const draft = getRemoteDraftByEventId(eventIndex.id)
 
@@ -135,7 +145,14 @@ function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
 
   return (
     <Content
-      icon={() => <IconWithName flags={flags} name={''} status={status} />}
+      icon={() => (
+        <IconWithName
+          flags={flags}
+          iconName={iconName}
+          name={''}
+          status={status}
+        />
+      )}
       size={ContentSize.LARGE}
       title={title}
       titleColor={eventIndex.id ? 'copy' : 'grey600'}

@@ -12,7 +12,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
-import { Flag, InherentFlags } from '@opencrvs/commons/client'
+import { AvailableIcons, Flag, InherentFlags } from '@opencrvs/commons/client'
 import { getEventIcon } from './IconWithNameEvent'
 
 export const Flex = styled.div`
@@ -71,18 +71,21 @@ export function IconWithName({
   name,
   isValidatedOnReview,
   isArchived,
-  flags
+  flags,
+  iconName
 }: {
   status: keyof typeof STATUS_TO_COLOR_MAP
   name: React.ReactNode
   isValidatedOnReview?: boolean
   isArchived?: boolean
   flags?: Flag[]
+  /** Icon resolved from `EventConfig.icon`, taking precedence over the default status/flag-based icon. */
+  iconName?: AvailableIcons
 }) {
   return (
     <Flex id="flex">
       <Icon>
-        {getEventIcon(flags, status, isArchived, isValidatedOnReview)}
+        {getEventIcon(flags, status, isArchived, isValidatedOnReview, iconName)}
       </Icon>
       {name}
     </Flex>

@@ -47,6 +47,7 @@ import { EventIndex } from '../events/EventIndex'
 import { Location } from '../events/locations'
 import { SystemVariables } from '../events/TemplateConfig'
 import { getCurrentEventState } from '../events/state'
+import { AvailableIcons } from '../icons'
 
 const ajv = new Ajv({
   $data: true,
@@ -169,10 +170,12 @@ export function buildClientFunctionContext(input: {
   adminLevelIds?: string[]
 }): ClientFunctionContext {
   const flags =
-    (input.validatorContext?.event &&
-      input.validatorContext?.eventConfig) ? getCurrentEventState(
-    input.validatorContext?.event,
-    input.validatorContext?.eventConfig)?.flags : []
+    input.validatorContext?.event && input.validatorContext?.eventConfig
+      ? getCurrentEventState(
+          input.validatorContext?.event,
+          input.validatorContext?.eventConfig
+        )?.flags
+      : []
 
   return {
     $form: input.form,
@@ -475,6 +478,37 @@ export function areConditionsMet(
   return conditions.every((condition) =>
     validate(condition.conditional, clientFunctionContext)
   )
+}
+
+/**
+ * Given an EventConfig's `icon` map (icon name -> conditional) and a real
+ * event, returns the name of the first icon (in definition order) whose
+ * conditional matches, or `undefined` if there's no icon config or nothing
+ * matches — callers should fall back to a default icon in that case.
+ */
+export function resolveEventIcon(
+  iconConfig: EventConfig['icon'],
+  event: EventIndex,
+  context: ValidatorContext
+): AvailableIcons | undefined {
+  if (!iconConfig) {
+    return undefined
+  }
+
+  const clientFunctionContext = {
+    ...buildClientFunctionContext({
+      form: mergeWithBaseFormState(event.declaration, context),
+      validatorContext: context
+    }),
+    $flags: event.flags,
+    $status: event.status
+  }
+
+  const match = Object.entries(iconConfig).find(([, conditional]) =>
+    validate(conditional as JSONSchema, clientFunctionContext)
+  )
+
+  return match?.[0] as AvailableIcons | undefined
 }
 
 export type ValidatorContext = {
