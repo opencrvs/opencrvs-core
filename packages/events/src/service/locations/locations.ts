@@ -199,12 +199,18 @@ function isRetriedAppend(
   )
 }
 
-/** Outcome of a checked version append, consumed by the router audit log. */
-export interface VersionAppendOutcome {
-  appended: boolean
-  previousVersion?: LocationVersion
-  newVersion?: LocationVersion
-}
+/**
+ * Outcome of a checked version append, consumed by the router audit log.
+ * Discriminated on `appended`: the version elements for the audit diff exist
+ * exactly when something was written.
+ */
+export type VersionAppendOutcome =
+  | {
+      appended: true
+      previousVersion: LocationVersion
+      newVersion: LocationVersion
+    }
+  | { appended: false }
 
 /** The complete new element: payload snapshot + server-resolved defaults. */
 function resolveNewVersion(payload: UpdateLocationPayload): LocationVersion {
@@ -432,12 +438,12 @@ export function diffLocationVersions(
  */
 export async function updateLocation(
   payload: UpdateLocationPayload
-): Promise<{ location: Location } & VersionAppendOutcome> {
+): Promise<{ location: Location; outcome: VersionAppendOutcome }> {
   const outcome = await appendVersionChecked({
     payload,
     entityLabel: 'Location',
     table: 'locations'
   })
 
-  return { location: await getLocationById(payload.id), ...outcome }
+  return { location: await getLocationById(payload.id), outcome }
 }

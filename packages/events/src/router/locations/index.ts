@@ -143,11 +143,12 @@ export const locationRouter = router({
     .input(UpdateLocationPayload)
     .output(Location)
     .mutation(async ({ input, ctx }) => {
-      const { location, appended, previousVersion, newVersion } =
-        await updateLocation(input)
+      const { location, outcome } = await updateLocation(input)
 
       // An idempotent replay appends nothing and must not be audited twice.
-      if (appended && previousVersion && newVersion) {
+      if (outcome.appended) {
+        const { previousVersion, newVersion } = outcome
+
         await writeAuditLog({
           clientId: ctx.user.id,
           clientType: ctx.user.type,

@@ -119,11 +119,13 @@ export const administrativeAreaRouter = router({
     .input(UpdateAdministrativeAreaPayload)
     .output(AdministrativeArea)
     .mutation(async ({ input, ctx }) => {
-      const { administrativeArea, appended, previousVersion, newVersion } =
+      const { administrativeArea, outcome } =
         await updateAdministrativeArea(input)
 
       // An idempotent replay appends nothing and must not be audited twice.
-      if (appended && previousVersion && newVersion) {
+      if (outcome.appended) {
+        const { previousVersion, newVersion } = outcome
+
         await writeAuditLog({
           clientId: ctx.user.id,
           clientType: ctx.user.type,

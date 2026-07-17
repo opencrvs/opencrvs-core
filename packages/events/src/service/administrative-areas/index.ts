@@ -153,7 +153,10 @@ export async function createAdministrativeArea(
  */
 export async function updateAdministrativeArea(
   payload: UpdateAdministrativeAreaPayload
-): Promise<{ administrativeArea: AdministrativeArea } & VersionAppendOutcome> {
+): Promise<{
+  administrativeArea: AdministrativeArea
+  outcome: VersionAppendOutcome
+}> {
   const outcome = await appendVersionChecked({
     payload,
     entityLabel: 'Administrative area',
@@ -162,7 +165,7 @@ export async function updateAdministrativeArea(
 
   return {
     administrativeArea: await getAdministrativeAreaById(payload.id),
-    ...outcome
+    outcome
   }
 }
 
