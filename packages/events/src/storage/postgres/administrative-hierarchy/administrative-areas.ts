@@ -97,9 +97,10 @@ export async function getAdministrativeAreas({
  * whose versions array carried the code at any point in their timeline.
  */
 export async function getAdministrativeAreasEverHoldingExternalId(
-  externalId: string,
-  db: Kysely<Schema> = getClient()
+  externalId: string
 ) {
+  const db = getClient()
+
   const rows = await db
     .selectFrom('administrativeAreas')
     .select(['id', 'versions'])
@@ -130,9 +131,10 @@ export interface CreateAdministrativeAreaRow {
  * handling — id / externalId collisions must surface to the caller.
  */
 export async function createAdministrativeArea(
-  administrativeArea: CreateAdministrativeAreaRow,
-  db: Kysely<Schema> = getClient()
+  administrativeArea: CreateAdministrativeAreaRow
 ) {
+  const db = getClient()
+
   await db
     .insertInto('administrativeAreas')
     .values({

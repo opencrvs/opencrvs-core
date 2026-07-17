@@ -182,10 +182,9 @@ export interface CreateLocationRow {
  * code moving to its successor). The legacy `name` column is still written
  * (NOT NULL) — legacy columns hold the creation-time snapshot at best.
  */
-export async function createLocation(
-  location: CreateLocationRow,
-  db: Kysely<Schema> = getClient()
-) {
+export async function createLocation(location: CreateLocationRow) {
+  const db = getClient()
+
   await db
     .insertInto('locations')
     .values({
@@ -224,12 +223,6 @@ export interface LockedVersionedRowContext {
   getCandidatesEverHoldingExternalId: (
     externalId: string
   ) => Promise<{ id: UUID; versions: LocationVersion[] }[]>
-  /** Serialises writers of the same external code across rows (and across the
-   *  create path). The row lock alone cannot prevent two concurrent writes
-   *  claiming the same code on different rows; this advisory lock (released at
-   *  transaction end) makes the second writer wait and then see the first
-   *  writer's committed claim. Must be taken BEFORE the candidates check. */
-  lockExternalId: (externalId: string) => Promise<void>
 }
 
 /**
@@ -279,35 +272,8 @@ export async function withLockedVersionedRow<T>(
           id: rowId,
           versions: parseVersions(rawVersions, rowId)
         }))
-      },
-      lockExternalId: async (externalId) => {
-        await sql`SELECT pg_advisory_xact_lock(hashtext(${externalId}))`.execute(
-          trx
-        )
       }
     })
-  })
-}
-
-/**
- * Runs `run` inside a transaction holding the external-code advisory lock (no
- * lock when the code is null), so concurrent creates — and creates racing
- * updates — that claim the same code serialise. The callback receives the
- * transaction to run its uniqueness check and insert on the same connection.
- */
-export async function withExternalIdLock<T>(
-  externalId: string | null,
-  run: (trx: Kysely<Schema>) => Promise<T>
-): Promise<T> {
-  const db = getClient()
-
-  return db.transaction().execute(async (trx) => {
-    if (externalId !== null) {
-      await sql`SELECT pg_advisory_xact_lock(hashtext(${externalId}))`.execute(
-        trx
-      )
-    }
-    return run(trx)
   })
 }
 
@@ -409,10 +375,9 @@ export async function getLocations({
  * which matches the current code only. Used by the create/update uniqueness
  * check, which needs to inspect each candidate's whole timeline.
  */
-export async function getLocationsEverHoldingExternalId(
-  externalId: string,
-  db: Kysely<Schema> = getClient()
-) {
+export async function getLocationsEverHoldingExternalId(externalId: string) {
+  const db = getClient()
+
   const rows = await db
     .selectFrom('locations')
     .select(['id', 'versions'])

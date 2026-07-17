@@ -134,37 +134,28 @@ export async function createLocation(
     }
   }
 
+  if (resolved.externalId !== null) {
+    const externalId = resolved.externalId
+    const candidates =
+      await locationsRepo.getLocationsEverHoldingExternalId(externalId)
+
+    // The new location holds the code from `effectiveFrom` onward, so it
+    // collides with any location that is (or is scheduled to be) active with
+    // the code at that date or later — not just with holders active today.
+    const collides = candidates.some(({ versions }) =>
+      hasActiveExternalIdOnOrAfter(versions, externalId, resolved.effectiveFrom)
+    )
+
+    if (collides) {
+      throw new TRPCError({
+        code: 'CONFLICT',
+        message: `An active location with externalId ${externalId} already exists`
+      })
+    }
+  }
+
   try {
-    // The advisory lock on the code serialises concurrent writers claiming
-    // the same externalId (across rows, and across the update path) — the
-    // uniqueness check and the insert must run in the same transaction.
-    await locationsRepo.withExternalIdLock(resolved.externalId, async (trx) => {
-      if (resolved.externalId !== null) {
-        const externalId = resolved.externalId
-        const candidates =
-          await locationsRepo.getLocationsEverHoldingExternalId(externalId, trx)
-
-        // The new location holds the code from `effectiveFrom` onward, so it
-        // collides with any location that is (or is scheduled to be) active
-        // with the code at that date or later — not just holders active today.
-        const collides = candidates.some(({ versions }) =>
-          hasActiveExternalIdOnOrAfter(
-            versions,
-            externalId,
-            resolved.effectiveFrom
-          )
-        )
-
-        if (collides) {
-          throw new TRPCError({
-            code: 'CONFLICT',
-            message: `An active location with externalId ${externalId} already exists`
-          })
-        }
-      }
-
-      await locationsRepo.createLocation(resolved, trx)
-    })
+    await locationsRepo.createLocation(resolved)
   } catch (error) {
     if (isUniqueViolation(error)) {
       throw new TRPCError({
@@ -224,12 +215,7 @@ export async function appendVersionChecked({
 
   return withLockedRow(
     payload.id,
-    async ({
-      row,
-      append,
-      getCandidatesEverHoldingExternalId,
-      lockExternalId
-    }) => {
+    async ({ row, append, getCandidatesEverHoldingExternalId }) => {
       if (!row || row.deletedAt !== null) {
         throw new TRPCError({
           code: 'NOT_FOUND',
@@ -277,9 +263,6 @@ export async function appendVersionChecked({
       const externalId = newVersion.externalId ?? null
 
       if (externalId !== null && externalId !== (last.externalId ?? null)) {
-        // Serialise with other writers claiming this code (on other rows or
-        // via the create path) — the row lock alone cannot see them.
-        await lockExternalId(externalId)
         const candidates = await getCandidatesEverHoldingExternalId(externalId)
 
         const collides = candidates.some(

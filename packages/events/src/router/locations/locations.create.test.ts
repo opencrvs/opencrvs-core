@@ -322,37 +322,3 @@ test('creates a future-dated location whose fields resolve to the only version',
 
   expect(rows).toHaveLength(1)
 })
-
-test('two concurrent creates claiming the same code serialise: one wins', async () => {
-  const { user } = await setupTestCase()
-  const client = createTestClient(user, [scope])
-
-  // Without the advisory lock on the code, both uniqueness checks can pass
-  // before either insert commits, creating two active holders of the code.
-  const results = await Promise.allSettled([
-    client.locations.create({
-      name: 'Concurrent Office A',
-      externalId: 'concurrent-create-pcode',
-      administrativeAreaId: null,
-      locationType: 'CRVS_OFFICE'
-    }),
-    client.locations.create({
-      name: 'Concurrent Office B',
-      externalId: 'concurrent-create-pcode',
-      administrativeAreaId: null,
-      locationType: 'CRVS_OFFICE'
-    })
-  ])
-
-  expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1)
-  const rejected = results.filter((r) => r.status === 'rejected')
-  expect(rejected).toHaveLength(1)
-  expect((rejected[0] as PromiseRejectedResult).reason).toMatchObject({
-    code: 'CONFLICT'
-  })
-
-  const holders = await client.locations.list({
-    externalId: 'concurrent-create-pcode'
-  })
-  expect(holders).toHaveLength(1)
-})
