@@ -64,6 +64,17 @@ export const administrativeAreaRouter = router({
     )
   ),
   create: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'Create an administrative area',
+        description:
+          'Create a new administrative area with a single initial version.',
+        method: 'POST',
+        path: '/administrative-areas',
+        tags: ['Administrative areas'],
+        protect: true
+      }
+    })
     .use(allowedWithAnyOfScopes(['location.edit']))
     .input(CreateAdministrativeAreaPayload)
     .output(AdministrativeArea)
