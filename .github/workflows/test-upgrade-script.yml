@@ -31,6 +31,8 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.ref || github.ref }}
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v6
         with:
@@ -40,9 +42,9 @@ jobs:
         with:
           timeout_minutes: 10
           max_attempts: 3
-          command: yarn install --frozen-lockfile
+          command: pnpm install --frozen-lockfile
       - name: Build toolkit
-        run: yarn build:all
+        run: pnpm build:all
         working-directory: packages/toolkit
       - name: Checkout the correct opencrvs-countryconfig branch
         run: |
