@@ -11,7 +11,13 @@
 
 import { Kysely, RawBuilder, sql } from 'kysely'
 import { chunk } from 'lodash'
-import { Location, logger, UUID } from '@opencrvs/commons'
+import {
+  getUUID,
+  LocationVersion,
+  logger,
+  resolveVersion,
+  UUID
+} from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import { NewLocations } from '../events/schema/app/Locations'
 import Schema from '../events/schema/Database'
@@ -28,9 +34,66 @@ export function clearAdministrativeHierarchyCache() {
   administrativeHierarchyByIdCache.clear()
 }
 
+/**
+ * Builds the initial `versions` jsonb value for a location or administrative
+ * area row on insert. The initial version is always a single active element
+ * effective from the beginning of time.
+ */
+export function buildInitialVersions({
+  name,
+  externalId
+}: {
+  name: string
+  externalId?: string | null
+}): RawBuilder<LocationVersion[]> {
+  const versions: LocationVersion[] = [
+    {
+      versionId: getUUID(),
+      effectiveFrom: '0001-01-01',
+      name,
+      externalId: externalId ?? null,
+      status: 'active'
+    }
+  ]
+
+  return sql`cast (${JSON.stringify(versions)} as jsonb)`
+}
+
+/**
+ * Parses the `versions` jsonb column of a location or administrative area
+ * row, attaching the row id to the error when the content does not match the
+ * schema — a raw ZodError would not identify which row is corrupt.
+ */
+export function parseVersions(rawVersions: unknown, rowId: string) {
+  try {
+    return LocationVersion.array().parse(rawVersions)
+  } catch (error) {
+    throw new Error(
+      `Invalid versions content for row ${rowId}: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    )
+  }
+}
+
+/**
+ * Resolves the read model fields (`name`, `externalId`, `status`) from the
+ * version in effect today (UTC).
+ */
+export function resolveVersionFields(versions: LocationVersion[]) {
+  const today = new Date().toISOString().slice(0, 10)
+  const current = resolveVersion(versions, today)
+
+  return {
+    name: current.name,
+    externalId: current.externalId ?? null,
+    status: current.status
+  }
+}
+
 export async function setLocationsInTrx(
   trx: Kysely<Schema>,
-  locations: NewLocations[]
+  locations: Omit<NewLocations, 'versions' | 'validUntil'>[]
 ) {
   // Insert new locations in chunks to avoid exceeding max query size
   for (const [index, batch] of chunk(
@@ -42,7 +105,13 @@ export async function setLocationsInTrx(
     )
     await trx
       .insertInto('locations')
-      .values(batch.map((loc) => ({ ...loc, deletedAt: null })))
+      .values(
+        batch.map((loc) => ({
+          ...loc,
+          deletedAt: null,
+          versions: buildInitialVersions(loc)
+        }))
+      )
       .onConflict((oc) =>
         oc.column('id').doUpdateSet({
           name: () =>
@@ -54,12 +123,6 @@ export async function setLocationsInTrx(
           administrativeAreaId: (eb) => eb.ref('excluded.administrativeAreaId'),
           locationType: (eb) => eb.ref('excluded.locationType'),
           updatedAt: () => sql`now()`,
-          validUntil: () =>
-            sql`CASE
-             WHEN excluded.valid_until IS NOT NULL
-             THEN excluded.valid_until
-             ELSE locations.valid_until
-           END`,
           externalId: () =>
             sql`CASE
              WHEN excluded.external_id IS NOT NULL
@@ -73,7 +136,9 @@ export async function setLocationsInTrx(
   }
 }
 
-export async function setLocations(locations: NewLocations[]) {
+export async function setLocations(
+  locations: Omit<NewLocations, 'versions' | 'validUntil'>[]
+) {
   const db = getClient()
 
   await setLocationsInTrx(db, locations)
@@ -95,19 +160,8 @@ export async function getLocations({
 
   let query = db
     .selectFrom('locations')
-    .select([
-      'id',
-      'name',
-      'validUntil',
-      'locationType',
-      'externalId',
-      'administrativeAreaId'
-    ])
+    .select(['id', 'locationType', 'administrativeAreaId', 'versions'])
     .where('deletedAt', 'is', null)
-    .$narrowType<{
-      deletedAt: null
-      validUntil: Location['validUntil']
-    }>()
 
   if (locationType) {
     query = query.where('locationType', '=', locationType)
@@ -121,13 +175,20 @@ export async function getLocations({
     query = query.where('id', 'in', locationIds)
   }
 
+  const rows = await query.execute()
+
+  const locations = rows.map(({ versions: rawVersions, ...row }) => {
+    const versions = parseVersions(rawVersions, row.id)
+    return { ...row, versions, ...resolveVersionFields(versions) }
+  })
+
+  // Active status is resolved from the versions array (the version in effect
+  // today), so the filter runs after row mapping rather than in SQL.
   if (isActive) {
-    query = query.where((eb) =>
-      eb.or([eb('validUntil', 'is', null), eb('validUntil', '>', 'now()')])
-    )
+    return locations.filter((location) => location.status === 'active')
   }
 
-  return query.execute()
+  return locations
 }
 
 export async function locationExists(locationId: UUID) {
@@ -148,22 +209,25 @@ export async function locationExists(locationId: UUID) {
 export async function getLocationById(locationId: UUID) {
   const db = getClient()
 
-  return db
+  const row = await db
     .selectFrom('locations')
-    .select([
-      'id',
-      'name',
-      'administrativeAreaId',
-      'validUntil',
-      'locationType'
-    ])
+    .select(['id', 'locationType', 'administrativeAreaId', 'versions'])
     .where('id', '=', locationId)
     .where('deletedAt', 'is', null)
-    .$narrowType<{
-      deletedAt: null
-      validUntil: Location['validUntil']
-    }>()
     .executeTakeFirst()
+
+  if (!row) {
+    return undefined
+  }
+
+  const { versions: rawVersions, ...rest } = row
+  const versions = parseVersions(rawVersions, rest.id)
+
+  return {
+    ...rest,
+    versions,
+    ...resolveVersionFields(versions)
+  }
 }
 
 export function getAdministrativeHierarchyByIdCte(
@@ -212,7 +276,9 @@ export function getAdministrativeHierarchyByIdCte(
  * @returns The list of location hierarchy ids, ex: [admin_area_1_id, admin_area_2_id, locationId]
  */
 
-export async function getAdministrativeHierarchyById(id: string): Promise<UUID[]> {
+export async function getAdministrativeHierarchyById(
+  id: string
+): Promise<UUID[]> {
   const cached = administrativeHierarchyByIdCache.get(id)
   if (cached) {
     return cached

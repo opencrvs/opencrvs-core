@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { UUID, AdministrativeArea } from '@opencrvs/commons'
+import { UUID, SetAdministrativeAreaPayload } from '@opencrvs/commons'
 import * as administrativeAreaRepo from '@events/storage/postgres/administrative-hierarchy/administrative-areas'
 import { clearAdministrativeHierarchyCache } from '@events/storage/postgres/administrative-hierarchy/locations'
 
@@ -24,7 +24,7 @@ export async function getAdministrativeAreas(params?: {
 }
 
 export async function setAdministrativeAreas(
-  administrativeAreas: AdministrativeArea[]
+  administrativeAreas: SetAdministrativeAreaPayload[]
 ) {
   await administrativeAreaRepo.setAdministrativeAreas(administrativeAreas)
   clearAdministrativeHierarchyCache()

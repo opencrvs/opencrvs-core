@@ -169,7 +169,6 @@ test('Returns user in nested location with administrativeArea scope', async () =
       name: 'Child area',
       parentId: user.administrativeAreaId,
       id: childAdministrativeAreaId,
-      validUntil: null,
       externalId: 'abc123xyz462'
     }
   ])
@@ -180,7 +179,6 @@ test('Returns user in nested location with administrativeArea scope', async () =
       administrativeAreaId: childAdministrativeAreaId,
       locationType: 'CRVS_OFFICE',
       id: grandchildLocationId,
-      validUntil: null,
       externalId: 'abc123xyz463'
     }
   ])

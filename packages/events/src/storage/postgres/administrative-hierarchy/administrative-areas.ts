@@ -11,9 +11,14 @@
 
 import { chunk } from 'lodash'
 import { Kysely, sql } from 'kysely'
-import { AdministrativeArea, logger, UUID } from '@opencrvs/commons'
+import { logger, SetAdministrativeAreaPayload, UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import Schema from '../events/schema/Database'
+import {
+  buildInitialVersions,
+  parseVersions,
+  resolveVersionFields
+} from './locations'
 
 export async function getAdministrativeAreas({
   ids,
@@ -26,32 +31,34 @@ export async function getAdministrativeAreas({
 
   let query = db
     .selectFrom('administrativeAreas')
-    .select(['id', 'name', 'parentId', 'validUntil', 'externalId'])
+    .select(['id', 'parentId', 'versions'])
     .where('deletedAt', 'is', null)
-    .$narrowType<{
-      deletedAt: null
-      validUntil: AdministrativeArea['validUntil']
-      externalId: string | null
-    }>()
 
   if (ids && ids.length > 0) {
     query = query.where('id', 'in', ids)
   }
 
+  const rows = await query.execute()
+
+  const administrativeAreas = rows.map(({ versions: rawVersions, ...row }) => {
+    const versions = parseVersions(rawVersions, row.id)
+    return { ...row, versions, ...resolveVersionFields(versions) }
+  })
+
+  // Active status is resolved from the versions array (the version in effect
+  // today), so the filter runs after row mapping rather than in SQL.
   if (isActive) {
-    query = query.where((eb) =>
-      eb.or([eb('validUntil', 'is', null), eb('validUntil', '>', 'now()')])
-    )
+    return administrativeAreas.filter((area) => area.status === 'active')
   }
 
-  return query.execute()
+  return administrativeAreas
 }
 
 const INSERT_MAX_CHUNK_SIZE = 1000
 
 export async function setAdministrativeAreasInTrx(
   trx: Kysely<Schema>,
-  administrativeAreas: AdministrativeArea[]
+  administrativeAreas: SetAdministrativeAreaPayload[]
 ) {
   for (const [index, batch] of chunk(
     administrativeAreas,
@@ -67,9 +74,9 @@ export async function setAdministrativeAreasInTrx(
           id: aa.id,
           name: aa.name,
           parentId: aa.parentId,
-          validUntil: aa.validUntil,
           deletedAt: null,
-          externalId: aa.externalId
+          externalId: aa.externalId,
+          versions: buildInitialVersions(aa)
         }))
       )
       .onConflict((oc) =>
@@ -82,12 +89,6 @@ export async function setAdministrativeAreasInTrx(
            END`,
           parentId: (eb) => eb.ref('excluded.parentId'),
           updatedAt: () => sql`now()`,
-          validUntil: () =>
-            sql`CASE
-             WHEN excluded.valid_until IS NOT NULL
-             THEN excluded.valid_until
-             ELSE administrative_areas.valid_until
-           END`,
           externalId: () =>
             sql`CASE
              WHEN excluded.external_id IS NOT NULL
@@ -102,7 +103,7 @@ export async function setAdministrativeAreasInTrx(
 }
 
 export async function setAdministrativeAreas(
-  administrativeAreas: AdministrativeArea[]
+  administrativeAreas: SetAdministrativeAreaPayload[]
 ) {
   const db = getClient()
   await setAdministrativeAreasInTrx(db, administrativeAreas)

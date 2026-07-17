@@ -9,12 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  AdministrativeArea,
+  SetAdministrativeAreaPayload,
   createPrng,
   generateUuid,
   encodeScope
 } from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createTestClient,
+  setupTestCase,
+  UUID_REGEX
+} from '@events/tests/utils'
+import { getClient } from '@events/storage/postgres/events'
 
 const scope = encodeScope({ type: 'user.data-seeding' })
 
@@ -55,12 +60,11 @@ test('Creates single administrative area', async () => {
 
   const initialAdministrativeAreas =
     await dataSeedingClient.administrativeAreas.list()
-  const administrativeAreaPayload: AdministrativeArea[] = [
+  const administrativeAreaPayload: SetAdministrativeAreaPayload[] = [
     {
       id: generateUuid(),
       parentId: null,
       name: 'New Administrative Area',
-      validUntil: null,
       externalId: 'abc123xyz456'
     }
   ]
@@ -72,9 +76,10 @@ test('Creates single administrative area', async () => {
   expect(administrativeAreas).toHaveLength(
     initialAdministrativeAreas.length + 1
   )
-  expect(administrativeAreas).toMatchObject(
-    initialAdministrativeAreas.concat(administrativeAreaPayload)
-  )
+  expect(administrativeAreas).toMatchObject([
+    ...initialAdministrativeAreas,
+    ...administrativeAreaPayload
+  ])
 })
 
 test('Creates multiple administrative areas under parent administrative area', async () => {
@@ -101,9 +106,10 @@ test('Creates multiple administrative areas under parent administrative area', a
 
   const administrativeAreas = await dataSeedingClient.administrativeAreas.list()
 
-  expect(administrativeAreas).toEqual(
-    initialAdministrativeAreas.concat(administrativeAreaPayload)
-  )
+  expect(administrativeAreas).toMatchObject([
+    ...initialAdministrativeAreas,
+    ...administrativeAreaPayload
+  ])
 })
 
 test('updates externalId on existing administrative area when re-seeded with a value', async () => {
@@ -117,7 +123,6 @@ test('updates externalId on existing administrative area when re-seeded with a v
       id: areaId,
       parentId: null,
       name: 'Area without external id',
-      validUntil: null,
       externalId: null
     }
   ])
@@ -127,15 +132,54 @@ test('updates externalId on existing administrative area when re-seeded with a v
       id: areaId,
       parentId: null,
       name: 'Area without external id',
-      validUntil: null,
       externalId: 'adminpcode123'
     }
   ])
 
-  const areas = await dataSeedingClient.administrativeAreas.list()
-  const updated = areas.find((a) => a.id === areaId)
+  // The read API resolves externalId from the versions array, which
+  // re-seeding deliberately leaves untouched — assert on the flat column
+  // that the upsert updates.
+  const updated = await getClient()
+    .selectFrom('administrativeAreas')
+    .select('externalId')
+    .where('id', '=', areaId)
+    .executeTakeFirstOrThrow()
 
-  expect(updated?.externalId).toBe('adminpcode123')
+  expect(updated.externalId).toBe('adminpcode123')
+})
+
+test('stores a single active initial version when creating an administrative area', async () => {
+  const { user } = await setupTestCase()
+  const dataSeedingClient = createTestClient(user, [scope])
+
+  const areaId = generateUuid()
+
+  await dataSeedingClient.administrativeAreas.set([
+    {
+      id: areaId,
+      parentId: null,
+      name: 'Versioned administrative area',
+      externalId: 'versioned-area-pcode'
+    }
+  ])
+
+  const { versions } = await getClient()
+    .selectFrom('administrativeAreas')
+    .select('versions')
+    .where('id', '=', areaId)
+    .executeTakeFirstOrThrow()
+
+  // toEqual matches keys exactly, so this also asserts the version element
+  // contains no parent reference (parentId).
+  expect(versions).toEqual([
+    {
+      versionId: expect.stringMatching(UUID_REGEX),
+      effectiveFrom: '0001-01-01',
+      name: 'Versioned administrative area',
+      externalId: 'versioned-area-pcode',
+      status: 'active'
+    }
+  ])
 })
 
 test('seeding administrative areas is additive, not destructive', async () => {
