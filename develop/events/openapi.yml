@@ -872,6 +872,255 @@ paths:
         "403": *a3
         "404": *a5
         "500": *a4
+    post:
+      operationId: locations-create
+      summary: Create a location
+      description: Create a new location with a single initial version.
+      tags:
+        - Locations
+      security:
+        - Authorization: []
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                versionId:
+                  type: string
+                  format: uuid
+                  pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                name:
+                  type: string
+                externalId:
+                  anyOf:
+                    - type: string
+                    - type: "null"
+                administrativeAreaId:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                    - type: "null"
+                locationType:
+                  anyOf:
+                    - type: string
+                    - type: "null"
+                effectiveFrom:
+                  type: string
+                  format: date
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+                status:
+                  default: active
+                  type: string
+                  enum:
+                    - active
+                    - inactive
+              required:
+                - name
+                - administrativeAreaId
+                - locationType
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                  name:
+                    type: string
+                  externalId:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  administrativeAreaId:
+                    anyOf:
+                      - type: string
+                        format: uuid
+                        pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                      - type: "null"
+                  locationType:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  status:
+                    type: string
+                    enum:
+                      - active
+                      - inactive
+                  versions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        versionId:
+                          type: string
+                          format: uuid
+                          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                        effectiveFrom:
+                          type: string
+                          format: date
+                          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+                        name:
+                          type: string
+                        externalId:
+                          anyOf:
+                            - type: string
+                            - type: "null"
+                        status:
+                          type: string
+                          enum:
+                            - active
+                            - inactive
+                      required:
+                        - versionId
+                        - effectiveFrom
+                        - name
+                        - status
+                      additionalProperties: false
+                required:
+                  - id
+                  - name
+                  - administrativeAreaId
+                  - locationType
+                  - status
+                  - versions
+                additionalProperties: false
+        "400": *a1
+        "401": *a2
+        "403": *a3
+        "500": *a4
+  /administrative-areas:
+    post:
+      operationId: administrativeAreas-create
+      summary: Create an administrative area
+      description: Create a new administrative area with a single initial version.
+      tags:
+        - Administrative areas
+      security:
+        - Authorization: []
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                versionId:
+                  type: string
+                  format: uuid
+                  pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                name:
+                  type: string
+                externalId:
+                  anyOf:
+                    - type: string
+                    - type: "null"
+                parentId:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                    - type: "null"
+                effectiveFrom:
+                  type: string
+                  format: date
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+                status:
+                  default: active
+                  type: string
+                  enum:
+                    - active
+                    - inactive
+              required:
+                - name
+                - parentId
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                  name:
+                    type: string
+                  externalId:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  parentId:
+                    anyOf:
+                      - type: string
+                        format: uuid
+                        pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                      - type: "null"
+                  status:
+                    type: string
+                    enum:
+                      - active
+                      - inactive
+                  versions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        versionId:
+                          type: string
+                          format: uuid
+                          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                        effectiveFrom:
+                          type: string
+                          format: date
+                          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+                        name:
+                          type: string
+                        externalId:
+                          anyOf:
+                            - type: string
+                            - type: "null"
+                        status:
+                          type: string
+                          enum:
+                            - active
+                            - inactive
+                      required:
+                        - versionId
+                        - effectiveFrom
+                        - name
+                        - status
+                      additionalProperties: false
+                required:
+                  - id
+                  - name
+                  - parentId
+                  - status
+                  - versions
+                additionalProperties: false
+        "400": *a1
+        "401": *a2
+        "403": *a3
+        "500": *a4
   /integrations:
     post:
       operationId: integrations-create
@@ -2182,6 +2431,7 @@ components:
                                 - integration.create
                                 - record.import
                                 - config.update-all
+                                - location.edit
                                 - attachment.upload
                                 - profile.electronic-signature
                                 - user.read-only-my-audit
@@ -2447,6 +2697,7 @@ components:
                                 - integration.create
                                 - record.import
                                 - config.update-all
+                                - location.edit
                                 - attachment.upload
                                 - profile.electronic-signature
                                 - user.read-only-my-audit
@@ -3106,6 +3357,7 @@ components:
                             - integration.create
                             - record.import
                             - config.update-all
+                            - location.edit
                             - attachment.upload
                             - profile.electronic-signature
                             - user.read-only-my-audit
@@ -8141,6 +8393,7 @@ components:
                             - integration.create
                             - record.import
                             - config.update-all
+                            - location.edit
                             - attachment.upload
                             - profile.electronic-signature
                             - user.read-only-my-audit
@@ -8603,6 +8856,7 @@ components:
                             - integration.create
                             - record.import
                             - config.update-all
+                            - location.edit
                             - attachment.upload
                             - profile.electronic-signature
                             - user.read-only-my-audit
@@ -13680,6 +13934,7 @@ components:
                                   - integration.create
                                   - record.import
                                   - config.update-all
+                                  - location.edit
                                   - attachment.upload
                                   - profile.electronic-signature
                                   - user.read-only-my-audit
@@ -13991,6 +14246,7 @@ components:
                                   - integration.create
                                   - record.import
                                   - config.update-all
+                                  - location.edit
                                   - attachment.upload
                                   - profile.electronic-signature
                                   - user.read-only-my-audit
