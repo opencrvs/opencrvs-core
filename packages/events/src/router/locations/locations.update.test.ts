@@ -475,3 +475,147 @@ test('rejects a recode to an actively held externalId but allows a brand-new cod
   expect(updated.externalId).toBe('brand-new-pcode')
   expect(updated.versions).toHaveLength(2)
 })
+
+test('rejects an update to a soft-deleted location', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const created = await createLocation(client, {
+    name: 'Soft Deleted Office',
+    externalId: 'soft-deleted-pcode'
+  })
+
+  await getClient()
+    .updateTable('locations')
+    .set({ deletedAt: new Date().toISOString() })
+    .where('id', '=', created.id)
+    .execute()
+
+  await expect(
+    client.locations.update({
+      id: created.id,
+      name: 'Ghost Rename',
+      externalId: 'soft-deleted-pcode',
+      status: 'active',
+      lastVersionId: created.versions[0].versionId
+    })
+  ).rejects.toMatchObject({ code: 'NOT_FOUND' })
+})
+
+test('allows recoding to a code whose previous holder is inactive from that date', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  // The predecessor actively holds the code, then closes on 2025-01-01.
+  const predecessor = await createLocation(client, {
+    name: 'Predecessor Office',
+    externalId: 'handover-pcode'
+  })
+  await client.locations.update({
+    id: predecessor.id,
+    name: 'Predecessor Office',
+    externalId: 'handover-pcode',
+    status: 'inactive',
+    effectiveFrom: '2025-01-01',
+    lastVersionId: predecessor.versions[0].versionId
+  })
+
+  // The successor takes the code over from the same date — allowed, because
+  // no location actively holds it from 2025-01-01 onward.
+  const successor = await createLocation(client, {
+    name: 'Successor Office',
+    externalId: 'successor-own-pcode'
+  })
+  const recoded = await client.locations.update({
+    id: successor.id,
+    name: 'Successor Office',
+    externalId: 'handover-pcode',
+    status: 'active',
+    effectiveFrom: '2025-01-01',
+    lastVersionId: successor.versions[0].versionId
+  })
+
+  expect(recoded.externalId).toBe('handover-pcode')
+})
+
+test('audits externalId and status changes in the diff', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const created = await createLocation(client, {
+    name: 'Diff Office',
+    externalId: 'diff-old-pcode'
+  })
+
+  // One update that recodes AND inactivates — both must appear in the diff.
+  await client.locations.update({
+    id: created.id,
+    name: 'Diff Office',
+    externalId: 'diff-new-pcode',
+    status: 'inactive',
+    effectiveFrom: '2025-01-01',
+    lastVersionId: created.versions[0].versionId
+  })
+
+  const auditEntries = await getUpdateAuditEntries()
+  expect(auditEntries).toHaveLength(1)
+  expect(auditEntries[0].responseSummary).toMatchObject({
+    changed: {
+      externalId: { from: 'diff-old-pcode', to: 'diff-new-pcode' },
+      status: { from: 'active', to: 'inactive' }
+    }
+  })
+  // The unchanged name must not appear in the diff.
+  expect(
+    (auditEntries[0].responseSummary as { changed: object }).changed
+  ).not.toHaveProperty('name')
+})
+
+test('an omitted effectiveFrom defaults to today', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const created = await createLocation(client, {
+    name: 'Default Date Office',
+    externalId: 'default-date-pcode'
+  })
+
+  const updated = await client.locations.update({
+    id: created.id,
+    name: 'Renamed Today',
+    externalId: 'default-date-pcode',
+    status: 'active',
+    lastVersionId: created.versions[0].versionId
+  })
+
+  const today = new Date().toISOString().slice(0, 10)
+  expect(updated.versions[1].effectiveFrom).toBe(today)
+  expect(updated.name).toBe('Renamed Today')
+})
+
+test('a future-dated rename is stored but does not drive the flat fields yet', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const created = await createLocation(client, {
+    name: 'Present Name',
+    externalId: 'future-rename-update-pcode'
+  })
+
+  const updated = await client.locations.update({
+    id: created.id,
+    name: 'Future Name',
+    externalId: 'future-rename-update-pcode',
+    status: 'active',
+    effectiveFrom: '2099-01-01',
+    lastVersionId: created.versions[0].versionId
+  })
+
+  expect(updated.versions).toHaveLength(2)
+  expect(updated.versions[1]).toMatchObject({
+    effectiveFrom: '2099-01-01',
+    name: 'Future Name'
+  })
+  // The version in effect today still drives the read model.
+  expect(updated.name).toBe('Present Name')
+})
