@@ -13,7 +13,7 @@ import { TRPCClientError } from '@trpc/client'
 import type { AppRouter } from '@client/v2-events/trpc'
 import { ToastKey } from '@client/v2-events/routes/Toaster'
 
-export const MAX_ACTION_RETRY_ATTEMPTS = 10
+const MAX_ACTION_RETRY_ATTEMPTS = 10
 
 /**
  * 4xx errors (404 Not Found, 409 Conflict, 403 Forbidden, ...) represent
@@ -47,6 +47,6 @@ export function retryTransientErrors(
   return true
 }
 
-export function retryDelay(attemptIndex: number) {
+function retryDelay(attemptIndex: number) {
   return Math.max(10000, 1000 * 2 ** attemptIndex)
 }

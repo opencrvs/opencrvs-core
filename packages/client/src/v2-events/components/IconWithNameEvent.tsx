@@ -60,7 +60,7 @@ export function getEventIcon(
           isArchive={isArchived}
           isValidatedOnReview={isValidatedOnReview}
         />
-        <LockContainer>🔐</LockContainer>
+        <LockContainer>{'🔐'}</LockContainer>
       </SealedContainer>
     )
   }
