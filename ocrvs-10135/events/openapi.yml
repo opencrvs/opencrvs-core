@@ -846,7 +846,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 94d09b6d-56f3-44b3-9eac-be611e871be9
+                transactionId: 5a250ba7-b115-4481-a197-a93e8dee5c40
                 type: birth
       responses:
         "200":
@@ -936,7 +936,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: db9ec144-9262-4c2a-888a-e9ded145fe92
+                transactionId: ea32b3ae-56c5-43a9-8183-00cd3a8643b3
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -12650,7 +12650,6 @@ components:
             the next page
         showClearButton:
           type: boolean
-          default: false
           description: If true, a "Clear" button is shown at the top of the page allowing
             the user to reset all fields on the page to their default state
         fields:
@@ -12667,7 +12666,6 @@ components:
         - id
         - title
         - requireCompletionToContinue
-        - showClearButton
         - fields
       description: Form page configuration
     VerificationActionConfig:

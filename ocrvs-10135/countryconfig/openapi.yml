@@ -11739,7 +11739,6 @@ components:
             the next page
         showClearButton:
           type: boolean
-          default: false
           description: If true, a "Clear" button is shown at the top of the page allowing
             the user to reset all fields on the page to their default state
         fields:
@@ -11755,7 +11754,6 @@ components:
         - id
         - title
         - requireCompletionToContinue
-        - showClearButton
         - fields
       description: Form page configuration
     VerificationActionConfig:
