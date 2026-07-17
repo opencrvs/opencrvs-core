@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable max-lines */
 import {
   encodeScope,
   generateUuid,
@@ -54,6 +55,55 @@ async function getUpdateAuditEntries() {
     .where('operation', '=', 'locations.update')
     .execute()
 }
+
+test('two concurrent recodes of different locations to the same code serialise: one wins', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const first = await createLocation(client, {
+    name: 'Race Office A',
+    externalId: 'race-a-pcode'
+  })
+  const second = await createLocation(client, {
+    name: 'Race Office B',
+    externalId: 'race-b-pcode'
+  })
+
+  // Without the advisory lock on the code, both uniqueness checks can run
+  // before either write commits and both recodes succeed — leaving two
+  // active locations with the same code.
+  const results = await Promise.allSettled([
+    client.locations.update({
+      id: first.id,
+      name: 'Race Office A',
+      externalId: 'race-contested-pcode',
+      status: 'active',
+      effectiveFrom: '2025-01-01',
+      lastVersionId: first.versions[0].versionId
+    }),
+    client.locations.update({
+      id: second.id,
+      name: 'Race Office B',
+      externalId: 'race-contested-pcode',
+      status: 'active',
+      effectiveFrom: '2025-01-01',
+      lastVersionId: second.versions[0].versionId
+    })
+  ])
+
+  expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1)
+  const rejected = results.filter((r) => r.status === 'rejected')
+  expect(rejected).toHaveLength(1)
+  expect((rejected[0] as PromiseRejectedResult).reason).toMatchObject({
+    code: 'CONFLICT'
+  })
+
+  // Exactly one location resolves to the contested code.
+  const holders = await client.locations.list({
+    externalId: 'race-contested-pcode'
+  })
+  expect(holders).toHaveLength(1)
+})
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()

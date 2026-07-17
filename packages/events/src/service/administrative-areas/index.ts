@@ -20,7 +20,10 @@ import {
   SetAdministrativeAreaPayload
 } from '@opencrvs/commons'
 import * as administrativeAreaRepo from '@events/storage/postgres/administrative-hierarchy/administrative-areas'
-import { clearAdministrativeHierarchyCache } from '@events/storage/postgres/administrative-hierarchy/locations'
+import {
+  clearAdministrativeHierarchyCache,
+  withExternalIdLock
+} from '@events/storage/postgres/administrative-hierarchy/locations'
 import {
   appendVersionChecked,
   isUniqueViolation,
@@ -106,30 +109,40 @@ export async function createAdministrativeArea(
     }
   }
 
-  if (resolved.externalId !== null) {
-    const externalId = resolved.externalId
-    const candidates =
-      await administrativeAreaRepo.getAdministrativeAreasEverHoldingExternalId(
-        externalId
-      )
-
-    // The new area holds the code from `effectiveFrom` onward, so it collides
-    // with any area that is (or is scheduled to be) active with the code at
-    // that date or later — not just with holders active today.
-    const collides = candidates.some(({ versions }) =>
-      hasActiveExternalIdOnOrAfter(versions, externalId, resolved.effectiveFrom)
-    )
-
-    if (collides) {
-      throw new TRPCError({
-        code: 'CONFLICT',
-        message: `An active administrative area with externalId ${externalId} already exists`
-      })
-    }
-  }
-
   try {
-    await administrativeAreaRepo.createAdministrativeArea(resolved)
+    // The advisory lock on the code serialises concurrent writers claiming
+    // the same externalId (across rows, and across the update path) — the
+    // uniqueness check and the insert must run in the same transaction.
+    await withExternalIdLock(resolved.externalId, async (trx) => {
+      if (resolved.externalId !== null) {
+        const externalId = resolved.externalId
+        const candidates =
+          await administrativeAreaRepo.getAdministrativeAreasEverHoldingExternalId(
+            externalId,
+            trx
+          )
+
+        // The new area holds the code from `effectiveFrom` onward, so it
+        // collides with any area that is (or is scheduled to be) active with
+        // the code at that date or later — not just holders active today.
+        const collides = candidates.some(({ versions }) =>
+          hasActiveExternalIdOnOrAfter(
+            versions,
+            externalId,
+            resolved.effectiveFrom
+          )
+        )
+
+        if (collides) {
+          throw new TRPCError({
+            code: 'CONFLICT',
+            message: `An active administrative area with externalId ${externalId} already exists`
+          })
+        }
+      }
+
+      await administrativeAreaRepo.createAdministrativeArea(resolved, trx)
+    })
   } catch (error) {
     if (isUniqueViolation(error)) {
       throw new TRPCError({
