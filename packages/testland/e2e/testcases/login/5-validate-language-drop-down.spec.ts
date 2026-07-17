@@ -26,7 +26,7 @@ test.describe('5. Validate language change', () => {
   })
 
   test('5.2. Click on language drop down', async ({ page }) => {
-    await page.locator('_react=LanguageSelect').click()
+    await page.locator('#language-select').click()
 
     /*
      * Expected result: should show option for changing language
@@ -35,20 +35,20 @@ test.describe('5. Validate language change', () => {
   })
 
   test('5.3. Select french language', async ({ page }) => {
-    await page.locator('_react=LanguageSelect').click()
+    await page.locator('#language-select').click()
     await page.getByText('Français').click()
 
     /*
      * Expected result: should change language to french
      */
-    expect(await page.locator('_react=LanguageSelect').innerText()).toMatch(
+    expect(await page.locator('#language-select').innerText()).toMatch(
       'Français'
     )
   })
 
   test.describe('5.4. Validate language of login page', () => {
     test.beforeEach(async ({ page }) => {
-      await page.locator('_react=LanguageSelect').click()
+      await page.locator('#language-select').click()
       await page.getByText('Français').click()
     })
     test('5.4.1. Username label should be in french', async ({ page }) => {
@@ -82,7 +82,7 @@ test.describe('5. Validate language change', () => {
 
   test.describe('5.5. Validate language of 2fa page', () => {
     test.beforeEach(async ({ page }) => {
-      await page.locator('_react=LanguageSelect').click()
+      await page.locator('#language-select').click()
       await page.getByText('Français').click()
       await page.fill('#username', 'k.bwalya')
       await page.fill('#password', 'test')
@@ -133,7 +133,7 @@ test.describe('5. Validate language change', () => {
 
   test.describe('5.6. Validate create pin page', () => {
     test.beforeEach(async ({ page }) => {
-      await page.locator('_react=LanguageSelect').click()
+      await page.locator('#language-select').click()
       await page.getByText('Français').click()
       await page.fill('#username', 'k.bwalya')
       await page.fill('#password', 'test')
