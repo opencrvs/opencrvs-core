@@ -64,6 +64,7 @@ const PlainScopeType = z.enum([
   'integration.create',
   'record.import',
   'config.update-all',
+  'location.edit',
   'attachment.upload',
   'profile.electronic-signature',
   'user.read-only-my-audit',

@@ -405,6 +405,13 @@ describe('2.0 scopes', () => {
     )
   })
 
+  it('Encodes and decodes the plain location.edit scope', () => {
+    const encoded = encodeScope({ type: 'location.edit' })
+
+    expect(encoded).toBe('type=location.edit')
+    expect(decodeScope(encoded)).toEqual({ type: 'location.edit' })
+  })
+
   it('Should decode scope with single event & template', () => {
     const scope =
       'type=record.print-certified-copies&event=tennis-club-membership&templates=v2.tennis-club-membership-certificate-alpha' as EncodedScope

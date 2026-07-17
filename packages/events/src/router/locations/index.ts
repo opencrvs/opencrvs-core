@@ -10,18 +10,25 @@
  */
 
 import * as z from 'zod/v4'
-import { Location, SetLocationPayload, UUID } from '@opencrvs/commons'
+import {
+  CreateLocationPayload,
+  Location,
+  SetLocationPayload,
+  UUID
+} from '@opencrvs/commons'
 import {
   internalProcedure,
   router,
   userAndSystemProcedure
 } from '@events/router/trpc'
 import {
+  createLocation,
   getLocationById,
   getLocationHierarchy,
   getLocations,
   setLocations
 } from '@events/service/locations/locations'
+import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import { allowedWithAnyOfScopes } from '../middleware'
 
 export function listLocationsRoute(
@@ -78,6 +85,45 @@ export const locationRouter = router({
       allowedWithAnyOfScopes(['user.data-seeding', 'config.update-all'])
     )
   ),
+  create: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'Create a location',
+        description: 'Create a new location with a single initial version.',
+        method: 'POST',
+        path: '/locations',
+        tags: ['Locations'],
+        protect: true
+      }
+    })
+    .use(allowedWithAnyOfScopes(['location.edit']))
+    .input(CreateLocationPayload)
+    .output(Location)
+    .mutation(async ({ input, ctx }) => {
+      const { location, created } = await createLocation(input)
+
+      if (created) {
+        const [initialVersion] = location.versions
+
+        await writeAuditLog({
+          clientId: ctx.user.id,
+          clientType: ctx.user.type,
+          operation: 'locations.create',
+          requestData: {
+            id: location.id,
+            versionId: initialVersion.versionId,
+            name: initialVersion.name,
+            externalId: initialVersion.externalId ?? null,
+            administrativeAreaId: location.administrativeAreaId,
+            locationType: location.locationType,
+            effectiveFrom: initialVersion.effectiveFrom,
+            status: initialVersion.status
+          }
+        })
+      }
+
+      return location
+    }),
   get: userAndSystemProcedure
     .input(z.object({ id: UUID }))
     .output(Location)
