@@ -1,0 +1,15 @@
+FROM alpine:3.20
+
+# Directory inside the assets image
+WORKDIR /assets
+
+# Copy assets
+# Metabase
+COPY --chmod=755 infrastructure/metabase /assets/metabase
+# Postgres
+COPY --chmod=755 infrastructure/postgres /assets/postgres
+# Elasticsearch re-indexing
+COPY --chmod=755 infrastructure/deployment/reindex.sh /assets/elasticsearch/reindex.sh
+
+# FIXME: This is a workaround to prevent the on-deploy.sh script from being executed in the assets image
+RUN rm -f /assets/postgres/on-deploy.sh
