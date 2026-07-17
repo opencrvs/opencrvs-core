@@ -2592,7 +2592,6 @@ components:
                     - correction-requested
                     - potential-duplicate
                     - edit-in-progress
-                    - sealed
             - type: string
               description: Custom flag identifier defined by the country config.
         operation:
@@ -12839,7 +12838,6 @@ components:
                       - correction-requested
                       - potential-duplicate
                       - edit-in-progress
-                      - sealed
               - type: string
                 description: Custom flag identifier defined by the country config.
         noneOf:
@@ -12855,7 +12853,6 @@ components:
                       - correction-requested
                       - potential-duplicate
                       - edit-in-progress
-                      - sealed
               - type: string
                 description: Custom flag identifier defined by the country config.
         allOf:
@@ -12871,7 +12868,6 @@ components:
                       - correction-requested
                       - potential-duplicate
                       - edit-in-progress
-                      - sealed
               - type: string
                 description: Custom flag identifier defined by the country config.
       additionalProperties: false
