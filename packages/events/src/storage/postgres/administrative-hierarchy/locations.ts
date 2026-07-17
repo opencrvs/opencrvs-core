@@ -223,8 +223,9 @@ export async function getVersionedRowById(
 }
 
 /**
- * Appends a single element to a row's `versions` jsonb array. Touches no
- * other column — legacy columns stay frozen at their creation values.
+ * Appends a single element to a row's `versions` jsonb array and bumps the
+ * row's `updatedAt`. The legacy data columns (`name`, `external_id`) stay
+ * frozen at their creation values — versions are the source of truth.
  */
 export async function appendVersion(
   table: 'locations' | 'administrativeAreas',
@@ -236,7 +237,8 @@ export async function appendVersion(
   await db
     .updateTable(table)
     .set({
-      versions: sql`versions || ${JSON.stringify([version])}::jsonb`
+      versions: sql`versions || ${JSON.stringify([version])}::jsonb`,
+      updatedAt: sql`now()`
     })
     .where('id', '=', id)
     .execute()
