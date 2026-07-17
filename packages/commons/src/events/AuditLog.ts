@@ -172,28 +172,40 @@ const ChangedNullableStringField = z.object({
   to: z.string().nullable()
 })
 
-const LocationUpdateEntrySchema = AuditLogEntryBase.extend({
-  operation: z.enum(['locations.update', 'administrativeAreas.update']),
-  /** The submitted snapshot, with server-resolved `versionId`/`effectiveFrom`. */
-  requestData: z.object({
-    id: z.string(),
-    versionId: z.string(),
-    name: z.string(),
-    externalId: z.string().nullish(),
-    status: z.string(),
-    effectiveFrom: z.string(),
-    lastVersionId: z.string()
-  }),
-  /** The diff against the previous version — only fields that changed. */
-  responseSummary: z.object({
-    previousVersionId: z.string(),
-    versionId: z.string(),
-    changed: z.object({
-      name: ChangedStringField.optional(),
-      externalId: ChangedNullableStringField.optional(),
-      status: ChangedStringField.optional()
-    })
+/** The submitted snapshot, with server-resolved `versionId`/`effectiveFrom`.
+ *  Updates carry no identity fields (parent / locationType are immutable),
+ *  so the shape is shared by both entities. */
+const updatedVersionRequestData = z.object({
+  id: z.string(),
+  versionId: z.string(),
+  name: z.string(),
+  externalId: z.string().nullish(),
+  status: z.string(),
+  effectiveFrom: z.string(),
+  lastVersionId: z.string()
+})
+
+/** The diff against the previous version — only fields that changed. */
+const updatedVersionResponseSummary = z.object({
+  previousVersionId: z.string(),
+  versionId: z.string(),
+  changed: z.object({
+    name: ChangedStringField.optional(),
+    externalId: ChangedNullableStringField.optional(),
+    status: ChangedStringField.optional()
   })
+})
+
+const LocationUpdateEntrySchema = AuditLogEntryBase.extend({
+  operation: z.literal('locations.update'),
+  requestData: updatedVersionRequestData,
+  responseSummary: updatedVersionResponseSummary
+})
+
+const AdministrativeAreaUpdateEntrySchema = AuditLogEntryBase.extend({
+  operation: z.literal('administrativeAreas.update'),
+  requestData: updatedVersionRequestData,
+  responseSummary: updatedVersionResponseSummary
 })
 
 // ── Attachments ────────────────────────────────────────────────────────────────
@@ -287,6 +299,7 @@ export const AuditLogEntrySchema = z.discriminatedUnion('operation', [
   IntegrationRefreshSecretEntrySchema,
   LocationCreateEntrySchema,
   LocationUpdateEntrySchema,
+  AdministrativeAreaUpdateEntrySchema,
   AdministrativeAreaCreateEntrySchema,
   AttachmentUploadEntrySchema,
   UserCreateEntrySchema,
