@@ -108,7 +108,8 @@
     "eslint-plugin-prettier": "^5.2.5",
     "jest-fetch-mock": "^2.1.2",
     "jsonwebtoken": "^9.0.2",
-    "pino-pretty": "^11.0.0"
+    "pino-pretty": "^11.0.0",
+    "tsx": "^4.15.7"
   },
   "lint-staged": {
     "src/**/*.ts": [

@@ -18,7 +18,7 @@
   },
   "scripts": {
     "build": "./build.sh",
-    "build:all": "lerna run build --include-dependencies --scope @opencrvs/toolkit"
+    "build:all": "pnpm -w exec lerna run build --include-dependencies --scope @opencrvs/toolkit"
   },
   "repository": {
     "type": "git",
