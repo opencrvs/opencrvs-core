@@ -18,7 +18,7 @@
   },
   "scripts": {
     "build": "./build.sh",
-    "build:all": "lerna run build --include-dependencies --scope @opencrvs/toolkit && ./build.sh"
+    "build:all": "lerna run build --include-dependencies --scope @opencrvs/toolkit"
   },
   "repository": {
     "type": "git",
@@ -51,6 +51,7 @@
     "zod-openapi": "^5.4.6"
   },
   "devDependencies": {
+    "@opencrvs/commons": "^2.0.0",
     "@opencrvs/events": "^2.0.0",
     "@types/js-yaml": "4.0.9",
     "@types/libsodium-wrappers": "^0.7.10",

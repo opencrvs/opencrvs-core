@@ -1,0 +1,85 @@
+id,description,en,fr
+buttons.confirm,Label used for confirm button,Confirm,Confirmer
+buttons.continue,Label used for continue button,Continue,Continuer
+buttons.login,The title that appears in step one of the form,Login,Se connecter
+constants.emailAddress,Label used for email address input field,Email address,Adresse e-mail
+constants.phoneNumber,Label used for phone number input field,Phone number,Numéro de téléphone
+constants.skipToMainContent,Label for a keyboard accessibility link which skips to the main content,Skip to main content,Passer au contenu principal
+error.errorEmailAddressNotFound,Error message for email address not found,Email address not found.,Adresse e-mail introuvable.
+error.errorPhoneNumberNotFound,Error message for phone number not found,Phone number not found,Numéro de téléphone mobile non trouvé.
+error.networkError,The error that appears when there is no internet connection,Unable to connect to server,Impossible de se connecter au serveur
+error.required.password,New password required,Invalid password,Le nouveau mot de passe n'est pas valide
+label.error,Generic error message for invalid form nput,Invalid input,Entrée invalide
+login.clearForm,,Clear form,Effacer le formulaire
+login.codeSubmissionError,The error that appears when the user entered sms code is unauthorised,Incorrect verification code. Please try again,"Désolé, ce code n'a pas fonctionné."
+login.fieldMissing,The error if user doesn't fill all the field,Enter your username and password,Nom d'utilisateur/mot de passe requis
+login.forbiddenCredentialError,The error that appears when the user entered details are forbidden,User is currently deactivated,L'utilisateur est actuellement désactivé.
+login.forgotPassword,The label that appears on the Forgot password button,Can't login?,Vous ne pouvez pas vous connecter ?
+login.language,Language name,"{language, select, en {English} fr {Français} other {{language}}}","{language, select, en {English} fr {Français} other {{language}}}"
+login.manager.performanceAppDescription,,Analyse the performance of a particular area of your country in it's Civil Registration.,Analysez les performances d'une région particulière de votre pays en matière d'enregistrement des faits d'état civil.
+login.manager.performanceAppTitle,,Performance Management,Gestion des performances
+login.manager.registerAppDescription,,"Manage declarations, registrations and certifications here.","Gérez ici vos déclarations, enregistrements et certifications."
+login.manager.registerAppTitle,,OpenCRVS,Page d'accueil OpenCRVS
+login.mobileLabel,,Mobile number,Numéro de téléphone mobile
+login.mobilePlaceholder,,07123456789,7123456789
+login.optionalLabel,Optional label,Optional,Optionel
+login.passwordLabel,The label that appears on the password input,Password,Mot de passe
+login.resend,Text for button that resends SMS or email verification code,"Resend {notificationMethod, select, sms {SMS} email {Email} other {}}","Renvoyer le {notificationMethod, select, sms {SMS} email {Email} other {}}"
+login.resentEMAIL,The message that appears when the resend button is clicked and tells user than code is resent to email,Authentication code sent to {email},Nous venons de vous envoyer un autre code à {email}.
+login.resentSMS,The message that appears when the resend button is clicked and tells user than code is resent to email,Authentication code sent to {number},Nous venons de vous envoyer un autre code à {number}.
+login.stepOneInstruction,The instruction that appears in step one of the form,Please enter your username and password.,Veuillez entrer votre nom d'utilisateur et votre mot de passe.
+login.stepOneText,The instruction that appears in step one of the login form,Login to Farajaland CRVS,Connectez-vous à Farajaland CRVS
+login.stepTwoInstruction.email,The instruction that appears in step two of the form that lets users know that code has been sent to email,An authentication code has been sent to {email}. This code will be valid for 10 minutes,Un code d'authentification a été envoyé à {email}. Ce code sera valable 10 minutes
+login.stepTwoInstruction.sms,The instruction that appears in step two of the form that lets users know that code has been sent to phone,An authentication code has been sent to {number}. This code will be valid for 10 minutes,Un code de vérification a été envoyé à votre téléphone. se terminant par {number}. Ce code sera valide pendant 5 minutes.
+login.stepTwoResendTitle,The title that appears in step two of the form after resend button click,Authentication code resent,Envoi du code de vérification
+login.stepTwoTitle,The title that appears in step two of the form,Verify your account,Vérifier votre compte
+login.submissionError,The error that appears when the user entered details are unauthorised,Incorrect username or password,Désolé que le nom d'utilisateur et le mot de passe n'aient pas fonctionné.
+login.submit,The label that appears on the submit button,Login,Se connecter
+login.tooManyCodeAttemptError,,Too many code entry attempts. You can try again after one minute.,Trop de tentatives de saisie du code. Vous pouvez réessayer après une minute.
+login.tooManyLoginAttemptError,,Too many login attempts. You can try again after one minute.,Trop de tentatives de connexion. Vous pouvez réessayer après une minute.
+login.username,The label that appears on the mobile number input,Username,Nom d'utilisateur
+login.verficationCodeLabel,Verification code label,Verification code (6 digits),Code de vérification (6 chiffres)
+login.verify,The label that appears on the verify code button,Verify,Vérifier
+misc.newPass.header,New Password header,Choose a new password,Choisissez un nouveau mot de passe
+misc.newPass.instruction,New Password instruction,"Create a unique password - one that you don't use for other websites or applications. A secure and easy to remember passphrase could include three random words, while avoiding the use of personal info.","Nous vous recommandons de créer un mot de passe unique, que vous n'utilisez pas pour un autre site Web ou une autre application. Remarque. Vous ne pouvez pas réutiliser votre ancien mot de passe une fois que vous l'avez modifié."
+password.cases,Password validation,At least one upper and lower case character,Contient des majuscules et des minuscules
+password.label.confirm,Confirm password label,Confirm password,Confirmez le mot de passe
+password.label.new,New password label,New password,Nouveau mot de passe
+password.match,Password validation,Passwords match,Les mots de passe correspondent
+password.minLength,Password validation,{min} characters minimum,{min} caractères minimum
+password.mismatch,Password validation,Passwords do not match,Les mots de passe ne correspondent pas
+password.number,Password validation,At least one number,Au moins un chiffre
+password.validation.msg,Password validation message,Password must have:,"Le mot de passe doit avoir ,"
+reloadmodal.body,Body of reload modal,There’s a new version of {app_name} available. Please update to continue.,Une nouvelle version de {app_name} est disponible. Veuillez effectuer la mise à jour pour continuer.
+reloadmodal.button.update,Label of update button,Update,Mise à jour
+reloadmodal.title,Title when update is available,Update available,Mise à jour disponible
+resend.sms,Text for button that resend SMS or email verification code,"Resend {notificationMethod, select, sms {SMS} email {Email} other {}}","Renvoyer un {notificationMethod, select, sms {SMS} email {Email} other {}}"
+resetCredentials.emailAddressConfirmation.form.body.header,Form body header used in the body of email address confirmation step,Enter your email address,Entrez votre adresse email
+resetCredentials.forgottenItem.form.body.header,Body header for forgotten item form,Select an option,Qu'avez-vous oublié ?
+resetCredentials.forgottenItem.form.title,Title used for forgotten item form,Can't login,Impossible de se connecter
+resetCredentials.form.title,Title used reset credentials forms,"{forgottenItem, select, username {Username reminder} password {Password reset} other {}}","{forgottenItem, select, username {Demande de rappel de nom d'utilisateur} password {Réinitialisation du mot de passe} other {}}"
+resetCredentials.label.field.answer,Label used for answer input field,Answer,Réponse
+resetCredentials.label.field.verificationCode,Label used for verification code input field,Verification code (6 digits),Code de vérification (6 chiffres)
+resetCredentials.option.password,Option used for password,Password reset,Mon mot de passe
+resetCredentials.option.username,Option used for username,Username reminder,Mon nom d'utilisateur
+resetCredentials.phoneNumberConfirmation.form.body.header,Form body header used in the body of phone number confirmation step,Enter your phone number,Quel est votre numéro de téléphone ?
+resetCredentials.phoneNumberConfirmation.form.body.subheader,,,C'est le numéro associé à votre compte.
+resetCredentials.recoveryCodeEntry.codeResent.form.body.header,The title that appears in step two of the form after resend button click,Authentication code resent,Envoi du code de vérification
+resetCredentials.recoveryCodeEntry.codeResent.form.body.subheader,The message that appears when the resend button is clicked.,Resent another code to {number}.,Nous venons de vous renvoyer un autre code à {number}.
+resetCredentials.recoveryCodeEntry.form.body.header,Form body header used for recovery code entry step,Enter 6-digit authetication code,Entrez le code de récupération à 6 chiffres
+resetCredentials.recoveryCodeEntry.form.body.subheader,Form body subheader used for recovery code entry step in mobile flow,An authentication code was sent to your phone number. Didn't receive it? {link},Le code de récupération a été envoyé à votre numéro de téléphone. Veuillez entrer le code. Vous ne l'avez pas reçu ?
+resetCredentials.recoveryCodeEntry.form.body.subheader.email,Form body subheader used for recovery code entry step in email flow,The recovery code was sent to your email. Please enter the code. Didn't receive it? {link},Le code de récupération a été envoyé à votre adresse e-mail. Veuillez entrer le code. Vous ne l'avez pas reçu ?
+resetCredentials.securityQuestion.form.body.subheader,Form body subheader used for security question step,This is one of the security questions you choose when setting up your account,Il s'agit d'une des questions de sécurité que vous choisissez lors de la création de votre compte
+resetCredentials.success.page.subtitle.email,Subtitle for success page for email,"{forgottenItem, select, username {Check your email for a reminder of your username} password {You can now login with your new password} other {}}","{forgottenItem, select, username {Vérifiez votre e-mail pour vous rappeler votre nom d'utilisateur.} password {Vous pouvez maintenant vous connecter avec votre nouveau mot de passe} other {}}"
+resetCredentials.success.page.subtitle.phone,Subtitle for success page for phone,"{forgottenItem, select, username {Check your phone for a reminder of your username} password {You can now login with your new password} other {}}","{forgottenItem, select, username {Vérifiez votre téléphone pour vous rappeler votre nom d'utilisateur.} password {Vous pouvez maintenant vous connecter avec votre nouveau mot de passe} other {}}"
+resetCredentials.success.page.title,Title for success page,"{forgottenItem, select, username {Username reminder sent} password {Password reset successful} other {}}","{forgottenItem, select, username {Rappel de l'identifiant envoyé} password {Réinitialisation du mot de passe réussie} other {}}"
+userSetup.securityQuestions.birthTown,,What city were you born in?,Dans quelle ville êtes-vous né ?
+userSetup.securityQuestions.favoriteFood,,What is your favorite food?,Quel est votre plat préféré ?
+userSetup.securityQuestions.favoriteMovie,,What is your favorite movie?,Quel est votre film préféré ?
+userSetup.securityQuestions.favoriteSong,,What is your favorite song?,Quelle est votre chanson préférée ?
+userSetup.securityQuestions.favoriteTeacher,,What is the name of your favorite school teacher?,Quel est le nom de votre professeur d'école préféré ?
+userSetup.securityQuestions.firstChildName,,What is your first child's name?,Quel est le nom de votre premier enfant ?
+userSetup.securityQuestions.hightSchool,,What is the name of your high school?,Quel est le nom de votre école secondaire ?
+userSetup.securityQuestions.motherName,,What is your mother's name?,Quel est le nom de votre mère ?
+validations.emailAddressFormat,The error message that appears on email address,Must be a valid email address,Doit être une adresse e-mail valide
+validations.phoneNumberFormat,The error message that appears on phone numbers where the first character must be a 0,Enter a valid mobile phone number,"Doit être un numéro de téléphone mobile valide. Commençant par 0. Par exemple, {example}"
