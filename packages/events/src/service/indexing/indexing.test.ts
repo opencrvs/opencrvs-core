@@ -15,7 +15,7 @@ import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   ActionType,
   AddressType,
-  AdministrativeArea,
+  SetAdministrativeAreaPayload,
   createPrng,
   EventConfig,
   EventDocument,
@@ -26,7 +26,7 @@ import {
   FieldType,
   generateActionDeclarationInput,
   generateUuid,
-  Location,
+  SetLocationPayload,
   QueryType,
   TENNIS_CLUB_MEMBERSHIP,
   TestUserRole,
@@ -89,7 +89,6 @@ test('legalStatuses.NOTIFIED is indexed with full location hierarchy after a not
     name: 'Administrative Area'
   }
   const childAdministrativeArea = {
-    validUntil: null,
     externalId: null,
     name: 'Child Administrative Area',
     id: user.administrativeAreaId as UUID,
@@ -101,7 +100,7 @@ test('legalStatuses.NOTIFIED is indexed with full location hierarchy after a not
     administrativeAreaId: childAdministrativeArea.id,
     name: 'Child location',
     locationType: 'CRVS_OFFICE'
-  } satisfies Location
+  } satisfies SetLocationPayload
 
   await seed.administrativeAreas([
     parentAdministrativeArea,
@@ -171,7 +170,6 @@ test('records are indexed with full location hierarchy', async () => {
   }
 
   const childAdministrativeArea = {
-    validUntil: null,
     externalId: null,
     name: 'Child Administrative Area',
     id: user.administrativeAreaId as UUID,
@@ -184,7 +182,7 @@ test('records are indexed with full location hierarchy', async () => {
     administrativeAreaId: childAdministrativeArea.id,
     name: 'Child location',
     locationType: 'CRVS_OFFICE'
-  } satisfies Location
+  } satisfies SetLocationPayload
 
   await seed.administrativeAreas([
     parentAdministrativeArea,
@@ -1080,9 +1078,9 @@ describe('placeOfEvent location hierarchy handling', () => {
   let declarationWithHomeAddress: EventState
   let generator: Awaited<ReturnType<typeof setupTestCase>>['generator']
   let seed: Awaited<ReturnType<typeof setupTestCase>>['seed']
-  let grandParentAdministrativeArea: AdministrativeArea
-  let parentAdministrativeArea: AdministrativeArea
-  let childOffice: Location
+  let grandParentAdministrativeArea: SetAdministrativeAreaPayload
+  let parentAdministrativeArea: SetAdministrativeAreaPayload
+  let childOffice: SetLocationPayload
   let modifiedEventConfig: EventConfig
   beforeEach(async () => {
     // Setup: Generate location IDs upfront

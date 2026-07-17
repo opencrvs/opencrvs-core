@@ -61,7 +61,7 @@ import { useOnlineStatus } from '../../../../utils'
 import { useAdministrativeAreas } from '../../../../v2-events/hooks/useAdministrativeAreas'
 import { UserActivationModal } from './UserActivationModal'
 
-const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
+const USERS_PER_PAGE = 10
 const DEFAULT_PAGE_NUMBER = 1
 
 const UserTable = styled(BodyContent)`
@@ -282,13 +282,7 @@ function UserListComponent({ userDetails }: UserListProps) {
     isLoading,
     error
   } = searchUsers.useQuery(
-    {
-      primaryOfficeId: locationId,
-      count: DEFAULT_FIELD_AGENT_LIST_SIZE,
-      skip: (currentPageNumber - 1) * DEFAULT_FIELD_AGENT_LIST_SIZE,
-      sortBy: 'firstname',
-      sortOrder: 'asc'
-    },
+    { primaryOfficeId: locationId, sortBy: 'firstname', sortOrder: 'asc' },
     { enabled: !!locationId }
   )
 
@@ -619,7 +613,15 @@ function UserListComponent({ userDetails }: UserListProps) {
       userDetails: UserDetails | null
     }) {
       const totalData = users.length
-      const userContent = generateUserContents(users, locationId, userDetails)
+      const paginatedUsers = users.slice(
+        (currentPageNumber - 1) * USERS_PER_PAGE,
+        currentPageNumber * USERS_PER_PAGE
+      )
+      const userContent = generateUserContents(
+        paginatedUsers,
+        locationId,
+        userDetails
+      )
 
       return (
         <UserTable id="user_list">
@@ -639,10 +641,10 @@ function UserListComponent({ userDetails }: UserListProps) {
               valueHeader={intl.formatMessage(constantsMessages.labelRole)}
             />
           )}
-          {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
+          {totalData > USERS_PER_PAGE && (
             <Pagination
               currentPage={currentPageNumber}
-              totalPages={Math.ceil(totalData / DEFAULT_FIELD_AGENT_LIST_SIZE)}
+              totalPages={Math.ceil(totalData / USERS_PER_PAGE)}
               onPageChange={(currentPage: number) =>
                 setCurrentPageNumber(currentPage)
               }
