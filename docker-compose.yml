@@ -128,3 +128,21 @@ services:
     environment:
       - EVENTS_URL=http://events:5555/
       - AUTH_URL=http://auth:4040/
+  # testland is the reference country config, merged into core as packages/testland.
+  # Listing it here makes it auto-join the ghcr image matrix in
+  # build-images-from-branch.yml -> ghcr.io/opencrvs/ocrvs-testland:<tag>.
+  # Its companion assets image (ghcr.io/opencrvs/ocrvs-testland:<tag>-assets,
+  # built from packages/testland/Dockerfile.assets) is published by a dedicated
+  # step in that workflow. Only the top-level docker-compose.yml is consumed by
+  # the image matrix; local dev runs countryconfig from docker-compose.dev.yml.
+  testland:
+    image: ghcr.io/opencrvs/ocrvs-testland:${VERSION}
+    #platform: linux/amd64
+    build:
+      context: .
+      dockerfile: ./packages/testland/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - base
+    environment:
+      - NODE_ENV=production

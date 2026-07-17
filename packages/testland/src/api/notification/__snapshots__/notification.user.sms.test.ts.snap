@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`User notification - sms > 2fa 1`] = `"{"messages":[{"destinations":[{"recipient":"+15551234567"}],"from":"mock_sender","text":"Your OpenCRVS authentication code is: 102030"}]}"`;
+
+exports[`User notification - sms > change-email-address 1`] = `"{"messages":[{"destinations":[{"recipient":"+15551234567"}],"from":"mock_sender","text":"Your OpenCRVS authentication code is: 654321"}]}"`;
+
+exports[`User notification - sms > change-phone-number 1`] = `"{"messages":[{"destinations":[{"recipient":"+15551234567"}],"from":"mock_sender","text":"Your OpenCRVS authentication code is: 123456"}]}"`;
+
+exports[`User notification - sms > resend-invite 1`] = `"{"messages":[{"destinations":[{"recipient":"+15551234567"}],"from":"mock_sender","text":"Your OpenCRVS account invitation has been resent. Please login with your username: j.doe and temporary password: TempPass123!"}]}"`;
+
+exports[`User notification - sms > reset-password 1`] = `"{"messages":[{"destinations":[{"recipient":"+15551234567"}],"from":"mock_sender","text":"Use the code 112233 to reset your Farajaland CRS password. This code expires in 10 minutes."}]}"`;
+
+exports[`User notification - sms > reset-password-by-admin 1`] = `"{"messages":[{"destinations":[{"recipient":"+15551234567"}],"from":"mock_sender","text":"Your password has been reset. Please login to Farajaland CRS with the temporary password: tempPass123."}]}"`;
+
+exports[`User notification - sms > user-created 1`] = `"{"messages":[{"destinations":[{"recipient":"+15551234567"}],"from":"mock_sender","text":"Your OpenCRVS account has been created. Please login with your username: j.doe and temporary password: TempPass123!"}]}"`;
+
+exports[`User notification - sms > user-updated 1`] = `"{"messages":[{"destinations":[{"recipient":"+15551234567"}],"from":"mock_sender","text":"Your OpenCRVS username has been updated to: j.doe. Your password has not changed."}]}"`;
+
+exports[`User notification - sms > username-reminder 1`] = `"{"messages":[{"destinations":[{"recipient":"+15551234567"}],"from":"mock_sender","text":"Your username for OpenCRVS is: j.doe"}]}"`;
