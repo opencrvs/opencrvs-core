@@ -85,11 +85,6 @@ export const locationRouter = router({
       }
     })
   ),
-  set: setLocationsRoute(
-    userAndSystemProcedure.use(
-      allowedWithAnyOfScopes(['user.data-seeding', 'config.update-all'])
-    )
-  ),
   create: userAndSystemProcedure
     .meta({
       openapi: {
