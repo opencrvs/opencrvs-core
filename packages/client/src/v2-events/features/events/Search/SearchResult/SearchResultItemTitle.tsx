@@ -14,11 +14,9 @@ import { useNavigate } from 'react-router-dom'
 import { EventConfig, EventIndex } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import { Link as TextButton } from '@opencrvs/components'
-import { IconWithName } from '@client/v2-events/components/IconWithName'
-import { IconWithNameEvent } from '@client/v2-events/components/IconWithNameEvent'
+import { EventIcon } from '@client/v2-events/components/EventIcon'
 import { ROUTES } from '@client/v2-events/routes'
 import { useCurrentBackTo } from '@client/v2-events/features/events/useEventFormNavigation'
-import { useEventIcon } from '@client/v2-events/hooks/useEventIcon'
 import { useEventTitle } from '../../useEvents/useEventTitle'
 import { ExtendedEventStatuses } from './utils'
 
@@ -37,26 +35,16 @@ export function SearchResultItemTitle({
   const backTo = useCurrentBackTo()
   const { getEventTitle } = useEventTitle()
   const { title, useFallbackTitle } = getEventTitle(eventConfig, event)
-  const iconName = useEventIcon(eventConfig, event)
 
   const isWideScreen = width > theme.grid.breakpoints.lg
-  const renderIconWithName = () =>
-    isWideScreen ? (
-      <IconWithName
-        flags={event.flags}
-        iconName={iconName}
-        name={title}
-        status={event.status}
-      />
-    ) : (
-      <IconWithNameEvent
-        event={event.type}
-        flags={event.flags}
-        iconName={iconName}
-        name={title}
-        status={event.status}
-      />
-    )
+  const renderIconWithName = () => (
+    <EventIcon
+      displayEventType={!isWideScreen}
+      event={event}
+      eventConfig={eventConfig}
+      name={title}
+    />
+  )
 
   if (localEventStatus === ExtendedEventStatuses.OUTBOX) {
     return renderIconWithName()
