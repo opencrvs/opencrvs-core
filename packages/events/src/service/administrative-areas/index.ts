@@ -15,12 +15,17 @@ import {
   CreateAdministrativeAreaPayload,
   getUUID,
   hasActiveExternalIdOnOrAfter,
+  UpdateAdministrativeAreaPayload,
   UUID,
   SetAdministrativeAreaPayload
 } from '@opencrvs/commons'
 import * as administrativeAreaRepo from '@events/storage/postgres/administrative-hierarchy/administrative-areas'
 import { clearAdministrativeHierarchyCache } from '@events/storage/postgres/administrative-hierarchy/locations'
-import { isUniqueViolation } from '@events/service/locations/locations'
+import {
+  appendVersionChecked,
+  isUniqueViolation,
+  VersionAppendOutcome
+} from '@events/service/locations/locations'
 
 export async function getAdministrativeAreas(params?: {
   isActive?: boolean
@@ -138,6 +143,29 @@ export async function createAdministrativeArea(
   return {
     administrativeArea: await getAdministrativeAreaById(resolved.id),
     created: true
+  }
+}
+
+/**
+ * Appends a new version to an administrative area after the checks documented
+ * on {@link appendVersionChecked}. Returns the area via the normal read path
+ * plus the previous/new version elements for the router's audit diff.
+ */
+export async function updateAdministrativeArea(
+  payload: UpdateAdministrativeAreaPayload
+): Promise<{
+  administrativeArea: AdministrativeArea
+  outcome: VersionAppendOutcome
+}> {
+  const outcome = await appendVersionChecked({
+    payload,
+    entityLabel: 'Administrative area',
+    table: 'administrativeAreas'
+  })
+
+  return {
+    administrativeArea: await getAdministrativeAreaById(payload.id),
+    outcome
   }
 }
 

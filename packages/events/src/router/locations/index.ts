@@ -14,6 +14,7 @@ import {
   CreateLocationPayload,
   Location,
   SetLocationPayload,
+  UpdateLocationPayload,
   UUID
 } from '@opencrvs/commons'
 import {
@@ -23,10 +24,12 @@ import {
 } from '@events/router/trpc'
 import {
   createLocation,
+  diffLocationVersions,
   getLocationById,
   getLocationHierarchy,
   getLocations,
-  setLocations
+  setLocations,
+  updateLocation
 } from '@events/service/locations/locations'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import { allowedWithAnyOfScopes } from '../middleware'
@@ -118,6 +121,51 @@ export const locationRouter = router({
             locationType: location.locationType,
             effectiveFrom: initialVersion.effectiveFrom,
             status: initialVersion.status
+          }
+        })
+      }
+
+      return location
+    }),
+  update: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'Update a location',
+        description:
+          'Append a new version to a location (rename, recode or inactivate). Prior versions are never modified.',
+        method: 'PUT',
+        path: '/locations/{id}',
+        tags: ['Locations'],
+        protect: true
+      }
+    })
+    .use(allowedWithAnyOfScopes(['location.edit']))
+    .input(UpdateLocationPayload)
+    .output(Location)
+    .mutation(async ({ input, ctx }) => {
+      const { location, outcome } = await updateLocation(input)
+
+      // An idempotent replay appends nothing and must not be audited twice.
+      if (outcome.appended) {
+        const { previousVersion, newVersion } = outcome
+
+        await writeAuditLog({
+          clientId: ctx.user.id,
+          clientType: ctx.user.type,
+          operation: 'locations.update',
+          requestData: {
+            id: location.id,
+            versionId: newVersion.versionId,
+            name: newVersion.name,
+            externalId: newVersion.externalId ?? null,
+            status: newVersion.status,
+            effectiveFrom: newVersion.effectiveFrom,
+            lastVersionId: input.lastVersionId
+          },
+          responseSummary: {
+            previousVersionId: previousVersion.versionId,
+            versionId: newVersion.versionId,
+            changed: diffLocationVersions(previousVersion, newVersion)
           }
         })
       }

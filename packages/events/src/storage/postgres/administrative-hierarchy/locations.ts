@@ -202,6 +202,49 @@ export async function createLocation(location: CreateLocationRow) {
 }
 
 /**
+ * Fetches a locations / administrative-areas row's versions for the update
+ * path. No soft-delete filter — soft-deleted handling is the caller's
+ * decision. Location writes are rare, single-admin operations, so the update
+ * path deliberately runs without locking (plain read → check → append).
+ */
+export async function getVersionedRowById(
+  table: 'locations' | 'administrativeAreas',
+  id: UUID
+) {
+  const db = getClient()
+
+  const row = await db
+    .selectFrom(table)
+    .select(['id', 'deletedAt', 'versions'])
+    .where('id', '=', id)
+    .executeTakeFirst()
+
+  return row && { ...row, versions: parseVersions(row.versions, row.id) }
+}
+
+/**
+ * Appends a single element to a row's `versions` jsonb array and bumps the
+ * row's `updatedAt`. The legacy data columns (`name`, `external_id`) stay
+ * frozen at their creation values — versions are the source of truth.
+ */
+export async function appendVersion(
+  table: 'locations' | 'administrativeAreas',
+  id: UUID,
+  version: LocationVersion
+) {
+  const db = getClient()
+
+  await db
+    .updateTable(table)
+    .set({
+      versions: sql`versions || ${JSON.stringify([version])}::jsonb`,
+      updatedAt: sql`now()`
+    })
+    .where('id', '=', id)
+    .execute()
+}
+
+/**
  * Fetches a location row by id without the soft-delete filter and without
  * resolving version fields. Used by the create path to detect idempotent
  * retries against any existing row, including soft-deleted ones.
