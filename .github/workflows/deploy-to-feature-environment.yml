@@ -32,7 +32,7 @@ concurrency:
 jobs:
   # Validate branch name and check for skip-e2e label
   check_skip_e2e_label:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     outputs:
       skip_e2e: ${{ steps.set_skip_flag.outputs.SKIP_E2E }}
     steps:
@@ -69,7 +69,7 @@ jobs:
   generate_stack_name_and_branch:
     needs: check_skip_e2e_label
     if: ${{ needs.check_skip_e2e_label.outputs.skip_e2e != 'true' }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     outputs:
       branch_name: ${{ steps.set_branch_and_pr_number.outputs.BRANCH_NAME }}
       pr_number: ${{ steps.set_branch_and_pr_number.outputs.PR_NUMBER }}
@@ -192,7 +192,7 @@ jobs:
     secrets: inherit
 
   trigger-e2e:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: [check_skip_e2e_label, generate_stack_name_and_branch, trigger-build]
     if: ${{ needs.check_skip_e2e_label.outputs.skip_e2e != 'true' }}
     outputs:
@@ -309,7 +309,7 @@ jobs:
 
   listen-e2e:
     needs: [trigger-e2e, generate_stack_name_and_branch]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Wait for Environment Deployment (Deploy Job)
         uses: actions/github-script@v8
