@@ -12,10 +12,12 @@ import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import {
   AdministrativeAreaField,
+  ClientLocation,
   getAdministrativeAreaHierarchy,
   JurisdictionFilter,
-  Location,
   resolveJurisdictionReference,
+  resolveVersion,
+  todayISO,
   UUID
 } from '@opencrvs/commons/client'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
@@ -136,8 +138,15 @@ function AdministrativeAreaInput({
     jurisdictionFilter
   )
 
+  // Selector option labels are behavior-preserving: always today's name.
+  // Anchoring options to the form's event date is the selector-anchoring
+  // follow-up (#13143).
   const options = useMemo(
-    () => administrativeAreas.map((o) => ({ label: o.name, value: o.id })),
+    () =>
+      administrativeAreas.map((o) => ({
+        label: resolveVersion(o.versions, todayISO()).name,
+        value: o.id
+      })),
     [administrativeAreas]
   )
 
@@ -164,27 +173,39 @@ function AdministrativeAreaInput({
 }
 
 function AdministrativeAreaOutput({
-  value
+  value,
+  anchor
 }: {
   value: Stringifiable | undefined
+  anchor: string
 }) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
   const administrativeAreaId = UUID.safeParse(value?.toString()).data
 
-  const administrativeArea =
-    administrativeAreaId && administrativeAreas.get(administrativeAreaId)
+  const resolved =
+    administrativeAreaId &&
+    resolveVersion(
+      administrativeAreas.get(administrativeAreaId)?.versions ?? [],
+      anchor
+    )
 
-  return administrativeArea?.name ?? ''
+  return administrativeAreaId ? (resolved ? resolved.name : '') : ''
 }
 
-function stringify(value: string, context: { locations: Map<UUID, Location> }) {
+function stringify(
+  value: string,
+  context: { locations: Map<UUID, ClientLocation>; anchor: string }
+) {
   const locationId = UUID.safeParse(value).data
   const location = locationId && context.locations.get(locationId)
 
-  const name = location?.name
-  return name ?? EMPTY_TOKEN
+  if (!location) {
+    return EMPTY_TOKEN
+  }
+
+  return resolveVersion(location.versions, context.anchor).name
 }
 
 function isAdministrativeAreaEmpty(value: Stringifiable) {

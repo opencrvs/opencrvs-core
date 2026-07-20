@@ -10,8 +10,8 @@
  */
 
 import {
-  AdministrativeArea,
-  Location,
+  ClientAdministrativeArea,
+  ClientLocation,
   UUID,
   EventIndexWithAdministrativeHierarchy,
   EventIndex,
@@ -34,8 +34,8 @@ import {
 export function buildEventIndexWithHierarchy(
   event: EventIndex,
   context: {
-    administrativeAreas: Map<UUID, AdministrativeArea>
-    locations: Map<UUID, Location>
+    administrativeAreas: Map<UUID, ClientAdministrativeArea>
+    locations: Map<UUID, ClientLocation>
   }
 ): EventIndexWithAdministrativeHierarchy {
   const resolve = (id: UUID | null | undefined) =>

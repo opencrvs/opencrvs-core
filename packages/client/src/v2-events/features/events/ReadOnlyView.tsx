@@ -40,6 +40,7 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messa
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { recordAnchorDate } from '@client/v2-events/utils'
 import { useAuthentication } from '@client/utils/userUtils'
 import { useOnlineStatus } from '@client/utils'
 import { queryClient, useTRPC } from '@client/v2-events/trpc'
@@ -146,6 +147,7 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   return (
     <ReviewComponent.Body
       readonlyMode
+      anchor={recordAnchorDate(eventStateWithDraft)}
       annotation={annotation}
       form={eventStateWithDraft.declaration}
       formConfig={formConfig}

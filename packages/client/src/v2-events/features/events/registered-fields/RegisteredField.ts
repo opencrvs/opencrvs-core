@@ -11,9 +11,9 @@
 
 import { IntlShape } from 'react-intl'
 import {
-  AdministrativeArea,
+  ClientAdministrativeArea,
+  ClientLocation,
   FieldConfigInput,
-  Location,
   User,
   UUID
 } from '@opencrvs/commons/client'
@@ -36,8 +36,15 @@ export interface RegisteredFieldModule<T extends FieldConfigInput> {
 
 export interface StringifierContext<F extends FieldConfigInput> {
   intl: IntlShape
-  locations: Map<UUID, Location>
-  administrativeAreas: Map<UUID, AdministrativeArea>
+  locations: Map<UUID, ClientLocation>
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
+  /**
+   * The date at which every location in this context is resolved to a
+   * version — the date of the fact being rendered. Required: there is no
+   * default anchor, so omitting it is a compile error rather than a silent
+   * fall-through to the current name.
+   */
+  anchor: string
   users?: User[]
   config?: F
   adminLevels?: AdminStructureItem[]

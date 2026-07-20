@@ -18,6 +18,11 @@ import {
   EventIndexWithAdministrativeHierarchy,
   getLocationHierarchy,
   Location,
+  LocationVersion,
+  resolvePath,
+  resolveVersion,
+  toClientAdministrativeArea,
+  toClientLocation,
   UserWithResolvedHierarchy
 } from './locations'
 import { RecordScopeV2, UserScopeV2 } from 'src/scopes'
@@ -549,6 +554,219 @@ function buildMaps() {
   ])
   return { administrativeAreas, locations }
 }
+
+function version(
+  effectiveFrom: string,
+  name: string,
+  status: 'active' | 'inactive' = 'active'
+): LocationVersion {
+  return {
+    versionId: generateUuid(),
+    effectiveFrom,
+    name,
+    externalId: null,
+    status
+  }
+}
+
+describe('resolveVersion', () => {
+  const versions = [
+    version('0001-01-01', 'Alaminos'),
+    version('2005-03-28', 'Alaminos City'),
+    version('2020-01-01', 'Alaminos City', 'inactive')
+  ]
+
+  it('returns the version with the greatest effectiveFrom ≤ anchor', () => {
+    expect(resolveVersion(versions, '2010-06-15').name).toBe('Alaminos City')
+    expect(resolveVersion(versions, '2010-06-15').status).toBe('active')
+  })
+
+  it('treats an anchor equal to effectiveFrom as within that version', () => {
+    expect(resolveVersion(versions, '2005-03-28').name).toBe('Alaminos City')
+  })
+
+  it('returns the last version for anchors after all versions', () => {
+    expect(resolveVersion(versions, '2030-01-01').status).toBe('inactive')
+  })
+
+  it('returns the earliest version when the anchor precedes all versions', () => {
+    const late = [
+      version('1990-01-01', 'Founded Town'),
+      version('2000-01-01', 'Renamed Town')
+    ]
+    expect(resolveVersion(late, '1980-01-01').name).toBe('Founded Town')
+  })
+
+  it('resolves a single sentinel-dated version at any anchor', () => {
+    const single = [version('0001-01-01', 'Only Name')]
+    expect(resolveVersion(single, '1970-01-01').name).toBe('Only Name')
+    expect(resolveVersion(single, '2099-12-31').name).toBe('Only Name')
+  })
+})
+
+describe('resolvePath', () => {
+  const rng = createPrng(4242)
+
+  const versionedProvince: AdministrativeArea = {
+    id: generateUuid(rng),
+    name: 'Greater Pangasinan',
+    externalId: null,
+    parentId: null,
+    status: 'active',
+    versions: [
+      version('0001-01-01', 'Pangasinan'),
+      version('2010-01-01', 'Greater Pangasinan')
+    ]
+  }
+
+  const versionedDistrict: AdministrativeArea = {
+    id: generateUuid(rng),
+    name: 'Alaminos City',
+    externalId: null,
+    parentId: versionedProvince.id,
+    status: 'inactive',
+    versions: [
+      version('0001-01-01', 'Alaminos'),
+      version('2005-03-28', 'Alaminos City'),
+      version('2020-01-01', 'Alaminos City', 'inactive')
+    ]
+  }
+
+  const versionedOffice: Location = {
+    id: generateUuid(rng),
+    name: 'Alaminos City Registry Office',
+    externalId: null,
+    administrativeAreaId: versionedDistrict.id,
+    locationType: 'CRVS_OFFICE',
+    status: 'active',
+    versions: [
+      version('0001-01-01', 'Alaminos Registry'),
+      version('2008-06-01', 'Alaminos City Registry Office')
+    ]
+  }
+
+  const standaloneOffice: Location = {
+    id: generateUuid(rng),
+    name: 'Standalone Office',
+    externalId: null,
+    administrativeAreaId: null,
+    locationType: 'CRVS_OFFICE',
+    status: 'active',
+    versions: [version('0001-01-01', 'Standalone Office')]
+  }
+
+  const context = {
+    administrativeAreas: new Map([
+      [versionedProvince.id, versionedProvince],
+      [versionedDistrict.id, versionedDistrict]
+    ]),
+    locations: new Map([
+      [versionedOffice.id, versionedOffice],
+      [standaloneOffice.id, standaloneOffice]
+    ])
+  }
+
+  it('resolves the whole path, leaf included, at an anchor before any change', () => {
+    expect(resolvePath(versionedOffice.id, '1995-05-20', context)).toEqual([
+      { id: versionedProvince.id, name: 'Pangasinan', status: 'active' },
+      { id: versionedDistrict.id, name: 'Alaminos', status: 'active' },
+      { id: versionedOffice.id, name: 'Alaminos Registry', status: 'active' }
+    ])
+  })
+
+  it('resolves the whole path at an anchor after all changes', () => {
+    expect(resolvePath(versionedOffice.id, '2021-06-01', context)).toEqual([
+      {
+        id: versionedProvince.id,
+        name: 'Greater Pangasinan',
+        status: 'active'
+      },
+      { id: versionedDistrict.id, name: 'Alaminos City', status: 'inactive' },
+      {
+        id: versionedOffice.id,
+        name: 'Alaminos City Registry Office',
+        status: 'active'
+      }
+    ])
+  })
+
+  it('resolves each ancestor independently at a mid-history anchor', () => {
+    expect(
+      resolvePath(versionedOffice.id, '2006-01-01', context).map((n) => n.name)
+    ).toEqual(['Pangasinan', 'Alaminos City', 'Alaminos Registry'])
+  })
+
+  it('keeps an inactivated node resolvable with its status exposed', () => {
+    const district = resolvePath(versionedDistrict.id, '2021-01-01', context)
+    expect(district).toEqual([
+      {
+        id: versionedProvince.id,
+        name: 'Greater Pangasinan',
+        status: 'active'
+      },
+      { id: versionedDistrict.id, name: 'Alaminos City', status: 'inactive' }
+    ])
+  })
+
+  it('returns an areas-only path for an administrative area id', () => {
+    expect(
+      resolvePath(versionedDistrict.id, '1999-01-01', context).map((n) => n.id)
+    ).toEqual([versionedProvince.id, versionedDistrict.id])
+  })
+
+  it('returns only the leaf for a location without an administrative area', () => {
+    expect(resolvePath(standaloneOffice.id, '2020-01-01', context)).toEqual([
+      { id: standaloneOffice.id, name: 'Standalone Office', status: 'active' }
+    ])
+  })
+
+  it('returns an empty path for an unknown id', () => {
+    expect(resolvePath(generateUuid(rng), '2020-01-01', context)).toEqual([])
+  })
+
+  it('accepts stripped client maps', () => {
+    const clientContext = {
+      administrativeAreas: new Map(
+        [versionedProvince, versionedDistrict].map((a) => [
+          a.id,
+          toClientAdministrativeArea(a)
+        ])
+      ),
+      locations: new Map(
+        [versionedOffice, standaloneOffice].map((l) => [
+          l.id,
+          toClientLocation(l)
+        ])
+      )
+    }
+    expect(
+      resolvePath(versionedOffice.id, '1995-05-20', clientContext).map(
+        (n) => n.name
+      )
+    ).toEqual(['Pangasinan', 'Alaminos', 'Alaminos Registry'])
+  })
+})
+
+describe('toClientLocation / toClientAdministrativeArea', () => {
+  it('strips the server-flattened fields from a location', () => {
+    const stripped = toClientLocation(office)
+    expect(stripped).toEqual({
+      id: office.id,
+      administrativeAreaId: office.administrativeAreaId,
+      locationType: office.locationType,
+      versions: office.versions
+    })
+  })
+
+  it('strips the server-flattened fields from an administrative area', () => {
+    const stripped = toClientAdministrativeArea(district)
+    expect(stripped).toEqual({
+      id: district.id,
+      parentId: district.parentId,
+      versions: district.versions
+    })
+  })
+})
 
 describe('getLocationHierarchy', () => {
   it('returns root-first hierarchy for a location with an administrative area', () => {

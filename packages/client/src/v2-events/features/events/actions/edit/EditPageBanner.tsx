@@ -15,7 +15,12 @@ import { defineMessage, useIntl } from 'react-intl'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Text } from '@opencrvs/components'
-import { ActionType, ActionStatus } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  ActionStatus,
+  resolveVersion,
+  todayISO
+} from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
@@ -77,6 +82,13 @@ export function EditPageBanner() {
     ? locations.get(createdAtLocation)
     : undefined
 
+  // The office is resolved at the action's own date — the name it carried
+  // when the record was notified/declared.
+  const locationName = location
+    ? resolveVersion(location.versions, latestAction.createdAt.split('T')[0])
+        .name
+    : undefined
+
   const { getUserDetails } = useUserDetails()
   const { role, name } = getUserDetails({
     createdByUserType,
@@ -89,7 +101,7 @@ export function EditPageBanner() {
     declarationActions.length > 0 ? declaredMessage : notifiedMessage
 
   const formattedMessage = intl.formatMessage(message, {
-    location: location?.name,
+    location: locationName,
     role,
     name
   })

@@ -57,6 +57,7 @@ export function ActionFormContent({
       label: intl.formatMessage(field.label),
       value: (
         <Output
+          anchor={action.createdAt.split('T')[0]}
           eventConfig={eventConfiguration}
           field={field}
           value={annotation?.[field.id]}

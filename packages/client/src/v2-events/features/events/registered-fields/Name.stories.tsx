@@ -12,7 +12,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import styled from 'styled-components'
-import { FieldType, NameField } from '@opencrvs/commons/client'
+import { FieldType, NameField, todayISO } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGeneratorPropsWithoutRef } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
@@ -150,7 +150,11 @@ export const WithAllOptions: Story = {
     return (
       <div>
         <strong>{'Current Value:'}</strong>
-        <ValueOutput config={field} value={form?.['storybook.name']} />
+        <ValueOutput
+          anchor={todayISO()}
+          config={field}
+          value={form?.['storybook.name']}
+        />
         <br />
         <br />
         <strong>{'Form:'}</strong>

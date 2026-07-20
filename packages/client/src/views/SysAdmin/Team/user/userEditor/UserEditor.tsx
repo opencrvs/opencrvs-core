@@ -52,6 +52,7 @@ import {
 import styled from 'styled-components'
 import { useUsers } from '../../../../../v2-events/hooks/useUsers'
 import { createTemporaryId, isTemporaryId } from '@client/v2-events/utils'
+import { todayISO } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import { usePermissions } from '@client/hooks/useAuthorization'
@@ -513,6 +514,7 @@ const ReviewUserComponent = () => {
         </Toast>
       )}
       <ReviewComponent.Body
+        anchor={todayISO()}
         form={formState as Record<string, FieldValue>}
         formConfig={formConfig}
         reviewFields={[]}

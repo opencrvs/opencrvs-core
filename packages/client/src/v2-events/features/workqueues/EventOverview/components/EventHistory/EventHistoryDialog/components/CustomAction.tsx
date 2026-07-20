@@ -42,6 +42,7 @@ function prepareContent(
     .map((field) => {
       const value = (
         <Output
+          anchor={action.createdAt.split('T')[0]}
           eventConfig={eventConfiguration}
           field={field}
           value={annotation?.[field.id]}

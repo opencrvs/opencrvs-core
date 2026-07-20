@@ -76,6 +76,7 @@ export function PrintCertificate({
       .map((field) => {
         const valueDisplay = (
           <Output
+            anchor={action.createdAt.split('T')[0]}
             eventConfig={eventConfiguration}
             field={field}
             value={annotation[field.id]}
@@ -91,6 +92,7 @@ export function PrintCertificate({
     if (page.type === PageTypes.enum.VERIFICATION) {
       const value = (
         <Output
+          anchor={action.createdAt.split('T')[0]}
           eventConfig={eventConfiguration}
           field={{
             id: page.id,

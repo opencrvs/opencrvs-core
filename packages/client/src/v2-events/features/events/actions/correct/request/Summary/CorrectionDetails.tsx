@@ -18,14 +18,16 @@ import { Text } from '@opencrvs/components/lib/Text'
 import {
   Action,
   ActionType,
+  ClientLocation,
   EventDocument,
   EventState,
+  getCurrentEventState,
   isFieldVisible,
   isPageVisible,
-  Location,
   PageConfig,
   PageTypes,
   RequestedCorrectionAction,
+  resolveVersion,
   TranslationConfig,
   UUID,
   ValidatorContext
@@ -41,6 +43,7 @@ import {
 import { ROUTES } from '@client/v2-events/routes'
 import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { recordAnchorDate } from '@client/v2-events/utils'
 import { DeclarationComparisonTable } from './DeclarationComparisonTable'
 
 const messages = defineMessages({
@@ -79,11 +82,19 @@ const Label = styled.label`
 function getRequestActionDetails(
   correctionRequestAction: Action,
   submitterName: string,
-  locations: Map<UUID, Location>
+  locations: Map<UUID, ClientLocation>
 ): CorrectionDetail[] {
   const location =
     correctionRequestAction.createdAtLocation &&
     locations.get(correctionRequestAction.createdAtLocation)
+  // The requester's office renders under the name it carried on the date the
+  // correction was requested.
+  const locationName = location
+    ? resolveVersion(
+        location.versions,
+        correctionRequestAction.createdAt.split('T')[0]
+      ).name
+    : ''
   return [
     {
       label: messages.correctionSubmittedBy,
@@ -93,7 +104,7 @@ function getRequestActionDetails(
     {
       label: messages.correctionRequesterOffice,
       id: 'correction.requesterOffice',
-      valueDisplay: location?.name || ''
+      valueDisplay: locationName
     },
     {
       label: messages.correctionSubmittedOn,
@@ -112,8 +123,9 @@ function buildCorrectionDetails(
   form: EventState,
   intl: IntlShape,
   submitterName: string,
-  locations: Map<UUID, Location>,
+  locations: Map<UUID, ClientLocation>,
   validatorContext: ValidatorContext,
+  anchor: string,
   correctionRequestAction?: Action
 ): CorrectionDetail[] {
   const details: CorrectionDetail[] = correctionFormPages
@@ -145,7 +157,13 @@ function buildCorrectionDetails(
         .map((field) => ({
           label: field.label,
           id: field.id,
-          valueDisplay: <Output field={field} value={annotation[field.id]} />,
+          valueDisplay: (
+            <Output
+              anchor={anchor}
+              field={field}
+              value={annotation[field.id]}
+            />
+          ),
           pageId: page.id
         }))
     })
@@ -226,6 +244,10 @@ export function CorrectionDetails({
       }).name
     : ''
 
+  const anchor = recordAnchorDate(
+    getCurrentEventState(event, eventConfiguration)
+  )
+
   const correctionDetails = buildCorrectionDetails(
     correctionFormPages,
     annotation,
@@ -234,6 +256,7 @@ export function CorrectionDetails({
     submitterName,
     locations,
     validatorContext,
+    anchor,
     correctionRequestAction
   )
 

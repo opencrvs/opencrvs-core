@@ -29,9 +29,9 @@ import {
   EventStatus,
   DEFAULT_DATE_OF_EVENT_PROPERTY,
   ActionDocument,
-  Location,
+  ClientLocation,
   UUID,
-  AdministrativeArea,
+  ClientAdministrativeArea,
   getActionAnnotationFields,
   FieldUpdateValue,
   FieldConfig,
@@ -93,6 +93,18 @@ function findUserById(userId: string, users: UserOrSystemSummary[]) {
   }
 }
 
+/**
+ * The anchor date for a fact is the plain-date portion of its own timestamp,
+ * compared as a date string with no timezone conversion. A record's
+ * declaration fields anchor on the record's date of event (falling back to
+ * its creation date); each action-metadata office anchors on that action's
+ * own date, so a reprint reproduces exactly the name the original certificate
+ * carried.
+ */
+function toAnchor(dateTime: string): string {
+  return dateTime.split('T')[0]
+}
+
 export const stringifyEventMetadata = ({
   metadata,
   intl,
@@ -108,36 +120,46 @@ export const stringifyEventMetadata = ({
     }
   >
   intl: IntlShape
-  locations: Map<UUID, Location>
-  administrativeAreas: Map<UUID, AdministrativeArea>
+  locations: Map<UUID, ClientLocation>
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
   users: UserOrSystemSummary[]
   adminLevels: AdminStructureItem[]
 }) => {
+  // The record anchor — date of event, falling back to the record's creation
+  // date. Used for the date fields, whose output is anchor-independent anyway.
+  const recordAnchor = toAnchor(
+    metadata.dateOfEvent ?? metadata[DEFAULT_DATE_OF_EVENT_PROPERTY]
+  )
+
   return {
     modifiedAt: DateField.toCertificateVariables(metadata.modifiedAt, {
       intl,
       locations,
-      administrativeAreas
+      administrativeAreas,
+      anchor: recordAnchor
     }),
     assignedTo: findUserById(metadata.assignedTo ?? '', users),
     dateOfEvent: metadata.dateOfEvent
       ? DateField.toCertificateVariables(metadata.dateOfEvent, {
           intl,
           locations,
-          administrativeAreas
+          administrativeAreas,
+          anchor: recordAnchor
         })
       : DateField.toCertificateVariables(
           metadata[DEFAULT_DATE_OF_EVENT_PROPERTY],
           {
             intl,
             locations,
-            administrativeAreas
+            administrativeAreas,
+            anchor: recordAnchor
           }
         ),
     createdAt: DateField.toCertificateVariables(metadata.createdAt, {
       intl,
       locations,
-      administrativeAreas
+      administrativeAreas,
+      anchor: recordAnchor
     }),
     createdBy: findUserById(metadata.createdBy, users),
     createdAtLocation: LocationSearch.toCertificateVariables(
@@ -146,13 +168,15 @@ export const stringifyEventMetadata = ({
         intl,
         locations,
         administrativeAreas,
-        adminLevels
+        adminLevels,
+        anchor: toAnchor(metadata.createdAt)
       }
     ),
     updatedAt: DateField.toCertificateVariables(metadata.updatedAt, {
       intl,
       locations,
-      administrativeAreas
+      administrativeAreas,
+      anchor: recordAnchor
     }),
     updatedBy: metadata.updatedBy
       ? findUserById(metadata.updatedBy, users)
@@ -168,7 +192,8 @@ export const stringifyEventMetadata = ({
         intl,
         locations,
         administrativeAreas,
-        adminLevels
+        adminLevels,
+        anchor: toAnchor(metadata.updatedAt)
       }
     ),
     flags: [],
@@ -177,7 +202,12 @@ export const stringifyEventMetadata = ({
         ? {
             createdAt: DateField.toCertificateVariables(
               metadata.legalStatuses.DECLARED.createdAt,
-              { intl, locations, administrativeAreas }
+              {
+                intl,
+                locations,
+                administrativeAreas,
+                anchor: recordAnchor
+              }
             ),
             createdBy: findUserById(
               metadata.legalStatuses.DECLARED.createdBy,
@@ -185,11 +215,22 @@ export const stringifyEventMetadata = ({
             ),
             createdAtLocation: LocationSearch.toCertificateVariables(
               metadata.legalStatuses.DECLARED.createdAtLocation,
-              { intl, locations, administrativeAreas, adminLevels }
+              {
+                intl,
+                locations,
+                administrativeAreas,
+                adminLevels,
+                anchor: toAnchor(metadata.legalStatuses.DECLARED.createdAt)
+              }
             ),
             acceptedAt: DateField.toCertificateVariables(
               metadata.legalStatuses.DECLARED.acceptedAt,
-              { intl, locations, administrativeAreas }
+              {
+                intl,
+                locations,
+                administrativeAreas,
+                anchor: recordAnchor
+              }
             ),
             createdByRole: metadata.legalStatuses.DECLARED.createdByRole
           }
@@ -198,7 +239,12 @@ export const stringifyEventMetadata = ({
         ? {
             createdAt: DateField.toCertificateVariables(
               metadata.legalStatuses.REGISTERED.createdAt,
-              { intl, locations, administrativeAreas }
+              {
+                intl,
+                locations,
+                administrativeAreas,
+                anchor: recordAnchor
+              }
             ),
             createdBy: findUserById(
               metadata.legalStatuses.REGISTERED.createdBy,
@@ -206,11 +252,22 @@ export const stringifyEventMetadata = ({
             ),
             createdAtLocation: LocationSearch.toCertificateVariables(
               metadata.legalStatuses.REGISTERED.createdAtLocation,
-              { intl, locations, administrativeAreas, adminLevels }
+              {
+                intl,
+                locations,
+                administrativeAreas,
+                adminLevels,
+                anchor: toAnchor(metadata.legalStatuses.REGISTERED.createdAt)
+              }
             ),
             acceptedAt: DateField.toCertificateVariables(
               metadata.legalStatuses.REGISTERED.acceptedAt,
-              { intl, locations, administrativeAreas }
+              {
+                intl,
+                locations,
+                administrativeAreas,
+                anchor: recordAnchor
+              }
             ),
             createdByRole: metadata.legalStatuses.REGISTERED.createdByRole,
             registrationNumber:
@@ -255,8 +312,8 @@ export function compileSvg({
   }
   $actions: ActionDocument[]
   $declaration: EventState
-  locations: Map<UUID, Location>
-  administrativeAreas: Map<UUID, AdministrativeArea>
+  locations: Map<UUID, ClientLocation>
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
   users: UserOrSystemSummary[]
   /**
    * Indicates whether certificate is reviewed or actually printed
@@ -277,10 +334,17 @@ export function compileSvg({
 
   const customHelpers = getHandlebarHelpers()
 
+  // The record anchor — date of event, falling back to the record's creation
+  // date — resolves every location-bearing declaration field.
+  const recordAnchor = toAnchor(
+    $metadata.dateOfEvent ?? $metadata[DEFAULT_DATE_OF_EVENT_PROPERTY]
+  )
+
   const stringifyDeclaration = getFormDataStringifier(
     intl,
     locations,
     administrativeAreas,
+    recordAnchor,
     adminLevels
   )
   const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
@@ -393,13 +457,15 @@ export function compileSvg({
                 )
               )
             : {}
+        const actionAnchor = toAnchor(action.data.createdAt)
         const resolvedAction = {
           id: action.data.id,
           type: action.data.type,
           createdAt: DateField.stringify(action.data.createdAt, {
             intl,
             locations,
-            administrativeAreas
+            administrativeAreas,
+            anchor: actionAnchor
           }),
           createdBy: users.find((user) => user.id === action.data.createdBy),
           createdByUserType: action.data.createdByUserType,
@@ -412,7 +478,8 @@ export function compileSvg({
               intl,
               locations,
               administrativeAreas,
-              adminLevels
+              adminLevels,
+              anchor: actionAnchor
             }
           ),
           createdByRole: action.data.createdByRole,

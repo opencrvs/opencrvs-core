@@ -10,7 +10,12 @@
  */
 
 import { UUID } from 'src/uuid'
-import { AdministrativeArea, Location } from './locations'
+import {
+  AdministrativeArea,
+  Location,
+  toClientAdministrativeArea,
+  toClientLocation
+} from './locations'
 
 /*
  * Central
@@ -404,4 +409,22 @@ export const V2_DEFAULT_MOCK_LOCATIONS_MAP = new Map(
 
 export const V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP = new Map(
   V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS.map((a) => [a.id, a])
+)
+
+/**
+ * Stripped view of {@link V2_DEFAULT_MOCK_LOCATIONS_MAP} matching what the
+ * client's cached location map actually holds at runtime (identity +
+ * versions only). Use this — not the wire-format map above — wherever a test
+ * stands in for `useLocations().getLocations.useSuspenseQuery()`.
+ */
+export const V2_DEFAULT_MOCK_CLIENT_LOCATIONS_MAP = new Map(
+  V2_DEFAULT_MOCK_LOCATIONS.map((l) => [l.id, toClientLocation(l)])
+)
+
+/** See {@link V2_DEFAULT_MOCK_CLIENT_LOCATIONS_MAP}. */
+export const V2_DEFAULT_MOCK_CLIENT_ADMINISTRATIVE_AREAS_MAP = new Map(
+  V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS.map((a) => [
+    a.id,
+    toClientAdministrativeArea(a)
+  ])
 )
