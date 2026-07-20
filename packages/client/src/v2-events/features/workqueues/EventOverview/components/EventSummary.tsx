@@ -17,7 +17,8 @@ import {
   areConditionsMet,
   getMixedPath,
   EventIndex,
-  EventDocument
+  EventDocument,
+  isFieldSecured
 } from '@opencrvs/commons/client'
 import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -133,7 +134,9 @@ export function EventSummary({
   const { summary, label: eventLabelMessage } = eventConfiguration
   const declarationFields = getDeclarationFields(eventConfiguration)
   const securedFields = declarationFields
-    .filter(({ secured }) => secured)
+    .filter((declarationField) =>
+      isFieldSecured(declarationField, eventIndex, validationContext)
+    )
     .map(({ id }) => id)
 
   const configuredFields = summary.fields.map((field) => {
@@ -162,7 +165,7 @@ export function EventSummary({
         // If a custom label is configured, use it. Otherwise, by default, use the label from the original form field.
         label: field.label ?? config.label,
         emptyValueMessage: field.emptyValueMessage,
-        secured: config.secured ?? false,
+        secured: isFieldSecured(config, eventIndex, validationContext),
         value: (
           <Output
             eventConfig={eventConfiguration}

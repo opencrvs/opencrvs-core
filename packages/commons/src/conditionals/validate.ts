@@ -511,6 +511,32 @@ export function resolveEventIcon(
   return match?.[0] as AvailableIcons | undefined
 }
 
+/**
+ * Given a field's `secured` property (a boolean, or a JSONSchema conditional
+ * evaluated against the event, e.g. `flag('sealed')`), returns whether the
+ * field is currently secured for the given event.
+ */
+export function isFieldSecured(
+  field: Pick<FieldConfig, 'secured'>,
+  event: EventIndex,
+  context: ValidatorContext = {}
+): boolean {
+  if (typeof field.secured !== 'object' || field.secured === null) {
+    return Boolean(field.secured)
+  }
+
+  const clientFunctionContext = {
+    ...buildClientFunctionContext({
+      form: mergeWithBaseFormState(event.declaration, context),
+      validatorContext: context
+    }),
+    $flags: event.flags,
+    $status: event.status
+  }
+
+  return validate(field.secured as JSONSchema, clientFunctionContext)
+}
+
 export type ValidatorContext = {
   user?: ITokenPayload
   leafAdminStructureLocationIds?: Array<{ id: UUID }>

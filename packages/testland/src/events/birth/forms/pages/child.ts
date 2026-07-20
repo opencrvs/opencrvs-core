@@ -21,7 +21,8 @@ import {
   field,
   user,
   never,
-  SelectOption
+  SelectOption,
+  flag
 } from '@opencrvs/toolkit/events'
 import { not } from '@opencrvs/toolkit/conditionals'
 
@@ -247,6 +248,7 @@ export const child = defineFormPage({
       required: true,
       configuration: farajalandNameConfig,
       hideLabel: true,
+      secured: flag('sealed'),
       label: {
         defaultMessage: "Child's name",
         description: 'This is the label for the field',
@@ -259,6 +261,7 @@ export const child = defineFormPage({
       analytics: true,
       type: FieldType.SELECT,
       required: true,
+      secured: flag('sealed'),
       label: {
         defaultMessage: 'Sex',
         description: 'This is the label for the field',
@@ -292,6 +295,7 @@ export const child = defineFormPage({
       id: 'child.reason',
       type: FieldType.TEXT,
       required: true,
+      secured: flag('sealed'),
       label: {
         defaultMessage: 'Reason for delayed registration',
         description: 'This is the label for the field',
@@ -457,6 +461,7 @@ export const child = defineFormPage({
       id: 'child.birthLocationId',
       type: FieldType.ALPHA_HIDDEN,
       required: false,
+      secured: flag('sealed'),
       label: {
         defaultMessage: 'Health Institution',
         description: 'This is the label for the field',
@@ -484,6 +489,7 @@ export const child = defineFormPage({
       type: FieldType.SELECT,
       analytics: true,
       required: false,
+      secured: flag('sealed'),
       label: {
         defaultMessage: 'Attendant at birth',
         description: 'This is the label for the field',
@@ -496,6 +502,7 @@ export const child = defineFormPage({
       analytics: true,
       type: FieldType.SELECT,
       required: false,
+      secured: flag('sealed'),
       label: {
         defaultMessage: 'Type of birth',
         description: 'This is the label for the field',
@@ -508,6 +515,7 @@ export const child = defineFormPage({
       analytics: true,
       type: FieldType.NUMBER,
       required: false,
+      secured: flag('sealed'),
       label: {
         defaultMessage: 'Weight at birth',
         description: 'This is the label for the field',

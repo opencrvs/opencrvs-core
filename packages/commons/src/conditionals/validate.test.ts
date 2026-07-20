@@ -18,6 +18,7 @@ import { eventQueryDataGenerator } from '../events/test.utils'
 import {
   errorMessages,
   areConditionsMet,
+  isFieldSecured,
   runFieldValidations,
   validateFieldInput
 } from './validate'
@@ -350,5 +351,34 @@ describe('areConditionsMet', () => {
     const eventIndex = eventQueryDataGenerator({ flags: [] })
 
     expect(areConditionsMet([flagConditional], {}, {}, eventIndex)).toBe(false)
+  })
+})
+
+describe('isFieldSecured', () => {
+  it('returns true for a field secured with a plain boolean', () => {
+    const eventIndex = eventQueryDataGenerator({ flags: [] })
+
+    expect(isFieldSecured({ secured: true }, eventIndex)).toBe(true)
+  })
+
+  it('returns false for a field not secured (boolean or unset)', () => {
+    const eventIndex = eventQueryDataGenerator({ flags: [] })
+
+    expect(isFieldSecured({ secured: false }, eventIndex)).toBe(false)
+    expect(isFieldSecured({ secured: undefined }, eventIndex)).toBe(false)
+  })
+
+  it("resolves a conditional secured value against the event, e.g. flag('sealed')", () => {
+    const securedField = { secured: flag('sealed') }
+
+    expect(
+      isFieldSecured(
+        securedField,
+        eventQueryDataGenerator({ flags: ['sealed'] })
+      )
+    ).toBe(true)
+    expect(
+      isFieldSecured(securedField, eventQueryDataGenerator({ flags: [] }))
+    ).toBe(false)
   })
 })

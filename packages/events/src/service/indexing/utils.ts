@@ -23,6 +23,7 @@ import {
   FieldValue,
   getDeclarationFieldById,
   isAgeFieldType,
+  isFieldSecured,
   isNameFieldType,
   NameFieldValue,
   QueryInputType,
@@ -368,7 +369,7 @@ export function removeSecuredFields(
     declaration: Object.fromEntries(
       Object.entries(event.declaration).filter(
         ([fieldId]) =>
-          getDeclarationFieldById(eventConfig, fieldId).secured !== true
+          !isFieldSecured(getDeclarationFieldById(eventConfig, fieldId), event)
       )
     )
   }
