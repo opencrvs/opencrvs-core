@@ -25,6 +25,7 @@ Other environment operations are available as separate commands:
 
 ```sh
 opencrvs environment update-workflows
+opencrvs environment upgrade
 opencrvs environment users
 opencrvs environment swarm-to-k8s
 ```
