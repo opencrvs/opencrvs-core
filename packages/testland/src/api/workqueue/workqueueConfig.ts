@@ -349,5 +349,18 @@ export const Workqueues = defineWorkqueues([
       }
     },
     action: { type: ActionType.READ }
+  },
+  {
+    slug: 'pending-unsealing',
+    icon: 'PaperPlaneTilt',
+    name: {
+      id: 'workqueues.pendingUnsealing.title',
+      defaultMessage: 'Pending unsealing',
+      description: 'Title of pending unsealing workqueue'
+    },
+    query: {
+      flags: { anyOf: ['unseal-requested'] }
+    },
+    action: { type: ActionType.READ }
   }
 ])

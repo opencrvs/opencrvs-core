@@ -158,6 +158,15 @@ export const birthEvent = defineConfig({
         description: 'Flag label for sealed'
       },
       requiresAction: false
+    },
+    {
+      id: 'unseal-requested',
+      label: {
+        id: 'event.birth.flag.unseal-requested',
+        defaultMessage: 'Unseal requested',
+        description: 'Flag label for unseal requested'
+      },
+      requiresAction: true
     }
   ],
   summary: {
@@ -329,7 +338,9 @@ export const birthEvent = defineConfig({
     'ISSUE_VERIFIABLE_CREDENTIAL',
     ActionType.UNASSIGN,
     'SEAL',
-    'UNSEAL'
+    'UNSEAL',
+    'REQUEST_UNSEAL',
+    'DENY_UNSEAL_REQUEST'
   ],
   actions: [
     {
@@ -1238,6 +1249,117 @@ export const birthEvent = defineConfig({
           conditional: flag('sealed')
         }
       ]
+    },
+    {
+      type: ActionType.CUSTOM,
+      customActionType: 'REQUEST_UNSEAL',
+      icon: 'PaperPlaneTilt',
+      label: {
+        defaultMessage: 'Request to unseal a record',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.birth.custom.action.request-unseal.label'
+      },
+      supportingCopy: {
+        defaultMessage:
+          'This will send a request to the Registrar General to unseal this record. Please explain why the record should be unsealed and attach any supporting evidence.',
+        description:
+          'This is the confirmation text for the request to unseal action',
+        id: 'event.birth.custom.action.request-unseal.supportingCopy'
+      },
+      form: [
+        {
+          id: 'reason',
+          type: FieldType.TEXTAREA,
+          required: true,
+          label: {
+            defaultMessage: 'Reason',
+            description: 'This is the label for reason field',
+            id: 'form.field.label.reason'
+          }
+        },
+        {
+          id: 'supportingDocument',
+          type: FieldType.FILE,
+          required: true,
+          label: {
+            defaultMessage: 'Supporting document',
+            description:
+              'This is the label for uploading a document supporting the unseal request',
+            id: 'event.birth.custom.action.request-unseal.field.supportingDocument.label'
+          },
+          configuration: {
+            maxFileSize: 5 * 1024 * 1024, // 5 MB
+            acceptedFileTypes: [
+              'image/png',
+              'image/jpg',
+              'image/jpeg',
+              'application/pdf'
+            ],
+            fileName: {
+              defaultMessage: 'Supporting document',
+              description: 'This is the label for the file name',
+              id: 'event.birth.custom.action.request-unseal.field.supportingDocument.fileName'
+            }
+          }
+        }
+      ],
+      conditionals: [
+        {
+          type: ConditionalType.SHOW,
+          conditional: and(flag('sealed'), not(flag('unseal-requested')))
+        }
+      ],
+      flags: [{ id: 'unseal-requested', operation: 'add' }],
+      auditHistoryLabel: {
+        defaultMessage: 'Unseal requested',
+        description:
+          'The label to show in audit history for the request to unseal action',
+        id: 'event.birth.custom.action.request-unseal.audit-history-label'
+      }
+    },
+    {
+      type: ActionType.CUSTOM,
+      customActionType: 'DENY_UNSEAL_REQUEST',
+      icon: 'XCircle',
+      label: {
+        defaultMessage: 'Deny unsealing request',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.birth.custom.action.deny-unseal-request.label'
+      },
+      supportingCopy: {
+        defaultMessage:
+          'This will deny the request to unseal this record. The record will remain sealed.',
+        description:
+          'This is the confirmation text for the deny unsealing request action',
+        id: 'event.birth.custom.action.deny-unseal-request.supportingCopy'
+      },
+      form: [
+        {
+          id: 'reason',
+          type: FieldType.TEXTAREA,
+          required: true,
+          label: {
+            defaultMessage: 'Reason',
+            description: 'This is the label for reason field',
+            id: 'form.field.label.reason'
+          }
+        }
+      ],
+      conditionals: [
+        {
+          type: ConditionalType.SHOW,
+          conditional: flag('unseal-requested')
+        }
+      ],
+      flags: [{ id: 'unseal-requested', operation: 'remove' }],
+      auditHistoryLabel: {
+        defaultMessage: 'Unsealing request denied',
+        description:
+          'The label to show in audit history for the deny unsealing request action',
+        id: 'event.birth.custom.action.deny-unseal-request.audit-history-label'
+      }
     }
   ],
   advancedSearch: advancedSearchBirth

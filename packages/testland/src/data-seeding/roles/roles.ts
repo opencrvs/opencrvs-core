@@ -74,7 +74,7 @@ export const roles: Role[] = [
       },
       { type: 'record.search', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.create', options: { placeOfEvent: 'administrativeArea' } },
-      { type: 'record.read', options: { placeOfEvent: 'administrativeArea', flags: { noneOf: ['sealed'] } } },
+      { type: 'record.read', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.declare', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.edit', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.reject', options: { placeOfEvent: 'administrativeArea' } },
@@ -86,6 +86,7 @@ export const roles: Role[] = [
       { type: 'record.correct', options: { registeredIn: 'administrativeArea' } },
       { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['ESCALATE', 'REINSTATE_REVOKE_REGISTRATION'], placeOfEvent: 'administrativeArea' } },
       { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['ISSUE_CERTIFIED_COPY', 'ISSUE_VERIFIABLE_CREDENTIAL'], registeredIn: 'administrativeArea' } },
+      { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['REQUEST_UNSEAL'], registeredIn: 'administrativeArea' } },
       { type: 'record.unassign-others' },
       {
         type: 'dashboard.view',
@@ -170,7 +171,7 @@ export const roles: Role[] = [
       { type: 'user.read' },
       { type: 'user.search' },
       { type: 'record.search' },
-      { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent', 'pending-feedback-registrar-general', 'potential-duplicate', 'registration-registrar-general'] } },
+      { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent', 'pending-feedback-registrar-general', 'potential-duplicate', 'registration-registrar-general', 'pending-unsealing'] } },
       { type: 'record.read' },
       { type: 'record.declare' },
       { type: 'record.reject' },
@@ -180,7 +181,7 @@ export const roles: Role[] = [
       { type: 'record.register' },
       { type: 'record.print-certified-copies' },
       { type: 'record.correct' },
-      { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['SEAL', 'UNSEAL', 'REGISTRAR_GENERAL_FEEDBACK', 'REVOKE_REGISTRATION', 'REINSTATE_REVOKE_REGISTRATION', 'APPROVE_DECLARATION'] } },
+      { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['SEAL', 'UNSEAL', 'DENY_UNSEAL_REQUEST', 'REGISTRAR_GENERAL_FEEDBACK', 'REVOKE_REGISTRATION', 'REINSTATE_REVOKE_REGISTRATION', 'APPROVE_DECLARATION'] } },
       { type: 'record.custom-action', options: { event: ['death'], customActionTypes: ['APPROVE_DECLARATION'] } },
       { type: 'record.unassign-others' }
     ])
