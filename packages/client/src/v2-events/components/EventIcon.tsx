@@ -11,13 +11,48 @@
 
 import * as React from 'react'
 import {
+  AvailableIcons,
+  buildClientFunctionContext,
   EventConfig,
   EventIndex,
-  resolveEventIcon
+  JSONSchema,
+  validate,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { IconWithName } from './IconWithName'
 import { IconWithNameEvent } from './IconWithNameEvent'
+
+/**
+ * Given an EventConfig's `icon` map (icon name -> conditional) and a real
+ * event, returns the name of the first icon (in definition order) whose
+ * conditional matches, or `undefined` if there's no icon config or nothing
+ * matches — callers should fall back to a default icon in that case.
+ */
+export function resolveEventIcon(
+  iconConfig: EventConfig['icon'],
+  event: EventIndex,
+  context: ValidatorContext
+): AvailableIcons | undefined {
+  if (!iconConfig) {
+    return undefined
+  }
+
+  const clientFunctionContext = {
+    ...buildClientFunctionContext({
+      form: { ...context.baseFormState, ...event.declaration },
+      validatorContext: context
+    }),
+    $flags: event.flags,
+    $status: event.status
+  }
+
+  const match = Object.entries(iconConfig).find(([, conditional]) =>
+    validate(conditional as JSONSchema, clientFunctionContext)
+  )
+
+  return match?.[0] as AvailableIcons | undefined
+}
 
 /**
  * Resolves and renders the icon for an event (from `EventConfig.icon`,
