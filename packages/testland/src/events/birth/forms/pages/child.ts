@@ -248,7 +248,6 @@ export const child = defineFormPage({
       required: true,
       configuration: farajalandNameConfig,
       hideLabel: true,
-      secured: flag('sealed'),
       label: {
         defaultMessage: "Child's name",
         description: 'This is the label for the field',
