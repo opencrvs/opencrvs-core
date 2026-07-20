@@ -19,7 +19,7 @@ import {
   ActionType,
   ActionStatus,
   resolveVersion,
-  todayISO
+  toPlainDate
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -85,7 +85,7 @@ export function EditPageBanner() {
   // The office is resolved at the action's own date — the name it carried
   // when the record was notified/declared.
   const locationName = location
-    ? resolveVersion(location.versions, latestAction.createdAt.split('T')[0])
+    ? resolveVersion(location.versions, toPlainDate(latestAction.createdAt))
         .name
     : undefined
 

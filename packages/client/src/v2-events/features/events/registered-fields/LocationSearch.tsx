@@ -21,7 +21,8 @@ import {
   resolveJurisdictionReference,
   resolvePath,
   resolveVersion,
-  todayISO
+  todayISO,
+  PlainDate
 } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
@@ -185,7 +186,7 @@ function toCertificateVariables(
     intl: IntlShape
     locations: Map<UUID, ClientLocation>
     administrativeAreas: Map<UUID, ClientAdministrativeArea>
-    anchor: string
+    anchor: PlainDate
     adminLevels?: AdminStructureItem[]
   }
 ) {
@@ -242,7 +243,7 @@ function LocationSearchOutput({
   anchor
 }: {
   value: Stringifiable
-  anchor: string
+  anchor: PlainDate
 }) {
   const intl = useIntl()
   const { getLocations } = useLocations()

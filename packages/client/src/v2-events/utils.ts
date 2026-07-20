@@ -16,6 +16,8 @@ import {
   WorkqueueConfigWithoutQuery,
   joinValues,
   LocationVersion,
+  PlainDate,
+  toPlainDate,
   UUID,
   UserOrSystem,
   ClientAdministrativeArea,
@@ -109,8 +111,8 @@ export type RequireKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
 export function recordAnchorDate(eventState: {
   dateOfEvent?: string | null
   createdAt: string
-}): string {
-  return eventState.dateOfEvent ?? eventState.createdAt.split('T')[0]
+}): PlainDate {
+  return toPlainDate(eventState.dateOfEvent ?? eventState.createdAt)
 }
 
 /**
@@ -121,7 +123,7 @@ export function recordAnchorDate(eventState: {
  */
 export function resolveLocationName(
   entity: { versions: LocationVersion[] } | undefined | null,
-  anchor: string
+  anchor: PlainDate
 ): string {
   return entity ? resolveVersion(entity.versions, anchor).name : ''
 }
@@ -237,14 +239,14 @@ export function getAdminLevelHierarchy(
   administrativeAreas: Map<UUID, ClientAdministrativeArea>,
   adminStructure: string[],
   outputMode: 'withNames',
-  anchor: string
+  anchor: PlainDate
 ): Partial<Record<string, string>>
 export function getAdminLevelHierarchy(
   administrativeAreaId: string | undefined | null,
   administrativeAreas: Map<UUID, ClientAdministrativeArea>,
   adminStructure: string[],
   outputMode: 'withIds' | 'withNames' = 'withIds',
-  anchor?: string
+  anchor?: PlainDate
 ): Partial<Record<string, string>> {
   // Reverse so root is first, leaf is last
   const collectedLocations = getAdministrativeAreaHierarchy(
@@ -261,7 +263,8 @@ export function getAdminLevelHierarchy(
   ) {
     hierarchy[adminStructure[i]] =
       outputMode === 'withNames'
-        ? resolveVersion(collectedLocations[i].versions, anchor as string).name
+        ? resolveVersion(collectedLocations[i].versions, anchor as PlainDate)
+            .name
         : collectedLocations[i].id
   }
 

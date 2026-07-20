@@ -40,7 +40,8 @@ import {
   ValidatorContext,
   flattenFormState,
   IndexMap,
-  FormState
+  FormState,
+  PlainDate
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
@@ -247,7 +248,7 @@ function FormReview({
   isReviewCorrection?: boolean
   treatMissingValuesAsCleared?: boolean
   /** The record anchor — declaration fields are per-fact but share one record-wide anchor. */
-  anchor: string
+  anchor: PlainDate
 }) {
   const intl = useIntl()
 
@@ -475,7 +476,7 @@ function ReviewComponent({
   treatMissingValuesAsCleared?: boolean
   banner?: React.ReactNode
   /** The record anchor — date of event, falling back to the record's creation date. */
-  anchor: string
+  anchor: PlainDate
 }) {
   const intl = useIntl()
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined

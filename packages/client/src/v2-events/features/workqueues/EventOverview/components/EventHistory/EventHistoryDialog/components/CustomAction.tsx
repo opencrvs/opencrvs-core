@@ -18,7 +18,8 @@ import {
   FieldConfig,
   EventConfig,
   isFieldVisible,
-  ValidatorContext
+  ValidatorContext,
+  toPlainDate
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -42,7 +43,7 @@ function prepareContent(
     .map((field) => {
       const value = (
         <Output
-          anchor={action.createdAt.split('T')[0]}
+          anchor={toPlainDate(action.createdAt)}
           eventConfig={eventConfiguration}
           field={field}
           value={annotation?.[field.id]}

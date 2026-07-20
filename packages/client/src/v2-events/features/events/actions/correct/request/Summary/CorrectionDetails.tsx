@@ -30,7 +30,9 @@ import {
   resolveVersion,
   TranslationConfig,
   UUID,
-  ValidatorContext
+  ValidatorContext,
+  PlainDate,
+  toPlainDate
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment, Link } from '@opencrvs/components'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
@@ -92,7 +94,7 @@ function getRequestActionDetails(
   const locationName = location
     ? resolveVersion(
         location.versions,
-        correctionRequestAction.createdAt.split('T')[0]
+        toPlainDate(correctionRequestAction.createdAt)
       ).name
     : ''
   return [
@@ -125,7 +127,7 @@ function buildCorrectionDetails(
   submitterName: string,
   locations: Map<UUID, ClientLocation>,
   validatorContext: ValidatorContext,
-  anchor: string,
+  anchor: PlainDate,
   correctionRequestAction?: Action
 ): CorrectionDetail[] {
   const details: CorrectionDetail[] = correctionFormPages

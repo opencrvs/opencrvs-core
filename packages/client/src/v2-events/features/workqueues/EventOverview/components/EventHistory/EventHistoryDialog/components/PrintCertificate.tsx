@@ -20,7 +20,8 @@ import {
   getPrintCertificatePages,
   getCurrentEventState,
   isFieldDisplayedOnReview,
-  ValidatorContext
+  ValidatorContext,
+  toPlainDate
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -76,7 +77,7 @@ export function PrintCertificate({
       .map((field) => {
         const valueDisplay = (
           <Output
-            anchor={action.createdAt.split('T')[0]}
+            anchor={toPlainDate(action.createdAt)}
             eventConfig={eventConfiguration}
             field={field}
             value={annotation[field.id]}
@@ -92,7 +93,7 @@ export function PrintCertificate({
     if (page.type === PageTypes.enum.VERIFICATION) {
       const value = (
         <Output
-          anchor={action.createdAt.split('T')[0]}
+          anchor={toPlainDate(action.createdAt)}
           eventConfig={eventConfiguration}
           field={{
             id: page.id,

@@ -25,7 +25,8 @@ import {
   getDeclarationFields,
   DataEntry,
   isFieldReference,
-  todayISO
+  todayISO,
+  PlainDate
 } from '@opencrvs/commons/client'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -228,7 +229,7 @@ function getDataOutputEntry(
   value: NonNullable<DataFieldValue>,
   dataEntryConfig: DataEntry,
   declarationFields: FieldConfig[],
-  anchor: string
+  anchor: PlainDate
 ) {
   if ('id' in dataEntryConfig) {
     const { id, label } = dataEntryConfig
@@ -287,7 +288,7 @@ function DataOutput({
   value: DataFieldValue
   field: DataField
   eventConfig: EventConfig
-  anchor: string
+  anchor: PlainDate
 }) {
   const intl = useIntl()
 

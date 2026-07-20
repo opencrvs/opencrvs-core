@@ -21,7 +21,9 @@ import {
   FieldTypesToHideInReview,
   isFieldDisplayedOnReview,
   isPageVisible,
+  PlainDate,
   resolveVersion,
+  toPlainDate,
   todayISO,
   UUID,
   ValidatorContext
@@ -125,13 +127,7 @@ function UserFullName({ userId }: { userId: string }) {
   return getUsersFullName(user.name)
 }
 
-function RegisteredAtOfficeName({
-  id,
-  anchor
-}: {
-  id?: UUID
-  anchor: string
-}) {
+function RegisteredAtOfficeName({ id, anchor }: { id?: UUID; anchor: PlainDate }) {
   const { getLocations } = useLocations()
   const { getAdministrativeAreas } = useAdministrativeAreas()
 
@@ -178,17 +174,23 @@ export function DuplicateComparison({
   // Each side's declaration fields render at that record's own anchor —
   // date of event, falling back to the record's creation date.
   const originalAnchor = recordAnchorDate(originalEventState)
-  const potentialDuplicateAnchor = recordAnchorDate(potentialDuplicateEventState)
+  const potentialDuplicateAnchor = recordAnchorDate(
+    potentialDuplicateEventState
+  )
 
   // The registered-at office renders at each record's registration date, per
   // the per-fact anchoring rule. Falls back to today when unregistered.
   const originalRegistrationAnchor =
-    originalEventState.legalStatuses.REGISTERED?.createdAt.split('T')[0] ??
+    (originalEventState.legalStatuses.REGISTERED
+      ? toPlainDate(originalEventState.legalStatuses.REGISTERED.createdAt)
+      : undefined) ??
     todayISO()
   const potentialDuplicateRegistrationAnchor =
-    potentialDuplicateEventState.legalStatuses.REGISTERED?.createdAt.split(
-      'T'
-    )[0] ?? todayISO()
+    (potentialDuplicateEventState.legalStatuses.REGISTERED
+      ? toPlainDate(
+          potentialDuplicateEventState.legalStatuses.REGISTERED.createdAt
+        )
+      : undefined) ?? todayISO()
 
   const hideFieldTypes = [
     ...FieldTypesToHideInReview,

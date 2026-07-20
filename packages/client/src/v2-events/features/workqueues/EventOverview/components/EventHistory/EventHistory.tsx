@@ -24,7 +24,8 @@ import {
   EventDocument,
   getActionConfig,
   resolveVersion,
-  TokenUserType
+  TokenUserType,
+  toPlainDate
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -219,7 +220,7 @@ function ActionLocation({ action }: { action: ActionDocument }) {
     ? getLocation(action.createdAtLocation)
     : undefined
   const locationName = location
-    ? resolveVersion(location.versions, action.createdAt.split('T')[0]).name
+    ? resolveVersion(location.versions, toPlainDate(action.createdAt)).name
     : undefined
 
   const hasAccessToOffice =

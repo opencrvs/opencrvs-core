@@ -18,7 +18,8 @@ import {
   resolveJurisdictionReference,
   resolveVersion,
   todayISO,
-  UUID
+  UUID,
+  PlainDate
 } from '@opencrvs/commons/client'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
@@ -177,7 +178,7 @@ function AdministrativeAreaOutput({
   anchor
 }: {
   value: Stringifiable | undefined
-  anchor: string
+  anchor: PlainDate
 }) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
@@ -196,7 +197,7 @@ function AdministrativeAreaOutput({
 
 function stringify(
   value: string,
-  context: { locations: Map<UUID, ClientLocation>; anchor: string }
+  context: { locations: Map<UUID, ClientLocation>; anchor: PlainDate }
 ) {
   const locationId = UUID.safeParse(value).data
   const location = locationId && context.locations.get(locationId)

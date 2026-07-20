@@ -33,7 +33,8 @@ import {
   IndexMap,
   FormState,
   FieldConfig,
-  UUID
+  UUID,
+  PlainDate
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -612,7 +613,7 @@ function AddressOutput({
   value?: AddressFieldValue
   lineSeparator?: React.ReactNode
   configuration: AddressField
-  anchor: string
+  anchor: PlainDate
 }) {
   const validatorContext = useValidatorContext()
   const { getAdministrativeAreas } = useAdministrativeAreas()
@@ -677,7 +678,7 @@ function toCertificateVariables(
     intl: IntlShape
     locations: Map<UUID, ClientLocation>
     administrativeAreas: Map<UUID, ClientAdministrativeArea>
-    anchor: string
+    anchor: PlainDate
     adminLevels?: AdminStructureItem[]
   }
 ) {

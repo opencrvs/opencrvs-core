@@ -15,6 +15,7 @@ import { isUndefined } from 'lodash'
 import {
   FieldConfig,
   FieldValue,
+  PlainDate,
   isAddressFieldType,
   isAdministrativeAreaFieldType,
   isBulletListFieldType,
@@ -117,7 +118,7 @@ export function ValueOutput({
   value: FieldValue | FieldUpdateValue
   searchMode?: {} | boolean
   eventConfig?: EventConfig
-  anchor: string
+  anchor: PlainDate
 }) {
   const field = { config, value }
   if (isFieldGroupFieldType(field)) {
@@ -368,7 +369,7 @@ export function Output({
    * version — see {@link StringifierContext} for the full rationale. Required:
    * there is no default anchor, so omitting it is a compile error.
    */
-  anchor: string
+  anchor: PlainDate
 }) {
   // Explicitly check for undefined, so that e.g. number 0 is considered a value,
   // even null is considered as value removed

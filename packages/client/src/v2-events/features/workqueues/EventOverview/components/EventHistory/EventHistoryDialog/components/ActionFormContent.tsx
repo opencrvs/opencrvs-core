@@ -16,7 +16,8 @@ import {
   EventDocument,
   getActionFormFields,
   isFieldVisible,
-  ValidatorContext
+  ValidatorContext,
+  toPlainDate
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -57,7 +58,7 @@ export function ActionFormContent({
       label: intl.formatMessage(field.label),
       value: (
         <Output
-          anchor={action.createdAt.split('T')[0]}
+          anchor={toPlainDate(action.createdAt)}
           eventConfig={eventConfiguration}
           field={field}
           value={annotation?.[field.id]}

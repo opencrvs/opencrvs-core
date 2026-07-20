@@ -11,6 +11,7 @@
 
 import { UUID } from '../uuid'
 import * as z from 'zod/v4'
+import { PlainDate } from './PlainDate'
 import { EventIndex } from './EventIndex'
 import {
   ActionCreationMetadata,
@@ -595,7 +596,7 @@ export type ResolvedPathNode = {
  */
 export function resolvePath(
   locationId: UUID,
-  anchor: string,
+  anchor: PlainDate,
   context: {
     administrativeAreas: Map<
       UUID,

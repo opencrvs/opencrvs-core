@@ -30,6 +30,7 @@ import {
   DEFAULT_DATE_OF_EVENT_PROPERTY,
   ActionDocument,
   ClientLocation,
+  toPlainDate,
   UUID,
   ClientAdministrativeArea,
   getActionAnnotationFields,
@@ -93,18 +94,6 @@ function findUserById(userId: string, users: UserOrSystemSummary[]) {
   }
 }
 
-/**
- * The anchor date for a fact is the plain-date portion of its own timestamp,
- * compared as a date string with no timezone conversion. A record's
- * declaration fields anchor on the record's date of event (falling back to
- * its creation date); each action-metadata office anchors on that action's
- * own date, so a reprint reproduces exactly the name the original certificate
- * carried.
- */
-function toAnchor(dateTime: string): string {
-  return dateTime.split('T')[0]
-}
-
 export const stringifyEventMetadata = ({
   metadata,
   intl,
@@ -127,7 +116,7 @@ export const stringifyEventMetadata = ({
 }) => {
   // The record anchor — date of event, falling back to the record's creation
   // date. Used for the date fields, whose output is anchor-independent anyway.
-  const recordAnchor = toAnchor(
+  const recordAnchor = toPlainDate(
     metadata.dateOfEvent ?? metadata[DEFAULT_DATE_OF_EVENT_PROPERTY]
   )
 
@@ -169,7 +158,7 @@ export const stringifyEventMetadata = ({
         locations,
         administrativeAreas,
         adminLevels,
-        anchor: toAnchor(metadata.createdAt)
+        anchor: toPlainDate(metadata.createdAt)
       }
     ),
     updatedAt: DateField.toCertificateVariables(metadata.updatedAt, {
@@ -193,7 +182,7 @@ export const stringifyEventMetadata = ({
         locations,
         administrativeAreas,
         adminLevels,
-        anchor: toAnchor(metadata.updatedAt)
+        anchor: toPlainDate(metadata.updatedAt)
       }
     ),
     flags: [],
@@ -220,7 +209,7 @@ export const stringifyEventMetadata = ({
                 locations,
                 administrativeAreas,
                 adminLevels,
-                anchor: toAnchor(metadata.legalStatuses.DECLARED.createdAt)
+                anchor: toPlainDate(metadata.legalStatuses.DECLARED.createdAt)
               }
             ),
             acceptedAt: DateField.toCertificateVariables(
@@ -257,7 +246,7 @@ export const stringifyEventMetadata = ({
                 locations,
                 administrativeAreas,
                 adminLevels,
-                anchor: toAnchor(metadata.legalStatuses.REGISTERED.createdAt)
+                anchor: toPlainDate(metadata.legalStatuses.REGISTERED.createdAt)
               }
             ),
             acceptedAt: DateField.toCertificateVariables(
@@ -336,7 +325,7 @@ export function compileSvg({
 
   // The record anchor — date of event, falling back to the record's creation
   // date — resolves every location-bearing declaration field.
-  const recordAnchor = toAnchor(
+  const recordAnchor = toPlainDate(
     $metadata.dateOfEvent ?? $metadata[DEFAULT_DATE_OF_EVENT_PROPERTY]
   )
 
@@ -457,7 +446,7 @@ export function compileSvg({
                 )
               )
             : {}
-        const actionAnchor = toAnchor(action.data.createdAt)
+        const actionAnchor = toPlainDate(action.data.createdAt)
         const resolvedAction = {
           id: action.data.id,
           type: action.data.type,

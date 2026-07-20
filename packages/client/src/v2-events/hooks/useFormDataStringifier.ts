@@ -16,7 +16,8 @@ import {
   EventState,
   FieldConfig,
   FieldValue,
-  UUID
+  UUID,
+  PlainDate
 } from '@opencrvs/commons/client'
 import { getRegisteredFieldByFieldConfig } from '@client/v2-events/features/events/registered-fields'
 import { AdminStructureItem } from '@client/utils/referenceApi'
@@ -67,7 +68,7 @@ export const getFormDataStringifier = (
   intl: IntlShape,
   locations: Map<UUID, ClientLocation>,
   administrativeAreas: Map<UUID, ClientAdministrativeArea>,
-  anchor: string,
+  anchor: PlainDate,
   adminLevels?: AdminStructureItem[]
 ) => {
   const stringifier = (fieldConfig: FieldConfig, value: FieldValue) => {
@@ -101,7 +102,7 @@ export const getFormDataStringifier = (
   return formDataStringifierFactory(stringifier)
 }
 
-export function useFormDataStringifier(anchor: string) {
+export function useFormDataStringifier(anchor: PlainDate) {
   const intl = useIntl()
   const { getLocations } = useLocations()
   const { getAdministrativeAreas } = useAdministrativeAreas()

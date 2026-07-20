@@ -11,6 +11,7 @@
 
 import { createPrng, generateUuid, TestUserRole } from './test.utils'
 import { SystemContext, UserContext } from '../users/User'
+import { toPlainDate } from './PlainDate'
 import {
   AdministrativeArea,
   canAccessEventWithScope,
@@ -667,7 +668,7 @@ describe('resolvePath', () => {
   }
 
   it('resolves the whole path, leaf included, at an anchor before any change', () => {
-    expect(resolvePath(versionedOffice.id, '1995-05-20', context)).toEqual([
+    expect(resolvePath(versionedOffice.id, toPlainDate('1995-05-20'), context)).toEqual([
       { id: versionedProvince.id, name: 'Pangasinan', status: 'active' },
       { id: versionedDistrict.id, name: 'Alaminos', status: 'active' },
       { id: versionedOffice.id, name: 'Alaminos Registry', status: 'active' }
@@ -675,7 +676,7 @@ describe('resolvePath', () => {
   })
 
   it('resolves the whole path at an anchor after all changes', () => {
-    expect(resolvePath(versionedOffice.id, '2021-06-01', context)).toEqual([
+    expect(resolvePath(versionedOffice.id, toPlainDate('2021-06-01'), context)).toEqual([
       {
         id: versionedProvince.id,
         name: 'Greater Pangasinan',
@@ -692,12 +693,12 @@ describe('resolvePath', () => {
 
   it('resolves each ancestor independently at a mid-history anchor', () => {
     expect(
-      resolvePath(versionedOffice.id, '2006-01-01', context).map((n) => n.name)
+      resolvePath(versionedOffice.id, toPlainDate('2006-01-01'), context).map((n) => n.name)
     ).toEqual(['Pangasinan', 'Alaminos City', 'Alaminos Registry'])
   })
 
   it('keeps an inactivated node resolvable with its status exposed', () => {
-    const district = resolvePath(versionedDistrict.id, '2021-01-01', context)
+    const district = resolvePath(versionedDistrict.id, toPlainDate('2021-01-01'), context)
     expect(district).toEqual([
       {
         id: versionedProvince.id,
@@ -710,18 +711,18 @@ describe('resolvePath', () => {
 
   it('returns an areas-only path for an administrative area id', () => {
     expect(
-      resolvePath(versionedDistrict.id, '1999-01-01', context).map((n) => n.id)
+      resolvePath(versionedDistrict.id, toPlainDate('1999-01-01'), context).map((n) => n.id)
     ).toEqual([versionedProvince.id, versionedDistrict.id])
   })
 
   it('returns only the leaf for a location without an administrative area', () => {
-    expect(resolvePath(standaloneOffice.id, '2020-01-01', context)).toEqual([
+    expect(resolvePath(standaloneOffice.id, toPlainDate('2020-01-01'), context)).toEqual([
       { id: standaloneOffice.id, name: 'Standalone Office', status: 'active' }
     ])
   })
 
   it('returns an empty path for an unknown id', () => {
-    expect(resolvePath(generateUuid(rng), '2020-01-01', context)).toEqual([])
+    expect(resolvePath(generateUuid(rng), toPlainDate('2020-01-01'), context)).toEqual([])
   })
 
   it('accepts stripped client maps', () => {
@@ -740,7 +741,7 @@ describe('resolvePath', () => {
       )
     }
     expect(
-      resolvePath(versionedOffice.id, '1995-05-20', clientContext).map(
+      resolvePath(versionedOffice.id, toPlainDate('1995-05-20'), clientContext).map(
         (n) => n.name
       )
     ).toEqual(['Pangasinan', 'Alaminos', 'Alaminos Registry'])

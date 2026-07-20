@@ -27,19 +27,11 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { ROUTES } from '@client/v2-events/routes'
-import {
-  getUsersFullName,
-  resolveLocationName
-} from '@client/v2-events/utils'
+import { getUsersFullName, resolveLocationName } from '@client/v2-events/utils'
 import { getAddressNameV2, UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useUserFormState } from '@client/views/SysAdmin/Team/user/userEditor/useUserFormState'
-import {
-  ClientLocation,
-  todayISO,
-  User,
-  UUID
-} from '@opencrvs/commons/client'
+import { ClientLocation, todayISO, User, UUID } from '@opencrvs/commons/client'
 import { Link } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import { LinkButton } from '@opencrvs/components/lib/buttons'

@@ -14,6 +14,7 @@ import {
   ClientAdministrativeArea,
   ClientLocation,
   FieldConfigInput,
+  PlainDate,
   User,
   UUID
 } from '@opencrvs/commons/client'
@@ -44,7 +45,7 @@ export interface StringifierContext<F extends FieldConfigInput> {
    * default anchor, so omitting it is a compile error rather than a silent
    * fall-through to the current name.
    */
-  anchor: string
+  anchor: PlainDate
   users?: User[]
   config?: F
   adminLevels?: AdminStructureItem[]

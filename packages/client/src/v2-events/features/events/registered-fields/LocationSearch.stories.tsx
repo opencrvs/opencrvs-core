@@ -13,7 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import { within, expect, fn } from '@storybook/test'
 import { userEvent } from '@storybook/testing-library'
-import { todayISO } from '@opencrvs/commons/client'
+import { toPlainDate, todayISO } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 // NOTE: If you do not import from index, you might encounter: ReferenceError: Cannot access 'LocationSearch' before initialization
 import { LocationSearch } from '.'
@@ -167,6 +167,6 @@ export const LocationSearchOutputAtHistoricalAnchor: StoryObj<
   render: (props) => <LocationSearch.Output {...props} />,
   args: {
     value: healthFacilityLocationId,
-    anchor: '1995-05-20'
+    anchor: toPlainDate('1995-05-20')
   }
 }
