@@ -12,7 +12,7 @@
 import * as React from 'react'
 
 import styled from 'styled-components'
-import { DeclarationIcon, Duplicate, Box } from '@opencrvs/components/lib/icons'
+import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
 import { Icon as GenericIcon, Stack } from '@opencrvs/components'
 import { AvailableIcons, InherentFlags, Flag } from '@opencrvs/commons/client'
 import {

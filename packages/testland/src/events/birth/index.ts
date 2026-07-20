@@ -1185,10 +1185,6 @@ export const birthEvent = defineConfig({
         {
           type: ConditionalType.SHOW,
           conditional: not(flag('sealed'))
-        },
-        {
-          type: ConditionalType.ENABLE,
-          conditional: not(flag('sealed'))
         }
       ],
       flags: [{ id: 'sealed', operation: 'add' }],
@@ -1239,10 +1235,6 @@ export const birthEvent = defineConfig({
       conditionals: [
         {
           type: ConditionalType.SHOW,
-          conditional: flag('sealed')
-        },
-        {
-          type: ConditionalType.ENABLE,
           conditional: flag('sealed')
         }
       ]
