@@ -256,15 +256,14 @@ export function useDrafts() {
       })
     },
     isLocalDraftSubmitted: createDraft.isSuccess,
-    getAllRemoteDrafts,
     getRemoteDraftsWithLocalEvent,
     getRemoteDraftByEventId: function useDraftList(
       eventId: string,
       additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
     ): Draft | undefined {
-      const eventDrafts = getAllRemoteDrafts(additionalOptions).filter(
-        (draft) => draft.eventId === eventId
-      )
+      const eventDrafts = getRemoteDraftsWithLocalEvent(
+        additionalOptions
+      ).filter((draft) => draft.eventId === eventId)
 
       if (eventDrafts.length > 1) {
         throw new Error(
