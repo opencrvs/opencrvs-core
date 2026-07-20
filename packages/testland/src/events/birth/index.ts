@@ -327,7 +327,9 @@ export const birthEvent = defineConfig({
     'REVOKE_REGISTRATION',
     'REINSTATE_REVOKE_REGISTRATION',
     'ISSUE_VERIFIABLE_CREDENTIAL',
-    ActionType.UNASSIGN
+    ActionType.UNASSIGN,
+    'SEAL',
+    'UNSEAL'
   ],
   actions: [
     {
