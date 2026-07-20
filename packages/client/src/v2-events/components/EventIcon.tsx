@@ -29,7 +29,7 @@ import { IconWithNameEvent } from './IconWithNameEvent'
  * conditional matches, or `undefined` if there's no icon config or nothing
  * matches — callers should fall back to a default icon in that case.
  */
-export function resolveEventIcon(
+function resolveEventIcon(
   iconConfig: EventConfig['icon'],
   event: EventIndex,
   context: ValidatorContext
