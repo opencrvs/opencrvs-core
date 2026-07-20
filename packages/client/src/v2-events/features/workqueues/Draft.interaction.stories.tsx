@@ -272,7 +272,7 @@ export const DraftCountMatchesListWhenEventUnavailable: Story = {
     const canvas = within(canvasElement)
 
     await step('List shows only the draft whose event resolves', async () => {
-      await canvas.findByText('Present Applicant', {}, { timeout: 5000 })
+      await canvas.findByText('Present Applicant')
       await expect(
         canvas.queryByText('Missing Applicant')
       ).not.toBeInTheDocument()
@@ -281,11 +281,7 @@ export const DraftCountMatchesListWhenEventUnavailable: Story = {
     await step(
       'Sidebar draft badge count matches the list (1, not 2)',
       async () => {
-        const draftNav = await canvas.findByTestId(
-          'navigation_workqueue_draft',
-          {},
-          { timeout: 5000 }
-        )
+        const draftNav = await canvas.findByTestId('navigation_workqueue_draft')
         await expect(draftNav).toHaveTextContent(/^Drafts1$/)
       }
     )
