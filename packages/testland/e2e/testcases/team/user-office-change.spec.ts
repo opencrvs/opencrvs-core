@@ -217,28 +217,41 @@ test('Scope changes after office change - user loses access when the office chan
   await test.step('User can no longer find the record or drafts after the office change', async () => {
     await logout(page)
 
+    // Log the moved user back in on a fresh browser context. The client
+    // persists the drafts cache to IndexedDB (keyed by user id) and does not
+    // clear it on logout, so reusing the same context would rehydrate the
+    // drafts created before the move even though the server cleared them. A
+    // fresh context reflects the server state — what the user sees on a clean
+    // session.
+    const freshContext = await browser.newContext()
+    const freshPage = await freshContext.newPage()
+
     const { refreshToken } = await getAuthTokens(username, NEW_USER_PASSWORD)
     expect(refreshToken).toBeDefined()
 
-    await page.goto(`${CLIENT_URL}?refreshToken=${refreshToken}`)
-    await page.waitForSelector('#pin-input, #appSpinner', {
+    await freshPage.goto(`${CLIENT_URL}?refreshToken=${refreshToken}`)
+    await freshPage.waitForSelector('#pin-input, #appSpinner', {
       state: 'visible'
     })
+    await createPIN(freshPage)
+    await freshPage.goto(CLIENT_URL)
 
-    await searchFromSearchBar(page, trackingId, false)
+    await searchFromSearchBar(freshPage, trackingId, false)
     await expect(
-      page.getByRole('button', { name: trackingId, exact: true })
+      freshPage.getByRole('button', { name: trackingId, exact: true })
     ).not.toBeVisible()
 
-    await page.goto(CLIENT_URL)
-    const draftCountAfterChange = await countDraftRows(page, 0)
+    await freshPage.goto(CLIENT_URL)
+    const draftCountAfterChange = await countDraftRows(freshPage, 0)
     expect(draftCountAfterChange).toBe(0)
     expect(draftCountBeforeChange).toBeGreaterThan(0)
 
-    await page.goto(`${CLIENT_URL}/events/${eventId}`)
+    await freshPage.goto(`${CLIENT_URL}/events/${eventId}`)
     await expect(
-      page.getByText(`No event or draft found with id: ${eventId}`)
+      freshPage.getByText(`No event or draft found with id: ${eventId}`)
     ).toBeVisible()
+
+    await freshContext.close()
   })
 })
 
@@ -319,21 +332,21 @@ test('Scope changes after office and role changes', async ({ browser }) => {
       draftNames.push(await createDraft(page))
     }
 
-    draftCountBeforeChange = await countDraftRows(page, draftNames.length)
-    expect(draftCountBeforeChange).toBe(draftNames.length)
-
-    for (const draftName of draftNames) {
-      await expect(
-        page.getByRole('button', { name: draftName, exact: true })
-      ).toBeVisible()
-    }
-
     await expectVersionCard(
       page,
       fullName,
       'Registrar',
       'Ibombo District Office'
     )
+
+    draftCountBeforeChange = await countDraftRows(page, draftNames.length)
+    await expect(draftCountBeforeChange).toBe(draftNames.length)
+
+    for (const draftName of draftNames) {
+      await expect(
+        page.getByRole('button', { name: draftName, exact: true })
+      ).toBeVisible()
+    }
   })
 
   await test.step('Administrator moves the user to Isamba District Office and Hospital Official', async () => {
@@ -386,34 +399,45 @@ test('Scope changes after office and role changes', async ({ browser }) => {
   await test.step('User can no longer find the record or drafts after the office and role change', async () => {
     await logout(page)
 
+    // Fresh context so the moved user's session doesn't rehydrate the drafts
+    // cache persisted (in IndexedDB, keyed by user id) before the move — see
+    // the note in the first test case.
+    const freshContext = await browser.newContext()
+    const freshPage = await freshContext.newPage()
+
     const { refreshToken } = await getAuthTokens(username, NEW_USER_PASSWORD)
     expect(refreshToken).toBeDefined()
 
-    await page.goto(`${CLIENT_URL}?refreshToken=${refreshToken}`)
-    await page.waitForSelector('#pin-input, #appSpinner', {
+    await freshPage.goto(`${CLIENT_URL}?refreshToken=${refreshToken}`)
+    await freshPage.waitForSelector('#pin-input, #appSpinner', {
       state: 'visible'
     })
+    await createPIN(freshPage)
+    await freshPage.goto(CLIENT_URL)
 
-    await searchFromSearchBar(page, trackingId, false)
+    await searchFromSearchBar(freshPage, trackingId, false)
     await expect(
-      page.getByRole('button', { name: trackingId, exact: true })
+      freshPage.getByRole('button', { name: trackingId, exact: true })
     ).not.toBeVisible()
 
-    await page.goto(CLIENT_URL)
-    const draftCountAfterChange = await countDraftRows(page, 0)
-    expect(draftCountAfterChange).toBe(0)
-    expect(draftCountBeforeChange).toBeGreaterThan(0)
+    await freshPage.goto(CLIENT_URL)
 
     await expectVersionCard(
-      page,
+      freshPage,
       fullName,
       'Hospital Official',
       'Isamba District Office'
     )
 
-    await page.goto(`${CLIENT_URL}/events/${eventId}`)
+    const draftCountAfterChange = await countDraftRows(freshPage, 0)
+    expect(draftCountAfterChange).toBe(0)
+    expect(draftCountBeforeChange).toBeGreaterThan(0)
+
+    await freshPage.goto(`${CLIENT_URL}/events/${eventId}`)
     await expect(
-      page.getByText(`No event or draft found with id: ${eventId}`)
+      freshPage.getByText(`No event or draft found with id: ${eventId}`)
     ).toBeVisible()
+
+    await freshContext.close()
   })
 })
