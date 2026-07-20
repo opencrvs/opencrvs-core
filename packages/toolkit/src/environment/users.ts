@@ -16,6 +16,7 @@ import * as path from 'path'
 import kleur from 'kleur'
 import { manageUsers } from './manage-users'
 import { warn } from './logger'
+import { getEnvironmentInventoryPath } from './paths'
 
 async function select<Value = string>(options: any): Promise<Value> {
   const inquirer = await import('@inquirer/prompts')
@@ -30,7 +31,7 @@ async function select<Value = string>(options: any): Promise<Value> {
  * * @returns {string} Inventory file
  */
 async function selectInventoryFile(
-  dirPath: string = './infrastructure/server-setup/inventory/'
+  dirPath: string = './environments'
 ): Promise<string | null> {
   // Check if directory exists
   if (!fs.existsSync(dirPath)) {
@@ -41,18 +42,18 @@ async function selectInventoryFile(
     return null
   }
 
-  // Read and filter files
-  const files = fs
+  const environments = fs
     .readdirSync(dirPath)
-    .filter((file) => {
-      const filePath = path.join(dirPath, file)
-      const isFile = fs.statSync(filePath).isFile()
-      const ext = path.extname(file).slice(1).toLowerCase()
-      return isFile && (ext === 'yml' || ext === 'yaml')
+    .filter((entry) => {
+      const filePath = path.join(dirPath, entry)
+      return (
+        fs.statSync(filePath).isDirectory() &&
+        fs.existsSync(getEnvironmentInventoryPath(entry))
+      )
     })
     .sort()
 
-  if (files.length === 0) {
+  if (environments.length === 0) {
     warn(`⚠️  No environment configuration files found at ${dirPath}`)
     warn(
       'Hint: If this is a new infrastructure repository, run `opencrvs environment init` first.'
@@ -60,10 +61,9 @@ async function selectInventoryFile(
     return null
   }
 
-  // Create choices - remove extension from display
-  const choices = files.map((file) => ({
-    name: path.basename(file, path.extname(file)),
-    value: path.join(dirPath, file)
+  const choices = environments.map((environment) => ({
+    name: environment,
+    value: getEnvironmentInventoryPath(environment)
   }))
 
   const selectedFile = await select({

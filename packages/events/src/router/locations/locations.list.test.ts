@@ -14,13 +14,15 @@ import {
   generateUuid,
   LocationVersion,
   SetLocationPayload,
-  UUID,
-  encodeScope
+  UUID
 } from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createInitialisationTestClient,
+  createTestClient,
+  setupTestCase,
+  systemInitialisationTestSetup
+} from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
-
-const scope = encodeScope({ type: 'user.data-seeding' })
 
 async function appendVersion(locationId: UUID, version: LocationVersion) {
   await getClient()
@@ -32,7 +34,9 @@ async function appendVersion(locationId: UUID, version: LocationVersion) {
 
 test('Returns single location in right format', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [scope])
+  const client = createTestClient(user, [])
+  await systemInitialisationTestSetup()
+  const seeder = createInitialisationTestClient()
 
   const initialLocations = await client.locations.list()
 
@@ -46,7 +50,7 @@ test('Returns single location in right format', async () => {
     }
   ]
 
-  await client.locations.set(setLocationPayload)
+  await seeder.locations.set(setLocationPayload)
 
   const locations = await client.locations.list()
 
@@ -56,12 +60,14 @@ test('Returns single location in right format', async () => {
 
 test('Returns multiple locations', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [scope])
+  const client = createTestClient(user, [])
+  await systemInitialisationTestSetup()
+  const seeder = createInitialisationTestClient()
 
   const initialLocations = await client.locations.list()
 
   const locationRng = createPrng(845)
-  await client.locations.set(generator.locations.set(5, locationRng))
+  await seeder.locations.set(generator.locations.set(5, locationRng))
 
   const locations = await client.locations.list()
 
@@ -70,11 +76,13 @@ test('Returns multiple locations', async () => {
 
 test('Returns the full versions array and resolves flat fields from the current version', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [scope])
+  const client = createTestClient(user, [])
+  await systemInitialisationTestSetup()
+  const seeder = createInitialisationTestClient()
 
   const locationId = generateUuid()
 
-  await client.locations.set([
+  await seeder.locations.set([
     {
       id: locationId,
       administrativeAreaId: null,
@@ -112,11 +120,13 @@ test('Returns the full versions array and resolves flat fields from the current 
 
 test('A future-dated version is returned in versions but does not drive the flat fields', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [scope])
+  const client = createTestClient(user, [])
+  await systemInitialisationTestSetup()
+  const seeder = createInitialisationTestClient()
 
   const locationId = generateUuid()
 
-  await client.locations.set([
+  await seeder.locations.set([
     {
       id: locationId,
       administrativeAreaId: null,
@@ -147,11 +157,13 @@ test('A future-dated version is returned in versions but does not drive the flat
 
 test('Filters locations by active status resolved from versions', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [scope])
+  const client = createTestClient(user, [])
+  await systemInitialisationTestSetup()
+  const seeder = createInitialisationTestClient()
 
   const locationId = generateUuid()
 
-  await client.locations.set([
+  await seeder.locations.set([
     {
       id: locationId,
       administrativeAreaId: null,
@@ -183,11 +195,13 @@ test('Filters locations by active status resolved from versions', async () => {
 
 test('A future-dated inactivation does not exclude a location from the active list yet', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [scope])
+  const client = createTestClient(user, [])
+  await systemInitialisationTestSetup()
+  const seeder = createInitialisationTestClient()
 
   const locationId = generateUuid()
 
-  await client.locations.set([
+  await seeder.locations.set([
     {
       id: locationId,
       administrativeAreaId: null,
