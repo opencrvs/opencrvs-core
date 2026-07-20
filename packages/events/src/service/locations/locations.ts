@@ -19,7 +19,8 @@ import {
   LocationVersion,
   SetLocationPayload,
   UpdateLocationPayload,
-  UUID
+  UUID,
+  WithdrawLocationVersionPayload
 } from '@opencrvs/commons'
 import * as locationsRepo from '@events/storage/postgres/administrative-hierarchy/locations'
 import * as administrativeAreasRepo from '@events/storage/postgres/administrative-hierarchy/administrative-areas'
@@ -464,4 +465,69 @@ export async function updateLocation(
   })
 
   return { location: await getLocationById(payload.id), outcome }
+}
+
+/** The version element that was withdrawn, for the router's audit entry. */
+export interface WithdrawnVersion {
+  withdrawnVersion: LocationVersion
+}
+
+/**
+ * Withdraws a pending (future-dated) version element by `versionId`.
+ *
+ * - unknown id, or no element with that `versionId` → NOT_FOUND
+ * - the element's `effectiveFrom` is today or in the past (no longer
+ *   pending — it may already be in effect) → CONFLICT
+ */
+export async function withdrawVersionChecked({
+  payload,
+  entityLabel,
+  table
+}: {
+  payload: WithdrawLocationVersionPayload
+  entityLabel: 'Location' | 'Administrative area'
+  table: 'locations' | 'administrativeAreas'
+}): Promise<WithdrawnVersion> {
+  const versions = await getExistingVersions(table, payload.id, entityLabel)
+
+  const target = versions.find((v) => v.versionId === payload.versionId)
+
+  if (!target) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `${entityLabel} with id ${payload.id} has no version ${payload.versionId}`
+    })
+  }
+
+  const today = new Date().toISOString().slice(0, 10)
+
+  if (target.effectiveFrom <= today) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: `Version ${payload.versionId} is already in effect and can no longer be withdrawn`
+    })
+  }
+
+  await locationsRepo.removeVersion(table, payload.id, payload.versionId)
+
+  return { withdrawnVersion: target }
+}
+
+/**
+ * Withdraws a pending version from a location after the checks documented on
+ * {@link withdrawVersionChecked}.
+ */
+export async function withdrawLocationVersion(
+  payload: WithdrawLocationVersionPayload
+): Promise<{
+  location: Location
+  withdrawnVersion: WithdrawnVersion['withdrawnVersion']
+}> {
+  const { withdrawnVersion } = await withdrawVersionChecked({
+    payload,
+    entityLabel: 'Location',
+    table: 'locations'
+  })
+
+  return { location: await getLocationById(payload.id), withdrawnVersion }
 }

@@ -15,7 +15,8 @@ import {
   Location,
   SetLocationPayload,
   UpdateLocationPayload,
-  UUID
+  UUID,
+  WithdrawLocationVersionPayload
 } from '@opencrvs/commons'
 import {
   internalProcedure,
@@ -29,7 +30,8 @@ import {
   getLocationHierarchy,
   getLocations,
   setLocations,
-  updateLocation
+  updateLocation,
+  withdrawLocationVersion
 } from '@events/service/locations/locations'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import { allowedWithAnyOfScopes } from '../middleware'
@@ -169,6 +171,40 @@ export const locationRouter = router({
           }
         })
       }
+
+      return location
+    }),
+  withdrawVersion: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'Withdraw a pending location version',
+        description:
+          'Removes a not-yet-effective (future-dated) version from a location. A version whose effectiveFrom has already passed cannot be withdrawn.',
+        method: 'DELETE',
+        path: '/locations/{id}/versions/{versionId}',
+        tags: ['Locations'],
+        protect: true
+      }
+    })
+    .use(allowedWithAnyOfScopes(['location.edit']))
+    .input(WithdrawLocationVersionPayload)
+    .output(Location)
+    .mutation(async ({ input, ctx }) => {
+      const { location, withdrawnVersion } =
+        await withdrawLocationVersion(input)
+
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'locations.withdrawVersion',
+        requestData: { id: input.id, versionId: input.versionId },
+        responseSummary: {
+          effectiveFrom: withdrawnVersion.effectiveFrom,
+          name: withdrawnVersion.name,
+          externalId: withdrawnVersion.externalId ?? null,
+          status: withdrawnVersion.status
+        }
+      })
 
       return location
     }),
