@@ -18,14 +18,15 @@ import {
   getMixedPath,
   EventIndex,
   EventDocument,
-  isFieldSecured
+  isFieldSecured,
+  FieldValue
 } from '@opencrvs/commons/client'
-import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { convertDateFieldsToUnixTimestamps } from '@client/v2-events/utils'
 import { useFlagLabelsString } from '@client/v2-events/messages/flags'
+import { SummaryBanner } from './SummaryBanner'
 
 const messages = {
   assignedTo: {
@@ -139,6 +140,17 @@ export function EventSummary({
     )
     .map(({ id }) => id)
 
+  const visibleBanners = (summary.banners ?? []).filter(
+    (banner) =>
+      !banner.conditionals ||
+      banner.conditionals.length === 0 ||
+      areConditionsMet(
+        banner.conditionals,
+        event,
+        validationContext,
+        eventIndex
+      )
+  )
   const configuredFields = summary.fields.map((field) => {
     if (
       field.conditionals &&
@@ -200,6 +212,18 @@ export function EventSummary({
 
   return (
     <>
+      {visibleBanners.map((banner, index) => (
+        <SummaryBanner
+          key={index}
+          data-testid={`summary-banner-${index}`}
+          description={
+            banner.description && intl.formatMessage(banner.description)
+          }
+          icon={banner.icon}
+          title={intl.formatMessage(banner.title)}
+          type={banner.type}
+        />
+      ))}
       <Summary id="summary">
         <Summary.Row
           key="assignedTo"

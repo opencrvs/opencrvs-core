@@ -161,6 +161,28 @@ export const birthEvent = defineConfig({
     }
   ],
   summary: {
+    banners: [
+      {
+        type: 'error',
+        icon: 'FileLock',
+        title: {
+          id: 'event.birth.summary.banner.sealed.title',
+          defaultMessage: 'Record is protected',
+          description: 'Title of the banner shown when a record is sealed'
+        },
+        description: {
+          id: 'event.birth.summary.banner.sealed.description',
+          defaultMessage: 'Request to unseal to view this record',
+          description: 'Description of the banner shown when a record is sealed'
+        },
+        conditionals: [
+          {
+            type: ConditionalType.SHOW,
+            conditional: flag('sealed')
+          }
+        ]
+      }
+    ],
     fields: [
       {
         fieldId: 'child.nid',

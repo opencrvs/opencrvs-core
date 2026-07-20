@@ -11,6 +11,31 @@
 import * as z from 'zod/v4'
 import { TranslationConfig } from './TranslationConfig'
 import { ShowConditional } from './Conditional'
+import { AvailableIcons } from '../icons'
+
+export const SummaryBanner = z
+  .object({
+    type: z
+      .enum(['info', 'warning', 'error'])
+      .describe('Visual style of the banner.'),
+    icon: AvailableIcons.optional().describe(
+      'Icon displayed inside the banner.'
+    ),
+    title: TranslationConfig.describe('Banner title.'),
+    description: TranslationConfig.optional().describe(
+      'Supporting text displayed below the banner title.'
+    ),
+    conditionals: z
+      .array(ShowConditional)
+      .default([])
+      .optional()
+      .describe(
+        'Conditions under which the banner is shown. When omitted, the banner is always shown.'
+      )
+  })
+  .describe('Banner displayed above the summary fields in the event overview.')
+
+export type SummaryBanner = z.infer<typeof SummaryBanner>
 
 const BaseField = z.object({
   emptyValueMessage: TranslationConfig.optional().describe(
@@ -36,6 +61,13 @@ const Field = BaseField.extend({
 
 export const SummaryConfig = z
   .object({
+    banners: z
+      .array(SummaryBanner)
+      .default([])
+      .optional()
+      .describe(
+        'Banners displayed above the summary fields in the event overview.'
+      ),
     fields: z
       .array(z.union([Field, ReferenceField]))
       .describe('Fields displayed in the event summary view.')
