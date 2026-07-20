@@ -21,12 +21,12 @@
     "test:watch": "NO_MOSIP=false vitest",
     "test:compilation": "tsc --noEmit --resolveJsonModule",
     "lint": "eslint -c eslint.config.js",
-    "setup-analytics": "docker exec -i -e POSTGRES_HOST=localhost -e POSTGRES_PORT=5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e ANALYTICS_POSTGRES_USER=events_analytics -e ANALYTICS_POSTGRES_PASSWORD=analytics_password postgres bash -s < ./infrastructure/postgres/setup-analytics.sh",
-    "setup-reference-data": "docker exec -i -e POSTGRES_HOST=localhost -e POSTGRES_PORT=5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e REFERENCE_DATA_POSTGRES_USER=events_reference_data -e REFERENCE_DATA_POSTGRES_PASSWORD=reference_data_password -e REFERENCE_DATA_EDITOR_USER=reference_data_editor_user -e REFERENCE_DATA_EDITOR_PASSWORD=reference_data_editor_password postgres bash -s < ./infrastructure/postgres/setup-reference-data.sh",
+    "setup-analytics": "docker exec -i -e POSTGRES_HOST=localhost -e POSTGRES_PORT=5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e ANALYTICS_POSTGRES_USER=events_analytics -e ANALYTICS_POSTGRES_PASSWORD=analytics_password postgres bash -s < ./assets/postgres/setup-analytics.sh",
+    "setup-reference-data": "docker exec -i -e POSTGRES_HOST=localhost -e POSTGRES_PORT=5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e REFERENCE_DATA_POSTGRES_USER=events_reference_data -e REFERENCE_DATA_POSTGRES_PASSWORD=reference_data_password -e REFERENCE_DATA_EDITOR_USER=reference_data_editor_user -e REFERENCE_DATA_EDITOR_PASSWORD=reference_data_editor_password postgres bash -s < ./assets/postgres/setup-reference-data.sh",
     "db:clear:all": "bash infrastructure/clear-all-data-dev.sh && yarn setup-analytics",
     "start": "yarn setup-analytics && yarn setup-reference-data &&  cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon --watch src --exec tsx src/index.ts",
     "start:prod": "tsx src/index.ts",
-    "metabase": "bash infrastructure/metabase/run-dev.sh",
+    "metabase": "bash assets/metabase/run-dev.sh",
     "sort-translations": "cross-env NODE_ENV=development tsx src/sort-translations.ts"
   },
   "devDependencies": {
