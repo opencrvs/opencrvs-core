@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect, type Page } from '@playwright/test'
-import { login } from '../../helpers'
+import { findOnOrganisationPage, login } from '../../helpers'
 import { CREDENTIALS } from '../../constants'
 import { verifyMembersClickable } from '../birth/helpers'
 import { navigateToWorkqueue } from '../../utils'
@@ -67,7 +67,7 @@ test.describe.serial('4. Organisation Page', () => {
       test('4.1.2.0 Verify Embassy Official', async () => {
         await navigateToWorkqueue(page, 'Organisation')
         await expect(
-          page.getByRole('button', { name: /French Embassy Office/ })
+          await findOnOrganisationPage(page, /French Embassy Office/)
         ).toBeDisabled()
       })
       test('4.1.2.1 Verify Province -> District -> District Office', async () => {
@@ -78,7 +78,7 @@ test.describe.serial('4. Organisation Page', () => {
       })
       test('4.1.2.2 Verify Province -> District', async () => {
         await navigateToWorkqueue(page, 'Organisation')
-        await page.getByRole('button', { name: /Pualula/ }).click()
+        await (await findOnOrganisationPage(page, /Pualula/)).click()
 
         await expect(
           page.getByRole('button', { name: /Pualula Province Office/ })

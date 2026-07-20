@@ -41,6 +41,10 @@ Archiving a NOTIFIED (incomplete) record used to clear `InherentFlags.INCOMPLETE
 
 ### New features
 
+#### Location and administrative area write API
+
+Locations and administrative areas can now be created, renamed, recoded, and inactivated via `create`, `update`, and `withdrawVersion` endpoints — each change appends an effective-dated element to the entity's `versions[]` array rather than overwriting state; prior versions are never modified (see location versioning, [#6691](https://github.com/opencrvs/opencrvs-core/issues/6691)). A new `location.edit` scope guards these endpoints; country configs must assign it to the relevant role(s). All changes are recorded in the audit log.
+
 #### Notification-based scope filtering
 
 Added `notifiedIn` and `notifiedBy` scope options for record scopes (`record.read`, `record.edit`, `record.search`, etc.), mirroring the existing `declaredIn`/`declaredBy` and `registeredIn`/`registeredBy` patterns — enables role configurations to restrict access based on where or by whom an event was notified. [#11875](https://github.com/opencrvs/opencrvs-core/issues/11875)
