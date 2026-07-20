@@ -48,7 +48,7 @@ const createDraft = async (page: Page) => {
   await page.getByRole('button', { name: 'Drafts' }).click()
   await expect(
     page.getByRole('button', { name: childName, exact: true })
-  ).toBeVisible({ timeout: 30_000 })
+  ).toBeVisible()
 
   return childName
 }
@@ -60,7 +60,7 @@ const countDraftRows = async (page: Page, expectedCount?: number) => {
   const rows = page.locator('[id^="row_"]')
 
   if (typeof expectedCount === 'number') {
-    await expect(rows).toHaveCount(expectedCount, { timeout: 30_000 })
+    await expect(rows).toHaveCount(expectedCount)
   }
 
   return rows.count()
@@ -83,8 +83,6 @@ const expectVersionCard = async (
 test('Scope changes after office change - user loses access when the office changes', async ({
   browser
 }) => {
-  test.setTimeout(300_000)
-
   const page = await browser.newPage()
   let username = ''
   let fullName = ''
@@ -240,13 +238,11 @@ test('Scope changes after office change - user loses access when the office chan
     await page.goto(`${CLIENT_URL}/events/${eventId}`)
     await expect(
       page.getByText(`No event or draft found with id: ${eventId}`)
-    ).toBeVisible({ timeout: 30_000 })
+    ).toBeVisible()
   })
 })
 
 test('Scope changes after office and role changes', async ({ browser }) => {
-  test.setTimeout(300_000)
-
   const page = await browser.newPage()
   let username = ''
   let fullName = ''
@@ -418,6 +414,6 @@ test('Scope changes after office and role changes', async ({ browser }) => {
     await page.goto(`${CLIENT_URL}/events/${eventId}`)
     await expect(
       page.getByText(`No event or draft found with id: ${eventId}`)
-    ).toBeVisible({ timeout: 30_000 })
+    ).toBeVisible()
   })
 })
