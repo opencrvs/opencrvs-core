@@ -2718,11 +2718,15 @@ components:
               items:
                 $ref: "#/components/schemas/FieldConditional"
             secured:
-              description: Indicates whether the field is secured. Secured fields are not
+              description: Indicates whether the field is secured, either always (boolean) or
+                conditionally, evaluated against the event (a JSONSchema
+                conditional, e.g. flag('sealed')). Secured fields are not
                 indexed for search and are only visible when explicitly
                 assigned.
               default: false
-              type: boolean
+              anyOf:
+                - type: boolean
+                - $ref: "#/components/schemas/Conditional"
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2985,11 +2989,15 @@ components:
               items:
                 $ref: "#/components/schemas/FieldConditional"
             secured:
-              description: Indicates whether the field is secured. Secured fields are not
+              description: Indicates whether the field is secured, either always (boolean) or
+                conditionally, evaluated against the event (a JSONSchema
+                conditional, e.g. flag('sealed')). Secured fields are not
                 indexed for search and are only visible when explicitly
                 assigned.
               default: false
-              type: boolean
+              anyOf:
+                - type: boolean
+                - $ref: "#/components/schemas/Conditional"
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -3273,10 +3281,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -3512,10 +3524,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -4002,10 +4018,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -4224,10 +4244,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -4422,10 +4446,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -4649,10 +4677,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -4850,10 +4882,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -5065,10 +5101,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -5266,10 +5306,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -5468,10 +5512,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -5678,10 +5726,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -5886,10 +5938,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -6089,10 +6145,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -6279,10 +6339,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -6476,10 +6540,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -6694,10 +6762,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -6889,10 +6961,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -7057,10 +7133,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -7285,10 +7365,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -7638,10 +7722,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -7820,10 +7908,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -8002,10 +8094,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -8185,10 +8281,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -8438,10 +8538,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -8638,10 +8742,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -8957,10 +9065,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -9125,10 +9237,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -9417,10 +9533,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -9644,10 +9764,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -9835,10 +9959,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -10104,10 +10232,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -10335,10 +10467,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -10563,10 +10699,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -10745,10 +10885,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -11038,10 +11182,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -11239,10 +11387,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -11424,10 +11576,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -11626,10 +11782,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -11823,10 +11983,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -12018,10 +12182,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -12199,10 +12367,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -12384,10 +12556,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -13005,10 +13181,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -13169,10 +13349,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -13339,10 +13523,14 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured. Secured fields are not
-            indexed for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured, either always (boolean) or
+            conditionally, evaluated against the event (a JSONSchema
+            conditional, e.g. flag('sealed')). Secured fields are not indexed
+            for search and are only visible when explicitly assigned.
           default: false
-          type: boolean
+          anyOf:
+            - type: boolean
+            - $ref: "#/components/schemas/Conditional"
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
