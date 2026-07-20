@@ -60,11 +60,6 @@ export const administrativeAreaRouter = router({
         ids: input?.ids
       })
     ),
-  set: setAdministrativeAreasRoute(
-    userAndSystemProcedure.use(
-      allowedWithAnyOfScopes(['user.data-seeding', 'config.update-all'])
-    )
-  ),
   create: userAndSystemProcedure
     .meta({
       openapi: {
