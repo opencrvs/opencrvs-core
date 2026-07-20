@@ -253,6 +253,25 @@ test.describe('Location write API (/api/events/locations)', () => {
     test('HTTP 422 when effectiveFrom is not later than the latest version', async () => {
       const created = await createLocation()
 
+      // Move the latest version to 2025-01-01, then attempt a splice into the
+      // past at a date that does not collide with any existing element
+      // (0001-01-01 or 2025-01-01) but is not later than the latest — 422,
+      // not 409.
+      const renamed = await (
+        await fetchClientAPI(
+          `/api/events/locations/${created.id}`,
+          'PUT',
+          systemAdminToken,
+          {
+            name: created.name,
+            externalId: created.externalId,
+            status: 'active',
+            effectiveFrom: '2025-01-01',
+            lastVersionId: created.versions[0].versionId
+          }
+        )
+      ).json()
+
       const response = await fetchClientAPI(
         `/api/events/locations/${created.id}`,
         'PUT',
@@ -261,8 +280,8 @@ test.describe('Location write API (/api/events/locations)', () => {
           name: 'Past Splice',
           externalId: created.externalId,
           status: 'active',
-          effectiveFrom: '0001-01-01',
-          lastVersionId: created.versions[0].versionId
+          effectiveFrom: '2020-01-01',
+          lastVersionId: renamed.versions[1].versionId
         }
       )
 
