@@ -39,6 +39,7 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messa
 import { ROUTES } from '@client/v2-events/routes'
 import { flattenEventIndex } from '@client/v2-events/utils'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
+import { EventIcon } from '@client/v2-events/components/EventIcon'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { EventOverviewProvider } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
 import { constantsMessages } from '@client/i18n/messages/constants'
@@ -196,6 +197,13 @@ export function EventOverviewLayout({
         <AppBar
           appBarRowTwo={<EventOverviewTabs />}
           desktopCenter={<EventOverviewTabs />}
+          desktopLeft={
+            <EventIcon
+              event={eventIndexWithDraftApplied}
+              eventConfig={eventConfiguration}
+              name={null}
+            />
+          }
           desktopRight={
             <Stack>
               {!readActionStatus.hidden && (
@@ -222,6 +230,13 @@ export function EventOverviewLayout({
               eventConfiguration.title,
               flattenEventIndex(deepDropNulls(eventIndexWithDraftApplied))
             ) || intl.formatMessage(noNameMessage)
+          }
+          mobileLeft={
+            <EventIcon
+              event={eventIndexWithDraftApplied}
+              eventConfig={eventConfiguration}
+              name={null}
+            />
           }
           mobileRight={
             <>
