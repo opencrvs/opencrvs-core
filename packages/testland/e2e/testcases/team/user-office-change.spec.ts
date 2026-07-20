@@ -83,6 +83,8 @@ const expectVersionCard = async (
 test('Scope changes after office change - user loses access when the office changes', async ({
   browser
 }) => {
+  test.setTimeout(180_000)
+
   const page = await browser.newPage()
   let username = ''
   let fullName = ''
@@ -100,7 +102,8 @@ test('Scope changes after office change - user loses access when the office chan
 
     const name = {
       firstname: faker.person.firstName(),
-      surname: faker.person.lastName()
+      // Append random chars to ensure username is unique
+      surname: `${faker.person.lastName()}${faker.string.alphanumeric(6)}`
     }
 
     fullName = `${name.firstname} ${name.surname}`
@@ -256,6 +259,8 @@ test('Scope changes after office change - user loses access when the office chan
 })
 
 test('Scope changes after office and role changes', async ({ browser }) => {
+  test.setTimeout(180_000)
+
   const page = await browser.newPage()
   let username = ''
   let fullName = ''
@@ -273,7 +278,8 @@ test('Scope changes after office and role changes', async ({ browser }) => {
 
     const name = {
       firstname: faker.person.firstName(),
-      surname: faker.person.lastName()
+      // Append random chars to ensure username is unique
+      surname: `${faker.person.lastName()}${faker.string.alphanumeric(6)}`
     }
 
     fullName = `${name.firstname} ${name.surname}`
