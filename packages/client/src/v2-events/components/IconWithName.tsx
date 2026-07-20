@@ -11,7 +11,6 @@
 
 import * as React from 'react'
 import styled from 'styled-components'
-import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
 import { AvailableIcons, Flag, InherentFlags } from '@opencrvs/commons/client'
 import { getEventIcon } from './IconWithNameEvent'
 
