@@ -61,15 +61,14 @@ describe('user.activate', () => {
     const attacker = users[0]
     const victim = users[1]
 
-    // Put the victim in the invited-but-not-activated window.
+    // Put the victim in the invited-but-not-activated state
     await eventsDb
       .updateTable('users')
       .where('id', '=', victim.id)
       .set({ status: 'pending' })
       .execute()
 
-    // A different authenticated user must not be able to set the victim's
-    // credentials and take over the account.
+    // A different authenticated user must not be able to set the victim's credentials and take over the account.
     const attackerClient = createTestClient(attacker)
     await expect(
       attackerClient.user.activate({
