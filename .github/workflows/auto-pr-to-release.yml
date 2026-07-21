@@ -30,7 +30,7 @@ on:
 jobs:
   resolve-releases:
     if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch' }}
-    runs-on: ubuntu-26.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     outputs:
       matrix: ${{ steps.resolve-applicable-versions.outputs.matrix }}
     steps:
@@ -108,7 +108,7 @@ jobs:
 
   create-pr:
     needs: resolve-releases
-    runs-on: ubuntu-26.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     if: ${{ always() && needs.resolve-releases.result == 'success' }}
 
     strategy:

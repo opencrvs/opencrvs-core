@@ -19,7 +19,7 @@ on:
 
 jobs:
   mirror-dbs:
-    runs-on: ubuntu-26.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     env:
       RETRIES: 100
     strategy:

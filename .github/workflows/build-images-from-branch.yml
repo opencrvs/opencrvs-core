@@ -135,7 +135,7 @@ jobs:
 
   merge-manifest:
     needs: [base]
-    runs-on: ubuntu-26.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v4
@@ -222,7 +222,7 @@ jobs:
       fail-fast: false
       matrix:
         service: ${{ fromJSON(needs.base.outputs.services) }}
-    runs-on: ubuntu-26.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v4
@@ -310,7 +310,7 @@ jobs:
   merge-testland-assets-manifest:
     needs: [base, testland-assets]
     if: always()
-    runs-on: ubuntu-26.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v4
@@ -338,7 +338,7 @@ jobs:
 
   security-scans-pr:
     needs: [build, base]
-    runs-on: ubuntu-26.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     if: >
       github.event_name == 'pull_request' && (github.event.pull_request.base.ref == 'develop' || github.event.pull_request.base.ref == 'main') && !inputs.skip_security_check
     strategy:
@@ -379,7 +379,7 @@ jobs:
 
   security-scans-develop:
     needs: [build, base]
-    runs-on: ubuntu-26.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     if: ${{ (needs.base.outputs.branch == 'develop' || inputs.publish_release) && !inputs.skip_security_check }}
     strategy:
       fail-fast: false
@@ -408,7 +408,7 @@ jobs:
     needs:
       [base, build, merge-services-manifest, merge-testland-assets-manifest]
     if: success() && github.event_name == 'push' && github.ref_name == 'develop'
-    runs-on: ubuntu-26.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - uses: actions/github-script@v8
         with:
