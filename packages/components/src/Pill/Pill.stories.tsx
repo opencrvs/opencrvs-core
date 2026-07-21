@@ -57,6 +57,12 @@ Inactive.args = {
   type: 'inactive'
 }
 
+export const Neutral = Template.bind({})
+Neutral.args = {
+  label: 'Neutral',
+  type: 'neutral'
+}
+
 export const ActiveDark = Template.bind({})
 ActiveDark.args = {
   label: 'Active Dark',

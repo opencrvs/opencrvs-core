@@ -15,7 +15,6 @@ import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
 import {
   EventDocument,
-  mandatoryColumns,
   getCurrentEventState,
   applyDraftToEventIndex,
   getEventConfigById
@@ -25,6 +24,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { CoreWorkqueues, WORKQUEUE_DRAFT } from '@client/v2-events/utils'
 import { useEventConfigurations } from '../events/useEventConfiguration'
 import { SearchResultComponent } from '../events/Search/SearchResult/SearchResult'
+import { workqueueHeaderMessages } from '../events/Search/SearchResult/utils'
 import { useDrafts } from '../drafts/useDrafts'
 import { useOutbox } from '../events/useEvents/outbox'
 import { findLocalEventDocument } from '../events/useEvents/api'
@@ -70,7 +70,7 @@ export function Draft() {
     <SearchResultComponent
       key={`${CoreWorkqueues.DRAFT}-${outboxIds.length}`}
       action={WORKQUEUE_DRAFT.action}
-      columns={mandatoryColumns}
+      dateColumnLabel={workqueueHeaderMessages.updated}
       eventConfigs={eventConfigs}
       paginationVisibleOffline={true}
       queryData={currentPageDrafts}

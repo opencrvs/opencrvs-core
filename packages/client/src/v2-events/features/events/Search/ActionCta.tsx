@@ -10,23 +10,35 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
-import styled from 'styled-components'
-import { EventIndex, WorkqueueActionType } from '@opencrvs/commons/client'
-import { Button } from '@opencrvs/components'
+import {
+  ActionType,
+  EventIndex,
+  WorkqueueActionType
+} from '@opencrvs/commons/client'
+import { Button, Icon } from '@opencrvs/components'
 import { useCurrentBackTo } from '@client/v2-events/features/events/useEventFormNavigation'
 import { withSuspense } from '../../../components/withSuspense'
 import { useGetWorkqueueActionConfiguration } from '../../workqueues/Actions/useGetActionConfiguration'
 
-const StyledButton = styled(Button)`
-  max-width: 150px;
-  overflow: hidden;
-  white-space: nowrap;
-  display: block;
-  text-overflow: ellipsis;
-`
+const ACTION_ICONS: Record<
+  WorkqueueActionType,
+  React.ComponentProps<typeof Icon>['name']
+> = {
+  [ActionType.READ]: 'Eye',
+  [ActionType.DELETE]: 'Trash',
+  [ActionType.DECLARE]: 'PaperPlaneTilt',
+  [ActionType.REGISTER]: 'Stamp',
+  [ActionType.EDIT]: 'PencilSimpleLine',
+  [ActionType.REJECT]: 'ArrowCounterClockwise',
+  [ActionType.MARK_AS_DUPLICATE]: 'Files',
+  [ActionType.ARCHIVE]: 'Archive',
+  [ActionType.UNARCHIVE]: 'ArchiveTray',
+  [ActionType.PRINT_CERTIFICATE]: 'Printer',
+  [ActionType.REQUEST_CORRECTION]: 'NotePencil'
+}
 
 /**
- * Component rendering CTA button for an event in search result.
+ * Component rendering CTA icon button for an event in search result.
  *
  * @returns next available action cta based on the given event.
  */
@@ -41,15 +53,18 @@ function ActionCtaComponent({
   const backTo = useCurrentBackTo()
 
   const config = useGetWorkqueueActionConfiguration(event, actionType)
+  const label = intl.formatMessage(config.label)
 
   return (
-    <StyledButton
+    <Button
+      aria-label={label}
       disabled={'disabled' in config && Boolean(config.disabled)}
-      type="primary"
+      title={label}
+      type="icon"
       onClick={async () => config.onClick(backTo)}
     >
-      {intl.formatMessage(config.label)}
-    </StyledButton>
+      <Icon name={ACTION_ICONS[actionType]} />
+    </Button>
   )
 }
 

@@ -18,36 +18,35 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   EventIndex,
   EventConfig,
-  WorkqueueColumn,
   TranslationConfig,
   WorkqueueActionType
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
-  ColumnContentAlignment,
   SORT_ORDER,
-  Workqueue
+  WorkqueueHeader,
+  WorkqueueList,
+  WorkqueueRow
 } from '@opencrvs/components/lib/Workqueue'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useOnlineStatus } from '@client/utils'
+import { useCurrentBackTo } from '@client/v2-events/features/events/useEventFormNavigation'
 import { deserializeSearchParams, serializeSearchParams } from '../utils'
 import { useEventTitle } from '../../useEvents/useEventTitle'
 import {
   enrichEventsForWorkueue,
   COLUMNS,
   createSortFunction,
-  getColumns,
-  getDefaultColumns,
   getNoResultsText,
-  processEventsToRows
+  processEventsToRows,
+  workqueueHeaderMessages
 } from './utils'
 
 const WithTestId = styled.div.attrs({ 'data-testid': 'search-result' })``
 export const SearchResultComponent = ({
-  columns,
   queryData: events,
   eventConfigs,
   limit = 10,
@@ -57,9 +56,9 @@ export const SearchResultComponent = ({
   action,
   emptyMessage,
   totalResults,
-  paginationVisibleOffline
+  paginationVisibleOffline,
+  dateColumnLabel
 }: PropsWithChildren<{
-  columns: WorkqueueColumn[]
   eventConfigs: EventConfig[]
   queryData: EventIndex[]
   limit?: number
@@ -70,6 +69,8 @@ export const SearchResultComponent = ({
   action?: { type: WorkqueueActionType }
   emptyMessage?: TranslationConfig
   paginationVisibleOffline?: boolean
+  /** Header label of the date column. Defaults to "Sent" */
+  dateColumnLabel?: TranslationConfig
 }>) => {
   const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const intl = useIntl()
@@ -164,6 +165,9 @@ export const SearchResultComponent = ({
     sortOrder
   ])
 
+  const backTo = useCurrentBackTo()
+  const hasFlags = rows.some((row) => Boolean(row.flagsCell))
+
   const currentPageNumber = Math.floor(offset / limit) + 1
   const totalPages = totalResults ? Math.ceil(totalResults / limit) : 0
 
@@ -176,39 +180,8 @@ export const SearchResultComponent = ({
     searchTerm: params.term
   })
 
-  const responsiveColumns = useMemo(() => {
-    if (isWideScreen) {
-      return [
-        ...getDefaultColumns(intl, sortedCol, getSortFunction),
-        ...getColumns({
-          isWideScreen,
-          intl,
-          columns,
-          sortedCol,
-          getSortFunction
-        }),
-        {
-          width: 20,
-          key: COLUMNS.ACTIONS,
-          isActionColumn: true,
-          alignment: ColumnContentAlignment.RIGHT
-        }
-      ]
-    }
-
-    return [
-      {
-        ...getDefaultColumns(intl, sortedCol, getSortFunction)[0],
-        width: 70
-      },
-      {
-        width: 30,
-        key: COLUMNS.ACTIONS,
-        isActionColumn: true,
-        alignment: ColumnContentAlignment.RIGHT
-      }
-    ]
-  }, [isWideScreen, intl, columns, sortedCol, getSortFunction])
+  const handleSort = (column: (typeof COLUMNS)[keyof typeof COLUMNS]) =>
+    getSortFunction(column)?.(column)
 
   return (
     <WithTestId>
@@ -227,12 +200,65 @@ export const SearchResultComponent = ({
         totalPages={totalPages}
         onPageChange={(page) => setOffset((page - 1) * limit)}
       >
-        <Workqueue
-          columns={responsiveColumns}
-          content={rows}
-          hideLastBorder={!isShowPagination}
-          sortOrder={sortOrder}
-        />
+        <WorkqueueList>
+          {rows.length > 0 && (
+            <WorkqueueHeader
+              flags={
+                hasFlags
+                  ? { label: intl.formatMessage(workqueueHeaderMessages.flags) }
+                  : undefined
+              }
+              record={{
+                label: intl.formatMessage(workqueueHeaderMessages.record),
+                isSorted: sortedCol === COLUMNS.NAME,
+                onSort: () => handleSort(COLUMNS.NAME)
+              }}
+              sent={{
+                label: intl.formatMessage(
+                  dateColumnLabel ?? workqueueHeaderMessages.sent
+                ),
+                isSorted: sortedCol === COLUMNS.LAST_UPDATED,
+                onSort: () => handleSort(COLUMNS.LAST_UPDATED)
+              }}
+              sortOrder={sortOrder}
+            />
+          )}
+          {rows.map((row, index) => (
+            <WorkqueueRow
+              key={row.id}
+              actions={
+                row.actions.length > 0
+                  ? row.actions.map((rowAction) =>
+                      /* `ListItemAction-${index}` matches the id the previous
+                       * ListItemAction wrapper assigned, which action
+                       * components use to derive their test ids */
+                      React.cloneElement(
+                        rowAction.actionComponent() as React.ReactElement,
+                        { id: `ListItemAction-${index}` }
+                      )
+                    )
+                  : undefined
+              }
+              flags={row.flagsCell}
+              id={`row_${index}`}
+              meta={row.meta}
+              name={row.title}
+              sent={row.sent}
+              showFlagsColumn={hasFlags}
+              onClick={
+                row.rowClickable
+                  ? () =>
+                      navigate(
+                        ROUTES.V2.EVENTS.EVENT.buildPath(
+                          { eventId: row.id },
+                          { backTo }
+                        )
+                      )
+                  : undefined
+              }
+            />
+          ))}
+        </WorkqueueList>
       </WQContentWrapper>
     </WithTestId>
   )

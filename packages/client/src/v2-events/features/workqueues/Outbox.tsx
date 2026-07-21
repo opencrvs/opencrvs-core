@@ -12,12 +12,12 @@
 import React from 'react'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
-import { defineWorkqueuesColumns, event } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
-import { emptyMessage, WORKQUEUE_OUTBOX } from '@client/v2-events/utils'
+import { WORKQUEUE_OUTBOX } from '@client/v2-events/utils'
 import { useEventConfigurations } from '../events/useEventConfiguration'
 import { useEvents } from '../events/useEvents/useEvents'
 import { SearchResultComponent } from '../events/Search/SearchResult/SearchResult'
+import { workqueueHeaderMessages } from '../events/Search/SearchResult/utils'
 
 export function Outbox() {
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
@@ -27,24 +27,9 @@ export function Outbox() {
   const { getOutbox } = useEvents()
   const outbox = getOutbox()
 
-  const outboxColumns = defineWorkqueuesColumns([
-    {
-      label: {
-        id: 'workqueues.dateOfEvent',
-        defaultMessage: 'Date of Event',
-        description: 'Label for workqueue column: dateOfEvent'
-      },
-      value: event.field('dateOfEvent')
-    },
-    {
-      label: emptyMessage,
-      value: event.field('outbox')
-    }
-  ])
-
   return (
     <SearchResultComponent
-      columns={outboxColumns}
+      dateColumnLabel={workqueueHeaderMessages.updated}
       eventConfigs={eventConfigs}
       queryData={outbox}
       title={intl.formatMessage(WORKQUEUE_OUTBOX.name)}

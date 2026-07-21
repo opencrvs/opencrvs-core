@@ -1579,6 +1579,10 @@ views.qrReader.scannerDialogSupportingCopy,Supporting copy for the scanner dialo
 views.qrReader.tutorial.cameraCleanliness,Camera cleanliness tutorial,Ensure your camera is clean and functional.,Assurez-vous que votre appareil photo est propre et fonctionnel.
 views.qrReader.tutorial.distance,Distance tutorial,Hold the device steadily 6-12 inches away from the QR code.,Tenez l'appareil régulièrement à 6 à 12 pouces du code QR.
 views.qrReader.tutorial.lightBalance,Light balance tutorial,Ensure the QR code is well-lit and not damaged or blurry.,Assurez-vous que le code QR est bien éclairé et non endommagé ou flou.
+workqueue.header.flags,Label for the workqueue flags column header,Flags,Indicateurs
+workqueue.header.record,Label for the workqueue record column header,Record,Dossier
+workqueue.header.sent,Label for the workqueue sent column header,Sent,Envoyé
+workqueue.header.updated,"Label for the workqueue date column header in queues where records have not been sent (drafts, outbox)",Updated,Mis à jour
 workqueues.assignedToYou.title,Title of assigned to you workqueue,Assigned to you,Attribué à vous
 workqueues.correctionRequested.title,Title of correction requested workqueue,Pending corrections,Corrections en attente
 workqueues.dateOfEvent,Label for workqueue column: dateOfEvent,Date of Event,Date de l'événement

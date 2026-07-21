@@ -12,13 +12,13 @@ import React from 'react'
 import styled from 'styled-components'
 import { IFont } from '../fonts'
 
-type IPillType = 'active' | 'inactive' | 'pending' | 'default'
+type IPillType = 'active' | 'inactive' | 'pending' | 'default' | 'neutral'
 
 type IPillSize = 'small' | 'medium'
 
 type IPillTheme = 'light' | 'dark'
 
-export interface IPillProps {
+export interface IPillProps extends React.HTMLAttributes<HTMLSpanElement> {
   label: React.ReactNode
   type?: IPillType
   size?: IPillSize
@@ -45,6 +45,7 @@ const StyledPill = styled.span<{
     ${type === 'inactive' ? theme.colors.redLight : ''}
     ${type === 'pending' ? theme.colors.orangeLight : ''}
     ${type === 'default' ? theme.colors.primaryLight : ''}
+    ${type === 'neutral' ? theme.colors.grey100 : ''}
   `};
 
   --mediumShade: ${({ type, theme }) => `
@@ -52,6 +53,7 @@ const StyledPill = styled.span<{
   ${type === 'inactive' ? theme.colors.red : ''}
   ${type === 'pending' ? theme.colors.orange : ''}
   ${type === 'default' ? theme.colors.primary : ''}
+  ${type === 'neutral' ? theme.colors.grey400 : ''}
 `};
 
   --darkerShade: ${({ type, theme }) => `
@@ -59,6 +61,7 @@ const StyledPill = styled.span<{
   ${type === 'inactive' ? theme.colors.redDark : ''}
   ${type === 'pending' ? theme.colors.orangeDark : ''}
   ${type === 'default' ? theme.colors.primaryDark : ''}
+  ${type === 'neutral' ? theme.colors.grey500 : ''}
 `};
 
   ${({ pillTheme }) =>
@@ -81,6 +84,14 @@ const StyledPill = styled.span<{
   border-radius: 100px;
 `
 
+/* Truncates the label when the pill is width-constrained by its container */
+const PillLabel = styled.span`
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`
+
 export function Pill({
   label,
   type = 'default',
@@ -90,7 +101,7 @@ export function Pill({
 }: IPillProps) {
   return (
     <StyledPill type={type} size={size} pillTheme={pillTheme} {...rest}>
-      {label}
+      <PillLabel>{label}</PillLabel>
     </StyledPill>
   )
 }

@@ -12,21 +12,26 @@
 import { defineMessages, IntlShape } from 'react-intl'
 import React from 'react'
 import { first } from 'lodash'
-import { ColumnContentAlignment, SORT_ORDER } from '@opencrvs/components'
+import { SORT_ORDER, Pill } from '@opencrvs/components'
 import {
-  defaultWorkqueueColumns,
+  ActionFlag,
   EventStatus,
-  WorkqueueColumn,
   EventIndex,
   EventConfig,
   deepDropNulls,
   applyDraftToEventIndex,
   getEventConfigById,
   Draft,
+  Flag,
+  InherentFlags,
   WorkqueueActionType
 } from '@opencrvs/commons/client'
+import { getFlagLabel } from '@client/v2-events/messages/flags'
 
-import { formattedDuration } from '../../../../../utils/date-formatting'
+import {
+  formatLongDate,
+  formattedDuration
+} from '../../../../../utils/date-formatting'
 import { DownloadButton } from '../../../../components/DownloadButton'
 import { ActionCta } from '../ActionCta'
 import RetryButton from '../../../../components/RetryButton'
@@ -67,6 +72,62 @@ const messages = defineMessages({
   }
 })
 
+export const workqueueHeaderMessages = defineMessages({
+  record: {
+    id: 'workqueue.header.record',
+    defaultMessage: 'Record',
+    description: 'Label for the workqueue record column header'
+  },
+  sent: {
+    id: 'workqueue.header.sent',
+    defaultMessage: 'Sent',
+    description: 'Label for the workqueue sent column header'
+  },
+  updated: {
+    id: 'workqueue.header.updated',
+    defaultMessage: 'Updated',
+    description:
+      'Label for the workqueue date column header in queues where records have not been sent (drafts, outbox)'
+  },
+  flags: {
+    id: 'workqueue.header.flags',
+    defaultMessage: 'Flags',
+    description: 'Label for the workqueue flags column header'
+  }
+})
+
+type PillType = 'active' | 'inactive' | 'pending' | 'default' | 'neutral'
+
+const INHERENT_FLAG_PILL_TYPES: Partial<Record<Flag, PillType>> = {
+  [InherentFlags.CORRECTION_REQUESTED]: 'active',
+  [InherentFlags.POTENTIAL_DUPLICATE]: 'inactive',
+  [InherentFlags.REJECTED]: 'inactive',
+  [InherentFlags.INCOMPLETE]: 'pending'
+}
+
+/** Renders the flags of a record as pills for the workqueue flags cell */
+export function getFlagPills(
+  flags: Flag[],
+  eventConfig: EventConfig,
+  intl: IntlShape
+) {
+  const pills = flags
+    // Action flags (`actiontype:actionstatus`) are transient processing
+    // markers, and edit-in-progress never survives past the edit flow
+    .filter((flag) => !ActionFlag.safeParse(flag).success)
+    .filter((flag) => flag !== InherentFlags.EDIT_IN_PROGRESS)
+    .map((flag) => {
+      const label = getFlagLabel(intl, eventConfig, flag)
+      const type = INHERENT_FLAG_PILL_TYPES[flag] ?? 'neutral'
+
+      return (
+        <Pill key={flag} label={label} size="small" title={label} type={type} />
+      )
+    })
+
+  return pills.length > 0 ? pills : null
+}
+
 export const ExtendedEventStatuses = {
   OUTBOX: 'OUTBOX',
   DRAFT: 'DRAFT'
@@ -100,16 +161,6 @@ function getLocalEventStatus({
   }
 
   return currentStatus
-}
-
-interface Column {
-  label?: string
-  width: number
-  key: string
-  sortFunction?: (columnName: string) => void
-  isActionColumn?: boolean
-  isSorted?: boolean
-  alignment?: ColumnContentAlignment
 }
 
 export const COLUMNS = {
@@ -224,60 +275,6 @@ export function createSortFunction(
       setSortedCol(newSortedCol)
       setSortOrder(newSortOrder)
     }
-  }
-}
-
-export function getDefaultColumns(
-  intl: IntlShape,
-  sortedCol: (typeof COLUMNS)[keyof typeof COLUMNS],
-  getSortFunction: (
-    column: string
-  ) => ((columnName: string) => void) | undefined
-): Array<Column> {
-  return defaultWorkqueueColumns.map(
-    ({ label, value }): Column => ({
-      label: intl.formatMessage(label),
-      width: value.$event === 'title' ? 35 : 15,
-      key: value.$event,
-      sortFunction: getSortFunction(value.$event),
-      isSorted: sortedCol === value.$event
-    })
-  )
-}
-
-export function getColumns({
-  isWideScreen,
-  intl,
-  columns,
-  sortedCol,
-  getSortFunction
-}: {
-  isWideScreen: boolean
-  intl: IntlShape
-  columns: WorkqueueColumn[]
-  sortedCol: (typeof COLUMNS)[keyof typeof COLUMNS]
-  getSortFunction: (
-    column: string
-  ) => ((columnName: string) => void) | undefined
-}): Array<Column> {
-  if (isWideScreen) {
-    return columns.map(({ label, value }) => ({
-      label: intl.formatMessage(label),
-      width: value.$event === 'outbox' ? 35 : 15,
-      key: value.$event,
-      sortFunction: getSortFunction(value.$event),
-      isSorted: sortedCol === value.$event
-    }))
-  } else {
-    return columns
-      .map(({ label, value }) => ({
-        label: intl.formatMessage(label),
-        width: 15,
-        key: value.$event,
-        sortFunction: getSortFunction(value.$event),
-        isSorted: sortedCol === value.$event
-      }))
-      .slice(0, 2)
   }
 }
 
@@ -436,6 +433,24 @@ export function processEventsToRows({
 
     const outboxMeta = outbox.find((o) => o.id === enrichedEvent.id)?.meta
 
+    const outboxStatusText = intl.formatMessage(
+      isOnline ? messages.processingAction : messages.waitingForAction,
+      {
+        action:
+          typeof outboxMeta?.actionType === 'string'
+            ? outboxMeta.actionType
+            : ''
+      }
+    )
+
+    const metaLine = [
+      intl.formatMessage(eventConfig.label),
+      enrichedEvent.trackingId,
+      enrichedEvent.dateOfEvent && formatLongDate(enrichedEvent.dateOfEvent)
+    ]
+      .filter(Boolean)
+      .join(' • ')
+
     return {
       ...enrichedEvent,
       actions: actionComponents,
@@ -450,18 +465,17 @@ export function processEventsToRows({
         <SearchResultItemTitle
           event={enrichedEvent}
           eventConfig={eventConfig}
-          localEventStatus={localEventStatus}
         />
       ),
-      outbox: intl.formatMessage(
-        isOnline ? messages.processingAction : messages.waitingForAction,
-        {
-          action:
-            typeof outboxMeta?.actionType === 'string'
-              ? outboxMeta.actionType
-              : ''
-        }
-      )
+      meta: metaLine,
+      sent: formattedDuration(new Date(enrichedEvent.updatedAt)),
+      // Outbox rows are not navigable; their title is plain text as well
+      rowClickable: localEventStatus !== ExtendedEventStatuses.OUTBOX,
+      flagsCell:
+        localEventStatus === ExtendedEventStatuses.OUTBOX
+          ? outboxStatusText
+          : getFlagPills(enrichedEvent.flags, eventConfig, intl),
+      outbox: outboxStatusText
     }
   })
 }

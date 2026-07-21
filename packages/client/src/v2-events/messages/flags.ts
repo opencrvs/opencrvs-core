@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useIntl } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
 import {
   EventConfig,
   Flag,
@@ -47,6 +47,28 @@ const flagMessages = {
 } satisfies Record<InherentFlags, TranslationConfig>
 
 /**
+ * Resolves the human-readable label for a single event flag: inherent flags
+ * use built-in messages, custom flags use the label from the event
+ * configuration, and unknown flags fall back to the raw flag id.
+ */
+export function getFlagLabel(
+  intl: IntlShape,
+  eventConfiguration: EventConfig,
+  flag: Flag
+): string {
+  if (flag in flagMessages) {
+    return intl.formatMessage(flagMessages[flag as InherentFlags])
+  }
+
+  const flagConfig = eventConfiguration.flags.find(({ id }) => id === flag)
+  if (flagConfig) {
+    return intl.formatMessage(flagConfig.label)
+  }
+
+  return flag
+}
+
+/**
  * React hook that resolves and formats human-readable labels for event flags.
  *
  * @param {EventConfig} eventConfiguration - The configuration for the event, used to look up custom flag labels.
@@ -61,17 +83,6 @@ export function useFlagLabelsString(
   return flags
     .filter((flag) => !ActionFlag.safeParse(flag).success)
     .filter((flag) => flag !== InherentFlags.INCOMPLETE)
-    .map((flag) => {
-      if (flag in flagMessages) {
-        return intl.formatMessage(flagMessages[flag as InherentFlags])
-      }
-
-      const flagConfig = eventConfiguration.flags.find(({ id }) => id === flag)
-      if (flagConfig) {
-        return intl.formatMessage(flagConfig.label)
-      }
-
-      return flag
-    })
+    .map((flag) => getFlagLabel(intl, eventConfiguration, flag))
     .join(', ')
 }

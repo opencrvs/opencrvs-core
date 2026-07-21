@@ -9,61 +9,32 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { useTheme } from 'styled-components'
-import { useNavigate } from 'react-router-dom'
+import styled from 'styled-components'
 import { EventConfig, EventIndex } from '@opencrvs/commons/client'
-import { useWindowSize } from '@opencrvs/components/src/hooks'
-import { Link as TextButton } from '@opencrvs/components'
-import { IconWithName } from '@client/v2-events/components/IconWithName'
-import { IconWithNameEvent } from '@client/v2-events/components/IconWithNameEvent'
-import { ROUTES } from '@client/v2-events/routes'
-import { useCurrentBackTo } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEventTitle } from '../../useEvents/useEventTitle'
-import { ExtendedEventStatuses } from './utils'
+
+/*
+ * The workqueue row is the click and keyboard target for opening a record,
+ * so the title renders as plain text. Fallback titles stay red to signal
+ * the record is missing a name.
+ */
+const FallbackTitle = styled.span`
+  color: ${({ theme }) => theme.colors.red};
+`
 
 export function SearchResultItemTitle({
   event,
-  localEventStatus,
   eventConfig
 }: {
   event: EventIndex
-  localEventStatus: EventIndex['status'] | keyof typeof ExtendedEventStatuses
   eventConfig: EventConfig
 }) {
-  const theme = useTheme()
-  const { width } = useWindowSize()
-  const navigate = useNavigate()
-  const backTo = useCurrentBackTo()
   const { getEventTitle } = useEventTitle()
   const { title, useFallbackTitle } = getEventTitle(eventConfig, event)
 
-  const isWideScreen = width > theme.grid.breakpoints.lg
-  const renderIconWithName = () =>
-    isWideScreen ? (
-      <IconWithName flags={event.flags} name={title} status={event.status} />
-    ) : (
-      <IconWithNameEvent
-        event={event.type}
-        flags={event.flags}
-        name={title}
-        status={event.status}
-      />
-    )
-
-  if (localEventStatus === ExtendedEventStatuses.OUTBOX) {
-    return renderIconWithName()
+  if (useFallbackTitle) {
+    return <FallbackTitle>{title}</FallbackTitle>
   }
 
-  return (
-    <TextButton
-      color={useFallbackTitle ? 'red' : 'primary'}
-      onClick={() => {
-        navigate(
-          ROUTES.V2.EVENTS.EVENT.buildPath({ eventId: event.id }, { backTo })
-        )
-      }}
-    >
-      {renderIconWithName()}
-    </TextButton>
-  )
+  return <>{title}</>
 }

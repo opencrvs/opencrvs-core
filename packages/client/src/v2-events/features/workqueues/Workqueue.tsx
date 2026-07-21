@@ -80,7 +80,6 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
     <SearchResultComponent
       key={workqueueSlug}
       action={workqueueConfig.action}
-      columns={workqueueConfig.columns}
       emptyMessage={workqueueConfig.emptyMessage}
       eventConfigs={eventConfigs}
       queryData={events}

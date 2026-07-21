@@ -13,7 +13,6 @@ import * as React from 'react'
 import {
   eventQueryDataGenerator,
   EventStatus,
-  mandatoryColumns,
   tennisClubMembershipEvent,
   WorkqueueActionType
 } from '@opencrvs/commons/client'
@@ -61,8 +60,7 @@ export const DefaultSearchResult: Story = {
         },
         status: EventStatus.enum.REGISTERED
       })
-    ],
-    columns: mandatoryColumns
+    ]
   }
 }
 
@@ -76,15 +74,13 @@ export const SearchResultWithMultipleItems: Story = {
     queryData: queryData.map((e) => ({
       ...e,
       status: EventStatus.enum.REGISTERED
-    })),
-    columns: mandatoryColumns
+    }))
   }
 }
 export const NoSearchResult: Story = {
   name: 'No Search Result',
   args: {
     eventConfigs: [tennisClubMembershipEvent],
-    queryData: [],
-    columns: mandatoryColumns
+    queryData: []
   }
 }
