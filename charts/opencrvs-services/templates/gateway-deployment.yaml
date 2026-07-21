@@ -54,10 +54,7 @@ spec:
         - name: gateway
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.gateway) }}
           env:
-            - name: APN_NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
+          {{- include "render-otel-env-vars" (dict "Values" .Values "Release" .Release) }}
             - name: CERT_PUBLIC_KEY_PATH
               value: /secrets/public-key.pem
             - name: DOMAIN

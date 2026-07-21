@@ -209,6 +209,16 @@ env:
   # Note: The SENTRY_DSN should be defined at the global level of environment variables.
   # SENTRY_DSN: https://...@o309867.ingest.sentry.io/....
 
+# OpenTelemetry tracing configuration for instrumented OpenCRVS services.
+# When enabled, auth, countryconfig, documents, events and gateway receive
+# OTEL exporter and resource environment variables.
+otel:
+  enabled: false
+  # Defaults to env.NODE_ENV
+  # deployment_environment: production
+  exporter_otlp_endpoint: ''
+  exporter_otlp_protocol: http/protobuf
+
 # OpenCRVS core image tag:
 # Deprecated: use platform.tag instead.
 image:
