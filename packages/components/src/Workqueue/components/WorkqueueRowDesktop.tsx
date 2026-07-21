@@ -78,6 +78,10 @@ export const IconWrapper = styled(ContentWrapper)`
   padding-top: 8px;
 `
 
+/**
+ * @deprecated Only used by the legacy column-driven Workqueue table.
+ * Use WorkqueueRow (./WorkqueueRow) instead.
+ */
 export const WorkqueueRowDesktop = (props: IWorkqueueRow) => {
   return (
     <>

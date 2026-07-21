@@ -43,6 +43,10 @@ const RowWrapper = styled.div<{
   cursor: ${({ clickable }) => (clickable ? 'pointer' : 'default')};
 `
 
+/**
+ * @deprecated Only used by the legacy column-driven Workqueue table.
+ * Use WorkqueueRow (./WorkqueueRow) instead.
+ */
 export const WorkqueueRowMobile = (props: IWorkqueueRow) => {
   return (
     <>

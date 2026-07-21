@@ -92,6 +92,10 @@ function getActionComponent(action: IActionComponent): React.ReactElement {
   return action.actionComponent
 }
 
+/**
+ * @deprecated Only used by the legacy column-driven Workqueue table.
+ * WorkqueueRow renders action components directly in its actions slot.
+ */
 export function ListItemAction(props: IListItemActionProps) {
   const {
     actions,

@@ -140,6 +140,12 @@ interface IWorkqueueProps extends IComponentWithTheme {
   hideLastBorder?: boolean
 }
 
+/**
+ * @deprecated Legacy column-driven workqueue table. Workqueues render
+ * WorkqueueList/WorkqueueHeader/WorkqueueRow (./components/WorkqueueRow)
+ * instead; the only remaining consumer is UserAuditHistory, which should
+ * migrate to the Table component.
+ */
 const WorkqueueComp = ({
   content,
   columns,
