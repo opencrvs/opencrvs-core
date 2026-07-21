@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines -- location schemas, anchored version resolution and scope-access logic are cohesive; splitting them would create an import cycle (ClientLocation derives from Location) or fan the access helpers' 30+ importers across modules. */
+
 import { UUID } from '../uuid'
 import * as z from 'zod/v4'
 import { PlainDate } from './PlainDate'
