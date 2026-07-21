@@ -11,7 +11,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { SortIcon } from '../../icons/SortIcon'
-import { SORT_ORDER } from '../Workqueue'
+import { SORT_ORDER } from '../shared'
 
 /* v4 design token values not yet available in the theme palette */
 const TEXT_SECONDARY = '#525252'

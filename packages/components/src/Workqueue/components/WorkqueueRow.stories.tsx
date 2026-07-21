@@ -13,7 +13,7 @@ import React from 'react'
 import { Pill } from '../../Pill'
 import { Button } from '../../Button'
 import { Icon } from '../../Icon'
-import { SORT_ORDER } from '../Workqueue'
+import { SORT_ORDER } from '../shared'
 import {
   WorkqueueList,
   WorkqueueHeader,

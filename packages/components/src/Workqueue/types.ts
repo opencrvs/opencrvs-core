@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ColumnContentAlignment } from './Workqueue'
+import { ColumnContentAlignment } from './shared'
 import * as React from 'react'
 
 enum GQLRegStatus {
