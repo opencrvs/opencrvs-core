@@ -10,12 +10,17 @@
  */
 import {
   JurisdictionFilter,
+  LocationVersion,
+  UUID,
   V2_DEFAULT_MOCK_LOCATIONS,
   V2_DEFAULT_MOCK_LOCATIONS_MAP,
   V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
 } from '@opencrvs/commons/client'
 
-import { filterLocationsByJurisdiction } from './LocationSearch'
+import {
+  buildLocationNameOptions,
+  filterLocationsByJurisdiction
+} from './LocationSearch'
 
 /**
  * Mock data reference (from administrative-hierarchy-mock.ts):
@@ -213,5 +218,79 @@ describe('filterLocationsByJurisdiction', () => {
       )
       expect(result).toHaveLength(V2_DEFAULT_MOCK_LOCATIONS.length)
     })
+  })
+})
+
+/**
+ * Builds a location-like item with one version per supplied name. `name` (the
+ * server-resolved current name) is set to the last version's name.
+ */
+function makeVersionedItem(id: string, names: string[]) {
+  const versions: LocationVersion[] = names.map((name, index) => ({
+    versionId: `${id}-v${index}` as UUID,
+    effectiveFrom: `2020-01-${String(index + 1).padStart(2, '0')}`,
+    name,
+    externalId: null,
+    status: 'active' as const
+  }))
+
+  return {
+    id: id as UUID,
+    name: names[names.length - 1],
+    versions
+  }
+}
+
+describe('buildLocationNameOptions', () => {
+  it('lists each location once by its current name when not enumerating history', () => {
+    const items = [
+      makeVersionedItem('11111111-1111-1111-1111-111111111111', [
+        'Office A',
+        'Office Z'
+      ])
+    ]
+
+    const options = buildLocationNameOptions(items, false)
+
+    expect(options).toEqual([
+      { value: '11111111-1111-1111-1111-111111111111', label: 'Office Z' }
+    ])
+  })
+
+  it('lists a renamed location once per distinct historical name, current name first', () => {
+    const id = '11111111-1111-1111-1111-111111111111'
+    const items = [makeVersionedItem(id, ['Office A', 'Office Z'])]
+
+    const options = buildLocationNameOptions(items, true)
+
+    // Both rows resolve to the same location id; the current name comes first
+    // so the field displays it after either row is picked.
+    expect(options).toEqual([
+      { value: id, label: 'Office Z' },
+      { value: id, label: 'Office A' }
+    ])
+  })
+
+  it('does not duplicate a name that repeats across versions', () => {
+    const id = '22222222-2222-2222-2222-222222222222'
+    const items = [
+      makeVersionedItem(id, ['Alaminos', 'Alaminos City', 'Alaminos'])
+    ]
+
+    const options = buildLocationNameOptions(items, true)
+
+    expect(options).toEqual([
+      { value: id, label: 'Alaminos' },
+      { value: id, label: 'Alaminos City' }
+    ])
+  })
+
+  it('yields a single row for a never-renamed location even when enumerating', () => {
+    const id = '33333333-3333-3333-3333-333333333333'
+    const items = [makeVersionedItem(id, ['Ibombo District Office'])]
+
+    const options = buildLocationNameOptions(items, true)
+
+    expect(options).toEqual([{ value: id, label: 'Ibombo District Office' }])
   })
 })
