@@ -181,7 +181,7 @@ export function useDrafts() {
   const localDraft = localDraftStore((drafts) => drafts.draft)
   const createDraft = useCreateDraft()
 
-  function getAllRemoteDrafts(
+  function getDisplayableDrafts(
     additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
   ): Draft[] {
     // Skip the queryFn defined by tRPC and use the one defined above
@@ -216,7 +216,20 @@ export function useDrafts() {
       }
     })
 
-    return drafts.data
+    /**
+     * Filter out drafts whose backing event does not resolve locally.
+     *
+     * The workqueue needs a draft's event to render its row, so the list and the
+     * sidebar badge both derive from this set to stay in lockstep (otherwise the
+     * badge could read "1" while the list shows "No records in drafts"). Missing
+     * events are normally prefetched by the `event.draft.list` queryFn, so a
+     * cleared cache self-heals; a draft is only dropped when its event genuinely
+     * can't be resolved (e.g. access lost after an office change) — where it isn't
+     * actionable anyway.
+     */
+    return drafts.data.filter(({ eventId }) =>
+      Boolean(findLocalEventDocument(eventId))
+    )
   }
 
   return {
@@ -237,12 +250,12 @@ export function useDrafts() {
       })
     },
     isLocalDraftSubmitted: createDraft.isSuccess,
-    getAllRemoteDrafts,
-    getRemoteDraftByEventId: function useDraftList(
+    getDisplayableDrafts,
+    getRemoteDraftByEventId: (
       eventId: string,
       additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
-    ): Draft | undefined {
-      const eventDrafts = getAllRemoteDrafts(additionalOptions).filter(
+    ): Draft | undefined => {
+      const eventDrafts = getDisplayableDrafts(additionalOptions).filter(
         (draft) => draft.eventId === eventId
       )
 
