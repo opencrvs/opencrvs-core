@@ -211,8 +211,9 @@ function DataInput({
           <Summary.Row
             key={config.id}
             label={intl.formatMessage(config.label)}
-            // Live form-entry preview, not a record view — behavior-preserving
-            // today's name, same convention as other form default values.
+            // Behavior-preserving: today's name. Anchoring this live form-entry
+            // preview to the form's event date is the selector-anchoring
+            // follow-up (#13143).
             value={<Output anchor={todayISO()} field={config} value={value} />}
           />
         ))}

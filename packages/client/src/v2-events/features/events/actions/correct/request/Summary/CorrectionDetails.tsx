@@ -27,7 +27,6 @@ import {
   PageConfig,
   PageTypes,
   RequestedCorrectionAction,
-  resolveVersion,
   TranslationConfig,
   UUID,
   ValidatorContext,
@@ -45,7 +44,7 @@ import {
 import { ROUTES } from '@client/v2-events/routes'
 import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { recordAnchorDate } from '@client/v2-events/utils'
+import { recordAnchorDate, resolveLocationName } from '@client/v2-events/utils'
 import { DeclarationComparisonTable } from './DeclarationComparisonTable'
 
 const messages = defineMessages({
@@ -91,12 +90,10 @@ function getRequestActionDetails(
     locations.get(correctionRequestAction.createdAtLocation)
   // The requester's office renders under the name it carried on the date the
   // correction was requested.
-  const locationName = location
-    ? resolveVersion(
-        location.versions,
-        toPlainDate(correctionRequestAction.createdAt)
-      ).name
-    : ''
+  const locationName = resolveLocationName(
+    location || undefined,
+    toPlainDate(correctionRequestAction.createdAt)
+  )
   return [
     {
       label: messages.correctionSubmittedBy,

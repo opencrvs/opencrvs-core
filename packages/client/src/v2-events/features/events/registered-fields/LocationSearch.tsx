@@ -19,7 +19,6 @@ import {
   joinValues,
   JurisdictionFilter,
   resolveJurisdictionReference,
-  resolvePath,
   resolveVersion,
   todayISO,
   PlainDate
@@ -214,8 +213,11 @@ function toCertificateVariables(
   })
 
   const locationId = UUID.safeParse(value.toString()).data
-  const resolvedLocation = locationId
-    ? resolvePath(locationId, anchor, { locations, administrativeAreas }).at(-1)
+  const locationEntity = locationId
+    ? (locations.get(locationId) ?? administrativeAreas.get(locationId))
+    : undefined
+  const resolvedLocation = locationEntity
+    ? resolveVersion(locationEntity.versions, anchor)
     : undefined
 
   const parentAdministrativeAreaId = locationId
