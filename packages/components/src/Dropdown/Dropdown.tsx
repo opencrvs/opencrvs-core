@@ -13,7 +13,6 @@ import React, { ReactNode, useEffect } from 'react'
 import { disabled } from '../Button/Button.styles'
 import styled from 'styled-components'
 import { DropdownProvider, useDropdown } from './DropdownContext'
-// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
 
 const StyledWrapper = styled.nav`

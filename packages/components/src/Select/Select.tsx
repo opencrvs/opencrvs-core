@@ -13,7 +13,6 @@ import { default as ReactSelect, components } from 'react-select'
 import styled from 'styled-components'
 import { Props } from 'react-select/lib/Select'
 import { Icon } from '../Icon'
-// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
 
 import { IndicatorProps } from 'react-select/lib/components/indicators'

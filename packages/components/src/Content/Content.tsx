@@ -12,7 +12,6 @@ import * as React from 'react'
 import { ReactElement } from 'react'
 import styled from 'styled-components'
 import { colors } from '../colors'
-// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
 
 const Container = styled.div<{ size: ContentSize }>`

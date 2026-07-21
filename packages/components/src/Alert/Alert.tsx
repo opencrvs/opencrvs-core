@@ -14,7 +14,6 @@ import { Check, Help, Cross, NotificationError, Notification } from '../icons'
 import { Spinner } from '../Spinner'
 import { Button } from '../Button'
 import { Text } from '../Text'
-// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
 
 export type AlertType = 'success' | 'warning' | 'loading' | 'info' | 'error'

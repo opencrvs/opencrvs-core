@@ -14,7 +14,6 @@ import styled from 'styled-components'
 import { Stack } from '../../../Stack'
 import { Text } from '../../../Text'
 import { Icon, IconProps } from '../../../Icon'
-// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../../../semantics'
 
 interface InfoBoxProps {

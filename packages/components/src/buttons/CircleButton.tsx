@@ -10,7 +10,6 @@
  */
 import styled from 'styled-components'
 import React from 'react'
-// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
 
 type IButtonSize = 'small' | 'medium' | 'large'

@@ -12,7 +12,6 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Link, Stack, Text } from '../'
 import { Icon } from '../Icon'
-// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
 
 const Container = styled.div`

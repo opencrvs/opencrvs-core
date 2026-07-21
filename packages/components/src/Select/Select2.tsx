@@ -13,7 +13,6 @@ import ReactSelect, { components } from 'react-select'
 import styled from 'styled-components'
 import { IndicatorProps } from 'react-select/lib/components/indicators'
 import { ArrowDownBlue } from '../icons'
-// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
 
 export interface ISelect2Option {

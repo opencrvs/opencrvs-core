@@ -12,7 +12,6 @@ import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
 import { IDataPoint } from '../chart-datapoint-types'
 import { ITheme } from '../theme'
-// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
 
 export interface IBarChartProps {

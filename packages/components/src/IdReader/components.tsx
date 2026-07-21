@@ -11,7 +11,6 @@
 import styled from 'styled-components'
 import { Box } from '../Box'
 import { Stack } from '../Stack'
-// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
 
 export const MainContainer = styled(Box)`

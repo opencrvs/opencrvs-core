@@ -12,7 +12,6 @@ import { Text } from '../Text'
 import { Stack } from '../Stack'
 import React from 'react'
 import styled, { keyframes } from 'styled-components'
-// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
 
 const ProgressBackground = styled.div`

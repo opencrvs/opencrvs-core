@@ -12,7 +12,6 @@ import * as React from 'react'
 import { withTheme } from 'styled-components'
 import { ITheme } from '../../theme'
 import { IDataPoint } from '../../chart-datapoint-types'
-// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../../semantics'
 
 export interface ICustomizedAxisTick {

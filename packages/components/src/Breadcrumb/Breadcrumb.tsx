@@ -13,7 +13,6 @@ import { Link } from '../Link'
 import { Stack } from '../Stack'
 import { Text } from '../Text'
 import styled from 'styled-components'
-// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
 
 export interface IBreadCrumbData {
