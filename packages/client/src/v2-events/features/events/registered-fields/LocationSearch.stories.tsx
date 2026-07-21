@@ -13,7 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import { within, expect, fn } from '@storybook/test'
 import { userEvent } from '@storybook/testing-library'
-import { toPlainDate, todayISO } from '@opencrvs/commons/client'
+import { toPlainDate } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 // NOTE: If you do not import from index, you might encounter: ReferenceError: Cannot access 'LocationSearch' before initialization
 import { LocationSearch } from '.'
@@ -119,7 +119,7 @@ export const LocationSearchOutput: StoryObj<typeof LocationSearch.Output> = {
   render: (props) => <LocationSearch.Output {...props} />,
   args: {
     value: '',
-    anchor: todayISO()
+    anchor: toPlainDate('2025-01-01')
   }
 }
 
@@ -129,7 +129,7 @@ export const LocationSearchOutputResolved: StoryObj<
   render: (props) => <LocationSearch.Output {...props} />,
   args: {
     value: healthFacilityLocationId,
-    anchor: todayISO()
+    anchor: toPlainDate('2025-01-01')
   }
 }
 
@@ -139,7 +139,7 @@ export const LocationSearchOutputResolvedPualula: StoryObj<
   render: (props) => <LocationSearch.Output {...props} />,
   args: {
     value: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64', // Pualula
-    anchor: todayISO()
+    anchor: toPlainDate('2025-01-01')
   }
 }
 
@@ -152,7 +152,7 @@ export const LocationSearchOutputResolvedCentralHealthPost: StoryObj<
   render: (props) => <LocationSearch.Output {...props} />,
   args: {
     value: 'b1c2d3e4-f5a6-7890-bcde-f12345678901', // Central Health Post
-    anchor: todayISO()
+    anchor: toPlainDate('2025-01-01')
   }
 }
 

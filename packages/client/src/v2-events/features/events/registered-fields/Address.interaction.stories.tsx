@@ -27,7 +27,7 @@ import {
   ConditionalType,
   FieldValue,
   AddressFieldValue,
-  todayISO
+  toPlainDate
 } from '@opencrvs/commons/client'
 import {
   FormFieldGenerator,
@@ -679,7 +679,7 @@ export const ToCertificateVariables: Story = {
                 locations,
                 administrativeAreas,
                 adminLevels,
-                anchor: todayISO()
+                anchor: toPlainDate('2025-01-01')
               })
               setResolvedAddress((prev) => ({
                 ...prev,

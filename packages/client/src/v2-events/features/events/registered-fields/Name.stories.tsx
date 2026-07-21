@@ -12,7 +12,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import styled from 'styled-components'
-import { FieldType, NameField, todayISO } from '@opencrvs/commons/client'
+import { FieldType, NameField, toPlainDate } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGeneratorPropsWithoutRef } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
@@ -151,7 +151,7 @@ export const WithAllOptions: Story = {
       <div>
         <strong>{'Current Value:'}</strong>
         <ValueOutput
-          anchor={todayISO()}
+          anchor={toPlainDate('2025-01-01')}
           config={field}
           value={form?.['storybook.name']}
         />

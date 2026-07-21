@@ -23,7 +23,7 @@ import {
   never,
   user,
   FieldConfig,
-  todayISO
+  toPlainDate
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import {
@@ -475,7 +475,7 @@ export const HttpTextResponseInCopy: StoryObj<typeof Review> = {
   },
   render: function Component() {
     const allFields = fetchNidFields.flat()
-    const stringifier = useFormDataStringifier(todayISO())
+    const stringifier = useFormDataStringifier(toPlainDate('2025-01-01'))
     const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
 
     const FORM_DATA = {
