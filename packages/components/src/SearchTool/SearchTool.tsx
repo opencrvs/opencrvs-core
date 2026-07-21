@@ -13,7 +13,6 @@ import { ClearText } from '../icons'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 type SearchCriterias =
   | 'TRACKING_ID'
@@ -24,28 +23,28 @@ type SearchCriterias =
   | 'EMAIL'
 
 const SearchBox = styled.div`
-  background: ${lightColors['surface/inset']};
+  background: ${({ theme }) => theme.colors['surface/inset']};
   box-sizing: border-box;
   width: 664px;
   height: 40px;
   border-radius: 40px;
 
   &:hover {
-    outline: 1px solid ${lightColors['border/strong']};
-    background: ${lightColors['surface/inset']};
+    outline: 1px solid ${({ theme }) => theme.colors['border/strong']};
+    background: ${({ theme }) => theme.colors['surface/inset']};
   }
 
   &:focus-within {
-    outline: 2px solid ${lightColors['border/emphasis']};
-    background: ${lightColors['surface/default']};
+    outline: 2px solid ${({ theme }) => theme.colors['border/emphasis']};
+    background: ${({ theme }) => theme.colors['surface/default']};
   }
 
   &:active {
-    outline: 2px solid ${lightColors['border/emphasis']};
+    outline: 2px solid ${({ theme }) => theme.colors['border/emphasis']};
   }
 
   &:focus-within input {
-    background: ${lightColors['surface/default']};
+    background: ${({ theme }) => theme.colors['surface/default']};
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.xl}px) {
@@ -63,7 +62,7 @@ const Wrapper = styled.form`
   border-radius: 2px;
   display: flex;
   ${({ theme }) => theme.fonts.bold14};
-  color: ${lightColors['text/link']};
+  color: ${({ theme }) => theme.colors['text/link']};
   padding: 0px 8px 0px 4px;
   position: relative;
 `
@@ -75,7 +74,7 @@ const SearchInput = styled.input`
   flex-grow: 1;
   &:focus {
     outline: none;
-    background-color: ${lightColors['surface/default']};
+    background-color: ${({ theme }) => theme.colors['surface/default']};
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -87,14 +86,14 @@ export const LabelButton = styled(Button)`
   width: auto;
   height: auto;
   border-radius: 2px;
-  color: ${lightColors['text/link']};
+  color: ${({ theme }) => theme.colors['text/link']};
   ${({ theme }) => theme.fonts.bold14};
 `
 
 const DropDownWrapper = styled.ul`
-  background: ${lightColors['surface/raised']};
+  background: ${({ theme }) => theme.colors['surface/raised']};
   border-radius: 4px;
-  border: 1px solid ${lightColors['border/strong']};
+  border: 1px solid ${({ theme }) => theme.colors['border/strong']};
   ${({ theme }) => theme.shadows.light};
   position: absolute;
   padding: 6px 0;
@@ -109,7 +108,7 @@ const DropDownWrapper = styled.ul`
 
 const DropDownItem = styled.li`
   ${({ theme }) => theme.fonts.bold14};
-  color: ${lightColors['text/tertiary']};
+  color: ${({ theme }) => theme.colors['text/tertiary']};
   display: flex;
   align-items: center;
   gap: 8px;
@@ -118,16 +117,16 @@ const DropDownItem = styled.li`
   border-radius: 4px;
   padding: 8px 12px;
   &:hover {
-    color: ${lightColors['text/primary']};
-    background: ${lightColors['action/secondary']};
+    color: ${({ theme }) => theme.colors['text/primary']};
+    background: ${({ theme }) => theme.colors['action/secondary']};
   }
   &:active {
-    color: ${lightColors['text/primary']};
-    background: ${lightColors['action/secondaryHover']};
+    color: ${({ theme }) => theme.colors['text/primary']};
+    background: ${({ theme }) => theme.colors['action/secondaryHover']};
   }
 
   &:focus-visible {
-    background-color: ${lightColors['feedback/focus']};
+    background-color: ${({ theme }) => theme.colors['feedback/focus']};
   }
 `
 
@@ -137,7 +136,7 @@ const AdvancedSearchWrapper = styled.div`
   flex-flow: column nowrap;
   align-items: stretch;
   margin-top: 6px;
-  border-top: 1px solid ${lightColors['border/strong']};
+  border-top: 1px solid ${({ theme }) => theme.colors['border/strong']};
   padding: 6px;
   padding-bottom: 0;
 `

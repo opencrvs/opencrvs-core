@@ -12,13 +12,12 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { Link } from '../Link'
 import { Button } from '../Button'
-import { lightColors } from '../semantics'
 
 const Container = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  border-bottom: 1px solid ${lightColors['border/default']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors['border/default']};
   padding: 16px 0px;
   width: 100%;
   &:last-child {
@@ -87,7 +86,7 @@ const HideOnDesktop = styled.div`
 
 const PlaceHolder = styled.div`
   ${({ theme }) => theme.fonts.reg16};
-  color: ${lightColors['text/secondary']};
+  color: ${({ theme }) => theme.colors['text/secondary']};
   flex: 1;
 `
 const Action = styled.div`

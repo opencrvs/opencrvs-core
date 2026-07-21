@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import styled, { keyframes } from 'styled-components'
+import styled, { keyframes, useTheme } from 'styled-components'
 import { Spinner } from '../Spinner'
 import { Button } from '../Button'
 import { Text } from '../Text'
 import { Link } from '../Link'
-import { lightColors } from '../semantics'
 import { useToastVisibility } from './useToastVisibility'
 import { Icon } from '../Icon'
 
@@ -35,16 +34,16 @@ const shallowToast = keyframes`
 const Container = styled.div<{
   $type?: ToastType
 }>`
-  --color: ${({ $type }) => `
-    ${$type === 'success' ? lightColors['action/positiveHover'] : ''}
+  --color: ${({ $type, theme }) => `
+    ${$type === 'success' ? theme.colors['action/positiveHover'] : ''}
     ${
       $type === 'loading' || $type === 'info'
-        ? lightColors['action/primaryHover']
+        ? theme.colors['action/primaryHover']
         : ''
     }
-    ${$type === 'error' ? lightColors['action/negativePressed'] : ''}
-    ${$type === 'warning' ? lightColors['feedback/warning'] : ''}
-    ${$type === undefined ? lightColors['action/positiveHover'] : ''}
+    ${$type === 'error' ? theme.colors['action/negativePressed'] : ''}
+    ${$type === 'warning' ? theme.colors['feedback/warning'] : ''}
+    ${$type === undefined ? theme.colors['action/positiveHover'] : ''}
   `};
   background: var(--color);
   border-radius: 8px;
@@ -82,7 +81,7 @@ const ActionLink = styled(Link)`
 `
 
 const Close = styled(Button)`
-  color: ${lightColors['text/onAction']};
+  color: ${({ theme }) => theme.colors['text/onAction']};
   margin-top: 4px;
   margin-right: 4px;
   &:hover {
@@ -119,6 +118,7 @@ export function Toast({
   children,
   ...props
 }: IToastProps) {
+  const theme = useTheme()
   useToastVisibility({
     duration: type === 'loading' ? null : duration,
     onClose
@@ -129,7 +129,7 @@ export function Toast({
         <SpinnerContainer>
           <Spinner
             id="in-progress-floating-notification"
-            baseColor={lightColors['text/onAction']}
+            baseColor={theme.colors['text/onAction']}
             size={20}
           />
         </SpinnerContainer>

@@ -12,7 +12,6 @@ import * as React from 'react'
 import { withTheme } from 'styled-components'
 import { ITheme } from '../../theme'
 import { IDataPoint } from '../../chart-datapoint-types'
-import { lightColors } from '../../semantics'
 
 export interface ICustomizedAxisTick {
   x: number
@@ -34,7 +33,7 @@ export const CustomizedXAxisTick = withTheme(
           dy={16}
           fontFamily={theme.fontFamily}
           textAnchor="middle"
-          fill={lightColors['feedback/info']}
+          fill={theme.colors['feedback/info']}
         >
           {payload && payload.label}
         </text>
@@ -44,7 +43,7 @@ export const CustomizedXAxisTick = withTheme(
           dy={16}
           fontFamily={theme.fontFamily}
           textAnchor="middle"
-          fill={lightColors['feedback/info']}
+          fill={theme.colors['feedback/info']}
         >
           {payload && `${Math.round((payload.value / totalValue) * 100)}%`}
         </text>
@@ -55,7 +54,7 @@ export const CustomizedXAxisTick = withTheme(
           fontFamily={theme.fontFamily}
           fontSize={12}
           textAnchor="middle"
-          fill={lightColors['text/primary']}
+          fill={theme.colors['text/primary']}
         >
           {payload && payload.value}
         </text>
@@ -74,7 +73,7 @@ export const CustomizedYAxisTick = withTheme(
           fontFamily={theme.fontFamily}
           textAnchor="end"
           height={22}
-          fill={lightColors['feedback/info']}
+          fill={theme.colors['feedback/info']}
         >
           {payload && payload.value}
         </text>

@@ -11,7 +11,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { IActionObject, ColumnContentAlignment, IAction, IColumn } from '..'
-import { lightColors } from '../../semantics'
 
 export interface IWorkqueueRow {
   displayItems: Array<Record<string, unknown>>
@@ -32,11 +31,11 @@ export interface IWorkqueueRow {
 }
 
 const StyledBox = styled.div<{ hideLastBorder?: boolean }>`
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
   ${({ theme }) => theme.fonts.reg16};
   display: flex;
   align-items: center;
-  border-bottom: 1px solid ${lightColors['border/default']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors['border/default']};
   &:last-child {
     ${({ hideLastBorder }) => hideLastBorder && ` border-bottom: 0;`}
   }
@@ -72,7 +71,7 @@ export const ContentWrapper = styled.div<{
 `
 
 export const Error = styled.span`
-  color: ${lightColors['feedback/negative']};
+  color: ${({ theme }) => theme.colors['feedback/negative']};
 `
 
 export const IconWrapper = styled(ContentWrapper)`

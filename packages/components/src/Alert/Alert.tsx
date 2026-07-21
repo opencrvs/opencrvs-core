@@ -9,25 +9,24 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import styled from 'styled-components'
+import styled, { useTheme } from 'styled-components'
 import { Check, Help, Cross, NotificationError, Notification } from '../icons'
 import { Spinner } from '../Spinner'
 import { Button } from '../Button'
 import { Text } from '../Text'
-import { lightColors } from '../semantics'
 
 export type AlertType = 'success' | 'warning' | 'loading' | 'info' | 'error'
 
 const Container = styled.div<{
   $type?: AlertType
 }>`
-  --color: ${({ $type }) => `
-    ${$type === 'success' ? lightColors['feedback/positive'] : ''}
-    ${$type === 'loading' ? lightColors['feedback/info'] : ''}
-    ${$type === 'info' ? lightColors['feedback/info'] : ''}
-    ${$type === 'error' ? lightColors['feedback/negative'] : ''}
-    ${$type === 'warning' ? lightColors['feedback/warning'] : ''}
-    ${$type === undefined ? lightColors['feedback/positive'] : ''}
+  --color: ${({ $type, theme }) => `
+    ${$type === 'success' ? theme.colors['feedback/positive'] : ''}
+    ${$type === 'loading' ? theme.colors['feedback/info'] : ''}
+    ${$type === 'info' ? theme.colors['feedback/info'] : ''}
+    ${$type === 'error' ? theme.colors['feedback/negative'] : ''}
+    ${$type === 'warning' ? theme.colors['feedback/warning'] : ''}
+    ${$type === undefined ? theme.colors['feedback/positive'] : ''}
   `};
 
   display: flex;
@@ -37,7 +36,7 @@ const Container = styled.div<{
   background: linear-gradient(
     to right,
     var(--color) 48px,
-    ${lightColors['surface/default']} 48px
+    ${({ theme }) => theme.colors['surface/default']} 48px
   );
 `
 
@@ -47,7 +46,7 @@ const IconContainer = styled.div`
   align-items: center;
   height: 48px;
   width: 48px;
-  color: ${lightColors['text/onAction']};
+  color: ${({ theme }) => theme.colors['text/onAction']};
 `
 
 const Close = styled(Button)`
@@ -96,51 +95,54 @@ export const Alert = ({
   children,
   customIcon,
   ...props
-}: IAlertProps) => (
-  <Container $type={type} {...props}>
-    <IconContainer>
-      {!customIcon ? (
-        <>
-          {type === 'success' && <Check />}
-          {type === 'warning' && <Help />}
-          {type === 'error' && <NotificationError />}
-          {type === 'info' && <Notification />}
-          {type === 'loading' && (
-            <Spinner
-              id="in-progress-floating-notification"
-              baseColor={lightColors['text/onAction']}
-              size={20}
-            />
-          )}
-        </>
-      ) : (
-        <>{customIcon}</>
+}: IAlertProps) => {
+  const theme = useTheme()
+  return (
+    <Container $type={type} {...props}>
+      <IconContainer>
+        {!customIcon ? (
+          <>
+            {type === 'success' && <Check />}
+            {type === 'warning' && <Help />}
+            {type === 'error' && <NotificationError />}
+            {type === 'info' && <Notification />}
+            {type === 'loading' && (
+              <Spinner
+                id="in-progress-floating-notification"
+                baseColor={theme.colors['text/onAction']}
+                size={20}
+              />
+            )}
+          </>
+        ) : (
+          <>{customIcon}</>
+        )}
+      </IconContainer>
+
+      <NotificationMessage>{children}</NotificationMessage>
+
+      {onActionClick && (
+        <ActionButton
+          type="tertiary"
+          onClick={onActionClick}
+          data-testid={props['data-testid'] && `${props['data-testid']}-action`}
+        >
+          <ButtonText variant="bold14" element="span">
+            {actionText}
+          </ButtonText>
+        </ActionButton>
       )}
-    </IconContainer>
 
-    <NotificationMessage>{children}</NotificationMessage>
-
-    {onActionClick && (
-      <ActionButton
-        type="tertiary"
-        onClick={onActionClick}
-        data-testid={props['data-testid'] && `${props['data-testid']}-action`}
-      >
-        <ButtonText variant="bold14" element="span">
-          {actionText}
-        </ButtonText>
-      </ActionButton>
-    )}
-
-    {onClose && type !== 'loading' && (
-      <Close
-        type="icon"
-        id={props.id + 'Cancel'}
-        data-testid={props['data-testid'] && `${props['data-testid']}-close`}
-        onClick={onClose}
-      >
-        <Cross color="currentColor" />
-      </Close>
-    )}
-  </Container>
-)
+      {onClose && type !== 'loading' && (
+        <Close
+          type="icon"
+          id={props.id + 'Cancel'}
+          data-testid={props['data-testid'] && `${props['data-testid']}-close`}
+          onClick={onClose}
+        >
+          <Cross color="currentColor" />
+        </Close>
+      )}
+    </Container>
+  )
+}

@@ -32,7 +32,7 @@ import { getAddressNameV2, UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useUserFormState } from '@client/views/SysAdmin/Team/user/userEditor/useUserFormState'
 import { Location, User, UUID } from '@opencrvs/commons/client'
-import { Link, lightColors } from '@opencrvs/components'
+import { Link } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
@@ -92,7 +92,7 @@ const Loading = styled.div`
 `
 
 const Header = styled.h1`
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
   ${({ theme }) => theme.fonts.h2};
   margin: 8px 0;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -130,12 +130,12 @@ const LocationInfo = styled.div`
 `
 
 const LocationInfoValue = styled.div`
-  color: ${lightColors['text/secondary']};
+  color: ${({ theme }) => theme.colors['text/secondary']};
   ${({ theme }) => theme.fonts.reg18};
 `
 
 const Value = styled.span`
-  color: ${lightColors['text/tertiary']};
+  color: ${({ theme }) => theme.colors['text/tertiary']};
   ${({ theme }) => theme.fonts.reg16}
 `
 
@@ -143,7 +143,7 @@ const NoRecord = styled.div<{ isFullPage?: boolean }>`
   ${({ theme }) => theme.fonts.h3};
   text-align: left;
   margin-left: ${({ isFullPage }) => (isFullPage ? `40px` : `10px`)};
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
   margin-top: 20px;
 `
 

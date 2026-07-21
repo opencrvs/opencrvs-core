@@ -21,10 +21,9 @@ import { Text } from '../../../Text'
 import { ErrorHandler, ScannableQrReader } from '../../types'
 import { useWindowSize } from '../../../hooks'
 import { getTheme } from '../../../theme'
-import { lightColors } from '../../../semantics'
 
 const ScannerBox = styled(Box)`
-  background: ${lightColors['surface/page']};
+  background: ${({ theme }) => theme.colors['surface/page']};
   width: 100%;
   padding: 12px;
   border: 0;

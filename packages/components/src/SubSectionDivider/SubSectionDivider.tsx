@@ -10,24 +10,23 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 const SubSectionWrapper = styled.div`
-  border-top: solid 1px ${lightColors['border/default']};
+  border-top: solid 1px ${({ theme }) => theme.colors['border/default']};
   padding: 24px 0;
   flex-direction: row;
 `
 
 const Title = styled.div`
   ${({ theme }) => theme.fonts.h3};
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
 `
 const Optional = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >`
   ${({ theme }) => theme.fonts.reg18};
-  color: ${({ disabled }) =>
-    disabled ? lightColors['text/disabled'] : lightColors['text/tertiary']};
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors['text/disabled'] : theme.colors['text/tertiary']};
   flex-grow: 0;
 `
 

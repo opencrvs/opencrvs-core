@@ -11,7 +11,6 @@
 
 import * as React from 'react'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 export interface INavigationSubItemProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -21,30 +20,30 @@ export interface INavigationSubItemProps
 
 export const SubItemContainer = styled.button<{ isSelected?: boolean }>`
   border: 0;
-  background-color: ${lightColors['surface/default']};
+  background-color: ${({ theme }) => theme.colors['surface/default']};
   outline: none;
   border-radius: 4px;
   cursor: pointer;
   width: 100%;
   min-height: 32px;
-  color: ${({ isSelected }) =>
-    isSelected ? lightColors['text/primary'] : lightColors['text/tertiary']};
+  color: ${({ isSelected, theme }) =>
+    isSelected ? theme.colors['text/primary'] : theme.colors['text/tertiary']};
   ${({ isSelected, theme }) =>
     isSelected ? theme.fonts.bold14 : theme.fonts.reg14};
   &:hover {
-    color: ${lightColors['text/primary']};
+    color: ${({ theme }) => theme.colors['text/primary']};
     ${({ theme }) => theme.fonts.bold14};
   }
 
   &:active {
-    color: ${lightColors['text/primary']};
+    color: ${({ theme }) => theme.colors['text/primary']};
     ${({ theme }) => theme.fonts.bold14};
   }
 
   &:focus-visible {
     ${({ theme }) => theme.fonts.bold14};
-    background-color: ${lightColors['feedback/focus']};
-    color: ${lightColors['text/primary']};
+    background-color: ${({ theme }) => theme.colors['feedback/focus']};
+    color: ${({ theme }) => theme.colors['text/primary']};
   }
 `
 

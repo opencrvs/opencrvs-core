@@ -10,12 +10,11 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 const NavigationMainWrapper = styled.div`
   width: 100%;
   ${({ theme }) => theme.fonts.reg16};
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
   height: 100vh;
   z-index: 99999;
   position: fixed;
@@ -32,7 +31,7 @@ const Backdrop = styled.div`
       opacity: 0.8;
     }
   }
-  background: ${lightColors['overlay/scrim']};
+  background: ${({ theme }) => theme.colors['overlay/scrim']};
   opacity: 0.8;
   position: absolute;
   top: 0;
@@ -53,7 +52,7 @@ const NavigationContainer = styled.div`
   }
   display: flex;
   flex-direction: column;
-  background: ${lightColors['surface/inset']};
+  background: ${({ theme }) => theme.colors['surface/inset']};
   width: 320px;
   height: 100vh;
   animation: 300ms ease-out 0s 1 slideInFromLeft;

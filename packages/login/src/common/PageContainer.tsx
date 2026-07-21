@@ -10,10 +10,9 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { lightColors } from '@opencrvs/components'
 
 export const PageContainer = styled.div`
-  background: ${lightColors['surface/page']};
+  background: ${({ theme }) => theme.colors['surface/page']};
   height: 100vh;
   display: flex;
   flex-direction: column;

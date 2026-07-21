@@ -11,7 +11,7 @@
 
 import React from 'react'
 import { fonts, IFont } from '../fonts'
-import { lightColors, SemanticColor } from '../semantics'
+import { SemanticColor } from '../semantics'
 import styled from 'styled-components'
 import type { Property } from 'csstype'
 
@@ -39,7 +39,7 @@ const StyledText = styled.span<{
 }>`
   ${({ $variant }) => fonts[$variant]}
   ${({ $align }) => `text-align: ${$align};`}
-  ${({ $color }) => `color: ${lightColors[$color]};`}
+  ${({ $color, theme }) => `color: ${theme.colors[$color]};`}
   ${({ $overflowWrap }) => $overflowWrap && `overflow-wrap: ${$overflowWrap};`}
 `
 

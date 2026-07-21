@@ -10,7 +10,6 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 export interface ICustomProps {
   error?: boolean
@@ -45,34 +44,34 @@ const StyledInputContainer = styled.div<{
   box-sizing: border-box;
   overflow: hidden;
 
-  ${({ error, touched, disabled }) => `
+  ${({ error, touched, disabled, theme }) => `
     border: 1.5px solid ${
       error && touched
-        ? lightColors['feedback/negative']
+        ? theme.colors['feedback/negative']
         : disabled
-        ? lightColors['border/strong']
-        : lightColors['text/primary']
+        ? theme.colors['border/strong']
+        : theme.colors['text/primary']
     };
     &:hover {
-      box-shadow: 0 0 0 4px ${lightColors['border/default']};
+      box-shadow: 0 0 0 4px ${theme.colors['border/default']};
     }
     &:focus-within {
-      outline: 0.5px solid ${lightColors['border/emphasis']};
-      border: 1.5px solid ${lightColors['border/emphasis']};
-      box-shadow: 0 0 0px 4px ${lightColors['feedback/focus']};
+      outline: 0.5px solid ${theme.colors['border/emphasis']};
+      border: 1.5px solid ${theme.colors['border/emphasis']};
+      box-shadow: 0 0 0px 4px ${theme.colors['feedback/focus']};
     }
   `}
 `
 
 const StyledPrefix = styled.span`
   ${({ theme }) => theme.fonts.reg19};
-  color: ${lightColors['text/disabled']};
+  color: ${({ theme }) => theme.colors['text/disabled']};
   user-select: none;
 `
 
 const StyledPostfix = styled.span`
   ${({ theme }) => theme.fonts.reg19};
-  color: ${lightColors['text/disabled']};
+  color: ${({ theme }) => theme.colors['text/disabled']};
   user-select: none;
 `
 
@@ -84,20 +83,20 @@ const StyledInput = styled.input<ICustomProps>`
   outline: none;
   border: none;
   ${({ theme }) => theme.fonts.reg19};
-  color: ${({ disabled }) =>
-    disabled ? lightColors['text/tertiary'] : lightColors['text/primary']};
-  background: ${lightColors['surface/default']};
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors['text/tertiary'] : theme.colors['text/primary']};
+  background: ${({ theme }) => theme.colors['surface/default']};
 
   &::-webkit-input-placeholder {
-    color: ${lightColors['text/tertiary']};
+    color: ${({ theme }) => theme.colors['text/tertiary']};
   }
 
   &::-moz-placeholder {
-    color: ${lightColors['text/tertiary']};
+    color: ${({ theme }) => theme.colors['text/tertiary']};
   }
 
   &:-ms-input-placeholder {
-    color: ${lightColors['text/tertiary']};
+    color: ${({ theme }) => theme.colors['text/tertiary']};
   }
 
   &::-webkit-outer-spin-button,

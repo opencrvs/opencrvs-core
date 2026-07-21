@@ -28,8 +28,7 @@ import {
   Frame,
   Stack,
   Icon,
-  DividerVertical,
-  lightColors
+  DividerVertical
 } from '@opencrvs/components'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -48,21 +47,21 @@ import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAcces
 const Tab = styled.button`
   border: none;
   background: none;
-  color: ${lightColors['text/tertiary']};
+  color: ${({ theme }) => theme.colors['text/tertiary']};
   ${({ theme }) => theme.fonts.bold16};
   cursor: pointer;
   height: 100%;
   box-sizing: border-box;
 
   &:hover {
-    color: ${lightColors['text/link']};
-    border-bottom: 3px solid ${lightColors['border/default']};
+    color: ${({ theme }) => theme.colors['text/link']};
+    border-bottom: 3px solid ${({ theme }) => theme.colors['border/default']};
     border-top: 3px solid transparent;
   }
 
   &.active {
-    color: ${lightColors['text/link']};
-    border-bottom: 3px solid ${lightColors['border/action']};
+    color: ${({ theme }) => theme.colors['text/link']};
+    border-bottom: 3px solid ${({ theme }) => theme.colors['border/action']};
     border-top: 3px solid transparent;
   }
 `

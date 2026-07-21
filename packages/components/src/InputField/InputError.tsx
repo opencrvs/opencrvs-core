@@ -10,7 +10,6 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 export interface IInputError {
   id: string
@@ -23,5 +22,5 @@ export const InputError = styled.div<IInputError>`
   padding-top: 4px;
   display: inline-block;
   ${({ theme }) => theme.fonts.bold14}
-  color: ${lightColors['feedback/negative']};
+  color: ${({ theme }) => theme.colors['feedback/negative']};
 `

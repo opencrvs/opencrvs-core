@@ -10,7 +10,6 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 const TooltipWrapper = styled.div`
   position: relative;
@@ -19,9 +18,9 @@ const TooltipWrapper = styled.div`
 
 const TooltipContent = styled.div<{ position: TooltipProps['position'] }>`
   visibility: hidden;
-  background-color: ${lightColors['surface/inverse']};
+  background-color: ${({ theme }) => theme.colors['surface/inverse']};
   ${({ theme }) => theme.fonts.bold12};
-  color: ${lightColors['text/onAction']};
+  color: ${({ theme }) => theme.colors['text/onAction']};
   text-align: center;
   border-radius: 8px;
   padding: 6px 12px;

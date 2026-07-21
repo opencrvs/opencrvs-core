@@ -12,24 +12,23 @@ import React from 'react'
 import { Box } from '../Box'
 import { IStackProps, Stack } from '../Stack'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 export type BannerVariant = 'active' | 'inactive' | 'pending' | 'default'
 
 const Wrapper = styled(Box)<{ variant: BannerVariant }>`
   padding: 0;
   overflow: hidden;
-  --banner-background-color: ${({ variant }) => `
-    ${variant === 'active' ? lightColors['feedback/positiveSubtle'] : ''}
-    ${variant === 'inactive' ? lightColors['feedback/negativeSubtle'] : ''}
-    ${variant === 'pending' ? lightColors['feedback/warningSubtle'] : ''}
-    ${variant === 'default' ? lightColors['feedback/infoSubtle'] : ''}
+  --banner-background-color: ${({ variant, theme }) => `
+    ${variant === 'active' ? theme.colors['feedback/positiveSubtle'] : ''}
+    ${variant === 'inactive' ? theme.colors['feedback/negativeSubtle'] : ''}
+    ${variant === 'pending' ? theme.colors['feedback/warningSubtle'] : ''}
+    ${variant === 'default' ? theme.colors['feedback/infoSubtle'] : ''}
   `};
-  --banner-border-color: ${({ variant }) => `
-    ${variant === 'active' ? lightColors['feedback/positive'] : ''}
-    ${variant === 'inactive' ? lightColors['feedback/negative'] : ''}
-    ${variant === 'pending' ? lightColors['feedback/warning'] : ''}
-    ${variant === 'default' ? lightColors['feedback/info'] : ''}
+  --banner-border-color: ${({ variant, theme }) => `
+    ${variant === 'active' ? theme.colors['feedback/positive'] : ''}
+    ${variant === 'inactive' ? theme.colors['feedback/negative'] : ''}
+    ${variant === 'pending' ? theme.colors['feedback/warning'] : ''}
+    ${variant === 'default' ? theme.colors['feedback/info'] : ''}
   `};
   border: 1px solid var(--banner-border-color);
 `

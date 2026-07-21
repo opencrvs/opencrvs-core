@@ -12,7 +12,6 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { Button, IButtonProps } from './Button'
 import { PlusTransparent, MinusTransparent } from '../icons'
-import { lightColors } from '../semantics'
 
 export const StyledButton = styled(Button)`
   border: none;
@@ -23,15 +22,15 @@ export const StyledButton = styled(Button)`
   border-radius: 100%;
   align-items: center;
   &:hover {
-    background-color: ${lightColors['action/secondary']};
+    background-color: ${({ theme }) => theme.colors['action/secondary']};
   }
   &:not([data-focus-visible-added]):hover {
-    background-color: ${lightColors['action/secondary']};
+    background-color: ${({ theme }) => theme.colors['action/secondary']};
   }
   &:focus {
     outline: none;
-    background: ${lightColors['feedback/focus']};
-    color: ${lightColors['text/primary']};
+    background: ${({ theme }) => theme.colors['feedback/focus']};
+    color: ${({ theme }) => theme.colors['text/primary']};
   }
   &:not([data-focus-visible-added]) {
     background: none;
@@ -40,8 +39,8 @@ export const StyledButton = styled(Button)`
   }
   &:active:not([data-focus-visible-added]) {
     outline: none;
-    background: ${lightColors['feedback/focus']};
-    color: ${lightColors['text/primary']};
+    background: ${({ theme }) => theme.colors['feedback/focus']};
+    color: ${({ theme }) => theme.colors['text/primary']};
   }
 `
 export interface IExpansionButtonProps extends IButtonProps {

@@ -10,13 +10,12 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { lightColors } from '../../semantics'
 
 export const HeaderContainer = styled.tr<{
   fontVariant: HeaderFontVariant
 }>`
   th {
-    border-bottom: 2px solid ${lightColors['border/default']};
+    border-bottom: 2px solid ${({ theme }) => theme.colors['border/default']};
     padding: 20px 0;
     text-align: left;
     ${({ theme, fontVariant }) => theme.fonts[fontVariant ?? 'reg16']};

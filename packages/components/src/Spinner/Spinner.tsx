@@ -10,7 +10,6 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 export interface ISpinner extends React.HTMLAttributes<HTMLDivElement> {
   id: string
@@ -29,8 +28,8 @@ const StyledSpinner = styled.div<ISpinner>`
     height: ${({ size }) => size}px;
 
     & circle {
-      stroke: ${({ baseColor }) =>
-        baseColor ? baseColor : lightColors['action/primary']};
+      stroke: ${({ baseColor, theme }) =>
+        baseColor ? baseColor : theme.colors['action/primary']};
       stroke-linecap: round;
       animation: dash 1.5s ease-in-out infinite;
     }

@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import styled from 'styled-components'
-import { lightColors } from '../../semantics'
 
 export const Section = styled.div`
   display: grid;
@@ -27,7 +26,7 @@ export const SectionFormBackAction = styled.div`
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     gap: 0;
-    background: ${lightColors['surface/default']};
+    background: ${({ theme }) => theme.colors['surface/default']};
     align-items: centre;
     justify-items: start;
   }

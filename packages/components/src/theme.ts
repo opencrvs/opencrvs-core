@@ -9,10 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { gradients, shadows } from './colors'
+import { lightColors } from './semantics'
 import { fonts, family as fontFamily } from './fonts'
 import { grid } from './grid'
 
+/**
+ * The active semantic colour set is carried on the theme (`theme.colors`),
+ * alongside fonts / grid / shadows, so components resolve colours through the
+ * provider — never via a direct `lightColors` import. `colors` is `lightColors`
+ * today; theme selection (light/dark) is wired in a follow-up.
+ */
 export const getTheme = () => ({
+  colors: lightColors,
   gradients,
   shadows,
   fonts,

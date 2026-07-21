@@ -13,7 +13,6 @@ import ReactSelect, { components } from 'react-select'
 import styled from 'styled-components'
 import { IndicatorProps } from 'react-select/lib/components/indicators'
 import { ArrowDownBlue } from '../icons'
-import { lightColors } from '../semantics'
 
 export interface ISelect2Option {
   value: string
@@ -41,21 +40,21 @@ const StyledSelect = styled(ReactSelect)<{
   .react-select__control {
     ${({ defaultWidth }) =>
       defaultWidth ? `min-width: ${defaultWidth}px` : 'min-width: 240px'};
-    background-color: ${lightColors['surface/default']};
+    background-color: ${({ theme }) => theme.colors['surface/default']};
     justify-content: center;
     min-height: 32px;
     max-height: 32px;
     ${({ theme }) => theme.fonts.bold14};
     text-transform: none;
-    border: 2px solid ${lightColors['action/primary']};
+    border: 2px solid ${({ theme }) => theme.colors['action/primary']};
     &:hover {
-      border: 2px solid ${lightColors['action/primary']};
-      background-color: ${lightColors['surface/inset']};
+      border: 2px solid ${({ theme }) => theme.colors['action/primary']};
+      background-color: ${({ theme }) => theme.colors['surface/inset']};
     }
   }
 
   .react-select__control--is-focused {
-    box-shadow: 0 0 0px 3px ${lightColors['feedback/focus']};
+    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors['feedback/focus']};
   }
 
   .react-select__indicator-separator {
@@ -69,29 +68,29 @@ const StyledSelect = styled(ReactSelect)<{
   }
 
   .react-select__option {
-    background-color: ${lightColors['surface/default']};
+    background-color: ${({ theme }) => theme.colors['surface/default']};
   }
 
   .react-select__option--is-focused {
-    background-color: ${lightColors['surface/inset']};
-    color: ${lightColors['text/primary']};
+    background-color: ${({ theme }) => theme.colors['surface/inset']};
+    color: ${({ theme }) => theme.colors['text/primary']};
     &:active {
-      background: ${lightColors['action/secondaryHover']};
-      color: ${lightColors['text/primary']};
+      background: ${({ theme }) => theme.colors['action/secondaryHover']};
+      color: ${({ theme }) => theme.colors['text/primary']};
     }
   }
 
   .react-select__option--is-selected {
-    background-color: ${lightColors['action/primary']};
-    color: ${lightColors['text/onAction']};
+    background-color: ${({ theme }) => theme.colors['action/primary']};
+    color: ${({ theme }) => theme.colors['text/onAction']};
     &:active {
-      background: ${lightColors['action/primaryHover']};
-      color: ${lightColors['text/onAction']};
+      background: ${({ theme }) => theme.colors['action/primaryHover']};
+      color: ${({ theme }) => theme.colors['text/onAction']};
     }
   }
 
   .react-select__single-value {
-    color: ${lightColors['text/link']};
+    color: ${({ theme }) => theme.colors['text/link']};
   }
 `
 

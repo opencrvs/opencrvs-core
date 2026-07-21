@@ -10,10 +10,9 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { lightColors } from '../../semantics'
 
 export const RowContainer = styled.tr`
-  border-bottom: 1px solid ${lightColors['border/subtle']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors['border/subtle']};
 
   td {
     padding: 14px 0;

@@ -13,7 +13,6 @@ import styled from 'styled-components'
 import { Text } from '../Text'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
-import { lightColors } from '../semantics'
 
 export interface IDialogProps {
   id?: string
@@ -36,7 +35,7 @@ const DialogWrapper = styled.div`
   left: 0;
   bottom: 0;
   right: 0;
-  background-color: ${lightColors['overlay/scrim']};
+  background-color: ${({ theme }) => theme.colors['overlay/scrim']};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -66,7 +65,7 @@ const DialogContainer = styled.div<{
              border-radius: 0;
              }
       `}
-  background-color: ${lightColors['surface/raised']};
+  background-color: ${({ theme }) => theme.colors['surface/raised']};
   border-radius: 4px;
   box-shadow: ${({ theme }) => theme.shadows.heavy};
   display: flex;
@@ -76,7 +75,7 @@ const DialogContainer = styled.div<{
 const DialogHeader = styled.div`
   display: flex;
   padding: 12px 32px;
-  border-bottom: 1px solid ${lightColors['border/default']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors['border/default']};
   justify-content: space-between;
   min-height: 40px;
 `
@@ -88,7 +87,7 @@ const DialogTitle = styled.div`
 
 const DialogContent = styled.div`
   ${({ theme }) => theme.fonts.reg16};
-  color: ${lightColors['text/secondary']};
+  color: ${({ theme }) => theme.colors['text/secondary']};
   padding: 24px 32px;
   flex-grow: 1;
   overflow-y: auto;
@@ -104,7 +103,7 @@ const DialogFooter = styled.div`
   display: flex;
   gap: 8px;
   justify-content: flex-end;
-  border-top: 1px solid ${lightColors['border/default']};
+  border-top: 1px solid ${({ theme }) => theme.colors['border/default']};
 `
 
 export function Dialog({

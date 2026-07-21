@@ -14,7 +14,6 @@ import styled from 'styled-components'
 import { Stack } from '../../../Stack'
 import { Text } from '../../../Text'
 import { Icon, IconProps } from '../../../Icon'
-import { lightColors } from '../../../semantics'
 
 interface InfoBoxProps {
   iconName: IconProps['name']
@@ -22,14 +21,14 @@ interface InfoBoxProps {
 }
 
 const Container = styled(Box)`
-  background-color: ${lightColors['surface/page']};
+  background-color: ${({ theme }) => theme.colors['surface/page']};
   border: 0;
   flex: 1;
 `
 const IconContainer = styled.div`
   height: 44px;
   width: 44px;
-  background-color: ${lightColors['surface/default']};
+  background-color: ${({ theme }) => theme.colors['surface/default']};
   border-radius: 50%;
   display: flex;
   justify-content: center;

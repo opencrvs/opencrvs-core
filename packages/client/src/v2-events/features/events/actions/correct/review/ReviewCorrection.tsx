@@ -34,7 +34,6 @@ import {
   ContentSize,
   Icon,
   InputField,
-  lightColors,
   Stack,
   Text,
   TextArea
@@ -101,10 +100,10 @@ const Row = styled.div<{
   gap: 16px;
   width: 100%;
   justify-content: ${({ position }) => position || 'center'};
-  background-color: ${({ background }) =>
+  background-color: ${({ background, theme }) =>
     !background || background === 'background'
-      ? lightColors['surface/page']
-      : lightColors['surface/default']};
+      ? theme.colors['surface/page']
+      : theme.colors['surface/default']};
   flex-direction: row;
   padding: 24px 0px 24px 0px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {

@@ -19,27 +19,26 @@ import { SortIcon } from '../icons/SortIcon'
 import { IAction } from '../common-types'
 import { ListItemAction } from './components/ListItemAction'
 import { useWindowSize } from '../hooks'
-import { lightColors } from '../semantics'
 
 const Wrapper = styled.div`
   width: 100%;
 `
 const TableHeader = styled.div`
-  color: ${lightColors['text/primary']};
-  background-color: ${lightColors['surface/inset']};
+  color: ${({ theme }) => theme.colors['text/primary']};
+  background-color: ${({ theme }) => theme.colors['surface/inset']};
   ${({ theme }) => theme.fonts.bold14};
   height: 36px;
   display: flex;
   align-items: center;
   padding: 0 16px;
-  border-bottom: 1px solid ${lightColors['border/strong']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors['border/strong']};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
 
 export const NoResultText = styled.div`
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
   ${({ theme }) => theme.fonts.bold16}
   text-align: left;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {

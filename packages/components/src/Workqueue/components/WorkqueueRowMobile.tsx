@@ -17,19 +17,18 @@ import {
   ContentWrapper
 } from './WorkqueueRowDesktop'
 import { IActionObject, IAction } from '../types'
-import { lightColors } from '../../semantics'
 
 const StyledBox = styled.div`
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
   ${({ theme }) => theme.fonts.reg16};
   display: flex;
   align-items: center;
-  border: 1px solid ${lightColors['border/strong']};
+  border: 1px solid ${({ theme }) => theme.colors['border/strong']};
   box-sizing: border-box;
   border-radius: 4px;
   height: 80px;
   max-width: 520px;
-  background-color: ${lightColors['surface/default']};
+  background-color: ${({ theme }) => theme.colors['surface/default']};
   margin: auto;
   margin-bottom: 8px;
 `

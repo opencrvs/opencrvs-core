@@ -26,8 +26,7 @@ import {
   FormTabs,
   Frame,
   Icon,
-  IFormTabs,
-  lightColors
+  IFormTabs
 } from '@opencrvs/components'
 import { Duplicate } from '@opencrvs/components/lib/icons'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -126,8 +125,8 @@ export const duplicateMessages = {
 const TopBar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
   height: 56px;
-  background: ${lightColors['surface/default']};
-  border-bottom: 1px solid ${lightColors['border/default']};
+  background: ${({ theme }) => theme.colors['surface/default']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors['border/default']};
   display: flex;
   justify-content: space-between;
   align-items: flex-end;

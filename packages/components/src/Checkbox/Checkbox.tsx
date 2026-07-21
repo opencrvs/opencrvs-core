@@ -11,7 +11,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Tick, TickLarge } from '../icons'
-import { lightColors } from '../semantics'
 
 const Label = styled.label<{ disabled?: boolean }>`
   display: flex;
@@ -23,23 +22,23 @@ const Label = styled.label<{ disabled?: boolean }>`
   padding: 8px 8px;
   align-items: center;
   isolation: isolate;
-  color: ${({ disabled }) =>
-    disabled ? lightColors['text/disabled'] : lightColors['text/primary']};
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors['text/disabled'] : theme.colors['text/primary']};
   ${({ theme }) => theme.fonts.h4};
   cursor: pointer;
   &:hover {
-    background: ${lightColors['action/secondary']};
+    background: ${({ theme }) => theme.colors['action/secondary']};
   }
   &:active {
-    background: ${lightColors['action/secondaryHover']};
+    background: ${({ theme }) => theme.colors['action/secondaryHover']};
   }
 `
 
 const Check = styled.span<{ size?: string; disabled?: boolean }>`
   display: inline-block;
   border-radius: 4px;
-  background: ${({ disabled }) =>
-    disabled ? lightColors['action/disabled'] : lightColors['surface/inverse']};
+  background: ${({ disabled, theme }) =>
+    disabled ? theme.colors['action/disabled'] : theme.colors['surface/inverse']};
   ${({ size }) =>
     size === 'large'
       ? `height: 40px;
@@ -52,12 +51,12 @@ const Check = styled.span<{ size?: string; disabled?: boolean }>`
   transition: border 0.25s linear;
   -webkit-transition: border 0.25s linear;
   position: relative;
-  color: ${({ disabled }) =>
-    disabled ? lightColors['text/disabled'] : lightColors['text/primary']};
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors['text/disabled'] : theme.colors['text/primary']};
   &::after {
     position: absolute;
     content: '';
-    background: ${lightColors['surface/default']};
+    background: ${({ theme }) => theme.colors['surface/default']};
     ${({ size }) =>
       size === 'large'
         ? `height: 36px;
@@ -99,8 +98,8 @@ const Input = styled.input`
 
   &:active ~ ${Check} {
     &::after {
-      border: 2px solid ${lightColors['border/emphasis']};
-      box-shadow: ${lightColors['feedback/focus']} 0 0 0 3px;
+      border: 2px solid ${({ theme }) => theme.colors['border/emphasis']};
+      box-shadow: ${({ theme }) => theme.colors['feedback/focus']} 0 0 0 3px;
       width: ${({ size }) => `max(18px, ${(size ?? 0) - 6}px)`};
       height: ${({ size }) => `max(18px, ${(size ?? 0) - 6}px)`};
     }
@@ -109,8 +108,8 @@ const Input = styled.input`
   &:focus ~ ${Check} {
     &::after {
       box-sizing: content-box;
-      border: 2px solid ${lightColors['border/emphasis']};
-      box-shadow: ${lightColors['feedback/focus']} 0 0 0 3px;
+      border: 2px solid ${({ theme }) => theme.colors['border/emphasis']};
+      box-shadow: ${({ theme }) => theme.colors['feedback/focus']} 0 0 0 3px;
       width: ${({ size }) => `max(18px, ${(size ?? 0) - 6}px)`};
       height: ${({ size }) => `max(18px, ${(size ?? 0) - 6}px)`};
     }

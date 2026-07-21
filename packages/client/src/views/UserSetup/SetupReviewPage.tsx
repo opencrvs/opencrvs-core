@@ -40,8 +40,7 @@ import {
   Frame,
   Loader,
   DataRow,
-  IDataProps,
-  lightColors
+  IDataProps
 } from '@opencrvs/components'
 import * as React from 'react'
 import { useIntl } from 'react-intl'
@@ -49,7 +48,7 @@ import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 const GlobalError = styled.div`
-  color: ${lightColors['feedback/negative']};
+  color: ${({ theme }) => theme.colors['feedback/negative']};
 `
 
 interface IProps {

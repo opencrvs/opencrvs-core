@@ -10,7 +10,6 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 export interface IListUserProps {
   labelHeader?: React.ReactNode
@@ -28,8 +27,8 @@ export const UserHeader = styled.table`
   border-collapse: collapse;
   width: 100%;
   th {
-    border-bottom: 1px solid ${lightColors['border/default']};
-    color: ${lightColors['text/disabled']};
+    border-bottom: 1px solid ${({ theme }) => theme.colors['border/default']};
+    color: ${({ theme }) => theme.colors['text/disabled']};
     ${({ theme }) => theme.fonts.bold12};
     text-align: left;
     padding: 8px 0;
@@ -58,7 +57,7 @@ export const UserRow = styled.table`
   width: 100%;
 
   td {
-    border-bottom: 1px solid ${lightColors['border/default']};
+    border-bottom: 1px solid ${({ theme }) => theme.colors['border/default']};
     padding: 8px 0;
   }
   td:first-child {

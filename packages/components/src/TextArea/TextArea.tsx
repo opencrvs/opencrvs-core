@@ -10,7 +10,6 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 interface ITextAreaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -24,28 +23,28 @@ const StyledTextArea = styled.textarea<ITextAreaProps>`
   padding: 8px 16px;
   min-height: 104px;
   border-radius: 4px;
-  border: 1.5px solid ${lightColors['border/emphasis']};
-  background-color: ${lightColors['surface/default']};
-  color: ${({ disabled }) =>
-    disabled ? lightColors['text/disabled'] : lightColors['text/primary']};
+  border: 1.5px solid ${({ theme }) => theme.colors['border/emphasis']};
+  background-color: ${({ theme }) => theme.colors['surface/default']};
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors['text/disabled'] : theme.colors['text/primary']};
 
   &:hover {
-    box-shadow: 0 0 0px 4px ${lightColors['border/default']};
+    box-shadow: 0 0 0px 4px ${({ theme }) => theme.colors['border/default']};
   }
   &:focus {
-    outline: 0.5px solid ${lightColors['border/emphasis']};
-    border: 1.5px solid $ ${lightColors['border/emphasis']};
-    box-shadow: 0 0 0px 4px ${lightColors['feedback/focus']};
+    outline: 0.5px solid ${({ theme }) => theme.colors['border/emphasis']};
+    border: 1.5px solid $ ${({ theme }) => theme.colors['border/emphasis']};
+    box-shadow: 0 0 0px 4px ${({ theme }) => theme.colors['feedback/focus']};
   }
 
   &::-webkit-input-placeholder {
-    color: ${lightColors['text/tertiary']};
+    color: ${({ theme }) => theme.colors['text/tertiary']};
   }
   &::-moz-placeholder {
-    color: ${lightColors['text/tertiary']};
+    color: ${({ theme }) => theme.colors['text/tertiary']};
   }
   &:-ms-input-placeholder {
-    color: ${lightColors['text/tertiary']};
+    color: ${({ theme }) => theme.colors['text/tertiary']};
   }
 `
 

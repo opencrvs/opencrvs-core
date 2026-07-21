@@ -12,7 +12,6 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
-import { lightColors } from '../semantics'
 
 export type IPaginationVariant = 'small' | 'large' // small for desktop and large for mobile
 
@@ -72,10 +71,10 @@ const DotsButton = styled(Button)`
 const StyledPageNumber = styled.span<{ isCurrentPage: boolean; size?: string }>`
   ${({ theme, size }) =>
     size && size === 'large' ? theme.fonts.h4 : theme.fonts.bold12};
-  color: ${({ isCurrentPage }) =>
+  color: ${({ isCurrentPage, theme }) =>
     isCurrentPage
-      ? lightColors['text/primary']
-      : lightColors['text/disabled']};
+      ? theme.colors['text/primary']
+      : theme.colors['text/disabled']};
 `
 export const Pagination = ({
   totalPages,

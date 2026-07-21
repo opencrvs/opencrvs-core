@@ -11,7 +11,6 @@
 import React from 'react'
 import styled from 'styled-components'
 import { IFont } from '../fonts'
-import { lightColors } from '../semantics'
 
 type IPillType = 'active' | 'inactive' | 'pending' | 'default'
 
@@ -41,25 +40,25 @@ const StyledPill = styled.span<{
   type: IPillType
   pillTheme: IPillTheme
 }>`
-  --lighterShade: ${({ type }) => `
-    ${type === 'active' ? lightColors['feedback/positiveSubtle'] : ''}
-    ${type === 'inactive' ? lightColors['feedback/negativeSubtle'] : ''}
-    ${type === 'pending' ? lightColors['feedback/warningSubtle'] : ''}
-    ${type === 'default' ? lightColors['feedback/infoSubtle'] : ''}
+  --lighterShade: ${({ type, theme }) => `
+    ${type === 'active' ? theme.colors['feedback/positiveSubtle'] : ''}
+    ${type === 'inactive' ? theme.colors['feedback/negativeSubtle'] : ''}
+    ${type === 'pending' ? theme.colors['feedback/warningSubtle'] : ''}
+    ${type === 'default' ? theme.colors['feedback/infoSubtle'] : ''}
   `};
 
-  --mediumShade: ${({ type }) => `
-  ${type === 'active' ? lightColors['feedback/positive'] : ''}
-  ${type === 'inactive' ? lightColors['feedback/negative'] : ''}
-  ${type === 'pending' ? lightColors['feedback/warning'] : ''}
-  ${type === 'default' ? lightColors['feedback/info'] : ''}
+  --mediumShade: ${({ type, theme }) => `
+  ${type === 'active' ? theme.colors['feedback/positive'] : ''}
+  ${type === 'inactive' ? theme.colors['feedback/negative'] : ''}
+  ${type === 'pending' ? theme.colors['feedback/warning'] : ''}
+  ${type === 'default' ? theme.colors['feedback/info'] : ''}
 `};
 
-  --darkerShade: ${({ type }) => `
-  ${type === 'active' ? lightColors['feedback/positive'] : ''}
-  ${type === 'inactive' ? lightColors['feedback/negative'] : ''}
-  ${type === 'pending' ? lightColors['feedback/warning'] : ''}
-  ${type === 'default' ? lightColors['feedback/info'] : ''}
+  --darkerShade: ${({ type, theme }) => `
+  ${type === 'active' ? theme.colors['feedback/positive'] : ''}
+  ${type === 'inactive' ? theme.colors['feedback/negative'] : ''}
+  ${type === 'pending' ? theme.colors['feedback/warning'] : ''}
+  ${type === 'default' ? theme.colors['feedback/info'] : ''}
 `};
 
   ${({ pillTheme }) =>

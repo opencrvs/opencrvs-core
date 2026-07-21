@@ -14,7 +14,7 @@ import styled from 'styled-components'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { Link, Pagination, lightColors } from '@opencrvs/components'
+import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
@@ -52,7 +52,7 @@ const eventHistoryStatusMessage = {
 
 const LargeGreyedInfo = styled.div`
   height: 231px;
-  background-color: ${lightColors['action/disabled']};
+  background-color: ${({ theme }) => theme.colors['action/disabled']};
   max-width: 100%;
   border-radius: 4px;
 `
@@ -120,7 +120,7 @@ const SystemName = styled.div`
     align-items: center;
     margin-right: 10px;
     justify-content: center;
-    background-color: ${lightColors['action/disabled']};
+    background-color: ${({ theme }) => theme.colors['action/disabled']};
   }
 `
 

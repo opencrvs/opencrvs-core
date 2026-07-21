@@ -12,7 +12,6 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Text } from '../../Text'
-import { lightColors } from '../../semantics'
 
 const RowContainer = styled.tr``
 
@@ -37,7 +36,7 @@ const LockedBox = styled.div`
   height: 24px;
   border-radius: 4px;
   cursor: not-allowed;
-  background-color: ${lightColors['action/disabled']};
+  background-color: ${({ theme }) => theme.colors['action/disabled']};
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;

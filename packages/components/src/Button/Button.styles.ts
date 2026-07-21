@@ -10,7 +10,6 @@
  */
 
 import { css } from 'styled-components'
-import { lightColors } from '../semantics'
 
 export const base = ({ fullWidth }: { fullWidth?: boolean }) => css`
   ${({ theme }) => theme.fonts.bold16};
@@ -42,137 +41,137 @@ export const base = ({ fullWidth }: { fullWidth?: boolean }) => css`
   }
 
   &:focus-visible {
-    background: ${lightColors['feedback/focus']};
-    color: ${lightColors['text/primary']};
+    background: ${({ theme }) => theme.colors['feedback/focus']};
+    color: ${({ theme }) => theme.colors['text/primary']};
   }
 `
 
 export const primary = ({ loading }: { loading?: boolean }) => css`
-  color: ${lightColors['text/onAction']};
-  background: ${lightColors['action/primary']};
+  color: ${({ theme }) => theme.colors['text/onAction']};
+  background: ${({ theme }) => theme.colors['action/primary']};
 
   svg {
-    color: ${lightColors['text/onAction']};
+    color: ${({ theme }) => theme.colors['text/onAction']};
   }
 
   &:hover {
-    background: ${lightColors['action/primaryHover']};
+    background: ${({ theme }) => theme.colors['action/primaryHover']};
   }
   &:active {
-    background-color: ${lightColors['action/primaryPressed']};
+    background-color: ${({ theme }) => theme.colors['action/primaryPressed']};
   }
 
   ${loading &&
   css`
-    background: ${lightColors['action/primaryHover']};
+    background: ${({ theme }) => theme.colors['action/primaryHover']};
   `}
 `
 
 export const secondary = css`
-  border: 1.5px solid ${lightColors['action/primary']};
-  color: ${lightColors['text/primary']};
-  background: ${lightColors['surface/default']};
+  border: 1.5px solid ${({ theme }) => theme.colors['action/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
+  background: ${({ theme }) => theme.colors['surface/default']};
 
   svg {
-    color: ${lightColors['action/primary']};
+    color: ${({ theme }) => theme.colors['action/primary']};
   }
 
   &:hover {
-    border: 1.5px solid ${lightColors['action/primaryHover']};
-    background: ${lightColors['action/secondary']};
+    border: 1.5px solid ${({ theme }) => theme.colors['action/primaryHover']};
+    background: ${({ theme }) => theme.colors['action/secondary']};
   }
   &:active {
-    background: ${lightColors['action/secondaryHover']};
+    background: ${({ theme }) => theme.colors['action/secondaryHover']};
   }
 
   &:focus-visible {
-    border: 1.5px solid ${lightColors['border/emphasis']};
-    background: ${lightColors['feedback/focus']};
-    color: ${lightColors['text/primary']};
+    border: 1.5px solid ${({ theme }) => theme.colors['border/emphasis']};
+    background: ${({ theme }) => theme.colors['feedback/focus']};
+    color: ${({ theme }) => theme.colors['text/primary']};
   }
 `
 export const secondaryNegative = css`
-  border: 1.5px solid ${lightColors['action/negative']};
-  color: ${lightColors['text/primary']};
+  border: 1.5px solid ${({ theme }) => theme.colors['action/negative']};
+  color: ${({ theme }) => theme.colors['text/primary']};
 
   svg {
-    color: ${lightColors['action/negative']};
+    color: ${({ theme }) => theme.colors['action/negative']};
   }
 
   &:hover {
-    background: ${lightColors['action/secondary']};
-    border: 1.5px solid ${lightColors['action/negativePressed']};
+    background: ${({ theme }) => theme.colors['action/secondary']};
+    border: 1.5px solid ${({ theme }) => theme.colors['action/negativePressed']};
   }
 
   &:active {
-    background: ${lightColors['action/secondaryHover']};
+    background: ${({ theme }) => theme.colors['action/secondaryHover']};
   }
 
   &:focus-visible {
-    border: 1.5px solid ${lightColors['action/negativePressed']};
-    background: ${lightColors['feedback/focus']};
-    color: ${lightColors['action/negativePressed']};
+    border: 1.5px solid ${({ theme }) => theme.colors['action/negativePressed']};
+    background: ${({ theme }) => theme.colors['feedback/focus']};
+    color: ${({ theme }) => theme.colors['action/negativePressed']};
   }
 `
 
 export const tertiary = css`
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
 
   svg {
-    color: ${lightColors['action/primary']};
+    color: ${({ theme }) => theme.colors['action/primary']};
   }
 
   &:hover {
-    background: ${lightColors['action/secondary']};
+    background: ${({ theme }) => theme.colors['action/secondary']};
   }
 
   &:active {
-    background: ${lightColors['action/secondaryHover']};
+    background: ${({ theme }) => theme.colors['action/secondaryHover']};
   }
 `
 
 export const positive = css`
-  background: ${lightColors['action/positive']};
-  color: ${lightColors['text/onAction']};
+  background: ${({ theme }) => theme.colors['action/positive']};
+  color: ${({ theme }) => theme.colors['text/onAction']};
 
   svg {
-    color: ${lightColors['text/onAction']};
+    color: ${({ theme }) => theme.colors['text/onAction']};
   }
 
   &:hover {
-    background: ${lightColors['action/positiveHover']};
+    background: ${({ theme }) => theme.colors['action/positiveHover']};
   }
   &:active {
-    background-color: ${lightColors['action/positivePressed']};
+    background-color: ${({ theme }) => theme.colors['action/positivePressed']};
   }
 `
 
 export const negative = css`
-  background: ${lightColors['action/negative']};
-  color: ${lightColors['text/onAction']};
+  background: ${({ theme }) => theme.colors['action/negative']};
+  color: ${({ theme }) => theme.colors['text/onAction']};
 
   svg {
-    color: ${lightColors['text/onAction']};
+    color: ${({ theme }) => theme.colors['text/onAction']};
   }
 
   &:hover {
-    background: ${lightColors['action/negativePressed']};
+    background: ${({ theme }) => theme.colors['action/negativePressed']};
   }
   &:active {
-    background-color: ${lightColors['action/negativePressed']};
+    background-color: ${({ theme }) => theme.colors['action/negativePressed']};
   }
 `
 
 export const icon = css`
-  color: ${lightColors['action/primary']};
+  color: ${({ theme }) => theme.colors['action/primary']};
   border-radius: 100%;
   aspect-ratio: 1 / 1;
 
   &:hover {
-    background: ${lightColors['action/secondary']};
+    background: ${({ theme }) => theme.colors['action/secondary']};
   }
   &:active {
-    background: ${lightColors['action/secondaryHover']};
+    background: ${({ theme }) => theme.colors['action/secondaryHover']};
   }
   svg {
     margin-left: -8px;
@@ -181,16 +180,16 @@ export const icon = css`
 `
 
 export const iconPrimary = css`
-  color: ${lightColors['text/onAction']};
-  background: ${lightColors['action/primary']};
+  color: ${({ theme }) => theme.colors['text/onAction']};
+  background: ${({ theme }) => theme.colors['action/primary']};
   border-radius: 100%;
   aspect-ratio: 1 / 1;
 
   &:hover {
-    background: ${lightColors['action/primaryHover']};
+    background: ${({ theme }) => theme.colors['action/primaryHover']};
   }
   &:active {
-    background: ${lightColors['action/primaryPressed']};
+    background: ${({ theme }) => theme.colors['action/primaryPressed']};
   }
   svg {
     margin-left: -8px;

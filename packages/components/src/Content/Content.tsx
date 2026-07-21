@@ -11,7 +11,7 @@
 import * as React from 'react'
 import { ReactElement } from 'react'
 import styled from 'styled-components'
-import { lightColors, SemanticColor } from '../semantics'
+import { SemanticColor } from '../semantics'
 
 const Container = styled.div<{ size: ContentSize }>`
   position: relative;
@@ -29,8 +29,8 @@ const Container = styled.div<{ size: ContentSize }>`
         return '568px'
     }
   }};
-  border: 1px solid ${lightColors['border/strong']};
-  background: ${lightColors['surface/default']};
+  border: 1px solid ${({ theme }) => theme.colors['border/strong']};
+  background: ${({ theme }) => theme.colors['surface/default']};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin: 0;
     height: 100%;
@@ -45,7 +45,7 @@ const Header = styled.div`
   justify-content: center;
   flex-direction: column;
   padding: 0 24px;
-  border-bottom: 1px solid ${lightColors['border/strong']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors['border/strong']};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     border: 0;
     padding: 0;
@@ -61,11 +61,11 @@ const TopActionBar = styled.div`
 `
 export const SubHeader = styled.div`
   padding-bottom: 24px;
-  color: ${lightColors['text/secondary']};
+  color: ${({ theme }) => theme.colors['text/secondary']};
   ${({ theme }) => theme.fonts.reg16};
 `
 export const Body = styled.div`
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
   ${({ theme }) => theme.fonts.reg16};
 `
 const Footer = styled.div`
@@ -81,7 +81,7 @@ const HeaderBottom = styled.div`
   width: 100%;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding: 24px;
-    border-bottom: 1px solid ${lightColors['border/strong']};
+    border-bottom: 1px solid ${({ theme }) => theme.colors['border/strong']};
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 0 16px 16px;
@@ -140,17 +140,17 @@ const TitleContainer = styled.div<{ titleColor?: SemanticColor }>`
   align-items: center;
   width: 0;
   flex: 1;
-  color: ${({ titleColor }) => titleColor && lightColors[titleColor]};
+  color: ${({ titleColor, theme }) => titleColor && theme.colors[titleColor]};
 `
 
 const Title = styled.div`
   ${({ theme }) => theme.fonts.h1}
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
 `
 
 const Icon = styled.div`
   height: 24px;
-  background-color: ${lightColors['surface/default']};
+  background-color: ${({ theme }) => theme.colors['surface/default']};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }

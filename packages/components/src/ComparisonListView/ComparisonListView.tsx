@@ -14,7 +14,6 @@ import styled from 'styled-components'
 import { Row } from './RowView'
 import { Stack } from '../Stack'
 import { Text } from '../Text'
-import { lightColors } from '../semantics'
 
 const Grid = styled.div<{ headingCount: number }>`
   display: grid;
@@ -22,14 +21,14 @@ const Grid = styled.div<{ headingCount: number }>`
     `repeat(${headingCount}, 1fr)`};
   grid-auto-rows: minmax(50px, auto);
   border-bottom: 1px solid;
-  border-color: ${lightColors['border/default']};
+  border-color: ${({ theme }) => theme.colors['border/default']};
   > div {
-    border-bottom: 1px solid ${lightColors['border/default']};
+    border-bottom: 1px solid ${({ theme }) => theme.colors['border/default']};
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     grid-template-columns: auto;
     > div:not(:nth-last-child(-n + 1)) {
-      border-bottom: 1px solid ${lightColors['border/default']};
+      border-bottom: 1px solid ${({ theme }) => theme.colors['border/default']};
     }
   }
 `

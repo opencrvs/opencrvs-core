@@ -12,7 +12,7 @@ import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { Button, ITheme, Dialog, lightColors } from '@opencrvs/components'
+import { Button, ITheme, Dialog } from '@opencrvs/components'
 import Cropper from 'react-easy-crop'
 import type { Point, Area, Size } from 'react-easy-crop'
 import styled, { useTheme } from 'styled-components'
@@ -77,11 +77,11 @@ const DefaultImage = styled.div<{ width: number; height: number }>`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: ${lightColors['surface/inset']};
+  background-color: ${({ theme }) => theme.colors['surface/inset']};
 `
 
 const ErrorMessage = styled.div`
-  color: ${lightColors['feedback/negative']};
+  color: ${({ theme }) => theme.colors['feedback/negative']};
 `
 
 interface IProps {

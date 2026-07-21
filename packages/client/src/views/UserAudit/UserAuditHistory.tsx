@@ -31,7 +31,7 @@ import format from '@client/utils/date-formatting'
 import { Text } from '@opencrvs/components/lib/Text'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import { useTRPC } from '@client/v2-events/trpc'
-import { Link, lightColors } from '@opencrvs/components'
+import { Link } from '@opencrvs/components'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@client/v2-events/routes'
 import {
@@ -76,11 +76,11 @@ const HistoryHeader = styled.div`
 
 const RecentActionsHolder = styled.div`
   margin-top: 24px;
-  border-top: 1px solid ${lightColors['border/subtle']};
+  border-top: 1px solid ${({ theme }) => theme.colors['border/subtle']};
 `
 
 const AuditContent = styled.div`
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
 `
 
 interface IBaseProp {

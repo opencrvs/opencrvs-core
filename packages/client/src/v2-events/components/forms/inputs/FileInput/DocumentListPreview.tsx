@@ -20,13 +20,12 @@ import {
   FileFieldValueWithOption,
   SelectOption
 } from '@opencrvs/commons/client'
-import { lightColors } from '@opencrvs/components'
 
 const Wrapper = styled.div`
   max-width: 100%;
   & > *:last-child {
     margin-bottom: 8px;
-    border-bottom: 1.5px solid ${lightColors['border/subtle']};
+    border-bottom: 1.5px solid ${({ theme }) => theme.colors['border/subtle']};
   }
 `
 const Container = styled.div`
@@ -35,7 +34,7 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 4px;
-  border-top: 1.5px solid ${lightColors['border/subtle']};
+  border-top: 1.5px solid ${({ theme }) => theme.colors['border/subtle']};
   height: 48px;
   padding: 0px 10px;
 `

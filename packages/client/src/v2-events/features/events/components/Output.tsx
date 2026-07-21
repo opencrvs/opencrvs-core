@@ -12,7 +12,6 @@
 import React from 'react'
 import styled from 'styled-components'
 import { isUndefined } from 'lodash'
-import { lightColors } from '@opencrvs/components'
 import {
   FieldConfig,
   FieldValue,
@@ -94,7 +93,7 @@ import { Data } from '../registered-fields/Data'
 import { Custom } from '../registered-fields/Custom'
 
 const Deleted = styled.del`
-  color: ${lightColors['feedback/negative']};
+  color: ${({ theme }) => theme.colors['feedback/negative']};
 `
 
 const DeletedEmpty = styled(Deleted)`

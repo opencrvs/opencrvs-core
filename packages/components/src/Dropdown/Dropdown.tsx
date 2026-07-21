@@ -13,7 +13,6 @@ import React, { ReactNode, useEffect } from 'react'
 import { disabled } from '../Button/Button.styles'
 import styled from 'styled-components'
 import { DropdownProvider, useDropdown } from './DropdownContext'
-import { lightColors } from '../semantics'
 
 const StyledWrapper = styled.nav`
   position: relative;
@@ -47,8 +46,8 @@ const StyledContent = styled.ul.withConfig({
   // Forward popover prop directly
 })<StyledContentProp>`
   border-radius: 4px;
-  border: 1px solid ${lightColors['border/strong']};
-  background-color: ${lightColors['surface/raised']};
+  border: 1px solid ${({ theme }) => theme.colors['border/strong']};
+  background-color: ${({ theme }) => theme.colors['surface/raised']};
   ${({ theme }) => theme.shadows.light};
   text-align: left;
   min-width: 256px;
@@ -73,13 +72,13 @@ const Label = styled.li`
 
 const Separator = styled.div<{ weight: number }>`
   border-bottom: ${({ weight }) => `${weight}px solid `}
-    ${lightColors['border/strong']};
+    ${({ theme }) => theme.colors['border/strong']};
   margin: 4px 0;
 `
 
 const MenuItem = styled.li<{ disabled?: boolean }>`
   ${({ theme }) => theme.fonts.bold14};
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
   display: flex;
   align-items: center;
   gap: 12px;
@@ -88,15 +87,15 @@ const MenuItem = styled.li<{ disabled?: boolean }>`
   border-radius: 2px;
   padding: 8px 12px;
   &:hover {
-    background: ${lightColors['action/secondary']};
-    color: ${lightColors['text/primary']};
+    background: ${({ theme }) => theme.colors['action/secondary']};
+    color: ${({ theme }) => theme.colors['text/primary']};
   }
   &:active {
-    background: ${lightColors['action/secondaryHover']};
-    color: ${lightColors['text/primary']};
+    background: ${({ theme }) => theme.colors['action/secondaryHover']};
+    color: ${({ theme }) => theme.colors['text/primary']};
   }
   &:focus-visible {
-    background-color: ${lightColors['feedback/focus']};
+    background-color: ${({ theme }) => theme.colors['feedback/focus']};
   }
   ${(props) => props.disabled && disabled}
 `

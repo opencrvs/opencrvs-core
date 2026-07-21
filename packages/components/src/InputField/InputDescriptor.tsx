@@ -10,11 +10,10 @@
  */
 import React, { ReactNode } from 'react'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 export const InputDescriptor = styled.p`
   ${({ theme }) => theme.fonts.reg16};
-  color: ${lightColors['text/secondary']};
+  color: ${({ theme }) => theme.colors['text/secondary']};
   width: 100%;
   margin: 0;
   padding-bottom: 8px;

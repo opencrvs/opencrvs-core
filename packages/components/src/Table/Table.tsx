@@ -17,7 +17,6 @@ import {
   ColumnContentAlignment
 } from '../Workqueue'
 import { Pagination } from '../Pagination'
-import { lightColors } from '../semantics'
 
 const Wrapper = styled.div<{
   fixedWidth: number | undefined
@@ -28,7 +27,7 @@ const Wrapper = styled.div<{
   @media (max-width: ${({ fixedWidth }) => fixedWidth}px) {
     width: 100%;
   }
-  background: ${lightColors['surface/default']};
+  background: ${({ theme }) => theme.colors['surface/default']};
 `
 const TableHeader = styled.div<{
   totalWidth?: number
@@ -36,11 +35,11 @@ const TableHeader = styled.div<{
 }>`
   ${({ fixedWidth, totalWidth }) =>
     fixedWidth ? `width: ${fixedWidth}px;` : `width: ${totalWidth || 100}%;`}
-  background: ${lightColors['surface/inset']};
+  background: ${({ theme }) => theme.colors['surface/inset']};
   padding: 10px 0px;
   display: flex;
   align-items: top;
-  border-bottom: 1px solid ${lightColors['border/strong']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors['border/strong']};
   border-radius: 2px 2px 0 0;
 
   & span:first-child {
@@ -54,14 +53,14 @@ const TableHeader = styled.div<{
 
 const TableHeaderText = styled.div`
   ${({ theme }) => theme.fonts.bold14};
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
 `
 
 const TableBody = styled.div<{
   footerColumns: boolean
   columns: IColumn[]
 }>`
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
   ${({ theme, columns }) =>
     columns.length > 3 && columns.length <= 5
       ? theme.fonts.reg14
@@ -91,7 +90,7 @@ const RowWrapper = styled.div<{
   min-height: 48px;
   padding-top: 10px;
   padding-bottom: 10px;
-  border-bottom: 1px solid ${lightColors['border/default']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors['border/default']};
 
   &:last-child {
     ${({ hideTableBottomBorder }) =>
@@ -112,11 +111,11 @@ const TableFooter = styled(RowWrapper)<{
     fixedWidth ? `width: ${fixedWidth}px;` : `width: ${totalWidth || 100}%;`}
   display: flex;
   align-items: top;
-  background: ${lightColors['surface/inset']};
-  border-top: 2px solid ${lightColors['border/strong']};
+  background: ${({ theme }) => theme.colors['surface/inset']};
+  border-top: 2px solid ${({ theme }) => theme.colors['border/strong']};
   border-bottom: none;
   & span {
-    color: ${lightColors['text/primary']};
+    color: ${({ theme }) => theme.colors['text/primary']};
     ${({ theme }) => theme.fonts.bold14};
   }
   & span:first-child {
@@ -138,7 +137,7 @@ const ContentWrapper = styled.span<{
   flex-shrink: 0;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   cursor: ${({ sortable }) => (sortable ? 'pointer' : 'default')};
-  color: ${lightColors['text/disabled']};
+  color: ${({ theme }) => theme.colors['text/disabled']};
   padding: 0 4px;
 `
 const ValueWrapper = styled.span<{
@@ -164,18 +163,18 @@ const ValueWrapper = styled.span<{
   ${({ color }) => color && `color: ${color};`}
 `
 const Error = styled.span`
-  color: ${lightColors['feedback/negative']};
+  color: ${({ theme }) => theme.colors['feedback/negative']};
 `
 const ErrorText = styled.div<{ isFullPage?: boolean }>`
   ${({ theme }) => theme.fonts.h3};
   text-align: left;
   margin-left: ${({ isFullPage }) => (isFullPage ? `40px` : `10px`)};
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
 `
 export const LoadingTableGrey = styled.span<{
   width?: number
 }>`
-  background: ${lightColors['surface/page']};
+  background: ${({ theme }) => theme.colors['surface/page']};
   display: inline-block;
   height: 24px;
   width: ${({ width }) => (width ? `${width}%` : '100%')};
@@ -190,12 +189,12 @@ const TableScrollerHorizontal = styled.div<{
     border-radius: 8px;
     width: 8px;
     height: 8px;
-    background: ${lightColors['border/default']};
+    background: ${({ theme }) => theme.colors['border/default']};
   }
 
   &::-webkit-scrollbar-thumb {
     border-radius: 8px;
-    background: ${lightColors['border/strong']};
+    background: ${({ theme }) => theme.colors['border/strong']};
   }
 `
 const TableScroller = styled.div<{

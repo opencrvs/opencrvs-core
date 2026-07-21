@@ -13,7 +13,6 @@ import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { capitalize } from 'lodash'
-import { lightColors } from '@opencrvs/components'
 import { Pill, Link as StyledLink } from '@opencrvs/components/lib'
 import {
   EventConfig,
@@ -47,7 +46,7 @@ const SearchParamContainer = styled.div`
   gap: 10px;
   flex-wrap: wrap;
   align-items: center;
-  color: ${lightColors['action/primaryHover']};
+  color: ${({ theme }) => theme.colors['action/primaryHover']};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     max-height: 200px;
     overflow-y: scroll;

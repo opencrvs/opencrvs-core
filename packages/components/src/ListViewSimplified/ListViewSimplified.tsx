@@ -10,7 +10,6 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 export type IRowListViewSize = 'small' | 'medium'
 
@@ -25,14 +24,14 @@ const Grid = styled.div<{
   ${({ rowHeight }) =>
     rowHeight === 'small' && 'grid-auto-rows: minmax(48px, auto);'}
   ${({ bottomBorder }) => bottomBorder && 'border-bottom: 1px solid'};
-  border-color: ${lightColors['border/default']};
+  border-color: ${({ theme }) => theme.colors['border/default']};
   > div:not(:nth-last-child(-n + 4)) {
-    border-bottom: 1px solid ${lightColors['border/default']};
+    border-bottom: 1px solid ${({ theme }) => theme.colors['border/default']};
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     grid-template-columns: auto;
     > div:not(:nth-last-child(-n + 1)) {
-      border-bottom: 1px solid ${lightColors['border/default']};
+      border-bottom: 1px solid ${({ theme }) => theme.colors['border/default']};
     }
   }
 `
@@ -52,7 +51,7 @@ const ValueContainer = styled.div<{ compactLabel?: boolean }>`
   ${({ compactLabel }) => (!compactLabel ? 'flex: 0 1 50%;' : '')}
   ${({ compactLabel }) => (compactLabel ? 'margin:0 auto;' : '')}
   align-items: center;
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }

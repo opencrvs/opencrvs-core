@@ -11,7 +11,6 @@
 import * as React from 'react'
 import { IButtonSize, dimensionsMap } from '.'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 export enum ICON_ALIGNMENT {
   LEFT,
@@ -34,7 +33,7 @@ const ButtonBase = styled.button.withConfig({
   background: transparent;
   &:disabled {
     path {
-      stroke: ${lightColors['text/disabled']};
+      stroke: ${({ theme }) => theme.colors['text/disabled']};
     }
   }
   -webkit-tap-highlight-color: transparent;

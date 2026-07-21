@@ -13,12 +13,11 @@ import styled from 'styled-components'
 import { Select, ISelectOption as SelectComponentOptions } from '../Select'
 import PanViewer from './components/PanViewer'
 import PanControls from './components/PanControls'
-import { lightColors } from '../semantics'
 
 const ViewerWrapper = styled.div`
   position: relative;
-  background-color: ${lightColors['surface/default']};
-  border: 1px solid ${lightColors['border/strong']};
+  background-color: ${({ theme }) => theme.colors['surface/default']};
+  border: 1px solid ${({ theme }) => theme.colors['border/strong']};
   border-radius: 4px;
   box-sizing: border-box;
   height: calc(100vh - 104px);
@@ -41,8 +40,8 @@ const ViewerHeader = styled.div`
   padding: 0 16px;
   z-index: 99;
   justify-content: space-between;
-  background-color: ${lightColors['surface/default']};
-  border-bottom: 1px solid ${lightColors['border/strong']};
+  background-color: ${({ theme }) => theme.colors['surface/default']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors['border/strong']};
 `
 
 const ViewerImage = styled.div`

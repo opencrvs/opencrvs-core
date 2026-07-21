@@ -12,11 +12,10 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Link, Stack, Text } from '../'
 import { Icon } from '../Icon'
-import { lightColors } from '../semantics'
 
 const Container = styled.div`
   box-sizing: border-box;
-  border-bottom: 1px solid ${lightColors['border/default']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors['border/default']};
   padding: 0;
   width: 100%;
 `
@@ -27,11 +26,11 @@ const AccordionHeader = styled.div`
   flex-direction: row;
 
   &:hover {
-    background: ${lightColors['action/secondary']};
+    background: ${({ theme }) => theme.colors['action/secondary']};
     cursor: pointer;
   }
   &:active {
-    background: ${lightColors['action/secondaryHover']};
+    background: ${({ theme }) => theme.colors['action/secondaryHover']};
     cursor: pointer;
   }
 `

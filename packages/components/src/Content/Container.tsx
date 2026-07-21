@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 export const BodyContent = styled.div`
   max-width: 1140px;
@@ -22,16 +21,16 @@ export const BodyContent = styled.div`
 `
 
 export const Container = styled.div<{ isCertificatesConfigPage?: boolean }>`
-  background-color: ${({ isCertificatesConfigPage }) =>
+  background-color: ${({ isCertificatesConfigPage, theme }) =>
     isCertificatesConfigPage === true
-      ? lightColors['surface/page']
-      : lightColors['surface/default']};
+      ? theme.colors['surface/page']
+      : theme.colors['surface/default']};
   position: absolute;
   min-height: 100vh;
   width: 100%;
 `
 export const FullBodyContent = styled.div`
-  background-color: ${lightColors['surface/page']};
+  background-color: ${({ theme }) => theme.colors['surface/page']};
   flex: 1;
   width: 100%;
   height: 100%;

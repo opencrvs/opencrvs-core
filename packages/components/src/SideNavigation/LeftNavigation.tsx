@@ -12,7 +12,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { ConnectionStatus } from './ConnectionStatus'
-import { lightColors } from '../semantics'
 
 export interface ILeftNavigationProps {
   applicationName: string
@@ -38,18 +37,18 @@ const LeftNavigationContainer = styled.div<{
     navigationWidth ? navigationWidth : 282}px;
   height: 100vh;
   overflow-y: auto;
-  background-color: ${lightColors['surface/default']};
-  border-right: 1px solid ${lightColors['border/strong']};
+  background-color: ${({ theme }) => theme.colors['surface/default']};
+  border-right: 1px solid ${({ theme }) => theme.colors['border/strong']};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     ${({ navigationWidth }) => !navigationWidth && `display: none;`}
   }
 `
 const UserInfo = styled.div`
-  background: ${lightColors['surface/default']};
+  background: ${({ theme }) => theme.colors['surface/default']};
   padding: 32px 24px;
   text-align: justify;
   border: 0px;
-  border-bottom: 1px solid ${lightColors['border/strong']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors['border/strong']};
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
@@ -66,8 +65,8 @@ const Role = styled.p`
 const ApplicationNameContainer = styled.div`
   padding: 16px 20px;
   height: 56px;
-  background-color: ${lightColors['surface/default']};
-  border-bottom: 1px solid ${lightColors['border/strong']};
+  background-color: ${({ theme }) => theme.colors['surface/default']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors['border/strong']};
   box-sizing: border-box;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
@@ -81,10 +80,10 @@ const ApplicationName = styled.div`
 `
 
 const VersionCard = styled.div`
-  color: ${lightColors['text/disabled']};
+  color: ${({ theme }) => theme.colors['text/disabled']};
   height: auto;
   padding: 16px;
-  background-color: ${lightColors['surface/page']};
+  background-color: ${({ theme }) => theme.colors['surface/page']};
   margin: 16px;
   border-radius: 8px;
   display: flex;
@@ -108,12 +107,12 @@ const MenuItem = styled.div`
 
 const VersionCardName = styled.span`
   ${({ theme }) => theme.fonts.bold12};
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
   display: block;
 `
 const UserDescription = styled.span`
   ${({ theme }) => theme.fonts.reg12};
-  color: ${lightColors['text/tertiary']};
+  color: ${({ theme }) => theme.colors['text/tertiary']};
 `
 
 export const LeftNavigation = (props: ILeftNavigationProps) => {

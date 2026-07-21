@@ -15,13 +15,12 @@ import { DeclarationIcon, Cross } from '../icons'
 import { ToggleMenu } from '../ToggleMenu'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
-import { lightColors } from '../semantics'
 
 const TopBar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
   height: 56px;
-  background: ${lightColors['surface/default']};
-  border-bottom: 1px solid ${lightColors['border/strong']};
+  background: ${({ theme }) => theme.colors['surface/default']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors['border/strong']};
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -33,7 +32,7 @@ const TopBar = styled.div`
 const TopBarTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4};
   padding-left: 16px;
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
 `
 
 const ActionContainer = styled.span`

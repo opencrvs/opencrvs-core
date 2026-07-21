@@ -11,7 +11,6 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Link } from '../../Link'
-import { lightColors } from '../../semantics'
 
 export const SkipToContentContainer = styled(Link)`
   left: 0;
@@ -22,8 +21,8 @@ export const SkipToContentContainer = styled(Link)`
   padding: 16px;
   filter: drop-shadow(0px 2px 4px rgba(34, 34, 34, 0.24));
   margin: 8px;
-  background: ${lightColors['feedback/focus']};
-  color: ${lightColors['text/primary']};
+  background: ${({ theme }) => theme.colors['feedback/focus']};
+  color: ${({ theme }) => theme.colors['text/primary']};
 
   &:not(:focus-visible) {
     transition: transform 400ms;

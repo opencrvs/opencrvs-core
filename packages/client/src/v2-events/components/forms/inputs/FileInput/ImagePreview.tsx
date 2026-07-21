@@ -23,7 +23,6 @@ import PanControls from '@opencrvs/components/lib/DocumentViewer/components/PanC
 import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanViewer'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Stack } from '@opencrvs/components/lib/Stack'
-import { lightColors } from '@opencrvs/components'
 import { toFileUrl } from '@client/v2-events/cache'
 
 const ViewerWrapper = styled.div`
@@ -35,7 +34,7 @@ const ViewerWrapper = styled.div`
   z-index: 4;
   width: 100%;
   height: 100%;
-  background: ${lightColors['surface/default']};
+  background: ${({ theme }) => theme.colors['surface/default']};
 `
 
 const ViewerContainer = styled.div`

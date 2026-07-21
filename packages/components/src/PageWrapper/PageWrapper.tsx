@@ -10,13 +10,12 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 const Page = styled.div`
   display: flex;
   min-width: ${({ theme }) => theme.grid.minWidth}px;
   flex-direction: column;
-  background-color: ${lightColors['surface/page']};
+  background-color: ${({ theme }) => theme.colors['surface/page']};
   min-height: 100vh;
   ${({ theme }) => theme.fonts.reg16};
 `
@@ -30,7 +29,7 @@ const Content = styled.section`
   flex: 1;
   width: 100%;
   height: 100%;
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
   ${({ theme }) => theme.fonts.reg16};
 `
 

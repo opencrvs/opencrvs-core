@@ -10,7 +10,6 @@
  */
 import * as React from 'react'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { lightColors } from '@opencrvs/components'
 import { ConnectionError } from '@opencrvs/components/lib/icons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from 'styled-components'
@@ -18,7 +17,7 @@ import { errorMessages, constantsMessages } from '@client/i18n/messages'
 import { useOnlineStatus } from '@client/utils'
 
 const ErrorText = styled.div`
-  color: ${lightColors['feedback/negative']};
+  color: ${({ theme }) => theme.colors['feedback/negative']};
   ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;

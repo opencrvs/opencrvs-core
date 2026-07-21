@@ -22,7 +22,6 @@ import {
   Divider
 } from '@opencrvs/components/lib'
 import { IBreadCrumbData } from '@opencrvs/components/src/Breadcrumb'
-import { lightColors } from '@opencrvs/components'
 import { useParams, useNavigate } from 'react-router-dom'
 import { formatUrl } from '@client/navigation'
 import styled from 'styled-components'
@@ -53,7 +52,7 @@ const NoRecord = styled.div<{ isFullPage?: boolean }>`
   ${({ theme }) => theme.fonts.h3};
   text-align: left;
   margin-left: ${({ isFullPage }) => (isFullPage ? `40px` : `10px`)};
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
   margin-top: 20px;
 `
 

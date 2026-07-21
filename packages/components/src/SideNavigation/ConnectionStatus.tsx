@@ -10,7 +10,6 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 interface ConnectionStatusProps {
   isOnline?: boolean
@@ -21,16 +20,16 @@ const Dot = styled.span<{ isOnline: boolean }>`
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: ${({ isOnline }) =>
+  background-color: ${({ isOnline, theme }) =>
     isOnline
-      ? lightColors['feedback/positive']
-      : lightColors['feedback/negative']};
+      ? theme.colors['feedback/positive']
+      : theme.colors['feedback/negative']};
   margin-right: 4px;
 `
 
 const Label = styled.span`
   ${({ theme }) => theme.fonts.reg12};
-  color: ${lightColors['text/tertiary']};
+  color: ${({ theme }) => theme.colors['text/tertiary']};
 `
 
 const Container = styled.div`

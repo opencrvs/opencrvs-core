@@ -11,7 +11,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Line } from 'rc-progress'
-import { lightColors } from '../semantics'
 
 const HeaderWrapper = styled.div`
   display: flex;
@@ -22,8 +21,8 @@ const HeaderWrapper = styled.div`
 const TitleLink = styled.div<{ disabled?: boolean }>`
   ${({ disabled }) => (disabled ? '' : 'cursor: pointer;')};
   ${({ theme }) => theme.fonts.reg16};
-  color: ${({ disabled }) =>
-    disabled ? lightColors['text/primary'] : lightColors['text/link']};
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors['text/primary'] : theme.colors['text/link']};
   ${({ disabled }) => (disabled ? '' : 'text-decoration: underline')};
 `
 const ValueHolder = styled.div`
@@ -33,12 +32,12 @@ const Value = styled.span`
   ${({ theme }) => theme.fonts.bold16};
 `
 const Percentage = styled.span`
-  color: ${lightColors['text/disabled']};
+  color: ${({ theme }) => theme.colors['text/disabled']};
 `
 const LoaderBox = styled.span<{
   width?: number
 }>`
-  background: ${lightColors['surface/page']};
+  background: ${({ theme }) => theme.colors['surface/page']};
   display: inline-block;
   height: 24px;
   width: ${({ width }) => (width ? `${width}%` : '100%')};

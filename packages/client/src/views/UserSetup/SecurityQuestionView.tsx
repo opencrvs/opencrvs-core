@@ -28,8 +28,7 @@ import {
   Select,
   Frame,
   AppBar,
-  Button,
-  lightColors
+  Button
 } from '@opencrvs/components'
 import { find, at } from 'lodash'
 import {
@@ -157,7 +156,7 @@ const FullWidthInput = styled(TextInput)`
   }
 `
 const Error = styled.span`
-  color: ${lightColors['feedback/negative']};
+  color: ${({ theme }) => theme.colors['feedback/negative']};
   ${({ theme }) => theme.fonts.reg12};
 `
 

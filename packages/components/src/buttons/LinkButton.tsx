@@ -10,7 +10,6 @@
  */
 import styled from 'styled-components'
 import { Button } from './Button'
-import { lightColors } from '../semantics'
 
 /** @deprecated Use Link instead */
 export const LinkButton = styled(Button)<{
@@ -18,34 +17,34 @@ export const LinkButton = styled(Button)<{
 }>`
   ${({ theme, isBoldLink }) =>
     isBoldLink ? theme.fonts.bold16 : theme.fonts.reg16}
-  color: ${lightColors['text/disabled']};
+  color: ${({ theme }) => theme.colors['text/disabled']};
   padding: 0;
   margin-left: -8px;
   border-radius: 2px;
   &:focus {
-    background: ${lightColors['feedback/focus']};
-    color: ${lightColors['text/primary']};
+    background: ${({ theme }) => theme.colors['feedback/focus']};
+    color: ${({ theme }) => theme.colors['text/primary']};
   }
   &:not([data-focus-visible-added]) {
     background: transparent;
     padding: 0;
-    color: ${lightColors['text/link']};
+    color: ${({ theme }) => theme.colors['text/link']};
   }
 
   &:active {
-    color: ${lightColors['action/primaryHover']};
+    color: ${({ theme }) => theme.colors['action/primaryHover']};
     text-decoration-line: underline;
     text-underline-offset: 4px;
   }
 
   &:hover {
-    color: ${lightColors['action/primaryHover']};
+    color: ${({ theme }) => theme.colors['action/primaryHover']};
     text-decoration-line: underline;
     text-underline-offset: 4px;
   }
 
   &:disabled {
-    color: ${lightColors['text/disabled']};
+    color: ${({ theme }) => theme.colors['text/disabled']};
     background-color: transparent;
   }
 `

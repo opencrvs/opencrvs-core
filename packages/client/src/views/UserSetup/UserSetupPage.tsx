@@ -25,11 +25,10 @@ import { messages } from '@client/i18n/messages/views/userSetup'
 import { getOfflineData } from '@client/offline/selectors'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { Box } from '@opencrvs/components/lib/Box'
-import { lightColors } from '@opencrvs/components'
 import { useSelector } from 'react-redux'
 
 export const Page = styled.div`
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
   min-height: 100vh;
   display: flex;
   flex-direction: column;

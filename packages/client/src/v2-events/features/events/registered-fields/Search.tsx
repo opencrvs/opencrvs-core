@@ -30,8 +30,7 @@ import {
   Loader,
   Stack,
   Text,
-  TextInput,
-  lightColors
+  TextInput
 } from '@opencrvs/components'
 import { useOnlineStatus } from '@client/utils'
 import { useModal } from '@client/v2-events/hooks/useModal'
@@ -158,13 +157,13 @@ function ClearModal({
 }
 
 const StyledContainer = styled(Box)`
-  background: ${lightColors['surface/page']};
+  background: ${({ theme }) => theme.colors['surface/page']};
   border: none;
   flex: 1;
 `
 
 const SearchInputWrapper = styled.div`
-  background-color: ${lightColors['surface/default']};
+  background-color: ${({ theme }) => theme.colors['surface/default']};
   border-radius: 4px;
   display: flex;
   width: 100%;
@@ -183,7 +182,7 @@ const StyledIcon = styled(Icon)`
   position: absolute;
   top: 50%;
   z-index: 2;
-  color: ${lightColors['feedback/info']};
+  color: ${({ theme }) => theme.colors['feedback/info']};
   transform: translateX(50%) translateY(-50%);
   pointer-events: none;
 `

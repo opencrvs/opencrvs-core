@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 export const LoadingGrey = styled.span<{
   width?: number
 }>`
-  background: ${lightColors['surface/page']};
+  background: ${({ theme }) => theme.colors['surface/page']};
   display: inline-block;
   height: 24px;
   width: ${({ width }) => (width ? `${width}%` : '100%')};

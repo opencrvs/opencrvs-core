@@ -14,7 +14,6 @@ import styled from 'styled-components'
 import { MimeType, FieldValue, FileFieldValue } from '@opencrvs/commons/client'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { ImageUploader } from '@opencrvs/components/lib/ImageUploader'
-import { lightColors } from '@opencrvs/components'
 import { formMessages as messages } from '@client/i18n/messages'
 import { setLockBypass } from '@client/utils/lockBypass'
 import { DocumentPreview } from './DocumentPreview'
@@ -22,8 +21,8 @@ import { SingleDocumentPreview } from './SingleDocumentPreview'
 import { useOnFileChange } from './useOnFileChange'
 
 export const DocumentUploader = styled(ImageUploader)<{ fullWidth?: boolean }>`
-  background: ${lightColors['surface/default']};
-  border: 2px solid ${lightColors['border/action']};
+  background: ${({ theme }) => theme.colors['surface/default']};
+  border: 2px solid ${({ theme }) => theme.colors['border/action']};
   border-radius: 4px;
   ${({ theme }) => theme.fonts.bold16};
   height: 46px;

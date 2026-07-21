@@ -10,7 +10,6 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 export interface IBox extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -18,8 +17,8 @@ const Wrapper = styled.div<IBox>`
   position: relative;
   border-radius: 4px;
   padding: 24px;
-  border: 1px solid ${lightColors['border/strong']};
-  background: ${lightColors['surface/default']};
+  border: 1px solid ${({ theme }) => theme.colors['border/strong']};
+  background: ${({ theme }) => theme.colors['surface/default']};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     border: 0;
     padding: 16px;

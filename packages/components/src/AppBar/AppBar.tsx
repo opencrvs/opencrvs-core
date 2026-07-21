@@ -14,13 +14,12 @@ import { grid } from '../grid'
 import { Stack } from '../Stack'
 import { Text } from '../Text'
 import { useWindowSize } from '../hooks'
-import { lightColors } from '../semantics'
 
 const AppBarWrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  background: ${lightColors['surface/default']};
+  background: ${({ theme }) => theme.colors['surface/default']};
 `
 
 const AppBarRowOne = styled.div`
@@ -29,7 +28,7 @@ const AppBarRowOne = styled.div`
   align-items: center;
   height: 56px;
   padding: 0 16px;
-  border-bottom: 1px solid ${lightColors['border/strong']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors['border/strong']};
 `
 
 const AppBarRowTwo = styled.div`
@@ -37,7 +36,7 @@ const AppBarRowTwo = styled.div`
   display: flex;
   align-items: center;
   height: 56px;
-  border-bottom: 1px solid ${lightColors['border/strong']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors['border/strong']};
 `
 
 const Left = styled.div`

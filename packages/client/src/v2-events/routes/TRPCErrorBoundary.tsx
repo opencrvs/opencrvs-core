@@ -15,7 +15,7 @@ import styled from 'styled-components'
 import { TRPCClientError } from '@trpc/client'
 import { connect } from 'react-redux'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { Button, Box, PageWrapper, lightColors } from '@opencrvs/components'
+import { Button, Box, PageWrapper } from '@opencrvs/components'
 import { errorMessages, buttonMessages } from '@client/i18n/messages'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 
@@ -28,13 +28,13 @@ const ErrorContainer = styled(Box)`
 `
 const ErrorTitle = styled.h1`
   ${({ theme }) => theme.fonts.h1};
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
   margin-bottom: 16px;
 `
 
 const ErrorMessage = styled.div`
   ${({ theme }) => theme.fonts.reg18};
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
   margin-bottom: 32px;
   text-align: center;
 `

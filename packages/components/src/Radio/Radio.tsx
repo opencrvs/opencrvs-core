@@ -10,7 +10,6 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 const Wrapper = styled.li`
   padding-top: 5px;
@@ -22,14 +21,14 @@ const Label = styled.label`
   position: relative;
   left: 6px;
   top: -2px;
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
   ${({ theme }) => theme.fonts.reg16};
   cursor: pointer;
 `
 
 const Check = styled.span`
   display: inline-block;
-  background: ${lightColors['action/primary']};
+  background: ${({ theme }) => theme.colors['action/primary']};
   border-radius: 50%;
   height: 22px;
   width: 22px;
@@ -41,7 +40,7 @@ const Check = styled.span`
     display: block;
     position: relative;
     content: '';
-    background: ${lightColors['surface/default']};
+    background: ${({ theme }) => theme.colors['surface/default']};
     border-radius: 50%;
     height: 14px;
     width: 14px;
@@ -55,7 +54,7 @@ const Check = styled.span`
     display: block;
     position: relative;
     content: '';
-    background: ${lightColors['surface/default']};
+    background: ${({ theme }) => theme.colors['surface/default']};
     border-radius: 50%;
     height: 18px;
     width: 18px;
@@ -76,7 +75,7 @@ const Input = styled.input`
   /* stylelint-disable */
   &:checked ~ ${Check}::after {
     /* stylelint-enable */
-    background: ${lightColors['action/primary']};
+    background: ${({ theme }) => theme.colors['action/primary']};
   }
 `
 

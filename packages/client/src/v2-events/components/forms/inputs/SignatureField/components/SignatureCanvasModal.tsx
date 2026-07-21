@@ -13,7 +13,7 @@ import { useState } from 'react'
 import { useIntl } from 'react-intl'
 import * as React from 'react'
 import styled from 'styled-components'
-import { Dialog, lightColors } from '@opencrvs/components'
+import { Dialog } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages } from '@client/i18n/messages'
@@ -24,7 +24,7 @@ import { SignatureCanvas } from './SignatureCanvas'
 const SignatureDescription = styled.p`
   margin-top: 0;
   ${({ theme }) => theme.fonts.reg16};
-  color: ${lightColors['text/tertiary']};
+  color: ${({ theme }) => theme.colors['text/tertiary']};
   padding-bottom: 24px;
 `
 

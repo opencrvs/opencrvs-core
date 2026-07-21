@@ -21,7 +21,6 @@ import {
 } from '@opencrvs/components/lib/LocationSearch'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { CircleButton } from '@opencrvs/components/lib/buttons'
-import { lightColors } from '@opencrvs/components'
 import {
   PickerButton,
   ModalContainer as CommonModalContainer,
@@ -29,7 +28,7 @@ import {
   TitleContent,
   CancelableArea
 } from '@client/components/DateRangePicker'
-import styled from 'styled-components'
+import styled, { useTheme } from 'styled-components'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdministrativeArea, Location } from '@opencrvs/commons/client'
 import { useAdministrativeAreas } from '../v2-events/hooks/useAdministrativeAreas'
@@ -58,7 +57,7 @@ const ModalContainer = styled(CommonModalContainer)`
 `
 
 const ModalBody = styled.div`
-  background: ${lightColors['surface/default']};
+  background: ${({ theme }) => theme.colors['surface/default']};
   padding: 8px 0;
 `
 const StyledLocationSearch = styled(LocationSearch)`
@@ -104,6 +103,7 @@ export function LocationPicker({
   additionalLocations = []
 }: LocationPickerProps) {
   const intl = useIntl()
+  const theme = useTheme()
   const [modalVisible, setModalVisible] = useState<boolean>(false)
 
   const { getLocations } = useLocations()
@@ -155,7 +155,9 @@ export function LocationPicker({
             selectedSearchedLocation.displayLabel) ||
             ''}
         </span>
-        <MapPin color={disabled ? lightColors['action/disabled'] : undefined} />
+        <MapPin
+          color={disabled ? theme.colors['action/disabled'] : undefined}
+        />
       </PickerButton>
       {modalVisible && (
         <>

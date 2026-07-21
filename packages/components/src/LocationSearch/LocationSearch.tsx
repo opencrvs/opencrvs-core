@@ -10,7 +10,6 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 import { Icon } from '../Icon'
 import { Button } from '../Button'
 import { InputError } from '../InputField/InputError'
@@ -44,27 +43,27 @@ const SearchTextInput = styled.input<{ error?: boolean; touched?: boolean }>`
   ${({ theme }) => theme.fonts.reg19};
   padding-left: 40px;
 
-  color: ${lightColors['text/primary']};
-  background: ${lightColors['surface/default']};
+  color: ${({ theme }) => theme.colors['text/primary']};
+  background: ${({ theme }) => theme.colors['surface/default']};
   border: 1.5px solid
-    ${({ error, touched }) =>
-      error && touched ? lightColors['feedback/negative'] : lightColors['border/emphasis']};
+    ${({ error, touched, theme }) =>
+      error && touched ? theme.colors['feedback/negative'] : theme.colors['border/emphasis']};
 
   &:focus {
-    outline: 0.5px solid ${lightColors['border/emphasis']};
-    border: 1.5px solid ${lightColors['border/emphasis']};
-    box-shadow: 0 0 0px 4px ${lightColors['feedback/focus']};
+    outline: 0.5px solid ${({ theme }) => theme.colors['border/emphasis']};
+    border: 1.5px solid ${({ theme }) => theme.colors['border/emphasis']};
+    box-shadow: 0 0 0px 4px ${({ theme }) => theme.colors['feedback/focus']};
   }
 
   &:disabled {
-    color: ${lightColors['text/disabled']};
-    border: 1.5px solid ${lightColors['text/disabled']};
+    color: ${({ theme }) => theme.colors['text/disabled']};
+    border: 1.5px solid ${({ theme }) => theme.colors['text/disabled']};
     box-shadow: none;
   }
 `
 
 const DropDownWrapper = styled.ul`
-  background: ${lightColors['surface/raised']};
+  background: ${({ theme }) => theme.colors['surface/raised']};
   box-shadow: 0px 2px 8px rgba(53, 67, 93, 0.54);
   border-radius: 4px;
   position: absolute;
@@ -81,18 +80,18 @@ const DropDownItem = styled.li`
   height: 40px;
   border-radius: 4px;
   margin-bottom: 2px;
-  background-color: ${lightColors['surface/raised']};
+  background-color: ${({ theme }) => theme.colors['surface/raised']};
   padding: 8px 16px;
   white-space: nowrap;
   cursor: pointer;
   ${({ theme }) => theme.fonts.reg18};
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
 
   &:hover {
-    background: ${lightColors['action/secondary']};
+    background: ${({ theme }) => theme.colors['action/secondary']};
   }
   &:active {
-    background: ${lightColors['action/secondaryHover']};
+    background: ${({ theme }) => theme.colors['action/secondaryHover']};
   }
 `
 export interface ISearchLocation {

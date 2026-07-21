@@ -11,7 +11,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import ReactTooltip from 'react-tooltip'
-import { lightColors } from '../semantics'
 
 export type IInputLabel = {
   inputDescriptor?: string
@@ -24,8 +23,8 @@ export type IInputLabel = {
 
 const StyledInputLabel = styled.label<IInputLabel>`
   ${({ theme }) => theme.fonts.h4};
-  color: ${({ disabled }) =>
-    disabled ? lightColors['text/disabled'] : lightColors['text/primary']};
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors['text/disabled'] : theme.colors['text/primary']};
   width: 100%;
   margin-bottom: 5px;
   display: inline-block;
@@ -35,8 +34,8 @@ const Required = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >`
   ${({ theme }) => theme.fonts.h4};
-  color: ${({ disabled }) =>
-    disabled ? lightColors['text/disabled'] : lightColors['feedback/negative']};
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors['text/disabled'] : theme.colors['feedback/negative']};
   flex-grow: 0;
 `
 

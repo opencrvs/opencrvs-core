@@ -13,7 +13,6 @@ import { Link } from '../Link'
 import { Stack } from '../Stack'
 import { Text } from '../Text'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 export interface IBreadCrumbData {
   paramId: string | null | undefined
@@ -25,7 +24,7 @@ const BreadcrumbLink = styled(Link)`
     display: inline-block;
     content: '/';
     padding-left: 4px;
-    color: ${lightColors['text/primary']};
+    color: ${({ theme }) => theme.colors['text/primary']};
   }
 `
 

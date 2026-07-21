@@ -27,8 +27,7 @@ import {
   TextInput,
   Toast,
   Dialog,
-  ToggleMenu,
-  lightColors
+  ToggleMenu
 } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content } from '@opencrvs/components/lib/Content'
@@ -69,8 +68,8 @@ const ScopeTag = styled.span`
   display: inline-block;
   padding: 2px 8px;
   border-radius: 12px;
-  background-color: ${lightColors['action/secondary']};
-  color: ${lightColors['text/tertiary']};
+  background-color: ${({ theme }) => theme.colors['action/secondary']};
+  color: ${({ theme }) => theme.colors['text/tertiary']};
   ${({ theme }) => theme.fonts.reg12};
 `
 

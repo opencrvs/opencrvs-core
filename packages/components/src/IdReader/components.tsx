@@ -11,10 +11,9 @@
 import styled from 'styled-components'
 import { Box } from '../Box'
 import { Stack } from '../Stack'
-import { lightColors } from '../semantics'
 
 export const MainContainer = styled(Box)`
-  background: ${lightColors['surface/page']};
+  background: ${({ theme }) => theme.colors['surface/page']};
   border: none;
   flex: 1;
 `

@@ -9,9 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { lightColors } from '../semantics'
+import { useTheme } from 'styled-components'
 
 export const Cross = (props: React.HTMLAttributes<SVGElement>) => {
+  const theme = useTheme()
   let fill: string
   switch (props.color) {
     case 'white':
@@ -21,10 +22,10 @@ export const Cross = (props: React.HTMLAttributes<SVGElement>) => {
       fill = 'currentColor'
       break
     case 'red':
-      fill = lightColors['feedback/negative']
+      fill = theme.colors['feedback/negative']
       break
     default:
-      fill = lightColors['feedback/info']
+      fill = theme.colors['feedback/info']
   }
   return (
     <svg width={24} height={24} fill="none" {...props}>

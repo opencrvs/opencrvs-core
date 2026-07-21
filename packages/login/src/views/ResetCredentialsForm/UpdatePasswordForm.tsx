@@ -19,7 +19,6 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { lightColors } from '@opencrvs/components'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from 'styled-components'
@@ -29,23 +28,23 @@ import { RouteComponentProps, withRouter } from '@login/common/WithRouterProps'
 import * as routes from '@login/navigation/routes'
 
 const GlobalError = styled.div`
-  color: ${lightColors['feedback/negative']};
+  color: ${({ theme }) => theme.colors['feedback/negative']};
 `
 const PasswordMatch = styled.div`
-  color: ${lightColors['feedback/positive']};
+  color: ${({ theme }) => theme.colors['feedback/positive']};
   margin-top: 8px;
 `
 const PasswordMismatch = styled.div`
-  color: ${lightColors['feedback/negative']};
+  color: ${({ theme }) => theme.colors['feedback/negative']};
   margin-top: 8px;
 `
 
 const PasswordContents = styled.div`
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
   max-width: 416px;
 `
 const ValidationRulesSection = styled.div`
-  background: ${lightColors['surface/page']};
+  background: ${({ theme }) => theme.colors['surface/page']};
   margin: 16px 0 24px;
   padding: 8px 24px;
   & div {

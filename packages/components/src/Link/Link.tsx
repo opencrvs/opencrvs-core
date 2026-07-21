@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { fonts, IFont } from '../fonts'
-import { lightColors, SemanticColor } from '../semantics'
+import { SemanticColor } from '../semantics'
 import styled, { css } from 'styled-components'
 
 export interface LinkProps
@@ -39,7 +39,7 @@ const StyledLink = styled.button<{
   $underline: boolean
 }>`
   ${({ $font }) => fonts[$font]};
-  ${({ $color }) => `color: ${lightColors[$color]};`}
+  ${({ $color, theme }) => `color: ${theme.colors[$color]};`}
   cursor: pointer;
   padding: 0;
   border: 0;
@@ -50,28 +50,28 @@ const StyledLink = styled.button<{
   overflow: hidden;
   max-width: 100%;
 
-  ${({ $underline, $color }) =>
+  ${({ $underline, $color, theme }) =>
     $underline
       ? underlineStyles
       : css`
           &:hover,
           &:active {
             ${underlineStyles}
-            text-decoration-color: ${lightColors[$color]};
+            text-decoration-color: ${theme.colors[$color]};
           }
         `}
   &:hover,
   &:active {
     ${underlineStyles}
-    ${({ $color }) => `text-decoration-color: ${lightColors[$color]};`}
+    ${({ $color, theme }) => `text-decoration-color: ${theme.colors[$color]};`}
   }
 
   &:focus-visible {
-    background: ${lightColors['feedback/focus']};
-    box-shadow: 0 -2px ${lightColors['feedback/focus']},
-      0px 2px ${lightColors['feedback/focus']},
-      0 4px ${lightColors['text/primary']};
-    color: ${lightColors['text/primary']};
+    background: ${({ theme }) => theme.colors['feedback/focus']};
+    box-shadow: 0 -2px ${({ theme }) => theme.colors['feedback/focus']},
+      0px 2px ${({ theme }) => theme.colors['feedback/focus']},
+      0 4px ${({ theme }) => theme.colors['text/primary']};
+    color: ${({ theme }) => theme.colors['text/primary']};
     outline: none;
     text-decoration: none;
   }

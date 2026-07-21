@@ -13,7 +13,6 @@ import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { lightColors } from '@opencrvs/components'
 import { ClearText } from '@opencrvs/components/src/icons'
 import { Button } from '@opencrvs/components/src/Button'
 import { Icon } from '@opencrvs/components/src/Icon'
@@ -23,28 +22,28 @@ import { serializeSearchParams } from '@client/v2-events/features/events/Search/
 import { getScope } from '@client/profile/profileSelectors'
 
 const SearchBox = styled.div`
-  background: ${lightColors['surface/inset']};
+  background: ${({ theme }) => theme.colors['surface/inset']};
   box-sizing: border-box;
   width: 664px;
   height: 40px;
   border-radius: 40px;
 
   &:hover {
-    outline: 1px solid ${lightColors['border/strong']};
-    background: ${lightColors['surface/inset']};
+    outline: 1px solid ${({ theme }) => theme.colors['border/strong']};
+    background: ${({ theme }) => theme.colors['surface/inset']};
   }
 
   &:focus-within {
-    outline: 2px solid ${lightColors['border/emphasis']};
-    background: ${lightColors['surface/default']};
+    outline: 2px solid ${({ theme }) => theme.colors['border/emphasis']};
+    background: ${({ theme }) => theme.colors['surface/default']};
   }
 
   &:active {
-    outline: 2px solid ${lightColors['border/emphasis']};
+    outline: 2px solid ${({ theme }) => theme.colors['border/emphasis']};
   }
 
   &:focus-within input {
-    background: ${lightColors['surface/default']};
+    background: ${({ theme }) => theme.colors['surface/default']};
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.xl}px) {
@@ -62,7 +61,7 @@ const Wrapper = styled.form`
   border-radius: 2px;
   display: flex;
   ${({ theme }) => theme.fonts.bold14};
-  color: ${lightColors['action/primary']};
+  color: ${({ theme }) => theme.colors['action/primary']};
   padding: 0px 8px 0px 4px;
   position: relative;
 `
@@ -78,7 +77,7 @@ const SearchInput = styled.input`
   white-space: nowrap;
   &:focus {
     outline: none;
-    background-color: ${lightColors['surface/default']};
+    background-color: ${({ theme }) => theme.colors['surface/default']};
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {

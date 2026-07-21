@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 /** @deprecated in favor of `<Toast>` / `<Alert>` */
 export const ErrorMessage = styled.p`
-  color: ${lightColors['text/onAction']};
-  background: ${lightColors['action/negative']};
+  color: ${({ theme }) => theme.colors['text/onAction']};
+  background: ${({ theme }) => theme.colors['action/negative']};
   padding: 8px 24px;
   text-align: center;
 `

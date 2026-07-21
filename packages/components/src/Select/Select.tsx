@@ -13,7 +13,6 @@ import { default as ReactSelect, components } from 'react-select'
 import styled from 'styled-components'
 import { Props } from 'react-select/lib/Select'
 import { Icon } from '../Icon'
-import { lightColors } from '../semantics'
 
 import { IndicatorProps } from 'react-select/lib/components/indicators'
 
@@ -44,48 +43,48 @@ const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
 const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   width: 100%;
   ${({ theme }) => theme.fonts.reg19};
-  background: ${lightColors['surface/default']};
-  color: ${lightColors['text/primary']};
+  background: ${({ theme }) => theme.colors['surface/default']};
+  color: ${({ theme }) => theme.colors['text/primary']};
   border-radius: 4px;
   &:hover {
-    box-shadow: 0 0 0 4px ${lightColors['border/default']};
+    box-shadow: 0 0 0 4px ${({ theme }) => theme.colors['border/default']};
   }
 
   .react-select__control {
     height: 48px;
     cursor: pointer;
     border: 1.5px solid
-      ${({ error, touched, disabled }) =>
+      ${({ error, touched, disabled, theme }) =>
         error && touched
-          ? lightColors['feedback/negative']
+          ? theme.colors['feedback/negative']
           : disabled
-            ? lightColors['border/strong']
-            : lightColors['text/primary']};
+            ? theme.colors['border/strong']
+            : theme.colors['text/primary']};
     &:hover {
       border: 1.5px solid
-        ${({ error, touched, disabled }) =>
+        ${({ error, touched, disabled, theme }) =>
           error && touched
-            ? lightColors['feedback/negative']
+            ? theme.colors['feedback/negative']
             : disabled
-              ? lightColors['border/strong']
-              : lightColors['text/primary']};
+              ? theme.colors['border/strong']
+              : theme.colors['text/primary']};
       outline: 0.5px solid
-        ${({ error, touched, disabled }) =>
+        ${({ error, touched, disabled, theme }) =>
           error && touched
-            ? lightColors['feedback/negative']
+            ? theme.colors['feedback/negative']
             : disabled
-              ? lightColors['border/strong']
-              : lightColors['text/primary']};
+              ? theme.colors['border/strong']
+              : theme.colors['text/primary']};
     }
     &:focus {
-      outline: 0.5px solid ${lightColors['border/emphasis']};
-      border: 1.5px solid ${lightColors['border/emphasis']};
-      color: ${lightColors['text/primary']};
+      outline: 0.5px solid ${({ theme }) => theme.colors['border/emphasis']};
+      border: 1.5px solid ${({ theme }) => theme.colors['border/emphasis']};
+      color: ${({ theme }) => theme.colors['text/primary']};
     }
   }
 
   .react-select__placeholder {
-    color: ${lightColors['text/disabled']};
+    color: ${({ theme }) => theme.colors['text/disabled']};
   }
 
   .react-select__indicator-separator {
@@ -93,17 +92,17 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   }
 
   .react-select__control--is-focused {
-    outline: 0.5px solid ${lightColors['border/emphasis']};
-    border: 1.5px solid ${lightColors['border/emphasis']};
-    box-shadow: 0 0 0 4px ${lightColors['feedback/focus']};
+    outline: 0.5px solid ${({ theme }) => theme.colors['border/emphasis']};
+    border: 1.5px solid ${({ theme }) => theme.colors['border/emphasis']};
+    box-shadow: 0 0 0 4px ${({ theme }) => theme.colors['feedback/focus']};
   }
 
   .react-select__control--is-active {
-    box-shadow: 0 0 0 4px ${lightColors['feedback/focus']};
+    box-shadow: 0 0 0 4px ${({ theme }) => theme.colors['feedback/focus']};
   }
 
   .react-select__control--is-disabled {
-    background-color: ${lightColors['surface/default']};
+    background-color: ${({ theme }) => theme.colors['surface/default']};
   }
 
   .react-select__value-container {
@@ -115,28 +114,28 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     border-radius: 4px;
     padding: 10px 16px;
     ${({ theme }) => theme.fonts.reg18};
-    background-color: ${lightColors['surface/default']};
+    background-color: ${({ theme }) => theme.colors['surface/default']};
   }
 
   .react-select__option--is-focused {
-    background-color: ${lightColors['surface/hover']};
-    color: ${lightColors['text/primary']};
+    background-color: ${({ theme }) => theme.colors['surface/hover']};
+    color: ${({ theme }) => theme.colors['text/primary']};
     &:active {
-      background: ${lightColors['surface/inset']};
-      color: ${lightColors['text/primary']};
+      background: ${({ theme }) => theme.colors['surface/inset']};
+      color: ${({ theme }) => theme.colors['text/primary']};
     }
   }
   .react-select__option--is-selected {
-    background-color: ${lightColors['action/secondaryHover']};
-    color: ${lightColors['text/primary']};
+    background-color: ${({ theme }) => theme.colors['action/secondaryHover']};
+    color: ${({ theme }) => theme.colors['text/primary']};
     &:active {
-      background: ${lightColors['action/secondaryHover']};
-      color: ${lightColors['text/primary']};
+      background: ${({ theme }) => theme.colors['action/secondaryHover']};
+      color: ${({ theme }) => theme.colors['text/primary']};
     }
   }
 
   .react-select__single-value--is-disabled {
-    color: ${lightColors['text/tertiary']};
+    color: ${({ theme }) => theme.colors['text/tertiary']};
   }
 
   .react-select__menu {

@@ -10,7 +10,8 @@
  */
 
 import * as React from 'react'
-import { lightColors, SemanticColor } from '../semantics'
+import { useTheme } from 'styled-components'
+import { SemanticColor } from '../semantics'
 import * as icons from './all-icons'
 import { IconWeight } from 'phosphor-react'
 
@@ -38,10 +39,11 @@ export function Icon({
   disabled = false,
   ...rest
 }: IconProps) {
+  const theme = useTheme()
   const IconComponent = icons[name]
   return (
     <IconComponent
-      color={color === 'currentColor' ? 'currentColor' : lightColors[color]}
+      color={color === 'currentColor' ? 'currentColor' : theme.colors[color]}
       opacity={disabled ? 0.5 : 1}
       size={IconSize[size]}
       weight={weight}

@@ -12,7 +12,6 @@ import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
 import { IDataPoint } from '../chart-datapoint-types'
 import { ITheme } from '../theme'
-import { lightColors } from '../semantics'
 
 export interface IBarChartProps {
   data: IDataPoint[]
@@ -27,7 +26,7 @@ const Estimate = styled.div`
   height: 60px;
   width: 100%;
   box-sizing: border-box;
-  border: 2px dashed ${lightColors['action/primary']};
+  border: 2px dashed ${({ theme }) => theme.colors['action/primary']};
   padding: 6px;
 `
 
@@ -75,7 +74,7 @@ export const Bar = withTheme((props: IBarChartProps & { theme: ITheme }) => {
   const totalValue =
     allTotalPoints.length > 0 ? sumOfTotalPoints : otherPointsValue
 
-  const colours = [lightColors['action/primary']]
+  const colours = [props.theme.colors['action/primary']]
 
   if (estimatePoint) {
     return (

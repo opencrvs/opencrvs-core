@@ -12,10 +12,9 @@ import { Text } from '../Text'
 import { Stack } from '../Stack'
 import React from 'react'
 import styled, { keyframes } from 'styled-components'
-import { lightColors } from '../semantics'
 
 const ProgressBackground = styled.div`
-  background: ${lightColors['surface/inset']};
+  background: ${({ theme }) => theme.colors['surface/inset']};
   height: 100vh;
   width: 100%;
   display: flex;
@@ -31,7 +30,7 @@ const ProgressBar = styled.div`
   margin-top: 27px;
   border-radius: 100px;
   opacity: 0px;
-  background: ${lightColors['action/secondaryPressed']};
+  background: ${({ theme }) => theme.colors['action/secondaryPressed']};
 `
 
 const ProgressAnimation = keyframes`
@@ -48,7 +47,7 @@ const Progress = styled.div`
   gap: 0px;
   border-radius: 100px;
   opacity: 0px;
-  background: ${lightColors['action/primary']};
+  background: ${({ theme }) => theme.colors['action/primary']};
   animation: ${ProgressAnimation} 300s ease;
 `
 export const LoadingBar = () => (

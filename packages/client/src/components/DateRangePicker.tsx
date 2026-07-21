@@ -12,7 +12,7 @@ import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import styled from 'styled-components'
 import format from '@client/utils/date-formatting'
 import { CircleButton } from '@opencrvs/components/lib/buttons'
-import { Button, lightColors } from '@opencrvs/components'
+import { Button } from '@opencrvs/components'
 import { IActionObject } from '@opencrvs/components/lib/common-types'
 import {
   Calendar,
@@ -137,7 +137,7 @@ export const ModalContainer = styled.div`
   transform: translateX(50%);
   ${({ theme }) => theme.shadows.heavy};
   border-radius: 4px;
-  color: ${lightColors['text/primary']};
+  color: ${({ theme }) => theme.colors['text/primary']};
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     max-width: calc(100vw - 24px * 2);
@@ -148,8 +148,8 @@ export const ModalHeader = styled.div<{ hide?: boolean }>`
   padding: 8px 16px;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid ${lightColors['border/default']};
-  background: ${lightColors['surface/default']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors['border/default']};
+  background: ${({ theme }) => theme.colors['surface/default']};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     ${({ hide }) => (hide ? `display: none;` : '')}
   }
@@ -167,8 +167,8 @@ export const TitleContent = styled.div`
 const ModalBody = styled.div`
   display: flex;
   flex: 1;
-  border-bottom: 1px solid ${lightColors['border/default']};
-  background: ${lightColors['surface/default']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors['border/default']};
+  background: ${({ theme }) => theme.colors['surface/default']};
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
@@ -186,8 +186,8 @@ const ModalBodyMobile = styled(ModalBody)`
 const PresetContainer = styled.div`
   flex: 0.9;
   flex-direction: column;
-  background: ${lightColors['surface/default']};
-  border-right: 1px solid ${lightColors['border/subtle']};
+  background: ${({ theme }) => theme.colors['surface/default']};
+  border-right: 1px solid ${({ theme }) => theme.colors['border/subtle']};
 
   & > :last-child {
     display: none;
@@ -236,12 +236,12 @@ const YearLabelContainer = styled.div`
 `
 
 const MonthSelectorHeader = styled.div`
-  background: ${lightColors['surface/default']};
+  background: ${({ theme }) => theme.colors['surface/default']};
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 0 16px;
     border-radius: 2px;
-    border-bottom: 1px solid ${lightColors['border/subtle']};
+    border-bottom: 1px solid ${({ theme }) => theme.colors['border/subtle']};
   }
 `
 const MonthContainer = styled.div`
@@ -274,7 +274,7 @@ const NavigatorContainer = styled.div`
 const MonthButtonsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  background: ${lightColors['surface/default']};
+  background: ${({ theme }) => theme.colors['surface/default']};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     border-radius: 2px;
   }
@@ -290,19 +290,19 @@ const PresetRangeButton = styled.button<{ selected?: boolean }>`
     outline: none;
   }
 
-  ${({ selected }) =>
+  ${({ selected, theme }) =>
     selected
-      ? `background: ${lightColors['action/primary']};
-  color: ${lightColors['text/onAction']};`
+      ? `background: ${theme.colors['action/primary']};
+  color: ${theme.colors['text/onAction']};`
       : `background: none;
-  color: ${lightColors['text/primary']};`}
+  color: ${theme.colors['text/primary']};`}
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 12px 24px;
 
     &:active {
-      background: ${lightColors['action/primaryHover']};
-      color: ${lightColors['text/onAction']};
+      background: ${({ theme }) => theme.colors['action/primaryHover']};
+      color: ${({ theme }) => theme.colors['text/onAction']};
     }
   }
 `
@@ -311,12 +311,12 @@ const MonthButton = styled.button<{ selected?: boolean }>`
   height: 40px;
   width: 64px;
   border: 0;
-  ${({ selected }) =>
+  ${({ selected, theme }) =>
     selected
-      ? `background: ${lightColors['action/primary']};
-  color: ${lightColors['text/onAction']};`
+      ? `background: ${theme.colors['action/primary']};
+  color: ${theme.colors['text/onAction']};`
       : `background: none;
-  color: ${lightColors['text/primary']};`}
+  color: ${theme.colors['text/primary']};`}
 
   cursor: pointer;
   &:focus {
@@ -324,7 +324,7 @@ const MonthButton = styled.button<{ selected?: boolean }>`
   }
 
   &:disabled {
-    color: ${lightColors['text/disabled']};
+    color: ${({ theme }) => theme.colors['text/disabled']};
     cursor: default;
   }
 
@@ -337,10 +337,10 @@ const MonthButton = styled.button<{ selected?: boolean }>`
     -moz-background-clip: content-box;
 
     &:active {
-      background: ${lightColors['action/primaryHover']};
+      background: ${({ theme }) => theme.colors['action/primaryHover']};
       background-clip: content-box;
       -moz-background-clip: content-box;
-      color: ${lightColors['text/onAction']};
+      color: ${({ theme }) => theme.colors['text/onAction']};
     }
   }
 `
@@ -349,7 +349,7 @@ const ModalFooter = styled.div`
   flex-direction: row-reverse;
   padding: 8px 16px;
   align-items: center;
-  background: ${lightColors['surface/default']};
+  background: ${({ theme }) => theme.colors['surface/default']};
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
@@ -365,7 +365,7 @@ export const CancelableArea = styled.div`
   overflow: hidden;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    background: ${lightColors['surface/inverse']};
+    background: ${({ theme }) => theme.colors['surface/inverse']};
     opacity: 0.5;
   }
 `

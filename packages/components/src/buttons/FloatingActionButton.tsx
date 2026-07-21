@@ -11,12 +11,11 @@
 import * as React from 'react'
 
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 const ButtonStyled = styled.button`
   height: 56px;
   width: 56px;
   border-radius: 100%;
-  background: ${lightColors['action/primary']};
+  background: ${({ theme }) => theme.colors['action/primary']};
   ${({ theme }) => theme.shadows.light};
   justify-content: center;
   outline: none;
@@ -24,20 +23,20 @@ const ButtonStyled = styled.button`
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   &:hover:enabled {
-    ${lightColors['action/primaryHover']};
-    color: ${lightColors['text/onAction']};
+    ${({ theme }) => theme.colors['action/primaryHover']};
+    color: ${({ theme }) => theme.colors['text/onAction']};
   }
 
   &:active:enabled {
-    background: ${lightColors['action/primary']};
-    border: 3px solid ${lightColors['feedback/focus']};
+    background: ${({ theme }) => theme.colors['action/primary']};
+    border: 3px solid ${({ theme }) => theme.colors['feedback/focus']};
     outline: none;
   }
 
   &:disabled {
-    background-color: ${lightColors['action/disabled']};
+    background-color: ${({ theme }) => theme.colors['action/disabled']};
     cursor: not-allowed;
-    color: ${lightColors['text/disabled']};
+    color: ${({ theme }) => theme.colors['text/disabled']};
   }
 `
 interface IButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

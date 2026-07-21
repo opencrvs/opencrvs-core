@@ -10,7 +10,6 @@
  */
 import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components'
-import { lightColors } from '../semantics'
 
 interface IProps {
   id?: string
@@ -33,7 +32,7 @@ const StyledInput = styled.input`
 const DotFilled = styled.span`
   height: 18px;
   width: 18px;
-  background-color: ${lightColors['action/primary']};
+  background-color: ${({ theme }) => theme.colors['action/primary']};
   border-radius: 50%;
   display: inline-block;
   margin: 0 8px;
@@ -42,7 +41,7 @@ const DotFilled = styled.span`
 const DotUnfilled = styled.span`
   height: 18px;
   width: 18px;
-  border: 2px solid ${lightColors['action/primary']};
+  border: 2px solid ${({ theme }) => theme.colors['action/primary']};
   border-radius: 50%;
   display: inline-block;
   margin: 0 8px;

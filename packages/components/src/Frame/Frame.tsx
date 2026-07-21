@@ -16,7 +16,6 @@ import {
   SkipToContent,
   MAIN_CONTENT_ANCHOR_ID
 } from './components/SkipToContent'
-import { lightColors } from '../semantics'
 
 export interface FrameProps {
   /** Accepts a header component that will be rendered at the top-most portion of an application frame */
@@ -53,7 +52,7 @@ const FrameMainContent = styled.main`
   grid-area: content;
   height: 100%;
   overflow-y: auto;
-  background: ${lightColors['surface/page']};
+  background: ${({ theme }) => theme.colors['surface/page']};
 `
 
 export function Frame({

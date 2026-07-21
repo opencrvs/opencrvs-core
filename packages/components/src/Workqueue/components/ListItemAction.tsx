@@ -15,9 +15,8 @@ import { ArrowExpansionButton } from '../../buttons/ArrowExpansionButton'
 import { Button } from '../../Button'
 import { ColumnContentAlignment, IAction } from '../../common-types'
 import { IActionComponent } from '..'
-import { lightColors } from '../../semantics'
 const Container = styled.div`
-  background: ${lightColors['surface/default']};
+  background: ${({ theme }) => theme.colors['surface/default']};
   display: flex;
   flex-direction: row;
   align-items: center;
