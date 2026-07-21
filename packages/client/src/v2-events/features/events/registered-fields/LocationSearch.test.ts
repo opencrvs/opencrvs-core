@@ -20,8 +20,9 @@ import {
 
 import { filterLocationsByJurisdiction } from './LocationSearch'
 
-const nameOf = (location: ClientLocation) =>
-  resolveVersion(location.versions, todayISO()).name
+function nameOf(location: ClientLocation) {
+  return resolveVersion(location.versions, todayISO()).name
+}
 
 /**
  * Mock data reference (from administrative-hierarchy-mock.ts):

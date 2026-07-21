@@ -192,7 +192,7 @@ function AdministrativeAreaOutput({
       anchor
     )
 
-  return administrativeAreaId ? (resolved ? resolved.name : '') : ''
+  return resolved ? resolved.name : ''
 }
 
 function stringify(

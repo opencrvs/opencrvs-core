@@ -218,8 +218,8 @@ function DeclarationComparisonTableComponent({
           .map((f) => {
             const previous = (
               <Output
-                anchor={anchor}
                 displayEmptyAsDash
+                anchor={anchor}
                 eventConfig={eventConfig}
                 field={f}
                 formConfig={declarationConfig}
@@ -230,8 +230,8 @@ function DeclarationComparisonTableComponent({
 
             const latest = (
               <Output
-                anchor={anchor}
                 displayEmptyAsDash
+                anchor={anchor}
                 eventConfig={eventConfig}
                 field={f}
                 value={latestDeclaration[f.id]}
