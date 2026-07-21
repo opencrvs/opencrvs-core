@@ -189,7 +189,7 @@ export function TRPCProvider({
   children,
   waitForClientRestored = true,
   storeIdentifier = `DEFAULT_IDENTIFIER_FOR_TESTS_ONLY__THIS_SHOULD_NEVER_SHOW_OUTSIDE_STORYBOOK_${getUUID()}`,
-  accessKey
+  userCacheKey
 }: {
   children: React.ReactNode
   /**
@@ -205,7 +205,7 @@ export function TRPCProvider({
   /**
    * A signature of the user's current access (e.g. office + role). We want to bust the cache when the user's access rights change.
    */
-  accessKey?: string
+  userCacheKey?: string
 }) {
   const [queriesRestored, setQueriesRestored] = React.useState(false)
 
@@ -214,7 +214,7 @@ export function TRPCProvider({
       client={queryClient}
       persistOptions={{
         persister: createIDBPersister(storeIdentifier),
-        buster: `persisted-indexed-db-v${CACHE_VERSION}-${accessKey}`,
+        buster: `persisted-indexed-db-v${CACHE_VERSION}-${userCacheKey}`,
         maxAge: Infinity,
         dehydrateOptions: {
           shouldDehydrateQuery: (query) => {
