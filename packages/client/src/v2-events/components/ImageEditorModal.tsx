@@ -14,7 +14,7 @@ import Cropper from 'react-easy-crop'
 import type { Area, Point, Size } from 'react-easy-crop'
 import styled, { useTheme } from 'styled-components'
 import { Dialog } from '@opencrvs/components/lib/Dialog'
-import { Button, Link } from '@opencrvs/components'
+import { Button, Link, lightColors } from '@opencrvs/components'
 import { buttonMessages } from '@client/i18n/messages'
 import { useModal } from '@client/hooks/useModal'
 import { getCroppedImageWithTargetSize, IImage } from '@client/utils/imageUtils'
@@ -48,7 +48,7 @@ const Description = styled.div`
   gap: 10px;
 `
 const Error = styled.div`
-  color: ${({ theme }) => theme.colors.negative};
+  color: ${lightColors['feedback/negative']};
 `
 const DefaultImage = styled.div<{ width: number; height: number }>`
   border-radius: 50%;
@@ -59,7 +59,7 @@ const DefaultImage = styled.div<{ width: number; height: number }>`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: ${({ theme }) => theme.colors.grey100};
+  background-color: ${lightColors['surface/inset']};
 `
 interface ImageEditorModalProps {
   onClose: (result: IImage | null) => void

@@ -28,10 +28,11 @@ import { getPreferredLanguage } from '@client/i18n/utils'
 import { IOfflineData } from '@client/offline/reducer'
 import { isNavigatorOnline } from '@client/utils'
 import { LoadingBar } from '@opencrvs/components/src/LoadingBar/LoadingBar'
+import { lightColors } from '@opencrvs/components'
 import { RouteComponentProps, withRouter } from './WithRouterProps'
 
 const StyledPage = styled.div<IPageProps>`
-  background: ${({ theme }) => theme.colors.background};
+  background: ${lightColors['surface/page']};
   min-height: 100vh;
   box-sizing: border-box;
   justify-content: space-between;

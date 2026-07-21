@@ -27,6 +27,7 @@ import {
   isFieldReference
 } from '@opencrvs/commons/client'
 import { Summary } from '@opencrvs/components/lib/Summary'
+import { lightColors } from '@opencrvs/components'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { makeFormikFieldIdOpenCRVSCompatible } from '@client/v2-events/components/forms/utils'
@@ -86,7 +87,7 @@ function getFieldFromDataEntry({
 }
 
 const Container = styled.div`
-  background-color: ${({ theme }) => theme.colors.background};
+  background-color: ${lightColors['surface/page']};
   padding: 17px 20px 10px;
   border-radius: 5px;
   ${({ theme }) => theme.fonts.reg16}
@@ -100,7 +101,7 @@ const Container = styled.div`
 
 const Subtitle = styled.div`
   ${({ theme }) => theme.fonts.reg16};
-  color: ${({ theme }) => theme.colors.grey500};
+  color: ${lightColors['text/tertiary']};
   margin: 0 0 1rem;
 `
 

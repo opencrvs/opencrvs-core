@@ -11,7 +11,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { defineMessages, useIntl } from 'react-intl'
-import { Spinner } from '@opencrvs/components'
+import { Spinner, lightColors } from '@opencrvs/components'
 import { ConnectionError } from '@opencrvs/components/lib/icons'
 import { useOnlineStatus } from '@client/utils'
 
@@ -48,12 +48,12 @@ const OfflineWrapper = styled.div`
 `
 const OfflineTitle = styled.h2`
   ${({ theme }) => theme.fonts.h2};
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${lightColors['text/primary']};
   margin: 16px 0 8px;
 `
 const OfflineDescription = styled.p`
   ${({ theme }) => theme.fonts.reg16};
-  color: ${({ theme }) => theme.colors.grey500};
+  color: ${lightColors['text/tertiary']};
   margin: 0;
 `
 

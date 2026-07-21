@@ -21,6 +21,7 @@ import {
   ToggleMenu
 } from '@opencrvs/components/lib/ToggleMenu'
 import { Icon } from '@opencrvs/components/lib/Icon'
+import { lightColors } from '@opencrvs/components'
 import { AvatarSmall } from '@client/components/Avatar'
 import { IStoreState } from '@client/store'
 import { getLanguage } from '@client/i18n/selectors'
@@ -34,13 +35,13 @@ import { useCurrentUser } from '@client/v2-events/hooks/useCurrentUser'
 import { User } from '@opencrvs/commons/client'
 
 const UserName = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${lightColors['text/primary']};
   ${({ theme }) => theme.fonts.h4};
   margin-bottom: 6px;
 `
 
 const UserRole = styled.div`
-  color: ${({ theme }) => theme.colors.supportingCopy};
+  color: ${lightColors['text/secondary']};
   ${({ theme }) => theme.fonts.reg14};
   margin-bottom: 6px;
 `

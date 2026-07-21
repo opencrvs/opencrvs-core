@@ -22,7 +22,13 @@ import {
   getCurrentEventState,
   getDeclaration
 } from '@opencrvs/commons/client'
-import { FormTabs, Frame, Icon, IFormTabs } from '@opencrvs/components'
+import {
+  FormTabs,
+  Frame,
+  Icon,
+  IFormTabs,
+  lightColors
+} from '@opencrvs/components'
 import { Duplicate } from '@opencrvs/components/lib/icons'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -120,8 +126,8 @@ export const duplicateMessages = {
 const TopBar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
   height: 56px;
-  background: ${({ theme }) => theme.colors.white};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  background: ${lightColors['surface/default']};
+  border-bottom: 1px solid ${lightColors['border/default']};
   display: flex;
   justify-content: space-between;
   align-items: flex-end;

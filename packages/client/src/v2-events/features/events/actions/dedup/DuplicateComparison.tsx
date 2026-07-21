@@ -29,6 +29,7 @@ import {
   Content,
   ContentSize,
   FullBodyContent,
+  lightColors,
   Stack,
   Text
 } from '@opencrvs/components'
@@ -67,7 +68,7 @@ const MobileOnly = styled.div`
 
 const DocWrapper = styled.div`
   padding: 8px 16px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+  border-bottom: 1px solid ${lightColors['border/subtle']};
 `
 
 interface ComparisonDeclaration {

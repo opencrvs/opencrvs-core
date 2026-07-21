@@ -16,13 +16,14 @@ import {
   Select2
 } from '@opencrvs/components/lib/Select/Select2'
 import styled from 'styled-components'
+import { lightColors } from '@opencrvs/components'
 import { useSearchQuery } from '@login/i18n/utils'
 import { getLanguages, getLanguage } from '@login/i18n/selectors'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { defineMessages, useIntl } from 'react-intl'
 
 const SelectContainer = styled.div`
-  ${({ theme }) => theme.colors.primary};
+  ${lightColors['action/primary']};
   position: absolute;
   top: 0;
   right: 0;

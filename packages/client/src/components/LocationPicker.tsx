@@ -21,7 +21,7 @@ import {
 } from '@opencrvs/components/lib/LocationSearch'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { CircleButton } from '@opencrvs/components/lib/buttons'
-import { colors } from '@opencrvs/components/lib/colors'
+import { lightColors } from '@opencrvs/components'
 import {
   PickerButton,
   ModalContainer as CommonModalContainer,
@@ -58,7 +58,7 @@ const ModalContainer = styled(CommonModalContainer)`
 `
 
 const ModalBody = styled.div`
-  background: ${({ theme }) => theme.colors.white};
+  background: ${lightColors['surface/default']};
   padding: 8px 0;
 `
 const StyledLocationSearch = styled(LocationSearch)`
@@ -155,7 +155,7 @@ export function LocationPicker({
             selectedSearchedLocation.displayLabel) ||
             ''}
         </span>
-        <MapPin color={disabled ? colors.grey200 : undefined} />
+        <MapPin color={disabled ? lightColors['action/disabled'] : undefined} />
       </PickerButton>
       {modalVisible && (
         <>

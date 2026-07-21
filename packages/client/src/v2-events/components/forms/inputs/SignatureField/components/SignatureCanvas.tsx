@@ -14,13 +14,14 @@ import { useIntl } from 'react-intl'
 import * as React from 'react'
 import styled from 'styled-components'
 import SignatureCanvasComponent from 'react-signature-canvas'
+import { lightColors } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import { messages } from '@client/i18n/messages/views/review'
 
 /** Based on packages/client/src/components/form/SignatureField/SignatureUploader.tsx */
 
 const SignatureContainer = styled.div`
-  border: 2px solid ${({ theme }) => theme.colors.grey600};
+  border: 2px solid ${lightColors['border/emphasis']};
   border-radius: 4px;
   width: 100%;
 `

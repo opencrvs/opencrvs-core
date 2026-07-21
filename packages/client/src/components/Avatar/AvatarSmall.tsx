@@ -10,6 +10,7 @@
  */
 import * as React from 'react'
 import { AvatarSmall as DefaultAvatar } from '@opencrvs/components/lib/icons'
+import { lightColors } from '@opencrvs/components'
 import { AVATAR_API } from '@client/utils/constants'
 import styled from 'styled-components'
 import { toFileUrl } from '@client/v2-events/cache'
@@ -28,7 +29,7 @@ const AvatarImage = styled.img`
   }
   &:focus {
     outline: none;
-    box-shadow: 0 0px 0px 2px ${({ theme }) => theme.colors.yellow};
+    box-shadow: 0 0px 0px 2px ${lightColors['feedback/focus']};
   }
 `
 

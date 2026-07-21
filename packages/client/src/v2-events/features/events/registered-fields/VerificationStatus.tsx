@@ -18,7 +18,8 @@ import {
   Pill,
   Dialog,
   Stack,
-  Text
+  Text,
+  lightColors
 } from '@opencrvs/components'
 import * as SupportedIcons from '@opencrvs/components/lib/Icon/all-icons'
 import {
@@ -38,7 +39,7 @@ const HeaderTitle = styled.span`
 `
 
 const RequiredAsterisk = styled.span`
-  color: ${({ theme }) => theme.colors.negative};
+  color: ${lightColors['feedback/negative']};
 `
 
 const PILL_FOR_STATUS = {

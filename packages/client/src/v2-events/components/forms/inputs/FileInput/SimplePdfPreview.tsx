@@ -10,6 +10,7 @@
  */
 import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
+import { lightColors } from '@opencrvs/components'
 import { usePreviewPdf } from '@client/v2-events/hooks/usePreviewPdf'
 
 const ViewerContainer = styled.div`
@@ -22,7 +23,7 @@ const ViewerContainer = styled.div`
   display: flex;
   flex-direction: column; /* stack pages vertically */
   align-items: center; /* center pages horizontally */
-  background: ${({ theme }) => theme.colors.white};
+  background: ${lightColors['surface/default']};
 
   & canvas {
     margin-bottom: 16px; /* spacing between pages */
@@ -38,7 +39,7 @@ const LoadingOverlay = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background: ${({ theme }) => theme.colors.white};
+  background: ${lightColors['surface/default']};
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -65,8 +66,8 @@ const SpinnerAnimation = keyframes`
 const Spinner = styled.div`
   width: 32px;
   height: 32px;
-  border: 4px solid ${({ theme }) => theme.colors.redLight};
-  border-top-color: ${({ theme }) => theme.colors.supportingCopy};
+  border: 4px solid ${lightColors['feedback/negativeSubtle']};
+  border-top-color: ${lightColors['text/secondary']};
   border-radius: 50%;
   animation: ${SpinnerAnimation} 1s linear infinite;
   margin-bottom: 8px;

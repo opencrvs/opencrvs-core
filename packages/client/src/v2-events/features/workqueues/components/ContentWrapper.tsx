@@ -13,7 +13,7 @@ import styled from 'styled-components'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { NoResultText } from '@opencrvs/components/lib/Workqueue'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { Text } from '@opencrvs/components'
+import { Text, lightColors } from '@opencrvs/components'
 import { LoadingIndicator } from '@client/v2-events/components/LoadingIndicator'
 import { useOnlineStatus } from '@client/utils'
 
@@ -22,9 +22,9 @@ import { useOnlineStatus } from '@client/utils'
  */
 
 const TabBarContainer = styled.div`
-  background-color: ${({ theme }) => theme.colors.white};
+  background-color: ${lightColors['surface/default']};
   padding-left: 20px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  border-bottom: 1px solid ${lightColors['border/default']};
 `
 
 const MobileChildrenContainer = styled.div`

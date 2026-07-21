@@ -13,6 +13,7 @@ import styled from 'styled-components'
 import React, { useState } from 'react'
 import PanControls from '@opencrvs/components/lib/DocumentViewer/components/PanControls'
 import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanViewer'
+import { lightColors } from '@opencrvs/components'
 import { DocumentPath } from '@opencrvs/commons/client'
 import { Option } from '@client/v2-events/utils'
 import { toFileUrl } from '@client/v2-events/cache'
@@ -23,8 +24,8 @@ import { SimplePdfPreview } from './FileInput/SimplePdfPreview'
 
 const ViewerWrapper = styled.div`
   position: relative;
-  background-color: ${({ theme }) => theme.colors.white};
-  border: 1px solid ${({ theme }) => theme.colors.grey300};
+  background-color: ${lightColors['surface/default']};
+  border: 1px solid ${lightColors['border/default']};
   border-radius: 4px;
   box-sizing: border-box;
   height: calc(100vh - 104px);
@@ -47,8 +48,8 @@ const ViewerHeader = styled.div`
   padding: 0 16px;
   z-index: 99;
   justify-content: space-between;
-  background-color: ${({ theme }) => theme.colors.white};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  background-color: ${lightColors['surface/default']};
+  border-bottom: 1px solid ${lightColors['border/default']};
 `
 
 const ViewerImage = styled.div`

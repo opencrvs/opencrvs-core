@@ -13,6 +13,7 @@ import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { lightColors } from '@opencrvs/components'
 import { ClearText } from '@opencrvs/components/src/icons'
 import { Button } from '@opencrvs/components/src/Button'
 import { Icon } from '@opencrvs/components/src/Icon'
@@ -22,28 +23,28 @@ import { serializeSearchParams } from '@client/v2-events/features/events/Search/
 import { getScope } from '@client/profile/profileSelectors'
 
 const SearchBox = styled.div`
-  background: ${({ theme }) => theme.colors.grey100};
+  background: ${lightColors['surface/inset']};
   box-sizing: border-box;
   width: 664px;
   height: 40px;
   border-radius: 40px;
 
   &:hover {
-    outline: 1px solid ${({ theme }) => theme.colors.grey400};
-    background: ${({ theme }) => theme.colors.grey100};
+    outline: 1px solid ${lightColors['border/strong']};
+    background: ${lightColors['surface/inset']};
   }
 
   &:focus-within {
-    outline: 2px solid ${({ theme }) => theme.colors.grey600};
-    background: ${({ theme }) => theme.colors.white};
+    outline: 2px solid ${lightColors['border/emphasis']};
+    background: ${lightColors['surface/default']};
   }
 
   &:active {
-    outline: 2px solid ${({ theme }) => theme.colors.grey600};
+    outline: 2px solid ${lightColors['border/emphasis']};
   }
 
   &:focus-within input {
-    background: ${({ theme }) => theme.colors.white};
+    background: ${lightColors['surface/default']};
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.xl}px) {
@@ -61,7 +62,7 @@ const Wrapper = styled.form`
   border-radius: 2px;
   display: flex;
   ${({ theme }) => theme.fonts.bold14};
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${lightColors['action/primary']};
   padding: 0px 8px 0px 4px;
   position: relative;
 `
@@ -77,7 +78,7 @@ const SearchInput = styled.input`
   white-space: nowrap;
   &:focus {
     outline: none;
-    background-color: ${({ theme }) => theme.colors.white};
+    background-color: ${lightColors['surface/default']};
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {

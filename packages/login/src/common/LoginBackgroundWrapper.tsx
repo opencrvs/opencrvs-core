@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import styled, { css, useTheme } from 'styled-components'
+import styled, { css } from 'styled-components'
 import { storage } from '@login/storage'
 import {
   selectCountryBackground,
@@ -18,7 +18,7 @@ import {
 import { LanguageSelect } from '@login/i18n/components/LanguageSelect'
 import { useSelector } from 'react-redux'
 import { isEqual } from 'lodash-es'
-import { ITheme } from '@opencrvs/components'
+import { primitives } from '@opencrvs/components'
 
 const StyledPage = styled.div<{
   background: NonNullable<ReturnType<typeof selectCountryBackground>>
@@ -56,9 +56,8 @@ export interface IProps {
 }
 
 function usePersistentCountryBackground() {
-  const theme = useTheme()
   const [countryBackground, setCountryBackground] = React.useState({
-    backgroundColor: `${(theme as ITheme).colors.purpleDarker}`,
+    backgroundColor: `${primitives.purple[900]}`,
     backgroundImage: '',
     imageFit: ''
   })

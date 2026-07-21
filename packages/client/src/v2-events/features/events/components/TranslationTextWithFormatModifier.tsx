@@ -11,7 +11,7 @@
 import React, { ComponentProps } from 'react'
 import { MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { Text } from '@opencrvs/components'
+import { Text, lightColors } from '@opencrvs/components'
 
 const StyledKbd = styled.kbd`
   /* stylelint-disable-next-line opencrvs/no-font-styles */
@@ -19,10 +19,10 @@ const StyledKbd = styled.kbd`
   /* stylelint-disable-next-line opencrvs/no-font-styles */
   font-size: 0.9em;
   padding: 1px 5px;
-  border: 1px solid ${({ theme }) => theme.colors.grey400};
+  border: 1px solid ${lightColors['border/strong']};
   border-bottom-width: 2px;
   border-radius: 3px;
-  background: ${({ theme }) => theme.colors.grey100};
+  background: ${lightColors['surface/inset']};
 `
 
 const StyledCode = styled.code`
@@ -32,7 +32,7 @@ const StyledCode = styled.code`
   font-size: 0.9em;
   padding: 1px 5px;
   border-radius: 3px;
-  background: ${({ theme }) => theme.colors.grey100};
+  background: ${lightColors['surface/inset']};
 `
 
 interface TranslationTextWithFormatModifierProps

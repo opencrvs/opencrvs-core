@@ -12,7 +12,7 @@ import React, { useState } from 'react'
 import * as Sentry from '@sentry/react'
 import styled from 'styled-components'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { Button, PageWrapper, Box } from '@opencrvs/components'
+import { Button, PageWrapper, Box, lightColors } from '@opencrvs/components'
 import { errorMessages, buttonMessages } from '@client/i18n/messages'
 
 const ErrorContainer = styled(Box)`
@@ -24,13 +24,13 @@ const ErrorContainer = styled(Box)`
 `
 const ErrorTitle = styled.h1`
   ${({ theme }) => theme.fonts.h1};
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${lightColors['text/primary']};
   margin-bottom: 16px;
 `
 
 const ErrorMessage = styled.div`
   ${({ theme }) => theme.fonts.reg18};
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${lightColors['text/primary']};
   margin-bottom: 32px;
 `
 

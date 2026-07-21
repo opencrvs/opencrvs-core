@@ -21,7 +21,8 @@ import {
   Content,
   ContentSize,
   AppBar,
-  Icon
+  Icon,
+  lightColors
 } from '@opencrvs/components'
 import {
   ProtectedAccoutStep,
@@ -33,23 +34,23 @@ import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { EMPTY_STRING } from '@client/utils/constants'
 
 const GlobalError = styled.div`
-  color: ${({ theme }) => theme.colors.negative};
+  color: ${lightColors['feedback/negative']};
 `
 const PasswordMatch = styled.div`
-  color: ${({ theme }) => theme.colors.positive};
+  color: ${lightColors['feedback/positive']};
   margin-top: 8px;
 `
 const PasswordMismatch = styled.div`
-  color: ${({ theme }) => theme.colors.negative};
+  color: ${lightColors['feedback/negative']};
   margin-top: 8px;
 `
 
 const PasswordContents = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${lightColors['text/primary']};
   max-width: 416px;
 `
 const ValidationRulesSection = styled.div`
-  background: ${({ theme }) => theme.colors.background};
+  background: ${lightColors['surface/page']};
   margin: 16px 0 24px;
   padding: 8px 24px;
   & div {

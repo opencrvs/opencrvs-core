@@ -14,7 +14,7 @@ import styled from 'styled-components'
 import { defineMessage, useIntl } from 'react-intl'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { Text } from '@opencrvs/components'
+import { lightColors, primitives, Text } from '@opencrvs/components'
 import { ActionType, ActionStatus } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -24,8 +24,8 @@ import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
 const Wrapper = styled.div`
   display: flex;
   flex: 1;
-  color: ${({ theme }) => theme.colors.white};
-  background-color: ${({ theme }) => theme.colors.orangeDarker};
+  color: ${lightColors['text/onAction']};
+  background-color: ${primitives.orange[900]};
   padding: 8px 20px;
   align-items: center;
 `

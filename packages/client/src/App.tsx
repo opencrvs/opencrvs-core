@@ -13,7 +13,7 @@ import { NotificationComponent } from '@client/components/Notification'
 import { Page } from '@client/components/Page'
 import { ProtectedPage } from '@client/components/ProtectedPage'
 import ScrollToTop from '@client/components/ScrollToTop'
-import { getTheme } from '@opencrvs/components'
+import { getTheme, lightColors } from '@opencrvs/components'
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import {
@@ -44,7 +44,7 @@ const GlobalStyle = createGlobalStyle`
 
 const MainSection = styled.section`
   flex-grow: 8;
-  background: ${({ theme }) => theme.colors.background};
+  background: ${lightColors['surface/page']};
 `
 
 function createRedirect(from: string, to: string) {

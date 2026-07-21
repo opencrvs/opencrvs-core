@@ -21,6 +21,7 @@ import {
   Link,
   ListReview,
   Dialog,
+  lightColors,
   Stack,
   Text,
   TextArea
@@ -53,7 +54,7 @@ import { DocumentViewer } from './DocumentViewer'
 import { TranslationTextWithFormatModifier } from './TranslationTextWithFormatModifier'
 
 const ValidationError = styled.span`
-  color: ${({ theme }) => theme.colors.negative};
+  color: ${lightColors['feedback/negative']};
   display: inline-block;
   text-transform: lowercase;
 
@@ -70,10 +71,10 @@ const Row = styled.div<{
   gap: 24px;
   width: 100%;
   justify-content: ${({ position }) => position || 'center'};
-  background-color: ${({ theme, background }) =>
+  background-color: ${({ background }) =>
     !background || background === 'background'
-      ? theme.colors.background
-      : theme.colors.white};
+      ? lightColors['surface/page']
+      : lightColors['surface/default']};
   flex-direction: row;
   padding: 24px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -82,7 +83,7 @@ const Row = styled.div<{
 `
 const HeaderContainer = styled.div`
   padding: 16px 24px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  border-bottom: 1px solid ${lightColors['border/default']};
 `
 const HeaderContent = styled.div`
   display: flex;
@@ -91,12 +92,12 @@ const HeaderContent = styled.div`
   gap: 16px;
   align-items: center;
   ${({ theme }) => theme.fonts.h2}
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${lightColors['text/primary']};
 `
 
 const TitleContainer = styled.div`
   ${({ theme }) => theme.fonts.bold14}
-  color: ${({ theme }) => theme.colors.supportingCopy};
+  color: ${lightColors['text/secondary']};
   text-transform: uppercase;
 `
 const SubjectContainer = styled.div`
@@ -117,8 +118,8 @@ const LeftColumn = styled.div`
 `
 
 const Card = styled.div`
-  border: 1px solid ${({ theme }) => theme.colors.grey300};
-  background: ${({ theme }) => theme.colors.white};
+  border: 1px solid ${lightColors['border/default']};
+  background: ${lightColors['surface/default']};
   border-radius: 4px;
   margin-bottom: 40px;
   &:last-child {
@@ -132,8 +133,8 @@ const Card = styled.div`
 
 const FormData = styled.div`
   padding-top: 24px;
-  background: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.copy};
+  background: ${lightColors['surface/default']};
+  color: ${lightColors['text/primary']};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 24px;
   }

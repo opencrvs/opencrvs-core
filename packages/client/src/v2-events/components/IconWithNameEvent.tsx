@@ -13,7 +13,7 @@ import * as React from 'react'
 
 import styled from 'styled-components'
 import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
-import { Stack } from '@opencrvs/components'
+import { Stack, lightColors } from '@opencrvs/components'
 import { InherentFlags } from '@opencrvs/commons/client'
 import { Flex, getIconColor, Icon, IconWithName } from './IconWithName'
 
@@ -23,7 +23,7 @@ interface IconWithNameEventProps
 }
 
 const Event = styled.div`
-  color: ${({ theme }) => theme.colors.grey500};
+  color: ${lightColors['text/tertiary']};
   ${({ theme }) => theme.fonts.reg16}
 `
 export function IconWithNameEvent({

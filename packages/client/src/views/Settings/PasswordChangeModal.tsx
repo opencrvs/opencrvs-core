@@ -13,7 +13,8 @@ import {
   InputField,
   Dialog,
   ErrorMessage,
-  PasswordInput
+  PasswordInput,
+  lightColors
 } from '@opencrvs/components'
 import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
 import { userMessages as messages } from '@client/i18n/messages'
@@ -30,7 +31,7 @@ const Message = styled.div`
   margin-bottom: 16px;
 `
 const PasswordContents = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${lightColors['text/primary']};
   max-width: 50%;
   & input {
     width: 100%;
@@ -43,7 +44,7 @@ const PasswordContents = styled.div`
   }
 `
 const ValidationRulesSection = styled.div`
-  background: ${({ theme }) => theme.colors.background};
+  background: ${lightColors['surface/page']};
   margin: 16px 0 24px;
   padding: 8px 24px;
   & div {
@@ -59,7 +60,7 @@ const ValidationRulesSection = styled.div`
   }
 `
 const ValidationRulesSectionLg = styled.div`
-  background: ${({ theme }) => theme.colors.background};
+  background: ${lightColors['surface/page']};
   margin: 30px 20px 24px;
   width: 100%;
   padding: 8px 24px;
@@ -77,12 +78,12 @@ const ValidationRulesSectionLg = styled.div`
 `
 const PasswordMatch = styled.div`
   ${({ theme }) => theme.fonts.bold16};
-  color: ${({ theme }) => theme.colors.positive};
+  color: ${lightColors['feedback/positive']};
   margin-top: 8px;
 `
 const PasswordMismatch = styled.div`
   ${({ theme }) => theme.fonts.bold16};
-  color: ${({ theme }) => theme.colors.negative};
+  color: ${lightColors['feedback/negative']};
   margin-top: 8px;
 `
 const Row = styled.div`

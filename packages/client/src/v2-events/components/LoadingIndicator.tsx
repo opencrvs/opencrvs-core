@@ -17,11 +17,12 @@ import {
 import styled from 'styled-components'
 import { ConnectionError } from '@opencrvs/components/lib/icons'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { lightColors } from '@opencrvs/components'
 import { errorMessages } from '@client/v2-events/messages'
 import { useOnlineStatus } from '@client/utils'
 
 const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.negative};
+  color: ${lightColors['feedback/negative']};
   ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;
