@@ -138,6 +138,10 @@ export const Workqueues = defineWorkqueues([
     },
     query: {
       ...declaredInMyAdminArea,
+      status: {
+        type: 'anyOf',
+        terms: [EventStatus.enum.NOTIFIED, EventStatus.enum.DECLARED]
+      },
       flags: { anyOf: [InherentFlags.POTENTIAL_DUPLICATE] }
     },
     action: { type: ActionType.READ }
@@ -152,6 +156,10 @@ export const Workqueues = defineWorkqueues([
     },
     query: {
       ...createdInMyAdminArea,
+      status: {
+        type: 'anyOf',
+        terms: [EventStatus.enum.NOTIFIED, EventStatus.enum.DECLARED]
+      },
       flags: { anyOf: [InherentFlags.REJECTED] }
     },
     action: { type: ActionType.READ }
@@ -166,6 +174,10 @@ export const Workqueues = defineWorkqueues([
     },
     query: {
       ...createdInMyAdminArea,
+      status: {
+        type: 'anyOf',
+        terms: [EventStatus.enum.NOTIFIED, EventStatus.enum.DECLARED]
+      },
       flags: { anyOf: ['attestation-required'] }
     },
     action: { type: ActionType.READ }
@@ -237,6 +249,14 @@ export const Workqueues = defineWorkqueues([
     },
     query: {
       ...createdInMyAdminArea,
+      status: {
+        type: 'anyOf',
+        terms: [
+          EventStatus.enum.NOTIFIED,
+          EventStatus.enum.DECLARED,
+          EventStatus.enum.REGISTERED
+        ]
+      },
       flags: {
         anyOf: [
           'escalated-to-registrar-general',
@@ -254,7 +274,17 @@ export const Workqueues = defineWorkqueues([
       defaultMessage: 'Pending feedback',
       description: 'Title of pending feedback workqueue'
     },
-    query: { flags: { anyOf: ['escalated-to-registrar-general'] } },
+    query: {
+      status: {
+        type: 'anyOf',
+        terms: [
+          EventStatus.enum.NOTIFIED,
+          EventStatus.enum.DECLARED,
+          EventStatus.enum.REGISTERED
+        ]
+      },
+      flags: { anyOf: ['escalated-to-registrar-general'] }
+    },
     action: { type: ActionType.READ }
   },
   {
@@ -265,7 +295,17 @@ export const Workqueues = defineWorkqueues([
       defaultMessage: 'Pending feedback',
       description: 'Title of pending feedback workqueue'
     },
-    query: { flags: { anyOf: ['escalated-to-provincial-registrar'] } },
+    query: {
+      status: {
+        type: 'anyOf',
+        terms: [
+          EventStatus.enum.NOTIFIED,
+          EventStatus.enum.DECLARED,
+          EventStatus.enum.REGISTERED
+        ]
+      },
+      flags: { anyOf: ['escalated-to-provincial-registrar'] }
+    },
     action: { type: ActionType.READ }
   },
   {

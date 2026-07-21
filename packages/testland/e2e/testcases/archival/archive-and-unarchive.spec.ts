@@ -25,7 +25,11 @@ import {
 } from '../../helpers'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS, GATEWAY_HOST } from '../../constants'
-import { fillDate, formatV2ChildName } from '../birth/helpers'
+import {
+  assertRecordInWorkqueue,
+  fillDate,
+  formatV2ChildName
+} from '../birth/helpers'
 import {
   ensureAssignedToUser,
   navigateToWorkqueue,
@@ -438,6 +442,14 @@ test('Archival of rejected declaration', async ({ page }) => {
     await login(page, CREDENTIALS.REGISTRAR)
   })
 
+  await test.step('Rejected record appears in the Pending updates workqueue', async () => {
+    await assertRecordInWorkqueue({
+      page,
+      name: formatV2ChildName(declaration),
+      workqueues: [{ title: 'Pending updates', exists: true }]
+    })
+  })
+
   await test.step('Archive the rejected declaration', async () => {
     await searchFromSearchBar(page, formatV2ChildName(declaration))
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
@@ -451,6 +463,14 @@ test('Archival of rejected declaration', async ({ page }) => {
     )
     await page.getByRole('button', { name: 'Archive', exact: true }).click()
     await archiveResponse
+  })
+
+  await test.step('Archived rejected record no longer appears in the Pending updates workqueue', async () => {
+    await assertRecordInWorkqueue({
+      page,
+      name: formatV2ChildName(declaration),
+      workqueues: [{ title: 'Pending updates', exists: false }]
+    })
   })
 
   await test.step('Archived rejected record cannot be edited', async () => {
