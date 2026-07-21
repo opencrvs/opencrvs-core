@@ -251,10 +251,10 @@ export function useDrafts() {
     },
     isLocalDraftSubmitted: createDraft.isSuccess,
     getDisplayableDrafts,
-    getRemoteDraftByEventId: function useDraftList(
+    getRemoteDraftByEventId: (
       eventId: string,
       additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
-    ): Draft | undefined {
+    ): Draft | undefined => {
       const eventDrafts = getDisplayableDrafts(additionalOptions).filter(
         (draft) => draft.eventId === eventId
       )
