@@ -194,7 +194,7 @@ export const routesConfig = {
         <TRPCErrorBoundary>
           <TRPCProvider
             storeIdentifier={currentUser.id}
-            userCacheKey={`${currentUser.primaryOfficeId ?? ''}:${currentUser.role}`}
+            userCacheKey={`${currentUser.primaryOfficeId}:${currentUser.role}`}
           >
             <Outlet />
             <Debug />
