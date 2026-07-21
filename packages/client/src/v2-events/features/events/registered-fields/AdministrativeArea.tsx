@@ -31,7 +31,7 @@ import {
 import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useIsSearchFilter } from '@client/v2-events/features/events/Search/SearchFilterContext'
-import { LocationSearch } from './LocationSearch'
+import { buildLocationNameOptions, LocationSearch } from './LocationSearch'
 
 /**
  * Return the full administrative area hierarchy for the user's location.
@@ -154,8 +154,8 @@ function AdministrativeAreaInput({
   )
 
   const options = useMemo(
-    () => administrativeAreas.map((o) => ({ label: o.name, value: o.id })),
-    [administrativeAreas]
+    () => buildLocationNameOptions(administrativeAreas, isSearchFilter),
+    [administrativeAreas, isSearchFilter]
   )
 
   const selectedLocation = useMemo(
