@@ -20,8 +20,7 @@ import {
   getPrintCertificatePages,
   getCurrentEventState,
   isFieldDisplayedOnReview,
-  ValidatorContext,
-  toPlainDate
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -31,6 +30,7 @@ import {
 } from '@client/v2-events/features/events/components/Output'
 import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
+import { recordAnchorDate } from '@client/v2-events/utils'
 
 const verifiedMessage = {
   id: 'verified',
@@ -53,6 +53,9 @@ export function PrintCertificate({
 
   const { certificateTemplates } = useAppConfig()
   const eventIndex = getCurrentEventState(event, eventConfiguration)
+  // These are form values, so their locations resolve at the record's form
+  // anchor (date of event, falling back to creation) — not the action date.
+  const anchor = recordAnchorDate(eventIndex)
   const annotation = deepMerge(eventIndex.declaration, action.annotation ?? {})
   const templateId = action.content?.templateId
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
@@ -77,7 +80,7 @@ export function PrintCertificate({
       .map((field) => {
         const valueDisplay = (
           <Output
-            anchor={toPlainDate(action.createdAt)}
+            anchor={anchor}
             eventConfig={eventConfiguration}
             field={field}
             value={annotation[field.id]}
@@ -93,7 +96,7 @@ export function PrintCertificate({
     if (page.type === PageTypes.enum.VERIFICATION) {
       const value = (
         <Output
-          anchor={toPlainDate(action.createdAt)}
+          anchor={anchor}
           eventConfig={eventConfiguration}
           field={{
             id: page.id,
