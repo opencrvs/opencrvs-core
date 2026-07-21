@@ -20,7 +20,7 @@ const TooltipWrapper = styled.div`
 
 const TooltipContent = styled.div<{ position: TooltipProps['position'] }>`
   visibility: hidden;
-  background-color: ${lightColors['border/emphasis']};
+  background-color: ${lightColors['surface/inverse']};
   ${({ theme }) => theme.fonts.bold12};
   color: ${lightColors['text/onAction']};
   text-align: center;

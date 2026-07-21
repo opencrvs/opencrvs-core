@@ -40,7 +40,7 @@ const Check = styled.span<{ size?: string; disabled?: boolean }>`
   display: inline-block;
   border-radius: 4px;
   background: ${({ disabled }) =>
-    disabled ? lightColors['action/disabled'] : lightColors['border/emphasis']};
+    disabled ? lightColors['action/disabled'] : lightColors['surface/inverse']};
   ${({ size }) =>
     size === 'large'
       ? `height: 40px;

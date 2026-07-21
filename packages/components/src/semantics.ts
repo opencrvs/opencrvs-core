@@ -76,6 +76,7 @@ export type SemanticColors = {
   'surface/raised': string
   'surface/selected': string
   'surface/inset': string
+  'surface/inverse': string
 
   'text/primary': string
   'text/secondary': string
@@ -126,6 +127,7 @@ export const lightColors: SemanticColors = {
   'surface/raised': p.white, //      white    — Raised surface (cards, modals)
   'surface/selected': p.blue[50], // blue/50  — Selected row / nav item background
   'surface/inset': p.grey[100], //   grey/100 — Inset surface (textarea, code block)
+  'surface/inverse': p.grey[900], // grey/900 — Inverse surface (tooltips, dark chips)
 
   'text/primary': p.grey[900], //   grey/900 — Body text, headings
   'text/secondary': p.grey[600], // grey/600 — Less prominent text (subtitles)
@@ -176,6 +178,7 @@ export const darkColors: SemanticColors = {
   'surface/raised': p.grey[800],
   'surface/selected': p.blue[900],
   'surface/inset': p.black,
+  'surface/inverse': p.grey[100],
 
   'text/primary': p.grey[100],
   'text/secondary': p.grey[400],
