@@ -208,6 +208,31 @@ const AdministrativeAreaUpdateEntrySchema = AuditLogEntryBase.extend({
   responseSummary: updatedVersionResponseSummary
 })
 
+/** Identifies the request; the withdrawn element itself is the response. */
+const withdrawVersionRequestData = z.object({
+  id: z.string(),
+  versionId: z.string()
+})
+
+const withdrawVersionResponseSummary = z.object({
+  effectiveFrom: z.string(),
+  name: z.string(),
+  externalId: z.string().nullish(),
+  status: z.string()
+})
+
+const LocationWithdrawEntrySchema = AuditLogEntryBase.extend({
+  operation: z.literal('locations.withdrawVersion'),
+  requestData: withdrawVersionRequestData,
+  responseSummary: withdrawVersionResponseSummary
+})
+
+const AdministrativeAreaWithdrawEntrySchema = AuditLogEntryBase.extend({
+  operation: z.literal('administrativeAreas.withdrawVersion'),
+  requestData: withdrawVersionRequestData,
+  responseSummary: withdrawVersionResponseSummary
+})
+
 // ── Attachments ────────────────────────────────────────────────────────────────
 
 const AttachmentUploadEntrySchema = AuditLogEntryBase.extend({
@@ -300,6 +325,8 @@ export const AuditLogEntrySchema = z.discriminatedUnion('operation', [
   LocationCreateEntrySchema,
   LocationUpdateEntrySchema,
   AdministrativeAreaUpdateEntrySchema,
+  LocationWithdrawEntrySchema,
+  AdministrativeAreaWithdrawEntrySchema,
   AdministrativeAreaCreateEntrySchema,
   AttachmentUploadEntrySchema,
   UserCreateEntrySchema,

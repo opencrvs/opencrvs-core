@@ -22,7 +22,8 @@ import {
   setupTestCase,
   systemInitialisationTestSetup,
   TEST_SYSTEM_ID,
-  TEST_USER_DEFAULT_SCOPES
+  TEST_USER_DEFAULT_SCOPES,
+  UUID_REGEX
 } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
 import { payloadGenerator } from '@events/tests/generators'
@@ -242,4 +243,88 @@ test('seeding locations is additive, not destructive', async () => {
       updatedAt: expect.any(String)
     })
   }
+})
+
+test('stores a single active initial version when creating a location', async () => {
+  await systemInitialisationTestSetup()
+  const client = createInitialisationTestClient()
+
+  const locationId = generateUuid()
+
+  await client.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Versioned location',
+      locationType: 'CRVS_OFFICE',
+      externalId: 'versioned-location-pcode'
+    }
+  ])
+
+  const eventsDb = getClient()
+  const { versions } = await eventsDb
+    .selectFrom('locations')
+    .select('versions')
+    .where('id', '=', locationId)
+    .executeTakeFirstOrThrow()
+
+  // toEqual matches keys exactly, so this also asserts the version element
+  // contains no parent reference (administrativeAreaId).
+  expect(versions).toEqual([
+    {
+      versionId: expect.stringMatching(UUID_REGEX),
+      effectiveFrom: '0001-01-01',
+      name: 'Versioned location',
+      externalId: 'versioned-location-pcode',
+      status: 'active'
+    }
+  ])
+})
+
+test('does not modify versions when re-seeding an existing location with a new name', async () => {
+  await systemInitialisationTestSetup()
+  const client = createInitialisationTestClient()
+
+  const locationId = generateUuid()
+
+  await client.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Original name',
+      locationType: 'CRVS_OFFICE',
+      externalId: 'renamed-location-pcode'
+    }
+  ])
+
+  const eventsDb = getClient()
+  const { versions: versionsAfterInsert } = await eventsDb
+    .selectFrom('locations')
+    .select('versions')
+    .where('id', '=', locationId)
+    .executeTakeFirstOrThrow()
+
+  await client.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Renamed location',
+      locationType: 'CRVS_OFFICE',
+      externalId: 'renamed-location-pcode'
+    }
+  ])
+
+  const updated = await eventsDb
+    .selectFrom('locations')
+    .select(['name', 'versions'])
+    .where('id', '=', locationId)
+    .executeTakeFirstOrThrow()
+
+  // The flat column updates, but re-seeding deliberately leaves versions
+  // untouched: still the original single element with the original name.
+  expect(updated.name).toBe('Renamed location')
+  expect(updated.versions).toEqual(versionsAfterInsert)
+  expect(updated.versions).toEqual([
+    expect.objectContaining({ name: 'Original name', status: 'active' })
+  ])
 })

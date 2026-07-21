@@ -8,19 +8,19 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { createPrng, generateUuid, SetLocationPayload } from '@opencrvs/commons'
 import {
-  createPrng,
-  generateUuid,
-  SetLocationPayload,
-  encodeScope
-} from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
-
-const scope = encodeScope({ type: 'user.data-seeding' })
+  createInitialisationTestClient,
+  createTestClient,
+  setupTestCase,
+  systemInitialisationTestSetup
+} from '@events/tests/utils'
 
 test('Returns a single location by id', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [scope])
+  const client = createTestClient(user, [])
+  await systemInitialisationTestSetup()
+  const seeder = createInitialisationTestClient()
 
   const location: SetLocationPayload = {
     id: generateUuid(),
@@ -29,7 +29,7 @@ test('Returns a single location by id', async () => {
     locationType: 'CRVS_OFFICE'
   }
 
-  await client.locations.set([location])
+  await seeder.locations.set([location])
   const result = await client.locations.get({ id: location.id })
 
   expect(result).toMatchObject(location)
@@ -37,7 +37,9 @@ test('Returns a single location by id', async () => {
 
 test('Returns the correct location when multiple exist', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [scope])
+  const client = createTestClient(user, [])
+  await systemInitialisationTestSetup()
+  const seeder = createInitialisationTestClient()
 
   const locationA: SetLocationPayload = {
     id: generateUuid(createPrng(1)),
@@ -52,7 +54,7 @@ test('Returns the correct location when multiple exist', async () => {
     locationType: 'CRVS_OFFICE'
   }
 
-  await client.locations.set([locationA, locationB])
+  await seeder.locations.set([locationA, locationB])
   const result = await client.locations.get({ id: locationA.id })
 
   expect(result).toMatchObject(locationA)
@@ -61,14 +63,15 @@ test('Returns the correct location when multiple exist', async () => {
 
 test('Throws when location is not found', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [scope])
+  const client = createTestClient(user, [])
 
   await expect(client.locations.get({ id: generateUuid() })).rejects.toThrow()
 })
 
 test('Is accessible without elevated scopes', async () => {
   const { user } = await setupTestCase()
-  const seeder = createTestClient(user, [scope])
+  await systemInitialisationTestSetup()
+  const seeder = createInitialisationTestClient()
   const reader = createTestClient(user, [])
 
   const location: SetLocationPayload = {

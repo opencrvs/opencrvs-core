@@ -120,6 +120,7 @@ export const roles: Role[] = [
     scopes: [
       ...defineScopes([
         { type: 'config.update-all' },
+        { type: 'location.edit' },
         { type: 'organisation.read-locations' },
         {
           type: 'user.create',

@@ -17,14 +17,17 @@ import {
   hasActiveExternalIdOnOrAfter,
   UpdateAdministrativeAreaPayload,
   UUID,
-  SetAdministrativeAreaPayload
+  SetAdministrativeAreaPayload,
+  WithdrawAdministrativeAreaVersionPayload
 } from '@opencrvs/commons'
 import * as administrativeAreaRepo from '@events/storage/postgres/administrative-hierarchy/administrative-areas'
 import { clearAdministrativeHierarchyCache } from '@events/storage/postgres/administrative-hierarchy/locations'
 import {
   appendVersionChecked,
   isUniqueViolation,
-  VersionAppendOutcome
+  VersionAppendOutcome,
+  withdrawVersionChecked,
+  WithdrawnVersion
 } from '@events/service/locations/locations'
 
 export async function getAdministrativeAreas(params?: {
@@ -166,6 +169,28 @@ export async function updateAdministrativeArea(
   return {
     administrativeArea: await getAdministrativeAreaById(payload.id),
     outcome
+  }
+}
+
+/**
+ * Withdraws a pending version from an administrative area after the checks
+ * documented on {@link withdrawVersionChecked}.
+ */
+export async function withdrawAdministrativeAreaVersion(
+  payload: WithdrawAdministrativeAreaVersionPayload
+): Promise<{
+  administrativeArea: AdministrativeArea
+  withdrawnVersion: WithdrawnVersion['withdrawnVersion']
+}> {
+  const { withdrawnVersion } = await withdrawVersionChecked({
+    payload,
+    entityLabel: 'Administrative area',
+    table: 'administrativeAreas'
+  })
+
+  return {
+    administrativeArea: await getAdministrativeAreaById(payload.id),
+    withdrawnVersion
   }
 }
 
