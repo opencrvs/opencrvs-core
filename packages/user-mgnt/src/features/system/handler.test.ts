@@ -465,6 +465,76 @@ describe('createIntegration handler', () => {
     expect(body.clientSecret).toBeUndefined()
   })
 
+  it('seeds a new integration with caller-provided credentials', async () => {
+    mockingoose(System).toReturn(null, 'findOne')
+    mockingoose(System).toReturn(mockIntegration, 'save')
+    const createSpy = jest.spyOn(System, 'create')
+
+    const seededClientId = '3db2eed5-9d44-4dc2-ab27-74a2254f4c32'
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/createIntegration',
+      payload: {
+        name: 'MOSIP',
+        scopes: [
+          { type: 'record.register', options: { event: ['birth', 'death'] } }
+        ],
+        clientId: seededClientId,
+        clientSecret: 'seeded-client-secret'
+      },
+      headers: {
+        Authorization: `Bearer ${integrationCreatorToken}`
+      }
+    })
+
+    expect(res.statusCode).toBe(201)
+    const body = JSON.parse(res.payload)
+    // The provided client id is used verbatim rather than a generated UUID
+    expect(body.clientId).toBe(seededClientId)
+    // The secret is still never echoed back
+    expect(body.clientSecret).toBeUndefined()
+    // The seeded client id is persisted; the secret is stored hashed, never raw
+    const created = createSpy.mock.calls[0][0] as Record<string, unknown>
+    expect(created.client_id).toBe(seededClientId)
+    expect(created.secretHash).toBeDefined()
+    expect(created.secretHash).not.toBe('seeded-client-secret')
+  })
+
+  it('reconciles scopes but never the secret when re-registering a seeded integration', async () => {
+    mockingoose(System).toReturn(mockIntegration, 'findOne')
+    mockingoose(System).toReturn({}, 'updateOne')
+    const updateSpy = jest.spyOn(System, 'updateOne')
+    const createSpy = jest.spyOn(System, 'create')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/createIntegration',
+      payload: {
+        name: 'MOSIP',
+        scopes: [
+          { type: 'record.register', options: { event: ['birth', 'death'] } }
+        ],
+        clientId: mockIntegration.client_id,
+        clientSecret: 'seeded-client-secret'
+      },
+      headers: {
+        Authorization: `Bearer ${integrationCreatorToken}`
+      }
+    })
+
+    expect(res.statusCode).toBe(200)
+    const body = JSON.parse(res.payload)
+    expect(body.clientId).toBe(mockIntegration.client_id)
+    expect(body.sha_secret).toBe(mockIntegration.sha_secret)
+    // Only the scopes are reconciled — the update payload carries no secret
+    // fields, and no new system is created
+    expect(updateSpy).toHaveBeenCalledWith(
+      { name: 'MOSIP' },
+      { scope: ['record.register[event=birth|death]'] }
+    )
+    expect(createSpy).not.toHaveBeenCalled()
+  })
+
   it('updates scopes of an existing integration without regenerating credentials', async () => {
     mockingoose(System).toReturn(mockIntegration, 'findOne')
     mockingoose(System).toReturn({}, 'updateOne')
