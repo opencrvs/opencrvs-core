@@ -80,6 +80,8 @@ export * from './WarningMessage'
 export * from './Workqueue'
 
 export * from './colors'
+export * from './primitives'
+export * from './semantics'
 export * from './fonts'
 export * from './grid'
 export * from './theme'

@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 export interface DividerProps {
   width?: string
@@ -18,7 +20,7 @@ export interface DividerProps {
 }
 
 export const Divider = styled.div<DividerProps>`
-  ${({ children, border, color, theme, width }) =>
+  ${({ children, border, color, width }) =>
     children
       ? `
   display: flex;
@@ -29,7 +31,7 @@ export const Divider = styled.div<DividerProps>`
     flex: 1;
     content: '';
     padding: 0 1px 1px;
-    background-color: ${color || theme.colors.grey200};
+    background-color: ${color || lightColors['border/default']};
     margin: 16px;
   }
 
@@ -44,12 +46,12 @@ export const Divider = styled.div<DividerProps>`
       : `
   margin-bottom: 20px;
   padding: 8px 0px;
-  border-bottom: ${border || '1px'} solid ${color || theme.colors.grey200};
+  border-bottom: ${border || '1px'} solid ${color || lightColors['border/default']};
   width: ${width || '100%'};`}
 `
 
 export const DividerVertical = styled.div`
-  background: ${({ theme }) => theme.colors.grey200};
+  background: ${lightColors['border/default']};
   width: 1px;
   height: 100%;
   min-height: 24px;

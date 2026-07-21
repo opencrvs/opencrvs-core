@@ -11,13 +11,15 @@
 
 import * as React from 'react'
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 export interface INavigationGroup
   extends React.HTMLAttributes<HTMLDivElement> {}
 
 const NavigationGroupContainer = styled.div`
   padding: 6px;
-  box-shadow: 0px 8px 2px -8px ${({ theme }) => theme.colors.grey300};
+  box-shadow: 0px 8px 2px -8px ${lightColors['border/strong']};
 `
 
 interface IProps {

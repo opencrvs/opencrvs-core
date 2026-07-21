@@ -10,6 +10,9 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
+import { primitives } from '../primitives'
 import { Icon } from '../Icon'
 import { Button } from '../Button'
 import { InputError } from '../InputField/InputError'
@@ -43,27 +46,27 @@ const SearchTextInput = styled.input<{ error?: boolean; touched?: boolean }>`
   ${({ theme }) => theme.fonts.reg19};
   padding-left: 40px;
 
-  color: ${({ theme }) => theme.colors.copy};
-  background: ${({ theme }) => theme.colors.white};
+  color: ${lightColors['text/primary']};
+  background: ${lightColors['surface/default']};
   border: 1.5px solid
-    ${({ theme, error, touched }) =>
-      error && touched ? theme.colors.negative : theme.colors.copy};
+    ${({ error, touched }) =>
+      error && touched ? lightColors['feedback/negative'] : primitives.grey[900]};
 
   &:focus {
-    outline: 0.5px solid ${({ theme }) => theme.colors.grey600};
-    border: 1.5px solid ${({ theme }) => theme.colors.grey600};
-    box-shadow: 0 0 0px 4px ${({ theme }) => theme.colors.yellow};
+    outline: 0.5px solid ${primitives.grey[900]};
+    border: 1.5px solid ${primitives.grey[900]};
+    box-shadow: 0 0 0px 4px ${lightColors['feedback/focus']};
   }
 
   &:disabled {
-    color: ${({ theme }) => theme.colors.disabled};
-    border: 1.5px solid ${({ theme }) => theme.colors.disabled};
+    color: ${lightColors['text/disabled']};
+    border: 1.5px solid ${lightColors['text/disabled']};
     box-shadow: none;
   }
 `
 
 const DropDownWrapper = styled.ul`
-  background: ${({ theme }) => theme.colors.white};
+  background: ${lightColors['surface/raised']};
   box-shadow: 0px 2px 8px rgba(53, 67, 93, 0.54);
   border-radius: 4px;
   position: absolute;
@@ -80,18 +83,18 @@ const DropDownItem = styled.li`
   height: 40px;
   border-radius: 4px;
   margin-bottom: 2px;
-  background-color: ${({ theme }) => theme.colors.white};
+  background-color: ${lightColors['surface/raised']};
   padding: 8px 16px;
   white-space: nowrap;
   cursor: pointer;
   ${({ theme }) => theme.fonts.reg18};
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${lightColors['text/primary']};
 
   &:hover {
-    background: ${({ theme }) => theme.colors.grey100};
+    background: ${lightColors['action/secondary']};
   }
   &:active {
-    background: ${({ theme }) => theme.colors.grey200};
+    background: ${lightColors['action/secondaryHover']};
   }
 `
 export interface ISearchLocation {

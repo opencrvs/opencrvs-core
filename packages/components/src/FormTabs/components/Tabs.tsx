@@ -11,6 +11,8 @@
 import styled from 'styled-components'
 import { Button, IButtonProps } from '../../buttons'
 import { ITabColor } from '../FormTabs'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../../semantics'
 
 export const Tabs = styled.div`
   display: flex;
@@ -26,14 +28,14 @@ export interface IProps extends IButtonProps {
 }
 
 export const Tab = styled(Button)<IProps>`
-  --color: ${({ theme, activeColor }) =>
-    activeColor ? activeColor : theme.colors.primary};
+  --color: ${({ activeColor }) =>
+    activeColor ? activeColor : lightColors['action/primary']};
   border-radius: 0;
   margin-top: 8px;
   margin-right: 16px;
   padding: 0;
-  color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.grey300 : 'var(--color)'};
+  color: ${({ disabled }) =>
+    disabled ? lightColors['text/disabled'] : 'var(--color)'};
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   border-bottom: ${({ active }) =>
     active ? `2px solid var(--color)` : '2px solid transparent'};
@@ -41,7 +43,7 @@ export const Tab = styled(Button)<IProps>`
     padding: 0px;
   }
   &:hover:enabled {
-    border-bottom: 2px solid ${({ theme }) => theme.colors.grey300};
+    border-bottom: 2px solid ${lightColors['border/strong']};
   }
 
   &:disabled {

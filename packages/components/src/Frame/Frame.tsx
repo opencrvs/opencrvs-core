@@ -16,6 +16,8 @@ import {
   SkipToContent,
   MAIN_CONTENT_ANCHOR_ID
 } from './components/SkipToContent'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 export interface FrameProps {
   /** Accepts a header component that will be rendered at the top-most portion of an application frame */
@@ -52,7 +54,7 @@ const FrameMainContent = styled.main`
   grid-area: content;
   height: 100%;
   overflow-y: auto;
-  background: ${({ theme }) => theme.colors.background};
+  background: ${lightColors['surface/page']};
 `
 
 export function Frame({

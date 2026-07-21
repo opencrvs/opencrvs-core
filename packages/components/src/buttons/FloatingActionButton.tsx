@@ -11,11 +11,13 @@
 import * as React from 'react'
 
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 const ButtonStyled = styled.button`
   height: 56px;
   width: 56px;
   border-radius: 100%;
-  background: ${({ theme }) => theme.colors.primary};
+  background: ${lightColors['action/primary']};
   ${({ theme }) => theme.shadows.light};
   justify-content: center;
   outline: none;
@@ -23,20 +25,20 @@ const ButtonStyled = styled.button`
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   &:hover:enabled {
-    ${({ theme }) => theme.colors.primaryDark};
-    color: ${({ theme }) => theme.colors.white};
+    ${lightColors['action/primaryHover']};
+    color: ${lightColors['text/onAction']};
   }
 
   &:active:enabled {
-    background: ${({ theme }) => theme.colors.primary};
-    border: 3px solid ${({ theme }) => theme.colors.yellow};
+    background: ${lightColors['action/primary']};
+    border: 3px solid ${lightColors['feedback/focus']};
     outline: none;
   }
 
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.disabled};
+    background-color: ${lightColors['action/disabled']};
     cursor: not-allowed;
-    color: ${({ theme }) => theme.colors.disabled};
+    color: ${lightColors['text/disabled']};
   }
 `
 interface IButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

@@ -11,6 +11,8 @@
 
 import * as React from 'react'
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 export interface INavigationSubItemProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -20,30 +22,30 @@ export interface INavigationSubItemProps
 
 export const SubItemContainer = styled.button<{ isSelected?: boolean }>`
   border: 0;
-  background-color: ${({ theme }) => theme.colors.white};
+  background-color: ${lightColors['surface/default']};
   outline: none;
   border-radius: 4px;
   cursor: pointer;
   width: 100%;
   min-height: 32px;
-  color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.grey600 : theme.colors.grey500};
+  color: ${({ isSelected }) =>
+    isSelected ? lightColors['text/primary'] : lightColors['text/tertiary']};
   ${({ isSelected, theme }) =>
     isSelected ? theme.fonts.bold14 : theme.fonts.reg14};
   &:hover {
-    color: ${({ theme }) => theme.colors.grey600};
+    color: ${lightColors['text/primary']};
     ${({ theme }) => theme.fonts.bold14};
   }
 
   &:active {
-    color: ${({ theme }) => theme.colors.grey600};
+    color: ${lightColors['text/primary']};
     ${({ theme }) => theme.fonts.bold14};
   }
 
   &:focus-visible {
     ${({ theme }) => theme.fonts.bold14};
-    background-color: ${({ theme }) => theme.colors.yellow};
-    color: ${({ theme }) => theme.colors.grey600};
+    background-color: ${lightColors['feedback/focus']};
+    color: ${lightColors['text/primary']};
   }
 `
 

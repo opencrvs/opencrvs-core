@@ -11,6 +11,8 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { IActionObject, ColumnContentAlignment, IAction, IColumn } from '..'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../../semantics'
 
 export interface IWorkqueueRow {
   displayItems: Array<Record<string, unknown>>
@@ -31,11 +33,11 @@ export interface IWorkqueueRow {
 }
 
 const StyledBox = styled.div<{ hideLastBorder?: boolean }>`
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${lightColors['text/primary']};
   ${({ theme }) => theme.fonts.reg16};
   display: flex;
   align-items: center;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+  border-bottom: 1px solid ${lightColors['border/default']};
   &:last-child {
     ${({ hideLastBorder }) => hideLastBorder && ` border-bottom: 0;`}
   }
@@ -71,7 +73,7 @@ export const ContentWrapper = styled.div<{
 `
 
 export const Error = styled.span`
-  color: ${({ theme }) => theme.colors.negative};
+  color: ${lightColors['feedback/negative']};
 `
 
 export const IconWrapper = styled(ContentWrapper)`

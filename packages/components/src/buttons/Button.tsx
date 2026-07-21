@@ -11,6 +11,8 @@
 import * as React from 'react'
 import { IButtonSize, dimensionsMap } from '.'
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 export enum ICON_ALIGNMENT {
   LEFT,
@@ -33,7 +35,7 @@ const ButtonBase = styled.button.withConfig({
   background: transparent;
   &:disabled {
     path {
-      stroke: ${({ theme }) => theme.colors.disabled};
+      stroke: ${lightColors['text/disabled']};
     }
   }
   -webkit-tap-highlight-color: transparent;

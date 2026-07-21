@@ -14,6 +14,8 @@ import styled from 'styled-components'
 import { Stack } from '../../../Stack'
 import { Text } from '../../../Text'
 import { Icon, IconProps } from '../../../Icon'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../../../semantics'
 
 interface InfoBoxProps {
   iconName: IconProps['name']
@@ -21,14 +23,14 @@ interface InfoBoxProps {
 }
 
 const Container = styled(Box)`
-  background-color: ${({ theme }) => theme.colors.background};
+  background-color: ${lightColors['surface/page']};
   border: 0;
   flex: 1;
 `
 const IconContainer = styled.div`
   height: 44px;
   width: 44px;
-  background-color: ${({ theme }) => theme.colors.white};
+  background-color: ${lightColors['surface/default']};
   border-radius: 50%;
   display: flex;
   justify-content: center;

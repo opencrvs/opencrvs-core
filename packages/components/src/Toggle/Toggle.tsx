@@ -10,6 +10,8 @@
  */
 import styled from 'styled-components'
 import * as React from 'react'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 const CheckBoxWrapper = styled.div`
   position: relative;
@@ -17,7 +19,7 @@ const CheckBoxWrapper = styled.div`
   height: 24px;
   border-radius: 100px;
   :focus-within {
-    box-shadow: 0px 0px 0px 2px ${({ theme }) => theme.colors.yellow};
+    box-shadow: 0px 0px 0px 2px ${lightColors['feedback/focus']};
   }
 `
 const CheckBoxLabel = styled.label<{ checked: boolean }>`
@@ -27,11 +29,13 @@ const CheckBoxLabel = styled.label<{ checked: boolean }>`
   width: 46px;
   height: 24px;
   border-radius: 100px;
-  background: ${({ checked, theme }) =>
-    checked ? theme.colors.positive : theme.colors.grey300};
+  background: ${({ checked }) =>
+    checked
+      ? lightColors['action/positive']
+      : lightColors['action/secondaryPressed']};
   :hover {
-    background: ${({ checked, theme }) =>
-      checked ? theme.colors.positiveDark : theme.colors.grey400};
+    background: ${({ checked }) =>
+      checked ? lightColors['action/positiveHover'] : lightColors['text/disabled']};
   }
   cursor: pointer;
   &::after {
@@ -47,7 +51,7 @@ const CheckBoxLabel = styled.label<{ checked: boolean }>`
     margin-bottom: 3px;
     margin-left: ${({ checked }) => (checked ? '24px' : '4px')};
     margin-right: ${({ checked }) => (checked ? '4px' : '24px')};
-    background: ${({ theme }) => theme.colors.white};
+    background: ${lightColors['text/onAction']};
     transition: margin-left 0.2s;
   }
 `

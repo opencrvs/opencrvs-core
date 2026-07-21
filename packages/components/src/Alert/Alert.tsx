@@ -14,20 +14,21 @@ import { Check, Help, Cross, NotificationError, Notification } from '../icons'
 import { Spinner } from '../Spinner'
 import { Button } from '../Button'
 import { Text } from '../Text'
-import { colors } from '../colors'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 export type AlertType = 'success' | 'warning' | 'loading' | 'info' | 'error'
 
 const Container = styled.div<{
   $type?: AlertType
 }>`
-  --color: ${({ $type, theme }) => `
-    ${$type === 'success' ? theme.colors.positive : ''}
-    ${$type === 'loading' ? theme.colors.primary : ''}
-    ${$type === 'info' ? theme.colors.teal : ''}
-    ${$type === 'error' ? theme.colors.negative : ''}
-    ${$type === 'warning' ? theme.colors.orange : ''}
-    ${$type === undefined ? theme.colors.positive : ''}
+  --color: ${({ $type }) => `
+    ${$type === 'success' ? lightColors['feedback/positive'] : ''}
+    ${$type === 'loading' ? lightColors['feedback/info'] : ''}
+    ${$type === 'info' ? lightColors['feedback/info'] : ''}
+    ${$type === 'error' ? lightColors['feedback/negative'] : ''}
+    ${$type === 'warning' ? lightColors['feedback/warning'] : ''}
+    ${$type === undefined ? lightColors['feedback/positive'] : ''}
   `};
 
   display: flex;
@@ -37,7 +38,7 @@ const Container = styled.div<{
   background: linear-gradient(
     to right,
     var(--color) 48px,
-    ${({ theme }) => theme.colors.white} 48px
+    ${lightColors['surface/default']} 48px
   );
 `
 
@@ -47,7 +48,7 @@ const IconContainer = styled.div`
   align-items: center;
   height: 48px;
   width: 48px;
-  color: ${({ theme }) => theme.colors.white};
+  color: ${lightColors['text/onAction']};
 `
 
 const Close = styled(Button)`
@@ -108,7 +109,7 @@ export const Alert = ({
           {type === 'loading' && (
             <Spinner
               id="in-progress-floating-notification"
-              baseColor={colors.white}
+              baseColor={lightColors['text/onAction']}
               size={20}
             />
           )}

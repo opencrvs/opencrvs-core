@@ -10,6 +10,9 @@
  */
 import React from 'react'
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
+import { primitives } from '../primitives'
 
 const TooltipWrapper = styled.div`
   position: relative;
@@ -18,9 +21,9 @@ const TooltipWrapper = styled.div`
 
 const TooltipContent = styled.div<{ position: TooltipProps['position'] }>`
   visibility: hidden;
-  background-color: ${({ theme }) => theme.colors.grey600};
+  background-color: ${primitives.grey[900]};
   ${({ theme }) => theme.fonts.bold12};
-  color: ${({ theme }) => theme.colors.white};
+  color: ${lightColors['text/onAction']};
   text-align: center;
   border-radius: 8px;
   padding: 6px 12px;

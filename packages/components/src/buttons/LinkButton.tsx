@@ -10,6 +10,8 @@
  */
 import styled from 'styled-components'
 import { Button } from './Button'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 /** @deprecated Use Link instead */
 export const LinkButton = styled(Button)<{
@@ -17,34 +19,34 @@ export const LinkButton = styled(Button)<{
 }>`
   ${({ theme, isBoldLink }) =>
     isBoldLink ? theme.fonts.bold16 : theme.fonts.reg16}
-  color: ${({ theme }) => theme.colors.grey400};
+  color: ${lightColors['text/disabled']};
   padding: 0;
   margin-left: -8px;
   border-radius: 2px;
   &:focus {
-    background: ${({ theme }) => theme.colors.yellow};
-    color: ${({ theme }) => theme.colors.copy};
+    background: ${lightColors['feedback/focus']};
+    color: ${lightColors['text/primary']};
   }
   &:not([data-focus-visible-added]) {
     background: transparent;
     padding: 0;
-    color: ${({ theme }) => theme.colors.primary};
+    color: ${lightColors['text/link']};
   }
 
   &:active {
-    color: ${({ theme }) => theme.colors.primaryDark};
+    color: ${lightColors['action/primaryHover']};
     text-decoration-line: underline;
     text-underline-offset: 4px;
   }
 
   &:hover {
-    color: ${({ theme }) => theme.colors.primaryDark};
+    color: ${lightColors['action/primaryHover']};
     text-decoration-line: underline;
     text-underline-offset: 4px;
   }
 
   &:disabled {
-    color: ${({ theme }) => theme.colors.grey300};
+    color: ${lightColors['text/disabled']};
     background-color: transparent;
   }
 `

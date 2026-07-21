@@ -12,6 +12,8 @@ import * as React from 'react'
 import { withTheme } from 'styled-components'
 import { ITheme } from '../../theme'
 import { IDataPoint } from '../../chart-datapoint-types'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../../semantics'
 
 export interface ICustomizedAxisTick {
   x: number
@@ -33,7 +35,7 @@ export const CustomizedXAxisTick = withTheme(
           dy={16}
           fontFamily={theme.fontFamily}
           textAnchor="middle"
-          fill={theme.colors.primary}
+          fill={lightColors['feedback/info']}
         >
           {payload && payload.label}
         </text>
@@ -43,7 +45,7 @@ export const CustomizedXAxisTick = withTheme(
           dy={16}
           fontFamily={theme.fontFamily}
           textAnchor="middle"
-          fill={theme.colors.primary}
+          fill={lightColors['feedback/info']}
         >
           {payload && `${Math.round((payload.value / totalValue) * 100)}%`}
         </text>
@@ -54,7 +56,7 @@ export const CustomizedXAxisTick = withTheme(
           fontFamily={theme.fontFamily}
           fontSize={12}
           textAnchor="middle"
-          fill={theme.colors.copy}
+          fill={lightColors['text/primary']}
         >
           {payload && payload.value}
         </text>
@@ -73,7 +75,7 @@ export const CustomizedYAxisTick = withTheme(
           fontFamily={theme.fontFamily}
           textAnchor="end"
           height={22}
-          fill={theme.colors.primary}
+          fill={lightColors['feedback/info']}
         >
           {payload && payload.value}
         </text>

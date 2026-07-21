@@ -11,6 +11,8 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Text } from '../Text'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 export interface IListConfigRowProps {
   id?: string
@@ -29,8 +31,8 @@ export const ConfigHeader = styled.table`
   border-collapse: collapse;
   width: 100%;
   th {
-    border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
-    color: ${({ theme }) => theme.colors.grey400};
+    border-bottom: 1px solid ${lightColors['border/default']};
+    color: ${lightColors['text/disabled']};
     ${({ theme }) => theme.fonts.bold12};
     padding: 12px 8px;
     text-align: left;
@@ -60,7 +62,7 @@ export const ConfigRow = styled.table`
   width: 100%;
 
   td {
-    border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+    border-bottom: 1px solid ${lightColors['border/default']};
     padding: 20px 8px;
     vertical-align: center;
   }

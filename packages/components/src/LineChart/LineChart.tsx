@@ -13,6 +13,9 @@ import * as Recharts from 'recharts'
 import { ITheme } from '../theme'
 import styled, { withTheme } from 'styled-components'
 import { CategoricalChartFunc } from 'recharts/types/chart/generateCategoricalChart'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
+import { primitives } from '../primitives'
 
 const {
   CartesianGrid,
@@ -85,8 +88,8 @@ function CustomizedDot(props: ICustomisedDot) {
         cx={8}
         cy={8}
         r={5}
-        fill={theme.colors.white}
-        stroke={theme.colors.yellow}
+        fill={lightColors['surface/default']}
+        stroke={lightColors['feedback/focus']}
         strokeWidth={3}
       />
     </svg>
@@ -115,7 +118,7 @@ function CustomizedAxisTick(props: IThemedAxisTickProps) {
         x={0}
         y={0}
         dy={24}
-        fill={theme.colors.copy}
+        fill={lightColors['text/primary']}
         fontFamily={theme.fontFamily}
         fontSize={12}
         fontWeight="normal"
@@ -187,21 +190,21 @@ class LineChartComponent extends React.Component<IProps> {
 
             <Line
               dataKey={dataKeys[0]}
-              stroke={theme.colors.grey200}
+              stroke={primitives.grey[200]}
               dot={false}
               activeDot={false}
               strokeWidth={3}
             />
             <Line
               dataKey={dataKeys[1]}
-              stroke={theme.colors.tealLight}
+              stroke={primitives.blue[200]}
               dot={false}
               activeDot={false}
               strokeWidth={3}
             />
             <Line
               dataKey={dataKeys[2]}
-              stroke={theme.colors.teal}
+              stroke={primitives.blue[300]}
               dot={false}
               activeDot={(dotProps: unknown) => (
                 <CustomizedDot {...(dotProps as ICustomisedDot)} theme={theme} />
@@ -210,7 +213,7 @@ class LineChartComponent extends React.Component<IProps> {
             />
 
             <Tooltip
-              cursor={{ stroke: theme.colors.yellow }}
+              cursor={{ stroke: lightColors['feedback/focus'] }}
               content={(tooltipProps) =>
                 tooltipContent(tooltipProps as unknown as IDataPoint)
               }

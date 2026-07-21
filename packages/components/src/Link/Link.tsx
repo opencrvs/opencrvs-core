@@ -11,6 +11,8 @@
 import React from 'react'
 import { fonts, IFont } from '../fonts'
 import { colors, IColor } from '../colors'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 import styled, { css } from 'styled-components'
 
 export interface LinkProps
@@ -67,11 +69,11 @@ const StyledLink = styled.button<{
   }
 
   &:focus-visible {
-    background: ${({ theme }) => theme.colors.yellow};
-    box-shadow: 0 -2px ${({ theme }) => theme.colors.yellow},
-      0px 2px ${({ theme }) => theme.colors.yellow},
-      0 4px ${({ theme }) => theme.colors.copy};
-    color: ${({ theme }) => theme.colors.grey600};
+    background: ${lightColors['feedback/focus']};
+    box-shadow: 0 -2px ${lightColors['feedback/focus']},
+      0px 2px ${lightColors['feedback/focus']},
+      0 4px ${lightColors['text/primary']};
+    color: ${lightColors['text/primary']};
     outline: none;
     text-decoration: none;
   }

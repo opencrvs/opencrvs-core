@@ -10,9 +10,11 @@
  */
 import React from 'react'
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../../semantics'
 
 export const RowContainer = styled.tr`
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey100};
+  border-bottom: 1px solid ${lightColors['border/subtle']};
 
   td {
     padding: 14px 0;

@@ -12,7 +12,8 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Text } from '../../Text'
-import { colors } from '../../colors'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../../semantics'
 
 const RowContainer = styled.tr``
 
@@ -37,7 +38,7 @@ const LockedBox = styled.div`
   height: 24px;
   border-radius: 4px;
   cursor: not-allowed;
-  background-color: ${colors.grey200};
+  background-color: ${lightColors['action/disabled']};
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;

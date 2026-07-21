@@ -10,23 +10,25 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 const SubSectionWrapper = styled.div`
-  border-top: solid 1px ${({ theme }) => theme.colors.grey200};
+  border-top: solid 1px ${lightColors['border/default']};
   padding: 24px 0;
   flex-direction: row;
 `
 
 const Title = styled.div`
   ${({ theme }) => theme.fonts.h3};
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${lightColors['text/primary']};
 `
 const Optional = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >`
   ${({ theme }) => theme.fonts.reg18};
-  color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.placeholderCopy};
+  color: ${({ disabled }) =>
+    disabled ? lightColors['text/disabled'] : lightColors['text/tertiary']};
   flex-grow: 0;
 `
 

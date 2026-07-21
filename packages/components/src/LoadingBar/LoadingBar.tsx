@@ -12,9 +12,11 @@ import { Text } from '../Text'
 import { Stack } from '../Stack'
 import React from 'react'
 import styled, { keyframes } from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 const ProgressBackground = styled.div`
-  background: ${({ theme }) => theme.colors.grey100};
+  background: ${lightColors['surface/sunken']};
   height: 100vh;
   width: 100%;
   display: flex;
@@ -30,7 +32,7 @@ const ProgressBar = styled.div`
   margin-top: 27px;
   border-radius: 100px;
   opacity: 0px;
-  background: ${({ theme }) => theme.colors.grey300};
+  background: ${lightColors['action/secondaryPressed']};
 `
 
 const ProgressAnimation = keyframes`
@@ -47,7 +49,7 @@ const Progress = styled.div`
   gap: 0px;
   border-radius: 100px;
   opacity: 0px;
-  background: ${({ theme }) => theme.colors.primary};
+  background: ${lightColors['action/primary']};
   animation: ${ProgressAnimation} 300s ease;
 `
 export const LoadingBar = () => (

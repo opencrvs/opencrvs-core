@@ -12,23 +12,25 @@ import React from 'react'
 import { Box } from '../Box'
 import { IStackProps, Stack } from '../Stack'
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 export type BannerVariant = 'active' | 'inactive' | 'pending' | 'default'
 
 const Wrapper = styled(Box)<{ variant: BannerVariant }>`
   padding: 0;
   overflow: hidden;
-  --banner-background-color: ${({ variant, theme }) => `
-    ${variant === 'active' ? theme.colors.greenLighter : ''}
-    ${variant === 'inactive' ? theme.colors.redLighter : ''}
-    ${variant === 'pending' ? theme.colors.orangeLighter : ''}
-    ${variant === 'default' ? theme.colors.primaryLighter : ''}
+  --banner-background-color: ${({ variant }) => `
+    ${variant === 'active' ? lightColors['feedback/positiveSubtle'] : ''}
+    ${variant === 'inactive' ? lightColors['feedback/negativeSubtle'] : ''}
+    ${variant === 'pending' ? lightColors['feedback/warningSubtle'] : ''}
+    ${variant === 'default' ? lightColors['feedback/infoSubtle'] : ''}
   `};
-  --banner-border-color: ${({ variant, theme }) => `
-    ${variant === 'active' ? theme.colors.green : ''}
-    ${variant === 'inactive' ? theme.colors.red : ''}
-    ${variant === 'pending' ? theme.colors.orange : ''}
-    ${variant === 'default' ? theme.colors.primary : ''}
+  --banner-border-color: ${({ variant }) => `
+    ${variant === 'active' ? lightColors['feedback/positive'] : ''}
+    ${variant === 'inactive' ? lightColors['feedback/negative'] : ''}
+    ${variant === 'pending' ? lightColors['feedback/warning'] : ''}
+    ${variant === 'default' ? lightColors['feedback/info'] : ''}
   `};
   border: 1px solid var(--banner-border-color);
 `

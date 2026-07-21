@@ -15,8 +15,10 @@ import { ArrowExpansionButton } from '../../buttons/ArrowExpansionButton'
 import { Button } from '../../Button'
 import { ColumnContentAlignment, IAction } from '../../common-types'
 import { IActionComponent } from '..'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../../semantics'
 const Container = styled.div`
-  background: ${({ theme }) => theme.colors.white};
+  background: ${lightColors['surface/default']};
   display: flex;
   flex-direction: row;
   align-items: center;

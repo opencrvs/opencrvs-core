@@ -10,6 +10,8 @@
  */
 import React from 'react'
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 import { Cross } from '../icons'
 
 interface IProps {
@@ -37,16 +39,16 @@ const Backdrop = styled.div`
 const ModalContent = styled.div`
   width: 70%;
   border-radius: 2px;
-  background-color: ${({ theme }) => theme.colors.white};
+  background-color: ${lightColors['surface/raised']};
   padding: 50px;
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${lightColors['text/primary']};
   text-align: center;
   ${({ theme }) => theme.fonts.reg18};
   position: relative;
 `
 
 const Heading = styled.h3`
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${lightColors['text/primary']};
   text-align: center;
   margin-bottom: 24px;
   ${({ theme }) => theme.fonts.h4};

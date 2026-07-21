@@ -11,6 +11,8 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import ReactTooltip from 'react-tooltip'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 export type IInputLabel = {
   inputDescriptor?: string
@@ -23,8 +25,8 @@ export type IInputLabel = {
 
 const StyledInputLabel = styled.label<IInputLabel>`
   ${({ theme }) => theme.fonts.h4};
-  color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.copy};
+  color: ${({ disabled }) =>
+    disabled ? lightColors['text/disabled'] : lightColors['text/primary']};
   width: 100%;
   margin-bottom: 5px;
   display: inline-block;
@@ -34,8 +36,8 @@ const Required = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >`
   ${({ theme }) => theme.fonts.h4};
-  color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.negative};
+  color: ${({ disabled }) =>
+    disabled ? lightColors['text/disabled'] : lightColors['feedback/negative']};
   flex-grow: 0;
 `
 

@@ -10,6 +10,8 @@
  */
 import styled from 'styled-components'
 import React from 'react'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 type IButtonSize = 'small' | 'medium' | 'large'
 
@@ -20,7 +22,7 @@ const dimensionMap = {
 }
 
 const Button = styled.button<ICircleButtonProps & { size: IButtonSize }>`
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${lightColors['action/primary']};
   transition: background 0.4s ease;
   border: none;
   background: none;
@@ -31,23 +33,23 @@ const Button = styled.button<ICircleButtonProps & { size: IButtonSize }>`
   align-items: center;
   border-radius: 100%;
   &:hover:not([disabled]) {
-    ${({ theme, dark }) =>
+    ${({ dark }) =>
       dark
-        ? theme.colors.primaryDark
-        : 'background-color: ' + theme.colors.grey200};
+        ? lightColors['action/primaryHover']
+        : 'background-color: ' + lightColors['action/secondaryHover']};
   }
   &:not([data-focus-visible-added]):not([disabled]):hover {
-    ${({ theme, dark }) =>
+    ${({ dark }) =>
       dark
-        ? theme.colors.primaryDark
-        : 'background-color: ' + theme.colors.grey200};
+        ? lightColors['action/primaryHover']
+        : 'background-color: ' + lightColors['action/secondaryHover']};
   }
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   &:focus {
     outline: none;
-    background: ${({ theme }) => theme.colors.yellow};
-    color: ${({ theme }) => theme.colors.copy};
+    background: ${lightColors['feedback/focus']};
+    color: ${lightColors['text/primary']};
   }
   &:not([data-focus-visible-added]):not([disabled]) {
     background: none;
@@ -56,13 +58,13 @@ const Button = styled.button<ICircleButtonProps & { size: IButtonSize }>`
   }
   &:active:not([data-focus-visible-added]):not([disabled]) {
     outline: none;
-    background: ${({ theme }) => theme.colors.grey200};
-    color: ${({ theme }) => theme.colors.copy};
+    background: ${lightColors['action/secondaryHover']};
+    color: ${lightColors['text/primary']};
   }
   &:disabled {
     cursor: default;
     path {
-      stroke: ${({ theme }) => theme.colors.grey200};
+      stroke: ${lightColors['action/disabled']};
     }
   }
 `

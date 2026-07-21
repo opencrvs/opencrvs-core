@@ -12,6 +12,8 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 export type IPaginationVariant = 'small' | 'large' // small for desktop and large for mobile
 
@@ -71,8 +73,10 @@ const DotsButton = styled(Button)`
 const StyledPageNumber = styled.span<{ isCurrentPage: boolean; size?: string }>`
   ${({ theme, size }) =>
     size && size === 'large' ? theme.fonts.h4 : theme.fonts.bold12};
-  color: ${({ theme, isCurrentPage }) =>
-    isCurrentPage ? theme.colors.grey600 : theme.colors.grey400};
+  color: ${({ isCurrentPage }) =>
+    isCurrentPage
+      ? lightColors['text/primary']
+      : lightColors['text/disabled']};
 `
 export const Pagination = ({
   totalPages,

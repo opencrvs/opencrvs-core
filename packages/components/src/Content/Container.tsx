@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 export const BodyContent = styled.div`
   max-width: 1140px;
@@ -21,16 +23,16 @@ export const BodyContent = styled.div`
 `
 
 export const Container = styled.div<{ isCertificatesConfigPage?: boolean }>`
-  background-color: ${({ isCertificatesConfigPage, theme }) =>
+  background-color: ${({ isCertificatesConfigPage }) =>
     isCertificatesConfigPage === true
-      ? theme.colors.background
-      : theme.colors.white};
+      ? lightColors['surface/page']
+      : lightColors['surface/default']};
   position: absolute;
   min-height: 100vh;
   width: 100%;
 `
 export const FullBodyContent = styled.div`
-  background-color: ${({ theme }) => theme.colors.background};
+  background-color: ${lightColors['surface/page']};
   flex: 1;
   width: 100%;
   height: 100%;

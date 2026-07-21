@@ -13,6 +13,8 @@ import styled from 'styled-components'
 import { Text } from '../Text'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 export interface IDialogProps {
   id?: string
@@ -35,7 +37,7 @@ const DialogWrapper = styled.div`
   left: 0;
   bottom: 0;
   right: 0;
-  background-color: ${({ theme }) => theme.colors.opacity54};
+  background-color: ${lightColors['overlay/scrim']};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -65,7 +67,7 @@ const DialogContainer = styled.div<{
              border-radius: 0;
              }
       `}
-  background-color: ${({ theme }) => theme.colors.white};
+  background-color: ${lightColors['surface/raised']};
   border-radius: 4px;
   box-shadow: ${({ theme }) => theme.shadows.heavy};
   display: flex;
@@ -75,7 +77,7 @@ const DialogContainer = styled.div<{
 const DialogHeader = styled.div`
   display: flex;
   padding: 12px 32px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+  border-bottom: 1px solid ${lightColors['border/default']};
   justify-content: space-between;
   min-height: 40px;
 `
@@ -87,7 +89,7 @@ const DialogTitle = styled.div`
 
 const DialogContent = styled.div`
   ${({ theme }) => theme.fonts.reg16};
-  color: ${({ theme }) => theme.colors.supportingCopy};
+  color: ${lightColors['text/secondary']};
   padding: 24px 32px;
   flex-grow: 1;
   overflow-y: auto;
@@ -103,7 +105,7 @@ const DialogFooter = styled.div`
   display: flex;
   gap: 8px;
   justify-content: flex-end;
-  border-top: 1px solid ${({ theme }) => theme.colors.grey200};
+  border-top: 1px solid ${lightColors['border/default']};
 `
 
 export function Dialog({

@@ -9,11 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 /** @deprecated in favor of `<Toast>` / `<Alert>` */
 export const ErrorMessage = styled.p`
-  color: ${({ theme }) => theme.colors.white};
-  background: ${({ theme }) => theme.colors.negative};
+  color: ${lightColors['text/onAction']};
+  background: ${lightColors['action/negative']};
   padding: 8px 24px;
   text-align: center;
 `

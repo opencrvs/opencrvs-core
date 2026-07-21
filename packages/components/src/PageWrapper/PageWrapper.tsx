@@ -10,12 +10,14 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 const Page = styled.div`
   display: flex;
   min-width: ${({ theme }) => theme.grid.minWidth}px;
   flex-direction: column;
-  background-color: ${({ theme }) => theme.colors.background};
+  background-color: ${lightColors['surface/page']};
   min-height: 100vh;
   ${({ theme }) => theme.fonts.reg16};
 `
@@ -29,7 +31,7 @@ const Content = styled.section`
   flex: 1;
   width: 100%;
   height: 100%;
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${lightColors['text/primary']};
   ${({ theme }) => theme.fonts.reg16};
 `
 

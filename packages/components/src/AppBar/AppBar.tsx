@@ -14,12 +14,14 @@ import { grid } from '../grid'
 import { Stack } from '../Stack'
 import { Text } from '../Text'
 import { useWindowSize } from '../hooks'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 const AppBarWrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  background: ${({ theme }) => theme.colors.white};
+  background: ${lightColors['surface/default']};
 `
 
 const AppBarRowOne = styled.div`
@@ -28,7 +30,7 @@ const AppBarRowOne = styled.div`
   align-items: center;
   height: 56px;
   padding: 0 16px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  border-bottom: 1px solid ${lightColors['border/strong']};
 `
 
 const AppBarRowTwo = styled.div`
@@ -36,7 +38,7 @@ const AppBarRowTwo = styled.div`
   display: flex;
   align-items: center;
   height: 56px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  border-bottom: 1px solid ${lightColors['border/strong']};
 `
 
 const Left = styled.div`

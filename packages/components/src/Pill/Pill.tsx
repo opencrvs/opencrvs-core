@@ -11,6 +11,9 @@
 import React from 'react'
 import styled from 'styled-components'
 import { IFont } from '../fonts'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
+import { primitives } from '../primitives'
 
 type IPillType = 'active' | 'inactive' | 'pending' | 'default'
 
@@ -40,25 +43,25 @@ const StyledPill = styled.span<{
   type: IPillType
   pillTheme: IPillTheme
 }>`
-  --lighterShade: ${({ type, theme }) => `
-    ${type === 'active' ? theme.colors.greenLight : ''}
-    ${type === 'inactive' ? theme.colors.redLight : ''}
-    ${type === 'pending' ? theme.colors.orangeLight : ''}
-    ${type === 'default' ? theme.colors.primaryLight : ''}
+  --lighterShade: ${({ type }) => `
+    ${type === 'active' ? lightColors['feedback/positiveSubtle'] : ''}
+    ${type === 'inactive' ? lightColors['feedback/negativeSubtle'] : ''}
+    ${type === 'pending' ? lightColors['feedback/warningSubtle'] : ''}
+    ${type === 'default' ? lightColors['feedback/infoSubtle'] : ''}
   `};
 
-  --mediumShade: ${({ type, theme }) => `
-  ${type === 'active' ? theme.colors.green : ''}
-  ${type === 'inactive' ? theme.colors.red : ''}
-  ${type === 'pending' ? theme.colors.orange : ''}
-  ${type === 'default' ? theme.colors.primary : ''}
+  --mediumShade: ${({ type }) => `
+  ${type === 'active' ? lightColors['feedback/positive'] : ''}
+  ${type === 'inactive' ? lightColors['feedback/negative'] : ''}
+  ${type === 'pending' ? lightColors['feedback/warning'] : ''}
+  ${type === 'default' ? lightColors['feedback/info'] : ''}
 `};
 
-  --darkerShade: ${({ type, theme }) => `
-  ${type === 'active' ? theme.colors.greenDark : ''}
-  ${type === 'inactive' ? theme.colors.redDark : ''}
-  ${type === 'pending' ? theme.colors.orangeDark : ''}
-  ${type === 'default' ? theme.colors.primaryDark : ''}
+  --darkerShade: ${({ type }) => `
+  ${type === 'active' ? primitives.green[800] : ''}
+  ${type === 'inactive' ? primitives.red[800] : ''}
+  ${type === 'pending' ? primitives.orange[800] : ''}
+  ${type === 'default' ? primitives.blue[800] : ''}
 `};
 
   ${({ pillTheme }) =>

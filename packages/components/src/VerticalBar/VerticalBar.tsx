@@ -23,6 +23,8 @@ import {
 import { ITheme } from '../theme'
 import { IDataPoint } from '../chart-datapoint-types'
 import { CustomizedXAxisTick } from './components/AxisTick'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 const Container = styled.div`
   margin-top: 30px;
@@ -44,7 +46,10 @@ const sumUpAllValues = (data: IDataPoint[]) =>
 export const VerticalBar = withTheme(
   (props: IVerticalBarProps & { theme: ITheme }) => {
     const { data, theme, xAxisLabel, yAxisLabel } = props
-    const colours = [theme.colors.primary, theme.colors.grey400]
+    const colours = [
+      lightColors['action/primary'],
+      lightColors['text/disabled']
+    ]
 
     return (
       <Container>
@@ -91,7 +96,7 @@ export const VerticalBar = withTheme(
               dataKey="label"
             >
               <Label
-                fill={theme.colors.primary}
+                fill={lightColors['feedback/info']}
                 fontFamily={theme.fontFamily}
                 offset={20}
                 value={xAxisLabel}
@@ -100,7 +105,7 @@ export const VerticalBar = withTheme(
             </XAxis>
             <YAxis width={30} tickLine={false} axisLine={false} tick={false}>
               <Label
-                fill={theme.colors.primary}
+                fill={lightColors['feedback/info']}
                 fontFamily={theme.fontFamily}
                 transform="rotate(-90)"
                 dy={-40}
@@ -113,7 +118,7 @@ export const VerticalBar = withTheme(
               vertical={false}
               horizontal={false}
               fillOpacity="0.05"
-              fill={theme.colors.primary}
+              fill={lightColors['feedback/info']}
             />
 
             <Bar dataKey="value">

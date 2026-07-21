@@ -19,26 +19,28 @@ import { SortIcon } from '../icons/SortIcon'
 import { IAction } from '../common-types'
 import { ListItemAction } from './components/ListItemAction'
 import { useWindowSize } from '../hooks'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 const Wrapper = styled.div`
   width: 100%;
 `
 const TableHeader = styled.div`
-  color: ${({ theme }) => theme.colors.grey600};
-  background-color: ${({ theme }) => theme.colors.grey100};
+  color: ${lightColors['text/primary']};
+  background-color: ${lightColors['surface/sunken']};
   ${({ theme }) => theme.fonts.bold14};
   height: 36px;
   display: flex;
   align-items: center;
   padding: 0 16px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  border-bottom: 1px solid ${lightColors['border/strong']};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
 
 export const NoResultText = styled.div`
-  color: ${({ theme }) => theme.colors.grey600};
+  color: ${lightColors['text/primary']};
   ${({ theme }) => theme.fonts.bold16}
   text-align: left;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {

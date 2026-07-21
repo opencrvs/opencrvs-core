@@ -12,6 +12,8 @@ import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
 import { IDataPoint } from '../chart-datapoint-types'
 import { ITheme } from '../theme'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 export interface IBarChartProps {
   data: IDataPoint[]
@@ -26,7 +28,7 @@ const Estimate = styled.div`
   height: 60px;
   width: 100%;
   box-sizing: border-box;
-  border: 2px dashed ${({ theme }) => theme.colors.primary};
+  border: 2px dashed ${lightColors['action/primary']};
   padding: 6px;
 `
 
@@ -60,7 +62,7 @@ const calculateSum = (points: IDataPoint[]) =>
   points.reduce((sum, item) => sum + item.value, 0)
 
 export const Bar = withTheme((props: IBarChartProps & { theme: ITheme }) => {
-  const { data, theme } = props
+  const { data } = props
   const fromSmallest = [...data].sort((a, b) => a.value - b.value)
 
   const estimatePoint = fromSmallest.find(({ estimate }) => Boolean(estimate))
@@ -74,7 +76,7 @@ export const Bar = withTheme((props: IBarChartProps & { theme: ITheme }) => {
   const totalValue =
     allTotalPoints.length > 0 ? sumOfTotalPoints : otherPointsValue
 
-  const colours = [theme.colors.primary]
+  const colours = [lightColors['action/primary']]
 
   if (estimatePoint) {
     return (

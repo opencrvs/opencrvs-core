@@ -11,6 +11,9 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Icon } from '../Icon'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
+import { primitives } from '../primitives'
 
 const Label = styled.label<{ disabled?: boolean }>`
   display: flex;
@@ -21,15 +24,15 @@ const Label = styled.label<{ disabled?: boolean }>`
   padding: 8px 8px;
   align-items: center;
   isolation: isolate;
-  color: ${({ theme, disabled }) =>
-    disabled ? theme.colors.disabled : theme.colors.copy};
+  color: ${({ disabled }) =>
+    disabled ? lightColors['text/disabled'] : lightColors['text/primary']};
   ${({ theme }) => theme.fonts.h4};
   cursor: pointer;
   &:hover {
-    background: ${({ theme }) => theme.colors.grey100};
+    background: ${lightColors['action/secondary']};
   }
   &:active {
-    background: ${({ theme }) => theme.colors.grey200};
+    background: ${lightColors['action/secondaryHover']};
   }
 `
 
@@ -39,10 +42,10 @@ const Radio = styled.span<{
 }>`
   display: inline-block;
   border-radius: 100%;
-  background: ${({ theme, disabled }) =>
-    disabled ? theme.colors.disabled : theme.colors.copy};
-  color: ${({ theme, disabled }) =>
-    disabled ? theme.colors.disabled : theme.colors.copy};
+  background: ${({ disabled }) =>
+    disabled ? lightColors['action/disabled'] : lightColors['text/primary']};
+  color: ${({ disabled }) =>
+    disabled ? lightColors['text/disabled'] : lightColors['text/primary']};
   ${({ size }) =>
     size === 'large'
       ? `height: 40px;
@@ -55,7 +58,7 @@ const Radio = styled.span<{
   &::after {
     position: absolute;
     content: '';
-    background: ${({ theme }) => theme.colors.white};
+    background: ${lightColors['surface/default']};
     ${({ size }) =>
       size === 'large'
         ? `height: 37px;
@@ -96,8 +99,8 @@ const Input = styled.input`
 
   &:active ~ ${Radio} {
     &::after {
-      border: 1.5px solid ${({ theme }) => theme.colors.grey600};
-      box-shadow: ${({ theme }) => theme.colors.yellow} 0 0 0 3px;
+      border: 1.5px solid ${primitives.grey[900]};
+      box-shadow: ${lightColors['feedback/focus']} 0 0 0 3px;
       width: ${({ size }) => `max(21px, ${(size ?? 0) - 6}px)`};
       height: ${({ size }) => `max(21px, ${(size ?? 0) - 6}px)`};
     }
@@ -113,8 +116,8 @@ const Input = styled.input`
   &:focus ~ ${Radio} {
     &::after {
       box-sizing: content-box;
-      border: 1.5px solid ${({ theme }) => theme.colors.grey600};
-      box-shadow: ${({ theme }) => theme.colors.yellow} 0 0 0 3px;
+      border: 1.5px solid ${primitives.grey[900]};
+      box-shadow: ${lightColors['feedback/focus']} 0 0 0 3px;
       width: ${({ size }) => `max(21px, ${(size ?? 0) - 6}px)`};
       height: ${({ size }) => `max(21px, ${(size ?? 0) - 6}px)`};
     }

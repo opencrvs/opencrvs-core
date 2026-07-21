@@ -21,9 +21,11 @@ import { Text } from '../../../Text'
 import { ErrorHandler, ScannableQrReader } from '../../types'
 import { useWindowSize } from '../../../hooks'
 import { getTheme } from '../../../theme'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../../../semantics'
 
 const ScannerBox = styled(Box)`
-  background: ${({ theme }) => theme.colors.background};
+  background: ${lightColors['surface/page']};
   width: 100%;
   padding: 12px;
   border: 0;

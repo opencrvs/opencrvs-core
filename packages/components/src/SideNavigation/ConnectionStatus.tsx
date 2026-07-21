@@ -10,6 +10,8 @@
  */
 import React from 'react'
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 interface ConnectionStatusProps {
   isOnline?: boolean
@@ -20,14 +22,16 @@ const Dot = styled.span<{ isOnline: boolean }>`
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: ${({ isOnline, theme }) =>
-    isOnline ? theme.colors.green : theme.colors.red};
+  background-color: ${({ isOnline }) =>
+    isOnline
+      ? lightColors['feedback/positive']
+      : lightColors['feedback/negative']};
   margin-right: 4px;
 `
 
 const Label = styled.span`
   ${({ theme }) => theme.fonts.reg12};
-  color: ${({ theme }) => theme.colors.grey500};
+  color: ${lightColors['text/tertiary']};
 `
 
 const Container = styled.div`

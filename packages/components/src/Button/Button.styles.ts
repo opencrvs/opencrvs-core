@@ -10,6 +10,9 @@
  */
 
 import { css } from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
+import { primitives } from '../primitives'
 
 export const base = ({ fullWidth }: { fullWidth?: boolean }) => css`
   ${({ theme }) => theme.fonts.bold16};
@@ -41,137 +44,137 @@ export const base = ({ fullWidth }: { fullWidth?: boolean }) => css`
   }
 
   &:focus-visible {
-    background: ${({ theme }) => theme.colors.yellow};
-    color: ${({ theme }) => theme.colors.grey600};
+    background: ${lightColors['feedback/focus']};
+    color: ${lightColors['text/primary']};
   }
 `
 
 export const primary = ({ loading }: { loading?: boolean }) => css`
-  color: ${({ theme }) => theme.colors.white};
-  background: ${({ theme }) => theme.colors.primary};
+  color: ${lightColors['text/onAction']};
+  background: ${lightColors['action/primary']};
 
   svg {
-    color: ${({ theme }) => theme.colors.white};
+    color: ${lightColors['text/onAction']};
   }
 
   &:hover {
-    background: ${({ theme }) => theme.colors.primaryDark};
+    background: ${lightColors['action/primaryHover']};
   }
   &:active {
-    background-color: ${({ theme }) => theme.colors.primaryDarker};
+    background-color: ${lightColors['action/primaryPressed']};
   }
 
   ${loading &&
   css`
-    background: ${({ theme }) => theme.colors.primaryDark};
+    background: ${lightColors['action/primaryHover']};
   `}
 `
 
 export const secondary = css`
-  border: 1.5px solid ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.copy};
-  background: ${({ theme }) => theme.colors.white};
+  border: 1.5px solid ${lightColors['action/primary']};
+  color: ${lightColors['text/primary']};
+  background: ${lightColors['surface/default']};
 
   svg {
-    color: ${({ theme }) => theme.colors.primary};
+    color: ${lightColors['action/primary']};
   }
 
   &:hover {
-    border: 1.5px solid ${({ theme }) => theme.colors.primaryDark};
-    background: ${({ theme }) => theme.colors.grey100};
+    border: 1.5px solid ${lightColors['action/primaryHover']};
+    background: ${lightColors['action/secondary']};
   }
   &:active {
-    background: ${({ theme }) => theme.colors.grey200};
+    background: ${lightColors['action/secondaryHover']};
   }
 
   &:focus-visible {
-    border: 1.5px solid ${({ theme }) => theme.colors.grey600};
-    background: ${({ theme }) => theme.colors.yellow};
-    color: ${({ theme }) => theme.colors.grey600};
+    border: 1.5px solid ${primitives.grey[900]};
+    background: ${lightColors['feedback/focus']};
+    color: ${lightColors['text/primary']};
   }
 `
 export const secondaryNegative = css`
-  border: 1.5px solid ${({ theme }) => theme.colors.negative};
-  color: ${({ theme }) => theme.colors.copy};
+  border: 1.5px solid ${lightColors['action/negative']};
+  color: ${lightColors['text/primary']};
 
   svg {
-    color: ${({ theme }) => theme.colors.negative};
+    color: ${lightColors['action/negative']};
   }
 
   &:hover {
-    background: ${({ theme }) => theme.colors.grey100};
-    border: 1.5px solid ${({ theme }) => theme.colors.negativeDark};
+    background: ${lightColors['action/secondary']};
+    border: 1.5px solid ${lightColors['action/negativePressed']};
   }
 
   &:active {
-    background: ${({ theme }) => theme.colors.grey200};
+    background: ${lightColors['action/secondaryHover']};
   }
 
   &:focus-visible {
-    border: 1.5px solid ${({ theme }) => theme.colors.negativeDarker};
-    background: ${({ theme }) => theme.colors.yellow};
-    color: ${({ theme }) => theme.colors.negativeDarker};
+    border: 1.5px solid ${primitives.red[900]};
+    background: ${lightColors['feedback/focus']};
+    color: ${primitives.red[900]};
   }
 `
 
 export const tertiary = css`
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${lightColors['text/primary']};
 
   svg {
-    color: ${({ theme }) => theme.colors.primary};
+    color: ${lightColors['action/primary']};
   }
 
   &:hover {
-    background: ${({ theme }) => theme.colors.grey100};
+    background: ${lightColors['action/secondary']};
   }
 
   &:active {
-    background: ${({ theme }) => theme.colors.grey200};
+    background: ${lightColors['action/secondaryHover']};
   }
 `
 
 export const positive = css`
-  background: ${({ theme }) => theme.colors.positive};
-  color: ${({ theme }) => theme.colors.white};
+  background: ${lightColors['action/positive']};
+  color: ${lightColors['text/onAction']};
 
   svg {
-    color: ${({ theme }) => theme.colors.white};
+    color: ${lightColors['text/onAction']};
   }
 
   &:hover {
-    background: ${({ theme }) => theme.colors.positiveDark};
+    background: ${lightColors['action/positiveHover']};
   }
   &:active {
-    background-color: ${({ theme }) => theme.colors.positiveDarker};
+    background-color: ${lightColors['action/positivePressed']};
   }
 `
 
 export const negative = css`
-  background: ${({ theme }) => theme.colors.negative};
-  color: ${({ theme }) => theme.colors.white};
+  background: ${lightColors['action/negative']};
+  color: ${lightColors['text/onAction']};
 
   svg {
-    color: ${({ theme }) => theme.colors.white};
+    color: ${lightColors['text/onAction']};
   }
 
   &:hover {
-    background: ${({ theme }) => theme.colors.negativeDark};
+    background: ${lightColors['action/negativePressed']};
   }
   &:active {
-    background-color: ${({ theme }) => theme.colors.negativeDarker};
+    background-color: ${primitives.red[900]};
   }
 `
 
 export const icon = css`
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${lightColors['action/primary']};
   border-radius: 100%;
   aspect-ratio: 1 / 1;
 
   &:hover {
-    background: ${({ theme }) => theme.colors.grey100};
+    background: ${lightColors['action/secondary']};
   }
   &:active {
-    background: ${({ theme }) => theme.colors.grey200};
+    background: ${lightColors['action/secondaryHover']};
   }
   svg {
     margin-left: -8px;
@@ -180,16 +183,16 @@ export const icon = css`
 `
 
 export const iconPrimary = css`
-  color: ${({ theme }) => theme.colors.white};
-  background: ${({ theme }) => theme.colors.primary};
+  color: ${lightColors['text/onAction']};
+  background: ${lightColors['action/primary']};
   border-radius: 100%;
   aspect-ratio: 1 / 1;
 
   &:hover {
-    background: ${({ theme }) => theme.colors.primaryDark};
+    background: ${lightColors['action/primaryHover']};
   }
   &:active {
-    background: ${({ theme }) => theme.colors.primaryDarker};
+    background: ${lightColors['action/primaryPressed']};
   }
   svg {
     margin-left: -8px;

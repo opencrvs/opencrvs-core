@@ -12,6 +12,8 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { Button, IButtonProps } from './Button'
 import { PlusTransparent, MinusTransparent } from '../icons'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 export const StyledButton = styled(Button)`
   border: none;
@@ -22,15 +24,15 @@ export const StyledButton = styled(Button)`
   border-radius: 100%;
   align-items: center;
   &:hover {
-    background-color: ${({ theme }) => theme.colors.grey100};
+    background-color: ${lightColors['action/secondary']};
   }
   &:not([data-focus-visible-added]):hover {
-    background-color: ${({ theme }) => theme.colors.grey100};
+    background-color: ${lightColors['action/secondary']};
   }
   &:focus {
     outline: none;
-    background: ${({ theme }) => theme.colors.yellow};
-    color: ${({ theme }) => theme.colors.copy};
+    background: ${lightColors['feedback/focus']};
+    color: ${lightColors['text/primary']};
   }
   &:not([data-focus-visible-added]) {
     background: none;
@@ -39,8 +41,8 @@ export const StyledButton = styled(Button)`
   }
   &:active:not([data-focus-visible-added]) {
     outline: none;
-    background: ${({ theme }) => theme.colors.yellow};
-    color: ${({ theme }) => theme.colors.copy};
+    background: ${lightColors['feedback/focus']};
+    color: ${lightColors['text/primary']};
   }
 `
 export interface IExpansionButtonProps extends IButtonProps {

@@ -9,11 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-
-const colors = {
-  primary: '#2684FF',
-  danger: '#DE350B'
-}
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 export const Cross = (props: React.HTMLAttributes<SVGElement>) => {
   let fill: string
@@ -25,10 +22,10 @@ export const Cross = (props: React.HTMLAttributes<SVGElement>) => {
       fill = 'currentColor'
       break
     case 'red':
-      fill = colors.danger
+      fill = lightColors['feedback/negative']
       break
     default:
-      fill = colors.primary
+      fill = lightColors['feedback/info']
   }
   return (
     <svg width={24} height={24} fill="none" {...props}>

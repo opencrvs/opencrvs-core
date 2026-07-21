@@ -13,6 +13,8 @@ import { RadioButton } from './RadioButton'
 import { NoticeWrapper } from '../DateField'
 import { InputLabel } from '../InputField/InputLabel'
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -49,7 +51,7 @@ const LargeList = styled.ul<{ flexDirection?: string }>`
 const NestedChildren = styled.div`
   margin: 15px 0px 0px 18px;
   padding-left: 33px;
-  border-left: 4px solid ${({ theme }) => theme.colors.copy};
+  border-left: 4px solid ${lightColors['text/primary']};
   padding-top: 0px !important;
 `
 

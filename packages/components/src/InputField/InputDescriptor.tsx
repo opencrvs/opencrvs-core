@@ -10,10 +10,12 @@
  */
 import React, { ReactNode } from 'react'
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 export const InputDescriptor = styled.p`
   ${({ theme }) => theme.fonts.reg16};
-  color: ${({ theme }) => theme.colors.supportingCopy};
+  color: ${lightColors['text/secondary']};
   width: 100%;
   margin: 0;
   padding-bottom: 8px;

@@ -13,6 +13,9 @@ import { ClearText } from '../icons'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
+import { primitives } from '../primitives'
 
 type SearchCriterias =
   | 'TRACKING_ID'
@@ -23,28 +26,28 @@ type SearchCriterias =
   | 'EMAIL'
 
 const SearchBox = styled.div`
-  background: ${({ theme }) => theme.colors.grey100};
+  background: ${lightColors['surface/sunken']};
   box-sizing: border-box;
   width: 664px;
   height: 40px;
   border-radius: 40px;
 
   &:hover {
-    outline: 1px solid ${({ theme }) => theme.colors.grey400};
-    background: ${({ theme }) => theme.colors.grey100};
+    outline: 1px solid ${lightColors['border/strong']};
+    background: ${lightColors['surface/sunken']};
   }
 
   &:focus-within {
-    outline: 2px solid ${({ theme }) => theme.colors.grey600};
-    background: ${({ theme }) => theme.colors.white};
+    outline: 2px solid ${primitives.grey[900]};
+    background: ${lightColors['surface/default']};
   }
 
   &:active {
-    outline: 2px solid ${({ theme }) => theme.colors.grey600};
+    outline: 2px solid ${primitives.grey[900]};
   }
 
   &:focus-within input {
-    background: ${({ theme }) => theme.colors.white};
+    background: ${lightColors['surface/default']};
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.xl}px) {
@@ -62,7 +65,7 @@ const Wrapper = styled.form`
   border-radius: 2px;
   display: flex;
   ${({ theme }) => theme.fonts.bold14};
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${lightColors['text/link']};
   padding: 0px 8px 0px 4px;
   position: relative;
 `
@@ -74,7 +77,7 @@ const SearchInput = styled.input`
   flex-grow: 1;
   &:focus {
     outline: none;
-    background-color: ${({ theme }) => theme.colors.white};
+    background-color: ${lightColors['surface/default']};
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -86,14 +89,14 @@ export const LabelButton = styled(Button)`
   width: auto;
   height: auto;
   border-radius: 2px;
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${lightColors['text/link']};
   ${({ theme }) => theme.fonts.bold14};
 `
 
 const DropDownWrapper = styled.ul`
-  background: ${({ theme }) => theme.colors.white};
+  background: ${lightColors['surface/raised']};
   border-radius: 4px;
-  border: 1px solid ${({ theme }) => theme.colors.grey300};
+  border: 1px solid ${lightColors['border/strong']};
   ${({ theme }) => theme.shadows.light};
   position: absolute;
   padding: 6px 0;
@@ -108,7 +111,7 @@ const DropDownWrapper = styled.ul`
 
 const DropDownItem = styled.li`
   ${({ theme }) => theme.fonts.bold14};
-  color: ${({ theme }) => theme.colors.grey500};
+  color: ${lightColors['text/tertiary']};
   display: flex;
   align-items: center;
   gap: 8px;
@@ -117,16 +120,16 @@ const DropDownItem = styled.li`
   border-radius: 4px;
   padding: 8px 12px;
   &:hover {
-    color: ${({ theme }) => theme.colors.grey600};
-    background: ${({ theme }) => theme.colors.grey100};
+    color: ${lightColors['text/primary']};
+    background: ${lightColors['action/secondary']};
   }
   &:active {
-    color: ${({ theme }) => theme.colors.grey600};
-    background: ${({ theme }) => theme.colors.grey200};
+    color: ${lightColors['text/primary']};
+    background: ${lightColors['action/secondaryHover']};
   }
 
   &:focus-visible {
-    background-color: ${({ theme }) => theme.colors.yellow};
+    background-color: ${lightColors['feedback/focus']};
   }
 `
 
@@ -136,7 +139,7 @@ const AdvancedSearchWrapper = styled.div`
   flex-flow: column nowrap;
   align-items: stretch;
   margin-top: 6px;
-  border-top: 1px solid ${({ theme }) => theme.colors.grey300};
+  border-top: 1px solid ${lightColors['border/strong']};
   padding: 6px;
   padding-bottom: 0;
 `

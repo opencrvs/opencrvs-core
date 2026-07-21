@@ -14,7 +14,9 @@ import { Spinner } from '../Spinner'
 import { Button } from '../Button'
 import { Text } from '../Text'
 import { Link } from '../Link'
-import { colors } from '../colors'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
+import { primitives } from '../primitives'
 import { useToastVisibility } from './useToastVisibility'
 import { Icon } from '../Icon'
 
@@ -35,12 +37,16 @@ const shallowToast = keyframes`
 const Container = styled.div<{
   $type?: ToastType
 }>`
-  --color: ${({ $type, theme }) => `
-    ${$type === 'success' ? theme.colors.positiveDark : ''}
-    ${$type === 'loading' || $type === 'info' ? theme.colors.primaryDark : ''}
-    ${$type === 'error' ? theme.colors.negativeDark : ''}
-    ${$type === 'warning' ? theme.colors.orangeDark : ''}
-    ${$type === undefined ? theme.colors.positiveDark : ''}
+  --color: ${({ $type }) => `
+    ${$type === 'success' ? lightColors['action/positiveHover'] : ''}
+    ${
+      $type === 'loading' || $type === 'info'
+        ? lightColors['action/primaryHover']
+        : ''
+    }
+    ${$type === 'error' ? lightColors['action/negativePressed'] : ''}
+    ${$type === 'warning' ? primitives.orange[800] : ''}
+    ${$type === undefined ? lightColors['action/positiveHover'] : ''}
   `};
   background: var(--color);
   border-radius: 8px;
@@ -78,7 +84,7 @@ const ActionLink = styled(Link)`
 `
 
 const Close = styled(Button)`
-  color: ${({ theme }) => theme.colors.white};
+  color: ${lightColors['text/onAction']};
   margin-top: 4px;
   margin-right: 4px;
   &:hover {
@@ -125,7 +131,7 @@ export function Toast({
         <SpinnerContainer>
           <Spinner
             id="in-progress-floating-notification"
-            baseColor={colors.white}
+            baseColor={lightColors['text/onAction']}
             size={20}
           />
         </SpinnerContainer>

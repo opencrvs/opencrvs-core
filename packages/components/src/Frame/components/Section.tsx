@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../../semantics'
 
 export const Section = styled.div`
   display: grid;
@@ -26,7 +28,7 @@ export const SectionFormBackAction = styled.div`
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     gap: 0;
-    background: ${({ theme }) => theme.colors.white};
+    background: ${lightColors['surface/default']};
     align-items: centre;
     justify-items: start;
   }

@@ -10,6 +10,9 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
+import { primitives } from '../primitives'
 
 export interface ICustomProps {
   error?: boolean
@@ -44,34 +47,34 @@ const StyledInputContainer = styled.div<{
   box-sizing: border-box;
   overflow: hidden;
 
-  ${({ error, touched, disabled, theme }) => `
+  ${({ error, touched, disabled }) => `
     border: 1.5px solid ${
       error && touched
-        ? theme.colors.negative
+        ? lightColors['feedback/negative']
         : disabled
-        ? theme.colors.grey300
-        : theme.colors.copy
+        ? lightColors['border/strong']
+        : lightColors['text/primary']
     };
     &:hover {
-      box-shadow: 0 0 0 4px ${theme.colors.grey200};
+      box-shadow: 0 0 0 4px ${lightColors['border/default']};
     }
     &:focus-within {
-      outline: 0.5px solid ${theme.colors.grey600};
-      border: 1.5px solid ${theme.colors.grey600};
-      box-shadow: 0 0 0px 4px ${theme.colors.yellow};
+      outline: 0.5px solid ${primitives.grey[900]};
+      border: 1.5px solid ${primitives.grey[900]};
+      box-shadow: 0 0 0px 4px ${lightColors['feedback/focus']};
     }
   `}
 `
 
 const StyledPrefix = styled.span`
   ${({ theme }) => theme.fonts.reg19};
-  color: ${({ theme }) => theme.colors.grey400};
+  color: ${lightColors['text/disabled']};
   user-select: none;
 `
 
 const StyledPostfix = styled.span`
   ${({ theme }) => theme.fonts.reg19};
-  color: ${({ theme }) => theme.colors.grey400};
+  color: ${lightColors['text/disabled']};
   user-select: none;
 `
 
@@ -83,20 +86,20 @@ const StyledInput = styled.input<ICustomProps>`
   outline: none;
   border: none;
   ${({ theme }) => theme.fonts.reg19};
-  color: ${({ theme, disabled }) =>
-    disabled ? theme.colors.grey500 : theme.colors.copy};
-  background: ${({ theme }) => theme.colors.white};
+  color: ${({ disabled }) =>
+    disabled ? lightColors['text/tertiary'] : lightColors['text/primary']};
+  background: ${lightColors['surface/default']};
 
   &::-webkit-input-placeholder {
-    color: ${({ theme }) => theme.colors.placeholderCopy};
+    color: ${lightColors['text/tertiary']};
   }
 
   &::-moz-placeholder {
-    color: ${({ theme }) => theme.colors.placeholderCopy};
+    color: ${lightColors['text/tertiary']};
   }
 
   &:-ms-input-placeholder {
-    color: ${({ theme }) => theme.colors.placeholderCopy};
+    color: ${lightColors['text/tertiary']};
   }
 
   &::-webkit-outer-spin-button,

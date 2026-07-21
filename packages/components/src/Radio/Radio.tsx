@@ -10,6 +10,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 const Wrapper = styled.li`
   padding-top: 5px;
@@ -21,14 +23,14 @@ const Label = styled.label`
   position: relative;
   left: 6px;
   top: -2px;
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${lightColors['text/primary']};
   ${({ theme }) => theme.fonts.reg16};
   cursor: pointer;
 `
 
 const Check = styled.span`
   display: inline-block;
-  background: ${({ theme }) => theme.colors.primary};
+  background: ${lightColors['action/primary']};
   border-radius: 50%;
   height: 22px;
   width: 22px;
@@ -40,7 +42,7 @@ const Check = styled.span`
     display: block;
     position: relative;
     content: '';
-    background: ${({ theme }) => theme.colors.white};
+    background: ${lightColors['surface/default']};
     border-radius: 50%;
     height: 14px;
     width: 14px;
@@ -54,7 +56,7 @@ const Check = styled.span`
     display: block;
     position: relative;
     content: '';
-    background: ${({ theme }) => theme.colors.white};
+    background: ${lightColors['surface/default']};
     border-radius: 50%;
     height: 18px;
     width: 18px;
@@ -75,7 +77,7 @@ const Input = styled.input`
   /* stylelint-disable */
   &:checked ~ ${Check}::after {
     /* stylelint-enable */
-    background: ${({ theme }) => theme.colors.primary};
+    background: ${lightColors['action/primary']};
   }
 `
 

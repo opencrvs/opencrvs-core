@@ -10,6 +10,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 export interface IInputError {
   id: string
@@ -22,5 +24,5 @@ export const InputError = styled.div<IInputError>`
   padding-top: 4px;
   display: inline-block;
   ${({ theme }) => theme.fonts.bold14}
-  color: ${({ theme }) => theme.colors.negative};
+  color: ${lightColors['feedback/negative']};
 `

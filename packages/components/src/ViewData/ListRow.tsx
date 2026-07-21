@@ -12,12 +12,14 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { Link } from '../Link'
 import { Button } from '../Button'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 const Container = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+  border-bottom: 1px solid ${lightColors['border/default']};
   padding: 16px 0px;
   width: 100%;
   &:last-child {
@@ -86,7 +88,7 @@ const HideOnDesktop = styled.div`
 
 const PlaceHolder = styled.div`
   ${({ theme }) => theme.fonts.reg16};
-  color: ${({ theme }) => theme.colors.supportingCopy};
+  color: ${lightColors['text/secondary']};
   flex: 1;
 `
 const Action = styled.div`

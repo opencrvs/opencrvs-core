@@ -12,10 +12,12 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Link, Stack, Text } from '../'
 import { Icon } from '../Icon'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 const Container = styled.div`
   box-sizing: border-box;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+  border-bottom: 1px solid ${lightColors['border/default']};
   padding: 0;
   width: 100%;
 `
@@ -26,11 +28,11 @@ const AccordionHeader = styled.div`
   flex-direction: row;
 
   &:hover {
-    background: ${({ theme }) => theme.colors.grey100};
+    background: ${lightColors['action/secondary']};
     cursor: pointer;
   }
   &:active {
-    background: ${({ theme }) => theme.colors.grey200};
+    background: ${lightColors['action/secondaryHover']};
     cursor: pointer;
   }
 `

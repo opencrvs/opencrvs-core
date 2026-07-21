@@ -11,6 +11,8 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Link } from '../../Link'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../../semantics'
 
 export const SkipToContentContainer = styled(Link)`
   left: 0;
@@ -21,8 +23,8 @@ export const SkipToContentContainer = styled(Link)`
   padding: 16px;
   filter: drop-shadow(0px 2px 4px rgba(34, 34, 34, 0.24));
   margin: 8px;
-  background: ${({ theme }) => theme.colors.yellow};
-  color: ${({ theme }) => theme.colors.copy};
+  background: ${lightColors['feedback/focus']};
+  color: ${lightColors['text/primary']};
 
   &:not(:focus-visible) {
     transition: transform 400ms;

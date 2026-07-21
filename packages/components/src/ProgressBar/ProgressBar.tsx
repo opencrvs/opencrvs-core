@@ -11,6 +11,8 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Line } from 'rc-progress'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 const HeaderWrapper = styled.div`
   display: flex;
@@ -21,8 +23,8 @@ const HeaderWrapper = styled.div`
 const TitleLink = styled.div<{ disabled?: boolean }>`
   ${({ disabled }) => (disabled ? '' : 'cursor: pointer;')};
   ${({ theme }) => theme.fonts.reg16};
-  color: ${({ theme, disabled }) =>
-    disabled ? theme.colors.copy : theme.colors.primary};
+  color: ${({ disabled }) =>
+    disabled ? lightColors['text/primary'] : lightColors['text/link']};
   ${({ disabled }) => (disabled ? '' : 'text-decoration: underline')};
 `
 const ValueHolder = styled.div`
@@ -32,12 +34,12 @@ const Value = styled.span`
   ${({ theme }) => theme.fonts.bold16};
 `
 const Percentage = styled.span`
-  color: ${({ theme }) => theme.colors.grey400};
+  color: ${lightColors['text/disabled']};
 `
 const LoaderBox = styled.span<{
   width?: number
 }>`
-  background: ${({ theme }) => theme.colors.background};
+  background: ${lightColors['surface/page']};
   display: inline-block;
   height: 24px;
   width: ${({ width }) => (width ? `${width}%` : '100%')};

@@ -10,6 +10,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 export interface IBox extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -17,8 +19,8 @@ const Wrapper = styled.div<IBox>`
   position: relative;
   border-radius: 4px;
   padding: 24px;
-  border: 1px solid ${({ theme }) => theme.colors.grey300};
-  background: ${({ theme }) => theme.colors.white};
+  border: 1px solid ${lightColors['border/strong']};
+  background: ${lightColors['surface/default']};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     border: 0;
     padding: 16px;

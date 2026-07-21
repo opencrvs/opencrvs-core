@@ -12,6 +12,8 @@ import * as React from 'react'
 import { ReactElement } from 'react'
 import styled from 'styled-components'
 import { colors } from '../colors'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../semantics'
 
 const Container = styled.div<{ size: ContentSize }>`
   position: relative;
@@ -29,8 +31,8 @@ const Container = styled.div<{ size: ContentSize }>`
         return '568px'
     }
   }};
-  border: 1px solid ${({ theme }) => theme.colors.grey300};
-  background: ${({ theme }) => theme.colors.white};
+  border: 1px solid ${lightColors['border/strong']};
+  background: ${lightColors['surface/default']};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin: 0;
     height: 100%;
@@ -45,7 +47,7 @@ const Header = styled.div`
   justify-content: center;
   flex-direction: column;
   padding: 0 24px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  border-bottom: 1px solid ${lightColors['border/strong']};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     border: 0;
     padding: 0;
@@ -61,11 +63,11 @@ const TopActionBar = styled.div`
 `
 export const SubHeader = styled.div`
   padding-bottom: 24px;
-  color: ${({ theme }) => theme.colors.supportingCopy};
+  color: ${lightColors['text/secondary']};
   ${({ theme }) => theme.fonts.reg16};
 `
 export const Body = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${lightColors['text/primary']};
   ${({ theme }) => theme.fonts.reg16};
 `
 const Footer = styled.div`
@@ -81,7 +83,7 @@ const HeaderBottom = styled.div`
   width: 100%;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding: 24px;
-    border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+    border-bottom: 1px solid ${lightColors['border/strong']};
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 0 16px 16px;
@@ -145,12 +147,12 @@ const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
 
 const Title = styled.div`
   ${({ theme }) => theme.fonts.h1}
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${lightColors['text/primary']};
 `
 
 const Icon = styled.div`
   height: 24px;
-  background-color: ${({ theme }) => theme.colors.white};
+  background-color: ${lightColors['surface/default']};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }

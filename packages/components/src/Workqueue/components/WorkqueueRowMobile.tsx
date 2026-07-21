@@ -17,18 +17,20 @@ import {
   ContentWrapper
 } from './WorkqueueRowDesktop'
 import { IActionObject, IAction } from '../types'
+// Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
+import { lightColors } from '../../semantics'
 
 const StyledBox = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${lightColors['text/primary']};
   ${({ theme }) => theme.fonts.reg16};
   display: flex;
   align-items: center;
-  border: 1px solid ${({ theme }) => theme.colors.grey300};
+  border: 1px solid ${lightColors['border/strong']};
   box-sizing: border-box;
   border-radius: 4px;
   height: 80px;
   max-width: 520px;
-  background-color: ${({ theme }) => theme.colors.white};
+  background-color: ${lightColors['surface/default']};
   margin: auto;
   margin-bottom: 8px;
 `
