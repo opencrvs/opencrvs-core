@@ -616,6 +616,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
         <Address.Input
           config={field.config}
           disabled={disabled}
+          eventConfig={eventConfig}
           id={field.config.id}
           name={name}
           touched={groupTouched}
