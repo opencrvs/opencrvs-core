@@ -32,6 +32,7 @@ const Container = styled.div<{ $type: BannerType }>`
   margin-bottom: 16px;
   border-radius: 4px;
   background-color: ${({ $type, theme }) =>
+    // eslint-disable-next-line no-nested-ternary
     $type === 'error'
       ? theme.colors.redLighter
       : $type === 'warning'
