@@ -251,7 +251,11 @@ export const Workqueues = defineWorkqueues([
       ...createdInMyAdminArea,
       status: {
         type: 'anyOf',
-        terms: [EventStatus.enum.NOTIFIED, EventStatus.enum.DECLARED]
+        terms: [
+          EventStatus.enum.NOTIFIED,
+          EventStatus.enum.DECLARED,
+          EventStatus.enum.REGISTERED
+        ]
       },
       flags: {
         anyOf: [
@@ -273,7 +277,11 @@ export const Workqueues = defineWorkqueues([
     query: {
       status: {
         type: 'anyOf',
-        terms: [EventStatus.enum.NOTIFIED, EventStatus.enum.DECLARED]
+        terms: [
+          EventStatus.enum.NOTIFIED,
+          EventStatus.enum.DECLARED,
+          EventStatus.enum.REGISTERED
+        ]
       },
       flags: { anyOf: ['escalated-to-registrar-general'] }
     },
@@ -290,7 +298,11 @@ export const Workqueues = defineWorkqueues([
     query: {
       status: {
         type: 'anyOf',
-        terms: [EventStatus.enum.NOTIFIED, EventStatus.enum.DECLARED]
+        terms: [
+          EventStatus.enum.NOTIFIED,
+          EventStatus.enum.DECLARED,
+          EventStatus.enum.REGISTERED
+        ]
       },
       flags: { anyOf: ['escalated-to-provincial-registrar'] }
     },
