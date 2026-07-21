@@ -98,11 +98,11 @@ export const SearchResultComponent = ({
   }
 
   const { getOutbox } = useEvents()
-  const { getRemoteDraftsWithLocalEvent } = useDrafts()
+  const { getDisplayableDrafts } = useDrafts()
   const { getEventTitle } = useEventTitle()
 
   const outbox = getOutbox()
-  const drafts = getRemoteDraftsWithLocalEvent()
+  const drafts = getDisplayableDrafts()
 
   const [sortedCol, setSortedCol] = useState<
     (typeof COLUMNS)[keyof typeof COLUMNS]

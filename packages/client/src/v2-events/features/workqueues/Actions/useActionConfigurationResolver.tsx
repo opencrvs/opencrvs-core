@@ -43,8 +43,8 @@ import { useUserAllowedActions } from './useUserAllowedActions'
  * Pattern needs to return a resolver function, since a hook should not be mapped through.
  */
 export function useEventActionConfigurationResolver(event: EventIndex) {
-  const { getRemoteDraftsWithLocalEvent } = useDrafts()
-  const drafts = getRemoteDraftsWithLocalEvent()
+  const { getDisplayableDrafts } = useDrafts()
+  const drafts = getDisplayableDrafts()
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { onClick, modals } = useEventActionsOnClick(event)
   const validatorContext = useValidatorContext()

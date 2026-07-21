@@ -115,8 +115,8 @@ function SidebarComponent({
   const { getOutbox } = useEvents()
   const outbox = getOutbox()
 
-  const { getRemoteDraftsWithLocalEvent } = useDrafts()
-  const drafts = getRemoteDraftsWithLocalEvent()
+  const { getDisplayableDrafts } = useDrafts()
+  const drafts = getDisplayableDrafts()
 
   const workqueues = useCountryConfigWorkqueueConfigurations()
 

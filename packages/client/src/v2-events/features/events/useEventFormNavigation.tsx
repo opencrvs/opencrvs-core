@@ -76,8 +76,8 @@ export function useEventFormNavigation() {
   const navigate = useNavigate()
 
   const events = useEvents()
-  const { getRemoteDraftsWithLocalEvent, setLocalDraft } = useDrafts()
-  const remoteDrafts = getRemoteDraftsWithLocalEvent()
+  const { getDisplayableDrafts, setLocalDraft } = useDrafts()
+  const displayableDrafts = getDisplayableDrafts()
 
   const deleteEvent = events.deleteEvent.useMutation()
 
@@ -161,7 +161,9 @@ export function useEventFormNavigation() {
       return
     }
 
-    const hasDrafts = remoteDrafts.find((draft) => draft.eventId === event.id)
+    const hasDrafts = displayableDrafts.find(
+      (draft) => draft.eventId === event.id
+    )
     if (isUndeclaredDraft(event.status) && !hasDrafts) {
       deleteEvent.mutate({ eventId: event.id })
     }

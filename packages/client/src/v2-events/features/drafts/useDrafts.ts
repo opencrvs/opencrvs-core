@@ -181,7 +181,7 @@ export function useDrafts() {
   const localDraft = localDraftStore((drafts) => drafts.draft)
   const createDraft = useCreateDraft()
 
-  function getAllRemoteDrafts(
+  function getDisplayableDrafts(
     additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
   ): Draft[] {
     // Skip the queryFn defined by tRPC and use the one defined above
@@ -216,25 +216,19 @@ export function useDrafts() {
       }
     })
 
-    return drafts.data
-  }
-
-  /**
-   * Remote drafts whose backing event resolves locally.
-   *
-   * The workqueue needs a draft's event to render its row, so the list and the
-   * sidebar badge both derive from this set to stay in lockstep (otherwise the
-   * badge could read "1" while the list shows "No records in drafts"). Missing
-   * events are normally prefetched by the `event.draft.list` queryFn, so a
-   * cleared cache self-heals; a draft is only dropped when its event genuinely
-   * can't be resolved (e.g. access lost after an office change) — where it isn't
-   * actionable anyway.
-   */
-  function getRemoteDraftsWithLocalEvent(
-    additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
-  ): Draft[] {
-    return getAllRemoteDrafts(additionalOptions).filter((draft) =>
-      Boolean(findLocalEventDocument(draft.eventId))
+    /**
+     * Filter out drafts whose backing event does not resolve locally.
+     *
+     * The workqueue needs a draft's event to render its row, so the list and the
+     * sidebar badge both derive from this set to stay in lockstep (otherwise the
+     * badge could read "1" while the list shows "No records in drafts"). Missing
+     * events are normally prefetched by the `event.draft.list` queryFn, so a
+     * cleared cache self-heals; a draft is only dropped when its event genuinely
+     * can't be resolved (e.g. access lost after an office change) — where it isn't
+     * actionable anyway.
+     */
+    return drafts.data.filter(({ eventId }) =>
+      Boolean(findLocalEventDocument(eventId))
     )
   }
 
@@ -256,14 +250,14 @@ export function useDrafts() {
       })
     },
     isLocalDraftSubmitted: createDraft.isSuccess,
-    getRemoteDraftsWithLocalEvent,
+    getDisplayableDrafts,
     getRemoteDraftByEventId: function useDraftList(
       eventId: string,
       additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
     ): Draft | undefined {
-      const eventDrafts = getRemoteDraftsWithLocalEvent(
-        additionalOptions
-      ).filter((draft) => draft.eventId === eventId)
+      const eventDrafts = getDisplayableDrafts(additionalOptions).filter(
+        (draft) => draft.eventId === eventId
+      )
 
       if (eventDrafts.length > 1) {
         throw new Error(
