@@ -249,14 +249,6 @@ export const Workqueues = defineWorkqueues([
     },
     query: {
       ...createdInMyAdminArea,
-      status: {
-        type: 'anyOf',
-        terms: [
-          EventStatus.enum.NOTIFIED,
-          EventStatus.enum.DECLARED,
-          EventStatus.enum.REGISTERED
-        ]
-      },
       flags: {
         anyOf: [
           'escalated-to-registrar-general',
@@ -274,17 +266,7 @@ export const Workqueues = defineWorkqueues([
       defaultMessage: 'Pending feedback',
       description: 'Title of pending feedback workqueue'
     },
-    query: {
-      status: {
-        type: 'anyOf',
-        terms: [
-          EventStatus.enum.NOTIFIED,
-          EventStatus.enum.DECLARED,
-          EventStatus.enum.REGISTERED
-        ]
-      },
-      flags: { anyOf: ['escalated-to-registrar-general'] }
-    },
+    query: { flags: { anyOf: ['escalated-to-registrar-general'] } },
     action: { type: ActionType.READ }
   },
   {
@@ -295,17 +277,7 @@ export const Workqueues = defineWorkqueues([
       defaultMessage: 'Pending feedback',
       description: 'Title of pending feedback workqueue'
     },
-    query: {
-      status: {
-        type: 'anyOf',
-        terms: [
-          EventStatus.enum.NOTIFIED,
-          EventStatus.enum.DECLARED,
-          EventStatus.enum.REGISTERED
-        ]
-      },
-      flags: { anyOf: ['escalated-to-provincial-registrar'] }
-    },
+    query: { flags: { anyOf: ['escalated-to-provincial-registrar'] } },
     action: { type: ActionType.READ }
   },
   {
