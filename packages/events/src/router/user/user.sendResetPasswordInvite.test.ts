@@ -20,6 +20,10 @@ import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { getUserCredentialsByUserId } from '@events/storage/postgres/events/users'
 
 const USER_EDIT_SCOPE = encodeScope({ type: 'user.edit' })
+const USER_EDIT_LOCATION_SCOPE = encodeScope({
+  type: 'user.edit',
+  options: { accessLevel: 'location' }
+})
 
 test('sendResetPasswordInvite throws NOT_FOUND when user does not exist', async () => {
   const { user } = await setupTestCase()
@@ -112,4 +116,32 @@ test('sendResetPasswordInvite requires user.edit scope', async () => {
   await expect(
     limitedClient.user.sendResetPasswordInvite(targetUser.id)
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test('sendResetPasswordInvite is jurisdiction-enforced: cannot reset a user outside the caller jurisdiction', async () => {
+  const { user, users } = await setupTestCase()
+  const outOfJurisdictionTarget = users[1]
+
+  const client = createTestClient(user, [USER_EDIT_LOCATION_SCOPE])
+
+  await expect(
+    client.user.sendResetPasswordInvite(outOfJurisdictionTarget.id)
+  ).rejects.toMatchObject({ code: 'NOT_FOUND' })
+})
+
+test('sendResetPasswordInvite allows a location-scoped admin to reset a user in their jurisdiction', async () => {
+  const { user, locations, seed, generator } = await setupTestCase()
+
+  const sameOfficeTarget = await seed.user(
+    generator.user.create({
+      primaryOfficeId: locations[0].id,
+      administrativeAreaId: locations[0].administrativeAreaId
+    })
+  )
+
+  const client = createTestClient(user, [USER_EDIT_LOCATION_SCOPE])
+
+  await expect(
+    client.user.sendResetPasswordInvite(sameOfficeTarget.id)
+  ).resolves.not.toThrow()
 })

@@ -32,7 +32,6 @@ import {
   UserOrSystemSummaryWithStatus
 } from '@opencrvs/commons'
 import {
-  allowedWithAnyOfScopes,
   canAccessUserWithScopes,
   canCreateUserWithScopes,
   canSearchUsers,
@@ -713,8 +712,8 @@ export const userRouter = router({
       })
     }),
   sendResetPasswordInvite: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.edit']))
     .input(UUID)
+    .use(canAccessUserWithScopes(['user.edit']))
     .mutation(async ({ input, ctx }) => {
       const userId = UUID.parse(input)
       const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
