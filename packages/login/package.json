@@ -46,7 +46,6 @@
     "webfontloader": "^1.6.28"
   },
   "scripts": {
-    "postinstall": "node ../../development-environment/link-ts6-api.js",
     "start": "vite --port=3020",
     "preview": "vite preview",
     "build": "NODE_OPTIONS=--max_old_space_size=8000 vite build",

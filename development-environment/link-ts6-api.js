@@ -21,8 +21,9 @@
  * directly (extract-translations), so pnpm links the TS 6 `tsc`/`tsserver`
  * bins into their package-local node_modules/.bin, where they shadow the
  * workspace-root native TS 7 compiler on script PATHs. Remove them so bare
- * `tsc` in package scripts falls through to the root .bin (TS 7). Runs from
- * the root `postinstall`.
+ * `tsc` in package scripts falls through to the root .bin (TS 7). Only these
+ * two packages carry the alias, so the fixup is scoped to them explicitly.
+ * Runs once from the root `postinstall`.
  *
  * When TypeScript 7.1 ships its API, delete this script and .pnpmfile.cjs,
  * the consumers can resolve the root `typescript` again.
@@ -44,7 +45,11 @@ if (!fs.existsSync(path.join(ROOT, 'node_modules', 'typescript'))) {
   process.exit(0)
 }
 
-for (const pkg of fs.readdirSync(path.join(ROOT, 'packages'))) {
+// Only client and login declare the `@typescript/api` alias, so they are the
+// only packages that get a TS 6 tsc/tsserver linked into their local .bin.
+// Target them explicitly rather than sweeping every package, which would also
+// strip the bins of any package that legitimately depends on typescript.
+for (const pkg of ['client', 'login']) {
   for (const bin of ['tsc', 'tsserver']) {
     const local = path.join(ROOT, 'packages', pkg, 'node_modules', '.bin', bin)
     if (fs.existsSync(local)) {

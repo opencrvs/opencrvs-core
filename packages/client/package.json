@@ -5,7 +5,6 @@
   "license": "MPL-2.0",
   "private": true,
   "scripts": {
-    "postinstall": "node ../../development-environment/link-ts6-api.js",
     "start": "vite --port=3000",
     "preview": "vite preview",
     "build": "NODE_OPTIONS=--max_old_space_size=8000 vite build",
