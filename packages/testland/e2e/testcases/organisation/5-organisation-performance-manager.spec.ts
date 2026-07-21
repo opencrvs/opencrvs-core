@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { test, expect, type Page } from '@playwright/test'
-import { login } from '../../helpers'
+import { findOnOrganisationPage, login } from '../../helpers'
 import { CREDENTIALS } from '../../constants'
 import { navigateToWorkqueue } from '../../utils'
 test.describe.serial('5. Organisation Page', () => {
@@ -85,7 +85,9 @@ test.describe.serial('5. Organisation Page', () => {
 
     test('5.1.5 Verify Embassy Office', async () => {
       await page.getByRole('button', { name: 'Organisation' }).click()
-      await page.getByRole('button', { name: 'French Embassy Office' }).click()
+      await (
+        await findOnOrganisationPage(page, 'French Embassy Office')
+      ).click()
       await expect(page.locator('#content-name')).toHaveText(
         'French Embassy Office'
       )

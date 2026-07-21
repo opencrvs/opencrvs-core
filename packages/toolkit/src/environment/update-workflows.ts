@@ -11,23 +11,32 @@
 
 import { readdir } from 'fs/promises'
 /* eslint-disable no-console */
-import { readFileSync, writeFileSync, statSync, existsSync } from 'fs'
-import { basename, join } from 'path'
+import { existsSync, readFileSync, writeFileSync, statSync } from 'fs'
+import { basename, dirname, join } from 'path'
 import * as glob from 'glob'
 import * as yaml from 'js-yaml'
-import { error, info, log, success, warn } from './logger'
+import { log, success } from './logger'
+import { INVENTORY_FILE_NAME } from './paths'
 interface WorkflowConfig {
   workflows: string[]
   path: string
 }
 
-async function extractInfrastructureNames(): Promise<string[]> {
-  const files = glob.sync('infrastructure/server-setup/inventory/*.yml')
+function isDirectory(path: string) {
+  try {
+    return statSync(path).isDirectory()
+  } catch {
+    return false
+  }
+}
 
-  const infraEnvironments = files.map((file) => basename(file, '.yml'))
+async function extractInfrastructureNames(): Promise<string[]> {
+  const files = glob.sync(join('environments', '*', INVENTORY_FILE_NAME))
+
+  const infraEnvironments = files.map((file) => basename(dirname(file)))
   if (infraEnvironments.length === 0) {
     console.log(
-      '⚠️  Warning: No environment directories found in infrastructure/server-setup/inventory/'
+      `⚠️  Warning: No environment inventory files found at environments/*/${INVENTORY_FILE_NAME}`
     )
     return []
   }
@@ -40,8 +49,14 @@ async function extractEnvironmentNames(): Promise<string[]> {
 
   // Filter only directories
   const environments = entries.filter((entry) => {
-    const fullPath = join('environments', entry)
-    return statSync(fullPath).isDirectory()
+    const environmentPath = join('environments', entry)
+    const opencrvsServicesPath = join(environmentPath, 'opencrvs-services')
+
+    return (
+      isDirectory(environmentPath) &&
+      existsSync(opencrvsServicesPath) &&
+      isDirectory(opencrvsServicesPath)
+    )
   })
   if (environments.length === 0) {
     console.log(

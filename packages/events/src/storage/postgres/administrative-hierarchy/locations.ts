@@ -245,6 +245,34 @@ export async function appendVersion(
 }
 
 /**
+ * Removes a single element from a row's `versions` jsonb array by
+ * `versionId`, and bumps `updatedAt`. The caller is responsible for having
+ * already verified the element exists and is still pending (withdrawal must
+ * not remove an effective element) — this function performs the removal
+ * unconditionally.
+ */
+export async function removeVersion(
+  table: 'locations' | 'administrativeAreas',
+  id: UUID,
+  versionId: UUID
+) {
+  const db = getClient()
+
+  await db
+    .updateTable(table)
+    .set({
+      versions: sql`(
+        SELECT jsonb_agg(element)
+        FROM jsonb_array_elements(versions) AS element
+        WHERE element->>'versionId' != ${versionId}
+      )`,
+      updatedAt: sql`now()`
+    })
+    .where('id', '=', id)
+    .execute()
+}
+
+/**
  * Fetches a location row by id without the soft-delete filter and without
  * resolving version fields. Used by the create path to detect idempotent
  * retries against any existing row, including soft-deleted ones.
