@@ -249,14 +249,6 @@ export const Workqueues = defineWorkqueues([
     },
     query: {
       ...createdInMyAdminArea,
-      status: {
-        type: 'anyOf',
-        terms: [
-          EventStatus.enum.NOTIFIED,
-          EventStatus.enum.DECLARED,
-          EventStatus.enum.REGISTERED
-        ]
-      },
       flags: {
         anyOf: [
           'escalated-to-registrar-general',
