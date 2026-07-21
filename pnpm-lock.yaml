@@ -2072,9 +2072,6 @@ importers:
       tsx:
         specifier: ^4.15.7
         version: 4.23.1
-      typescript:
-        specifier: 6.0.3
-        version: 6.0.3
       uuid:
         specifier: ^11.1.0
         version: 11.1.1
@@ -2123,7 +2120,7 @@ importers:
         version: 2.4.9
       '@types/react-intl':
         specifier: ^3.0.0
-        version: 3.0.0(react@19.1.0)(typescript@6.0.3)
+        version: 3.0.0(react@19.1.0)(typescript@5.9.3)
       '@typescript-eslint/eslint-plugin':
         specifier: 8.63.0
         version: 8.63.0(@typescript-eslint/parser@8.63.0(eslint@9.23.0))(eslint@9.23.0)
@@ -2177,13 +2174,13 @@ importers:
         version: 3.5.3
       react-intl:
         specifier: ^6.4.3
-        version: 6.8.9(react@19.1.0)(typescript@6.0.3)
+        version: 6.8.9(react@19.1.0)(typescript@5.9.3)
       vite-tsconfig-paths:
         specifier: ^4.3.2
-        version: 4.3.2(typescript@6.0.3)(vite@5.4.8(@types/node@20.19.43)(terser@5.31.0))
+        version: 4.3.2(typescript@5.9.3)(vite@5.4.8(@types/node@20.19.43)(terser@5.31.0))
       vitest:
         specifier: 2.1.9
-        version: 2.1.9(@types/node@20.19.43)(jsdom@16.7.0)(msw@2.7.3(@types/node@20.19.43)(typescript@6.0.3))(terser@5.31.0)
+        version: 2.1.9(@types/node@20.19.43)(jsdom@16.7.0)(msw@2.7.3(@types/node@20.19.43)(typescript@5.9.3))(terser@5.31.0)
 
   packages/toolkit:
     dependencies:
@@ -20349,7 +20346,7 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@formatjs/intl@2.10.15(typescript@6.0.3)':
+  '@formatjs/intl@2.10.15(typescript@5.9.3)':
     dependencies:
       '@formatjs/ecma402-abstract': 2.2.4
       '@formatjs/fast-memoize': 2.2.3
@@ -20359,7 +20356,7 @@ snapshots:
       intl-messageformat: 10.7.7
       tslib: 2.8.1
     optionalDependencies:
-      typescript: 6.0.3
+      typescript: 5.9.3
 
   '@formatjs/intl@2.2.1(typescript@7.0.2)':
     dependencies:
@@ -24256,9 +24253,9 @@ snapshots:
     dependencies:
       '@types/react': 18.3.1
 
-  '@types/react-intl@3.0.0(react@19.1.0)(typescript@6.0.3)':
+  '@types/react-intl@3.0.0(react@19.1.0)(typescript@5.9.3)':
     dependencies:
-      react-intl: 6.8.9(react@19.1.0)(typescript@6.0.3)
+      react-intl: 6.8.9(react@19.1.0)(typescript@5.9.3)
     transitivePeerDependencies:
       - react
       - typescript
@@ -24830,13 +24827,13 @@ snapshots:
       chai: 5.1.2
       tinyrainbow: 1.2.0
 
-  '@vitest/mocker@2.1.9(msw@2.7.3(@types/node@20.19.43)(typescript@6.0.3))(vite@5.4.8(@types/node@20.19.43)(terser@5.31.0))':
+  '@vitest/mocker@2.1.9(msw@2.7.3(@types/node@20.19.43)(typescript@5.9.3))(vite@5.4.8(@types/node@20.19.43)(terser@5.31.0))':
     dependencies:
       '@vitest/spy': 2.1.9
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      msw: 2.7.3(@types/node@20.19.43)(typescript@6.0.3)
+      msw: 2.7.3(@types/node@20.19.43)(typescript@5.9.3)
       vite: 5.4.8(@types/node@20.19.43)(terser@5.31.0)
 
   '@vitest/mocker@2.1.9(msw@2.7.3(@types/node@20.19.43)(typescript@7.0.2))(vite@5.4.8(@types/node@20.19.43)(terser@5.31.0))':
@@ -32996,7 +32993,7 @@ snapshots:
       - encoding
       - supports-color
 
-  msw@2.7.3(@types/node@20.19.43)(typescript@6.0.3):
+  msw@2.7.3(@types/node@20.19.43)(typescript@5.9.3):
     dependencies:
       '@bundled-es-modules/cookie': 2.0.1
       '@bundled-es-modules/statuses': 1.0.1
@@ -33017,7 +33014,7 @@ snapshots:
       type-fest: 4.30.0
       yargs: 17.7.2
     optionalDependencies:
-      typescript: 6.0.3
+      typescript: 5.9.3
     transitivePeerDependencies:
       - '@types/node'
     optional: true
@@ -35166,11 +35163,11 @@ snapshots:
     optionalDependencies:
       typescript: 7.0.2
 
-  react-intl@6.8.9(react@19.1.0)(typescript@6.0.3):
+  react-intl@6.8.9(react@19.1.0)(typescript@5.9.3):
     dependencies:
       '@formatjs/ecma402-abstract': 2.2.4
       '@formatjs/icu-messageformat-parser': 2.9.4
-      '@formatjs/intl': 2.10.15(typescript@6.0.3)
+      '@formatjs/intl': 2.10.15(typescript@5.9.3)
       '@formatjs/intl-displaynames': 6.8.5
       '@formatjs/intl-listformat': 7.7.5
       '@types/hoist-non-react-statics': 3.3.7(@types/react@18.3.1)
@@ -35180,7 +35177,7 @@ snapshots:
       react: 19.1.0
       tslib: 2.8.1
     optionalDependencies:
-      typescript: 6.0.3
+      typescript: 5.9.3
 
   react-is@16.13.1: {}
 
@@ -37587,9 +37584,9 @@ snapshots:
     optionalDependencies:
       typescript: 7.0.2
 
-  tsconfck@3.1.6(typescript@6.0.3):
+  tsconfck@3.1.6(typescript@5.9.3):
     optionalDependencies:
-      typescript: 6.0.3
+      typescript: 5.9.3
 
   tsconfig-paths@3.15.0:
     dependencies:
@@ -38134,11 +38131,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vite-tsconfig-paths@4.3.2(typescript@6.0.3)(vite@5.4.8(@types/node@20.19.43)(terser@5.31.0)):
+  vite-tsconfig-paths@4.3.2(typescript@5.9.3)(vite@5.4.8(@types/node@20.19.43)(terser@5.31.0)):
     dependencies:
       debug: 4.4.3(supports-color@8.1.1)
       globrex: 0.1.2
-      tsconfck: 3.1.6(typescript@6.0.3)
+      tsconfck: 3.1.6(typescript@5.9.3)
     optionalDependencies:
       vite: 5.4.8(@types/node@20.19.43)(terser@5.31.0)
     transitivePeerDependencies:
@@ -38236,10 +38233,10 @@ snapshots:
       - supports-color
       - terser
 
-  vitest@2.1.9(@types/node@20.19.43)(jsdom@16.7.0)(msw@2.7.3(@types/node@20.19.43)(typescript@6.0.3))(terser@5.31.0):
+  vitest@2.1.9(@types/node@20.19.43)(jsdom@16.7.0)(msw@2.7.3(@types/node@20.19.43)(typescript@5.9.3))(terser@5.31.0):
     dependencies:
       '@vitest/expect': 2.1.9
-      '@vitest/mocker': 2.1.9(msw@2.7.3(@types/node@20.19.43)(typescript@6.0.3))(vite@5.4.8(@types/node@20.19.43)(terser@5.31.0))
+      '@vitest/mocker': 2.1.9(msw@2.7.3(@types/node@20.19.43)(typescript@5.9.3))(vite@5.4.8(@types/node@20.19.43)(terser@5.31.0))
       '@vitest/pretty-format': 2.1.9
       '@vitest/runner': 2.1.9
       '@vitest/snapshot': 2.1.9

@@ -121,7 +121,6 @@
     "short-uid": "^0.1.0",
     "stream-json": "^1.9.1",
     "tsx": "^4.15.7",
-    "typescript": "6.0.3",
     "uuid": "^11.1.0",
     "whatwg-fetch": "^3.0.0",
     "yargs": "^17.7.2",
