@@ -20,7 +20,8 @@ import {
   generateEventDocument,
   generateEventDraftDocument,
   generateWorkqueues,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  TestUserRole
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -189,6 +190,103 @@ export const DraftDefaultSortByUpdatedAt: Story = {
         )
         await expect(oldRows).toHaveLength(5)
         await expect(canvas.queryAllByText('Recent Smith')).toHaveLength(0)
+      }
+    )
+  }
+}
+
+const resolvableRng = createPrng(9001)
+const resolvableEvent = generateEventDocument({
+  rng: resolvableRng,
+  configuration: tennisClubMembershipEvent,
+  actions: [{ type: ActionType.CREATE }]
+})
+
+const resolvableDraft = generateEventDraftDocument({
+  eventId: resolvableEvent.id,
+  actionType: ActionType.DECLARE,
+  rng: resolvableRng,
+  declaration: {
+    'applicant.name': { firstname: 'Present', surname: 'Applicant' }
+  }
+})
+
+const unresolvableRng = createPrng(9002)
+const unresolvableEvent = generateEventDocument({
+  rng: unresolvableRng,
+  configuration: tennisClubMembershipEvent,
+  actions: [{ type: ActionType.CREATE }]
+})
+
+const unresolvableDraft = generateEventDraftDocument({
+  eventId: unresolvableEvent.id,
+  actionType: ActionType.DECLARE,
+  rng: unresolvableRng,
+  declaration: {
+    'applicant.name': { firstname: 'Missing', surname: 'Applicant' }
+  }
+})
+
+const draftsWithOneUnresolvableEvent = [resolvableDraft, unresolvableDraft]
+
+export const DraftCountMatchesListWhenEventUnavailable: Story = {
+  parameters: {
+    userRole: TestUserRole.enum.FIELD_AGENT,
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'draft' })
+    },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues('draft')
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: 1 }
+            }, {})
+          })
+        ],
+        events: [tRPCMsw.event.search.query(() => ({ results: [], total: 0 }))],
+        event: [
+          tRPCMsw.event.draft.list.query(() => draftsWithOneUnresolvableEvent),
+          tRPCMsw.event.get.query((input) => {
+            if (input.eventId === resolvableEvent.id) {
+              return resolvableEvent
+            }
+            // Simulates an event that is no longer accessible to the user.
+            throw new Error(`Event not found with id: ${input.eventId}`)
+          }),
+          tRPCMsw.event.search.query(() => ({ results: [], total: 0 }))
+        ],
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => draftsWithOneUnresolvableEvent)
+        ],
+        offline: { drafts: draftsWithOneUnresolvableEvent }
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('List shows only the draft whose event resolves', async () => {
+      await canvas.findByText('Present Applicant', {}, { timeout: 5000 })
+      await expect(
+        canvas.queryByText('Missing Applicant')
+      ).not.toBeInTheDocument()
+    })
+
+    await step(
+      'Sidebar draft badge count matches the list (1, not 2)',
+      async () => {
+        const draftNav = await canvas.findByTestId(
+          'navigation_workqueue_draft',
+          {},
+          { timeout: 5000 }
+        )
+        await expect(draftNav).toHaveTextContent(/^Drafts1$/)
       }
     )
   }
