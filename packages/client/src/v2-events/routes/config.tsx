@@ -192,7 +192,10 @@ export const routesConfig = {
     return (
       <NavigationHistoryProvider>
         <TRPCErrorBoundary>
-          <TRPCProvider storeIdentifier={currentUser.id}>
+          <TRPCProvider
+            storeIdentifier={currentUser.id}
+            accessKey={`${currentUser.primaryOfficeId ?? ''}:${currentUser.role}`}
+          >
             <Outlet />
             <Debug />
             <Toaster />
