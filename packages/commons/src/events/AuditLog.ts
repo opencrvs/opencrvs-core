@@ -138,6 +138,101 @@ const IntegrationRefreshSecretEntrySchema = AuditLogEntryBase.extend({
   responseSummary: z.object({ clientId: z.string() })
 })
 
+// ── Locations & administrative areas ──────────────────────────────────────────
+
+const createdVersionFields = {
+  id: z.string(),
+  versionId: z.string(),
+  name: z.string(),
+  externalId: z.string().nullish(),
+  effectiveFrom: z.string(),
+  status: z.string()
+}
+
+const LocationCreateEntrySchema = AuditLogEntryBase.extend({
+  operation: z.literal('locations.create'),
+  requestData: z.object({
+    ...createdVersionFields,
+    administrativeAreaId: z.string().nullish(),
+    locationType: z.string().nullish()
+  })
+})
+
+const AdministrativeAreaCreateEntrySchema = AuditLogEntryBase.extend({
+  operation: z.literal('administrativeAreas.create'),
+  requestData: z.object({
+    ...createdVersionFields,
+    parentId: z.string().nullish()
+  })
+})
+
+const ChangedStringField = z.object({ from: z.string(), to: z.string() })
+const ChangedNullableStringField = z.object({
+  from: z.string().nullable(),
+  to: z.string().nullable()
+})
+
+/** The submitted snapshot, with server-resolved `versionId`/`effectiveFrom`.
+ *  Updates carry no identity fields (parent / locationType are immutable),
+ *  so the shape is shared by both entities. */
+const updatedVersionRequestData = z.object({
+  id: z.string(),
+  versionId: z.string(),
+  name: z.string(),
+  externalId: z.string().nullish(),
+  status: z.string(),
+  effectiveFrom: z.string(),
+  lastVersionId: z.string()
+})
+
+/** The diff against the previous version — only fields that changed. */
+const updatedVersionResponseSummary = z.object({
+  previousVersionId: z.string(),
+  versionId: z.string(),
+  changed: z.object({
+    name: ChangedStringField.optional(),
+    externalId: ChangedNullableStringField.optional(),
+    status: ChangedStringField.optional()
+  })
+})
+
+const LocationUpdateEntrySchema = AuditLogEntryBase.extend({
+  operation: z.literal('locations.update'),
+  requestData: updatedVersionRequestData,
+  responseSummary: updatedVersionResponseSummary
+})
+
+const AdministrativeAreaUpdateEntrySchema = AuditLogEntryBase.extend({
+  operation: z.literal('administrativeAreas.update'),
+  requestData: updatedVersionRequestData,
+  responseSummary: updatedVersionResponseSummary
+})
+
+/** Identifies the request; the withdrawn element itself is the response. */
+const withdrawVersionRequestData = z.object({
+  id: z.string(),
+  versionId: z.string()
+})
+
+const withdrawVersionResponseSummary = z.object({
+  effectiveFrom: z.string(),
+  name: z.string(),
+  externalId: z.string().nullish(),
+  status: z.string()
+})
+
+const LocationWithdrawEntrySchema = AuditLogEntryBase.extend({
+  operation: z.literal('locations.withdrawVersion'),
+  requestData: withdrawVersionRequestData,
+  responseSummary: withdrawVersionResponseSummary
+})
+
+const AdministrativeAreaWithdrawEntrySchema = AuditLogEntryBase.extend({
+  operation: z.literal('administrativeAreas.withdrawVersion'),
+  requestData: withdrawVersionRequestData,
+  responseSummary: withdrawVersionResponseSummary
+})
+
 // ── Attachments ────────────────────────────────────────────────────────────────
 
 const AttachmentUploadEntrySchema = AuditLogEntryBase.extend({
@@ -227,6 +322,12 @@ export const AuditLogEntrySchema = z.discriminatedUnion('operation', [
   IntegrationActivateEntrySchema,
   IntegrationDeleteEntrySchema,
   IntegrationRefreshSecretEntrySchema,
+  LocationCreateEntrySchema,
+  LocationUpdateEntrySchema,
+  AdministrativeAreaUpdateEntrySchema,
+  LocationWithdrawEntrySchema,
+  AdministrativeAreaWithdrawEntrySchema,
+  AdministrativeAreaCreateEntrySchema,
   AttachmentUploadEntrySchema,
   UserCreateEntrySchema,
   UserReasonEntrySchema,

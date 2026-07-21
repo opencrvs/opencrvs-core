@@ -22,7 +22,8 @@ import {
   systemInitialisationTestSetup,
   TEST_SYSTEM_ID,
   TEST_USER_DEFAULT_SCOPES,
-  createInitialisationToken
+  createInitialisationToken,
+  UUID_REGEX
 } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
 import { payloadGenerator } from '@events/tests/generators'
@@ -245,4 +246,38 @@ test('seeding administrative areas is additive, not destructive', async () => {
       updatedAt: expect.any(String)
     })
   }
+})
+
+test('stores a single active initial version when creating an administrative area', async () => {
+  await systemInitialisationTestSetup()
+  const client = createInitialisationTestClient()
+
+  const areaId = generateUuid()
+
+  await client.administrativeAreas.set([
+    {
+      id: areaId,
+      parentId: null,
+      name: 'Versioned administrative area',
+      externalId: 'versioned-area-pcode'
+    }
+  ])
+
+  const { versions } = await getClient()
+    .selectFrom('administrativeAreas')
+    .select('versions')
+    .where('id', '=', areaId)
+    .executeTakeFirstOrThrow()
+
+  // toEqual matches keys exactly, so this also asserts the version element
+  // contains no parent reference (parentId).
+  expect(versions).toEqual([
+    {
+      versionId: expect.stringMatching(UUID_REGEX),
+      effectiveFrom: '0001-01-01',
+      name: 'Versioned administrative area',
+      externalId: 'versioned-area-pcode',
+      status: 'active'
+    }
+  ])
 })

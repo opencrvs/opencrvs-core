@@ -132,6 +132,25 @@ export function resolveVersion<T extends { effectiveFrom: string }>(
   return resolved
 }
 
+/**
+ * Whether the entity holds the given externalId with active status at the
+ * anchor date or at any point after it. Used for point-in-time uniqueness of
+ * external codes: a new holder starting at `anchor` collides when an existing
+ * holder is (or is scheduled to be) active with the code from then on.
+ */
+export function hasActiveExternalIdOnOrAfter(
+  versions: LocationVersion[],
+  externalId: string,
+  anchor: string
+): boolean {
+  const inEffectAtAnchor = resolveVersion(versions, anchor)
+  const laterVersions = versions.filter((v) => v.effectiveFrom > anchor)
+
+  return [inEffectAtAnchor, ...laterVersions].some(
+    (v) => v.externalId === externalId && v.status === 'active'
+  )
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type WrapArrayPreserveNullish<V> = V extends readonly any[]
   ? V

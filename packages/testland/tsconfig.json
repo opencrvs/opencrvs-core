@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@countryconfig/*": ["./src/*"]
+    },
+    "target": "es6",
+    "module": "Node16",
+    "outDir": "build/dist",
+    "sourceMap": true,
+    "moduleResolution": "node16",
+    "rootDir": ".",
+    "lib": ["esnext.asynciterable", "es6", "es2017", "es2019", "es2022", "dom"],
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "types": ["jest", "fhir", "geojson"]
+  },
+  "include": [
+    "src/**/*.ts",
+    "infrastructure/environments/**/*.ts",
+    "typings",
+    "e2e/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "build",
+    "scripts",
+    "acceptance-tests",
+    "src/setupTests.ts",
+    "src/**/*.test.ts"
+  ],
+  "ts-node": {
+    "files": true
+  }
+}

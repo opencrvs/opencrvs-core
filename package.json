@@ -22,7 +22,7 @@
   },
   "scripts": {
     "postinstall": "patch-package && node development-environment/link-ts6-api.js",
-    "start": "lerna run build --scope @opencrvs/commons && lerna run build --scope @opencrvs/components && lerna run --stream --parallel $OTHER_LERNA_FLAGS start",
+    "start": "lerna run build --scope @opencrvs/toolkit --include-dependencies && lerna run build --scope @opencrvs/components && lerna run --stream --parallel $OTHER_LERNA_FLAGS start",
     "start:prod": "yarn build && lerna run --stream --parallel --ignore @opencrvs/components $OTHER_LERNA_FLAGS start:prod",
     "dev": "bash development-environment/dev.sh",
     "dev:secrets:gen": "openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem",
@@ -67,6 +67,9 @@
     "react-signature-canvas": "^1.0.6"
   },
   "resolutions": {
+    "playwright": "1.61.1",
+    "playwright-core": "1.61.1",
+    "@playwright/test": "1.61.1",
     "@types/react": "18.3.1",
     "fast-xml-parser": "4.5.6",
     "lodash": "^4.18.1",
@@ -75,7 +78,7 @@
     "form-data": "4.0.6",
     "sha.js": "2.4.12",
     "handlebars": "4.7.9",
-    "js-yaml": "4.2.0",
+    "js-yaml": "4.3.0",
     "h3": "1.15.6",
     "defu": "6.1.5",
     "msgpackr": "1.11.0",
@@ -100,12 +103,15 @@
     "jws": "3.2.3"
   },
   "overrides": {
+    "playwright": "1.61.1",
+    "playwright-core": "1.61.1",
+    "@playwright/test": "1.61.1",
     "fast-xml-parser": "4.5.6",
     "axios": "1.15.0",
     "form-data": "4.0.6",
     "sha.js": "2.4.12",
     "handlebars": "4.7.9",
-    "js-yaml": "4.2.0",
+    "js-yaml": "4.3.0",
     "h3": "1.15.6",
     "defu": "6.1.5",
     "msgpackr": "1.11.0",

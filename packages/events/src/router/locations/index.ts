@@ -10,18 +10,30 @@
  */
 
 import * as z from 'zod/v4'
-import { Location, SetLocationPayload, UUID } from '@opencrvs/commons'
+import {
+  CreateLocationPayload,
+  Location,
+  SetLocationPayload,
+  UpdateLocationPayload,
+  UUID,
+  WithdrawLocationVersionPayload
+} from '@opencrvs/commons'
 import {
   internalProcedure,
   router,
   userAndSystemProcedure
 } from '@events/router/trpc'
 import {
+  createLocation,
+  diffLocationVersions,
   getLocationById,
   getLocationHierarchy,
   getLocations,
-  setLocations
+  setLocations,
+  updateLocation,
+  withdrawLocationVersion
 } from '@events/service/locations/locations'
+import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import { allowedWithAnyOfScopes } from '../middleware'
 
 export function listLocationsRoute(
@@ -73,11 +85,124 @@ export const locationRouter = router({
       }
     })
   ),
-  set: setLocationsRoute(
-    userAndSystemProcedure.use(
-      allowedWithAnyOfScopes(['user.data-seeding', 'config.update-all'])
-    )
-  ),
+  create: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'Create a location',
+        description: 'Create a new location with a single initial version.',
+        method: 'POST',
+        path: '/locations',
+        tags: ['Locations'],
+        protect: true
+      }
+    })
+    .use(allowedWithAnyOfScopes(['location.edit']))
+    .input(CreateLocationPayload)
+    .output(Location)
+    .mutation(async ({ input, ctx }) => {
+      const { location, created } = await createLocation(input)
+
+      if (created) {
+        const [initialVersion] = location.versions
+
+        await writeAuditLog({
+          clientId: ctx.user.id,
+          clientType: ctx.user.type,
+          operation: 'locations.create',
+          requestData: {
+            id: location.id,
+            versionId: initialVersion.versionId,
+            name: initialVersion.name,
+            externalId: initialVersion.externalId ?? null,
+            administrativeAreaId: location.administrativeAreaId,
+            locationType: location.locationType,
+            effectiveFrom: initialVersion.effectiveFrom,
+            status: initialVersion.status
+          }
+        })
+      }
+
+      return location
+    }),
+  update: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'Update a location',
+        description:
+          'Append a new version to a location (rename, recode or inactivate). Prior versions are never modified.',
+        method: 'PUT',
+        path: '/locations/{id}',
+        tags: ['Locations'],
+        protect: true
+      }
+    })
+    .use(allowedWithAnyOfScopes(['location.edit']))
+    .input(UpdateLocationPayload)
+    .output(Location)
+    .mutation(async ({ input, ctx }) => {
+      const { location, outcome } = await updateLocation(input)
+
+      // An idempotent replay appends nothing and must not be audited twice.
+      if (outcome.appended) {
+        const { previousVersion, newVersion } = outcome
+
+        await writeAuditLog({
+          clientId: ctx.user.id,
+          clientType: ctx.user.type,
+          operation: 'locations.update',
+          requestData: {
+            id: location.id,
+            versionId: newVersion.versionId,
+            name: newVersion.name,
+            externalId: newVersion.externalId ?? null,
+            status: newVersion.status,
+            effectiveFrom: newVersion.effectiveFrom,
+            lastVersionId: input.lastVersionId
+          },
+          responseSummary: {
+            previousVersionId: previousVersion.versionId,
+            versionId: newVersion.versionId,
+            changed: diffLocationVersions(previousVersion, newVersion)
+          }
+        })
+      }
+
+      return location
+    }),
+  withdrawVersion: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'Withdraw a pending location version',
+        description:
+          'Removes a not-yet-effective (future-dated) version from a location. A version whose effectiveFrom has already passed cannot be withdrawn.',
+        method: 'DELETE',
+        path: '/locations/{id}/versions/{versionId}',
+        tags: ['Locations'],
+        protect: true
+      }
+    })
+    .use(allowedWithAnyOfScopes(['location.edit']))
+    .input(WithdrawLocationVersionPayload)
+    .output(Location)
+    .mutation(async ({ input, ctx }) => {
+      const { location, withdrawnVersion } =
+        await withdrawLocationVersion(input)
+
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'locations.withdrawVersion',
+        requestData: { id: input.id, versionId: input.versionId },
+        responseSummary: {
+          effectiveFrom: withdrawnVersion.effectiveFrom,
+          name: withdrawnVersion.name,
+          externalId: withdrawnVersion.externalId ?? null,
+          status: withdrawnVersion.status
+        }
+      })
+
+      return location
+    }),
   get: userAndSystemProcedure
     .input(z.object({ id: UUID }))
     .output(Location)
