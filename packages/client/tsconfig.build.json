@@ -2,7 +2,6 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "paths": {
-      "@opencrvs/client/src/*": ["./src/*"],
       "@client/*": ["./src/*"],
       "@gateway/*": ["../gateway/src/*"],
       "@events/*": ["../events/src/*"]
