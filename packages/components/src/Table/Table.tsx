@@ -37,7 +37,7 @@ const TableHeader = styled.div<{
 }>`
   ${({ fixedWidth, totalWidth }) =>
     fixedWidth ? `width: ${fixedWidth}px;` : `width: ${totalWidth || 100}%;`}
-  background: ${lightColors['surface/sunken']};
+  background: ${lightColors['surface/inset']};
   padding: 10px 0px;
   display: flex;
   align-items: top;
@@ -113,7 +113,7 @@ const TableFooter = styled(RowWrapper)<{
     fixedWidth ? `width: ${fixedWidth}px;` : `width: ${totalWidth || 100}%;`}
   display: flex;
   align-items: top;
-  background: ${lightColors['surface/sunken']};
+  background: ${lightColors['surface/inset']};
   border-top: 2px solid ${lightColors['border/strong']};
   border-bottom: none;
   & span {

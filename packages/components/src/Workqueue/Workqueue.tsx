@@ -27,7 +27,7 @@ const Wrapper = styled.div`
 `
 const TableHeader = styled.div`
   color: ${lightColors['text/primary']};
-  background-color: ${lightColors['surface/sunken']};
+  background-color: ${lightColors['surface/inset']};
   ${({ theme }) => theme.fonts.bold14};
   height: 36px;
   display: flex;

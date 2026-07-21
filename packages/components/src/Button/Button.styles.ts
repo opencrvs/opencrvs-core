@@ -12,7 +12,6 @@
 import { css } from 'styled-components'
 // Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
-import { primitives } from '../primitives'
 
 export const base = ({ fullWidth }: { fullWidth?: boolean }) => css`
   ${({ theme }) => theme.fonts.bold16};
@@ -88,7 +87,7 @@ export const secondary = css`
   }
 
   &:focus-visible {
-    border: 1.5px solid ${primitives.grey[900]};
+    border: 1.5px solid ${lightColors['border/emphasis']};
     background: ${lightColors['feedback/focus']};
     color: ${lightColors['text/primary']};
   }
@@ -111,9 +110,9 @@ export const secondaryNegative = css`
   }
 
   &:focus-visible {
-    border: 1.5px solid ${primitives.red[900]};
+    border: 1.5px solid ${lightColors['action/negativePressed']};
     background: ${lightColors['feedback/focus']};
-    color: ${primitives.red[900]};
+    color: ${lightColors['action/negativePressed']};
   }
 `
 
@@ -161,7 +160,7 @@ export const negative = css`
     background: ${lightColors['action/negativePressed']};
   }
   &:active {
-    background-color: ${primitives.red[900]};
+    background-color: ${lightColors['action/negativePressed']};
   }
 `
 

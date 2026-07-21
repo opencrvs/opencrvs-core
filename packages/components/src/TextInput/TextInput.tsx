@@ -12,7 +12,6 @@ import * as React from 'react'
 import styled from 'styled-components'
 // Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
-import { primitives } from '../primitives'
 
 export interface ICustomProps {
   error?: boolean
@@ -59,8 +58,8 @@ const StyledInputContainer = styled.div<{
       box-shadow: 0 0 0 4px ${lightColors['border/default']};
     }
     &:focus-within {
-      outline: 0.5px solid ${primitives.grey[900]};
-      border: 1.5px solid ${primitives.grey[900]};
+      outline: 0.5px solid ${lightColors['border/emphasis']};
+      border: 1.5px solid ${lightColors['border/emphasis']};
       box-shadow: 0 0 0px 4px ${lightColors['feedback/focus']};
     }
   `}

@@ -12,7 +12,6 @@ import * as React from 'react'
 import styled from 'styled-components'
 // Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
-import { primitives } from '../primitives'
 
 interface ITextAreaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -26,7 +25,7 @@ const StyledTextArea = styled.textarea<ITextAreaProps>`
   padding: 8px 16px;
   min-height: 104px;
   border-radius: 4px;
-  border: 1.5px solid ${primitives.grey[900]};
+  border: 1.5px solid ${lightColors['border/emphasis']};
   background-color: ${lightColors['surface/default']};
   color: ${({ disabled }) =>
     disabled ? lightColors['text/disabled'] : lightColors['text/primary']};
@@ -35,8 +34,8 @@ const StyledTextArea = styled.textarea<ITextAreaProps>`
     box-shadow: 0 0 0px 4px ${lightColors['border/default']};
   }
   &:focus {
-    outline: 0.5px solid ${primitives.grey[900]};
-    border: 1.5px solid $ ${primitives.grey[900]};
+    outline: 0.5px solid ${lightColors['border/emphasis']};
+    border: 1.5px solid $ ${lightColors['border/emphasis']};
     box-shadow: 0 0 0px 4px ${lightColors['feedback/focus']};
   }
 

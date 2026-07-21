@@ -15,7 +15,6 @@ import { Props } from 'react-select/lib/Select'
 import { Icon } from '../Icon'
 // Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
-import { primitives } from '../primitives'
 
 import { IndicatorProps } from 'react-select/lib/components/indicators'
 
@@ -80,8 +79,8 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
               : lightColors['text/primary']};
     }
     &:focus {
-      outline: 0.5px solid ${primitives.grey[900]};
-      border: 1.5px solid ${primitives.grey[900]};
+      outline: 0.5px solid ${lightColors['border/emphasis']};
+      border: 1.5px solid ${lightColors['border/emphasis']};
       color: ${lightColors['text/primary']};
     }
   }
@@ -95,8 +94,8 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   }
 
   .react-select__control--is-focused {
-    outline: 0.5px solid ${primitives.grey[900]};
-    border: 1.5px solid ${primitives.grey[900]};
+    outline: 0.5px solid ${lightColors['border/emphasis']};
+    border: 1.5px solid ${lightColors['border/emphasis']};
     box-shadow: 0 0 0 4px ${lightColors['feedback/focus']};
   }
 
@@ -124,7 +123,7 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     background-color: ${lightColors['surface/hover']};
     color: ${lightColors['text/primary']};
     &:active {
-      background: ${lightColors['surface/sunken']};
+      background: ${lightColors['surface/inset']};
       color: ${lightColors['text/primary']};
     }
   }

@@ -13,7 +13,6 @@ import styled from 'styled-components'
 import { Icon } from '../Icon'
 // Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
-import { primitives } from '../primitives'
 
 const Label = styled.label<{ disabled?: boolean }>`
   display: flex;
@@ -99,7 +98,7 @@ const Input = styled.input`
 
   &:active ~ ${Radio} {
     &::after {
-      border: 1.5px solid ${primitives.grey[900]};
+      border: 1.5px solid ${lightColors['border/emphasis']};
       box-shadow: ${lightColors['feedback/focus']} 0 0 0 3px;
       width: ${({ size }) => `max(21px, ${(size ?? 0) - 6}px)`};
       height: ${({ size }) => `max(21px, ${(size ?? 0) - 6}px)`};
@@ -116,7 +115,7 @@ const Input = styled.input`
   &:focus ~ ${Radio} {
     &::after {
       box-sizing: content-box;
-      border: 1.5px solid ${primitives.grey[900]};
+      border: 1.5px solid ${lightColors['border/emphasis']};
       box-shadow: ${lightColors['feedback/focus']} 0 0 0 3px;
       width: ${({ size }) => `max(21px, ${(size ?? 0) - 6}px)`};
       height: ${({ size }) => `max(21px, ${(size ?? 0) - 6}px)`};

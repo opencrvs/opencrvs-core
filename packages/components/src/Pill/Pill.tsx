@@ -13,7 +13,6 @@ import styled from 'styled-components'
 import { IFont } from '../fonts'
 // Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
-import { primitives } from '../primitives'
 
 type IPillType = 'active' | 'inactive' | 'pending' | 'default'
 
@@ -58,10 +57,10 @@ const StyledPill = styled.span<{
 `};
 
   --darkerShade: ${({ type }) => `
-  ${type === 'active' ? primitives.green[800] : ''}
-  ${type === 'inactive' ? primitives.red[800] : ''}
-  ${type === 'pending' ? primitives.orange[800] : ''}
-  ${type === 'default' ? primitives.blue[800] : ''}
+  ${type === 'active' ? lightColors['feedback/positive'] : ''}
+  ${type === 'inactive' ? lightColors['feedback/negative'] : ''}
+  ${type === 'pending' ? lightColors['feedback/warning'] : ''}
+  ${type === 'default' ? lightColors['feedback/info'] : ''}
 `};
 
   ${({ pillTheme }) =>

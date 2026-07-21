@@ -15,7 +15,6 @@ import { Icon } from '../Icon'
 import styled from 'styled-components'
 // Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
-import { primitives } from '../primitives'
 
 type SearchCriterias =
   | 'TRACKING_ID'
@@ -26,7 +25,7 @@ type SearchCriterias =
   | 'EMAIL'
 
 const SearchBox = styled.div`
-  background: ${lightColors['surface/sunken']};
+  background: ${lightColors['surface/inset']};
   box-sizing: border-box;
   width: 664px;
   height: 40px;
@@ -34,16 +33,16 @@ const SearchBox = styled.div`
 
   &:hover {
     outline: 1px solid ${lightColors['border/strong']};
-    background: ${lightColors['surface/sunken']};
+    background: ${lightColors['surface/inset']};
   }
 
   &:focus-within {
-    outline: 2px solid ${primitives.grey[900]};
+    outline: 2px solid ${lightColors['border/emphasis']};
     background: ${lightColors['surface/default']};
   }
 
   &:active {
-    outline: 2px solid ${primitives.grey[900]};
+    outline: 2px solid ${lightColors['border/emphasis']};
   }
 
   &:focus-within input {

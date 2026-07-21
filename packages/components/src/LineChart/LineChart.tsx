@@ -15,7 +15,6 @@ import styled, { withTheme } from 'styled-components'
 import { CategoricalChartFunc } from 'recharts/types/chart/generateCategoricalChart'
 // Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
-import { primitives } from '../primitives'
 
 const {
   CartesianGrid,
@@ -190,21 +189,21 @@ class LineChartComponent extends React.Component<IProps> {
 
             <Line
               dataKey={dataKeys[0]}
-              stroke={primitives.grey[200]}
+              stroke={lightColors['border/subtle']}
               dot={false}
               activeDot={false}
               strokeWidth={3}
             />
             <Line
               dataKey={dataKeys[1]}
-              stroke={primitives.blue[200]}
+              stroke={lightColors['feedback/info']}
               dot={false}
               activeDot={false}
               strokeWidth={3}
             />
             <Line
               dataKey={dataKeys[2]}
-              stroke={primitives.blue[300]}
+              stroke={lightColors['feedback/positive']}
               dot={false}
               activeDot={(dotProps: unknown) => (
                 <CustomizedDot {...(dotProps as ICustomisedDot)} theme={theme} />

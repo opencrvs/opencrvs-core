@@ -51,7 +51,7 @@ const StyledSelect = styled(ReactSelect)<{
     border: 2px solid ${lightColors['action/primary']};
     &:hover {
       border: 2px solid ${lightColors['action/primary']};
-      background-color: ${lightColors['surface/sunken']};
+      background-color: ${lightColors['surface/inset']};
     }
   }
 
@@ -74,7 +74,7 @@ const StyledSelect = styled(ReactSelect)<{
   }
 
   .react-select__option--is-focused {
-    background-color: ${lightColors['surface/sunken']};
+    background-color: ${lightColors['surface/inset']};
     color: ${lightColors['text/primary']};
     &:active {
       background: ${lightColors['action/secondaryHover']};

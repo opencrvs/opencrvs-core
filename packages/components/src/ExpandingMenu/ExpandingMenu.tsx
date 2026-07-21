@@ -12,7 +12,6 @@ import React from 'react'
 import styled from 'styled-components'
 // Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
-import { primitives } from '../primitives'
 
 const NavigationMainWrapper = styled.div`
   width: 100%;
@@ -34,7 +33,7 @@ const Backdrop = styled.div`
       opacity: 0.8;
     }
   }
-  background: ${primitives.grey[900]};
+  background: ${lightColors['overlay/scrim']};
   opacity: 0.8;
   position: absolute;
   top: 0;
@@ -55,7 +54,7 @@ const NavigationContainer = styled.div`
   }
   display: flex;
   flex-direction: column;
-  background: ${lightColors['surface/sunken']};
+  background: ${lightColors['surface/inset']};
   width: 320px;
   height: 100vh;
   animation: 300ms ease-out 0s 1 slideInFromLeft;

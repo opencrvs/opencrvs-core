@@ -13,7 +13,6 @@ import styled from 'styled-components'
 import { Tick, TickLarge } from '../icons'
 // Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
-import { primitives } from '../primitives'
 
 const Label = styled.label<{ disabled?: boolean }>`
   display: flex;
@@ -41,7 +40,7 @@ const Check = styled.span<{ size?: string; disabled?: boolean }>`
   display: inline-block;
   border-radius: 4px;
   background: ${({ disabled }) =>
-    disabled ? lightColors['action/disabled'] : primitives.grey[900]};
+    disabled ? lightColors['action/disabled'] : lightColors['border/emphasis']};
   ${({ size }) =>
     size === 'large'
       ? `height: 40px;
@@ -101,7 +100,7 @@ const Input = styled.input`
 
   &:active ~ ${Check} {
     &::after {
-      border: 2px solid ${primitives.grey[900]};
+      border: 2px solid ${lightColors['border/emphasis']};
       box-shadow: ${lightColors['feedback/focus']} 0 0 0 3px;
       width: ${({ size }) => `max(18px, ${(size ?? 0) - 6}px)`};
       height: ${({ size }) => `max(18px, ${(size ?? 0) - 6}px)`};
@@ -111,7 +110,7 @@ const Input = styled.input`
   &:focus ~ ${Check} {
     &::after {
       box-sizing: content-box;
-      border: 2px solid ${primitives.grey[900]};
+      border: 2px solid ${lightColors['border/emphasis']};
       box-shadow: ${lightColors['feedback/focus']} 0 0 0 3px;
       width: ${({ size }) => `max(18px, ${(size ?? 0) - 6}px)`};
       height: ${({ size }) => `max(18px, ${(size ?? 0) - 6}px)`};

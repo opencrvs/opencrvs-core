@@ -12,17 +12,17 @@
 import { primitives as p } from './primitives'
 
 /**
- * Semantic tokens — intent-based colour names that reference primitives,
- * transcribed from the Figma v4 Design System "Semantic" collection:
- * https://www.figma.com/design/fi2i59UhtoxW0crnknz6wv/v4---OpenCRVS-Design-System?node-id=53-308
+ * Semantic tokens — intent-based colour names that reference primitives.
+ *
+ * Transcribed from the Figma v4 Design System **Variables** panel ("Semantic"
+ * collection, Light + Dark modes) — the authoritative source, not the
+ * documentation swatch frame (which can lag the variables).
+ * https://www.figma.com/design/fi2i59UhtoxW0crnknz6wv/v4---OpenCRVS-Design-System
  *
  * Every token is defined once for light (`lightColors`) and once for dark
- * (`darkColors`); both satisfy `SemanticColors` so the two themes cannot drift
- * out of sync. Components should reference these tokens rather than primitives
- * or raw hex.
- *
- * The `→ primitive` in each trailing comment records the Figma light/dark
- * mapping so drift between code and design is easy to spot.
+ * (`darkColors`); both satisfy `SemanticColors` so the two themes cannot drift.
+ * Components reference these tokens exclusively — never primitives or raw hex.
+ * The trailing comment on each light token records its Figma primitive alias.
  */
 
 /** Turn a primitive hex into an rgba() string — used only for `overlay/*`,
@@ -53,6 +53,9 @@ export type SemanticColors = {
   'border/default': string
   'border/subtle': string
   'border/strong': string
+  'border/focus': string
+  'border/emphasis': string
+  'border/action': string
 
   'feedback/focus': string
   'feedback/info': string
@@ -72,7 +75,7 @@ export type SemanticColors = {
   'surface/page': string
   'surface/raised': string
   'surface/selected': string
-  'surface/sunken': string
+  'surface/inset': string
 
   'text/primary': string
   'text/secondary': string
@@ -83,72 +86,78 @@ export type SemanticColors = {
 }
 
 export const lightColors: SemanticColors = {
-  'action/primary': p.blue[500], //          Primary CTA fill (buttons, toggles on)
-  'action/primaryHover': p.blue[800], //     Primary button hover
-  'action/primaryPressed': p.blue[900], //   Primary button pressed / active
-  'action/secondary': p.grey[100], //        Secondary button fill (neutral)
-  'action/secondaryHover': p.grey[200], //   Secondary button hover
-  'action/secondaryPressed': p.grey[300], // Secondary button pressed
-  'action/positive': p.green[500], //        Confirm / approve action fill
-  'action/positiveHover': p.green[700], //   Positive button hover
-  'action/positivePressed': p.green[900], // Positive button pressed
-  'action/negative': p.red[500], //          Destructive action fill (delete, reject)
-  'action/negativeHover': p.red[600], //     Negative button hover
-  'action/negativePressed': p.red[800], //   Negative button pressed
-  'action/disabled': p.grey[200], //         Disabled button / control fill
+  'action/primary': p.blue[500], //          blue/500  — Primary CTA fill
+  'action/primaryHover': p.blue[800], //     blue/800  — Primary button hover
+  'action/primaryPressed': p.blue[900], //   blue/900  — Primary button pressed
+  'action/secondary': p.grey[100], //        grey/100  — Secondary button fill
+  'action/secondaryHover': p.grey[200], //   grey/200  — Secondary button hover
+  'action/secondaryPressed': p.grey[300], // grey/300  — Secondary button pressed
+  'action/positive': p.green[500], //        green/500 — Confirm / approve fill
+  'action/positiveHover': p.green[800], //   green/800 — Positive button hover
+  'action/positivePressed': p.green[900], // green/900 — Positive button pressed
+  'action/negative': p.red[500], //          red/500   — Destructive action fill
+  'action/negativeHover': p.red[800], //     red/800   — Negative button hover
+  'action/negativePressed': p.red[900], //   red/900   — Negative button pressed
+  'action/disabled': p.grey[200], //         grey/200  — Disabled control fill
 
-  'border/default': p.grey[200], // Default control border (inputs, cards)
-  'border/subtle': p.grey[100], //  Faintest border (table rows, list separators)
-  'border/strong': p.grey[300], //  Stronger-than-default border
+  'border/default': p.grey[300], //  grey/300  — Default control border
+  'border/subtle': p.grey[200], //   grey/200  — Faintest border / separator
+  'border/strong': p.grey[400], //   grey/400  — Stronger-than-default border
+  'border/focus': p.yellow[500], //  yellow/500 (feedback/focus) — Focus ring border
+  'border/emphasis': p.grey[900], // grey/900  — High-contrast divider / outline
+  'border/action': p.blue[500], //   blue/500  — Border on interactive elements
 
-  'feedback/focus': p.yellow[300], //         Keyboard focus indicator
-  'feedback/info': p.blue[500], //            Informational accent (Figma labels this blue/600; it resolves to blue/500)
-  'feedback/infoSubtle': p.blue[100], //      Info banner / toast background
-  'feedback/negative': p.red[500], //         Error accent (icon, banner border)
-  'feedback/negativeSubtle': p.red[50], //    Error background
-  'feedback/positive': p.green[500], //       Success accent
-  'feedback/positiveSubtle': p.green[100], // Success background
-  'feedback/warning': p.orange[500], //       Warning accent
-  'feedback/warningSubtle': p.orange[100], // Warning background
+  'feedback/focus': p.yellow[500], //         yellow/500 — Keyboard focus indicator
+  'feedback/info': p.blue[500], //            blue/500   — Informational accent
+  'feedback/infoSubtle': p.blue[50], //       blue/50    — Info background
+  'feedback/negative': p.red[500], //         red/500    — Error accent
+  'feedback/negativeSubtle': p.red[50], //    red/50     — Error background
+  'feedback/positive': p.green[500], //       green/500  — Success accent
+  'feedback/positiveSubtle': p.green[50], //  green/50   — Success background
+  'feedback/warning': p.orange[500], //       orange/500 — Warning accent
+  'feedback/warningSubtle': p.orange[50], //  orange/50  — Warning background
 
-  'overlay/scrim': alpha(p.grey[900], 0.54), //  Modal / drawer backdrop
-  'overlay/subtle': alpha(p.grey[900], 0.24), // Lighter dim (popovers, hover scrims)
+  'overlay/scrim': alpha(p.grey[900], 0.54), //  grey/900 @ 54% — Modal / drawer backdrop
+  'overlay/subtle': alpha(p.grey[900], 0.24), // grey/900 @ 24% — Lighter dim
 
-  'surface/default': p.white, //     Default card / component background
-  'surface/hover': p.grey[50], //    Hover state for rows, list items
-  'surface/page': p.grey[50], //     Page / app background
-  'surface/raised': p.white, //      Raised surface (cards, modals)
-  'surface/selected': p.blue[50], // Selected row / nav item background
-  'surface/sunken': p.grey[100], //  Inset surface (textarea, code block)
+  'surface/default': p.white, //     white    — Default component background
+  'surface/hover': p.grey[50], //    grey/50  — Hover state for rows / list items
+  'surface/page': p.grey[50], //     grey/50  — Page / app background
+  'surface/raised': p.white, //      white    — Raised surface (cards, modals)
+  'surface/selected': p.blue[50], // blue/50  — Selected row / nav item background
+  'surface/inset': p.grey[100], //   grey/100 — Inset surface (textarea, code block)
 
-  'text/primary': p.grey[900], //   Body text, headings
-  'text/secondary': p.grey[600], // Less prominent text (subtitles)
-  'text/tertiary': p.grey[500], //  Captions, helper text, placeholders
-  'text/disabled': p.grey[400], //  Disabled text
-  'text/link': p.blue[500], //      Hyperlink text
-  'text/onAction': p.white //       Text on coloured action fills (white on primary)
+  'text/primary': p.grey[900], //   grey/900 — Body text, headings
+  'text/secondary': p.grey[600], // grey/600 — Less prominent text (subtitles)
+  'text/tertiary': p.grey[500], //  grey/500 — Captions, helper text, placeholders
+  'text/disabled': p.grey[400], //  grey/400 — Disabled text
+  'text/link': p.blue[500], //      blue/500 — Hyperlink text
+  'text/onAction': p.white //       white    — Text on coloured action fills
 }
 
 export const darkColors: SemanticColors = {
   'action/primary': p.blue[500],
-  'action/primaryHover': p.blue[200],
-  'action/primaryPressed': p.blue[100],
+  'action/primaryHover': p.blue[100],
+  'action/primaryPressed': p.blue[50],
   'action/secondary': p.grey[800],
   'action/secondaryHover': p.grey[700],
   'action/secondaryPressed': p.grey[600],
   'action/positive': p.green[500],
-  'action/positiveHover': p.green[200],
-  'action/positivePressed': p.green[100],
+  'action/positiveHover': p.green[100],
+  'action/positivePressed': p.green[50],
   'action/negative': p.red[500],
-  'action/negativeHover': p.red[200],
+  'action/negativeHover': p.red[100],
   'action/negativePressed': p.red[50],
   'action/disabled': p.grey[700],
 
   'border/default': p.grey[700],
   'border/subtle': p.grey[800],
   'border/strong': p.grey[600],
+  'border/focus': p.yellow[500],
+  'border/emphasis': p.grey[100],
+  'border/action': p.blue[100],
 
-  'feedback/focus': p.yellow[300],
+  'feedback/focus': p.yellow[500],
   'feedback/info': p.blue[500],
   'feedback/infoSubtle': p.blue[900],
   'feedback/negative': p.red[500],
@@ -166,13 +175,13 @@ export const darkColors: SemanticColors = {
   'surface/page': p.grey[950],
   'surface/raised': p.grey[800],
   'surface/selected': p.blue[900],
-  'surface/sunken': p.black,
+  'surface/inset': p.black,
 
   'text/primary': p.grey[100],
   'text/secondary': p.grey[400],
   'text/tertiary': p.grey[500],
   'text/disabled': p.grey[600],
-  'text/link': p.blue[200],
+  'text/link': p.blue[100],
   'text/onAction': p.white
 }
 

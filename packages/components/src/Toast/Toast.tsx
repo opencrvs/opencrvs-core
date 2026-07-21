@@ -16,7 +16,6 @@ import { Text } from '../Text'
 import { Link } from '../Link'
 // Direct light-theme token access; dark-mode theme switching lands in a follow-up PR (#12628).
 import { lightColors } from '../semantics'
-import { primitives } from '../primitives'
 import { useToastVisibility } from './useToastVisibility'
 import { Icon } from '../Icon'
 
@@ -45,7 +44,7 @@ const Container = styled.div<{
         : ''
     }
     ${$type === 'error' ? lightColors['action/negativePressed'] : ''}
-    ${$type === 'warning' ? primitives.orange[800] : ''}
+    ${$type === 'warning' ? lightColors['feedback/warning'] : ''}
     ${$type === undefined ? lightColors['action/positiveHover'] : ''}
   `};
   background: var(--color);

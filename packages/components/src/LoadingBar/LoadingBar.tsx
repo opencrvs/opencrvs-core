@@ -16,7 +16,7 @@ import styled, { keyframes } from 'styled-components'
 import { lightColors } from '../semantics'
 
 const ProgressBackground = styled.div`
-  background: ${lightColors['surface/sunken']};
+  background: ${lightColors['surface/inset']};
   height: 100vh;
   width: 100%;
   display: flex;

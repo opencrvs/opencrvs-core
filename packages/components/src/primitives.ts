@@ -18,9 +18,9 @@
  * never reference primitives directly — go through the semantic tokens in
  * `semantics.ts` (`lightColors` / `darkColors`) instead.
  *
- * Values mirror Figma exactly. Note the ramps run 50 / 100 / 200 / 300 / 500 /
- * 700 / 800 / 900 (grey adds 600 and 950); `red` additionally has a `600`
- * (#C23636) referenced by `action/negativeHover`.
+ * Values mirror the Figma Variables "Primitives" collection exactly. The ramps
+ * run 50 / 100 / 200 / 300 / 500 / 700 / 800 / 900 (grey additionally has 600
+ * and 950).
  */
 export const primitives = {
   black: '#000000',
@@ -101,7 +101,6 @@ export const primitives = {
     200: '#E37E7E',
     300: '#DE6969',
     500: '#D53F3F',
-    600: '#C23636',
     700: '#C33232',
     800: '#B02525',
     900: '#792323'

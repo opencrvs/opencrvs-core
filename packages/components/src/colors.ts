@@ -84,7 +84,7 @@ export const colors = {
   // Secondary Red
   /** @deprecated use `lightColors['action/negative']` or `feedback/negative` */
   red: primitives.red[500],
-  /** @deprecated use `lightColors['action/negativePressed']` / `primitives.red[800]` */
+  /** @deprecated use `lightColors['action/negativeHover']` / `primitives.red[800]` */
   redDark: primitives.red[800],
   /** @deprecated use `primitives.red[900]` */
   redDarker: primitives.red[900],
@@ -94,7 +94,7 @@ export const colors = {
   redLighter: primitives.red[50],
 
   // Secondary Yellow
-  /** @deprecated no palette equivalent — legacy brand yellow (v4 `yellow` ramp is a different hue; `feedback/focus` = `yellow[300]` #FDE047) */
+  /** @deprecated no palette equivalent — legacy brand yellow (v4 `yellow` ramp is a different hue; `feedback/focus` = `yellow[500]` #EAB308) */
   yellow: '#FBD91E',
   /** @deprecated no palette equivalent — legacy brand yellow */
   yellowDark: '#E2B605',
@@ -122,7 +122,7 @@ export const colors = {
   white: primitives.white,
   /** @deprecated use `primitives.grey[50]`, `surface/page` or `surface/hover` */
   grey50: primitives.grey[50],
-  /** @deprecated use `primitives.grey[100]`, `surface/sunken`, `border/subtle` or `action/secondary` */
+  /** @deprecated use `primitives.grey[100]`, `surface/inset`, `border/subtle` or `action/secondary` */
   grey100: primitives.grey[100],
   /** @deprecated use `primitives.grey[200]`, `border/default` or `action/disabled` */
   grey200: primitives.grey[200],
@@ -158,7 +158,7 @@ export const colors = {
   neutralLighter: primitives.orange[50],
   /** @deprecated use `lightColors['action/negative']` or `feedback/negative` */
   negative: primitives.red[500],
-  /** @deprecated use `lightColors['action/negativePressed']` / `primitives.red[800]` */
+  /** @deprecated use `lightColors['action/negativeHover']` / `primitives.red[800]` */
   negativeDark: primitives.red[800],
   /** @deprecated use `primitives.red[900]` */
   negativeDarker: primitives.red[900],

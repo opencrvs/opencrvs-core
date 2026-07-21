@@ -34,7 +34,7 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
   padding: 0 8px;
   background-color: ${({ isSelected }) =>
     isSelected
-      ? lightColors['surface/sunken']
+      ? lightColors['surface/inset']
       : lightColors['surface/default']};
   ${({ theme }) => theme.fonts.bold14};
   color: ${({ isSelected }) =>
@@ -46,7 +46,7 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
   }
 
   &:active {
-    background-color: ${lightColors['surface/sunken']};
+    background-color: ${lightColors['surface/inset']};
     color: ${lightColors['text/primary']};
   }
   &:focus-visible {
