@@ -120,53 +120,41 @@ export const stringifyEventMetadata = ({
     metadata.dateOfEvent ?? metadata[DEFAULT_DATE_OF_EVENT_PROPERTY]
   )
 
+  // Shared resolution context. Every DateField output is anchored at the record
+  // anchor; LocationSearch additionally needs adminLevels and a per-fact anchor.
+  const dateOptions = {
+    intl,
+    locations,
+    administrativeAreas,
+    anchor: recordAnchor
+  }
+  const locationOptions = { intl, locations, administrativeAreas, adminLevels }
+
   return {
-    modifiedAt: DateField.toCertificateVariables(metadata.modifiedAt, {
-      intl,
-      locations,
-      administrativeAreas,
-      anchor: recordAnchor
-    }),
+    modifiedAt: DateField.toCertificateVariables(
+      metadata.modifiedAt,
+      dateOptions
+    ),
     assignedTo: findUserById(metadata.assignedTo ?? '', users),
     dateOfEvent: metadata.dateOfEvent
-      ? DateField.toCertificateVariables(metadata.dateOfEvent, {
-          intl,
-          locations,
-          administrativeAreas,
-          anchor: recordAnchor
-        })
+      ? DateField.toCertificateVariables(metadata.dateOfEvent, dateOptions)
       : DateField.toCertificateVariables(
           metadata[DEFAULT_DATE_OF_EVENT_PROPERTY],
-          {
-            intl,
-            locations,
-            administrativeAreas,
-            anchor: recordAnchor
-          }
+          dateOptions
         ),
-    createdAt: DateField.toCertificateVariables(metadata.createdAt, {
-      intl,
-      locations,
-      administrativeAreas,
-      anchor: recordAnchor
-    }),
+    createdAt: DateField.toCertificateVariables(
+      metadata.createdAt,
+      dateOptions
+    ),
     createdBy: findUserById(metadata.createdBy, users),
     createdAtLocation: LocationSearch.toCertificateVariables(
       metadata.createdAtLocation,
-      {
-        intl,
-        locations,
-        administrativeAreas,
-        adminLevels,
-        anchor: toPlainDate(metadata.createdAt)
-      }
+      { ...locationOptions, anchor: toPlainDate(metadata.createdAt) }
     ),
-    updatedAt: DateField.toCertificateVariables(metadata.updatedAt, {
-      intl,
-      locations,
-      administrativeAreas,
-      anchor: recordAnchor
-    }),
+    updatedAt: DateField.toCertificateVariables(
+      metadata.updatedAt,
+      dateOptions
+    ),
     updatedBy: metadata.updatedBy
       ? findUserById(metadata.updatedBy, users)
       : '',
@@ -177,13 +165,7 @@ export const stringifyEventMetadata = ({
     updatedByUserRole: metadata.updatedByUserRole,
     updatedAtLocation: LocationSearch.toCertificateVariables(
       metadata.updatedAtLocation,
-      {
-        intl,
-        locations,
-        administrativeAreas,
-        adminLevels,
-        anchor: toPlainDate(metadata.updatedAt)
-      }
+      { ...locationOptions, anchor: toPlainDate(metadata.updatedAt) }
     ),
     flags: [],
     legalStatuses: {
@@ -191,12 +173,7 @@ export const stringifyEventMetadata = ({
         ? {
             createdAt: DateField.toCertificateVariables(
               metadata.legalStatuses.DECLARED.createdAt,
-              {
-                intl,
-                locations,
-                administrativeAreas,
-                anchor: recordAnchor
-              }
+              dateOptions
             ),
             createdBy: findUserById(
               metadata.legalStatuses.DECLARED.createdBy,
@@ -205,21 +182,13 @@ export const stringifyEventMetadata = ({
             createdAtLocation: LocationSearch.toCertificateVariables(
               metadata.legalStatuses.DECLARED.createdAtLocation,
               {
-                intl,
-                locations,
-                administrativeAreas,
-                adminLevels,
+                ...locationOptions,
                 anchor: toPlainDate(metadata.legalStatuses.DECLARED.createdAt)
               }
             ),
             acceptedAt: DateField.toCertificateVariables(
               metadata.legalStatuses.DECLARED.acceptedAt,
-              {
-                intl,
-                locations,
-                administrativeAreas,
-                anchor: recordAnchor
-              }
+              dateOptions
             ),
             createdByRole: metadata.legalStatuses.DECLARED.createdByRole
           }
@@ -228,12 +197,7 @@ export const stringifyEventMetadata = ({
         ? {
             createdAt: DateField.toCertificateVariables(
               metadata.legalStatuses.REGISTERED.createdAt,
-              {
-                intl,
-                locations,
-                administrativeAreas,
-                anchor: recordAnchor
-              }
+              dateOptions
             ),
             createdBy: findUserById(
               metadata.legalStatuses.REGISTERED.createdBy,
@@ -242,21 +206,13 @@ export const stringifyEventMetadata = ({
             createdAtLocation: LocationSearch.toCertificateVariables(
               metadata.legalStatuses.REGISTERED.createdAtLocation,
               {
-                intl,
-                locations,
-                administrativeAreas,
-                adminLevels,
+                ...locationOptions,
                 anchor: toPlainDate(metadata.legalStatuses.REGISTERED.createdAt)
               }
             ),
             acceptedAt: DateField.toCertificateVariables(
               metadata.legalStatuses.REGISTERED.acceptedAt,
-              {
-                intl,
-                locations,
-                administrativeAreas,
-                anchor: recordAnchor
-              }
+              dateOptions
             ),
             createdByRole: metadata.legalStatuses.REGISTERED.createdByRole,
             registrationNumber:
