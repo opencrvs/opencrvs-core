@@ -12,6 +12,7 @@ import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import {
   AdministrativeAreaField,
+  AdministrativeAreas,
   getAdministrativeAreaHierarchy,
   JurisdictionFilter,
   Location,
@@ -29,6 +30,7 @@ import {
 } from '@client/v2-events/components/forms/inputs/SearchableSelect'
 import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useIsSearchFilter } from '@client/v2-events/features/events/Search/SearchFilterContext'
 import { LocationSearch } from './LocationSearch'
 
 /**
@@ -72,7 +74,8 @@ function useUserAdministrativeAreaHierarchy() {
  */
 function useAvailableAdministrativeAreas(
   parentId?: string | null,
-  jurisdictionFilter?: JurisdictionFilter
+  jurisdictionFilter?: JurisdictionFilter,
+  excludeInactive = false
 ) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
@@ -80,13 +83,19 @@ function useAvailableAdministrativeAreas(
 
   const options = React.useMemo(() => {
     return [...administrativeAreas.values()].filter((administrativeArea) => {
+      // In advanced search, address (admin-structure) filters offer only
+      // currently-valid areas; inactivated ones are not selectable.
+      if (excludeInactive && administrativeArea.status !== 'active') {
+        return false
+      }
+
       if (parentId === undefined) {
         return true
       }
 
       return administrativeArea.parentId === parentId
     })
-  }, [administrativeAreas, parentId])
+  }, [administrativeAreas, parentId, excludeInactive])
 
   // When jurisdictionFilter is not "all", restrict options to the user's own area hierarchy.
   // e.g. a LOCAL_REGISTRAR sees only their province/district; a COMMUNITY_LEADER sees only their province/district/village.
@@ -125,15 +134,23 @@ function AdministrativeAreaInput({
   ...inputProps
 }: AdministrativeAreaInputProps) {
   const token = useSelector(getToken)
+  const isSearchFilter = useIsSearchFilter()
   const jurisdictionFilter = resolveJurisdictionReference(
     configuration.allowedLocations,
     token,
     eventType
   )
 
+  // Only admin-structure address filters drop inactive areas, and only within
+  // advanced search. Office/health-facility fields keep listing inactive ones.
+  const excludeInactive =
+    isSearchFilter &&
+    configuration.type === AdministrativeAreas.enum.ADMIN_STRUCTURE
+
   const administrativeAreas = useAvailableAdministrativeAreas(
     partOf,
-    jurisdictionFilter
+    jurisdictionFilter,
+    excludeInactive
   )
 
   const options = useMemo(
