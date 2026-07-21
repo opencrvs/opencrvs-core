@@ -23,7 +23,7 @@ export const IdReader = (props: IdReaderProps) => {
       <Stack direction="column" alignItems="center" gap={0}>
         <ReadersContainer>{children}</ReadersContainer>
         <Divider>
-          <Text variant="reg18" element="p" align="center" color="grey500">
+          <Text variant="reg18" element="p" align="center" color="text/tertiary">
             {dividerLabel}
           </Text>
         </Divider>

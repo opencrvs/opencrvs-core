@@ -47,7 +47,7 @@ export function Slider({
 }: SliderProps) {
   return (
     <SliderContainer>
-      <Square color="grey400" height={12} width={12} />
+      <Square color="text/disabled" height={12} width={12} />
       <StyledInput
         max={max}
         min={min}
@@ -58,7 +58,7 @@ export function Slider({
           onChange(updatedValue)
         }
       />
-      <Square color="grey400" height={18} width={18} />
+      <Square color="text/disabled" height={18} width={18} />
     </SliderContainer>
   )
 }

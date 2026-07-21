@@ -101,7 +101,7 @@ export function WorkqueueLayout({
                 type={'icon'}
                 onClick={() => navigate(ROUTES.V2.SEARCH.buildPath({}))}
               >
-                <Icon color="primary" name="MagnifyingGlass" size="medium" />
+                <Icon color="text/link" name="MagnifyingGlass" size="medium" />
               </Button>
             )
           }

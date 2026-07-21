@@ -150,7 +150,7 @@ export function useEventFormNavigation() {
         onClose={() => close(null)}
       >
         <Stack>
-          <Text color="grey500" element="p" variant="reg16">
+          <Text color="text/tertiary" element="p" variant="reg16">
             {intl.formatMessage(modalMessages.exitWithoutSavingDescription)}
           </Text>
         </Stack>
@@ -201,7 +201,7 @@ export function useEventFormNavigation() {
         onClose={() => close(null)}
       >
         <Stack>
-          <Text color="grey500" element="p" variant="reg16">
+          <Text color="text/tertiary" element="p" variant="reg16">
             {intl.formatMessage(modalMessages.deleteDeclarationDescription)}
           </Text>
         </Stack>

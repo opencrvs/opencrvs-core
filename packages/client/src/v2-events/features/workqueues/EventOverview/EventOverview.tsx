@@ -82,7 +82,7 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
       icon={() => <IconWithName flags={flags} name={''} status={status} />}
       size={ContentSize.LARGE}
       title={title}
-      titleColor={event.id ? 'copy' : 'grey600'}
+      titleColor="text/primary"
     >
       <EventSummary
         event={flattenedEventIndex}
@@ -138,7 +138,7 @@ function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
       icon={() => <IconWithName flags={flags} name={''} status={status} />}
       size={ContentSize.LARGE}
       title={title}
-      titleColor={eventIndex.id ? 'copy' : 'grey600'}
+      titleColor="text/primary"
     >
       <EventSummary
         hideSecuredFields

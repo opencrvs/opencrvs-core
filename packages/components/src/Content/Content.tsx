@@ -11,8 +11,7 @@
 import * as React from 'react'
 import { ReactElement } from 'react'
 import styled from 'styled-components'
-import { colors } from '../colors'
-import { lightColors } from '../semantics'
+import { lightColors, SemanticColor } from '../semantics'
 
 const Container = styled.div<{ size: ContentSize }>`
   position: relative;
@@ -135,13 +134,13 @@ const BackButtonContainer = styled.div`
     display: none;
   }
 `
-const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
+const TitleContainer = styled.div<{ titleColor?: SemanticColor }>`
   display: flex;
   gap: 16px;
   align-items: center;
   width: 0;
   flex: 1;
-  color: ${({ theme, titleColor }) => titleColor && theme.colors[titleColor]};
+  color: ${({ titleColor }) => titleColor && lightColors[titleColor]};
 `
 
 const Title = styled.div`
@@ -174,7 +173,7 @@ interface IProps {
   id?: string
   icon?: () => React.ReactNode
   title?: string | React.ReactNode
-  titleColor?: keyof typeof colors
+  titleColor?: SemanticColor
   showTitleOnMobile?: boolean
   noPadding?: boolean
   topActionButtons?: ReactElement[]

@@ -476,7 +476,7 @@ function UserListComponent({ userDetails }: UserListProps) {
             <ToggleMenu
               id={`user-item-${index}-menu`}
               toggleButton={
-                <Icon name="DotsThreeVertical" color="primary" size="large" />
+                <Icon name="DotsThreeVertical" color="text/link" size="large" />
               }
               menuItems={getMenuItems(user)}
             />

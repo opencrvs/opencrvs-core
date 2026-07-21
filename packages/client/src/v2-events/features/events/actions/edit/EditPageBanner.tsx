@@ -97,7 +97,7 @@ export function EditPageBanner() {
   return (
     <Wrapper>
       <Icon name="PencilSimpleLine" size="small" />
-      <StyledText color="white" element="span" variant="bold14">
+      <StyledText color="text/onAction" element="span" variant="bold14">
         {formattedMessage}
       </StyledText>
     </Wrapper>

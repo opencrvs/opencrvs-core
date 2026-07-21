@@ -151,7 +151,7 @@ export const Pagination = ({
           disabled={!canGoToPreviousPage}
           aria-label="Previous page"
         >
-          <Icon color="grey400" name="CaretLeft" size="small" />
+          <Icon color="text/disabled" name="CaretLeft" size="small" />
         </Button>
         <StyledPagination>
           {pages.map((page, id) => {
@@ -199,7 +199,7 @@ export const Pagination = ({
           disabled={!canGoToNextPage}
           aria-label="Next page"
         >
-          <Icon color="grey400" name="CaretRight" size="small" />
+          <Icon color="text/disabled" name="CaretRight" size="small" />
         </Button>
       </PaginationContainer>
     )

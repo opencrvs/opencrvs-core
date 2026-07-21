@@ -153,7 +153,7 @@ export function Dialog({
             <DialogHeader>
               <DialogTitle>
                 {titleIcon}
-                <Text variant="h2" element="h2" color="grey600">
+                <Text variant="h2" element="h2" color="text/primary">
                   {title}
                 </Text>
               </DialogTitle>

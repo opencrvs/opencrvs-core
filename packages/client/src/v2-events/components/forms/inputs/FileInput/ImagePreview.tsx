@@ -103,7 +103,7 @@ export function ImagePreview({
                   type="icon"
                   onClick={() => onDelete(previewImage)}
                 >
-                  <Icon color="red" name="Trash" />
+                  <Icon color="feedback/negative" name="Trash" />
                 </Button>
               </>
             )}
@@ -134,7 +134,7 @@ export function ImagePreview({
                 type="icon"
                 onClick={() => onDelete(previewImage)}
               >
-                <Icon color="red" name="Trash" />
+                <Icon color="feedback/negative" name="Trash" />
               </Button>
             )}
             <Button

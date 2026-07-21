@@ -351,7 +351,7 @@ export function DuplicateComparison({
             duplicateMessages.duplicateComparePageTitle,
             {
               actualTrackingId: (
-                <Text color="negative" element="span" variant="bold18">
+                <Text color="feedback/negative" element="span" variant="bold18">
                   {originalEventState.trackingId}
                 </Text>
               ),
@@ -363,7 +363,7 @@ export function DuplicateComparison({
             {comparisonData.map((sections, index) => {
               return (
                 <div key={`comparison-div-${index}`}>
-                  <Text color="grey600" element="span" variant="bold18">
+                  <Text color="text/primary" element="span" variant="bold18">
                     {sections.title}
                   </Text>
                   <ComparisonListView
@@ -381,7 +381,7 @@ export function DuplicateComparison({
                           left: originalEventState.trackingId
                         }}
                         label={
-                          <Text color="grey600" element="span" variant="bold16">
+                          <Text color="text/primary" element="span" variant="bold16">
                             {item.label}
                           </Text>
                         }
@@ -420,7 +420,7 @@ export function DuplicateComparison({
         >
           <SupportingDocumentWrapper gap={25} justifyContent={'space-between'}>
             <div style={{ flex: 1 }}>
-              <Text color="redDark" element="p" variant="bold14">
+              <Text color="feedback/negative" element="p" variant="bold14">
                 {originalEventState.trackingId}
               </Text>
               <DocumentViewer
@@ -437,7 +437,7 @@ export function DuplicateComparison({
               </MobileOnly>
             </div>
             <div style={{ flex: 1 }}>
-              <Text color="grey400" element="p" variant="bold14">
+              <Text color="text/disabled" element="p" variant="bold14">
                 {potentialDuplicateEventState.trackingId}
               </Text>
               <DocumentViewer

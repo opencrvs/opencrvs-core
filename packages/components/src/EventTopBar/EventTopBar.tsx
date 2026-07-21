@@ -123,7 +123,7 @@ export const EventTopBar = (props: IEventTopBarProps) => {
           <ToggleMenu
             id="eventToggleMenu"
             toggleButton={
-              <Icon name="DotsThreeVertical" color="primary" size="large" />
+              <Icon name="DotsThreeVertical" color="text/link" size="large" />
             }
             menuItems={menuItems}
           />

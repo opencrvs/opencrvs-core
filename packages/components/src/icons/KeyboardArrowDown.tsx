@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { colors } from '../colors'
+import { lightColors, SemanticColor } from '../semantics'
 
 export const KeyboardArrowDown = ({
   pathStroke,
   ...otherProps
-}: React.HTMLAttributes<SVGElement> & { pathStroke?: keyof typeof colors }) => {
+}: React.HTMLAttributes<SVGElement> & { pathStroke?: SemanticColor }) => {
   return (
     <svg width={24} height={24} fill="none" {...otherProps}>
       <path
         d="M6 9l6 5.96L18 9"
-        stroke={pathStroke ? colors[pathStroke] : 'currentColor'}
+        stroke={pathStroke ? lightColors[pathStroke] : 'currentColor'}
         strokeWidth={2}
         strokeLinecap="round"
         strokeLinejoin="round"

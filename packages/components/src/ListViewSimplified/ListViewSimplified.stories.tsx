@@ -36,7 +36,7 @@ const toggleMenu = (
     id="toggleMenu"
     key="toggleMenu"
     toggleButton={
-      <Icon name="DotsThreeVertical" color="primary" size="large" />
+      <Icon name="DotsThreeVertical" color="text/link" size="large" />
     }
     menuItems={[
       {

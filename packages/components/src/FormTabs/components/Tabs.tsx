@@ -28,7 +28,7 @@ export interface IProps extends IButtonProps {
 
 export const Tab = styled(Button)<IProps>`
   --color: ${({ activeColor }) =>
-    activeColor ? activeColor : lightColors['action/primary']};
+    activeColor ? lightColors[activeColor] : lightColors['action/primary']};
   border-radius: 0;
   margin-top: 8px;
   margin-right: 16px;

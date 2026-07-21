@@ -142,7 +142,7 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
                 type="icon"
                 onClick={() => handleCrossBar()}
               >
-                <Icon color="primary" name="X" />
+                <Icon color="text/link" name="X" />
               </Button>
             }
             desktopTitle={title}
@@ -153,7 +153,7 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
                 type="icon"
                 onClick={() => handleCrossBar()}
               >
-                <Icon color="primary" name="X" />
+                <Icon color="text/link" name="X" />
               </Button>
             }
             mobileTitle={title}

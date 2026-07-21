@@ -30,7 +30,7 @@ export function ErrorText(props: IErrorTextProps) {
   return (
     <Container id={props.id}>
       <Warning />
-      <Text variant="bold16" element="span" color="negative">
+      <Text variant="bold16" element="span" color="feedback/negative">
         {props.children}
       </Text>
     </Container>

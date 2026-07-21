@@ -80,7 +80,7 @@ const RowValue = ({
 
   if (typeof placeholder === 'string') {
     return (
-      <Text variant="reg16" color="grey400" element="span">
+      <Text variant="reg16" color="text/disabled" element="span">
         {placeholder}
       </Text>
     )

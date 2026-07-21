@@ -56,7 +56,7 @@ export function SearchResultItemTitle({
 
   return (
     <TextButton
-      color={useFallbackTitle ? 'red' : 'primary'}
+      color={useFallbackTitle ? 'feedback/negative' : 'text/link'}
       onClick={() => {
         navigate(
           ROUTES.V2.EVENTS.EVENT.buildPath({ eventId: event.id }, { backTo })

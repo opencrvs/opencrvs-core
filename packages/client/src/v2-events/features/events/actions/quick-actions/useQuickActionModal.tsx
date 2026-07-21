@@ -165,7 +165,7 @@ function QuickActionModal({
       title={intl.formatMessage(config.label) + '?'}
       titleIcon={
         <Icon
-          color="primary"
+          color="text/link"
           name={
             config.icon ??
             (config.actionType && DefaultIcons[config.actionType]) ??
@@ -181,7 +181,7 @@ function QuickActionModal({
       <Stack alignItems="left" direction="column" gap={16}>
         {config.supportingCopy && (
           <TranslationTextWithFormatModifier
-            color="supportingCopy"
+            color="text/secondary"
             element="p"
             message={config.supportingCopy}
             variant="reg16"

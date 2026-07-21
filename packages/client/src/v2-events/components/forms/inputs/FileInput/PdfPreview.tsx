@@ -73,7 +73,7 @@ export function PdfPreview({
                   type="icon"
                   onClick={() => onDelete(previewImage)}
                 >
-                  <Icon color="red" name="Trash" />
+                  <Icon color="feedback/negative" name="Trash" />
                 </Button>
               </>
             )}
@@ -99,7 +99,7 @@ export function PdfPreview({
                 type="icon"
                 onClick={() => onDelete(previewImage)}
               >
-                <Icon color="red" name="Trash" />
+                <Icon color="feedback/negative" name="Trash" />
               </Button>
             )}
             <Button

@@ -91,7 +91,7 @@ const Close = styled(Button)`
 `
 
 const NotificationMessage = styled(Text).attrs({
-  color: 'white',
+  color: 'text/onAction',
   variant: 'bold16',
   element: 'span'
 })`
@@ -139,7 +139,7 @@ export function Toast({
 
       {onActionClick && (
         <ActionLink
-          color="white"
+          color="text/onAction"
           font="bold14"
           element="button"
           data-testid={props['data-testid'] && `${props['data-testid']}-action`}

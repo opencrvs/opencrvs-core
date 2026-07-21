@@ -82,7 +82,7 @@ const ResetCredentialsSuccessView = (props: Props) => {
                 variant="reg18"
                 element="p"
                 align="center"
-                color="grey500"
+                color="text/tertiary"
                 id="authenticating-label"
               >
                 {window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms'

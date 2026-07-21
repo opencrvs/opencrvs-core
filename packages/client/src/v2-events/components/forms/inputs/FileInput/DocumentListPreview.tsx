@@ -107,7 +107,7 @@ export const DocumentListPreview = ({
         documents.map((document: FileFieldValueWithOption, key: number) => (
           <Container key={`preview_${key}`}>
             <Label>
-              <Icon color="grey600" name="Paperclip" size="large" />
+              <Icon color="text/primary" name="Paperclip" size="large" />
               <Link
                 key={key}
                 disabled={disabled}
@@ -137,7 +137,7 @@ export const DocumentListPreview = ({
                 type="icon"
                 onClick={() => onDelete(document.path)}
               >
-                <Icon color="red" name="Trash" size="small" />
+                <Icon color="feedback/negative" name="Trash" size="small" />
               </Button>
             )}
           </Container>
@@ -146,7 +146,7 @@ export const DocumentListPreview = ({
         processingDocuments.map(({ label }) => (
           <Container key={label}>
             <Label>
-              <Icon color="grey400" name="Paperclip" size="large" />
+              <Icon color="text/disabled" name="Paperclip" size="large" />
               <Link key={label} disabled={true}>
                 <span>{getFormattedLabelForDocType(label) || label}</span>
               </Link>

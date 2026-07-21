@@ -10,11 +10,11 @@
  */
 import * as React from 'react'
 import { Tab, Tabs } from './components/Tabs'
-import { colors } from '../colors'
+import { SemanticColor } from '../semantics'
 import { Text } from '../Text'
 import { Stack } from '../Stack'
 
-export type ITabColor = keyof typeof colors
+export type ITabColor = SemanticColor
 export interface IFormTabs<T extends string | number = string> {
   id: T
   title: string
@@ -47,7 +47,7 @@ function FormTabsComponent<T extends string | number = string>({
         >
           <Stack>
             {icon}
-            <Text variant="bold14" element="span" color={color ?? 'primary'}>
+            <Text variant="bold14" element="span" color={color ?? 'text/link'}>
               {title}
             </Text>
           </Stack>

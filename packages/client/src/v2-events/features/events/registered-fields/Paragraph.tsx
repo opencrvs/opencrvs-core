@@ -26,7 +26,7 @@ function ParagraphInput({
   return (
     <TextComponent
       align={textAlign}
-      color={hint ? 'grey500' : 'copy'}
+      color={hint ? 'text/tertiary' : 'text/primary'}
       element="p"
       variant="reg16"
     >

@@ -24,7 +24,7 @@ import {
   Box,
   Button,
   Dialog,
-  IColor,
+  SemanticColor,
   Icon,
   Link,
   Loader,
@@ -147,7 +147,7 @@ function ClearModal({
       )}
       onClose={() => close(false)}
     >
-      <Text color="grey500" element="p" variant="reg16">
+      <Text color="text/tertiary" element="p" variant="reg16">
         {intl.formatMessage(
           configuration.indicators?.clearModal?.description ??
             defaultIndicators.clearModal.description
@@ -334,11 +334,11 @@ function SearchInput({
   }
   const valid = validateValue(configuration.validation.validator, inputState)
 
-  const getMessages = (): { message?: string; color?: IColor } => {
+  const getMessages = (): { message?: string; color?: SemanticColor } => {
     if (inputState && !valid) {
       return {
         message: intl.formatMessage(configuration.validation.message),
-        color: 'red'
+        color: 'feedback/negative'
       }
     }
     if (!isOnline) {
@@ -357,7 +357,7 @@ function SearchInput({
           configuration.indicators?.httpError || defaultIndicators.httpError,
           httpState.error
         ),
-        color: 'red'
+        color: 'feedback/negative'
       }
     }
     if (!httpState?.error && httpState?.data && 'total' in httpState.data) {
@@ -370,7 +370,7 @@ function SearchInput({
             configuration.indicators?.ok || defaultIndicators.ok,
             { count: total }
           ),
-          color: 'green'
+          color: 'feedback/positive'
         }
       } else {
         return {
@@ -378,14 +378,14 @@ function SearchInput({
             configuration.indicators?.noResultsError ||
               defaultIndicators.noResultsError
           ),
-          color: 'red'
+          color: 'feedback/negative'
         }
       }
     }
     return {}
   }
 
-  const { message, color = 'grey600' } = getMessages()
+  const { message, color = 'text/primary' } = getMessages()
 
   const isEditable =
     !httpState || !!httpState.error || !((httpState.data?.total ?? 0) > 0)
@@ -396,7 +396,7 @@ function SearchInput({
         <Stack alignItems="initial" direction="column" gap={8}>
           {label && (
             <Text
-              color="grey600"
+              color="text/primary"
               element="span"
               style={{ fontWeight: 500 }}
               variant="h4"
@@ -406,7 +406,7 @@ function SearchInput({
           )}
           {helperText && (
             <Text
-              color="grey500"
+              color="text/tertiary"
               element="span"
               style={{ fontWeight: 400 }}
               variant="h4"
@@ -478,7 +478,7 @@ function SearchInput({
           <Stack alignItems="normal" direction="row" gap={4}>
             <Icon
               color={color}
-              name={color === 'red' ? 'XCircle' : 'CheckCircle'}
+              name={color === 'feedback/negative' ? 'XCircle' : 'CheckCircle'}
               weight={'bold'}
             />
             <Text

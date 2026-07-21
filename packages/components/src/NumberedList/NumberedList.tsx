@@ -29,7 +29,7 @@ const ListItem = styled.li`
 export function NumberedList({ id, font, items }: NumberedListProps) {
   return (
     <List id={id}>
-      <Text variant={font} element="p" color="grey600">
+      <Text variant={font} element="p" color="text/primary">
         {items.map((items) => (
           <ListItem key={items}>{items}</ListItem>
         ))}

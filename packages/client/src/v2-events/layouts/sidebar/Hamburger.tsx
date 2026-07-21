@@ -29,7 +29,7 @@ export function Hamburger() {
         type="icon"
         onClick={toggleMenu}
       >
-        <Icon color="primary" name="List" size="medium" />
+        <Icon color="text/link" name="List" size="medium" />
       </Button>
       <ExpandingMenu
         menuCollapse={toggleMenu}

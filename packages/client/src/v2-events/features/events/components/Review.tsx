@@ -641,7 +641,7 @@ function EditModal({
       onClose={() => close(null)}
     >
       <Stack>
-        <Text color="grey500" element="p" variant="reg16">
+        <Text color="text/tertiary" element="p" variant="reg16">
           {intl.formatMessage(
             copy?.description || reviewMessages.changeModalDescription
           )}
@@ -728,7 +728,7 @@ function AcceptActionModal({
       <Stack alignItems="left" direction="column" gap={16}>
         {copy.supportingCopy && (
           <TranslationTextWithFormatModifier
-            color="supportingCopy"
+            color="text/secondary"
             element="p"
             message={copy.supportingCopy}
             variant="reg16"
@@ -822,7 +822,7 @@ function RejectActionModal({
       onClose={() => close(null)}
     >
       <Stack alignItems="left" direction="column">
-        <Text color="grey500" element="p" variant="reg16">
+        <Text color="text/tertiary" element="p" variant="reg16">
           {supportingCopy ? intl.formatMessage(supportingCopy) : null}
         </Text>
         <TextArea

@@ -170,7 +170,7 @@ function ApproveModal({
       onClose={() => close(true)}
     >
       <Stack>
-        <Text color="grey500" element="p" variant="reg16">
+        <Text color="text/tertiary" element="p" variant="reg16">
           {intl.formatMessage(reviewCorrectionMessages.actionModalDescription)}
         </Text>
       </Stack>
@@ -224,7 +224,7 @@ function RejectModal({
       onClose={() => close(true)}
     >
       <Stack>
-        <Text color="grey500" element="p" variant="reg16">
+        <Text color="text/tertiary" element="p" variant="reg16">
           {intl.formatMessage(reviewCorrectionMessages.rejectModalDescription)}
         </Text>
       </Stack>

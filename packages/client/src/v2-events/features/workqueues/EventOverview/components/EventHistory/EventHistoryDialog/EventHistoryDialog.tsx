@@ -129,7 +129,7 @@ export function EventHistoryDialog({
       onClose={close}
     >
       <Stack>
-        <Text color="grey500" element="p" variant="reg19">
+        <Text color="text/tertiary" element="p" variant="reg19">
           {joinValues(
             [
               userName,

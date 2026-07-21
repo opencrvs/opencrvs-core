@@ -111,7 +111,7 @@ export function Onboarding() {
               type="icon"
               onClick={() => closeActionView(backTo)}
             >
-              <Icon color="primary" name="X" />
+              <Icon color="text/link" name="X" />
             </Button>
           }
           desktopTitle={title}
@@ -132,7 +132,7 @@ export function Onboarding() {
               type="icon"
               onClick={() => closeActionView(backTo)}
             >
-              <Icon color="primary" name="X" />
+              <Icon color="text/link" name="X" />
             </Button>
           }
           mobileTitle={title}

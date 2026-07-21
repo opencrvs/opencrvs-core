@@ -146,7 +146,7 @@ export function ListConfig({
                 <td>
                   {row.label}
                   {row.labelDescription && (
-                    <Text variant="reg14" element="p" color="supportingCopy">
+                    <Text variant="reg14" element="p" color="text/secondary">
                       {row.labelDescription}
                     </Text>
                   )}

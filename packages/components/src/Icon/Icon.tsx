@@ -10,7 +10,7 @@
  */
 
 import * as React from 'react'
-import { colors } from '../colors'
+import { lightColors, SemanticColor } from '../semantics'
 import * as icons from './all-icons'
 import { IconWeight } from 'phosphor-react'
 
@@ -20,7 +20,7 @@ enum IconSize {
   large = 24
 }
 
-type IconColor = keyof typeof colors | 'currentColor'
+type IconColor = SemanticColor | 'currentColor'
 
 export type IconProps = {
   name: keyof typeof icons
@@ -41,7 +41,7 @@ export function Icon({
   const IconComponent = icons[name]
   return (
     <IconComponent
-      color={color === 'currentColor' ? 'currentColor' : colors[color]}
+      color={color === 'currentColor' ? 'currentColor' : lightColors[color]}
       opacity={disabled ? 0.5 : 1}
       size={IconSize[size]}
       weight={weight}

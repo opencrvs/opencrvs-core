@@ -165,7 +165,7 @@ function EditActionModal({
       {supportingCopy && (
         <Stack>
           <TranslationTextWithFormatModifier
-            color="grey500"
+            color="text/tertiary"
             element="p"
             message={supportingCopy}
             variant="reg16"

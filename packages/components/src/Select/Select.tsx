@@ -35,7 +35,7 @@ const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
   return (
     components.DropdownIndicator && (
       <components.DropdownIndicator {...props}>
-        <Icon name="CaretDown" size="small" color="grey600" />
+        <Icon name="CaretDown" size="small" color="text/primary" />
       </components.DropdownIndicator>
     )
   )

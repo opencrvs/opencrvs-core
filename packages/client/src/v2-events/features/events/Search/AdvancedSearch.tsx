@@ -123,7 +123,7 @@ export function AdvancedSearch() {
         />
       }
       title={intl.formatMessage(messages.advancedSearch)}
-      titleColor={'copy'}
+      titleColor={'text/primary'}
     >
       {currentTabSections.length > 0 && (
         <TabSearch

@@ -329,7 +329,7 @@ export function SystemList() {
                       toggleButton={
                         <Icon
                           name="DotsThreeVertical"
-                          color="primary"
+                          color="text/link"
                           size="large"
                         />
                       }
@@ -338,7 +338,7 @@ export function SystemList() {
                 }
                 label={integration.name}
                 value={
-                  <Text variant="reg14" element="p" color="grey500">
+                  <Text variant="reg14" element="p" color="text/tertiary">
                     {user
                       ? intl.formatMessage(integrationMessages.createdOnBy, {
                           date: intl.formatDate(

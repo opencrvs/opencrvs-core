@@ -8,12 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { colors, gradients, shadows } from './colors'
+import { gradients, shadows } from './colors'
 import { fonts, family as fontFamily } from './fonts'
 import { grid } from './grid'
 
 export const getTheme = () => ({
-  colors,
   gradients,
   shadows,
   fonts,

@@ -197,7 +197,7 @@ export function Summary() {
                 type="icon"
                 onClick={() => eventFormNavigation.closeActionView(backTo)}
               >
-                <Icon color="primary" name="X" />
+                <Icon color="text/link" name="X" />
               </Button>
             }
             desktopTitle={title}
@@ -217,7 +217,7 @@ export function Summary() {
                 type="icon"
                 onClick={() => eventFormNavigation.closeActionView(backTo)}
               >
-                <Icon color="primary" name="X" />
+                <Icon color="text/link" name="X" />
               </Button>
             }
             mobileTitle={title}

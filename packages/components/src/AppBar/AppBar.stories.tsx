@@ -96,19 +96,19 @@ Home.args = {
       searchTypeList={[
         {
           name: 'TRACKING_ID',
-          icon: <Icon name="Target" size="medium" color="grey600" />,
+          icon: <Icon name="Target" size="medium" color="text/primary" />,
           label: 'Tracking ID',
           placeHolderText: 'Search'
         },
         {
           name: 'REGISTRATION_NUMBER',
-          icon: <Icon name="Medal" size="medium" color="grey600" />,
+          icon: <Icon name="Medal" size="medium" color="text/primary" />,
           label: 'Registration No.',
           placeHolderText: 'Search'
         },
         {
           name: 'PHONE_NUMBER',
-          icon: <Icon name="Phone" size="medium" color="grey600" />,
+          icon: <Icon name="Phone" size="medium" color="text/primary" />,
           label: 'Phone no.',
           placeHolderText: 'Search'
         }

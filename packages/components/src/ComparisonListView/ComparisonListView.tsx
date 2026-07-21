@@ -59,7 +59,7 @@ export const ComparisonListView = ({
               <Text
                 variant="reg16"
                 element="span"
-                color={index ? 'grey600' : 'negative'}
+                color={index ? 'text/primary' : 'feedback/negative'}
               >
                 {heading}
               </Text>

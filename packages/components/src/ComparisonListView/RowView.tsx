@@ -33,7 +33,7 @@ export const Row: React.FC<{
       <Stack>{label}</Stack>
       <Stack justifyContent="space-between">
         <HideOnLargeScreen>
-          <Text variant="reg16" element="span" color="redDark">
+          <Text variant="reg16" element="span" color="feedback/negative">
             {heading.left}
           </Text>
         </HideOnLargeScreen>
@@ -41,7 +41,7 @@ export const Row: React.FC<{
       </Stack>
       <Stack justifyContent="space-between">
         <HideOnLargeScreen>
-          <Text variant="reg16" element="span" color="grey600">
+          <Text variant="reg16" element="span" color="text/primary">
             {heading.right}
           </Text>
         </HideOnLargeScreen>

@@ -66,15 +66,15 @@ export function CopyButton({
     >
       {clipToCopy ? (
         <>
-          <Icon color="green" name="CheckSquare" />
-          <Text variant="bold14" color="green" element="span">
+          <Icon color="feedback/positive" name="CheckSquare" />
+          <Text variant="bold14" color="feedback/positive" element="span">
             {copiedLabel}
           </Text>
         </>
       ) : (
         <>
           <Icon name="Copy" />
-          <Text variant="bold14" color="primary" element="span">
+          <Text variant="bold14" color="text/link" element="span">
             {copyLabel}
           </Text>
         </>

@@ -132,7 +132,7 @@ const CreatePinComponent = ({
               <Text
                 element="p"
                 variant="reg16"
-                color="supportingCopy"
+                color="text/secondary"
                 align="center"
                 id="description-text"
               >

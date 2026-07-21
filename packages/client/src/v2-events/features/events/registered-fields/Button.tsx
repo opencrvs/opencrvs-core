@@ -69,7 +69,11 @@ function ButtonInput({
           size="large"
         />
       )}
-      <Text color={textColor} element="span" variant={textVariant}>
+      <Text
+        color={textColor === 'primary' ? 'text/link' : 'text/primary'}
+        element="span"
+        variant={textVariant}
+      >
         {intl.formatMessage(text)}
       </Text>
     </UiButton>

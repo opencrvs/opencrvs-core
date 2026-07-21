@@ -319,7 +319,7 @@ function UserAuditHistoryComponent(props: Props) {
   return (
     <RecentActionsHolder id="user-audit-list">
       <HistoryHeader>
-        <Text variant="h3" element="h3" color="copy">
+        <Text variant="h3" element="h3" color="text/primary">
           {intl.formatMessage(messages.auditSectionTitle)}
         </Text>
         <DateRangePicker

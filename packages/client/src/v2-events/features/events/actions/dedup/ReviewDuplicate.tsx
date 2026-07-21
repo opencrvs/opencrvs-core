@@ -188,8 +188,8 @@ function ReviewDuplicate() {
     {
       id: event.trackingId,
       title: event.trackingId,
-      color: 'red',
-      icon: <Icon color="red" name="WarningCircle" size="medium" />
+      color: 'feedback/negative',
+      icon: <Icon color="feedback/negative" name="WarningCircle" size="medium" />
     },
     ...eventState.potentialDuplicates.map(({ trackingId }) => ({
       id: trackingId,

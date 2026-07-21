@@ -26,7 +26,7 @@ function HeadingInput({
   return (
     <TextComponent
       align={textAlign}
-      color={'copy'}
+      color={'text/primary'}
       element="p"
       variant={fontVariant ?? 'reg16'}
     >

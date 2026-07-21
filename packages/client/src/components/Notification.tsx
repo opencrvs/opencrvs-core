@@ -197,7 +197,7 @@ const Component = ({
             trackingId: (
               <Link
                 underline
-                color="white"
+                color="text/onAction"
                 element="button"
                 onClick={() => {
                   hideDuplicateRecordsToast()

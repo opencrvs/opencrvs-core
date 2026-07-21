@@ -71,7 +71,7 @@ export function SingleDocumentPreview({
       {attachment && label && (
         <Container>
           <Label>
-            <Icon color="grey600" name="Paperclip" size="medium" />
+            <Icon color="text/primary" name="Paperclip" size="medium" />
             <Link disabled={disabled} onClick={() => onSelect(attachment)}>
               <span>{getFormattedLabelForDocType(label) || label}</span>
             </Link>
@@ -85,7 +85,7 @@ export function SingleDocumentPreview({
               type="icon"
               onClick={() => onDelete(attachment)}
             >
-              <Icon color="red" name="Trash" size="small" />
+              <Icon color="feedback/negative" name="Trash" size="small" />
             </Button>
           )}
         </Container>

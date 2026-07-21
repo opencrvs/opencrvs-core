@@ -75,7 +75,7 @@ const AllUserEmail = () => {
     <>
       <Content
         title={intl.formatMessage(messages.emailAllUsersTitle)}
-        titleColor="copy"
+        titleColor="text/primary"
         subtitle={intl.formatMessage(messages.emailAllUsersSubtitle)}
       >
         <Form

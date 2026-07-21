@@ -61,9 +61,9 @@ const StyledInput = styled.input`
 function Slider(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <SliderContainer>
-      <Square width={12} height={12} color="grey400" />
+      <Square width={12} height={12} color="text/disabled" />
       <StyledInput {...props} />
-      <Square width={18} height={18} color="grey400" />
+      <Square width={18} height={18} color="text/disabled" />
     </SliderContainer>
   )
 }

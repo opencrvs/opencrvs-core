@@ -81,7 +81,7 @@ export function StepTwoContainer() {
                 <Text
                   variant="reg16"
                   align="center"
-                  color="supportingCopy"
+                  color="text/secondary"
                   element="p"
                 >
                   {notificationMethod === 'sms' &&
@@ -105,7 +105,7 @@ export function StepTwoContainer() {
                 <Text
                   variant="reg16"
                   align="center"
-                  color="supportingCopy"
+                  color="text/secondary"
                   element="p"
                 >
                   {notificationMethod === 'sms' &&

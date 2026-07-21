@@ -105,13 +105,13 @@ export const Accordion = ({
           </TitleContainer>
           {!isActive && (
             <Stack gap={4}>
-              <Icon name={'CaretRight'} color={'primary'} size={'small'} />
+              <Icon name={'CaretRight'} color={'text/link'} size={'small'} />
               <Link font="bold14">{labelForShowAction}</Link>
             </Stack>
           )}
           {isActive && (
             <Stack gap={4}>
-              <Icon name={'CaretDown'} color={'primary'} size={'small'} />
+              <Icon name={'CaretDown'} color={'text/link'} size={'small'} />
               <Link font="bold14">{labelForHideAction}</Link>
             </Stack>
           )}

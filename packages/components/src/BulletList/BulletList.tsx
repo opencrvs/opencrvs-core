@@ -30,7 +30,7 @@ const ListItem = styled.li`
 export function BulletList({ id, font, items }: BulletListProps) {
   return (
     <List id={id}>
-      <Text variant={font} element="p" color="grey600">
+      <Text variant={font} element="p" color="text/primary">
         {items.map((items) => (
           <ListItem key={items}>{items}</ListItem>
         ))}

@@ -11,7 +11,7 @@
 
 import React from 'react'
 import { fonts, IFont } from '../fonts'
-import { colors, IColor } from '../colors'
+import { lightColors, SemanticColor } from '../semantics'
 import styled from 'styled-components'
 import type { Property } from 'csstype'
 
@@ -24,7 +24,7 @@ export interface ITextProps extends React.HTMLAttributes<HTMLSpanElement> {
   /** Element type. Required for making semantically correct hierarchies, for example `h2` or `p` */
   element: Element
   /** Color */
-  color?: IColor
+  color?: SemanticColor
   /** Text alignment */
   align?: Align
   /** Setting whether the browser should insert line breaks within an otherwise unbreakable string to prevent text from overflowing its line box */
@@ -33,13 +33,13 @@ export interface ITextProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 const StyledText = styled.span<{
   $variant: IFont
-  $color: IColor
+  $color: SemanticColor
   $overflowWrap?: Property.OverflowWrap
   $align: Align
 }>`
   ${({ $variant }) => fonts[$variant]}
   ${({ $align }) => `text-align: ${$align};`}
-  ${({ $color }) => `color: ${colors[$color]};`}
+  ${({ $color }) => `color: ${lightColors[$color]};`}
   ${({ $overflowWrap }) => $overflowWrap && `overflow-wrap: ${$overflowWrap};`}
 `
 
@@ -48,7 +48,7 @@ export const Text = ({
   variant,
   element,
   overflowWrap,
-  color = 'copy',
+  color = 'text/primary',
   align = 'left',
   ...props
 }: ITextProps) => (

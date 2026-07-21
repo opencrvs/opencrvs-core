@@ -45,7 +45,7 @@ export const BreadCrumb = ({ items = [], onSelect }: IBreadCrumbProps) => {
         !isLast(i) ? (
           <BreadcrumbLink
             key={item.label}
-            color={'primary'}
+            color={'text/link'}
             font={'bold14'}
             onClick={(e) => {
               e.preventDefault()

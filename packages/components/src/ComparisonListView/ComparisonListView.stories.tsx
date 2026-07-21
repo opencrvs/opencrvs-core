@@ -61,10 +61,10 @@ const Template: Story<IComparisonListProps> = (args) => {
 export const Default = Template.bind({})
 Default.args = {
   headings: [
-    <Text variant="reg14" element="span" color="grey500">
+    <Text variant="reg14" element="span" color="text/tertiary">
       Heading1
     </Text>,
-    <Text variant="reg14" element="span" color="grey500">
+    <Text variant="reg14" element="span" color="text/tertiary">
       Heading2
     </Text>
   ]

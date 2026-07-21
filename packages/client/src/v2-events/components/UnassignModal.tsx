@@ -56,7 +56,7 @@ export function UnassignModal({
       title={intl.formatMessage(conflictsMessages.unassignTitle)}
       onClose={() => close(false)}
     >
-      <Text color="grey500" element="p" variant="reg16">
+      <Text color="text/tertiary" element="p" variant="reg16">
         {assignedSelf
           ? intl.formatMessage(conflictsMessages.selfUnassignDesc)
           : intl.formatMessage(conflictsMessages.regUnassignDesc, {

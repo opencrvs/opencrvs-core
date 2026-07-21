@@ -218,7 +218,7 @@ export const UserAudit = () => {
                     toggleButton={
                       <Icon
                         name="DotsThreeVertical"
-                        color="primary"
+                        color="text/link"
                         size="large"
                       />
                     }

@@ -47,16 +47,16 @@ ToggleMenuView.args = {
   id: 'birth',
   menuHeader: header,
   toggleButton: (
-    <Icon name="DotsThreeVertical" color="primary" size="large" weight="bold" />
+    <Icon name="DotsThreeVertical" color="text/link" size="large" weight="bold" />
   ),
   menuItems: [
     {
-      icon: <Icon name="Export" color="primary" size="large" weight="bold" />,
+      icon: <Icon name="Export" color="text/link" size="large" weight="bold" />,
       label: 'Share',
       handler: () => alert('Settings')
     },
     {
-      icon: <Icon name="Star" color="primary" size="large" weight="bold" />,
+      icon: <Icon name="Star" color="text/link" size="large" weight="bold" />,
       label: 'Favourite',
       handler: () => alert('Logout')
     }

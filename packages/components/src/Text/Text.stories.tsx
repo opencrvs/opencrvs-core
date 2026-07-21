@@ -48,7 +48,7 @@ export const HeadingWithIcon = () => (
 )
 
 export const HeadingWithColour = () => (
-  <Text variant="h4" element="h4" color="red">
+  <Text variant="h4" element="h4" color="feedback/negative">
     No data provided
   </Text>
 )

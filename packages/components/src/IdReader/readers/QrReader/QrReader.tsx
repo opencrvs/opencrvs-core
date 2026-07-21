@@ -80,7 +80,7 @@ export const QrReader = (
       <Dialog
         isOpen={isScannerDialogOpen}
         onClose={() => setScannerDialogOpen(false)}
-        titleIcon={<Icon name="QrCode" size="large" color="primary" />}
+        titleIcon={<Icon name="QrCode" size="large" color="text/link" />}
         title={labels.button}
         variant="large"
         actions={[]}
@@ -93,7 +93,7 @@ export const QrReader = (
           />
         </ScannerBox>
         {error && (
-          <Text element="p" variant="bold16" color="redDark">
+          <Text element="p" variant="bold16" color="feedback/negative">
             {error}
           </Text>
         )}

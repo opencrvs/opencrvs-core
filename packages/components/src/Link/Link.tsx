@@ -10,8 +10,7 @@
  */
 import React from 'react'
 import { fonts, IFont } from '../fonts'
-import { colors, IColor } from '../colors'
-import { lightColors } from '../semantics'
+import { lightColors, SemanticColor } from '../semantics'
 import styled, { css } from 'styled-components'
 
 export interface LinkProps
@@ -21,7 +20,7 @@ export interface LinkProps
   /** Element the button renders as */
   element?: 'a' | 'button'
   /** Color */
-  color?: IColor
+  color?: SemanticColor
   /** Disabled */
   disabled?: boolean
   /** Always underline link */
@@ -36,11 +35,11 @@ const underlineStyles = css`
 
 const StyledLink = styled.button<{
   $font: IFont
-  $color: IColor
+  $color: SemanticColor
   $underline: boolean
 }>`
   ${({ $font }) => fonts[$font]};
-  ${({ $color }) => `color: ${colors[$color]};`}
+  ${({ $color }) => `color: ${lightColors[$color]};`}
   cursor: pointer;
   padding: 0;
   border: 0;
@@ -58,13 +57,13 @@ const StyledLink = styled.button<{
           &:hover,
           &:active {
             ${underlineStyles}
-            text-decoration-color: ${colors[$color]};
+            text-decoration-color: ${lightColors[$color]};
           }
         `}
   &:hover,
   &:active {
     ${underlineStyles}
-    ${({ $color }) => `text-decoration-color: ${colors[$color]};`}
+    ${({ $color }) => `text-decoration-color: ${lightColors[$color]};`}
   }
 
   &:focus-visible {
@@ -88,7 +87,7 @@ const StyledLink = styled.button<{
 export const Link = ({
   element,
   font = 'bold16',
-  color = 'primary',
+  color = 'text/link',
   underline = false,
   ...props
 }: LinkProps) => (

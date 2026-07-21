@@ -107,7 +107,7 @@ function DropdownIndicator<T>(
 ) {
   return (
     <components.DropdownIndicator {...props}>
-      <Icon color="grey600" name="CaretDown" size="small" />
+      <Icon color="text/primary" name="CaretDown" size="small" />
     </components.DropdownIndicator>
   )
 }
