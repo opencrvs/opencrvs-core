@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import {
+  useQuery,
+  useSuspenseQuery,
+  UseQueryResult
+} from '@tanstack/react-query'
 import {
   ClientLocation,
   toClientLocation,
@@ -110,10 +114,14 @@ export function useLocations() {
       useQuery: (id: string) => {
         const { queryFn, ...options } =
           trpcOptionsProxy.locations.get.queryOptions({ id })
+        // The queryFn override above returns a `ClientLocation` (flattened
+        // `name`/`status`/`externalId` stripped), but tRPC still infers the
+        // server `Location` type here. Cast so callers can't read a location's
+        // current name without going through the anchored resolution utilities.
         return useQuery({
           ...options,
           queryKey: trpc.locations.get.queryKey({ id })
-        })
+        }) as unknown as UseQueryResult<ClientLocation>
       }
     },
     getLocationHierarchy: {
