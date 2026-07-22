@@ -23,6 +23,7 @@ import { AppBar, Button, Icon, ToggleMenu } from '@opencrvs/components'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useFormBackAction } from './FormBackAction'
 import { AllowedRouteWithEventId } from './utils'
 
 export const messages = defineMessages({
@@ -40,6 +41,11 @@ export const messages = defineMessages({
     id: 'buttons.deleteDeclaration',
     defaultMessage: 'Delete declaration',
     description: 'The label for the delete declaration button'
+  },
+  back: {
+    id: 'buttons.back',
+    defaultMessage: 'Back',
+    description: 'The label for the back button'
   }
 })
 
@@ -47,19 +53,18 @@ export function FormHeader({
   label,
   onSaveAndExit,
   route,
-  appbarIcon,
   actionComponent
 }: {
   label: string
   onSaveAndExit?: () => void
   route: AllowedRouteWithEventId
-  appbarIcon?: React.ReactNode
   actionComponent?: React.ReactNode
 }) {
   const intl = useIntl()
   const { modal, exit, closeActionView, deleteDeclaration } =
     useEventFormNavigation()
   const events = useEvents()
+  const back = useFormBackAction()
 
   const { eventId } = useTypedParams(route)
   const [{ backTo }] = useTypedSearchParams(route)
@@ -156,13 +161,25 @@ export function FormHeader({
     )
   }
 
+  const leftSlot = back ? (
+    <Button
+      aria-label={intl.formatMessage(messages.back)}
+      data-testid="back-button"
+      size="small"
+      type="icon"
+      onClick={back}
+    >
+      <Icon name="ArrowLeft" />
+    </Button>
+  ) : null
+
   return (
     <>
       <AppBar
-        desktopLeft={appbarIcon}
+        desktopLeft={leftSlot}
         desktopRight={getActionComponent()}
         desktopTitle={label}
-        mobileLeft={appbarIcon}
+        mobileLeft={leftSlot}
         mobileRight={
           <>
             {onSaveAndExit ? (

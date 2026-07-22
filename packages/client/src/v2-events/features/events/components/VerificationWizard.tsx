@@ -12,15 +12,7 @@ import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { EventState, VerificationPageConfig } from '@opencrvs/commons/client'
 import { Check, Cross } from '@opencrvs/components/lib/icons'
-import {
-  Dialog,
-  Text,
-  Frame,
-  Icon,
-  Stack,
-  Content,
-  Button
-} from '@opencrvs/components'
+import { Dialog, Text, Frame, Stack, Content, Button } from '@opencrvs/components'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { FormWizardProps, messages as formWizardMessages } from './FormWizard'
 
@@ -39,11 +31,9 @@ const messages = defineMessages({
 
 export const VerificationWizard = ({
   children,
-  currentPage,
   onSubmit,
   pageTitle,
   onNextPage,
-  onPreviousPage,
   showReviewButton,
   pageConfig
 }: FormWizardProps & {
@@ -91,14 +81,6 @@ export const VerificationWizard = ({
 
   return (
     <Frame.LayoutForm>
-      <Frame.SectionFormBackAction>
-        {currentPage > 0 && (
-          <Button size="small" type="tertiary" onClick={onPreviousPage}>
-            <Icon name="ArrowLeft" size="medium" />
-            {intl.formatMessage(formWizardMessages.back)}
-          </Button>
-        )}
-      </Frame.SectionFormBackAction>
       <Frame.Section>
         <Content showTitleOnMobile={true} title={pageTitle}>
           <Stack alignItems="stretch" direction="column" gap={16}>

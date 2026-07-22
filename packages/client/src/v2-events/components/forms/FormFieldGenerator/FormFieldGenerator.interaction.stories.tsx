@@ -909,7 +909,6 @@ export const CustomRequiredValidationMessage: Story = {
     const formRef = useRef<FormFieldGeneratorHandle>(null)
     return (
       <FormWizard
-        currentPage={0}
         pageTitle="Tennis form"
         onNextPage={() => formRef.current?.submit()}
         onSubmit={noop}

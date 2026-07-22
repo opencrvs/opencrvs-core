@@ -24,6 +24,7 @@ import {
   FormFieldGenerator,
   FormFieldGeneratorHandle
 } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { useProvideFormBackAction } from '@client/v2-events/layouts/form/FormBackAction'
 import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
@@ -126,12 +127,14 @@ export function Pages({
     }
   }
 
+  // Publish the back navigation to the form header, which renders the Back
+  // button. Only pages after the first have a previous page to go to.
+  useProvideFormBackAction(pageIdx > 0 ? onPreviousPage : undefined)
+
   const wizardProps = {
-    currentPage: pageIdx,
     pageTitle: intl.formatMessage(page.title),
     showReviewButton: !hideBackToReview,
     onNextPage,
-    onPreviousPage,
     onSubmit: handleSubmit
   }
   const fields = (

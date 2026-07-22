@@ -19,7 +19,6 @@ import {
   getCurrentEventState,
   getPrintCertificatePages
 } from '@opencrvs/commons/client'
-import { Print } from '@opencrvs/components/lib/icons'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import {
@@ -82,10 +81,7 @@ export function Pages() {
   }, [pageId, currentPageId, navigate, eventId, searchParams])
 
   return (
-    <FormLayout
-      appbarIcon={<Print />}
-      route={ROUTES.V2.EVENTS.PRINT_CERTIFICATE}
-    >
+    <FormLayout route={ROUTES.V2.EVENTS.PRINT_CERTIFICATE}>
       {modal}
       <PagesComponent
         hideBackToReview
