@@ -2,6 +2,10 @@
 
 ## 1.9.16 Release Candidate
 
+### Bug fixes
+
+- On mobile, uploading a file or signature no longer triggers the PIN re-lock screen. Opening the native file picker or camera briefly backgrounds the app, which was previously indistinguishable from the user actually leaving the app. [#13124](https://github.com/opencrvs/opencrvs-core/issues/13124)
+
 ## 1.9.15 Release Candidate
 
 ### Improvements
