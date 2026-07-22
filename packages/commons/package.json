@@ -19,19 +19,19 @@
     "./events/deduplication": "./build/dist/common/events/deduplication.js"
   },
   "scripts": {
-    "start": "yarn build:watch",
-    "test": "yarn test:compilation && jest --coverage",
+    "start": "pnpm build:watch",
+    "test": "pnpm test:compilation && jest --coverage",
     "test:watch": "jest --watch",
     "test:compilation": "wireit",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
-    "postinstall": "yarn build",
+    "postinstall": "pnpm build",
     "build": "wireit",
-    "build:watch": "yarn build --watch",
+    "build:watch": "pnpm build --watch",
     "build:clean": "rm -rf build && rm -rf ./.wireit"
   },
   "wireit": {
     "build": {
-      "command": "yarn tsc -b tsconfig.build.json --pretty",
+      "command": "pnpm tsc -b tsconfig.build.json --pretty",
       "clean": "if-file-deleted",
       "files": [
         "src/**/*.ts",
@@ -48,7 +48,7 @@
       ]
     },
     "test:compilation": {
-      "command": "yarn tsc -b --pretty",
+      "command": "pnpm tsc -b --pretty",
       "clean": "if-file-deleted",
       "files": [
         "src/**/*.test.ts",
@@ -67,7 +67,7 @@
   },
   "private": true,
   "dependencies": {
-    "@types/hapi__hapi": "^20.0.0",
+    "@hapi/hapi": "^21.0.0",
     "@types/jest": "^26.0.14",
     "@types/jwt-decode": "^2.2.1",
     "@types/lodash": "4.17.0",
@@ -88,6 +88,7 @@
     "qs": "6.15.2",
     "uuid": "^9.0.0",
     "wireit": "^0.14.12",
+    "yaml": "^2.7.1",
     "zod": "^4.2.1",
     "zod-openapi": "^5.4.6"
   },
@@ -107,7 +108,8 @@
     "eslint-plugin-prettier": "^5.2.5",
     "jest-fetch-mock": "^2.1.2",
     "jsonwebtoken": "^9.0.2",
-    "pino-pretty": "^11.0.0"
+    "pino-pretty": "^11.0.0",
+    "tsx": "^4.15.7"
   },
   "lint-staged": {
     "src/**/*.ts": [
