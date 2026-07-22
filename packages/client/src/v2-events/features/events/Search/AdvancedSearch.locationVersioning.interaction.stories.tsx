@@ -25,6 +25,7 @@ import {
   TestUserRole,
   UUID,
   user,
+  V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS,
   V2_DEFAULT_MOCK_LOCATIONS
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
@@ -60,7 +61,7 @@ const IBOMBO_ADMIN_AREA_ID = '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
  * current (resolved) name is the latest.
  */
 const RENAMED_FACILITY: Location = {
-  id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' as UUID,
+  id: 'a1a1a1a1-1111-4111-8111-111111111111' as UUID,
   name: 'New Riverside Health Post',
   locationType: 'HEALTH_FACILITY',
   administrativeAreaId: IBOMBO_ADMIN_AREA_ID,
@@ -68,14 +69,14 @@ const RENAMED_FACILITY: Location = {
   status: 'active',
   versions: [
     {
-      versionId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1' as UUID,
+      versionId: 'a1a1a1a1-1111-4111-8111-111111111112' as UUID,
       effectiveFrom: '0001-01-01',
       name: 'Old Riverside Health Post',
       externalId: null,
       status: 'active'
     },
     {
-      versionId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2' as UUID,
+      versionId: 'a1a1a1a1-1111-4111-8111-111111111113' as UUID,
       effectiveFrom: '2023-01-01',
       name: 'New Riverside Health Post',
       externalId: null,
@@ -86,7 +87,7 @@ const RENAMED_FACILITY: Location = {
 
 /** A health facility in Ibombo that has since been inactivated (closed). */
 const INACTIVE_FACILITY: Location = {
-  id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' as UUID,
+  id: 'b2b2b2b2-2222-4222-8222-222222222222' as UUID,
   name: 'Closed Hilltop Health Post',
   locationType: 'HEALTH_FACILITY',
   administrativeAreaId: IBOMBO_ADMIN_AREA_ID,
@@ -94,7 +95,7 @@ const INACTIVE_FACILITY: Location = {
   status: 'inactive',
   versions: [
     {
-      versionId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1' as UUID,
+      versionId: 'b2b2b2b2-2222-4222-8222-222222222223' as UUID,
       effectiveFrom: '0001-01-01',
       name: 'Closed Hilltop Health Post',
       externalId: null,
@@ -158,7 +159,12 @@ const mswConfig = {
         ]
       })
     ],
-    eventLocations: [tRPCMsw.locations.list.query(() => mockLocations)],
+    eventLocations: [
+      tRPCMsw.locations.list.query(() => mockLocations),
+      tRPCMsw.administrativeAreas.list.query(
+        () => V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS
+      )
+    ],
     user: [
       tRPCMsw.user.list.query(() => {
         return [mockUser]
