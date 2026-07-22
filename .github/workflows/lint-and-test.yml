@@ -473,7 +473,7 @@ jobs:
         working-directory: pr
 
       - name: Compare base and PR totals
-        if: ${{ steps.knip_pr.outputs.total > steps.knip_base.outputs.total }}
+        if: ${{ fromJSON(steps.knip_pr.outputs.total) > fromJSON(steps.knip_base.outputs.total) }}
         run: |
           echo "## ⚠️ Total issues have increased in the PR branch." >> $GITHUB_STEP_SUMMARY
           echo "Differences:" >> $GITHUB_STEP_SUMMARY
