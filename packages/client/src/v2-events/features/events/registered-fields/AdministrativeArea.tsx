@@ -31,7 +31,8 @@ import {
 import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useIsSearchFilter } from '@client/v2-events/features/events/Search/SearchFilterContext'
-import { buildLocationNameOptions, LocationSearch } from './LocationSearch'
+import { buildLocationNameOptions } from '@client/v2-events/utils'
+import { LocationSearch } from './LocationSearch'
 
 /**
  * Return the full administrative area hierarchy for the user's location.

@@ -17,10 +17,8 @@ import {
   V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
 } from '@opencrvs/commons/client'
 
-import {
-  buildLocationNameOptions,
-  filterLocationsByJurisdiction
-} from './LocationSearch'
+import { buildLocationNameOptions } from '@client/v2-events/utils'
+import { filterLocationsByJurisdiction } from './LocationSearch'
 
 /**
  * Mock data reference (from administrative-hierarchy-mock.ts):

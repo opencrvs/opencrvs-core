@@ -14,7 +14,6 @@ import { useSelector } from 'react-redux'
 import {
   FieldPropsWithoutReferenceValue,
   Location,
-  LocationVersion,
   UUID,
   joinValues,
   AdministrativeArea,
@@ -25,7 +24,10 @@ import { getOfflineData } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
-import { getAdminLevelHierarchy } from '@client/v2-events/utils'
+import {
+  buildLocationNameOptions,
+  getAdminLevelHierarchy
+} from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { SearchableSelect } from '@client/v2-events/components/forms/inputs/SearchableSelect'
@@ -88,35 +90,6 @@ export function filterLocationsByJurisdiction({
   }
 
   return allOptions
-}
-
-/**
- * Builds `{ value, label }` options for a location selector.
- *
- * In advanced search (`enumerateHistoricalNames`) a renamed location is listed
- * once per distinct name it has ever carried, so records saved under an old
- * name stay findable; every row resolves to the same location id. The current
- * name is listed first, so the field shows it after any row is picked.
- * Elsewhere a location contributes a single row with its current name.
- */
-export function buildLocationNameOptions<
-  T extends { id: UUID; name: string; versions: LocationVersion[] }
->(
-  items: T[],
-  enumerateHistoricalNames: boolean
-): { value: UUID; label: string }[] {
-  return items.flatMap((item) => {
-    if (!enumerateHistoricalNames) {
-      return [{ value: item.id, label: item.name }]
-    }
-
-    const distinctNames = [
-      item.name,
-      ...item.versions.map((version) => version.name)
-    ].filter((name, index, names) => names.indexOf(name) === index)
-
-    return distinctNames.map((name) => ({ value: item.id, label: name }))
-  })
 }
 
 /**
