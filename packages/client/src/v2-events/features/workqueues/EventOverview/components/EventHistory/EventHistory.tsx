@@ -23,7 +23,6 @@ import {
   isActionConfigType,
   EventDocument,
   getActionConfig,
-  resolveVersion,
   TokenUserType,
   toPlainDate
 } from '@opencrvs/commons/client'
@@ -42,6 +41,7 @@ import { usePermissions } from '@client/hooks/useAuthorization'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
+import { resolveLocationName } from '@client/v2-events/utils';
 import { useEventOverviewInfo } from '../useEventOverviewInfo'
 import { UserAvatar } from './UserAvatar'
 import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
@@ -127,7 +127,6 @@ const SystemName = styled.div`
 `
 
 function User({ action }: { action: ActionDocument }) {
-  const intl = useIntl()
   const { findUser } = useEventOverviewContext()
   const navigate = useNavigate()
   const user = findUser(action.createdBy)
@@ -220,7 +219,7 @@ function ActionLocation({ action }: { action: ActionDocument }) {
     ? getLocation(action.createdAtLocation)
     : undefined
   const locationName = location
-    ? resolveVersion(location.versions, toPlainDate(action.createdAt)).name
+    ? resolveLocationName(location, toPlainDate(action.createdAt))
     : undefined
 
   const hasAccessToOffice =

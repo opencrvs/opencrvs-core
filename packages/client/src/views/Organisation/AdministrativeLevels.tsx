@@ -37,7 +37,8 @@ import {
   todayISO,
   UUID
 } from '@opencrvs/commons/client'
-import { useAdministrativeAreas } from '../../v2-events/hooks/useAdministrativeAreas'
+import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
+import { resolveLocationName } from '@client/v2-events/utils';
 
 const DEFAULT_PAGINATION_LIST_SIZE = 10
 
@@ -75,7 +76,7 @@ export function AdministrativeLevels() {
   const isActiveToday = (entity: ClientLocation | ClientAdministrativeArea) =>
     resolveVersion(entity.versions, today).status === 'active'
   const nameToday = (entity: ClientLocation | ClientAdministrativeArea) =>
-    resolveVersion(entity.versions, today).name
+    resolveLocationName(entity, today)
 
   const getNewLevel = (
     currentlySelectedLocationId: UUID | null

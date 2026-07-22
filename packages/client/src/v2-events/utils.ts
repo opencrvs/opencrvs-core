@@ -122,7 +122,7 @@ export function recordAnchorDate(eventState: {
  * don't each hand-roll their own.
  */
 export function resolveLocationName(
-  entity: { versions: LocationVersion[] } | undefined | null,
+  entity: { versions: LocationVersion[] } | undefined,
   anchor: PlainDate
 ): string {
   return entity ? resolveVersion(entity.versions, anchor).name : ''

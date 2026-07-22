@@ -251,7 +251,7 @@ export const UserAudit = () => {
                     {resolveLocationName(
                       locations.get(user.primaryOfficeId),
                       todayISO()
-                    ) || user.primaryOfficeId}
+                    )}
                   </Link>
                 }
               />
