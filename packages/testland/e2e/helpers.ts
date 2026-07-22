@@ -694,3 +694,37 @@ export const randomPastDate = (daysBack = 14) => {
 
   return dateToIsoDateString(faker.date.between({ from: pastDate, to: today }))
 }
+
+/**
+ * The Organisation page paginates its location list client-side (10 items
+ * per page) once a level has more than 10 children — e.g. locations created
+ * directly via the API can push a previously first-page entry onto a later
+ * page. Since tests in the same `test.describe.serial` block share one page
+ * instance, a prior test may have already paged forward past where the
+ * target actually is — so this first resets to page 1 (clicking 'Previous
+ * page' until disabled), then clicks 'Next page' until `locator` becomes
+ * visible or that button is disabled (no more pages), then asserts on it.
+ */
+export async function findOnOrganisationPage(
+  page: Page,
+  name: string | RegExp
+) {
+  const target = page.getByRole('button', { name })
+  const nextPageButton = page.getByRole('button', { name: 'Next page' })
+  const previousPageButton = page.getByRole('button', {
+    name: 'Previous page'
+  })
+
+  while (!(await previousPageButton.isDisabled().catch(() => true))) {
+    await previousPageButton.click()
+  }
+
+  while (
+    !(await target.isVisible()) &&
+    !(await nextPageButton.isDisabled().catch(() => true))
+  ) {
+    await nextPageButton.click()
+  }
+
+  return target
+}

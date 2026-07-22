@@ -15,7 +15,8 @@ import {
   CreateAdministrativeAreaPayload,
   SetAdministrativeAreaPayload,
   UpdateAdministrativeAreaPayload,
-  UUID
+  UUID,
+  WithdrawAdministrativeAreaVersionPayload
 } from '@opencrvs/commons'
 import {
   internalProcedure,
@@ -28,7 +29,8 @@ import {
   createAdministrativeArea,
   getAdministrativeAreas,
   setAdministrativeAreas,
-  updateAdministrativeArea
+  updateAdministrativeArea,
+  withdrawAdministrativeAreaVersion
 } from '../../service/administrative-areas'
 import { allowedWithAnyOfScopes } from '../middleware'
 
@@ -58,11 +60,6 @@ export const administrativeAreaRouter = router({
         ids: input?.ids
       })
     ),
-  set: setAdministrativeAreasRoute(
-    userAndSystemProcedure.use(
-      allowedWithAnyOfScopes(['user.data-seeding', 'config.update-all'])
-    )
-  ),
   create: userAndSystemProcedure
     .meta({
       openapi: {
@@ -146,6 +143,40 @@ export const administrativeAreaRouter = router({
           }
         })
       }
+
+      return administrativeArea
+    }),
+  withdrawVersion: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'Withdraw a pending administrative area version',
+        description:
+          'Removes a not-yet-effective (future-dated) version from an administrative area. A version whose effectiveFrom has already passed cannot be withdrawn.',
+        method: 'DELETE',
+        path: '/administrative-areas/{id}/versions/{versionId}',
+        tags: ['Administrative areas'],
+        protect: true
+      }
+    })
+    .use(allowedWithAnyOfScopes(['location.edit']))
+    .input(WithdrawAdministrativeAreaVersionPayload)
+    .output(AdministrativeArea)
+    .mutation(async ({ input, ctx }) => {
+      const { administrativeArea, withdrawnVersion } =
+        await withdrawAdministrativeAreaVersion(input)
+
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'administrativeAreas.withdrawVersion',
+        requestData: { id: input.id, versionId: input.versionId },
+        responseSummary: {
+          effectiveFrom: withdrawnVersion.effectiveFrom,
+          name: withdrawnVersion.name,
+          externalId: withdrawnVersion.externalId ?? null,
+          status: withdrawnVersion.status
+        }
+      })
 
       return administrativeArea
     })

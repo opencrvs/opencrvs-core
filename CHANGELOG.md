@@ -37,8 +37,13 @@ Archiving a NOTIFIED (incomplete) record used to clear `InherentFlags.INCOMPLETE
 
 - Private docker image registry support for Dependencies helm chart [#13090](https://github.com/opencrvs/opencrvs-core/issues/13090)
 - Added infrastructure management script to toolkit [#12941](https://github.com/opencrvs/opencrvs-core/issues/12941)
+- Moved Ansible inventory files into environment-specific folders so each environment is self-contained and portable [#13181](https://github.com/opencrvs/opencrvs-core/pull/13181)
 
 ### New features
+
+#### Location and administrative area write API
+
+Locations and administrative areas can now be created, renamed, recoded, and inactivated via `create`, `update`, and `withdrawVersion` endpoints — each change appends an effective-dated element to the entity's `versions[]` array rather than overwriting state; prior versions are never modified (see location versioning, [#6691](https://github.com/opencrvs/opencrvs-core/issues/6691)). A new `location.edit` scope guards these endpoints; country configs must assign it to the relevant role(s). All changes are recorded in the audit log.
 
 #### Notification-based scope filtering
 

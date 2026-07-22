@@ -11,6 +11,7 @@
 
 import { statSync } from 'fs'
 import { resolve } from 'path'
+import { assertNoOldInventoryLayout } from './paths'
 
 const REQUIRED_REPOSITORY_DIRECTORIES = [
   '.github/workflows',
@@ -40,7 +41,14 @@ function validateRepositoryStructure(repositoryRoot = process.cwd()) {
 
 export async function runEnvironmentInit() {
   validateRepositoryStructure()
+  assertNoOldInventoryLayout()
   await import('./setup-environment.js')
+}
+
+export async function runEnvironmentUpgrade() {
+  validateRepositoryStructure()
+  const { upgradeEnvironmentLayout } = await import('./upgrade.js')
+  await upgradeEnvironmentLayout()
 }
 
 export async function runEnvironmentUpdateWorkflows() {

@@ -32,7 +32,6 @@ import {
   UserOrSystemSummaryWithStatus
 } from '@opencrvs/commons'
 import {
-  allowedWithAnyOfScopes,
   canAccessUserWithScopes,
   canCreateUserWithScopes,
   canSearchUsers,
@@ -687,7 +686,15 @@ export const userRouter = router({
         )
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
+      // Ensure the user is activating their own account
+      if (input.userId !== ctx.user.id) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: "Not allowed to activate another user's account"
+        })
+      }
+
       return activateUser(input)
     }),
   sendUsernameReminder: userAndSystemProcedure
@@ -705,8 +712,8 @@ export const userRouter = router({
       })
     }),
   sendResetPasswordInvite: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.edit']))
     .input(UUID)
+    .use(canAccessUserWithScopes(['user.edit']))
     .mutation(async ({ input, ctx }) => {
       const userId = UUID.parse(input)
       const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)

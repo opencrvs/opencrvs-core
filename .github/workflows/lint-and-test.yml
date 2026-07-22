@@ -21,7 +21,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
 
@@ -69,7 +69,7 @@ jobs:
   test:
     name: Test
     needs: setup
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       pull-requests: write
     strategy:
@@ -236,7 +236,7 @@ jobs:
 
   prepare-client-tests:
     name: Prepare client tests
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -333,7 +333,7 @@ jobs:
   lint-client:
     name: Lint client
     needs: prepare-client-tests
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     steps:
       - name: Download filesystem artifact
@@ -379,7 +379,7 @@ jobs:
   chromatic:
     name: Run chromatic visual tests
     needs: prepare-client-tests
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     # Chromatic visual tests are disabled for now until we find a way to reduce the monthly costs
     # On average, every day we create roughly 7500 - 10000 snapshots per working day
     # Snapshots included in our plan are 35 000 per month and all exceeding snapshots are charged at $0.008 per snapshot
@@ -458,7 +458,7 @@ jobs:
   test-storybook:
     name: Run storybook interaction tests
     needs: prepare-client-tests
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     steps:
       - name: Download filesystem artifact
@@ -510,7 +510,7 @@ jobs:
   test-client:
     name: Test client
     needs: prepare-client-tests
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
@@ -553,7 +553,7 @@ jobs:
 
   lint-knip:
     name: Lint unused exports with Knip
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout base branch
@@ -617,7 +617,7 @@ jobs:
 
   build-toolkit:
     name: Build toolkit
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout code

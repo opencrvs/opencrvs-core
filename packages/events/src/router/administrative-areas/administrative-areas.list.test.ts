@@ -12,17 +12,21 @@ import { sql } from 'kysely'
 import {
   SetAdministrativeAreaPayload,
   createPrng,
-  generateUuid,
-  encodeScope
+  generateUuid
 } from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createInitialisationTestClient,
+  createTestClient,
+  setupTestCase,
+  systemInitialisationTestSetup
+} from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
-
-const scope = encodeScope({ type: 'user.data-seeding' })
 
 test('Returns new administrative area after it has been added', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [scope])
+  const client = createTestClient(user, [])
+  await systemInitialisationTestSetup()
+  const seeder = createInitialisationTestClient()
 
   const initialAdministrativeAreas = await client.administrativeAreas.list()
 
@@ -35,7 +39,7 @@ test('Returns new administrative area after it has been added', async () => {
     }
   ]
 
-  await client.administrativeAreas.set(setAdministrativeAreaPayload)
+  await seeder.administrativeAreas.set(setAdministrativeAreaPayload)
   const administrativeAreas = await client.administrativeAreas.list()
 
   expect(administrativeAreas).toHaveLength(
@@ -49,11 +53,13 @@ test('Returns new administrative area after it has been added', async () => {
 
 test('Returns multiple administrative areas', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [scope])
+  const client = createTestClient(user, [])
+  await systemInitialisationTestSetup()
+  const seeder = createInitialisationTestClient()
 
   const initialAdministrativeAreas = await client.administrativeAreas.list()
   const administratieAreaRng = createPrng(12312312)
-  await client.administrativeAreas.set(
+  await seeder.administrativeAreas.set(
     generator.administrativeAreas.set(5, administratieAreaRng)
   )
 
@@ -66,7 +72,7 @@ test('Returns multiple administrative areas', async () => {
 
 test('Filters administrative areas by ids', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [scope])
+  const client = createTestClient(user, [])
 
   const initialAdministrativeAreas = await client.administrativeAreas.list()
 
@@ -83,11 +89,13 @@ test('Filters administrative areas by ids', async () => {
 
 test('Returns the full versions array and resolves flat fields from the current version', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [scope])
+  const client = createTestClient(user, [])
+  await systemInitialisationTestSetup()
+  const seeder = createInitialisationTestClient()
 
   const areaId = generateUuid()
 
-  await client.administrativeAreas.set([
+  await seeder.administrativeAreas.set([
     {
       id: areaId,
       parentId: null,
@@ -128,7 +136,7 @@ test('Returns the full versions array and resolves flat fields from the current 
 
 test('Filters administrative areas by active status', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [scope])
+  const client = createTestClient(user, [])
 
   const initialAdministrativeAreas = await client.administrativeAreas.list()
 
