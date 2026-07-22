@@ -23,6 +23,7 @@ import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { recordAnchorDate } from '@client/v2-events/utils'
 import { convertDateFieldsToUnixTimestamps } from '@client/v2-events/utils'
 import { useFlagLabelsString } from '@client/v2-events/messages/flags'
 
@@ -165,6 +166,7 @@ export function EventSummary({
         secured: config.secured ?? false,
         value: (
           <Output
+            anchor={recordAnchorDate(eventIndex)}
             eventConfig={eventConfiguration}
             field={config}
             value={value}

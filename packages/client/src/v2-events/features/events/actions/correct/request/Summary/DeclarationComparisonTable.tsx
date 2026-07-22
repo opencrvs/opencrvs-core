@@ -30,6 +30,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Output } from '@client/v2-events/features/events/components/Output'
+import { recordAnchorDate } from '@client/v2-events/utils'
 import {
   getAnnotationComparisonForField,
   getReviewFormFields,
@@ -122,6 +123,7 @@ function DeclarationComparisonTableComponent({
     : fullEvent
 
   const currentState = getCurrentEventState(currentEvent, eventConfiguration)
+  const anchor = recordAnchorDate(currentState)
 
   const previousDeclaration = getCurrentEventState(
     eventBeforeUpdate,
@@ -165,6 +167,7 @@ function DeclarationComparisonTableComponent({
 
       const previous = (
         <Output
+          anchor={anchor}
           eventConfig={eventConfig}
           field={f}
           formConfig={declarationConfig}
@@ -175,6 +178,7 @@ function DeclarationComparisonTableComponent({
 
       const latest = (
         <Output
+          anchor={anchor}
           eventConfig={eventConfig}
           field={f}
           value={currentAnnotations[f.id]}
@@ -215,6 +219,7 @@ function DeclarationComparisonTableComponent({
             const previous = (
               <Output
                 displayEmptyAsDash
+                anchor={anchor}
                 eventConfig={eventConfig}
                 field={f}
                 formConfig={declarationConfig}
@@ -226,6 +231,7 @@ function DeclarationComparisonTableComponent({
             const latest = (
               <Output
                 displayEmptyAsDash
+                anchor={anchor}
                 eventConfig={eventConfig}
                 field={f}
                 value={latestDeclaration[f.id]}

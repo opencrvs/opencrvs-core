@@ -21,6 +21,10 @@ import {
   FieldTypesToHideInReview,
   isFieldDisplayedOnReview,
   isPageVisible,
+  PlainDate,
+  resolveVersion,
+  toPlainDate,
+  todayISO,
   UUID,
   ValidatorContext
 } from '@opencrvs/commons/client'
@@ -34,7 +38,11 @@ import {
 } from '@opencrvs/components'
 import { summaryMessages } from '@client/v2-events/features/workqueues/EventOverview/components/EventSummary'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
-import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
+import {
+  flattenEventIndex,
+  getUsersFullName,
+  recordAnchorDate
+} from '@client/v2-events/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
@@ -98,6 +106,9 @@ function SupportingDocumentList({
     .map((field) => (
       <DocWrapper key={field.id}>
         {ValueOutput({
+          // File fields only — no location is rendered, so today's anchor is
+          // inert here.
+          anchor: todayISO(),
           config: field,
           value: declaration[field.id]
         })}
@@ -116,18 +127,20 @@ function UserFullName({ userId }: { userId: string }) {
   return getUsersFullName(user.name)
 }
 
-function PlaceOfEventName({ id }: { id?: UUID }) {
+function RegisteredAtOfficeName({ id, anchor }: { id?: UUID; anchor: PlainDate }) {
   const { getLocations } = useLocations()
   const { getAdministrativeAreas } = useAdministrativeAreas()
 
   const locations = getLocations.useSuspenseQuery()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
-  const placeOfEventName = id
-    ? (locations.get(id)?.name ?? administrativeAreas.get(id)?.name)
-    : null
+  // The registered-at office renders under the name it carried on the date the
+  // record was registered.
+  const versions = id
+    ? (locations.get(id)?.versions ?? administrativeAreas.get(id)?.versions)
+    : undefined
 
-  return placeOfEventName
+  return versions ? resolveVersion(versions, anchor).name : null
 }
 
 export function DuplicateComparison({
@@ -157,6 +170,27 @@ export function DuplicateComparison({
 
   const originalDeclaration = originalEventState.declaration
   const potentialDuplicateDeclaration = potentialDuplicateEventState.declaration
+
+  // Each side's declaration fields render at that record's own anchor —
+  // date of event, falling back to the record's creation date.
+  const originalAnchor = recordAnchorDate(originalEventState)
+  const potentialDuplicateAnchor = recordAnchorDate(
+    potentialDuplicateEventState
+  )
+
+  // The registered-at office renders at each record's registration date, per
+  // the per-fact anchoring rule. Falls back to today when unregistered.
+  const originalRegistrationAnchor =
+    (originalEventState.legalStatuses.REGISTERED
+      ? toPlainDate(originalEventState.legalStatuses.REGISTERED.createdAt)
+      : undefined) ??
+    todayISO()
+  const potentialDuplicateRegistrationAnchor =
+    (potentialDuplicateEventState.legalStatuses.REGISTERED
+      ? toPlainDate(
+          potentialDuplicateEventState.legalStatuses.REGISTERED.createdAt
+        )
+      : undefined) ?? todayISO()
 
   const hideFieldTypes = [
     ...FieldTypesToHideInReview,
@@ -247,6 +281,7 @@ export function DuplicateComparison({
               label: intl.formatMessage(fields[0].label),
               rightValue: (
                 <Output
+                  anchor={potentialDuplicateAnchor}
                   displayEmptyAsDash={true}
                   eventConfig={eventConfiguration}
                   field={rightField}
@@ -257,6 +292,7 @@ export function DuplicateComparison({
               ),
               leftValue: (
                 <Output
+                  anchor={originalAnchor}
                   displayEmptyAsDash={true}
                   eventConfig={eventConfiguration}
                   field={leftField}
@@ -316,12 +352,16 @@ export function DuplicateComparison({
       {
         label: intl.formatMessage(duplicateMessages.registeredAt),
         rightValue: flattenedPotentialDuplicateEvent['event.registeredAt'] ? (
-          <PlaceOfEventName
+          <RegisteredAtOfficeName
+            anchor={potentialDuplicateRegistrationAnchor}
             id={flattenedPotentialDuplicateEvent['event.registeredAt']}
           />
         ) : null,
         leftValue: flattenedOriginalEvent['event.registeredAt'] ? (
-          <PlaceOfEventName id={flattenedOriginalEvent['event.registeredAt']} />
+          <RegisteredAtOfficeName
+            anchor={originalRegistrationAnchor}
+            id={flattenedOriginalEvent['event.registeredAt']}
+          />
         ) : null
       },
       {
