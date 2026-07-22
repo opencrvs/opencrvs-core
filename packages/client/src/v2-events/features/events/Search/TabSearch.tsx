@@ -40,7 +40,6 @@ import {
   resolveAdvancedSearchConfig,
   serializeSearchParams
 } from './utils'
-import { SearchFilterProvider } from './SearchFilterContext'
 const MIN_PARAMS_TO_SEARCH = 2
 
 const SearchButton = styled(Button)`
@@ -100,6 +99,7 @@ function SearchSectionForm({
         fields={section.fields}
         formValues={fieldValues}
         id={section.title.id}
+        isSearchFilter={true}
         validatorContext={validatorContext}
         onFormChange={(updatedValues) => {
           Object.entries(updatedValues).forEach(([fieldId, value]) =>
@@ -256,7 +256,7 @@ export function TabSearch({
     countNonEmptyFields(nonEmptyValues) >= MIN_PARAMS_TO_SEARCH
 
   return (
-    <SearchFilterProvider>
+    <>
       {sections.map((section) => (
         <SearchSectionForm
           key={section.title.id}
@@ -279,6 +279,6 @@ export function TabSearch({
         <Icon name="MagnifyingGlass" />
         {intl.formatMessage(messages.search)}
       </SearchButton>
-    </SearchFilterProvider>
+    </>
   )
 }

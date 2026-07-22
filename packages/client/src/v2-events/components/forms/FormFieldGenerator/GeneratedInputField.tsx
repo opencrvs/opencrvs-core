@@ -168,6 +168,8 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   onBlur: (formikFieldId: string, newTouched?: FormState<boolean>) => void
   disabled?: boolean
   readonlyMode?: boolean
+  /** Marks the field as an advanced-search filter (see FormFieldGenerator). */
+  isSearchFilter?: boolean
   allKnownFields: FieldConfig[]
   validatorContext: ValidatorContext
   attachmentPath: string
@@ -219,7 +221,8 @@ export const GeneratedInputField = <T extends FieldConfig>(
     ocrvsFullForm,
     disabled,
     attachmentPath,
-    readonlyMode
+    readonlyMode,
+    isSearchFilter
   } = props
   const intl = useIntl()
   const [input, meta] = useField<FieldValue>(name)
@@ -617,6 +620,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
           config={field.config}
           disabled={disabled}
           id={field.config.id}
+          isSearchFilter={isSearchFilter}
           name={name}
           touched={groupTouched}
           // The main form is context (non-editable) for the inner address form
@@ -736,6 +740,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
           {...inputProps}
           configuration={field.config.configuration}
           eventType={eventConfig?.id}
+          isSearchFilter={isSearchFilter}
           partOf={typeof partOf === 'string' ? partOf : null}
           value={field.value}
         />
@@ -750,6 +755,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
           {...field.config}
           disabled={disabled}
           eventType={eventConfig?.id}
+          isSearchFilter={isSearchFilter}
           locationTypes={field.config.configuration?.locationTypes}
           value={field.value}
           onBlur={handleBlur}
@@ -766,6 +772,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
           {...field.config}
           disabled={disabled}
           eventType={eventConfig?.id}
+          isSearchFilter={isSearchFilter}
           locationTypes={['CRVS_OFFICE']}
           value={field.value}
           onBlur={handleBlur}
@@ -782,6 +789,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
           {...field.config}
           disabled={disabled}
           eventType={eventConfig?.id}
+          isSearchFilter={isSearchFilter}
           locationTypes={['CRVS_OFFICE']}
           value={field.value}
           onBlur={handleBlur}

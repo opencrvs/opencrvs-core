@@ -67,6 +67,12 @@ export interface FormFieldGeneratorPropsWithoutRef {
   /** Called when the form is submitted and all fields are valid */
   onValidSubmit?: (formValues: EventState) => void
   isCorrection?: boolean
+  /**
+   * Marks the form as an advanced-search filter so location/admin-area
+   * selectors switch to search semantics (list historical names, exclude
+   * inactive admin structures). Defaults to non-search behaviour.
+   */
+  isSearchFilter?: boolean
   validatorContext: ValidatorContext
 }
 
@@ -87,6 +93,7 @@ export const FormFieldGenerator = forwardRef<
       id,
       onValidSubmit,
       isCorrection = false,
+      isSearchFilter = false,
       formTouched,
       validatorContext
     },
@@ -206,6 +213,7 @@ export const FormFieldGenerator = forwardRef<
               eventConfig={eventConfig}
               fields={pageFields}
               isCorrection={isCorrection}
+              isSearchFilter={isSearchFilter}
               ocrvsFullForm={{
                 ...formValues,
                 ...makeFormikFieldIdsOpenCRVSCompatible(formikProps.values)

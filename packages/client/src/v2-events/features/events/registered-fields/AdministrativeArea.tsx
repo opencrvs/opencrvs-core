@@ -30,7 +30,6 @@ import {
 } from '@client/v2-events/components/forms/inputs/SearchableSelect'
 import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { useIsSearchFilter } from '@client/v2-events/features/events/Search/SearchFilterContext'
 import { buildLocationNameOptions } from '@client/v2-events/utils'
 import { LocationSearch } from './LocationSearch'
 
@@ -124,6 +123,8 @@ interface AdministrativeAreaInputProps
   partOf: string | null
   onChange: (val: string | null) => void
   value?: string | null
+  /** When true (advanced search), excludes inactive admin structures and lists historical names. */
+  isSearchFilter?: boolean
 }
 
 function AdministrativeAreaInput({
@@ -132,10 +133,10 @@ function AdministrativeAreaInput({
   value,
   partOf,
   onChange,
+  isSearchFilter = false,
   ...inputProps
 }: AdministrativeAreaInputProps) {
   const token = useSelector(getToken)
-  const isSearchFilter = useIsSearchFilter()
   const jurisdictionFilter = resolveJurisdictionReference(
     configuration.allowedLocations,
     token,

@@ -59,6 +59,12 @@ interface Props {
   config: AddressField
   disabled?: boolean
   validatorContext: ValidatorContext
+  /**
+   * Marks the address as an advanced-search filter. Not destructured below so
+   * it is forwarded via `...otherProps` into the nested FormFieldGenerator,
+   * reaching the admin-area selectors.
+   */
+  isSearchFilter?: boolean
 }
 
 const DEFAULT_COUNTRY_FIELD = {

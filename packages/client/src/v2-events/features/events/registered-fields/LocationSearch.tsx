@@ -33,7 +33,6 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { SearchableSelect } from '@client/v2-events/components/forms/inputs/SearchableSelect'
 import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
 import { getToken } from '@client/utils/authUtils'
-import { useIsSearchFilter } from '@client/v2-events/features/events/Search/SearchFilterContext'
 import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
 
 /**
@@ -132,6 +131,7 @@ function LocationSearchInput({
   onBlur,
   id,
   eventType,
+  isSearchFilter = false,
   ...props
 }: FieldPropsWithoutReferenceValue<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
   onChange: (val: string | undefined) => void
@@ -141,6 +141,8 @@ function LocationSearchInput({
   disabled?: boolean
   id: string
   eventType?: string
+  /** When true (advanced search), lists every historical name of a location. */
+  isSearchFilter?: boolean
 }) {
   const token = useSelector(getToken)
   const jurisdictionFilter = resolveJurisdictionReference(
@@ -149,7 +151,6 @@ function LocationSearchInput({
     eventType
   )
 
-  const isSearchFilter = useIsSearchFilter()
   const locations = useAvailableLocations(locationTypes, jurisdictionFilter)
 
   const options = useMemo(

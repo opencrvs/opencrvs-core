@@ -71,6 +71,8 @@ type AllProps = {
    * If isCorrection is true, fields with configuration option 'uncorrectable' set to true will be disabled.
    */
   isCorrection?: boolean
+  /** Marks the form as an advanced-search filter (see FormFieldGenerator). */
+  isSearchFilter?: boolean
   validatorContext: ValidatorContext
 } & UsedFormikProps
 
@@ -224,6 +226,7 @@ export function FormSectionComponent({
   setTouched,
   attachmentPath,
   isCorrection = false,
+  isSearchFilter = false,
   validatorContext
 }: AllProps) {
   // Conditionals need to be able to react to whether the user is online or not
@@ -503,6 +506,7 @@ export function FormSectionComponent({
               name={formikFieldId}
               ocrvsFullForm={ocrvsFullForm}
               readonlyMode={readonlyMode}
+              isSearchFilter={isSearchFilter}
               validatorContext={validatorContext}
               onBatchFieldValueChange={onBatchFieldValueChange}
               onBlur={handleBlur}
