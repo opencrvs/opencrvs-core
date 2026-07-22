@@ -44,7 +44,6 @@ const preview: Preview = {
       </ThemeProvider>
     )
   ],
-
   parameters: {
     viewMode: 'docs',
     actions: { argTypesRegex: '^on[A-Z].*' },
@@ -95,7 +94,6 @@ const preview: Preview = {
       }
     }
   },
-
   tags: ['autodocs']
 }
 

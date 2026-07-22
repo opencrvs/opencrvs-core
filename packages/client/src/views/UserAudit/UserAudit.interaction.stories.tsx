@@ -77,14 +77,12 @@ export const TitleVisibleOnMobile: Story = {
       }
     }
   },
-
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
     await step('User name title is visible on mobile', async () => {
       expect(await canvas.findByText('Kennedy Mweene')).toBeVisible()
     })
   },
-
   globals: {
     viewport: {
       value: 'mobile',

@@ -364,7 +364,9 @@ const fields = [
   {
     id: 'club.rules',
     type: FieldType.PARAGRAPH,
-    label: generateTranslationConfig('All members must follow club guidelines and regulations.'),
+    label: generateTranslationConfig(
+      'All members must follow club guidelines and regulations.'
+    ),
     configuration: {
       styles: { hint: true }
     }

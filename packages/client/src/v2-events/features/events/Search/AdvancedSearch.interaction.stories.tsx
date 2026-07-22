@@ -641,7 +641,9 @@ export const JurisdictionScope_AdministrativeArea: Story = {
         )
         const options = within(listbox).queryAllByRole('listitem')
 
-        await expect(options.length).toEqual(locationsUnderAdministration.length)
+        await expect(options.length).toEqual(
+          locationsUnderAdministration.length
+        )
         locationsUnderAdministration.forEach(async (office) => {
           await expect(
             options.some((o) => o.textContent.includes(office))
@@ -871,7 +873,9 @@ export const JurisdictionScope_MultipleScopes_MostRelaxedWins: Story = {
         )
         const options = within(listbox).queryAllByRole('listitem')
 
-        await expect(options.length).toEqual(locationsUnderAdministration.length)
+        await expect(options.length).toEqual(
+          locationsUnderAdministration.length
+        )
         locationsUnderAdministration.forEach(async (office) => {
           await expect(
             options.some((o) => o.textContent.includes(office))

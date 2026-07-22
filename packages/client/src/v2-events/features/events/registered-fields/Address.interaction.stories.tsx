@@ -621,9 +621,7 @@ interface ResolvedAddress {
   } | null
 }
 
-function ToCertificateVariablesStory(
-  args: FormFieldGeneratorPropsWithoutRef
-) {
+function ToCertificateVariablesStory(args: FormFieldGeneratorPropsWithoutRef) {
   const intl = useIntl()
   const [formData, setFormData] = React.useState<Record<string, FieldValue>>({
     'storybook.address': {

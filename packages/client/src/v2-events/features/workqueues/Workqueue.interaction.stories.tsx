@@ -757,14 +757,11 @@ export const MobileCreateEventHiddenForUnauthorizedUser: Story = {
   parameters: {
     userRole: TestUserRole.enum.FIELD_AGENT,
     token: tokenWithWorkqueueButNoCreate,
-
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
     },
-
     chromatic: { disableSnapshot: true },
-
     msw: {
       handlers: {
         workqueues: [
@@ -791,7 +788,6 @@ export const MobileCreateEventHiddenForUnauthorizedUser: Story = {
       }
     }
   },
-
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
@@ -811,7 +807,6 @@ export const MobileCreateEventHiddenForUnauthorizedUser: Story = {
       }
     )
   },
-
   globals: {
     viewport: {
       value: 'mobile',
@@ -823,14 +818,11 @@ export const MobileCreateEventHiddenForUnauthorizedUser: Story = {
 export const MobileCreateEventShownForAuthorizedUser: Story = {
   parameters: {
     userRole: TestUserRole.enum.LOCAL_REGISTRAR,
-
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
     },
-
     chromatic: { disableSnapshot: true },
-
     msw: {
       handlers: {
         workqueues: [
