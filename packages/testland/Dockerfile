@@ -8,21 +8,21 @@ USER node
 COPY --chown=node:node packages/events/package.json /app/packages/events/package.json
 
 WORKDIR /app/packages/events
-RUN yarn install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 COPY --chown=node:node packages/events /app/packages/events
-RUN yarn build:types
+RUN pnpm build:types
 
 COPY --chown=node:node packages/toolkit /app/packages/toolkit
 WORKDIR /app/packages/toolkit
-RUN yarn install --frozen-lockfile
-RUN yarn build
+RUN pnpm install --frozen-lockfile
+RUN pnpm build
 
 WORKDIR /app/packages/testland
 COPY --chown=node:node packages/testland/*.json /app/packages/testland/
 
-RUN yarn install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 COPY --chown=node:node packages/testland /app/packages/testland
 
 EXPOSE 3040
 
-CMD [ "yarn", "start:prod" ]
+CMD [ "pnpm", "start:prod" ]

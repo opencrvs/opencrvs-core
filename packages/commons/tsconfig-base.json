@@ -1,21 +1,13 @@
 {
   "compilerOptions": {
     "paths": {
-      "src/*": [
-        "./src/*"
-      ]
+      "src/*": ["./src/*"]
     },
     "target": "es6",
     "sourceMap": true,
     "rootDir": "src",
     "declaration": true,
-    "lib": [
-      "esnext.asynciterable",
-      "es2015",
-      "es6",
-      "es2019",
-      "DOM"
-    ],
+    "lib": ["esnext.asynciterable", "es2015", "es6", "es2019", "es2022", "DOM"],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
