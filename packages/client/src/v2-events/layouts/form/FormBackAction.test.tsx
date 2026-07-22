@@ -49,6 +49,16 @@ describe('FormBackAction', () => {
     expect(back).toBeUndefined()
   })
 
+  it('does not throw when providing a back action without a provider', () => {
+    // Pages / wizards are rendered in isolation in stories and tests, outside
+    // FormLayout. Providing a back action there must be a safe no-op.
+    function StandaloneBody() {
+      useProvideFormBackAction(vi.fn())
+      return null
+    }
+    expect(() => render(<StandaloneBody />)).not.toThrow()
+  })
+
   it('publishes a back handler that the header can read and invoke', () => {
     const onBack = vi.fn()
     render(<App onBack={onBack} />)

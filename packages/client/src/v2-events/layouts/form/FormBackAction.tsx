@@ -50,20 +50,14 @@ export function FormBackActionProvider({
   )
 }
 
-function useFormBackActionContext() {
-  const context = useContext(FormBackActionContext)
-  if (!context) {
-    throw new Error(
-      'Form back action hooks must be used within a FormBackActionProvider'
-    )
-  }
-  return context
-}
-
 /**
  * Write side — called by the component that owns the back navigation (`Pages`).
  * Publishes a back handler into the context, or clears it when `onBack` is
  * undefined or the caller unmounts, so the header never keeps a stale handler.
+ *
+ * No-ops when there is no provider (e.g. `Pages`/a wizard rendered in isolation
+ * in a story or test, outside `FormLayout`) — there is no header to show the
+ * button in that case.
  *
  * The published handler is a stable wrapper that always calls the latest
  * `onBack` via a ref. This keeps the context value stable across renders even
@@ -71,13 +65,16 @@ function useFormBackActionContext() {
  * when the back button appears or disappears — not on every page render.
  */
 export function useProvideFormBackAction(onBack?: BackAction) {
-  const { setBack } = useFormBackActionContext()
+  const setBack = useContext(FormBackActionContext)?.setBack
   const latest = useRef(onBack)
   latest.current = onBack
 
   const hasBack = Boolean(onBack)
 
   useEffect(() => {
+    if (!setBack) {
+      return
+    }
     const wrapper: BackAction | undefined = hasBack
       ? () => latest.current?.()
       : undefined

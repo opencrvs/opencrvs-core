@@ -127,7 +127,7 @@ export const DeclareForm: Story = {
     const continueButton = await canvas.findByText('Continue')
     await userEvent.click(continueButton)
 
-    const backButton = await canvas.findByText('Back')
+    const backButton = await canvas.findByRole('button', { name: 'Back' })
     await userEvent.click(backButton)
 
     await expect(
@@ -165,7 +165,7 @@ export const CountryDomestic: Story = {
     const continueButton = await canvas.findByText('Continue')
     await userEvent.click(continueButton)
 
-    const backButton = await canvas.findByText('Back')
+    const backButton = await canvas.findByRole('button', { name: 'Back' })
     await userEvent.click(backButton)
 
     await expect(
@@ -189,7 +189,7 @@ export const CountryInternational: Story = {
     const continueButton = await canvas.findByText('Continue')
     await userEvent.click(continueButton)
 
-    const backButton = await canvas.findByText('Back')
+    const backButton = await canvas.findByRole('button', { name: 'Back' })
     await userEvent.click(backButton)
 
     await expect(canvasElement.querySelector('#state_error')).toHaveTextContent(
