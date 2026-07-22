@@ -5,11 +5,11 @@ USER node
 
 WORKDIR /app/packages/components
 COPY --chown=node:node packages/components /app/packages/components
-RUN yarn install --frozen-lockfile && yarn build
+RUN pnpm install --frozen-lockfile && pnpm build
 
 WORKDIR /app/packages/login
 COPY --chown=node:node packages/login /app/packages/login
-RUN yarn install --frozen-lockfile && yarn build
+RUN pnpm install --frozen-lockfile && pnpm build
 
 
 FROM nginxinc/nginx-unprivileged:1.29-alpine
