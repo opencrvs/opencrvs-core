@@ -22,7 +22,7 @@
     "@opencrvs/commons": "workspace:*",
     "superjson": "1.9.0-0",
     "@opencrvs/events": "workspace:*",
-    "@trpc/client": "^11.0.0-rc.532",
+    "@trpc/client": "11.8.0",
     "@types/node": "^16.18.39",
     "@types/node-fetch": "^2.5.12",
     "envalid": "^8.0.0",

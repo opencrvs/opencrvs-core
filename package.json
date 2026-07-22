@@ -56,7 +56,10 @@
   "pnpm": {
     "overrides": {
       "react-signature-canvas>react": "18.3.1",
-      "react-signature-canvas>react-dom": "18.3.1"
+      "react-signature-canvas>react-dom": "18.3.1",
+      "@trpc/client": "11.8.0",
+      "@trpc/server": "11.8.0",
+      "@trpc/tanstack-react-query": "11.8.0"
     }
   }
 }

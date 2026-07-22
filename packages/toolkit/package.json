@@ -27,8 +27,8 @@
   "dependencies": {
     "@inquirer/prompts": "^8.3.0",
     "@octokit/core": "4.2.1",
-    "@trpc/client": "11.4.3",
-    "@trpc/server": "^11.8.0",
+    "@trpc/client": "11.8.0",
+    "@trpc/server": "11.8.0",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "date-fns": "^2.28.0",
