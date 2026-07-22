@@ -4,6 +4,7 @@
     "packages/client/src/utils/gateway-types.ts",
     "packages/client/src/forms/register/mappings/**/*.ts",
     "packages/client/src/utils/validate.ts",
-    "packages/events/src/storage/postgres/events/schema/**/*.ts"
+    "packages/events/src/storage/postgres/events/schema/**/*.ts",
+    "packages/components/src/icons/**/*.tsx"
   ]
 }
