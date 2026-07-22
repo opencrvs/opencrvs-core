@@ -89,16 +89,14 @@ test.describe.serial('Issue Certified Copy', () => {
       }
 
       await page.getByText(selectOptionsLabels[2], { exact: true }).click()
-
       await expect(page.getByText('Certify record')).toBeVisible()
-
-      await page.getByRole('button', { name: 'Continue' }).click()
-      await page.getByRole('button', { name: 'Verified' }).click()
       await page.getByRole('button', { name: 'Continue' }).click()
     })
+
     test('Print', async () => {
       await printAndExpectPopup(page)
     })
+
     test('Ensure "Certified copy printed in advance of issuance" flag appears on record', async () => {
       await searchFromSearchBar(page, childName)
       const Flags = page.getByTestId('flags').filter({ hasText: 'Flags' })
@@ -120,6 +118,7 @@ test.describe.serial('Issue Certified Copy', () => {
         Flags.getByText('Certified copy printed in advance of issuance')
       ).toBeVisible()
     })
+
     test('Navigate to print', async () => {
       await selectAction(page, 'Issue certified copy')
     })
@@ -137,10 +136,12 @@ test.describe.serial('Issue Certified Copy', () => {
     test('Click continue after selecting collector type and template type', async () => {
       await page.getByText('Select...').click()
       const selectOptionsLabels = ['Mother', 'Father', 'Someone else']
+
       for (const label of selectOptionsLabels) {
         await page.getByText(label, { exact: true }).scrollIntoViewIfNeeded()
         await expect(page.getByText(label, { exact: true })).toBeVisible()
       }
+
       await page
         .getByText(selectOptionsLabels[0], { exact: true })
         .scrollIntoViewIfNeeded()
@@ -149,6 +150,7 @@ test.describe.serial('Issue Certified Copy', () => {
       await expect(page.getByRole('button', { name: 'Confirm' })).toBeEnabled()
       await page.getByRole('button', { name: 'Confirm' }).click()
     })
+
     test('Search The record and check the No Flag', async () => {
       await searchFromSearchBar(page, childName)
       const Flags = page.getByTestId('flags').filter({ hasText: 'Flags' })

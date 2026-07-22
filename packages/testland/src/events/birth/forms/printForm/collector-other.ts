@@ -317,7 +317,12 @@ export const printCertificateCollectorOther: FieldConfig[] = [
     },
     configuration: {
       maxFileSize: 5 * 1024 * 1024, // 5 MB
-      acceptedFileTypes: ['image/png', 'image/jpg', 'image/jpeg'],
+      acceptedFileTypes: [
+        'image/png',
+        'image/jpg',
+        'image/jpeg',
+        'application/pdf'
+      ],
       fileName: {
         defaultMessage: 'Signed Affidavit',
         description: 'This is the label for the file name',
