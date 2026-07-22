@@ -9,24 +9,24 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { IntlProvider } from 'react-intl'
 import { ThemeProvider } from 'styled-components'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import { NewEventButton } from './NewEventButton'
 
-const { createEventSpy, state } = vi.hoisted(() => ({
-  createEventSpy: vi.fn(),
-  state: { configs: [] as Array<{ id: string; label: unknown }> }
+// The two data hooks are mocked so the real ones — and their
+// `@opencrvs/commons` / router / redux dependencies — never load. Factories
+// return plain functions reading module-level state (the pattern vitest 0.25
+// applies reliably); tests set the state before rendering.
+let mockCreatableEvents: Array<{ id: string; label: unknown }> = []
+const mockCreateEvent = vi.fn()
+
+vi.mock('@client/v2-events/features/events/useCreateEvent', () => ({
+  useCreateEvent: () => mockCreateEvent
 }))
-
-vi.mock('./useCreateEvent', () => ({
-  useCreateEvent: () => createEventSpy
-}))
-
-vi.mock('./useEventConfiguration', () => ({
-  useCreatableEventConfigurations: () => state.configs
+vi.mock('@client/v2-events/features/events/useEventConfiguration', () => ({
+  useCreatableEventConfigurations: () => mockCreatableEvents
 }))
 
 const birth = {
@@ -38,7 +38,8 @@ const death = {
   label: { id: 'event.death.label', defaultMessage: 'Death', description: '' }
 }
 
-function renderButton(variant: 'header' | 'fab' = 'header') {
+async function renderButton(variant: 'header' | 'fab' = 'header') {
+  const { NewEventButton } = await import('./NewEventButton')
   return render(
     <ThemeProvider theme={getTheme()}>
       <IntlProvider locale="en">
@@ -49,31 +50,36 @@ function renderButton(variant: 'header' | 'fab' = 'header') {
 }
 
 describe('NewEventButton', () => {
+  beforeEach(() => {
+    vi.resetModules()
+    vi.clearAllMocks()
+    mockCreatableEvents = []
+  })
+
   afterEach(() => {
-    createEventSpy.mockClear()
     cleanup()
   })
 
-  it('renders nothing when the user may not create any event', () => {
-    state.configs = []
-    const { container } = renderButton()
+  it('renders nothing when the user may not create any event', async () => {
+    mockCreatableEvents = []
+    const { container } = await renderButton()
     expect(container.querySelector('button')).toBeNull()
   })
 
-  it('creates the event directly (no menu) when only one type is creatable', () => {
-    state.configs = [birth]
-    renderButton()
+  it('creates the event directly (no menu) when only one type is creatable', async () => {
+    mockCreatableEvents = [birth]
+    await renderButton()
 
     // No menu header/items are rendered for the single-type shortcut.
     expect(screen.queryByText('Declare an event')).toBeNull()
 
     fireEvent.click(screen.getByRole('button', { name: 'New event' }))
-    expect(createEventSpy).toHaveBeenCalledWith('birth')
+    expect(mockCreateEvent).toHaveBeenCalledWith('birth')
   })
 
-  it('renders a menu of creatable types when more than one is available', () => {
-    state.configs = [birth, death]
-    renderButton()
+  it('renders a menu of creatable types when more than one is available', async () => {
+    mockCreatableEvents = [birth, death]
+    await renderButton()
 
     // Menu header, and one item per creatable event type.
     expect(screen.getByText('Declare an event')).toBeTruthy()

@@ -505,21 +505,23 @@ export const DraftPagination: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
 
-    // Expect 10 elements with text 'Tennis club membership application'
-    const firstPageRows = await canvas.findAllByText(
-      'Tennis club membership application'
-    )
-    await expect(firstPageRows).toHaveLength(10)
+    // Expect 10 result rows on the first page. We count the row elements
+    // directly rather than by event-name text: the header "New event" menu now
+    // also renders that label, so a text query would match its items too.
+    await waitFor(async () => {
+      const firstPageRows = canvasElement.querySelectorAll('div[id^="row_"]')
+      await expect(firstPageRows.length).toBe(10)
+    })
 
     // Wait for page to load before interacting
     await canvas.findByRole('button', { name: 'Next page' }, { timeout: 5000 })
     await userEvent.click(canvas.getByRole('button', { name: 'Next page' }))
 
-    // Expect 5 elements with text 'Tennis club membership application'
-    const secondPageRows = await canvas.findAllByText(
-      'Tennis club membership application'
-    )
-    await expect(secondPageRows).toHaveLength(5)
+    // Expect 5 result rows on the second page
+    await waitFor(async () => {
+      const secondPageRows = canvasElement.querySelectorAll('div[id^="row_"]')
+      await expect(secondPageRows.length).toBe(5)
+    })
   }
 }
 
@@ -575,10 +577,12 @@ export const DraftPaginationOffline: Story = {
     // Wait for the initial data to load before simulating an offline transition.
     // Dispatching the offline event before queries complete would pause them
     // indefinitely, preventing the workqueue from rendering at all.
-    const firstPageRows = await canvas.findAllByText(
-      'Tennis club membership application'
-    )
-    await expect(firstPageRows).toHaveLength(10)
+    // We count the row elements directly rather than by event-name text: the
+    // header "New event" menu now also renders that label.
+    await waitFor(async () => {
+      const firstPageRows = canvasElement.querySelectorAll('div[id^="row_"]')
+      await expect(firstPageRows.length).toBe(10)
+    })
 
     setNavigatorOnline(false)
 
@@ -589,11 +593,11 @@ export const DraftPaginationOffline: Story = {
     await canvas.findByRole('button', { name: 'Next page' }, { timeout: 5000 })
     await userEvent.click(canvas.getByRole('button', { name: 'Next page' }))
 
-    // Expect 5 elements with text 'Tennis club membership application'
-    const secondPageRows = await canvas.findAllByText(
-      'Tennis club membership application'
-    )
-    await expect(secondPageRows).toHaveLength(5)
+    // Expect 5 result rows on the second page
+    await waitFor(async () => {
+      const secondPageRows = canvasElement.querySelectorAll('div[id^="row_"]')
+      await expect(secondPageRows.length).toBe(5)
+    })
 
     // Restore online status so the stubbed offline state does not leak into
     // stories rendered after this one in the same preview iframe
