@@ -36,6 +36,7 @@ import {
   Spinner,
   Toast,
   Button,
+  Icon,
   Dialog,
   Text
 } from '@opencrvs/components'
@@ -58,6 +59,10 @@ import { usePermissions } from '@client/hooks/useAuthorization'
 import toast from 'react-hot-toast'
 import { showToast } from '@client/v2-events/features/events/useToastAndRedirect'
 import { messages as notificationMessages } from '@client/i18n/messages/views/notifications'
+import {
+  FormBackActionProvider,
+  useFormBackAction
+} from '@client/v2-events/layouts/form/FormBackAction'
 import { useUserEditConfig } from '@client/hooks/useUserEditConfig'
 import { useUserFormState } from './useUserFormState'
 
@@ -709,23 +714,25 @@ function FormLayout({
   }, [isUnauthorized, onClose, intl])
 
   return (
-    <Frame
-      header={
-        <FormHeader
-          actionComponent={actionComponent}
-          label={title}
-          onSaveAndExit={onSaveAndExit}
-          onClose={onClose ? () => onClose() : undefined}
-        />
-      }
-      skipToContentText={intl.formatMessage(
-        constantsMessages.skipToMainContent
-      )}
-    >
-      <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
-        {children}
-      </React.Suspense>
-    </Frame>
+    <FormBackActionProvider>
+      <Frame
+        header={
+          <FormHeader
+            actionComponent={actionComponent}
+            label={title}
+            onSaveAndExit={onSaveAndExit}
+            onClose={onClose ? () => onClose() : undefined}
+          />
+        }
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
+      >
+        <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
+          {children}
+        </React.Suspense>
+      </Frame>
+    </FormBackActionProvider>
   )
 }
 
@@ -738,6 +745,9 @@ function FormHeader({
   onClose?: () => void
   actionComponent?: React.ReactNode
 }) {
+  const intl = useIntl()
+  const back = useFormBackAction()
+
   const getHeaderRight = () => {
     return (
       <CircleButton
@@ -751,10 +761,24 @@ function FormHeader({
     )
   }
 
+  const leftSlot = back ? (
+    <Button
+      aria-label={intl.formatMessage(buttonMessages.back)}
+      data-testid="back-button"
+      size="small"
+      type="icon"
+      onClick={back}
+    >
+      <Icon name="ArrowLeft" />
+    </Button>
+  ) : null
+
   return (
     <>
       <AppBar
+        desktopLeft={leftSlot}
         desktopTitle={label}
+        mobileLeft={leftSlot}
         mobileTitle={label}
         desktopRight={getHeaderRight()}
         mobileRight={getHeaderRight()}
