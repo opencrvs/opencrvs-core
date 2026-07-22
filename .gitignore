@@ -11,11 +11,7 @@ coverage
 build
 
 # misc
-.claude
-CLAUDE.md
-.claude-working/
-.claude
-CLAUDE.md
+CLAUDE.local.md
 .DS_Store
 .env*
 *.log
