@@ -46,13 +46,13 @@ elif [[ ! -d "${COUNTRY_CONFIG_PATH}" ]]; then
 fi
 
 if $outdated; then
-  yarn run tsx src/extract-translations.ts $COUNTRY_CONFIG_PATH --outdated
+  pnpm exec tsx src/extract-translations.ts $COUNTRY_CONFIG_PATH --outdated
   exit 0
 fi
 
 if $write; then
-  yarn run tsx src/extract-translations.ts $COUNTRY_CONFIG_PATH --write
+  pnpm exec tsx src/extract-translations.ts $COUNTRY_CONFIG_PATH --write
   exit 0
 fi
 
-yarn run tsx src/extract-translations.ts $COUNTRY_CONFIG_PATH
+pnpm exec tsx src/extract-translations.ts $COUNTRY_CONFIG_PATH

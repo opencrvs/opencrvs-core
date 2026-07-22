@@ -7,7 +7,7 @@
   "scripts": {
     "seed": "NODE_OPTIONS=--dns-result-order=ipv4first tsx src/index.ts",
     "test:compilation": "tsc --noEmit",
-    "test": "yarn test:compilation",
+    "test": "pnpm test:compilation",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0"
   },
   "devDependencies": {
@@ -19,8 +19,9 @@
     "tsx": "^4.15.7"
   },
   "dependencies": {
-    "@opencrvs/commons": "^2.0.0",
-    "@opencrvs/events": "^2.0.0",
+    "@opencrvs/commons": "workspace:*",
+    "superjson": "1.9.0-0",
+    "@opencrvs/events": "workspace:*",
     "@trpc/client": "^11.0.0-rc.532",
     "@types/node": "^16.18.39",
     "@types/node-fetch": "^2.5.12",

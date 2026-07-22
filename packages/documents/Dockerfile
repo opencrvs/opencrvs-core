@@ -5,8 +5,8 @@ USER node
 
 WORKDIR /app/packages/documents
 COPY --chown=node:node packages/documents/*.json /app/packages/documents/
-RUN yarn install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 COPY --chown=node:node packages/documents /app/packages/documents
-RUN yarn build
+RUN pnpm build
 
-CMD [ "yarn", "start:prod" ]
+CMD [ "pnpm", "start:prod" ]
