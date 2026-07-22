@@ -19,6 +19,7 @@ import {
   AddressField,
   AddressType,
   getDeclaration,
+  toPlainDate,
   UUID
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -313,7 +314,7 @@ export const AddressInCopy: ReviewStory = {
   name: 'Address to string',
   render: function Component() {
     const allFields = declarationForm.pages.map((page) => page.fields).flat()
-    const stringifier = useFormDataStringifier()
+    const stringifier = useFormDataStringifier(toPlainDate('2025-01-01'))
     const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
     const FORM_DATA = {
       'applicant.address': {

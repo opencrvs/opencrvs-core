@@ -15,6 +15,7 @@ import { isUndefined } from 'lodash'
 import {
   FieldConfig,
   FieldValue,
+  PlainDate,
   isAddressFieldType,
   isAdministrativeAreaFieldType,
   isBulletListFieldType,
@@ -110,12 +111,14 @@ export function ValueOutput({
   config,
   value,
   searchMode,
-  eventConfig
+  eventConfig,
+  anchor
 }: {
   config: FieldConfig
   value: FieldValue | FieldUpdateValue
   searchMode?: {} | boolean
   eventConfig?: EventConfig
+  anchor: PlainDate
 }) {
   const field = { config, value }
   if (isFieldGroupFieldType(field)) {
@@ -127,6 +130,7 @@ export function ValueOutput({
         {field.config.fields.map((subfield, idx, subfields) => (
           <React.Fragment key={subfield.id}>
             <ValueOutput
+              anchor={anchor}
               config={subfield}
               eventConfig={eventConfig}
               searchMode={searchMode}
@@ -226,6 +230,7 @@ export function ValueOutput({
   if (isAddressFieldType(field)) {
     return (
       <Address.Output
+        anchor={anchor}
         configuration={field.config}
         lineSeparator={searchMode === true ? ', ' : undefined}
         value={field.value}
@@ -244,7 +249,7 @@ export function ValueOutput({
   }
 
   if (isAdministrativeAreaFieldType(field)) {
-    return <AdministrativeArea.Output value={field.value} />
+    return <AdministrativeArea.Output anchor={anchor} value={field.value} />
   }
 
   if (
@@ -252,7 +257,7 @@ export function ValueOutput({
     isLocationFieldType(field) ||
     isFacilityFieldType(field)
   ) {
-    return <LocationSearch.Output value={field.value} />
+    return <LocationSearch.Output anchor={anchor} value={field.value} />
   }
 
   if (isDividerFieldType(field)) {
@@ -273,6 +278,7 @@ export function ValueOutput({
   if (isDataFieldType(field) && eventConfig) {
     return (
       <Data.Output
+        anchor={anchor}
         eventConfig={eventConfig}
         field={field.config}
         value={field.value}
@@ -347,7 +353,8 @@ export function Output({
   previousValue,
   formConfig,
   eventConfig,
-  displayEmptyAsDash = false
+  displayEmptyAsDash = false,
+  anchor
 }: {
   field: FieldConfig
   value?: FieldValue | FieldUpdateValue
@@ -357,6 +364,12 @@ export function Output({
   eventConfig?: EventConfig
   formConfig?: FormConfig
   displayEmptyAsDash?: boolean
+  /**
+   * The date at which every location rendered by this field is resolved to a
+   * version — see {@link StringifierContext} for the full rationale. Required:
+   * there is no default anchor, so omitting it is a compile error.
+   */
+  anchor: PlainDate
 }) {
   // Explicitly check for undefined, so that e.g. number 0 is considered a value,
   // even null is considered as value removed
@@ -402,6 +415,7 @@ export function Output({
     if (previousValue) {
       return (
         <ValueOutput
+          anchor={anchor}
           config={previousValueField ?? field}
           eventConfig={eventConfig}
           value={previousValue}
@@ -414,7 +428,12 @@ export function Output({
     }
 
     return (
-      <ValueOutput config={field} eventConfig={eventConfig} value={undefined} />
+      <ValueOutput
+        anchor={anchor}
+        config={field}
+        eventConfig={eventConfig}
+        value={undefined}
+      />
     )
   }
 
@@ -423,7 +442,12 @@ export function Output({
   // Note, checking for previousValue !== value is not enough, as we have composite fields.
   if (hasPreviousValue && !isEqualFieldValue(previousValue, value)) {
     let valueOutput = (
-      <ValueOutput config={field} eventConfig={eventConfig} value={value} />
+      <ValueOutput
+        anchor={anchor}
+        config={field}
+        eventConfig={eventConfig}
+        value={value}
+      />
     )
 
     if (isEmptyValue(field, value)) {
@@ -440,6 +464,7 @@ export function Output({
           <>
             <Deleted>
               <ValueOutput
+                anchor={anchor}
                 config={previousValueField ?? field}
                 eventConfig={eventConfig}
                 value={previousValue}
@@ -456,6 +481,7 @@ export function Output({
   if (!hasPreviousValue && showPreviouslyMissingValuesAsChanged) {
     const deleted = (
       <ValueOutput
+        anchor={anchor}
         config={{ ...field, required: true }}
         eventConfig={eventConfig}
         value={undefined}
@@ -470,10 +496,22 @@ export function Output({
           <Deleted>{deleted}</Deleted>
         )}
         <br />
-        <ValueOutput config={field} eventConfig={eventConfig} value={value} />
+        <ValueOutput
+          anchor={anchor}
+          config={field}
+          eventConfig={eventConfig}
+          value={value}
+        />
       </>
     )
   }
 
-  return <ValueOutput config={field} eventConfig={eventConfig} value={value} />
+  return (
+    <ValueOutput
+      anchor={anchor}
+      config={field}
+      eventConfig={eventConfig}
+      value={value}
+    />
+  )
 }

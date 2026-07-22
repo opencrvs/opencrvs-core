@@ -27,11 +27,11 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { ROUTES } from '@client/v2-events/routes'
-import { getUsersFullName } from '@client/v2-events/utils'
+import { getUsersFullName, resolveLocationName } from '@client/v2-events/utils'
 import { getAddressNameV2, UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useUserFormState } from '@client/views/SysAdmin/Team/user/userEditor/useUserFormState'
-import { Location, User, UUID } from '@opencrvs/commons/client'
+import { ClientLocation, todayISO, User, UUID } from '@opencrvs/commons/client'
 import { Link } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
@@ -263,7 +263,7 @@ function UserListComponent({ userDetails }: UserListProps) {
 
   const parsedId = UUID.safeParse(locationId)
 
-  const searchedLocation: Location | undefined = parsedId.success
+  const searchedLocation: ClientLocation | undefined = parsedId.success
     ? locations.get(parsedId.data)
     : undefined
 
@@ -784,7 +784,7 @@ function UserListComponent({ userDetails }: UserListProps) {
         <Content
           title={
             !isLoading && !error
-              ? searchedLocation?.name || ''
+              ? resolveLocationName(searchedLocation, todayISO())
               : intl.formatMessage(headerMessages.teamTitle)
           }
           size={ContentSize.NORMAL}
@@ -803,7 +803,9 @@ function UserListComponent({ userDetails }: UserListProps) {
             </Loading>
           ) : searchResults ? (
             <>
-              <Header id="header">{searchedLocation?.name || ''}</Header>
+              <Header id="header">
+                {resolveLocationName(searchedLocation, todayISO())}
+              </Header>
               <MobileActionBar>{LocationButton(locationId)}</MobileActionBar>
               <LocationInfo>
                 {searchedLocation && (

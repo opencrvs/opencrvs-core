@@ -25,9 +25,9 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useUserFormState } from '@client/views/SysAdmin/Team/user/userEditor/useUserFormState'
-import { getUsersFullName } from '@client/v2-events/utils'
+import { getUsersFullName, resolveLocationName } from '@client/v2-events/utils'
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
-import { User, UUID } from '@opencrvs/commons/client'
+import { todayISO, User, UUID } from '@opencrvs/commons/client'
 import { Link } from '@opencrvs/components/lib'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -247,8 +247,11 @@ export const UserAudit = () => {
                       })
                     }
                   >
-                    {locations.get(user.primaryOfficeId)?.name ||
-                      user.primaryOfficeId}
+                    {/* A user's office is a present-tense surface — today's name. */}
+                    {resolveLocationName(
+                      locations.get(user.primaryOfficeId),
+                      todayISO()
+                    )}
                   </Link>
                 }
               />

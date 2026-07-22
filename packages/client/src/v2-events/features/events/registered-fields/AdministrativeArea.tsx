@@ -12,12 +12,15 @@ import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import {
   AdministrativeAreaField,
+  ClientLocation,
   AdministrativeAreas,
   getAdministrativeAreaHierarchy,
   JurisdictionFilter,
-  Location,
   resolveJurisdictionReference,
-  UUID
+  resolveVersion,
+  todayISO,
+  UUID,
+  PlainDate
 } from '@opencrvs/commons/client'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
@@ -30,7 +33,10 @@ import {
 } from '@client/v2-events/components/forms/inputs/SearchableSelect'
 import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { buildLocationNameOptions } from '@client/v2-events/utils'
+import {
+  buildLocationNameOptions,
+  resolveLocationName
+} from '@client/v2-events/utils'
 import { LocationSearch } from './LocationSearch'
 
 /**
@@ -85,7 +91,11 @@ function useAvailableAdministrativeAreas(
     return [...administrativeAreas.values()].filter((administrativeArea) => {
       // In advanced search, address (admin-structure) filters offer only
       // currently-valid areas; inactivated ones are not selectable.
-      if (excludeInactive && administrativeArea.status !== 'active') {
+      if (
+        excludeInactive &&
+        resolveVersion(administrativeArea.versions, todayISO()).status !==
+          'active'
+      ) {
         return false
       }
 
@@ -155,8 +165,17 @@ function AdministrativeAreaInput({
     excludeInactive
   )
 
+  // In advanced search, list every historical name so records saved under an
+  // outdated name stay findable. Elsewhere show a single current-name option.
+  // Names are anchored to today; event-date anchoring is a follow-up (#13143).
   const options = useMemo(
-    () => buildLocationNameOptions(administrativeAreas, isSearchFilter),
+    () =>
+      isSearchFilter
+        ? buildLocationNameOptions(administrativeAreas)
+        : administrativeAreas.map((o) => ({
+            label: resolveLocationName(o, todayISO()),
+            value: o.id
+          })),
     [administrativeAreas, isSearchFilter]
   )
 
@@ -183,27 +202,39 @@ function AdministrativeAreaInput({
 }
 
 function AdministrativeAreaOutput({
-  value
+  value,
+  anchor
 }: {
   value: Stringifiable | undefined
+  anchor: PlainDate
 }) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
   const administrativeAreaId = UUID.safeParse(value?.toString()).data
 
-  const administrativeArea =
-    administrativeAreaId && administrativeAreas.get(administrativeAreaId)
+  const resolved =
+    administrativeAreaId &&
+    resolveVersion(
+      administrativeAreas.get(administrativeAreaId)?.versions ?? [],
+      anchor
+    )
 
-  return administrativeArea?.name ?? ''
+  return resolved ? resolved.name : ''
 }
 
-function stringify(value: string, context: { locations: Map<UUID, Location> }) {
+function stringify(
+  value: string,
+  context: { locations: Map<UUID, ClientLocation>; anchor: PlainDate }
+) {
   const locationId = UUID.safeParse(value).data
   const location = locationId && context.locations.get(locationId)
 
-  const name = location?.name
-  return name ?? EMPTY_TOKEN
+  if (!location) {
+    return EMPTY_TOKEN
+  }
+
+  return resolveVersion(location.versions, context.anchor).name
 }
 
 function isAdministrativeAreaEmpty(value: Stringifiable) {

@@ -15,7 +15,12 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { ActionType, getDeclaration } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  getCurrentEventState,
+  getDeclaration
+} from '@opencrvs/commons/client'
+import { recordAnchorDate } from '@client/v2-events/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
@@ -49,6 +54,7 @@ export function Review() {
   }
 
   const reviewConfig = actionConfiguration.review
+  const anchor = recordAnchorDate(getCurrentEventState(event, config))
   const form = useEventFormData((state) => state.getFormValues())
 
   const { setAnnotation, getAnnotation } = useActionAnnotation()
@@ -91,6 +97,7 @@ export function Review() {
       route={ROUTES.V2.EVENTS.DECLARE}
     >
       <ReviewComponent.Body
+        anchor={anchor}
         annotation={annotation}
         form={form}
         formConfig={formConfig}
