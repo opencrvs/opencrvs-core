@@ -96,11 +96,6 @@ export function useEventFormNavigation() {
     clearAnnotation()
   }
 
-  function createNewDeclaration() {
-    clearEphemeralFormState()
-    navigate(ROUTES.V2.EVENTS.CREATE.path)
-  }
-
   /**
    * Accepts an optional back-to URL (full pathname + search) — typically the
    * originating workqueue or search-result page captured via `useCurrentBackTo`.
@@ -217,7 +212,6 @@ export function useEventFormNavigation() {
   return {
     exit,
     modal,
-    createNewDeclaration,
     deleteDeclaration,
     closeActionView,
     clearEphemeralFormState

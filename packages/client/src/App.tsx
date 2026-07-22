@@ -82,7 +82,7 @@ export const routesConfig = [
       createRedirect('/registration-home/readyToIssue/*', '/'),
       createRedirect('/registration-home/print/*', '/'),
       createRedirect('/registration-home/readyForReview/*', '/'),
-      createRedirect('/events', '/events/create')
+      createRedirect('/events', '/')
     ]
   }
 ]

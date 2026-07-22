@@ -49,11 +49,6 @@ export const ROUTES = {
               })
             }
           ),
-          CREATE: route('create', {
-            searchParams: {
-              backTo: string()
-            }
-          }),
           DELETE: route('delete/:eventId', {
             searchParams: {
               backTo: string()

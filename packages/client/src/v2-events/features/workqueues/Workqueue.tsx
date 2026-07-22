@@ -17,18 +17,16 @@ import {
 } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
-import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import { precompileActionSchemas } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 
 import { ROUTES } from '@client/v2-events/routes'
 import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
 import { CoreWorkqueues } from '@client/v2-events/utils'
+import { NewEventButton } from '../events/NewEventButton'
 import { SearchResultComponent } from '../events/Search/SearchResult/SearchResult'
 import { useCountryConfigWorkqueueConfigurations } from '../events/useCountryConfigWorkqueueConfigurations'
 import { useOutbox } from '../events/useEvents/outbox'
-import { useEventFormNavigation } from '../events/useEventFormNavigation'
 import { useUserMayCreateEvents } from '../../layouts/workqueues'
 import { Outbox } from './Outbox'
 import { Draft } from './Draft'
@@ -111,18 +109,13 @@ function WorkqueueContent() {
 }
 
 export function WorkqueueContainer() {
-  const { createNewDeclaration } = useEventFormNavigation()
   const mayCreateEvents = useUserMayCreateEvents()
   return (
     <>
       <WorkqueueContent />
       {mayCreateEvents && (
         <FabContainer>
-          <FloatingActionButton
-            icon={() => <PlusTransparentWhite />}
-            id="new_event_declaration"
-            onClick={createNewDeclaration}
-          />
+          <NewEventButton variant="fab" />
         </FabContainer>
       )}
     </>

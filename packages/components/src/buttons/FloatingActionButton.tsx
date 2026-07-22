@@ -11,7 +11,22 @@
 import * as React from 'react'
 
 import styled from 'styled-components'
-const ButtonStyled = styled.button`
+
+interface StyledButtonProps {
+  /**
+   * Injected by `DropdownMenu.Trigger` (via `asChild`) so the button can act as
+   * the CSS anchor the dropdown content positions itself against.
+   */
+  dropdownName?: string
+}
+
+const ButtonStyled = styled.button.withConfig({
+  shouldForwardProp: (prop, defaultValidatorFn) =>
+    // `popovertarget` is a native HTML attribute that styled-components' default
+    // validator does not recognise; forward it explicitly so the button can act
+    // as a `DropdownMenu.Trigger` (which wires it up via the Popover API).
+    ['popovertarget'].includes(prop) || defaultValidatorFn(prop)
+})<StyledButtonProps>`
   height: 56px;
   width: 56px;
   border-radius: 100%;
@@ -22,6 +37,10 @@ const ButtonStyled = styled.button`
   border: none;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+
+  ${({ dropdownName }) =>
+    dropdownName && `anchor-name: --Dropdown-Anchor-${dropdownName};`}
+
   &:hover:enabled {
     ${({ theme }) => theme.colors.primaryDark};
     color: ${({ theme }) => theme.colors.white};
@@ -39,7 +58,9 @@ const ButtonStyled = styled.button`
     color: ${({ theme }) => theme.colors.disabled};
   }
 `
-interface IButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface IButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    StyledButtonProps {
   icon?: () => React.ReactNode
 }
 

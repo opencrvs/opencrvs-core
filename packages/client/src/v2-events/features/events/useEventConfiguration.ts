@@ -9,8 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { EventConfig } from '@opencrvs/commons/client'
+import { useSelector } from 'react-redux'
+import { canUserCreateEvent, EventConfig } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
+import { getScope } from '@client/profile/profileSelectors'
 
 /**
  * Fetches configured events and finds a matching event
@@ -43,4 +45,15 @@ export function useEventConfiguration(eventIdentifier: string): {
   }
 
   return { eventConfiguration }
+}
+
+/**
+ * @returns the configured events the current user is permitted to create,
+ * filtered by the `record.create` scope via `canUserCreateEvent`.
+ */
+export function useCreatableEventConfigurations(): EventConfig[] {
+  const scopes = useSelector(getScope) ?? []
+  return useEventConfigurations().filter(({ id }) =>
+    canUserCreateEvent(scopes, id)
+  )
 }

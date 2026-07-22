@@ -28,7 +28,6 @@ import {
   AdvancedSearch,
   SearchResult
 } from '@client/v2-events/features/events/Search'
-import { EventSelectionIndex } from '@client/v2-events/features/events/index'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
 import { router as workqueueRouter } from '@client/v2-events/features/workqueues/router'
 import { EventOverviewLayout, WorkqueueLayout } from '@client/v2-events/layouts'
@@ -232,10 +231,6 @@ export const routesConfig = {
           element: <EventHistoryIndex />
         }
       ]
-    },
-    {
-      path: ROUTES.V2.EVENTS.CREATE.path,
-      element: <EventSelectionIndex />
     },
     {
       path: ROUTES.V2.EVENTS.DELETE.path,
