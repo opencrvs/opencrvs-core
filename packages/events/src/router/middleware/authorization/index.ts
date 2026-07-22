@@ -189,11 +189,6 @@ export const requireAssignment: MiddlewareFunction<
     )
   )
 
-  // System users can always perform action on assigned events
-  if (user.type === TokenUserType.enum.system) {
-    return next()
-  }
-
   // Normal users require assignment
   if (user.type === TokenUserType.enum.user && user.id !== assignedTo) {
     throw new TRPCError({
