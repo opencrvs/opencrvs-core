@@ -67,6 +67,9 @@ jobs:
           repository: opencrvs/opencrvs-core
           ref: ${{ github.head_ref }}
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js from core nvmrc
         uses: actions/setup-node@v6
         with:
@@ -75,9 +78,9 @@ jobs:
       - name: Install dependencies and check for missing translations
         run: |
           export COUNTRY_CONFIG_PATH=${{steps.set_branch.outputs.countryconfig_path}}
-          yarn install
+          pnpm install --frozen-lockfile
           cd ./packages/client
-          CI=true yarn extract:translations 2>&1 | tee output.txt
+          CI=true pnpm extract:translations 2>&1 | tee output.txt
           if grep -q "Missing translations" output.txt; then
              awk '/You are missing the following content keys from your country configuration package:/ {flag=1; next} /Add them to this file and run again:/ {flag=0} flag' output.txt > missing_translations.txt
              sed -i '/^$/d' missing_translations.txt

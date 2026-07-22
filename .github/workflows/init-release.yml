@@ -95,8 +95,8 @@ jobs:
           git checkout -b "release/${{ inputs.version }}"
 
           # Bump all workspace package.json files and the root in one command.
-          npx lerna exec 'yarn version --new-version ${{ inputs.version }} --no-git-tag-version'
-          yarn version --new-version ${{ inputs.version }} --no-git-tag-version
+          npx lerna exec 'npm version ${{ inputs.version }} --no-git-tag-version --allow-same-version'
+          npm version ${{ inputs.version }} --no-git-tag-version --allow-same-version
           # Bump helm chart version without creating a git tag.
           find charts/ -name Chart.yaml -exec yq -i ".version = \"v$VERSION\"" {} \;
           find charts/ -name Chart.yaml -exec yq -i ".appVersion = \"v$VERSION\"" {} \;
