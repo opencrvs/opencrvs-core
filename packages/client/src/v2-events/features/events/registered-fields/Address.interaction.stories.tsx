@@ -13,7 +13,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 import React from 'react'
-import * as selectEvent from '@client/v2-events/select-event'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
@@ -27,6 +26,7 @@ import {
   FieldValue,
   AddressFieldValue
 } from '@opencrvs/commons/client'
+import * as selectEvent from '@client/v2-events/select-event'
 import {
   FormFieldGenerator,
   FormFieldGeneratorPropsWithoutRef
@@ -322,7 +322,7 @@ export const AddressFieldInteraction: Story = {
 
         // Select a province
         const province = await canvas.findByLabelText(/Province/i)
-        selectEvent.openMenu(province)
+        await selectEvent.openMenu(province)
         await userEvent.click(province)
         await selectEvent.select(province, 'Central')
 

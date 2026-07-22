@@ -13,14 +13,13 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, within } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-
-import * as selectEvent from '@client/v2-events/select-event'
 import {
   ActionType,
   generateWorkqueues,
   getCurrentEventState,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
+import * as selectEvent from '@client/v2-events/select-event'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { Pages } from '../components/Pages'

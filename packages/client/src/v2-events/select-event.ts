@@ -30,9 +30,9 @@ function getReactSelectContainerFromInput(input: HTMLElement): HTMLElement {
 }
 
 /** Open a `react-select` dropdown menu. */
-export function openMenu(input: HTMLElement): void {
-  fireEvent.focus(input)
-  fireEvent.keyDown(input, { key: 'ArrowDown', keyCode: 40, code: 40 })
+export async function openMenu(input: HTMLElement) {
+  await fireEvent.focus(input)
+  await fireEvent.keyDown(input, { key: 'ArrowDown', keyCode: 40, code: 40 })
 }
 
 /** Select one or more options in a `react-select` dropdown by visible text. */
@@ -45,7 +45,7 @@ export async function select(
     : [optionOrOptions]
 
   for (const option of options) {
-    openMenu(input)
+    await openMenu(input)
     const container = getReactSelectContainerFromInput(input)
     const matchingElements = await within(container).findAllByText(option, {
       // ignore aria-live announcements and visually hidden nodes
@@ -55,6 +55,6 @@ export async function select(
      * When the option is already selected, the display text also matches; the
      * actual menu option is positioned last in the DOM tree.
      */
-    fireEvent.click(matchingElements[matchingElements.length - 1])
+    await fireEvent.click(matchingElements[matchingElements.length - 1])
   }
 }

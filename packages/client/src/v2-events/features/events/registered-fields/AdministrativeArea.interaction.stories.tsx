@@ -11,7 +11,6 @@
 
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, within } from 'storybook/test'
-import * as selectEvent from '@client/v2-events/select-event'
 import React from 'react'
 import styled from 'styled-components'
 import {
@@ -23,6 +22,7 @@ import {
   AddressType,
   TestUserRole
 } from '@opencrvs/commons/client'
+import * as selectEvent from '@client/v2-events/select-event'
 
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
