@@ -186,10 +186,10 @@ export function Select<T>({
       isDisabled={disabled}
       isSearchable={options.length > length}
       options={options}
-      placeholder={intl.formatMessage(formMessages.select)}
       value={valueFromOptions}
       onChange={onChange}
       {...props}
+      placeholder={props.placeholder ?? intl.formatMessage(formMessages.select)}
     />
   )
 }

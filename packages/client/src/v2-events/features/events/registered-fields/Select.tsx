@@ -53,11 +53,11 @@ function SelectInput({
 
   return (
     <SelectComponent
-      placeholder={intl.formatMessage(formMessages.select)}
       {...props}
       data-testid={props['data-testid'] || `select__${props.id}`}
       noOptionsMessage={formattedNoOptionsMessage}
       options={formattedOptions}
+      placeholder={props.placeholder ?? intl.formatMessage(formMessages.select)}
       value={inputValue}
     />
   )
