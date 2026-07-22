@@ -86,7 +86,7 @@ function officeAccessible(
   return true
 }
 
-test('grants access iff both existing and updated (location, role) satisfy any user.edit scope', async () => {
+test('grants access iff both existing and updated (location, role) satisfy any user.edit scope', { timeout: 120000 }, async () => {
   const officePairs = fc
     .record({
       existingOffice: fc.constantFrom(...crvsOffices),

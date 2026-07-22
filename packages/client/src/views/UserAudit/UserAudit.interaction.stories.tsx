@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
-import { expect, userEvent, waitFor, within } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { TRPCError } from '@trpc/server'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
@@ -71,18 +71,25 @@ type Story = StoryObj<typeof UserAudit>
 
 export const TitleVisibleOnMobile: Story = {
   parameters: {
-    viewport: { defaultViewport: 'mobile' },
     msw: {
       handlers: {
         userGet: [tRPCMsw.user.get.query(() => kennedy)]
       }
     }
   },
+
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
     await step('User name title is visible on mobile', async () => {
       expect(await canvas.findByText('Kennedy Mweene')).toBeVisible()
     })
+  },
+
+  globals: {
+    viewport: {
+      value: 'mobile',
+      isRotated: false
+    }
   }
 }
 

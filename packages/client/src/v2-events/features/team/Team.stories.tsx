@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { TestUserRole } from '@opencrvs/commons/client'
 import { V2_DEFAULT_MOCK_LOCATIONS } from '@opencrvs/commons/client'
 import { routesConfig } from '@client/v2-events/routes'
@@ -40,12 +40,20 @@ export const TeamPageStory: Story = {
 
 export const TeamPageMobile: Story = {
   name: 'Team Page - Mobile',
+
   parameters: {
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
-    viewport: { defaultViewport: 'Tablet' },
+
     reactRouter: {
       router: routesConfig,
       initialPath: V1_LEGACY_ROUTES.TEAM_USER_LIST + `?locationId=${locationId}`
+    }
+  },
+
+  globals: {
+    viewport: {
+      value: 'Tablet',
+      isRotated: false
     }
   }
 }

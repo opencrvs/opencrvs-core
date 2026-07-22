@@ -11,10 +11,10 @@
 
 /* eslint-disable max-lines */
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { userEvent, within, expect, waitFor, screen } from '@storybook/test'
+import { userEvent, within, expect, waitFor, screen } from 'storybook/test'
 import { toast } from 'react-hot-toast'
 import {
   ActionType,
@@ -596,6 +596,7 @@ export const ChangeFieldInReview: Story = {
 
 export const MobileReviewShowsActionMenuAndExitsUndeclaredDraft: Story = {
   name: 'Mobile: action menu visible and X-button exits undeclared draft',
+
   loaders: [
     () => {
       declarationTrpcMsw.events.reset()
@@ -606,17 +607,19 @@ export const MobileReviewShowsActionMenuAndExitsUndeclaredDraft: Story = {
       await new Promise((resolve) => setTimeout(resolve, 50))
     }
   ],
+
   parameters: {
-    viewport: { defaultViewport: 'mobile' },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
         eventId: createdEventDocument.id
       })
     },
+
     chromatic: { disableSnapshot: true },
     msw
   },
+
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
@@ -637,6 +640,13 @@ export const MobileReviewShowsActionMenuAndExitsUndeclaredDraft: Story = {
         ).toBeInTheDocument()
       }
     )
+  },
+
+  globals: {
+    viewport: {
+      value: 'mobile',
+      isRotated: false
+    }
   }
 }
 

@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { DocsContainer } from '@storybook/addon-docs'
+import { DocsContainer } from '@storybook/addon-docs/blocks'
 import { ThemeProvider, createGlobalStyle } from 'styled-components'
 import WebFont from 'webfontloader'
-import type { Preview } from '@storybook/react'
+import type { Preview } from '@storybook/react-vite'
 import { getTheme } from '@opencrvs/components/lib/theme'
 
 const theme = getTheme()
@@ -44,6 +44,7 @@ const preview: Preview = {
       </ThemeProvider>
     )
   ],
+
   parameters: {
     viewMode: 'docs',
     actions: { argTypesRegex: '^on[A-Z].*' },
@@ -93,7 +94,9 @@ const preview: Preview = {
         }
       }
     }
-  }
+  },
+
+  tags: ['autodocs']
 }
 
 export default preview

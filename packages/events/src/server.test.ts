@@ -17,10 +17,8 @@ import {
   createTRPCClient,
   httpBatchLink,
   HTTPHeaders,
-  httpLink,
-  TRPCClientError
+  httpLink
 } from '@trpc/client'
-import { TRPCError } from '@trpc/server'
 import * as jwt from 'jsonwebtoken'
 import {
   ActionStatus,
@@ -169,7 +167,7 @@ test('continues accepting requests after a failed one', async () => {
     appClient.event.create.mutate(generator.event.create(), {
       context: { headers: { authorization: tokenWithoutScope } }
     })
-  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+  ).rejects.toMatchObject({ data: { code: 'FORBIDDEN' } })
 
   const tokenWithScope = createTestToken({
     userId: user.id,
@@ -193,12 +191,10 @@ test('rejects requests with no authorization header', async () => {
       { transactionId: getUUID(), type: TENNIS_CLUB_MEMBERSHIP },
       { context: { headers: {} } }
     )
-  ).rejects.toThrow(
-    new TRPCError({
-      code: 'UNAUTHORIZED',
-      message: 'Authorization token is missing'
-    })
-  )
+  ).rejects.toMatchObject({
+    message: 'Authorization token is missing',
+    data: { code: 'UNAUTHORIZED' }
+  })
 })
 
 test('rejects requests with a malformed token', async () => {
@@ -222,7 +218,7 @@ test('rejects requests where token lacks required scope', async () => {
       { transactionId: getUUID(), type: TENNIS_CLUB_MEMBERSHIP },
       { context: { headers: { authorization: tokenWithoutScope } } }
     )
-  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+  ).rejects.toMatchObject({ data: { code: 'FORBIDDEN' } })
 })
 
 test('Throws with unsigned forged token', async () => {
@@ -243,7 +239,7 @@ test('UNAUTHORIZED error is thrown when internal request is made without token',
 
   await expect(
     internalServiceClient.user.ping.query('ping')
-  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+  ).rejects.toMatchObject({ data: { code: 'UNAUTHORIZED' } })
 })
 
 test('UNAUTHORIZED error is thrown when request is made with valid APP token', async () => {
@@ -258,7 +254,7 @@ test('UNAUTHORIZED error is thrown when request is made with valid APP token', a
         }
       }
     })
-  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+  ).rejects.toMatchObject({ data: { code: 'UNAUTHORIZED' } })
 })
 
 test('UNAUTHORIZED error is thrown when internal request is made with token is not signed by the correct issuer', async () => {
@@ -284,7 +280,7 @@ test('UNAUTHORIZED error is thrown when internal request is made with token is n
         }
       }
     })
-  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+  ).rejects.toMatchObject({ data: { code: 'UNAUTHORIZED' } })
 })
 
 test('API response is returned when internal request is made with valid token', async () => {
@@ -330,7 +326,7 @@ test('UNAUTHORIZED error is thrown when internal request is made with token is n
         }
       }
     })
-  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+  ).rejects.toMatchObject({ data: { code: 'UNAUTHORIZED' } })
 })
 // ─── upstream failures ───────────────────────────────────────────────────────
 
@@ -342,6 +338,6 @@ describe('upstream error handling', () => {
   test('propagates a TRPC error returned by the upstream service', async () => {
     await expect(
       createEvent(BearerTokenByUserType.localRegistrar)
-    ).rejects.toMatchObject(new TRPCClientError('fetch failed'))
+    ).rejects.toMatchObject({ message: 'fetch failed' })
   })
 })

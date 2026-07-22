@@ -32,6 +32,7 @@ import { EventNotFoundError } from '../../service/events/events'
 
 test(
   'Check scopes against event.getDuplicates',
+  { timeout: 90000 },
   async () => {
     await createIndex(
       getEventIndexName('tennis-club-membership_premium'),
@@ -140,8 +141,5 @@ test(
       }),
       { numRuns: 20 }
     )
-  },
-  {
-    timeout: 90000
   }
 )

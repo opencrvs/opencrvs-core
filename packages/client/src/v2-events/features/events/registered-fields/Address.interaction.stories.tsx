@@ -10,9 +10,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
-import { expect } from '@storybook/test'
-import { userEvent, waitFor, within } from '@storybook/testing-library'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect } from 'storybook/test'
+import { userEvent, waitFor, within } from 'storybook/test'
 import React from 'react'
 import * as selectEvent from 'react-select-event'
 import styled from 'styled-components'

@@ -22,23 +22,23 @@ const viteFinal = async (config: Record<string, any>) => {
 }
 const config: StorybookConfig = {
   viteFinal,
+
   stories: [
-    '../@(src|stories)/**/*.stories.mdx',
+    '../@(src|stories)/**/*.mdx',
     '../@(src|stories)/**/*.stories.@(js|jsx|ts|tsx)'
   ],
+
   addons: [
     '@storybook/addon-links',
-    '@storybook/addon-essentials',
     '@storybook/addon-a11y',
     '@storybook/addon-docs'
   ],
+
   staticDirs: ['../public', '../static'],
+
   framework: {
     name: '@storybook/react-vite',
     options: {}
-  },
-  docs: {
-    autodocs: true
   }
 }
 export default config

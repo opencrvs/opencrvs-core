@@ -10,8 +10,8 @@
  */
 
 import React from 'react'
-import { Meta, StoryObj } from '@storybook/react'
-import { userEvent, within, expect } from '@storybook/test'
+import { Meta, StoryObj } from '@storybook/react-vite'
+import { userEvent, within, expect } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import * as selectEvent from 'react-select-event'

@@ -8,7 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineConfig, HttpProxy, loadEnv, ProxyOptions } from 'vite'
+import { loadEnv } from 'vite'
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -20,7 +21,7 @@ import { IncomingMessage, ServerResponse } from 'node:http'
 dns.setDefaultResultOrder('ipv4first')
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }): any => {
+export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, 'env')
 
   const registerRedirectPlugin = () => ({
@@ -61,6 +62,9 @@ export default defineConfig(({ mode }): any => {
       registerType: 'autoUpdate',
       workbox: {
         cacheId: 'ocrvs-login',
+        // strategy is 'generateSW', so the size limit lives here (the
+        // injectManifest block above is ignored for this strategy).
+        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
         runtimeCaching: [
           {
             urlPattern: /config\.js/,
@@ -125,7 +129,7 @@ export default defineConfig(({ mode }): any => {
           target: 'http://localhost:3040',
           changeOrigin: true,
           rewrite: (path: string) => path.replace(/^\/health\/ready/, '/ping'),
-          configure: (proxy: HttpProxy.Server, _options: ProxyOptions) => {
+          configure: (proxy, _options) => {
             proxy.on(
               'proxyRes',
               (
@@ -165,12 +169,8 @@ export default defineConfig(({ mode }): any => {
 
             proxy.on(
               'error',
-              (
-                _err: Error,
-                req: IncomingMessage,
-                res: ServerResponse<IncomingMessage>
-              ) => {
-                if (req.url === '/health/ready') {
+              (_err, req, res) => {
+                if (req.url === '/health/ready' && 'writeHead' in res) {
                   res.writeHead(500, { 'Content-Type': 'application/json' })
                   res.end(
                     JSON.stringify({

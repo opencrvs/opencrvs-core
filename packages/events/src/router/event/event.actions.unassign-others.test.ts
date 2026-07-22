@@ -33,6 +33,7 @@ import { getEventIndexName } from '@events/storage/elasticsearch'
 
 test(
   'Check scopes against event.actions.unassign',
+  { timeout: 120000 },
   async () => {
     await createIndex(
       getEventIndexName('tennis-club-membership_premium'),
@@ -148,8 +149,5 @@ test(
       }),
       { numRuns: 20 }
     )
-  },
-  {
-    timeout: 120000
   }
 )

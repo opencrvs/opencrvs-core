@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Meta, StoryObj } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
-import { expect, within } from '@storybook/test'
+import { expect, within } from 'storybook/test'
 import styled from 'styled-components'
 import { ConditionalType, user } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'

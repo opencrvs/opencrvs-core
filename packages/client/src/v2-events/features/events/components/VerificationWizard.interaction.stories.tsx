@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Meta, StoryObj } from '@storybook/react'
-import { userEvent, within } from '@storybook/testing-library'
+import { Meta, StoryObj } from '@storybook/react-vite'
+import { userEvent, within } from 'storybook/test'
 import React from 'react'
-import { expect, fn } from '@storybook/test'
+import { expect, fn } from 'storybook/test'
 import { noop } from 'lodash'
 import { generateTranslationConfig, PageTypes } from '@opencrvs/commons/client'
 import { VerificationWizard } from './VerificationWizard'

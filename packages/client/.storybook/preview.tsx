@@ -10,7 +10,7 @@
  */
 
 import { getTheme } from '@opencrvs/components/lib/theme'
-import type { Preview } from '@storybook/react'
+import type { Preview } from '@storybook/react-vite'
 import { initialize, mswLoader } from 'msw-storybook-addon'
 import React, { PropsWithChildren } from 'react'
 
@@ -143,7 +143,7 @@ export const parameters = {
     handlers
   },
   viewport: {
-    viewports: {
+    options: {
       mobile: {
         name: 'Mobile',
         styles: {
@@ -158,8 +158,7 @@ export const parameters = {
           height: '1024px'
         }
       }
-    },
-    defaultViewport: 'responsive'
+    }
   }
 }
 
@@ -342,6 +341,7 @@ const preview: Preview = {
       await new Promise((resolve) => setTimeout(resolve, 50))
     }
   ],
+
   decorators: [
     (Story, context) => {
       const { store } = createStore()
@@ -356,7 +356,14 @@ const preview: Preview = {
         </Wrapper>
       )
     }
-  ]
+  ],
+
+  initialGlobals: {
+    viewport: {
+      value: 'responsive',
+      isRotated: false
+    }
+  }
 }
 
 export default preview
