@@ -229,10 +229,10 @@ export const roles: Role[] = [
       { type: 'record.search', options: { placeOfEvent: 'location', flags: { noneOf: ['sealed'] } } },
       { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent', 'pending-attestation', 'pending-updates'] } },
       { type: 'record.create', options: { placeOfEvent: 'location' } },
-      { type: 'record.read', options: { event: ['birth', 'death'], notifiedIn: 'location', flags: { noneOf: ['sealed'] } } },
+      { type: 'record.read', options: { event: ['birth', 'death', 'adoption'], notifiedIn: 'location', flags: { noneOf: ['sealed'] } } },
       { type: 'record.declare', options: { placeOfEvent: 'location' } },
       { type: 'record.notify', options: { placeOfEvent: 'location' } },
-      { type: 'record.edit', options: { event: ['birth', 'death'], notifiedBy: 'user' } },
+      { type: 'record.edit', options: { event: ['birth', 'death', 'adoption'], notifiedBy: 'user' } },
       { type: 'record.print-certified-copies', options: { templates: ['v2.tennis-club-membership-certificate-alpha'], registeredIn: 'location' } }
     ])
   },

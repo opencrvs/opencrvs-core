@@ -29,6 +29,8 @@ import {
   getInformantPsut
 } from '@countryconfig/events/mosip'
 import { InformantType as DeathInformantType } from '@countryconfig/events/death/forms/pages/informant'
+import { Event } from '@countryconfig/events/utils'
+import { getAdoptionSealingToken } from '@countryconfig/events/adoption/sealing-service'
 
 export type ActionConfirmationRefs = { Payload: EventDocument }
 export type ActionConfirmationRequest = Hapi.Request<ActionConfirmationRefs>
@@ -287,5 +289,116 @@ export async function onMosipDeathRegisterHandler(
         reason: 'Unexpected error in OpenCRVS-MOSIP interoperability layer'
       })
       .code(400)
+  }
+}
+
+/**
+ * Handler for adoption registration confirmation.
+ *
+ * Once an adoption is registered, the linked 'child.brn' field (the
+ * Birth Registration Number entered/looked-up on the declaration) is used
+ * to locate the birth record it originated from, and that birth record is
+ * sealed (using its existing 'SEAL' custom action) so that its details are
+ * hidden from general access, per the legal effect of adoption.
+ */
+export async function onAdoptionRegisterHandler(
+  request: ActionConfirmationRequest,
+  h: Hapi.ResponseToolkit<ActionConfirmationRefs>
+) {
+  const token = request.auth.artifacts.token as string
+  const event = request.payload
+  const declaration = aggregateActionDeclarations(event)
+  const registrationNumber = generateRegistrationNumber()
+
+  await sealOriginalBirthRecord(declaration, event)
+  await sendInformantNotification({ event, token, registrationNumber })
+
+  return h.response({ registrationNumber }).code(200)
+}
+
+type SearchFieldValue = {
+  data?: {
+    input?: string
+    firstResult?: { id: string } | null
+  }
+}
+
+async function findBirthRecordByBrn(
+  brnField: SearchFieldValue | undefined,
+  client: ReturnType<typeof createClient>
+) {
+  if (brnField?.data?.firstResult) {
+    return brnField.data.firstResult
+  }
+
+  const brn = brnField?.data?.input
+
+  if (!brn) {
+    return undefined
+  }
+
+  const { results } = await client.event.search.query({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: Event.Birth,
+          'legalStatuses.REGISTERED.registrationNumber': {
+            type: 'exact',
+            term: brn
+          }
+        }
+      ]
+    }
+  })
+
+  return results[0]
+}
+
+/**
+ * Sealing acts on a *different* record (the original birth record) than the
+ * one this handler was invoked for. The token forwarded to trigger handlers
+ * is bound to the triggering (adoption) event's id, so it can never be used
+ * to act on another record - hence the dedicated sealing-service token here,
+ * rather than the request's own token.
+ */
+async function sealOriginalBirthRecord(
+  declaration: ReturnType<typeof aggregateActionDeclarations>,
+  adoptionEvent: EventDocument
+) {
+  const sealingToken = await getAdoptionSealingToken()
+
+  if (!sealingToken) {
+    return
+  }
+
+  const brnField = declaration['child.brn'] as SearchFieldValue | undefined
+  const url = new URL('events', GATEWAY_URL).toString()
+  const client = createClient(url, `Bearer ${sealingToken}`)
+
+  const birthRecord = await findBirthRecordByBrn(brnField, client)
+
+  if (!birthRecord) {
+    logger.warn(
+      `Adoption ${adoptionEvent.id}: no birth record found for the provided child.brn, skipping seal.`
+    )
+    return
+  }
+
+  try {
+    await client.event.actions.custom.request.mutate({
+      eventId: birthRecord.id,
+      transactionId: uuidv4(),
+      customActionType: 'SEAL',
+      annotation: {
+        reason: 'Adoption registered',
+        comments: `Sealed automatically after adoption ${adoptionEvent.trackingId} was registered.`
+      }
+    })
+  } catch (error) {
+    logger.error(
+      { eventId: birthRecord.id, err: error },
+      'Failed to seal the original birth record after adoption registration'
+    )
   }
 }
