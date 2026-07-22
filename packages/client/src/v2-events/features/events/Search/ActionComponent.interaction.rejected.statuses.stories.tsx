@@ -11,8 +11,7 @@
 
 import React from 'react'
 import { Meta, StoryObj } from '@storybook/react-vite'
-import { userEvent, within, expect } from 'storybook/test'
-import { waitFor } from '@testing-library/dom'
+import { userEvent, within, expect, waitFor } from 'storybook/test'
 import {
   ActionType,
   eventQueryDataGenerator,

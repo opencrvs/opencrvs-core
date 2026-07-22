@@ -107,7 +107,8 @@ export default defineConfig(({ mode }) => {
         plugins: [noTreeshakingForEvalPlugin()]
       },
       commonjsOptions: {
-        transformMixedEsModules: true
+        transformMixedEsModules: true,
+        defaultIsModuleExports: true
       },
       sourcemap: true
     },
@@ -116,7 +117,12 @@ export default defineConfig(({ mode }) => {
         crypto: require.resolve('crypto-js'),
         '@opencrvs/commons/build/dist/authentication':
           '@opencrvs/commons/authentication'
-      }
+      },
+      /*
+       * react-signature-canvas ships a UMD build that must share the app's
+       * React instance. Without dedupe, Vite 8 can bundle a second React copy.
+       */
+      dedupe: ['react', 'react-dom']
     },
     plugins: [
       loginRedirectPlugin(),

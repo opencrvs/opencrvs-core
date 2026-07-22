@@ -50,9 +50,13 @@
     "typescript": "7.0.2"
   },
   "dependencies": {
-    "@types/react-signature-canvas": "^1.0.2",
     "license-check-and-add": "^3.0.3",
-    "opener": "^1.5.1",
-    "react-signature-canvas": "^1.0.6"
+    "opener": "^1.5.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "react-signature-canvas>react": "18.3.1",
+      "react-signature-canvas>react-dom": "18.3.1"
+    }
   }
 }

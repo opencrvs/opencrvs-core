@@ -13,9 +13,20 @@ import { useEffect, useRef, useState } from 'react'
 import { useIntl } from 'react-intl'
 import * as React from 'react'
 import styled from 'styled-components'
-import SignatureCanvasComponent from 'react-signature-canvas'
+import SignatureCanvasImport from 'react-signature-canvas'
 import { Button } from '@opencrvs/components/lib/Button'
 import { messages } from '@client/i18n/messages/views/review'
+
+/*
+ * UMD/CJS default export interop: Vite 8 must resolve this to the component
+ * constructor, not the module namespace object.
+ */
+const SignatureCanvasComponent =
+  (
+    SignatureCanvasImport as {
+      default?: typeof SignatureCanvasImport
+    }
+  ).default ?? SignatureCanvasImport
 
 /** Based on packages/client/src/components/form/SignatureField/SignatureUploader.tsx */
 
