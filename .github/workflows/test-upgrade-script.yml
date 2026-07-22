@@ -25,12 +25,17 @@ jobs:
     runs-on: ubuntu-26.04
     env:
       COUNTRYCONFIG_BRANCH: ${{ github.event.inputs.countryconfig-branch || 'release/2.0.0' }}
+      # yarn 1.22 refuses to run inside a workspace whose package.json pins
+      # packageManager: pnpm; the countryconfig side of this job still uses yarn
+      SKIP_YARN_COREPACK_CHECK: 1
     steps:
       - name: Checkout opencrvs-core repository
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
           ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.ref || github.ref }}
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v6
         with:
@@ -40,9 +45,9 @@ jobs:
         with:
           timeout_minutes: 10
           max_attempts: 3
-          command: yarn install --frozen-lockfile
+          command: pnpm install --frozen-lockfile
       - name: Build toolkit
-        run: yarn build:all
+        run: pnpm build:all
         working-directory: packages/toolkit
       - name: Checkout the correct opencrvs-countryconfig branch
         run: |

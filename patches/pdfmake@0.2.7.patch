@@ -1,7 +1,7 @@
-diff --git a/node_modules/pdfmake/build/pdfmake.js b/node_modules/pdfmake/build/pdfmake.js
+diff --git a/build/pdfmake.js b/build/pdfmake.js
 index 7547d87..0d90240 100644
---- a/node_modules/pdfmake/build/pdfmake.js
-+++ b/node_modules/pdfmake/build/pdfmake.js
+--- a/build/pdfmake.js
++++ b/build/pdfmake.js
 @@ -20345,7 +20345,7 @@ var SVGtoPDF = function SVGtoPDF(doc, svg, x, y, options) {
      doc.addContent('ET');
    }

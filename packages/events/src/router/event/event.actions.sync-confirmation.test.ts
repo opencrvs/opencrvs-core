@@ -22,7 +22,6 @@ function mockDeclareApi(status: number, body: Record<string, unknown> = {}) {
       () =>
         HttpResponse.json(
           body,
-          // @ts-expect-error - msw types complain about numeric status
           { status }
         )
     )
