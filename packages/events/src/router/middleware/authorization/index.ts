@@ -189,12 +189,9 @@ export const requireAssignment: MiddlewareFunction<
     )
   )
 
-  // System users can not perform action on assigned events
-  if (user.type === TokenUserType.enum.system && assignedTo) {
-    throw new TRPCError({
-      code: 'CONFLICT',
-      cause: 'System user can not perform action on assigned event'
-    })
+  // System users can always perform action on assigned events
+  if (user.type === TokenUserType.enum.system) {
+    return next()
   }
 
   // Normal users require assignment
