@@ -18,7 +18,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/EventConfig"
-  "/trigger/events/{eventType}/actions/{actionType}":
+  /trigger/events/{eventType}/actions/{actionType}:
     post:
       tags:
         - Events
@@ -7060,23 +7060,21 @@ components:
         noOptionsMessage:
           description: "
 
-            \    A translation configuration object used to display
-            a message when no options are available.
+            \    A translation configuration object used to display a message
+            when no options are available.
 
-            \    It must follow the shape: { id: string;
-            defaultMessage: string; description?: string }.
+            \    It must follow the shape: { id: string; defaultMessage: string;
+            description?: string }.
 
             \    The message is rendered via
             intl.formatMessage(noOptionsMessage, { input }),
 
-            \    where 'input' represents the text entered in the
-            Select field.
+            \    where 'input' represents the text entered in the Select field.
 
-            \    You can reference this variable in your message,
-            for example:
+            \    You can reference this variable in your message, for example:
 
-            \    { ..., defaultMessage: \"'{input}' is not listed
-            among the health facilities.\" }
+            \    { ..., defaultMessage: \"'{input}' is not listed among the
+            health facilities.\" }
 
             \  "
           $ref: "#/components/schemas/TranslationConfig"
@@ -14353,21 +14351,18 @@ components:
                       searchFields:
                         description: "
 
-                          \      Defines multiple form
-                          fields that should be searched when this field has a
-                          value.
+                          \      Defines multiple form fields that should be
+                          searched when this field has a value.
 
-                          \      All specified fields
-                          will be combined using OR logic.
+                          \      All specified fields will be combined using OR
+                          logic.
 
 
-                          \      Example: {
-                          searchFields: ['mother.name', 'father.name',
-                          'informant.name'] }
+                          \      Example: { searchFields: ['mother.name',
+                          'father.name', 'informant.name'] }
 
-                          \      Will search all
-                          fields and return a record if any of the fields match
-                          the search value.    \ 
+                          \      Will search all fields and return a record if
+                          any of the fields match the search value.    \ 
 
                           \      "
                         type: array
@@ -14379,18 +14374,16 @@ components:
                   type:
                     description: "
 
-                      \      Explicitly specify the field
-                      type for searchFields.
+                      \      Explicitly specify the field type for searchFields.
 
-                      \      This is required when
-                      searchFields is defined, to show the correct control in
-                      the UI.
+                      \      This is required when searchFields is defined, to
+                      show the correct control in the UI.
 
                       \       \ 
 
-                      \      Example: FieldType.NAME for
-                      name fields, FieldType.TEXT for text fields,
-                      FieldType.DATE for date fields, etc.
+                      \      Example: FieldType.NAME for name fields,
+                      FieldType.TEXT for text fields, FieldType.DATE for date
+                      fields, etc.
 
                       \      "
                     type: string
@@ -14445,11 +14438,10 @@ components:
                   label:
                     description: "
 
-                      \      Explicitly specify the label
-                      for searchFields.
+                      \      Explicitly specify the label for searchFields.
 
-                      \      This is required when
-                      searchFields is defined.           \ 
+                      \      This is required when searchFields is
+                      defined.           \ 
 
                       \      "
                     $ref: "#/components/schemas/TranslationConfig"
@@ -14478,87 +14470,81 @@ components:
                   searchCriteriaLabelPrefix:
                     description: "
 
-                      \    This property determines
-                      whether to add a prefix (such as \"Child\" or
-                      \"Applicant\") before the field label
+                      \    This property determines whether to add a prefix
+                      (such as \"Child\" or \"Applicant\") before the field
+                      label
 
-                      \    when rendering search parameter
-                      labels — for example, in the search results page to
-                      indicate which fields were used in the search.
-
-
-                      \    For example, a field config
-                      like { id: \"child.name.firstname\", label: {
-                      defaultMessage: \"First Name(s)\" } } would render as
-                      \"First Name(s)\" by default.
+                      \    when rendering search parameter labels — for example,
+                      in the search results page to indicate which fields were
+                      used in the search.
 
 
-                      \    A field config like { id:
-                      \"mother.firstname\", label: { defaultMessage: \"First
-                      Name(s)\" } } would also render as \"First Name(s)\" by
+                      \    For example, a field config like { id:
+                      \"child.name.firstname\", label: { defaultMessage: \"First
+                      Name(s)\" } } would render as \"First Name(s)\" by
                       default.
 
 
-                      \    So, if both
-                      child.name.firstname and mother.firstname are used in a
-                      search, the resulting search criteria labels would be
-                      \"First Name(s)\", \"First Name(s)\",
+                      \    A field config like { id: \"mother.firstname\",
+                      label: { defaultMessage: \"First Name(s)\" } } would also
+                      render as \"First Name(s)\" by default.
+
+
+                      \    So, if both child.name.firstname and mother.firstname
+                      are used in a search, the resulting search criteria labels
+                      would be \"First Name(s)\", \"First Name(s)\",
 
                       \    which is ambiguous.
 
 
-                      \    Now, if we treat the field ID
-                      prefix as a label (e.g., \"applicant.firstname\" →
-                      \"Applicant\"), and the field label is already
+                      \    Now, if we treat the field ID prefix as a label
+                      (e.g., \"applicant.firstname\" → \"Applicant\"), and the
+                      field label is already
 
-                      \    descriptive — like { id:
-                      \"applicant.firstname\", label: { defaultMessage:
-                      \"Applicant's First Name\" } } — then the resulting
+                      \    descriptive — like { id: \"applicant.firstname\",
+                      label: { defaultMessage: \"Applicant's First Name\" } } —
+                      then the resulting
 
-                      \    label would be \"Applicant
-                      Applicant's First Name\", which is redundant and awkward.
+                      \    label would be \"Applicant Applicant's First Name\",
+                      which is redundant and awkward.
 
 
-                      \    By setting
-                      searchCriteriaLabelPrefix to a translation config object,
-                      we can explicitly define the desired prefix
+                      \    By setting searchCriteriaLabelPrefix to a translation
+                      config object, we can explicitly define the desired prefix
 
-                      \    in the country-config >
-                      event.advancedSearch configuration. For example:
-                      field(\"child.dob\", { searchCriteriaLabelPrefix:
-                      TranslationConfig }).
+                      \    in the country-config > event.advancedSearch
+                      configuration. For example: field(\"child.dob\", {
+                      searchCriteriaLabelPrefix: TranslationConfig }).
 
                       \    "
                     $ref: "#/components/schemas/TranslationConfig"
                   conditionals:
                     description: "
 
-                      \       In advanced search, we
-                      sometimes need to override the default field visibility
-                      conditionals.
+                      \       In advanced search, we sometimes need to override
+                      the default field visibility conditionals.
 
 
-                      \       For example, Informant
-                      fields in the declaration form may have conditional logic
+                      \       For example, Informant fields in the declaration
+                      form may have conditional logic
 
-                      \       that hides them based on
-                      other field values. Since the advanced search form reuses
+                      \       that hides them based on other field values. Since
+                      the advanced search form reuses
 
-                      \       the declaration form config,
-                      those same conditionals would apply by default.
+                      \       the declaration form config, those same
+                      conditionals would apply by default.
 
 
-                      \       However, in advanced search
-                      we often want to make all Informant fields searchable,
+                      \       However, in advanced search we often want to make
+                      all Informant fields searchable,
 
-                      \       regardless of their original
-                      visibility logic. To do this, we explicitly set their
+                      \       regardless of their original visibility logic. To
+                      do this, we explicitly set their
 
-                      \       'conditionals' to an empty
-                      array ('[]') in the search config. This ensures they
+                      \       'conditionals' to an empty array ('[]') in the
+                      search config. This ensures they
 
-                      \       are always rendered in the
-                      advanced search form.
+                      \       are always rendered in the advanced search form.
 
                       \      "
                     type: array
@@ -14677,21 +14663,18 @@ components:
                       searchFields:
                         description: "
 
-                          \      Defines multiple form
-                          fields that should be searched when this field has a
-                          value.
+                          \      Defines multiple form fields that should be
+                          searched when this field has a value.
 
-                          \      All specified fields
-                          will be combined using OR logic.
+                          \      All specified fields will be combined using OR
+                          logic.
 
 
-                          \      Example: {
-                          searchFields: ['mother.name', 'father.name',
-                          'informant.name'] }
+                          \      Example: { searchFields: ['mother.name',
+                          'father.name', 'informant.name'] }
 
-                          \      Will search all
-                          fields and return a record if any of the fields match
-                          the search value.    \ 
+                          \      Will search all fields and return a record if
+                          any of the fields match the search value.    \ 
 
                           \      "
                         type: array
@@ -14703,18 +14686,16 @@ components:
                   type:
                     description: "
 
-                      \      Explicitly specify the field
-                      type for searchFields.
+                      \      Explicitly specify the field type for searchFields.
 
-                      \      This is required when
-                      searchFields is defined, to show the correct control in
-                      the UI.
+                      \      This is required when searchFields is defined, to
+                      show the correct control in the UI.
 
                       \       \ 
 
-                      \      Example: FieldType.NAME for
-                      name fields, FieldType.TEXT for text fields,
-                      FieldType.DATE for date fields, etc.
+                      \      Example: FieldType.NAME for name fields,
+                      FieldType.TEXT for text fields, FieldType.DATE for date
+                      fields, etc.
 
                       \      "
                     type: string
@@ -14769,11 +14750,10 @@ components:
                   label:
                     description: "
 
-                      \      Explicitly specify the label
-                      for searchFields.
+                      \      Explicitly specify the label for searchFields.
 
-                      \      This is required when
-                      searchFields is defined.           \ 
+                      \      This is required when searchFields is
+                      defined.           \ 
 
                       \      "
                     $ref: "#/components/schemas/TranslationConfig"
@@ -14802,87 +14782,81 @@ components:
                   searchCriteriaLabelPrefix:
                     description: "
 
-                      \    This property determines
-                      whether to add a prefix (such as \"Child\" or
-                      \"Applicant\") before the field label
+                      \    This property determines whether to add a prefix
+                      (such as \"Child\" or \"Applicant\") before the field
+                      label
 
-                      \    when rendering search parameter
-                      labels — for example, in the search results page to
-                      indicate which fields were used in the search.
-
-
-                      \    For example, a field config
-                      like { id: \"child.name.firstname\", label: {
-                      defaultMessage: \"First Name(s)\" } } would render as
-                      \"First Name(s)\" by default.
+                      \    when rendering search parameter labels — for example,
+                      in the search results page to indicate which fields were
+                      used in the search.
 
 
-                      \    A field config like { id:
-                      \"mother.firstname\", label: { defaultMessage: \"First
-                      Name(s)\" } } would also render as \"First Name(s)\" by
+                      \    For example, a field config like { id:
+                      \"child.name.firstname\", label: { defaultMessage: \"First
+                      Name(s)\" } } would render as \"First Name(s)\" by
                       default.
 
 
-                      \    So, if both
-                      child.name.firstname and mother.firstname are used in a
-                      search, the resulting search criteria labels would be
-                      \"First Name(s)\", \"First Name(s)\",
+                      \    A field config like { id: \"mother.firstname\",
+                      label: { defaultMessage: \"First Name(s)\" } } would also
+                      render as \"First Name(s)\" by default.
+
+
+                      \    So, if both child.name.firstname and mother.firstname
+                      are used in a search, the resulting search criteria labels
+                      would be \"First Name(s)\", \"First Name(s)\",
 
                       \    which is ambiguous.
 
 
-                      \    Now, if we treat the field ID
-                      prefix as a label (e.g., \"applicant.firstname\" →
-                      \"Applicant\"), and the field label is already
+                      \    Now, if we treat the field ID prefix as a label
+                      (e.g., \"applicant.firstname\" → \"Applicant\"), and the
+                      field label is already
 
-                      \    descriptive — like { id:
-                      \"applicant.firstname\", label: { defaultMessage:
-                      \"Applicant's First Name\" } } — then the resulting
+                      \    descriptive — like { id: \"applicant.firstname\",
+                      label: { defaultMessage: \"Applicant's First Name\" } } —
+                      then the resulting
 
-                      \    label would be \"Applicant
-                      Applicant's First Name\", which is redundant and awkward.
+                      \    label would be \"Applicant Applicant's First Name\",
+                      which is redundant and awkward.
 
 
-                      \    By setting
-                      searchCriteriaLabelPrefix to a translation config object,
-                      we can explicitly define the desired prefix
+                      \    By setting searchCriteriaLabelPrefix to a translation
+                      config object, we can explicitly define the desired prefix
 
-                      \    in the country-config >
-                      event.advancedSearch configuration. For example:
-                      field(\"child.dob\", { searchCriteriaLabelPrefix:
-                      TranslationConfig }).
+                      \    in the country-config > event.advancedSearch
+                      configuration. For example: field(\"child.dob\", {
+                      searchCriteriaLabelPrefix: TranslationConfig }).
 
                       \    "
                     $ref: "#/components/schemas/TranslationConfig"
                   conditionals:
                     description: "
 
-                      \       In advanced search, we
-                      sometimes need to override the default field visibility
-                      conditionals.
+                      \       In advanced search, we sometimes need to override
+                      the default field visibility conditionals.
 
 
-                      \       For example, Informant
-                      fields in the declaration form may have conditional logic
+                      \       For example, Informant fields in the declaration
+                      form may have conditional logic
 
-                      \       that hides them based on
-                      other field values. Since the advanced search form reuses
+                      \       that hides them based on other field values. Since
+                      the advanced search form reuses
 
-                      \       the declaration form config,
-                      those same conditionals would apply by default.
+                      \       the declaration form config, those same
+                      conditionals would apply by default.
 
 
-                      \       However, in advanced search
-                      we often want to make all Informant fields searchable,
+                      \       However, in advanced search we often want to make
+                      all Informant fields searchable,
 
-                      \       regardless of their original
-                      visibility logic. To do this, we explicitly set their
+                      \       regardless of their original visibility logic. To
+                      do this, we explicitly set their
 
-                      \       'conditionals' to an empty
-                      array ('[]') in the search config. This ensures they
+                      \       'conditionals' to an empty array ('[]') in the
+                      search config. This ensures they
 
-                      \       are always rendered in the
-                      advanced search form.
+                      \       are always rendered in the advanced search form.
 
                       \      "
                     type: array
