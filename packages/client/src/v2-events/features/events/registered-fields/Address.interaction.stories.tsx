@@ -670,7 +670,8 @@ function ToCertificateVariablesStory(args: FormFieldGeneratorPropsWithoutRef) {
               intl,
               locations,
               administrativeAreas,
-              adminLevels
+              adminLevels,
+              anchor: toPlainDate('2025-01-01')
             })
             setResolvedAddress((prev) => ({
               ...prev,
