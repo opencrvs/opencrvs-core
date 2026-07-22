@@ -14,7 +14,7 @@ import { expect, userEvent, within } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 
-import selectEvent from 'react-select-event'
+import * as selectEvent from '@client/v2-events/select-event'
 import {
   ActionType,
   generateWorkqueues,

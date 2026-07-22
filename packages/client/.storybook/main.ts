@@ -12,12 +12,9 @@ import { createRequire } from "node:module";
  */
 
 import type { StorybookConfig } from '@storybook/react-vite'
-import { mergeConfig } from 'vite'
-import { fileURLToPath } from 'node:url'
 import { join, dirname } from 'path'
 
 const require = createRequire(import.meta.url)
-const storybookDir = dirname(fileURLToPath(import.meta.url))
 
 /**
  * This function is used to resolve the absolute path of a package.
@@ -56,21 +53,7 @@ const config: StorybookConfig = {
         .some((plugin) => plugin.name.startsWith('vite-plugin-pwa'))
     })
 
-    /*
-     * react-select-event imports act from @testing-library/react, which throws
-     * in production React builds and breaks interaction tests against built
-     * Storybook. Storybook's instrumented utilities handle act internally.
-     */
-    return mergeConfig(config, {
-      resolve: {
-        alias: {
-          '@testing-library/react': join(
-            storybookDir,
-            'testing-library-react-shim.ts'
-          )
-        }
-      }
-    })
+    return config
   }
 }
 export default config

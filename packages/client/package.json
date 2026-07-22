@@ -192,7 +192,6 @@
     "postcss-styled-syntax": "^0.7.1",
     "prettier": "3.5.3",
     "qrcode": "^1.5.1",
-    "react-select-event": "^5.5.1",
     "serve": "^14.2.0",
     "storybook": "^10.5.3",
     "storybook-addon-source-link": "^2.0.1",

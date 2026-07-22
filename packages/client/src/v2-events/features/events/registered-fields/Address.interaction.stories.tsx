@@ -13,7 +13,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 import React from 'react'
-import * as selectEvent from 'react-select-event'
+import * as selectEvent from '@client/v2-events/select-event'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'

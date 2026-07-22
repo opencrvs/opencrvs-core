@@ -11,7 +11,7 @@
 
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, within } from 'storybook/test'
-import * as selectEvent from 'react-select-event'
+import * as selectEvent from '@client/v2-events/select-event'
 import React from 'react'
 import styled from 'styled-components'
 import {
