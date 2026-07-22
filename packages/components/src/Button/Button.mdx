@@ -1,0 +1,45 @@
+{/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */}
+
+import { Meta, Canvas, Controls } from '@storybook/blocks'
+import * as ButtonStories from './Button.stories'
+
+<Meta of={ButtonStories} />
+
+# Button
+
+Buttons are used primarily for actions. For buttons that need to look like links, see [Link component.](/docs/controls-link--default)
+
+Use the `aria-label`-prop when the button's visible text doesn't fully convey the meaning of the action. For example "Add" or "Remove" doesn't tell what is being added or removed. Make sure that your button is accessible by keyboard tab navigation.
+
+<Canvas of={ButtonStories.Primary} />
+
+<Controls of={ButtonStories.Primary} />
+
+## Sizes
+
+<Canvas of={ButtonStories.Sizes} />
+
+## With icon
+
+<Canvas of={ButtonStories.WithIcon} />
+
+## Icons
+
+<Canvas of={ButtonStories.Icons} />
+
+## Loading
+
+<Canvas of={ButtonStories.Loading} />
+
+## Disabled
+
+<Canvas of={ButtonStories.Disabled} />

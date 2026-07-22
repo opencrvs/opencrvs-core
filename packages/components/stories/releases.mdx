@@ -1,9 +1,18 @@
-import { Meta, DocsContainer } from '@storybook/addon-docs'
-import { Pill } from '@opencrvs/components/lib/Pill'
-import { Stack } from '@opencrvs/components/lib/Stack'
-import { Text } from '@opencrvs/components/lib/Text'
-import { ThemeProvider } from 'styled-components'
-import { getTheme } from '@opencrvs/components/lib/theme'
+{/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */}
+
+import { Meta } from '@storybook/blocks'
+import { Pill } from '../src/Pill'
+import { Stack } from '../src/Stack'
+import { Text } from '../src/Text'
 
 export const ReleasePill = ({ date, version }) => (
   <>
@@ -17,14 +26,9 @@ export const ReleasePill = ({ date, version }) => (
   </>
 )
 
-<Meta
-  title="Releases"
-  parameters={{
-    docsCss: {
-      maxWidth: '640px'
-    }
-  }}
-/>
+<Meta title="Releases" />
+
+<div style={{ maxWidth: '640px' }}>
 
 # Releases
 
@@ -81,3 +85,5 @@ export const ReleasePill = ({ date, version }) => (
 - Create [Divider](?path=/docs/layout-divider--template)
 - Create [Text](?path=/docs/typography-text--default)
 - Create [Stack](?path=/docs/layout-stack--default)
+
+</div>

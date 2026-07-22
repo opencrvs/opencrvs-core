@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { create } from '@storybook/theming'
-import { getTheme } from '@opencrvs/components/lib/theme'
+import { getTheme } from '../src/theme'
 
 export const BRAND_BLUE =
   '#0058E0' /* Also see `manager-head.html`, if you're going to change this */

@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { DocsContainer } from '@storybook/addon-docs'
+import { DocsContainer } from '@storybook/blocks'
 import { ThemeProvider, createGlobalStyle } from 'styled-components'
 import WebFont from 'webfontloader'
 import type { Preview } from '@storybook/react'
-import { getTheme } from '@opencrvs/components/lib/theme'
+import { getTheme } from '../src/theme'
 
 const theme = getTheme()
 
@@ -44,6 +44,7 @@ const preview: Preview = {
       </ThemeProvider>
     )
   ],
+  tags: ['autodocs'],
   parameters: {
     viewMode: 'docs',
     actions: { argTypesRegex: '^on[A-Z].*' },
@@ -58,16 +59,7 @@ const preview: Preview = {
         <DocsContainer context={context}>
           <ThemeProvider theme={theme}>
             <FontStyle />
-            {
-              // Allows adding { parameters: { docsCss: { ... } }} inside stories
-              context?.attachedCSFFile?.meta?.parameters?.docsCss ? (
-                <div style={context.attachedCSFFile.meta.parameters.docsCss}>
-                  {children}
-                </div>
-              ) : (
-                children
-              )
-            }
+            {children}
           </ThemeProvider>
         </DocsContainer>
       )
