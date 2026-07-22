@@ -740,8 +740,6 @@ paths:
                           - desc
                     required:
                       - field
-              required:
-                - query
       responses:
         "200":
           description: Successful response
