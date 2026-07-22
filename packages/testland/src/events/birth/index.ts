@@ -13,11 +13,13 @@ import {
   and,
   ConditionalType,
   defineConfig,
+  DocumentMimeType,
   event,
   EventStatus,
   field,
   FieldType,
   flag,
+  ImageMimeType,
   InherentFlags,
   not,
   or,
@@ -1184,22 +1186,79 @@ export const birthEvent = defineConfig({
       form: [
         {
           id: 'reason',
-          type: FieldType.TEXTAREA,
+          type: FieldType.SELECT,
           required: true,
           label: {
-            defaultMessage: 'Reason',
-            description: 'This is the label for reason field',
-            id: 'form.field.label.reason'
+            defaultMessage: 'Seal reason / legal basis',
+            description: 'This is the label for the seal reason field',
+            id: 'event.birth.custom.action.seal.field.reason.label'
+          },
+          options: [
+            {
+              value: 'ADOPTION',
+              label: {
+                defaultMessage: 'Adoption',
+                description: 'Option label for adoption as the seal reason',
+                id: 'event.birth.custom.action.seal.field.reason.option.adoption.label'
+              }
+            },
+            {
+              value: 'COURT_ORDER',
+              label: {
+                defaultMessage: 'Court order',
+                description: 'Option label for court order as the seal reason',
+                id: 'event.birth.custom.action.seal.field.reason.option.courtOrder.label'
+              }
+            },
+            {
+              value: 'OTHER',
+              label: {
+                defaultMessage: 'Other',
+                description: 'Option label for other seal reasons',
+                id: 'event.birth.custom.action.seal.field.reason.option.other.label'
+              }
+            }
+          ]
+        },
+        {
+          id: 'courtOrderReference',
+          type: FieldType.TEXT,
+          required: true,
+          label: {
+            defaultMessage: 'Court order reference',
+            description:
+              'This is the label for the court order reference field',
+            id: 'event.birth.custom.action.seal.field.courtOrderReference.label'
           }
         },
         {
-          id: 'comments',
-          type: FieldType.TEXTAREA,
-          required: true,
+          id: 'requestingParty',
+          type: FieldType.TEXT,
+          required: false,
           label: {
-            defaultMessage: 'Additional comments',
-            description: 'This is the label for additional comments field',
-            id: 'form.field.label.additionalComments'
+            defaultMessage: 'Requesting party',
+            description: 'This is the label for the requesting party field',
+            id: 'event.birth.custom.action.seal.field.requestingParty.label'
+          }
+        },
+        {
+          id: 'courtOrderCopy',
+          type: FieldType.FILE,
+          required: true,
+          uncorrectable: true,
+          configuration: {
+            maxFileSize: 5 * 1024 * 1024,
+            acceptedFileTypes: [
+              ImageMimeType.enum['image/jpeg'],
+              ImageMimeType.enum['image/png'],
+              ImageMimeType.enum['image/jpg'],
+              DocumentMimeType.enum['application/pdf']
+            ]
+          },
+          label: {
+            defaultMessage: 'Supporting document — court order copy',
+            description: 'This is the label for the supporting document field',
+            id: 'event.birth.custom.action.seal.field.courtOrderCopy.label'
           }
         }
       ],

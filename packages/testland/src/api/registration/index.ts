@@ -300,6 +300,13 @@ export async function onMosipDeathRegisterHandler(
  * to locate the birth record it originated from, and that birth record is
  * sealed (using its existing 'SEAL' custom action) so that its details are
  * hidden from general access, per the legal effect of adoption.
+ *
+ * Sealing is a precondition for registering the adoption, not a best-effort
+ * side effect: if the original can't be identified or sealing otherwise
+ * fails, the adoption registration itself is rejected rather than left to
+ * succeed with the original still unsealed. The one exception is a birth
+ * record that is already sealed (e.g. a second adoption referencing the same
+ * BRN) - that is treated as a no-op and the adoption registers normally.
  */
 export async function onAdoptionRegisterHandler(
   request: ActionConfirmationRequest,
@@ -308,9 +315,14 @@ export async function onAdoptionRegisterHandler(
   const token = request.auth.artifacts.token as string
   const event = request.payload
   const declaration = aggregateActionDeclarations(event)
-  const registrationNumber = generateRegistrationNumber()
 
-  await sealOriginalBirthRecord(declaration, event)
+  const sealResult = await sealOriginalBirthRecord(declaration, event)
+
+  if (!sealResult.success) {
+    return h.response({ reason: sealResult.reason }).code(400)
+  }
+
+  const registrationNumber = generateRegistrationNumber()
   await sendInformantNotification({ event, token, registrationNumber })
 
   return h.response({ registrationNumber }).code(200)
@@ -319,14 +331,16 @@ export async function onAdoptionRegisterHandler(
 type SearchFieldValue = {
   data?: {
     input?: string
-    firstResult?: { id: string } | null
+    firstResult?: { id: string; flags?: string[] } | null
   }
 }
+
+type BirthRecord = { id: string; flags?: string[] }
 
 async function findBirthRecordByBrn(
   brnField: SearchFieldValue | undefined,
   client: ReturnType<typeof createClient>
-) {
+): Promise<BirthRecord | undefined> {
   if (brnField?.data?.firstResult) {
     return brnField.data.firstResult
   }
@@ -355,6 +369,8 @@ async function findBirthRecordByBrn(
   return results[0]
 }
 
+type SealResult = { success: true } | { success: false; reason: string }
+
 /**
  * Sealing acts on a *different* record (the original birth record) than the
  * one this handler was invoked for. The token forwarded to trigger handlers
@@ -365,11 +381,14 @@ async function findBirthRecordByBrn(
 async function sealOriginalBirthRecord(
   declaration: ReturnType<typeof aggregateActionDeclarations>,
   adoptionEvent: EventDocument
-) {
+): Promise<SealResult> {
   const sealingToken = await getAdoptionSealingToken()
 
   if (!sealingToken) {
-    return
+    return {
+      success: false,
+      reason: 'Unable to authenticate the sealing service'
+    }
   }
 
   const brnField = declaration['child.brn'] as SearchFieldValue | undefined
@@ -380,9 +399,19 @@ async function sealOriginalBirthRecord(
 
   if (!birthRecord) {
     logger.warn(
-      `Adoption ${adoptionEvent.id}: no birth record found for the provided child.brn, skipping seal.`
+      `Adoption ${adoptionEvent.id}: no registered birth record found for the provided child.brn.`
     )
-    return
+    return {
+      success: false,
+      reason: 'No registered birth record found for the provided BRN'
+    }
+  }
+
+  if (birthRecord.flags?.includes('sealed')) {
+    logger.info(
+      `Adoption ${adoptionEvent.id}: birth record ${birthRecord.id} is already sealed, skipping.`
+    )
+    return { success: true }
   }
 
   try {
@@ -391,14 +420,21 @@ async function sealOriginalBirthRecord(
       transactionId: uuidv4(),
       customActionType: 'SEAL',
       annotation: {
-        reason: 'Adoption registered',
-        comments: `Sealed automatically after adoption ${adoptionEvent.trackingId} was registered.`
+        reason: 'ADOPTION',
+        courtOrderReference: declaration['adoptionOrder.reference'],
+        courtOrderCopy: declaration['documents.courtOrderCopy']
       }
     })
+
+    return { success: true }
   } catch (error) {
     logger.error(
       { eventId: birthRecord.id, err: error },
       'Failed to seal the original birth record after adoption registration'
     )
+    return {
+      success: false,
+      reason: 'Failed to seal the original birth record'
+    }
   }
 }

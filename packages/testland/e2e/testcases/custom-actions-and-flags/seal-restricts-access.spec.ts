@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test } from '@playwright/test'
-import { getToken, login, searchFromSearchBar } from '../../helpers'
+import {
+  getToken,
+  login,
+  searchFromSearchBar,
+  uploadImage
+} from '../../helpers'
 import { CREDENTIALS } from '../../constants'
 import { ensureAssignedToUser, selectAction } from '../../utils'
 import { createDeclaration, Declaration } from '../test-data/birth-declaration'
@@ -35,10 +40,14 @@ test('Sealing a record hides it from local registrars and blocks all actions', a
 
     await expect(page.getByRole('button', { name: 'Confirm' })).toBeDisabled()
 
-    await page.locator('#reason').fill('Sealing record for testing purposes.')
+    await page.locator('#reason').click()
     await page
-      .locator('#comments')
-      .fill('Additional context for sealing the record.')
+      .locator('.react-select__option', { hasText: 'Court order' })
+      .click()
+    await page
+      .locator('#courtOrderReference')
+      .fill('Sealing record for testing purposes.')
+    await uploadImage(page, page.locator('button[name="courtOrderCopy"]'))
 
     const sealResponse = page.waitForResponse(
       (response) =>
