@@ -22,7 +22,7 @@
     "@hapi/hapi": "^21.0.0",
     "@opencrvs/commons": "workspace:*",
     "@opencrvs/events": "workspace:*",
-    "@trpc/client": "11.8.0",
+    "@trpc/client": "11.4.3",
     "app-module-path": "^2.2.0",
     "dotenv": "^6.1.0",
     "envalid": "^8.0.0",

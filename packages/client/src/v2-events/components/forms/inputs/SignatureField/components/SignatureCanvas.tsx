@@ -28,6 +28,8 @@ const SignatureCanvasComponent =
     }
   ).default ?? SignatureCanvasImport
 
+type SignatureCanvasInstance = InstanceType<typeof SignatureCanvasComponent>
+
 /** Based on packages/client/src/components/form/SignatureField/SignatureUploader.tsx */
 
 const SignatureContainer = styled.div`
@@ -56,7 +58,7 @@ export function SignatureCanvas({
 }) {
   const [canvasWidth, setCanvasWidth] = useState(300)
   const canvasContainerRef = useRef<HTMLDivElement>(null)
-  const canvasRef = useRef<SignatureCanvasComponent>(null)
+  const canvasRef = useRef<SignatureCanvasInstance>(null)
   const intl = useIntl()
 
   useEffect(() => {
