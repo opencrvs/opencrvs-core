@@ -117,6 +117,7 @@ certificate.parent.details.label.nationality,Parent Nationality,Nationality,Nati
 certificate.parent.details.label.number,Parent number,Number,Numéro
 certificates.birth.certificate,Birth Certificate,Birth Certificate,Acte de naissance
 certificates.birth.certificate.copy,Birth Certificate Certified Copy,Birth Certificate Certified Copy,Copie certifiée conforme de l'acte de naissance
+certificates.birth.printedCertificateCount,Number of printed copies,"{copiesPrintedForTemplate, select, 0{} other{Copy #{copiesPrintedForTemplate}}}","{copiesPrintedForTemplate, select, 0{} other{Copie #{copiesPrintedForTemplate}}}"
 certificates.birth.registration.receipt,Birth Registration Receipt,Birth Registration Receipt,Reçu d'enregistrement de naissance
 certificates.death.certificate,Death Certificate,Death Certificate,Certificat de décès
 certificates.death.certificate.copy,Death Certificate Certified Copy,Death Certificate Certified Copy,Copie certifiée conforme du certificat de décès
