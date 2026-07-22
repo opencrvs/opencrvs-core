@@ -138,6 +138,10 @@ export const Workqueues = defineWorkqueues([
     },
     query: {
       ...declaredInMyAdminArea,
+      status: {
+        type: 'anyOf',
+        terms: [EventStatus.enum.NOTIFIED, EventStatus.enum.DECLARED]
+      },
       flags: { anyOf: [InherentFlags.POTENTIAL_DUPLICATE] }
     },
     action: { type: ActionType.READ }
@@ -152,6 +156,10 @@ export const Workqueues = defineWorkqueues([
     },
     query: {
       ...createdInMyAdminArea,
+      status: {
+        type: 'anyOf',
+        terms: [EventStatus.enum.NOTIFIED, EventStatus.enum.DECLARED]
+      },
       flags: { anyOf: [InherentFlags.REJECTED] }
     },
     action: { type: ActionType.READ }
@@ -166,6 +174,10 @@ export const Workqueues = defineWorkqueues([
     },
     query: {
       ...createdInMyAdminArea,
+      status: {
+        type: 'anyOf',
+        terms: [EventStatus.enum.NOTIFIED, EventStatus.enum.DECLARED]
+      },
       flags: { anyOf: ['attestation-required'] }
     },
     action: { type: ActionType.READ }

@@ -431,7 +431,10 @@ export const deathEvent = defineConfig({
       conditionals: [
         {
           type: ConditionalType.SHOW,
-          conditional: flag('attestation-required')
+          conditional: and(
+            flag('attestation-required'),
+            not(status('ARCHIVED'))
+          )
         }
       ],
       flags: [{ id: 'attestation-required', operation: 'remove' }],
