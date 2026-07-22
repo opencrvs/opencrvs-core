@@ -18,7 +18,8 @@ import {
   EventConfig,
   EventState,
   FieldValue,
-  FieldConfig
+  FieldConfig,
+  todayISO
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { filterEmptyValues } from '@client/v2-events/utils'
@@ -88,7 +89,13 @@ function SearchParamLabel({
     : undefined
 
   const label = intl.formatMessage(field.label)
-  const valueOutput = ValueOutput({ config: field, value, searchMode: true })
+  const valueOutput = ValueOutput({
+    // Search criteria are a present-tense surface — today's names.
+    anchor: todayISO(),
+    config: field,
+    value,
+    searchMode: true
+  })
   const output = (
     <>
       {prefix}

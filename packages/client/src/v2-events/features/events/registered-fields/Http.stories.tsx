@@ -24,7 +24,8 @@ import {
   user,
   FieldConfig,
   digitalIdentityEvent,
-  PRINT_DIGITAL_ID_CERTIFICATE_FORM
+  PRINT_DIGITAL_ID_CERTIFICATE_FORM,
+  toPlainDate
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import {
@@ -228,7 +229,7 @@ export const HttpJsonResponseInCopy: StoryObj<typeof Review> = {
   },
   render: function Component() {
     const allFields = fetchBrnFields.flat()
-    const stringifier = useFormDataStringifier()
+    const stringifier = useFormDataStringifier(toPlainDate('2025-01-01'))
     const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
     const FORM_DATA = {
       'groom.http-fetch': {

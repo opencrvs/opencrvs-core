@@ -99,9 +99,9 @@ function resolveDataPath(
   return current
 }
 
-/** Returns today's date as an ISO date string (YYYY-MM-DD). */
-export function todayISO(): string {
-  return formatISO(new Date(), { representation: 'date' })
+/** Returns today's date as a {@link PlainDate} (YYYY-MM-DD), device-local. */
+export function todayISO(): PlainDate {
+  return formatISO(new Date(), { representation: 'date' }) as PlainDate
 }
 
 /**

@@ -19,13 +19,18 @@ import {
   EventIndex,
   getOrThrow,
   ActionType,
-  ClientSpecificAction
+  ClientSpecificAction,
+  todayISO
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/i18n/messages/views/action'
 import { useAuthentication } from '@client/utils/userUtils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
+import {
+  flattenEventIndex,
+  getUsersFullName,
+  resolveLocationName
+} from '@client/v2-events/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -173,8 +178,11 @@ export function ActionMenu({
     : ''
 
   const assignedOffice = assignedToUser?.primaryOfficeId
-  const assignedOfficeName =
-    (assignedOffice && locations.get(assignedOffice)?.name) || ''
+  // Assigned office is a present-tense surface — today's name.
+  const assignedOfficeName = resolveLocationName(
+    assignedOffice ? locations.get(assignedOffice) : undefined,
+    todayISO()
+  )
 
   const [modals, actionMenuItems] = useAllowedActionConfigurations(eventIndex)
 

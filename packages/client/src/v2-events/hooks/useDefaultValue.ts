@@ -25,7 +25,7 @@ import {
   EventState,
   buildFormState,
   UUID,
-  AdministrativeArea,
+  ClientAdministrativeArea,
   FieldGroup,
   TextField,
   FieldConfigDefaultValue,
@@ -40,7 +40,7 @@ import { useSystemVariables } from './useSystemVariables'
 import { useAdministrativeAreas } from './useAdministrativeAreas'
 
 interface Context extends SystemVariables {
-  administrativeAreas: Map<UUID, AdministrativeArea>
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
   adminLevelIds: string[]
   form: EventState | ActionUpdate
 }

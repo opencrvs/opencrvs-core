@@ -24,7 +24,8 @@ import {
   field as createFieldCondition,
   ConditionalType,
   FieldValue,
-  AddressFieldValue
+  AddressFieldValue,
+  toPlainDate
 } from '@opencrvs/commons/client'
 import * as selectEvent from '@client/v2-events/select-event'
 import {
