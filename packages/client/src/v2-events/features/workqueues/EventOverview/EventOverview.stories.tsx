@@ -215,14 +215,12 @@ export const OverviewMobile: Story = {
     offline: {
       events: [defaultEvent]
     },
-
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: defaultEvent.id
       })
     },
-
     msw: {
       handlers: {
         events: [
@@ -254,13 +252,7 @@ export const OverviewMobile: Story = {
       }
     }
   },
-
-  globals: {
-    viewport: {
-      value: 'mobile',
-      isRotated: false
-    }
-  }
+  globals: { viewport: { value: 'mobile' } }
 }
 
 export const WithAcceptedRegisterEvent: Story = {

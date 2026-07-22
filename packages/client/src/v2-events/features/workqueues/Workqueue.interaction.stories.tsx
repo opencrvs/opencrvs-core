@@ -807,12 +807,7 @@ export const MobileCreateEventHiddenForUnauthorizedUser: Story = {
       }
     )
   },
-  globals: {
-    viewport: {
-      value: 'mobile',
-      isRotated: false
-    }
-  }
+  globals: { viewport: { value: 'mobile' } }
 }
 
 export const MobileCreateEventShownForAuthorizedUser: Story = {
@@ -849,7 +844,6 @@ export const MobileCreateEventShownForAuthorizedUser: Story = {
       }
     }
   },
-
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
@@ -860,7 +854,6 @@ export const MobileCreateEventShownForAuthorizedUser: Story = {
         await expect(rows.length).toBeGreaterThan(0)
       })
     })
-
     await step(
       'Floating action button for new event creation is rendered',
       async () => {
@@ -871,13 +864,7 @@ export const MobileCreateEventShownForAuthorizedUser: Story = {
       }
     )
   },
-
-  globals: {
-    viewport: {
-      value: 'mobile',
-      isRotated: false
-    }
-  }
+  globals: { viewport: { value: 'mobile' } }
 }
 
 export const WorkqueueAutoRefreshOnCountChange: Story = {

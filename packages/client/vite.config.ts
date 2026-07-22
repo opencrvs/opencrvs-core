@@ -69,9 +69,6 @@ export default defineConfig(({ mode }) => {
       strategies: 'injectManifest',
       injectManifest: {
         globDirectory: 'build/',
-        // Source maps (.map) are intentionally not precached: they are large
-        // (a single Rolldown chunk map can exceed the size limit) and are not
-        // needed for the app to run offline.
         globPatterns: ['**/*.{json,ico,ttf,html,js}'],
         globIgnores: ['**/config.js'],
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
@@ -120,16 +117,13 @@ export default defineConfig(({ mode }) => {
       },
       /*
        * react-signature-canvas ships a UMD build that must share the app's
-       * React instance. Without dedupe, Vite 8 can bundle a second React copy.
+React instance. Without dedupe, Vite 8 can bundle a second React copy.
        */
       dedupe: ['react', 'react-dom']
     },
     plugins: [
       loginRedirectPlugin(),
       htmlPlugin(),
-      // @vitejs/plugin-react v6 transforms with Oxc and no longer supports a
-      // `babel` option, so the babel-plugin-styled-components config (which only
-      // added displayName/fileName for debugging) has been dropped.
       react(),
       tsconfigPaths({
         projects: ['./tsconfig.build.json']

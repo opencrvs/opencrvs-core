@@ -62,8 +62,6 @@ export default defineConfig(({ mode }) => {
       registerType: 'autoUpdate',
       workbox: {
         cacheId: 'ocrvs-login',
-        // strategy is 'generateSW', so the size limit lives here (the
-        // injectManifest block above is ignored for this strategy).
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
         runtimeCaching: [
           {
@@ -167,25 +165,22 @@ export default defineConfig(({ mode }) => {
               }
             )
 
-            proxy.on(
-              'error',
-              (_err, req, res) => {
-                if (req.url === '/health/ready' && 'writeHead' in res) {
-                  res.writeHead(500, { 'Content-Type': 'application/json' })
-                  res.end(
-                    JSON.stringify({
-                      status: 'error',
-                      checks: {
-                        countryconfig: {
-                          status: 'error',
-                          error: 'Country config service unavailable'
-                        }
+            proxy.on('error', (_err, req, res) => {
+              if (req.url === '/health/ready' && 'writeHead' in res) {
+                res.writeHead(500, { 'Content-Type': 'application/json' })
+                res.end(
+                  JSON.stringify({
+                    status: 'error',
+                    checks: {
+                      countryconfig: {
+                        status: 'error',
+                        error: 'Country config service unavailable'
                       }
-                    })
-                  )
-                }
+                    }
+                  })
+                )
               }
-            )
+            })
           }
         }
       }

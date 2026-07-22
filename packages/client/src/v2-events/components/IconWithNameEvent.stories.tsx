@@ -27,10 +27,5 @@ export const PotentialDuplicateInMobileView: Story = {
     event: 'Birth Registration',
     flags: [InherentFlags.POTENTIAL_DUPLICATE]
   },
-  globals: {
-    viewport: {
-      value: 'mobile',
-      isRotated: false
-    }
-  }
+  globals: { viewport: { value: 'mobile' } }
 }

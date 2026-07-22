@@ -596,7 +596,6 @@ export const ChangeFieldInReview: Story = {
 
 export const MobileReviewShowsActionMenuAndExitsUndeclaredDraft: Story = {
   name: 'Mobile: action menu visible and X-button exits undeclared draft',
-
   loaders: [
     () => {
       declarationTrpcMsw.events.reset()
@@ -607,7 +606,6 @@ export const MobileReviewShowsActionMenuAndExitsUndeclaredDraft: Story = {
       await new Promise((resolve) => setTimeout(resolve, 50))
     }
   ],
-
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -615,7 +613,6 @@ export const MobileReviewShowsActionMenuAndExitsUndeclaredDraft: Story = {
         eventId: createdEventDocument.id
       })
     },
-
     chromatic: { disableSnapshot: true },
     msw
   },
@@ -641,13 +638,7 @@ export const MobileReviewShowsActionMenuAndExitsUndeclaredDraft: Story = {
       }
     )
   },
-
-  globals: {
-    viewport: {
-      value: 'mobile',
-      isRotated: false
-    }
-  }
+  globals: { viewport: { value: 'mobile' } }
 }
 
 export const ShowToastOnDuplicateDetectedOnDeclare: Story = {

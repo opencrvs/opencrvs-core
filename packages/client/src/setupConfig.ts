@@ -10,12 +10,6 @@
  */
 import { vi } from 'vitest'
 
-/*
- * `window.config` must be defined before any application module is evaluated:
- * several modules (e.g. utils/countries.ts) read it at import time. This file
- * runs first (see `setupFiles` order in vite.config.ts) so the stub is in place
- * before setupTests.ts imports pull in that application code.
- */
 const config = {
   APPLICATION_NAME: 'Farajaland CRVS',
   COUNTRY: 'BGD',

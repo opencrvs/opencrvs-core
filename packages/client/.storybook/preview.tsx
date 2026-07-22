@@ -341,7 +341,6 @@ const preview: Preview = {
       await new Promise((resolve) => setTimeout(resolve, 50))
     }
   ],
-
   decorators: [
     (Story, context) => {
       const { store } = createStore()
@@ -357,13 +356,7 @@ const preview: Preview = {
       )
     }
   ],
-
-  initialGlobals: {
-    viewport: {
-      value: 'responsive',
-      isRotated: false
-    }
-  }
+  initialGlobals: { viewport: { value: 'responsive' } }
 }
 
 export default preview

@@ -83,12 +83,7 @@ export const TitleVisibleOnMobile: Story = {
       expect(await canvas.findByText('Kennedy Mweene')).toBeVisible()
     })
   },
-  globals: {
-    viewport: {
-      value: 'mobile',
-      isRotated: false
-    }
-  }
+  globals: { viewport: { value: 'mobile' } }
 }
 
 /**

@@ -40,20 +40,12 @@ export const TeamPageStory: Story = {
 
 export const TeamPageMobile: Story = {
   name: 'Team Page - Mobile',
-
   parameters: {
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
-
     reactRouter: {
       router: routesConfig,
       initialPath: V1_LEGACY_ROUTES.TEAM_USER_LIST + `?locationId=${locationId}`
     }
   },
-
-  globals: {
-    viewport: {
-      value: 'Tablet',
-      isRotated: false
-    }
-  }
+  globals: { viewport: { value: 'Tablet' } }
 }
