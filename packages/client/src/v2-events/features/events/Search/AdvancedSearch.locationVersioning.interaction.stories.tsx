@@ -11,11 +11,12 @@
 
 import React from 'react'
 import { Meta, StoryObj } from '@storybook/react'
-import { userEvent, within, expect } from '@storybook/test'
+import { userEvent, within, expect, waitFor } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import * as selectEvent from 'react-select-event'
 import {
+  AdministrativeArea,
   ChildOnboardingEvent,
   EventConfig,
   field,
@@ -110,6 +111,48 @@ const mockLocations: Location[] = [
   INACTIVE_FACILITY
 ]
 
+/** A currently-valid top-level administrative area. */
+const ACTIVE_PROVINCE: AdministrativeArea = {
+  id: 'c3c3c3c3-3333-4333-8333-333333333333' as UUID,
+  name: 'ZZ Active Province',
+  externalId: null,
+  parentId: null,
+  status: 'active',
+  versions: [
+    {
+      versionId: 'c3c3c3c3-3333-4333-8333-333333333334' as UUID,
+      effectiveFrom: '0001-01-01',
+      name: 'ZZ Active Province',
+      externalId: null,
+      status: 'active'
+    }
+  ]
+}
+
+/** A top-level administrative area that has since been inactivated. */
+const INACTIVE_PROVINCE: AdministrativeArea = {
+  id: 'd4d4d4d4-4444-4444-8444-444444444444' as UUID,
+  name: 'ZZ Closed Province',
+  externalId: null,
+  parentId: null,
+  status: 'inactive',
+  versions: [
+    {
+      versionId: 'd4d4d4d4-4444-4444-8444-444444444445' as UUID,
+      effectiveFrom: '0001-01-01',
+      name: 'ZZ Closed Province',
+      externalId: null,
+      status: 'inactive'
+    }
+  ]
+}
+
+const mockAdministrativeAreas: AdministrativeArea[] = [
+  ...V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS,
+  ACTIVE_PROVINCE,
+  INACTIVE_PROVINCE
+]
+
 /**
  * ChildOnboardingEvent with an advanced search section for `child.birthLocation`
  * (a HEALTH_FACILITY selector), restricted by the user's `record.search`
@@ -127,6 +170,11 @@ const childOnboardingWithHealthFacilitySearch: EventConfig = {
       fields: [
         field('child.placeOfBirth').exact(),
         field('child.birthLocation', {
+          allowedLocations: user.jurisdiction(
+            user.scope('record.search').attribute('placeOfEvent')
+          )
+        }).exact(),
+        field('child.birthLocation.privateHome', {
           allowedLocations: user.jurisdiction(
             user.scope('record.search').attribute('placeOfEvent')
           )
@@ -161,9 +209,7 @@ const mswConfig = {
     ],
     eventLocations: [
       tRPCMsw.locations.list.query(() => mockLocations),
-      tRPCMsw.administrativeAreas.list.query(
-        () => V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS
-      )
+      tRPCMsw.administrativeAreas.list.query(() => mockAdministrativeAreas)
     ],
     user: [
       tRPCMsw.user.list.query(() => {
@@ -253,6 +299,76 @@ export const RenamedAndInactiveFacilitiesStayFilterable: Story = {
         const labels = options.map((o) => o.textContent)
 
         await expect(labels).toContain('Closed Hilltop Health Post')
+      }
+    )
+  }
+}
+
+async function openAddressProvinceDropdown(
+  canvasElement: HTMLElement,
+  canvas: ReturnType<typeof within>
+) {
+  const accordion = await canvas.findByTestId(
+    'accordion-advancedSearch.form.eventDetails'
+  )
+  await userEvent.click(within(accordion).getByRole('button', { name: 'Show' }))
+
+  const placeOfBirth = await canvas.findByTestId(
+    'select__child____placeOfBirth'
+  )
+  await selectEvent.select(placeOfBirth, 'Residential address')
+
+  // Admin-structure dropdowns only appear once the domestic country (the
+  // configured home country, Bangladesh in storybook) is selected.
+  const country = await canvas.findByTestId('location__country')
+  await selectEvent.select(country, 'Bangladesh')
+
+  // The province dropdown only appears once the domestic country is applied.
+  // It has no associated label or testid, so wait for its input by id.
+  await waitFor(() => {
+    if (!canvasElement.querySelector('#searchable-select-province input')) {
+      throw new Error('Province input not rendered yet')
+    }
+  })
+  const provinceInput = canvasElement.querySelector(
+    '#searchable-select-province input'
+  )
+
+  if (!provinceInput) {
+    throw new Error('Province input not found')
+  }
+
+  await userEvent.click(provinceInput)
+  // Custom test areas are appended after the default set, past the initial
+  // render cap — type a distinctive prefix so both would surface if present.
+  await userEvent.type(provinceInput, 'ZZ')
+  return canvas.findByRole('listbox')
+}
+
+/**
+ * In advanced search, the residential/other-address (admin-structure) filter
+ * lists only currently-valid areas — a renamed active area is offered, an
+ * inactivated one is not. This is the opposite of the office/facility filters,
+ * which keep listing inactive locations.
+ */
+export const InactiveAdminAreaHiddenFromAddressFilter: Story = {
+  parameters: {
+    ...storyParams,
+    token: generator.user.token.communityLeaderSearchAllAndLocation,
+    msw: mswConfig
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Address filter lists an active admin area but hides an inactivated one',
+      async () => {
+        const listbox = await openAddressProvinceDropdown(canvasElement, canvas)
+
+        await within(listbox).findByText('ZZ Active Province')
+        await expect(
+          within(listbox).queryByText('ZZ Closed Province')
+        ).toBeNull()
       }
     )
   }
