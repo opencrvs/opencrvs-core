@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
+import decode from 'jwt-decode'
 import { createClient } from '@opencrvs/toolkit/api'
 import { defineScopes } from '@opencrvs/toolkit/scopes'
 import { AUTH_URL, GATEWAY_URL } from '@countryconfig/constants'
@@ -154,8 +155,35 @@ export async function getAdoptionSealingToken(): Promise<string | undefined> {
 
   cachedToken = {
     token,
-    expiresAt: Date.now() + (body.expires_in ?? 3600) * 1000
+    expiresAt: getTokenExpiry(token, body.expires_in)
   }
 
   return token
+}
+
+const DEFAULT_TOKEN_EXPIRY_SECONDS = 600
+
+/**
+ * The client_credentials response never actually includes `expires_in` (see
+ * packages/auth/src/features/oauthToken/responses.ts) - trusting a fallback
+ * here previously caused tokens to be cached well past their real (and much
+ * shorter, CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS - 10 minutes by default) JWT
+ * expiry, leading to "Expired token" 401s. Decode the token's own `exp`
+ * claim, which is authoritative, and only fall back to `expires_in`/a
+ * conservative default if that's somehow not present.
+ */
+function getTokenExpiry(token: string, expiresInSeconds?: number): number {
+  try {
+    const { exp } = decode<{ exp?: number }>(token)
+    if (exp) {
+      return exp * 1000
+    }
+  } catch (error) {
+    logger.warn(
+      { err: error },
+      'Failed to decode adoption sealing integration token to determine its expiry'
+    )
+  }
+
+  return Date.now() + (expiresInSeconds ?? DEFAULT_TOKEN_EXPIRY_SECONDS) * 1000
 }
