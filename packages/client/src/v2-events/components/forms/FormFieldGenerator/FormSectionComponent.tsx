@@ -503,10 +503,10 @@ export function FormSectionComponent({
               disabled={isDisabled}
               eventConfig={eventConfig}
               fieldDefinition={{ ...field, id: formikFieldId }}
+              isSearchFilter={isSearchFilter}
               name={formikFieldId}
               ocrvsFullForm={ocrvsFullForm}
               readonlyMode={readonlyMode}
-              isSearchFilter={isSearchFilter}
               validatorContext={validatorContext}
               onBatchFieldValueChange={onBatchFieldValueChange}
               onBlur={handleBlur}
