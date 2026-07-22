@@ -16,6 +16,7 @@ interface IPropsActivity {
   width?: number
 }
 
+/** @knipignore */
 export function Activity(
   props: React.HTMLAttributes<SVGElement> & IPropsActivity
 ) {
