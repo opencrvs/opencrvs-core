@@ -24,53 +24,8 @@ import createFetchMock from 'vitest-fetch-mock'
  * Navigator & Window
  */
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
-const config = {
-  APPLICATION_NAME: 'Farajaland CRVS',
-  COUNTRY: 'BGD',
-  CURRENCY: {
-    isoCode: 'ZMW',
-    languagesAndCountry: ['en-ZM']
-  },
-  ADMIN_STRUCTURE: [
-    {
-      id: 'province',
-      label: {
-        id: 'field.address.province.label',
-        defaultMessage: 'Province',
-        description: 'Label for province in address'
-      }
-    },
-    {
-      id: 'district',
-      label: {
-        id: 'field.address.district.label',
-        defaultMessage: 'District',
-        description: 'Label for district in address'
-      }
-    }
-  ],
-  DASHBOARDS: [
-    {
-      id: 'test',
-      title: {
-        id: 'navigation.dashboard',
-        defaultMessage: 'Test Dashboard',
-        description: 'Title for the test dashboard'
-      },
-      url: '/'
-    }
-  ],
-  FEATURES: {
-    V2_EVENTS: false
-  },
-  LANGUAGES: ['en', 'bn', 'fr'],
-  USER_NOTIFICATION_DELIVERY_METHOD: 'sms',
-  INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms',
-  SENTRY: 'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551',
-  PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/
-}
 
-vi.stubGlobal('config', config)
+// `window.config` is stubbed in ./setupConfig.ts, which runs before this file.
 
 /*
  * Profile queries
@@ -110,18 +65,6 @@ vi.mock('@client/forms/conditionals', async () => {
     ...actual,
     conditionals: actual.builtInConditionals,
     initConditionals: () => Promise.resolve()
-  }
-})
-
-vi.mock('@client/forms/handlebarHelpers', async () => {
-  const actual = (await vi.importActual(
-    '@client/forms/handlebarHelpers'
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  )) as any
-  return {
-    ...actual,
-    handlebarHelpers: {},
-    initHandlebarHelpers: () => Promise.resolve()
   }
 })
 

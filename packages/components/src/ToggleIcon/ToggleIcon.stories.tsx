@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { ComponentMeta, ComponentStory } from '@storybook/react'
+import { ComponentMeta, ComponentStory } from '@storybook/react-vite'
 import { ToggleIcon } from './ToggleIcon'
 
 export default {

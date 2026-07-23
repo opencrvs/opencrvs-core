@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fireEvent } from '@storybook/test'
-import { userEvent, within } from '@storybook/testing-library'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect, fireEvent } from 'storybook/test'
+import { userEvent, within } from 'storybook/test'
 import React, { Suspense } from 'react'
 import styled from 'styled-components'
 import { AgeField, field, FieldType } from '@opencrvs/commons/client'

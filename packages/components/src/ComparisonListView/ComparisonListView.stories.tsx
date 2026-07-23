@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { ComponentMeta, Story } from '@storybook/react'
+import { ComponentMeta, Story } from '@storybook/react-vite'
 import { ComparisonListView, IComparisonListProps } from './ComparisonListView'
 import { Text } from '../Text'
 

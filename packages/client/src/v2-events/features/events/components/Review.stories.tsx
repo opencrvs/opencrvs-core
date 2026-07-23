@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {
   fireEvent,
@@ -17,7 +17,7 @@ import {
   fn,
   userEvent,
   waitFor
-} from '@storybook/test'
+} from 'storybook/test'
 import React from 'react'
 import superjson from 'superjson'
 import { noop } from 'lodash'

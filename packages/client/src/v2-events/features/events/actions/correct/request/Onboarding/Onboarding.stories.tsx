@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
-import { waitFor, within, userEvent, expect } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { waitFor, within, userEvent, expect } from 'storybook/test'
 import { Onboarding as OnboardingIndex } from '@client/v2-events/features/events/actions/correct/request/index'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
