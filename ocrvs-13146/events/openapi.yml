@@ -2912,6 +2912,8 @@ components:
                   required:
                     - $jurisdiction
                   additionalProperties: false
+                listHistoricalNames:
+                  type: boolean
               additionalProperties: false
           required:
             - id
@@ -3178,6 +3180,8 @@ components:
                   required:
                     - $jurisdiction
                   additionalProperties: false
+                listHistoricalNames:
+                  type: boolean
               additionalProperties: false
           required:
             - id
@@ -3838,6 +3842,16 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
+            listHistoricalNames:
+              description: "Advanced search: list every historical name a location has had as
+                a separate, selectable option. Propagated to the embedded
+                admin-area selectors."
+              type: boolean
+            activeOnly:
+              description: "Advanced search: offer only currently-active admin areas;
+                inactivated ones are excluded. Propagated to the embedded
+                admin-area selectors."
+              type: boolean
           additionalProperties: false
         defaultValue:
           anyOf:
@@ -8874,6 +8888,14 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
+            listHistoricalNames:
+              description: "Advanced search: list every historical name a location has had as
+                a separate, selectable option."
+              type: boolean
+            activeOnly:
+              description: "Advanced search: offer only currently-active locations;
+                inactivated ones are excluded."
+              type: boolean
           required:
             - type
           additionalProperties: false
@@ -9337,6 +9359,10 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
+            listHistoricalNames:
+              description: "Advanced search: list every historical name a location has had as
+                a separate, selectable option."
+              type: boolean
           additionalProperties: false
       required:
         - id
