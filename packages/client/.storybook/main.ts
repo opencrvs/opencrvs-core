@@ -1,5 +1,3 @@
-// This file has been automatically migrated to valid ESM format by Storybook.
-import { createRequire } from "node:module";
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,6 +9,8 @@ import { createRequire } from "node:module";
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+// This file has been automatically migrated to valid ESM format by Storybook.
+import { createRequire } from 'node:module'
 import type { StorybookConfig } from '@storybook/react-vite'
 import { join, dirname } from 'path'
 
