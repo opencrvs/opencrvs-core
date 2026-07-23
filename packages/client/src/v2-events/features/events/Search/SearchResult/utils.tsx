@@ -345,6 +345,10 @@ function buildAvailableActionComponents({
     }
   }
 
+  // `DownloadButton` resolves its own visibility (based on the READ action's
+  // conditionals) internally, since hooks can't be called from a plain
+  // function invoked per-row inside `.map()`/`useMemo` — see
+  // useResolveAssignmentActionConditionals's doc comment for why.
   actionConfigs.push({
     actionComponent: () => (
       <DownloadButton

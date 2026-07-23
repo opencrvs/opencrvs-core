@@ -339,6 +339,7 @@ export const eventRouter = router({
     assignment: router({
       assign: userOnlyProcedure
         .input(AssignActionInput)
+        .use(middleware.canAccessEventWithScopes(['record.read']))
         .use(middleware.validateAction)
         .mutation(async ({ ctx, input }) => {
           const { user, token } = ctx

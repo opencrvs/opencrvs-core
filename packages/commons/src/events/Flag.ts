@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ActionType } from './ActionType'
-import { ActionStatus } from './ActionDocument'
+import { ActionStatus } from './ActionStatus'
 import * as z from 'zod/v4'
 import { TranslationConfig } from './TranslationConfig'
 import { Conditional } from './Conditional'
@@ -30,18 +30,30 @@ export const InherentFlags = {
 
 export type InherentFlags = (typeof InherentFlags)[keyof typeof InherentFlags]
 
+/**
+ * Built lazily (rather than at module scope) because ActionType/ActionStatus
+ * can still be mid-initialisation here when this file participates in a
+ * circular import chain (e.g. via commons/scopes.ts -> events -> Flag.ts).
+ * Evaluating `Object.values(...)` eagerly at import time can then throw or
+ * silently produce an empty pattern depending on module load order.
+ */
+let actionFlagPattern: RegExp | undefined
+function getActionFlagPattern() {
+  actionFlagPattern ??= new RegExp(
+    `^(${Object.values(ActionType).join('|').toLowerCase()}):(${Object.values(
+      ActionStatus
+    )
+      .join('|')
+      .toLowerCase()})$`
+  )
+  return actionFlagPattern
+}
+
 export const ActionFlag = z
   .string()
-  .regex(
-    new RegExp(
-      `^(${Object.values(ActionType).join('|').toLowerCase()}):(${Object.values(
-        ActionStatus
-      )
-        .join('|')
-        .toLowerCase()})$`
-    ),
-    'Flag must be in the format ActionType:ActionStatus (lowerCase)'
-  )
+  .refine((value) => getActionFlagPattern().test(value), {
+    message: 'Flag must be in the format ActionType:ActionStatus (lowerCase)'
+  })
 
 export type ActionFlag = z.infer<typeof ActionFlag>
 
@@ -65,6 +77,17 @@ export type CustomFlag = z.infer<typeof CustomFlag>
 
 export const Flag = ActionFlag.or(z.enum(InherentFlags)).or(CustomFlag)
 export type Flag = z.infer<typeof Flag>
+
+export const ContainsFlags = z
+  .object({
+    anyOf: z.array(Flag).optional(),
+    noneOf: z.array(Flag).optional(),
+    allOf: z.array(Flag).optional()
+  })
+  .meta({
+    id: 'ContainsFlags'
+  })
+export type ContainsFlags = z.infer<typeof ContainsFlags>
 
 /**
  * Configuration of a custom flag that can be associated with a certain event type.

@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
 import { createPrng, generateUuid, TestUserRole } from './test.utils'
 import { SystemContext, UserContext } from '../users/User'
 import {
@@ -283,6 +284,86 @@ describe('canAccessEventWithScope()', () => {
         ).toBe(true)
       }
     )
+  })
+
+  describe('flags option', () => {
+    test('should not access event with a "noneOf" flag it carries', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['sealed'] },
+          {
+            type: 'record.read',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access event without a "noneOf" flag it does not carry', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: [] },
+          {
+            type: 'record.read',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should access event carrying one of the "anyOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete'] },
+          {
+            type: 'record.read',
+            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event carrying none of the "anyOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: [] },
+          {
+            type: 'record.read',
+            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access event carrying all of the "allOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete', 'rejected'] },
+          {
+            type: 'record.read',
+            options: { flags: { allOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event missing one of the "allOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete'] },
+          {
+            type: 'record.read',
+            options: { flags: { allOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
   })
 
   test('should not access event if user does not meet any of the scope options', () => {

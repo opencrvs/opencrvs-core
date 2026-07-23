@@ -93,7 +93,10 @@ test('Check scopes against event.getDuplicates', async () => {
       const randomIndex = Math.floor(Math.random() * eventIds.length)
       const [eventId] = eventIds.splice(randomIndex, 1)
 
-      const testClient = createTestClient(user, [scope])
+      const testClient = createTestClient(user, [
+        scope,
+        encodeScope({ type: 'record.read' })
+      ])
 
       let result: { success: boolean; event: EventDocument }
       try {
