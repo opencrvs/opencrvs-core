@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ComponentMeta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react-vite'
 import React from 'react'
 import { EventTopBar } from '../EventTopBar'
 import { SideNav } from '../SideNavigation/LeftNavigation.stories'

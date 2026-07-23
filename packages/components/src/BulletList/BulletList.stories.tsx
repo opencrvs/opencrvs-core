@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { ComponentStory } from '@storybook/react'
+import { ComponentStory } from '@storybook/react-vite'
 import { BulletList } from './BulletList'
 
 export default {

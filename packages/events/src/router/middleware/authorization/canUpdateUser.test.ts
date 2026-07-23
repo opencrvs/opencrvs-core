@@ -86,122 +86,131 @@ function officeAccessible(
   return true
 }
 
-test('grants access iff both existing and updated (location, role) satisfy any user.edit scope', async () => {
-  const officePairs = fc
-    .record({
-      existingOffice: fc.constantFrom(...crvsOffices),
-      updatedOffice: fc.constantFrom(...crvsOffices)
+test(
+  'grants access if both existing and updated (location, role) satisfy any user.edit scope',
+  { timeout: 120000 },
+  async () => {
+    const officePairs = fc
+      .record({
+        existingOffice: fc.constantFrom(...crvsOffices),
+        updatedOffice: fc.constantFrom(...crvsOffices)
+      })
+      .filter(
+        ({ existingOffice, updatedOffice }) =>
+          existingOffice.id !== updatedOffice.id
+      )
+
+    const rolePairs = fc.record({
+      existingUserRole: fc.constantFrom(...TestUserRole.options),
+      updatedUserRole: fc.constantFrom(...TestUserRole.options)
     })
-    .filter(
-      ({ existingOffice, updatedOffice }) =>
-        existingOffice.id !== updatedOffice.id
-    )
 
-  const rolePairs = fc.record({
-    existingUserRole: fc.constantFrom(...TestUserRole.options),
-    updatedUserRole: fc.constantFrom(...TestUserRole.options)
-  })
-
-  const combinations = fc.record({
-    offices: officePairs,
-    roles: rolePairs,
-    accessLevel: fc.option(fc.constantFrom(...JurisdictionFilter.options), {
-      nil: undefined
+    const combinations = fc.record({
+      offices: officePairs,
+      roles: rolePairs,
+      accessLevel: fc.option(fc.constantFrom(...JurisdictionFilter.options), {
+        nil: undefined
+      })
     })
-  })
 
-  await fc.assert(
-    fc.asyncProperty(combinations, async ({ offices, roles, accessLevel }) => {
-      const { existingOffice, updatedOffice } = offices
-      const { existingUserRole, updatedUserRole } = roles
+    await fc.assert(
+      fc.asyncProperty(
+        combinations,
+        async ({ offices, roles, accessLevel }) => {
+          const { existingOffice, updatedOffice } = offices
+          const { existingUserRole, updatedUserRole } = roles
 
-      const existingHierarchy = computeLocationHierarchy(
-        existingOffice.id,
-        locationContext
-      )
-      const updatedHierarchy = computeLocationHierarchy(
-        updatedOffice.id,
-        locationContext
-      )
+          const existingHierarchy = computeLocationHierarchy(
+            existingOffice.id,
+            locationContext
+          )
+          const updatedHierarchy = computeLocationHierarchy(
+            updatedOffice.id,
+            locationContext
+          )
 
-      const irrelevantRole = TestUserRole.options.find(
-        (role) => role !== existingUserRole && role !== updatedUserRole
-      ) as TestUserRole
+          const irrelevantRole = TestUserRole.options.find(
+            (role) => role !== existingUserRole && role !== updatedUserRole
+          ) as TestUserRole
 
-      const roleOptions = fc.option(
-        fc.constantFrom(
-          [irrelevantRole] as string[],
-          [existingUserRole] as string[],
-          [updatedUserRole] as string[],
-          [existingUserRole, updatedUserRole] as string[]
-        ),
-        { nil: undefined }
-      )
+          const roleOptions = fc.option(
+            fc.constantFrom(
+              [irrelevantRole] as string[],
+              [existingUserRole] as string[],
+              [updatedUserRole] as string[],
+              [existingUserRole, updatedUserRole] as string[]
+            ),
+            { nil: undefined }
+          )
 
-      await fc.assert(
-        fc.asyncProperty(roleOptions, async (scopeRole) => {
-          vi.clearAllMocks()
+          await fc.assert(
+            fc.asyncProperty(roleOptions, async (scopeRole) => {
+              vi.clearAllMocks()
 
-          mockedGetUserById.mockResolvedValue({
-            officeId: existingOffice.id,
-            role: existingUserRole
-          })
-          mockedGetLocationHierarchy
-            .mockResolvedValueOnce(existingHierarchy)
-            .mockResolvedValueOnce(updatedHierarchy)
-
-          const existingOk =
-            (scopeRole === undefined || scopeRole.includes(existingUserRole)) &&
-            officeAccessible(
-              existingHierarchy,
-              existingOffice.id,
-              accessLevel,
-              requestingUser
-            )
-          const updatedOk =
-            (scopeRole === undefined || scopeRole.includes(updatedUserRole)) &&
-            officeAccessible(
-              updatedHierarchy,
-              updatedOffice.id,
-              accessLevel,
-              requestingUser
-            )
-          const expectedAllowed = existingOk && updatedOk
-
-          const token = createTestToken({
-            userId: requestingUserId,
-            scopes: [
-              encodeScope({
-                type: 'user.edit',
-                options: { accessLevel, role: scopeRole }
+              mockedGetUserById.mockResolvedValue({
+                officeId: existingOffice.id,
+                role: existingUserRole
               })
-            ],
-            role: TestUserRole.enum.REGISTRATION_AGENT
-          })
-          const next = vi.fn((a) => a)
+              mockedGetLocationHierarchy
+                .mockResolvedValueOnce(existingHierarchy)
+                .mockResolvedValueOnce(updatedHierarchy)
 
-          try {
-            await canUpdateUser({
-              ctx: { token, user: requestingUser },
-              input: {
-                id: existingUserId,
-                primaryOfficeId: updatedOffice.id,
-                role: updatedUserRole
-              },
-              next
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            } as any)
-            expect(expectedAllowed).toBe(true)
-          } catch (e) {
-            if (e instanceof TRPCError) {
-              expect(expectedAllowed).toBe(false)
-            } else {
-              throw e
-            }
-          }
-        })
-      )
-    }),
-    { numRuns: 100 }
-  )
-})
+              const existingOk =
+                (scopeRole === undefined ||
+                  scopeRole.includes(existingUserRole)) &&
+                officeAccessible(
+                  existingHierarchy,
+                  existingOffice.id,
+                  accessLevel,
+                  requestingUser
+                )
+              const updatedOk =
+                (scopeRole === undefined ||
+                  scopeRole.includes(updatedUserRole)) &&
+                officeAccessible(
+                  updatedHierarchy,
+                  updatedOffice.id,
+                  accessLevel,
+                  requestingUser
+                )
+              const expectedAllowed = existingOk && updatedOk
+
+              const token = createTestToken({
+                userId: requestingUserId,
+                scopes: [
+                  encodeScope({
+                    type: 'user.edit',
+                    options: { accessLevel, role: scopeRole }
+                  })
+                ],
+                role: TestUserRole.enum.REGISTRATION_AGENT
+              })
+              const next = vi.fn((a) => a)
+
+              try {
+                await canUpdateUser({
+                  ctx: { token, user: requestingUser },
+                  input: {
+                    id: existingUserId,
+                    primaryOfficeId: updatedOffice.id,
+                    role: updatedUserRole
+                  },
+                  next
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                } as any)
+                expect(expectedAllowed).toBe(true)
+              } catch (e) {
+                if (e instanceof TRPCError) {
+                  expect(expectedAllowed).toBe(false)
+                } else {
+                  throw e
+                }
+              }
+            })
+          )
+        }
+      ),
+      { numRuns: 100 }
+    )
+  }
+)

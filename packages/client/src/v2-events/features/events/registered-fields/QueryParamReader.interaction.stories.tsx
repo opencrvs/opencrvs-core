@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { Meta, StoryObj } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react-vite'
 import { http, HttpResponse } from 'msw'
-import { expect, within } from '@storybook/test'
-import { waitFor } from '@storybook/testing-library'
+import { expect, within } from 'storybook/test'
+import { waitFor } from 'storybook/test'
 import { useSearchParams } from 'react-router-dom'
 import {
   ConditionalType,

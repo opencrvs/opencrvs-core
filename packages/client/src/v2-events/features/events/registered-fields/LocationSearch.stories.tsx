@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
-import { within, expect, fn } from '@storybook/test'
-import { userEvent } from '@storybook/testing-library'
+import { within, expect, fn } from 'storybook/test'
+import { userEvent } from 'storybook/test'
 import { toPlainDate } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 // NOTE: If you do not import from index, you might encounter: ReferenceError: Cannot access 'LocationSearch' before initialization

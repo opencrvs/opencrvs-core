@@ -11,12 +11,10 @@
  */
 
 import React from 'react'
-import { Meta, StoryObj } from '@storybook/react'
-import { userEvent, within, expect } from '@storybook/test'
+import { Meta, StoryObj } from '@storybook/react-vite'
+import { userEvent, within, expect, waitFor } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { waitFor } from '@testing-library/dom'
-import * as selectEvent from 'react-select-event'
 import {
   ActionType,
   footballClubMembershipEvent,
@@ -27,6 +25,7 @@ import {
   TestUserRole,
   UUID
 } from '@opencrvs/commons/client'
+import * as selectEvent from '@client/v2-events/select-event'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { storeUserDetails } from '@client/utils/userUtils'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
@@ -642,7 +641,9 @@ export const JurisdictionScope_AdministrativeArea: Story = {
         )
         const options = within(listbox).queryAllByRole('listitem')
 
-        await expect(options.length).toEqual(locationsUnderAdministration.length)
+        await expect(options.length).toEqual(
+          locationsUnderAdministration.length
+        )
         locationsUnderAdministration.forEach(async (office) => {
           await expect(
             options.some((o) => o.textContent.includes(office))
@@ -872,7 +873,9 @@ export const JurisdictionScope_MultipleScopes_MostRelaxedWins: Story = {
         )
         const options = within(listbox).queryAllByRole('listitem')
 
-        await expect(options.length).toEqual(locationsUnderAdministration.length)
+        await expect(options.length).toEqual(
+          locationsUnderAdministration.length
+        )
         locationsUnderAdministration.forEach(async (office) => {
           await expect(
             options.some((o) => o.textContent.includes(office))

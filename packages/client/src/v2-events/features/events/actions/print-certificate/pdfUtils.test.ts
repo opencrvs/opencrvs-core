@@ -122,7 +122,7 @@ describe('svgToPdfTemplate', () => {
       'data:image/png;base64,SECOND_FILE_DATA'
     ]
 
-    global.FileReader = vi.fn(() => {
+    global.FileReader = vi.fn(function () {
       const mockFileReader = {
         readAsDataURL: vi.fn(),
         result: mockFiles.shift(),
@@ -199,7 +199,7 @@ describe('svgToPdfTemplate', () => {
         Promise.resolve(new Blob(['fake-sig'], { type: 'image/png' }))
     } as Response)
 
-    global.FileReader = vi.fn(() => {
+    global.FileReader = vi.fn(function () {
       const mockFileReader = {
         readAsDataURL: vi.fn(),
         result: mockFiles.shift(),
