@@ -32,7 +32,8 @@ import {
   DocumentPath,
   generateTranslationConfig,
   TENNIS_CLUB_DECLARATION_FORM,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  toPlainDate
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
@@ -539,6 +540,7 @@ export const ReviewDuringCreateNoAnnotationFields: Story = {
         path: '/event/:eventId',
         element: (
           <Review.Body
+            anchor={toPlainDate('2025-01-01')}
             annotation={{}}
             form={mockDeclaration}
             formConfig={TENNIS_CLUB_DECLARATION_FORM}

@@ -23,7 +23,8 @@ import {
   isActionConfigType,
   EventDocument,
   getActionConfig,
-  TokenUserType
+  TokenUserType,
+  toPlainDate
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -40,6 +41,7 @@ import { usePermissions } from '@client/hooks/useAuthorization'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
+import { resolveLocationName } from '@client/v2-events/utils';
 import { useEventOverviewInfo } from '../useEventOverviewInfo'
 import { UserAvatar } from './UserAvatar'
 import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
@@ -125,7 +127,6 @@ const SystemName = styled.div`
 `
 
 function User({ action }: { action: ActionDocument }) {
-  const intl = useIntl()
   const { findUser } = useEventOverviewContext()
   const navigate = useNavigate()
   const user = findUser(action.createdBy)
@@ -212,8 +213,13 @@ function ActionLocation({ action }: { action: ActionDocument }) {
   const { getUserDetails } = useUserDetails()
 
   const user = findUser(action.createdBy)
-  const locationName = action.createdAtLocation
-    ? getLocation(action.createdAtLocation)?.name
+  // Each history entry's office is resolved at that action's own date, so it
+  // shows where the action actually happened under its then-current name.
+  const location = action.createdAtLocation
+    ? getLocation(action.createdAtLocation)
+    : undefined
+  const locationName = location
+    ? resolveLocationName(location, toPlainDate(action.createdAt))
     : undefined
 
   const hasAccessToOffice =
@@ -282,7 +288,9 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
 
   const history = extractHistoryActions(fullEvent)
 
-  const visibleHistory = history.filter(({ type }) => type !== ActionType.CREATE)
+  const visibleHistory = history.filter(
+    ({ type }) => type !== ActionType.CREATE
+  )
 
   const onHistoryRowClick = (
     action: ActionDocument,
@@ -308,12 +316,12 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
     .map((x) => {
       if (x.type === ActionType.REQUEST_CORRECTION) {
         const immediateApprovedCorrection = visibleHistory.find(
-            (h) =>
-              h.type === ActionType.APPROVE_CORRECTION &&
-              (h.requestId === x.id || h.requestId === x.originalActionId) &&
-              h.content?.immediateCorrection &&
-              h.createdBy === x.createdBy
-          )
+          (h) =>
+            h.type === ActionType.APPROVE_CORRECTION &&
+            (h.requestId === x.id || h.requestId === x.originalActionId) &&
+            h.content?.immediateCorrection &&
+            h.createdBy === x.createdBy
+        )
         // Adding flag on immediately approved REQUEST_CORRECTION to show it
         // as 'Record corrected' in history table
         if (immediateApprovedCorrection) {

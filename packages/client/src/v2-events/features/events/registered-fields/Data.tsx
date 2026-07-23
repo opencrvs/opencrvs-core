@@ -24,7 +24,9 @@ import {
   EventConfig,
   getDeclarationFields,
   DataEntry,
-  isFieldReference
+  isFieldReference,
+  todayISO,
+  PlainDate
 } from '@opencrvs/commons/client'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -209,7 +211,10 @@ function DataInput({
           <Summary.Row
             key={config.id}
             label={intl.formatMessage(config.label)}
-            value={<Output field={config} value={value} />}
+            // Behavior-preserving: today's name. Anchoring this live form-entry
+            // preview to the form's event date is the selector-anchoring
+            // follow-up (#13143).
+            value={<Output anchor={todayISO()} field={config} value={value} />}
           />
         ))}
       </Summary>
@@ -224,7 +229,8 @@ function DataInput({
 function getDataOutputEntry(
   value: NonNullable<DataFieldValue>,
   dataEntryConfig: DataEntry,
-  declarationFields: FieldConfig[]
+  declarationFields: FieldConfig[],
+  anchor: PlainDate
 ) {
   if ('id' in dataEntryConfig) {
     const { id, label } = dataEntryConfig
@@ -238,6 +244,7 @@ function getDataOutputEntry(
       label,
       valueDisplay: (
         <Output
+          anchor={anchor}
           field={{ type: FieldType.TEXT, id, label }}
           value={value.data[id]}
         />
@@ -261,7 +268,11 @@ function getDataOutputEntry(
     id: fieldId,
     label: referencedFieldConfig.label,
     valueDisplay: (
-      <Output field={referencedFieldConfig} value={value.data[fieldId]} />
+      <Output
+        anchor={anchor}
+        field={referencedFieldConfig}
+        value={value.data[fieldId]}
+      />
     )
   }
 }
@@ -272,11 +283,13 @@ function getDataOutputEntry(
 function DataOutput({
   value,
   field,
-  eventConfig
+  eventConfig,
+  anchor
 }: {
   value: DataFieldValue
   field: DataField
   eventConfig: EventConfig
+  anchor: PlainDate
 }) {
   const intl = useIntl()
 
@@ -286,7 +299,7 @@ function DataOutput({
 
   const declarationFields = getDeclarationFields(eventConfig)
   const entries = field.configuration.data
-    .map((d) => getDataOutputEntry(value, d, declarationFields))
+    .map((d) => getDataOutputEntry(value, d, declarationFields, anchor))
     .filter((e) => e !== null)
 
   if (!entries.length) {

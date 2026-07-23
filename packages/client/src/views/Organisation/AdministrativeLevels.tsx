@@ -30,12 +30,15 @@ import * as routes from '@client/navigation/routes'
 import { stringify } from 'querystring'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import {
-  AdministrativeArea,
+  ClientAdministrativeArea,
+  ClientLocation,
   getAdministrativeAreaHierarchy,
-  Location,
+  resolveVersion,
+  todayISO,
   UUID
 } from '@opencrvs/commons/client'
-import { useAdministrativeAreas } from '../../v2-events/hooks/useAdministrativeAreas'
+import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
+import { resolveLocationName } from '@client/v2-events/utils';
 
 const DEFAULT_PAGINATION_LIST_SIZE = 10
 
@@ -44,7 +47,7 @@ type IRouteProps = {
 }
 
 type IGetNewLevel = {
-  childLocations: (Location | AdministrativeArea)[]
+  childLocations: (ClientLocation | ClientAdministrativeArea)[]
   breadCrumb: IBreadCrumbData[]
 }
 
@@ -67,18 +70,26 @@ export function AdministrativeLevels() {
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const locations = getLocations.useSuspenseQuery()
 
+  // The organisation view is a present-tense surface: names and active status
+  // are resolved at today's date.
+  const today = todayISO()
+  const isActiveToday = (entity: ClientLocation | ClientAdministrativeArea) =>
+    resolveVersion(entity.versions, today).status === 'active'
+  const nameToday = (entity: ClientLocation | ClientAdministrativeArea) =>
+    resolveLocationName(entity, today)
+
   const getNewLevel = (
     currentlySelectedLocationId: UUID | null
   ): IGetNewLevel => {
     const childLocations = [...locations.values()].filter(
-      ({ administrativeAreaId, status }) =>
-        status === 'active' &&
-        administrativeAreaId === currentlySelectedLocationId
+      (location) =>
+        isActiveToday(location) &&
+        location.administrativeAreaId === currentlySelectedLocationId
     )
 
     const childAdministrativeAreas = [...administrativeAreas.values()].filter(
-      ({ parentId, status }) =>
-        status === 'active' && parentId === currentlySelectedLocationId
+      (area) =>
+        isActiveToday(area) && area.parentId === currentlySelectedLocationId
     )
 
     let dataOfBreadCrumb: IBreadCrumbData[] = [
@@ -95,7 +106,7 @@ export function AdministrativeLevels() {
           administrativeAreas
         )
           .reverse()
-          .map((area) => ({ label: area.name, paramId: area.id }))
+          .map((area) => ({ label: nameToday(area), paramId: area.id }))
 
       dataOfBreadCrumb = [...dataOfBreadCrumb, ...locationBreadCrumb]
     }
@@ -147,37 +158,42 @@ export function AdministrativeLevels() {
                 (currentPageNumber - 1) * DEFAULT_PAGINATION_LIST_SIZE,
                 currentPageNumber * DEFAULT_PAGINATION_LIST_SIZE
               )
-              .map((level: Location | AdministrativeArea, index: number) => (
-                <ListViewItemSimplified
-                  key={index}
-                  label={
-                    AdministrativeArea.safeParse(level).success ? (
-                      <Link
-                        onClick={(e) => {
-                          setCurrentPageNumber(1)
-                          changeLevelAction(e, level.id)
-                        }}
-                      >
-                        {level.name}
-                      </Link>
-                    ) : (
-                      <Link
-                        disabled={!canAccessOffice(level)}
-                        onClick={() =>
-                          navigate({
-                            pathname: routes.TEAM_USER_LIST,
-                            search: stringify({
-                              locationId: level.id
+              .map(
+                (
+                  level: ClientLocation | ClientAdministrativeArea,
+                  index: number
+                ) => (
+                  <ListViewItemSimplified
+                    key={index}
+                    label={
+                      ClientAdministrativeArea.safeParse(level).success ? (
+                        <Link
+                          onClick={(e) => {
+                            setCurrentPageNumber(1)
+                            changeLevelAction(e, level.id)
+                          }}
+                        >
+                          {nameToday(level)}
+                        </Link>
+                      ) : (
+                        <Link
+                          disabled={!canAccessOffice(level)}
+                          onClick={() =>
+                            navigate({
+                              pathname: routes.TEAM_USER_LIST,
+                              search: stringify({
+                                locationId: level.id
+                              })
                             })
-                          })
-                        }
-                      >
-                        {level.name}
-                      </Link>
-                    )
-                  }
-                />
-              ))
+                          }
+                        >
+                          {nameToday(level)}
+                        </Link>
+                      )
+                    }
+                  />
+                )
+              )
           ) : (
             <NoRecord id="no-record">
               {intl.formatMessage(constantsMessages.noResults)}

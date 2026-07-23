@@ -19,9 +19,9 @@ import {
   Country as CountryField,
   field as fieldHelper,
   FieldType,
-  Location,
+  ClientLocation,
   not,
-  AdministrativeArea,
+  ClientAdministrativeArea,
   AdministrativeAreas,
   alwaysTrue,
   AddressType,
@@ -29,11 +29,13 @@ import {
   AddressField,
   AdministrativeAreaField,
   TextField,
+  EventConfig,
   ValidatorContext,
   IndexMap,
   FormState,
   FieldConfig,
-  UUID
+  UUID,
+  PlainDate
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -59,6 +61,7 @@ interface Props {
   config: AddressField
   disabled?: boolean
   validatorContext: ValidatorContext
+  eventConfig?: EventConfig
 }
 
 const DEFAULT_COUNTRY_FIELD = {
@@ -346,7 +349,7 @@ function getAdministrativeAreaIdFromAddress(value?: AddressFieldValue) {
 function transformParentValueToNestedValue(
   value: AddressFieldValue,
   adminLevelIds: string[],
-  administrativeAreas: Map<UUID, AdministrativeArea>
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
 ): EventState {
   const fullAdminHierarchy = getAdminLevelHierarchy(
     getAdministrativeAreaIdFromAddress(value),
@@ -606,11 +609,13 @@ function AddressInput(props: Props) {
 function AddressOutput({
   value,
   lineSeparator,
-  configuration
+  configuration,
+  anchor
 }: {
   value?: AddressFieldValue
   lineSeparator?: React.ReactNode
   configuration: AddressField
+  anchor: PlainDate
 }) {
   const validatorContext = useValidatorContext()
   const { getAdministrativeAreas } = useAdministrativeAreas()
@@ -661,7 +666,7 @@ function AddressOutput({
     <>
       {fieldsToShow.map((field, index) => (
         <React.Fragment key={field.field.id}>
-          <Output field={field.field} value={field.value} />
+          <Output anchor={anchor} field={field.field} value={field.value} />
           {index < fieldsToShow.length - 1 && (lineSeparator || <br />)}
         </React.Fragment>
       ))}
@@ -673,8 +678,9 @@ function toCertificateVariables(
   value: AddressFieldValue,
   context: {
     intl: IntlShape
-    locations: Map<UUID, Location>
-    administrativeAreas: Map<UUID, AdministrativeArea>
+    locations: Map<UUID, ClientLocation>
+    administrativeAreas: Map<UUID, ClientAdministrativeArea>
+    anchor: PlainDate
     adminLevels?: AdminStructureItem[]
   }
 ) {
@@ -683,11 +689,12 @@ function toCertificateVariables(
    * form data stringifier so location and other form fields can handle stringifying their own data
    */
 
-  const { intl, locations, adminLevels, administrativeAreas } = context
+  const { intl, locations, adminLevels, administrativeAreas, anchor } = context
   const stringifier = getFormDataStringifier(
     intl,
     locations,
-    administrativeAreas
+    administrativeAreas,
+    anchor
   )
   const stringifiedResult = stringifier(ALL_ADDRESS_FIELDS, value as EventState)
   const { streetLevelDetails } = value
@@ -717,7 +724,8 @@ function toCertificateVariables(
     administrativeAreaId,
     administrativeAreas,
     appConfigAdminLevels as string[],
-    'withNames'
+    'withNames',
+    anchor
   )
 
   // Reverse so the most specific level (e.g. district) comes first
