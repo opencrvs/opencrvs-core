@@ -95,7 +95,6 @@ import { getGovernmentPortalApiRoutes } from './government-portal-api/routes'
 import { Event } from './events/utils/types'
 import { syncReferenceData } from './data-seeding/reference-data/reference-data'
 import { causeOfDeathSearchHandler } from './data-seeding/reference-data/handler'
-import { ensureAdoptionSealingIntegration } from './events/adoption/sealing-service'
 
 export interface ITokenPayload {
   sub: string
@@ -826,8 +825,6 @@ export async function createServer() {
     if (env.REFERENCE_DATA_DATABASE_URL) {
       await syncReferenceData()
     }
-
-    await ensureAdoptionSealingIntegration()
 
     logger.info(
       `Server successfully started on ${COUNTRY_CONFIG_HOST}:${COUNTRY_CONFIG_PORT}`

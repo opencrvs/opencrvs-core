@@ -70,7 +70,7 @@ async function authenticateAsNationalSystemAdmin() {
  * (the server stores just a hash) - there is nothing for an operator to
  * configure by hand.
  */
-export async function ensureAdoptionSealingIntegration() {
+export async function getAdoptionSealingIntegrationCredentials() {
   try {
     const adminToken = await authenticateAsNationalSystemAdmin()
     const client = createClient(
@@ -94,12 +94,11 @@ export async function ensureAdoptionSealingIntegration() {
       scopes: SEALING_SERVICE_SCOPES
     })
 
-    credentials = {
+    logger.info('Adoption sealing integration provisioned.')
+    return {
       clientId: created.clientId,
       clientSecret: created.clientSecret
     }
-
-    logger.info('Adoption sealing integration provisioned.')
   } catch (error) {
     logger.error(
       { err: error },
@@ -113,6 +112,7 @@ export async function ensureAdoptionSealingIntegration() {
  * if it could not be provisioned at startup.
  */
 export async function getAdoptionSealingToken(): Promise<string | undefined> {
+  const credentials = await getAdoptionSealingIntegrationCredentials()
   if (!credentials) {
     logger.warn('Adoption sealing integration is not available, skipping seal.')
     return undefined
