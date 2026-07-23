@@ -22,6 +22,7 @@ import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { getBase64String } from '@client/utils/imageUtils'
+import { setLockBypass } from '@client/utils/lockBypass'
 
 const DocumentUploader = styled(ImageUploader)`
   color: ${({ theme }) => theme.colors.primary};
@@ -170,6 +171,7 @@ const SimpleDocumentUploaderComponent = ({
           id="upload_document"
           name={name}
           onChange={handleFileChange}
+          onClick={setLockBypass}
         >
           {intl.formatMessage(messages.uploadFile)}
         </DocumentUploader>
