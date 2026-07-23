@@ -40,7 +40,12 @@ export const DeployFunctionDefinition = DefineFunction({
 })
 
 export default SlackFunction(DeployFunctionDefinition, async ({ inputs }) => {
-  const updatedMsg = `:wave: <@${inputs.user}> submitted the following message: \n\n>${inputs.message}`
+  const updatedMsg = `🚢 ${inputs.user} initiated a deployment with the following parameters:
+Environment: <TODO>
+Branch or commit hash: <TODO>
+
+Follow the progress of the deployment here: <TODO>
+\n\n>${inputs.message}`
 
   return { outputs: { updatedMsg } }
 })
