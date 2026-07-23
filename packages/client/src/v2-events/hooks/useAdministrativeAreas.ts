@@ -10,7 +10,11 @@
  */
 
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { AdministrativeArea, UUID } from '@opencrvs/commons/client'
+import {
+  ClientAdministrativeArea,
+  toClientAdministrativeArea,
+  UUID
+} from '@opencrvs/commons/client'
 import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
 
@@ -26,10 +30,12 @@ setQueryDefaults(trpcOptionsProxy.administrativeAreas.list, {
     }
 
     const administrativeAreas = await queryOptions.queryFn(...params)
-    return new Map<UUID, AdministrativeArea>(
+    // Strip the server-flattened `name`/`status`/`externalId` as the cache is
+    // built — see useLocations.ts for the full rationale.
+    return new Map<UUID, ClientAdministrativeArea>(
       administrativeAreas.map((administrativeArea) => [
         administrativeArea.id,
-        administrativeArea
+        toClientAdministrativeArea(administrativeArea)
       ])
     )
   },
@@ -61,7 +67,7 @@ export function useAdministrativeAreas() {
             isActive,
             ids
           })
-        }).data as unknown as Map<UUID, AdministrativeArea>
+        }).data as unknown as Map<UUID, ClientAdministrativeArea>
       }
     }
   }
@@ -77,7 +83,7 @@ export function useAdministrativeAreas() {
  * @returns The list of leaf administrative area IDs.
  */
 export function getLeafAdministrativeAreaIds(
-  administrativeAreas: Map<UUID, AdministrativeArea>
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
 ): Array<{ id: UUID }> {
   const nonLeafAdministrativeAreaIds = new Set<string>()
 

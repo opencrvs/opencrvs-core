@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {
   fireEvent,
@@ -17,7 +17,7 @@ import {
   fn,
   userEvent,
   waitFor
-} from '@storybook/test'
+} from 'storybook/test'
 import React from 'react'
 import superjson from 'superjson'
 import { noop } from 'lodash'
@@ -32,7 +32,8 @@ import {
   DocumentPath,
   generateTranslationConfig,
   TENNIS_CLUB_DECLARATION_FORM,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  toPlainDate
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
@@ -539,6 +540,7 @@ export const ReviewDuringCreateNoAnnotationFields: Story = {
         path: '/event/:eventId',
         element: (
           <Review.Body
+            anchor={toPlainDate('2025-01-01')}
             annotation={{}}
             form={mockDeclaration}
             formConfig={TENNIS_CLUB_DECLARATION_FORM}

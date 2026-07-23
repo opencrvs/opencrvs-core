@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Meta, StoryObj } from '@storybook/react'
-import { waitFor, within, expect } from '@storybook/test'
+import { Meta, StoryObj } from '@storybook/react-vite'
+import { waitFor, within, expect } from 'storybook/test'
 import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {

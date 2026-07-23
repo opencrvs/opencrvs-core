@@ -76,7 +76,7 @@ test.describe.serial('4(b) Validate "Pending updates"-workqueue for RO', () => {
   })
 
   test('4.2 validate the list', async () => {
-    const header = page.locator('div[class^="TableHeader"]')
+    const header = page.getByTestId('workqueue-table-header')
     const columns = await header.locator(':scope > div').allInnerTexts()
     expect(columns).toStrictEqual([
       'Title',

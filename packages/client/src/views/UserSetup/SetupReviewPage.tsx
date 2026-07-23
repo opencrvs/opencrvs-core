@@ -30,7 +30,8 @@ import { getUserName, UserDetails } from '@client/utils/userUtils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { getOrThrow } from '@opencrvs/commons/client'
+import { getOrThrow, todayISO } from '@opencrvs/commons/client'
+import { resolveLocationName } from '@client/v2-events/utils'
 import {
   ErrorText,
   Button,
@@ -91,7 +92,9 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
   const email = (userDetails && (userDetails.email as string)) || ''
   const role = formatUserRole(userDetails?.role, intl)
 
-  const primaryOffice = location.data?.name ?? ''
+  // Present-tense surface — resolve the office's name as of today (the client
+  // cache strips the flattened `name`; see `toClientLocation`).
+  const primaryOffice = resolveLocationName(location.data, todayISO())
 
   const answeredQuestions: IDataProps[] = []
   setupData.securityQuestionAnswers &&

@@ -40,7 +40,8 @@ import {
   ValidatorContext,
   flattenFormState,
   IndexMap,
-  FormState
+  FormState,
+  PlainDate
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
@@ -233,7 +234,8 @@ function FormReview({
   isCorrection = false,
   isReviewCorrection = false,
   treatMissingValuesAsCleared = false,
-  validatorContext
+  validatorContext,
+  anchor
 }: {
   formConfig: FormConfig
   form: EventState
@@ -245,6 +247,8 @@ function FormReview({
   isCorrection?: boolean
   isReviewCorrection?: boolean
   treatMissingValuesAsCleared?: boolean
+  /** The record anchor — declaration fields are per-fact but share one record-wide anchor. */
+  anchor: PlainDate
 }) {
   const intl = useIntl()
 
@@ -274,6 +278,7 @@ function FormReview({
               // previousForm, formConfig are used to find previous values with the same label if required
               const valueDisplay = (
                 <Output
+                  anchor={anchor}
                   field={field}
                   formConfig={formConfig}
                   previousForm={previousForm}
@@ -444,7 +449,8 @@ function ReviewComponent({
   isCorrection = false,
   isReviewCorrection = false,
   treatMissingValuesAsCleared = false,
-  banner
+  banner,
+  anchor
 }: {
   children?: React.ReactNode
   formConfig: FormConfig
@@ -469,6 +475,8 @@ function ReviewComponent({
   isReviewCorrection?: boolean
   treatMissingValuesAsCleared?: boolean
   banner?: React.ReactNode
+  /** The record anchor — date of event, falling back to the record's creation date. */
+  anchor: PlainDate
 }) {
   const intl = useIntl()
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
@@ -503,6 +511,7 @@ function ReviewComponent({
         <Card>
           <ReviewHeader title={title} />
           <FormReview
+            anchor={anchor}
             form={form}
             formConfig={formConfig}
             isCorrection={isCorrection}
@@ -573,6 +582,7 @@ function ReviewComponent({
                             label={intl.formatMessage(field.label)}
                             value={
                               <Output
+                                anchor={anchor}
                                 field={field}
                                 value={annotation[field.id]}
                               />

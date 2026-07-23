@@ -10,11 +10,10 @@
  */
 
 import React from 'react'
-import { Meta, StoryObj } from '@storybook/react'
-import { userEvent, within, expect } from '@storybook/test'
+import { Meta, StoryObj } from '@storybook/react-vite'
+import { userEvent, within, expect } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import * as selectEvent from 'react-select-event'
 import {
   ChildOnboardingEvent,
   EventConfig,
@@ -25,6 +24,7 @@ import {
   UUID,
   user
 } from '@opencrvs/commons/client'
+import * as selectEvent from '@client/v2-events/select-event'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'

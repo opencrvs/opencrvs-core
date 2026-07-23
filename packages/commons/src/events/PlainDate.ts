@@ -26,6 +26,17 @@ export const PlainDate = z
 export type PlainDate = z.infer<typeof PlainDate>
 
 /**
+ * Extracts the plain calendar date from an ISO 8601 datetime (or passes an
+ * already-plain YYYY-MM-DD through) as a {@link PlainDate}. This is the single
+ * conversion from a timestamp to a location-resolution anchor — comparing
+ * plain dates as strings, with no timezone conversion. Assumes a valid ISO /
+ * YYYY-MM-DD input, as produced by the event metadata and date fields.
+ */
+export function toPlainDate(dateTime: string): PlainDate {
+  return dateTime.split('T')[0] as PlainDate
+}
+
+/**
  * Converts a {@link PlainDate} (YYYY-MM-DD) to a local `Date` at midnight.
  *
  * The `Date(year, month, day)` constructor uses the local timezone, unlike

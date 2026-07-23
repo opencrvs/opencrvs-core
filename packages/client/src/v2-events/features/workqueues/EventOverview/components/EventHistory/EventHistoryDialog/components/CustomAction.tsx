@@ -9,28 +9,32 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { useIntl } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
   EventDocument,
   CustomAction,
+  getCurrentEventState,
   getCustomActionFields,
   FieldConfig,
   EventConfig,
   isFieldVisible,
+  PlainDate,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { Output } from '@client/v2-events/features/events/components/Output'
+import { recordAnchorDate } from '@client/v2-events/utils'
 
 function prepareContent(
   action: CustomAction,
   customActionFields: FieldConfig[],
   eventConfiguration: EventConfig,
-  validatorContext: ValidatorContext
+  validatorContext: ValidatorContext,
+  anchor: PlainDate,
+  intl: IntlShape
 ) {
-  const intl = useIntl()
   const annotation = action.annotation
   return customActionFields
     .filter(
@@ -42,6 +46,7 @@ function prepareContent(
     .map((field) => {
       const value = (
         <Output
+          anchor={anchor}
           eventConfig={eventConfiguration}
           field={field}
           value={annotation?.[field.id]}
@@ -64,6 +69,7 @@ export function CustomActionContent({
   action: CustomAction
   validatorContext: ValidatorContext
 }) {
+  const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(event.type)
   const originalAction =
     event.actions.find(
@@ -77,11 +83,18 @@ export function CustomActionContent({
     eventConfiguration,
     action.customActionType
   )
+  // These are form values, so their locations resolve at the record's form
+  // anchor (date of event, falling back to creation) — not the action date.
+  const anchor = recordAnchorDate(
+    getCurrentEventState(event, eventConfiguration)
+  )
   const content = prepareContent(
     originalAction,
     customActionFields,
     eventConfiguration,
-    validatorContext
+    validatorContext,
+    anchor,
+    intl
   )
 
   return (

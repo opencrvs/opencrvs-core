@@ -64,6 +64,7 @@ The core `NOTIFY`, `DECLARE`, `REGISTER`, `ARCHIVE` and `REJECT` actions now acc
 ### Bug fixes
 
 - Keep a number field's postfix/unit label (e.g. `Kilograms (kg)` on Weight at birth) on a single line instead of wrapping onto a second row [#13216](https://github.com/opencrvs/opencrvs-core/issues/13216)
+- Bust the locally cached data when a user's office or role changes, so stale drafts and records from the previous office no longer appear after the change
 
 ## 2.0.0
 

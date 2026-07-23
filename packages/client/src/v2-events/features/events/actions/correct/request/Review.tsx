@@ -28,6 +28,7 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { FormLayout } from '@client/v2-events/layouts'
+import { recordAnchorDate } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
@@ -91,6 +92,7 @@ export function Review() {
   return (
     <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
       <ReviewComponent.Body
+        anchor={recordAnchorDate(eventIndex)}
         form={form}
         formConfig={formConfig}
         isCorrection={true}

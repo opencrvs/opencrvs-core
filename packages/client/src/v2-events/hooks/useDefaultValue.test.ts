@@ -185,7 +185,7 @@ describe('mapFieldToDefaultValue', () => {
     })
   })
 
-  it('for ADDRESS fields', () => {
+  describe('for ADDRESS fields', () => {
     const addressField = {
       id: 'applicant.address',
       type: FieldType.ADDRESS,
