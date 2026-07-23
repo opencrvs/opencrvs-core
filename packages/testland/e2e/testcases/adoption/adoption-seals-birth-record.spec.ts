@@ -111,12 +111,8 @@ test('Registering an adoption seals the original birth record', async ({
   await test.step('Fill adoptive parent 1 details', async () => {
     await expect(page.getByText('Adoptive parent 1 details')).toBeVisible()
 
-    await page
-      .locator('#adoptiveMother____firstName')
-      .fill(faker.person.firstName())
-    await page
-      .locator('#adoptiveMother____lastName')
-      .fill(faker.person.lastName())
+    await page.locator('#firstname').fill(faker.person.firstName())
+    await page.locator('#surname').fill(faker.person.lastName())
     await page
       .locator('#adoptiveMother____idNumber')
       .fill(faker.string.numeric(10))

@@ -16,6 +16,10 @@ import {
   PageTypes,
   TranslationConfig
 } from '@opencrvs/toolkit/events'
+import {
+  farajalandNameConfig,
+  invalidNameValidator
+} from '@countryconfig/events/birth/validators'
 
 /**
  * The declaration fields for an adoptive parent. Adoptive parent 1 is
@@ -32,24 +36,17 @@ export function createAdoptiveParentPage(
     title,
     fields: [
       {
-        id: `${prefix}.firstName`,
-        type: FieldType.TEXT,
+        id: `${prefix}.name`,
+        type: FieldType.NAME,
         required,
+        configuration: farajalandNameConfig,
+        hideLabel: true,
         label: {
-          defaultMessage: "Adoptive parent's first name(s)",
+          defaultMessage: "Adoptive parent's name",
           description: 'This is the label for the field',
-          id: 'event.adoption.action.declare.form.section.adoptiveParent.field.firstName.label'
-        }
-      },
-      {
-        id: `${prefix}.lastName`,
-        type: FieldType.TEXT,
-        required,
-        label: {
-          defaultMessage: "Adoptive parent's last name",
-          description: 'This is the label for the field',
-          id: 'event.adoption.action.declare.form.section.adoptiveParent.field.lastName.label'
-        }
+          id: 'event.adoption.action.declare.form.section.adoptiveParent.field.name.label'
+        },
+        validation: [invalidNameValidator(`${prefix}.name`)]
       },
       {
         id: `${prefix}.idNumber`,
