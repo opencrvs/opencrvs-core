@@ -13,29 +13,42 @@ import { TranslationConfig } from './TranslationConfig'
 import { ShowConditional } from './Conditional'
 import { AvailableIcons } from '../icons'
 
-export const SummaryBanner = z
+export const InfoBox = z
   .object({
     type: z
-      .enum(['info', 'warning', 'error'])
-      .describe('Visual style of the banner.'),
+      .enum(['info', 'positive', 'warning', 'negative'])
+      .describe(
+        'Semantic tint of the icon block: info (blue), positive (green), warning (orange), negative (red).'
+      ),
+    background: z
+      .enum(['tinted', 'white'])
+      .default('tinted')
+      .optional()
+      .describe(
+        'tinted reads as a recessed empty state; white reads as a standalone card.'
+      ),
     icon: AvailableIcons.optional().describe(
-      'Icon displayed inside the banner.'
+      'Icon displayed inside the icon block. Defaults to FileSearch.'
     ),
-    title: TranslationConfig.describe('Banner title.'),
+    heading: TranslationConfig.describe(
+      'Primary message. Short, sentence-case.'
+    ),
     description: TranslationConfig.optional().describe(
-      'Supporting text displayed below the banner title.'
+      'Secondary copy displayed below the heading, typically a suggested next step.'
     ),
     conditionals: z
       .array(ShowConditional)
       .default([])
       .optional()
       .describe(
-        'Conditions under which the banner is shown. When omitted, the banner is always shown.'
+        'Conditions under which the info box is shown. When omitted, it is always shown.'
       )
   })
-  .describe('Banner displayed above the summary fields in the event overview.')
+  .describe(
+    'A compact icon-block + heading + description block displayed above the summary fields in the event overview.'
+  )
 
-export type SummaryBanner = z.infer<typeof SummaryBanner>
+export type InfoBox = z.infer<typeof InfoBox>
 
 const BaseField = z.object({
   emptyValueMessage: TranslationConfig.optional().describe(
@@ -62,11 +75,11 @@ const Field = BaseField.extend({
 export const SummaryConfig = z
   .object({
     banners: z
-      .array(SummaryBanner)
+      .array(InfoBox)
       .default([])
       .optional()
       .describe(
-        'Banners displayed above the summary fields in the event overview.'
+        'Info boxes displayed above the summary fields in the event overview.'
       ),
     fields: z
       .array(z.union([Field, ReferenceField]))

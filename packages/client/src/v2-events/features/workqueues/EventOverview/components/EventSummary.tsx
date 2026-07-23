@@ -26,7 +26,7 @@ import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { convertDateFieldsToUnixTimestamps } from '@client/v2-events/utils'
 import { useFlagLabelsString } from '@client/v2-events/messages/flags'
-import { SummaryBanner } from './SummaryBanner'
+import { InfoBox } from './InfoBox'
 
 const messages = {
   assignedTo: {
@@ -213,14 +213,15 @@ export function EventSummary({
   return (
     <>
       {visibleBanners.map((banner, index) => (
-        <SummaryBanner
+        <InfoBox
           key={index}
-          data-testid={`summary-banner-${index}`}
+          background={banner.background}
+          data-testid={`summary-info-box-${index}`}
           description={
             banner.description && intl.formatMessage(banner.description)
           }
+          heading={intl.formatMessage(banner.heading)}
           icon={banner.icon}
-          title={intl.formatMessage(banner.title)}
           type={banner.type}
         />
       ))}

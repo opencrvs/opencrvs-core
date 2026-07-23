@@ -165,12 +165,12 @@ export const birthEvent = defineConfig({
   summary: {
     banners: [
       {
-        type: 'error',
+        type: 'negative',
         icon: 'FileLock',
-        title: {
+        heading: {
           id: 'event.birth.summary.banner.sealed.title',
           defaultMessage: 'Record is protected',
-          description: 'Title of the banner shown when a record is sealed'
+          description: 'Heading of the info box shown when a record is sealed'
         },
         description: {
           id: 'event.birth.summary.banner.sealed.description',
