@@ -42,14 +42,12 @@ const inputForm = DeployWorkflow.addStep(Schema.slack.functions.OpenForm, {
         title: 'Environment',
         type: Schema.types.string,
         enum: ['qa'],
-        default: 'qa',
-        require: true,
+        default: 'qa'
       },
       {
         name: 'tag',
         title: 'Branch, tag or commit hash',
         type: Schema.types.string,
-        require: true,
         default: 'develop'
       }
     ],
