@@ -176,11 +176,11 @@ const BaseField = z
         'Conditions determining when the field is shown or enabled. By default, the field is always shown and enabled.'
       ),
     secured: z
-      .boolean()
+      .union([z.boolean(), Conditional])
       .default(false)
       .optional()
       .describe(
-        'Indicates whether the field is secured. Secured fields are not indexed for search and are only visible when explicitly assigned.'
+        "Indicates whether the field is secured, either always (boolean) or conditionally, evaluated against the event (a JSONSchema conditional, e.g. flag('sealed')). Secured fields are not indexed for search and are only visible when explicitly assigned."
       ),
     placeholder: TranslationConfig.optional(),
     validation: z

@@ -100,6 +100,8 @@ export async function selectAction(
     | 'Update'
     | 'Issue certified copy'
     | 'Review potential duplicates'
+    | 'Seal'
+    | 'Unseal'
 ) {
   await page.getByRole('button', { name: 'Action', exact: true }).click()
 

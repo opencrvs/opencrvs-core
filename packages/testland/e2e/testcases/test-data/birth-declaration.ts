@@ -19,6 +19,7 @@ import {
 import { createClient } from '@opencrvs/toolkit/api'
 import {
   ActionDocument,
+  ActionStatus,
   ActionType,
   ActionUpdate,
   AddressType
@@ -248,16 +249,24 @@ export async function createDeclaration(
     annotation
   })
 
-  const registerAction = registerRes.actions.find(
-    (action: ActionDocument) => action.type === ActionType.REGISTER
+  const registerActionRequested = registerRes.actions.find(
+    (action: ActionDocument) =>
+      action.type === ActionType.REGISTER &&
+      action.status === ActionStatus.Requested
+  )
+  const registerActionAccepted = registerRes.actions.find(
+    (action: ActionDocument) =>
+      action.type === ActionType.REGISTER &&
+      action.status === ActionStatus.Accepted
   )
 
   const trackingId = registerRes?.trackingId as string
-  const registrationNumber = registerAction?.registrationNumber as string
+  const registrationNumber =
+    registerActionAccepted?.registrationNumber as string
 
   return {
     eventId,
-    declaration: registerAction?.declaration as Declaration,
+    declaration: registerActionRequested?.declaration as Declaration,
     trackingId,
     registrationNumber
   }
