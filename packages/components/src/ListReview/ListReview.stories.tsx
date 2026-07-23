@@ -14,7 +14,7 @@ import { Link } from '../Link'
 import { Toggle } from '../Toggle'
 import { Stack } from '../Stack'
 import { Text } from '../Text'
-import { Meta } from '@storybook/react'
+import { Meta } from '@storybook/react-vite'
 
 export default {
   title: 'Data/List Review',

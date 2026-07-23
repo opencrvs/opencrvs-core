@@ -10,11 +10,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
-import { expect } from '@storybook/test'
-import { userEvent, waitFor, within } from '@storybook/testing-library'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 import React from 'react'
-import * as selectEvent from 'react-select-event'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
@@ -29,6 +27,7 @@ import {
   AddressFieldValue,
   toPlainDate
 } from '@opencrvs/commons/client'
+import * as selectEvent from '@client/v2-events/select-event'
 import {
   FormFieldGenerator,
   FormFieldGeneratorPropsWithoutRef
@@ -324,7 +323,7 @@ export const AddressFieldInteraction: Story = {
 
         // Select a province
         const province = await canvas.findByLabelText(/Province/i)
-        selectEvent.openMenu(province)
+        await selectEvent.openMenu(province)
         await userEvent.click(province)
         await selectEvent.select(province, 'Central')
 
@@ -623,117 +622,119 @@ interface ResolvedAddress {
   } | null
 }
 
+function ToCertificateVariablesStory(args: FormFieldGeneratorPropsWithoutRef) {
+  const intl = useIntl()
+  const [formData, setFormData] = React.useState<Record<string, FieldValue>>({
+    'storybook.address': {
+      country: 'BGD',
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      addressType: 'DOMESTIC'
+    }
+  })
+  const [resolvedAddress, setResolvedAddress] =
+    React.useState<ResolvedAddress>()
+  const { getLocations } = useLocations()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+
+  const locations = getLocations.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const { config: appConfig } = useSelector(getOfflineData)
+
+  const adminLevels = appConfig.ADMIN_STRUCTURE
+  return (
+    <>
+      <StyledFormFieldGenerator
+        {...args}
+        fields={[
+          {
+            id: 'storybook.address',
+            type: FieldType.ADDRESS,
+            label: {
+              id: 'storybook.address.label',
+              defaultMessage: 'Address',
+              description: 'The title for the address input'
+            },
+
+            configuration: {
+              streetAddressForm: streetAddressConfigs
+            }
+          }
+        ]}
+        formValues={formData}
+        id="my-form"
+        onFormChange={(data) => {
+          setFormData((prev) => ({ ...prev, ...data }))
+          const address = AddressFieldValue.safeParse(data['storybook.address'])
+          if (address.success) {
+            const resolved = Address.toCertificateVariables(address.data, {
+              intl,
+              locations,
+              administrativeAreas,
+              adminLevels,
+              anchor: toPlainDate('2025-01-01')
+            })
+            setResolvedAddress((prev) => ({
+              ...prev,
+              ...(resolved satisfies ResolvedAddress)
+            }))
+          }
+        }}
+      />
+      {resolvedAddress && (
+        <div>
+          <div data-testid="country">
+            {'Country:'} {resolvedAddress.country}
+          </div>
+          <div data-testid="addressType">
+            {'Address Type:'} {resolvedAddress.addressType}
+          </div>
+          {resolvedAddress.province && (
+            <div data-testid="province">
+              {'Province:'} {resolvedAddress.province}
+            </div>
+          )}
+          {resolvedAddress.district && (
+            <div data-testid="district">
+              {'District:'} {resolvedAddress.district}
+            </div>
+          )}
+          {resolvedAddress.streetLevelDetails?.state && (
+            <div data-testid="state">
+              {'State:'} {resolvedAddress.streetLevelDetails.state}
+            </div>
+          )}
+          {resolvedAddress.streetLevelDetails?.district2 && (
+            <div data-testid="district2">
+              {'District:'} {resolvedAddress.streetLevelDetails.district2}
+            </div>
+          )}
+
+          {resolvedAddress.streetLevelDetails?.town && (
+            <div data-testid="town">
+              {resolvedAddress.streetLevelDetails.town}
+            </div>
+          )}
+          {resolvedAddress.streetLevelDetails?.cityOrTown && (
+            <div data-testid="cityOrTown">
+              {resolvedAddress.streetLevelDetails.cityOrTown}
+            </div>
+          )}
+        </div>
+      )}
+    </>
+  )
+}
+
 export const ToCertificateVariables: Story = {
   name: 'Certificate Variables',
   parameters: {
     layout: 'centered'
   },
-  render: function Component(args) {
-    const intl = useIntl()
-    const [formData, setFormData] = React.useState<Record<string, FieldValue>>({
-      'storybook.address': {
-        country: 'BGD',
-        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
-        addressType: 'DOMESTIC'
-      }
-    })
-    const [resolvedAddress, setResolvedAddress] =
-      React.useState<ResolvedAddress>()
-    const { getLocations } = useLocations()
-    const { getAdministrativeAreas } = useAdministrativeAreas()
-
-    const locations = getLocations.useSuspenseQuery()
-    const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
-    const { config: appConfig } = useSelector(getOfflineData)
-
-    const adminLevels = appConfig.ADMIN_STRUCTURE
-    return (
-      <>
-        <StyledFormFieldGenerator
-          {...args}
-          fields={[
-            {
-              id: 'storybook.address',
-              type: FieldType.ADDRESS,
-              label: {
-                id: 'storybook.address.label',
-                defaultMessage: 'Address',
-                description: 'The title for the address input'
-              },
-
-              configuration: {
-                streetAddressForm: streetAddressConfigs
-              }
-            }
-          ]}
-          formValues={formData}
-          id="my-form"
-          onFormChange={(data) => {
-            setFormData((prev) => ({ ...prev, ...data }))
-            const address = AddressFieldValue.safeParse(
-              data['storybook.address']
-            )
-            if (address.success) {
-              const resolved = Address.toCertificateVariables(address.data, {
-                intl,
-                locations,
-                administrativeAreas,
-                adminLevels,
-                anchor: toPlainDate('2025-01-01')
-              })
-              setResolvedAddress((prev) => ({
-                ...prev,
-                ...(resolved satisfies ResolvedAddress)
-              }))
-            }
-          }}
-        />
-        {resolvedAddress && (
-          <div>
-            <div data-testid="country">
-              {'Country:'} {resolvedAddress.country}
-            </div>
-            <div data-testid="addressType">
-              {'Address Type:'} {resolvedAddress.addressType}
-            </div>
-            {resolvedAddress.province && (
-              <div data-testid="province">
-                {'Province:'} {resolvedAddress.province}
-              </div>
-            )}
-            {resolvedAddress.district && (
-              <div data-testid="district">
-                {'District:'} {resolvedAddress.district}
-              </div>
-            )}
-            {resolvedAddress.streetLevelDetails?.state && (
-              <div data-testid="state">
-                {'State:'} {resolvedAddress.streetLevelDetails.state}
-              </div>
-            )}
-            {resolvedAddress.streetLevelDetails?.district2 && (
-              <div data-testid="district2">
-                {'District:'} {resolvedAddress.streetLevelDetails.district2}
-              </div>
-            )}
-
-            {resolvedAddress.streetLevelDetails?.town && (
-              <div data-testid="town">
-                {resolvedAddress.streetLevelDetails.town}
-              </div>
-            )}
-            {resolvedAddress.streetLevelDetails?.cityOrTown && (
-              <div data-testid="cityOrTown">
-                {resolvedAddress.streetLevelDetails.cityOrTown}
-              </div>
-            )}
-          </div>
-        )}
-      </>
-    )
-  },
+  render: (args) => <ToCertificateVariablesStory {...args} />,
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
+
+    await canvas.findByText(/Address/)
 
     await step('Fill up Domestic Address', async () => {
       const province = await canvas.findByLabelText(/Province/i)

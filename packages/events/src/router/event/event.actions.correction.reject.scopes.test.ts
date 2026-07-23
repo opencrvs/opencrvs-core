@@ -30,103 +30,98 @@ import {
 import { createIndex } from '@events/service/indexing/indexing'
 import { getEventIndexName } from '@events/storage/elasticsearch'
 
-test(
-  'Check scopes against event.actions.correction.reject',
+test('Check scopes against event.actions.correction.reject', async () => {
+  await createIndex(
+    getEventIndexName('tennis-club-membership_premium'),
+    getDeclarationFields(tennisClubMembershipEvent)
+  )
 
-  async () => {
-    await createIndex(
-      getEventIndexName('tennis-club-membership_premium'),
-      getDeclarationFields(tennisClubMembershipEvent)
-    )
-
-    // 1. Setup test fixture with a known set of users, administrative areas, and events.
-    const { users, isUnderAdministrativeArea, eventIds } =
-      await setupScopeTestFixture(8843, [
-        ActionType.DECLARE,
-        ActionType.REGISTER,
-        ActionType.REQUEST_CORRECTION,
-        ActionType.UNASSIGN
-      ])
-
-    const clientReadingAllEvents = createTestClient(users[0], [
-      encodeScope({
-        type: 'record.read'
-      })
+  // 1. Setup test fixture with a known set of users, administrative areas, and events.
+  const { users, isUnderAdministrativeArea, eventIds } =
+    await setupScopeTestFixture(8843, [
+      ActionType.DECLARE,
+      ActionType.REGISTER,
+      ActionType.REQUEST_CORRECTION,
+      ActionType.UNASSIGN
     ])
 
-    const jurisdictionOptions = fc.option(
-      fc.constantFrom(...JurisdictionFilter.options),
-      {
-        nil: undefined
-      }
-    )
+  const clientReadingAllEvents = createTestClient(users[0], [
+    encodeScope({
+      type: 'record.read'
+    })
+  ])
 
-    const userOptions = fc.option(fc.constant(UserFilter.enum.user), {
+  const jurisdictionOptions = fc.option(
+    fc.constantFrom(...JurisdictionFilter.options),
+    {
       nil: undefined
-    })
+    }
+  )
 
-    // 2. Create option combinations for scopes and users
-    const combinations = fc.record({
-      user: fc.constantFrom(...users),
-      event: fc.option(
-        fc.constantFrom<string[]>(
-          [TENNIS_CLUB_MEMBERSHIP],
-          [TENNIS_CLUB_MEMBERSHIP, 'tennis-club-membership_premium'],
-          ['tennis-club-membership_premium']
-        ),
-        { nil: undefined }
+  const userOptions = fc.option(fc.constant(UserFilter.enum.user), {
+    nil: undefined
+  })
+
+  // 2. Create option combinations for scopes and users
+  const combinations = fc.record({
+    user: fc.constantFrom(...users),
+    event: fc.option(
+      fc.constantFrom<string[]>(
+        [TENNIS_CLUB_MEMBERSHIP],
+        [TENNIS_CLUB_MEMBERSHIP, 'tennis-club-membership_premium'],
+        ['tennis-club-membership_premium']
       ),
-      placeOfEvent: jurisdictionOptions,
-      declaredBy: userOptions,
-      declaredIn: jurisdictionOptions,
-      registeredBy: userOptions,
-      registeredIn: jurisdictionOptions
-    })
+      { nil: undefined }
+    ),
+    placeOfEvent: jurisdictionOptions,
+    declaredBy: userOptions,
+    declaredIn: jurisdictionOptions,
+    registeredBy: userOptions,
+    registeredIn: jurisdictionOptions
+  })
 
-    // 3. Test combination against random event and assert results
+  // 3. Test combination against random event and assert results
 
-    await fc.assert(
-      fc.asyncProperty(combinations, async ({ user, ...options }) => {
-        const scope = encodeScope({
-          type: 'record.correct',
-          options
-        })
+  await fc.assert(
+    fc.asyncProperty(combinations, async ({ user, ...options }) => {
+      const scope = encodeScope({
+        type: 'record.correct',
+        options
+      })
 
-        const randomIndex = Math.floor(Math.random() * eventIds.length)
-        const [eventId] = eventIds.splice(randomIndex, 1)
+      const randomIndex = Math.floor(Math.random() * eventIds.length)
+      const [eventId] = eventIds.splice(randomIndex, 1)
 
-        const event = await clientReadingAllEvents.event.get({ eventId })
+      const event = await clientReadingAllEvents.event.get({ eventId })
 
-        const correctionRequestId = event.actions.find(
-          (a) =>
-            a.type === ActionType.REQUEST_CORRECTION &&
-            a.status === ActionStatus.Accepted
-        )?.id
+      const correctionRequestId = event.actions.find(
+        (a) =>
+          a.type === ActionType.REQUEST_CORRECTION &&
+          a.status === ActionStatus.Accepted
+      )?.id
 
-        const result = await attemptScopedAction(
-          eventId,
-          user,
-          scope,
-          clientReadingAllEvents,
-          async (client) =>
-            client.event.actions.correction.reject.request({
-              eventId,
-              transactionId: getUUID(),
-              requestId: correctionRequestId,
-              content: {
-                reason: 'reject test'
-              }
-            })
-        )
+      const result = await attemptScopedAction(
+        eventId,
+        user,
+        scope,
+        clientReadingAllEvents,
+        async (client) =>
+          client.event.actions.correction.reject.request({
+            eventId,
+            transactionId: getUUID(),
+            requestId: correctionRequestId,
+            content: {
+              reason: 'reject test'
+            }
+          })
+      )
 
-        assertScopeResult(result, {
-          user,
-          isUnderAdministrativeArea,
-          ...options
-        })
-      }),
-      { numRuns: 20 }
-    )
-  },
-  { timeout: 90000 }
-)
+      assertScopeResult(result, {
+        user,
+        isUnderAdministrativeArea,
+        ...options
+      })
+    }),
+    { numRuns: 20 }
+  )
+})

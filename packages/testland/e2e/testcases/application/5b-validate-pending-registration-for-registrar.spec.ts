@@ -55,7 +55,7 @@ test.describe
   })
 
   test('5.2 validate the list', async () => {
-    const header = page.locator('div[class^="TableHeader"]')
+    const header = page.getByTestId('workqueue-table-header')
     const columns = await header.locator(':scope > div').allInnerTexts()
     expect(columns).toStrictEqual([
       'Title',

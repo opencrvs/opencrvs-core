@@ -48,6 +48,8 @@ overrides:
   'nx>minimatch': '9.0.9'
   '@nx/devkit>minimatch': '9.0.9'
   jws: '3.2.3'
+  'react-signature-canvas>react': '18.3.1'
+  'react-signature-canvas>react-dom': '18.3.1'
 
 # Replaces patch-package (patches/ dir); diff paths are package-root-relative.
 patchedDependencies:
