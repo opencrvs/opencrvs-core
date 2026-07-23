@@ -1,0 +1,95 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+name: Fix Renovate Lockfile
+
+# The Mend-hosted Renovate app regenerates pnpm-lock.yaml with
+# `pnpm install --ignore-scripts --ignore-pnpmfile`. The --ignore-pnpmfile
+# flag disables .pnpmfile.cjs, so the TypeScript 6 API redirect and the
+# @types/hapi__hapi cleanup are dropped: the lockfile churns massively and
+# loses its `pnpmfileChecksum`, which then fails `--frozen-lockfile` installs.
+#
+# There is no renovate.json fix for this on the hosted app: `allowScripts` is
+# a self-hosted-only setting, and repo-level `ignoreScripts: false` only drops
+# `--ignore-scripts`, never `--ignore-pnpmfile`. The pnpmfile's transforms are
+# deletions (removing peer deps / dependencies), which cannot be expressed via
+# declarative pnpm-workspace.yaml (overrides / packageExtensions only add).
+#
+# So we repair the lockfile ourselves: re-run the install WITH .pnpmfile.cjs
+# active on our own runner and push the corrected lock back to the branch.
+
+on:
+  push:
+    branches:
+      - 'renovate/**'
+    paths:
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.pnpmfile.cjs'
+      - '**/package.json'
+
+permissions:
+  contents: write
+
+# One repair run per branch; cancel superseded runs when Renovate force-pushes.
+concurrency:
+  group: fix-renovate-lockfile-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fix-lockfile:
+    runs-on: ubuntu-26.04
+    # Only Renovate's own pushes. This also prevents a loop when a PAT is used
+    # for the fix-up push (see checkout token note): that push runs as the PAT
+    # owner, not renovate[bot], so it is skipped here.
+    if: github.actor == 'renovate[bot]'
+    steps:
+      - name: Checkout Renovate branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref_name }}
+          # GH_TOKEN (a PAT — same secret auto-pr-to-release.yml uses to push
+          # and open PRs) is persisted as the push credential so the fix-up
+          # commit RE-TRIGGERS downstream workflows (lint-and-test etc.)
+          # against the corrected lockfile. Pushes made with the default
+          # GITHUB_TOKEN do not trigger further workflow runs.
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Setup pnpm
+        # No `version:` — action-setup reads `packageManager` from package.json
+        # (pnpm@10.34.5), matching what the lockfile was authored with.
+        uses: pnpm/action-setup@v4
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Regenerate lockfile with .pnpmfile.cjs applied
+        # Deliberately NO --ignore-pnpmfile: honoring the hook is the point.
+        # --ignore-scripts is safe (the pnpmfile is a resolution hook, not a
+        # lifecycle script) and keeps the run fast; --lockfile-only skips
+        # node_modules linking entirely.
+        run: pnpm install --lockfile-only --ignore-scripts
+
+      - name: Commit corrected lockfile
+        # Idempotent: if the lock is already pnpmfile-consistent there is no
+        # diff, so nothing is pushed. This no-op is also the loop breaker —
+        # after one repair the next push produces no changes.
+        run: |
+          if git diff --quiet -- pnpm-lock.yaml; then
+            echo "Lockfile already .pnpmfile.cjs-consistent; nothing to fix."
+            exit 0
+          fi
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add pnpm-lock.yaml
+          git commit -m "chore: restore .pnpmfile.cjs-applied pnpm-lock.yaml"
+          git push origin HEAD:${{ github.ref_name }}
