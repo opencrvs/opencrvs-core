@@ -9,8 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines -- location schemas, anchored version resolution and scope-access logic are cohesive; splitting them would create an import cycle (ClientLocation derives from Location) or fan the access helpers' 30+ importers across modules. */
+
 import { UUID } from '../uuid'
 import * as z from 'zod/v4'
+import { PlainDate } from './PlainDate'
 import { EventIndex } from './EventIndex'
 import {
   ActionCreationMetadata,
@@ -78,6 +81,63 @@ export const Location = z.object({
 })
 
 export type Location = z.infer<typeof Location>
+
+/**
+ * TEMPORARY — client-side view of {@link AdministrativeArea} with the
+ * server-flattened `name`, `status` and `externalId` removed, leaving exactly
+ * identity + versions. Every name/status read is thereby forced through the
+ * anchored resolution utilities ({@link resolveVersion}, {@link resolvePath})
+ * at compile time. Delete this type when the contract migration removes the
+ * flat fields from the server schema, at which point the wire type itself
+ * becomes identity + versions.
+ */
+export const ClientAdministrativeArea = AdministrativeArea.omit({
+  name: true,
+  status: true,
+  externalId: true
+})
+
+export type ClientAdministrativeArea = z.infer<typeof ClientAdministrativeArea>
+
+/**
+ * TEMPORARY — client-side view of {@link Location} with the server-flattened
+ * `name`, `status` and `externalId` removed, leaving exactly identity +
+ * versions. See {@link ClientAdministrativeArea} for the full rationale and
+ * deletion condition.
+ */
+export const ClientLocation = Location.omit({
+  name: true,
+  status: true,
+  externalId: true
+})
+
+export type ClientLocation = z.infer<typeof ClientLocation>
+
+/**
+ * Strips the server-flattened fields from a location as it enters the
+ * client's cached maps. The wire format keeps the flat fields for
+ * compatibility; the cache must not, or devices would keep rendering names
+ * flattened before a future-dated version takes effect.
+ */
+export function toClientLocation(location: Location): ClientLocation {
+  return {
+    id: location.id,
+    administrativeAreaId: location.administrativeAreaId,
+    locationType: location.locationType,
+    versions: location.versions
+  }
+}
+
+/** See {@link toClientLocation}. */
+export function toClientAdministrativeArea(
+  area: AdministrativeArea
+): ClientAdministrativeArea {
+  return {
+    id: area.id,
+    parentId: area.parentId,
+    versions: area.versions
+  }
+}
 
 /**
  * Input payload for the locations `set` mutation. Carries only the seedable
@@ -492,12 +552,14 @@ export function userCanAccessEventWithScopes(
 }
 
 // Given an administrative area id, return the full hierarchy from root to leaf.
-export function getAdministrativeAreaHierarchy(
+export function getAdministrativeAreaHierarchy<
+  A extends { id: UUID; parentId: UUID | null }
+>(
   administrativeAreaId: string | undefined | null,
-  administrativeAreas: Map<UUID, AdministrativeArea>
+  administrativeAreas: Map<UUID, A>
 ) {
   // Collect location objects from leaf to root
-  const collectedLocations: AdministrativeArea[] = []
+  const collectedLocations: A[] = []
 
   const parsedAdministrativeAreaId =
     administrativeAreaId && UUID.safeParse(administrativeAreaId).data
@@ -531,8 +593,8 @@ export function getAdministrativeAreaHierarchy(
 export function getLocationHierarchy(
   selectedId: UUID,
   context: {
-    administrativeAreas: Map<UUID, AdministrativeArea>
-    locations: Map<UUID, Location>
+    administrativeAreas: Map<UUID, { id: UUID; parentId: UUID | null }>
+    locations: Map<UUID, { id: UUID; administrativeAreaId: UUID | null }>
   }
 ): UUID[] {
   const { administrativeAreas, locations } = context
@@ -554,4 +616,55 @@ export function getLocationHierarchy(
     administrativeAreas
   )
   return hierarchy.reverse().map((area) => area.id)
+}
+
+/**
+ * A node of an anchored hierarchy path: the identity id plus the name and
+ * status in effect at the anchor date.
+ */
+export type ResolvedPathNode = {
+  id: UUID
+  name: string
+  status: LocationStatus
+}
+
+/**
+ * Resolves a location or administrative area id into its root-first
+ * hierarchy path — leaf included — with every node's name and status
+ * resolved at the anchor date.
+ *
+ * The parent chain is identity-level and fixed for life, so the chain is
+ * constant and only each node's name/status varies with the anchor. Status is
+ * returned for callers that filter on it; an inactive node still resolves to
+ * its name. Returns an empty array for an unknown id.
+ */
+export function resolvePath(
+  locationId: UUID,
+  anchor: PlainDate,
+  context: {
+    administrativeAreas: Map<
+      UUID,
+      { id: UUID; parentId: UUID | null; versions: LocationVersion[] }
+    >
+    locations: Map<
+      UUID,
+      {
+        id: UUID
+        administrativeAreaId: UUID | null
+        versions: LocationVersion[]
+      }
+    >
+  }
+): ResolvedPathNode[] {
+  return getLocationHierarchy(locationId, context).flatMap((id) => {
+    const node =
+      context.locations.get(id) ?? context.administrativeAreas.get(id)
+
+    if (!node) {
+      return []
+    }
+
+    const { name, status } = resolveVersion(node.versions, anchor)
+    return [{ id, name, status }]
+  })
 }

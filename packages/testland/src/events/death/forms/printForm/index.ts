@@ -104,6 +104,9 @@ export const DEATH_CERTIFICATE_COLLECTOR_FORM = defineActionForm({
         defaultMessage: 'Collect Payment',
         description: 'This is the title of the section'
       },
+      conditional: not(
+        field('collector.requesterId').isEqualTo('PRINT_IN_ADVANCE')
+      ),
       fields: [
         {
           id: 'collector.collect.payment.data.afterRegistrationTarget',

@@ -24,9 +24,11 @@ import { createIntl } from 'react-intl'
 import { ILanguage } from '@client/i18n/reducer'
 import {
   UUID,
-  V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
+  V2_DEFAULT_MOCK_CLIENT_ADMINISTRATIVE_AREAS_MAP,
+  V2_DEFAULT_MOCK_CLIENT_LOCATIONS_MAP,
   V2_DEFAULT_MOCK_LOCATIONS,
-  V2_DEFAULT_MOCK_LOCATIONS_MAP
+  resolveVersion,
+  todayISO
 } from '@opencrvs/commons/client'
 
 describe('locationUtil tests', () => {
@@ -204,8 +206,8 @@ describe('isLocationUnderJurisdiction', () => {
       isLocationUnderJurisdiction({
         locationId,
         otherLocationId,
-        locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
-        administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+        locations: V2_DEFAULT_MOCK_CLIENT_LOCATIONS_MAP,
+        administrativeAreas: V2_DEFAULT_MOCK_CLIENT_ADMINISTRATIVE_AREAS_MAP
       })
     ).toEqual(true)
   })
@@ -224,8 +226,8 @@ describe('isLocationUnderJurisdiction', () => {
       isLocationUnderJurisdiction({
         locationId,
         otherLocationId,
-        locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
-        administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+        locations: V2_DEFAULT_MOCK_CLIENT_LOCATIONS_MAP,
+        administrativeAreas: V2_DEFAULT_MOCK_CLIENT_ADMINISTRATIVE_AREAS_MAP
       })
     ).toEqual(false)
   })
@@ -238,13 +240,11 @@ describe('isLocationUnderJurisdiction', () => {
       V2_DEFAULT_MOCK_LOCATIONS.find((l) => l.name === 'Ibombo District Office')
         ?.id
     )
-    const locations = new Map(V2_DEFAULT_MOCK_LOCATIONS_MAP)
+    const locations = new Map(V2_DEFAULT_MOCK_CLIENT_LOCATIONS_MAP)
     locations.set(rootLocationId, {
       id: rootLocationId,
-      name: 'Root Office',
       locationType: 'CRVS_OFFICE',
       administrativeAreaId: null,
-      status: 'active' as const,
       versions: [
         {
           versionId: rootLocationId,
@@ -261,7 +261,7 @@ describe('isLocationUnderJurisdiction', () => {
         locationId: rootLocationId,
         otherLocationId,
         locations,
-        administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+        administrativeAreas: V2_DEFAULT_MOCK_CLIENT_ADMINISTRATIVE_AREAS_MAP
       })
     ).toEqual(true)
   })
@@ -275,13 +275,11 @@ describe('isLocationUnderJurisdiction', () => {
       )?.id
     )
     const otherLocationId = UUID.parse('11111111-1111-4111-8111-111111111111')
-    const locations = new Map(V2_DEFAULT_MOCK_LOCATIONS_MAP)
+    const locations = new Map(V2_DEFAULT_MOCK_CLIENT_LOCATIONS_MAP)
     locations.set(otherLocationId, {
       id: otherLocationId,
-      name: 'Floating Office',
       locationType: 'CRVS_OFFICE',
       administrativeAreaId: null,
-      status: 'active' as const,
       versions: [
         {
           versionId: otherLocationId,
@@ -298,7 +296,7 @@ describe('isLocationUnderJurisdiction', () => {
         locationId,
         otherLocationId,
         locations,
-        administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+        administrativeAreas: V2_DEFAULT_MOCK_CLIENT_ADMINISTRATIVE_AREAS_MAP
       })
     ).toEqual(false)
   })
@@ -307,8 +305,8 @@ describe('isLocationUnderJurisdiction', () => {
 describe('createSearchOptions', () => {
   it('creates search options for locations', () => {
     const options = createSearchOptions({
-      locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
-      administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+      locations: V2_DEFAULT_MOCK_CLIENT_LOCATIONS_MAP,
+      administrativeAreas: V2_DEFAULT_MOCK_CLIENT_ADMINISTRATIVE_AREAS_MAP
     })
 
     expect(options).toMatchSnapshot()
@@ -316,9 +314,10 @@ describe('createSearchOptions', () => {
 
   it('filters search options for locations', () => {
     const options = createSearchOptions({
-      locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
-      administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
-      filter: (f) => f.name.includes('Ibombo')
+      locations: V2_DEFAULT_MOCK_CLIENT_LOCATIONS_MAP,
+      administrativeAreas: V2_DEFAULT_MOCK_CLIENT_ADMINISTRATIVE_AREAS_MAP,
+      filter: (f) =>
+        resolveVersion(f.versions, todayISO()).name.includes('Ibombo')
     })
 
     expect(options).toMatchSnapshot()

@@ -32,6 +32,7 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messa
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { SuspenseLoadingFallback } from '@client/v2-events/components/SuspenseLoadingFallback'
 import { FormHeader } from '@client/v2-events/layouts/form/FormHeader'
+import { recordAnchorDate } from '@client/v2-events/utils'
 import { findLocalEventDocument } from '../../useEvents/api'
 import { useValidatorContext } from '../../../../hooks/useValidatorContext'
 import { DuplicateForm } from './DuplicateForm'
@@ -229,6 +230,7 @@ function ReviewDuplicate() {
         >
           <ReviewComponent.Body
             readonlyMode
+            anchor={recordAnchorDate(eventState)}
             banner={<DuplicateForm eventIndex={eventState} />}
             form={eventState.declaration}
             formConfig={formConfig}

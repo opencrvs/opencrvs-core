@@ -21,7 +21,7 @@ import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavig
 import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavigation'
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
-import { WorkqueueConfig } from '@opencrvs/commons/client'
+import { todayISO, WorkqueueConfig } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { storage } from '@client/storage'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
@@ -38,6 +38,7 @@ import { Avatar } from '@client/components/Avatar'
 import {
   getUsersFullName,
   hasDraftWorkqueue,
+  resolveLocationName,
   WORKQUEUE_DRAFT
 } from '@client/v2-events/utils'
 import { hasOutboxWorkqueue, WORKQUEUE_OUTBOX } from '@client/v2-events/utils'
@@ -150,8 +151,14 @@ function SidebarComponent({
         }
       )) ??
     ''
+  // The sidebar shows the current user's current office — a present-tense
+  // surface, so resolve today's name rather than reading the flattened field
+  // (which the client cache strips; see `toClientLocation`).
   const primaryOffice = userDetails?.primaryOfficeId
-    ? getLocation.useQuery(userDetails.primaryOfficeId).data?.name
+    ? resolveLocationName(
+        getLocation.useQuery(userDetails.primaryOfficeId).data,
+        todayISO()
+      )
     : undefined
 
   const avatar = <Avatar avatar={userDetails?.avatar} name={name} />

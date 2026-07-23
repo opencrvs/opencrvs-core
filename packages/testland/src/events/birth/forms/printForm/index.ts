@@ -54,8 +54,9 @@ export const BIRTH_CERTIFICATE_COLLECTOR_FORM = defineActionForm({
         defaultMessage: 'Verify their identity',
         description: 'This is the title of the section'
       },
-      conditional: not(
-        field('collector.requesterId').isEqualTo('SOMEONE_ELSE')
+      conditional: and(
+        not(field('collector.requesterId').isEqualTo('SOMEONE_ELSE')),
+        not(field('collector.requesterId').isEqualTo('PRINT_IN_ADVANCE'))
       ),
       fields: printCertificateCollectorIdentityVerify,
       actions: {
@@ -100,6 +101,9 @@ export const BIRTH_CERTIFICATE_COLLECTOR_FORM = defineActionForm({
         defaultMessage: 'Collect Payment',
         description: 'This is the title of the section'
       },
+      conditional: not(
+        field('collector.requesterId').isEqualTo('PRINT_IN_ADVANCE')
+      ),
       fields: [
         {
           id: 'collector.collect.payment.data.afterLateRegistrationTarget',

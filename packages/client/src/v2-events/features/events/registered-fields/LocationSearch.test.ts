@@ -9,13 +9,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  ClientLocation,
   JurisdictionFilter,
+  resolveVersion,
+  todayISO,
   V2_DEFAULT_MOCK_LOCATIONS,
-  V2_DEFAULT_MOCK_LOCATIONS_MAP,
-  V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+  V2_DEFAULT_MOCK_CLIENT_LOCATIONS_MAP,
+  V2_DEFAULT_MOCK_CLIENT_ADMINISTRATIVE_AREAS_MAP
 } from '@opencrvs/commons/client'
 
 import { filterLocationsByJurisdiction } from './LocationSearch'
+
+function nameOf(location: ClientLocation) {
+  return resolveVersion(location.versions, todayISO()).name
+}
 
 /**
  * Mock data reference (from administrative-hierarchy-mock.ts):
@@ -36,8 +43,8 @@ import { filterLocationsByJurisdiction } from './LocationSearch'
  *   HEALTH_FACILITYs only — the saved CRVS_OFFICE UUID was not found → field appeared empty.
  */
 
-const locations = V2_DEFAULT_MOCK_LOCATIONS_MAP
-const administrativeAreas = V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+const locations = V2_DEFAULT_MOCK_CLIENT_LOCATIONS_MAP
+const administrativeAreas = V2_DEFAULT_MOCK_CLIENT_ADMINISTRATIVE_AREAS_MAP
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const KLOW_VILLAGE_OFFICE = V2_DEFAULT_MOCK_LOCATIONS.find(
@@ -62,7 +69,7 @@ describe('filterLocationsByJurisdiction', () => {
       })
 
       expect(result).toHaveLength(1)
-      expect(result[0].name).toBe('Ibombo District Office')
+      expect(nameOf(result[0])).toBe('Ibombo District Office')
     })
 
     it('returns [] when the user office type does not match the required locationTypes', () => {
@@ -92,7 +99,7 @@ describe('filterLocationsByJurisdiction', () => {
       })
 
       expect(result).toHaveLength(1)
-      expect(result[0].name).toBe('Klow Village Office')
+      expect(nameOf(result[0])).toBe('Klow Village Office')
     })
   })
 
@@ -113,10 +120,12 @@ describe('filterLocationsByJurisdiction', () => {
         true
       )
       // Ibombo health facilities should be included
-      expect(result.some((l) => l.name === 'Chamakubi Health Post')).toBe(true)
-      expect(result.some((l) => l.name === 'Ibombo Rural Health Centre')).toBe(
+      expect(result.some((l) => nameOf(l) === 'Chamakubi Health Post')).toBe(
         true
       )
+      expect(
+        result.some((l) => nameOf(l) === 'Ibombo Rural Health Centre')
+      ).toBe(true)
     })
 
     it('does not include locations from a different admin area at the same level', () => {
@@ -130,7 +139,7 @@ describe('filterLocationsByJurisdiction', () => {
         jurisdictionFilter: JurisdictionFilter.enum.administrativeArea
       })
 
-      expect(result.some((l) => l.name === 'Isango District Office')).toBe(
+      expect(result.some((l) => nameOf(l) === 'Isango District Office')).toBe(
         false
       )
     })

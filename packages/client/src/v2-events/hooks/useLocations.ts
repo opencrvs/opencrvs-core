@@ -9,8 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
-import { Location, UUID } from '@opencrvs/commons/client'
+import {
+  useQuery,
+  useSuspenseQuery,
+  UseQueryResult
+} from '@tanstack/react-query'
+import {
+  ClientLocation,
+  toClientLocation,
+  UUID
+} from '@opencrvs/commons/client'
 import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
 
@@ -24,7 +32,12 @@ setQueryDefaults(trpcOptionsProxy.locations.list, {
       throw new Error('queryFn is not a function')
     }
     const locations = await queryOptions.queryFn(...params)
-    return new Map<UUID, Location>(locations.map((l) => [l.id, l]))
+    // Strip the server-flattened `name`/`status`/`externalId` as the cache is
+    // built, so no client code can read a location's current name without
+    // going through the anchored resolution utilities.
+    return new Map<UUID, ClientLocation>(
+      locations.map((l) => [l.id, toClientLocation(l)])
+    )
   },
   staleTime: 1000 * 60 * 60 * 24 // keep it in cache 1 day
 })
@@ -43,7 +56,8 @@ setQueryDefaults(trpcOptionsProxy.locations.get, {
       throw new Error('queryFn is not a function')
     }
 
-    return await queryOptions.queryFn(...params)
+    const location = await queryOptions.queryFn(...params)
+    return toClientLocation(location)
   },
   staleTime: 1000 * 60 * 60 * 24
 })
@@ -93,17 +107,21 @@ export function useLocations() {
             locationIds,
             locationType
           })
-        }).data as unknown as Map<UUID, Location>
+        }).data as unknown as Map<UUID, ClientLocation>
       }
     },
     getLocation: {
       useQuery: (id: string) => {
         const { queryFn, ...options } =
           trpcOptionsProxy.locations.get.queryOptions({ id })
+        // The queryFn override above returns a `ClientLocation` (flattened
+        // `name`/`status`/`externalId` stripped), but tRPC still infers the
+        // server `Location` type here. Cast so callers can't read a location's
+        // current name without going through the anchored resolution utilities.
         return useQuery({
           ...options,
           queryKey: trpc.locations.get.queryKey({ id })
-        })
+        }) as unknown as UseQueryResult<ClientLocation>
       }
     },
     getLocationHierarchy: {

@@ -12,13 +12,16 @@ import React, { useMemo } from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import {
+  ClientAdministrativeArea,
+  ClientLocation,
   FieldPropsWithoutReferenceValue,
-  Location,
   UUID,
   joinValues,
-  AdministrativeArea,
   JurisdictionFilter,
-  resolveJurisdictionReference
+  resolveJurisdictionReference,
+  resolveVersion,
+  todayISO,
+  PlainDate
 } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
@@ -46,13 +49,13 @@ export function filterLocationsByJurisdiction({
   locationTypes,
   jurisdictionFilter
 }: {
-  locations: Map<UUID, Location>
-  administrativeAreas: Map<UUID, AdministrativeArea>
+  locations: Map<UUID, ClientLocation>
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
   userLocationId: string | undefined
   locationTypes?: string[]
   jurisdictionFilter?: JurisdictionFilter
-}): Location[] {
-  const matchesType = (location: Location) =>
+}): ClientLocation[] {
+  const matchesType = (location: ClientLocation) =>
     location.locationType &&
     (locationTypes ? locationTypes.includes(location.locationType) : true)
 
@@ -147,8 +150,15 @@ function LocationSearchInput({
 
   const locations = useAvailableLocations(locationTypes, jurisdictionFilter)
 
+  // Selector option labels are behavior-preserving: always today's name.
+  // Anchoring options to the form's event date is the selector-anchoring
+  // follow-up (#13143).
   const options = useMemo(
-    () => locations.map((l) => ({ value: l.id, label: l.name })),
+    () =>
+      locations.map((l) => ({
+        value: l.id,
+        label: resolveVersion(l.versions, todayISO()).name
+      })),
     [locations]
   )
 
@@ -173,12 +183,19 @@ function toCertificateVariables(
   value: Stringifiable | undefined | null,
   context: {
     intl: IntlShape
-    locations: Map<UUID, Location>
-    administrativeAreas: Map<UUID, AdministrativeArea>
+    locations: Map<UUID, ClientLocation>
+    administrativeAreas: Map<UUID, ClientAdministrativeArea>
+    anchor: PlainDate
     adminLevels?: AdminStructureItem[]
   }
 ) {
-  const { intl, locations, administrativeAreas, adminLevels = [] } = context
+  const {
+    intl,
+    locations,
+    administrativeAreas,
+    anchor,
+    adminLevels = []
+  } = context
   const appConfigAdminLevels = adminLevels.map((level) => level.id)
 
   if (!value) {
@@ -196,29 +213,40 @@ function toCertificateVariables(
   })
 
   const locationId = UUID.safeParse(value.toString()).data
-  const location = locationId
+  const locationEntity = locationId
     ? (locations.get(locationId) ?? administrativeAreas.get(locationId))
     : undefined
+  const resolvedLocation = locationEntity
+    ? resolveVersion(locationEntity.versions, anchor)
+    : undefined
 
-  const parentAdministrativeAreaId =
-    (location as Location | undefined)?.administrativeAreaId ??
-    (location as AdministrativeArea | undefined)?.parentId
+  const parentAdministrativeAreaId = locationId
+    ? (locations.get(locationId)?.administrativeAreaId ??
+      administrativeAreas.get(locationId)?.parentId)
+    : undefined
 
   const adminLevelHierarchy = getAdminLevelHierarchy(
     parentAdministrativeAreaId,
     administrativeAreas,
     appConfigAdminLevels,
-    'withNames'
+    'withNames',
+    anchor
   )
 
   return {
-    name: location?.name || '',
+    name: resolvedLocation?.name || '',
     ...adminLevelHierarchy,
     country
   }
 }
 
-function LocationSearchOutput({ value }: { value: Stringifiable }) {
+function LocationSearchOutput({
+  value,
+  anchor
+}: {
+  value: Stringifiable
+  anchor: PlainDate
+}) {
   const intl = useIntl()
   const { getLocations } = useLocations()
   const { getAdministrativeAreas } = useAdministrativeAreas()
@@ -233,6 +261,7 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
     intl,
     locations,
     administrativeAreas,
+    anchor,
     adminLevels
   })
   const { name, country } = certificateVars

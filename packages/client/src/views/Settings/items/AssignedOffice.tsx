@@ -17,7 +17,8 @@ import {
   ValueContainer
 } from '@client/views/Settings/items/components'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { UUID } from '@opencrvs/commons/client'
+import { todayISO, UUID } from '@opencrvs/commons/client'
+import { resolveLocationName } from '@client/v2-events/utils'
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import * as React from 'react'
 import { useIntl } from 'react-intl'
@@ -29,9 +30,13 @@ export function AssignedOffice() {
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
 
-  const officeName = userDetails?.primaryOfficeId
-    ? (locations.get(userDetails.primaryOfficeId as UUID)?.name ?? '')
-    : ''
+  // The current user's own office is a present-tense surface — today's name.
+  const officeName = resolveLocationName(
+    userDetails?.primaryOfficeId
+      ? locations.get(userDetails.primaryOfficeId as UUID)
+      : undefined,
+    todayISO()
+  )
 
   return (
     <ListViewItemSimplified
