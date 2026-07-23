@@ -21,7 +21,9 @@ export default Manifest({
   description: 'Deploy OpenCRVS to a selected internal environment',
   icon: 'assets/app.png',
   workflows: [DeployWorkflow],
-  outgoingDomains: [],
+  // Required so the deploy function can call the GitHub REST API from the
+  // hosted runtime (workflow dispatch + run lookup).
+  outgoingDomains: ['api.github.com'],
   datastores: [],
   botScopes: [
     'commands',

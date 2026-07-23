@@ -26,17 +26,11 @@ const DeployWorkflow = DefineWorkflow({
 })
 
 const inputForm = DeployWorkflow.addStep(Schema.slack.functions.OpenForm, {
-  title: 'Send message to channel',
+  title: 'Deploy OpenCRVS',
   interactivity: DeployWorkflow.inputs.interactivity,
-  submit_label: 'Send message',
+  submit_label: 'Deploy',
   fields: {
     elements: [
-      {
-        name: 'channel',
-        title: 'Channel to send message to <TODO REMOVE>',
-        type: Schema.slack.types.channel_id,
-        default: DeployWorkflow.inputs.channel
-      },
       {
         name: 'environment',
         title: 'Environment',
@@ -51,17 +45,19 @@ const inputForm = DeployWorkflow.addStep(Schema.slack.functions.OpenForm, {
         default: 'develop'
       }
     ],
-    required: ['channel', 'environment', 'tag']
+    required: ['environment', 'tag']
   }
 })
 
-const deployFunctionStep = DeployWorkflow.addStep(DeployFunctionDefinition, {
-  user: DeployWorkflow.inputs.user
-})
-
-DeployWorkflow.addStep(Schema.slack.functions.SendMessage, {
-  channel_id: inputForm.outputs.fields.channel,
-  message: deployFunctionStep.outputs.updatedMsg
+// The function triggers the deployment and posts the (Block Kit) result
+// message itself, so no separate SendMessage step is needed. The message goes
+// to the channel where the trigger link was clicked (the workflow's `channel`
+// input, populated from the Shortcut trigger's channel_id).
+DeployWorkflow.addStep(DeployFunctionDefinition, {
+  user: DeployWorkflow.inputs.user,
+  channel: DeployWorkflow.inputs.channel,
+  environment: inputForm.outputs.fields.environment,
+  tag: inputForm.outputs.fields.tag
 })
 
 export default DeployWorkflow
