@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { Outlet } from 'react-router-dom'
 import superjson from 'superjson'
-import { expect, waitFor, within, userEvent } from '@storybook/test'
+import { expect, waitFor, within, userEvent } from 'storybook/test'
 import {
   ActionType,
   and,

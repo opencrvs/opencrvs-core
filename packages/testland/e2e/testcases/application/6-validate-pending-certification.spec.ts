@@ -54,7 +54,7 @@ test.describe.serial('6 Validate "Pending certification"-workqueue', () => {
       name: formatV2ChildName(declaration)
     })
 
-    const header = page.locator('div[class^="TableHeader"]')
+    const header = page.getByTestId('workqueue-table-header')
     const columns = await header.locator(':scope > div').allInnerTexts()
     expect(columns).toStrictEqual([
       'Title',

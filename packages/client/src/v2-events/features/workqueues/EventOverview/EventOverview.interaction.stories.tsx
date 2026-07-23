@@ -8,11 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Meta, StoryObj } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { expect, within, userEvent } from '@storybook/test'
+import { expect, within, userEvent } from 'storybook/test'
 import {
   tennisClubMembershipEvent,
   generateEventDraftDocument,

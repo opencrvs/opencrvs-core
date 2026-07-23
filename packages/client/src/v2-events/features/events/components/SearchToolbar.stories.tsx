@@ -10,7 +10,7 @@
  */
 
 import React from 'react'
-import { Meta, StoryObj } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react-vite'
 import { ThemeProvider } from 'styled-components'
 import { getTheme } from '@opencrvs/components'
 import { SearchToolbar } from './SearchToolbar'

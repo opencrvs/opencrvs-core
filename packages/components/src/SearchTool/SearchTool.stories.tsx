@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Story } from '@storybook/react'
+import { Story } from '@storybook/react-vite'
 import { Icon } from '../Icon'
 import { SearchTool, ISearchType } from './SearchTool'
 import React from 'react'

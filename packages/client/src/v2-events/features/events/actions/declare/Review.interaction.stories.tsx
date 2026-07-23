@@ -11,10 +11,10 @@
 
 /* eslint-disable max-lines */
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { userEvent, within, expect, waitFor, screen } from '@storybook/test'
+import { userEvent, within, expect, waitFor, screen } from 'storybook/test'
 import { toast } from 'react-hot-toast'
 import {
   ActionType,
@@ -607,7 +607,6 @@ export const MobileReviewShowsActionMenuAndExitsUndeclaredDraft: Story = {
     }
   ],
   parameters: {
-    viewport: { defaultViewport: 'mobile' },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
@@ -617,6 +616,7 @@ export const MobileReviewShowsActionMenuAndExitsUndeclaredDraft: Story = {
     chromatic: { disableSnapshot: true },
     msw
   },
+
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
@@ -637,7 +637,8 @@ export const MobileReviewShowsActionMenuAndExitsUndeclaredDraft: Story = {
         ).toBeInTheDocument()
       }
     )
-  }
+  },
+  globals: { viewport: { value: 'mobile' } }
 }
 
 export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
