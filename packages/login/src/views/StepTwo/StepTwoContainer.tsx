@@ -22,7 +22,7 @@ import { IVerifyCodeNumbers, resetSubmissionError } from '@login/login/actions'
 import { ceil } from 'lodash'
 import { messages } from '@login/i18n/messages/views/stepTwoForm'
 import { useDispatch, useSelector } from 'react-redux'
-import { Box } from '@login/../../components/lib/Box'
+import { Box } from '@opencrvs/components'
 import {
   getResentAuthenticationCode,
   getStepOneDetails,
@@ -68,60 +68,9 @@ export function StepTwoContainer() {
   return (
     <Container id="login-step-two-box">
       <Box id="Box">
-        <Stack direction="column" alignItems="stretch" gap={24}>
-          <LogoContainer>
-            <CountryLogo size="small" src={logo} />
-          </LogoContainer>
-          {resentAuthenticationCode ? (
-            <React.Fragment>
-              <Stack direction="column" alignItems="stretch" gap={8}>
-                <Text element="h1" variant="h2" align="center">
-                  {intl.formatMessage(messages.stepTwoResendTitle)}
-                </Text>
-                <Text
-                  variant="reg16"
-                  align="center"
-                  color="supportingCopy"
-                  element="p"
-                >
-                  {notificationMethod === 'sms' &&
-                    intl.formatMessage(messages.resentSMS, {
-                      number: mobileNumber
-                    })}
-                  {notificationMethod === 'email' &&
-                    intl.formatMessage(messages.resentEMAIL, {
-                      email: emailAddress
-                    })}
-                </Text>
-              </Stack>
-            </React.Fragment>
-          ) : (
-            <React.Fragment>
-              <Stack direction="column" alignItems="stretch" gap={8}>
-                <Text element="h1" variant="h2" align="center">
-                  {intl.formatMessage(messages.stepTwoTitle)}
-                </Text>
-
-                <Text
-                  variant="reg16"
-                  align="center"
-                  color="supportingCopy"
-                  element="p"
-                >
-                  {notificationMethod === 'sms' &&
-                    intl.formatMessage(messages.stepTwoInstructionSMS, {
-                      number: mobileNumber
-                    })}
-                  {notificationMethod === 'email' &&
-                    intl.formatMessage(messages.stepTwoInstructionEMAIL, {
-                      email: emailAddress
-                    })}
-                </Text>
-              </Stack>
-            </React.Fragment>
-          )}
-        </Stack>
-
+        <LogoContainer>
+          <CountryLogo size="small" src={logo} />
+        </LogoContainer>
         <Form
           onSubmit={(values: IVerifyCodeNumbers) =>
             dispatch(actions.verifyCode(values))
@@ -130,6 +79,50 @@ export function StepTwoContainer() {
           {({ handleSubmit }) => (
             <FormWrapper id={FORM_NAME} onSubmit={handleSubmit}>
               <Stack direction="column" alignItems="stretch" gap={24}>
+                {resentAuthenticationCode ? (
+                  <Stack direction="column" alignItems="stretch" gap={8}>
+                    <Text element="h1" variant="h2" align="center">
+                      {intl.formatMessage(messages.stepTwoResendTitle)}
+                    </Text>
+                    <Text
+                      variant="reg16"
+                      align="center"
+                      color="supportingCopy"
+                      element="p"
+                    >
+                      {notificationMethod === 'sms' &&
+                        intl.formatMessage(messages.resentSMS, {
+                          number: mobileNumber
+                        })}
+                      {notificationMethod === 'email' &&
+                        intl.formatMessage(messages.resentEMAIL, {
+                          email: emailAddress
+                        })}
+                    </Text>
+                  </Stack>
+                ) : (
+                  <Stack direction="column" alignItems="stretch" gap={8}>
+                    <Text element="h1" variant="h2" align="center">
+                      {intl.formatMessage(messages.stepTwoTitle)}
+                    </Text>
+
+                    <Text
+                      variant="reg16"
+                      align="center"
+                      color="supportingCopy"
+                      element="p"
+                    >
+                      {notificationMethod === 'sms' &&
+                        intl.formatMessage(messages.stepTwoInstructionSMS, {
+                          number: mobileNumber
+                        })}
+                      {notificationMethod === 'email' &&
+                        intl.formatMessage(messages.stepTwoInstructionEMAIL, {
+                          email: emailAddress
+                        })}
+                    </Text>
+                  </Stack>
+                )}
                 <Field name={field.name} field={field}>
                   {({ meta, input, ...otherProps }) => (
                     <InputField
@@ -143,6 +136,8 @@ export function StepTwoContainer() {
                       <TextInput
                         {...field}
                         {...input}
+                        autoComplete="one-time-code"
+                        inputMode="numeric"
                         touched={Boolean(meta.touched)}
                         error={Boolean(meta.error)}
                       />
@@ -162,7 +157,7 @@ export function StepTwoContainer() {
 
                   <Button
                     size="small"
-                    type="tertiary"
+                    type="secondary"
                     onClick={(e) => {
                       e.preventDefault()
                       dispatch(
