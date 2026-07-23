@@ -794,7 +794,19 @@ const AdministrativeAreaField = BaseField.extend({
     .object({
       partOf: FieldReference.optional().describe('Parent location'),
       type: AdministrativeAreas,
-      allowedLocations: AllowedLocations
+      allowedLocations: AllowedLocations,
+      listHistoricalNames: z
+        .boolean()
+        .optional()
+        .describe(
+          'Advanced search: list every historical name a location has had as a separate, selectable option.'
+        ),
+      activeOnly: z
+        .boolean()
+        .optional()
+        .describe(
+          'Advanced search: offer only currently-active locations; inactivated ones are excluded.'
+        )
     })
     .describe('Administrative area options')
 }).meta({
@@ -815,7 +827,13 @@ const LocationInput = BaseField.extend({
         .array(z.string())
         .optional()
         .describe('Types of the locations that are available for selection.'),
-      allowedLocations: AllowedLocations
+      allowedLocations: AllowedLocations,
+      listHistoricalNames: z
+        .boolean()
+        .optional()
+        .describe(
+          'Advanced search: list every historical name a location has had as a separate, selectable option.'
+        )
     })
     .optional()
 }).meta({
@@ -860,7 +878,12 @@ export type FileUploadWithOptions = z.infer<typeof FileUploadWithOptions>
 const Facility = BaseField.extend({
   type: z.literal(FieldType.FACILITY),
   defaultValue: NonEmptyTextValue.or(ComputedDefaultValue).optional(),
-  configuration: z.object({ allowedLocations: AllowedLocations }).optional()
+  configuration: z
+    .object({
+      allowedLocations: AllowedLocations,
+      listHistoricalNames: z.boolean().optional()
+    })
+    .optional()
 }).describe('Input field for a facility')
 
 export type Facility = z.infer<typeof Facility>
@@ -871,7 +894,12 @@ export type Facility = z.infer<typeof Facility>
 const Office = BaseField.extend({
   type: z.literal(FieldType.OFFICE),
   defaultValue: NonEmptyTextValue.or(ComputedDefaultValue).optional(),
-  configuration: z.object({ allowedLocations: AllowedLocations }).optional()
+  configuration: z
+    .object({
+      allowedLocations: AllowedLocations,
+      listHistoricalNames: z.boolean().optional()
+    })
+    .optional()
 }).describe('Input field for an office')
 
 export type Office = z.infer<typeof Office>
@@ -920,7 +948,19 @@ const Address = BaseField.extend({
           })
         )
         .optional(),
-      allowedLocations: AllowedLocations
+      allowedLocations: AllowedLocations,
+      listHistoricalNames: z
+        .boolean()
+        .optional()
+        .describe(
+          'Advanced search: list every historical name a location has had as a separate, selectable option. Propagated to the embedded admin-area selectors.'
+        ),
+      activeOnly: z
+        .boolean()
+        .optional()
+        .describe(
+          'Advanced search: offer only currently-active admin areas; inactivated ones are excluded. Propagated to the embedded admin-area selectors.'
+        )
     })
     .optional(),
   defaultValue: DefaultAddressFieldValue.or(ComputedDefaultValue).optional()

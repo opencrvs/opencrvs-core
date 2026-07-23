@@ -13,7 +13,6 @@ import { useSelector } from 'react-redux'
 import {
   AdministrativeAreaField,
   ClientLocation,
-  AdministrativeAreas,
   getAdministrativeAreaHierarchy,
   JurisdictionFilter,
   resolveJurisdictionReference,
@@ -133,8 +132,6 @@ interface AdministrativeAreaInputProps
   partOf: string | null
   onChange: (val: string | null) => void
   value?: string | null
-  /** When true (advanced search), excludes inactive admin structures and lists historical names. */
-  isSearchFilter?: boolean
 }
 
 function AdministrativeAreaInput({
@@ -143,7 +140,6 @@ function AdministrativeAreaInput({
   value,
   partOf,
   onChange,
-  isSearchFilter = false,
   ...inputProps
 }: AdministrativeAreaInputProps) {
   const token = useSelector(getToken)
@@ -153,11 +149,10 @@ function AdministrativeAreaInput({
     eventType
   )
 
-  // Only admin-structure address filters drop inactive areas, and only within
-  // advanced search. Office/health-facility fields keep listing inactive ones.
-  const excludeInactive =
-    isSearchFilter &&
-    configuration.type === AdministrativeAreas.enum.ADMIN_STRUCTURE
+  // Advanced search stamps `activeOnly` on admin-structure address filters so
+  // inactivated areas are dropped; office/health-facility fields don't set it
+  // and keep listing inactive ones.
+  const excludeInactive = Boolean(configuration.activeOnly)
 
   const administrativeAreas = useAvailableAdministrativeAreas(
     partOf,
@@ -165,18 +160,19 @@ function AdministrativeAreaInput({
     excludeInactive
   )
 
-  // In advanced search, list every historical name so records saved under an
-  // outdated name stay findable. Elsewhere show a single current-name option.
-  // Names are anchored to today; event-date anchoring is a follow-up (#13143).
+  // When the field config opts in (advanced search sets this), list every
+  // historical name so records saved under an outdated name stay findable.
+  // Otherwise show a single current-name option. Names are anchored to today;
+  // event-date anchoring is a follow-up (#13143).
   const options = useMemo(
     () =>
-      isSearchFilter
+      configuration.listHistoricalNames
         ? buildLocationNameOptions(administrativeAreas)
         : administrativeAreas.map((o) => ({
             label: resolveLocationName(o, todayISO()),
             value: o.id
           })),
-    [administrativeAreas, isSearchFilter]
+    [administrativeAreas, configuration.listHistoricalNames]
   )
 
   const selectedLocation = useMemo(

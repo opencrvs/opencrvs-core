@@ -60,12 +60,6 @@ interface Props {
   config: AddressField
   disabled?: boolean
   validatorContext: ValidatorContext
-  /**
-   * Marks the address as an advanced-search filter. Not destructured below so
-   * it is forwarded via `...otherProps` into the nested FormFieldGenerator,
-   * reaching the admin-area selectors.
-   */
-  isSearchFilter?: boolean
 }
 
 const DEFAULT_COUNTRY_FIELD = {
@@ -256,7 +250,10 @@ function generateAddressFields(
 
     const configuration: AdministrativeAreaField['configuration'] = {
       type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
-      allowedLocations: addressConfig.configuration?.allowedLocations
+      allowedLocations: addressConfig.configuration?.allowedLocations,
+      // Propagate advanced-search behaviour to the embedded admin-area selectors.
+      listHistoricalNames: addressConfig.configuration?.listHistoricalNames,
+      activeOnly: addressConfig.configuration?.activeOnly
     }
 
     if (!isFirst && prevItem?.id) {

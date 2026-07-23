@@ -99,7 +99,6 @@ function SearchSectionForm({
         fields={section.fields}
         formValues={fieldValues}
         id={section.title.id}
-        isSearchFilter={true}
         validatorContext={validatorContext}
         onFormChange={(updatedValues) => {
           Object.entries(updatedValues).forEach(([fieldId, value]) =>
