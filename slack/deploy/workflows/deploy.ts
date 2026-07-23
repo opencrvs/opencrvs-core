@@ -1,14 +1,16 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
 import { DefineWorkflow, Schema } from 'deno-slack-sdk/mod.ts'
 import { DeployFunctionDefinition } from '../functions/deploy.ts'
 
-/**
- * A workflow is a set of steps that are executed in order.
- * Each step in a workflow is a function.
- * https://api.slack.com/automation/workflows
- *
- * This workflow uses interactivity. Learn more at:
- * https://api.slack.com/automation/forms#add-interactivity
- */
 const DeployWorkflow = DefineWorkflow({
   callback_id: 'deploy_workflow',
   title: 'Deploy OpenCRVS',
@@ -29,11 +31,6 @@ const DeployWorkflow = DefineWorkflow({
   }
 })
 
-/**
- * For collecting input from users, we recommend the
- * OpenForm Slack function as a first step.
- * https://api.slack.com/automation/functions#open-a-form
- */
 const inputForm = DeployWorkflow.addStep(Schema.slack.functions.OpenForm, {
   title: 'Send message to channel',
   interactivity: DeployWorkflow.inputs.interactivity,

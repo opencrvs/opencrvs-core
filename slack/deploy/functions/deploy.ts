@@ -1,12 +1,15 @@
-import { DefineFunction, Schema, SlackFunction } from 'deno-slack-sdk/mod.ts'
-import type SampleObjectDatastore from '../datastores/sample_datastore.ts'
-
-/**
- * Functions are reusable building blocks of automation that accept
- * inputs, perform calculations, and provide outputs. Functions can
- * be used independently or as steps in workflows.
- * https://api.slack.com/automation/functions/custom
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { DefineFunction, Schema, SlackFunction } from 'deno-slack-sdk/mod.ts'
+
 export const DeployFunctionDefinition = DefineFunction({
   callback_id: 'deploy_function',
   title: 'Deploy OpenCRVS',
@@ -42,36 +45,8 @@ export const DeployFunctionDefinition = DefineFunction({
  * handler logic that's run when the function is executed.
  * https://api.slack.com/automation/functions/custom
  */
-export default SlackFunction(
-  DeployFunctionDefinition,
-  async ({ inputs, client }) => {
-    const uuid = crypto.randomUUID()
+export default SlackFunction(DeployFunctionDefinition, async ({ inputs }) => {
+  const updatedMsg = `:wave: <@${inputs.user}> submitted the following message: \n\n>${inputs.message}`
 
-    // inputs.user is set from the interactivity_context defined in sample_trigger.ts
-    // https://api.slack.com/automation/forms#add-interactivity
-    const updatedMsg = `:wave: <@${inputs.user}> submitted the following message: \n\n>${inputs.message}`
-
-    const sampleObject = {
-      original_msg: inputs.message,
-      updated_msg: updatedMsg,
-      object_id: uuid
-    }
-
-    // Save the sample object to the datastore
-    // https://api.slack.com/automation/datastores
-    const putResponse = await client.apps.datastore.put<
-      typeof SampleObjectDatastore.definition
-    >({
-      datastore: 'SampleObjects',
-      item: sampleObject
-    })
-
-    if (!putResponse.ok) {
-      return {
-        error: `Failed to put item into the datastore: ${putResponse.error}`
-      }
-    }
-
-    return { outputs: { updatedMsg } }
-  }
-)
+  return { outputs: { updatedMsg } }
+})

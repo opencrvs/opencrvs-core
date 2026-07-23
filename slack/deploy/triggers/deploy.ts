@@ -1,12 +1,17 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
 import type { Trigger } from 'deno-slack-sdk/types.ts'
 import { TriggerContextData, TriggerTypes } from 'deno-slack-api/mod.ts'
 import DeployWorkflow from '../workflows/deploy.ts'
-/**
- * Triggers determine when workflows are executed. A trigger
- * file describes a scenario in which a workflow should be run,
- * such as a user pressing a button or when a specific event occurs.
- * https://api.slack.com/automation/triggers
- */
+
 const deployTrigger: Trigger<typeof DeployWorkflow.definition> = {
   type: TriggerTypes.Shortcut,
   name: 'Deploy OpenCRVS',
