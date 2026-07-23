@@ -22,6 +22,7 @@ import {
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
+import { getFormBackAction } from '@client/v2-events/layouts/form/FormBackAction'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
@@ -84,8 +85,27 @@ export function Pages() {
     }
   }, [pageId, currentPageId, navigate, eventId, searchParams])
 
+  const onPageChange = (nextPageId: string) =>
+    navigate(
+      ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
+        { eventId, pageId: nextPageId },
+        searchParams
+      )
+    )
+
+  const backAction = getFormBackAction({
+    formPages: correctablePages,
+    formData: form,
+    validatorContext,
+    pageId: currentPageId,
+    onNavigateToPage: onPageChange
+  })
+
   return (
-    <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
+    <FormLayout
+      backAction={backAction}
+      route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}
+    >
       {modal}
       <PagesComponent
         attachmentPath={`events/${eventId}/`}
@@ -96,17 +116,7 @@ export function Pages() {
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}
         validatorContext={validatorContext}
-        onPageChange={(nextPageId: string) =>
-          navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
-              {
-                eventId,
-                pageId: nextPageId
-              },
-              searchParams
-            )
-          )
-        }
+        onPageChange={onPageChange}
         onSubmit={() =>
           navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(

@@ -17,7 +17,6 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { SuspenseLoadingFallback } from '@client/v2-events/components/SuspenseLoadingFallback'
 import { FormHeader } from './FormHeader'
-import { FormBackActionProvider } from './FormBackAction'
 import { AllowedRouteWithEventId } from './utils'
 
 /**
@@ -28,12 +27,14 @@ export function FormLayout({
   route,
   children,
   onSaveAndExit,
-  actionComponent
+  actionComponent,
+  backAction
 }: {
   route: AllowedRouteWithEventId
   children: React.ReactNode
   onSaveAndExit?: () => void | Promise<void>
   actionComponent?: React.ReactNode
+  backAction?: () => void
 }) {
   const intl = useIntl()
   const { eventId } = useTypedParams(route)
@@ -44,24 +45,23 @@ export function FormLayout({
   )
 
   return (
-    <FormBackActionProvider>
-      <Frame
-        header={
-          <FormHeader
-            actionComponent={actionComponent}
-            label={intl.formatMessage(configuration.label)}
-            route={route}
-            onSaveAndExit={onSaveAndExit}
-          />
-        }
-        skipToContentText="Skip to form"
+    <Frame
+      header={
+        <FormHeader
+          actionComponent={actionComponent}
+          backAction={backAction}
+          label={intl.formatMessage(configuration.label)}
+          route={route}
+          onSaveAndExit={onSaveAndExit}
+        />
+      }
+      skipToContentText="Skip to form"
+    >
+      <React.Suspense
+        fallback={<SuspenseLoadingFallback id="event-form-spinner" />}
       >
-        <React.Suspense
-          fallback={<SuspenseLoadingFallback id="event-form-spinner" />}
-        >
-          {children}
-        </React.Suspense>
-      </Frame>
-    </FormBackActionProvider>
+        {children}
+      </React.Suspense>
+    </Frame>
   )
 }

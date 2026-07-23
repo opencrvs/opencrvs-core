@@ -20,6 +20,7 @@ import {
   getPrintCertificatePages
 } from '@opencrvs/commons/client'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
+import { getFormBackAction } from '@client/v2-events/layouts/form/FormBackAction'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import {
   CERT_TEMPLATE_ID,
@@ -80,8 +81,32 @@ export function Pages() {
     }
   }, [pageId, currentPageId, navigate, eventId, searchParams])
 
+  const pagesValidatorContext = {
+    ...validatorContext,
+    baseFormState: eventIndex.declaration
+  }
+
+  const onPageChange = (nextPageId: string) =>
+    navigate(
+      ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath(
+        { eventId, pageId: nextPageId },
+        { backTo: searchParams.backTo }
+      )
+    )
+
+  const backAction = getFormBackAction({
+    formPages,
+    formData: annotation,
+    validatorContext: pagesValidatorContext,
+    pageId: currentPageId,
+    onNavigateToPage: onPageChange
+  })
+
   return (
-    <FormLayout route={ROUTES.V2.EVENTS.PRINT_CERTIFICATE}>
+    <FormLayout
+      backAction={backAction}
+      route={ROUTES.V2.EVENTS.PRINT_CERTIFICATE}
+    >
       {modal}
       <PagesComponent
         hideBackToReview
@@ -103,21 +128,8 @@ export function Pages() {
         })}
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
-        validatorContext={{
-          ...validatorContext,
-          baseFormState: eventIndex.declaration
-        }}
-        onPageChange={(nextPageId: string) => {
-          return navigate(
-            ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath(
-              {
-                eventId,
-                pageId: nextPageId
-              },
-              { backTo: searchParams.backTo }
-            )
-          )
-        }}
+        validatorContext={pagesValidatorContext}
+        onPageChange={onPageChange}
         onSubmit={() => {
           navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.buildPath(

@@ -23,7 +23,6 @@ import { AppBar, Button, Icon, ToggleMenu } from '@opencrvs/components'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { useFormBackAction } from './FormBackAction'
 import { AllowedRouteWithEventId } from './utils'
 
 export const messages = defineMessages({
@@ -53,18 +52,19 @@ export function FormHeader({
   label,
   onSaveAndExit,
   route,
-  actionComponent
+  actionComponent,
+  backAction
 }: {
   label: string
   onSaveAndExit?: () => void
   route: AllowedRouteWithEventId
   actionComponent?: React.ReactNode
+  backAction?: () => void
 }) {
   const intl = useIntl()
   const { modal, exit, closeActionView, deleteDeclaration } =
     useEventFormNavigation()
   const events = useEvents()
-  const back = useFormBackAction()
 
   const { eventId } = useTypedParams(route)
   const [{ backTo }] = useTypedSearchParams(route)
@@ -161,13 +161,13 @@ export function FormHeader({
     )
   }
 
-  const leftSlot = back ? (
+  const leftSlot = backAction ? (
     <Button
       aria-label={intl.formatMessage(messages.back)}
       data-testid="back-button"
       size="small"
       type="icon"
-      onClick={back}
+      onClick={backAction}
     >
       <Icon name="ArrowLeft" />
     </Button>
