@@ -17,16 +17,12 @@ export const DeployFunctionDefinition = DefineFunction({
   source_file: 'functions/deploy.ts',
   input_parameters: {
     properties: {
-      message: {
-        type: Schema.types.string,
-        description: 'Message to be posted'
-      },
       user: {
         type: Schema.slack.types.user_id,
         description: 'The user invoking the workflow'
       }
     },
-    required: ['message', 'user']
+    required: ['user']
   },
   output_parameters: {
     properties: {
@@ -39,13 +35,17 @@ export const DeployFunctionDefinition = DefineFunction({
   }
 })
 
-export default SlackFunction(DeployFunctionDefinition, async ({ inputs }) => {
-  const updatedMsg = `🚢 ${inputs.user} initiated a deployment with the following parameters:
+export default SlackFunction(
+  DeployFunctionDefinition,
+  async ({ inputs, client }) => {
+    console.log(inputs)
+    console.log(client)
+    const updatedMsg = `🚢 <@${inputs.user}> initiated a deployment with the following parameters:
 Environment: <TODO>
 Branch or commit hash: <TODO>
 
-Follow the progress of the deployment here: <TODO>
-\n\n>${inputs.message}`
+Follow the progress of the deployment here: <TODO>`
 
-  return { outputs: { updatedMsg } }
-})
+    return { outputs: { updatedMsg } }
+  }
+)

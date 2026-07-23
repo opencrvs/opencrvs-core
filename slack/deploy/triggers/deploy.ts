@@ -18,15 +18,9 @@ const deployTrigger: Trigger<typeof DeployWorkflow.definition> = {
   description: 'Deploy OpenCRVS to a selected internal environment',
   workflow: `#/workflows/${DeployWorkflow.definition.callback_id}`,
   inputs: {
-    interactivity: {
-      value: TriggerContextData.Shortcut.interactivity
-    },
-    channel: {
-      value: TriggerContextData.Shortcut.channel_id
-    },
-    user: {
-      value: TriggerContextData.Shortcut.user_id
-    }
+    interactivity: { value: TriggerContextData.Shortcut.interactivity },
+    channel: { value: TriggerContextData.Shortcut.channel_id },
+    user: { value: TriggerContextData.Shortcut.user_id }
   }
 }
 

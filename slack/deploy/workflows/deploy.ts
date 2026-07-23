@@ -17,15 +17,9 @@ const DeployWorkflow = DefineWorkflow({
   description: 'Deploy OpenCRVS to a selected internal environment',
   input_parameters: {
     properties: {
-      interactivity: {
-        type: Schema.slack.types.interactivity
-      },
-      channel: {
-        type: Schema.slack.types.channel_id
-      },
-      user: {
-        type: Schema.slack.types.user_id
-      }
+      interactivity: { type: Schema.slack.types.interactivity },
+      channel: { type: Schema.slack.types.channel_id },
+      user: { type: Schema.slack.types.user_id }
     },
     required: ['interactivity', 'channel', 'user']
   }
@@ -39,23 +33,31 @@ const inputForm = DeployWorkflow.addStep(Schema.slack.functions.OpenForm, {
     elements: [
       {
         name: 'channel',
-        title: 'Channel to send message to',
+        title: 'Channel to send message to <TODO REMOVE>',
         type: Schema.slack.types.channel_id,
         default: DeployWorkflow.inputs.channel
       },
       {
-        name: 'message',
-        title: 'Message',
+        name: 'environment',
+        title: 'Environment',
         type: Schema.types.string,
-        long: true
+        enum: ['qa'],
+        default: 'qa',
+        require: true,
+      },
+      {
+        name: 'tag',
+        title: 'Branch, tag or commit hash',
+        type: Schema.types.string,
+        require: true,
+        default: 'develop'
       }
     ],
-    required: ['channel', 'message']
+    required: ['channel', 'environment', 'tag']
   }
 })
 
 const deployFunctionStep = DeployWorkflow.addStep(DeployFunctionDefinition, {
-  message: inputForm.outputs.fields.message,
   user: DeployWorkflow.inputs.user
 })
 

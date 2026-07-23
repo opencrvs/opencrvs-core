@@ -1,0 +1,4 @@
+# The Slack app under slack/ is a Deno project formatted by `deno fmt`
+# (see slack/deploy/deno.jsonc). Keep the Node prettier out of it so the two
+# formatters don't fight.
+.
