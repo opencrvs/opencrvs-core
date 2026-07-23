@@ -2529,7 +2529,7 @@ components:
       type: object
       properties:
         banners:
-          description: Banners displayed above the summary fields in the event overview.
+          description: Info boxes displayed above the summary fields in the event overview.
           default: []
           type: array
           items:
@@ -2539,11 +2539,21 @@ components:
                 type: string
                 enum:
                   - info
+                  - positive
                   - warning
-                  - error
-                description: Visual style of the banner.
+                  - negative
+                description: "Semantic tint of the icon block: info (blue), positive (green),
+                  warning (orange), negative (red)."
+              background:
+                description: tinted reads as a recessed empty state; white reads as a standalone
+                  card.
+                default: tinted
+                type: string
+                enum:
+                  - tinted
+                  - white
               icon:
-                description: Icon displayed inside the banner.
+                description: Icon displayed inside the icon block. Defaults to FileSearch.
                 type: string
                 enum:
                   - Archived
@@ -2650,15 +2660,16 @@ components:
                   - Fingerprint
                   - PushPin
                   - Timer
-              title:
-                description: Banner title.
+              heading:
+                description: Primary message. Short, sentence-case.
                 $ref: "#/components/schemas/TranslationConfigOutput"
               description:
-                description: Supporting text displayed below the banner title.
+                description: Secondary copy displayed below the heading, typically a suggested
+                  next step.
                 $ref: "#/components/schemas/TranslationConfigOutput"
               conditionals:
-                description: Conditions under which the banner is shown. When omitted, the
-                  banner is always shown.
+                description: Conditions under which the info box is shown. When omitted, it is
+                  always shown.
                 default: []
                 type: array
                 items:
@@ -2677,9 +2688,10 @@ components:
                     user only if the condition is met
             required:
               - type
-              - title
+              - heading
             additionalProperties: false
-            description: Banner displayed above the summary fields in the event overview.
+            description: A compact icon-block + heading + description block displayed above
+              the summary fields in the event overview.
         fields:
           type: array
           items:
