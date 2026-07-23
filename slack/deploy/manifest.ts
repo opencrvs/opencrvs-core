@@ -19,7 +19,7 @@ import DeployWorkflow from './workflows/deploy.ts'
 export default Manifest({
   name: 'deploy',
   description: 'Deploy OpenCRVS to a selected internal environment',
-  icon: 'assets/default_new_app_icon.png',
+  icon: 'assets/app.png',
   workflows: [DeployWorkflow],
   outgoingDomains: [],
   datastores: [],

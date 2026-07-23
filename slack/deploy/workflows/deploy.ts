@@ -54,24 +54,11 @@ const inputForm = DeployWorkflow.addStep(Schema.slack.functions.OpenForm, {
   }
 })
 
-/**
- * Custom functions are reusable building blocks
- * of automation deployed to Slack infrastructure. They
- * accept inputs, perform calculations, and provide
- * outputs, just like typical programmatic functions.
- * https://api.slack.com/automation/functions/custom
- */
 const deployFunctionStep = DeployWorkflow.addStep(DeployFunctionDefinition, {
   message: inputForm.outputs.fields.message,
   user: DeployWorkflow.inputs.user
 })
 
-/**
- * SendMessage is a Slack function. These are
- * Slack-native actions, like creating a channel or sending
- * a message and can be used alongside custom functions in a workflow.
- * https://api.slack.com/automation/functions
- */
 DeployWorkflow.addStep(Schema.slack.functions.SendMessage, {
   channel_id: inputForm.outputs.fields.channel,
   message: deployFunctionStep.outputs.updatedMsg

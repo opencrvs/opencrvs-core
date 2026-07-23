@@ -39,12 +39,6 @@ export const DeployFunctionDefinition = DefineFunction({
   }
 })
 
-/**
- * SlackFunction takes in two arguments: the CustomFunction
- * definition (see above), as well as a function that contains
- * handler logic that's run when the function is executed.
- * https://api.slack.com/automation/functions/custom
- */
 export default SlackFunction(DeployFunctionDefinition, async ({ inputs }) => {
   const updatedMsg = `:wave: <@${inputs.user}> submitted the following message: \n\n>${inputs.message}`
 
