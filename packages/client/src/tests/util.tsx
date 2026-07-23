@@ -97,7 +97,7 @@ export const resizeWindow = (width: number, height: number) => {
 
 export const selectOption = (
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  wrapper: ReactWrapper<{}, {}, React.Component<{}, {}, any>>,
+  wrapper: ReactWrapper<any, any, any>,
   selector: string,
   option: string
 ): ReactWrapper => {

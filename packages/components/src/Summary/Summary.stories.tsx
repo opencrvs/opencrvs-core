@@ -11,7 +11,7 @@
 
 import React from 'react'
 import { Summary } from './Summary'
-import { ComponentMeta, ComponentStory } from '@storybook/react'
+import { ComponentMeta, ComponentStory } from '@storybook/react-vite'
 
 export default {
   title: 'Data/Summary',

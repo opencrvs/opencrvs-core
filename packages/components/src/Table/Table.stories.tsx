@@ -11,7 +11,7 @@
 
 import React, { useState } from 'react'
 import { Table } from './Table'
-import { ComponentMeta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react-vite'
 import { SortArrow } from '../icons'
 import { orderBy } from 'lodash'
 
