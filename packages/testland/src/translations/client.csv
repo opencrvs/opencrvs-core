@@ -986,6 +986,7 @@ flags.builtin.edit-in-progress.label,Flag label for edit in progress,Edit in pro
 flags.builtin.incomplete.label,Label for flag,Incomplete,Incomplet
 flags.builtin.potential-duplicate.label,Label for flag,Potential duplicate,Doublon potentiel
 flags.builtin.rejected.label,Label for flag,Rejected,Rejeté
+flags.builtin.sealed.label,Label for flag,Sealed,Scellé
 form.birth.child.title,Form section title for Child,Child's details,information de l'enfant
 form.field.dateRangepicker.checkbox.dateLabel,,{rangeStart} to {rangeEnd},{rangeStart} à {rangeEnd}
 form.field.helpertext.nid,Helper text for nid input field,The National ID can only be numeric and must be 10 digits long,Le numéro d'identification national doit être uniquement numérique et comporter 10 chiffres

@@ -70,6 +70,7 @@ import {
   EventDocument
 } from '@opencrvs/toolkit/events'
 import {
+  onAdoptionRegisterHandler,
   onMosipBirthRegisterHandler,
   onMosipDeathRegisterHandler,
   onRegisterHandler
@@ -642,6 +643,17 @@ export async function createServer() {
     options: {
       tags: ['api', 'events'],
       description: 'Receives notifications on event actions'
+    }
+  })
+
+  server.route<{ Payload: EventDocument }>({
+    method: 'POST',
+    path: `/trigger/events/${Event.Adoption}/actions/${ActionType.REGISTER}`,
+    handler: onAdoptionRegisterHandler,
+    options: {
+      tags: ['api', 'events'],
+      description:
+        'Seals the original birth record matching the adopted child once the adoption is registered'
     }
   })
 

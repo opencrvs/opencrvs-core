@@ -31,6 +31,7 @@ import {
   scopeUsesRoleOptions
 } from '../scopes'
 import { SystemContext, UserContext } from '../users/User'
+import { ContainsFlags, Flag } from './Flag'
 
 /** @deprecated Moving on, location types are arbitrary and defined by the country config. */
 export const LocationTypeV1 = z.enum([
@@ -278,6 +279,43 @@ function matchesJurisdictionFilter(
 }
 
 /**
+ * Mirrors `buildFlagsQuery` (packages/events/src/service/indexing/query.ts),
+ * which applies the same `anyOf`/`noneOf`/`allOf` rules to Elasticsearch
+ * queries — this is the single-record equivalent used for e.g. Record tab
+ * and action-button visibility checks.
+ *
+ * @param eventFlags flags currently present on the event index
+ * @param flags flags filter from the scope
+ * @returns whether the event's flags satisfy the scope's flags filter.
+ */
+function matchesFlagsFilter(
+  eventFlags: Flag[] | null | undefined,
+  flags: ContainsFlags
+): boolean {
+  const currentFlags = eventFlags ?? []
+
+  if (flags.anyOf && !flags.anyOf.some((flag) => currentFlags.includes(flag))) {
+    return false
+  }
+
+  if (
+    flags.noneOf &&
+    flags.noneOf.some((flag) => currentFlags.includes(flag))
+  ) {
+    return false
+  }
+
+  if (
+    flags.allOf &&
+    !flags.allOf.every((flag) => currentFlags.includes(flag))
+  ) {
+    return false
+  }
+
+  return true
+}
+
+/**
  * Given indexed event and resolved scope, determine if the scope allows access to the event.
  *
  * All of the options within the scope must be satisfied for access to be granted.
@@ -412,6 +450,10 @@ export function canAccessEventWithScope(
         user
       )
     ) {
+      return false
+    }
+
+    if (options?.flags && !matchesFlagsFilter(event.flags, options.flags)) {
       return false
     }
   }

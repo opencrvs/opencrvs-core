@@ -93,6 +93,7 @@ export function DownloadButton({
   const { resolveConditionals } = useResolveAssignmentActionConditionals(event)
   const unassign = resolveConditionals(ActionType.UNASSIGN)
   const assign = resolveConditionals(ActionType.ASSIGN)
+  const read = resolveConditionals(ActionType.READ)
 
   const { getEvent, actions } = useEvents()
   const users = useUsers()
@@ -112,6 +113,10 @@ export function DownloadButton({
   const isAssignMutationFetching = actions.assignment.assign.isAssigning(
     event.id
   )
+
+  if (!read.visible) {
+    return null
+  }
 
   if (!isOnline) {
     return (

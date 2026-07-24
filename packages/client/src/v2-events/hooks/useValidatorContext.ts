@@ -16,6 +16,7 @@ import {
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { useAuthentication } from '../../utils/userUtils'
+import { useEventConfigurations } from '../features/events/useEventConfiguration'
 import { useSuspenseGetLeafAdministrativeAreaIds } from './useAdministrativeAreas'
 
 /**
@@ -36,10 +37,12 @@ export function useValidatorContext(event?: EventDocument): ValidatorContext {
   const leafAdminStructureLocationIds =
     useSuspenseGetLeafAdministrativeAreaIds()
   const user = useUser()
+  const configs = useEventConfigurations()
 
   return {
     user,
     leafAdminStructureLocationIds,
-    event
+    event,
+    eventConfig: configs.find((c) => c.id === event?.type) ?? undefined
   }
 }
