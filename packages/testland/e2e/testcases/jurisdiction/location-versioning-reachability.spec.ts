@@ -35,22 +35,22 @@ import {
 import { fetchClientAPI } from '../events-rest-api/helpers'
 
 /**
- * ocrvs-13144 — Jurisdiction & routing under change: verification.
+ * Verifies that jurisdiction/routing predicates keep resolving correctly as
+ * locations are renamed, inactivated, or transferred.
  *
  * These specs create their own throwaway offices/users via the location
- * write API (ocrvs-13134) rather than mutating seeded Farajaland offices,
- * because renaming/inactivating a shared office (e.g. Ibombo District
- * Office) would be observed by every other spec running in parallel against
- * the same credentials.
+ * write API rather than mutating seeded Farajaland offices, because
+ * renaming/inactivating a shared office (e.g. Ibombo District Office) would
+ * be observed by every other spec running in parallel against the same
+ * credentials.
  *
  * Not covered here yet, because the underlying behaviour isn't merged:
- * - ocrvs-13143 (form selector anchoring) / ocrvs-13146 (search) — whether
- *   an inactivated office disappears from *selectors* while staying
- *   filterable in advanced search.
- * - ocrvs-13205 (error overlay for users in inactive offices) — the
- *   "no auto-reassignment" check below only asserts today's behaviour
- *   (user keeps their office, can still log in); once ocrvs-13205 ships,
- *   the login step here may need an accompanying overlay assertion.
+ * - form selector anchoring / search — whether an inactivated office
+ *   disappears from *selectors* while staying filterable in advanced search.
+ * - the error overlay for users in inactive offices — the "no
+ *   auto-reassignment" check below only asserts today's behaviour (user
+ *   keeps their office, can still log in); once that behaviour ships, the
+ *   login step here may need an accompanying overlay assertion.
  */
 
 async function createOffice(
