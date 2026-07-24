@@ -159,19 +159,19 @@ addFormats(ajv)
 // call. Cache by (event, config) identity so calls within the same validation pass
 // reuse the result; a WeakMap lets entries be collected once a new event/config
 // reference replaces the old one after a mutation.
-const eventStateCache = new WeakMap<
+const inMemoryEventStateCache = new WeakMap<
   EventDocument,
   WeakMap<EventConfig, EventIndex>
 >()
 
-function getCachedCurrentEventState(
+function getInMemoryEventState(
   event: EventDocument,
   config: EventConfig
 ): EventIndex {
-  let stateByConfig = eventStateCache.get(event)
+  let stateByConfig = inMemoryEventStateCache.get(event)
   if (!stateByConfig) {
     stateByConfig = new WeakMap()
-    eventStateCache.set(event, stateByConfig)
+    inMemoryEventStateCache.set(event, stateByConfig)
   }
 
   let state = stateByConfig.get(config)
@@ -200,7 +200,7 @@ export function buildClientFunctionContext(input: {
 }): ClientFunctionContext {
   const flags =
     input.validatorContext?.event && input.validatorContext?.eventConfig
-      ? getCachedCurrentEventState(
+      ? getInMemoryEventState(
           input.validatorContext?.event,
           input.validatorContext?.eventConfig
         )?.flags
