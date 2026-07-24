@@ -22,7 +22,7 @@ const INFRA_REF = 'develop'
 // env var; otherwise this value is used. Get it from `slack triggers list` (or
 // the output of `slack trigger create`).
 const TRIGGER_URL =
-  'https://slack.com/shortcuts/Ft0BKCQZ3317/a5e0d6f2832e675ab28cb29e3020167c'
+  'https://slack.com/shortcuts/Ft0BK5Q27NQ5/797f688b8548e9dc77e400c9d5a3500d'
 
 // The result message is always posted to this channel, regardless of where the
 // trigger link was clicked. Override with an OUTPUT_CHANNEL env var if needed.

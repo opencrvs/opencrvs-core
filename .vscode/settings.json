@@ -8,9 +8,6 @@
     "typescriptreact"
   ],
   "typescript.updateImportsOnFileMove.enabled": "always",
-  // Deno is enabled ONLY under the Slack app directory; the rest of the
-  // monorepo stays on the Node/tsserver toolchain. The Deno LSP resolves
-  // deps (e.g. deno-slack-sdk/mod.ts) from slack/deploy/deno.jsonc's imports.
   "deno.enablePaths": ["./slack/deploy"],
   "eslint.workingDirectories": [
     {
