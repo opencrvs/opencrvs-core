@@ -58,8 +58,7 @@
     "packages/events/src/tests/extract-dump.sh",
     ".kube",
     ".claude",
-    "packages/api-docs/public-key.pem",
-    ".prettierignore"
+    "packages/api-docs/public-key.pem"
   ],
   "license": "license-header.txt",
   "licenseFormats": {
