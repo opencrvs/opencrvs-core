@@ -17,6 +17,18 @@ const REPO = 'opencrvs/opencrvs-testland-infrastructure'
 const WORKFLOW = 'deploy-opencrvs.yml'
 const INFRA_REF = 'develop'
 
+// Shortcut/link trigger URL, shown as a footer so people can re-run the deploy
+// straight from the result message. Override per-environment with a TRIGGER_URL
+// env var; otherwise this value is used. Get it from `slack triggers list` (or
+// the output of `slack trigger create`).
+const TRIGGER_URL =
+  'https://slack.com/shortcuts/Ft0BKCQZ3317/a5e0d6f2832e675ab28cb29e3020167c'
+
+// The result message is always posted to this channel, regardless of where the
+// trigger link was clicked. Override with an OUTPUT_CHANNEL env var if needed.
+// This is #opencrvs-developers on Slack
+const OUTPUT_CHANNEL = 'C02LU432JGK'
+
 const POLL_ATTEMPTS = 10
 const POLL_DELAY_MS = 2000
 
@@ -31,10 +43,6 @@ export const DeployFunctionDefinition = DefineFunction({
         type: Schema.slack.types.user_id,
         description: 'The user invoking the workflow'
       },
-      channel: {
-        type: Schema.slack.types.channel_id,
-        description: 'Channel to post the deployment message in'
-      },
       environment: {
         type: Schema.types.string,
         description: 'Target environment'
@@ -44,7 +52,7 @@ export const DeployFunctionDefinition = DefineFunction({
         description: 'opencrvs-core branch name, tag, or commit hash'
       }
     },
-    required: ['user', 'channel', 'environment', 'tag']
+    required: ['user', 'environment', 'tag']
   },
   output_parameters: {
     properties: {},
@@ -110,18 +118,37 @@ async function findRunUrl(
 // deno-lint-ignore no-explicit-any
 type Blocks = Array<Record<string, any>>
 
+// Small greyed footer linking back to the trigger, so a deploy can be re-run
+// straight from the result message.
+function rerunFooter(triggerUrl: string): Blocks[number] {
+  return {
+    type: 'context',
+    elements: [
+      {
+        type: 'mrkdwn',
+        text: `This deployment was made with the Slack Deployment workflow. Workflow link: <${triggerUrl}|Deploy OpenCRVS>`
+      }
+    ]
+  }
+}
+
 function startedBlocks(args: {
   user: string
   environment: string
   tag: string
   coreImageTag: string
   runLink: string
+  triggerUrl: string
 }): Blocks {
-  const { user, environment, tag, coreImageTag, runLink } = args
+  const { user, environment, tag, coreImageTag, runLink, triggerUrl } = args
   return [
     {
       type: 'header',
-      text: { type: 'plain_text', text: ':ship: Deployment started', emoji: true }
+      text: {
+        type: 'plain_text',
+        text: ':ship: Deployment started',
+        emoji: true
+      }
     },
     {
       type: 'section',
@@ -134,8 +161,15 @@ function startedBlocks(args: {
     },
     {
       type: 'section',
-      text: { type: 'mrkdwn', text: `:mag: <${runLink}|Follow the deployment progress →>` }
-    }
+      text: {
+        type: 'mrkdwn',
+        text: `:mag: <${runLink}|Follow the deployment progress →>`
+      }
+    },
+    {
+      type: 'divider'
+    },
+    rerunFooter(triggerUrl)
   ]
 }
 
@@ -144,8 +178,9 @@ function errorBlocks(args: {
   environment: string
   coreImageTag: string
   reason: string
+  triggerUrl: string
 }): Blocks {
-  const { user, environment, coreImageTag, reason } = args
+  const { user, environment, coreImageTag, reason, triggerUrl } = args
   return [
     {
       type: 'section',
@@ -155,19 +190,22 @@ function errorBlocks(args: {
           `:x: <@${user}> — failed to trigger a deployment to *${environment}* ` +
           `(core: \`${coreImageTag}\`).\n${reason}`
       }
-    }
+    },
+    rerunFooter(triggerUrl)
   ]
 }
 
 export default SlackFunction(
   DeployFunctionDefinition,
   async ({ inputs, env, client }) => {
-    const { user, channel, environment, tag } = inputs
+    const { user, environment, tag } = inputs
     const coreImageTag = resolveImageTag(tag)
     const token = env.GITHUB_TOKEN
+    const triggerUrl = env.TRIGGER_URL ?? TRIGGER_URL
+    const outputChannel = env.OUTPUT_CHANNEL ?? OUTPUT_CHANNEL
 
     const post = (text: string, blocks: Blocks) =>
-      client.chat.postMessage({ channel, text, blocks })
+      client.chat.postMessage({ channel: outputChannel, text, blocks })
 
     if (!token) {
       await post(
@@ -176,6 +214,7 @@ export default SlackFunction(
           user,
           environment,
           coreImageTag,
+          triggerUrl,
           reason:
             'The `GITHUB_TOKEN` environment variable is not set for this app.'
         })
@@ -212,6 +251,7 @@ export default SlackFunction(
           user,
           environment,
           coreImageTag,
+          triggerUrl,
           reason: `GitHub responded ${dispatchRes.status}: ${
             detail || dispatchRes.statusText
           }`
@@ -226,7 +266,14 @@ export default SlackFunction(
 
     await post(
       `${environment} deployment started by <@${user}> (core: ${coreImageTag}) — ${runLink}`,
-      startedBlocks({ user, environment, tag, coreImageTag, runLink })
+      startedBlocks({
+        user,
+        environment,
+        tag,
+        coreImageTag,
+        runLink,
+        triggerUrl
+      })
     )
 
     return { outputs: {} }

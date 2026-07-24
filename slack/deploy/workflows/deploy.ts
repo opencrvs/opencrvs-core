@@ -50,12 +50,10 @@ const inputForm = DeployWorkflow.addStep(Schema.slack.functions.OpenForm, {
 })
 
 // The function triggers the deployment and posts the (Block Kit) result
-// message itself, so no separate SendMessage step is needed. The message goes
-// to the channel where the trigger link was clicked (the workflow's `channel`
-// input, populated from the Shortcut trigger's channel_id).
+// message itself (always to a fixed channel — see OUTPUT_CHANNEL in the
+// function), so no separate SendMessage step is needed.
 DeployWorkflow.addStep(DeployFunctionDefinition, {
   user: DeployWorkflow.inputs.user,
-  channel: DeployWorkflow.inputs.channel,
   environment: inputForm.outputs.fields.environment,
   tag: inputForm.outputs.fields.tag
 })
