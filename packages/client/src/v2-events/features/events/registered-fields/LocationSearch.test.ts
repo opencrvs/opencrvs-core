@@ -20,7 +20,7 @@ import {
   V2_DEFAULT_MOCK_CLIENT_ADMINISTRATIVE_AREAS_MAP
 } from '@opencrvs/commons/client'
 
-import { buildLocationNameOptions } from '@client/v2-events/utils'
+import { buildHistoricalLocationNameOptions } from '@client/v2-events/utils'
 import { filterLocationsByJurisdiction } from './LocationSearch'
 
 function nameOf(location: ClientLocation) {
@@ -248,12 +248,12 @@ function makeVersionedItem(id: string, names: string[]) {
   }
 }
 
-describe('buildLocationNameOptions', () => {
+describe('buildHistoricalLocationNameOptions', () => {
   it('lists a renamed location once per distinct historical name, in version order', () => {
     const id = '11111111-1111-1111-1111-111111111111'
     const items = [makeVersionedItem(id, ['Office A', 'Office Z'])]
 
-    const options = buildLocationNameOptions(items)
+    const options = buildHistoricalLocationNameOptions(items)
 
     // Both rows resolve to the same location id.
     expect(options).toEqual([
@@ -268,7 +268,7 @@ describe('buildLocationNameOptions', () => {
       makeVersionedItem(id, ['Alaminos', 'Alaminos City', 'Alaminos'])
     ]
 
-    const options = buildLocationNameOptions(items)
+    const options = buildHistoricalLocationNameOptions(items)
 
     expect(options).toEqual([
       { value: id, label: 'Alaminos' },
@@ -280,7 +280,7 @@ describe('buildLocationNameOptions', () => {
     const id = '33333333-3333-3333-3333-333333333333'
     const items = [makeVersionedItem(id, ['Ibombo District Office'])]
 
-    const options = buildLocationNameOptions(items)
+    const options = buildHistoricalLocationNameOptions(items)
 
     expect(options).toEqual([{ value: id, label: 'Ibombo District Office' }])
   })

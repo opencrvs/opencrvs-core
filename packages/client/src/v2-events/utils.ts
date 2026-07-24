@@ -47,7 +47,7 @@ export function getUsersFullName(name: UserOrSystem['name']) {
  * and every row resolves to the same location id. Ordinary forms list a single
  * current-name option instead of calling this.
  */
-export function buildLocationNameOptions<
+export function buildHistoricalLocationNameOptions<
   T extends { id: UUID; versions: LocationVersion[] }
 >(items: T[]): { value: UUID; label: string }[] {
   return items.flatMap((item) => {

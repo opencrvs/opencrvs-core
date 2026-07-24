@@ -33,7 +33,7 @@ import {
 import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import {
-  buildLocationNameOptions,
+  buildHistoricalLocationNameOptions,
   resolveLocationName
 } from '@client/v2-events/utils'
 import { LocationSearch } from './LocationSearch'
@@ -167,7 +167,7 @@ function AdministrativeAreaInput({
   const options = useMemo(
     () =>
       configuration.listHistoricalNames
-        ? buildLocationNameOptions(administrativeAreas)
+        ? buildHistoricalLocationNameOptions(administrativeAreas)
         : administrativeAreas.map((o) => ({
             label: resolveLocationName(o, todayISO()),
             value: o.id

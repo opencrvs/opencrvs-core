@@ -28,7 +28,7 @@ import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import {
-  buildLocationNameOptions,
+  buildHistoricalLocationNameOptions,
   getAdminLevelHierarchy
 } from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
@@ -160,7 +160,7 @@ function LocationSearchInput({
   const options = useMemo(
     () =>
       props.configuration?.listHistoricalNames
-        ? buildLocationNameOptions(locations)
+        ? buildHistoricalLocationNameOptions(locations)
         : locations.map((l) => ({
             value: l.id,
             label: resolveVersion(l.versions, todayISO()).name
