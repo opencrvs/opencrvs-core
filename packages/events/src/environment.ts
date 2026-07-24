@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { cleanEnv, str, url, bool } from 'envalid'
+import { cleanEnv, str, url, bool, num } from 'envalid'
 
 /**
  * When defining variables aim to be consistent with existing values.
@@ -31,5 +31,9 @@ export const env = cleanEnv(process.env, {
     default: true,
     desc: 'Enable two-factor authentication. When disabled, verification codes are set to 000000.'
   }),
-  DEFAULT_USER_PASSWORD: str({ devDefault: 'test', default: undefined })
+  DEFAULT_USER_PASSWORD: str({ devDefault: 'test', default: undefined }),
+  EVENT_CONFIG_CACHE_TTL_MS: num({
+    default: 60_000,
+    desc: 'How long (ms) the events service caches event/workqueue configuration fetched from countryconfig before refetching. Bounds how stale served config can be after a countryconfig deploy that does not restart the events service.'
+  })
 })
