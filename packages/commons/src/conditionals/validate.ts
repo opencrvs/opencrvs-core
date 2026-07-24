@@ -159,6 +159,10 @@ addFormats(ajv)
 // call. Cache by (event, config) identity so calls within the same validation pass
 // reuse the result; a WeakMap lets entries be collected once a new event/config
 // reference replaces the old one after a mutation.
+// @TODO: longer term, computing this once and carrying it on `ValidatorContext`
+// would be more explicit than caching it here — but that needs `eventConfig`
+// threaded into the server-side contexts that don't carry it today, so keeping
+// the cache here for now.
 const inMemoryEventStateCache = new WeakMap<
   EventDocument,
   WeakMap<EventConfig, EventIndex>
