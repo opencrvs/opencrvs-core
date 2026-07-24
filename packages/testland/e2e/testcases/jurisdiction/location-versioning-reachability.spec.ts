@@ -427,4 +427,72 @@ test.describe.serial('Jurisdiction & routing under location versioning', () => {
       ownUserPage.getByRole('button', { name: 'Recent' })
     ).toBeVisible({ timeout: 30_000 })
   })
+
+  test('Inactivating an office keeps its Notified records reachable to the same administrative area', async ({
+    browser
+  }) => {
+    // A full office+user provisioning cycle plus the first-login ceremony —
+    // same weight class as the other provisioning-heavy tests in this file.
+    test.setTimeout(180_000)
+
+    const officeName = `E2E Notify Office ${uuidv4()}`
+    const office = await createOffice(
+      systemAdminToken,
+      ibomboAreaId,
+      officeName
+    )
+
+    // Community Leader has record.notify but not record.declare — its own
+    // workqueue scope is only ['assigned-to-you', 'recent'], so unlike the
+    // Registration Officer tests, there is no bucket for it to review its own
+    // notification in; the reachability check below has to come from a
+    // registrar instead.
+    const adminPage = await newPage(browser)
+    await login(adminPage, CREDENTIALS.LOCAL_SYSTEM_ADMIN)
+    const { username } = await provisionUserInOffice(
+      adminPage,
+      officeName,
+      'Community Leader'
+    )
+
+    const firstLoginPage = await newPage(browser)
+    await loginWithNewUser(firstLoginPage, username)
+    const userToken = await getToken(username, NEW_USER_PASSWORD)
+
+    const { declaration, eventId } = await createDeclaration(
+      userToken,
+      undefined,
+      ActionType.NOTIFY
+    )
+    const childName = formatV2ChildName(declaration as any)
+    expect(eventId).toBeTruthy()
+
+    await putLocationVersion(systemAdminToken, office.id, {
+      name: office.name,
+      externalId: office.externalId,
+      status: 'inactive',
+      effectiveFrom: '2020-06-01',
+      lastVersionId: office.versions[0].versionId
+    })
+
+    // The notifying user's own view: "Recent" is the only bucket in their
+    // scope, and has no location dependency, so this only confirms no
+    // lockout — the real reachability check is the registrar below.
+    const ownUserPage = await newPage(browser)
+    await loginAsProvisionedUser(ownUserPage, username)
+    await expect(
+      ownUserPage.getByRole('button', { name: 'Recent' })
+    ).toBeVisible({ timeout: 30_000 })
+
+    // A registrar in the same administrative area (Ibombo) — a different
+    // office entirely — should still see the notification in the
+    // "Notifications" workqueue despite the notifying office being inactive.
+    const registrarPage = await newPage(browser)
+    await login(registrarPage, CREDENTIALS.REGISTRAR)
+    await assertRecordInWorkqueue({
+      page: registrarPage,
+      name: childName,
+      workqueues: [{ title: 'Notifications', exists: true }]
+    })
+  })
 })
