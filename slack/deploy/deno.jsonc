@@ -1,29 +1,10 @@
 {
   "$schema": "https://raw.githubusercontent.com/denoland/deno/main/cli/schemas/config-file.v1.json",
   "fmt": {
-    "include": [
-      "README.md",
-      "datastores",
-      "external_auth",
-      "functions",
-      "manifest.ts",
-      "triggers",
-      "types",
-      "views",
-      "workflows"
-    ]
+    "include": ["README.md", "functions", "manifest.ts", "triggers", "workflows"]
   },
   "lint": {
-    "include": [
-      "datastores",
-      "external_auth",
-      "functions",
-      "manifest.ts",
-      "triggers",
-      "types",
-      "views",
-      "workflows"
-    ]
+    "include": ["functions", "manifest.ts", "triggers", "workflows"]
   },
   "lock": false,
   "tasks": {
