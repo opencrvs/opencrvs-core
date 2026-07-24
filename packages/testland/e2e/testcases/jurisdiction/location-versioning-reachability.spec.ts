@@ -162,6 +162,7 @@ test.describe.serial('Jurisdiction & routing under location versioning', () => {
     ibomboAreaId = getIdByName(administrativeAreas, 'Ibombo')
   })
 
+  // Extra pages from newPage() don't auto-close and pile up across this serial run.
   test.afterEach(async () => {
     await Promise.all(openPages.map((page) => page.close().catch(() => {})))
     openPages = []
@@ -423,6 +424,7 @@ test.describe.serial('Jurisdiction & routing under location versioning', () => {
 
     const ownUserPage = await newPage(browser)
     await loginAsProvisionedUser(ownUserPage, username)
+    // Default 5s isn't always enough for the PWA's own bootstrap after login.
     await expect(
       ownUserPage.getByRole('button', { name: 'Recent' })
     ).toBeVisible({ timeout: 30_000 })
@@ -480,6 +482,7 @@ test.describe.serial('Jurisdiction & routing under location versioning', () => {
     // lockout — the real reachability check is the registrar below.
     const ownUserPage = await newPage(browser)
     await loginAsProvisionedUser(ownUserPage, username)
+    // Default 5s isn't always enough for the PWA's own bootstrap after login.
     await expect(
       ownUserPage.getByRole('button', { name: 'Recent' })
     ).toBeVisible({ timeout: 30_000 })
