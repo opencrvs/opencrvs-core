@@ -13,8 +13,17 @@ import { FieldConfig } from '../events/FieldConfig'
 import { FieldType } from '../events/FieldType'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { errorMessages, runFieldValidations, validateFieldInput } from './validate'
+import { ConditionalType } from '../events/Conditional'
+import { eventQueryDataGenerator } from '../events/test.utils'
+import {
+  errorMessages,
+  areConditionsMet,
+  isFieldSecured,
+  runFieldValidations,
+  validateFieldInput
+} from './validate'
 import { field } from '../events/field'
+import { flag } from './conditionals'
 /**
  * Goal of testing is to ensure right error messages are returned, and our custom logic holds.
  * We should be able to trust zod validation for the rest.
@@ -323,5 +332,53 @@ describe('runFieldValidations with customClientValidator', () => {
         }
       }
     ])
+  })
+})
+
+describe('areConditionsMet', () => {
+  const flagConditional = {
+    type: ConditionalType.SHOW,
+    conditional: flag('sealed')
+  }
+
+  it('is met when the event carries the flag', () => {
+    const eventIndex = eventQueryDataGenerator({ flags: ['sealed'] })
+
+    expect(areConditionsMet([flagConditional], {}, {}, eventIndex)).toBe(true)
+  })
+
+  it('is not met when the event does not carry the flag', () => {
+    const eventIndex = eventQueryDataGenerator({ flags: [] })
+
+    expect(areConditionsMet([flagConditional], {}, {}, eventIndex)).toBe(false)
+  })
+})
+
+describe('isFieldSecured', () => {
+  it('returns true for a field secured with a plain boolean', () => {
+    const eventIndex = eventQueryDataGenerator({ flags: [] })
+
+    expect(isFieldSecured({ secured: true }, eventIndex)).toBe(true)
+  })
+
+  it('returns false for a field not secured (boolean or unset)', () => {
+    const eventIndex = eventQueryDataGenerator({ flags: [] })
+
+    expect(isFieldSecured({ secured: false }, eventIndex)).toBe(false)
+    expect(isFieldSecured({ secured: undefined }, eventIndex)).toBe(false)
+  })
+
+  it("resolves a conditional secured value against the event, e.g. flag('sealed')", () => {
+    const securedField = { secured: flag('sealed') }
+
+    expect(
+      isFieldSecured(
+        securedField,
+        eventQueryDataGenerator({ flags: ['sealed'] })
+      )
+    ).toBe(true)
+    expect(
+      isFieldSecured(securedField, eventQueryDataGenerator({ flags: [] }))
+    ).toBe(false)
   })
 })

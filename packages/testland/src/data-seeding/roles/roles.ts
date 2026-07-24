@@ -32,9 +32,9 @@ export const roles: Role[] = [
       { type: 'user.search', options: { accessLevel: 'administrativeArea' } },
       { type: 'performance.read-dashboards' },
       { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent', 'requires-completion', 'in-external-validation', 'escalated', 'pending-validation', 'pending-updates', 'pending-approval', 'pending-certification', 'pending-issuance', 'correction-requested'] } },
-      { type: 'record.search', options: { placeOfEvent: 'administrativeArea' } },
+      { type: 'record.search', options: { placeOfEvent: 'administrativeArea', flags: { noneOf: ['sealed'] } } },
       { type: 'record.create', options: { placeOfEvent: 'administrativeArea' } },
-      { type: 'record.read', options: { placeOfEvent: 'administrativeArea' } },
+      { type: 'record.read', options: { placeOfEvent: 'administrativeArea', flags: { noneOf: ['sealed'] } } },
       { type: 'record.declare', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.edit', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.reject', options: { placeOfEvent: 'administrativeArea' } },
@@ -74,7 +74,7 @@ export const roles: Role[] = [
       },
       { type: 'record.search', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.create', options: { placeOfEvent: 'administrativeArea' } },
-      { type: 'record.read', options: { placeOfEvent: 'administrativeArea' } },
+      { type: 'record.read', options: { placeOfEvent: 'administrativeArea', flags: { noneOf: ['sealed'] } } },
       { type: 'record.declare', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.edit', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.reject', options: { placeOfEvent: 'administrativeArea' } },
@@ -181,7 +181,7 @@ export const roles: Role[] = [
       { type: 'record.register' },
       { type: 'record.print-certified-copies' },
       { type: 'record.correct' },
-      { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['REGISTRAR_GENERAL_FEEDBACK', 'REVOKE_REGISTRATION', 'REINSTATE_REVOKE_REGISTRATION', 'APPROVE_DECLARATION'] } },
+      { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['SEAL', 'UNSEAL', 'REGISTRAR_GENERAL_FEEDBACK', 'REVOKE_REGISTRATION', 'REINSTATE_REVOKE_REGISTRATION', 'APPROVE_DECLARATION'] } },
       { type: 'record.custom-action', options: { event: ['death'], customActionTypes: ['APPROVE_DECLARATION'] } },
       { type: 'record.unassign-others' }
     ])
@@ -200,9 +200,9 @@ export const roles: Role[] = [
       { type: 'performance.read' },
       { type: 'performance.read-dashboards' },
       { type: 'profile.electronic-signature' },
-      { type: 'record.search', options: { placeOfEvent: 'administrativeArea' } },
+      { type: 'record.search', options: { placeOfEvent: 'administrativeArea', flags: { noneOf: ['sealed'] } } },
       { type: 'workqueue', options: { ids: ['recent', 'pending-feedback-provincinal-registrar', 'pending-approval', 'correction-requested'] } },
-      { type: 'record.read', options: { placeOfEvent: 'administrativeArea' } },
+      { type: 'record.read', options: { placeOfEvent: 'administrativeArea', flags: { noneOf: ['sealed'] } } },
       { type: 'record.reject', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.register', options: { declaredIn: 'administrativeArea' } },
       { type: 'record.archive', options: { placeOfEvent: 'administrativeArea' } },
@@ -227,13 +227,13 @@ export const roles: Role[] = [
     },
     scopes: defineScopes([
       { type: 'user.read-only-my-audit' },
-      { type: 'record.search', options: { placeOfEvent: 'location' } },
+      { type: 'record.search', options: { placeOfEvent: 'location', flags: { noneOf: ['sealed'] } } },
       { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent', 'pending-attestation', 'pending-updates'] } },
       { type: 'record.create', options: { placeOfEvent: 'location' } },
-      { type: 'record.read', options: { event: ['birth', 'death'], notifiedIn: 'location' } },
+      { type: 'record.read', options: { event: ['birth', 'death', 'adoption'], notifiedIn: 'location', flags: { noneOf: ['sealed'] } } },
       { type: 'record.declare', options: { placeOfEvent: 'location' } },
       { type: 'record.notify', options: { placeOfEvent: 'location' } },
-      { type: 'record.edit', options: { event: ['birth', 'death'], notifiedBy: 'user' } },
+      { type: 'record.edit', options: { event: ['birth', 'death', 'adoption'], notifiedBy: 'user' } },
       { type: 'record.print-certified-copies', options: { templates: ['v2.tennis-club-membership-certificate-alpha'], registeredIn: 'location' } }
     ])
   },
@@ -246,9 +246,9 @@ export const roles: Role[] = [
     },
     scopes: defineScopes([
       { type: 'user.read-only-my-audit' },
-      { type: 'record.search', options: { placeOfEvent: 'location' } },
+      { type: 'record.search', options: { placeOfEvent: 'location', flags: { noneOf: ['sealed'] } } },
       { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent', 'pending-attestation'] } },
-      { type: 'record.read', options: { placeOfEvent: 'location' } },
+      { type: 'record.read', options: { placeOfEvent: 'location', flags: { noneOf: ['sealed'] } } },
       { type: 'record.custom-action', options: { event: ['death'], customActionTypes: ['ATTEST'], placeOfEvent: 'location' } }
     ])
   },
@@ -261,10 +261,10 @@ export const roles: Role[] = [
     },
     scopes: defineScopes([
       { type: 'user.read-only-my-audit' },
-      { type: 'record.search', options: { placeOfEvent: 'administrativeArea' } },
+      { type: 'record.search', options: { placeOfEvent: 'administrativeArea', flags: { noneOf: ['sealed'] } } },
       { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent'] } },
       { type: 'record.create', options: { placeOfEvent: 'administrativeArea' } },
-      { type: 'record.read', options: { placeOfEvent: 'administrativeArea' } },
+      { type: 'record.read', options: { placeOfEvent: 'administrativeArea', flags: { noneOf: ['sealed'] } } },
       { type: 'record.edit', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.notify', options: { placeOfEvent: 'administrativeArea' } }
     ])
@@ -279,9 +279,9 @@ export const roles: Role[] = [
     scopes: defineScopes([
       { type: 'user.read-only-my-audit' },
       { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent', 'escalated', 'pending-updates', 'pending-certification', 'potential-duplicate'] } },
-      { type: 'record.search', options: { placeOfEvent: 'location' } },
+      { type: 'record.search', options: { placeOfEvent: 'location', flags: { noneOf: ['sealed'] } } },
       { type: 'record.create', options: { placeOfEvent: 'location' } },
-      { type: 'record.read', options: { placeOfEvent: 'location' } },
+      { type: 'record.read', options: { placeOfEvent: 'location', flags: { noneOf: ['sealed'] } } },
       { type: 'record.declare', options: { placeOfEvent: 'location' } },
       { type: 'record.edit', options: { placeOfEvent: 'location' } },
       { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['ESCALATE'], placeOfEvent: 'location' } },

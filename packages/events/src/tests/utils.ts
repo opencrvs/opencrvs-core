@@ -1087,7 +1087,15 @@ export async function attemptScopedAction(
     testClient: ReturnType<typeof createTestClient>
   ) => Promise<EventDocument>
 ): Promise<{ success: boolean; event: EventDocument }> {
-  const testClient = createTestClient(user, [scope])
+  // Assignment always assigns to the calling user (processAction ignores
+  // `input.assignedTo`), so it must be self-assigned by `testClient` — but
+  // it also requires `record.read`, which the scope under test may not
+  // grant. Add unrestricted `record.read` alongside it; this only affects
+  // the assign/get endpoints, not the action under test.
+  const testClient = createTestClient(user, [
+    scope,
+    encodeScope({ type: 'record.read' })
+  ])
 
   await expect(
     testClient.event.actions.assignment.assign({

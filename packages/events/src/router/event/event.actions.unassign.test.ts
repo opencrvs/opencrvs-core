@@ -23,6 +23,12 @@ describe('Without scope: record.unassign-others', () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user, [
       encodeScope({
+        type: 'record.read',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
+      encodeScope({
         type: 'record.create',
         options: {
           event: ['birth', 'death', 'tennis-club-membership']
@@ -60,6 +66,12 @@ describe('Without scope: record.unassign-others', () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user, [
         encodeScope({
+          type: 'record.read',
+          options: {
+            event: ['birth', 'death', 'tennis-club-membership']
+          }
+        }),
+        encodeScope({
           type: 'record.create',
           options: {
             event: ['birth', 'death', 'tennis-club-membership']
@@ -83,6 +95,12 @@ describe('Without scope: record.unassign-others', () => {
     test(`If there is ${ActionType.UNASSIGN} action after last ${ActionType.ASSIGN} action, should not throw error and should not add unassign action`, async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user, [
+        encodeScope({
+          type: 'record.read',
+          options: {
+            event: ['birth', 'death', 'tennis-club-membership']
+          }
+        }),
         encodeScope({
           type: 'record.create',
           options: {
@@ -114,6 +132,12 @@ test(`Can unassign record that is assigned to someone else, if user has unassign
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
     encodeScope({
+      type: 'record.read',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
       type: 'record.create',
       options: {
         event: ['birth', 'death', 'tennis-club-membership']
@@ -138,6 +162,12 @@ test(`Can unassign record that is assigned to someone else, if user has unassign
 test(`${ActionType.UNASSIGN} action deletes draft`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.read',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
     encodeScope({
       type: 'record.create',
       options: {
@@ -185,6 +215,12 @@ test(`${ActionType.UNASSIGN} action deletes draft`, async () => {
 test(`${ActionType.UNASSIGN} is idempotent`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.read',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
     encodeScope({
       type: 'record.create',
       options: {

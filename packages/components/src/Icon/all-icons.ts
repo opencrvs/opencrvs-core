@@ -45,6 +45,7 @@ export {
   File,
   FileArrowUp,
   FileDotted,
+  FileLock,
   FileMinus,
   FilePlus,
   Files,
