@@ -96,7 +96,7 @@
     "react-intl": "5.25.1",
     "react-page-visibility": "^3.2.1",
     "react-redux": "^7.1.1",
-    "react-router": "^6.28.1",
+    "react-router": "^7.0.0",
     "react-router-dom": "^6.28.1",
     "react-router-typesafe-routes": "1.2.2",
     "react-signature-canvas": "^1.0.6",
