@@ -26,6 +26,7 @@ import {
   getFullDocumentPath,
   getUnsignedFileUrl
 } from '@client/v2-events/cache'
+import { setLockBypass } from '@client/utils/lockBypass'
 import { useOnFileChange } from '../FileInput/useOnFileChange'
 import { SignatureCanvasModal } from './components/SignatureCanvasModal'
 
@@ -142,7 +143,11 @@ function SignatureFieldInput({
               <Icon name="Pen" />
               {intl.formatMessage(messages.signatureOpenSignatureInput)}
             </Button>
-            <ImageUploader disabled={disabled} onChange={handleFileChange}>
+            <ImageUploader
+              disabled={disabled}
+              onChange={handleFileChange}
+              onClick={setLockBypass}
+            >
               {intl.formatMessage(buttonMessages.upload)}
             </ImageUploader>
           </Stack>

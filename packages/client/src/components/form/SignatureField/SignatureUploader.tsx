@@ -23,6 +23,7 @@ import {
   validationMessages
 } from '@client/i18n/messages'
 import { getBase64String } from '@client/utils/imageUtils'
+import { setLockBypass } from '@client/utils/lockBypass'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -108,6 +109,7 @@ export function SignatureUploader({
             </Button>
             <ImageUploader
               {...props}
+              onClick={setLockBypass}
               onChange={async (file) => {
                 const fileSizeMB = file.size / (1024 * 1024) // convert bytes to megabytes
                 if (fileSizeMB > maxSizeMb) {

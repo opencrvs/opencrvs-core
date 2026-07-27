@@ -33,10 +33,15 @@ import { LoadingBar } from '@opencrvs/components/src/LoadingBar/LoadingBar'
 import { RouteComponentProps, withRouter } from './WithRouterProps'
 import { getAuthenticated } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
+import { shouldBypassLock } from '@client/utils/lockBypass'
 export const SCREEN_LOCK = 'screenLock'
 
 type OwnProps = PropsWithChildren<{
-  unprotectedRouteElements: string[]
+  // Kept for the legacy (V1) declaration flow, which tolerates the app
+  // backgrounding at any point on these routes, not just right after an
+  // upload click. shouldBypassLock() covers the narrower, click-triggered
+  // case (e.g. v2-events routes, which don't match these route names).
+  unprotectedRouteElements?: string[]
 }>
 
 type DispatchProps = {
@@ -120,9 +125,11 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
       (route) => this.props.router.location.pathname.includes(route)
     )
 
+    const lockShouldBeBypassed = onUnprotectedPage || shouldBypassLock()
+
     const newState = { ...this.state }
 
-    if (!alreadyLocked && !onUnprotectedPage) {
+    if (!alreadyLocked && !lockShouldBeBypassed) {
       newState.secured = false
       if (await this.getPIN()) {
         newState.pinExists = true
