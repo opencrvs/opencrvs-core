@@ -893,7 +893,8 @@ const Facility = BaseField.extend({
   configuration: z
     .object({
       allowedLocations: AllowedLocations,
-      listHistoricalNames: z.boolean().optional()
+      listHistoricalNames: z.boolean().optional(),
+      anchorToDateOfEvent: z.boolean().optional()
     })
     .optional()
 }).describe('Input field for a facility')
@@ -909,7 +910,8 @@ const Office = BaseField.extend({
   configuration: z
     .object({
       allowedLocations: AllowedLocations,
-      listHistoricalNames: z.boolean().optional()
+      listHistoricalNames: z.boolean().optional(),
+      anchorToDateOfEvent: z.boolean().optional()
     })
     .optional()
 }).describe('Input field for an office')

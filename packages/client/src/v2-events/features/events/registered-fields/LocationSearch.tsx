@@ -18,9 +18,9 @@ import {
   UUID,
   joinValues,
   JurisdictionFilter,
+  isSelectableAtAnchor,
   resolveJurisdictionReference,
   resolveVersion,
-  todayISO,
   PlainDate
 } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
@@ -134,6 +134,7 @@ function LocationSearchInput({
   onBlur,
   id,
   eventType,
+  anchor,
   ...props
 }: FieldPropsWithoutReferenceValue<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
   onChange: (val: string | undefined) => void
@@ -143,6 +144,7 @@ function LocationSearchInput({
   disabled?: boolean
   id: string
   eventType?: string
+  anchor: PlainDate
 }) {
   const token = useSelector(getToken)
   const jurisdictionFilter = resolveJurisdictionReference(
@@ -153,19 +155,31 @@ function LocationSearchInput({
 
   const locations = useAvailableLocations(locationTypes, jurisdictionFilter)
 
+  // Fields anchored to the event's date (place-of-event, place-of-delivery)
+  // offer only locations that already existed and were active as at that
+  // date. Advanced search doesn't set this, so its office/health-facility
+  // filters keep listing inactive locations exactly as before (#13146).
+  const anchorToDateOfEvent = Boolean(props.configuration?.anchorToDateOfEvent)
+  const selectableLocations = useMemo(
+    () =>
+      anchorToDateOfEvent
+        ? locations.filter((l) => isSelectableAtAnchor(l.versions, anchor))
+        : locations,
+    [locations, anchor, anchorToDateOfEvent]
+  )
+
   // When the field config opts in (advanced search sets this), list every
   // historical name so records saved under an outdated name stay findable.
-  // Otherwise show a single current-name option. Names are anchored to today;
-  // event-date anchoring is a follow-up (#13143).
+  // Otherwise show a single current-name option, resolved at the field's anchor.
   const options = useMemo(
     () =>
       props.configuration?.listHistoricalNames
-        ? buildHistoricalLocationNameOptions(locations)
-        : locations.map((l) => ({
+        ? buildHistoricalLocationNameOptions(selectableLocations)
+        : selectableLocations.map((l) => ({
             value: l.id,
-            label: resolveVersion(l.versions, todayISO()).name
+            label: resolveVersion(l.versions, anchor).name
           })),
-    [locations, props.configuration?.listHistoricalNames]
+    [selectableLocations, props.configuration?.listHistoricalNames, anchor]
   )
 
   const selectedOption =

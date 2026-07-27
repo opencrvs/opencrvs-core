@@ -14,6 +14,7 @@ import {
   AdministrativeAreaField,
   ClientLocation,
   getAdministrativeAreaHierarchy,
+  isSelectableAtAnchor,
   JurisdictionFilter,
   resolveJurisdictionReference,
   resolveVersion,
@@ -80,7 +81,8 @@ function useUserAdministrativeAreaHierarchy() {
 function useAvailableAdministrativeAreas(
   parentId?: string | null,
   jurisdictionFilter?: JurisdictionFilter,
-  excludeInactive = false
+  excludeInactive = false,
+  anchor: PlainDate = todayISO()
 ) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
@@ -89,11 +91,13 @@ function useAvailableAdministrativeAreas(
   const options = React.useMemo(() => {
     return [...administrativeAreas.values()].filter((administrativeArea) => {
       // In advanced search, address (admin-structure) filters offer only
-      // currently-valid areas; inactivated ones are not selectable.
+      // currently-valid areas; when anchored to the event's date (#13143),
+      // fields anchored to it offer only areas that existed and were active
+      // as at that date. Either way, inactivated/not-yet-effective areas are
+      // excluded; other fields keep listing everything, unchanged.
       if (
         excludeInactive &&
-        resolveVersion(administrativeArea.versions, todayISO()).status !==
-          'active'
+        !isSelectableAtAnchor(administrativeArea.versions, anchor)
       ) {
         return false
       }
@@ -104,7 +108,7 @@ function useAvailableAdministrativeAreas(
 
       return administrativeArea.parentId === parentId
     })
-  }, [administrativeAreas, parentId, excludeInactive])
+  }, [administrativeAreas, parentId, excludeInactive, anchor])
 
   // When jurisdictionFilter is not "all", restrict options to the user's own area hierarchy.
   // e.g. a LOCAL_REGISTRAR sees only their province/district; a COMMUNITY_LEADER sees only their province/district/village.
@@ -132,6 +136,7 @@ interface AdministrativeAreaInputProps
   partOf: string | null
   onChange: (val: string | null) => void
   value?: string | null
+  anchor: PlainDate
 }
 
 function AdministrativeAreaInput({
@@ -140,6 +145,7 @@ function AdministrativeAreaInput({
   value,
   partOf,
   onChange,
+  anchor,
   ...inputProps
 }: AdministrativeAreaInputProps) {
   const token = useSelector(getToken)
@@ -150,29 +156,32 @@ function AdministrativeAreaInput({
   )
 
   // Advanced search stamps `activeOnly` on admin-structure address filters so
-  // inactivated areas are dropped; office/health-facility fields don't set it
-  // and keep listing inactive ones.
-  const excludeInactive = Boolean(configuration.activeOnly)
+  // inactivated areas are dropped; capture forms set `anchorToDateOfEvent`
+  // for the same reason (#13143). Either way, only currently-active/effective
+  // areas at `anchor` are selectable; other fields keep listing everything.
+  const excludeInactive = Boolean(
+    configuration.activeOnly || configuration.anchorToDateOfEvent
+  )
 
   const administrativeAreas = useAvailableAdministrativeAreas(
     partOf,
     jurisdictionFilter,
-    excludeInactive
+    excludeInactive,
+    anchor
   )
 
   // When the field config opts in (advanced search sets this), list every
   // historical name so records saved under an outdated name stay findable.
-  // Otherwise show a single current-name option. Names are anchored to today;
-  // event-date anchoring is a follow-up (#13143).
+  // Otherwise show a single current-name option, resolved at the field's anchor.
   const options = useMemo(
     () =>
       configuration.listHistoricalNames
         ? buildHistoricalLocationNameOptions(administrativeAreas)
         : administrativeAreas.map((o) => ({
-            label: resolveLocationName(o, todayISO()),
+            label: resolveLocationName(o, anchor),
             value: o.id
           })),
-    [administrativeAreas, configuration.listHistoricalNames]
+    [administrativeAreas, configuration.listHistoricalNames, anchor]
   )
 
   const selectedLocation = useMemo(
