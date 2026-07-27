@@ -152,7 +152,10 @@ export async function throwConflictIfActionNotAllowed(
     return
   }
 
-  const context = await getValidatorContext(token)
+  const context = {
+    ...(await getValidatorContext(token)),
+    eventState: eventIndex
+  }
   const actionIsEnabled = isActionEnabled(actionConfig, eventIndex, context)
   const actionIsAvailable = isActionVisible(actionConfig, eventIndex, context)
 

@@ -20,6 +20,7 @@ import {
 import {
   ActionType,
   EventDocument,
+  getCurrentEventState,
   NotifyActionInput
 } from '@opencrvs/commons/events'
 import { systemOnlyProcedure } from '@events/router/trpc'
@@ -191,7 +192,11 @@ export function createAndNotifyProcedure() {
           eventConfig,
           declaration: declaration,
           annotation,
-          context: { ...validatorContext, event }
+          context: {
+            ...validatorContext,
+            event,
+            eventState: getCurrentEventState(event, eventConfig)
+          }
         })
         throwWhenNotEmpty(notifyErrors)
 
