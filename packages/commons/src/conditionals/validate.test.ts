@@ -19,6 +19,7 @@ import {
   errorMessages,
   areConditionsMet,
   isFieldSecured,
+  isFieldVisible,
   runFieldValidations,
   validateFieldInput
 } from './validate'
@@ -351,6 +352,43 @@ describe('areConditionsMet', () => {
     const eventIndex = eventQueryDataGenerator({ flags: [] })
 
     expect(areConditionsMet([flagConditional], {}, {}, eventIndex)).toBe(false)
+  })
+})
+
+describe('isFieldVisible', () => {
+  // Unlike `areConditionsMet` / `isActionEnabled`, this path takes no `EventIndex`
+  // argument, so `flag(...)` can only resolve through `context.eventState`.
+  const flaggedField = {
+    id: 'sealedOnly',
+    type: FieldType.TEXT,
+    label: { id: '', defaultMessage: '', description: '' },
+    conditionals: [{ type: ConditionalType.SHOW, conditional: flag('sealed') }]
+  } satisfies FieldConfig
+
+  it('resolves flag() against the event state carried on the context', () => {
+    expect(
+      isFieldVisible(
+        flaggedField,
+        {},
+        {
+          eventState: eventQueryDataGenerator({ flags: ['sealed'] })
+        }
+      )
+    ).toBe(true)
+
+    expect(
+      isFieldVisible(
+        flaggedField,
+        {},
+        {
+          eventState: eventQueryDataGenerator({ flags: [] })
+        }
+      )
+    ).toBe(false)
+  })
+
+  it('treats flags as empty when the context carries no event state', () => {
+    expect(isFieldVisible(flaggedField, {}, {})).toBe(false)
   })
 })
 

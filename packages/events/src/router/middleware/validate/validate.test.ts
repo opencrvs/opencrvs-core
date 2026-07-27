@@ -11,8 +11,11 @@
 import {
   ActionType,
   ConditionalType,
+  errorMessages,
+  eventQueryDataGenerator,
   field,
   FieldType,
+  flag,
   TestUserRole,
   TokenUserType,
   user
@@ -290,6 +293,56 @@ describe('getFieldErrors()', () => {
     )
 
     expect(errors).toMatchSnapshot()
+  })
+
+  /*
+   * `flag(...)` in a *field* conditional resolves through `context.eventState` — this
+   * path gets no `EventIndex` argument, so without it every event looks unflagged and
+   * the server would reject values the client legitimately collected.
+   */
+  describe('flag() in a field conditional', () => {
+    const flaggedField = {
+      id: 'test.input',
+      type: FieldType.TEXT,
+      required: true,
+      label: {
+        id: 'test.field.label',
+        defaultMessage: 'Test Field',
+        description: 'Test Field Description'
+      },
+      conditionals: [
+        { type: ConditionalType.SHOW, conditional: flag('sealed') }
+      ]
+    }
+
+    it('accepts a value when the event carries the flag that makes the field visible', () => {
+      const errors = getFieldErrors(
+        [flaggedField],
+        { 'test.input': 'not empty' },
+        {
+          ...testContext,
+          eventState: eventQueryDataGenerator({ flags: ['sealed'] })
+        }
+      )
+
+      expect(errors).toEqual([])
+    })
+
+    it('rejects a value when the event does not carry the flag', () => {
+      const errors = getFieldErrors(
+        [flaggedField],
+        { 'test.input': 'not empty' },
+        { ...testContext, eventState: eventQueryDataGenerator({ flags: [] }) }
+      )
+
+      expect(errors).toEqual([
+        {
+          message: errorMessages.hiddenField.defaultMessage,
+          id: 'test.input',
+          value: 'not empty'
+        }
+      ])
+    })
   })
 
   it('should return errors for field with custom validation if value does not pass validation', () => {
