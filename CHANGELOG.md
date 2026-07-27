@@ -2,6 +2,10 @@
 
 ## 1.9.16 Release Candidate
 
+### New features
+
+- Third-party integrations (such as MOSIP) can now authenticate with OpenCRVS using their own credentials instead of borrowing the requesting user's session. Integrations are registered automatically on startup from the country configuration, and each one signs in with its own client ID and secret. This keeps integrations working reliably even when services restart mid-request, and makes the audit trail attribute actions to the integration itself (e.g. "Registered — MOSIP") rather than to a person. The feature is opt-in: configurations with no integrations are unaffected. [#12360](https://github.com/opencrvs/opencrvs-core/issues/12360)
+
 ### Bug fixes
 
 - On mobile, uploading a file or signature no longer triggers the PIN re-lock screen. Opening the native file picker or camera briefly backgrounds the app, which was previously indistinguishable from the user actually leaving the app. [#13124](https://github.com/opencrvs/opencrvs-core/issues/13124)
