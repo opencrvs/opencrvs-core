@@ -257,6 +257,31 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Global environment variables, each variable defined here is available to all workloads (service) deployed by helm chart. See example at <a href="values.yaml">values.yaml</a></td>
         </tr>
         <tr>
+            <td>otel.enabled</td>
+            <td>false</td>
+            <td>Enable OpenTelemetry tracing environment variables for instrumented backend services: <code>auth</code>, <code>countryconfig</code>, <code>documents</code>, <code>events</code> and <code>gateway</code>.</td>
+        </tr>
+        <tr>
+            <td>otel.deployment_environment</td>
+            <td>production</td>
+            <td>Value used for <code>OTEL_DEPLOYMENT_ENVIRONMENT</code> and <code>deployment.environment.name</code> in <code>OTEL_RESOURCE_ATTRIBUTES</code>.</td>
+        </tr>
+        <tr>
+            <td>otel.exporter_otlp_endpoint</td>
+            <td></td>
+            <td>Base OTLP HTTP endpoint for the OpenTelemetry Collector, for example <code>http://opentelemetry-collector.opencrvs-deps-production.svc.cluster.local:4318</code>. Required when <code>otel.enabled</code> is <code>true</code>.</td>
+        </tr>
+        <tr>
+            <td>otel.exporter_otlp_protocol</td>
+            <td>http/protobuf</td>
+            <td>OTLP exporter protocol. The trace-specific endpoint is generated as <code>&lt;otel.exporter_otlp_endpoint&gt;/v1/traces</code>.</td>
+        </tr>
+        <tr>
+            <td>OTEL_RESOURCE_ATTRIBUTES</td>
+            <td></td>
+            <td>Generated automatically when <code>otel.enabled</code> is <code>true</code>. It includes <code>service.version</code> from <code>platform.tag</code>, <code>deployment.environment.name</code> from <code>otel.deployment_environment</code>, and <code>service.namespace</code> from the Helm release namespace.</td>
+        </tr>
+        <tr>
             <td>timezone</td>
             <td></td>
             <td>Time zone for a backup and restore CronJobs, by default local time zone is used from server. See example at <a href="values.yaml">values.yaml</a></td>
