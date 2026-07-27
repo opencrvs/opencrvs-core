@@ -806,6 +806,12 @@ const AdministrativeAreaField = BaseField.extend({
         .optional()
         .describe(
           'Advanced search: offer only currently-active locations; inactivated ones are excluded.'
+        ),
+      anchorToDateOfEvent: z
+        .boolean()
+        .optional()
+        .describe(
+          "Anchor selectable/displayed versions to the event's date of event (falling back to the record's creation date when empty) instead of today."
         )
     })
     .describe('Administrative area options')
@@ -833,6 +839,12 @@ const LocationInput = BaseField.extend({
         .optional()
         .describe(
           'Advanced search: list every historical name a location has had as a separate, selectable option.'
+        ),
+      anchorToDateOfEvent: z
+        .boolean()
+        .optional()
+        .describe(
+          "Anchor selectable/displayed versions to the event's date of event (falling back to the record's creation date when empty) instead of today."
         )
     })
     .optional()
@@ -960,6 +972,12 @@ const Address = BaseField.extend({
         .optional()
         .describe(
           'Advanced search: offer only currently-active admin areas; inactivated ones are excluded. Propagated to the embedded admin-area selectors.'
+        ),
+      anchorToDateOfEvent: z
+        .boolean()
+        .optional()
+        .describe(
+          "Anchor selectable/displayed versions to the event's date of event (falling back to the record's creation date when empty) instead of today. Propagated to the embedded admin-area selectors."
         )
     })
     .optional(),
