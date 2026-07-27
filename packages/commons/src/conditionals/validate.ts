@@ -153,6 +153,40 @@ export function compileClientFunction(code: string): CompiledClientFunction {
 // https://ajv.js.org/packages/ajv-formats.html
 addFormats(ajv)
 
+// `buildClientFunctionContext` is invoked per field, per conditional (SHOW/ENABLE/
+// DISPLAY_ON_REVIEW), for every field in a form, so `getCurrentEventState` — a full
+// action-history aggregation — would otherwise be recomputed from scratch on every
+// call. Cache by (event, config) identity so calls within the same validation pass
+// reuse the result; a WeakMap lets entries be collected once a new event/config
+// reference replaces the old one after a mutation.
+// @TODO: longer term, computing this once and carrying it on `ValidatorContext`
+// would be more explicit than caching it here — but that needs `eventConfig`
+// threaded into the server-side contexts that don't carry it today, so keeping
+// the cache here for now.
+const inMemoryEventStateCache = new WeakMap<
+  EventDocument,
+  WeakMap<EventConfig, EventIndex>
+>()
+
+function getInMemoryEventState(
+  event: EventDocument,
+  config: EventConfig
+): EventIndex {
+  let stateByConfig = inMemoryEventStateCache.get(event)
+  if (!stateByConfig) {
+    stateByConfig = new WeakMap()
+    inMemoryEventStateCache.set(event, stateByConfig)
+  }
+
+  let state = stateByConfig.get(config)
+  if (!state) {
+    state = getCurrentEventState(event, config)
+    stateByConfig.set(config, state)
+  }
+
+  return state
+}
+
 // `$now` / `$online` are sampled fresh on each call — callers that care
 // about a stable timestamp/online flag should snapshot it themselves.
 export function buildClientFunctionContext(input: {
@@ -170,7 +204,7 @@ export function buildClientFunctionContext(input: {
 }): ClientFunctionContext {
   const flags =
     input.validatorContext?.event && input.validatorContext?.eventConfig
-      ? getCurrentEventState(
+      ? getInMemoryEventState(
           input.validatorContext?.event,
           input.validatorContext?.eventConfig
         )?.flags
