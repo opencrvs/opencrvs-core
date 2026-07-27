@@ -117,7 +117,7 @@
     "luxon": "^3.7.1",
     "nanoid": "3",
     "node-fetch": "^2.6.1",
-    "nodemailer": "^7.0.11",
+    "nodemailer": "^9.0.0",
     "opener": "^1.5.1",
     "p-queue": "^6.6.2",
     "pg": "^8.16.3",
