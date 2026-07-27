@@ -13,11 +13,14 @@ import {
   JurisdictionFilter,
   resolveVersion,
   todayISO,
+  LocationVersion,
+  UUID,
   V2_DEFAULT_MOCK_LOCATIONS,
   V2_DEFAULT_MOCK_CLIENT_LOCATIONS_MAP,
   V2_DEFAULT_MOCK_CLIENT_ADMINISTRATIVE_AREAS_MAP
 } from '@opencrvs/commons/client'
 
+import { buildHistoricalLocationNameOptions } from '@client/v2-events/utils'
 import { filterLocationsByJurisdiction } from './LocationSearch'
 
 function nameOf(location: ClientLocation) {
@@ -222,5 +225,63 @@ describe('filterLocationsByJurisdiction', () => {
       )
       expect(result).toHaveLength(V2_DEFAULT_MOCK_LOCATIONS.length)
     })
+  })
+})
+
+/**
+ * Builds a location-like item with one version per supplied name. `name` (the
+ * server-resolved current name) is set to the last version's name.
+ */
+function makeVersionedItem(id: string, names: string[]) {
+  const versions: LocationVersion[] = names.map((name, index) => ({
+    versionId: `${id}-v${index}` as UUID,
+    effectiveFrom: `2020-01-${String(index + 1).padStart(2, '0')}`,
+    name,
+    externalId: null,
+    status: 'active' as const
+  }))
+
+  return {
+    id: id as UUID,
+    name: names[names.length - 1],
+    versions
+  }
+}
+
+describe('buildHistoricalLocationNameOptions', () => {
+  it('lists a renamed location once per distinct historical name, in version order', () => {
+    const id = '11111111-1111-1111-1111-111111111111'
+    const items = [makeVersionedItem(id, ['Office A', 'Office Z'])]
+
+    const options = buildHistoricalLocationNameOptions(items)
+
+    // Both rows resolve to the same location id.
+    expect(options).toEqual([
+      { value: id, label: 'Office A' },
+      { value: id, label: 'Office Z' }
+    ])
+  })
+
+  it('does not duplicate a name that repeats across versions', () => {
+    const id = '22222222-2222-2222-2222-222222222222'
+    const items = [
+      makeVersionedItem(id, ['Alaminos', 'Alaminos City', 'Alaminos'])
+    ]
+
+    const options = buildHistoricalLocationNameOptions(items)
+
+    expect(options).toEqual([
+      { value: id, label: 'Alaminos' },
+      { value: id, label: 'Alaminos City' }
+    ])
+  })
+
+  it('yields a single row for a never-renamed location', () => {
+    const id = '33333333-3333-3333-3333-333333333333'
+    const items = [makeVersionedItem(id, ['Ibombo District Office'])]
+
+    const options = buildHistoricalLocationNameOptions(items)
+
+    expect(options).toEqual([{ value: id, label: 'Ibombo District Office' }])
   })
 })

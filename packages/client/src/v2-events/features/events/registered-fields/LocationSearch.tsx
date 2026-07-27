@@ -27,7 +27,10 @@ import { getOfflineData } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
-import { getAdminLevelHierarchy } from '@client/v2-events/utils'
+import {
+  buildHistoricalLocationNameOptions,
+  getAdminLevelHierarchy
+} from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { SearchableSelect } from '@client/v2-events/components/forms/inputs/SearchableSelect'
@@ -150,16 +153,19 @@ function LocationSearchInput({
 
   const locations = useAvailableLocations(locationTypes, jurisdictionFilter)
 
-  // Selector option labels are behavior-preserving: always today's name.
-  // Anchoring options to the form's event date is the selector-anchoring
-  // follow-up (#13143).
+  // When the field config opts in (advanced search sets this), list every
+  // historical name so records saved under an outdated name stay findable.
+  // Otherwise show a single current-name option. Names are anchored to today;
+  // event-date anchoring is a follow-up (#13143).
   const options = useMemo(
     () =>
-      locations.map((l) => ({
-        value: l.id,
-        label: resolveVersion(l.versions, todayISO()).name
-      })),
-    [locations]
+      props.configuration?.listHistoricalNames
+        ? buildHistoricalLocationNameOptions(locations)
+        : locations.map((l) => ({
+            value: l.id,
+            label: resolveVersion(l.versions, todayISO()).name
+          })),
+    [locations, props.configuration?.listHistoricalNames]
   )
 
   const selectedOption =
