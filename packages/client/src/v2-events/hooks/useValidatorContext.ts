@@ -11,7 +11,9 @@
 
 import { useMemo } from 'react'
 import {
+  EventConfig,
   EventDocument,
+  EventValidatorContext,
   getEventValidatorContext,
   getOrThrow,
   ValidatorContext
@@ -34,6 +36,19 @@ function useUser() {
   )
 }
 
+export function resolveEventValidatorContext(
+  configs: EventConfig[],
+  event?: EventDocument
+): EventValidatorContext | undefined {
+  const eventConfig = configs.find((c) => c.id === event?.type)
+
+  if (!event || !eventConfig) {
+    return undefined
+  }
+
+  return getEventValidatorContext(event, eventConfig)
+}
+
 export function useValidatorContext(event?: EventDocument): ValidatorContext {
   const leafAdminStructureLocationIds =
     useSuspenseGetLeafAdministrativeAreaIds()
@@ -44,15 +59,10 @@ export function useValidatorContext(event?: EventDocument): ValidatorContext {
    * Aggregating the action history is expensive and conditionals are evaluated
    * per field, per conditional type — so compute it once per (event, config).
    */
-  const eventContext = useMemo(() => {
-    const eventConfig = configs.find((c) => c.id === event?.type)
-
-    if (!event || !eventConfig) {
-      return undefined
-    }
-
-    return getEventValidatorContext(event, eventConfig)
-  }, [event, configs])
+  const eventContext = useMemo(
+    () => resolveEventValidatorContext(configs, event),
+    [event, configs]
+  )
 
   return {
     user,
