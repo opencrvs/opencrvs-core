@@ -24,6 +24,7 @@ an object of the form {"findings": [...]}.
 
 import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -91,18 +92,58 @@ def write_markdown(findings, path: Path):
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
+LEVEL_BY_SEV = {"critical": "error", "high": "error", "medium": "warning", "low": "note"}
+SECURITY_SEVERITY_BY_SEV = {"critical": "9.0", "high": "7.0", "medium": "4.0", "low": "1.0"}
+
+
+def cwe_tag(cwe):
+    if not cwe:
+        return None
+    num = re.sub(r"\D", "", cwe)
+    return f"external/cwe/cwe-{num}" if num else None
+
+
 def write_sarif(findings, path: Path):
-    level = {"critical": "error", "high": "error", "medium": "warning", "low": "note"}
+    rules = []
     results = []
     for f in findings:
+        rule_id = finding_key(f)
+        severity = f.get("severity", "low")
+        title = f.get("title") or "(untitled)"
+        explanation = (f.get("explanation") or "").strip()
+        fix = (f.get("fix") or "").strip()
+
+        tags = ["security"]
+        tag = cwe_tag(f.get("cwe"))
+        if tag:
+            tags.append(tag)
+
+        rules.append(
+            {
+                "id": rule_id,
+                "name": title,
+                "shortDescription": {"text": title},
+                "fullDescription": {"text": explanation or title},
+                "help": {
+                    "text": f"{explanation}\n\nFix: {fix}",
+                    "markdown": f"{explanation}\n\n**Fix:** {fix}",
+                },
+                "defaultConfiguration": {
+                    "level": LEVEL_BY_SEV.get(severity, "note")
+                },
+                "properties": {
+                    "tags": tags,
+                    "security-severity": SECURITY_SEVERITY_BY_SEV.get(
+                        severity, "1.0"
+                    ),
+                },
+            }
+        )
         results.append(
             {
-                "ruleId": f.get("cwe") or "claude-security",
-                "level": level.get(f.get("severity", "low"), "note"),
-                "message": {
-                    "text": f"{f.get('title', '')}: {f.get('explanation', '')} "
-                    f"Fix: {f.get('fix', '')}"
-                },
+                "ruleId": rule_id,
+                "level": LEVEL_BY_SEV.get(severity, "note"),
+                "message": {"text": f"{explanation}\n\nFix: {fix}"},
                 "locations": [
                     {
                         "physicalLocation": {
@@ -123,7 +164,7 @@ def write_sarif(findings, path: Path):
                     "driver": {
                         "name": "claude-security-scan",
                         "informationUri": "https://www.anthropic.com",
-                        "rules": [],
+                        "rules": rules,
                     }
                 },
                 "results": results,
