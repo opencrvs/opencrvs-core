@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import {
   AdministrativeAreaField,
@@ -32,6 +32,7 @@ import {
   SearchableSelectProps
 } from '@client/v2-events/components/forms/inputs/SearchableSelect'
 import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
+import { useClearStaleSelectionOnAnchorChange } from '@client/v2-events/hooks/useClearStaleSelectionOnAnchorChange'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import {
   buildHistoricalLocationNameOptions,
@@ -170,31 +171,19 @@ function AdministrativeAreaInput({
     anchor
   )
 
-  // If the anchor moves (the date-of-event field changes) and the currently
-  // selected area is no longer selectable at the new anchor — it was
-  // inactivated, or didn't exist yet — clear the stale selection rather than
-  // leave it stored while the field just looks empty. Only for fields
-  // anchored to the event's date, not advanced search's `activeOnly` filter.
+  // Only for fields anchored to the event's date, not advanced search's
+  // `activeOnly` filter.
   const { getAdministrativeAreas: getAdministrativeAreasForStaleCheck } =
     useAdministrativeAreas()
   const allAdministrativeAreas =
     getAdministrativeAreasForStaleCheck.useSuspenseQuery()
-  useEffect(() => {
-    if (!configuration.anchorToDateOfEvent || !value) {
-      return
-    }
-    const areaId = UUID.safeParse(value).data
-    const entity = areaId && allAdministrativeAreas.get(areaId)
-    if (entity && !isSelectableAtAnchor(entity.versions, anchor)) {
-      onChange(null)
-    }
-  }, [
-    configuration.anchorToDateOfEvent,
+  useClearStaleSelectionOnAnchorChange({
+    enabled: Boolean(configuration.anchorToDateOfEvent),
     value,
-    allAdministrativeAreas,
     anchor,
-    onChange
-  ])
+    entities: allAdministrativeAreas,
+    onClear: () => onChange(null)
+  })
 
   // When the field config opts in (advanced search sets this), list every
   // historical name so records saved under an outdated name stay findable.
