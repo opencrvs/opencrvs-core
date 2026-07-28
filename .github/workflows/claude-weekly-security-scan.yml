@@ -1,0 +1,56 @@
+name: claude-weekly-security-scan
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Mondays 06:00 UTC
+  workflow_dispatch: # allow manual runs
+
+# Least privilege. security-events:write is needed to upload SARIF;
+# issues:write only if you switch on the issue-filing step.
+permissions:
+  contents: read
+  security-events: write
+
+concurrency:
+  group: weekly-security-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@<pin-to-sha>
+
+      - name: Set up Python
+        uses: actions/setup-python@<pin-to-sha>
+        with:
+          python-version: '3.12'
+
+      - name: Install deps
+        run: pip install anthropic
+
+      - name: Run Claude security scan
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SCAN_ROOT: '.'
+          MODEL: claude-opus-4-8
+          OUT_DIR: scan-out
+          # FAIL_ON_CRITICAL: '1'   # uncomment once you trust the signal
+        run: python .github/scripts/security-scan.py
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@7.0.1
+        with:
+          name: security-scan-report
+          path: scan-out/report.md
+          retention-days: 90
+
+      - name: Upload SARIF to Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@3
+        with:
+          sarif_file: scan-out/results.sarif
+          category: claude-security-scan
