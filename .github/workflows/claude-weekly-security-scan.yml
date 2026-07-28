@@ -43,14 +43,19 @@ jobs:
 
             Do NOT read the whole repository. Use Grep/Glob first to find and
             prioritise security-sensitive code, then Read only the files that
-            matter. Sensitive areas in this monorepo include (not exhaustive):
-              - packages/gateway, packages/auth (authn/authz)
-              - packages/events
-              - tRPC endpoints, PostgreSQL/Elasticsearch query construction
-              - login/session/token handling, file upload/download
-              - crypto and random number usage
-              - /internal/ endpoints
-              - Dockerfiles, docker-compose files, and CI workflow YAML
+            matter. Focus your exploration on these areas, in this order:
+              1. packages/gateway, packages/auth (authn/authz), login/session/
+                 token handling
+              2. packages/events, tRPC endpoints, and PostgreSQL/Elasticsearch
+                 query construction
+
+            You have a limited number of tool calls. Budget roughly half your
+            calls to area 1 and half to area 2 -- do not go deep into one area
+            at the expense of never reaching the other. Once you've covered
+            both areas, or you sense you are running low on turns, STOP
+            exploring immediately and call the final answer with whatever
+            findings you have. A partial scan that returns results is far
+            more useful than an exhaustive one that never returns anything.
 
             Focus on:
               - Broken authentication / missing or incorrect authorization
@@ -71,9 +76,9 @@ jobs:
               - Return your findings via the provided JSON schema only
 
           claude_args: |
-            --max-turns 40
+            --max-turns 70
             --model claude-opus-4-8
-            --allowedTools "Read,Grep,Glob"
+            --allowedTools "Read,Grep,Glob,TodoWrite"
             --json-schema '{"type":"object","properties":{"findings":{"type":"array","items":{"type":"object","properties":{"file":{"type":"string"},"line":{"type":["integer","null"]},"severity":{"type":"string","enum":["critical","high","medium","low"]},"cwe":{"type":["string","null"]},"title":{"type":"string"},"explanation":{"type":"string"},"fix":{"type":"string"},"confidence":{"type":"string","enum":["high","medium","low"]}},"required":["file","severity","title","explanation","fix"]}}},"required":["findings"]}'
 
       - name: Set up Python
