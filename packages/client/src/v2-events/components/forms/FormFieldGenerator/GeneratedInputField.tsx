@@ -126,12 +126,12 @@ import { NumberWithUnit } from '@client/v2-events/features/events/registered-fie
 import { Custom } from '@client/v2-events/features/events/registered-fields/Custom'
 import { Hidden } from '@client/v2-events/features/events/registered-fields/Hidden'
 import { Autocomplete } from '@client/v2-events/features/events/registered-fields/Autocomplete'
+import { liveAnchorDate } from '@client/v2-events/utils'
 import {
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
 } from '../utils'
 import { SignatureField } from '../inputs/SignatureField'
-import { liveAnchorDate } from '@client/v2-events/utils'
 import { parseFieldReferencesInConfiguration } from './utils'
 
 const fadeIn = keyframes`
