@@ -508,7 +508,9 @@ export const deceased = defineFormPage({
         administrativeArea: user('administrativeAreaId')
       },
       configuration: {
-        streetAddressForm: defaultStreetAddressConfiguration
+        streetAddressForm: defaultStreetAddressConfiguration,
+        // Deceased's residence at time of death is a demographic fact about the event, not a current address.
+        anchorToDateOfEvent: true
       }
     }
   ]

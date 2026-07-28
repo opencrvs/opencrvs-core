@@ -546,7 +546,8 @@ export const informant = defineFormPage({
         administrativeArea: user('administrativeAreaId')
       },
       configuration: {
-        streetAddressForm: defaultStreetAddressConfiguration
+        streetAddressForm: defaultStreetAddressConfiguration,
+        activeOnly: true
       },
       parent: field('informant.relation')
     },
