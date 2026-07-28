@@ -46,6 +46,7 @@ import { EventDocument } from '../events/EventDocument'
 import { EventIndex } from '../events/EventIndex'
 import { Location } from '../events/locations'
 import { SystemVariables } from '../events/TemplateConfig'
+import { getCurrentEventState } from '../events/state'
 
 const ajv = new Ajv({
   $data: true,
@@ -169,12 +170,12 @@ export function buildClientFunctionContext(input: {
 }): ClientFunctionContext {
   return {
     $form: input.form,
-    $flags: input.validatorContext?.eventState?.flags ?? [],
+    $flags: input.validatorContext?.event?.state.flags ?? [],
     $now: todayISO(),
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     $online: isOnline(),
     $user: input.validatorContext?.user,
-    $event: input.validatorContext?.event,
+    $event: input.validatorContext?.event?.document,
     $leafAdminStructureLocationIds:
       input.validatorContext?.leafAdminStructureLocationIds ?? [],
     user: input.systemVariables?.user,
@@ -496,12 +497,23 @@ export function isFieldSecured(
   return validate(field.secured as JSONSchema, clientFunctionContext)
 }
 
+export type EventValidatorContext = {
+  document: EventDocument
+  state: EventIndex
+}
+
+export function getEventValidatorContext(
+  document: EventDocument,
+  config: EventConfig
+): EventValidatorContext {
+  return { document, state: getCurrentEventState(document, config) }
+}
+
 export type ValidatorContext = {
   user?: ITokenPayload
   leafAdminStructureLocationIds?: Array<{ id: UUID }>
-  event?: EventDocument
-  eventState?: EventIndex
   baseFormState?: EventState
+  event?: EventValidatorContext
 }
 
 function isFieldConditionMet(

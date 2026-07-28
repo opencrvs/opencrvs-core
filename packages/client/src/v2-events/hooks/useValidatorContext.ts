@@ -12,7 +12,7 @@
 import { useMemo } from 'react'
 import {
   EventDocument,
-  getCurrentEventState,
+  getEventValidatorContext,
   getOrThrow,
   ValidatorContext
 } from '@opencrvs/commons/client'
@@ -44,20 +44,19 @@ export function useValidatorContext(event?: EventDocument): ValidatorContext {
    * Aggregating the action history is expensive and conditionals are evaluated
    * per field, per conditional type — so compute it once per (event, config).
    */
-  const eventState = useMemo(() => {
+  const eventContext = useMemo(() => {
     const eventConfig = configs.find((c) => c.id === event?.type)
 
     if (!event || !eventConfig) {
       return undefined
     }
 
-    return getCurrentEventState(event, eventConfig)
+    return getEventValidatorContext(event, eventConfig)
   }, [event, configs])
 
   return {
     user,
     leafAdminStructureLocationIds,
-    event,
-    eventState
+    event: eventContext
   }
 }

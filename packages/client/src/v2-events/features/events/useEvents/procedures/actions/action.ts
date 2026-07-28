@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -27,6 +28,7 @@ import {
   deepDropNulls,
   EventState,
   getCurrentEventState,
+  getEventValidatorContext,
   isPotentialDuplicate
 } from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
@@ -480,6 +482,8 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
           )
         : {}
 
+    const localEventDocument = findLocalEventDocument(eventId)
+
     return {
       ...restParams,
       eventId,
@@ -489,7 +493,9 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
         declarationDiff: params.declaration,
         validatorContext: {
           ...validatorContext,
-          event: findLocalEventDocument(eventId)
+          event:
+            localEventDocument &&
+            getEventValidatorContext(localEventDocument, eventConfiguration)
         }
       }),
       annotation
@@ -567,7 +573,12 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
           eventConfiguration,
           originalDeclaration,
           declarationDiff: params.declaration,
-          validatorContext: { ...validatorContext, event: localEvent }
+          validatorContext: {
+            ...validatorContext,
+            event:
+              localEvent &&
+              getEventValidatorContext(localEvent, eventConfiguration)
+          }
         })
       })
     }

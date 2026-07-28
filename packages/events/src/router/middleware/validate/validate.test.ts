@@ -16,6 +16,7 @@ import {
   field,
   FieldType,
   flag,
+  generateEventDocument,
   TestUserRole,
   TokenUserType,
   user
@@ -315,13 +316,21 @@ describe('getFieldErrors()', () => {
       ]
     }
 
+    const document = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
+    })
+
     it('accepts a value when the event carries the flag that makes the field visible', () => {
       const errors = getFieldErrors(
         [flaggedField],
         { 'test.input': 'not empty' },
         {
           ...testContext,
-          eventState: eventQueryDataGenerator({ flags: ['sealed'] })
+          event: {
+            document,
+            state: eventQueryDataGenerator({ flags: ['sealed'] })
+          }
         }
       )
 
@@ -332,7 +341,10 @@ describe('getFieldErrors()', () => {
       const errors = getFieldErrors(
         [flaggedField],
         { 'test.input': 'not empty' },
-        { ...testContext, eventState: eventQueryDataGenerator({ flags: [] }) }
+        {
+          ...testContext,
+          event: { document, state: eventQueryDataGenerator({ flags: [] }) }
+        }
       )
 
       expect(errors).toEqual([
