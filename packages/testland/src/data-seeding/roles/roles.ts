@@ -135,6 +135,7 @@ export const roles: Role[] = [
         { type: 'performance.read' },
         { type: 'record.reindex' },
         { type: 'integration.create' },
+        { type: 'integration.audit.read' },
         { type: 'performance.read-dashboards' },
         {
           type: 'dashboard.view',
