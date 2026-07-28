@@ -13,6 +13,7 @@ import { createPrng, generateUuid } from './test.utils'
 import { toPlainDate } from './PlainDate'
 import {
   AdministrativeArea,
+  isSelectableAtAnchor,
   Location,
   LocationVersion,
   resolvePath,
@@ -128,6 +129,38 @@ describe('resolveVersion', () => {
     const single = [version('0001-01-01', 'Only Name')]
     expect(resolveVersion(single, '1970-01-01').name).toBe('Only Name')
     expect(resolveVersion(single, '2099-12-31').name).toBe('Only Name')
+  })
+})
+
+describe('isSelectableAtAnchor', () => {
+  const versions = [
+    version('0001-01-01', 'Alaminos'),
+    version('2005-03-28', 'Alaminos City'),
+    version('2020-01-01', 'Alaminos City', 'inactive')
+  ]
+
+  it('is selectable when the resolved version at the anchor is active', () => {
+    expect(isSelectableAtAnchor(versions, '2010-06-15')).toBe(true)
+  })
+
+  it('is not selectable when the resolved version at the anchor is inactive', () => {
+    expect(isSelectableAtAnchor(versions, '2021-01-01')).toBe(false)
+  })
+
+  it('is not selectable when the anchor precedes every version — the location did not exist yet', () => {
+    // resolveVersion alone would fall back to the earliest ('Founded Town',
+    // active) and wrongly call this selectable; isSelectableAtAnchor must
+    // also require a version actually effective by the anchor.
+    const createdLater = [
+      version('1990-01-01', 'Founded Town'),
+      version('2000-01-01', 'Renamed Town')
+    ]
+    expect(isSelectableAtAnchor(createdLater, '1980-01-01')).toBe(false)
+    expect(resolveVersion(createdLater, '1980-01-01').status).toBe('active')
+  })
+
+  it('treats an anchor equal to effectiveFrom as within that version', () => {
+    expect(isSelectableAtAnchor(versions, '0001-01-01')).toBe(true)
   })
 })
 
