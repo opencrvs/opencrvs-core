@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import {
@@ -160,6 +160,24 @@ function LocationSearchInput({
   // date. Advanced search doesn't set this, so its office/health-facility
   // filters keep listing inactive locations exactly as before (#13146).
   const anchorToDateOfEvent = Boolean(props.configuration?.anchorToDateOfEvent)
+
+  // If the anchor moves (the date-of-event field changes) and the currently
+  // selected location is no longer selectable at the new anchor — it was
+  // inactivated, or didn't exist yet — clear the stale selection rather than
+  // leave it stored while the field just looks empty.
+  const { getLocations: getLocationsForStaleCheck } = useLocations()
+  const allLocations = getLocationsForStaleCheck.useSuspenseQuery()
+  useEffect(() => {
+    if (!anchorToDateOfEvent || !value) {
+      return
+    }
+    const locationId = UUID.safeParse(value).data
+    const entity = locationId && allLocations.get(locationId)
+    if (entity && !isSelectableAtAnchor(entity.versions, anchor)) {
+      onChange(undefined)
+    }
+  }, [anchorToDateOfEvent, value, allLocations, anchor, onChange])
+
   const selectableLocations = useMemo(
     () =>
       anchorToDateOfEvent
