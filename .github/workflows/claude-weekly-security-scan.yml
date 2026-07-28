@@ -9,8 +9,6 @@
 name: claude-weekly-security-scan
 
 on:
-  push:
-    branches: [security-scan] # remove before merging
   schedule:
     - cron: '0 6 * * 1' # Mondays 06:00 UTC
   workflow_dispatch: # allow manual runs
