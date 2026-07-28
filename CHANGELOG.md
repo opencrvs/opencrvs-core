@@ -2,7 +2,11 @@
 
 ## 2.0.1 Release Candidate
 
-## 2.0.0 Release Candidate
+### Bug fixes
+
+- Re-enable ARM-based images in the Tiltfile so local developers can run OpenCRVS on Apple silicon. [#13285](https://github.com/opencrvs/opencrvs-core/pull/13285)
+
+## 2.0.0 Release
 
 ### Upgrade guidance
 
