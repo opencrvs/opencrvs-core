@@ -66,5 +66,6 @@ jobs:
           # remove unused files
           rm -rf src/api/notification/testData.ts
           yarn --force
+      - name: Test opencrvs-farajaland compilation
         run: yarn test:compilation
         working-directory: opencrvs-farajaland
