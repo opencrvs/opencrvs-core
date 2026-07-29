@@ -21,6 +21,7 @@ import { getClient } from '@events/storage/postgres/events'
 import Schema from '../events/schema/Database'
 import {
   buildInitialVersions,
+  buildVersions,
   clearAdministrativeHierarchyCache,
   parseVersions,
   resolveVersionFields
@@ -148,7 +149,7 @@ export async function getAdministrativeAreaRowById(administrativeAreaId: UUID) {
 
   const row = await db
     .selectFrom('administrativeAreas')
-    .select(['id', 'name', 'externalId', 'parentId', 'versions'])
+    .select(['id', 'parentId', 'versions'])
     .where('id', '=', administrativeAreaId)
     .executeTakeFirst()
 
@@ -160,6 +161,29 @@ export async function getAdministrativeAreaRowById(administrativeAreaId: UUID) {
 }
 
 const INSERT_MAX_CHUNK_SIZE = 1000
+
+function toAdministrativeAreaInsertValues(area: SetAdministrativeAreaPayload) {
+  const base = {
+    id: area.id,
+    parentId: area.parentId,
+    externalId: area.externalId,
+    deletedAt: null
+  }
+
+  if (!area.versions) {
+    return {
+      ...base,
+      name: area.name,
+      versions: buildInitialVersions(area)
+    }
+  }
+
+  return {
+    ...base,
+    name: resolveVersionFields(area.versions).name,
+    versions: buildVersions(area.versions)
+  }
+}
 
 export async function setAdministrativeAreasInTrx(
   trx: Kysely<Schema>,
@@ -174,16 +198,7 @@ export async function setAdministrativeAreasInTrx(
     )
     await trx
       .insertInto('administrativeAreas')
-      .values(
-        batch.map((aa) => ({
-          id: aa.id,
-          name: aa.name,
-          parentId: aa.parentId,
-          deletedAt: null,
-          externalId: aa.externalId,
-          versions: buildInitialVersions(aa)
-        }))
-      )
+      .values(batch.map(toAdministrativeAreaInsertValues))
       .onConflict((oc) =>
         oc.column('id').doUpdateSet({
           name: () =>
@@ -200,6 +215,13 @@ export async function setAdministrativeAreasInTrx(
              THEN excluded.external_id
              ELSE administrative_areas.external_id
            END`,
+          // A repeated seed replaces the stored history with the incoming one:
+          // the supplied history when the payload carries `versions`,
+          // otherwise the freshly built single element. Sound only because
+          // seeding is gated to incomplete initialisation, so what gets
+          // replaced is an earlier seed attempt's work, never versions added
+          // through the audited update / withdraw endpoints.
+          versions: (eb) => eb.ref('excluded.versions'),
           deletedAt: null
         })
       )
