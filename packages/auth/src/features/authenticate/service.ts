@@ -137,7 +137,11 @@ export interface ISystemAuthentication {
   scope: EncodedScope[]
 }
 
-class UserInfoNotFoundError extends Error {}
+export class UserInfoNotFoundError extends Error {}
+
+export function isUserInfoNotFoundError(err: Error) {
+  return err instanceof UserInfoNotFoundError
+}
 
 export async function authenticate(
   username: string,
@@ -275,9 +279,7 @@ export async function subjectCanAccessRecord(
   try {
     const event = await eventsClient.event.get.query(
       { eventId, waitFor: false },
-      {
-        context: { headers: { Authorization: setBearerForToken(subjectToken) } }
-      }
+      { context: { headers: { Authorization: setBearerForToken(subjectToken) } } }
     )
     return event.actions.some((action) => action.id === actionId)
   } catch (err) {
@@ -386,6 +388,10 @@ const tokenPayload = t.type({
   aud: t.array(t.string),
   userType: t.string
 })
+
+export type ITokenPayload = t.TypeOf<typeof tokenPayload> & {
+  scope: EncodedScope[]
+}
 
 function safeVerifyJwt(token: string) {
   return tryCatch(
