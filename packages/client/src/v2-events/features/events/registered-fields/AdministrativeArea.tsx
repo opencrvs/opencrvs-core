@@ -156,13 +156,10 @@ function AdministrativeAreaInput({
     eventType
   )
 
-  // Advanced search stamps `activeOnly` on admin-structure address filters so
-  // inactivated areas are dropped; capture forms set `anchorToDateOfEvent`
-  // for the same reason (#13143). Either way, only currently-active/effective
-  // areas at `anchor` are selectable; other fields keep listing everything.
-  const excludeInactive = Boolean(
-    configuration.activeOnly || configuration.anchorToDateOfEvent
-  )
+  // `activeOnly` alone controls whether inactive/not-yet-effective areas are
+  // dropped from the list; `anchorToDateOfEvent` only changes which date is
+  // used to resolve `anchor` (event date vs today) — the two are orthogonal.
+  const excludeInactive = Boolean(configuration.activeOnly)
 
   const administrativeAreas = useAvailableAdministrativeAreas(
     partOf,

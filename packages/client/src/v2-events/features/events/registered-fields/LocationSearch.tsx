@@ -156,10 +156,6 @@ function LocationSearchInput({
 
   const locations = useAvailableLocations(locationTypes, jurisdictionFilter)
 
-  // Fields anchored to the event's date (place-of-event, place-of-delivery)
-  // offer only locations that already existed and were active as at that
-  // date. Advanced search doesn't set this, so its office/health-facility
-  // filters keep listing inactive locations exactly as before (#13146).
   const anchorToDateOfEvent = Boolean(props.configuration?.anchorToDateOfEvent)
 
   const { getLocations: getLocationsForStaleCheck } = useLocations()
@@ -172,12 +168,18 @@ function LocationSearchInput({
     onClear: () => onChange(undefined)
   })
 
+  // `activeOnly` alone controls whether inactive/not-yet-effective locations
+  // are dropped from the list; `anchorToDateOfEvent` only changes which date
+  // `anchor` is resolved against (event date vs today) — the two are
+  // orthogonal, so a field must opt into both to anchor-and-exclude.
+  const activeOnly = Boolean(props.configuration?.activeOnly)
+
   const selectableLocations = useMemo(
     () =>
-      anchorToDateOfEvent
+      activeOnly
         ? locations.filter((l) => isSelectableAtAnchor(l.versions, anchor))
         : locations,
-    [locations, anchor, anchorToDateOfEvent]
+    [locations, anchor, activeOnly]
   )
 
   // When the field config opts in (advanced search sets this), list every

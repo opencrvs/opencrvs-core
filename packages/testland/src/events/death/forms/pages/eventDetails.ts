@@ -299,7 +299,8 @@ export const eventDetails = defineFormPage({
         allowedLocations: user.jurisdiction(
           user.scope('record.create').attribute('placeOfEvent')
         ),
-        anchorToDateOfEvent: true
+        anchorToDateOfEvent: true,
+        activeOnly: true
       }
     },
     {
@@ -348,7 +349,8 @@ export const eventDetails = defineFormPage({
         allowedLocations: user.jurisdiction(
           user.scope('record.create').attribute('placeOfEvent')
         ),
-        anchorToDateOfEvent: true
+        anchorToDateOfEvent: true,
+        activeOnly: true
       }
     },
     {

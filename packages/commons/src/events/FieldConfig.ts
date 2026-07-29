@@ -799,19 +799,19 @@ const AdministrativeAreaField = BaseField.extend({
         .boolean()
         .optional()
         .describe(
-          'Advanced search: list every historical name a location has had as a separate, selectable option.'
+          'List every historical name a location has had as a separate, selectable option.'
         ),
       activeOnly: z
         .boolean()
         .optional()
         .describe(
-          'Advanced search: offer only currently-active locations; inactivated ones are excluded.'
+          'Offer only locations that are active at the resolved anchor date (today, or the date of event when anchorToDateOfEvent is set); inactive or not-yet-effective versions are excluded.'
         ),
       anchorToDateOfEvent: z
         .boolean()
         .optional()
         .describe(
-          "Anchor selectable/displayed versions to the event's date of event (falling back to the record's creation date when empty) instead of today."
+          "Resolve selectable/displayed versions against the event's date of event (falling back to the record's creation date when empty) instead of today. Does not by itself exclude inactive versions; combine with activeOnly for that."
         )
     })
     .describe('Administrative area options')
@@ -838,13 +838,19 @@ const LocationInput = BaseField.extend({
         .boolean()
         .optional()
         .describe(
-          'Advanced search: list every historical name a location has had as a separate, selectable option.'
+          'List every historical name a location has had as a separate, selectable option.'
+        ),
+      activeOnly: z
+        .boolean()
+        .optional()
+        .describe(
+          'Offer only locations that are active at the resolved anchor date (today, or the date of event when anchorToDateOfEvent is set); inactive or not-yet-effective versions are excluded.'
         ),
       anchorToDateOfEvent: z
         .boolean()
         .optional()
         .describe(
-          "Anchor selectable/displayed versions to the event's date of event (falling back to the record's creation date when empty) instead of today."
+          "Resolve selectable/displayed versions against the event's date of event (falling back to the record's creation date when empty) instead of today. Does not by itself exclude inactive versions; combine with activeOnly for that."
         )
     })
     .optional()
@@ -894,6 +900,7 @@ const Facility = BaseField.extend({
     .object({
       allowedLocations: AllowedLocations,
       listHistoricalNames: z.boolean().optional(),
+      activeOnly: z.boolean().optional(),
       anchorToDateOfEvent: z.boolean().optional()
     })
     .optional()
@@ -911,6 +918,7 @@ const Office = BaseField.extend({
     .object({
       allowedLocations: AllowedLocations,
       listHistoricalNames: z.boolean().optional(),
+      activeOnly: z.boolean().optional(),
       anchorToDateOfEvent: z.boolean().optional()
     })
     .optional()
@@ -967,19 +975,19 @@ const Address = BaseField.extend({
         .boolean()
         .optional()
         .describe(
-          'Advanced search: list every historical name a location has had as a separate, selectable option. Propagated to the embedded admin-area selectors.'
+          'List every historical name a location has had as a separate, selectable option. Propagated to the embedded admin-area selectors.'
         ),
       activeOnly: z
         .boolean()
         .optional()
         .describe(
-          'Advanced search: offer only currently-active admin areas; inactivated ones are excluded. Propagated to the embedded admin-area selectors.'
+          'Offer only admin areas that are active at the resolved anchor date (today, or the date of event when anchorToDateOfEvent is set); inactive or not-yet-effective versions are excluded. Propagated to the embedded admin-area selectors.'
         ),
       anchorToDateOfEvent: z
         .boolean()
         .optional()
         .describe(
-          "Anchor selectable/displayed versions to the event's date of event (falling back to the record's creation date when empty) instead of today. Propagated to the embedded admin-area selectors."
+          "Resolve selectable/displayed versions against the event's date of event (falling back to the record's creation date when empty) instead of today. Does not by itself exclude inactive versions; combine with activeOnly for that. Propagated to the embedded admin-area selectors."
         )
     })
     .optional(),
