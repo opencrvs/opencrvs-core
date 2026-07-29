@@ -311,6 +311,16 @@ jobs:
   countryconfig-template-build-test:
     runs-on: ubuntu-26.04
     steps:
+      - uses: actions/checkout@v6
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          ref: '${{ github.event.inputs.branch_tag_name }}'
+
+      - uses: actions/checkout@v6
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
       - name: Build countryconfig-template (without publishing)
         uses: Wandalen/wretry.action@v3.8.0
         with:
