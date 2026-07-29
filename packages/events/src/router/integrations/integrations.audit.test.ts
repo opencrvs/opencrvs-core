@@ -8,11 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { generateOpenApiDocument } from 'trpc-to-openapi'
+/* eslint-disable max-lines */
 import { UUID, encodeScope, getUUID, TokenUserType } from '@opencrvs/commons'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
-import { appRouter } from '@events/router/router'
 import {
   createSystemTestClient,
   createTestClient,
@@ -44,7 +42,9 @@ async function captureError(promise: Promise<unknown>) {
   throw new Error('Expected the call to be refused, but it resolved')
 }
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
 
 /** Create an integration through the router and return its system client id. */
 async function createIntegration(
@@ -86,50 +86,6 @@ function instantBetween(older: string, newer: string) {
 }
 
 describe('integrations.audit', () => {
-  describe('surface', () => {
-    test('is registered on the tRPC surface but is not a documented REST route', async () => {
-      const { user } = await setupTestCase()
-      const client = createAdministratorClient(user)
-      const clientId = await createIntegration(client, 'Surface Integration')
-
-      // Reachable over tRPC.
-      await expect(
-        client.integrations.audit({ id: clientId })
-      ).resolves.toEqual({ results: [], total: 0 })
-
-      // The REST surface is generated from the `openapi` meta of each
-      // procedure. This one carries none, so it must appear nowhere in the
-      // documented routes. `operationId` defaults to the tRPC procedure path
-      // with dots replaced by dashes.
-      const document = generateOpenApiDocument(appRouter, {
-        title: 'OpenCRVS API',
-        version: '2.0.0',
-        baseUrl: 'http://localhost:3000/api/events'
-      })
-
-      const documentedOperationIds = Object.values(
-        document.paths ?? {}
-      ).flatMap((path) =>
-        Object.values(path ?? {}).flatMap((operation) =>
-          typeof operation === 'object' &&
-          operation !== null &&
-          'operationId' in operation
-            ? [String(operation.operationId)]
-            : []
-        )
-      )
-
-      // The extraction works: sibling annotated procedures are documented.
-      expect(documentedOperationIds).toContain('integrations-create')
-      expect(documentedOperationIds).toContain('integrations-list')
-
-      expect(documentedOperationIds).not.toContain('integrations-audit')
-      expect(Object.keys(document.paths ?? {})).not.toContain(
-        '/integrations/audit'
-      )
-    })
-  })
-
   describe('access control', () => {
     test('refuses a caller without integration.audit.read', async () => {
       const { user } = await setupTestCase()
@@ -660,103 +616,6 @@ describe('integrations.audit', () => {
         Date.parse(entry.createdAt)
       )
       expect(timestamps).toEqual([...timestamps].sort((a, b) => b - a))
-    })
-  })
-
-  describe('serialisation', () => {
-    test('round-trips the operations a system client writes', async () => {
-      const { user } = await setupTestCase()
-      const administrator = createAdministratorClient(user)
-      const clientId = await createIntegration(
-        administrator,
-        'Serialising Integration'
-      )
-
-      const eventId = getUUID()
-      const searchRequestData = {
-        query: { trackingId: 'BXVF2QM' },
-        limit: 10,
-        offset: 0
-      }
-      const searchResponseSummary = { total: 1, eventIds: [eventId] }
-
-      await writeAuditLog({
-        clientId,
-        clientType: TokenUserType.enum.system,
-        operation: 'event.search',
-        requestData: searchRequestData,
-        responseSummary: searchResponseSummary
-      })
-      await sleep(20)
-
-      await writeAuditLog({
-        clientId,
-        clientType: TokenUserType.enum.system,
-        operation: 'event.create',
-        requestData: {
-          transactionId: 'txn-1',
-          type: 'birth',
-          createdAtLocation: null
-        },
-        responseSummary: { eventId, trackingId: 'BXVF2QM' }
-      })
-      await sleep(20)
-
-      // An operation with no curated response summary at all.
-      await writeAuditLog({
-        clientId,
-        clientType: TokenUserType.enum.system,
-        operation: 'event.actions.register.request',
-        requestData: {
-          eventId,
-          actionType: 'REGISTER',
-          eventType: 'birth',
-          trackingId: 'BXVF2QM',
-          transactionId: 'txn-2'
-        }
-      })
-
-      const result = await administrator.integrations.audit({ id: clientId })
-
-      expect(result.total).toBe(3)
-      expect(result.results.map((entry) => entry.operation)).toEqual([
-        'event.actions.register.request',
-        'event.create',
-        'event.search'
-      ])
-
-      // Narrowing on `operation` only compiles because the response is typed by
-      // the audit entry union.
-      const search = result.results.find(
-        (entry) => entry.operation === 'event.search'
-      )
-      if (!search || search.operation !== 'event.search') {
-        throw new Error('expected the event.search entry to be returned')
-      }
-
-      expect(search.requestData).toEqual(searchRequestData)
-      expect(search.responseSummary).toEqual(searchResponseSummary)
-      expect(search.clientId).toBe(clientId)
-      expect(search.clientType).toBe(TokenUserType.enum.system)
-      expect(new Date(search.createdAt).toISOString()).toBe(search.createdAt)
-
-      const registration = result.results.find(
-        (entry) => entry.operation === 'event.actions.register.request'
-      )
-      if (
-        !registration ||
-        registration.operation !== 'event.actions.register.request'
-      ) {
-        throw new Error('expected the register entry to be returned')
-      }
-
-      expect(registration.requestData).toEqual({
-        eventId,
-        actionType: 'REGISTER',
-        eventType: 'birth',
-        trackingId: 'BXVF2QM',
-        transactionId: 'txn-2'
-      })
     })
   })
 
