@@ -163,7 +163,7 @@ export function Pages({
           key="clear-form"
           id="clear-form"
           size="small"
-          type="tertiary"
+          type="secondaryNegative"
           onClick={onClearPage}
         >
           {intl.formatMessage(messages.clear)}
