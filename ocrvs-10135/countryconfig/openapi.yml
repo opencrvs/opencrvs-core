@@ -11947,7 +11947,6 @@ components:
                   - createdByUserType
                   - createdAt
                   - createdBy
-                  - createdByRole
                   - status
                   - type
           description: Ordered list of actions associated with the event.
@@ -12072,7 +12071,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -12144,7 +12142,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -12225,7 +12222,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -12316,7 +12312,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -12389,7 +12384,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -12469,7 +12463,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -12550,7 +12543,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -12623,7 +12615,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -12699,7 +12690,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -12771,7 +12761,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -12846,7 +12835,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -12919,7 +12907,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -12993,7 +12980,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13077,7 +13063,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13151,7 +13136,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13230,7 +13214,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13302,7 +13285,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
