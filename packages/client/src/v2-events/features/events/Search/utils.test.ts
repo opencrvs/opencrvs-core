@@ -8,13 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable max-lines */
 
 import {
   EventStatus,
   QueryInputType,
   AdvancedSearchField,
   tennisClubMembershipEvent,
-  PlainDate
+  PlainDate,
+  FieldConfig,
+  FieldType,
+  AdministrativeAreas
 } from '@opencrvs/commons/client'
 import {
   getMetadataFieldConfigs,
@@ -24,7 +28,8 @@ import {
   buildQuickSearchQuery,
   resolveAdvancedSearchConfig,
   getAdvancedSearchFieldErrors,
-  toAdvancedSearchQueryType
+  toAdvancedSearchQueryType,
+  withSearchLocationBehaviour
 } from './utils'
 
 describe('getAdvancedSearchFieldErrors', () => {
@@ -555,5 +560,93 @@ describe('Nested Query Generation with searchFields', () => {
         }
       ]
     })
+  })
+})
+
+describe('withSearchLocationBehaviour', () => {
+  const label = {
+    id: 'field.label',
+    defaultMessage: 'Field',
+    description: 'Field label'
+  }
+
+  const configOf = (field: FieldConfig) =>
+    (field as { configuration?: Record<string, unknown> }).configuration
+
+  it('lists historical names for a location (office/health) field, without excluding inactive', () => {
+    const field = {
+      id: 'field',
+      type: FieldType.LOCATION,
+      label,
+      configuration: { locationTypes: ['HEALTH_FACILITY'] }
+    } as FieldConfig
+
+    const result = withSearchLocationBehaviour(field)
+
+    expect(configOf(result)).toMatchObject({
+      locationTypes: ['HEALTH_FACILITY'],
+      listHistoricalNames: true
+    })
+    expect(configOf(result)).not.toHaveProperty('activeOnly')
+  })
+
+  it('lists historical names and excludes inactive for an admin-structure field', () => {
+    const field = {
+      id: 'field',
+      type: FieldType.ADMINISTRATIVE_AREA,
+      label,
+      configuration: { type: AdministrativeAreas.enum.ADMIN_STRUCTURE }
+    } as FieldConfig
+
+    const result = withSearchLocationBehaviour(field)
+
+    expect(configOf(result)).toMatchObject({
+      listHistoricalNames: true,
+      activeOnly: true
+    })
+  })
+
+  it('lists historical names but keeps inactive for a non-admin-structure admin-area field', () => {
+    const field = {
+      id: 'field',
+      type: FieldType.ADMINISTRATIVE_AREA,
+      label,
+      configuration: { type: AdministrativeAreas.enum.HEALTH_FACILITY }
+    } as FieldConfig
+
+    const result = withSearchLocationBehaviour(field)
+
+    expect(configOf(result)).toMatchObject({
+      listHistoricalNames: true,
+      activeOnly: false
+    })
+  })
+
+  it('lists historical names and excludes inactive for an address field', () => {
+    const field = {
+      id: 'field',
+      type: FieldType.ADDRESS,
+      label,
+      configuration: {}
+    } as FieldConfig
+
+    const result = withSearchLocationBehaviour(field)
+
+    expect(configOf(result)).toMatchObject({
+      listHistoricalNames: true,
+      activeOnly: true
+    })
+  })
+
+  it('leaves non-location fields untouched', () => {
+    const field = {
+      id: 'field',
+      type: FieldType.TEXT,
+      label
+    } as FieldConfig
+
+    const result = withSearchLocationBehaviour(field)
+
+    expect(result).toEqual(field)
   })
 })

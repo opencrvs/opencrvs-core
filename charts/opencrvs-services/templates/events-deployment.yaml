@@ -53,10 +53,7 @@ spec:
         - name: events
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.events) }}
           env:
-            - name: APN_NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
+          {{- include "render-otel-env-vars" (dict "Values" .Values "Release" .Release) }}
             - name: AUTH_URL
               value: "http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040"
             - name: CERT_PUBLIC_KEY_PATH

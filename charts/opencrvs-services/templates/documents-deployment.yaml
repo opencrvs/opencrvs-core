@@ -24,10 +24,7 @@ spec:
         - image: {{ include "opencrvs.image" (dict "root" . "service" .Values.documents) }}
           name: documents
           env:
-            - name: APN_NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
+          {{- include "render-otel-env-vars" (dict "Values" .Values "Release" .Release) }}
             - name: COUNTRY_CONFIG_URL
               value: http://countryconfig.{{ .Release.Namespace }}.svc.cluster.local:3040
             - name: DOCUMENTS_PORT

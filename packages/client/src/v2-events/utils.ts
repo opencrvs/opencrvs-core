@@ -40,6 +40,25 @@ export function getUsersFullName(name: UserOrSystem['name']) {
   return joinValues([name.firstname, name.surname])
 }
 
+/**
+ * Builds advanced-search filter options for a set of locations: one row per
+ * distinct name the location has ever carried (across all its versions), so a
+ * record saved under an outdated name stays findable. Rows are in version order
+ * and every row resolves to the same location id. Ordinary forms list a single
+ * current-name option instead of calling this.
+ */
+export function buildHistoricalLocationNameOptions<
+  T extends { id: UUID; versions: LocationVersion[] }
+>(items: T[]): { value: UUID; label: string }[] {
+  return items.flatMap((item) => {
+    const distinctNames = [
+      ...new Set(item.versions.map((version) => version.name))
+    ]
+
+    return distinctNames.map((name) => ({ value: item.id, label: name }))
+  })
+}
+
 /** Utility to get all keys from union */
 type AllKeys<T> = T extends T ? keyof T : never
 
