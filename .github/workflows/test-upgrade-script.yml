@@ -24,7 +24,7 @@ jobs:
   test-upgrade-script:
     runs-on: ubuntu-26.04
     env:
-      FARAJALAND_BRANCH: ${{ github.event.inputs.farajaland-branch || 'release/2.0.0' }}
+      FARAJALAND_BRANCH: ${{ github.event.inputs.farajaland-branch || 'release/v2.0.0' }}
       # yarn 1.22 refuses to run inside a workspace whose package.json pins
       # packageManager: pnpm; the farajaland side of this job still uses yarn
       SKIP_YARN_COREPACK_CHECK: 1
