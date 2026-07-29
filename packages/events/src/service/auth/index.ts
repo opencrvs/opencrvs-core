@@ -19,6 +19,20 @@ export async function getAnonymousToken() {
   return token as string
 }
 
+export async function getIntegrationCreatorToken() {
+  const res = await fetch(
+    new URL('/internal/integration-creator-token', env.AUTH_URL).toString(),
+    { method: 'POST' }
+  )
+  if (!res.ok) {
+    throw new Error(
+      `Failed to fetch integration creator token: ${res.status} ${res.statusText}`
+    )
+  }
+  const { token } = await res.json()
+  return token as string
+}
+
 export async function getActionConfirmationToken(
   { eventId, actionId }: { eventId: UUID; actionId: UUID },
   token: string

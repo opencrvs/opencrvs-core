@@ -21,6 +21,8 @@ import { Stack } from '@opencrvs/components/lib/Stack'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
+  ActionDocument,
+  ActionStatus,
   ActionType,
   EventConfig,
   EventDocument,
@@ -232,7 +234,9 @@ function Integration({ action }: { action: EventHistoryActionDocument }) {
       <div>
         <Box />
       </div>
-      {name}
+      <Text color="primary" element="span" variant="bold14">
+        {name}
+      </Text>
     </SystemName>
   )
 }
@@ -261,7 +265,8 @@ function ActionRole({ action }: { action: EventHistoryActionDocument }) {
   const { getActionCreator } = useActionCreator()
   const { type } = getActionCreator(action)
 
-  if (type === 'system') {
+  // Integrations have no role by design
+  if (type === 'system' || type === 'integration') {
     return null
   }
 
@@ -287,7 +292,8 @@ function ActionLocation({ action }: { action: EventHistoryActionDocument }) {
 
   const { type } = getActionCreator(action)
 
-  if (type === 'system') {
+  // Integrations have no office by design
+  if (type === 'system' || type === 'integration') {
     return null
   }
 
@@ -352,10 +358,23 @@ export function EventHistory({
     eventConfiguration
   )
 
-  const visibleHistoryWithClientSpecificActions =
-    historyWithClientSpecificActions.filter(
-      ({ type }) => type !== ActionType.CREATE
-    )
+  // Rejected action confirmations (e.g. an external ID system such as MOSIP
+  // rejecting a deferred registration) are excluded from the regular history
+  // extraction. Surface rejected registrations so the record does not appear
+  // to be waiting for external validation forever.
+  const rejectedRegistrations = fullEvent.actions.filter(
+    (a): a is ActionDocument =>
+      a.type === ActionType.REGISTER &&
+      a.status === ActionStatus.Rejected &&
+      Boolean(a.originalActionId)
+  )
+
+  const visibleHistoryWithClientSpecificActions = [
+    ...historyWithClientSpecificActions,
+    ...rejectedRegistrations
+  ]
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+    .filter(({ type }) => type !== ActionType.CREATE)
 
   const onHistoryRowClick = (
     action: EventHistoryActionDocument,
@@ -420,7 +439,10 @@ export function EventHistory({
           >
             {intl.formatMessage(eventHistoryStatusMessage, {
               action: getActionTypeForHistory(history, action),
-              status: action.status
+              status: action.status,
+              // Lets countries configure different wording for actions
+              // performed by an integration, e.g. "Registered and UIN created"
+              userType: action.createdByUserType
             })}
           </Link>
         ),

@@ -31,7 +31,7 @@ import { ActionTypeSpecificContent } from './components'
 export const eventHistoryStatusMessage = {
   id: 'events.history.status',
   defaultMessage:
-    '{status, select, Requested {Waiting for external validation} other {{action, select, CREATE {Draft} NOTIFY {Sent incomplete} VALIDATE {Validated} DRAFT {Draft} DECLARE {Sent for review} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} UPDATE {Updated} other {Unknown}}}}'
+    '{status, select, Requested {Waiting for external validation} Rejected {{action, select, REGISTER {Registration failed} other {Rejected}}} other {{action, select, CREATE {Draft} NOTIFY {Sent incomplete} VALIDATE {Validated} DRAFT {Draft} DECLARE {Sent for review} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} UPDATE {Updated} other {Unknown}}}}'
 }
 
 const messages = defineMessages({
@@ -125,7 +125,10 @@ export function EventHistoryDialog({
   const history = getAcceptedActions(fullEvent)
   const title = intl.formatMessage(eventHistoryStatusMessage, {
     action: getActionTypeForHistory(history, action),
-    status: action.status
+    status: action.status,
+    // Lets countries configure different wording for actions performed by an
+    // integration, e.g. "Registered and UIN created"
+    userType: action.createdByUserType
   })
 
   const comments = prepareComments(action)

@@ -18,7 +18,13 @@ import {
   createFhirPractitionerRole,
   postFhir
 } from '@user-mgnt/features/createUser/service'
-import { logger, SystemRole } from '@opencrvs/commons'
+import {
+  logger,
+  RecordScope,
+  RecordScopeType,
+  stringifyScope,
+  SystemRole
+} from '@opencrvs/commons'
 import System, { WebhookPermissions } from '@user-mgnt/model/system'
 import User from '@user-mgnt/model/user'
 import { generateHash, generateSaltedHash } from '@user-mgnt/utils/hash'
@@ -347,7 +353,7 @@ export async function getSystemHandler(
   }
   const systemName = system.name
   return {
-    name: systemName || system.createdBy,
+    name: systemName || system.createdBy || '',
     createdBy: system.createdBy,
     client_id: system.client_id,
     username: system.username,
@@ -524,3 +530,121 @@ export async function deleteSystem(
     return h.response(e.message).code(400)
   }
 }
+
+interface ICreateIntegrationPayload {
+  name: string
+  scopes: RecordScope[]
+  /**
+   * Optional pre-shared credentials. When country config seeds an integration
+   * with a fixed `clientId`/`clientSecret` (e.g. the same values the MOSIP
+   * integration carries in its own `OPENCRVS_CLIENT_ID`/`OPENCRVS_CLIENT_SECRET`
+   * env), the integration can authenticate immediately with no manual
+   * "Refresh secret" step. When omitted, credentials are generated here and the
+   * secret is only retrievable via the NSA "Refresh secret" flow.
+   */
+  clientId?: string
+  clientSecret?: string
+}
+
+export async function createIntegrationHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const {
+    name,
+    scopes,
+    clientId: providedClientId,
+    clientSecret: providedClientSecret
+  } = request.payload as ICreateIntegrationPayload
+
+  for (const scope of scopes) {
+    const parsed = RecordScopeType.safeParse(scope.type)
+    if (!parsed.success) {
+      return h.response(`Invalid scope type: ${scope.type}`).code(400)
+    }
+  }
+
+  const scopeStrings = scopes.map(stringifyScope)
+
+  const existingSystemResponse = (system: {
+    client_id: string
+    sha_secret?: string
+  }) =>
+    h
+      .response({ clientId: system.client_id, sha_secret: system.sha_secret })
+      .code(200)
+
+  try {
+    // An integration is identified by its name — the one key country config
+    // always controls and re-sends on every startup (a generated client_id is
+    // never known to the caller on restart). One integration per name.
+    //
+    // NOTE: neither `name` nor `client_id` has a unique index on the System
+    // schema. Renaming a seeded integration while keeping the same client_id
+    // would therefore orphan the old row and create a second system sharing
+    // that client_id. Adding a unique index (plus a migration to reconcile any
+    // existing duplicates) could harden this, and could be addressed later if
+    // prioritized.
+    const existing = await System.findOne({ name })
+
+    if (existing) {
+      // Reconcile scopes with the request (country config owns them), but never
+      // touch the stored secret — that stays owned by whoever last set it (the
+      // seed on creation, or an NSA "Refresh secret"). Re-registration is
+      // therefore idempotent for credentials and only ever updates scopes.
+      if (providedClientId && existing.client_id !== providedClientId) {
+        logger.warn(
+          `Integration "${name}" already exists with a different client_id; ` +
+            `seeded credentials were not applied. Delete it first to re-seed.`
+        )
+      }
+
+      await System.updateOne({ name }, { scope: scopeStrings })
+      return existingSystemResponse(existing)
+    }
+
+    const clientId = providedClientId ?? uuid()
+    const clientSecret = providedClientSecret ?? uuid()
+    const sha_secret = uuid()
+    const { hash, salt } = generateSaltedHash(clientSecret)
+
+    await System.create({
+      name,
+      client_id: clientId,
+      scope: scopeStrings,
+      secretHash: hash,
+      salt,
+      sha_secret,
+      status: statuses.ACTIVE,
+      settings: { dailyQuota: 0, webhook: [] }
+    })
+
+    return h.response({ clientId, sha_secret }).code(201)
+  } catch (e) {
+    logger.error(e)
+    return h.response().code(400)
+  }
+}
+
+export const createIntegrationRequestSchema = Joi.object({
+  name: Joi.string().required(),
+  scopes: Joi.array()
+    .items(
+      Joi.object({
+        type: Joi.string().required(),
+        options: Joi.object({
+          event: Joi.array().items(Joi.string()).required()
+        }).required()
+      })
+    )
+    .required(),
+  // Symmetric with createIntegrationResponseSchema, which requires a UUID
+  // clientId — reject a malformed seed at the door rather than after a write.
+  clientId: Joi.string().uuid(),
+  clientSecret: Joi.string()
+})
+
+export const createIntegrationResponseSchema = Joi.object({
+  clientId: Joi.string().uuid().required(),
+  sha_secret: Joi.string().required()
+})

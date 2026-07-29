@@ -47,7 +47,7 @@ type System {
   shaSecret: ID!
   status: SystemStatus!
   name: String!
-  type: SystemType!
+  type: SystemType
   integratingSystemType: IntegratingSystemType
   settings: SystemSettings
 }

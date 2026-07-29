@@ -72,7 +72,7 @@ type SystemAPIResult = {
   status: string
   scope: string[]
   sha_secret: string
-  type: SystemRole
+  type?: SystemRole
 }
 
 export async function getSystem(

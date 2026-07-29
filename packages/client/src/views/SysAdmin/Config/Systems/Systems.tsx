@@ -263,6 +263,10 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
   }
 
   const systemToLabel = (system: System) => {
+    if (!system.type) {
+      // Integrations registered through countryconfig have no legacy type
+      return intl.formatMessage(integrationMessages.apiIntegration)
+    }
     return system.type !== 'REINDEX'
       ? systemTypeLabels[system.type]
       : 'INVALID_SYSTEM_TYPE__REINDEX'

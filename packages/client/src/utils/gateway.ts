@@ -1920,7 +1920,7 @@ export type System = {
   settings?: Maybe<SystemSettings>
   shaSecret: Scalars['ID']
   status: SystemStatus
-  type: SystemType
+  type?: Maybe<SystemType>
 }
 
 export type SystemInput = {
@@ -7076,7 +7076,7 @@ export type RegisterSystemMutation = {
       name: string
       shaSecret: string
       status: SystemStatus
-      type: SystemType
+      type?: SystemType | null
       integratingSystemType?: IntegratingSystemType | null
       settings?: {
         __typename?: 'SystemSettings'
@@ -7103,7 +7103,7 @@ export type DeactivateSystemMutation = {
     name: string
     shaSecret: string
     status: SystemStatus
-    type: SystemType
+    type?: SystemType | null
     settings?: {
       __typename?: 'SystemSettings'
       webhook?: Array<{
@@ -7128,7 +7128,7 @@ export type ReactivateSystemMutation = {
     name: string
     shaSecret: string
     status: SystemStatus
-    type: SystemType
+    type?: SystemType | null
     settings?: {
       __typename?: 'SystemSettings'
       webhook?: Array<{
@@ -7156,7 +7156,7 @@ export type RefreshSystemSecretMutation = {
       name: string
       shaSecret: string
       status: SystemStatus
-      type: SystemType
+      type?: SystemType | null
     }
   } | null
 }
@@ -7174,7 +7174,7 @@ export type UpdatePermissionsMutation = {
     name: string
     shaSecret: string
     status: SystemStatus
-    type: SystemType
+    type?: SystemType | null
     settings?: {
       __typename?: 'SystemSettings'
       webhook?: Array<{
@@ -7199,7 +7199,7 @@ export type DeleteSystemMutation = {
     name: string
     shaSecret: string
     status: SystemStatus
-    type: SystemType
+    type?: SystemType | null
   } | null
 }
 

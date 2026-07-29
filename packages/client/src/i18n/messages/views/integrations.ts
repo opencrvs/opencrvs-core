@@ -225,6 +225,12 @@ const messagesToDefine = {
     defaultMessage: 'Import/Export',
     description: 'Label for import/export type system'
   },
+  apiIntegration: {
+    id: 'integrations.type.api',
+    defaultMessage: 'API integration',
+    description:
+      'Label for integration clients registered by the country configuration without a legacy system type'
+  },
   healthSystem: {
     id: 'integrations.type.healthSystem',
     defaultMessage: 'Health integration',

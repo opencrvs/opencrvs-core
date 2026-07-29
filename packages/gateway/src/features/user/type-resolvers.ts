@@ -72,13 +72,13 @@ export interface IUserModelData {
 export interface ISystemModelData {
   scope?: string[]
   name: string
-  createdBy: string
+  createdBy?: string
   client_id: string
-  username: string
+  username?: string
   status: string
   sha_secret: string
-  type: 'HEALTH'
-  practitionerId: string
+  type?: string
+  practitionerId?: string
   settings: {
     dailyQuota: number
   }

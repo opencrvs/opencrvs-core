@@ -31,7 +31,8 @@ function mapEventActions(actions: EventDocument['actions']) {
     /* eslint-enable @typescript-eslint/no-explicit-any */
     createdAtLocation: action.createdAtLocation ?? null,
     originalActionId: action.originalActionId ?? null,
-    createdBySignature: action.createdBySignature ?? null
+    createdBySignature: action.createdBySignature ?? null,
+    createdByRole: action.createdByRole ?? null
   }))
 }
 

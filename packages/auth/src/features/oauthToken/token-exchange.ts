@@ -67,7 +67,7 @@ export async function tokenExchangeHandler(
   if (decodedOrError._tag === 'Left') {
     return oauthResponse.invalidSubjectToken(h)
   }
-  const { sub } = decodedOrError.right
+  const { sub, userType } = decodedOrError.right
 
   const extraScopes = decodedOrError.right.scope.filter(
     (s) => s.startsWith('record.declared.reject') || s.startsWith('record.read')
@@ -77,7 +77,10 @@ export async function tokenExchangeHandler(
   const recordToken = await createTokenForActionConfirmation(
     { eventId, actionId, recordId },
     sub as UUID,
-    extraScopes
+    extraScopes,
+    // Carry the subject's user type over so integrations confirming an action
+    // are resolved (and audited) as the system client, not as a user
+    userType
   )
 
   return oauthResponse.success(h, recordToken)

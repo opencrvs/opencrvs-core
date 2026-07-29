@@ -404,3 +404,199 @@ describe('delete system ', () => {
     expect(res.statusCode).toBe(403)
   })
 })
+
+const integrationCreatorToken = jwt.sign(
+  { scope: [SCOPES.INTEGRATION_CREATE] },
+  readFileSync('./test/cert.key'),
+  {
+    subject: 'opencrvs:countryconfig-service',
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:user-mgnt-user'
+  }
+)
+
+const mockIntegration = {
+  name: 'MOSIP',
+  client_id: 'dbe70a54-c5d8-4268-a358-4b9773fedeba',
+  secretHash: 'secretsecret',
+  salt: '123',
+  sha_secret: 'existing-sha-secret',
+  scope: ['record.register[event=birth]'],
+  status: statuses.ACTIVE
+} as unknown as ISystem & { secretHash: string }
+
+describe('createIntegration handler', () => {
+  let server: any
+
+  beforeEach(async () => {
+    mockingoose.resetAll()
+    jest.restoreAllMocks()
+    server = await createServer()
+    fetch.resetMocks()
+  })
+
+  it('creates a new integration and returns generated credentials without the secret', async () => {
+    mockingoose(System).toReturn(null, 'findOne')
+    mockingoose(System).toReturn(mockIntegration, 'save')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/createIntegration',
+      payload: {
+        name: 'MOSIP',
+        scopes: [
+          { type: 'record.register', options: { event: ['birth', 'death'] } }
+        ]
+      },
+      headers: {
+        Authorization: `Bearer ${integrationCreatorToken}`
+      }
+    })
+
+    expect(res.statusCode).toBe(201)
+    const body = JSON.parse(res.payload)
+    expect(body.clientId).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+    )
+    expect(body.sha_secret).toBeDefined()
+    // The secret is never returned — a National System Admin obtains it via
+    // the Integrations page (Refresh secret)
+    expect(body.clientSecret).toBeUndefined()
+  })
+
+  it('seeds a new integration with caller-provided credentials', async () => {
+    mockingoose(System).toReturn(null, 'findOne')
+    mockingoose(System).toReturn(mockIntegration, 'save')
+    const createSpy = jest.spyOn(System, 'create')
+
+    const seededClientId = '3db2eed5-9d44-4dc2-ab27-74a2254f4c32'
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/createIntegration',
+      payload: {
+        name: 'MOSIP',
+        scopes: [
+          { type: 'record.register', options: { event: ['birth', 'death'] } }
+        ],
+        clientId: seededClientId,
+        clientSecret: 'seeded-client-secret'
+      },
+      headers: {
+        Authorization: `Bearer ${integrationCreatorToken}`
+      }
+    })
+
+    expect(res.statusCode).toBe(201)
+    const body = JSON.parse(res.payload)
+    // The provided client id is used verbatim rather than a generated UUID
+    expect(body.clientId).toBe(seededClientId)
+    // The secret is still never echoed back
+    expect(body.clientSecret).toBeUndefined()
+    // The seeded client id is persisted; the secret is stored hashed, never raw
+    const created = createSpy.mock.calls[0][0] as Record<string, unknown>
+    expect(created.client_id).toBe(seededClientId)
+    expect(created.secretHash).toBeDefined()
+    expect(created.secretHash).not.toBe('seeded-client-secret')
+  })
+
+  it('reconciles scopes but never the secret when re-registering a seeded integration', async () => {
+    mockingoose(System).toReturn(mockIntegration, 'findOne')
+    mockingoose(System).toReturn({}, 'updateOne')
+    const updateSpy = jest.spyOn(System, 'updateOne')
+    const createSpy = jest.spyOn(System, 'create')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/createIntegration',
+      payload: {
+        name: 'MOSIP',
+        scopes: [
+          { type: 'record.register', options: { event: ['birth', 'death'] } }
+        ],
+        clientId: mockIntegration.client_id,
+        clientSecret: 'seeded-client-secret'
+      },
+      headers: {
+        Authorization: `Bearer ${integrationCreatorToken}`
+      }
+    })
+
+    expect(res.statusCode).toBe(200)
+    const body = JSON.parse(res.payload)
+    expect(body.clientId).toBe(mockIntegration.client_id)
+    expect(body.sha_secret).toBe(mockIntegration.sha_secret)
+    // Only the scopes are reconciled — the update payload carries no secret
+    // fields, and no new system is created
+    expect(updateSpy).toHaveBeenCalledWith(
+      { name: 'MOSIP' },
+      { scope: ['record.register[event=birth|death]'] }
+    )
+    expect(createSpy).not.toHaveBeenCalled()
+  })
+
+  it('updates scopes of an existing integration without regenerating credentials', async () => {
+    mockingoose(System).toReturn(mockIntegration, 'findOne')
+    mockingoose(System).toReturn({}, 'updateOne')
+    const updateSpy = jest.spyOn(System, 'updateOne')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/createIntegration',
+      payload: {
+        name: 'MOSIP',
+        scopes: [
+          { type: 'record.register', options: { event: ['birth', 'death'] } }
+        ]
+      },
+      headers: {
+        Authorization: `Bearer ${integrationCreatorToken}`
+      }
+    })
+
+    expect(res.statusCode).toBe(200)
+    const body = JSON.parse(res.payload)
+    expect(body.clientId).toBe(mockIntegration.client_id)
+    expect(body.sha_secret).toBe(mockIntegration.sha_secret)
+    // Only the scopes may change on restart — never the secret, otherwise a
+    // National System Admin's "Refresh secret" would be undone on redeploy
+    expect(updateSpy).toHaveBeenCalledWith(
+      { name: 'MOSIP' },
+      { scope: ['record.register[event=birth|death]'] }
+    )
+  })
+
+  it('rejects scopes outside the record scope allowlist', async () => {
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/createIntegration',
+      payload: {
+        name: 'MOSIP',
+        scopes: [{ type: 'user.create', options: { event: [] } }]
+      },
+      headers: {
+        Authorization: `Bearer ${integrationCreatorToken}`
+      }
+    })
+
+    expect(res.statusCode).toBe(400)
+  })
+
+  it('return an error if a token scope check fails', async () => {
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/createIntegration',
+      payload: {
+        name: 'MOSIP',
+        scopes: [
+          { type: 'record.register', options: { event: ['birth', 'death'] } }
+        ]
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(403)
+  })
+})

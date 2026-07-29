@@ -81,6 +81,7 @@ export const ActionCreationMetadata = z.object({
     .describe('Timestamp when the action request was accepted.'),
   createdByRole: z
     .string()
+    .optional()
     .describe('Role of the user at the time of action request creation.'),
   createdBySignature: z
     .string()
@@ -134,6 +135,7 @@ export const EventMetadata = z.object({
     .describe('Whether the user is a normal user or a system.'),
   updatedByUserRole: z
     .string()
+    .optional()
     .describe('Role of the user who last changed the status.'),
   createdAtLocation: CreatedAtLocation.describe(
     'Location of the user who created the event.'
