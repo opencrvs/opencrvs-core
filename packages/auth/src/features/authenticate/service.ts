@@ -43,6 +43,7 @@ import * as F from 'fp-ts'
 import {
   EncodedScope,
   encodeScope,
+  setBearerForToken,
   TokenUserType,
   TokenWithBearer
 } from '@opencrvs/commons/authentication'
@@ -257,6 +258,34 @@ type ActionConfirmationInput = {
 
 type LegacyRecordValidationInput = {
   recordId: UUID
+}
+
+/**
+ * Confirms the subject of `subjectToken` actually has authorization over the
+ * given record before we mint a `record.confirm-registration` /
+ * `record.reject-registration` token scoped to it. `event.get` is reused
+ * rather than re-implemented here because it already runs
+ * `canAccessEventWithScopes(['record.read'])`, which enforces both the
+ * `record.read` scope and jurisdiction over the record's current state - the
+ * same check callers get when reading the record through any other route.
+ * `actionId` is checked against the returned event to make sure it actually
+ * belongs to this record, rather than being an unrelated id.
+ */
+export async function subjectCanAccessRecord(
+  subjectToken: string,
+  eventId: UUID,
+  actionId: UUID
+): Promise<boolean> {
+  try {
+    const event = await eventsClient.event.get.query(
+      { eventId, waitFor: false },
+      { context: { headers: { Authorization: setBearerForToken(subjectToken) } } }
+    )
+    return event.actions.some((action) => action.id === actionId)
+  } catch (err) {
+    logger.error('Failed to verify subject access to record', err)
+    return false
+  }
 }
 
 export async function createTokenForActionConfirmation(

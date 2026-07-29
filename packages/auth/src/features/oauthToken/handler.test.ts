@@ -10,6 +10,7 @@
  */
 import { AuthServer, createServer } from '@auth/server'
 import * as authService from '@auth/features/authenticate/service'
+import { right } from 'fp-ts/lib/Either'
 
 describe('authenticate handler receives a request', () => {
   let server: AuthServer
@@ -63,5 +64,74 @@ describe('authenticate handler receives a request', () => {
 
       expect(JSON.parse(res.payload).access_token).toBe('789')
     })
+  })
+})
+
+describe('token-exchange grant type', () => {
+  let server: AuthServer
+
+  const eventId = '3ee9ada3-cc76-4d33-a4b3-70b52a0f88a1'
+  const actionId = 'e97c7f9c-4d1f-4c3e-8f2d-1a2b3c4d5e6f'
+
+  const tokenExchangeUrl = (overrides: Record<string, string> = {}) => {
+    const params = new URLSearchParams({
+      grant_type: 'urn:opencrvs:oauth:grant-type:token-exchange',
+      subject_token: 'a-subject-token',
+      subject_token_type: 'urn:ietf:params:oauth:token-type:access_token',
+      requested_token_type:
+        'urn:opencrvs:oauth:token-type:single_record_token',
+      event_id: eventId,
+      action_id: actionId,
+      ...overrides
+    })
+    return `/token?${params.toString()}`
+  }
+
+  beforeEach(async () => {
+    server = await createServer()
+    jest.spyOn(authService, 'verifyToken').mockReturnValue(
+      right({
+        sub: 'user-1',
+        userType: 'user',
+        scope: [],
+        iat: 0,
+        exp: 0,
+        aud: ['opencrvs:auth-user']
+      }) as ReturnType<typeof authService.verifyToken>
+    )
+    jest
+      .spyOn(authService, 'createTokenForActionConfirmation')
+      .mockResolvedValue('record-token-abc')
+  })
+
+  it('rejects the exchange when the subject cannot access the record', async () => {
+    jest
+      .spyOn(authService, 'subjectCanAccessRecord')
+      .mockResolvedValue(false)
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: tokenExchangeUrl()
+    })
+
+    expect(res.statusCode).toBe(403)
+    expect(authService.createTokenForActionConfirmation).not.toHaveBeenCalled()
+  })
+
+  it('mints a record token when the subject can access the record', async () => {
+    jest.spyOn(authService, 'subjectCanAccessRecord').mockResolvedValue(true)
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: tokenExchangeUrl()
+    })
+
+    expect(res.statusCode).toBe(200)
+    expect(JSON.parse(res.payload).access_token).toBe('record-token-abc')
+    expect(authService.subjectCanAccessRecord).toHaveBeenCalledWith(
+      'a-subject-token',
+      eventId,
+      actionId
+    )
   })
 })
