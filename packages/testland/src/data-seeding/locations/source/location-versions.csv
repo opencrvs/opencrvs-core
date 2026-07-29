@@ -1,0 +1,11 @@
+locationId,effectiveFrom,name,status
+OldCentralRegOffice,,Old Central Registration Office,active
+OldCentralRegOffice,2026-02-01,Old Central Registration Office,inactive
+OldIbomboRegOffice,,Old Ibombo Registration Office,active
+OldIbomboRegOffice,2024-11-15,Old Ibombo Registration Office,inactive
+OldKlowVillageOffice,,Old Klow Village Office,inactive
+OldCentralMaternityHosp,,Old Central Maternity Hospital,active
+OldCentralMaternityHosp,2025-02-01,Old Central Maternity Hospital,inactive
+OldCommunityHealthCentre,,Old Community Health Centre,inactive
+OldIbomboCommunityClinic,,Old Ibombo Community Clinic,active
+OldIbomboCommunityClinic,2024-11-15,Old Ibombo Community Clinic,inactive
