@@ -364,7 +364,7 @@ export const eventRouter = router({
           tags: ['events']
         }
       })
-      .mutation(({ ctx }) => reindex(ctx.token)),
+      .mutation(async ({ ctx }) => reindex(ctx.token)),
     status: systemProcedure
       .meta({
         openapi: {

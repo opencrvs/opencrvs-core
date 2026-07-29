@@ -147,7 +147,8 @@ type LegacyRecordValidationInput = {
 export async function createTokenForActionConfirmation(
   input: ActionConfirmationInput | LegacyRecordValidationInput,
   userId: UUID,
-  extraScopes: string[] = []
+  extraScopes: string[] = [],
+  userType: TokenUserType = TokenUserType.enum.user
 ) {
   return sign(
     {
@@ -159,7 +160,7 @@ export async function createTokenForActionConfirmation(
       eventId: 'eventId' in input ? input.eventId : undefined,
       actionId: 'actionId' in input ? input.actionId : undefined,
       recordId: 'recordId' in input ? input.recordId : undefined,
-      userType: TokenUserType.enum.user
+      userType
     },
     cert,
     {
@@ -240,15 +241,27 @@ export async function generateAndSendVerificationCode(
   )
 }
 
-const tokenPayload = t.type({
-  sub: t.string,
-  scope: t.array(t.string),
-  // @TODO: Does role need to be here?
-  // role: t.string,
-  iat: t.number,
-  exp: t.number,
-  aud: t.array(t.string)
-})
+/**
+ * NOTE: this schema uses io-ts (`t`), not Zod as used elsewhere in the codebase.
+ * In io-ts, `t.type` fields are all required and `t.partial` fields are all
+ * optional, so a mix of required + optional fields is expressed by intersecting
+ * the two. Here `userType` is optional (via `t.partial`) — legacy tokens minted
+ * before the claim existed omit it and are treated as `user` downstream.
+ */
+const tokenPayload = t.intersection([
+  t.type({
+    sub: t.string,
+    scope: t.array(t.string),
+    // @TODO: Does role need to be here?
+    // role: t.string,
+    iat: t.number,
+    exp: t.number,
+    aud: t.array(t.string)
+  }),
+  t.partial({
+    userType: t.union([t.literal('user'), t.literal('system')])
+  })
+])
 
 export type ITokenPayload = t.TypeOf<typeof tokenPayload>
 
