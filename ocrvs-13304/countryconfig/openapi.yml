@@ -18,7 +18,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/EventConfig"
-  /trigger/events/{eventType}/actions/{actionType}:
+  "/trigger/events/{eventType}/actions/{actionType}":
     post:
       tags:
         - Events
@@ -45,7 +45,6 @@ paths:
               - MARK_AS_DUPLICATE
               - MARK_AS_NOT_DUPLICATE
               - ARCHIVE
-              - UNARCHIVE
               - PRINT_CERTIFICATE
               - REQUEST_CORRECTION
               - REJECT_CORRECTION
@@ -164,7 +163,6 @@ components:
                       - REGISTER
                       - REJECT
                       - ARCHIVE
-                      - UNARCHIVE
                       - PRINT_CERTIFICATE
                       - REQUEST_CORRECTION
                       - APPROVE_CORRECTION
@@ -197,7 +195,6 @@ components:
         - $ref: "#/components/schemas/MarkNotDuplicateAction"
         - $ref: "#/components/schemas/MarkAsDuplicateAction"
         - $ref: "#/components/schemas/ArchiveAction"
-        - $ref: "#/components/schemas/UnarchiveAction"
         - $ref: "#/components/schemas/NotifiedAction"
         - $ref: "#/components/schemas/RegisterAction"
         - $ref: "#/components/schemas/DeclareAction"
@@ -220,7 +217,6 @@ components:
           MARK_AS_NOT_DUPLICATE: "#/components/schemas/MarkNotDuplicateAction"
           MARK_AS_DUPLICATE: "#/components/schemas/MarkAsDuplicateAction"
           ARCHIVE: "#/components/schemas/ArchiveAction"
-          UNARCHIVE: "#/components/schemas/UnarchiveAction"
           NOTIFY: "#/components/schemas/NotifiedAction"
           REGISTER: "#/components/schemas/RegisterAction"
           DECLARE: "#/components/schemas/DeclareAction"
@@ -852,101 +848,6 @@ components:
         - status
         - type
         - content
-    UnarchiveAction:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-          description: Unique identifier of the action.
-        transactionId:
-          type: string
-          description: Unique identifier of the transaction.
-        createdByUserType:
-          type: string
-          enum:
-            - user
-            - system
-          description: Indicates whether the action was created by a human-user or by a
-            system-user.
-        createdAt:
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-          description: Timestamp indicating when the action was created.
-        createdBy:
-          type: string
-          description: Identifier of the user who created the action.
-        createdByRole:
-          description: Role of the user who created the action.
-          type: string
-        createdBySignature:
-          description: Reference to the signature of the user who created the action.
-          anyOf:
-            - type: string
-              description: A relative path within the S3 bucket, never starting with /. e.g.
-                document-id.jpg or directory/document-id.jpg. The document
-                service constructs the full /bucket/path internally.
-            - type: "null"
-        createdAtLocation:
-          description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
-        declaration:
-          type: object
-          propertyNames:
-            type: string
-          additionalProperties:
-            description: Value that matches exactly one of the possible schema types
-              (TextValue, DateValue, DateRangeFieldValue). The best matching
-              schema is chosen by priority.
-          description: Declaration data defined by the ActionConfig. Supports partial
-            updates.
-        annotation:
-          anyOf:
-            - type: object
-              propertyNames:
-                type: string
-              additionalProperties:
-                description: Value that matches exactly one of the possible schema types
-                  (TextValue, DateValue, DateRangeFieldValue). The best matching
-                  schema is chosen by priority.
-              description: Record of field-level changes made by an action. Supports partial
-                updates and nullable values.
-            - type: "null"
-          description: Action-specific metadata used to annotate the event.
-        status:
-          type: string
-          enum:
-            - Requested
-            - Accepted
-            - Rejected
-          description: Current status of the action. Actions may be validated
-            asynchronously by third-party integrations.
-        originalActionId:
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
-          description: Reference to the original action asynchronously accepted or
-            rejected by a third-party integration.
-        type:
-          type: string
-          const: UNARCHIVE
-      required:
-        - id
-        - transactionId
-        - createdByUserType
-        - createdAt
-        - createdBy
-        - declaration
-        - status
-        - type
     NotifiedAction:
       type: object
       properties:
@@ -2034,6 +1935,7 @@ components:
         - declaration
         - status
         - type
+        - content
     CustomAction:
       type: object
       properties:
@@ -2171,8 +2073,6 @@ components:
                   enum:
                     - createdAt
                     - updatedAt
-                    - legalStatuses.NOTIFIED.createdAt
-                    - legalStatuses.NOTIFIED.acceptedAt
                     - legalStatuses.DECLARED.createdAt
                     - legalStatuses.DECLARED.acceptedAt
                     - legalStatuses.REGISTERED.createdAt
@@ -2250,122 +2150,6 @@ components:
           description: Indicates whether the records of this event type are included in
             analytics
           type: boolean
-        icon:
-          description: Maps an icon name to a conditional. The icon of the first entry (in
-            definition order) whose conditional matches the event is used when
-            rendering it (e.g. in the "iconWithName"/"iconWithNameEvent"
-            workqueue columns). Falls back to the default status-based icon when
-            unset or when no conditional matches.
-          type: object
-          propertyNames:
-            type: string
-            enum:
-              - Archived
-              - Assigned
-              - Briefcase
-              - Certified
-              - Close
-              - Collapse
-              - Draft
-              - DuplicateYellow
-              - Expand
-              - ExternalValidate
-              - FilledCheck
-              - InReview
-              - Offline
-              - Registered
-              - RequiresUpdates
-              - Sent
-              - Validated
-              - WaitingApproval
-              - ChartActivity
-              - Activity
-              - Archive
-              - ArchiveTray
-              - ArrowLeft
-              - ArrowRight
-              - Buildings
-              - Circle
-              - CaretDown
-              - CaretLeft
-              - CaretRight
-              - ChartBar
-              - ChartLine
-              - ChatCircle
-              - CheckSquare
-              - Compass
-              - Check
-              - Copy
-              - Database
-              - DotsThreeVertical
-              - ArrowCounterClockwise
-              - MagnifyingGlassMinus
-              - MagnifyingGlassPlus
-              - Export
-              - Eye
-              - EyeSlash
-              - Envelope
-              - File
-              - FileLock
-              - FileSearch
-              - FileMinus
-              - FilePlus
-              - FileText
-              - FileX
-              - Handshake
-              - Gear
-              - GitBranch
-              - IdentificationCard
-              - List
-              - ListBullets
-              - Lock
-              - MagnifyingGlass
-              - MapPin
-              - Medal
-              - NotePencil
-              - Paperclip
-              - PaperPlaneTilt
-              - Pen
-              - PenNib
-              - Pencil
-              - PencilSimpleLine
-              - Phone
-              - Plus
-              - Printer
-              - SignOut
-              - Stamp
-              - Star
-              - Target
-              - TextT
-              - Trash
-              - UploadSimple
-              - User
-              - UserPlus
-              - Users
-              - WarningCircle
-              - X
-              - ChatText
-              - CircleWavyCheck
-              - CircleWavyQuestion
-              - ArchiveBox
-              - ArrowCircleDown
-              - FileArrowUp
-              - FileDotted
-              - Files
-              - PencilLine
-              - PencilCircle
-              - UserCircle
-              - Clock
-              - QrCode
-              - Webcam
-              - Sun
-              - DeviceTabletCamera
-              - Globe
-              - Fingerprint
-              - PushPin
-              - Timer
-          additionalProperties:
-            $ref: "#/components/schemas/Conditional"
       required:
         - id
         - title
@@ -2402,170 +2186,6 @@ components:
     SummaryConfig:
       type: object
       properties:
-        banners:
-          description: Info boxes displayed above the summary fields in the event overview.
-          default: []
-          type: array
-          items:
-            type: object
-            properties:
-              type:
-                type: string
-                enum:
-                  - info
-                  - positive
-                  - warning
-                  - negative
-                description: "Semantic tint of the icon block: info (blue), positive (green),
-                  warning (orange), negative (red)."
-              background:
-                description: tinted reads as a recessed empty state; white reads as a standalone
-                  card.
-                default: tinted
-                type: string
-                enum:
-                  - tinted
-                  - white
-              icon:
-                description: Icon displayed inside the icon block. Defaults to FileSearch.
-                type: string
-                enum:
-                  - Archived
-                  - Assigned
-                  - Briefcase
-                  - Certified
-                  - Close
-                  - Collapse
-                  - Draft
-                  - DuplicateYellow
-                  - Expand
-                  - ExternalValidate
-                  - FilledCheck
-                  - InReview
-                  - Offline
-                  - Registered
-                  - RequiresUpdates
-                  - Sent
-                  - Validated
-                  - WaitingApproval
-                  - ChartActivity
-                  - Activity
-                  - Archive
-                  - ArchiveTray
-                  - ArrowLeft
-                  - ArrowRight
-                  - Buildings
-                  - Circle
-                  - CaretDown
-                  - CaretLeft
-                  - CaretRight
-                  - ChartBar
-                  - ChartLine
-                  - ChatCircle
-                  - CheckSquare
-                  - Compass
-                  - Check
-                  - Copy
-                  - Database
-                  - DotsThreeVertical
-                  - ArrowCounterClockwise
-                  - MagnifyingGlassMinus
-                  - MagnifyingGlassPlus
-                  - Export
-                  - Eye
-                  - EyeSlash
-                  - Envelope
-                  - File
-                  - FileLock
-                  - FileSearch
-                  - FileMinus
-                  - FilePlus
-                  - FileText
-                  - FileX
-                  - Handshake
-                  - Gear
-                  - GitBranch
-                  - IdentificationCard
-                  - List
-                  - ListBullets
-                  - Lock
-                  - MagnifyingGlass
-                  - MapPin
-                  - Medal
-                  - NotePencil
-                  - Paperclip
-                  - PaperPlaneTilt
-                  - Pen
-                  - PenNib
-                  - Pencil
-                  - PencilSimpleLine
-                  - Phone
-                  - Plus
-                  - Printer
-                  - SignOut
-                  - Stamp
-                  - Star
-                  - Target
-                  - TextT
-                  - Trash
-                  - UploadSimple
-                  - User
-                  - UserPlus
-                  - Users
-                  - WarningCircle
-                  - X
-                  - ChatText
-                  - CircleWavyCheck
-                  - CircleWavyQuestion
-                  - ArchiveBox
-                  - ArrowCircleDown
-                  - FileArrowUp
-                  - FileDotted
-                  - Files
-                  - PencilLine
-                  - PencilCircle
-                  - UserCircle
-                  - Clock
-                  - QrCode
-                  - Webcam
-                  - Sun
-                  - DeviceTabletCamera
-                  - Globe
-                  - Fingerprint
-                  - PushPin
-                  - Timer
-              heading:
-                description: Primary message. Short, sentence-case.
-                $ref: "#/components/schemas/TranslationConfig"
-              description:
-                description: Secondary copy displayed below the heading, typically a suggested
-                  next step.
-                $ref: "#/components/schemas/TranslationConfig"
-              conditionals:
-                description: Conditions under which the info box is shown. When omitted, it is
-                  always shown.
-                default: []
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type:
-                      type: string
-                      const: SHOW
-                    conditional:
-                      $ref: "#/components/schemas/Conditional"
-                  required:
-                    - type
-                    - conditional
-                  additionalProperties: false
-                  description: If 'SHOW' conditional is defined, the component is shown to the
-                    user only if the condition is met
-            required:
-              - type
-              - heading
-            additionalProperties: false
-            description: A compact icon-block + heading + description block displayed above
-              the summary fields in the event overview.
         fields:
           type: array
           items:
@@ -2650,23 +2270,13 @@ components:
     ActionConfig:
       oneOf:
         - $ref: "#/components/schemas/ReadActionConfig"
-        - $ref: "#/components/schemas/AssignActionConfig"
-        - $ref: "#/components/schemas/UnassignActionConfig"
-        - $ref: "#/components/schemas/DeleteActionConfig"
-        - $ref: "#/components/schemas/NotifyActionConfig"
         - $ref: "#/components/schemas/DeclareActionConfig"
-        - $ref: "#/components/schemas/DuplicateDetectedActionConfig"
-        - $ref: "#/components/schemas/MarkAsDuplicateActionConfig"
-        - $ref: "#/components/schemas/MarkAsNotDuplicateActionConfig"
         - $ref: "#/components/schemas/RejectActionConfig"
         - $ref: "#/components/schemas/RegisterActionConfig"
         - $ref: "#/components/schemas/PrintCertificateActionConfig"
         - $ref: "#/components/schemas/RequestCorrectionActionConfig"
-        - $ref: "#/components/schemas/ApproveCorrectionActionConfig"
-        - $ref: "#/components/schemas/RejectCorrectionActionConfig"
         - $ref: "#/components/schemas/EditActionConfig"
         - $ref: "#/components/schemas/ArchiveActionConfig"
-        - $ref: "#/components/schemas/UnarchiveActionConfig"
         - $ref: "#/components/schemas/CustomActionConfig"
       description: Configuration of an action available for an event. Data collected
         depends on the action type and is accessible through the annotation
@@ -2676,23 +2286,13 @@ components:
         propertyName: type
         mapping:
           READ: "#/components/schemas/ReadActionConfig"
-          ASSIGN: "#/components/schemas/AssignActionConfig"
-          UNASSIGN: "#/components/schemas/UnassignActionConfig"
-          DELETE: "#/components/schemas/DeleteActionConfig"
-          NOTIFY: "#/components/schemas/NotifyActionConfig"
           DECLARE: "#/components/schemas/DeclareActionConfig"
-          DUPLICATE_DETECTED: "#/components/schemas/DuplicateDetectedActionConfig"
-          MARK_AS_DUPLICATE: "#/components/schemas/MarkAsDuplicateActionConfig"
-          MARK_AS_NOT_DUPLICATE: "#/components/schemas/MarkAsNotDuplicateActionConfig"
           REJECT: "#/components/schemas/RejectActionConfig"
           REGISTER: "#/components/schemas/RegisterActionConfig"
           PRINT_CERTIFICATE: "#/components/schemas/PrintCertificateActionConfig"
           REQUEST_CORRECTION: "#/components/schemas/RequestCorrectionActionConfig"
-          APPROVE_CORRECTION: "#/components/schemas/ApproveCorrectionActionConfig"
-          REJECT_CORRECTION: "#/components/schemas/RejectCorrectionActionConfig"
           EDIT: "#/components/schemas/EditActionConfig"
           ARCHIVE: "#/components/schemas/ArchiveActionConfig"
-          UNARCHIVE: "#/components/schemas/UnarchiveActionConfig"
           CUSTOM: "#/components/schemas/CustomActionConfig"
     ReadActionConfig:
       type: object
@@ -2749,6 +2349,7 @@ components:
           anyOf:
             - anyOf:
                 - type: string
+                  pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                 - type: string
                   enum:
                     - incomplete
@@ -2882,15 +2483,11 @@ components:
               items:
                 $ref: "#/components/schemas/FieldConditional"
             secured:
-              description: Indicates whether the field is secured, either always (boolean) or
-                conditionally, evaluated against the event (a JSONSchema
-                conditional, e.g. flag('sealed')). Secured fields are not
+              description: Indicates whether the field is secured. Secured fields are not
                 indexed for search and are only visible when explicitly
                 assigned.
               default: false
-              anyOf:
-                - type: boolean
-                - $ref: "#/components/schemas/Conditional"
+              type: boolean
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -3020,7 +2617,6 @@ components:
                                 - record.edit
                                 - record.reject
                                 - record.archive
-                                - record.unarchive
                                 - record.review-duplicates
                                 - record.register
                                 - record.print-certified-copies
@@ -3034,7 +2630,6 @@ components:
                                 - integration.create
                                 - record.import
                                 - config.update-all
-                                - location.edit
                                 - attachment.upload
                                 - profile.electronic-signature
                                 - user.read-only-my-audit
@@ -3050,13 +2645,10 @@ components:
                               enum:
                                 - event
                                 - placeOfEvent
-                                - notifiedIn
-                                - notifiedBy
                                 - declaredIn
                                 - declaredBy
                                 - registeredIn
                                 - registeredBy
-                                - flags
                                 - accessLevel
                                 - role
                                 - ids
@@ -3067,8 +2659,6 @@ components:
                   required:
                     - $jurisdiction
                   additionalProperties: false
-                listHistoricalNames:
-                  type: boolean
               additionalProperties: false
           required:
             - id
@@ -3155,15 +2745,11 @@ components:
               items:
                 $ref: "#/components/schemas/FieldConditional"
             secured:
-              description: Indicates whether the field is secured, either always (boolean) or
-                conditionally, evaluated against the event (a JSONSchema
-                conditional, e.g. flag('sealed')). Secured fields are not
+              description: Indicates whether the field is secured. Secured fields are not
                 indexed for search and are only visible when explicitly
                 assigned.
               default: false
-              anyOf:
-                - type: boolean
-                - $ref: "#/components/schemas/Conditional"
+              type: boolean
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -3293,7 +2879,6 @@ components:
                                 - record.edit
                                 - record.reject
                                 - record.archive
-                                - record.unarchive
                                 - record.review-duplicates
                                 - record.register
                                 - record.print-certified-copies
@@ -3307,7 +2892,6 @@ components:
                                 - integration.create
                                 - record.import
                                 - config.update-all
-                                - location.edit
                                 - attachment.upload
                                 - profile.electronic-signature
                                 - user.read-only-my-audit
@@ -3323,13 +2907,10 @@ components:
                               enum:
                                 - event
                                 - placeOfEvent
-                                - notifiedIn
-                                - notifiedBy
                                 - declaredIn
                                 - declaredBy
                                 - registeredIn
                                 - registeredBy
-                                - flags
                                 - accessLevel
                                 - role
                                 - ids
@@ -3340,8 +2921,6 @@ components:
                   required:
                     - $jurisdiction
                   additionalProperties: false
-                listHistoricalNames:
-                  type: boolean
               additionalProperties: false
           required:
             - id
@@ -3449,14 +3028,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -3692,14 +3267,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -3964,7 +3535,6 @@ components:
                             - record.edit
                             - record.reject
                             - record.archive
-                            - record.unarchive
                             - record.review-duplicates
                             - record.register
                             - record.print-certified-copies
@@ -3978,7 +3548,6 @@ components:
                             - integration.create
                             - record.import
                             - config.update-all
-                            - location.edit
                             - attachment.upload
                             - profile.electronic-signature
                             - user.read-only-my-audit
@@ -3994,13 +3563,10 @@ components:
                           enum:
                             - event
                             - placeOfEvent
-                            - notifiedIn
-                            - notifiedBy
                             - declaredIn
                             - declaredBy
                             - registeredIn
                             - registeredBy
-                            - flags
                             - accessLevel
                             - role
                             - ids
@@ -4011,16 +3577,6 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
-            listHistoricalNames:
-              description: "Advanced search: list every historical name a location has had as
-                a separate, selectable option. Propagated to the embedded
-                admin-area selectors."
-              type: boolean
-            activeOnly:
-              description: "Advanced search: offer only currently-active admin areas;
-                inactivated ones are excluded. Propagated to the embedded
-                admin-area selectors."
-              type: boolean
           additionalProperties: false
         defaultValue:
           anyOf:
@@ -4196,14 +3752,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -4422,14 +3974,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -4624,14 +4172,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -4855,14 +4399,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -5060,14 +4600,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -5279,14 +4815,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -5484,14 +5016,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -5690,14 +5218,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -5904,14 +5428,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -6116,14 +5636,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -6323,14 +5839,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -6517,14 +6029,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -6718,14 +6226,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -6940,14 +6444,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -7139,14 +6639,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -7311,14 +6807,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -7436,21 +6928,23 @@ components:
         noOptionsMessage:
           description: "
 
-            \    A translation configuration object used to display a message
-            when no options are available.
+            \    A translation configuration object used to display
+            a message when no options are available.
 
-            \    It must follow the shape: { id: string; defaultMessage: string;
-            description?: string }.
+            \    It must follow the shape: { id: string;
+            defaultMessage: string; description?: string }.
 
             \    The message is rendered via
             intl.formatMessage(noOptionsMessage, { input }),
 
-            \    where 'input' represents the text entered in the Select field.
+            \    where 'input' represents the text entered in the
+            Select field.
 
-            \    You can reference this variable in your message, for example:
+            \    You can reference this variable in your message,
+            for example:
 
-            \    { ..., defaultMessage: \"'{input}' is not listed among the
-            health facilities.\" }
+            \    { ..., defaultMessage: \"'{input}' is not listed
+            among the health facilities.\" }
 
             \  "
           $ref: "#/components/schemas/TranslationConfig"
@@ -7541,14 +7035,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -7898,14 +7388,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -8084,14 +7570,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -8270,14 +7752,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -8457,14 +7935,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -8714,14 +8188,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -8918,14 +8388,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -9103,7 +8569,6 @@ components:
                             - record.edit
                             - record.reject
                             - record.archive
-                            - record.unarchive
                             - record.review-duplicates
                             - record.register
                             - record.print-certified-copies
@@ -9117,7 +8582,6 @@ components:
                             - integration.create
                             - record.import
                             - config.update-all
-                            - location.edit
                             - attachment.upload
                             - profile.electronic-signature
                             - user.read-only-my-audit
@@ -9133,13 +8597,10 @@ components:
                           enum:
                             - event
                             - placeOfEvent
-                            - notifiedIn
-                            - notifiedBy
                             - declaredIn
                             - declaredBy
                             - registeredIn
                             - registeredBy
-                            - flags
                             - accessLevel
                             - role
                             - ids
@@ -9150,14 +8611,6 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
-            listHistoricalNames:
-              description: "Advanced search: list every historical name a location has had as
-                a separate, selectable option."
-              type: boolean
-            activeOnly:
-              description: "Advanced search: offer only currently-active locations;
-                inactivated ones are excluded."
-              type: boolean
           required:
             - type
           additionalProperties: false
@@ -9249,14 +8702,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -9421,14 +8870,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -9583,7 +9028,6 @@ components:
                             - record.edit
                             - record.reject
                             - record.archive
-                            - record.unarchive
                             - record.review-duplicates
                             - record.register
                             - record.print-certified-copies
@@ -9597,7 +9041,6 @@ components:
                             - integration.create
                             - record.import
                             - config.update-all
-                            - location.edit
                             - attachment.upload
                             - profile.electronic-signature
                             - user.read-only-my-audit
@@ -9613,13 +9056,10 @@ components:
                           enum:
                             - event
                             - placeOfEvent
-                            - notifiedIn
-                            - notifiedBy
                             - declaredIn
                             - declaredBy
                             - registeredIn
                             - registeredBy
-                            - flags
                             - accessLevel
                             - role
                             - ids
@@ -9630,10 +9070,6 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
-            listHistoricalNames:
-              description: "Advanced search: list every historical name a location has had as
-                a separate, selectable option."
-              type: boolean
           additionalProperties: false
       required:
         - id
@@ -9721,14 +9157,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -9952,14 +9384,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -10147,14 +9575,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -10420,14 +9844,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -10655,14 +10075,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -10887,14 +10303,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -11073,14 +10485,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -11370,14 +10778,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -11575,14 +10979,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -11764,14 +11164,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -11970,14 +11366,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -12171,14 +11563,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -12370,14 +11758,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -12555,14 +11939,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -12744,14 +12124,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -13200,6 +12576,7 @@ components:
             anyOf:
               - anyOf:
                   - type: string
+                    pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
                       - incomplete
@@ -13215,21 +12592,7 @@ components:
             anyOf:
               - anyOf:
                   - type: string
-                  - type: string
-                    enum:
-                      - incomplete
-                      - rejected
-                      - correction-requested
-                      - potential-duplicate
-                      - edit-in-progress
-              - type: string
-                description: Custom flag identifier defined by the country config.
-        allOf:
-          type: array
-          items:
-            anyOf:
-              - anyOf:
-                  - type: string
+                    pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
                       - incomplete
@@ -13369,14 +12732,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -13537,14 +12896,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -13711,14 +13066,10 @@ components:
           items:
             $ref: "#/components/schemas/FieldConditional"
         secured:
-          description: Indicates whether the field is secured, either always (boolean) or
-            conditionally, evaluated against the event (a JSONSchema
-            conditional, e.g. flag('sealed')). Secured fields are not indexed
-            for search and are only visible when explicitly assigned.
+          description: Indicates whether the field is secured. Secured fields are not
+            indexed for search and are only visible when explicitly assigned.
           default: false
-          anyOf:
-            - type: boolean
-            - $ref: "#/components/schemas/Conditional"
+          type: boolean
         placeholder:
           $ref: "#/components/schemas/TranslationConfig"
         validation:
@@ -13806,136 +13157,6 @@ components:
       additionalProperties: false
       description: A select dropdown that is automatically populated with available
         user roles
-    AssignActionConfig:
-      type: object
-      properties:
-        label:
-          description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
-        flags:
-          description: ASSIGN is a meta action excluded from flag resolution, so flags
-            configured here would never apply.
-          not: {}
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
-        icon:
-          type: string
-          description: Icon representing the action
-        conditionals:
-          description: Conditionals which can disable or hide actions.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionConditional"
-        type:
-          type: string
-          const: ASSIGN
-      required:
-        - label
-        - type
-      additionalProperties: false
-      description: Configuration for assigning a record to the current user.
-    UnassignActionConfig:
-      type: object
-      properties:
-        label:
-          description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
-        flags:
-          description: UNASSIGN is a meta action excluded from flag resolution, so flags
-            configured here would never apply.
-          not: {}
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
-        icon:
-          type: string
-          description: Icon representing the action
-        conditionals:
-          description: Conditionals which can disable or hide actions.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionConditional"
-        type:
-          type: string
-          const: UNASSIGN
-      required:
-        - label
-        - type
-      additionalProperties: false
-      description: Configuration for unassigning a record from its current assignee.
-    DeleteActionConfig:
-      type: object
-      properties:
-        label:
-          description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
-        flags:
-          default: []
-          description: Flag actions which are executed when the action is performed.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
-        icon:
-          type: string
-          description: Icon representing the action
-        conditionals:
-          description: Conditionals which can disable or hide actions.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionConditional"
-        type:
-          type: string
-          const: DELETE
-      required:
-        - label
-        - flags
-        - type
-      additionalProperties: false
-      description: Configuration for deleting a draft record.
-    NotifyActionConfig:
-      type: object
-      properties:
-        label:
-          description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
-        flags:
-          default: []
-          description: Flag actions which are executed when the action is performed.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
-        icon:
-          type: string
-          description: Icon representing the action
-        conditionals:
-          description: Conditionals which can disable or hide actions.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionConditional"
-        type:
-          type: string
-          const: NOTIFY
-        form:
-          description: Fields rendered on the action confirmation dialog. Submitted values
-            are stored in the action annotation and shown in the audit history.
-          type: array
-          items:
-            $ref: "#/components/schemas/FieldConfig"
-      required:
-        - label
-        - flags
-        - type
-      additionalProperties: false
-      description: Configuration for the notify action. When present, NOTIFY uses this
-        config independently from DECLARE. When absent, NOTIFY falls back to the
-        DeclareActionConfig.
     DeclareActionConfig:
       type: object
       properties:
@@ -13980,12 +13201,6 @@ components:
             - fields
           additionalProperties: false
           description: Configuration of the review page fields.
-        form:
-          description: Fields rendered on the action confirmation dialog. Submitted values
-            are stored in the action annotation and shown in the audit history.
-          type: array
-          items:
-            $ref: "#/components/schemas/FieldConfig"
         dialogCopy:
           type: object
           properties:
@@ -14010,8 +13225,7 @@ components:
         - review
       additionalProperties: false
       description: Configuration for the declare action. Includes review-page fields.
-        NOTIFY falls back to this config when no dedicated NotifyActionConfig is
-        provided.
+        Shared with the notify action (ActionType.NOTIFY).
     DeduplicationConfig:
       type: object
       properties:
@@ -14156,104 +13370,6 @@ components:
             - type
           additionalProperties: false
       type: object
-    DuplicateDetectedActionConfig:
-      type: object
-      properties:
-        label:
-          description: DUPLICATE_DETECTED is system-generated and never shown as a button,
-            so it has no label.
-          not: {}
-        flags:
-          default: []
-          description: Flag actions which are executed when the action is performed.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          not: {}
-        icon:
-          description: DUPLICATE_DETECTED is system-generated and never shown as a button,
-            so it has no icon.
-          not: {}
-        conditionals:
-          description: DUPLICATE_DETECTED is system-generated and never shown as a button,
-            so it cannot be disabled or hidden with conditionals.
-          not: {}
-        type:
-          type: string
-          const: DUPLICATE_DETECTED
-      required:
-        - flags
-        - type
-      additionalProperties: false
-      description: Configuration for the system-generated duplicate-detection action.
-        Never shown as a button, so it only supports flags — not label, icon, or
-        conditionals.
-    MarkAsDuplicateActionConfig:
-      type: object
-      properties:
-        label:
-          description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
-        flags:
-          default: []
-          description: Flag actions which are executed when the action is performed.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
-        icon:
-          type: string
-          description: Icon representing the action
-        conditionals:
-          description: Conditionals which can disable or hide actions.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionConditional"
-        type:
-          type: string
-          const: MARK_AS_DUPLICATE
-      required:
-        - label
-        - flags
-        - type
-      additionalProperties: false
-      description: Configuration for marking a record as a duplicate.
-    MarkAsNotDuplicateActionConfig:
-      type: object
-      properties:
-        label:
-          description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
-        flags:
-          default: []
-          description: Flag actions which are executed when the action is performed.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
-        icon:
-          type: string
-          description: Icon representing the action
-        conditionals:
-          description: Conditionals which can disable or hide actions.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionConditional"
-        type:
-          type: string
-          const: MARK_AS_NOT_DUPLICATE
-      required:
-        - label
-        - flags
-        - type
-      additionalProperties: false
-      description: Configuration for marking a record as not a duplicate, after it was
-        previously flagged as one.
     RejectActionConfig:
       type: object
       properties:
@@ -14280,12 +13396,6 @@ components:
         type:
           type: string
           const: REJECT
-        form:
-          description: Fields rendered on the action confirmation dialog. Submitted values
-            are stored in the action annotation and shown in the audit history.
-          type: array
-          items:
-            $ref: "#/components/schemas/FieldConfig"
       required:
         - label
         - flags
@@ -14320,12 +13430,6 @@ components:
         type:
           type: string
           const: REGISTER
-        form:
-          description: Fields rendered on the action confirmation dialog. Submitted values
-            are stored in the action annotation and shown in the audit history.
-          type: array
-          items:
-            $ref: "#/components/schemas/FieldConfig"
       required:
         - label
         - flags
@@ -14540,70 +13644,6 @@ components:
         - correctionForm
       additionalProperties: false
       description: Configuration for requesting a correction on a registered record.
-    ApproveCorrectionActionConfig:
-      type: object
-      properties:
-        label:
-          description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
-        flags:
-          default: []
-          description: Flag actions which are executed when the action is performed.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
-        icon:
-          type: string
-          description: Icon representing the action
-        conditionals:
-          description: Conditionals which can disable or hide actions.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionConditional"
-        type:
-          type: string
-          const: APPROVE_CORRECTION
-      required:
-        - label
-        - flags
-        - type
-      additionalProperties: false
-      description: Configuration for approving a requested correction.
-    RejectCorrectionActionConfig:
-      type: object
-      properties:
-        label:
-          description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
-        flags:
-          default: []
-          description: Flag actions which are executed when the action is performed.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
-        icon:
-          type: string
-          description: Icon representing the action
-        conditionals:
-          description: Conditionals which can disable or hide actions.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionConditional"
-        type:
-          type: string
-          const: REJECT_CORRECTION
-      required:
-        - label
-        - flags
-        - type
-      additionalProperties: false
-      description: Configuration for rejecting a requested correction.
     EditActionConfig:
       type: object
       properties:
@@ -14680,50 +13720,12 @@ components:
         type:
           type: string
           const: ARCHIVE
-        form:
-          description: Fields rendered on the action confirmation dialog. Submitted values
-            are stored in the action annotation and shown in the audit history.
-          type: array
-          items:
-            $ref: "#/components/schemas/FieldConfig"
       required:
         - label
         - flags
         - type
       additionalProperties: false
       description: Configuration for archiving a record.
-    UnarchiveActionConfig:
-      type: object
-      properties:
-        label:
-          description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
-        flags:
-          default: []
-          description: Flag actions which are executed when the action is performed.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
-        icon:
-          type: string
-          description: Icon representing the action
-        conditionals:
-          description: Conditionals which can disable or hide actions.
-          type: array
-          items:
-            $ref: "#/components/schemas/ActionConditional"
-        type:
-          type: string
-          const: UNARCHIVE
-      required:
-        - label
-        - flags
-        - type
-      additionalProperties: false
-      description: Configuration for unarchiving a record.
     CustomActionConfig:
       type: object
       properties:
@@ -14846,18 +13848,21 @@ components:
                       searchFields:
                         description: "
 
-                          \      Defines multiple form fields that should be
-                          searched when this field has a value.
+                          \      Defines multiple form
+                          fields that should be searched when this field has a
+                          value.
 
-                          \      All specified fields will be combined using OR
-                          logic.
+                          \      All specified fields
+                          will be combined using OR logic.
 
 
-                          \      Example: { searchFields: ['mother.name',
-                          'father.name', 'informant.name'] }
+                          \      Example: {
+                          searchFields: ['mother.name', 'father.name',
+                          'informant.name'] }
 
-                          \      Will search all fields and return a record if
-                          any of the fields match the search value.    \ 
+                          \      Will search all
+                          fields and return a record if any of the fields match
+                          the search value.    \ 
 
                           \      "
                         type: array
@@ -14869,16 +13874,18 @@ components:
                   type:
                     description: "
 
-                      \      Explicitly specify the field type for searchFields.
+                      \      Explicitly specify the field
+                      type for searchFields.
 
-                      \      This is required when searchFields is defined, to
-                      show the correct control in the UI.
+                      \      This is required when
+                      searchFields is defined, to show the correct control in
+                      the UI.
 
                       \       \ 
 
-                      \      Example: FieldType.NAME for name fields,
-                      FieldType.TEXT for text fields, FieldType.DATE for date
-                      fields, etc.
+                      \      Example: FieldType.NAME for
+                      name fields, FieldType.TEXT for text fields,
+                      FieldType.DATE for date fields, etc.
 
                       \      "
                     type: string
@@ -14933,10 +13940,11 @@ components:
                   label:
                     description: "
 
-                      \      Explicitly specify the label for searchFields.
+                      \      Explicitly specify the label
+                      for searchFields.
 
-                      \      This is required when searchFields is
-                      defined.           \ 
+                      \      This is required when
+                      searchFields is defined.           \ 
 
                       \      "
                     $ref: "#/components/schemas/TranslationConfig"
@@ -14965,81 +13973,87 @@ components:
                   searchCriteriaLabelPrefix:
                     description: "
 
-                      \    This property determines whether to add a prefix
-                      (such as \"Child\" or \"Applicant\") before the field
-                      label
+                      \    This property determines
+                      whether to add a prefix (such as \"Child\" or
+                      \"Applicant\") before the field label
 
-                      \    when rendering search parameter labels — for example,
-                      in the search results page to indicate which fields were
-                      used in the search.
+                      \    when rendering search parameter
+                      labels — for example, in the search results page to
+                      indicate which fields were used in the search.
 
 
-                      \    For example, a field config like { id:
-                      \"child.name.firstname\", label: { defaultMessage: \"First
-                      Name(s)\" } } would render as \"First Name(s)\" by
+                      \    For example, a field config
+                      like { id: \"child.name.firstname\", label: {
+                      defaultMessage: \"First Name(s)\" } } would render as
+                      \"First Name(s)\" by default.
+
+
+                      \    A field config like { id:
+                      \"mother.firstname\", label: { defaultMessage: \"First
+                      Name(s)\" } } would also render as \"First Name(s)\" by
                       default.
 
 
-                      \    A field config like { id: \"mother.firstname\",
-                      label: { defaultMessage: \"First Name(s)\" } } would also
-                      render as \"First Name(s)\" by default.
-
-
-                      \    So, if both child.name.firstname and mother.firstname
-                      are used in a search, the resulting search criteria labels
-                      would be \"First Name(s)\", \"First Name(s)\",
+                      \    So, if both
+                      child.name.firstname and mother.firstname are used in a
+                      search, the resulting search criteria labels would be
+                      \"First Name(s)\", \"First Name(s)\",
 
                       \    which is ambiguous.
 
 
-                      \    Now, if we treat the field ID prefix as a label
-                      (e.g., \"applicant.firstname\" → \"Applicant\"), and the
-                      field label is already
+                      \    Now, if we treat the field ID
+                      prefix as a label (e.g., \"applicant.firstname\" →
+                      \"Applicant\"), and the field label is already
 
-                      \    descriptive — like { id: \"applicant.firstname\",
-                      label: { defaultMessage: \"Applicant's First Name\" } } —
-                      then the resulting
+                      \    descriptive — like { id:
+                      \"applicant.firstname\", label: { defaultMessage:
+                      \"Applicant's First Name\" } } — then the resulting
 
-                      \    label would be \"Applicant Applicant's First Name\",
-                      which is redundant and awkward.
+                      \    label would be \"Applicant
+                      Applicant's First Name\", which is redundant and awkward.
 
 
-                      \    By setting searchCriteriaLabelPrefix to a translation
-                      config object, we can explicitly define the desired prefix
+                      \    By setting
+                      searchCriteriaLabelPrefix to a translation config object,
+                      we can explicitly define the desired prefix
 
-                      \    in the country-config > event.advancedSearch
-                      configuration. For example: field(\"child.dob\", {
-                      searchCriteriaLabelPrefix: TranslationConfig }).
+                      \    in the country-config >
+                      event.advancedSearch configuration. For example:
+                      field(\"child.dob\", { searchCriteriaLabelPrefix:
+                      TranslationConfig }).
 
                       \    "
                     $ref: "#/components/schemas/TranslationConfig"
                   conditionals:
                     description: "
 
-                      \       In advanced search, we sometimes need to override
-                      the default field visibility conditionals.
+                      \       In advanced search, we
+                      sometimes need to override the default field visibility
+                      conditionals.
 
 
-                      \       For example, Informant fields in the declaration
-                      form may have conditional logic
+                      \       For example, Informant
+                      fields in the declaration form may have conditional logic
 
-                      \       that hides them based on other field values. Since
-                      the advanced search form reuses
+                      \       that hides them based on
+                      other field values. Since the advanced search form reuses
 
-                      \       the declaration form config, those same
-                      conditionals would apply by default.
+                      \       the declaration form config,
+                      those same conditionals would apply by default.
 
 
-                      \       However, in advanced search we often want to make
-                      all Informant fields searchable,
+                      \       However, in advanced search
+                      we often want to make all Informant fields searchable,
 
-                      \       regardless of their original visibility logic. To
-                      do this, we explicitly set their
+                      \       regardless of their original
+                      visibility logic. To do this, we explicitly set their
 
-                      \       'conditionals' to an empty array ('[]') in the
-                      search config. This ensures they
+                      \       'conditionals' to an empty
+                      array ('[]') in the search config. This ensures they
 
-                      \       are always rendered in the advanced search form.
+                      \       are always rendered in the
+                      advanced search form.
 
                       \      "
                     type: array
@@ -15086,7 +14100,6 @@ components:
                                   - record.edit
                                   - record.reject
                                   - record.archive
-                                  - record.unarchive
                                   - record.review-duplicates
                                   - record.register
                                   - record.print-certified-copies
@@ -15100,7 +14113,6 @@ components:
                                   - integration.create
                                   - record.import
                                   - config.update-all
-                                  - location.edit
                                   - attachment.upload
                                   - profile.electronic-signature
                                   - user.read-only-my-audit
@@ -15116,13 +14128,10 @@ components:
                                 enum:
                                   - event
                                   - placeOfEvent
-                                  - notifiedIn
-                                  - notifiedBy
                                   - declaredIn
                                   - declaredBy
                                   - registeredIn
                                   - registeredBy
-                                  - flags
                                   - accessLevel
                                   - role
                                   - ids
@@ -15159,18 +14168,21 @@ components:
                       searchFields:
                         description: "
 
-                          \      Defines multiple form fields that should be
-                          searched when this field has a value.
+                          \      Defines multiple form
+                          fields that should be searched when this field has a
+                          value.
 
-                          \      All specified fields will be combined using OR
-                          logic.
+                          \      All specified fields
+                          will be combined using OR logic.
 
 
-                          \      Example: { searchFields: ['mother.name',
-                          'father.name', 'informant.name'] }
+                          \      Example: {
+                          searchFields: ['mother.name', 'father.name',
+                          'informant.name'] }
 
-                          \      Will search all fields and return a record if
-                          any of the fields match the search value.    \ 
+                          \      Will search all
+                          fields and return a record if any of the fields match
+                          the search value.    \ 
 
                           \      "
                         type: array
@@ -15182,16 +14194,18 @@ components:
                   type:
                     description: "
 
-                      \      Explicitly specify the field type for searchFields.
+                      \      Explicitly specify the field
+                      type for searchFields.
 
-                      \      This is required when searchFields is defined, to
-                      show the correct control in the UI.
+                      \      This is required when
+                      searchFields is defined, to show the correct control in
+                      the UI.
 
                       \       \ 
 
-                      \      Example: FieldType.NAME for name fields,
-                      FieldType.TEXT for text fields, FieldType.DATE for date
-                      fields, etc.
+                      \      Example: FieldType.NAME for
+                      name fields, FieldType.TEXT for text fields,
+                      FieldType.DATE for date fields, etc.
 
                       \      "
                     type: string
@@ -15246,10 +14260,11 @@ components:
                   label:
                     description: "
 
-                      \      Explicitly specify the label for searchFields.
+                      \      Explicitly specify the label
+                      for searchFields.
 
-                      \      This is required when searchFields is
-                      defined.           \ 
+                      \      This is required when
+                      searchFields is defined.           \ 
 
                       \      "
                     $ref: "#/components/schemas/TranslationConfig"
@@ -15278,81 +14293,87 @@ components:
                   searchCriteriaLabelPrefix:
                     description: "
 
-                      \    This property determines whether to add a prefix
-                      (such as \"Child\" or \"Applicant\") before the field
-                      label
+                      \    This property determines
+                      whether to add a prefix (such as \"Child\" or
+                      \"Applicant\") before the field label
 
-                      \    when rendering search parameter labels — for example,
-                      in the search results page to indicate which fields were
-                      used in the search.
+                      \    when rendering search parameter
+                      labels — for example, in the search results page to
+                      indicate which fields were used in the search.
 
 
-                      \    For example, a field config like { id:
-                      \"child.name.firstname\", label: { defaultMessage: \"First
-                      Name(s)\" } } would render as \"First Name(s)\" by
+                      \    For example, a field config
+                      like { id: \"child.name.firstname\", label: {
+                      defaultMessage: \"First Name(s)\" } } would render as
+                      \"First Name(s)\" by default.
+
+
+                      \    A field config like { id:
+                      \"mother.firstname\", label: { defaultMessage: \"First
+                      Name(s)\" } } would also render as \"First Name(s)\" by
                       default.
 
 
-                      \    A field config like { id: \"mother.firstname\",
-                      label: { defaultMessage: \"First Name(s)\" } } would also
-                      render as \"First Name(s)\" by default.
-
-
-                      \    So, if both child.name.firstname and mother.firstname
-                      are used in a search, the resulting search criteria labels
-                      would be \"First Name(s)\", \"First Name(s)\",
+                      \    So, if both
+                      child.name.firstname and mother.firstname are used in a
+                      search, the resulting search criteria labels would be
+                      \"First Name(s)\", \"First Name(s)\",
 
                       \    which is ambiguous.
 
 
-                      \    Now, if we treat the field ID prefix as a label
-                      (e.g., \"applicant.firstname\" → \"Applicant\"), and the
-                      field label is already
+                      \    Now, if we treat the field ID
+                      prefix as a label (e.g., \"applicant.firstname\" →
+                      \"Applicant\"), and the field label is already
 
-                      \    descriptive — like { id: \"applicant.firstname\",
-                      label: { defaultMessage: \"Applicant's First Name\" } } —
-                      then the resulting
+                      \    descriptive — like { id:
+                      \"applicant.firstname\", label: { defaultMessage:
+                      \"Applicant's First Name\" } } — then the resulting
 
-                      \    label would be \"Applicant Applicant's First Name\",
-                      which is redundant and awkward.
+                      \    label would be \"Applicant
+                      Applicant's First Name\", which is redundant and awkward.
 
 
-                      \    By setting searchCriteriaLabelPrefix to a translation
-                      config object, we can explicitly define the desired prefix
+                      \    By setting
+                      searchCriteriaLabelPrefix to a translation config object,
+                      we can explicitly define the desired prefix
 
-                      \    in the country-config > event.advancedSearch
-                      configuration. For example: field(\"child.dob\", {
-                      searchCriteriaLabelPrefix: TranslationConfig }).
+                      \    in the country-config >
+                      event.advancedSearch configuration. For example:
+                      field(\"child.dob\", { searchCriteriaLabelPrefix:
+                      TranslationConfig }).
 
                       \    "
                     $ref: "#/components/schemas/TranslationConfig"
                   conditionals:
                     description: "
 
-                      \       In advanced search, we sometimes need to override
-                      the default field visibility conditionals.
+                      \       In advanced search, we
+                      sometimes need to override the default field visibility
+                      conditionals.
 
 
-                      \       For example, Informant fields in the declaration
-                      form may have conditional logic
+                      \       For example, Informant
+                      fields in the declaration form may have conditional logic
 
-                      \       that hides them based on other field values. Since
-                      the advanced search form reuses
+                      \       that hides them based on
+                      other field values. Since the advanced search form reuses
 
-                      \       the declaration form config, those same
-                      conditionals would apply by default.
+                      \       the declaration form config,
+                      those same conditionals would apply by default.
 
 
-                      \       However, in advanced search we often want to make
-                      all Informant fields searchable,
+                      \       However, in advanced search
+                      we often want to make all Informant fields searchable,
 
-                      \       regardless of their original visibility logic. To
-                      do this, we explicitly set their
+                      \       regardless of their original
+                      visibility logic. To do this, we explicitly set their
 
-                      \       'conditionals' to an empty array ('[]') in the
-                      search config. This ensures they
+                      \       'conditionals' to an empty
+                      array ('[]') in the search config. This ensures they
 
-                      \       are always rendered in the advanced search form.
+                      \       are always rendered in the
+                      advanced search form.
 
                       \      "
                     type: array
@@ -15399,7 +14420,6 @@ components:
                                   - record.edit
                                   - record.reject
                                   - record.archive
-                                  - record.unarchive
                                   - record.review-duplicates
                                   - record.register
                                   - record.print-certified-copies
@@ -15413,7 +14433,6 @@ components:
                                   - integration.create
                                   - record.import
                                   - config.update-all
-                                  - location.edit
                                   - attachment.upload
                                   - profile.electronic-signature
                                   - user.read-only-my-audit
@@ -15429,13 +14448,10 @@ components:
                                 enum:
                                   - event
                                   - placeOfEvent
-                                  - notifiedIn
-                                  - notifiedBy
                                   - declaredIn
                                   - declaredBy
                                   - registeredIn
                                   - registeredBy
-                                  - flags
                                   - accessLevel
                                   - role
                                   - ids
@@ -15582,7 +14598,6 @@ components:
                       - REGISTER
                       - REJECT
                       - ARCHIVE
-                      - UNARCHIVE
                       - PRINT_CERTIFICATE
                       - REQUEST_CORRECTION
                       - APPROVE_CORRECTION
@@ -15617,7 +14632,6 @@ components:
         - $ref: "#/components/schemas/MarkNotDuplicateActionOutput"
         - $ref: "#/components/schemas/MarkAsDuplicateActionOutput"
         - $ref: "#/components/schemas/ArchiveActionOutput"
-        - $ref: "#/components/schemas/UnarchiveActionOutput"
         - $ref: "#/components/schemas/NotifiedActionOutput"
         - $ref: "#/components/schemas/RegisterActionOutput"
         - $ref: "#/components/schemas/DeclareActionOutput"
@@ -15640,7 +14654,6 @@ components:
           MARK_AS_NOT_DUPLICATE: "#/components/schemas/MarkNotDuplicateActionOutput"
           MARK_AS_DUPLICATE: "#/components/schemas/MarkAsDuplicateActionOutput"
           ARCHIVE: "#/components/schemas/ArchiveActionOutput"
-          UNARCHIVE: "#/components/schemas/UnarchiveActionOutput"
           NOTIFY: "#/components/schemas/NotifiedActionOutput"
           REGISTER: "#/components/schemas/RegisterActionOutput"
           DECLARE: "#/components/schemas/DeclareActionOutput"
@@ -16282,102 +15295,6 @@ components:
         - status
         - type
         - content
-      additionalProperties: false
-    UnarchiveActionOutput:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-          description: Unique identifier of the action.
-        transactionId:
-          type: string
-          description: Unique identifier of the transaction.
-        createdByUserType:
-          type: string
-          enum:
-            - user
-            - system
-          description: Indicates whether the action was created by a human-user or by a
-            system-user.
-        createdAt:
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-          description: Timestamp indicating when the action was created.
-        createdBy:
-          type: string
-          description: Identifier of the user who created the action.
-        createdByRole:
-          description: Role of the user who created the action.
-          type: string
-        createdBySignature:
-          description: Reference to the signature of the user who created the action.
-          anyOf:
-            - type: string
-              description: A relative path within the S3 bucket, never starting with /. e.g.
-                document-id.jpg or directory/document-id.jpg. The document
-                service constructs the full /bucket/path internally.
-            - type: "null"
-        createdAtLocation:
-          description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
-        declaration:
-          type: object
-          propertyNames:
-            type: string
-          additionalProperties:
-            description: Value that matches exactly one of the possible schema types
-              (TextValue, DateValue, DateRangeFieldValue). The best matching
-              schema is chosen by priority.
-          description: Declaration data defined by the ActionConfig. Supports partial
-            updates.
-        annotation:
-          anyOf:
-            - type: object
-              propertyNames:
-                type: string
-              additionalProperties:
-                description: Value that matches exactly one of the possible schema types
-                  (TextValue, DateValue, DateRangeFieldValue). The best matching
-                  schema is chosen by priority.
-              description: Record of field-level changes made by an action. Supports partial
-                updates and nullable values.
-            - type: "null"
-          description: Action-specific metadata used to annotate the event.
-        status:
-          type: string
-          enum:
-            - Requested
-            - Accepted
-            - Rejected
-          description: Current status of the action. Actions may be validated
-            asynchronously by third-party integrations.
-        originalActionId:
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
-          description: Reference to the original action asynchronously accepted or
-            rejected by a third-party integration.
-        type:
-          type: string
-          const: UNARCHIVE
-      required:
-        - id
-        - transactionId
-        - createdByUserType
-        - createdAt
-        - createdBy
-        - declaration
-        - status
-        - type
       additionalProperties: false
     NotifiedActionOutput:
       type: object
@@ -17480,6 +16397,7 @@ components:
         - declaration
         - status
         - type
+        - content
       additionalProperties: false
     CustomActionOutput:
       type: object
