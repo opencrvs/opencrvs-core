@@ -153,11 +153,6 @@ React instance. Without dedupe, Vite 8 can bundle a second React copy.
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/countryconfig/, '')
         },
-        '/api/auth/': {
-          target: 'http://localhost:4040',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/auth/, '')
-        },
         '/api/': {
           target: 'http://localhost:7070',
           changeOrigin: true,
