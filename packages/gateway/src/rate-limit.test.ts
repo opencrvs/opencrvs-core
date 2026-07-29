@@ -61,16 +61,40 @@ jest.mock('@gateway/utils/redis', () => {
   }
 })
 
+import { readFileSync } from 'fs'
+import * as jwt from 'jsonwebtoken'
 import { rateLimitedRoute, RateLimitError } from '@gateway/rate-limit'
+
+const signBypassToken = (key: string, overrides: jwt.SignOptions = {}) =>
+  jwt.sign({ scope: ['type=bypassratelimit'] }, readFileSync(key), {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:gateway-user',
+    ...overrides
+  })
+
+// jwt-decode-style unsigned/forged token: valid base64 JSON but no signature at all.
+const makeForgedToken = (payload: unknown) =>
+  [
+    Buffer.from(JSON.stringify({ alg: 'none', typ: 'JWT' })).toString(
+      'base64url'
+    ),
+    Buffer.from(JSON.stringify(payload)).toString('base64url'),
+    ''
+  ].join('.')
 
 const resetStore = () =>
   (
     jest.requireMock('@gateway/utils/redis') as { __resetStore: () => void }
   ).__resetStore()
 
-const makeArgs = (payload: unknown, path = '/auth/some-route') => {
+const makeArgs = (
+  payload: unknown,
+  path = '/auth/some-route',
+  authorization?: string
+) => {
   const request = {
-    headers: {},
+    headers: authorization ? { authorization } : {},
     payload: Buffer.from(JSON.stringify(payload))
   }
   const h = { request: { path } }
@@ -207,5 +231,73 @@ describe('rateLimitedRoute enforcement', () => {
     await expect(
       handler(...makeArgs({ nonce: 'abc' }, '/auth/verifyNumber'))
     ).resolves.toBe('OK')
+  })
+})
+
+describe('bypassratelimit scope', () => {
+  beforeEach(resetStore)
+
+  it('rejects a forged/unsigned token claiming bypassratelimit and still rate limits', async () => {
+    const fn = jest.fn(() => 'OK')
+    const handler = rateLimitedRoute(
+      { requestsPerMinute: 1, pathForKey: 'username' },
+      fn
+    )
+    const forged = makeForgedToken({ scope: ['type=bypassratelimit'] })
+
+    await expect(
+      handler(...makeArgs({ username: 'alice' }, '/auth/some-route', forged))
+    ).resolves.toBe('OK')
+
+    // The second request must still be blocked — the forged token must not
+    // have bypassed rate limiting.
+    await expect(
+      handler(...makeArgs({ username: 'alice' }, '/auth/some-route', forged))
+    ).rejects.toThrow(RateLimitError)
+  })
+
+  it('rejects a token signed with the wrong key claiming bypassratelimit', async () => {
+    const fn = jest.fn(() => 'OK')
+    const handler = rateLimitedRoute(
+      { requestsPerMinute: 1, pathForKey: 'username' },
+      fn
+    )
+    const invalidlySigned = signBypassToken('./test/cert-invalid.key')
+
+    await expect(
+      handler(
+        ...makeArgs(
+          { username: 'bob' },
+          '/auth/some-route',
+          `Bearer ${invalidlySigned}`
+        )
+      )
+    ).resolves.toBe('OK')
+    await expect(
+      handler(
+        ...makeArgs(
+          { username: 'bob' },
+          '/auth/some-route',
+          `Bearer ${invalidlySigned}`
+        )
+      )
+    ).rejects.toThrow(RateLimitError)
+  })
+
+  it('bypasses rate limiting for a properly signed token with the bypassratelimit scope', async () => {
+    const fn = jest.fn(() => 'OK')
+    const handler = rateLimitedRoute(
+      { requestsPerMinute: 1, pathForKey: 'username' },
+      fn
+    )
+    const valid = signBypassToken('./test/cert.key')
+
+    for (let i = 0; i < 5; i++) {
+      const result = handler(
+        ...makeArgs({ username: 'carol' }, '/auth/some-route', `Bearer ${valid}`)
+      )
+      expect(await result).toBe('OK')
+    }
+    expect(fn).toHaveBeenCalledTimes(5)
   })
 })
