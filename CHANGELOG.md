@@ -69,7 +69,7 @@ The core `NOTIFY`, `DECLARE`, `REGISTER`, `ARCHIVE` and `REJECT` actions now acc
 
 #### `anchorToDateOfEvent` location field config option
 
-`LOCATION`, `ADMINISTRATIVE_AREA`, and `ADDRESS` field configs accept an optional boolean, `anchorToDateOfEvent`, which resolves and filters the field's options against the event's date-of-event instead of today (falling back to the record's creation date when that field is empty). A selection is automatically cleared if the date-of-event later changes such that it's no longer valid at the new date. [#13143](https://github.com/opencrvs/opencrvs-core/issues/13143)
+`LOCATION`, `ADMINISTRATIVE_AREA`, and `ADDRESS` field configs accept an optional boolean, `anchorToDateOfEvent`, which resolves the field's displayed/selectable versions against the event's date-of-event instead of today (falling back to the record's creation date when that field is empty). It does not by itself exclude inactive versions — combine with `activeOnly` for that; when both are set, `activeOnly`'s active/inactive check is evaluated at the event-date anchor rather than today, so a location that has since become inactive can still be selected for a historical record, and one not yet active as at the event's date is excluded even if it's active today. A selection is automatically cleared if the date-of-event later changes such that it resolves to a different version than before. [#13143](https://github.com/opencrvs/opencrvs-core/issues/13143)
 
 ### Bug fixes
 
