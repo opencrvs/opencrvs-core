@@ -14,8 +14,7 @@
     "sharedGlobals": [
       "{workspaceRoot}/pnpm-lock.yaml",
       "{workspaceRoot}/pnpm-workspace.yaml",
-      "{workspaceRoot}/patches/**",
-      "{workspaceRoot}/.github/workflows/lint-and-test.yml"
+      "{workspaceRoot}/patches/**"
     ]
   },
   "targetDefaults": {

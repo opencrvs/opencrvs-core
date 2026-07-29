@@ -71,12 +71,25 @@ jobs:
 
       # create-countryconfig lives under packages/toolkit/ and has no
       # lint/test targets — it never ran in this workflow's matrix.
+      #
+      # Changes to this workflow (and the scripts it drives) are invisible
+      # to `nx affected`, so a CI-only PR would yield an empty matrix and
+      # skip every job below — merging CI changes without ever running
+      # them. Select every project instead when that happens. Dependency
+      # builds still come from the nx cache; what needs exercising is the
+      # workflow's own steps, not a cold rebuild.
       - name: Get list of affected packages
         id: set-matrix
         run: |
-          PACKAGES=$(pnpm exec nx show projects --affected --exclude @opencrvs/create-countryconfig --json \
-            | jq -c 'map("packages/" + ltrimstr("@opencrvs/"))')
-          echo "Affected packages: $PACKAGES"
+          if git diff --name-only "$NX_BASE" "$NX_HEAD" \
+            | grep -qE '^\.github/(workflows/lint-and-test\.yml|scripts/changed-files-affect-storybook\.mjs)$'; then
+            echo "CI configuration changed — selecting every project"
+            PROJECTS=$(pnpm exec nx show projects --exclude @opencrvs/create-countryconfig --json)
+          else
+            PROJECTS=$(pnpm exec nx show projects --affected --exclude @opencrvs/create-countryconfig --json)
+          fi
+          PACKAGES=$(echo "$PROJECTS" | jq -c 'map("packages/" + ltrimstr("@opencrvs/"))')
+          echo "Selected packages: $PACKAGES"
           echo "matrix=${PACKAGES}" >> $GITHUB_OUTPUT
 
       - name: Prepare coverage explanation
