@@ -101,7 +101,8 @@ jobs:
       - name: Get list of services
         id: get-services
         run: |
-          services=$(find packages -name Dockerfile | cut -f2 -d\/)
+          # Exclude countryconfig-template from the list of services to build, since it is not a deployable service.
+          services=$(find packages -name Dockerfile | cut -f2 -d\/ | grep -v '^countryconfig-template$')
           services_json=$(echo $services | tr '\n' ',' | sed 's/,$//' | jq -R 'split(" ")' | tr -d '\n')
           # Set the list of service names as an output variable
           echo "services=$services_json" >> $GITHUB_OUTPUT
