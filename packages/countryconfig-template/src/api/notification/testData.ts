@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+
 import { Recipient, TriggerEvent } from '@opencrvs/toolkit/notification'
 import { UUID, DocumentPath } from '@opencrvs/toolkit/events'
 import { TriggerEventPayloadPair } from './handler'
@@ -507,44 +518,44 @@ export const informantNotificationTestData: {
   actionType: ActionType
   eventDocument: EventDocument
 }[] = [
-    {
-      eventType: Event.Birth,
-      actionType: ActionType.NOTIFY,
-      eventDocument: birthNotificationEvent
-    },
-    {
-      eventType: Event.Birth,
-      actionType: ActionType.DECLARE,
-      eventDocument: birthDeclarationEvent
-    },
-    {
-      eventType: Event.Birth,
-      actionType: ActionType.REGISTER,
-      eventDocument: birthRegistrationEvent
-    },
-    {
-      eventType: Event.Birth,
-      actionType: ActionType.REJECT,
-      eventDocument: birthRejectionEvent
-    },
-    {
-      eventType: Event.Death,
-      actionType: ActionType.NOTIFY,
-      eventDocument: deathNotificationEvent
-    },
-    {
-      eventType: Event.Death,
-      actionType: ActionType.DECLARE,
-      eventDocument: deathDeclarationEvent
-    },
-    {
-      eventType: Event.Death,
-      actionType: ActionType.REGISTER,
-      eventDocument: deathRegistrationEvent
-    },
-    {
-      eventType: Event.Death,
-      actionType: ActionType.REJECT,
-      eventDocument: deathRejectionEvent
-    }
-  ]
+  {
+    eventType: Event.Birth,
+    actionType: ActionType.NOTIFY,
+    eventDocument: birthNotificationEvent
+  },
+  {
+    eventType: Event.Birth,
+    actionType: ActionType.DECLARE,
+    eventDocument: birthDeclarationEvent
+  },
+  {
+    eventType: Event.Birth,
+    actionType: ActionType.REGISTER,
+    eventDocument: birthRegistrationEvent
+  },
+  {
+    eventType: Event.Birth,
+    actionType: ActionType.REJECT,
+    eventDocument: birthRejectionEvent
+  },
+  {
+    eventType: Event.Death,
+    actionType: ActionType.NOTIFY,
+    eventDocument: deathNotificationEvent
+  },
+  {
+    eventType: Event.Death,
+    actionType: ActionType.DECLARE,
+    eventDocument: deathDeclarationEvent
+  },
+  {
+    eventType: Event.Death,
+    actionType: ActionType.REGISTER,
+    eventDocument: deathRegistrationEvent
+  },
+  {
+    eventType: Event.Death,
+    actionType: ActionType.REJECT,
+    eventDocument: deathRejectionEvent
+  }
+]

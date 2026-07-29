@@ -1,7 +1,17 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+
 # Shared OpenCRVS Tilt configuration
 # Load extensions
 load('ext://namespace', 'namespace_create', 'namespace_inject')
-load("./lib.tilt", 
+load("./lib.tilt",
         "copy_secrets", "data_cleanup", "seed_data")
 include('./common.tilt')
 
@@ -17,7 +27,7 @@ def setup_opencrvs(
 ):
     """
     Common OpenCRVS setup function
-    
+
     Args:
         core_images_tag: OpenCRVS core images tag to use for deployment
         countryconfig_image_name: Countryconfig image repository (e.g. your DockerHub repository or Farajaland demo repository)
@@ -28,11 +38,11 @@ def setup_opencrvs(
         monitoring_enabled: If true, monitoring components like Kibana will be deployed together with dependencies
         opencrvs_chart_repo: Path to OpenCRVS charts directory (relative)
     """
-        
+
     # Create namespaces
     namespace_create(dependencies_namespace)
     namespace_create(opencrvs_namespace)
-    
+
     # Select configuration files
     if security_enabled:
         print("🔑 Deploying OpenCRVS and Dependencies in secure mode")
@@ -45,7 +55,7 @@ def setup_opencrvs(
         - Authentication for Redis, MongoDB and Elasticsearch is disabled""")
         deps_configuration_file = './tilt/examples/dependencies/values.yaml'
         opencrvs_configuration_file = './tilt/examples/opencrvs-services/values.yaml'
-    
+
     # Deploy dependencies
     print("🚀 Deploying dependencies: mongo, minio, elasticsearch...")
     dependencies_chart_path = '{}/charts/dependencies'.format(opencrvs_chart_repo)
@@ -112,6 +122,6 @@ def setup_opencrvs(
         countryconfig_image_tag,
         opencrvs_chart_path
     )
-    
+
     if security_enabled:
         copy_secrets(dependencies_namespace, opencrvs_namespace)
