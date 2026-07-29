@@ -16,6 +16,7 @@ import {
   JurisdictionFilter,
   TENNIS_CLUB_MEMBERSHIP,
   UserFilter,
+  createPrng,
   encodeScope,
   getDeclarationFields
 } from '@opencrvs/commons'
@@ -23,10 +24,12 @@ import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   assertScopeResult,
   createTestClient,
-  setupScopeTestFixture
+  setupScopeTestFixture,
+  TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
 import { createIndex } from '@events/service/indexing/indexing'
 import { getEventIndexName } from '@events/storage/elasticsearch'
+import { payloadGenerator, setupHierarchyWithUsers } from '@events/tests/generators'
 import { EventNotFoundError } from '../../service/events/events'
 
 test('Check scopes against event.get', async () => {

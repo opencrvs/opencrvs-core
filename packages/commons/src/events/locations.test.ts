@@ -224,7 +224,6 @@ describe('canAccessEventWithScope()', () => {
           ...declaredEvent,
           createdBy: userContext.id,
           legalStatuses: {
-            NOTIFIED: undefined,
             DECLARED: {
               acceptedAt: new Date().toISOString(),
               createdAt: new Date().toISOString(),
