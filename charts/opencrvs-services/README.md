@@ -259,7 +259,7 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <tr>
             <td>otel.enabled</td>
             <td>false</td>
-            <td>Enable OpenTelemetry tracing environment variables for instrumented backend services: <code>auth</code>, <code>countryconfig</code>, <code>documents</code>, <code>events</code> and <code>gateway</code>.</td>
+            <td>Enable OpenTelemetry tracing environment variables for instrumented services.</td>
         </tr>
         <tr>
             <td>otel.deployment_environment</td>
@@ -269,12 +269,12 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <tr>
             <td>otel.exporter_otlp_endpoint</td>
             <td></td>
-            <td>Base OTLP HTTP endpoint for the OpenTelemetry Collector, for example <code>http://opentelemetry-collector.opencrvs-deps-production.svc.cluster.local:4318</code>. Required when <code>otel.enabled</code> is <code>true</code>.</td>
+            <td>OTLP/gRPC collector endpoint, for example <code>opentelemetry-collector.opencrvs-deps-production.svc.cluster.local:4317</code>. Required when <code>otel.enabled</code> is <code>true</code>. Node.js receives this as an insecure gRPC URL with <code>http://</code> added automatically; nginx receives the host and port without a scheme.</td>
         </tr>
         <tr>
             <td>otel.exporter_otlp_protocol</td>
-            <td>http/protobuf</td>
-            <td>OTLP exporter protocol. The trace-specific endpoint is generated as <code>&lt;otel.exporter_otlp_endpoint&gt;/v1/traces</code>.</td>
+            <td>grpc</td>
+            <td>OTLP exporter protocol.</td>
         </tr>
         <tr>
             <td>OTEL_RESOURCE_ATTRIBUTES</td>
