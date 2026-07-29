@@ -67,6 +67,12 @@ The core `NOTIFY`, `DECLARE`, `REGISTER`, `ARCHIVE` and `REJECT` actions now acc
 
 `LOCATION`, `ADMINISTRATIVE_AREA`, and `ADDRESS` field configs accept two optional booleans: `listHistoricalNames` lists every name a location has ever had (across its `versions[]`) as a separate, selectable option — so records saved under an outdated name stay findable — and `activeOnly` offers only currently-active locations, excluding inactivated ones. Advanced search sets these itself for its location/address filters (offices and health institutions list all names and keep inactive entries; address filters list all names but drop inactive admin structures), so no country configuration is required for that behaviour; they are documented here as a new, optional part of the field config schema. [#13146](https://github.com/opencrvs/opencrvs-core/issues/13146)
 
+#### Integration audit log retrieval
+
+An integration's audit log can now be read through the `integrations.audit` endpoint which returns a paginated, newest-first list of the operations a single system client performed. The endpoint returns what the client itself did; an integration's lifecycle (who created, disabled or re-keyed it) stays in the audit logs of the administrators who performed those actions.
+
+A new `integration.audit.read` scope guards it; country configs must assign it to the relevant role(s) before the endpoint is reachable. The endpoint is closed to system clients entirely — an integration cannot read any audit log, including its own — and, because system clients have no office or administrative area, access is national and carries no jurisdiction options. [#11909](https://github.com/opencrvs/opencrvs-core/issues/11909)
+
 ### Bug fixes
 
 - Keep a number field's postfix/unit label (e.g. `Kilograms (kg)` on Weight at birth) on a single line instead of wrapping onto a second row [#13216](https://github.com/opencrvs/opencrvs-core/issues/13216)
