@@ -4,6 +4,7 @@
     "pnpm-lock.yaml",
     "pnpm-workspace.yaml",
     "packages/testland/reqs-gathering-templates",
+    "packages/countryconfig-template/pnpm-lock.yaml",
     "packages/countryconfig-template/.nvmrc",
     "packages/countryconfig-template/.tiltignore",
     "packages/countryconfig-template/Tiltfile",
