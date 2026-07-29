@@ -21,6 +21,8 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      # nx-set-shas queries the API for the last successful workflow run
+      actions: read
     runs-on: ubuntu-26.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -28,6 +30,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          # nx affected needs history to resolve the base SHA
+          fetch-depth: 0
 
       - uses: mskelton/changelog-reminder-action@v3
         # forked repos cannot access secrets.GITHUB_TOKEN which causes this step
@@ -42,11 +47,36 @@ jobs:
               - Answer "What's new?", "Why was the change made?" and "Why should I care?" for each change.
               - If it's a breaking change, include a migration guide answering "What do I need to do to upgrade?".
 
-      - name: Get list of packages
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      # Nx needs node_modules to compute the project graph; lifecycle
+      # scripts are irrelevant for that.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      # Sets NX_BASE/NX_HEAD. On PRs: the PR base. On develop pushes: the
+      # SHA of the last successful run of this workflow, so commits whose
+      # run failed are re-included in the next run's affected set.
+      - name: Derive SHAs for nx affected
+        uses: nrwl/nx-set-shas@v4
+        with:
+          main-branch-name: develop
+
+      # create-countryconfig lives under packages/toolkit/ and has no
+      # lint/test targets — it never ran in this workflow's matrix.
+      - name: Get list of affected packages
         id: set-matrix
         run: |
-          PACKAGES=$(ls -d packages/* | jq -R -s -c 'split("\n")[:-1]')
-          echo "Found packages: $PACKAGES"
+          PACKAGES=$(pnpm exec nx show projects --affected --exclude @opencrvs/create-countryconfig --json \
+            | jq -c 'map("packages/" + ltrimstr("@opencrvs/"))')
+          echo "Affected packages: $PACKAGES"
           echo "matrix=${PACKAGES}" >> $GITHUB_OUTPUT
 
       - name: Prepare coverage explanation
@@ -69,6 +99,8 @@ jobs:
   test:
     name: Test
     needs: setup
+    # an empty matrix is a workflow error, so guard against it
+    if: needs.setup.outputs.matrix != '[]'
     runs-on: ubuntu-26.04
     permissions:
       pull-requests: write
@@ -151,21 +183,23 @@ jobs:
 
       - name: Build common package
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/commons')
-        run: pnpm exec lerna run build --scope @opencrvs/commons
+        run: pnpm exec nx run @opencrvs/commons:build
 
       - name: Build components
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/components')
-        run: pnpm exec lerna run build --scope @opencrvs/components
+        run: pnpm exec nx run @opencrvs/components:build
 
+      # run-many because `nx run` can't address a target with a colon in
+      # its name (parses it as a configuration)
       - name: Build events router types
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/events')
-        run: pnpm exec lerna run build:types --scope @opencrvs/events
+        run: pnpm exec nx run-many -t build:types -p @opencrvs/events
 
       # testland consumes the workspace toolkit at runtime; build.sh needs
       # commons + events types built first (steps above).
       - name: Build toolkit
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/toolkit')
-        run: pnpm exec lerna run build --scope @opencrvs/toolkit
+        run: pnpm exec nx run @opencrvs/toolkit:build
 
       - name: Save Nx cache
         if: |
@@ -179,11 +213,15 @@ jobs:
       # TODO: should run parallel to unit tests as can take as much as unit tests
       - name: Run linting
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-lint != 'true'
-        run: cd ${{ matrix.package }} && pnpm lint
+        run: pnpm exec nx run @opencrvs/$(basename ${{ matrix.package }}):lint
 
+      # --excludeTaskDependencies: the test target's ^build dependency
+      # would run the full build of every dependency (e.g. events), while
+      # the steps above build exactly what tests need (e.g. only events
+      # types)
       - name: Run Unit Test
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
-        run: cd ${{ matrix.package }} && pnpm test
+        run: pnpm exec nx run @opencrvs/$(basename ${{ matrix.package }}):test --excludeTaskDependencies
 
       - name: Generate test coverage summary
         if: github.event_name == 'pull_request'
@@ -222,6 +260,8 @@ jobs:
 
   prepare-client-tests:
     name: Prepare client tests
+    needs: setup
+    if: contains(needs.setup.outputs.matrix, 'packages/client')
     runs-on: ubuntu-26.04
     permissions:
       contents: read
@@ -255,7 +295,7 @@ jobs:
             nx-
 
       - name: Build common package and components
-        run: pnpm exec lerna run build --scope @opencrvs/commons --scope @opencrvs/components
+        run: pnpm exec nx run-many -t build -p @opencrvs/commons @opencrvs/components
 
       - name: Save Nx cache
         if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
@@ -323,13 +363,15 @@ jobs:
             nx-
 
       - name: Build events router types
-        run: pnpm exec lerna run build:types --scope @opencrvs/events
+        run: pnpm exec nx run-many -t build:types -p @opencrvs/events
 
+      # --excludeTaskDependencies: commons/components build outputs come
+      # prebuilt in the artifact, events types were built above
       - name: Compile
-        run: cd packages/client && pnpm test:compilation
+        run: pnpm exec nx run-many -t test:compilation -p @opencrvs/client --excludeTaskDependencies
 
       - name: Run linting
-        run: cd packages/client && pnpm lint
+        run: pnpm exec nx run @opencrvs/client:lint
 
   chromatic:
     name: Run chromatic visual tests
@@ -463,8 +505,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # --excludeTaskDependencies: dependency build outputs come prebuilt
+      # in the artifact; without it each shard would rebuild them (the
+      # artifact excludes .nx, so nothing is cached here)
       - name: Run Unit Test
-        run: cd packages/client && pnpm test --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}
+        run: pnpm exec nx run @opencrvs/client:test --excludeTaskDependencies -- --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}
 
   lint-knip:
     name: Lint unused exports with Knip
@@ -537,8 +582,9 @@ jobs:
 
   build-toolkit:
     name: Build toolkit
+    needs: setup
     runs-on: ubuntu-26.04
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && contains(needs.setup.outputs.matrix, 'packages/toolkit')
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -570,4 +616,4 @@ jobs:
       # nx resolves the `^build` dependency of the build target, so
       # commons and events are built first (cache hits when warm)
       - name: Build toolkit and dependencies
-        run: pnpm exec lerna run build --scope @opencrvs/toolkit
+        run: pnpm exec nx run @opencrvs/toolkit:build
