@@ -1,0 +1,32 @@
+# Overwriting https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
+namespaceOverride: 'traefik'
+logs:
+  general:
+    # "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "PANIC"
+    level: 'INFO'
+    # format: "common" # For local environment
+    format: 'json' # For server environment
+  access:
+    # -- To enable access logs
+    enabled: true
+ingressRoute:
+  dashboard:
+    enabled: false
+# Be explicit that we only use CRDs, not ingress/gw support
+providers:
+  kubernetesCRD:
+    enabled: true
+  kubernetesIngress:
+    enabled: true
+  kubernetesGateway:
+    enabled: false
+service:
+  enabled: true
+  single: false
+
+ports:
+  web:
+    port: 8000
+    protocol: TCP
+
+tlsStore: {}

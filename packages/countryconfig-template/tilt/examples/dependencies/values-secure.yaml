@@ -1,0 +1,19 @@
+hostname: opencrvs.localhost
+
+ingress:
+  ssl_enabled: false
+
+redis:
+  auth_mode: acl
+
+minio:
+  use_default_credentials: false
+
+elasticsearch:
+  use_default_credentials: false
+
+mongodb:
+  use_default_credentials: false
+
+postgres:
+  use_default_credentials: false

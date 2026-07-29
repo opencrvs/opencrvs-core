@@ -1,0 +1,125 @@
+name: Publish image to Dockerhub
+run-name: Publish image to Dockerhub from ${{ inputs.branch_name || github.ref_name }}
+on:
+  push:
+    branches:
+      - master
+      - develop
+      - main
+      - 'release*'
+    tags:
+      - '*'
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: Branch to build from
+        default: develop
+        required: true
+      build_arm:
+        description: Build ARM images
+        type: boolean
+        default: false
+        required: false
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: ${{
+          (inputs.build_arm == true && fromJSON('["ubuntu-24.04", "ubuntu-24.04-arm"]')) ||
+          fromJSON('["ubuntu-24.04"]')
+          }}
+    outputs:
+      version: ${{ steps.country_config.outputs.version }}
+      version_common: ${{ steps.country_config.outputs.version_common }}
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v5
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          fetch-depth: 2
+          ref: '${{ inputs.branch_name }}'
+
+      - uses: actions/checkout@v5
+        if: github.event_name == 'push'
+
+      - name: Get tags
+        run: git fetch --tags origin
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Country config image tag
+        id: country_config
+        env:
+          DOCKERHUB_ACCOUNT: ${{ secrets.DOCKERHUB_ACCOUNT }}
+          DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_REPO }}
+          BRANCH_NAME: ${{ inputs.branch_name || github.ref_name }}
+        run: |
+          # Check if the current commit has a tag and use it; otherwise, use the short SHA of the HEAD commit
+          GIT_HASH=$(git describe --tags --exact-match 2>/dev/null || git rev-parse --short=7 HEAD)
+          echo "version_common=${GIT_HASH}" >> $GITHUB_OUTPUT
+          if [[ "${{ matrix.runner }}" == "ubuntu-24.04-arm" ]]; then
+            echo "version=${GIT_HASH}-arm64" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GIT_HASH}-amd64" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push countryconfig image
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          provenance: false
+          context: .
+          tags: |
+            ${{ secrets.DOCKERHUB_ACCOUNT}}/${{ secrets.DOCKERHUB_REPO }}:${{ steps.country_config.outputs.version }}
+
+      - name: Build and push assets image
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          provenance: false
+          context: .
+          file: ./Dockerfile.assets
+          tags: |
+            ${{ secrets.DOCKERHUB_ACCOUNT}}/${{ secrets.DOCKERHUB_REPO }}:${{ steps.country_config.outputs.version }}-assets
+
+  merge-manifest:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Create and push multi-arch manifest
+        env:
+          BRANCH_NAME: ${{ inputs.branch_name || github.ref_name }}
+          BUILD_ARM: ${{ inputs.build_arm == true }}
+        run: |
+          TAG="${{ needs.build.outputs.version_common }}"
+          REPO="${{ secrets.DOCKERHUB_ACCOUNT}}/${{ secrets.DOCKERHUB_REPO }}"
+
+          # Create manifest list based on whether ARM build exists
+          if [[ "$BUILD_ARM" == "true" ]]; then
+            MANIFEST_LIST="$REPO:$TAG-amd64 $REPO:$TAG-arm64"
+            ASSETS_MANIFEST_LIST="$REPO:$TAG-amd64-assets $REPO:$TAG-arm64-assets"
+          else
+            MANIFEST_LIST="$REPO:$TAG-amd64"
+            ASSETS_MANIFEST_LIST="$REPO:$TAG-amd64-assets"
+          fi
+
+          echo "[🔁 pushing ] $REPO:$TAG"
+          docker manifest create $REPO:$TAG \
+             $MANIFEST_LIST
+          docker manifest push $REPO:$TAG
+          echo "[🔁 pushing ] $REPO:$TAG-assets"
+          docker manifest create $REPO:$TAG-assets \
+             $ASSETS_MANIFEST_LIST
+          docker manifest push $REPO:$TAG-assets

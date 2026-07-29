@@ -1,0 +1,117 @@
+# Shared OpenCRVS Tilt configuration
+# Load extensions
+load('ext://namespace', 'namespace_create', 'namespace_inject')
+load("./lib.tilt", 
+        "copy_secrets", "data_cleanup", "seed_data")
+include('./common.tilt')
+
+def setup_opencrvs(
+    core_images_tag,
+    countryconfig_image_tag,
+    countryconfig_image_name="opencrvs/ocrvs-countryconfig",
+    dependencies_namespace='opencrvs-deps-dev',
+    opencrvs_namespace='opencrvs-dev',
+    security_enabled=False,
+    monitoring_enabled=False,
+    opencrvs_chart_repo='.'
+):
+    """
+    Common OpenCRVS setup function
+    
+    Args:
+        core_images_tag: OpenCRVS core images tag to use for deployment
+        countryconfig_image_name: Countryconfig image repository (e.g. your DockerHub repository or Farajaland demo repository)
+        countryconfig_image_tag: Countryconfig image tag to use for deployment
+        dependencies_namespace: Kubernetes namespace for dependencies (e.g. MongoDB, MinIO, Elasticsearch)
+        opencrvs_namespace: Kubernetes namespace for OpenCRVS services
+        security_enabled: If true, OpenCRVS and dependencies will be deployed in secure mode with authentication enabled. If false, OpenCRVS and dependencies will be deployed in non-secure mode with default passwords and no authentication.
+        monitoring_enabled: If true, monitoring components like Kibana will be deployed together with dependencies
+        opencrvs_chart_repo: Path to OpenCRVS charts directory (relative)
+    """
+        
+    # Create namespaces
+    namespace_create(dependencies_namespace)
+    namespace_create(opencrvs_namespace)
+    
+    # Select configuration files
+    if security_enabled:
+        print("🔑 Deploying OpenCRVS and Dependencies in secure mode")
+        deps_configuration_file = './tilt/examples/dependencies/values-secure.yaml'
+        opencrvs_configuration_file = './tilt/examples/opencrvs-services/values-secure.yaml'
+    else:
+        print("""🔑 Deploying OpenCRVS and Dependencies in non-secure mode
+        - Minio admin user/password: minioadmin/minioadmin
+        - Postgres admin user/password: postgres/postgres
+        - Authentication for Redis, MongoDB and Elasticsearch is disabled""")
+        deps_configuration_file = './tilt/examples/dependencies/values.yaml'
+        opencrvs_configuration_file = './tilt/examples/opencrvs-services/values.yaml'
+    
+    # Deploy dependencies
+    print("🚀 Deploying dependencies: mongo, minio, elasticsearch...")
+    dependencies_chart_path = '{}/charts/dependencies'.format(opencrvs_chart_repo)
+    k8s_yaml(helm(dependencies_chart_path,
+        namespace=dependencies_namespace,
+        values=[deps_configuration_file],
+        set=["monitoring.enabled={}".format(monitoring_enabled).lower()]
+    ))
+    opencrvs_chart_path = '{}/charts/opencrvs-services'.format(opencrvs_chart_repo)
+    certs_dir = '{opencrvs_chart_path}/certs'.format(opencrvs_chart_path=opencrvs_chart_path)
+    if not os.path.exists("{certs_dir}/tls.crt".format(certs_dir=certs_dir)):
+        local("""
+        mkdir -p {certs_dir}
+        openssl req -x509 -nodes -days 365 \
+        -newkey rsa:2048 \
+        -keyout {certs_dir}/tls.key \
+        -out {certs_dir}/tls.crt \
+        -subj "/CN=local.dev"
+        """.format(certs_dir=certs_dir))
+
+    # Deploy OpenCRVS services
+    print("🚀 Deploying services: auth, events, gateway...")
+    k8s_yaml(
+        helm(opencrvs_chart_path,
+             namespace=opencrvs_namespace,
+             values=[opencrvs_configuration_file],
+             set=[
+                "platform.tag={}".format(core_images_tag),
+                "countryconfig.image.name={}".format(countryconfig_image_name),
+                "countryconfig.image.tag={}".format(countryconfig_image_tag),
+                "data_seed.enabled=false", # Disable data seeding on helm install for tilt
+                "certs.crt_file=certs/tls.crt",
+                "certs.key_file=certs/tls.key"
+             ]
+        )
+    )
+    cleanup_cmd = "./scripts/cleanup.sh"
+
+    if os.name == "nt":
+        cleanup_cmd = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\cleanup.ps1"
+
+    local_resource(
+        name="clean-&-seed",
+        auto_init=False,
+        labels="2.Data-tasks",
+        cmd="./tilt/clear-all-data.sh",
+        allow_parallel=True,
+    )
+    # Add data tasks
+    data_cleanup(
+        opencrvs_namespace,
+        opencrvs_configuration_file,
+        core_images_tag,
+        countryconfig_image_name,
+        countryconfig_image_tag,
+        opencrvs_chart_path
+    )
+
+    seed_data(
+        opencrvs_namespace,
+        opencrvs_configuration_file,
+        core_images_tag,
+        countryconfig_image_name,
+        countryconfig_image_tag,
+        opencrvs_chart_path
+    )
+    
+    if security_enabled:
+        copy_secrets(dependencies_namespace, opencrvs_namespace)

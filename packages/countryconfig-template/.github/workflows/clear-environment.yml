@@ -1,0 +1,84 @@
+name: Reset environment
+run-name: Reset data on ${{ github.event.inputs.environment }}
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: Environment to reset
+        required: true
+        default: 'development'
+        options:
+          - staging
+          - qa
+          - development
+jobs:
+  reset-data:
+    name: 'Reset data'
+    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-24.04
+    outputs:
+      outcome: ${{ steps.reset-data.outcome }}
+    timeout-minutes: 60
+    steps:
+      - name: Clone country config resource package
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+          path: './${{ github.event.repository.name }}'
+
+      - name: Read known hosts
+        run: |
+          cd ${{ github.event.repository.name }}
+          echo "KNOWN_HOSTS<<EOF" >> $GITHUB_ENV
+          sed -i -e '$a\' ./infrastructure/known-hosts
+          cat ./infrastructure/known-hosts >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          known_hosts: ${{ env.KNOWN_HOSTS }}
+
+      - name: Reset data
+        id: reset-data
+        env:
+          HOST: ${{ vars.DOMAIN }}
+          ENV: ${{ vars.ENVIRONMENT_TYPE }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ vars.SSH_HOST }}
+          SSH_PORT: ${{ vars.SSH_PORT }}
+          REPLICAS: ${{ vars.REPLICAS }}
+          MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
+          MONGODB_ADMIN_PASSWORD: ${{ secrets.MONGODB_ADMIN_PASSWORD }}
+          ELASTICSEARCH_SUPERUSER_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
+          MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
+          MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          SSH_ARGS: ${{ vars.SSH_ARGS }}
+        run: |
+          ssh -p $SSH_PORT $SSH_USER@$SSH_HOST $SSH_ARGS "
+            ELASTICSEARCH_ADMIN_USER=elastic \
+            ELASTICSEARCH_ADMIN_PASSWORD=$ELASTICSEARCH_SUPERUSER_PASSWORD \
+            MONGODB_ADMIN_USER=$MONGODB_ADMIN_USER \
+            MONGODB_ADMIN_PASSWORD=$MONGODB_ADMIN_PASSWORD \
+            MINIO_ROOT_USER=$MINIO_ROOT_USER \
+            MINIO_ROOT_PASSWORD=$MINIO_ROOT_PASSWORD \
+            POSTGRES_USER=$POSTGRES_USER \
+            POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+            /opt/opencrvs/infrastructure/clear-all-data.sh $REPLICAS"
+
+          echo "Running migrations..."
+          echo
+          ssh -p $SSH_PORT $SSH_USER@$SSH_HOST $SSH_ARGS "
+              ELASTICSEARCH_ADMIN_USER=elastic \
+              ELASTICSEARCH_ADMIN_PASSWORD=$ELASTICSEARCH_SUPERUSER_PASSWORD \
+              /opt/opencrvs/infrastructure/run-migrations.sh"

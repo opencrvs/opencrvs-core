@@ -1,0 +1,140 @@
+# TODO:
+# If merge conflicts are noticed:
+# - create new branch to farajaland, e.g. sync-with-countryconfig
+# - open new 'empty' pull request from new branch to develop
+# - send instructions and link to slack to:
+#   - checkout new branch
+#   - merge upstream (countryconfig) develop to new branch
+#   - fix merge conflicts
+#   - push branch
+# finally merge PR with fixed merge conflicts
+
+name: Sync Changes to Farajaland
+
+on:
+  pull_request:
+    types:
+      - closed
+env:
+  BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+  UPSTREAM_REPOSITORY: ${{ github.repository }}
+  # Check token under Olli's account
+  GH_TOKEN: ${{ secrets.FORK_ORGANISATION_TOKEN }}
+  FORK_REPOSITORY_PATH: '${{ vars.FORK_REPOSITORY_ORGANISATION }}/${{ vars.FORK_REPOSITORY_NAME }}'
+
+jobs:
+  check_farajaland_branch:
+    if: ${{ github.event.pull_request.merged == true }} && ${{github.event.pull_request.base.repo.full_name == 'opencrvs/opencrvs-countryconfig' }}
+    runs-on: ubuntu-24.04
+    outputs:
+      branch_exists: ${{ steps.check_branch.outputs.branch_exists }}
+    steps:
+      - name: Check if PR branch exists in Farajaland repository
+        id: check_branch
+        run: |
+          if git ls-remote --heads https://${GH_TOKEN}@github.com/${FORK_REPOSITORY_PATH}.git "$BASE_BRANCH" | grep "$BASE_BRANCH"; then
+            echo "branch_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "=============================================="
+            echo " 🚀 Branch $BASE_BRANCH doesn't exist in repository ${FORK_REPOSITORY_PATH}"
+            echo " 🚪 Doing exit"
+            echo "=============================================="
+            echo "branch_exists=false" >> $GITHUB_OUTPUT
+          fi
+
+  merge_conflicts:
+    if: ${{ needs.check_farajaland_branch.outputs.branch_exists == 'true' }}
+    runs-on: ubuntu-24.04
+    needs: check_farajaland_branch
+    steps:
+      - name: Checkout OpenCRVS Farajaland repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          repository: '${{ vars.FORK_REPOSITORY_ORGANISATION }}/${{ vars.FORK_REPOSITORY_NAME }}'
+          ref: ${{ github.event.pull_request.base.ref }}
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config pull.rebase true
+          git config --global url."https://${{ secrets.FORK_ORGANISATION_TOKEN }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+          git config -l | grep 'http\..*\.extraheader' | cut -d= -f1 | \
+              xargs -L1 git config --unset-all
+
+      - name: Merge changes from ${{ github.repository }}:${{ github.event.pull_request.base.ref }} into Farajaland repository
+        id: merge
+        continue-on-error: true
+        run: |
+          git remote add upstream https://github.com/${UPSTREAM_REPOSITORY}.git
+          git fetch upstream
+          git checkout ${BASE_BRANCH}
+          git status
+          git merge upstream/${BASE_BRANCH}
+
+      - if: steps.merge.outcome == 'success'
+        name: 'Push ${BASE_BRANCH} to Farajaland repository'
+        run: |
+          git remote -v
+          git push origin ${BASE_BRANCH}
+
+      - if: steps.merge.outcome == 'failure'
+        name: Handle merge conflicts and push opencrvs-farajaland/sync-with-${{ github.event.pull_request.base.ref }}
+        continue-on-error: true
+        run: |
+          git merge --abort
+          git checkout upstream/${BASE_BRANCH}
+          git checkout -b sync-with-${BASE_BRANCH}
+          git push --set-upstream origin sync-with-${BASE_BRANCH}
+
+      - name: Create PR in opencrvs-farajaland repository
+        if: steps.merge.outcome == 'failure'
+        run: |
+          if gh pr create \
+            --repo ${FORK_REPOSITORY_PATH} \
+            --base ${BASE_BRANCH} \
+            --head sync-with-${BASE_BRANCH} \
+            --title "Update Farajaland from ${BASE_BRANCH}" \
+            --body \
+          """
+          This PR updates the ${BASE_BRANCH} branch with the latest changes from
+          the original repository https://github.com/${UPSTREAM_REPOSITORY}.
+          """ 1>result.txt 2>&1; then
+              printf "PR created successfully: $(grep ${FORK_REPOSITORY_PATH} result.txt)\n"
+              echo RESULT=$(grep ${FORK_REPOSITORY_PATH} result.txt) >> $GITHUB_ENV
+              echo STATUS="Created" >> $GITHUB_ENV
+          else
+              if grep -q "already exists" result.txt; then
+                  printf "PR already exists in Farajaland repo: $(grep ${FORK_REPOSITORY_PATH} result.txt)\n"
+                  echo RESULT=$(grep ${FORK_REPOSITORY_PATH} result.txt) >> $GITHUB_ENV
+                  echo STATUS="Created" >> $GITHUB_ENV
+              else
+                  echo "Failed to create PR: $(cat result.txt)"
+                  echo RESULT=$(cat result.txt) >> $GITHUB_ENV
+                  echo STATUS="Failed" >> $GITHUB_ENV
+              fi
+          fi
+
+      - name: Send slack notification
+        if: steps.merge.outcome == 'failure'
+        run: |
+          [ "x$STATUS" == "xCreated" ] && \
+              FORK_STATUS="⚠️ Changes was not synced with Farajaland repo due to merge conflicts, please merge PR $RESULT manually to keep Farajaland in sync Countryconfig"
+          [ "x$STATUS" == "xFailed" ] && \
+              FORK_STATUS="❌ Failed to create PR in Farajaland repository: $RESULT"
+          BODY="""
+          🚀 Pull request https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}
+          authored by 👤 <https://github.com/${{ github.actor }}|@${{ github.actor }}> from branch ${{ github.head_ref }} was merged into ${BASE_BRANCH}.
+
+          $FORK_STATUS
+          """
+          echo "$BODY"
+
+          curl -X POST https://slack.com/api/chat.postMessage \
+          -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
+          -H 'Content-type: application/json' \
+          --data "{
+            'channel': '${{ vars.SLACK_BOT_CHANNEL }}',
+            'text': '$BODY'
+          }"

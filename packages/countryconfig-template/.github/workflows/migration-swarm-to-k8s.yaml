@@ -1,0 +1,387 @@
+name: Migration swarm to k8s
+run-name: 'Migration to ${{ inputs.target_repo_name }}'
+on:
+  workflow_dispatch:
+    inputs:
+      environment_to_migrate:
+        type: choice
+        description: 'The environment to migrate'
+        required: true
+        default: 'development'
+        options:
+          - all
+          - development
+          - qa
+          - staging
+          - production
+      target_owner:
+        type: string
+        description: 'The target organization owner'
+        required: true
+        default: '<YOUR_ORG_NAME>'
+      target_repo_name:
+        type: string
+        description: 'The target infrastructure repository'
+        required: true
+        default: '<YOUR_REPO_NAME>'
+
+env:
+  SOURCE_REPO: ${{ github.repository }}
+  TARGET_REPO: ${{ inputs.target_owner }}/${{ inputs.target_repo_name }}
+  GH_TOKEN: ${{ secrets.MIGRATION_GH_TOKEN }}
+  INFRA_TOKEN: ${{ secrets.MIGRATION_GH_TOKEN }}
+  INFRA_ORGANISATION: ${{ inputs.target_owner }}
+  INFRA_REPOSITORY: ${{ inputs.target_repo_name }}
+jobs:
+  repository-configuration-migration:
+    name: Repository secrets and variables
+    runs-on: ubuntu-latest
+    outputs:
+      secrets: ${{ steps.summary.outputs.secrets }}
+      variables: ${{ steps.summary.outputs.variables }}
+      environments: ${{ steps.summary.outputs.environments }}
+    steps:
+      - name: Summary
+        id: summary
+        run: |
+          # Repository-level counts
+          SOURCE_SECRETS=$(gh api repos/$SOURCE_REPO/actions/secrets --jq '.secrets')
+          SOURCE_SECRETS_COUNT=$(echo "$SOURCE_SECRETS" | jq 'length')
+          SOURCE_SECRETS_NAMES=$(echo "$SOURCE_SECRETS" | jq -r '.[].name' | sort)
+          echo secrets=$SOURCE_SECRETS_NAMES >> $GITHUB_OUTPUT
+
+          SOURCE_VARS=$(gh api repos/$SOURCE_REPO/actions/variables --jq '.variables')
+          SOURCE_VARS_COUNT=$(echo "$SOURCE_VARS" | jq 'length')
+          SOURCE_VARS_NAMES=$(echo "$SOURCE_VARS" | jq -r '.[].name' | sort)
+          echo variables=$SOURCE_VARS_NAMES >> $GITHUB_OUTPUT
+
+          SOURCE_ENVS=$(gh api repos/$SOURCE_REPO/environments --jq '.environments | map(.name)')
+          SOURCE_ENVS_COUNT=$(echo "$SOURCE_ENVS" | jq ' . | length')
+          if [ "${{ inputs.environment_to_migrate }}" = "all" ]; then
+            echo environments=$SOURCE_ENVS >> $GITHUB_OUTPUT
+          else
+            echo environments='["${{ inputs.environment_to_migrate }}"]' >> $GITHUB_OUTPUT
+          fi
+
+
+          TARGET_SECRETS=$(gh api repos/$TARGET_REPO/actions/secrets --jq '.secrets')
+          TARGET_SECRETS_COUNT=$(echo "$TARGET_SECRETS" | jq 'length')
+          TARGET_SECRETS_NAMES=$(echo "$TARGET_SECRETS" | jq -r '.[].name' | sort)
+
+          TARGET_VARS=$(gh api repos/$TARGET_REPO/actions/variables --jq '.variables')
+          TARGET_VARS_COUNT=$(echo "$TARGET_VARS" | jq 'length')
+          TARGET_VARS_NAMES=$(echo "$TARGET_VARS" | jq -r '.[].name' | sort)
+
+          TARGET_ENVS_COUNT=$(gh api repos/$TARGET_REPO/environments --jq '.total_count')
+          echo "
+          ## Source repository: $SOURCE_REPO
+
+          - 🌍 Number of environments: $SOURCE_ENVS_COUNT
+          - 🔐 Number of secrets (repo scope): $SOURCE_SECRETS_COUNT
+          - 📋 Number of variables (repo scope): $SOURCE_VARS_COUNT
+
+          ## Target repository: $TARGET_REPO
+          - 🌍 Number of environments: $TARGET_ENVS_COUNT
+          - 🔐 Number of secrets (repo scope): $TARGET_SECRETS_COUNT
+          - 📋 Number of variables (repo scope): $TARGET_VARS_COUNT
+          " >> $GITHUB_STEP_SUMMARY
+      - name: 'Export variables from ${{ github.repository }}'
+        id: export-repo-variables
+        run: |
+          jq -n -r \
+          '
+              [${{ toJSON(vars) }}]
+              | add
+              | with_entries(.value |= @base64)
+              | to_entries[]
+              | "\(.key)=\(.value)"
+          ' > variables.env
+      - name: Import variables to ${{ inputs.target_owner }}/${{ inputs.target_repo_name }}
+        run: |
+          echo "📊 Importing variables to $TARGET_REPO"
+          # Import each variable
+          while read line; do
+            [ -z "$line" ] && continue # Skip empty lines
+            KEY=$(echo "$line" | cut -d'=' -f1)
+            VALUE=$(echo "$line" | cut -d'=' -f2-)
+            DECODED_VALUE=$(echo "$VALUE" | base64 -d)
+            echo "  ✓ Setting variable: $KEY"
+            gh variable set "$KEY" --body "$DECODED_VALUE" --repo "$TARGET_REPO"
+          done < variables.env
+      - name: Export repository secrets
+        id: export-repo-secrets
+        run: |
+          jq -n -r \
+          '
+              [${{ toJSON(secrets) }}]
+              | add
+              | with_entries(.value |= @base64)
+              | to_entries[]
+              | "\(.key)=\(.value)"
+          ' > secrets.env
+      - name: Import secrets to ${{ inputs.target_owner }}/${{ inputs.target_repo_name }}
+        run: |
+          echo "📊 Importing secrets to $TARGET_REPO"
+          # Import each secret
+          while read line; do
+            [ -z "$line" ] && continue # Skip empty lines
+            KEY=$(echo "$line" | cut -d'=' -f1)
+            if echo "$KEY" | grep -iq MIGRATION_GH_TOKEN || echo "$KEY" | grep -iq gh_token; then
+              KEY=GH_TOKEN
+              echo "  ⚠️ Using replacement value for MIGRATION_GH_TOKEN secret: $KEY instead of actual value"
+            elif echo "$KEY" | grep -iq github || echo "$KEY" | grep -iq gh_token; then
+              echo "  ⚠️ Skipping secret: $KEY"
+              continue
+            fi
+            VALUE=$(echo "$line" | cut -d'=' -f2-)
+            DECODED_VALUE=$(echo "$VALUE" | base64 -d)
+            echo "  ✓ Setting secret: $KEY"
+            gh secret set "$KEY" --body "$DECODED_VALUE" --repo "$TARGET_REPO"
+          done < secrets.env
+
+  environment-secrets-migration:
+    runs-on: ubuntu-latest
+    needs: repository-configuration-migration
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        environment: ${{ fromJSON(needs.repository-configuration-migration.outputs.environments) }}
+    environment: ${{ matrix.environment }}
+    name: Copy secrets and vars to ${{ matrix.environment }} environment
+    env:
+      SECRETS_LIST: ${{ needs.repository-configuration-migration.outputs.secrets }}
+      VARS_LIST: ${{ needs.repository-configuration-migration.outputs.variables }}
+      ENVIRONMENT: ${{ matrix.environment }}
+    steps:
+      - name: 'Export variables from ${{ github.repository }}/${{ matrix.environment }}'
+        run: |
+          jq -n -r \
+          '
+              [${{ toJSON(vars) }}]
+              | add
+              | with_entries(.value |= @base64)
+              | to_entries[]
+              | "\(.key)=\(.value)"
+          ' > variables.env
+      - name: 'Export secrets from ${{ github.repository }}/${{ matrix.environment }}'
+        run: |
+          jq -n -r \
+          '
+              [${{ toJSON(secrets) }}]
+              | add
+              | with_entries(.value |= @base64)
+              | to_entries[]
+              | "\(.key)=\(.value)"
+          ' > secrets.env
+      - name: Create environment in ${{ inputs.target_owner }}/${{ inputs.target_repo_name }} if not exists
+        run: |
+          if gh api repos/$TARGET_REPO/environments/$ENVIRONMENT 2>/dev/null; then
+            echo "✅ Environment '$ENVIRONMENT' already exists"
+          else
+            echo "🔧 Creating environment '$ENVIRONMENT'..."
+            gh api repos/$TARGET_REPO/environments/$ENVIRONMENT -X PUT
+          fi
+      - name: Import variables to ${{ inputs.target_owner }}/${{ inputs.target_repo_name }} in ${{ matrix.environment }} environment
+        id: import-environment-variables
+        run: |
+          echo "📊 Importing variables to $TARGET_REPO"
+          # Import each variable
+          VARIABLES_LIST=$(gh api repos/$SOURCE_REPO/environments/$ENVIRONMENT/variables --jq '.variables[].name')
+          SKIPPED_KEYS=()
+          while read line; do
+            [ -z "$line" ] && continue # Skip empty lines
+            KEY=$(echo "$line" | cut -d'=' -f1)
+            VALUE=$(echo "$line" | cut -d'=' -f2-)
+            echo $VARIABLES_LIST | grep -q "$KEY" || { SKIPPED_KEYS+=("$KEY") && continue; }
+            DECODED_VALUE=$(echo "$VALUE" | base64 -d)
+            echo "  ✓ Setting variable: $KEY"
+            gh variable set "$KEY" --body "$DECODED_VALUE" --env "$ENVIRONMENT" --repo "$TARGET_REPO"
+          done < variables.env
+          echo "⚠️ Skipped variables, please check and move manually: ${SKIPPED_KEYS[*]}"
+          echo "SKIPPED_KEYS=${SKIPPED_KEYS[*]}" >> $GITHUB_OUTPUT
+      - name: Import secrets to ${{ inputs.target_owner }}/${{ inputs.target_repo_name }} in ${{ matrix.environment }} environment
+        id: import-environment-secrets
+        run: |
+          echo "📊 Importing secrets to $TARGET_REPO"
+          # Import each secret
+          SECRETS_LIST=$(gh api repos/$SOURCE_REPO/environments/$ENVIRONMENT/secrets --jq '.secrets[].name')
+
+          SKIPPED_KEYS=()
+          while read line; do
+            [ -z "$line" ] && continue # Skip empty lines
+            KEY=$(echo "$line" | cut -d'=' -f1)
+            VALUE=$(echo "$line" | cut -d'=' -f2-)
+            if echo "$KEY" | grep -iq MIGRATION_GH_TOKEN || echo "$KEY" | grep -iq gh_token; then
+              KEY=GH_TOKEN
+              echo "  ⚠️ Using replacement value for MIGRATION_GH_TOKEN secret: $KEY instead of actual value"
+            elif echo "$KEY" | grep -iq github || echo "$KEY" | grep -iq gh_token; then
+              echo "  ⚠️ Skipping secret: $KEY"
+              continue
+            fi
+            echo $SECRETS_LIST | grep -q "$KEY" || { SKIPPED_KEYS+=("$KEY") && continue; }
+            DECODED_VALUE=$(echo "$VALUE" | base64 -d)
+            echo "  ✓ Setting secret: $KEY"
+            gh secret set "$KEY" --body "$DECODED_VALUE" --env "$ENVIRONMENT" --repo "$TARGET_REPO"
+          done < secrets.env
+          echo "⚠️ Skipped secrets, please check and move manually: ${SKIPPED_KEYS[*]}"
+          echo "SKIPPED_KEYS=${SKIPPED_KEYS[*]}" >> $GITHUB_OUTPUT
+
+      - name: Summary
+        run: |
+          {
+          echo "
+          ## Summary for environment: $ENVIRONMENT
+          - 📋 Number of variables (repo scope): $(wc -l variables.env)
+          - 🔐 Number of secrets (repo scope): $(wc -l secrets.env)
+          - ⚠️ There are skipped variables and secrets (please check):
+            - secrets: $(echo  ${{ steps.import-environment-secrets.outputs.SKIPPED_KEYS }} | wc -w)
+            - variables: $(echo  ${{ steps.import-environment-variables.outputs.SKIPPED_KEYS }} | wc -w)
+          ---
+          **NOTE:** Skipped items doesn't mean there is an error, probably items are defined at repository level,
+          variable or secret name conflicts with existing secret or variable in the target repository,
+          incorrect filter applied.
+          "
+          } >> $GITHUB_STEP_SUMMARY
+
+  bootstrap-self-hosted-runner:
+    needs:
+      - repository-configuration-migration
+      - environment-secrets-migration
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        environment: ${{ fromJSON(needs.repository-configuration-migration.outputs.environments) }}
+    environment: ${{ matrix.environment }}
+    name: Bootstrap ${{ matrix.environment }} self-hosted runner
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Clone country config resource package
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+          path: './${{ github.event.repository.name }}'
+
+      - name: Set variables for ansible
+        id: ansible-variables
+        run: |
+          JSON_WITH_NEWLINES=$(cat<<EOF
+            ${{ toJSON(env) }}
+          EOF)
+          JSON_WITHOUT_NEWLINES=$(echo $JSON_WITH_NEWLINES | jq -R -c .)
+          echo "EXTRA_VARS=$JSON_WITHOUT_NEWLINES" >> $GITHUB_OUTPUT
+        env:
+          manager_production_server_ip: ${{ vars.SSH_HOST }}
+          ansible_user: ${{ secrets.SSH_USER }}
+          target_repo_owner: ${{ inputs.target_owner }}
+          target_repo_name: ${{ inputs.target_repo_name }}
+          migration_token: ${{ secrets.MIGRATION_GH_TOKEN }}
+          docker_swarm_env: ${{ matrix.environment }}
+      - name: Read known hosts
+        run: |
+          cd ${{ github.event.repository.name }}
+          echo "KNOWN_HOSTS<<EOF" >> $GITHUB_ENV
+          sed -i -e '$a\' ./infrastructure/known-hosts
+          cat ./infrastructure/known-hosts >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          known_hosts: ${{ env.KNOWN_HOSTS }}
+      - name: Run playbook
+        uses: dawidd6/action-ansible-playbook@v2.8.0
+        env:
+          ANSIBLE_PERSISTENT_COMMAND_TIMEOUT: 10
+          ANSIBLE_SSH_TIMEOUT: 10
+          ANSIBLE_SSH_RETRIES: 5
+        with:
+          playbook: self-hosted-runner.yml
+          directory: ${{ github.event.repository.name }}/infrastructure/server-setup
+          options: |
+            --verbose
+            --inventory inventory/${{ matrix.environment }}.yml
+            --extra-vars ""${{ steps.ansible-variables.outputs.EXTRA_VARS }}""
+      - name: Runner summary
+        run: |
+          echo "
+          ## Self-hosted runner bootstrap for environment: ${{ matrix.environment }}
+          ✅ Runner has been bootstrapped:
+            - Runner host: ${{ vars.SSH_HOST }}
+            - Connected to repository: ${{ inputs.target_owner }}/${{ inputs.target_repo_name }}
+          " >> $GITHUB_STEP_SUMMARY
+
+  create-configuration-files:
+    needs:
+      - repository-configuration-migration
+      - bootstrap-self-hosted-runner
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        environment: ${{ fromJSON(needs.repository-configuration-migration.outputs.environments) }}
+    environment: ${{ matrix.environment }}
+    name: Create configuration files for ${{ matrix.environment }} env
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Clone country config resource package
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.MIGRATION_GH_TOKEN }}
+          path: country-config-repo
+      - name: Clone infrastructure repository
+        uses: actions/checkout@v5
+        with:
+          repository: ${{ inputs.target_owner }}/${{ inputs.target_repo_name }}
+          token: ${{ secrets.MIGRATION_GH_TOKEN }}
+          path: infrastructure-repo
+      - name: Configure git client for infrastructure repository
+        working-directory: infrastructure-repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: infrastructure-repo/.nvmrc
+
+      - name: Create configuration files
+        working-directory: infrastructure-repo
+        env:
+          ENVIRONMENT: ${{ matrix.environment }}
+          OLD_INVENTORY_PATH: ../country-config-repo/infrastructure/server-setup/inventory
+        run: |
+          pnpm install
+          pnpm environment:swarm-to-k8s
+      - name: Commit, push changes and create PR
+        working-directory: infrastructure-repo
+        if: matrix.environment != 'backup' && matrix.environment != 'jump'
+        env:
+          BRANCH_NAME: add-config-files-${{ matrix.environment }}
+        run: |
+          echo "Current branch: $(git branch --show-current)"
+          BASE_BRANCH=$(git branch --show-current)
+          echo "Checking if branch '$BRANCH_NAME' exists on remote repository..."
+          if git ls-remote --exit-code --heads origin $BRANCH_NAME >/dev/null 2>&1; then
+            echo "⚠️  Branch '$BRANCH_NAME' exists on remote repository."
+            echo "⚠️  Branch '$BRANCH_NAME' exists on remote repository. New branch ${BRANCH_NAME}-$(date +%s) was created to avoid conflicts." >> $GITHUB_STEP_SUMMARY
+            BRANCH_NAME=${BRANCH_NAME}-$(date +%s)
+            echo "➡️  New branch name: $BRANCH_NAME"
+          fi
+
+          git checkout -b $BRANCH_NAME
+          git add .
+          git commit -m "chore: Create configuration files for ${{ matrix.environment }} environment"
+          git push --set-upstream origin $BRANCH_NAME
+          git status
+          gh pr create \
+            --repo ${{ inputs.target_owner }}/${{ inputs.target_repo_name }} \
+            --title "🔧 Add configuration for ${{ matrix.environment }}" \
+            --body "Automated configuration migration from workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --base $BASE_BRANCH \
+            --head $BRANCH_NAME
+          echo "✅ Pull request created for ${{ matrix.environment }} environment with configuration files." >> $GITHUB_STEP_SUMMARY

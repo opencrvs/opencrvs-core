@@ -1,0 +1,177 @@
+name: Deploy (development)
+run-name: 'Deploy to ${{ inputs.environment }} with (core: ${{ inputs.core-image-tag }}, country config: ${{ inputs.countryconfig-image-tag }}, reset: ${{ inputs.reset }})'
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: Environment to deploy to
+        required: true
+        default: 'staging'
+        options:
+          - staging
+          - qa
+          - development
+      core-image-tag:
+        description: Core DockerHub image tag
+        required: true
+        default: 'v1.8.1'
+      countryconfig-image-tag:
+        description: Your Country Config DockerHub image tag
+        default: 'latest'
+        required: false
+      reset:
+        type: boolean
+        description: Reset the environment
+        default: false
+jobs:
+  deploy:
+    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-24.04
+    outputs:
+      outcome: ${{ steps.deploy.outcome }}
+    timeout-minutes: 60
+    steps:
+      - name: Clone core
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          repository: 'opencrvs/opencrvs-core'
+          path: './opencrvs-core'
+      - name: Clone country config resource package
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+          path: './${{ github.event.repository.name }}'
+
+      - name: Checkout country branch ${{ inputs.countryconfig-image-tag }}
+        if: ${{ inputs.countryconfig-image-tag != 'latest' && inputs.countryconfig-image-tag != '' }}
+        working-directory: ${{ github.event.repository.name }}
+        run: git checkout ${{ inputs.countryconfig-image-tag }}
+
+      - name: Checkout core branch ${{ inputs.core-image-tag }}
+        working-directory: opencrvs-core
+        run: git checkout ${{ inputs.core-image-tag }}
+
+      - name: Resolve image tags
+        working-directory: ${{ github.event.repository.name }}
+        run: |
+          if [ '${{ inputs.countryconfig-image-tag }}' == 'latest' ] || [ '${{ inputs.countryconfig-image-tag }}' == '' ]
+          then
+            image_tag=`git rev-parse --short=7 HEAD`
+            message="⚠️ You haven't provided country config image tag, using latest git hash as image tag."
+            message="$message Please make sure image with tag was built and pushed to your registry"
+          else
+            image_tag=${{ inputs.countryconfig-image-tag }}
+          fi
+
+          message="Core image tag: ${{ inputs.core-image-tag }} \n\nCountry config image tag: $image_tag \n\n $message"
+          echo -e $message | tee -a $GITHUB_STEP_SUMMARY
+          echo "image_tag=$image_tag" >> $GITHUB_ENV
+
+      - name: Read known hosts
+        working-directory: ${{ github.event.repository.name }}
+        run: |
+          echo "KNOWN_HOSTS<<EOF" >> $GITHUB_ENV
+          sed -i -e '$a\' ./infrastructure/known-hosts
+          cat ./infrastructure/known-hosts >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          known_hosts: ${{ env.KNOWN_HOSTS }}
+
+      - name: Unset KNOWN_HOSTS variable
+        run: |
+          echo "KNOWN_HOSTS=" >> $GITHUB_ENV
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Wait for images to be available
+        run: |
+          while true; do
+            if docker manifest inspect ghcr.io/opencrvs/ocrvs-auth:${{ inputs.core-image-tag }}; then
+              break
+            fi
+            sleep 10
+          done
+          while true; do
+            if docker manifest inspect ${{ secrets.DOCKERHUB_ACCOUNT }}/${{ secrets.DOCKERHUB_REPO }}:${{ env.image_tag }}; then
+              break
+            fi
+            sleep 10
+          done
+
+      - name: Export all secrets and environment variables
+        working-directory: ${{ github.event.repository.name }}
+        run: |
+          jq -n -r '
+              [${{ toJSON(secrets) }}, ${{ toJSON(vars) }}]
+              | add
+              | to_entries
+              | map(select(.value | test("\n") | not))
+              | map("\(.key)=\"\(.value)\"")
+              | .[]
+          ' > .env.${{ inputs.environment }}
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ${{ github.event.repository.name }}/.nvmrc
+
+      - name: Deploy to ${{ inputs.environment }}
+        id: deploy
+        working-directory: ${{ github.event.repository.name }}
+        run: |
+          pnpm deploy \
+          --clear_data=no \
+          --environment=${{ inputs.environment }} \
+          --host=${{ vars.DOMAIN }} \
+          --ssh_host=${{ vars.SSH_HOST || secrets.SSH_HOST }} \
+          --ssh_port=${{ vars.SSH_PORT || secrets.SSH_PORT }} \
+          --ssh_user=${{ secrets.SSH_USER }} \
+          --version=${{ inputs.core-image-tag }} \
+          --country_config_version=${{ env.image_tag }} \
+          --replicas=${{ vars.REPLICAS }}
+
+  reset:
+    needs: deploy
+    if: ${{ inputs.reset == 'true' && needs.deploy.outputs.outcome == 'success' }}
+    uses: ./.github/workflows/clear-environment.yml
+    with:
+      environment: ${{ inputs.environment }}
+    secrets: inherit
+
+  seed-data:
+    needs: reset
+    if: ${{ inputs.reset == 'true' && needs.reset.outputs.outcome == 'success' }}
+    uses: ./.github/workflows/seed-data.yml
+    with:
+      environment: ${{ inputs.environment }}
+      core-image-tag: ${{ inputs.core-image-tag }}
+    secrets: inherit
+
+  reindex-after-seed:
+    needs: seed-data
+    if: ${{ inputs.reset == 'true' && needs.seed-data.result == 'success' }}
+    uses: ./.github/workflows/reindex.yml
+    with:
+      environment: ${{ inputs.environment }}
+      core-image-tag: ${{ inputs.core-image-tag }}
+    secrets: inherit
+
+  reindex-after-deploy:
+    needs: deploy
+    if: ${{ inputs.reset != 'true' && needs.deploy.result == 'success' }}
+    uses: ./.github/workflows/reindex.yml
+    with:
+      environment: ${{ inputs.environment }}
+      core-image-tag: ${{ inputs.core-image-tag }}
+    secrets: inherit

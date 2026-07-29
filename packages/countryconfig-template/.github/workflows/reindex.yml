@@ -1,0 +1,65 @@
+name: Reindex search
+run-name: Reindex search in ${{ inputs.environment }} core=${{ inputs.core-image-tag }}
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      core-image-tag:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: Environment where to reindex search
+        required: true
+        default: 'development'
+        options:
+          - development
+          - qa
+          - staging
+          - production
+      core-image-tag:
+        description: Core DockerHub image tag
+        required: true
+jobs:
+  reindex:
+    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    steps:
+      - name: Clone country config resource package
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+          path: './${{ github.event.repository.name }}'
+
+      - name: Read known hosts
+        run: |
+          cd ${{ github.event.repository.name }}
+          echo "KNOWN_HOSTS<<EOF" >> $GITHUB_ENV
+          sed -i -e '$a\' ./infrastructure/known-hosts
+          cat ./infrastructure/known-hosts >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          known_hosts: ${{ env.KNOWN_HOSTS }}
+
+      - name: Run reindex script in docker container
+        run: |
+          ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=120 -p ${{ vars.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ vars.SSH_HOST }} ${{ vars.SSH_ARGS }} "
+            docker run --rm \
+              -v /opt/opencrvs/infrastructure/deployment:/workspace \
+              -w /workspace \
+              --network opencrvs_overlay_net \
+              -e 'AUTH_URL=http://auth:4040/' \
+              -e 'EVENTS_URL=http://events:5555/' \
+              alpine \
+              sh -c 'apk add --no-cache curl jq && timeout 60m sh reindex.sh'"

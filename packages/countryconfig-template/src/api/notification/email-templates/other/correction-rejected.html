@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style type="text/css">
+      body {
+        font-family: 'Noto Sans', sans-serif;
+      }
+
+      h1 {
+        font-size: 21px;
+        margin-top: 32px;
+        margin-bottom: 32px;
+        font-weight: bold;
+      }
+
+      p {
+        line-height: 28px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <img
+      src="{{countryLogo}}"
+      alt="country_logo"
+      style="max-height: 104px; max-width: 100%"
+    />
+    <h1>Correction rejected</h1>
+    <p>
+      Dear {{firstNames}} {{lastName}}<br /><br />
+
+      Unfortunately your request to correct the {{event}} record {{trackingId}}
+      has been rejected.<br /><br />
+    </p>
+
+    <p>
+      Reason for rejection:<br />
+      {{reason}}
+    </p>
+
+    <p>
+      Best regards, <br />
+      {{applicationName}} Team
+    </p>
+  </body>
+</html>

@@ -1,0 +1,541 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Informant notification - Email > birth - DECLARE 1`] = `
+{
+  "from": "",
+  "html": "<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" />
+    <style type="text/css">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            color: #222;
+            padding: 16px 24px;
+        }
+
+        h1 {
+            font-size: 21px;
+            margin-top: 32px;
+            margin-bottom: 36px;
+            font-weight: 700;
+        }
+
+        p {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        i {
+            color: #666;
+            font-weight: 400;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="http://localhost:3040/content/country-logo" alt="country_logo" style="max-height: 88px;
+                max-width: 100%;">
+    <h1>Birth declaration submitted for review</h1>
+    <p>
+        Hello Rouge,
+    </p>
+    <p>
+        Your birth declaration for Ace is now in review. Please expect a follow up response in the next few days on
+        the outcome of your birth declaration.
+    </p>
+    <p>
+        Your registration tracking ID is <strong>PRZIB7</strong>. Please use this in any follow up enquiries with the Registrar
+        at Windmill village registrar office.
+    </p>
+    </br>
+    <p>
+        Best regards, <br />
+        Farajaland CRS Team
+    </p>
+    </br>
+    <i>This is an automated message. Please do not reply to this email.</i>
+</body>
+
+</html>",
+  "subject": "Birth declaration in review",
+  "to": "rouge@portgas.com",
+}
+`;
+
+exports[`Informant notification - Email > birth - NOTIFY 1`] = `
+{
+  "from": "",
+  "html": "<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" />
+    <style type="text/css">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            color: #222;
+            padding: 16px 24px;
+        }
+
+        h1 {
+            font-size: 21px;
+            margin-top: 32px;
+            margin-bottom: 36px;
+            font-weight: 700;
+        }
+
+        p {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        i {
+            color: #666;
+            font-weight: 400;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="http://localhost:3040/content/country-logo" alt="country_logo" style="max-height: 88px;
+                max-width: 100%;">
+    <h1>Complete your birth declaration</h1>
+
+    <p>
+            Hello Rouge,
+    </p>    
+    <p>
+        Please visit Windmill village registrar office to complete your birth declaration. 
+    </p>
+    </p>
+        Your birth registration tracking ID is <strong>PRZIB7</strong>.
+    </p>
+    </br>
+    <p>
+        Best regards, 
+    <br />
+        Farajaland CRS Team
+    </p>
+    </br>
+    <i>This is an automated message. Please do not reply to this email.</i>
+</body>
+
+</html>
+
+",
+  "subject": "Birth declaration in progress",
+  "to": "rouge@portgas.com",
+}
+`;
+
+exports[`Informant notification - Email > birth - REGISTER 1`] = `
+{
+  "from": "",
+  "html": "<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" />
+    <style type="text/css">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            color: #222;
+            padding: 16px 24px;
+        }
+
+        h1 {
+            font-size: 21px;
+            margin-top: 32px;
+            margin-bottom: 36px;
+            font-weight: 700;
+        }
+
+        p {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        i {
+            color: #666;
+            font-weight: 400;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="http://localhost:3040/content/country-logo" alt="country_logo" style="max-height: 88px;
+                max-width: 100%;">
+    <h1>Birth registration completed</h1>
+    <p>
+        Hello Rouge,
+    </p>
+    <p>
+        Congratulations, the birth of Ace has been registered.
+    </p>
+    <p>
+        Your birth registration number (BRN) is: <strong>P4JPMNEW3ZM3</strong>
+    </p>
+    <p>
+        Please visit Windmill village registrar office with your ID to collect your birth certificate. Your registration tracking ID is
+        PRZIB7.
+    </p>
+    </br>
+    <p>
+        Best regards, <br />
+        Farajaland CRS Team
+    </p>
+    </br>
+    <i>This is an automated message. Please do not reply to this email.</i>
+</body>
+
+</html>
+",
+  "subject": "Birth declaration registered",
+  "to": "rouge@portgas.com",
+}
+`;
+
+exports[`Informant notification - Email > birth - REJECT 1`] = `
+{
+  "from": "",
+  "html": "<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" />
+    <style type="text/css">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            color: #222;
+            padding: 16px 24px;
+        }
+
+        h1 {
+            font-size: 21px;
+            margin-top: 32px;
+            margin-bottom: 36px;
+            font-weight: 700;
+        }
+
+        p {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        i {
+            color: #666;
+            font-weight: 400;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="http://localhost:3040/content/country-logo" alt="country_logo" style="max-height: 88px;
+                max-width: 100%;">
+    <h1>Birth declaration requires changes</h1>
+    <p>
+            Hello Rouge,
+    </p>
+    <p>
+        Your birth declaration for Ace requires updates. Please visit Windmill village registrar office to complete your
+        declaration with your supporting documents.
+    </p>
+    <p>
+        Your registration tracking ID is <strong>PRZIB7</strong>.
+    </p>
+    </br>   
+    <p>
+        Best regards, <br />
+        Farajaland CRS Team
+    </p>
+    </br>
+    <i>This is an automated message. Please do not reply to this email.</i>
+</body>
+
+</html>
+",
+  "subject": "Birth declaration required update",
+  "to": "rouge@portgas.com",
+}
+`;
+
+exports[`Informant notification - Email > death - DECLARE 1`] = `
+{
+  "from": "",
+  "html": "<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" />
+    <style type="text/css">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            color: #222;
+            padding: 16px 24px;
+        }
+
+        h1 {
+            font-size: 21px;
+            margin-top: 32px;
+            margin-bottom: 36px;
+            font-weight: 700;
+        }
+
+        p {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        i {
+            color: #666;
+            font-weight: 400;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="http://localhost:3040/content/country-logo" alt="country_logo" style="max-height: 88px;
+                max-width: 100%;">
+    <h1>Death declaration submitted for review</h1>
+    <p>
+        Hello Toki,
+    </p>
+    <p>
+        Your death declaration for Oden is now in review. Please expect a follow up response in the next few days on
+        the outcome of your death declaration.
+    </p>
+    <p>
+        Your registration tracking ID is <strong>PRZIB7</strong>. Please use this in any follow up enquiries with the Registrar
+        at Windmill village registrar office.
+    </p>
+    </br>
+    <p>
+        Best regards, <br />
+        Farajaland CRS Team
+    </p>
+    </br>
+    <i>This is an automated message. Please do not reply to this email.</i>
+</body>
+
+</html>",
+  "subject": "Death declaration in review",
+  "to": "toki@kozuki.com",
+}
+`;
+
+exports[`Informant notification - Email > death - NOTIFY 1`] = `
+{
+  "from": "",
+  "html": "<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" />
+    <style type="text/css">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            color: #222;
+            padding: 16px 24px;
+        }
+
+        h1 {
+            font-size: 21px;
+            margin-top: 32px;
+            margin-bottom: 36px;
+            font-weight: 700;
+        }
+
+        p {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        i {
+            color: #666;
+            font-weight: 400;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="http://localhost:3040/content/country-logo" alt="country_logo" style="max-height: 88px;
+                max-width: 100%;">
+    <h1>Complete your death declaration</h1>
+    <p>
+            Hello Toki,
+    </p>
+    <p>
+        Please visit Windmill village registrar office to complete your death declaration. Your death registration tracking ID is
+        <strong>PRZIB7</strong>.
+    </p>
+    </br>
+    <p>
+        Best regards, <br />
+        Farajaland CRS Team
+    </p>
+    </br>
+    <i>This is an automated message. Please do not reply to this email.</i>
+</body>
+
+</html>",
+  "subject": "Death declaration in progress",
+  "to": "toki@kozuki.com",
+}
+`;
+
+exports[`Informant notification - Email > death - REGISTER 1`] = `
+{
+  "from": "",
+  "html": "<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" />
+    <style type="text/css">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            color: #222;
+            padding: 16px 24px;
+        }
+
+        h1 {
+            font-size: 21px;
+            margin-top: 32px;
+            margin-bottom: 36px;
+            font-weight: 700;
+        }
+
+        p {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        i {
+            color: #666;
+            font-weight: 400;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="http://localhost:3040/content/country-logo" alt="country_logo" style="max-height: 88px;
+                max-width: 100%;">
+    <h1>Death registration completed</h1>
+    <p>
+        Hello Toki,
+    </p>
+    <p>
+        Congratulations, the death of Oden has been registered.
+    </p>
+    <p>
+        Your death registration number (DRN) is: <strong>P4JPMNEW3ZM3</strong>
+    </p>
+    <p> 
+        Please visit Windmill village registrar office with your ID to collect your death certificate. Your registration tracking ID is
+        <strong>PRZIB7</strong>.
+    </p>
+    </br>
+    <p>
+        Best regards, <br />
+        Farajaland CRS Team
+    </p>
+    </br>
+    <i>This is an automated message. Please do not reply to this email.</i>
+</body>
+
+</html>
+",
+  "subject": "Death declaration registered",
+  "to": "toki@kozuki.com",
+}
+`;
+
+exports[`Informant notification - Email > death - REJECT 1`] = `
+{
+  "from": "",
+  "html": "<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" />
+    <style type="text/css">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            color: #222;
+            padding: 16px 24px;
+        }
+
+        h1 {
+            font-size: 21px;
+            margin-top: 32px;
+            margin-bottom: 36px;
+            font-weight: 700;
+        }
+
+        p {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        i {
+            color: #666;
+            font-weight: 400;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="http://localhost:3040/content/country-logo" alt="country_logo" style="max-height: 88px;
+                max-width: 100%;">
+    <h1>Death declaration requires changes</h1>
+    <p>
+            Hello Toki,
+    </p>
+    <p>
+        Your death declaration for Oden requires updates. Please visit Windmill village registrar office to complete your
+        declaration with your supporting documents.
+    </p>
+    <p>
+        Your registration tracking ID is <strong>PRZIB7</strong>.
+    </p>
+    </br>
+    <p>
+        Best regards, <br />
+        Farajaland CRS Team
+    </p>
+    </br>
+    <i>This is an automated message. Please do not reply to this email.</i>
+</body>
+
+</html>
+",
+  "subject": "Death declaration required update",
+  "to": "toki@kozuki.com",
+}
+`;

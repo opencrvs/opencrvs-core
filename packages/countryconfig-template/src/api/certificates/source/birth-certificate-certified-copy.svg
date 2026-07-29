@@ -1,0 +1,401 @@
+<svg width="595" height="842" viewBox="0 0 595 842" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <rect width="595" height="842" fill="white" />
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+    <tspan x="220.625" y="678.552">&#x2028;</tspan>
+    <tspan x="61" y="691.352">{{ordinalFormatDate registrar.date}}</tspan>
+  </text>
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="61" y="678.552">Date of certification / Date de certification</tspan>
+  </text>
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+    <tspan x="220.727" y="712.552">&#x2028;</tspan>
+    <tspan x="61" y="725.352">{{location registrar.officeId 'name'}}, {{location registrar.districtId 'name'}}, {{location registrar.stateId 'name'}}, Farajaland</tspan>
+  </text>
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="61" y="712.552">Place of certification / Lieu de certification</tspan>
+  </text>
+  <!--<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0.5px">
+    <tspan x="61" y="759.104">{{mosipAid}}</tspan>
+  </text>
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="61" y="747.104">MOSIP Application ID / MOSIP Application ID&#10;</tspan>
+  </text>-->
+  <path d="M324.42 741L532.999 741.984" stroke="#CCCCCC" stroke-width="0.782258" stroke-dasharray="3.13 1.56" />
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+    <tspan x="387.936" y="754.656">Certified by: {{registrar.name}}</tspan>
+  </text>
+  <g clip-path="url(#clip0_946_2501)">
+    <text fill="#8D8D8D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="6" font-weight="600" letter-spacing="0px">
+      <tspan x="56" y="793.828">CAUTION : THERE ARE OFFENCES RELATING TO FALSIFYING OR ALTERING A CERTIFICATE AND USING OR POSSESSING A FALSE CERTIFICATE. A</tspan>
+      <tspan x="56" y="803.828">CERTIFICATE IS NOT PROOF OF IDENTITY / ATTENTION : IL EXISTE DES INFRACTIONS RELATIVES &#xc0; LA FALSIFIATION OU &#xc0; LA MODIFICATION</tspan>
+      <tspan x="56" y="813.828">D&#39;UN CERTIFICAT ET &#xc0; L&#39;UTILISATION OU LA POSSESSION D&#39;UN FAUX CERTIFICAT. UN CERTIFICAT N&#39;EST PAS UNE PREUVE D&#39;IDENTIT&#xc9;</tspan>
+    </text>
+  </g>
+  <path d="M56 780.5H541V779.5H56V780.5Z" fill="#ECECEC" />
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+    <tspan x="61" y="628.604">I certify that this certificate is a true copy of the civil registry and is issued by the mandated authority in pursuance</tspan>
+    <tspan x="61" y="641.604">of civil registration and vital statistics law / J&#x2019;attestation est une copie conforme de l&#39;&#xe9;tat civil et est d&#xe9;livr&#xe9; par</tspan>
+    <tspan x="61" y="654.604">l&#39;autorit&#xe9; mandat&#xe9;e conform&#xe9;ment &#xe0; la loi sur l&#39;enregistrement et les statistiques de l&#39;&#xe9;tat civil</tspan>
+  </text>
+  <path d="M56 610H541" stroke="#038E86" stroke-width="2" stroke-linecap="round" />
+  <path d="M56 85H540" stroke="#038E86" stroke-width="2" stroke-linecap="round" />
+  <text fill="#038E86" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="bold" letter-spacing="4px">
+    <tspan x="221.483" y="99.88">No. {{registrationNumber}}</tspan>
+  </text>
+  <path d="M56 107H540" stroke="#038E86" stroke-width="2" stroke-linecap="round" />
+  <path d="M56 25H541" stroke="#DDDDDD" stroke-linecap="round" />
+  <g clip-path="url(#clip1_946_2501)">
+    <path d="M101.995 43.5958C101.997 50.8349 101.988 58.0763 102 65.3154C102.005 65.6338 101.906 65.9359 101.742 66.1911C101.59 66.4252 101.379 66.6172 101.128 66.7459L82.3116 77.6046C82.0516 77.7521 81.7752 77.8246 81.5058 77.8246C81.2294 77.8246 80.9506 77.7474 80.7023 77.6046L61.8948 66.7553C61.6371 66.6265 61.4193 66.4322 61.2647 66.1957C61.0984 65.9359 61 65.6338 61 65.3131L61.007 65.1679L61.0023 43.5115C60.9977 43.2212 61.0773 42.9473 61.2132 42.7108L61.2178 42.7062C61.3584 42.4627 61.5622 42.2613 61.8058 42.1185L80.6906 31.2201C80.9506 31.0726 81.2294 31 81.4964 31C81.7728 31 82.0539 31.0773 82.2999 31.2201L101.192 42.1209C101.456 42.273 101.66 42.4931 101.798 42.7436L101.803 42.7483C101.941 43.0058 102.009 43.3008 101.995 43.5958Z" fill="#EFCFA4" />
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M87.7976 72.5803H75.207L81.5011 76.2115L87.7976 72.5803Z" fill="#EFCFA4" />
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M75.207 72.5803H87.7976L94.094 68.9467H68.9104L75.207 72.5803Z" fill="#F1B162" />
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M68.9104 68.9467H94.094L100.388 65.3131H62.6139L68.9104 68.9467Z" fill="#C86E00" />
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M62.6139 65.3131H100.388V59.2282H62.6139V65.3131Z" fill="#EFCFA4" />
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M72.0072 59.2282H90.8944L86.172 51.055L82.2718 53.3049L77.1629 56.2525L72.0072 59.2282Z" fill="#E2F5F4" />
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M86.172 51.055L90.8944 59.2282H100.337L86.172 51.055Z" fill="#038E86" />
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M86.172 51.055L100.337 59.2282L90.4961 42.2028L76.767 50.1279L82.2718 53.3049L86.172 51.055Z" fill="#E2F5F4" />
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M100.337 59.2282L90.4961 42.2028L100.386 47.9107L100.337 59.2282Z" fill="#038E86" />
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M77.1629 56.2525L72.0517 47.4073L62.6116 52.8554L62.6139 59.2282L72.0072 59.2282L77.1629 56.2525Z" fill="#E2F5F4" />
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M72.0517 47.4073L77.1629 56.2525L82.2718 53.3049L76.767 50.1279L72.0517 47.4073Z" fill="#038E86" />
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M72.0517 47.4073L76.767 50.1279L90.4961 42.2051L100.386 47.9131V43.5139L81.4988 32.6131L62.6116 43.5115L62.614 52.8531L72.0517 47.4073ZM81.4988 42.7226C80.1682 42.7226 79.0907 41.6456 79.0907 40.3181C79.0907 38.9883 80.1682 37.9113 81.4988 37.9113C82.8269 37.9113 83.9068 38.9883 83.9068 40.3181C83.9044 41.6456 82.8269 42.7226 81.4988 42.7226Z" fill="#EEEEEE" />
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M81.4988 42.7226C82.8293 42.7226 83.9068 41.6456 83.9068 40.3158C83.9068 38.9859 82.8293 37.909 81.4988 37.909C80.1682 37.909 79.0907 38.9859 79.0907 40.3158C79.0907 41.6456 80.1682 42.7226 81.4988 42.7226Z" fill="#C86E00" />
+    <path d="M100.922 43.5396L100.927 65.3108C100.927 65.5074 100.819 65.6807 100.66 65.7743L81.7705 76.6774C81.5995 76.7781 81.3934 76.7711 81.2318 76.6774L62.3446 65.7767C62.1642 65.6713 62.0682 65.4793 62.0776 65.285L62.0729 43.5139C62.0729 43.3172 62.1806 43.144 62.3399 43.0503L81.2294 32.1472C81.4028 32.0465 81.6065 32.0536 81.7682 32.1472L100.655 43.048C100.836 43.1533 100.932 43.3453 100.922 43.5396ZM81.4988 37.3728C82.3116 37.3728 83.0495 37.703 83.5812 38.2344C84.113 38.7659 84.4432 39.5034 84.4432 40.3158C84.4432 41.1282 84.113 41.8633 83.5812 42.3971C83.0495 42.9286 82.3116 43.2587 81.4988 43.2587C80.686 43.2587 79.9504 42.9286 79.4164 42.3971C78.8846 41.8657 78.5543 41.1282 78.5543 40.3158C78.5543 39.5034 78.8846 38.7682 79.4164 38.2344L79.4492 38.204C79.9785 37.6913 80.7024 37.3728 81.4988 37.3728ZM82.8199 38.9977C82.4826 38.6605 82.0141 38.4498 81.4988 38.4498C80.9928 38.4498 80.536 38.6488 80.2011 38.9719L80.1777 38.9977C79.8403 39.3348 79.6295 39.803 79.6295 40.3181C79.6295 40.8332 79.8403 41.3014 80.1777 41.6386C80.515 41.9757 80.9835 42.1864 81.4988 42.1864C82.0141 42.1864 82.4826 41.9757 82.8199 41.6386C83.1572 41.3014 83.3681 40.8332 83.3681 40.3181C83.3681 39.803 83.1572 39.3348 82.8199 38.9977ZM63.1504 64.777H99.8519V59.7667H63.1504V64.777ZM98.3808 65.8516H64.6238L69.0534 68.4082H93.9536L98.3808 65.8516ZM87.6383 52.5206L91.2035 58.6921H98.3316L87.6383 52.5206ZM89.962 58.6921L85.9752 51.7878L74.0123 58.6921H89.962ZM73.5181 48.873L77.3597 55.5221L81.199 53.3073L73.5181 48.873ZM76.4297 56.0582L71.8573 48.1402L63.1481 53.1645L63.1504 58.6921H71.8667L76.4297 56.0582ZM63.1481 51.9259L71.7823 46.9438C71.944 46.8502 72.1477 46.8431 72.3211 46.9438L76.7671 49.5098L90.2267 41.7416C90.3884 41.6479 90.5922 41.6409 90.7655 41.7416L99.8495 46.9836V43.8229L81.4988 33.2312L63.1457 43.8229L63.1481 51.9259ZM99.8495 48.2221L91.9695 43.6731L99.8519 57.3178L99.8495 48.2221ZM90.304 42.9356L77.8399 50.1279L82.2718 52.6845L85.9026 50.5891C86.0642 50.4954 86.268 50.4884 86.4414 50.5891L98.8704 57.7626L90.304 42.9356ZM75.3475 72.0418H87.6547L92.089 69.4828H70.9156L75.3475 72.0418ZM85.7925 73.1164H77.2121L81.5011 75.5911L85.7925 73.1164Z" fill="#222222" />
+    <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="3.38904" font-weight="800" letter-spacing="0.2em">
+      <tspan x="67.334" y="63.5386">FARAJALAND</tspan>
+    </text>
+    <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0.2px">
+      <tspan x="115" y="49.5161">REPUBLIC OF FARAJALAND / REPUBLIC OF FARAJALAND</tspan>
+    </text>
+    <text fill="#038E86" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="600" letter-spacing="0px">
+      <tspan x="115" y="65.7921">CERTIFIED COPY OF BIRTH RECORD / COPIE CERTIFI&#xc9;E DE L&#39;ACTE DE NAISSANCE</tspan>
+    </text>
+  </g>
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="129.88">Child&#x2019;s details / D&#xe9;tails de l&#39;enfant</tspan>
+  </text>
+  <line x1="65" y1="134.5" x2="533" y2="134.5" stroke="#ECECEC" />
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="148.104">1.</tspan>
+  </text>
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="85" y="147.604">Full name / Nom et pr&#xe9;nom</tspan>
+  </text>
+  <g clip-path="url(#clip2_946_2501)">
+    <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+      <tspan x="307" y="148.104">{{ childFirstName }} {{ childFamilyName }}</tspan>
+    </text>
+  </g>
+  <line x1="65" y1="154.5" x2="533" y2="154.5" stroke="#ECECEC" />
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="168.104">2.</tspan>
+  </text>
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="85" y="167.604">Sex / Sexe</tspan>
+  </text>
+  <g clip-path="url(#clip3_946_2501)">
+    <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+      <tspan x="307" y="168.104">{{ childGender }}</tspan>
+    </text>
+  </g>
+  <line x1="65" y1="174.5" x2="533" y2="174.5" stroke="#ECECEC" />
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="188.104">3.</tspan>
+  </text>
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="85" y="187.604">Date of birth / Date de naissance</tspan>
+  </text>
+  <g clip-path="url(#clip4_946_2501)">
+    <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+      <tspan x="307" y="188.104">{{ eventDate }}</tspan>
+    </text>
+  </g>
+  <line x1="65" y1="194.5" x2="533" y2="194.5" stroke="#ECECEC" />
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="208.104">4.</tspan>
+  </text>
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="85" y="207.604">Place of birth / Lieu de naissance</tspan>
+  </text>
+  <g clip-path="url(#clip5_946_2501)">
+    <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+      {{#ifCond placeOfBirthFacility '===' undefined }}
+      <tspan x="307" y="208.104">{{location districtPlaceofbirthId 'name'}}{{internationalDistrictPlaceofbirth}},</tspan>
+      <tspan x="307" y="220.104">{{location statePlaceofbirthId 'name'}}{{internationalStatePlaceofbirth}}, {{countryPlaceofbirth}}</tspan>
+      {{else}}
+      <tspan x="307" y="208.104">{{ placeOfBirthFacility }}</tspan>
+      <tspan x="307" y="220.104">{{ placeOfBirthDistrict }}, {{ placeOfBirthState }}, {{ placeOfBirthCountry }}</tspan>
+      {{/ifCond}}
+    </text>
+  </g>
+  <line x1="65" y1="232.5" x2="533" y2="232.5" stroke="#222222" />
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="247.88">Mother&#x2019;s details / D&#xe9;tails de la m&#xe8;re</tspan>
+  </text>
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="266.104">5.</tspan>
+  </text>
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="85" y="265.604">Full name / Nom complet</tspan>
+  </text>
+  <g clip-path="url(#clip6_946_2501)">
+    <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+      <tspan x="307" y="266.104">{{ motherFirstName }} {{ motherFamilyName }}</tspan>
+    </text>
+  </g>
+  <line x1="65" y1="272.5" x2="533" y2="272.5" stroke="#ECECEC" />
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="286.104">6.</tspan>
+  </text>
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="85" y="285.604">Date of birth / Date de naissance</tspan>
+  </text>
+  <g clip-path="url(#clip7_946_2501)">
+    <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+      {{#ifCond ageOfMotherInYears '===' undefined }}
+      <tspan x="307" y="286.104">{{motherBirthDate}}</tspan>
+      {{else}}
+      <tspan x="307" y="286.104">{{ageOfMotherInYears}} years old</tspan>
+      {{/ifCond}}
+    </text>
+  </g>
+  <line x1="65" y1="292.5" x2="533" y2="292.5" stroke="#ECECEC" />
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="306.104">7.</tspan>
+  </text>
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="85" y="305.604">Resident at / Domicili&#xe9; &#xe0;</tspan>
+  </text>
+  <g clip-path="url(#clip8_946_2501)">
+    <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+      {{#ifCond motherFirstName '!==' undefined }}
+      <tspan x="307" y="306.104">{{ districtPrimaryMother }}{{ internationalDistrictPrimaryMother }}, {{ statePrimaryMother }}{{ internationalStatePrimaryMother }}, {{ countryPrimaryMother }}</tspan>
+      {{/ifCond}}
+    </text>
+  </g>
+  <line x1="65" y1="312.5" x2="533" y2="312.5" stroke="#ECECEC" />
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="326.104">8.</tspan>
+  </text>
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="85" y="325.604">Nationality / Nationalit&#xe9;</tspan>
+  </text>
+  <g clip-path="url(#clip9_946_2501)">
+    <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+      <tspan x="307" y="326.104">{{intl 'nationality' motherNationality}}</tspan>
+    </text>
+  </g>
+  <line x1="65" y1="332.5" x2="533" y2="332.5" stroke="#ECECEC" />
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="346.104">9.</tspan>
+  </text>
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="85" y="345.604">Occupation / Profession</tspan>
+  </text>
+  <g clip-path="url(#clip10_946_2501)">
+    <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+      <tspan x="307" y="346.104">{{motherOccupation}}</tspan>
+    </text>
+  </g>
+  <line x1="65" y1="358.5" x2="533" y2="358.5" stroke="#222222" />
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="373.88">Father&#x2019;s details / D&#xe9;tails du p&#xe8;re</tspan>
+  </text>
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="392.104">10.</tspan>
+  </text>
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="85" y="391.604">Full name / Nom complet</tspan>
+  </text>
+  <g clip-path="url(#clip11_946_2501)">
+    <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+      <tspan x="307" y="392.104">{{fatherFirstName}} {{fatherFamilyName}}</tspan>
+    </text>
+  </g>
+  <line x1="65" y1="398.5" x2="533" y2="398.5" stroke="#ECECEC" />
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="412.104">11.</tspan>
+  </text>
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="85" y="411.604">Date of birth / Date de naissance</tspan>
+  </text>
+  <g clip-path="url(#clip12_946_2501)">
+    <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+      {{#ifCond ageOfFatherInYears '===' undefined }}
+      <tspan x="307" y="412.104">{{fatherBirthDate}}</tspan>
+      {{else}}
+      <tspan x="307" y="412.104">{{ageOfFatherInYears}} years old</tspan>
+      {{/ifCond}}
+    </text>
+  </g>
+  <line x1="65" y1="418.5" x2="533" y2="418.5" stroke="#ECECEC" />
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="432.104">12.</tspan>
+  </text>
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="85" y="431.604">Resident at / Domicili&#xe9; &#xe0;</tspan>
+  </text>
+  <g clip-path="url(#clip13_946_2501)">
+    <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+      {{#ifCond fatherFirstName '!==' undefined }}
+      <tspan x="307" y="432.104">{{ districtPrimaryFather }}{{ internationalDistrictPrimaryFather }}, {{ statePrimaryFather }}{{ internationalStatePrimaryFather }}, {{ countryPrimaryFather }}</tspan>
+      {{/ifCond}}
+    </text>
+  </g>
+  <line x1="65" y1="438.5" x2="533" y2="438.5" stroke="#ECECEC" />
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="452.104">13.</tspan>
+  </text>
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="85" y="451.604">Nationality / Nationalit&#xe9;</tspan>
+  </text>
+  <g clip-path="url(#clip14_946_2501)">
+    <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+      <tspan x="307" y="452.104">{{intl 'nationality' fatherNationality}}</tspan>
+    </text>
+  </g>
+  <line x1="65" y1="458.5" x2="533" y2="458.5" stroke="#ECECEC" />
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="472.104">14.</tspan>
+  </text>
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="85" y="471.604">Occupation / Profession</tspan>
+  </text>
+  <g clip-path="url(#clip15_946_2501)">
+    <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+      <tspan x="307" y="472.104">{{fatherOccupation}}</tspan>
+    </text>
+  </g>
+  <line x1="65" y1="484.5" x2="533" y2="484.5" stroke="#222222" />
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="499.88">Registration details / D&#xe9;tails d&#39;inscription</tspan>
+  </text>
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="518.104">15.</tspan>
+  </text>
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="85" y="517.604">Informant full name / Informant full name</tspan>
+  </text>
+  <g clip-path="url(#clip16_946_2501)">
+    <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+      <tspan x="307" y="518.104">{{informantFirstName}} {{informantFamilyName}}</tspan>
+      <tspan x="307" y="528.104">{{getCamelCasedInformantType informantType otherInformantType}}</tspan>
+    </text>
+  </g>
+  <line x1="65" y1="536.5" x2="533" y2="536.5" stroke="#ECECEC" />
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="550.104">16.</tspan>
+  </text>
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="85" y="549.604">Place of registration / Inscrit &#xe0;</tspan>
+  </text>
+  <g clip-path="url(#clip17_946_2501)">
+    <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+      <tspan x="307" y="550.104">{{ registrar.district.name }}, {{ registrar.state.name }}, {{ registrar.country }}</tspan>
+    </text>
+  </g>
+  <line x1="65" y1="556.5" x2="533" y2="556.5" stroke="#ECECEC" />
+  <line x1="65" y1="556.5" x2="533" y2="556.5" stroke="#ECECEC" />
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="570.104">17.</tspan>
+  </text>
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="85" y="569.604">Date of registration / Date d&#39;enregistrement</tspan>
+  </text>
+  <g clip-path="url(#clip18_946_2501)">
+    <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+      <tspan x="307" y="570.104">{{{ ordinalFormatDate registrar.date }}}</tspan>
+    </text>
+  </g>
+  <line x1="65" y1="576.5" x2="533" y2="576.5" stroke="#ECECEC" />
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0px">
+    <tspan x="65" y="590.104">18.</tspan>
+  </text>
+  <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+    <tspan x="85" y="589.604">Registered by / Enregistr&#xe9; par</tspan>
+  </text>
+  <g clip-path="url(#clip19_946_2501)">
+    <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+      <tspan x="307" y="590.104">{{ registrar.name }}</tspan>
+    </text>
+  </g>
+  <g xmlns="http://www.w3.org/2000/svg" opacity="0.15" clip-path="url(#background)">
+    <path d="M560.248 419.659C560.278 510.844 560.16 602.058 560.308 693.243C560.367 697.253 559.125 701.058 557.055 704.272C555.132 707.221 552.47 709.639 549.306 711.261L311.736 848.038C308.453 849.896 304.963 850.81 301.562 850.81C298.072 850.81 294.553 849.837 291.418 848.038L53.9663 711.379C50.7132 709.757 47.9627 707.31 46.0108 704.331C43.9111 701.058 42.6689 697.253 42.6689 693.213L42.7577 691.385L42.6985 418.597C42.6394 414.941 43.6449 411.49 45.3602 408.512L45.4194 408.453C47.1938 405.386 49.7668 402.849 52.8425 401.05L291.27 263.772C294.553 261.914 298.072 261 301.444 261C304.934 261 308.483 261.973 311.588 263.772L550.105 401.08C553.446 402.997 556.019 405.769 557.764 408.924L557.823 408.983C559.568 412.227 560.426 415.943 560.248 419.659Z" fill="white"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M181.639 616.567H420.096L360.475 513.615L311.233 541.956L246.732 579.084L181.639 616.567Z" fill="#E2F5F4"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M360.474 513.615L420.096 616.567H539.31L360.474 513.615Z" fill="#038E86"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M360.473 513.616L539.309 616.567L415.067 402.112L241.732 501.938L311.232 541.956L360.473 513.616Z" fill="#E2F5F4"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M539.317 616.567L415.076 402.112L539.938 474.01L539.317 616.567Z" fill="#038E86"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M246.732 579.085L182.201 467.67L63.0162 536.294L63.0458 616.567H181.639L246.732 579.085Z" fill="#E2F5F4"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M182.2 467.67L246.731 579.085L311.233 541.956L241.733 501.938L182.2 467.67Z" fill="#038E86"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M182.201 467.67L241.734 501.938L415.068 402.142L539.931 474.04V418.627L301.474 281.319L63.0162 418.598L63.0458 536.265L182.201 467.67ZM301.474 408.659C284.675 408.659 271.071 395.094 271.071 378.373C271.071 361.622 284.675 348.056 301.474 348.056C318.242 348.056 331.876 361.622 331.876 378.373C331.846 395.094 318.242 408.659 301.474 408.659Z" fill="#EEEEEE"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M301.47 408.662C318.268 408.662 331.873 395.096 331.873 378.346C331.873 361.595 318.268 348.029 301.47 348.029C284.672 348.029 271.068 361.595 271.068 378.346C271.068 395.096 284.672 408.662 301.47 408.662Z" fill="#C86E00"/>
+    <path d="M546.703 418.95L546.762 693.183C546.762 695.66 545.401 697.842 543.39 699.022L304.903 836.359C302.744 837.627 300.142 837.539 298.101 836.359L59.6438 699.051C57.3665 697.724 56.154 695.306 56.2723 692.858L56.2131 418.626C56.2131 416.149 57.5736 413.966 59.5846 412.787L298.072 275.449C300.26 274.181 302.833 274.27 304.874 275.449L543.331 412.757C545.608 414.084 546.821 416.503 546.703 418.95ZM301.473 341.272C311.735 341.272 321.051 345.43 327.764 352.125C334.478 358.819 338.648 368.109 338.648 378.342C338.648 388.575 334.478 397.835 327.764 404.559C321.051 411.253 311.735 415.411 301.473 415.411C291.21 415.411 281.924 411.253 275.181 404.559C268.468 397.865 264.298 388.575 264.298 378.342C264.298 368.109 268.468 358.849 275.181 352.125L275.595 351.741C282.279 345.283 291.417 341.272 301.473 341.272ZM318.153 361.739C313.894 357.492 307.979 354.838 301.473 354.838C295.085 354.838 289.318 357.345 285.089 361.414L284.793 361.739C280.534 365.985 277.872 371.883 277.872 378.371C277.872 384.859 280.534 390.757 284.793 395.004C289.051 399.251 294.966 401.905 301.473 401.905C307.979 401.905 313.894 399.251 318.153 395.004C322.411 390.757 325.073 384.859 325.073 378.371C325.073 371.883 322.411 365.985 318.153 361.739ZM69.8173 686.459H533.187V623.349H69.8173V686.459ZM514.615 699.995H88.4195L144.344 732.199H458.719L514.615 699.995ZM378.987 532.076L423.999 609.813H513.993L378.987 532.076ZM408.325 609.813L357.989 522.845L206.953 609.813H408.325ZM200.713 486.13L249.215 569.883L297.687 541.985L200.713 486.13ZM237.474 576.636L179.745 476.899L69.7877 540.186L69.8173 609.813H179.863L237.474 576.636ZM69.7877 524.585L178.799 461.829C180.839 460.65 183.412 460.561 185.601 461.829L241.733 494.151L411.666 396.302C413.707 395.122 416.28 395.033 418.468 396.302L533.158 462.331V422.519L301.473 289.104L69.7582 422.519L69.7877 524.585ZM533.158 477.931L433.67 420.631L533.187 592.502L533.158 477.931ZM412.642 411.342L255.278 501.937L311.232 534.14L357.072 507.746C359.113 506.567 361.686 506.478 363.874 507.746L520.795 598.105L412.642 411.342ZM223.811 777.968H379.194L435.178 745.735H167.856L223.811 777.968ZM355.682 791.504H247.352L301.502 822.675L355.682 791.504Z" fill="white"/>
+  </g>
+  <defs>
+    <clipPath id="background">
+      <rect width="489" height="362" fill="white" transform="translate(57 261)"/>
+    </clipPath>
+    <clipPath id="clip0_946_2501">
+      <path d="M56 780H541V819H56V780Z" fill="white" />
+    </clipPath>
+    <clipPath id="clip1_946_2501">
+      <rect width="484" height="46.8246" fill="white" transform="translate(57 31)" />
+    </clipPath>
+    <clipPath id="clip2_946_2501">
+      <rect width="226" height="12" fill="white" transform="translate(307 139)" />
+    </clipPath>
+    <clipPath id="clip3_946_2501">
+      <rect width="226" height="12" fill="white" transform="translate(307 159)" />
+    </clipPath>
+    <clipPath id="clip4_946_2501">
+      <rect width="226" height="12" fill="white" transform="translate(307 179)" />
+    </clipPath>
+    <clipPath id="clip5_946_2501">
+      <rect width="226" height="24" fill="white" transform="translate(307 199)" />
+    </clipPath>
+    <clipPath id="clip6_946_2501">
+      <rect width="226" height="12" fill="white" transform="translate(307 257)" />
+    </clipPath>
+    <clipPath id="clip7_946_2501">
+      <rect width="226" height="12" fill="white" transform="translate(307 277)" />
+    </clipPath>
+    <clipPath id="clip8_946_2501">
+      <rect width="226" height="12" fill="white" transform="translate(307 297)" />
+    </clipPath>
+    <clipPath id="clip9_946_2501">
+      <rect width="226" height="12" fill="white" transform="translate(307 317)" />
+    </clipPath>
+    <clipPath id="clip10_946_2501">
+      <rect width="226" height="12" fill="white" transform="translate(307 337)" />
+    </clipPath>
+    <clipPath id="clip11_946_2501">
+      <rect width="226" height="12" fill="white" transform="translate(307 383)" />
+    </clipPath>
+    <clipPath id="clip12_946_2501">
+      <rect width="226" height="12" fill="white" transform="translate(307 403)" />
+    </clipPath>
+    <clipPath id="clip13_946_2501">
+      <rect width="226" height="12" fill="white" transform="translate(307 423)" />
+    </clipPath>
+    <clipPath id="clip14_946_2501">
+      <rect width="226" height="12" fill="white" transform="translate(307 443)" />
+    </clipPath>
+    <clipPath id="clip15_946_2501">
+      <rect width="226" height="12" fill="white" transform="translate(307 463)" />
+    </clipPath>
+    <clipPath id="clip16_946_2501">
+      <rect width="226" height="24" fill="white" transform="translate(307 509)" />
+    </clipPath>
+    <clipPath id="clip17_946_2501">
+      <rect width="226" height="12" fill="white" transform="translate(307 541)" />
+    </clipPath>
+    <clipPath id="clip18_946_2501">
+      <rect width="226" height="12" fill="white" transform="translate(307 561)" />
+    </clipPath>
+    <clipPath id="clip19_946_2501">
+      <rect width="226" height="12" fill="white" transform="translate(307 581)" />
+    </clipPath>
+  </defs>
+  <image x="506.287" y="784" width="34.7131" height="35" xlink:href="{{qrCode}}" />
+  {{#ifCond printInAdvance '!==' true}}
+  <image id="image0_946_2501" x="331.453" y="670" width="194.513" height="68" xlink:href="{{registrar.signature}}" />
+  {{/ifCond}}
+</svg>

@@ -1,0 +1,50 @@
+<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<rect width="420" height="595" fill="white" />
+<rect x="16.5" y="16.5" width="387" height="562" stroke="#EEEEEE" />
+<path d="M138.429 511.629H281.571" stroke="#EEEEEE" stroke-width="1.22857" stroke-linecap="square" stroke-linejoin="round" />
+
+<text fill="#222222" xml:space="default" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px">
+<tspan x="10%" y="30" >Field Agent Signature:&#10;</tspan>
+</text>
+
+<text fill="#222222" xml:space="default" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px">
+<tspan x="10%" y="80" >Registrar Signature:&#10;</tspan>
+</text>
+
+<text fill="#222222" xml:space="default" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px">
+<tspan x="10%" y="130" >Registration Agent Signature:&#10;</tspan>
+</text>
+
+<rect x="50%" y="12" width="40" height="40" fill="url(#pattern0)"/>
+<rect x="50%" y="60" width="40" height="40" fill="url(#pattern1)"/>
+<rect x="50%" y="112" width="40" height="40" fill="url(#pattern2)"/>
+
+<defs>
+
+<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image_field_agent" transform="scale(0.000818331 0.00224215)"/>
+</pattern>
+
+<pattern id="pattern1" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image_registrar" transform="scale(0.000818331 0.00224215)"/>
+</pattern>
+
+<pattern id="pattern2" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image_reg_agent" transform="scale(0.000818331 0.00224215)"/>
+</pattern>
+
+<image id="image_field_agent" width="1222" height="446" data-content="fieldAgent.signature" xlink:href="{{fieldAgent.signature}}"/>
+H281.571" stroke="#EEEEEE" stroke-width="1.22857" stroke-linecap="square" stroke-linejoin="round" />
+<image id="image_registrar" width="1222" height="446" data-content="registrarSignature" xlink:href="{{registrarSignature}}"/>
+
+<image id="image_reg_agent" width="1222" height="446" data-content="registrationAgent.signature" xlink:href="{{registrationAgent.signature}}"/>
+
+</defs>
+</svg>
+
+
+
+
+
+
+

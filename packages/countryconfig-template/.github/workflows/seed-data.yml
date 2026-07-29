@@ -1,0 +1,45 @@
+name: Seed data
+run-name: Seed data to ${{ inputs.environment }} core=${{ inputs.core-image-tag }}
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      core-image-tag:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: Environment to seed data
+        required: true
+        default: 'development'
+        options:
+          - development
+          - qa
+          - staging
+          - production
+      core-image-tag:
+        description: Core DockerHub image tag
+        required: true
+jobs:
+  seed-data:
+    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    steps:
+      - name: Pull the seed-data image
+        run: docker pull ghcr.io/opencrvs/ocrvs-data-seeder:${{ inputs.core-image-tag }}
+
+      - name: Run docker container
+        run: |
+          docker run \
+            -e "ACTIVATE_USERS=${{ vars.ACTIVATE_USERS }}" \
+            -e "GATEWAY_HOST=${{ vars.GATEWAY_HOST }}" \
+            -e "AUTH_HOST=${{ vars.AUTH_HOST }}" \
+            -e "COUNTRY_CONFIG_HOST=${{ vars.COUNTRY_CONFIG_HOST }}" \
+            -e "SUPER_USER_PASSWORD=${{ secrets.SUPER_USER_PASSWORD }}" \
+            ghcr.io/opencrvs/ocrvs-data-seeder:${{ inputs.core-image-tag }}

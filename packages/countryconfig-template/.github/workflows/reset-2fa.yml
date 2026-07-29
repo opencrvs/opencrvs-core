@@ -1,0 +1,51 @@
+name: Reset 2FA
+run-name: Reset 2FA from user ${{ github.event.inputs.user }} in ${{ github.event.inputs.environment }}
+on:
+  workflow_dispatch:
+    inputs:
+      user:
+        description: User to remove 2FA from
+        required: true
+      environment:
+        type: choice
+        description: Machine to provision
+        default: qa
+        required: true
+        options:
+          - development
+          - staging
+          - qa
+          - production
+          - backup
+
+jobs:
+  reset:
+    environment: ${{ github.event.inputs.environment }}
+    runs-on: ubuntu-24.04
+    outputs:
+      outcome: ${{ steps.deploy.outcome }}
+    timeout-minutes: 60
+    steps:
+      - name: Clone country config resource package
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          path: './${{ github.event.repository.name }}'
+
+      - name: Read known hosts
+        run: |
+          cd ${{ github.event.repository.name }}
+          echo "KNOWN_HOSTS<<EOF" >> $GITHUB_ENV
+          sed -i -e '$a\' ./infrastructure/known-hosts
+          cat ./infrastructure/known-hosts >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          known_hosts: ${{ env.KNOWN_HOSTS }}
+
+      - name: Remove 2FA
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ vars.SSH_HOST || secrets.SSH_HOST }} -p ${{ vars.SSH_PORT || secrets.SSH_PORT }} ${{ vars.SSH_ARGS }} "sudo rm /home/${{ github.event.inputs.user }}/.google_authenticator"

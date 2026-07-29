@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" />
+    <style type="text/css">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            color: #222;
+            padding: 16px 24px;
+        }
+
+        h1 {
+            font-size: 21px;
+            margin-top: 32px;
+            margin-bottom: 36px;
+            font-weight: 700;
+        }
+
+        p {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        i {
+            color: #666;
+            font-weight: 400;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="{{countryLogo}}" alt="country_logo" style="max-height: 88px;
+                max-width: 100%;">
+    <h1>Death registration completed</h1>
+    <p>
+        Hello {{informantName}},
+    </p>
+    <p>
+        Congratulations, the death of {{name}} has been registered.
+    </p>
+    <p>
+        Your death registration number (DRN) is: <strong>{{registrationNumber}}</strong>
+    </p>
+    <p> 
+        Please visit {{crvsOffice}} with your ID to collect your death certificate. Your registration tracking ID is
+        <strong>{{trackingId}}</strong>.
+    </p>
+    </br>
+    <p>
+        Best regards, <br />
+        {{applicationName}} Team
+    </p>
+    </br>
+    <i>This is an automated message. Please do not reply to this email.</i>
+</body>
+
+</html>

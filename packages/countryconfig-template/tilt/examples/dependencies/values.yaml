@@ -1,0 +1,4 @@
+hostname: opencrvs.localhost
+
+ingress:
+  ssl_enabled: false

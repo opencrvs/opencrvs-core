@@ -1,0 +1,87 @@
+##########################################################################
+# Tiltfile: OpenCRVS Country config developer
+# For more information about variables, please check:
+# https://github.com/opencrvs/infrastructure/blob/develop/Tiltfile
+
+# OpenCRVS core images tag:
+# For releases it's ok to keeps same as branch_or_tag
+core_images_tag = os.getenv("OPENCRVS_CORE_IMAGE_TAG", "v2.0.0")
+core_ref = os.getenv("OPENCRVS_CORE_REF", "release/2.0.0")
+
+# Build countryconfig image in local registry (use any name and tag you want)
+countryconfig_image_name="opencrvs/ocrvs-countryconfig"
+countryconfig_image_tag="local"
+
+
+# Internal variable for helm charts checkout
+core_charts_dir = ".opencrvs-core-charts"
+
+core_repo_url = 'https://github.com/opencrvs/opencrvs-core.git'
+
+print("Cloning OpenCRVS Helm charts from {}...".format(core_repo_url))
+local("""
+  rm -rf {core_charts_dir}
+  git clone \
+    --depth 1 \
+    --filter=blob:none \
+    --sparse \
+    --branch {core_ref} \
+    {core_repo_url} \
+    {core_charts_dir}
+
+  cd {core_charts_dir}
+  git sparse-checkout set charts
+""".format(
+  core_ref=core_ref,
+  core_charts_dir=core_charts_dir,
+  core_repo_url=core_repo_url
+))
+
+if not os.path.exists('{core_charts_dir}/charts/dependencies'.format(core_charts_dir=core_charts_dir)) or not os.path.exists('{core_charts_dir}/charts/opencrvs-services'.format(core_charts_dir=core_charts_dir)):
+  fail('Something went wrong while cloning infrastructure repository!')
+
+load('./tilt/opencrvs.tilt', 'setup_opencrvs')
+
+# Build countryconfig image
+docker_build(
+  "{0}:{1}".format(countryconfig_image_name, countryconfig_image_tag),
+  ".",
+  dockerfile="Dockerfile",
+  network="host",
+  only=[
+    './src',
+    './package.json',
+    './pnpm-lock.yaml',
+    './tsconfig.json',
+    './Dockerfile'
+  ],
+  live_update=[
+    # Fallback to full rebuild if dependencies change
+    fall_back_on(['package.json', 'pnpm-lock.yaml', 'Dockerfile']),
+    # Sync source code changes
+    sync('./src', '/usr/src/app/src'),
+  ]
+)
+
+
+# Build image with postgres and metabase assets
+docker_build("{0}:{1}-assets".format(countryconfig_image_name, countryconfig_image_tag), ".",
+              dockerfile="Dockerfile.assets",
+              network="host",
+              only=[
+                'assets/metabase',
+                'assets/postgres',
+                'assets/deployment',
+                'assets/elasticsearch',
+                './Dockerfile.assets'
+              ]
+)
+
+setup_opencrvs(
+    opencrvs_chart_repo=core_charts_dir,
+    core_images_tag=core_images_tag,
+    countryconfig_image_name=countryconfig_image_name,
+    countryconfig_image_tag=countryconfig_image_tag,
+)
+
+print("✅ Tiltfile configuration loaded successfully.")
