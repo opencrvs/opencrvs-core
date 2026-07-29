@@ -12,6 +12,7 @@ import * as oauthResponse from './responses'
 import * as Hapi from '@hapi/hapi'
 import {
   createTokenForActionConfirmation,
+  subjectCanAccessRecord,
   verifyToken
 } from '@auth/features/authenticate/service'
 import { pipe } from 'fp-ts/lib/function'
@@ -68,7 +69,15 @@ export async function tokenExchangeHandler(
     }
   )
 
-  // @TODO: If in the future we have a fine grained access control for records, check here that the subject actually has access to the record requested
+  const hasAccess = await subjectCanAccessRecord(
+    subjectToken,
+    eventId as UUID,
+    actionId as UUID
+  )
+  if (!hasAccess) {
+    return oauthResponse.insufficientScope(h)
+  }
+
   const recordToken = await createTokenForActionConfirmation(
     { eventId, actionId },
     sub as UUID,

@@ -54,6 +54,16 @@ export const invalidSubjectToken = (h: Hapi.ResponseToolkit) =>
     .header('Cache-Control', 'no-store')
     .code(401)
 
+export const insufficientScope = (h: Hapi.ResponseToolkit) =>
+  h
+    .response({
+      error: 'insufficient_scope',
+      error_description:
+        'The subject token does not grant access to the requested event_id/action_id'
+    })
+    .header('Cache-Control', 'no-store')
+    .code(403)
+
 export const success = (h: Hapi.ResponseToolkit, token: string) =>
   h
     .response({
