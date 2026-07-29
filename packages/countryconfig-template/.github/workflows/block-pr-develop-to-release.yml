@@ -1,3 +1,12 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
 name: Block PRs from Develop to Release
 
 on:
@@ -21,7 +30,8 @@ jobs:
         if: env.blocked == 'true'
         uses: thollander/actions-comment-pull-request@v2
         with:
-          message: "🚫 **Pull requests from 'develop' to 'release-*' are not allowed!**  
+          message:
+            "🚫 **Pull requests from 'develop' to 'release-*' are not allowed!**
             Please create pull request from hotfix into 'release-*' branch instead."
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
