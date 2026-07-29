@@ -139,24 +139,38 @@ export function toClientAdministrativeArea(
   }
 }
 
+function validateAscendingDates(
+  versions: LocationVersion[],
+  ctx: z.core.$RefinementCtx<LocationVersion[]>
+) {
+  const ascending = versions.every(
+    (version, index) =>
+      index === 0 || versions[index - 1].effectiveFrom < version.effectiveFrom
+  )
+
+  if (!ascending) {
+    ctx.addIssue('versions must be strictly ascending by effectiveFrom')
+  }
+}
+
+function validateUniqueIds(
+  versions: LocationVersion[],
+  ctx: z.core.$RefinementCtx<LocationVersion[]>
+) {
+  const versionIds = new Set(versions.map((version) => version.versionId))
+
+  if (versionIds.size !== versions.length) {
+    ctx.addIssue('versions must not repeat a versionId')
+  }
+}
+
 export const SeededLocationVersions = z
   .array(LocationVersion)
   .min(1)
-  .refine(
-    (versions) =>
-      versions.every(
-        (version, index) =>
-          index === 0 ||
-          versions[index - 1].effectiveFrom < version.effectiveFrom
-      ),
-    { message: 'versions must be strictly ascending by effectiveFrom' }
-  )
-  .refine(
-    (versions) =>
-      new Set(versions.map((version) => version.versionId)).size ===
-      versions.length,
-    { message: 'versions must not repeat a versionId' }
-  )
+  .superRefine((versions, ctx) => {
+    validateAscendingDates(versions, ctx)
+    validateUniqueIds(versions, ctx)
+  })
 
 export type SeededLocationVersions = z.infer<typeof SeededLocationVersions>
 

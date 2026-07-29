@@ -241,13 +241,20 @@ test('seeding administrative areas is additive, not destructive', async () => {
       (a) => a.id === remainingArea.id
     )
     expect(found).toBeDefined()
-    // `versions` is excluded: a re-seed replaces the history, and a payload
+    // `versionId` is excluded: a re-seed replaces the history, and a payload
     // carrying none rebuilds a single element with a fresh versionId. This
     // test is about rows surviving an omission, not about history.
     expect(remainingArea).toMatchObject({
       ...found,
       updatedAt: expect.any(String),
-      versions: expect.any(Array)
+      versions: [
+        {
+          effectiveFrom: expect.any(String),
+          name: expect.any(String),
+          externalId: expect.any(String),
+          status: expect.any(String)
+        }
+      ]
     })
   }
 })
