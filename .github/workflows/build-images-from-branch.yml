@@ -308,6 +308,29 @@ jobs:
             cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-testland:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}-assets
             cache-to: type=inline
 
+  countryconfig-template-build-test:
+    runs-on: ubuntu-26.04
+    steps:
+      - name: Build countryconfig-template (without publishing)
+        uses: Wandalen/wretry.action@v3.8.0
+        with:
+          attempt_limit: 3
+          action: docker/build-push-action@v6
+          with: |
+            file: packages/countryconfig-template/Dockerfile
+            context: .
+            push: false
+
+      - name: Build countryconfig-template assets (without publishing)
+        uses: Wandalen/wretry.action@v3.8.0
+        with:
+          attempt_limit: 3
+          action: docker/build-push-action@v6
+          with: |
+            file: packages/countryconfig-template/Dockerfile.assets
+            context: .
+            push: false
+
   merge-testland-assets-manifest:
     needs: [base, testland-assets]
     if: always()
@@ -400,25 +423,6 @@ jobs:
           trivy-config: trivy.yaml
           trivyignores: .trivyignore.yaml
 
-      - name: Build countryconfig-template (without publishing)
-        uses: Wandalen/wretry.action@v3.8.0
-        with:
-          attempt_limit: 3
-          action: docker/build-push-action@v6
-          with: |
-            file: packages/countryconfig-template/Dockerfile
-            context: .
-            push: false
-
-      - name: Build countryconfig-template assets (without publishing)
-        uses: Wandalen/wretry.action@v3.8.0
-        with:
-          attempt_limit: 3
-          action: docker/build-push-action@v6
-          with: |
-            file: packages/countryconfig-template/Dockerfile.assets
-            context: .
-            push: false
   # Testland's single-instance e2e environment redeploys and re-tests on every
   # develop push. Dispatched only after the image manifests are pushed, so the
   # tags the e2e deploy pulls are guaranteed to exist (a standalone push-
