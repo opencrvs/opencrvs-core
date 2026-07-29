@@ -151,7 +151,7 @@ class SystemClientNotFoundError extends TRPCError {
  * global mapping from that to a 404, so unhandled it surfaces as a 500. Same
  * shape as `getEventById` in `service/events/events.ts`.
  */
-const requireSystemClientById = async (id: UUID) => {
+async function requireSystemClientById(id: UUID) {
   try {
     return await getSystemClientById(id)
   } catch (error) {
