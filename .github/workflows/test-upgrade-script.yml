@@ -14,7 +14,7 @@ on:
     inputs:
       farajaland-branch:
         description: farajaland branch name
-        default: release/2.0.0
+        default: release/v2.0.0
         required: true
       ref:
         description: Commit SHA / branch / tag to checkout (optional)
