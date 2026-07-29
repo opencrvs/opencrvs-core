@@ -31,6 +31,32 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Fetch existing code scanning alerts
+        id: existing_alerts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p scan-out
+          gh api --paginate \
+            "repos/${{ github.repository }}/code-scanning/alerts?state=open&tool_name=claude-security-scan&per_page=100" \
+            > scan-out/existing-alerts.json || echo '[]' > scan-out/existing-alerts.json
+
+          SUMMARY=$(jq -r '
+            if length == 0 then
+              "(none yet -- this looks like the first run, or all previous findings were fixed/dismissed)"
+            else
+              map("- " + (.rule.description // "untitled")
+                  + " (`" + .most_recent_instance.location.path + ":"
+                  + (.most_recent_instance.location.start_line | tostring) + "`)") | join("\n")
+            end
+          ' scan-out/existing-alerts.json)
+
+          {
+            echo "summary<<SUMMARY_EOF"
+            echo "$SUMMARY"
+            echo "SUMMARY_EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Run Claude Code security scan
         id: claude
         uses: anthropics/claude-code-action@v1
@@ -40,6 +66,14 @@ jobs:
             You are a senior application-security engineer reviewing this repository
             (OpenCRVS: a civil-registration system handling population-scale birth,
             death and marriage records / PII) for real, exploitable vulnerabilities.
+
+            The following findings are already tracked as open GitHub code-scanning
+            alerts from previous scans. They are carried forward automatically --
+            do NOT spend turns re-discovering, re-reading, or re-explaining them.
+            Only report something in this list if you found a materially different
+            or additional problem at that same location. Otherwise spend all your
+            turns looking for things NOT already listed here:
+            ${{ steps.existing_alerts.outputs.summary }}
 
             Do NOT read the whole repository. Use Grep/Glob first to find and
             prioritise security-sensitive code, then Read only the files that
@@ -97,7 +131,7 @@ jobs:
 
       - name: Build report + SARIF
         if: always()
-        run: python .github/scripts/security-scan.py scan-out/findings.json scan-out
+        run: python .github/scripts/security-scan.py scan-out/findings.json scan-out/existing-alerts.json scan-out
 
       - name: Upload report artifact
         if: always()
