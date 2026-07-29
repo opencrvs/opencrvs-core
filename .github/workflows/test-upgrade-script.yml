@@ -12,8 +12,8 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
-      countryconfig-branch:
-        description: countryconfig branch name
+      farajaland-branch:
+        description: farajaland branch name
         default: release/2.0.0
         required: true
       ref:
@@ -24,9 +24,9 @@ jobs:
   test-upgrade-script:
     runs-on: ubuntu-26.04
     env:
-      COUNTRYCONFIG_BRANCH: ${{ github.event.inputs.countryconfig-branch || 'release/2.0.0' }}
+      FARAJALAND_BRANCH: ${{ github.event.inputs.farajaland-branch || 'release/2.0.0' }}
       # yarn 1.22 refuses to run inside a workspace whose package.json pins
-      # packageManager: pnpm; the countryconfig side of this job still uses yarn
+      # packageManager: pnpm; the farajaland side of this job still uses yarn
       SKIP_YARN_COREPACK_CHECK: 1
     steps:
       - name: Checkout opencrvs-core repository
@@ -49,23 +49,22 @@ jobs:
       - name: Build toolkit
         run: pnpm build:all
         working-directory: packages/toolkit
-      - name: Checkout the correct opencrvs-countryconfig branch
+      - name: Checkout the correct opencrvs-farajaland branch
         run: |
-          git clone -b ${{ env.COUNTRYCONFIG_BRANCH }} https://github.com/opencrvs/opencrvs-countryconfig.git
-      - name: Install opencrvs-countryconfig dependencies
-        working-directory: opencrvs-countryconfig
+          git clone -b ${{ env.FARAJALAND_BRANCH }} https://github.com/opencrvs/opencrvs-farajaland.git
+      - name: Install opencrvs-farajaland dependencies
+        working-directory: opencrvs-farajaland
         run: yarn install
       - name: Link toolkit
         run: |
           cd packages/toolkit && yarn link
-          cd ../../opencrvs-countryconfig && yarn link @opencrvs/toolkit
-      - name: Run upgrade script on opencrvs-countryconfig
+          cd ../../opencrvs-farajaland && yarn link @opencrvs/toolkit
+      - name: Run upgrade script on farajaland
         run: |
-          cd opencrvs-countryconfig
+          cd opencrvs-farajaland
           ./node_modules/@opencrvs/toolkit/dist/cli.js upgrade
           # remove unused files
           rm -rf src/api/notification/testData.ts
           yarn --force
-      - name: Test opencrvs-countryconfig compilation
         run: yarn test:compilation
-        working-directory: opencrvs-countryconfig
+        working-directory: opencrvs-farajaland
