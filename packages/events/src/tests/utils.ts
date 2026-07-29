@@ -709,6 +709,7 @@ function eventMatchesScope({
   eventIndex,
   user,
   placeOfEvent,
+  createdBy,
   declaredBy,
   registeredBy,
   declaredIn,
@@ -721,6 +722,7 @@ function eventMatchesScope({
     | { id: UUID; primaryOfficeId: UUID; administrativeAreaId: UUID | null }
     | CreatedUser
   placeOfEvent?: JurisdictionFilter
+  createdBy?: UserFilter
   declaredBy?: UserFilter
   registeredBy?: UserFilter
   declaredIn?: JurisdictionFilter
@@ -731,6 +733,12 @@ function eventMatchesScope({
     adminAreaId: UUID | null
   ) => boolean
 }): boolean {
+  if (createdBy === UserFilter.enum.user) {
+    if (eventIndex.createdBy !== user.id) {
+      return false
+    }
+  }
+
   if (declaredBy === UserFilter.enum.user) {
     if (eventIndex.legalStatuses.DECLARED?.createdBy !== user.id) {
       return false
@@ -1058,6 +1066,7 @@ export function assertScopeResult(
     event,
     placeOfEvent,
     isUnderAdministrativeArea,
+    createdBy,
     declaredBy,
     declaredIn,
     registeredBy,
@@ -1070,6 +1079,7 @@ export function assertScopeResult(
       locationId: UUID,
       adminAreaId: UUID | null
     ) => boolean
+    createdBy?: UserFilter
     declaredBy?: UserFilter
     registeredBy?: UserFilter
     declaredIn?: JurisdictionFilter
@@ -1086,6 +1096,7 @@ export function assertScopeResult(
   const isAccessibleWithScope = eventMatchesScope({
     eventIndex,
     user,
+    createdBy,
     declaredBy,
     registeredBy,
     declaredIn,
