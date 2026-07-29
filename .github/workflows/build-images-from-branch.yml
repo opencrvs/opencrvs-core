@@ -318,7 +318,7 @@ jobs:
           action: docker/build-push-action@v6
           with: |
             file: packages/countryconfig-template/Dockerfile
-            context: .
+            context: packages/countryconfig-template
             push: false
 
       - name: Build countryconfig-template assets (without publishing)
@@ -328,7 +328,7 @@ jobs:
           action: docker/build-push-action@v6
           with: |
             file: packages/countryconfig-template/Dockerfile.assets
-            context: .
+            context: packages/countryconfig-template
             push: false
 
   merge-testland-assets-manifest:
