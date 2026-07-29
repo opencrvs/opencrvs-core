@@ -139,30 +139,56 @@ export function toClientAdministrativeArea(
   }
 }
 
+export const SeededLocationVersions = z
+  .array(LocationVersion)
+  .min(1)
+  .refine(
+    (versions) =>
+      versions.every(
+        (version, index) =>
+          index === 0 ||
+          versions[index - 1].effectiveFrom < version.effectiveFrom
+      ),
+    { message: 'versions must be strictly ascending by effectiveFrom' }
+  )
+  .refine(
+    (versions) =>
+      new Set(versions.map((version) => version.versionId)).size ===
+      versions.length,
+    { message: 'versions must not repeat a versionId' }
+  )
+
+export type SeededLocationVersions = z.infer<typeof SeededLocationVersions>
+
 /**
- * Input payload for the locations `set` mutation. Carries only the seedable
- * identity and hierarchy fields — version history is managed by the server.
+ * Input payload for the locations `set` mutation. Carries the seedable
+ * identity and hierarchy fields, plus an optional pre-built history.
+ *
+ * Last-write-wins on history: re-seeding an existing row replaces its stored
+ * `versions`, so a caller that means to keep one has to send it.
  */
 export const SetLocationPayload = z.object({
   id: UUID,
   name: z.string(),
   externalId: z.string().nullish(),
   administrativeAreaId: UUID.nullable(),
-  locationType: z.string().nullable()
+  locationType: z.string().nullable(),
+  versions: SeededLocationVersions.optional()
 })
 
 export type SetLocationPayload = z.infer<typeof SetLocationPayload>
 
 /**
- * Input payload for the administrative areas `set` mutation. Carries only the
- * seedable identity and hierarchy fields — version history is managed by the
- * server.
+ * Input payload for the administrative areas `set` mutation. Twin of
+ * {@link SetLocationPayload}, including the optional pre-built `versions`
+ * history and the same semantics for omitting it.
  */
 export const SetAdministrativeAreaPayload = z.object({
   id: UUID,
   name: z.string(),
   externalId: z.string().nullish(),
-  parentId: UUID.nullable()
+  parentId: UUID.nullable(),
+  versions: SeededLocationVersions.optional()
 })
 
 export type SetAdministrativeAreaPayload = z.infer<

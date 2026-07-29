@@ -46,12 +46,20 @@ export function isUniqueViolation(error: unknown) {
 export async function setLocations(locations: SetLocationPayload[]) {
   await locationsRepo.setLocations(
     locations.map(
-      ({ id, name, administrativeAreaId, locationType, externalId }) => ({
+      ({
         id,
         name,
         administrativeAreaId,
         locationType,
-        externalId
+        externalId,
+        versions
+      }) => ({
+        id,
+        name,
+        administrativeAreaId,
+        locationType,
+        externalId,
+        versions
       })
     )
   )

@@ -15,6 +15,7 @@ import {
   UpdateAdministrativeAreaPayload,
   UpdateLocationPayload
 } from './locationPayloads'
+import { SetLocationPayload } from './locations'
 
 describe('location write payloads', () => {
   const locationId = generateUuid(() => 0.91)
@@ -91,6 +92,92 @@ describe('location write payloads', () => {
     })
 
     expect(result.success).toBe(false)
+  })
+
+  describe('SetLocationPayload versions', () => {
+    const versionA = generateUuid(() => 0.2)
+    const versionB = generateUuid(() => 0.4)
+
+    const identity = {
+      id: locationId,
+      name: 'Ilanga Office',
+      externalId: 'ilanga-office-pcode',
+      administrativeAreaId: null,
+      locationType: 'CRVS_OFFICE'
+    }
+
+    const version = (versionId: string, effectiveFrom: string) => ({
+      versionId,
+      effectiveFrom,
+      name: 'Ilanga Office',
+      externalId: 'ilanga-office-pcode',
+      status: 'active' as const
+    })
+
+    it('accepts a payload with no versions', () => {
+      const result = SetLocationPayload.safeParse(identity)
+
+      expect(result.success).toBe(true)
+      expect(result.data?.versions).toBeUndefined()
+    })
+
+    it('accepts a strictly ascending multi-element history', () => {
+      const result = SetLocationPayload.safeParse({
+        ...identity,
+        versions: [
+          version(versionA, '0001-01-01'),
+          version(versionB, '2019-04-02')
+        ]
+      })
+
+      expect(result.success).toBe(true)
+      expect(result.data?.versions).toHaveLength(2)
+    })
+
+    it('rejects an empty history', () => {
+      const result = SetLocationPayload.safeParse({
+        ...identity,
+        versions: []
+      })
+
+      expect(result.success).toBe(false)
+    })
+
+    it('rejects a descending history', () => {
+      const result = SetLocationPayload.safeParse({
+        ...identity,
+        versions: [
+          version(versionA, '2019-04-02'),
+          version(versionB, '0001-01-01')
+        ]
+      })
+
+      expect(result.success).toBe(false)
+    })
+
+    it('rejects two versions sharing an effectiveFrom', () => {
+      const result = SetLocationPayload.safeParse({
+        ...identity,
+        versions: [
+          version(versionA, '2019-04-02'),
+          version(versionB, '2019-04-02')
+        ]
+      })
+
+      expect(result.success).toBe(false)
+    })
+
+    it('rejects a repeated versionId, which would make lastVersionId ambiguous', () => {
+      const result = SetLocationPayload.safeParse({
+        ...identity,
+        versions: [
+          version(versionA, '0001-01-01'),
+          version(versionA, '2019-04-02')
+        ]
+      })
+
+      expect(result.success).toBe(false)
+    })
   })
 
   it('UpdateAdministrativeAreaPayload rejects parentId', () => {

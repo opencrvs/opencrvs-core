@@ -105,9 +105,36 @@ export function resolveVersionFields(versions: LocationVersion[]) {
   }
 }
 
+export type SetLocationRow = Omit<NewLocations, 'versions' | 'validUntil'> & {
+  versions?: LocationVersion[]
+}
+
+export function buildVersions(
+  versions: LocationVersion[]
+): RawBuilder<LocationVersion[]> {
+  return sql`cast (${JSON.stringify(versions)} as jsonb)`
+}
+
+function toLocationInsertValues({ versions, ...location }: SetLocationRow) {
+  if (!versions) {
+    return {
+      ...location,
+      deletedAt: null,
+      versions: buildInitialVersions(location)
+    }
+  }
+
+  return {
+    ...location,
+    name: resolveVersionFields(versions).name,
+    deletedAt: null,
+    versions: buildVersions(versions)
+  }
+}
+
 export async function setLocationsInTrx(
   trx: Kysely<Schema>,
-  locations: Omit<NewLocations, 'versions' | 'validUntil'>[]
+  locations: SetLocationRow[]
 ) {
   // Insert new locations in chunks to avoid exceeding max query size
   for (const [index, batch] of chunk(
@@ -119,13 +146,7 @@ export async function setLocationsInTrx(
     )
     await trx
       .insertInto('locations')
-      .values(
-        batch.map((loc) => ({
-          ...loc,
-          deletedAt: null,
-          versions: buildInitialVersions(loc)
-        }))
-      )
+      .values(batch.map(toLocationInsertValues))
       .onConflict((oc) =>
         oc.column('id').doUpdateSet({
           name: () =>
@@ -143,6 +164,11 @@ export async function setLocationsInTrx(
              THEN excluded.external_id
              ELSE locations.external_id
            END`,
+          // Re-seeding replaces the stored history with the incoming one: the
+          // supplied history when the payload carries `versions`, otherwise
+          // the freshly built single element. A caller that means to preserve
+          // an existing history must send it.
+          versions: (eb) => eb.ref('excluded.versions'),
           deletedAt: null
         })
       )
@@ -150,9 +176,7 @@ export async function setLocationsInTrx(
   }
 }
 
-export async function setLocations(
-  locations: Omit<NewLocations, 'versions' | 'validUntil'>[]
-) {
+export async function setLocations(locations: SetLocationRow[]) {
   const db = getClient()
 
   await setLocationsInTrx(db, locations)

@@ -241,9 +241,13 @@ test('seeding administrative areas is additive, not destructive', async () => {
       (a) => a.id === remainingArea.id
     )
     expect(found).toBeDefined()
+    // `versions` is excluded: a re-seed replaces the history, and a payload
+    // carrying none rebuilds a single element with a fresh versionId. This
+    // test is about rows surviving an omission, not about history.
     expect(remainingArea).toMatchObject({
       ...found,
-      updatedAt: expect.any(String)
+      updatedAt: expect.any(String),
+      versions: expect.any(Array)
     })
   }
 })
@@ -280,4 +284,298 @@ test('stores a single active initial version when creating an administrative are
       status: 'active'
     }
   ])
+})
+
+function uuidFactory(seed: number) {
+  const rng = createPrng(seed)
+
+  return () => generateUuid(rng)
+}
+
+test('stores a supplied multi-element history verbatim', async () => {
+  await systemInitialisationTestSetup()
+  const client = createInitialisationTestClient()
+
+  const uuid = uuidFactory(90001)
+  const areaId = uuid()
+  const versions = [
+    {
+      versionId: uuid(),
+      effectiveFrom: '0001-01-01',
+      name: 'Ibombo District',
+      externalId: 'ibombo-district-pcode',
+      status: 'active' as const
+    },
+    {
+      versionId: uuid(),
+      effectiveFrom: '2014-08-02',
+      name: 'Ibombo District (renamed)',
+      externalId: 'ibombo-district-pcode',
+      status: 'inactive' as const
+    },
+    {
+      versionId: uuid(),
+      effectiveFrom: '2021-05-19',
+      name: 'Ibombo District (reopened)',
+      externalId: 'ibombo-district-pcode',
+      status: 'active' as const
+    }
+  ]
+
+  await client.administrativeAreas.set([
+    {
+      id: areaId,
+      parentId: null,
+      name: 'Ibombo District (stale flat value)',
+      externalId: 'ibombo-district-pcode',
+      versions
+    }
+  ])
+
+  const row = await getClient()
+    .selectFrom('administrativeAreas')
+    .select(['name', 'externalId', 'versions'])
+    .where('id', '=', areaId)
+    .executeTakeFirstOrThrow()
+
+  expect(row.versions).toEqual(versions)
+  // Legacy columns are aligned with the history: `name` is the snapshot in
+  // effect today, and external_id holds the payload's code.
+  expect(row.name).toBe('Ibombo District (reopened)')
+  expect(row.externalId).toBe('ibombo-district-pcode')
+})
+
+test('a supplied history is readable through the API with resolved flat fields', async () => {
+  await systemInitialisationTestSetup()
+  const client = createInitialisationTestClient()
+
+  const uuid = uuidFactory(90002)
+
+  const areaId = uuid()
+  const versions = [
+    {
+      versionId: uuid(),
+      effectiveFrom: '0001-01-01',
+      name: 'Ilanga District',
+      externalId: 'ilanga-district-pcode',
+      status: 'active' as const
+    },
+    {
+      versionId: uuid(),
+      effectiveFrom: '2018-03-11',
+      name: 'Ilanga District (renamed)',
+      externalId: 'ilanga-district-pcode',
+      status: 'active' as const
+    }
+  ]
+
+  await client.administrativeAreas.set([
+    {
+      id: areaId,
+      parentId: null,
+      name: 'Ilanga District (renamed)',
+      externalId: 'ilanga-district-pcode',
+      versions
+    }
+  ])
+
+  const row = await getClient()
+    .selectFrom('administrativeAreas')
+    .select('versions')
+    .where('id', '=', areaId)
+    .executeTakeFirstOrThrow()
+
+  expect(row.versions).toEqual(versions)
+})
+
+test('re-seeding with a longer history overwrites the stored one', async () => {
+  await systemInitialisationTestSetup()
+  const client = createInitialisationTestClient()
+
+  const uuid = uuidFactory(90003)
+
+  const areaId = uuid()
+  const firstVersion = {
+    versionId: uuid(),
+    effectiveFrom: '0001-01-01',
+    name: 'Itambo District',
+    externalId: 'itambo-district-pcode',
+    status: 'active' as const
+  }
+  const identity = {
+    id: areaId,
+    parentId: null,
+    name: 'Itambo District',
+    externalId: 'itambo-district-pcode'
+  }
+
+  await client.administrativeAreas.set([
+    { ...identity, versions: [firstVersion] }
+  ])
+
+  const extendedVersions = [
+    firstVersion,
+    {
+      versionId: uuid(),
+      effectiveFrom: '2022-09-30',
+      name: 'Itambo District (renamed)',
+      externalId: 'itambo-district-pcode',
+      status: 'active' as const
+    }
+  ]
+
+  await client.administrativeAreas.set([
+    { ...identity, versions: extendedVersions }
+  ])
+
+  const row = await getClient()
+    .selectFrom('administrativeAreas')
+    .select('versions')
+    .where('id', '=', areaId)
+    .executeTakeFirstOrThrow()
+
+  expect(row.versions).toEqual(extendedVersions)
+})
+
+test('re-seeding without versions resets a supplied history to one element', async () => {
+  await systemInitialisationTestSetup()
+  const client = createInitialisationTestClient()
+
+  const uuid = uuidFactory(90004)
+
+  const areaId = uuid()
+  const versions = [
+    {
+      versionId: uuid(),
+      effectiveFrom: '0001-01-01',
+      name: 'Isamba District',
+      externalId: 'isamba-district-pcode',
+      status: 'active' as const
+    },
+    {
+      versionId: uuid(),
+      effectiveFrom: '2016-11-04',
+      name: 'Isamba District (renamed)',
+      externalId: 'isamba-district-pcode',
+      status: 'active' as const
+    }
+  ]
+  const identity = {
+    id: areaId,
+    parentId: null,
+    name: 'Isamba District (renamed)',
+    externalId: 'isamba-district-pcode'
+  }
+
+  await client.administrativeAreas.set([{ ...identity, versions }])
+
+  // A country-config re-seed of the same row carries no history, so the
+  // incoming single element replaces the stored one.  Preserving a history
+  // across a re-seed requires sending it.
+  await client.administrativeAreas.set([
+    { ...identity, name: 'Isamba District (re-seeded)' }
+  ])
+
+  const row = await getClient()
+    .selectFrom('administrativeAreas')
+    .select(['name', 'versions'])
+    .where('id', '=', areaId)
+    .executeTakeFirstOrThrow()
+
+  expect(row.versions).toEqual([
+    expect.objectContaining({
+      effectiveFrom: '0001-01-01',
+      name: 'Isamba District (re-seeded)',
+      status: 'active'
+    })
+  ])
+  expect(row.name).toBe('Isamba District (re-seeded)')
+})
+
+test('mixes areas with and without a supplied history in one call', async () => {
+  await systemInitialisationTestSetup()
+  const client = createInitialisationTestClient()
+
+  const uuid = uuidFactory(90005)
+
+  const withHistoryId = uuid()
+  const withoutHistoryId = uuid()
+  const versions = [
+    {
+      versionId: uuid(),
+      effectiveFrom: '0001-01-01',
+      name: 'Irundu District',
+      externalId: 'irundu-district-pcode',
+      status: 'active' as const
+    },
+    {
+      versionId: uuid(),
+      effectiveFrom: '2020-02-20',
+      name: 'Irundu District (renamed)',
+      externalId: 'irundu-district-pcode',
+      status: 'active' as const
+    }
+  ]
+
+  await client.administrativeAreas.set([
+    {
+      id: withHistoryId,
+      parentId: null,
+      name: 'Irundu District (renamed)',
+      externalId: 'irundu-district-pcode',
+      versions
+    },
+    {
+      id: withoutHistoryId,
+      parentId: null,
+      name: 'Zobwe District',
+      externalId: 'zobwe-district-pcode'
+    }
+  ])
+
+  const rows = await getClient()
+    .selectFrom('administrativeAreas')
+    .select(['id', 'externalId', 'versions'])
+    .execute()
+
+  const withHistory = rows.find((row) => row.id === withHistoryId)
+  const withoutHistory = rows.find((row) => row.id === withoutHistoryId)
+
+  expect(withHistory?.versions).toEqual(versions)
+  expect(withoutHistory?.versions).toHaveLength(1)
+  expect(withoutHistory?.externalId).toBe('zobwe-district-pcode')
+})
+
+test('rejects a non-ascending supplied history', async () => {
+  await systemInitialisationTestSetup()
+  const client = createInitialisationTestClient()
+
+  const uuid = uuidFactory(90006)
+
+  await expect(
+    client.administrativeAreas.set([
+      {
+        id: uuid(),
+        parentId: null,
+        name: 'Pili District',
+        externalId: 'pili-district-pcode',
+        versions: [
+          {
+            versionId: uuid(),
+            effectiveFrom: '2020-01-01',
+            name: 'Pili District (renamed)',
+            externalId: null,
+            status: 'active'
+          },
+          {
+            versionId: uuid(),
+            effectiveFrom: '0001-01-01',
+            name: 'Pili District',
+            externalId: null,
+            status: 'active'
+          }
+        ]
+      }
+    ])
+  ).rejects.toThrow()
 })
