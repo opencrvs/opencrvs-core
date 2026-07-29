@@ -164,10 +164,12 @@ export async function setLocationsInTrx(
              THEN excluded.external_id
              ELSE locations.external_id
            END`,
-          // Re-seeding replaces the stored history with the incoming one: the
-          // supplied history when the payload carries `versions`, otherwise
-          // the freshly built single element. A caller that means to preserve
-          // an existing history must send it.
+          // A repeated seed replaces the stored history with the incoming one:
+          // the supplied history when the payload carries `versions`,
+          // otherwise the freshly built single element. Sound only because
+          // seeding is gated to incomplete initialisation, so what gets
+          // replaced is an earlier seed attempt's work, never versions added
+          // through the audited update / withdraw endpoints.
           versions: (eb) => eb.ref('excluded.versions'),
           deletedAt: null
         })
@@ -306,14 +308,7 @@ export async function getLocationRowById(locationId: UUID) {
 
   const row = await db
     .selectFrom('locations')
-    .select([
-      'id',
-      'name',
-      'externalId',
-      'administrativeAreaId',
-      'locationType',
-      'versions'
-    ])
+    .select(['id', 'administrativeAreaId', 'locationType', 'versions'])
     .where('id', '=', locationId)
     .executeTakeFirst()
 

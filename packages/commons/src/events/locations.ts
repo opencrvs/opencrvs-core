@@ -45,9 +45,11 @@ export const LocationStatus = z.enum(['active', 'inactive'])
 export type LocationStatus = z.infer<typeof LocationStatus>
 
 /**
- * A single element of the append-only `versions` history of a location or
- * administrative area. Versions are sorted ascending by `effectiveFrom`
- * ('0001-01-01' is used as the beginning-of-time sentinel).
+ * A single element of the `versions` history of a location or administrative
+ * area. Versions are sorted ascending by `effectiveFrom` ('0001-01-01' is used
+ * as the beginning-of-time sentinel). Updates only ever append, but a
+ * not-yet-effective version can be withdrawn and seeding replaces a history
+ * wholesale, so the array is not append-only.
  */
 export const LocationVersion = z.object({
   versionId: UUID,
@@ -178,8 +180,10 @@ export type SeededLocationVersions = z.infer<typeof SeededLocationVersions>
  * Input payload for the locations `set` mutation. Carries the seedable
  * identity and hierarchy fields, plus an optional pre-built history.
  *
- * Last-write-wins on history: re-seeding an existing row replaces its stored
- * `versions`, so a caller that means to keep one has to send it.
+ * Last-write-wins on history: a repeated seed of the same row replaces its
+ * stored `versions`, so a caller that means to keep one has to send it every
+ * time. Seeding is only reachable while system initialisation is incomplete,
+ * so this replaces what an earlier seed attempt wrote, never a live history.
  */
 export const SetLocationPayload = z.object({
   id: UUID,

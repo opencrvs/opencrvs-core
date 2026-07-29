@@ -149,7 +149,7 @@ export async function getAdministrativeAreaRowById(administrativeAreaId: UUID) {
 
   const row = await db
     .selectFrom('administrativeAreas')
-    .select(['id', 'name', 'externalId', 'parentId', 'versions'])
+    .select(['id', 'parentId', 'versions'])
     .where('id', '=', administrativeAreaId)
     .executeTakeFirst()
 
@@ -215,10 +215,12 @@ export async function setAdministrativeAreasInTrx(
              THEN excluded.external_id
              ELSE administrative_areas.external_id
            END`,
-          // Re-seeding replaces the stored history with the incoming one: the
-          // supplied history when the payload carries `versions`, otherwise
-          // the freshly built single element. A caller that means to preserve
-          // an existing history must send it.
+          // A repeated seed replaces the stored history with the incoming one:
+          // the supplied history when the payload carries `versions`,
+          // otherwise the freshly built single element. Sound only because
+          // seeding is gated to incomplete initialisation, so what gets
+          // replaced is an earlier seed attempt's work, never versions added
+          // through the audited update / withdraw endpoints.
           versions: (eb) => eb.ref('excluded.versions'),
           deletedAt: null
         })

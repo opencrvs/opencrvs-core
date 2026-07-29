@@ -123,10 +123,12 @@ export async function createLocation(
 
     if (existing) {
       const [initialVersion] = existing.versions
-      // externalId is compared against the initial version, not the legacy
-      // column — create deliberately leaves the column NULL.
+      // name and externalId are compared against the initial version, never
+      // the legacy flat columns: create leaves external_id NULL, and a seeded
+      // row's flat name holds the version in effect today, which is not the
+      // initial version's name once the row carries a multi-element history.
       const matchesPayload =
-        existing.name === resolved.name &&
+        initialVersion.name === resolved.name &&
         (initialVersion.externalId ?? null) === resolved.externalId &&
         existing.administrativeAreaId === resolved.administrativeAreaId &&
         existing.locationType === resolved.locationType &&
@@ -311,7 +313,7 @@ function assertLatestVersionToken(
   }
 }
 
-/** History is append-only: no splicing new versions into the past. */
+/** Updates only append: no splicing new versions into the past. */
 function assertForwardOnly(
   newVersion: LocationVersion,
   last: LocationVersion
@@ -385,7 +387,7 @@ async function assertExternalIdAvailable({
  *    `lastVersionId` is legitimately stale.
  * 3. `lastVersionId` not the latest element → CONFLICT (stale token)
  * 4. `effectiveFrom` not strictly after the latest element →
- *    UNPROCESSABLE_CONTENT (history is append-only, no past splices)
+ *    UNPROCESSABLE_CONTENT (updates only append, no past splices)
  * 5. a recode (`externalId` change) colliding with another entity actively
  *    holding the code on or after `effectiveFrom` → CONFLICT
  */

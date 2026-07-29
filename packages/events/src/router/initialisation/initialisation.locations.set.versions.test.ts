@@ -132,7 +132,9 @@ test('a supplied history is readable through the API with resolved flat fields',
   expect(location.status).toBe('active')
 })
 
-test('re-seeding with a longer history overwrites the stored one', async () => {
+// Seeding is only reachable while initialisation is incomplete, so a repeated
+// seed means a retried initialisation — not a change to a live hierarchy.
+test('a repeated seed with a longer history replaces the stored one', async () => {
   await systemInitialisationTestSetup()
   const client = createInitialisationTestClient()
 
@@ -179,7 +181,7 @@ test('re-seeding with a longer history overwrites the stored one', async () => {
   expect(row.versions).toEqual(extendedVersions)
 })
 
-test('re-seeding without versions resets a supplied history to one element', async () => {
+test('a repeated seed carrying no history replaces the stored one with a single version', async () => {
   await systemInitialisationTestSetup()
   const client = createInitialisationTestClient()
 
@@ -212,9 +214,9 @@ test('re-seeding without versions resets a supplied history to one element', asy
 
   await client.locations.set([{ ...identity, versions }])
 
-  // A country-config re-seed of the same row carries no history, so the
-  // incoming single element replaces the stored one.  Preserving a history
-  // across a re-seed requires sending it.
+  // The config declares no history for this row, so the incoming single
+  // element replaces the stored one. Carrying a history through a repeated
+  // seed requires sending it every time.
   await client.locations.set([
     { ...identity, name: 'Irundu Office (re-seeded)' }
   ])

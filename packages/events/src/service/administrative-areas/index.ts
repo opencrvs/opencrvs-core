@@ -86,10 +86,12 @@ export async function createAdministrativeArea(
 
     if (existing) {
       const [initialVersion] = existing.versions
-      // externalId is compared against the initial version, not the legacy
-      // column — create deliberately leaves the column NULL.
+      // name and externalId are compared against the initial version, never
+      // the legacy flat columns: create leaves external_id NULL, and a seeded
+      // row's flat name holds the version in effect today, which is not the
+      // initial version's name once the row carries a multi-element history.
       const matchesPayload =
-        existing.name === resolved.name &&
+        initialVersion.name === resolved.name &&
         (initialVersion.externalId ?? null) === resolved.externalId &&
         existing.parentId === resolved.parentId &&
         initialVersion.effectiveFrom === resolved.effectiveFrom &&
