@@ -34,6 +34,7 @@ describe('canAccessEventWithScope()', () => {
 
   const declaredEvent: Partial<EventIndexWithAdministrativeHierarchy> = {
     type: 'birth',
+    createdBy: createdById,
     placeOfEvent: [provinceUuid, districtUuid, officeUuid],
     legalStatuses: {
       DECLARED: {
@@ -85,6 +86,7 @@ describe('canAccessEventWithScope()', () => {
   ] satisfies RecordScopeV2['options'][]
 
   const userOptions = [
+    { createdBy: 'user' },
     { declaredBy: 'user' },
     { registeredBy: 'user' }
   ] satisfies RecordScopeV2['options'][]
@@ -212,6 +214,45 @@ describe('canAccessEventWithScope()', () => {
         ).toBe(true)
       }
     )
+
+    test('should access an event they created even when it was declared by another user (createdBy:user)', () => {
+      // The user created the record, but a different user re-declared it, so
+      // DECLARED.createdBy no longer points to them. createdBy is based on the
+      // immutable CREATE author, so it should still grant access...
+      const reDeclaredByAnotherUser: Partial<EventIndexWithAdministrativeHierarchy> =
+        {
+          ...declaredEvent,
+          createdBy: userContext.id,
+          legalStatuses: {
+            NOTIFIED: undefined,
+            DECLARED: {
+              acceptedAt: new Date().toISOString(),
+              createdAt: new Date().toISOString(),
+              createdBy: generateUuid(rng),
+              createdAtLocation: [provinceUuid, districtUuid, officeUuid]
+            },
+            REGISTERED: undefined
+          }
+        }
+
+      expect(
+        canAccessEventWithScope(
+          reDeclaredByAnotherUser,
+          { type: 'record.edit', options: { createdBy: 'user' } },
+          userContext
+        )
+      ).toBe(true)
+
+      // ...whereas a declaredBy:user scope would not, since the latest DECLARE
+      // was authored by someone else.
+      expect(
+        canAccessEventWithScope(
+          reDeclaredByAnotherUser,
+          { type: 'record.edit', options: { declaredBy: 'user' } },
+          userContext
+        )
+      ).toBe(false)
+    })
   })
 
   test('should not access event if user does not meet any of the scope options', () => {
@@ -227,6 +268,7 @@ describe('canAccessEventWithScope()', () => {
     const singleOptions = [
       { placeOfEvent: 'location' },
       { placeOfEvent: 'administrativeArea' },
+      { createdBy: 'user' },
       { declaredIn: 'location' },
       { declaredIn: 'administrativeArea' },
       { registeredIn: 'location' },
