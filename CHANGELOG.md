@@ -2,6 +2,10 @@
 
 ## 2.0.1 Release Candidate
 
+### Improvements
+
+- Added `createdBy` as a config paramater to filter records created by the user [#13287](https://github.com/opencrvs/opencrvs-core/issues/13287)
+
 ### Bug fixes
 
 - Re-enable ARM-based images in the Tiltfile so local developers can run OpenCRVS on Apple silicon. [#13285](https://github.com/opencrvs/opencrvs-core/pull/13285)
