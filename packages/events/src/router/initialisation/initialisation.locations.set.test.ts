@@ -238,9 +238,13 @@ test('seeding locations is additive, not destructive', async () => {
       (a) => a.id === remainingLocation.id
     )
     expect(found).toBeDefined()
+    // `versions` is excluded: a re-seed replaces the history, and a payload
+    // carrying none rebuilds a single element with a fresh versionId. This
+    // test is about rows surviving an omission, not about history.
     expect(remainingLocation).toMatchObject({
       ...found,
-      updatedAt: expect.any(String)
+      updatedAt: expect.any(String),
+      versions: expect.any(Array)
     })
   }
 })
@@ -281,7 +285,7 @@ test('stores a single active initial version when creating a location', async ()
   ])
 })
 
-test('does not modify versions when re-seeding an existing location with a new name', async () => {
+test('replaces versions when re-seeding an existing location with a new name', async () => {
   await systemInitialisationTestSetup()
   const client = createInitialisationTestClient()
 
@@ -320,11 +324,17 @@ test('does not modify versions when re-seeding an existing location with a new n
     .where('id', '=', locationId)
     .executeTakeFirstOrThrow()
 
-  // The flat column updates, but re-seeding deliberately leaves versions
-  // untouched: still the original single element with the original name.
+  // Re-seeding replaces the stored history with the incoming one. A payload
+  // carrying no `versions` therefore resets the row to a single element built
+  // from its flat fields — including a freshly generated versionId.
   expect(updated.name).toBe('Renamed location')
-  expect(updated.versions).toEqual(versionsAfterInsert)
+  expect(updated.versions).not.toEqual(versionsAfterInsert)
   expect(updated.versions).toEqual([
-    expect.objectContaining({ name: 'Original name', status: 'active' })
+    expect.objectContaining({
+      versionId: expect.stringMatching(UUID_REGEX),
+      effectiveFrom: '0001-01-01',
+      name: 'Renamed location',
+      status: 'active'
+    })
   ])
 })

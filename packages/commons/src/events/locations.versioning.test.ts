@@ -9,13 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createPrng, generateUuid } from './test.utils'
+import { createPrng, generateUuid, locationVersion } from './test.utils'
 import { toPlainDate } from './PlainDate'
 import {
   AdministrativeArea,
   isSelectableAtAnchor,
   Location,
-  LocationVersion,
   resolvePath,
   resolveVersion,
   toClientAdministrativeArea,
@@ -24,20 +23,6 @@ import {
 
 const rng = createPrng(4242)
 
-function version(
-  effectiveFrom: string,
-  name: string,
-  status: 'active' | 'inactive' = 'active'
-): LocationVersion {
-  return {
-    versionId: generateUuid(),
-    effectiveFrom,
-    name,
-    externalId: null,
-    status
-  }
-}
-
 const versionedProvince: AdministrativeArea = {
   id: generateUuid(rng),
   name: 'Greater Pangasinan',
@@ -45,8 +30,8 @@ const versionedProvince: AdministrativeArea = {
   parentId: null,
   status: 'active',
   versions: [
-    version('0001-01-01', 'Pangasinan'),
-    version('2010-01-01', 'Greater Pangasinan')
+    locationVersion({ effectiveFrom: '0001-01-01', name: 'Pangasinan' }),
+    locationVersion({ effectiveFrom: '2010-01-01', name: 'Greater Pangasinan' })
   ]
 }
 
@@ -57,9 +42,13 @@ const versionedDistrict: AdministrativeArea = {
   parentId: versionedProvince.id,
   status: 'inactive',
   versions: [
-    version('0001-01-01', 'Alaminos'),
-    version('2005-03-28', 'Alaminos City'),
-    version('2020-01-01', 'Alaminos City', 'inactive')
+    locationVersion({ effectiveFrom: '0001-01-01', name: 'Alaminos' }),
+    locationVersion({ effectiveFrom: '2005-03-28', name: 'Alaminos City' }),
+    locationVersion({
+      effectiveFrom: '2020-01-01',
+      name: 'Alaminos City',
+      status: 'inactive'
+    })
   ]
 }
 
@@ -71,8 +60,11 @@ const versionedOffice: Location = {
   locationType: 'CRVS_OFFICE',
   status: 'active',
   versions: [
-    version('0001-01-01', 'Alaminos Registry'),
-    version('2008-06-01', 'Alaminos City Registry Office')
+    locationVersion({ effectiveFrom: '0001-01-01', name: 'Alaminos Registry' }),
+    locationVersion({
+      effectiveFrom: '2008-06-01',
+      name: 'Alaminos City Registry Office'
+    })
   ]
 }
 
@@ -83,7 +75,9 @@ const standaloneOffice: Location = {
   administrativeAreaId: null,
   locationType: 'CRVS_OFFICE',
   status: 'active',
-  versions: [version('0001-01-01', 'Standalone Office')]
+  versions: [
+    locationVersion({ effectiveFrom: '0001-01-01', name: 'Standalone Office' })
+  ]
 }
 
 const context = {
@@ -99,9 +93,13 @@ const context = {
 
 describe('resolveVersion', () => {
   const versions = [
-    version('0001-01-01', 'Alaminos'),
-    version('2005-03-28', 'Alaminos City'),
-    version('2020-01-01', 'Alaminos City', 'inactive')
+    locationVersion({ effectiveFrom: '0001-01-01', name: 'Alaminos' }),
+    locationVersion({ effectiveFrom: '2005-03-28', name: 'Alaminos City' }),
+    locationVersion({
+      effectiveFrom: '2020-01-01',
+      name: 'Alaminos City',
+      status: 'inactive'
+    })
   ]
 
   it('returns the version with the greatest effectiveFrom ≤ anchor', () => {
@@ -119,14 +117,16 @@ describe('resolveVersion', () => {
 
   it('returns the earliest version when the anchor precedes all versions', () => {
     const late = [
-      version('1990-01-01', 'Founded Town'),
-      version('2000-01-01', 'Renamed Town')
+      locationVersion({ effectiveFrom: '1990-01-01', name: 'Founded Town' }),
+      locationVersion({ effectiveFrom: '2000-01-01', name: 'Renamed Town' })
     ]
     expect(resolveVersion(late, '1980-01-01').name).toBe('Founded Town')
   })
 
   it('resolves a single sentinel-dated version at any anchor', () => {
-    const single = [version('0001-01-01', 'Only Name')]
+    const single = [
+      locationVersion({ effectiveFrom: '0001-01-01', name: 'Only Name' })
+    ]
     expect(resolveVersion(single, '1970-01-01').name).toBe('Only Name')
     expect(resolveVersion(single, '2099-12-31').name).toBe('Only Name')
   })

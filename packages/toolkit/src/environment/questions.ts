@@ -179,11 +179,28 @@ export const infrastructureQuestions = [
     scope: 'ENVIRONMENT' as const
   },
   {
-    name: 'kubeAPIHost',
+    name: 'kubeMasterNode',
     type: 'text' as const,
-    message: `Kubernetes API endpoint (default: auto-detect)`,
+    message: `Kubernetes master node hostnames or IP (default: auto-detect)`,
     valueType: 'VARIABLE' as const,
-    // validate: notEmpty,
+    valueLabel: 'KUBE_MASTER_NODE',
+    initial: process.env.KUBE_MASTER_NODE,
+    scope: 'ENVIRONMENT' as const
+  },
+  {
+    name: 'kubeWorkerNodes',
+    type: 'text' as const,
+    message: `Kubernetes worker node hostnames or IPs (comma-separated, default: no worker nodes)`,
+    valueType: 'VARIABLE' as const,
+    valueLabel: 'KUBE_WORKER_NODES',
+    initial: process.env.KUBE_WORKER_NODES || '',
+    scope: 'ENVIRONMENT' as const
+  },
+  {
+    name: 'kubeApiHost',
+    type: 'text' as const,
+    message: `Kubernetes API endpoint IP (default: KUBE_MASTER_NODE)`,
+    valueType: 'VARIABLE' as const,
     valueLabel: 'KUBE_API_HOST',
     initial: process.env.KUBE_API_HOST,
     scope: 'ENVIRONMENT' as const
@@ -198,16 +215,6 @@ export const infrastructureQuestions = [
     initial: process.env.KUBE_API_ALLOWED_CIDRS || '',
     scope: 'ENVIRONMENT' as const
   },
-  {
-    name: 'kubeWorkerNodes',
-    type: 'text' as const,
-    message: `Kubernetes worker node hostnames or IPs (comma-separated, default: no worker nodes)`,
-    valueType: 'VARIABLE' as const,
-    // validate: notEmpty,
-    valueLabel: 'KUBE_WORKER_NODES',
-    initial: process.env.KUBE_WORKER_NODES || '',
-    scope: 'ENVIRONMENT' as const
-  }
 ]
 
 export const staticSSLCertQuestions = [
@@ -239,7 +246,6 @@ export const backupQuestions = [
     type: 'text' as const,
     message: `Please enter backup server host/IP address, (default: no backup):`,
     valueType: 'VARIABLE' as const,
-    // validate: notEmpty,
     valueLabel: 'BACKUP_HOST',
     initial: process.env.BACKUP_HOST || '',
     scope: 'ENVIRONMENT' as const
