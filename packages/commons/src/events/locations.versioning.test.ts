@@ -134,9 +134,13 @@ describe('resolveVersion', () => {
 
 describe('isSelectableAtAnchor', () => {
   const versions = [
-    version('0001-01-01', 'Alaminos'),
-    version('2005-03-28', 'Alaminos City'),
-    version('2020-01-01', 'Alaminos City', 'inactive')
+    locationVersion({ effectiveFrom: '0001-01-01', name: 'Alaminos' }),
+    locationVersion({ effectiveFrom: '2005-03-28', name: 'Alaminos City' }),
+    locationVersion({
+      effectiveFrom: '2020-01-01',
+      name: 'Alaminos City',
+      status: 'inactive'
+    })
   ]
 
   it('is selectable when the resolved version at the anchor is active', () => {
@@ -152,8 +156,8 @@ describe('isSelectableAtAnchor', () => {
     // active) and wrongly call this selectable; isSelectableAtAnchor must
     // also require a version actually effective by the anchor.
     const createdLater = [
-      version('1990-01-01', 'Founded Town'),
-      version('2000-01-01', 'Renamed Town')
+      locationVersion({ effectiveFrom: '1990-01-01', name: 'Founded Town' }),
+      locationVersion({ effectiveFrom: '2000-01-01', name: 'Renamed Town' })
     ]
     expect(isSelectableAtAnchor(createdLater, '1980-01-01')).toBe(false)
     expect(resolveVersion(createdLater, '1980-01-01').status).toBe('active')
