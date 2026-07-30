@@ -9,10 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { v4 as uuidv4 } from 'uuid'
+import { Page } from '@playwright/test'
+import { faker } from '@faker-js/faker'
 import { createClient } from '@opencrvs/toolkit/api'
 import { ActionType, AddressType } from '@opencrvs/toolkit/events'
 import { CREDENTIALS, GATEWAY_HOST } from '../../constants'
-import { getClientToken, getToken } from '../../helpers'
+import {
+  getAuthTokens,
+  getClientToken,
+  getToken,
+  loginWithNewUser,
+  NEW_USER_PASSWORD
+} from '../../helpers'
 import {
   getIdByName,
   getLocations,
@@ -55,98 +63,69 @@ async function getNotifyOnlySystemClientToken() {
 }
 
 /**
- * Registered (as a registrar seeded specifically at that office) at an office
- * that is active when created but later inactivated; born at a health
- * facility that later becomes inactive; residential address stays on an
- * always-active administrative area.
+ * Registers a birth and a death record at a freshly-created, active office,
+ * then inactivates that office via the API — simulating the real lifecycle
+ * (active when registered, inactivated afterward) rather than seeding a user
+ * permanently pinned to an already-inactive office. Whether the system
+ * allows a user whose own office is *already* inactive to act at all is a
+ * separate, unconfirmed restriction — this avoids depending on it.
  */
-export async function createBirthRegisteredWithInactiveOfficeAndFacility() {
-  const token = await getToken(CREDENTIALS.REGISTRAR_OLD_CENTRAL_OFFICE)
+export async function registerDeclarationsThenDeactivateOffice(page: Page) {
+  const adminToken = await getToken(CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
+  const client = createClient(GATEWAY_HOST + '/events', `Bearer ${adminToken}`)
 
-  const facilities = await getLocations('HEALTH_FACILITY', token)
-  const facilityId = getIdByName(facilities, 'Old Central Maternity Hospital')
+  const administrativeAreas = await getAdministrativeAreas(adminToken)
+  const centralId = getIdByName(administrativeAreas, 'Central')
 
-  const declaration = await getBirthDeclaration({
-    token,
-    placeOfBirthType: 'HEALTH_FACILITY',
-    partialDeclaration: {
-      'child.birthLocation': facilityId,
-      'child.birthLocationId': facilityId
-    }
+  const officeName = `Test Registration Office ${faker.string.alphanumeric(6)}`
+  const office = await client.locations.create.mutate({
+    name: officeName,
+    locationType: 'CRVS_OFFICE',
+    administrativeAreaId: centralId
   })
 
-  return createBirthDeclaration(token, declaration, ActionType.REGISTER)
-}
-
-/**
- * Registered at the same office (and by the same registrar) as
- * `createBirthRegisteredWithInactiveOfficeAndFacility`; place of death and
- * residential/other address both point at the same inactive administrative
- * area — used to confirm that unit is included in the place-of-death facet
- * but excluded from the residential/other-address facet, despite being the
- * identical location.
- */
-export async function createDeathRegisteredWithInactiveAddress() {
-  const token = await getToken(CREDENTIALS.REGISTRAR_OLD_CENTRAL_OFFICE)
-
-  const administrativeAreas = await getAdministrativeAreas(token)
-  const klowNorthOldId = getIdByName(administrativeAreas, 'Klow-north (old)')
-
-  const inactiveAdminAreaAddress = {
-    country: 'FAR',
-    addressType: AddressType.DOMESTIC,
-    administrativeArea: klowNorthOldId
+  const name = {
+    firstname: faker.person.firstName(),
+    surname: `${faker.person.lastName()}${faker.string.alphanumeric(6)}`
   }
+  const username = `${name.firstname[0]}.${name.surname}`
+    .toLowerCase()
+    .replace(/[^a-z0-9.]/g, '')
 
-  return createDeathDeclaration(
-    token,
-    {
-      'eventDetails.placeOfDeath': 'OTHER',
-      'eventDetails.deathLocationOther': inactiveAdminAreaAddress,
-      'eventDetails.deathLocationId': klowNorthOldId,
-      'deceased.address': inactiveAdminAreaAddress
-    },
-    ActionType.REGISTER
+  await client.user.create.mutate({
+    name,
+    role: 'LOCAL_REGISTRAR',
+    primaryOfficeId: office.id,
+    mobile: `07${faker.string.numeric(8)}`,
+    email: faker.internet.email(),
+    fullHonorificName: `${name.firstname} ${name.surname}`,
+    device: 'web',
+    data: {}
+  })
+
+  await loginWithNewUser(page, username)
+  const { token: registrarToken } = await getAuthTokens(
+    username,
+    NEW_USER_PASSWORD
   )
-}
 
-/**
- * Registered (full REGISTER flow, as a registrar seeded specifically at that
- * office) at an office that is active when created but inactivated much
- * later; residential address stays on an always-active administrative area.
- */
-export async function createBirthRegisteredWithInactiveOffice() {
-  const token = await getToken(CREDENTIALS.REGISTRAR_OLD_IBOMBO_OFFICE)
-
-  return createBirthDeclaration(
-    token,
+  const birth = await createBirthDeclaration(
+    registrarToken,
     undefined,
     ActionType.REGISTER,
     'PRIVATE_HOME'
   )
-}
+  const death = await createDeathDeclaration(registrarToken)
 
-/**
- * Registered at the same office (and by the same registrar) as
- * `createBirthRegisteredWithInactiveOffice`; place of death is a health
- * facility that becomes inactive on the same date as the office; residential
- * address stays on an always-active administrative area.
- */
-export async function createDeathRegisteredWithInactiveOfficeAndFacility() {
-  const token = await getToken(CREDENTIALS.REGISTRAR_OLD_IBOMBO_OFFICE)
+  const [initialVersion] = office.versions
+  await client.locations.update.mutate({
+    id: office.id,
+    name: officeName,
+    status: 'inactive',
+    lastVersionId: initialVersion.versionId
+  })
 
-  const facilities = await getLocations('HEALTH_FACILITY', token)
-  const facilityId = getIdByName(facilities, 'Old Ibombo Community Clinic')
-
-  return createDeathDeclaration(
-    token,
-    {
-      'eventDetails.placeOfDeath': 'HEALTH_FACILITY',
-      'eventDetails.deathLocation': facilityId,
-      'eventDetails.deathLocationId': facilityId
-    },
-    ActionType.REGISTER
-  )
+  return { officeName, birth, death }
 }
 
 /**
