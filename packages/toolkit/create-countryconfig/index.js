@@ -53,6 +53,39 @@ async function cloneRepository(
   console.log(`Copied files from ${fullPath} to ${targetDir} succesfully.`)
 }
 
+function ensureTargetDirectoryDoesNotExist(directoryName) {
+  const targetDirectoryPath = path.resolve(process.cwd(), directoryName)
+
+  if (fs.existsSync(targetDirectoryPath)) {
+    console.error(
+      'Error: Directory already exists in path "' + targetDirectoryPath + '".'
+    )
+    process.exit(1)
+  }
+}
+
+function updatePackageJsonName(targetPath, newName) {
+  console.log('\nUpdating package.json with project name: ' + newName + '\n')
+
+  const pkgPath = path.join(targetPath, 'package.json')
+  if (fs.existsSync(pkgPath)) {
+    try {
+      const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
+      pkg.name = newName
+      fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
+    } catch (err) {
+      console.error('\nFailed to update package.json:', err.message)
+      process.exit(1)
+    }
+  } else {
+    console.warn(
+      '\nWarning: No package.json found in the targetPath: ' +
+        targetPath +
+        '. Project name was not updated.'
+    )
+  }
+}
+
 async function main() {
   const projectName = process.argv[2]
 
@@ -64,69 +97,39 @@ async function main() {
   }
 
   const countryconfigDirName = projectName + '-countryconfig'
-  const infrastructureDirName = projectName + '-infrastructure'
-
-  const countryconfigTargetDir = path.resolve(
+  const countryconfigTargetPath = path.resolve(
     process.cwd(),
     countryconfigDirName
   )
-  const infrastructureTargetDir = path.resolve(
+  const infrastructureDirName = projectName + '-infrastructure'
+  const infrastructureTargetPath = path.resolve(
     process.cwd(),
     infrastructureDirName
   )
 
-  if (fs.existsSync(countryconfigTargetDir)) {
-    console.error(
-      'Error: Directory "' + countryconfigDirName + '" already exists.'
-    )
-    process.exit(1)
-  }
-
-  if (fs.existsSync(infrastructureTargetDir)) {
-    console.error(
-      'Error: Directory "' + infrastructureDirName + '" already exists.'
-    )
-    process.exit(1)
-  }
+  ensureTargetDirectoryDoesNotExist(countryconfigDirName)
+  ensureTargetDirectoryDoesNotExist(infrastructureDirName)
 
   try {
     await cloneRepository(
       {
         repository: CORE_REPOSITORY,
         repositorySubPath: COUNTRYCONFIG_TEMPLATE_REPOSITORY_SUBPATH,
-        branch: 'ocrvs-13179' // todo: remove this hardcoded branch once the countryconfig-template is merged into main
+        branch: 'ocrvs-13179' // @todo: remove this hardcoded branch once the countryconfig-template is merged into main
       },
-      countryconfigTargetDir
+      countryconfigTargetPath
     )
   } catch (err) {
-    console.error('\nFailed to copy country config template:', err.message)
+    console.error('\nFailed to clone country config template:', err.message)
     process.exit(1)
   }
 
-  console.log(
-    '\nUpdating package.json with project name: ' + countryconfigDirName + '\n'
-  )
-
-  const pkgPath = path.join(countryconfigTargetDir, 'package.json')
-  if (fs.existsSync(pkgPath)) {
-    try {
-      const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
-      pkg.name = countryconfigDirName
-      fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
-    } catch (err) {
-      console.error('\nFailed to update package.json:', err.message)
-      process.exit(1)
-    }
-  } else {
-    console.warn(
-      '\nWarning: No package.json found in the cloned country config repository. Project name was not updated.'
-    )
-  }
+  updatePackageJsonName(countryconfigTargetPath, countryconfigDirName)
 
   try {
     await cloneRepository(
       { repository: INFRASTRUCTURE_REPOSITORY },
-      infrastructureTargetDir
+      infrastructureTargetPath
     )
   } catch (err) {
     console.error('Failed to clone the infrastructure repository:', err.message)
