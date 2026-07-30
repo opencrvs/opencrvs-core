@@ -13,7 +13,14 @@ import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import * as z from 'zod/v4'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { fromZodError } from 'zod-validation-error'
-import { logger, UUID } from '@opencrvs/commons'
+import {
+  getAcceptedScopesFromToken,
+  getCurrentEventState,
+  logger,
+  RecordScopeV2,
+  userCanAccessEventWithScopes,
+  UUID
+} from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -49,12 +56,14 @@ import {
   addAsyncRejectAction,
   throwConflictIfActionNotAllowed,
   ensureEventIndexed,
+  EventNotFoundError,
   processAction
 } from '@events/service/events/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
 import { getActionConfirmationToken } from '@events/service/auth'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
+import { getEventIndexWithAdministrativeHierarchy } from '@events/service/indexing/utils'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation
@@ -232,9 +241,33 @@ export async function defaultRequestHandler(
   token: TokenWithBearer,
   event: EventDocument,
   configuration: EventConfig,
+  /**
+   * The scopes the caller has already been granted access to the record with
+   * (e.g. `ctx.acceptedScopes` from `canAccessEventWithScopes`). Re-checked
+   * here, immediately before we request a `record.confirm-registration` /
+   * `record.reject-registration` token for this specific record, so that the
+   * OAuth token-exchange in auth can trust the events service rather than
+   * re-verifying access itself over the network.
+   */
+  acceptedScopes: RecordScopeV2[],
   // @TODO: Could this be typed with the actual input schema, or could these actually be anything?
   actionConfirmationResponseSchema?: z.ZodObject<z.ZodRawShape>
 ) {
+  const eventIndex = getCurrentEventState(event, configuration)
+  const eventIndexWithLocationHierarchy =
+    await getEventIndexWithAdministrativeHierarchy(configuration, eventIndex)
+
+  const hasAccess = userCanAccessEventWithScopes(
+    eventIndexWithLocationHierarchy,
+    acceptedScopes,
+    user,
+    'customActionType' in input ? input.customActionType : undefined
+  )
+
+  if (!hasAccess) {
+    throw new EventNotFoundError(event.id)
+  }
+
   await throwConflictIfActionNotAllowed(
     input.eventId,
     input.type,
@@ -385,6 +418,10 @@ export function getDefaultActionProcedures(
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
         const { token, user, existingAction, duplicates } = ctx
+        const acceptedScopes = getAcceptedScopesFromToken(
+          token,
+          ACTION_SCOPE_MAP[actionType]
+        )
         const { eventId } = input
         const event = ctx.event
         const eventConfiguration = await getEventConfigurationById({
@@ -406,6 +443,7 @@ export function getDefaultActionProcedures(
           token,
           event,
           eventConfiguration,
+          acceptedScopes,
           actionConfig.actionConfirmationResponseSchema
         )
 

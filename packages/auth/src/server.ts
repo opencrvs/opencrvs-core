@@ -59,6 +59,7 @@ import sendUserNameHandler, {
   requestSchema as reqSendUserNameSchema
 } from '@auth/features/retrievalSteps/sendUserName/handler'
 import { tokenHandler } from '@auth/features/oauthToken/handler'
+import { tokenExchangeHandler } from '@auth/features/oauthToken/token-exchange'
 import { logger } from '@opencrvs/commons'
 import { getPublicKey } from '@auth/features/authenticate/service'
 import serviceTokenHandler from './features/serviceToken/handler'
@@ -403,6 +404,18 @@ export async function createServer() {
     options: {
       tags: ['api'],
       description: 'Authenticate system with client_id and client_secret'
+    }
+  })
+
+  // curl -H 'Content-Type: application/json' -d '...' http://localhost:4040/internal/token-exchange
+  server.route({
+    method: 'POST',
+    path: '/internal/token-exchange',
+    handler: tokenExchangeHandler,
+    options: {
+      tags: ['api'],
+      description:
+        'Internal-only: exchange a subject token for a record-scoped record.confirm-registration / record.reject-registration token. Never exposed through the gateway. Callers must have already verified the subject has access to event_id/action_id themselves - see the events service defaultRequestHandler.'
     }
   })
 

@@ -12,7 +12,6 @@ import * as oauthResponse from './responses'
 import * as Hapi from '@hapi/hapi'
 import {
   createTokenForActionConfirmation,
-  subjectCanAccessRecord,
   verifyToken
 } from '@auth/features/authenticate/service'
 import { pipe } from 'fp-ts/lib/function'
@@ -25,9 +24,16 @@ export const RECORD_TOKEN_TYPE =
   'urn:opencrvs:oauth:token-type:single_record_token'
 
 /**
- * Allows creating record-specific tokens for when a 3rd party system needs to confirm a registration
+ * Allows creating record-specific tokens for when a 3rd party system needs to confirm a registration.
  *
  * https://datatracker.ietf.org/doc/html/rfc8693#section-2.1
+ *
+ * Only reachable via the internal `/internal/token-exchange` route - never
+ * exposed through the gateway. This handler does not itself verify that the
+ * subject has access to `event_id`/`action_id`; the only legitimate caller
+ * (the events service's `defaultRequestHandler`) has already done that
+ * check, using the record data it has in hand, before requesting this
+ * exchange. Do not wire this handler up to a publicly reachable route.
  */
 export async function tokenExchangeHandler(
   request: Hapi.Request,
@@ -68,15 +74,6 @@ export async function tokenExchangeHandler(
       return isReadScope || isRejectScope
     }
   )
-
-  const hasAccess = await subjectCanAccessRecord(
-    subjectToken,
-    eventId as UUID,
-    actionId as UUID
-  )
-  if (!hasAccess) {
-    return oauthResponse.insufficientScope(h)
-  }
 
   const recordToken = await createTokenForActionConfirmation(
     { eventId, actionId },

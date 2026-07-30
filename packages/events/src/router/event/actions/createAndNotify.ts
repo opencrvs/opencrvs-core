@@ -15,6 +15,7 @@ import {
   canUserCreateEvent,
   getAcceptedScopesByType,
   getScopes,
+  RecordScopeV2,
   UUID
 } from '@opencrvs/commons'
 import {
@@ -216,7 +217,11 @@ export function createAndNotifyProcedure() {
           user,
           token,
           event,
-          eventConfig
+          eventConfig,
+          // notifyScopes only ever contains 'record.notify'-typed scopes, a
+          // valid RecordScopeV2 member - getAcceptedScopesByType just isn't
+          // typed narrowly enough to express that.
+          notifyScopes as RecordScopeV2[]
         )
 
         // Step 5: Write audit log.

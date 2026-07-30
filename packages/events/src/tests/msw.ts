@@ -133,7 +133,7 @@ const handlers = [
   ),
   // token exchange for `event.actions.register.confirm` and `event.actions.register.reject`
   // query params such as `subject_token`, `subject_token_type` omitted for simplicity
-  http.post(`${env.AUTH_URL}/token`, () =>
+  http.post(`${env.AUTH_URL}/internal/token-exchange`, () =>
     HttpResponse.json({
       access_token: 'some-token'
     })

@@ -26,7 +26,7 @@ export const invalidGrantType = (h: Hapi.ResponseToolkit) =>
   h
     .response({
       error: 'unsupported_grant_type',
-      error_description: `Invalid or undefined grant type. Only "client_credentials" or "urn:opencrvs:oauth:grant-type:token-exchange" are supported.`,
+      error_description: `Invalid or undefined grant type. Only "client_credentials" is supported.`,
       error_uri:
         'Refer to https://documentation.opencrvs.org/technology/interoperability/authenticate-a-client'
     })
@@ -53,16 +53,6 @@ export const invalidSubjectToken = (h: Hapi.ResponseToolkit) =>
     })
     .header('Cache-Control', 'no-store')
     .code(401)
-
-export const insufficientScope = (h: Hapi.ResponseToolkit) =>
-  h
-    .response({
-      error: 'insufficient_scope',
-      error_description:
-        'The subject token does not grant access to the requested event_id/action_id'
-    })
-    .header('Cache-Control', 'no-store')
-    .code(403)
 
 export const success = (h: Hapi.ResponseToolkit, token: string) =>
   h
