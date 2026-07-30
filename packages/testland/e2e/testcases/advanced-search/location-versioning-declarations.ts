@@ -11,7 +11,8 @@
 import { v4 as uuidv4 } from 'uuid'
 import { createClient } from '@opencrvs/toolkit/api'
 import { ActionType, AddressType } from '@opencrvs/toolkit/events'
-import { GATEWAY_HOST } from '../../constants'
+import { CREDENTIALS, GATEWAY_HOST } from '../../constants'
+import { getToken } from '../../helpers'
 import {
   getIdByName,
   getLocations,
@@ -23,23 +24,24 @@ import {
 } from '../test-data/birth-declaration'
 import { createDeclaration as createDeathDeclaration } from '../test-data/death-declaration'
 
+function getUserIdFromToken(token: string) {
+  return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString()).sub
+}
+
 /**
- * Registered at an office that is active when created but later inactivated;
- * born at a health facility that later becomes inactive; residential address
- * stays on an always-active administrative area.
+ * Registered (as a registrar seeded specifically at that office) at an office
+ * that is active when created but later inactivated; born at a health
+ * facility that later becomes inactive; residential address stays on an
+ * always-active administrative area.
  */
-export async function createBirthDeclaredWithInactiveOfficeAndFacility(
-  clientToken: string
-) {
-  const [offices, facilities] = await Promise.all([
-    getLocations('CRVS_OFFICE', clientToken),
-    getLocations('HEALTH_FACILITY', clientToken)
-  ])
-  const officeId = getIdByName(offices, 'Old Central Registration Office')
+export async function createBirthRegisteredWithInactiveOfficeAndFacility() {
+  const token = await getToken(CREDENTIALS.REGISTRAR_OLD_CENTRAL_OFFICE)
+
+  const facilities = await getLocations('HEALTH_FACILITY', token)
   const facilityId = getIdByName(facilities, 'Old Central Maternity Hospital')
 
   const declaration = await getBirthDeclaration({
-    token: clientToken,
+    token,
     placeOfBirthType: 'HEALTH_FACILITY',
     partialDeclaration: {
       'child.birthLocation': facilityId,
@@ -47,31 +49,21 @@ export async function createBirthDeclaredWithInactiveOfficeAndFacility(
     }
   })
 
-  return createBirthDeclaration(
-    clientToken,
-    declaration,
-    ActionType.DECLARE,
-    undefined,
-    officeId
-  )
+  return createBirthDeclaration(token, declaration, ActionType.REGISTER)
 }
 
 /**
- * Registered at the same inactive office as
- * `createBirthDeclaredWithInactiveOfficeAndFacility`; place of death and
+ * Registered at the same office (and by the same registrar) as
+ * `createBirthRegisteredWithInactiveOfficeAndFacility`; place of death and
  * residential/other address both point at the same inactive administrative
  * area — used to confirm that unit is included in the place-of-death facet
  * but excluded from the residential/other-address facet, despite being the
  * identical location.
  */
-export async function createDeathDeclaredWithSharedInactiveAddress(
-  clientToken: string
-) {
-  const [offices, administrativeAreas] = await Promise.all([
-    getLocations('CRVS_OFFICE', clientToken),
-    getAdministrativeAreas(clientToken)
-  ])
-  const officeId = getIdByName(offices, 'Old Central Registration Office')
+export async function createDeathRegisteredWithInactiveAddress() {
+  const token = await getToken(CREDENTIALS.REGISTRAR_OLD_CENTRAL_OFFICE)
+
+  const administrativeAreas = await getAdministrativeAreas(token)
   const klowNorthOldId = getIdByName(administrativeAreas, 'Klow-north (old)')
 
   const inactiveAdminAreaAddress = {
@@ -81,65 +73,53 @@ export async function createDeathDeclaredWithSharedInactiveAddress(
   }
 
   return createDeathDeclaration(
-    clientToken,
+    token,
     {
       'eventDetails.placeOfDeath': 'OTHER',
       'eventDetails.deathLocationOther': inactiveAdminAreaAddress,
       'eventDetails.deathLocationId': klowNorthOldId,
       'deceased.address': inactiveAdminAreaAddress
     },
-    ActionType.DECLARE,
-    undefined,
-    officeId
+    ActionType.REGISTER
   )
 }
 
 /**
- * Registered (full REGISTER flow) at an office that is active when created
- * but inactivated much later; residential address stays on an always-active
- * administrative area.
+ * Registered (full REGISTER flow, as a registrar seeded specifically at that
+ * office) at an office that is active when created but inactivated much
+ * later; residential address stays on an always-active administrative area.
  */
-export async function createBirthRegisteredWithInactiveOffice(
-  clientToken: string
-) {
-  const offices = await getLocations('CRVS_OFFICE', clientToken)
-  const officeId = getIdByName(offices, 'Old Ibombo Registration Office')
+export async function createBirthRegisteredWithInactiveOffice() {
+  const token = await getToken(CREDENTIALS.REGISTRAR_OLD_IBOMBO_OFFICE)
 
   return createBirthDeclaration(
-    clientToken,
+    token,
     undefined,
     ActionType.REGISTER,
-    'PRIVATE_HOME',
-    officeId
+    'PRIVATE_HOME'
   )
 }
 
 /**
- * Registered (full REGISTER flow) at the same inactive office as
+ * Registered at the same office (and by the same registrar) as
  * `createBirthRegisteredWithInactiveOffice`; place of death is a health
  * facility that becomes inactive on the same date as the office; residential
  * address stays on an always-active administrative area.
  */
-export async function createDeathRegisteredWithInactiveOfficeAndFacility(
-  clientToken: string
-) {
-  const [offices, facilities] = await Promise.all([
-    getLocations('CRVS_OFFICE', clientToken),
-    getLocations('HEALTH_FACILITY', clientToken)
-  ])
-  const officeId = getIdByName(offices, 'Old Ibombo Registration Office')
+export async function createDeathRegisteredWithInactiveOfficeAndFacility() {
+  const token = await getToken(CREDENTIALS.REGISTRAR_OLD_IBOMBO_OFFICE)
+
+  const facilities = await getLocations('HEALTH_FACILITY', token)
   const facilityId = getIdByName(facilities, 'Old Ibombo Community Clinic')
 
   return createDeathDeclaration(
-    clientToken,
+    token,
     {
       'eventDetails.placeOfDeath': 'HEALTH_FACILITY',
       'eventDetails.deathLocation': facilityId,
       'eventDetails.deathLocationId': facilityId
     },
-    ActionType.REGISTER,
-    undefined,
-    officeId
+    ActionType.REGISTER
   )
 }
 
@@ -148,20 +128,16 @@ export async function createDeathRegisteredWithInactiveOfficeAndFacility(
  * points at an inactive administrative area — used to confirm that field is
  * excluded from the residential/other-address facet even when the office is
  * active, mirroring the same inactive admin unit used in
- * `createDeathDeclaredWithSharedInactiveAddress`.
+ * `createDeathRegisteredWithInactiveAddress`.
  */
-export async function createBirthNotifiedWithInactiveOtherAddress(
-  clientToken: string
-) {
-  const [offices, administrativeAreas] = await Promise.all([
-    getLocations('CRVS_OFFICE', clientToken),
-    getAdministrativeAreas(clientToken)
-  ])
-  const officeId = getIdByName(offices, 'Ibombo District Office')
+export async function createBirthNotifiedWithInactiveOtherAddress() {
+  const token = await getToken(CREDENTIALS.REGISTRAR)
+
+  const administrativeAreas = await getAdministrativeAreas(token)
   const klowNorthOldId = getIdByName(administrativeAreas, 'Klow-north (old)')
 
   const declaration = await getBirthDeclaration({
-    token: clientToken,
+    token,
     partialDeclaration: {
       'mother.nid': null,
       'mother.dob': null,
@@ -176,32 +152,30 @@ export async function createBirthNotifiedWithInactiveOtherAddress(
     }
   })
 
-  return createBirthDeclaration(
-    clientToken,
-    declaration,
-    ActionType.NOTIFY,
-    undefined,
-    officeId
-  )
+  return createBirthDeclaration(token, declaration, ActionType.NOTIFY)
 }
 
 /**
  * Control record: fully active office, facility, and residential address —
  * archived, with no inactive location anywhere. Confirms normal search is
  * unaffected by inactive-location handling elsewhere.
+ *
+ * DECLARE releases the declaring user's assignment (`keepAssignment: false`
+ * for a DECLARE action), so the record is re-assigned to the same user
+ * before ARCHIVE, which requires assignment.
  */
-export async function createDeathArchivedControlRecord(clientToken: string) {
-  const [offices, facilities, administrativeAreas] = await Promise.all([
-    getLocations('CRVS_OFFICE', clientToken),
-    getLocations('HEALTH_FACILITY', clientToken),
-    getAdministrativeAreas(clientToken)
+export async function createDeathArchivedControlRecord() {
+  const token = await getToken(CREDENTIALS.REGISTRAR_ISAMBA)
+
+  const [facilities, administrativeAreas] = await Promise.all([
+    getLocations('HEALTH_FACILITY', token),
+    getAdministrativeAreas(token)
   ])
-  const officeId = getIdByName(offices, 'Isamba District Office')
   const facilityId = getIdByName(facilities, 'Isamba District Hospital')
   const mbulaId = getIdByName(administrativeAreas, 'Mbula')
 
   const { eventId } = await createDeathDeclaration(
-    clientToken,
+    token,
     {
       'eventDetails.placeOfDeath': 'HEALTH_FACILITY',
       'eventDetails.deathLocation': facilityId,
@@ -212,12 +186,18 @@ export async function createDeathArchivedControlRecord(clientToken: string) {
         administrativeArea: mbulaId
       }
     },
-    ActionType.DECLARE,
-    undefined,
-    officeId
+    ActionType.DECLARE
   )
 
-  const client = createClient(GATEWAY_HOST + '/events', `Bearer ${clientToken}`)
+  const client = createClient(GATEWAY_HOST + '/events', `Bearer ${token}`)
+
+  await client.event.actions.assignment.assign.mutate({
+    eventId,
+    transactionId: uuidv4(),
+    type: ActionType.ASSIGN,
+    assignedTo: getUserIdFromToken(token)
+  })
+
   await client.event.actions.archive.request.mutate({
     eventId,
     transactionId: uuidv4(),
