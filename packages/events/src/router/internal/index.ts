@@ -11,8 +11,18 @@
 
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
-import { UserName, UserAuditRecordInput, UUID } from '@opencrvs/commons'
-import { internalProcedure, serviceRouter } from '@events/router/trpc'
+import {
+  UserName,
+  UserAuditRecordInput,
+  UUID,
+  EventDocument
+} from '@opencrvs/commons'
+import {
+  internalProcedure,
+  serviceRouter,
+  userAndSystemProcedure
+} from '@events/router/trpc'
+import * as middleware from '@events/router/middleware'
 import {
   getUserCredentialsByUsername,
   getUserRoleAndStatus,
@@ -27,7 +37,8 @@ import {
 } from '@events/service/users/api'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import { getSystemInitialisation } from '@events/service/auth'
-import { canInitialiseSystem } from '../middleware'
+import { getEventById } from '@events/service/events/events'
+import { canInitialiseSystem, EventIdParam } from '../middleware'
 
 const VerifyUserOutput = z.object({
   id: z.string(),
@@ -38,6 +49,17 @@ const VerifyUserOutput = z.object({
   name: UserName,
   securityQuestionKey: z.string(),
   scope: z.array(z.string())
+})
+
+export const internalEventRouter = serviceRouter({
+  get: userAndSystemProcedure
+    .input(EventIdParam)
+    .output(EventDocument)
+    .use(middleware.canAccessEventWithScopes(['record.read']))
+    .query(async ({ input }) => {
+      const { eventId } = input
+      return getEventById(eventId)
+    })
 })
 
 /**

@@ -273,8 +273,8 @@ export async function subjectCanAccessRecord(
   actionId: UUID
 ): Promise<boolean> {
   try {
-    const event = await eventsClient.event.get.query(
-      { eventId, waitFor: false },
+    const event = await internalClient.event.get.query(
+      { eventId },
       {
         context: { headers: { Authorization: setBearerForToken(subjectToken) } }
       }
