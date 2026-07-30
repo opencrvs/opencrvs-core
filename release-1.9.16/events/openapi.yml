@@ -846,7 +846,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 265ac55d-bd53-47fe-9658-3b4c405bd7f5
+                transactionId: f47c8053-940a-4da5-836e-474011a314f6
                 type: birth
       responses:
         "200":
@@ -936,7 +936,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: c77e44df-8fc7-48f1-b62a-e76692c4b25a
+                transactionId: 20f86951-876c-4573-82f9-bf615f51137f
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -12647,6 +12647,10 @@ components:
           default: false
           description: If true, all required fields must be filled before continuing to
             the next page
+        showClearButton:
+          type: boolean
+          description: If true, a "Clear" button is shown at the top of the page allowing
+            the user to reset all fields on the page to their default state
         fields:
           type: array
           items:
