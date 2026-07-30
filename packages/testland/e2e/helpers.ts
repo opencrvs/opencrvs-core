@@ -34,6 +34,39 @@ export async function createPIN(page: Page) {
   }
 }
 
+/**
+ * Waits for the client to land on either the PIN screen or its loading
+ * spinner after a refresh-token handoff. If the refresh token exchange
+ * fails, the client instead redirects to the separate login app — detecting
+ * that directly surfaces a clear failure immediately, rather than waiting out
+ * the full timeout for a selector that was never going to appear.
+ */
+export async function waitForAuthenticatedLanding(
+  page: Page,
+  timeout?: number
+) {
+  const selectorOptions = timeout !== undefined ? { timeout } : {}
+
+  const spinnerOrPin = page.waitForSelector('#pin-input, #appSpinner', {
+    state: 'visible',
+    ...selectorOptions
+  })
+  const redirectedToLogin = page
+    .waitForURL((url) => url.origin === LOGIN_URL, selectorOptions)
+    .then(() => {
+      throw new Error(
+        'Redirected to the login page instead of the PIN/spinner screen — the refresh token exchange likely failed'
+      )
+    })
+
+  try {
+    await Promise.race([spinnerOrPin, redirectedToLogin])
+  } finally {
+    spinnerOrPin.catch(() => {})
+    redirectedToLogin.catch(() => {})
+  }
+}
+
 export async function logout(page: Page) {
   if (await page.getByTestId('exit-event').isVisible()) {
     await page.getByTestId('exit-event').click()
@@ -72,7 +105,7 @@ export async function login(
   // Hand off only the refresh token; the client mints the access token from it.
   await page.goto(`${CLIENT_URL}?refreshToken=${refreshToken}`)
 
-  await page.waitForSelector('#pin-input, #appSpinner', { state: 'visible' })
+  await waitForAuthenticatedLanding(page)
 
   if (!skipPin) {
     await createPIN(page)

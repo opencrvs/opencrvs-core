@@ -61,6 +61,7 @@ export function OrganisationNavigationGroup({
         <NavigationGroup>
           <NavigationItem
             icon={() => <Icon name="Buildings" size="small" />}
+            data-testid={`navigation_${WORKQUEUE_TABS.organisation}`}
             id={`navigation_${WORKQUEUE_TABS.organisation}`}
             isSelected={currentWorkqueueSlug === WORKQUEUE_TABS.organisation}
             label={intl.formatMessage(

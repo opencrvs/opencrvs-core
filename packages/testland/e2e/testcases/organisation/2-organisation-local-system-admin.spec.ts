@@ -36,7 +36,7 @@ test.describe.serial('2. Organisation Page', () => {
     })
     test('2.1.1 Verify Province -> District -> Health Facility', async () => {
       await page.getByRole('button', { name: /Central/ }).click()
-      await page.getByRole('button', { name: /Ibombo/ }).click()
+      await page.getByRole('button', { name: /^Ibombo$/ }).click()
       await page.getByRole('button', { name: /Klow/ }).click()
 
       await page.getByRole('button', { name: /Klow Village Hospital/ }).click()
@@ -51,7 +51,7 @@ test.describe.serial('2. Organisation Page', () => {
     test('2.1.2 Verify Province -> District -> District Office', async () => {
       await navigateToWorkqueue(page, 'Organisation')
       await page.getByRole('button', { name: /Central/ }).click()
-      await page.getByRole('button', { name: /Ibombo/ }).click()
+      await page.getByRole('button', { name: /^Ibombo$/ }).click()
 
       await page.getByRole('button', { name: /Ibombo District Office/ }).click()
       await expect(page.locator('#content-name')).toHaveText(
