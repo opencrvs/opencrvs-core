@@ -6,6 +6,14 @@
 
 - Third-party integrations (such as MOSIP) can now authenticate with OpenCRVS using their own credentials instead of borrowing the requesting user's session. Integrations are registered automatically on startup from the country configuration, and each one signs in with its own client ID and secret. This keeps integrations working reliably even when services restart mid-request, and makes the audit trail attribute actions to the integration itself (e.g. "Registered — MOSIP") rather than to a person. The feature is opt-in: configurations with no integrations are unaffected. [#12360](https://github.com/opencrvs/opencrvs-core/issues/12360)
 
+### Improvements
+
+- Hardened the Content Security Policy served by the client and login apps, following a vulnerability scan of a national deployment. The login app no longer allows `unsafe-eval` and no longer permits scripts from the deployment's wildcard domain — it loads no third-party scripts and compiles no JavaScript at runtime. Both apps now send the `frame-ancestors`, `base-uri` and `form-action` directives, and `img-src` no longer permits plain-HTTP images. PDF previews are rendered with pdf.js code generation disabled.
+
+  The client still requires `unsafe-eval`: legacy v1 form conditionals, the v2-events serialised-function compiler, AJV's runtime JSON Schema compilation and Handlebars certificate templates all compile JavaScript in the browser from configuration fetched at runtime. The reasoning is documented next to the policy in `packages/client/nginx.conf`, and removing it is tracked for a future major release. Note that CSP nonces and hashes are not an alternative — they govern inline `<script>` blocks, not `eval`.
+
+  **Deployment note:** if your country configuration serves any image over plain HTTP, it will now be blocked in both apps. Serve those assets over HTTPS. [#13246](https://github.com/opencrvs/opencrvs-core/issues/13246)
+
 ### Bug fixes
 
 - On mobile, uploading a file or signature no longer triggers the PIN re-lock screen. Opening the native file picker or camera briefly backgrounds the app, which was previously indistinguishable from the user actually leaving the app. [#13124](https://github.com/opencrvs/opencrvs-core/issues/13124)
