@@ -11737,6 +11737,10 @@ components:
           default: false
           description: If true, all required fields must be filled before continuing to
             the next page
+        showClearButton:
+          type: boolean
+          description: If true, a "Clear" button is shown at the top of the page allowing
+            the user to reset all fields on the page to their default state
         fields:
           type: array
           items:
