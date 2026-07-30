@@ -11,9 +11,19 @@
 import * as Hapi from '@hapi/hapi'
 import { clientCredentialsHandler } from './client-credentials'
 import * as oauthResponse from './responses'
-import { tokenExchangeHandler } from './token-exchange'
 import { getParam } from './utils'
 
+/**
+ * Public `/token` endpoint, reachable through the gateway (`/auth/token`).
+ * Only `client_credentials` is served here. The
+ * `urn:opencrvs:oauth:grant-type:token-exchange` grant is intentionally not
+ * handled by this public handler - see `tokenExchangeHandler` and
+ * `/internal/token-exchange`, which assumes its caller (the events service)
+ * has already verified the subject has access to the requested record.
+ * Exposing that grant here would let anyone with a valid login token mint a
+ * `record.confirm-registration` / `record.reject-registration` token for any
+ * event_id/action_id they name.
+ */
 export async function tokenHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -22,10 +32,6 @@ export async function tokenHandler(
 
   if (grantType === 'client_credentials') {
     return clientCredentialsHandler(request, h)
-  }
-
-  if (grantType === 'urn:opencrvs:oauth:grant-type:token-exchange') {
-    return tokenExchangeHandler(request, h)
   }
 
   return oauthResponse.invalidGrantType(h)

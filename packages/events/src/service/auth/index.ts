@@ -44,13 +44,16 @@ export async function getActionConfirmationToken(
     action_id: actionId
   })
 
-  const res = await fetch(new URL(`token?${params}`, env.AUTH_URL), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token
+  const res = await fetch(
+    new URL(`internal/token-exchange?${params}`, env.AUTH_URL),
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      }
     }
-  })
+  )
 
   if (!res.ok) {
     throw new Error(

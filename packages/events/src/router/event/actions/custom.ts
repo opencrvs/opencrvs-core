@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { TRPCError } from '@trpc/server'
+import { getAcceptedScopesFromToken } from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -36,6 +37,9 @@ export function customActionProcedures() {
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
         const { token, user, existingAction } = ctx
+        const acceptedScopes = getAcceptedScopesFromToken(token, [
+          'record.custom-action'
+        ])
 
         // If an action exists but is not in the REQUESTED state,
         // then we consider the action to have been fully handled already.
@@ -79,7 +83,8 @@ export function customActionProcedures() {
           user,
           token,
           event,
-          config
+          config,
+          acceptedScopes
         )
 
         await writeAuditLog({
