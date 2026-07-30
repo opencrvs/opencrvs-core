@@ -412,14 +412,12 @@ export const resolvers: GQLResolver = {
       { userId, password, securityQNAs },
       { headers: authHeader }
     ) {
-      if (
-        !isTokenOwner(authHeader, userId) &&
-        !inScope(authHeader, [
-          SCOPES.USER_UPDATE,
-          SCOPES.USER_UPDATE_MY_JURISDICTION
-        ])
-      )
+      // An account may only be activated by its owner. Anyone else - including
+      // a user administrator - setting the password and security answers of a
+      // pending account would be able to take that account over.
+      if (!isTokenOwner(authHeader, userId)) {
         throw new Error('User can not be activated')
+      }
 
       const res = await fetch(`${USER_MANAGEMENT_URL}activateUser`, {
         method: 'POST',
@@ -444,14 +442,11 @@ export const resolvers: GQLResolver = {
       { userId, existingPassword, password },
       { headers: authHeader }
     ) {
-      // Only token owner of CONFIG_UPDATE_ALL should be able to change their password
-      if (
-        !inScope(authHeader, [
-          SCOPES.USER_UPDATE,
-          SCOPES.USER_UPDATE_MY_JURISDICTION
-        ]) &&
-        !isTokenOwner(authHeader, userId)
-      ) {
+      // Only the owner of an account may change its password. A user
+      // administrator resets a password through resetPasswordInvite, which
+      // sends the new credentials to the account owner instead of handing them
+      // to the administrator.
+      if (!isTokenOwner(authHeader, userId)) {
         throw new Error(
           `Change password is not allowed. ${userId} is not the owner of the token`
         )

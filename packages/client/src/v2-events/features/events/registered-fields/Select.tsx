@@ -16,11 +16,12 @@ import { StringifierContext } from './RegisteredField'
 
 export interface SelectInputProps
   extends Omit<React.InputHTMLAttributes<HTMLSelectElement>, 'onChange'> {
-  onChange: (newValue: string) => void
+  onChange: (newValue: string | null) => void
   value?: string
   noOptionsMessage?: SelectField['noOptionsMessage']
   options: Array<Omit<SelectOption, 'conditionals'> & { disabled?: boolean }>
   'data-testid'?: string
+  isClearable?: boolean
 }
 
 function SelectInput({
@@ -30,6 +31,8 @@ function SelectInput({
   // forwarding name to the underlying Select component results in
   // an extra input[type=hidden] element being rendered
   name,
+  onChange,
+  isClearable = true,
   ...props
 }: SelectInputProps) {
   const intl = useIntlWithFormData()
@@ -54,9 +57,16 @@ function SelectInput({
     <SelectComponent
       {...props}
       data-testid={props['data-testid'] || `select__${props.id}`}
+      isClearable={isClearable}
       noOptionsMessage={formattedNoOptionsMessage}
       options={formattedOptions}
       value={inputValue}
+      // The underlying Select reports a cleared value as an empty string.
+      // Store it as null so the value is explicitly removed when the
+      // declaration is submitted (PATCH semantics drop only null values).
+      onChange={(newValue: string) =>
+        onChange(newValue === '' ? null : newValue)
+      }
     />
   )
 }
