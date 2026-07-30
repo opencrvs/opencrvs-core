@@ -250,7 +250,7 @@ export const ActiveOnlyAloneExcludesUsingToday: Story = {
         await userEvent.click(getTestAdminAreaInput(canvasElement))
 
         const listbox = await canvas.findByRole('listbox')
-        await waitFor(() =>
+        await waitFor(async () =>
           expect(
             within(listbox).queryByText('Mercy District')
           ).not.toBeInTheDocument()
@@ -266,7 +266,7 @@ export const ActiveOnlyAloneExcludesUsingToday: Story = {
         await userEvent.click(getTestAdminAreaInput(canvasElement))
 
         const listbox = await canvas.findByRole('listbox')
-        await waitFor(() =>
+        await waitFor(async () =>
           expect(
             within(listbox).queryByText('Mercy District')
           ).not.toBeInTheDocument()
@@ -297,7 +297,7 @@ export const CombinedActiveOnlyChecksEventDateAnchor: Story = {
         await userEvent.click(getTestAdminAreaInput(canvasElement))
 
         const listbox = await canvas.findByRole('listbox')
-        await waitFor(() =>
+        await waitFor(async () =>
           expect(
             within(listbox).queryByText('Mercy District')
           ).not.toBeInTheDocument()
