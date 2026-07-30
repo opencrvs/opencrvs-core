@@ -16,7 +16,8 @@ import { assertTexts, selectLocationOption } from '../../utils'
 import {
   registerDeclarationsThenDeactivateOffice,
   createBirthRegisteredWithInactiveFacility,
-  createDeathRegisteredWithInactiveFacility
+  createDeathRegisteredWithInactiveFacility,
+  createBirthNotifiedInactiveAddress
 } from './location-versioning-declarations'
 
 function formatDeceasedName(declaration: {
@@ -216,5 +217,54 @@ test.describe.serial('Advanced search - inactive health facilities', () => {
         formatDeceasedName(deathFacility.declaration)
       ]
     })
+  })
+})
+
+test.describe
+  .serial('Advanced search - inactive admin area excluded from address filter', () => {
+  let page: Page
+
+  test.beforeAll(async ({ browser }) => {
+    page = await browser.newPage()
+
+    // Record itself isn't asserted on here — the filter should hide the
+    // inactive admin area as a search option regardless, but exercising the
+    // full notify flow confirms nothing breaks when a real record actually
+    // holds an inactive location in this field.
+    await createBirthNotifiedInactiveAddress()
+  })
+
+  test.afterAll(async () => {
+    await page.close()
+  })
+
+  test('0 - Log in and load advanced search', async () => {
+    await login(page, CREDENTIALS.REGISTRAR_GENERAL)
+    await page.click('#searchType')
+    await expect(page).toHaveURL(/.*\/advanced-search/)
+  })
+
+  test('1 - Inactive admin area is hidden from the Other address filter', async () => {
+    await page.getByText('Birth').click()
+    await page.getByText('Event details').click()
+
+    await page.locator('#child____placeOfBirth').click()
+    await page.getByText('Other', { exact: true }).click()
+
+    // Province/district only auto-fill to the searching user's own
+    // jurisdiction — Registrar General has none, so both start empty here.
+    await page.locator('#province').fill('Central')
+    await selectLocationOption(page, 'Central')
+
+    await page.locator('#district').fill('Ibombo-north')
+    await selectLocationOption(page, 'Ibombo-north (old)')
+
+    await page.locator('#village').fill('Klow-north')
+
+    // Unlike office/facility filters, the address admin-area filter only
+    // ever offers currently-active areas — the option never appears here.
+    await expect(
+      page.locator('[id^="locationOption"]').getByText('Klow-north (old)')
+    ).toHaveCount(0)
   })
 })
