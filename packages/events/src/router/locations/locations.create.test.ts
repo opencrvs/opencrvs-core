@@ -16,6 +16,7 @@ import {
   UUID_REGEX
 } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
+import { setLocations } from '@events/storage/postgres/administrative-hierarchy/locations'
 
 const scope = encodeScope({ type: 'location.edit' })
 
@@ -125,6 +126,67 @@ test('returns the existing location on identical replay with a client-supplied i
     .execute()
 
   expect(auditEntries).toHaveLength(1)
+})
+
+test('replays create idempotently against a seeded multi-element history', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const id = generateUuid()
+  const initialVersion = {
+    versionId: generateUuid(),
+    effectiveFrom: '0001-01-01',
+    name: 'Seeded Office',
+    externalId: 'seeded-office-pcode',
+    status: 'active' as const
+  }
+
+  // Seeding sets the flat `name` column to the version in effect today, so a
+  // seeded row that carries a rename has a flat name differing from its
+  // initial version's. The replay check must compare against the initial
+  // version, or this create would be rejected as a value conflict.
+  await setLocations([
+    {
+      id,
+      administrativeAreaId: null,
+      locationType: 'CRVS_OFFICE',
+      name: 'Seeded Office (renamed)',
+      externalId: 'seeded-office-pcode',
+      versions: [
+        initialVersion,
+        {
+          versionId: generateUuid(),
+          effectiveFrom: '2020-01-01',
+          name: 'Seeded Office (renamed)',
+          externalId: 'seeded-office-pcode',
+          status: 'active' as const
+        }
+      ]
+    }
+  ])
+
+  const replayed = await client.locations.create({
+    id,
+    administrativeAreaId: null,
+    locationType: 'CRVS_OFFICE',
+    name: initialVersion.name,
+    externalId: initialVersion.externalId,
+    effectiveFrom: initialVersion.effectiveFrom,
+    status: initialVersion.status
+  })
+
+  expect(replayed.id).toBe(id)
+  // The seeded history survived, proving the existing row was returned rather
+  // than a second one inserted.
+  expect(replayed.versions).toHaveLength(2)
+
+  const auditEntries = await getClient()
+    .selectFrom('auditLog')
+    .select('id')
+    .where('operation', '=', 'locations.create')
+    .execute()
+
+  expect(auditEntries).toHaveLength(0)
 })
 
 test('rejects replay with the same id but different values', async () => {
