@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { createClient } from '@opencrvs/toolkit/api'
 import { ActionType, AddressType } from '@opencrvs/toolkit/events'
 import { CREDENTIALS, GATEWAY_HOST } from '../../constants'
-import { getToken } from '../../helpers'
+import { getClientToken, getToken } from '../../helpers'
 import {
   getIdByName,
   getLocations,
@@ -26,6 +26,32 @@ import { createDeclaration as createDeathDeclaration } from '../test-data/death-
 
 function getUserIdFromToken(token: string) {
   return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString()).sub
+}
+
+/**
+ * NOTIFY is the one action a system/integration token is actually allowed to
+ * perform (unlike DECLARE/REGISTER/ARCHIVE, which are user-only) — so this
+ * client is scoped to just that, letting `createdAtLocation` be set
+ * explicitly instead of resolving from a seeded user's own office.
+ */
+async function getNotifyOnlySystemClientToken() {
+  const systemAdminToken = await getToken(CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
+
+  const integrationClient = createClient(
+    `${GATEWAY_HOST}/events`,
+    `Bearer ${systemAdminToken}`
+  )
+  const integration = await integrationClient.integrations.create.mutate({
+    name: `Notify-only client ${uuidv4()}`,
+    scopes: [
+      'type=record.create',
+      'type=record.search',
+      'type=record.read',
+      'type=record.notify&event=birth'
+    ]
+  })
+
+  return getClientToken(integration.clientId, integration.clientSecret)
 }
 
 /**
@@ -130,10 +156,14 @@ export async function createDeathRegisteredWithInactiveOfficeAndFacility() {
  * active, mirroring the same inactive admin unit used in
  * `createDeathRegisteredWithInactiveAddress`.
  */
-export async function createBirthNotifiedWithInactiveOtherAddress() {
-  const token = await getToken(CREDENTIALS.REGISTRAR)
+export async function createBirthNotifiedInactiveAddress() {
+  const token = await getNotifyOnlySystemClientToken()
 
-  const administrativeAreas = await getAdministrativeAreas(token)
+  const [offices, administrativeAreas] = await Promise.all([
+    getLocations('CRVS_OFFICE', token),
+    getAdministrativeAreas(token)
+  ])
+  const officeId = getIdByName(offices, 'Ibombo District Office')
   const klowNorthOldId = getIdByName(administrativeAreas, 'Klow-north (old)')
 
   const declaration = await getBirthDeclaration({
@@ -152,7 +182,13 @@ export async function createBirthNotifiedWithInactiveOtherAddress() {
     }
   })
 
-  return createBirthDeclaration(token, declaration, ActionType.NOTIFY)
+  return createBirthDeclaration(
+    token,
+    declaration,
+    ActionType.NOTIFY,
+    undefined,
+    officeId
+  )
 }
 
 /**
