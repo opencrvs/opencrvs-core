@@ -10,6 +10,8 @@
 
 ### Bug fixes
 
+- Activating a user account now requires the caller to be the account owner. Previously any user holding `user.update` or `user.update[my-jurisdiction]` could set another pending user's password and security answers, which allowed taking over that account. The ownership check is enforced both in the gateway and in user management. [#13197](https://github.com/opencrvs/opencrvs-core/pull/13197)
+- Changing a password now requires the caller to be the account owner, and the current password is always required. Previously a user holding `user.update` or `user.update[my-jurisdiction]` could change another user's password. Administrators reset a password through "Reset password", which sends the new credentials to the account owner and is unchanged.
 - On mobile, uploading a file or signature no longer triggers the PIN re-lock screen. Opening the native file picker or camera briefly backgrounds the app, which was previously indistinguishable from the user actually leaving the app. [#13124](https://github.com/opencrvs/opencrvs-core/issues/13124)
 
 ## 1.9.15 Release Candidate

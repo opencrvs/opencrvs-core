@@ -12,6 +12,8 @@ import activateUser, {
   requestSchema as activateUserRequestSchema
 } from '@user-mgnt/features/activateUser/handler'
 import changePasswordHandler, {
+  changeOwnPasswordHandler,
+  changeOwnPasswordRequestSchema,
   changePasswordRequestSchema
 } from '@user-mgnt/features/changePassword/handler'
 import changeAvatarHandler, {
@@ -201,12 +203,12 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/changeUserPassword',
-      handler: changePasswordHandler,
+      handler: changeOwnPasswordHandler,
       options: {
         tags: ['api'],
         description: 'Changes password for logged-in user',
         validate: {
-          payload: changePasswordRequestSchema
+          payload: changeOwnPasswordRequestSchema
         },
         response: {
           schema: false

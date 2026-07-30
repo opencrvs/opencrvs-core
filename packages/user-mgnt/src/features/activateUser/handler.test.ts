@@ -20,15 +20,15 @@ import * as mockingoose from 'mockingoose'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
-const token = jwt.sign(
-  { scope: [SCOPES.USER_UPDATE] },
-  readFileSync('./test/cert.key'),
-  {
+const createToken = (subject: string) =>
+  jwt.sign({ scope: [SCOPES.USER_UPDATE] }, readFileSync('./test/cert.key'), {
+    subject,
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
     audience: 'opencrvs:user-mgnt-user'
-  }
-)
+  })
+
+const token = createToken('5d10885374be318fa7689f0b')
 
 const mockUser: Partial<IUser> & { _id: string } = {
   _id: '5d10885374be318fa7689f0b',
@@ -51,10 +51,21 @@ const mockUser: Partial<IUser> & { _id: string } = {
   salt: '12345'
 }
 
+const activatePayload = {
+  userId: '5d10885374be318fa7689f0b',
+  password: 'new_password',
+  securityQNAs: [
+    { questionKey: 'HOME_TOWN', answer: 'test' },
+    { questionKey: 'FIRST_SCHOOL', answer: 'test' },
+    { questionKey: 'FAVORITE_COLOR', answer: 'test' }
+  ]
+}
+
 describe('activateUser handler', () => {
   let server: any
 
   beforeEach(async () => {
+    jest.restoreAllMocks()
     mockingoose.resetAll()
     server = await createServer()
     fetch.resetMocks()
@@ -67,30 +78,35 @@ describe('activateUser handler', () => {
     const res = await server.server.inject({
       method: 'POST',
       url: '/activateUser',
-      payload: {
-        userId: '5d10885374be318fa7689f0b',
-        password: 'new_password',
-        securityQNAs: [
-          {
-            questionKey: 'HOME_TOWN',
-            answer: 'test'
-          },
-          {
-            questionKey: 'FIRST_SCHOOL',
-            answer: 'test'
-          },
-          {
-            questionKey: 'FAVORITE_COLOR',
-            answer: 'test'
-          }
-        ]
-      },
+      payload: activatePayload,
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
 
     expect(res.statusCode).toBe(201)
+  })
+  it('returns 401 when activating an account owned by somebody else', async () => {
+    const logSpy = jest.spyOn(logger, 'error')
+    mockingoose(User).toReturn(mockUser, 'findOne')
+    mockingoose(User).toReturn({}, 'update')
+    const updateSpy = jest.spyOn(User, 'update')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/activateUser',
+      payload: { ...activatePayload, password: 'attacker_password' },
+      headers: {
+        Authorization: `Bearer ${createToken('5d10885374be318fa7689f0c')}`
+      }
+    })
+
+    expect(res.statusCode).toBe(401)
+    expect(logSpy).toHaveBeenLastCalledWith(
+      'Token owner 5d10885374be318fa7689f0c is not allowed to activate user: 5d10885374be318fa7689f0b'
+    )
+    // The victim's credentials were never touched
+    expect(updateSpy).not.toHaveBeenCalled()
   })
   it('returns 401 for invalid user', async () => {
     const logSpy = jest.spyOn(logger, 'error')
@@ -99,24 +115,7 @@ describe('activateUser handler', () => {
     const res = await server.server.inject({
       method: 'POST',
       url: '/activateUser',
-      payload: {
-        userId: '5d10885374be318fa7689f0b',
-        password: 'new_password',
-        securityQNAs: [
-          {
-            questionKey: 'HOME_TOWN',
-            answer: 'test'
-          },
-          {
-            questionKey: 'FIRST_SCHOOL',
-            answer: 'test'
-          },
-          {
-            questionKey: 'FAVORITE_COLOR',
-            answer: 'test'
-          }
-        ]
-      },
+      payload: activatePayload,
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -136,24 +135,7 @@ describe('activateUser handler', () => {
     const res = await server.server.inject({
       method: 'POST',
       url: '/activateUser',
-      payload: {
-        userId: '5d10885374be318fa7689f0b',
-        password: 'new_password',
-        securityQNAs: [
-          {
-            questionKey: 'HOME_TOWN',
-            answer: 'test'
-          },
-          {
-            questionKey: 'FIRST_SCHOOL',
-            answer: 'test'
-          },
-          {
-            questionKey: 'FAVORITE_COLOR',
-            answer: 'test'
-          }
-        ]
-      },
+      payload: activatePayload,
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -172,24 +154,7 @@ describe('activateUser handler', () => {
     const res = await server.server.inject({
       method: 'POST',
       url: '/activateUser',
-      payload: {
-        userId: '5d10885374be318fa7689f0b',
-        password: 'new_password',
-        securityQNAs: [
-          {
-            questionKey: 'HOME_TOWN',
-            answer: 'test'
-          },
-          {
-            questionKey: 'FIRST_SCHOOL',
-            answer: 'test'
-          },
-          {
-            questionKey: 'FAVORITE_COLOR',
-            answer: 'test'
-          }
-        ]
-      },
+      payload: activatePayload,
       headers: {
         Authorization: `Bearer ${token}`
       }
