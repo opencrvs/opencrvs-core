@@ -10,23 +10,36 @@
  */
 
 import React, { useEffect, useRef } from 'react'
-import { useIntl } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
+import { omit } from 'lodash'
 import {
   EventState,
   EventConfig,
   isPageVisible,
+  isNonInteractiveFieldType,
   PageTypes,
   PageConfig,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
+import { Button } from '@opencrvs/components/lib/Button'
 import {
   FormFieldGenerator,
   FormFieldGeneratorHandle
 } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { useClearFormModal } from '@client/v2-events/components/ClearFormModal'
+import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
 import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
+
+const messages = defineMessages({
+  clear: {
+    defaultMessage: 'Clear',
+    description: 'Label for the button clearing all fields on the form page',
+    id: 'buttons.clear'
+  }
+})
 
 interface PagesProps {
   formData: EventState
@@ -70,6 +83,11 @@ export function Pages({
   const formRef = useRef<FormFieldGeneratorHandle>(null)
 
   const { formTouched, setFormTouched } = useEventFormData()
+  const popHiddenFieldValue = useEventFormData(
+    (state) => state.popHiddenFieldValue
+  )
+  const getDefaultValue = useDefaultValue()
+  const { clearFormModal, openClearFormConfirmation } = useClearFormModal()
 
   useEffect(() => {
     // If page changes, scroll to the top of the page using the anchor element ID
@@ -114,6 +132,45 @@ export function Pages({
     }
   }
 
+  async function onClearPage() {
+    const confirmed = await openClearFormConfirmation()
+
+    if (!confirmed) {
+      return
+    }
+
+    const clearedPageValues = Object.fromEntries(
+      page.fields
+        .filter((field) => !isNonInteractiveFieldType(field))
+        .map((field) => [field.id, getDefaultValue(field, {}) ?? null])
+    )
+
+    setFormData({ ...formData, ...clearedPageValues })
+    setFormTouched(
+      omit(
+        formTouched,
+        page.fields.map((field) => field.id)
+      )
+    )
+    // Purge cached values of conditionally hidden fields on this page so
+    // re-showing them doesn't restore the values that were just cleared
+    page.fields.forEach((field) => popHiddenFieldValue(field.id))
+  }
+
+  const topActionButtons = page.showClearButton
+    ? [
+        <Button
+          key="clear-form"
+          id="clear-form"
+          size="small"
+          type="secondaryNegative"
+          onClick={onClearPage}
+        >
+          {intl.formatMessage(messages.clear)}
+        </Button>
+      ]
+    : undefined
+
   const wizardProps = {
     currentPage: pageIdx,
     pageTitle: intl.formatMessage(page.title),
@@ -148,8 +205,15 @@ export function Pages({
   }
 
   return (
-    <FormWizard {...wizardProps} continueButtonText={continueButtonText}>
-      {fields}
-    </FormWizard>
+    <>
+      <FormWizard
+        {...wizardProps}
+        continueButtonText={continueButtonText}
+        topActionButtons={topActionButtons}
+      >
+        {fields}
+      </FormWizard>
+      {clearFormModal}
+    </>
   )
 }

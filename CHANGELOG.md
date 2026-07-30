@@ -6,6 +6,8 @@
 
 - Third-party integrations (such as MOSIP) can now authenticate with OpenCRVS using their own credentials instead of borrowing the requesting user's session. Integrations are registered automatically on startup from the country configuration, and each one signs in with its own client ID and secret. This keeps integrations working reliably even when services restart mid-request, and makes the audit trail attribute actions to the integration itself (e.g. "Registered — MOSIP") rather than to a person. The feature is opt-in: configurations with no integrations are unaffected. [#12360](https://github.com/opencrvs/opencrvs-core/issues/12360)
 
+- Form pages can now show a "Clear" button next to the page title, which resets every field on that page to its default value after a confirmation dialog. Select fields are also clearable, so a chosen option can be removed without picking another. The button is opt-in per page via `showClearButton: true` in the page configuration, and appears as a small outlined destructive action so it reads as distinct from the page's primary controls. Country configurations need the `buttons.clear`, `clearForm.title.clearFormConfirm` and `clearForm.desc.clearFormConfirm` translation keys. [#10135](https://github.com/opencrvs/opencrvs-core/issues/10135)
+
 ### Bug fixes
 
 - Activating a user account now requires the caller to be the account owner. Previously any user holding `user.update` or `user.update[my-jurisdiction]` could set another pending user's password and security answers, which allowed taking over that account. The ownership check is enforced both in the gateway and in user management. [#13197](https://github.com/opencrvs/opencrvs-core/pull/13197)

@@ -39,6 +39,7 @@ function SelectDateRangeFieldInput(props: SelectDateRangeInputProps) {
   return (
     <Select.Input
       {...rest}
+      isClearable={false}
       type="SELECT"
       onChange={(val) => onChange(SelectDateRangeValue.parse(val))}
     />
