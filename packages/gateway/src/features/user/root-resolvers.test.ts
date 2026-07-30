@@ -668,19 +668,19 @@ describe('User root resolvers', () => {
     })
   })
   describe('activateUser mutation', () => {
-    const regsiterToken = jwt.sign(
-      { scope: ['SCOPES.REGISTER'] },
-      readFileSync('./test/cert.key'),
-      {
-        subject: 'ba7022f0ff4822',
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:gateway-user'
-      }
-    )
-    const newUserHeaders = {
-      Authorization: `Bearer ${regsiterToken}`
-    }
+    const authHeadersFor = (subject: string, scope: string[]) => ({
+      Authorization: `Bearer ${jwt.sign(
+        { scope },
+        readFileSync('./test/cert.key'),
+        {
+          subject,
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )}`
+    })
+    const newUserHeaders = authHeadersFor('ba7022f0ff4822', ['SCOPES.REGISTER'])
     it('activates the pending user', async () => {
       fetch.mockResponses(
         [
@@ -730,19 +730,7 @@ describe('User root resolvers', () => {
       )
     })
     it('fails to activate user if user is not token owner', async () => {
-      const regsiterToken = jwt.sign(
-        { scope: ['SCOPES.REGISTER'] },
-        readFileSync('./test/cert.key'),
-        {
-          subject: 'abcdefgh',
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:gateway-user'
-        }
-      )
-      const newUserHeaders = {
-        Authorization: `Bearer ${regsiterToken}`
-      }
+      const newUserHeaders = authHeadersFor('abcdefgh', ['SCOPES.REGISTER'])
       fetch.mockResponses(
         [
           JSON.stringify({
@@ -766,6 +754,29 @@ describe('User root resolvers', () => {
           }
         )
       ).rejects.toThrowError('User can not be activated')
+    })
+    it('fails to activate another user even with user update scopes', async () => {
+      const adminHeaders = authHeadersFor('abcdefgh', [
+        SCOPES.USER_UPDATE,
+        SCOPES.USER_UPDATE_MY_JURISDICTION
+      ])
+
+      await expect(
+        resolvers.Mutation!.activateUser(
+          {},
+          {
+            userId: 'ba7022f0ff4822',
+            password: 'attacker_password',
+            securityQNAs: [{ questionKey: 'HOME_TOWN', answer: 'attacker' }]
+          },
+          {
+            headers: adminHeaders
+          }
+        )
+      ).rejects.toThrowError('User can not be activated')
+
+      // The request never reached user-mgnt
+      expect(fetch).not.toHaveBeenCalled()
     })
   })
 

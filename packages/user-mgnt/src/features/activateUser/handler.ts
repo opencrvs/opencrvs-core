@@ -33,6 +33,18 @@ export default async function activateUser(
 ) {
   const userUpdateData = request.payload as IActivateUserPayload
 
+  // Ensure the user is activating their own account. Activation sets the
+  // password and security answers, so activating somebody else's pending
+  // account would mean taking it over.
+  const tokenOwnerId = request.auth.credentials?.sub
+  if (tokenOwnerId !== userUpdateData.userId) {
+    logger.error(
+      `Token owner ${tokenOwnerId} is not allowed to activate user: ${userUpdateData.userId}`
+    )
+    // Don't return a 403 as this gives away that this user account exists
+    throw unauthorized()
+  }
+
   const user: IUserModel | null = await User.findById(userUpdateData.userId)
   if (!user) {
     logger.error(
