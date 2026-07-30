@@ -59,7 +59,7 @@ jobs:
       # Nx needs node_modules to compute the project graph; lifecycle
       # scripts are irrelevant for that.
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --ignore-scripts
+        run: pnpm install --frozen-lockfile
 
       # Sets NX_BASE/NX_HEAD. On PRs: the PR base. On develop pushes: the
       # SHA of the last successful run of this workflow, so commits whose
@@ -383,7 +383,7 @@ jobs:
         run: pnpm exec nx run-many -t test:compilation -p @opencrvs/client --excludeTaskDependencies
 
       - name: Run linting
-        run: pnpm exec nx run @opencrvs/client:lint
+        run: pnpm exec nx run @opencrvs/client:lint --excludeTaskDependencies
 
   chromatic:
     name: Run chromatic visual tests
