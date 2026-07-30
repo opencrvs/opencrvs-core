@@ -12,7 +12,7 @@ spec:
     - web
   {{- end }}
   routes:
-  - match: 'PathRegexp(`^/(.*/)?internal(/.*)?$`)'
+  - match: '{{ include "render-opencrvs-host-matchers" . }} && PathRegexp(`^/(.*/)?internal(/.*)?$`)'
     kind: Rule
     priority: 1000
     services:
