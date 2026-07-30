@@ -11,6 +11,9 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 FROM node:22-alpine AS runner
+# The pnpm version is pinned by the packageManager field in package.json
+RUN corepack enable pnpm
+
 WORKDIR /usr/src/app
 ENV NPM_CONFIG_LOGLEVEL=warn
 
