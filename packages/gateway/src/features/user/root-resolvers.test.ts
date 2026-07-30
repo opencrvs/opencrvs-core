@@ -845,7 +845,7 @@ describe('User root resolvers', () => {
         "Something went wrong on user-mgnt service. Couldn't change user password"
       )
     })
-    it("throws error if any user (except sysadmin) tries to update some other user's password", async () => {
+    it("throws error if a user tries to update some other user's password", async () => {
       expect(
         resolvers.Mutation!.changePassword(
           {},
@@ -859,6 +859,37 @@ describe('User root resolvers', () => {
       ).rejects.toThrowError(
         'Change password is not allowed. ba7022f0ff4822 is not the owner of the token'
       )
+    })
+    it("throws error if a user administrator tries to update some other user's password", async () => {
+      const adminToken = jwt.sign(
+        {
+          scope: [SCOPES.USER_UPDATE, SCOPES.USER_UPDATE_MY_JURISDICTION]
+        },
+        readFileSync('./test/cert.key'),
+        {
+          subject: 'abcdefgh',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+
+      await expect(
+        resolvers.Mutation!.changePassword(
+          {},
+          {
+            userId: 'ba7022f0ff4822',
+            existingPassword: 'test',
+            password: 'NewPassword'
+          },
+          { headers: { Authorization: `Bearer ${adminToken}` } }
+        )
+      ).rejects.toThrowError(
+        'Change password is not allowed. ba7022f0ff4822 is not the owner of the token'
+      )
+
+      // The request never reached user-mgnt
+      expect(fetch).not.toHaveBeenCalled()
     })
   })
 

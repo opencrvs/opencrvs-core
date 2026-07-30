@@ -18,15 +18,15 @@ import { SCOPES } from '@opencrvs/commons/authentication'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
-const token = jwt.sign(
-  { scope: [SCOPES.USER_UPDATE] },
-  readFileSync('./test/cert.key'),
-  {
+const createToken = (subject: string) =>
+  jwt.sign({ scope: [SCOPES.USER_UPDATE] }, readFileSync('./test/cert.key'), {
+    subject,
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
     audience: 'opencrvs:user-mgnt-user'
-  }
-)
+  })
+
+const token = createToken('5d10885374be318fa7689f0b')
 
 const mockUser: Partial<IUser & { _id: string }> = {
   _id: '5d10885374be318fa7689f0b',
@@ -134,6 +134,7 @@ describe('changeUserPassword handler', () => {
   let server: any
   beforeEach(async () => {
     mockUser.status = 'active'
+    jest.restoreAllMocks()
     mockingoose.resetAll()
     server = await createServer()
     fetch.resetMocks()
@@ -176,6 +177,48 @@ describe('changeUserPassword handler', () => {
     })
 
     expect(res.statusCode).toBe(401)
+  })
+  it('Returns 401 when changing the password of another user', async () => {
+    mockingoose(User).toReturn(mockExistingUser, 'findOne')
+    mockingoose(User).toReturn({}, 'updateOne')
+    const updateSpy = jest.spyOn(User, 'updateOne')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/changeUserPassword',
+      payload: {
+        userId: '5d10885374be318fa7689f0b',
+        existingPassword: 'test',
+        password: 'attacker_password'
+      },
+      headers: {
+        Authorization: `Bearer ${createToken('5d10885374be318fa7689f0c')}`
+      }
+    })
+
+    expect(res.statusCode).toBe(401)
+    // The victim's password was never touched
+    expect(updateSpy).not.toHaveBeenCalled()
+  })
+  it('Returns 400 when the existing password is not supplied', async () => {
+    mockingoose(User).toReturn(mockExistingUser, 'findOne')
+    mockingoose(User).toReturn({}, 'updateOne')
+    const updateSpy = jest.spyOn(User, 'updateOne')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/changeUserPassword',
+      payload: {
+        userId: '5d10885374be318fa7689f0b',
+        password: 'new_password'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(400)
+    expect(updateSpy).not.toHaveBeenCalled()
   })
   it('Returns 401 for non-active user', async () => {
     mockUser.status = 'pending'

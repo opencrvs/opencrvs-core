@@ -23,6 +23,12 @@ interface IChangePasswordPayload {
   password: string
 }
 
+/**
+ * Serves the unauthenticated `/changePassword`, which the auth service calls
+ * during password retrieval. There the caller has already proven ownership of
+ * the account with a one-time code, so no existing password is required.
+ * Requests from a logged-in user go through `changeOwnPasswordHandler`.
+ */
 export default async function changePasswordHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -92,8 +98,40 @@ export default async function changePasswordHandler(
   return h.response().code(200)
 }
 
+/**
+ * Serves `/changeUserPassword`, which a logged-in user calls to change their
+ * own password. The caller must own the account, so that holding a token can
+ * never be turned into setting somebody else's password. Knowledge of the
+ * current password is enforced by `changeOwnPasswordRequestSchema`.
+ */
+export async function changeOwnPasswordHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const { userId } = request.payload as IChangePasswordPayload
+  const tokenOwnerId = request.auth.credentials?.sub
+
+  if (tokenOwnerId !== userId) {
+    logger.error(
+      `Token owner ${tokenOwnerId} is not allowed to change the password of user: ${userId}`
+    )
+    // Don't return a 403 as this gives away that this user account exists
+    throw unauthorized()
+  }
+
+  return changePasswordHandler(request, h)
+}
+
 export const changePasswordRequestSchema = Joi.object({
   userId: Joi.string().required(),
   existingPassword: Joi.string().optional(),
   password: Joi.string().required()
+})
+
+/**
+ * A logged-in user must prove they know the current password. Only the
+ * retrieval flow above may omit it.
+ */
+export const changeOwnPasswordRequestSchema = changePasswordRequestSchema.keys({
+  existingPassword: Joi.string().required()
 })
