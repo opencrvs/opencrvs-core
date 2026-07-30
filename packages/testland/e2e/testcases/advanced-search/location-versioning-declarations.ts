@@ -12,7 +12,12 @@ import { v4 as uuidv4 } from 'uuid'
 import { Page } from '@playwright/test'
 import { faker } from '@faker-js/faker'
 import { createClient } from '@opencrvs/toolkit/api'
-import { ActionType, AddressType } from '@opencrvs/toolkit/events'
+import {
+  ActionDocument,
+  ActionStatus,
+  ActionType,
+  AddressType
+} from '@opencrvs/toolkit/events'
 import { CREDENTIALS, GATEWAY_HOST } from '../../constants'
 import {
   getAuthTokens,
@@ -31,6 +36,7 @@ import {
   getDeclaration as getBirthDeclaration
 } from '../test-data/birth-declaration'
 import { createDeclaration as createDeathDeclaration } from '../test-data/death-declaration'
+import { getSignatureFile, uploadFile } from '../test-data/utils'
 
 function getUserIdFromToken(token: string) {
   return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString()).sub
@@ -129,11 +135,112 @@ export async function registerDeclarationsThenDeactivateOffice(page: Page) {
 }
 
 /**
+ * Registered with an active office; born at a health facility that is
+ * already inactive — used to confirm inactive facilities are still listed
+ * (and selectable) in the Place of Delivery filter.
+ *
+ * `record.register`'s `placeOfEvent` restriction is checked against the
+ * *declared* facility, so a Local Registrar can't register their own
+ * declaration once it points at a facility outside their own jurisdiction
+ * (Old Central Maternity Hospital is in Central, not the declarer's Ibombo).
+ * A Provincial Registrar over Central registers instead — their
+ * `record.register` scope checks `declaredIn`, i.e. the declarer's own
+ * office, which is within their jurisdiction.
+ */
+export async function createBirthRegisteredWithInactiveFacility() {
+  const declarerToken = await getToken(CREDENTIALS.REGISTRAR)
+  const registrarToken = await getToken(CREDENTIALS.PROVINCIAL_REGISTRAR)
+
+  const facilities = await getLocations('HEALTH_FACILITY', declarerToken)
+  const facilityId = getIdByName(facilities, 'Old Central Maternity Hospital')
+
+  const declarationInput = await getBirthDeclaration({
+    token: declarerToken,
+    placeOfBirthType: 'HEALTH_FACILITY',
+    partialDeclaration: {
+      'child.birthLocation': facilityId,
+      'child.birthLocationId': facilityId
+    }
+  })
+
+  const { eventId, declaration } = await createBirthDeclaration(
+    declarerToken,
+    declarationInput,
+    ActionType.DECLARE
+  )
+
+  const client = createClient(
+    GATEWAY_HOST + '/events',
+    `Bearer ${registrarToken}`
+  )
+
+  await client.event.actions.assignment.assign.mutate({
+    eventId,
+    transactionId: uuidv4(),
+    type: ActionType.ASSIGN,
+    assignedTo: getUserIdFromToken(registrarToken)
+  })
+
+  const filename = await uploadFile(getSignatureFile(), registrarToken)
+
+  const registerRes = await client.event.actions.register.request.mutate({
+    eventId,
+    transactionId: uuidv4(),
+    declaration,
+    annotation: {
+      'review.comment': 'My comment',
+      'review.signature': filename
+    }
+  })
+
+  const registerActionRequested = registerRes.actions.find(
+    (action: ActionDocument) =>
+      action.type === ActionType.REGISTER &&
+      action.status === ActionStatus.Requested
+  )
+  const registerActionAccepted = registerRes.actions.find(
+    (action: ActionDocument) =>
+      action.type === ActionType.REGISTER &&
+      action.status === ActionStatus.Accepted
+  )
+
+  return {
+    eventId,
+    declaration: registerActionRequested?.declaration as Awaited<
+      ReturnType<typeof getBirthDeclaration>
+    >,
+    trackingId: registerRes.trackingId as string,
+    registrationNumber: registerActionAccepted?.registrationNumber as string
+  }
+}
+
+/**
+ * Registered with an active office; place of death is a health facility
+ * that is already inactive — used to confirm inactive facilities are still
+ * listed (and selectable) in the Place of Delivery filter.
+ */
+export async function createDeathRegisteredWithInactiveFacility() {
+  const token = await getToken(CREDENTIALS.REGISTRAR)
+
+  const facilities = await getLocations('HEALTH_FACILITY', token)
+  const facilityId = getIdByName(facilities, 'Old Ibombo Community Clinic')
+
+  return createDeathDeclaration(
+    token,
+    {
+      'eventDetails.placeOfDeath': 'HEALTH_FACILITY',
+      'eventDetails.deathLocation': facilityId,
+      'eventDetails.deathLocationId': facilityId
+    },
+    ActionType.REGISTER
+  )
+}
+
+/**
  * Notified with an active office; the child's own "other" address field
  * points at an inactive administrative area — used to confirm that field is
  * excluded from the residential/other-address facet even when the office is
- * active, mirroring the same inactive admin unit used in
- * `createDeathRegisteredWithInactiveAddress`.
+ * active.
  */
 export async function createBirthNotifiedInactiveAddress() {
   const token = await getNotifyOnlySystemClientToken()
