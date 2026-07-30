@@ -15,6 +15,7 @@ import {
   UUID_REGEX
 } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
+import { setAdministrativeAreas } from '@events/storage/postgres/administrative-hierarchy/administrative-areas'
 
 const scope = encodeScope({ type: 'location.edit' })
 
@@ -121,4 +122,63 @@ test('returns the existing administrative area on identical replay with a client
     .execute()
 
   expect(auditEntries).toHaveLength(1)
+})
+
+test('replays create idempotently against a seeded multi-element history', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const id = generateUuid()
+  const initialVersion = {
+    versionId: generateUuid(),
+    effectiveFrom: '0001-01-01',
+    name: 'Seeded District',
+    externalId: 'seeded-area-pcode',
+    status: 'active' as const
+  }
+
+  // Seeding sets the flat `name` column to the version in effect today, so a
+  // seeded row that carries a rename has a flat name differing from its
+  // initial version's. The replay check must compare against the initial
+  // version, or this create would be rejected as a value conflict.
+  await setAdministrativeAreas([
+    {
+      id,
+      parentId: null,
+      name: 'Seeded District (renamed)',
+      externalId: 'seeded-area-pcode',
+      versions: [
+        initialVersion,
+        {
+          versionId: generateUuid(),
+          effectiveFrom: '2020-01-01',
+          name: 'Seeded District (renamed)',
+          externalId: 'seeded-area-pcode',
+          status: 'active' as const
+        }
+      ]
+    }
+  ])
+
+  const replayed = await client.administrativeAreas.create({
+    id,
+    parentId: null,
+    name: initialVersion.name,
+    externalId: initialVersion.externalId,
+    effectiveFrom: initialVersion.effectiveFrom,
+    status: initialVersion.status
+  })
+
+  expect(replayed.id).toBe(id)
+  // The seeded history survived, proving the existing row was returned rather
+  // than a second one inserted.
+  expect(replayed.versions).toHaveLength(2)
+
+  const auditEntries = await getClient()
+    .selectFrom('auditLog')
+    .select('id')
+    .where('operation', '=', 'administrativeAreas.create')
+    .execute()
+
+  expect(auditEntries).toHaveLength(0)
 })
