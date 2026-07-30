@@ -120,8 +120,7 @@ test.describe.serial('Advanced search - inactive registration office', () => {
   })
 })
 
-test.describe.serial
-  .only('Advanced search - inactive health facilities', () => {
+test.describe.serial('Advanced search - inactive health facilities', () => {
   let page: Page
 
   let birthFacility: Awaited<
