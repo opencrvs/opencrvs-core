@@ -137,11 +137,7 @@ export interface ISystemAuthentication {
   scope: EncodedScope[]
 }
 
-export class UserInfoNotFoundError extends Error {}
-
-export function isUserInfoNotFoundError(err: Error) {
-  return err instanceof UserInfoNotFoundError
-}
+class UserInfoNotFoundError extends Error {}
 
 export async function authenticate(
   username: string,
@@ -279,7 +275,9 @@ export async function subjectCanAccessRecord(
   try {
     const event = await eventsClient.event.get.query(
       { eventId, waitFor: false },
-      { context: { headers: { Authorization: setBearerForToken(subjectToken) } } }
+      {
+        context: { headers: { Authorization: setBearerForToken(subjectToken) } }
+      }
     )
     return event.actions.some((action) => action.id === actionId)
   } catch (err) {
