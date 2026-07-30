@@ -109,6 +109,50 @@ jobs:
           message-id: test-coverage-explanation
           message: ${{ env.COVERAGE_EXPLANATION }}
 
+  build-deps:
+    name: Warm nx cache
+    # Develop pushes only, and the ONLY writer of the nx cache. GitHub
+    # cache entries cannot be rewritten, so a job that restored and then
+    # saved would republish every old entry alongside its new ones and
+    # grow without bound. This job deliberately does not restore: what it
+    # publishes is exactly one run's fresh output, so it stays flat and
+    # every other job is free to restore.
+    #
+    # It runs in parallel with the jobs that consume the *previous*
+    # push's entry rather than blocking them, so a develop push still
+    # rebuilds whatever changed in that push.
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared dependencies
+        run: |
+          pnpm exec nx run-many -t build \
+            -p @opencrvs/commons @opencrvs/components @opencrvs/events @opencrvs/toolkit
+          pnpm exec nx run-many -t build:types -p @opencrvs/events
+
+      - name: Save Nx cache
+        uses: actions/cache/save@v4
+        with:
+          path: .nx/cache
+          key: nx-deps-${{ github.sha }}
+
   test:
     name: Test
     needs: setup
@@ -147,6 +191,13 @@ jobs:
             else
               echo "skip-lint=false" >> $GITHUB_OUTPUT
             fi
+
+            if ! grep -q "\"test:compilation\":" "${{ matrix.package }}/package.json"; then
+              echo "Typecheck script not found in ${{ matrix.package }}"
+              echo "skip-compilation=true" >> $GITHUB_OUTPUT
+            else
+              echo "skip-compilation=false" >> $GITHUB_OUTPUT
+            fi
           fi
 
       - name: Setup pnpm
@@ -168,73 +219,35 @@ jobs:
         if: steps.check-scripts.outputs.skip != 'true'
         run: pnpm install --frozen-lockfile
 
-      - name: Extract dependencies for ${{ matrix.package }}
-        if: steps.check-scripts.outputs.skip != 'true'
-        id: extract-dependencies
-        run: |
-          DEPENDENCIES=$(pnpm -r --filter "{${{ matrix.package }}}..." exec pwd | grep "^/" | sed "s|^$PWD/||" | tr '\n' ' ')
-          echo "DEPENDENCIES=${DEPENDENCIES}" >> $GITHUB_ENV
-          echo "Found dependencies: $DEPENDENCIES"
-
-      # Nx computation cache: dependency builds below are cache hits when
-      # their inputs match a previous develop run. Saved only from the
-      # gateway job on develop (covers commons + events types); that job
-      # deliberately skips restore so each saved cache contains only
-      # freshly built entries and never snowballs.
+      # Nx computation cache. Written by exactly one job (build-deps,
+      # develop pushes only) so restoring here can never feed back into
+      # what gets published.
+      #
+      # There are no explicit dependency-build steps: every target below
+      # declares `dependsOn: ["^build"]` in nx.json, so nx builds each
+      # package's dependencies from the project graph — cache hits when
+      # their inputs match the last develop run.
       - name: Restore Nx cache
-        if: |
-          steps.check-scripts.outputs.skip != 'true' &&
-          (github.event_name == 'pull_request' || matrix.package != 'packages/gateway')
+        if: steps.check-scripts.outputs.skip != 'true'
         uses: actions/cache/restore@v5
         id: nx-cache
         with:
           path: .nx/cache
-          key: nx-gateway-${{ github.sha }}
-          restore-keys: |
-            nx-gateway-
-            nx-
+          key: nx-deps-${{ github.sha }}
+          restore-keys: nx-deps-
 
-      - name: Build common package
-        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/commons')
-        run: pnpm exec nx run @opencrvs/commons:build
-
-      - name: Build components
-        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/components')
-        run: pnpm exec nx run @opencrvs/components:build
-
-      # run-many because `nx run` can't address a target with a colon in
-      # its name (parses it as a configuration)
-      - name: Build events router types
-        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/events')
-        run: pnpm exec nx run-many -t build:types -p @opencrvs/events
-
-      # testland consumes the workspace toolkit at runtime; build.sh needs
-      # commons + events types built first (steps above).
-      - name: Build toolkit
-        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/toolkit')
-        run: pnpm exec nx run @opencrvs/toolkit:build
-
-      - name: Save Nx cache
-        if: |
-          github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
-          matrix.package == 'packages/gateway'
-        uses: actions/cache/save@v4
-        with:
-          path: .nx/cache
-          key: nx-gateway-${{ github.sha }}
+      - name: Typecheck
+        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-compilation != 'true'
+        run: pnpm exec nx run @opencrvs/$(basename ${{ matrix.package }}):test:compilation
 
       # TODO: should run parallel to unit tests as can take as much as unit tests
       - name: Run linting
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-lint != 'true'
         run: pnpm exec nx run @opencrvs/$(basename ${{ matrix.package }}):lint
 
-      # --excludeTaskDependencies: the test target's ^build dependency
-      # would run the full build of every dependency (e.g. events), while
-      # the steps above build exactly what tests need (e.g. only events
-      # types)
       - name: Run Unit Test
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
-        run: pnpm exec nx run @opencrvs/$(basename ${{ matrix.package }}):test --excludeTaskDependencies
+        run: pnpm exec nx run @opencrvs/$(basename ${{ matrix.package }}):test
 
       - name: Generate test coverage summary
         if: github.event_name == 'pull_request'
@@ -294,28 +307,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Restore only on PRs: the develop-push run builds cold and saves a
-      # cache containing only fresh entries (see gateway job note above).
       - name: Restore Nx cache
-        if: github.event_name == 'pull_request'
         uses: actions/cache/restore@v5
         id: nx-cache
         with:
           path: .nx/cache
-          key: nx-client-prep-${{ github.sha }}
-          restore-keys: |
-            nx-client-prep-
-            nx-
+          key: nx-deps-${{ github.sha }}
+          restore-keys: nx-deps-
 
       - name: Build common package and components
         run: pnpm exec nx run-many -t build -p @opencrvs/commons @opencrvs/components
-
-      - name: Save Nx cache
-        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-        uses: actions/cache/save@v4
-        with:
-          path: .nx/cache
-          key: nx-client-prep-${{ github.sha }}
 
       # Build Storybook once here (with --webpack-stats-json so that
       # `preview-stats.json` is emitted). The artifact is reused by
@@ -370,10 +371,8 @@ jobs:
         uses: actions/cache/restore@v5
         with:
           path: .nx/cache
-          key: nx-gateway-${{ github.sha }}
-          restore-keys: |
-            nx-gateway-
-            nx-
+          key: nx-deps-${{ github.sha }}
+          restore-keys: nx-deps-
 
       - name: Build events router types
         run: pnpm exec nx run-many -t build:types -p @opencrvs/events
@@ -621,10 +620,8 @@ jobs:
         uses: actions/cache/restore@v5
         with:
           path: .nx/cache
-          key: nx-gateway-${{ github.sha }}
-          restore-keys: |
-            nx-gateway-
-            nx-
+          key: nx-deps-${{ github.sha }}
+          restore-keys: nx-deps-
 
       # nx resolves the `^build` dependency of the build target, so
       # commons and events are built first (cache hits when warm)
