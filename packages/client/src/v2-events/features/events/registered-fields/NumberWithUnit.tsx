@@ -40,8 +40,8 @@ function NumberWithUnitInput({
   options,
   ...props
 }: NumberWithUnitInputProps) {
-  const handleUnitChange = (code: string) => {
-    onChange({ ...value, unit: code })
+  const handleUnitChange = (code: string | null) => {
+    onChange({ ...value, unit: code ?? undefined })
   }
 
   const handleNumericValueChange = (newVal: number | undefined) => {
@@ -60,6 +60,7 @@ function NumberWithUnitInput({
       <Select.Input
         {...props}
         id="unit"
+        isClearable={false}
         options={options}
         type="SELECT"
         value={value?.unit}
