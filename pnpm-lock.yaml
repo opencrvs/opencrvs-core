@@ -1915,6 +1915,9 @@ importers:
       '@hapi/inert':
         specifier: ^7.0.0
         version: 7.1.2
+      '@opencrvs/events':
+        specifier: workspace:*
+        version: link:../events
       '@opencrvs/mosip':
         specifier: 2.0.0
         version: 2.0.0(node-fetch@2.7.0(encoding@0.1.13))
@@ -1945,6 +1948,9 @@ importers:
       '@opentelemetry/sdk-node':
         specifier: ^0.220.0
         version: 0.220.0(@opentelemetry/api@1.9.1)
+      '@trpc/client':
+        specifier: 11.4.3
+        version: 11.4.3(@trpc/server@11.8.0(typescript@7.0.2))(typescript@7.0.2)
       '@types/chalk':
         specifier: ^2.2.0
         version: 2.2.4
@@ -2089,6 +2095,9 @@ importers:
       stream-json:
         specifier: ^1.9.1
         version: 1.9.1
+      superjson:
+        specifier: 1.9.0-0
+        version: 1.9.0-0
       tsx:
         specifier: ^4.15.7
         version: 4.23.1
@@ -2140,7 +2149,7 @@ importers:
         version: 2.4.9
       '@types/react-intl':
         specifier: ^3.0.0
-        version: 3.0.0(react@19.1.0)(typescript@5.9.3)
+        version: 3.0.0(react@19.1.0)(typescript@7.0.2)
       '@typescript-eslint/eslint-plugin':
         specifier: 8.63.0
         version: 8.63.0(@typescript-eslint/parser@8.63.0(eslint@9.23.0))(eslint@9.23.0)
@@ -2194,16 +2203,16 @@ importers:
         version: 3.5.3
       react-intl:
         specifier: ^6.4.3
-        version: 6.8.9(react@19.1.0)(typescript@5.9.3)
+        version: 6.8.9(react@19.1.0)(typescript@7.0.2)
       vite:
         specifier: ^8.1.5
         version: 8.1.5(@types/node@20.19.43)(esbuild@0.18.20)(terser@5.49.0)(tsx@4.23.1)(yaml@2.8.3)
       vite-tsconfig-paths:
         specifier: ^6.1.1
-        version: 6.1.1(typescript@5.9.3)(vite@8.1.5(@types/node@20.19.43)(esbuild@0.18.20)(terser@5.49.0)(tsx@4.23.1)(yaml@2.8.3))
+        version: 6.1.1(typescript@7.0.2)(vite@8.1.5(@types/node@20.19.43)(esbuild@0.18.20)(terser@5.49.0)(tsx@4.23.1)(yaml@2.8.3))
       vitest:
         specifier: ^4.1.10
-        version: 4.1.10(@opentelemetry/api@1.9.1)(@types/node@20.19.43)(@vitest/coverage-v8@4.1.10)(jsdom@16.7.0)(msw@2.7.3(@types/node@20.19.43)(typescript@5.9.3))(vite@8.1.5(@types/node@20.19.43)(esbuild@0.18.20)(terser@5.49.0)(tsx@4.23.1)(yaml@2.8.3))
+        version: 4.1.10(@opentelemetry/api@1.9.1)(@types/node@20.19.43)(@vitest/coverage-v8@4.1.10)(jsdom@16.7.0)(msw@2.7.3(@types/node@20.19.43)(typescript@7.0.2))(vite@8.1.5(@types/node@20.19.43)(esbuild@0.18.20)(terser@5.49.0)(tsx@4.23.1)(yaml@2.8.3))
 
   packages/toolkit:
     dependencies:
@@ -20252,7 +20261,7 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@formatjs/intl@2.10.15(typescript@5.9.3)':
+  '@formatjs/intl@2.10.15(typescript@7.0.2)':
     dependencies:
       '@formatjs/ecma402-abstract': 2.2.4
       '@formatjs/fast-memoize': 2.2.3
@@ -20262,7 +20271,7 @@ snapshots:
       intl-messageformat: 10.7.7
       tslib: 2.8.1
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 7.0.2
 
   '@formatjs/intl@2.2.1(typescript@7.0.2)':
     dependencies:
@@ -21251,7 +21260,7 @@ snapshots:
       '@types/istanbul-lib-coverage': 2.0.6
       collect-v8-coverage: 1.0.2
 
-  '@jest/test-sequencer@26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))':
+  '@jest/test-sequencer@26.6.3':
     dependencies:
       '@jest/test-result': 26.6.2
       graceful-fs: 4.2.11
@@ -21259,11 +21268,7 @@ snapshots:
       jest-runner: 26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
       jest-runtime: 26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   '@jest/test-sequencer@29.7.0':
     dependencies:
@@ -24223,9 +24228,9 @@ snapshots:
     dependencies:
       '@types/react': 18.3.1
 
-  '@types/react-intl@3.0.0(react@19.1.0)(typescript@5.9.3)':
+  '@types/react-intl@3.0.0(react@19.1.0)(typescript@7.0.2)':
     dependencies:
-      react-intl: 6.8.9(react@19.1.0)(typescript@5.9.3)
+      react-intl: 6.8.9(react@19.1.0)(typescript@7.0.2)
     transitivePeerDependencies:
       - react
       - typescript
@@ -24839,13 +24844,13 @@ snapshots:
       msw: 0.22.0(encoding@0.1.13)
       vite: 8.1.5(@types/node@20.19.43)(esbuild@0.28.1)(terser@5.49.0)(tsx@4.23.1)(yaml@2.8.3)
 
-  '@vitest/mocker@4.1.10(msw@2.7.3(@types/node@20.19.43)(typescript@5.9.3))(vite@8.1.5(@types/node@20.19.43)(esbuild@0.18.20)(terser@5.49.0)(tsx@4.23.1)(yaml@2.8.3))':
+  '@vitest/mocker@4.1.10(msw@2.7.3(@types/node@20.19.43)(typescript@7.0.2))(vite@8.1.5(@types/node@20.19.43)(esbuild@0.18.20)(terser@5.49.0)(tsx@4.23.1)(yaml@2.8.3))':
     dependencies:
       '@vitest/spy': 4.1.10
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      msw: 2.7.3(@types/node@20.19.43)(typescript@5.9.3)
+      msw: 2.7.3(@types/node@20.19.43)(typescript@7.0.2)
       vite: 8.1.5(@types/node@20.19.43)(esbuild@0.18.20)(terser@5.49.0)(tsx@4.23.1)(yaml@2.8.3)
 
   '@vitest/mocker@4.1.10(msw@2.7.3(@types/node@20.19.43)(typescript@7.0.2))(vite@8.1.5(@types/node@20.19.43)(esbuild@0.28.1)(terser@5.49.0)(tsx@4.23.1)(yaml@2.8.3))':
@@ -30754,7 +30759,7 @@ snapshots:
       jest-util: 30.4.1
       p-limit: 3.1.0
 
-  jest-circus@26.6.0(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2)):
+  jest-circus@26.6.0:
     dependencies:
       '@babel/traverse': 7.29.7(supports-color@8.1.1)
       '@jest/environment': 26.6.2
@@ -30778,11 +30783,7 @@ snapshots:
       stack-utils: 2.0.6
       throat: 5.0.0
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   jest-circus@29.7.0(babel-plugin-macros@3.1.0):
     dependencies:
@@ -30945,7 +30946,7 @@ snapshots:
   jest-config@26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2)):
     dependencies:
       '@babel/core': 7.29.7
-      '@jest/test-sequencer': 26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
+      '@jest/test-sequencer': 26.6.3
       '@jest/types': 26.6.2
       babel-jest: 26.6.3(@babel/core@7.29.7)
       chalk: 4.1.2
@@ -33111,32 +33112,6 @@ snapshots:
       - encoding
       - supports-color
 
-  msw@2.7.3(@types/node@20.19.43)(typescript@5.9.3):
-    dependencies:
-      '@bundled-es-modules/cookie': 2.0.1
-      '@bundled-es-modules/statuses': 1.0.1
-      '@bundled-es-modules/tough-cookie': 0.1.6
-      '@inquirer/confirm': 5.0.2(@types/node@20.19.43)
-      '@mswjs/interceptors': 0.37.3
-      '@open-draft/deferred-promise': 2.2.0
-      '@open-draft/until': 2.1.0
-      '@types/cookie': 0.6.0
-      '@types/statuses': 2.0.5
-      graphql: 16.8.1
-      headers-polyfill: 4.0.3
-      is-node-process: 1.2.0
-      outvariant: 1.4.3
-      path-to-regexp: 6.3.0
-      picocolors: 1.1.1
-      strict-event-emitter: 0.5.1
-      type-fest: 4.30.0
-      yargs: 17.7.2
-    optionalDependencies:
-      typescript: 5.9.3
-    transitivePeerDependencies:
-      - '@types/node'
-    optional: true
-
   msw@2.7.3(@types/node@20.19.43)(typescript@7.0.2):
     dependencies:
       '@bundled-es-modules/cookie': 2.0.1
@@ -35266,11 +35241,11 @@ snapshots:
     optionalDependencies:
       typescript: 7.0.2
 
-  react-intl@6.8.9(react@19.1.0)(typescript@5.9.3):
+  react-intl@6.8.9(react@19.1.0)(typescript@7.0.2):
     dependencies:
       '@formatjs/ecma402-abstract': 2.2.4
       '@formatjs/icu-messageformat-parser': 2.9.4
-      '@formatjs/intl': 2.10.15(typescript@5.9.3)
+      '@formatjs/intl': 2.10.15(typescript@7.0.2)
       '@formatjs/intl-displaynames': 6.8.5
       '@formatjs/intl-listformat': 7.7.5
       '@types/hoist-non-react-statics': 3.3.7(@types/react@18.3.1)
@@ -35280,7 +35255,7 @@ snapshots:
       react: 19.1.0
       tslib: 2.8.1
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 7.0.2
 
   react-is@16.13.1: {}
 
@@ -35361,7 +35336,7 @@ snapshots:
       html-webpack-plugin: 4.5.0(webpack@4.44.2)
       identity-obj-proxy: 3.0.0
       jest: 26.6.0(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
-      jest-circus: 26.6.0(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
+      jest-circus: 26.6.0
       jest-resolve: 26.6.0
       jest-watch-typeahead: 0.6.1(jest@26.6.0(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2)))
       mini-css-extract-plugin: 0.11.3(webpack@4.44.2)
@@ -37630,10 +37605,6 @@ snapshots:
     optionalDependencies:
       typescript: 7.0.2
 
-  tsconfck@3.1.6(typescript@5.9.3):
-    optionalDependencies:
-      typescript: 5.9.3
-
   tsconfck@3.1.6(typescript@7.0.2):
     optionalDependencies:
       typescript: 7.0.2
@@ -38153,11 +38124,11 @@ snapshots:
       - supports-color
       - typescript
 
-  vite-tsconfig-paths@6.1.1(typescript@5.9.3)(vite@8.1.5(@types/node@20.19.43)(esbuild@0.18.20)(terser@5.49.0)(tsx@4.23.1)(yaml@2.8.3)):
+  vite-tsconfig-paths@6.1.1(typescript@7.0.2)(vite@8.1.5(@types/node@20.19.43)(esbuild@0.18.20)(terser@5.49.0)(tsx@4.23.1)(yaml@2.8.3)):
     dependencies:
       debug: 4.4.3(supports-color@8.1.1)
       globrex: 0.1.2
-      tsconfck: 3.1.6(typescript@5.9.3)
+      tsconfck: 3.1.6(typescript@7.0.2)
       vite: 8.1.5(@types/node@20.19.43)(esbuild@0.18.20)(terser@5.49.0)(tsx@4.23.1)(yaml@2.8.3)
     transitivePeerDependencies:
       - supports-color
@@ -38237,10 +38208,10 @@ snapshots:
     transitivePeerDependencies:
       - msw
 
-  vitest@4.1.10(@opentelemetry/api@1.9.1)(@types/node@20.19.43)(@vitest/coverage-v8@4.1.10)(jsdom@16.7.0)(msw@2.7.3(@types/node@20.19.43)(typescript@5.9.3))(vite@8.1.5(@types/node@20.19.43)(esbuild@0.18.20)(terser@5.49.0)(tsx@4.23.1)(yaml@2.8.3)):
+  vitest@4.1.10(@opentelemetry/api@1.9.1)(@types/node@20.19.43)(@vitest/coverage-v8@4.1.10)(jsdom@16.7.0)(msw@2.7.3(@types/node@20.19.43)(typescript@7.0.2))(vite@8.1.5(@types/node@20.19.43)(esbuild@0.18.20)(terser@5.49.0)(tsx@4.23.1)(yaml@2.8.3)):
     dependencies:
       '@vitest/expect': 4.1.10
-      '@vitest/mocker': 4.1.10(msw@2.7.3(@types/node@20.19.43)(typescript@5.9.3))(vite@8.1.5(@types/node@20.19.43)(esbuild@0.18.20)(terser@5.49.0)(tsx@4.23.1)(yaml@2.8.3))
+      '@vitest/mocker': 4.1.10(msw@2.7.3(@types/node@20.19.43)(typescript@7.0.2))(vite@8.1.5(@types/node@20.19.43)(esbuild@0.18.20)(terser@5.49.0)(tsx@4.23.1)(yaml@2.8.3))
       '@vitest/pretty-format': 4.1.10
       '@vitest/runner': 4.1.10
       '@vitest/snapshot': 4.1.10

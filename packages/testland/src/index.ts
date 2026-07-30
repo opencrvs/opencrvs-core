@@ -49,6 +49,8 @@ import { emailHandler, emailSchema } from './api/notification/handler'
 import { ErrorContext } from 'hapi-auth-jwt2'
 import { mapGeojsonHandler } from '@countryconfig/api/dashboards/handler'
 import { locationsHandler } from './data-seeding/locations/handler'
+import { seedSyntheticLocations } from './data-seeding/locations/seed-synthetic'
+import { SYNTHETIC } from './data-seeding/locations/synthetic-config'
 import { certificateHandler } from './api/certificates/handler'
 import { rolesHandler } from './data-seeding/roles/handler'
 import { usersHandler } from './data-seeding/employees/handler'
@@ -663,14 +665,37 @@ export async function createServer() {
   server.route({
     method: 'GET',
     path: '/triggers/system/ready',
-    handler: (_request, h) => {
-      // Not implemented by default
-      // You can use this endpoint to for instance set up integration clients
-      return h.response().code(501)
+    handler: async (request, h) => {
+      if (!SYNTHETIC.ENABLED) {
+        // Not implemented by default
+        // You can use this endpoint to for instance set up integration clients
+        return h.response().code(501)
+      }
+
+      // Development only. `data-seeder` calls this trigger after seeding users
+      // but before it deactivates the super user, so the initialisation window
+      // the `set` mutations require is still open. Generating here keeps
+      // `data-seeder` itself untouched.
+      // hapi types this header as `string | string[]`.
+      const { authorization } = request.headers
+      const header = Array.isArray(authorization)
+        ? authorization[0]
+        : authorization
+      const token = header?.replace('Bearer ', '')
+
+      if (!token) {
+        return h.response({ error: 'Missing authorization token' }).code(401)
+      }
+
+      return h.response(await seedSyntheticLocations(token))
     },
     options: {
       tags: ['api', 'triggers'],
-      description: 'System ready endpoint'
+      description: 'System ready endpoint',
+      // Generating a large hierarchy outlives the 10-minute default handler
+      // timeout (routes.timeout.server = DEFAULT_TIMEOUT), and data-seeder
+      // would see a 503 while the mutations carried on server-side.
+      timeout: { server: false }
     }
   })
 
