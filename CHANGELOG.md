@@ -14,7 +14,12 @@
 
   The client still requires `unsafe-eval`: legacy v1 form conditionals, the v2-events serialised-function compiler, AJV's runtime JSON Schema compilation and Handlebars certificate templates all compile JavaScript in the browser from configuration fetched at runtime. The reasoning is documented next to the policy in `packages/client/nginx.conf`, and removing it is tracked for a future major release. Note that CSP nonces and hashes are not an alternative — they govern inline `<script>` blocks, not `eval`.
 
-  **Deployment note:** if your country configuration serves any image over plain HTTP, it will now be blocked in both apps. Serve those assets over HTTPS. [#13246](https://github.com/opencrvs/opencrvs-core/issues/13246)
+  **Deployment note:** if your country configuration serves any image over plain HTTP, it will now be blocked in both apps. Serve those assets over HTTPS.
+
+  **Two further hardening steps are deployment decisions, left to each implementation:**
+
+  - `CONTENT_SECURITY_POLICY_WILDCARD` defaults to `*.<domain>`, which trusts every subdomain — including ones the apps never call, such as Kibana, the MinIO console and webhooks. It is substituted into the policy verbatim, so you can set an explicit space-separated origin list instead; both apps work with a wildcard, an explicit list, or an empty value. The minimum sets for a default deployment are documented next to the policy in `packages/client/nginx.conf` and `packages/login/nginx.conf`.
+  - Reverse-proxy TLS cipher suites are outside OpenCRVS core. If your proxy has no explicit TLS options, Traefik and most Go-based proxies fall back to a default TLS 1.2 list that still offers CBC suites with HMAC-SHA-1. Restricting it to AEAD suites (AES-GCM, ChaCha20-Poly1305) satisfies guidance such as ANSSI-BP-035, at the cost of dropping very old clients. [#13246](https://github.com/opencrvs/opencrvs-core/issues/13246)
 
 ### Bug fixes
 
