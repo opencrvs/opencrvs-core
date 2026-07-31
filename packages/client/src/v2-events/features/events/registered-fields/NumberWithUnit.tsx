@@ -60,7 +60,6 @@ function NumberWithUnitInput({
       <Select.Input
         {...props}
         id="unit"
-        isClearable={false}
         options={options}
         type="SELECT"
         value={value?.unit}

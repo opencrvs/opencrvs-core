@@ -1,33 +1,30 @@
 # Changelog
 
-## 1.9.16 Release Candidate
+## 1.9.16
 
 ### New features
 
-- Third-party integrations (such as MOSIP) can now authenticate with OpenCRVS using their own credentials instead of borrowing the requesting user's session. Integrations are registered automatically on startup from the country configuration, and each one signs in with its own client ID and secret. This keeps integrations working reliably even when services restart mid-request, and makes the audit trail attribute actions to the integration itself (e.g. "Registered — MOSIP") rather than to a person. The feature is opt-in: configurations with no integrations are unaffected. [#12360](https://github.com/opencrvs/opencrvs-core/issues/12360)
+- Third-party integrations (such as MOSIP) can now authenticate with their own client ID and secret instead of borrowing the requesting user's session. Integrations are registered on startup from the country configuration, so they keep working across service restarts and the audit trail attributes actions to the integration (e.g. "Registered — MOSIP") rather than to a person. Opt-in: configurations with no integrations are unaffected. [#12360](https://github.com/opencrvs/opencrvs-core/issues/12360)
 
-- Form pages can now show a "Clear" button next to the page title, which resets every field on that page to its default value after a confirmation dialog. Select fields are also clearable, so a chosen option can be removed without picking another. The button is opt-in per page via `showClearButton: true` in the page configuration, and appears as a small outlined destructive action so it reads as distinct from the page's primary controls. Country configurations need the `buttons.clear`, `clearForm.title.clearFormConfirm` and `clearForm.desc.clearFormConfirm` translation keys. [#10135](https://github.com/opencrvs/opencrvs-core/issues/10135)
+- Form pages can now show a "Clear" button that resets every field on the page to its default value after a confirmation dialog, and select fields can be cleared without picking another option. Opt in per page with `showClearButton: true`. Country configurations need the `buttons.clear`, `clearForm.title.clearFormConfirm` and `clearForm.desc.clearFormConfirm` translation keys. [#10135](https://github.com/opencrvs/opencrvs-core/issues/10135)
 
 ### Improvements
 
-- Hardened the Content Security Policy served by the client and login apps, following a vulnerability scan of a national deployment. The login app no longer allows `unsafe-eval` and no longer permits scripts from the deployment's wildcard domain — it loads no third-party scripts and compiles no JavaScript at runtime. Both apps now send the `frame-ancestors`, `base-uri` and `form-action` directives, and `img-src` no longer permits plain-HTTP images. PDF previews are rendered with pdf.js code generation disabled.
+- Hardened the Content Security Policy served by the client and login apps, following a vulnerability scan. The login app no longer allows `unsafe-eval` or wildcard-domain scripts, both apps now send `frame-ancestors`, `base-uri` and `form-action`, `img-src` no longer permits plain-HTTP images, and PDF previews disable pdf.js code generation. The client still requires `unsafe-eval` to compile configuration at runtime; the reasoning is documented next to the policy in `packages/client/nginx.conf`. [#13246](https://github.com/opencrvs/opencrvs-core/issues/13246)
 
-  The client still requires `unsafe-eval`: legacy v1 form conditionals, the v2-events serialised-function compiler, AJV's runtime JSON Schema compilation and Handlebars certificate templates all compile JavaScript in the browser from configuration fetched at runtime. The reasoning is documented next to the policy in `packages/client/nginx.conf`, and removing it is tracked for a future major release. Note that CSP nonces and hashes are not an alternative — they govern inline `<script>` blocks, not `eval`.
+  **Deployment notes:**
 
-  **Deployment note:** if your country configuration serves any image over plain HTTP, it will now be blocked in both apps. Serve those assets over HTTPS.
-
-  **Two further hardening steps are deployment decisions, left to each implementation:**
-
-  - `CONTENT_SECURITY_POLICY_WILDCARD` defaults to `*.<domain>`, which trusts every subdomain — including ones the apps never call, such as Kibana, the MinIO console and webhooks. It is substituted into the policy verbatim, so you can set an explicit space-separated origin list instead; both apps work with a wildcard, an explicit list, or an empty value. The minimum sets for a default deployment are documented next to the policy in `packages/client/nginx.conf` and `packages/login/nginx.conf`.
-  - Reverse-proxy TLS cipher suites are outside OpenCRVS core. If your proxy has no explicit TLS options, Traefik and most Go-based proxies fall back to a default TLS 1.2 list that still offers CBC suites with HMAC-SHA-1. Restricting it to AEAD suites (AES-GCM, ChaCha20-Poly1305) satisfies guidance such as ANSSI-BP-035, at the cost of dropping very old clients. [#13246](https://github.com/opencrvs/opencrvs-core/issues/13246)
+  - Images served over plain HTTP are now blocked in both apps. Serve those assets over HTTPS.
+  - `CONTENT_SECURITY_POLICY_WILDCARD` defaults to `*.<domain>`, which trusts every subdomain. It is substituted verbatim, so an explicit space-separated origin list can be used instead; minimum sets are documented in `packages/client/nginx.conf` and `packages/login/nginx.conf`.
+  - Reverse-proxy TLS cipher suites are outside OpenCRVS core. Proxies without explicit TLS options often fall back to a TLS 1.2 list offering CBC suites with HMAC-SHA-1; restricting to AEAD suites satisfies guidance such as ANSSI-BP-035.
 
 ### Bug fixes
 
-- Activating a user account now requires the caller to be the account owner. Previously any user holding `user.update` or `user.update[my-jurisdiction]` could set another pending user's password and security answers, which allowed taking over that account. The ownership check is enforced both in the gateway and in user management. [#13197](https://github.com/opencrvs/opencrvs-core/pull/13197)
-- Changing a password now requires the caller to be the account owner, and the current password is always required. Previously a user holding `user.update` or `user.update[my-jurisdiction]` could change another user's password. Administrators reset a password through "Reset password", which sends the new credentials to the account owner and is unchanged.
-- On mobile, uploading a file or signature no longer triggers the PIN re-lock screen. Opening the native file picker or camera briefly backgrounds the app, which was previously indistinguishable from the user actually leaving the app. [#13124](https://github.com/opencrvs/opencrvs-core/issues/13124)
+- Activating a user account now requires the caller to be the account owner. Previously any user holding `user.update` or `user.update[my-jurisdiction]` could set a pending user's password and security answers, allowing account takeover. Enforced in both the gateway and user management. [#13197](https://github.com/opencrvs/opencrvs-core/pull/13197)
+- Changing a password now requires the caller to be the account owner, and the current password is always required. Administrators still reset passwords through "Reset password", which is unchanged.
+- On mobile, uploading a file or signature no longer triggers the PIN re-lock screen. [#13124](https://github.com/opencrvs/opencrvs-core/issues/13124)
 
-## 1.9.15 Release Candidate
+## 1.9.15
 
 ### Improvements
 
