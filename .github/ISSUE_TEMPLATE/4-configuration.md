@@ -10,9 +10,9 @@ assignees: ''
 
 ## Why
 
-## Configuration changes
+## Configuration
 
-<!-- What changes, at a high level, and which countries or environments are affected. -->
+<!-- The forms, certificates, roles, scopes or settings involved, at a high level, and which countries or environments they apply to. -->
 
 ## Acceptance criteria
 
