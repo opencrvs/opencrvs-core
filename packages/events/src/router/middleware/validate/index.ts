@@ -428,9 +428,14 @@ export const validateAction: MiddlewareFunction<
     token: ctx.token
   })
 
-  const context = { ...(await getValidatorContext(ctx.token)), event }
+  const eventState = getCurrentEventState(event, eventConfig)
 
-  const declaration = getCurrentEventState(event, eventConfig).declaration
+  const context = await getValidatorContext({
+    token: ctx.token,
+    event: { document: event, state: eventState }
+  })
+
+  const declaration = eventState.declaration
 
   if (actionType === ActionType.NOTIFY || actionType === ActionType.EDIT) {
     const errors = validateNotifyAction({

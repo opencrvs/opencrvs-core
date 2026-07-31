@@ -15,6 +15,7 @@ import {
   errorMessages,
   EventConfig,
   EventState,
+  EventValidatorContext,
   getDeclarationFields,
   ValidatorContext
 } from '@opencrvs/commons/events'
@@ -92,13 +93,17 @@ export function getInvalidUpdateKeys<T>({
     }))
 }
 
-export async function getValidatorContext(
+export async function getValidatorContext({
+  token,
+  event
+}: {
   token: string
-): Promise<Omit<ValidatorContext, 'event'>> {
+  event?: EventValidatorContext
+}): Promise<ValidatorContext> {
   const leafAdminStructureLocationIds =
     await getLeafLevelAdministrativeAreaIds()
 
   const user = getOrThrow(getTokenPayload(token), 'Token is missing.')
 
-  return { leafAdminStructureLocationIds, user }
+  return { leafAdminStructureLocationIds, user, event }
 }
