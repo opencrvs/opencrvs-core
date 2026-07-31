@@ -16,7 +16,8 @@ import {
   getAuthTokens,
   login,
   loginWithNewUser,
-  NEW_USER_PASSWORD
+  NEW_USER_PASSWORD,
+  waitForAuthenticatedLanding
 } from '../../helpers'
 import { createClient } from '@opencrvs/toolkit/api'
 import { faker } from '@faker-js/faker'
@@ -68,7 +69,7 @@ test('Phone number changed from settings is stored as entered', async ({
     expect(refreshToken).toBeDefined()
 
     await page.goto(`${CLIENT_URL}?refreshToken=${refreshToken}`)
-    await page.waitForSelector('#pin-input, #appSpinner', { state: 'visible' })
+    await waitForAuthenticatedLanding(page)
     await createPIN(page)
     await page.goto(CLIENT_URL)
   })
