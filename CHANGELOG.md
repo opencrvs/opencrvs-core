@@ -8,6 +8,19 @@
 
 - Form pages can now show a "Clear" button next to the page title, which resets every field on that page to its default value after a confirmation dialog. Select fields are also clearable, so a chosen option can be removed without picking another. The button is opt-in per page via `showClearButton: true` in the page configuration, and appears as a small outlined destructive action so it reads as distinct from the page's primary controls. Country configurations need the `buttons.clear`, `clearForm.title.clearFormConfirm` and `clearForm.desc.clearFormConfirm` translation keys. [#10135](https://github.com/opencrvs/opencrvs-core/issues/10135)
 
+### Improvements
+
+- Hardened the Content Security Policy served by the client and login apps, following a vulnerability scan of a national deployment. The login app no longer allows `unsafe-eval` and no longer permits scripts from the deployment's wildcard domain — it loads no third-party scripts and compiles no JavaScript at runtime. Both apps now send the `frame-ancestors`, `base-uri` and `form-action` directives, and `img-src` no longer permits plain-HTTP images. PDF previews are rendered with pdf.js code generation disabled.
+
+  The client still requires `unsafe-eval`: legacy v1 form conditionals, the v2-events serialised-function compiler, AJV's runtime JSON Schema compilation and Handlebars certificate templates all compile JavaScript in the browser from configuration fetched at runtime. The reasoning is documented next to the policy in `packages/client/nginx.conf`, and removing it is tracked for a future major release. Note that CSP nonces and hashes are not an alternative — they govern inline `<script>` blocks, not `eval`.
+
+  **Deployment note:** if your country configuration serves any image over plain HTTP, it will now be blocked in both apps. Serve those assets over HTTPS.
+
+  **Two further hardening steps are deployment decisions, left to each implementation:**
+
+  - `CONTENT_SECURITY_POLICY_WILDCARD` defaults to `*.<domain>`, which trusts every subdomain — including ones the apps never call, such as Kibana, the MinIO console and webhooks. It is substituted into the policy verbatim, so you can set an explicit space-separated origin list instead; both apps work with a wildcard, an explicit list, or an empty value. The minimum sets for a default deployment are documented next to the policy in `packages/client/nginx.conf` and `packages/login/nginx.conf`.
+  - Reverse-proxy TLS cipher suites are outside OpenCRVS core. If your proxy has no explicit TLS options, Traefik and most Go-based proxies fall back to a default TLS 1.2 list that still offers CBC suites with HMAC-SHA-1. Restricting it to AEAD suites (AES-GCM, ChaCha20-Poly1305) satisfies guidance such as ANSSI-BP-035, at the cost of dropping very old clients. [#13246](https://github.com/opencrvs/opencrvs-core/issues/13246)
+
 ### Bug fixes
 
 - Activating a user account now requires the caller to be the account owner. Previously any user holding `user.update` or `user.update[my-jurisdiction]` could set another pending user's password and security answers, which allowed taking over that account. The ownership check is enforced both in the gateway and in user management. [#13197](https://github.com/opencrvs/opencrvs-core/pull/13197)
