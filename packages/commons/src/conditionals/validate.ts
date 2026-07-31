@@ -153,40 +153,6 @@ export function compileClientFunction(code: string): CompiledClientFunction {
 // https://ajv.js.org/packages/ajv-formats.html
 addFormats(ajv)
 
-// `buildClientFunctionContext` is invoked per field, per conditional (SHOW/ENABLE/
-// DISPLAY_ON_REVIEW), for every field in a form, so `getCurrentEventState` — a full
-// action-history aggregation — would otherwise be recomputed from scratch on every
-// call. Cache by (event, config) identity so calls within the same validation pass
-// reuse the result; a WeakMap lets entries be collected once a new event/config
-// reference replaces the old one after a mutation.
-// @TODO: longer term, computing this once and carrying it on `ValidatorContext`
-// would be more explicit than caching it here — but that needs `eventConfig`
-// threaded into the server-side contexts that don't carry it today, so keeping
-// the cache here for now.
-const inMemoryEventStateCache = new WeakMap<
-  EventDocument,
-  WeakMap<EventConfig, EventIndex>
->()
-
-function getInMemoryEventState(
-  event: EventDocument,
-  config: EventConfig
-): EventIndex {
-  let stateByConfig = inMemoryEventStateCache.get(event)
-  if (!stateByConfig) {
-    stateByConfig = new WeakMap()
-    inMemoryEventStateCache.set(event, stateByConfig)
-  }
-
-  let state = stateByConfig.get(config)
-  if (!state) {
-    state = getCurrentEventState(event, config)
-    stateByConfig.set(config, state)
-  }
-
-  return state
-}
-
 // `$now` / `$online` are sampled fresh on each call — callers that care
 // about a stable timestamp/online flag should snapshot it themselves.
 export function buildClientFunctionContext(input: {
@@ -202,22 +168,14 @@ export function buildClientFunctionContext(input: {
   locations?: Location[]
   adminLevelIds?: string[]
 }): ClientFunctionContext {
-  const flags =
-    input.validatorContext?.event && input.validatorContext?.eventConfig
-      ? getInMemoryEventState(
-          input.validatorContext?.event,
-          input.validatorContext?.eventConfig
-        )?.flags
-      : []
-
   return {
     $form: input.form,
-    $flags: flags,
+    $flags: input.validatorContext?.event?.state.flags ?? [],
     $now: todayISO(),
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     $online: isOnline(),
     $user: input.validatorContext?.user,
-    $event: input.validatorContext?.event,
+    $event: input.validatorContext?.event?.document,
     $leafAdminStructureLocationIds:
       input.validatorContext?.leafAdminStructureLocationIds ?? [],
     user: input.systemVariables?.user,
@@ -539,12 +497,23 @@ export function isFieldSecured(
   return validate(field.secured as JSONSchema, clientFunctionContext)
 }
 
+export type EventValidatorContext = {
+  document: EventDocument
+  state: EventIndex
+}
+
+export function getEventValidatorContext(
+  document: EventDocument,
+  config: EventConfig
+): EventValidatorContext {
+  return { document, state: getCurrentEventState(document, config) }
+}
+
 export type ValidatorContext = {
   user?: ITokenPayload
   leafAdminStructureLocationIds?: Array<{ id: UUID }>
-  event?: EventDocument
-  eventConfig?: EventConfig
   baseFormState?: EventState
+  event?: EventValidatorContext
 }
 
 function isFieldConditionMet(

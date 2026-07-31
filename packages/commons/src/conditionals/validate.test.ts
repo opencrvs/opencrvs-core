@@ -14,11 +14,17 @@ import { FieldType } from '../events/FieldType'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { ConditionalType } from '../events/Conditional'
-import { eventQueryDataGenerator } from '../events/test.utils'
+import { ActionType } from '../events/ActionType'
+import { tennisClubMembershipEvent } from '../fixtures'
+import {
+  eventQueryDataGenerator,
+  generateEventDocument
+} from '../events/test.utils'
 import {
   errorMessages,
   areConditionsMet,
   isFieldSecured,
+  isFieldVisible,
   runFieldValidations,
   validateFieldInput
 } from './validate'
@@ -351,6 +357,49 @@ describe('areConditionsMet', () => {
     const eventIndex = eventQueryDataGenerator({ flags: [] })
 
     expect(areConditionsMet([flagConditional], {}, {}, eventIndex)).toBe(false)
+  })
+})
+
+describe('isFieldVisible', () => {
+  // Unlike `areConditionsMet` / `isActionEnabled`, this path takes no `EventIndex`
+  // argument, so `flag(...)` can only resolve through `context.event.state`.
+  const flaggedField = {
+    id: 'sealedOnly',
+    type: FieldType.TEXT,
+    label: { id: '', defaultMessage: '', description: '' },
+    conditionals: [{ type: ConditionalType.SHOW, conditional: flag('sealed') }]
+  } satisfies FieldConfig
+
+  const document = generateEventDocument({
+    configuration: tennisClubMembershipEvent,
+    actions: [ActionType.CREATE, ActionType.DECLARE].map((type) => ({ type }))
+  })
+
+  it('resolves flag() against the event state carried on the context', () => {
+    expect(
+      isFieldVisible(
+        flaggedField,
+        {},
+        {
+          event: {
+            document,
+            state: eventQueryDataGenerator({ flags: ['sealed'] })
+          }
+        }
+      )
+    ).toBe(true)
+
+    expect(
+      isFieldVisible(
+        flaggedField,
+        {},
+        { event: { document, state: eventQueryDataGenerator({ flags: [] }) } }
+      )
+    ).toBe(false)
+  })
+
+  it('treats flags as empty when the context carries no event', () => {
+    expect(isFieldVisible(flaggedField, {}, {})).toBe(false)
   })
 })
 

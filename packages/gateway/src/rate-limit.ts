@@ -8,11 +8,38 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { readFileSync } from 'fs'
 import { redis } from '@gateway/utils/redis'
 import { Lifecycle, ReqRefDefaults } from '@hapi/hapi'
 import { get } from 'lodash'
-import { DISABLE_RATE_LIMIT } from './constants'
+import jwt from 'jsonwebtoken'
+import { CERT_PUBLIC_KEY_PATH, DISABLE_RATE_LIMIT } from './constants'
 import { hasScope } from '@opencrvs/commons'
+
+const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
+
+/**
+ * Routes wrapped by `rateLimitedRoute` are declared with `auth: false`, so
+ * Hapi's verified `jwt` strategy (see server.ts) never runs on them. Reading
+ * scopes off the token via `hasScope`/`jwt-decode` alone is therefore not
+ * safe here — `decode` only base64-decodes the payload without checking the
+ * signature, so anyone could forge a `{"scope":["bypassratelimit"]}` token
+ * and disable rate limiting on login/OTP endpoints. Verify the signature,
+ * issuer and audience ourselves before trusting the scope.
+ */
+const hasVerifiedBypassScope = (authorizationHeader: string): boolean => {
+  const token = authorizationHeader.replace(/^Bearer\s+/i, '')
+  try {
+    jwt.verify(token, publicCert, {
+      algorithms: ['RS256'],
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:gateway-user'
+    })
+  } catch {
+    return false
+  }
+  return hasScope(authorizationHeader, 'bypassratelimit')
+}
 
 /**
  * Custom RateLimitError. This is being caught in Hapi (`onPreResponse` in createServer)
@@ -108,7 +135,7 @@ export const rateLimitedRoute =
   (...args: A) => {
     if (
       args[0].headers.authorization &&
-      hasScope(args[0].headers.authorization as string, 'bypassratelimit')
+      hasVerifiedBypassScope(args[0].headers.authorization as string)
     ) {
       return fn(...args)
     }

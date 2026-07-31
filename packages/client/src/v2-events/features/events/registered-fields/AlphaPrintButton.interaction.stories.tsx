@@ -122,10 +122,13 @@ export const WithEnableCondition: StoryObj<{}> = {
       )
     },
     getTestValidatorContext(TestUserRole.enum.LOCAL_REGISTRAR, {
-      ...tennisClubMembershipEventDocument,
-      actions: tennisClubMembershipEventDocument.actions.filter(
-        (action) => action.type === ActionType.CREATE
-      )
+      event: {
+        ...tennisClubMembershipEventDocument,
+        actions: tennisClubMembershipEventDocument.actions.filter(
+          (action) => action.type === ActionType.CREATE
+        )
+      },
+      eventConfig: tennisClubMembershipEvent
     })
   ),
   play: async ({ canvasElement }) => {
@@ -145,10 +148,10 @@ export const WithDisableCondition: StoryObj<{}> = {
         not(event.hasAction(ActionType.DECLARE))
       )
     },
-    getTestValidatorContext(
-      TestUserRole.enum.LOCAL_REGISTRAR,
-      tennisClubMembershipEventDocument
-    )
+    getTestValidatorContext(TestUserRole.enum.LOCAL_REGISTRAR, {
+      event: tennisClubMembershipEventDocument,
+      eventConfig: tennisClubMembershipEvent
+    })
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
@@ -195,7 +198,10 @@ export const WithTemporaryEventId: StoryObj<{}> = {
             id="my-form"
             validatorContext={getTestValidatorContext(
               TestUserRole.enum.LOCAL_REGISTRAR,
-              temporaryEventDocument
+              {
+                event: temporaryEventDocument,
+                eventConfig: tennisClubMembershipEvent
+              }
             )}
           />
         )

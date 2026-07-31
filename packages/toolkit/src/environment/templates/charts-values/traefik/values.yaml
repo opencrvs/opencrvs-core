@@ -9,16 +9,15 @@
 
 # Overwriting https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
 namespaceOverride: "traefik"
-logs:
-  general:
-    # "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "PANIC"
-    level: "INFO"
-    # format: "common" # For local environment
-    format: "json" # For server environment
-  access:
-    # -- To enable access logs
-    enabled: true
-    format: "json"
+log:
+  # "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "PANIC"
+  level: "INFO"
+  # format: "common" # For local environment
+  format: "json" # For server environment
+accessLog:
+  # -- To enable access logs
+  enabled: true
+  format: "json"
 
 ingressRoute:
   dashboard:

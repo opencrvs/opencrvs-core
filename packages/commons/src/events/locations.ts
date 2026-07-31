@@ -45,9 +45,11 @@ export const LocationStatus = z.enum(['active', 'inactive'])
 export type LocationStatus = z.infer<typeof LocationStatus>
 
 /**
- * A single element of the append-only `versions` history of a location or
- * administrative area. Versions are sorted ascending by `effectiveFrom`
- * ('0001-01-01' is used as the beginning-of-time sentinel).
+ * A single element of the `versions` history of a location or administrative
+ * area. Versions are sorted ascending by `effectiveFrom` ('0001-01-01' is used
+ * as the beginning-of-time sentinel). Updates only ever append, but a
+ * not-yet-effective version can be withdrawn and seeding replaces a history
+ * wholesale, so the array is not append-only.
  */
 export const LocationVersion = z.object({
   versionId: UUID,
@@ -139,30 +141,72 @@ export function toClientAdministrativeArea(
   }
 }
 
+function validateAscendingDates(
+  versions: LocationVersion[],
+  ctx: z.core.$RefinementCtx<LocationVersion[]>
+) {
+  const ascending = versions.every(
+    (version, index) =>
+      index === 0 || versions[index - 1].effectiveFrom < version.effectiveFrom
+  )
+
+  if (!ascending) {
+    ctx.addIssue('versions must be strictly ascending by effectiveFrom')
+  }
+}
+
+function validateUniqueIds(
+  versions: LocationVersion[],
+  ctx: z.core.$RefinementCtx<LocationVersion[]>
+) {
+  const versionIds = new Set(versions.map((version) => version.versionId))
+
+  if (versionIds.size !== versions.length) {
+    ctx.addIssue('versions must not repeat a versionId')
+  }
+}
+
+export const SeededLocationVersions = z
+  .array(LocationVersion)
+  .min(1)
+  .superRefine((versions, ctx) => {
+    validateAscendingDates(versions, ctx)
+    validateUniqueIds(versions, ctx)
+  })
+
+export type SeededLocationVersions = z.infer<typeof SeededLocationVersions>
+
 /**
- * Input payload for the locations `set` mutation. Carries only the seedable
- * identity and hierarchy fields — version history is managed by the server.
+ * Input payload for the locations `set` mutation. Carries the seedable
+ * identity and hierarchy fields, plus an optional pre-built history.
+ *
+ * Last-write-wins on history: a repeated seed of the same row replaces its
+ * stored `versions`, so a caller that means to keep one has to send it every
+ * time. Seeding is only reachable while system initialisation is incomplete,
+ * so this replaces what an earlier seed attempt wrote, never a live history.
  */
 export const SetLocationPayload = z.object({
   id: UUID,
   name: z.string(),
   externalId: z.string().nullish(),
   administrativeAreaId: UUID.nullable(),
-  locationType: z.string().nullable()
+  locationType: z.string().nullable(),
+  versions: SeededLocationVersions.optional()
 })
 
 export type SetLocationPayload = z.infer<typeof SetLocationPayload>
 
 /**
- * Input payload for the administrative areas `set` mutation. Carries only the
- * seedable identity and hierarchy fields — version history is managed by the
- * server.
+ * Input payload for the administrative areas `set` mutation. Twin of
+ * {@link SetLocationPayload}, including the optional pre-built `versions`
+ * history and the same semantics for omitting it.
  */
 export const SetAdministrativeAreaPayload = z.object({
   id: UUID,
   name: z.string(),
   externalId: z.string().nullish(),
-  parentId: UUID.nullable()
+  parentId: UUID.nullable(),
+  versions: SeededLocationVersions.optional()
 })
 
 export type SetAdministrativeAreaPayload = z.infer<
@@ -191,6 +235,22 @@ export function resolveVersion<T extends { effectiveFrom: string }>(
   }
 
   return resolved
+}
+
+/**
+ * Whether the entity is selectable at `anchor`: it must already have a
+ * version effective by then, and the version that resolves at `anchor` must
+ * be active. `resolveVersion` alone is not enough for this — when `anchor`
+ * precedes every version it falls back to the earliest one, which would
+ * otherwise make a location created after `anchor` look selectable.
+ */
+export function isSelectableAtAnchor<
+  T extends { effectiveFrom: string; status: string }
+>(versions: T[], anchor: string): boolean {
+  return (
+    versions.some((version) => version.effectiveFrom <= anchor) &&
+    resolveVersion(versions, anchor).status === 'active'
+  )
 }
 
 /**

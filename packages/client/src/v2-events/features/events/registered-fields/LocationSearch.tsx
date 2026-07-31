@@ -18,13 +18,14 @@ import {
   UUID,
   joinValues,
   JurisdictionFilter,
+  isSelectableAtAnchor,
   resolveJurisdictionReference,
   resolveVersion,
-  todayISO,
   PlainDate
 } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
+import { useClearStaleSelectionOnAnchorChange } from '@client/v2-events/hooks/useClearStaleSelectionOnAnchorChange'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import {
@@ -134,6 +135,7 @@ function LocationSearchInput({
   onBlur,
   id,
   eventType,
+  anchor,
   ...props
 }: FieldPropsWithoutReferenceValue<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
   onChange: (val: string | undefined) => void
@@ -143,6 +145,7 @@ function LocationSearchInput({
   disabled?: boolean
   id: string
   eventType?: string
+  anchor: PlainDate
 }) {
   const token = useSelector(getToken)
   const jurisdictionFilter = resolveJurisdictionReference(
@@ -153,19 +156,44 @@ function LocationSearchInput({
 
   const locations = useAvailableLocations(locationTypes, jurisdictionFilter)
 
+  const anchorToDateOfEvent = Boolean(props.configuration?.anchorToDateOfEvent)
+
+  const { getLocations: getLocationsForStaleCheck } = useLocations()
+  const allLocations = getLocationsForStaleCheck.useSuspenseQuery()
+  useClearStaleSelectionOnAnchorChange({
+    enabled: anchorToDateOfEvent,
+    value,
+    anchor,
+    entities: allLocations,
+    onClear: () => onChange(undefined)
+  })
+
+  // `activeOnly` alone controls whether inactive/not-yet-effective locations
+  // are dropped from the list; `anchorToDateOfEvent` only changes which date
+  // `anchor` is resolved against (event date vs today) — the two are
+  // orthogonal, so a field must opt into both to anchor-and-exclude.
+  const activeOnly = Boolean(props.configuration?.activeOnly)
+
+  const selectableLocations = useMemo(
+    () =>
+      activeOnly
+        ? locations.filter((l) => isSelectableAtAnchor(l.versions, anchor))
+        : locations,
+    [locations, anchor, activeOnly]
+  )
+
   // When the field config opts in (advanced search sets this), list every
   // historical name so records saved under an outdated name stay findable.
-  // Otherwise show a single current-name option. Names are anchored to today;
-  // event-date anchoring is a follow-up (#13143).
+  // Otherwise show a single current-name option, resolved at the field's anchor.
   const options = useMemo(
     () =>
       props.configuration?.listHistoricalNames
-        ? buildHistoricalLocationNameOptions(locations)
-        : locations.map((l) => ({
+        ? buildHistoricalLocationNameOptions(selectableLocations)
+        : selectableLocations.map((l) => ({
             value: l.id,
-            label: resolveVersion(l.versions, todayISO()).name
+            label: resolveVersion(l.versions, anchor).name
           })),
-    [locations, props.configuration?.listHistoricalNames]
+    [selectableLocations, props.configuration?.listHistoricalNames, anchor]
   )
 
   const selectedOption =

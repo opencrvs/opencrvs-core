@@ -1319,7 +1319,7 @@ ALL_QUESTIONS.push(
   log('\n', kleur.bold().underline('Running configuration files updates'))
   generateInventory(environment, {
     kube_worker_nodes: kubeWorkerNodes,
-    kube_api_host: infrastructure.kubeAPIHost || '',
+    kube_api_host: infrastructure.kubeApiHost || '',
     backup_host: backupHost || '',
     users: users
   })
