@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Page } from '@playwright/test'
+import { CDPSession, Page } from '@playwright/test'
 
 export const NETWORK_CONDITIONS = {
   default: {
@@ -47,12 +47,31 @@ export const NETWORK_CONDITIONS = {
   }
 } as const
 
+/*
+ * Network emulation is scoped to the CDP session that set it, so restoring has to
+ * happen on the same session — a fresh session sending `default` leaves the earlier
+ * session's override in place and the page stays offline.
+ */
+const sessions = new WeakMap<Page, CDPSession>()
+
+async function getCDPSession(page: Page) {
+  const existing = sessions.get(page)
+  if (existing) {
+    return existing
+  }
+
+  const client = await page.context().newCDPSession(page)
+  await client.send('Network.enable')
+  sessions.set(page, client)
+
+  return client
+}
+
 export async function mockNetworkConditions(
   page: Page,
   connection: keyof typeof NETWORK_CONDITIONS
 ) {
-  const client = await page.context().newCDPSession(page)
-  await client.send('Network.enable')
+  const client = await getCDPSession(page)
   await client.send(
     'Network.emulateNetworkConditions',
     NETWORK_CONDITIONS[connection]
