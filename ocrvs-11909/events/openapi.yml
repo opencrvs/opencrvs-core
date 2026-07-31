@@ -1003,8 +1003,10 @@ paths:
     put:
       operationId: locations-update
       summary: Update a location
-      description: Append a new version to a location (rename, recode or inactivate).
-        Prior versions are never modified.
+      description: "Append a new version to a location (rename, recode or inactivate).
+        This endpoint only ever appends: it never modifies or removes an
+        existing version. To drop a version that has not taken effect yet, use
+        the withdraw endpoint instead."
       tags:
         - Locations
       security:
@@ -1353,8 +1355,10 @@ paths:
     put:
       operationId: administrativeAreas-update
       summary: Update an administrative area
-      description: Append a new version to an administrative area (rename, recode or
-        inactivate). Prior versions are never modified.
+      description: "Append a new version to an administrative area (rename, recode or
+        inactivate). This endpoint only ever appends: it never modifies or
+        removes an existing version. To drop a version that has not taken effect
+        yet, use the withdraw endpoint instead."
       tags:
         - Administrative areas
       security:
@@ -3196,6 +3200,10 @@ components:
                   additionalProperties: false
                 listHistoricalNames:
                   type: boolean
+                activeOnly:
+                  type: boolean
+                anchorToDateOfEvent:
+                  type: boolean
               additionalProperties: false
           required:
             - id
@@ -3469,6 +3477,10 @@ components:
                     - $jurisdiction
                   additionalProperties: false
                 listHistoricalNames:
+                  type: boolean
+                activeOnly:
+                  type: boolean
+                anchorToDateOfEvent:
                   type: boolean
               additionalProperties: false
           required:
@@ -4141,14 +4153,22 @@ components:
                 - $jurisdiction
               additionalProperties: false
             listHistoricalNames:
-              description: "Advanced search: list every historical name a location has had as
-                a separate, selectable option. Propagated to the embedded
-                admin-area selectors."
+              description: List every historical name a location has had as a separate,
+                selectable option. Propagated to the embedded admin-area
+                selectors.
               type: boolean
             activeOnly:
-              description: "Advanced search: offer only currently-active admin areas;
-                inactivated ones are excluded. Propagated to the embedded
-                admin-area selectors."
+              description: Offer only admin areas that are active at the resolved anchor date
+                (today, or the date of event when anchorToDateOfEvent is set);
+                inactive or not-yet-effective versions are excluded. Propagated
+                to the embedded admin-area selectors.
+              type: boolean
+            anchorToDateOfEvent:
+              description: Resolve selectable/displayed versions against the event's date of
+                event (falling back to the record's creation date when empty)
+                instead of today. Does not by itself exclude inactive versions;
+                combine with activeOnly for that. Propagated to the embedded
+                admin-area selectors.
               type: boolean
           additionalProperties: false
         defaultValue:
@@ -9281,12 +9301,19 @@ components:
                 - $jurisdiction
               additionalProperties: false
             listHistoricalNames:
-              description: "Advanced search: list every historical name a location has had as
-                a separate, selectable option."
+              description: List every historical name a location has had as a separate,
+                selectable option.
               type: boolean
             activeOnly:
-              description: "Advanced search: offer only currently-active locations;
-                inactivated ones are excluded."
+              description: Offer only locations that are active at the resolved anchor date
+                (today, or the date of event when anchorToDateOfEvent is set);
+                inactive or not-yet-effective versions are excluded.
+              type: boolean
+            anchorToDateOfEvent:
+              description: Resolve selectable/displayed versions against the event's date of
+                event (falling back to the record's creation date when empty)
+                instead of today. Does not by itself exclude inactive versions;
+                combine with activeOnly for that.
               type: boolean
           required:
             - type
@@ -9762,8 +9789,19 @@ components:
                 - $jurisdiction
               additionalProperties: false
             listHistoricalNames:
-              description: "Advanced search: list every historical name a location has had as
-                a separate, selectable option."
+              description: List every historical name a location has had as a separate,
+                selectable option.
+              type: boolean
+            activeOnly:
+              description: Offer only locations that are active at the resolved anchor date
+                (today, or the date of event when anchorToDateOfEvent is set);
+                inactive or not-yet-effective versions are excluded.
+              type: boolean
+            anchorToDateOfEvent:
+              description: Resolve selectable/displayed versions against the event's date of
+                event (falling back to the record's creation date when empty)
+                instead of today. Does not by itself exclude inactive versions;
+                combine with activeOnly for that.
               type: boolean
           additionalProperties: false
       required:
