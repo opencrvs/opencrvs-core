@@ -369,47 +369,108 @@ describe('integrations.audit', () => {
     })
   })
 
-  describe('pagination bounds', () => {
-    const invalidPagination: [string, { skip?: number; count?: number }][] = [
-      ['an oversized page size', { count: 101 }],
-      ['a fractional page size', { count: 10.5 }],
-      ['a zero page size', { count: 0 }],
-      ['a negative page size', { count: -1 }],
-      ['a negative offset', { skip: -1 }],
-      ['a fractional offset', { skip: 1.5 }]
-    ]
+  describe('input validation', () => {
+    describe('pagination bounds', () => {
+      const invalidPagination: [string, { skip?: number; count?: number }][] = [
+        ['an oversized page size', { count: 101 }],
+        ['a fractional page size', { count: 10.5 }],
+        ['a zero page size', { count: 0 }],
+        ['a negative page size', { count: -1 }],
+        ['a negative offset', { skip: -1 }],
+        ['a fractional offset', { skip: 1.5 }]
+      ]
 
-    test.each(invalidPagination)(
-      'rejects %s as a bad request',
-      async (_label, overrides) => {
+      test.each(invalidPagination)(
+        'rejects %s as a bad request',
+        async (_label, overrides) => {
+          const { user } = await setupTestCase()
+          const administrator = createAdministratorClient(user)
+          const clientId = await createIntegration(
+            administrator,
+            'Bounded Integration'
+          )
+
+          const error = await captureError(
+            administrator.integrations.audit({ id: clientId, ...overrides })
+          )
+
+          expect(error.code).toBe('BAD_REQUEST')
+        }
+      )
+
+      test('accepts the boundary page size of 100', async () => {
         const { user } = await setupTestCase()
         const administrator = createAdministratorClient(user)
         const clientId = await createIntegration(
           administrator,
-          'Bounded Integration'
+          'Boundary Integration'
         )
 
-        const error = await captureError(
-          administrator.integrations.audit({ id: clientId, ...overrides })
-        )
+        await expect(
+          administrator.integrations.audit({ id: clientId, count: 100, skip: 0 })
+        ).resolves.toEqual({ results: [], total: 0 })
+      })
+    })
 
-        expect(error.code).toBe('BAD_REQUEST')
-      }
-    )
-
-    test('accepts the boundary page size of 100', async () => {
+    test('rejects an identifier that is not a UUID', async () => {
       const { user } = await setupTestCase()
       const administrator = createAdministratorClient(user)
-      const clientId = await createIntegration(
-        administrator,
-        'Boundary Integration'
+
+      const error = await captureError(
+        administrator.integrations.audit({ id: 'not-a-uuid' as UUID })
       )
 
-      await expect(
-        administrator.integrations.audit({ id: clientId, count: 100, skip: 0 })
-      ).resolves.toEqual({ results: [], total: 0 })
+      expect(error.code).toBe('BAD_REQUEST')
     })
-  })
+
+    describe('date validation', () => {
+      const invalidBounds: [string, { timeStart?: string; timeEnd?: string }][] =
+        [
+          [
+            'a bare calendar date as the lower bound',
+            { timeStart: '2026-07-28' }
+          ],
+          ['a bare calendar date as the upper bound', { timeEnd: '2026-07-28' }],
+          ['a non-date string', { timeStart: 'garbage' }]
+        ]
+
+      test.each(invalidBounds)(
+        'rejects %s as a bad request',
+        async (_label, overrides) => {
+          const { user } = await setupTestCase()
+          const administrator = createAdministratorClient(user)
+          const clientId = await createIntegration(
+            administrator,
+            'Date Validation Integration'
+          )
+
+          const error = await captureError(
+            administrator.integrations.audit({ id: clientId, ...overrides })
+          )
+
+          expect(error.code).toBe('BAD_REQUEST')
+        }
+      )
+
+      const validBounds: [string, string][] = [
+        ['a UTC instant', '2026-07-28T10:00:00.000Z'],
+        ['an instant with a numeric offset', '2026-07-28T10:00:00+02:00']
+      ]
+
+      test.each(validBounds)('accepts %s', async (_label, timeStart) => {
+        const { user } = await setupTestCase()
+        const administrator = createAdministratorClient(user)
+        const clientId = await createIntegration(
+          administrator,
+          'Instant Integration'
+        )
+
+        await expect(
+          administrator.integrations.audit({ id: clientId, timeStart })
+        ).resolves.toMatchObject({ total: expect.any(Number) })
+      })
+    })
+    })
 
   describe('time filtering', () => {
     test('a lower bound in the future yields nothing', async () => {
@@ -519,65 +580,6 @@ describe('integrations.audit', () => {
 
       expect(result.results.map((entry) => entry.id)).toEqual([newest.id])
       expect(result.total).toBe(3)
-    })
-  })
-
-  describe('date validation', () => {
-    const invalidBounds: [string, { timeStart?: string; timeEnd?: string }][] =
-      [
-        [
-          'a bare calendar date as the lower bound',
-          { timeStart: '2026-07-28' }
-        ],
-        ['a bare calendar date as the upper bound', { timeEnd: '2026-07-28' }],
-        ['a non-date string', { timeStart: 'garbage' }]
-      ]
-
-    test.each(invalidBounds)(
-      'rejects %s as a bad request',
-      async (_label, overrides) => {
-        const { user } = await setupTestCase()
-        const administrator = createAdministratorClient(user)
-        const clientId = await createIntegration(
-          administrator,
-          'Date Validation Integration'
-        )
-
-        const error = await captureError(
-          administrator.integrations.audit({ id: clientId, ...overrides })
-        )
-
-        expect(error.code).toBe('BAD_REQUEST')
-      }
-    )
-
-    const validBounds: [string, string][] = [
-      ['a UTC instant', '2026-07-28T10:00:00.000Z'],
-      ['an instant with a numeric offset', '2026-07-28T10:00:00+02:00']
-    ]
-
-    test.each(validBounds)('accepts %s', async (_label, timeStart) => {
-      const { user } = await setupTestCase()
-      const administrator = createAdministratorClient(user)
-      const clientId = await createIntegration(
-        administrator,
-        'Instant Integration'
-      )
-
-      await expect(
-        administrator.integrations.audit({ id: clientId, timeStart })
-      ).resolves.toMatchObject({ total: expect.any(Number) })
-    })
-
-    test('rejects an identifier that is not a UUID', async () => {
-      const { user } = await setupTestCase()
-      const administrator = createAdministratorClient(user)
-
-      const error = await captureError(
-        administrator.integrations.audit({ id: 'not-a-uuid' as UUID })
-      )
-
-      expect(error.code).toBe('BAD_REQUEST')
     })
   })
 
