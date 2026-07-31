@@ -29,7 +29,3 @@ assignees: ''
 ## Open questions
 
 <!-- Only things genuinely awaiting a decision. Delete this section if there are none. -->
-
-## Sub-issues
-
-<!-- Raised as Task issues with this issue as their parent. -->
