@@ -89,6 +89,13 @@ importers:
         version: 7.0.2
 
   packages/api-docs:
+    dependencies:
+      '@opencrvs/commons':
+        specifier: workspace:*
+        version: link:../commons
+      '@opencrvs/events':
+        specifier: workspace:*
+        version: link:../events
     devDependencies:
       serve:
         specifier: ^14.2.4
