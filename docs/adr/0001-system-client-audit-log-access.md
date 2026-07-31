@@ -29,10 +29,6 @@ user's entire audit log without holding `user.read` at all, bypassing the author
 
 - The `getSystemClientById` call at the top of the procedure looks like a redundant existence
   check. It is load-bearing security. Removing it reopens the escalation described above.
-- A new scope is granted to nobody on merge. The implementing change grants it to
-  `userRole.nationalAdministrator` in `packages/testland/src/data-seeding/roles/roles.ts` so dev
-  and e2e work; every real deployment must grant it in its own countryconfig before the endpoint
-  is reachable.
 - Because the scope carries no jurisdiction options, anyone holding it reads every system
   client's log. That is a deliberate consequence of system clients being national, not an
   oversight to be "fixed" by adding options later — options would have nothing to bind to.
