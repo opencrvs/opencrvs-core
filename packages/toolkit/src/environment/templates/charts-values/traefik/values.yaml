@@ -19,6 +19,19 @@ accessLog:
   enabled: true
   format: "json"
 
+tracing:
+  serviceName: traefik
+  resourceAttributes:
+    deployment.environment.name: "{{env}}"
+    service.namespace: traefik
+  otlp:
+    enabled: true
+    grpc:
+      enabled: true
+      endpoint: "opentelemetry-collector.opencrvs-deps-{{env}}.svc.cluster.local:4317"
+      insecure: true
+
+
 ingressRoute:
   dashboard:
     enabled: false
@@ -97,6 +110,8 @@ tlsStore:
 
 deployment:
   hostNetwork: true
+  podLabels:
+    service_name: traefik
   {{#if static_ssl}}
   kind: DaemonSet
   {{/if}}
