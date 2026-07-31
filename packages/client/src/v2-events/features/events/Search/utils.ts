@@ -552,10 +552,18 @@ function generateSearchFieldConfig(
  */
 export function withSearchLocationBehaviour(field: FieldConfig): FieldConfig {
   if (field.type === FieldType.LOCATION) {
-    // Offices / health facilities: list historical names, keep inactive ones.
+    // Offices / health facilities: list historical names, keep inactive ones
+    // — override activeOnly regardless of what the declaration field (which
+    // anchors capture to exclude inactive locations) set it to. There's no
+    // event being captured in a search form, so never anchor to one either.
     return {
       ...field,
-      configuration: { ...field.configuration, listHistoricalNames: true }
+      configuration: {
+        ...field.configuration,
+        listHistoricalNames: true,
+        activeOnly: false,
+        anchorToDateOfEvent: false
+      }
     }
   }
 
@@ -566,7 +574,8 @@ export function withSearchLocationBehaviour(field: FieldConfig): FieldConfig {
         ...field.configuration,
         listHistoricalNames: true,
         activeOnly:
-          field.configuration.type === AdministrativeAreas.enum.ADMIN_STRUCTURE
+          field.configuration.type === AdministrativeAreas.enum.ADMIN_STRUCTURE,
+        anchorToDateOfEvent: false
       }
     }
   }
@@ -578,7 +587,8 @@ export function withSearchLocationBehaviour(field: FieldConfig): FieldConfig {
       configuration: {
         ...field.configuration,
         listHistoricalNames: true,
-        activeOnly: true
+        activeOnly: true,
+        anchorToDateOfEvent: false
       }
     }
   }
