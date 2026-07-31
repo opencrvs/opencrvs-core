@@ -58,6 +58,25 @@ type LocationVersion = {
   status: 'active' | 'inactive'
 }
 
+/**
+ * CSV sentinel for a version that shouldn't be effective yet, e.g. `FUTURE-2`
+ * resolves to two days from whenever this handler runs. Keeps the fixture
+ * "not yet effective" no matter when tests actually run, rather than going
+ * stale once a hardcoded future date is reached.
+ */
+const FUTURE_VERSION_PATTERN = /^FUTURE-(\d+)$/
+
+function resolveEffectiveFrom(effectiveFrom: string): string | undefined {
+  const match = FUTURE_VERSION_PATTERN.exec(effectiveFrom)
+  if (!match) {
+    return effectiveFrom || undefined
+  }
+
+  const futureDate = new Date()
+  futureDate.setDate(futureDate.getDate() + Number(match[1]))
+  return futureDate.toISOString().split('T')[0]
+}
+
 type LocationVersionRow = {
   locationId: string
   effectiveFrom: string // '' when the CSV cell is left empty, not omitted
@@ -86,14 +105,16 @@ function groupVersionsByRefId<R extends Record<string, string>>(
   return new Map(
     Array.from(grouped.entries()).map(([refId, refRows]) => [
       refId,
-      [...refRows]
-        .sort((a, b) => (a.effectiveFrom < b.effectiveFrom ? -1 : 1))
+      refRows
         .map((row) => ({
-          effectiveFrom: row.effectiveFrom || undefined,
+          effectiveFrom: resolveEffectiveFrom(row.effectiveFrom),
           name: row.name,
           externalId: refId,
           status: row.status as LocationVersion['status']
         }))
+        .sort((a, b) =>
+          (a.effectiveFrom ?? '') < (b.effectiveFrom ?? '') ? -1 : 1
+        )
     ])
   )
 }
