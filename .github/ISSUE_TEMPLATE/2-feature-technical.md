@@ -12,8 +12,20 @@ assignees: ''
 
 ## Approach
 
-<!-- The technical direction. Files to change, the migration path where this breaks consumers, and the alternatives ruled out if the choice is contested. -->
+<!-- The technical direction, and the alternatives ruled out if the choice is contested. -->
+
+## In scope
+
+## Out of scope
 
 ## Acceptance criteria
 
 <!-- Each one testable by someone who was not in the conversation. -->
+
+## Migration and rollout
+
+<!-- How we get from the current state to the target without breaking consumers. Deprecation, backwards compatibility, and how it ships. -->
+
+## Open questions
+
+<!-- Only things genuinely awaiting a decision. Delete this section if there are none. -->
