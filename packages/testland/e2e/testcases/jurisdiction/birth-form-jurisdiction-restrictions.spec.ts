@@ -66,15 +66,15 @@ test.describe('Birth form - child place of birth jurisdiction restrictions', () 
     await expect(dropdown).toBeVisible()
 
     // Make sure select menu only has visible options for locations in user's
-    // administrative area. Includes "Old Ibombo Community Clinic", an
-    // inactivated facility seeded for #13146 — inactive facilities are still
-    // listed here since this field has no `activeOnly` restriction.
+    // administrative area. This field anchors to the event date with
+    // `activeOnly`, so "Old Ibombo Community Clinic" — inactivated since
+    // 2024-11-15 — is correctly excluded rather than listed.
     const options = await dropdown.locator('[role="list"] > li')
-    await expect(options).toHaveCount(3)
+    await expect(options).toHaveCount(2)
     await expect(options.nth(1)).toHaveText('Ibombo District Hospital')
     await expect(
       dropdown.getByText('Old Ibombo Community Clinic')
-    ).toBeVisible()
+    ).not.toBeVisible()
   })
 
   test('Registrar should be able to only choose an address in their own administrative area as Residential Address', async () => {

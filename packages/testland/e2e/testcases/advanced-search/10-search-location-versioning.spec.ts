@@ -149,15 +149,20 @@ test.describe.serial('Advanced search - inactive health facilities', () => {
   })
 
   test('1 - Inactive health facility appears in Place of Delivery filter and finds the birth record', async () => {
+    test.setTimeout(10000)
+
     await page.getByText('Birth').click()
     await page.getByText('Event details').click()
 
     await page.locator('#child____placeOfBirth').click()
     await page.getByText('Health Institution', { exact: true }).click()
 
-    await page.locator('#child____birthLocation').fill('Old Central Maternity')
+    await page
+      .locator('#child____birthLocation')
+      .fill('Test Maternity Hospital')
     // The option is present despite the facility being inactive.
-    await selectLocationOption(page, 'Old Central Maternity Hospital')
+    console.log({ birthFacility })
+    await selectLocationOption(page, birthFacility.facilityName)
 
     // Advanced search requires at least 2 fields — status is the 2nd here,
     // under a separate "Registration details" accordion.
@@ -175,7 +180,7 @@ test.describe.serial('Advanced search - inactive health facilities', () => {
       testId: 'search-result',
       texts: [
         'Event: Birth',
-        "Child's Location of birth: Old Central Maternity Hospital, Central, Farajaland",
+        `Child's Location of birth: ${birthFacility.facilityName}, Ibombo, Central, Farajaland`,
         'Status of record: Registered',
         formatV2ChildName(birthFacility.declaration)
       ]
@@ -195,8 +200,8 @@ test.describe.serial('Advanced search - inactive health facilities', () => {
 
     await page
       .locator('#eventDetails____deathLocation')
-      .fill('Old Ibombo Community')
-    await selectLocationOption(page, 'Old Ibombo Community Clinic')
+      .fill(deathFacility.facilityName)
+    await selectLocationOption(page, deathFacility.facilityName)
 
     // Advanced search requires at least 2 fields — status is the 2nd here,
     // under a separate "Registration details" accordion.
@@ -212,7 +217,7 @@ test.describe.serial('Advanced search - inactive health facilities', () => {
       testId: 'search-result',
       texts: [
         'Event: Death',
-        "Deceased's Health Institution: Old Ibombo Community Clinic, Ibombo, Central, Farajaland",
+        `Deceased's Health Institution: ${deathFacility.facilityName}, Ibombo, Central, Farajaland`,
         'Status of record: Registered',
         formatDeceasedName(deathFacility.declaration)
       ]
@@ -223,6 +228,7 @@ test.describe.serial('Advanced search - inactive health facilities', () => {
 test.describe
   .serial('Advanced search - inactive admin area excluded from address filter', () => {
   let page: Page
+  let areaName: string
 
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage()
@@ -231,7 +237,8 @@ test.describe
     // inactive admin area as a search option regardless, but exercising the
     // full notify flow confirms nothing breaks when a real record actually
     // holds an inactive location in this field.
-    await createBirthNotifiedInactiveAddress()
+    const result = await createBirthNotifiedInactiveAddress()
+    areaName = result.areaName
   })
 
   test.afterAll(async () => {
@@ -256,15 +263,19 @@ test.describe
     await page.locator('#province').fill('Central')
     await selectLocationOption(page, 'Central')
 
-    await page.locator('#district').fill('Ibombo-north')
-    await selectLocationOption(page, 'Ibombo-north (old)')
+    // Exact match: "Ibombo" is also a substring of "Ibombo-north (old)".
+    await page.locator('#district').fill('Ibombo')
+    await page
+      .locator('[id^="locationOption"]')
+      .getByText('Ibombo', { exact: true })
+      .click()
 
-    await page.locator('#village').fill('Klow-north')
+    await page.locator('#village').fill(areaName)
 
     // Unlike office/facility filters, the address admin-area filter only
     // ever offers currently-active areas — the option never appears here.
     await expect(
-      page.locator('[id^="locationOption"]').getByText('Klow-north (old)')
+      page.locator('[id^="locationOption"]').getByText(areaName)
     ).toHaveCount(0)
   })
 })

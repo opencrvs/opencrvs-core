@@ -12,12 +12,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { Page } from '@playwright/test'
 import { faker } from '@faker-js/faker'
 import { createClient } from '@opencrvs/toolkit/api'
-import {
-  ActionDocument,
-  ActionStatus,
-  ActionType,
-  AddressType
-} from '@opencrvs/toolkit/events'
+import { ActionType, AddressType } from '@opencrvs/toolkit/events'
 import { CREDENTIALS, GATEWAY_HOST } from '../../constants'
 import {
   getAuthTokens,
@@ -36,7 +31,6 @@ import {
   getDeclaration as getBirthDeclaration
 } from '../test-data/birth-declaration'
 import { createDeclaration as createDeathDeclaration } from '../test-data/death-declaration'
-import { getSignatureFile, uploadFile } from '../test-data/utils'
 
 function getUserIdFromToken(token: string) {
   return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString()).sub
@@ -135,122 +129,118 @@ export async function registerDeclarationsThenDeactivateOffice(page: Page) {
 }
 
 /**
- * Registered with an active office; born at a health facility that is
- * already inactive — used to confirm inactive facilities are still listed
- * (and selectable) in the Place of Delivery filter.
- *
- * `record.register`'s `placeOfEvent` restriction is checked against the
- * *declared* facility, so a Local Registrar can't register their own
- * declaration once it points at a facility outside their own jurisdiction
- * (Old Central Maternity Hospital is in Central, not the declarer's Ibombo).
- * A Provincial Registrar over Central registers instead — their
- * `record.register` scope checks `declaredIn`, i.e. the declarer's own
- * office, which is within their jurisdiction.
+ * Registers a birth at a freshly-created, active health facility, then
+ * inactivates that facility via the API — simulating the real lifecycle
+ * (active at capture, inactivated afterward) rather than declaring directly
+ * against an already-inactive fixture facility, which a future backend
+ * validation against capturing at inactive locations would reject.
  */
 export async function createBirthRegisteredWithInactiveFacility() {
-  const declarerToken = await getToken(CREDENTIALS.REGISTRAR)
-  const registrarToken = await getToken(CREDENTIALS.PROVINCIAL_REGISTRAR)
+  const adminToken = await getToken(CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
+  const client = createClient(GATEWAY_HOST + '/events', `Bearer ${adminToken}`)
 
-  const facilities = await getLocations('HEALTH_FACILITY', declarerToken)
-  const facilityId = getIdByName(facilities, 'Old Central Maternity Hospital')
+  const administrativeAreas = await getAdministrativeAreas(adminToken)
+  const ibomboId = getIdByName(administrativeAreas, 'Ibombo')
 
-  const declarationInput = await getBirthDeclaration({
-    token: declarerToken,
+  const facilityName = `Test Maternity Hospital ${faker.string.alphanumeric(6)}`
+  const facility = await client.locations.create.mutate({
+    name: facilityName,
+    locationType: 'HEALTH_FACILITY',
+    administrativeAreaId: ibomboId
+  })
+
+  const token = await getToken(CREDENTIALS.REGISTRAR)
+  const declaration = await getBirthDeclaration({
+    token,
     placeOfBirthType: 'HEALTH_FACILITY',
     partialDeclaration: {
-      'child.birthLocation': facilityId,
-      'child.birthLocationId': facilityId
+      'child.birthLocation': facility.id,
+      'child.birthLocationId': facility.id
     }
   })
 
-  const { eventId, declaration } = await createBirthDeclaration(
-    declarerToken,
-    declarationInput,
-    ActionType.DECLARE
-  )
-
-  const client = createClient(
-    GATEWAY_HOST + '/events',
-    `Bearer ${registrarToken}`
-  )
-
-  await client.event.actions.assignment.assign.mutate({
-    eventId,
-    transactionId: uuidv4(),
-    type: ActionType.ASSIGN,
-    assignedTo: getUserIdFromToken(registrarToken)
-  })
-
-  const filename = await uploadFile(getSignatureFile(), registrarToken)
-
-  const registerRes = await client.event.actions.register.request.mutate({
-    eventId,
-    transactionId: uuidv4(),
+  const result = await createBirthDeclaration(
+    token,
     declaration,
-    annotation: {
-      'review.comment': 'My comment',
-      'review.signature': filename
-    }
+    ActionType.REGISTER
+  )
+
+  const [initialVersion] = facility.versions
+  await client.locations.update.mutate({
+    id: facility.id,
+    name: facilityName,
+    status: 'inactive',
+    lastVersionId: initialVersion.versionId
   })
 
-  const registerActionRequested = registerRes.actions.find(
-    (action: ActionDocument) =>
-      action.type === ActionType.REGISTER &&
-      action.status === ActionStatus.Requested
-  )
-  const registerActionAccepted = registerRes.actions.find(
-    (action: ActionDocument) =>
-      action.type === ActionType.REGISTER &&
-      action.status === ActionStatus.Accepted
-  )
-
-  return {
-    eventId,
-    declaration: registerActionRequested?.declaration as Awaited<
-      ReturnType<typeof getBirthDeclaration>
-    >,
-    trackingId: registerRes.trackingId as string,
-    registrationNumber: registerActionAccepted?.registrationNumber as string
-  }
+  return { facilityName, ...result }
 }
 
 /**
- * Registered with an active office; place of death is a health facility
- * that is already inactive — used to confirm inactive facilities are still
- * listed (and selectable) in the Place of Delivery filter.
+ * Registers a death at a freshly-created, active health facility, then
+ * inactivates that facility via the API — same reasoning as
+ * {@link createBirthRegisteredWithInactiveFacility}.
  */
 export async function createDeathRegisteredWithInactiveFacility() {
+  const adminToken = await getToken(CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
+  const client = createClient(GATEWAY_HOST + '/events', `Bearer ${adminToken}`)
+
+  const administrativeAreas = await getAdministrativeAreas(adminToken)
+  const ibomboId = getIdByName(administrativeAreas, 'Ibombo')
+
+  const facilityName = `Test Community Clinic ${faker.string.alphanumeric(6)}`
+  const facility = await client.locations.create.mutate({
+    name: facilityName,
+    locationType: 'HEALTH_FACILITY',
+    administrativeAreaId: ibomboId
+  })
+
   const token = await getToken(CREDENTIALS.REGISTRAR)
-
-  const facilities = await getLocations('HEALTH_FACILITY', token)
-  const facilityId = getIdByName(facilities, 'Old Ibombo Community Clinic')
-
-  return createDeathDeclaration(
+  const result = await createDeathDeclaration(
     token,
     {
       'eventDetails.placeOfDeath': 'HEALTH_FACILITY',
-      'eventDetails.deathLocation': facilityId,
-      'eventDetails.deathLocationId': facilityId
+      'eventDetails.deathLocation': facility.id,
+      'eventDetails.deathLocationId': facility.id
     },
     ActionType.REGISTER
   )
+
+  const [initialVersion] = facility.versions
+  await client.locations.update.mutate({
+    id: facility.id,
+    name: facilityName,
+    status: 'inactive',
+    lastVersionId: initialVersion.versionId
+  })
+
+  return { facilityName, ...result }
 }
 
 /**
- * Notified with an active office; the child's own "other" address field
- * points at an inactive administrative area — used to confirm that field is
- * excluded from the residential/other-address facet even when the office is
- * active.
+ * Notifies a birth against a freshly-created, active administrative area
+ * (the child's "other" address), then inactivates that area via the API —
+ * same create-active-then-deactivate reasoning as
+ * {@link createBirthRegisteredWithInactiveFacility}. Confirms the
+ * residential/other-address facet excludes the area once inactive, even
+ * though the office used to notify stays active throughout.
  */
 export async function createBirthNotifiedInactiveAddress() {
-  const token = await getNotifyOnlySystemClientToken()
+  const adminToken = await getToken(CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
+  const client = createClient(GATEWAY_HOST + '/events', `Bearer ${adminToken}`)
 
-  const [offices, administrativeAreas] = await Promise.all([
-    getLocations('CRVS_OFFICE', token),
-    getAdministrativeAreas(token)
-  ])
+  const administrativeAreas = await getAdministrativeAreas(adminToken)
+  const ibomboId = getIdByName(administrativeAreas, 'Ibombo')
+
+  const areaName = `Test Village ${faker.string.alphanumeric(6)}`
+  const administrativeArea = await client.administrativeAreas.create.mutate({
+    name: areaName,
+    parentId: ibomboId
+  })
+
+  const token = await getNotifyOnlySystemClientToken()
+  const offices = await getLocations('CRVS_OFFICE', token)
   const officeId = getIdByName(offices, 'Ibombo District Office')
-  const klowNorthOldId = getIdByName(administrativeAreas, 'Klow-north (old)')
 
   const declaration = await getBirthDeclaration({
     token,
@@ -262,19 +252,29 @@ export async function createBirthNotifiedInactiveAddress() {
       'child.birthLocation.other': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        administrativeArea: klowNorthOldId
+        administrativeArea: administrativeArea.id
       },
-      'child.birthLocationId': klowNorthOldId
+      'child.birthLocationId': administrativeArea.id
     }
   })
 
-  return createBirthDeclaration(
+  const result = await createBirthDeclaration(
     token,
     declaration,
     ActionType.NOTIFY,
     undefined,
     officeId
   )
+
+  const [initialVersion] = administrativeArea.versions
+  await client.administrativeAreas.update.mutate({
+    id: administrativeArea.id,
+    name: areaName,
+    status: 'inactive',
+    lastVersionId: initialVersion.versionId
+  })
+
+  return { areaName, ...result }
 }
 
 /**
