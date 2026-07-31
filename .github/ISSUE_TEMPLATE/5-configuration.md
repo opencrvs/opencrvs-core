@@ -6,15 +6,13 @@ type: 'Configuration'
 assignees: ''
 ---
 
-<!-- Stands alone, or acts as a parent with Task sub-issues where the work needs breaking out. -->
-
 ## Description
 
 ## Why
 
-## Configuration changes, high level
+## Configuration changes
 
-<!-- Testland and Demoland. -->
+<!-- What changes, at a high level, and which countries or environments are affected. -->
 
 ## Acceptance criteria
 

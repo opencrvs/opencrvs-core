@@ -10,8 +10,6 @@ assignees: ''
 
 ## Why
 
-<!-- The UX or UI problem this solves. -->
-
 ## Design
 
 <!-- Figma file or mockups, before and after where it helps. -->

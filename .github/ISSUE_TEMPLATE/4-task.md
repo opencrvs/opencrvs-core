@@ -6,8 +6,6 @@ type: 'Task'
 assignees: ''
 ---
 
-<!-- If this belongs to a Feature or a Configuration, set that issue as the parent. -->
-
 ## Description
 
 ## Why

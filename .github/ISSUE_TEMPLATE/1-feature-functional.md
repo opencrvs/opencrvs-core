@@ -1,26 +1,20 @@
 ---
-name: 'Feature'
-about: A body of work that needs scoping, broken out into Task sub-issues. Functional or technical.
+name: 'Feature: Functional'
+about: A user-facing body of work that needs scoping, broken out into Task sub-issues.
 title: ''
 type: 'Feature: Functional'
 assignees: ''
 ---
 
-<!-- For a technical feature, switch the type to "Feature: Technical" in the sidebar. -->
-
 ## Description
 
 ## Why
-
-<!-- The problem this solves and the value to the user. -->
 
 ## Countries and configuration
 
 <!-- Which countries require this feature and how each would configure it. This informs the configuration options the feature must expose. -->
 
 ## Design
-
-<!-- Figma file or mockups. -->
 
 ## In scope
 
