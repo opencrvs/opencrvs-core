@@ -238,6 +238,22 @@ export function resolveVersion<T extends { effectiveFrom: string }>(
 }
 
 /**
+ * Whether the entity is selectable at `anchor`: it must already have a
+ * version effective by then, and the version that resolves at `anchor` must
+ * be active. `resolveVersion` alone is not enough for this — when `anchor`
+ * precedes every version it falls back to the earliest one, which would
+ * otherwise make a location created after `anchor` look selectable.
+ */
+export function isSelectableAtAnchor<
+  T extends { effectiveFrom: string; status: string }
+>(versions: T[], anchor: string): boolean {
+  return (
+    versions.some((version) => version.effectiveFrom <= anchor) &&
+    resolveVersion(versions, anchor).status === 'active'
+  )
+}
+
+/**
  * Whether the entity holds the given externalId with active status at the
  * anchor date or at any point after it. Used for point-in-time uniqueness of
  * external codes: a new holder starting at `anchor` collides when an existing
