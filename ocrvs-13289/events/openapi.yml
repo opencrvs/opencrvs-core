@@ -3162,6 +3162,7 @@ components:
                                 - record.reindex
                                 - user.data-seeding
                                 - integration.create
+                                - integration.audit.read
                                 - record.import
                                 - config.update-all
                                 - location.edit
@@ -3439,6 +3440,7 @@ components:
                                 - record.reindex
                                 - user.data-seeding
                                 - integration.create
+                                - integration.audit.read
                                 - record.import
                                 - config.update-all
                                 - location.edit
@@ -4114,6 +4116,7 @@ components:
                             - record.reindex
                             - user.data-seeding
                             - integration.create
+                            - integration.audit.read
                             - record.import
                             - config.update-all
                             - location.edit
@@ -9261,6 +9264,7 @@ components:
                             - record.reindex
                             - user.data-seeding
                             - integration.create
+                            - integration.audit.read
                             - record.import
                             - config.update-all
                             - location.edit
@@ -9748,6 +9752,7 @@ components:
                             - record.reindex
                             - user.data-seeding
                             - integration.create
+                            - integration.audit.read
                             - record.import
                             - config.update-all
                             - location.edit
@@ -14914,6 +14919,7 @@ components:
                                   - record.reindex
                                   - user.data-seeding
                                   - integration.create
+                                  - integration.audit.read
                                   - record.import
                                   - config.update-all
                                   - location.edit
@@ -15227,6 +15233,7 @@ components:
                                   - record.reindex
                                   - user.data-seeding
                                   - integration.create
+                                  - integration.audit.read
                                   - record.import
                                   - config.update-all
                                   - location.edit
