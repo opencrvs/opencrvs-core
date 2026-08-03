@@ -298,7 +298,9 @@ export const eventDetails = defineFormPage({
         locationTypes: ['HEALTH_FACILITY'],
         allowedLocations: user.jurisdiction(
           user.scope('record.create').attribute('placeOfEvent')
-        )
+        ),
+        anchorToDateOfEvent: true,
+        activeOnly: true
       }
     },
     {
@@ -346,7 +348,9 @@ export const eventDetails = defineFormPage({
         streetAddressForm: defaultStreetAddressConfiguration,
         allowedLocations: user.jurisdiction(
           user.scope('record.create').attribute('placeOfEvent')
-        )
+        ),
+        anchorToDateOfEvent: true,
+        activeOnly: true
       }
     },
     {

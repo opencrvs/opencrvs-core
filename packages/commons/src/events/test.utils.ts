@@ -56,7 +56,11 @@ import {
 import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
-import { SetLocationPayload, SetAdministrativeAreaPayload } from './locations'
+import {
+  LocationVersion,
+  SetLocationPayload,
+  SetAdministrativeAreaPayload
+} from './locations'
 import { EventStatus } from './EventMetadata'
 import { defineWorkqueues, WorkqueueConfig } from './WorkqueueConfig'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
@@ -162,6 +166,26 @@ export function generateRegistrationNumber(rng: () => number): string {
 
 export function generateRandomSignature(rng: () => number): DocumentPath {
   return `${generateUuid(rng)}.png` as DocumentPath
+}
+
+/**
+ * Builds one element of a location / administrative area `versions` history.
+ * Every field is defaulted so a call names only what its assertion is about —
+ * an `effectiveFrom`, a `name`, or an explicit `versionId` when the test needs
+ * to control version identity.
+ */
+export function locationVersion(
+  overrides: Partial<LocationVersion> = {},
+  rng?: () => number
+): LocationVersion {
+  return {
+    versionId: generateUuid(rng),
+    effectiveFrom: '0001-01-01',
+    name: 'Location name',
+    externalId: null,
+    status: 'active',
+    ...overrides
+  }
 }
 
 /**

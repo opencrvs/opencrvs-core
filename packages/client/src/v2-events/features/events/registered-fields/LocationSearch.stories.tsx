@@ -40,7 +40,8 @@ export const LocationSearchInput: StoryObj<typeof LocationSearch.Input> = {
   args: {
     id: 'location-search',
     locationTypes: ['HEALTH_FACILITY', 'CRVS_OFFICE'],
-    value: ''
+    value: '',
+    anchor: toPlainDate('2025-01-01')
   }
 }
 
@@ -58,6 +59,7 @@ export const LocationSearchInputWithActiveLocations: StoryObj<
     id: 'location-search',
     locationTypes: ['HEALTH_FACILITY'],
     value: 'abc',
+    anchor: toPlainDate('2025-01-01'),
     onChange: fn()
   },
   play: async ({ canvasElement, step, args }) => {
@@ -102,6 +104,7 @@ export const LocationSearchInputInvalid: StoryObj<typeof LocationSearch.Input> =
       id: 'location-search',
       locationTypes: ['HEALTH_FACILITY', 'CRVS_OFFICE'],
       value: 'abc',
+      anchor: toPlainDate('2025-01-01'),
       onChange: fn()
     },
     play: async ({ canvasElement, step, args }) => {

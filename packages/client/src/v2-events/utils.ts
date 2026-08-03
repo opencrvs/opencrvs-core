@@ -12,8 +12,11 @@ import { uniq, isString, get, mergeWith } from 'lodash'
 import { v4 as uuid } from 'uuid'
 import {
   ActionDocument,
+  EventConfig,
   EventIndex,
+  EventState,
   WorkqueueConfigWithoutQuery,
+  isFieldReference,
   joinValues,
   LocationVersion,
   PlainDate,
@@ -29,7 +32,8 @@ import {
   RecordScopeTypeV2,
   EncodedScope,
   getAdministrativeAreaHierarchy,
-  resolveVersion
+  resolveVersion,
+  ZodDate
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name']) {
@@ -132,6 +136,35 @@ export function recordAnchorDate(eventState: {
   createdAt: string
 }): PlainDate {
   return toPlainDate(eventState.dateOfEvent ?? eventState.createdAt)
+}
+
+/**
+ * Same anchor as {@link recordAnchorDate}, computed while a declaration is
+ * still being filled in: the event's date-of-event field read off the
+ * in-progress form values (there is no persisted record yet to resolve it
+ * from), falling back to the record's creation date when that field is
+ * empty or not yet configured.
+ */
+export function liveAnchorDate({
+  dateOfEvent,
+  form,
+  createdAt
+}: {
+  dateOfEvent?: EventConfig['dateOfEvent']
+  form: EventState
+  createdAt: string
+}): PlainDate {
+  const fieldValue =
+    dateOfEvent && isFieldReference(dateOfEvent)
+      ? form[dateOfEvent.$$field]
+      : undefined
+
+  const parsedDate = ZodDate.safeParse(fieldValue)
+
+  return recordAnchorDate({
+    dateOfEvent: parsedDate.success ? parsedDate.data : undefined,
+    createdAt
+  })
 }
 
 /**

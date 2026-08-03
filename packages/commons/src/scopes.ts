@@ -62,6 +62,11 @@ const PlainScopeType = z.enum([
   'record.reindex',
   'user.data-seeding',
   'integration.create',
+  // Reading an integration's audit log. Deliberately separate from
+  // 'integration.create' so read-only oversight can be granted on its own, and
+  // deliberately option-less: system clients have no office and no
+  // administrative area, so jurisdiction options would have nothing to bind to.
+  'integration.audit.read',
   'record.import',
   'config.update-all',
   'location.edit',

@@ -480,7 +480,8 @@ export const spouse = defineFormPage({
         administrativeArea: user('administrativeAreaId')
       },
       configuration: {
-        streetAddressForm: defaultStreetAddressConfiguration
+        streetAddressForm: defaultStreetAddressConfiguration,
+        activeOnly: true
       }
     },
     {

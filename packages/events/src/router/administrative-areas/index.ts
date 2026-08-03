@@ -105,7 +105,7 @@ export const administrativeAreaRouter = router({
       openapi: {
         summary: 'Update an administrative area',
         description:
-          'Append a new version to an administrative area (rename, recode or inactivate). Prior versions are never modified.',
+          'Append a new version to an administrative area (rename, recode or inactivate). This endpoint only ever appends: it never modifies or removes an existing version. To drop a version that has not taken effect yet, use the withdraw endpoint instead.',
         method: 'PUT',
         path: '/administrative-areas/{id}',
         tags: ['Administrative areas'],
