@@ -16,22 +16,27 @@ import { fromZodError } from 'zod-validation-error'
 import { getUUID } from '@opencrvs/commons'
 import { createInitialisationClient } from './index'
 
-const RawLocationSchema =
-  z.object({
-    id: z.string(),
-    name: z.string(),
-    partOf: z.string(),
-    locationType: z.string()
-  })
+const RawLocationSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  partOf: z.string(),
+  locationType: z.string()
+})
 
-const RawAdministrativeAreaSchema = RawLocationSchema.omit({ locationType: true })
+const RawAdministrativeAreaSchema = RawLocationSchema.omit({
+  locationType: true
+})
 
 const CountryConfigLocationResponse = z.object({
   locations: z.array(RawLocationSchema),
   administrativeAreas: z.array(RawAdministrativeAreaSchema)
 })
 
-function validateAdminStructure(locations: z.output<typeof CountryConfigLocationResponse>['administrativeAreas']) {
+function validateAdminStructure(
+  locations: z.output<
+    typeof CountryConfigLocationResponse
+  >['administrativeAreas']
+) {
   const locationsMap = new Map(
     locations.map((loc) => {
       return [loc.id, loc]
@@ -66,7 +71,9 @@ async function getLocations() {
     raise(`Expected to get the locations from ${url}`)
   }
 
-  const parsedResponse = CountryConfigLocationResponse.safeParse(await res.json())
+  const parsedResponse = CountryConfigLocationResponse.safeParse(
+    await res.json()
+  )
   if (!parsedResponse.success) {
     raise(
       fromZodError(parsedResponse.error, {
@@ -75,7 +82,7 @@ async function getLocations() {
     )
   }
 
-  const {administrativeAreas, locations} = parsedResponse.data
+  const { administrativeAreas, locations } = parsedResponse.data
 
   const administrativeAreaMap = validateAdminStructure(administrativeAreas)
 
@@ -96,9 +103,7 @@ async function getLocations() {
     administrativeAreas.map(({ id }) => [id, getUUID()])
   )
 
-  const locationIdMap = new Map(
-    locations.map(({ id }) => [id, getUUID()])
-  )
+  const locationIdMap = new Map(locations.map(({ id }) => [id, getUUID()]))
 
   return {
     administrativeAreas: administrativeAreas.map((a) => ({
@@ -126,6 +131,6 @@ export async function seedLocations(token: string) {
 
   const client = createInitialisationClient(token)
 
-  await client.administrativeAreas.set.mutate(administrativeAreas)
-  await client.locations.set.mutate(locations)
+  await client.administrativeAreas.set.mutate({ administrativeAreas })
+  await client.locations.set.mutate({ locations })
 }

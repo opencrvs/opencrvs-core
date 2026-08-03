@@ -34,7 +34,9 @@ test('Returns new administrative area after it has been added', async () => {
     }
   ]
 
-  await client.administrativeAreas.set(setAdministrativeAreaPayload)
+  await client.administrativeAreas.set({
+    administrativeAreas: setAdministrativeAreaPayload
+  })
   const administrativeAreas = await client.administrativeAreas.list()
 
   expect(administrativeAreas).toHaveLength(
@@ -51,9 +53,12 @@ test('Returns multiple administrative areas', async () => {
 
   const initialAdministrativeAreas = await client.administrativeAreas.list()
   const administratieAreaRng = createPrng(12312312)
-  await client.administrativeAreas.set(
-    generator.administrativeAreas.set(5, administratieAreaRng)
-  )
+  await client.administrativeAreas.set({
+    administrativeAreas: generator.administrativeAreas.set(
+      5,
+      administratieAreaRng
+    )
+  })
 
   const administrativeAreas = await client.administrativeAreas.list()
 
@@ -98,7 +103,9 @@ test('Filters administrative areas by active status', async () => {
     }
   ]
 
-  await client.administrativeAreas.set(setAdministrativeAreaPayload)
+  await client.administrativeAreas.set({
+    administrativeAreas: setAdministrativeAreaPayload
+  })
 
   const administrativeAreas = await client.administrativeAreas.list({
     isActive: true

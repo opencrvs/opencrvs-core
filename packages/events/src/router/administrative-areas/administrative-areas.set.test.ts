@@ -24,7 +24,7 @@ test('prevents access when required scope is missing', async () => {
   const registrarClient = createTestClient(user)
 
   await expect(
-    registrarClient.administrativeAreas.set([])
+    registrarClient.administrativeAreas.set({ administrativeAreas: [] })
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
@@ -34,9 +34,12 @@ test('Allows setting administrative areas with data seeding scope', async () => 
 
   const administrativeAreaRng = createPrng(8423123)
   await expect(
-    dataSeedingClient.administrativeAreas.set(
-      generator.administrativeAreas.set(1, administrativeAreaRng)
-    )
+    dataSeedingClient.administrativeAreas.set({
+      administrativeAreas: generator.administrativeAreas.set(
+        1,
+        administrativeAreaRng
+      )
+    })
   ).resolves.toEqual(undefined)
 })
 
@@ -45,7 +48,7 @@ test('Prevents sending empty payload', async () => {
   const dataSeedingClient = createTestClient(user, [scope])
 
   await expect(
-    dataSeedingClient.administrativeAreas.set([])
+    dataSeedingClient.administrativeAreas.set({ administrativeAreas: [] })
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
@@ -65,7 +68,9 @@ test('Creates single administrative area', async () => {
     }
   ]
 
-  await dataSeedingClient.administrativeAreas.set(administrativeAreaPayload)
+  await dataSeedingClient.administrativeAreas.set({
+    administrativeAreas: administrativeAreaPayload
+  })
 
   const administrativeAreas = await dataSeedingClient.administrativeAreas.list()
 
@@ -97,7 +102,9 @@ test('Creates multiple administrative areas under parent administrative area', a
     rng
   )
 
-  await dataSeedingClient.administrativeAreas.set(administrativeAreaPayload)
+  await dataSeedingClient.administrativeAreas.set({
+    administrativeAreas: administrativeAreaPayload
+  })
 
   const administrativeAreas = await dataSeedingClient.administrativeAreas.list()
 
@@ -112,25 +119,29 @@ test('updates externalId on existing administrative area when re-seeded with a v
 
   const areaId = generateUuid()
 
-  await dataSeedingClient.administrativeAreas.set([
-    {
-      id: areaId,
-      parentId: null,
-      name: 'Area without external id',
-      validUntil: null,
-      externalId: null
-    }
-  ])
+  await dataSeedingClient.administrativeAreas.set({
+    administrativeAreas: [
+      {
+        id: areaId,
+        parentId: null,
+        name: 'Area without external id',
+        validUntil: null,
+        externalId: null
+      }
+    ]
+  })
 
-  await dataSeedingClient.administrativeAreas.set([
-    {
-      id: areaId,
-      parentId: null,
-      name: 'Area without external id',
-      validUntil: null,
-      externalId: 'adminpcode123'
-    }
-  ])
+  await dataSeedingClient.administrativeAreas.set({
+    administrativeAreas: [
+      {
+        id: areaId,
+        parentId: null,
+        name: 'Area without external id',
+        validUntil: null,
+        externalId: 'adminpcode123'
+      }
+    ]
+  })
 
   const areas = await dataSeedingClient.administrativeAreas.list()
   const updated = areas.find((a) => a.id === areaId)
@@ -150,7 +161,9 @@ test('seeding administrative areas is additive, not destructive', async () => {
     administrativeAreaRng
   )
 
-  await dataSeedingClient.administrativeAreas.set(initialPayload)
+  await dataSeedingClient.administrativeAreas.set({
+    administrativeAreas: initialPayload
+  })
 
   const administrativeAreasAfterInitialSeed =
     await dataSeedingClient.administrativeAreas.list()
@@ -161,9 +174,9 @@ test('seeding administrative areas is additive, not destructive', async () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_removedAdministrativeArea, ...remainingAdministrativeAreasPayload] =
     initialPayload
-  await dataSeedingClient.administrativeAreas.set(
-    remainingAdministrativeAreasPayload
-  )
+  await dataSeedingClient.administrativeAreas.set({
+    administrativeAreas: remainingAdministrativeAreasPayload
+  })
 
   const remainingAdministrativeAreasAfterDeletion =
     await dataSeedingClient.administrativeAreas.list()

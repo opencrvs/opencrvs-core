@@ -30,7 +30,7 @@ test('Returns a single location by id', async () => {
     locationType: 'CRVS_OFFICE'
   }
 
-  await client.locations.set([location])
+  await client.locations.set({ locations: [location] })
   const result = await client.locations.get({ id: location.id })
 
   expect(result).toMatchObject(location)
@@ -55,7 +55,7 @@ test('Returns the correct location when multiple exist', async () => {
     locationType: 'CRVS_OFFICE'
   }
 
-  await client.locations.set([locationA, locationB])
+  await client.locations.set({ locations: [locationA, locationB] })
   const result = await client.locations.get({ id: locationA.id })
 
   expect(result).toMatchObject(locationA)
@@ -82,7 +82,7 @@ test('Is accessible without elevated scopes', async () => {
     locationType: 'CRVS_OFFICE'
   }
 
-  await seeder.locations.set([location])
+  await seeder.locations.set({ locations: [location] })
   const result = await reader.locations.get({ id: location.id })
 
   expect(result).toMatchObject(location)

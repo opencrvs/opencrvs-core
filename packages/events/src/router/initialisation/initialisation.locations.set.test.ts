@@ -43,9 +43,9 @@ test('Returns 403 after initialisation is completed', async () => {
   const client = createInitialisationTestClient()
   await expect(client.complete()).resolves.toBeUndefined()
 
-  await expect(client.locations.set(locationPayload)).rejects.toMatchObject(
-    new TRPCError({ code: 'UNAUTHORIZED' })
-  )
+  await expect(
+    client.locations.set({ locations: locationPayload })
+  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
 })
 
 test('Returns 403 when accessed with user app token', async () => {
@@ -59,7 +59,7 @@ test('Returns 403 when accessed with user app token', async () => {
   })
   const client = createInitialisationTestClient(appToken)
 
-  await expect(client.locations.set([])).rejects.toMatchObject(
+  await expect(client.locations.set({ locations: [] })).rejects.toMatchObject(
     new TRPCError({ code: 'UNAUTHORIZED' })
   )
 })
@@ -75,9 +75,9 @@ test('Returns 403 when accessed with system app token', async () => {
 
   const client = createInitialisationTestClient(systemToken)
 
-  await expect(client.locations.set(locationPayload)).rejects.toMatchObject(
-    new TRPCError({ code: 'UNAUTHORIZED' })
-  )
+  await expect(
+    client.locations.set({ locations: locationPayload })
+  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
 })
 
 test('Returns 403 when accessed with internal token using invalid subject', async () => {
@@ -89,9 +89,9 @@ test('Returns 403 when accessed with internal token using invalid subject', asyn
 
   const client = createInitialisationTestClient(internalToken)
 
-  await expect(client.locations.set(locationPayload)).rejects.toMatchObject(
-    new TRPCError({ code: 'UNAUTHORIZED' })
-  )
+  await expect(
+    client.locations.set({ locations: locationPayload })
+  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
 })
 
 test('Prevents sending empty payload', async () => {
@@ -99,7 +99,9 @@ test('Prevents sending empty payload', async () => {
 
   const client = createInitialisationTestClient()
 
-  await expect(client.locations.set([])).rejects.toThrowErrorMatchingSnapshot()
+  await expect(
+    client.locations.set({ locations: [] })
+  ).rejects.toThrowErrorMatchingSnapshot()
 })
 
 test('Creates single location', async () => {
@@ -107,7 +109,7 @@ test('Creates single location', async () => {
 
   const client = createInitialisationTestClient()
 
-  await client.locations.set(locationPayload)
+  await client.locations.set({ locations: locationPayload })
 
   const eventsDb = getClient()
 
@@ -131,7 +133,9 @@ test('Creates multiple locations under parent administrative area', async () => 
     rng
   )
 
-  await client.administrativeAreas.set(administrativeAreaPayload)
+  await client.administrativeAreas.set({
+    administrativeAreas: administrativeAreaPayload
+  })
 
   const eventsDb = getClient()
 
@@ -139,7 +143,7 @@ test('Creates multiple locations under parent administrative area', async () => 
     [{ administrativeAreaId }, { administrativeAreaId }, {}],
     rng
   )
-  await client.locations.set(multipleLocationsPayload)
+  await client.locations.set({ locations: multipleLocationsPayload })
 
   const locations = await eventsDb.selectFrom('locations').selectAll().execute()
 
@@ -160,16 +164,18 @@ test('updates externalId on existing location when re-seeded with a value', asyn
   const locationId = generateUuid()
   const eventsDb = getClient()
 
-  await client.locations.set([
-    {
-      id: locationId,
-      administrativeAreaId: null,
-      name: 'Location without external id',
-      locationType: 'CRVS_OFFICE',
-      validUntil: null,
-      externalId: null
-    }
-  ])
+  await client.locations.set({
+    locations: [
+      {
+        id: locationId,
+        administrativeAreaId: null,
+        name: 'Location without external id',
+        locationType: 'CRVS_OFFICE',
+        validUntil: null,
+        externalId: null
+      }
+    ]
+  })
 
   const locationsBeforeUpdate = await eventsDb
     .selectFrom('locations')
@@ -178,16 +184,18 @@ test('updates externalId on existing location when re-seeded with a value', asyn
 
   expect(locationsBeforeUpdate).toHaveLength(1)
 
-  await client.locations.set([
-    {
-      id: locationId,
-      administrativeAreaId: null,
-      name: 'Location without external id',
-      locationType: 'CRVS_OFFICE',
-      validUntil: null,
-      externalId: 'adminpcode123'
-    }
-  ])
+  await client.locations.set({
+    locations: [
+      {
+        id: locationId,
+        administrativeAreaId: null,
+        name: 'Location without external id',
+        locationType: 'CRVS_OFFICE',
+        validUntil: null,
+        externalId: 'adminpcode123'
+      }
+    ]
+  })
 
   const locationsAfterUpdate = await eventsDb
     .selectFrom('locations')
@@ -213,7 +221,7 @@ test('seeding locations is additive, not destructive', async () => {
 
   const initialPayload = generator.locations.set(5, administrativeAreaRng)
 
-  await client.locations.set(initialPayload)
+  await client.locations.set({ locations: initialPayload })
 
   const locationsAfterInitialSeed = await eventsDb
     .selectFrom('locations')
@@ -224,7 +232,7 @@ test('seeding locations is additive, not destructive', async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_removedLocation, ...remainingLocationsPayload] = initialPayload
-  await client.locations.set(remainingLocationsPayload)
+  await client.locations.set({ locations: remainingLocationsPayload })
 
   const locationsAfterOmittingOne = await eventsDb
     .selectFrom('locations')

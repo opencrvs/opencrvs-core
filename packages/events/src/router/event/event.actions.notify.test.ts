@@ -304,8 +304,10 @@ describe('event.actions.notify', () => {
         locationRng
       )
 
-      await dataSeedingClient.administrativeAreas.set(administrativeAreaPayload)
-      await dataSeedingClient.locations.set(locationPayload)
+      await dataSeedingClient.administrativeAreas.set({
+        administrativeAreas: administrativeAreaPayload
+      })
+      await dataSeedingClient.locations.set({ locations: locationPayload })
 
       const locations = await dataSeedingClient.locations.list()
 
