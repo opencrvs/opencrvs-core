@@ -630,10 +630,23 @@ export async function triggerDeclarationAction(
   )
 }
 
+/**
+ * Title a record is listed under when its name fields are not readable, e.g.
+ * once it has been sealed. Matches the event config's `fallbackTitle`.
+ */
+export const REDACTED_RECORD_TITLE = 'No name provided'
+
 export async function searchFromSearchBar(
   page: Page,
   searchText: string,
-  expectToBeFound: boolean = true
+  expectToBeFound: boolean = true,
+  /**
+   * Title the record is listed under, when it differs from what was searched
+   * for - a sealed record is found by name but listed as
+   * {@link REDACTED_RECORD_TITLE}, since its name is stripped from search
+   * results.
+   */
+  recordTitle: string = searchText
 ) {
   const searchResultRegex = /Search result for “([^”]+)”/
   await page.locator('#searchText').fill(searchText)
@@ -642,7 +655,7 @@ export async function searchFromSearchBar(
   expect(searchResult).toMatch(searchResultRegex)
 
   if (expectToBeFound) {
-    await openRecordByTitle(page, searchText)
+    await openRecordByTitle(page, recordTitle)
   } else {
     await expect(
       page.getByRole('button', { name: searchText, exact: true })
