@@ -237,9 +237,6 @@ platform:
   # for example: ghcr.io/opencrvs or myorg
   repository: ghcr.io/opencrvs
 
-  # Override to "Always" for environments deploying a floating tag (e.g. "develop").
-  imagePullPolicy: IfNotPresent
-
   # Secrets used to pull images from private registries, if needed.
   # Example:
   # imagePullSecrets:
