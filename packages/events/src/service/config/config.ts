@@ -15,7 +15,6 @@ import {
   ApplicationConfig,
   EventConfig,
   EventDocument,
-  getOrThrow,
   logger,
   resolveActiveEventConfigVersion,
   resolveVersionForDate,
@@ -113,17 +112,6 @@ export const getInMemoryEventConfigurations = createTtlConfigCache(
   'event configurations',
   getEventConfigurations
 )
-
-async function findEventConfigurationById({
-  eventType,
-  token
-}: {
-  eventType: string
-  token: TokenWithBearer
-}) {
-  const configurations = await getInMemoryEventConfigurations(token)
-  return configurations.find((config) => config.id === eventType)
-}
 
 /**
  * Resolves the form version currently in effect for `eventType` — the
