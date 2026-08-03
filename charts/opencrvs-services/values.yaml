@@ -237,11 +237,7 @@ platform:
   # for example: ghcr.io/opencrvs or myorg
   repository: ghcr.io/opencrvs
 
-  # Default imagePullPolicy for all OpenCRVS images. Keep as IfNotPresent for
-  # immutable version tags (e.g. v2.1.0). Environments that deploy a floating
-  # tag (e.g. "develop") should override this to "Always", otherwise nodes
-  # keep serving whatever was cached under that tag instead of picking up
-  # newer pushes.
+  # Override to "Always" for environments deploying a floating tag (e.g. "develop").
   imagePullPolicy: IfNotPresent
 
   # Secrets used to pull images from private registries, if needed.
