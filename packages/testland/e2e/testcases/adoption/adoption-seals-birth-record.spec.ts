@@ -15,6 +15,7 @@ import {
   getRandomDate,
   getToken,
   login,
+  REDACTED_RECORD_TITLE,
   searchFromSearchBar,
   triggerDeclarationAction,
   uploadImage
@@ -156,7 +157,9 @@ test('Registering an adoption seals the original birth record', async ({
   })
 
   await test.step('The original birth record is now sealed', async () => {
-    await searchFromSearchBar(page, birthChildName)
+    // Sealing strips the declaration from the search index, so the birth
+    // record is still found by the child's name but listed without one.
+    await searchFromSearchBar(page, birthChildName, true, REDACTED_RECORD_TITLE)
     await expect(page.getByTestId('flags-value')).toContainText('Sealed')
     await expect(page.getByText('Record is protected')).toBeVisible()
   })
