@@ -22,6 +22,7 @@ spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.documents) | nindent 6 }}
       containers:
         - image: {{ include "opencrvs.image" (dict "root" . "service" .Values.documents) }}
+          imagePullPolicy: {{ .Values.documents.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           name: documents
           env:
           {{- include "render-otel-env-vars" (dict "Values" .Values "Release" .Release) }}
