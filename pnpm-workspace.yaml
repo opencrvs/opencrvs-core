@@ -1,6 +1,7 @@
 packages:
   - 'packages/*'
   - 'packages/toolkit/create-countryconfig'
+  - '!packages/countryconfig-template'
 
 # Ported from yarn `resolutions` (root package.json). `parent>child`
 # replaces yarn's `**/parent/child` nesting syntax.
