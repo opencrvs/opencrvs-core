@@ -12,6 +12,7 @@ import { expect, test } from '@playwright/test'
 import {
   getToken,
   login,
+  REDACTED_RECORD_TITLE,
   searchFromSearchBar,
   uploadImage
 } from '../../helpers'
@@ -59,7 +60,10 @@ test('Sealing a record hides it from local registrars and blocks all actions', a
   })
 
   await test.step('Registrar General still sees the "Sealed" flag and retains full access', async () => {
-    await searchFromSearchBar(page, childName)
+    // Sealing strips the declaration from the search index for everyone, so
+    // the record is still found by name but listed without one. The full
+    // record stays available to this role through the Record tab.
+    await searchFromSearchBar(page, childName, true, REDACTED_RECORD_TITLE)
     await expect(page.getByTestId('flags-value')).toContainText('Sealed')
     await expect(
       page.getByRole('button', { name: 'Record', exact: true })
@@ -69,8 +73,9 @@ test('Sealing a record hides it from local registrars and blocks all actions', a
   await test.step('Registrar (k.mweene) can still find the sealed record via search', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
     // `record.search` is not restricted by the `sealed` flag for this role,
-    // only `record.read` is - so the record still surfaces in search results.
-    await searchFromSearchBar(page, childName)
+    // only `record.read` is - so the record still surfaces in search results,
+    // with its declaration stripped.
+    await searchFromSearchBar(page, childName, true, REDACTED_RECORD_TITLE)
   })
 
   await test.step('Registrar sees the record is already sealed', async () => {

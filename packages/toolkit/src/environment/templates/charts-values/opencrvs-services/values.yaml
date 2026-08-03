@@ -27,7 +27,7 @@ env:
 otel:
   enabled: true
   deployment_environment: {{env}}
-  exporter_otlp_endpoint: "http://opentelemetry-collector.opencrvs-deps-{{env}}.svc.cluster.local:4318"
+  exporter_otlp_endpoint: "opentelemetry-collector.opencrvs-deps-{{env}}.svc.cluster.local:4317"
 
 elasticsearch:
   auth_mode: auto

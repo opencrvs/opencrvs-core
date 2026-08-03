@@ -259,7 +259,7 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <tr>
             <td>otel.enabled</td>
             <td>false</td>
-            <td>Enable OpenTelemetry tracing environment variables for instrumented backend services: <code>auth</code>, <code>countryconfig</code>, <code>documents</code>, <code>events</code> and <code>gateway</code>.</td>
+            <td>Enable OpenTelemetry tracing environment variables for instrumented services.</td>
         </tr>
         <tr>
             <td>otel.deployment_environment</td>
@@ -269,12 +269,12 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <tr>
             <td>otel.exporter_otlp_endpoint</td>
             <td></td>
-            <td>Base OTLP HTTP endpoint for the OpenTelemetry Collector, for example <code>http://opentelemetry-collector.opencrvs-deps-production.svc.cluster.local:4318</code>. Required when <code>otel.enabled</code> is <code>true</code>.</td>
+            <td>OTLP/gRPC collector endpoint, for example <code>opentelemetry-collector.opencrvs-deps-production.svc.cluster.local:4317</code>. Required when <code>otel.enabled</code> is <code>true</code>. Node.js receives this as an insecure gRPC URL with <code>http://</code> added automatically; nginx receives the host and port without a scheme.</td>
         </tr>
         <tr>
             <td>otel.exporter_otlp_protocol</td>
-            <td>http/protobuf</td>
-            <td>OTLP exporter protocol. The trace-specific endpoint is generated as <code>&lt;otel.exporter_otlp_endpoint&gt;/v1/traces</code>.</td>
+            <td>grpc</td>
+            <td>OTLP exporter protocol.</td>
         </tr>
         <tr>
             <td>OTEL_RESOURCE_ATTRIBUTES</td>
@@ -307,6 +307,11 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <td>Defines the image pull secrets applied at Pod level for authenticating with private registries.</td>
         </tr>
         <tr>
+        <td>platform.imagePullPolicy</td>
+        <td>-</td>
+        <td>Default <code>imagePullPolicy</code> applied to all OpenCRVS service containers. Leave unset to use Kubernetes' own tag-based default (<code>IfNotPresent</code> for versioned tags, <code>Always</code> for <code>:latest</code>). Environments deploying a floating tag (e.g. <code>develop</code>) should set this to <code>Always</code>, otherwise nodes keep serving whatever image was first cached under that tag. Can be overridden at service level.</td>
+        </tr>
+        <tr>
             <th>Common Service properties</th>
             <th></th>
             <th>Properties listed below can be defined for any service</th>
@@ -335,6 +340,11 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <td>image.repository</td>
         <td>platform.repository</td>
         <td>Overrides the default repository defined in <code>platform.repository</code>.</td>
+        </tr>
+        <tr>
+        <td>image.pullPolicy</td>
+        <td>platform.imagePullPolicy</td>
+        <td>Overrides the default <code>imagePullPolicy</code> defined in <code>platform.imagePullPolicy</code> for this service only.</td>
         </tr>
         <tr>
             <td>hpa.enabled</td>

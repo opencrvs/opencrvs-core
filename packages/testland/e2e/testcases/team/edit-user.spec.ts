@@ -50,7 +50,7 @@ test("Can update newly created user's location and role", async ({
   await test.step('Go to user details page', async () => {
     await login(page, CREDENTIALS.LOCAL_SYSTEM_ADMIN)
     await page.getByRole('button', { name: 'Central' }).click()
-    await page.getByRole('button', { name: 'Ibombo' }).click()
+    await page.getByRole('button', { name: 'Ibombo', exact: true }).click()
     await page.getByRole('button', { name: 'Quanza' }).click()
     await page.getByRole('button', { name: 'Quanza Village Office' }).click()
     await page.getByRole('button', { name: fullName }).click()
