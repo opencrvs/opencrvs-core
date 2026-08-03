@@ -12,7 +12,7 @@
 import React from 'react'
 import { v4 as uuid } from 'uuid'
 import {
-  UUID,
+  EventIndex,
   getActionConfig,
   getActionFormFields,
   ActionType
@@ -23,12 +23,13 @@ import {
   Review as ReviewComponent,
   RejectActionModalResult
 } from '@client/v2-events/features/events/components/Review'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForEvent } from '@client/v2-events/features/events/useEventConfiguration'
 
-export function useRejectionModal(eventId: UUID, eventType: string) {
+export function useRejectionModal(event: EventIndex) {
+  const eventId = event.id
   const [modal, openModal] = useModal()
   const events = useEvents()
-  const { eventConfiguration } = useEventConfiguration(eventType)
+  const { eventConfiguration } = useEventConfigurationForEvent(event)
   const rejectActionConfig = getActionConfig({
     eventConfiguration,
     actionType: ActionType.REJECT

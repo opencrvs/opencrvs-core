@@ -59,7 +59,8 @@ import { TokenUserType } from '../authentication'
 import {
   PlainDate,
   plainDateToLocalDate,
-  SelectDateRangeValue
+  SelectDateRangeValue,
+  toPlainDate
 } from './FieldValue'
 import { subDays, subYears, format } from 'date-fns'
 import { FieldType } from './FieldType'
@@ -696,6 +697,68 @@ export function getEventConfigById(eventConfigs: EventConfig[], id: string) {
     (eventConfiguration) => eventConfiguration.id === id
   )
   return getOrThrow(eventConfig, `Event config for ${id} not found`)
+}
+
+/**
+ * Finds a specific, explicitly identified form version — e.g. to resolve the
+ * version an already-created event was pinned to, or to let a digitization
+ * flow pin a new declaration to a named legacy version.
+ */
+export function findEventConfigVersion(
+  eventConfigs: EventConfig[],
+  id: string,
+  version: string
+): EventConfig {
+  const eventConfig = eventConfigs.find(
+    (config) => config.id === id && config.version === version
+  )
+  return getOrThrow(
+    eventConfig,
+    `No config version '${version}' found for event type '${id}'`
+  )
+}
+
+/**
+ * Resolves the version of `id` whose `[effectiveFrom, effectiveTo)` window
+ * covers `date` — the version that legally governs a declaration created (or
+ * digitized as having occurred) on that date. Works regardless of the order
+ * versions were authored in.
+ */
+export function resolveVersionForDate(
+  eventConfigs: EventConfig[],
+  id: string,
+  date: PlainDate
+): EventConfig {
+  const candidates = eventConfigs.filter(
+    (config) =>
+      config.id === id &&
+      config.effectiveFrom <= date &&
+      (config.effectiveTo === undefined || date < config.effectiveTo)
+  )
+
+  const resolved = candidates.reduce<EventConfig | undefined>(
+    (latest, candidate) =>
+      !latest || candidate.effectiveFrom > latest.effectiveFrom
+        ? candidate
+        : latest,
+    undefined
+  )
+
+  return getOrThrow(
+    resolved,
+    `No config version found for event type '${id}' active on ${date}`
+  )
+}
+
+/**
+ * Resolves the version of `id` currently in effect (the version a brand new,
+ * non-digitized declaration should be pinned to).
+ */
+export function resolveActiveEventConfigVersion(
+  eventConfigs: EventConfig[],
+  id: string
+): EventConfig {
+  return resolveVersionForDate(eventConfigs, id, toPlainDate(new Date().toISOString()))
 }
 
 export function timePeriodToDateRange(value: SelectDateRangeValue) {

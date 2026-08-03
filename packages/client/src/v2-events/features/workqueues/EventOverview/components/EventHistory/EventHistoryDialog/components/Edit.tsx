@@ -17,7 +17,7 @@ import {
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { Text } from '@opencrvs/components/lib/Text'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForEvent } from '@client/v2-events/features/events/useEventConfiguration'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { DeclarationComparisonTable } from '@client/v2-events/features/events/actions/correct/request/Summary/DeclarationComparisonTable'
 import { commentLabel } from '@client/v2-events/features/events/actions/edit/EditActionMenu'
@@ -36,7 +36,7 @@ function EditComponent({
   fullEvent: EventDocument
   validatorContext: ValidatorContext
 }) {
-  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const { eventConfiguration } = useEventConfigurationForEvent(fullEvent)
   // content.comment is a deprecated field that was used on 2.0
   const comment = action.content?.comment
   const intl = useIntl()

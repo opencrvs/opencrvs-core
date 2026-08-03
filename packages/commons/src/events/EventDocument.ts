@@ -30,6 +30,17 @@ export const EventDocument = z
       .describe(
         'Timestamp of the last update, excluding changes from actions.'
       ),
+    configVersion: z
+      .string()
+      .optional()
+      .describe(
+        'The form config version this event is pinned to, recorded at creation ' +
+          'time. The permanent audit trail (which legal form version governs ' +
+          'this record) and the resolution key for rendering/validating it — ' +
+          'never changed by ordinary corrections. Optional so events created ' +
+          'before this field existed continue to parse unchanged; resolution ' +
+          'falls back to the version active on `createdAt` for those.'
+      ),
     actions: z
       .array(Action)
       .describe('Ordered list of actions associated with the event.'),

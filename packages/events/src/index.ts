@@ -15,6 +15,7 @@ import { env } from './environment'
 import { server } from './server'
 import { getAnonymousToken } from './service/auth'
 import { getInMemoryEventConfigurations } from './service/config/config'
+import { backfillMissingConfigVersions } from './service/events/backfillConfigVersion'
 import { ensureIndexExists } from './service/indexing/indexing'
 import { ensureConnection } from './storage/postgres/events'
 import { startAnnouncementWorker } from './workers/announcementWorker'
@@ -37,6 +38,7 @@ export async function main() {
       logger.info(`Loaded event configuration: ${configuration.id}`)
       await ensureIndexExists(configuration)
     }
+    await backfillMissingConfigVersions(configurations)
   } catch (error) {
     if (error instanceof Error) {
       logger.error(error.message)

@@ -22,7 +22,7 @@ import {
 } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { usePrintableCertificate } from '@client/v2-events/hooks/usePrintableCertificate'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForEvent } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
@@ -77,7 +77,7 @@ export const AlphaPrintButton = {
     const locations = getLocations.useSuspenseQuery()
     const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
-    const { eventConfiguration } = useEventConfiguration(event.type)
+    const { eventConfiguration } = useEventConfigurationForEvent(event)
     const formDeclaration = useEventFormData((state) => state.getFormValues())
 
     const userDetails = useSelector(getUserDetails)

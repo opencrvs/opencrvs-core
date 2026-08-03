@@ -14,6 +14,7 @@ import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
+import { uniqBy } from 'lodash'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -83,9 +84,17 @@ function EventSelector() {
   const createEvent = events.createEvent()
   const user = useSelector(getUserDetails)
 
-  const allowedEventConfigurations = eventConfigurations.filter(({ id }) =>
-    canUserCreateEvent(scopes, id)
+  // Multiple versions can share an `id` — the event *type* picker below must
+  // only ever show one option per type, never one per version.
+  const allowedEventConfigurations = uniqBy(
+    eventConfigurations.filter(({ id }) => canUserCreateEvent(scopes, id)),
+    'id'
   )
+
+  function handleEventTypeChange(val: string) {
+    setEventType(val)
+    setNoEventSelectedError(false)
+  }
 
   function handleContinue() {
     if (eventType === '') {
@@ -132,10 +141,7 @@ function EventSelector() {
           }))}
           size={RadioSize.LARGE}
           value={eventType}
-          onChange={(val) => {
-            setEventType(val)
-            setNoEventSelectedError(false)
-          }}
+          onChange={handleEventTypeChange}
         />
 
         <Button

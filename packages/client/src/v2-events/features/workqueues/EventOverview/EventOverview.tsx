@@ -22,7 +22,7 @@ import {
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { EventIcon } from '@client/v2-events/components/EventIcon'
 import { ROUTES } from '@client/v2-events/routes'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForEvent } from '@client/v2-events/features/events/useEventConfiguration'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
@@ -36,7 +36,7 @@ import { useEventOverviewInfo } from './components/useEventOverviewInfo'
  * Renders the event overview page which shows a summary of the event.
  */
 function EventOverviewFull({ event }: { event: EventDocument }) {
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForEvent(event)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { status } = eventIndex
   const { getRemoteDraftByEventId } = useDrafts()
@@ -104,7 +104,7 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
  * Renders the protected event overview page with PII hidden in the event summary
  */
 function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
-  const { eventConfiguration } = useEventConfiguration(eventIndex.type)
+  const { eventConfiguration } = useEventConfigurationForEvent(eventIndex)
   const { status } = eventIndex
   const { getRemoteDraftByEventId } = useDrafts()
   const draft = getRemoteDraftByEventId(eventIndex.id)

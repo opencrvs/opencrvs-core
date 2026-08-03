@@ -79,6 +79,11 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
       transactionId: newEvent.transactionId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      // Carries through whatever version was explicitly picked (e.g. for
+      // digitizing a legacy record) so config resolution during the
+      // optimistic window matches what the server will actually pin —
+      // otherwise it'd fall back to "active today" until onSuccess lands.
+      configVersion: newEvent.configVersion,
       actions: [
         {
           type: ActionType.CREATE,

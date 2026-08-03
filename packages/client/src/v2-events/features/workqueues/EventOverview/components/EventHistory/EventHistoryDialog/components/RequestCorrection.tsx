@@ -16,7 +16,7 @@ import {
   RequestedCorrectionAction,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForEvent } from '@client/v2-events/features/events/useEventConfiguration'
 import { CorrectionDetails } from '@client/v2-events/features/events/actions/correct/request/Summary/CorrectionDetails'
 
 export function RequestCorrection({
@@ -28,7 +28,7 @@ export function RequestCorrection({
   fullEvent: EventDocument
   validatorContext: ValidatorContext
 }) {
-  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const { eventConfiguration } = useEventConfigurationForEvent(fullEvent)
 
   // We need to get the state of the event before the correction request was made
   // so that we can display the original, uncorrected values

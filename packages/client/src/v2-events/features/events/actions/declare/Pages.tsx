@@ -26,7 +26,7 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { isTemporaryId } from '@client/v2-events/utils'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForEvent } from '@client/v2-events/features/events/useEventConfiguration'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 export function Pages() {
@@ -42,9 +42,8 @@ export function Pages() {
   const event = events.getEvent.getFromCache(eventId)
   const validatorContext = useValidatorContext(event)
 
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const { eventConfiguration: configuration } =
+    useEventConfigurationForEvent(event)
   const declarationPages = getDeclarationPages(configuration)
 
   const currentPageId =

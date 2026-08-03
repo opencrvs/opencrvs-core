@@ -47,7 +47,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
-import { useEventConfiguration } from '../../useEventConfiguration'
+import { useEventConfigurationForEvent } from '../../useEventConfiguration'
 import { Output, ValueOutput } from '../../components/Output'
 import { DocumentViewer } from '../../components/DocumentViewer'
 import { duplicateMessages } from './ReviewDuplicate'
@@ -161,7 +161,10 @@ export function DuplicateComparison({
   )
 
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
-  const { eventConfiguration } = useEventConfiguration(originalEventState.type)
+  const { eventConfiguration: originalEventConfiguration } =
+    useEventConfigurationForEvent(originalEvent)
+  const { eventConfiguration: potentialDuplicateEventConfiguration } =
+    useEventConfigurationForEvent(potentialDuplicateEvent)
 
   const flattenedPotentialDuplicateEvent = flattenEventIndex(
     potentialDuplicateEventState
@@ -199,7 +202,7 @@ export function DuplicateComparison({
   ]
 
   const comparisonData: ComparisonDeclaration[] =
-    eventConfiguration.declaration.pages
+    originalEventConfiguration.declaration.pages
       .filter(
         (page) =>
           isPageVisible(
@@ -283,9 +286,9 @@ export function DuplicateComparison({
                 <Output
                   anchor={potentialDuplicateAnchor}
                   displayEmptyAsDash={true}
-                  eventConfig={eventConfiguration}
+                  eventConfig={potentialDuplicateEventConfiguration}
                   field={rightField}
-                  formConfig={eventConfiguration.declaration}
+                  formConfig={potentialDuplicateEventConfiguration.declaration}
                   previousForm={potentialDuplicateDeclaration}
                   value={potentialDuplicateDeclaration[rightField.id]}
                 />
@@ -294,9 +297,9 @@ export function DuplicateComparison({
                 <Output
                   anchor={originalAnchor}
                   displayEmptyAsDash={true}
-                  eventConfig={eventConfiguration}
+                  eventConfig={originalEventConfiguration}
                   field={leftField}
-                  formConfig={eventConfiguration.declaration}
+                  formConfig={originalEventConfiguration.declaration}
                   previousForm={originalDeclaration}
                   value={originalDeclaration[leftField.id]}
                 />
@@ -320,8 +323,10 @@ export function DuplicateComparison({
       },
       {
         label: intl.formatMessage(summaryMessages.event.label),
-        rightValue: intl.formatMessage(eventConfiguration.label),
-        leftValue: intl.formatMessage(eventConfiguration.label)
+        rightValue: intl.formatMessage(
+          potentialDuplicateEventConfiguration.label
+        ),
+        leftValue: intl.formatMessage(originalEventConfiguration.label)
       },
       {
         label: intl.formatMessage(summaryMessages.trackingId.label),
@@ -465,13 +470,13 @@ export function DuplicateComparison({
               <DocumentViewer
                 comparisonView={true}
                 form={originalDeclaration}
-                formConfig={eventConfiguration.declaration}
+                formConfig={originalEventConfiguration.declaration}
                 showInMobile={false}
               />
               <MobileOnly>
                 <SupportingDocumentList
                   declaration={originalDeclaration}
-                  declarationConfig={eventConfiguration.declaration}
+                  declarationConfig={originalEventConfiguration.declaration}
                 />
               </MobileOnly>
             </div>
@@ -482,13 +487,15 @@ export function DuplicateComparison({
               <DocumentViewer
                 comparisonView={true}
                 form={potentialDuplicateDeclaration}
-                formConfig={eventConfiguration.declaration}
+                formConfig={potentialDuplicateEventConfiguration.declaration}
                 showInMobile={false}
               />
               <MobileOnly>
                 <SupportingDocumentList
                   declaration={potentialDuplicateDeclaration}
-                  declarationConfig={eventConfiguration.declaration}
+                  declarationConfig={
+                    potentialDuplicateEventConfiguration.declaration
+                  }
                 />
               </MobileOnly>
             </div>

@@ -10,6 +10,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { cloneDeep } from 'lodash'
 import { ActionType } from './ActionType'
 import { EventConfig, EventConfigInput } from './EventConfig'
 
@@ -55,4 +56,50 @@ export const defineConfig = (config: EventConfigInput) => {
   warnOnConfigurationIssues(input)
 
   return input
+}
+
+/**
+ * Authors a new form version as a diff of a previous one, instead of
+ * hand-copying the whole form.
+ *
+ * `patch` receives a mutable clone of `previous` — mutate it directly (e.g.
+ * via `getDeclarationFieldById(draft, id)`, which returns a live reference
+ * into `draft.declaration.pages[...].fields[...]`). The result is still a
+ * complete, independent `EventConfig`, validated by the same
+ * `EventConfig.parse` as any other version — so referential integrity
+ * (dangling conditionals, missing field ids, etc.) is checked for the
+ * resulting snapshot exactly as it would be for a hand-written one.
+ *
+ * This is also the right tool for fixing an already-effective historical
+ * version in place: call it with the same `version`/`effectiveFrom` as
+ * before, patching whatever needs correcting. Historical versions are
+ * intentionally mutable — see the form-versioning design doc.
+ *
+ * @example
+ * export const birthV2 = defineNextVersion(
+ *   birthV1,
+ *   { version: 'v2', effectiveFrom: '2027-01-01' },
+ *   (draft) => {
+ *     getDeclarationFieldById(draft, 'informant.nationalId').required = true
+ *   }
+ * )
+ */
+export const defineNextVersion = (
+  previous: EventConfig,
+  meta: {
+    version: string
+    effectiveFrom: string
+    effectiveTo?: string
+    versionLabel?: EventConfigInput['versionLabel']
+  },
+  patch: (draft: EventConfig) => void
+): EventConfig => {
+  const draft = cloneDeep(previous)
+  patch(draft)
+
+  return defineConfig({
+    ...draft,
+    ...meta,
+    supersedes: previous.version
+  } as EventConfigInput)
 }

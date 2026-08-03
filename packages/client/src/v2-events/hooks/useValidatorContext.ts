@@ -19,7 +19,10 @@ import {
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { useAuthentication } from '../../utils/userUtils'
-import { useEventConfigurations } from '../features/events/useEventConfiguration'
+import {
+  resolveEventConfiguration,
+  useEventConfigurations
+} from '../features/events/useEventConfiguration'
 import { useSuspenseGetLeafAdministrativeAreaIds } from './useAdministrativeAreas'
 
 /**
@@ -40,9 +43,19 @@ export function resolveEventValidatorContext(
   configs: EventConfig[],
   event?: EventDocument
 ): EventValidatorContext | undefined {
-  const eventConfig = configs.find((c) => c.id === event?.type)
+  if (!event) {
+    return undefined
+  }
 
-  if (!event || !eventConfig) {
+  // Unlike rendering/validation entry points (which should fail loudly on an
+  // unresolvable config), this context feeds conditional evaluation all over
+  // the app — degrade to "no event context" rather than crash the whole
+  // render when a config genuinely can't be resolved (e.g. in isolated
+  // tests, or transient states before configs have loaded).
+  let eventConfig: EventConfig
+  try {
+    eventConfig = resolveEventConfiguration(configs, event)
+  } catch {
     return undefined
   }
 

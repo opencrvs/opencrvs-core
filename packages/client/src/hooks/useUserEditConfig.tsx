@@ -24,6 +24,7 @@ import {
   never,
   or,
   PageTypes,
+  PlainDate,
   user,
   UserContext,
   UserScopeV2,
@@ -214,7 +215,12 @@ export function useUserEditConfig(
             }
           ]
         },
-        actions: []
+        actions: [],
+        // Not a real registrable event — this config drives the shared form
+        // renderer for the user-profile-edit form, which has no legal
+        // effective-date lifecycle of its own.
+        version: 'user-edit',
+        effectiveFrom: PlainDate.parse('1970-01-01')
       }) satisfies EventConfig
   }
 }

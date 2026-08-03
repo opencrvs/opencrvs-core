@@ -14,8 +14,13 @@ import { array } from 'zod'
 import {
   ApplicationConfig,
   EventConfig,
+  EventDocument,
   getOrThrow,
   logger,
+  resolveActiveEventConfigVersion,
+  resolveVersionForDate,
+  findEventConfigVersion,
+  toPlainDate,
   Role,
   TokenWithBearer,
   WorkqueueConfig
@@ -117,6 +122,15 @@ async function findEventConfigurationById({
   return configurations.find((config) => config.id === eventType)
 }
 
+/**
+ * @deprecated for anything touching an existing event — resolves to *some*
+ * config version for `eventType` (whichever a naive `.find` hits first), not
+ * necessarily the one that event was pinned to. Use
+ * `getActiveEventConfiguration` when starting a new declaration, or
+ * `getEventConfigurationForEvent` when acting on/rendering an existing one.
+ * Kept for call sites that only care "does this event type exist at all"
+ * (e.g. listing).
+ */
 export async function getEventConfigurationById({
   eventType,
   token
@@ -130,6 +144,70 @@ export async function getEventConfigurationById({
       token
     }),
     `No configuration found for event type: ${eventType}`
+  )
+}
+
+/**
+ * Resolves the form version currently in effect for `eventType` — the
+ * version a brand-new, non-digitized declaration should be pinned to.
+ */
+export async function getActiveEventConfiguration({
+  eventType,
+  token
+}: {
+  eventType: string
+  token: TokenWithBearer
+}): Promise<EventConfig> {
+  const configurations = await getInMemoryEventConfigurations(token)
+  return resolveActiveEventConfigVersion(configurations, eventType)
+}
+
+/**
+ * Resolves a specific, explicitly named form version — used by digitization
+ * flows that pin a new declaration to a named legacy version, and internally
+ * by `getEventConfigurationForEvent` to resolve an existing event's pin.
+ */
+export async function getEventConfigurationByVersion({
+  eventType,
+  version,
+  token
+}: {
+  eventType: string
+  version: string
+  token: TokenWithBearer
+}): Promise<EventConfig> {
+  const configurations = await getInMemoryEventConfigurations(token)
+  return findEventConfigVersion(configurations, eventType, version)
+}
+
+/**
+ * Resolves the form version an *existing* event is pinned to — reading
+ * `event.configVersion`, recorded at creation time, so rendering/validation
+ * for a 10-year-old record uses the rules that were active when it was
+ * created, not whatever is live today.
+ *
+ * Events created before this pin existed (or by test fixtures that don't set
+ * it) fall back to resolving by the event's creation date, so they behave as
+ * pinned to whichever version was active at that time (the implicit "legacy"
+ * version during rollout).
+ */
+export async function getEventConfigurationForEvent({
+  event,
+  token
+}: {
+  event: EventDocument
+  token: TokenWithBearer
+}): Promise<EventConfig> {
+  const configurations = await getInMemoryEventConfigurations(token)
+
+  if (event.configVersion) {
+    return findEventConfigVersion(configurations, event.type, event.configVersion)
+  }
+
+  return resolveVersionForDate(
+    configurations,
+    event.type,
+    toPlainDate(event.createdAt)
   )
 }
 

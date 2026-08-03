@@ -42,7 +42,9 @@ import {
   userAndSystemProcedure
 } from '@events/router/trpc'
 import {
-  getEventConfigurationById,
+  getActiveEventConfiguration,
+  getEventConfigurationByVersion,
+  getEventConfigurationForEvent,
   getInMemoryEventConfigurations
 } from '@events/service/config/config'
 import { assignRecord } from '@events/service/events/actions/assign'
@@ -161,10 +163,16 @@ export const eventRouter = router({
 
     .output(EventDocument)
     .mutation(async ({ input, ctx }) => {
-      const config = await getEventConfigurationById({
-        token: ctx.token,
-        eventType: input.type
-      })
+      const config = input.configVersion
+        ? await getEventConfigurationByVersion({
+            token: ctx.token,
+            eventType: input.type,
+            version: input.configVersion
+          })
+        : await getActiveEventConfiguration({
+            token: ctx.token,
+            eventType: input.type
+          })
 
       const result = await createEvent({
         transactionId: input.transactionId,
@@ -205,10 +213,11 @@ export const eventRouter = router({
     .output(EventDocument)
     .use(middleware.canAccessEventWithScopes(['record.read']))
     .query(async ({ ctx, input }) => {
-      const { eventId, eventType } = ctx
-      const configuration = await getEventConfigurationById({
+      const { eventId } = ctx
+      const event = await getEventById(eventId)
+      const configuration = await getEventConfigurationForEvent({
         token: ctx.token,
-        eventType
+        event
       })
 
       const updatedEvent = await processAction(
@@ -397,9 +406,9 @@ export const eventRouter = router({
         .mutation(async (options) => {
           const { user, token } = options.ctx
           const event = await getEventById(options.input.eventId)
-          const configuration = await getEventConfigurationById({
+          const configuration = await getEventConfigurationForEvent({
             token,
-            eventType: event.type
+            event
           })
           const result = await markAsDuplicate(
             event,
@@ -430,9 +439,9 @@ export const eventRouter = router({
         .mutation(async (options) => {
           const { user, token } = options.ctx
           const event = await getEventById(options.input.eventId)
-          const configuration = await getEventConfigurationById({
+          const configuration = await getEventConfigurationForEvent({
             token,
-            eventType: event.type
+            event
           })
           const result = await markNotDuplicate(
             event,

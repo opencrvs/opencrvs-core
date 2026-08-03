@@ -20,12 +20,14 @@ import { FlagConfig } from './Flag'
 import { Conditional } from './Conditional'
 import type { JSONSchema } from '../conditionals/conditionals'
 import { AvailableIcons } from '../icons'
+import { PlainDate } from './PlainDate'
 import {
   validateActionOrder,
   validateActionFlags,
   validatePlaceOfEvent,
   validateDateOfEvent,
-  validateAdvancedSearchConfig
+  validateAdvancedSearchConfig,
+  validateVersionWindow
 } from './eventConfigValidation'
 
 export const EventFieldReference = z
@@ -36,6 +38,20 @@ export const EventFieldReference = z
 
 export type EventConfig = {
   id: string
+  /**
+   * Opaque identifier for this configuration snapshot, unique per `id`.
+   * Together with `id`, forms the natural key for a form version (e.g. "v1", "legacy-1985").
+   * Defaults to `"legacy"` so pre-versioning configs keep parsing unchanged.
+   */
+  version: string
+  /** Date this version starts governing new (or explicitly pinned) declarations. */
+  effectiveFrom: PlainDate
+  /** Date this version stops applying, if it's a closed historical/legacy window. Open-ended (current) versions omit this. */
+  effectiveTo?: PlainDate
+  /** The `version` this one replaces, for lineage/audit display only — not used in resolution. */
+  supersedes?: string
+  /** Human-readable label for this version, e.g. "2027 Legal Update" or "Pre-1996 Paper Form". */
+  versionLabel?: TranslationConfig
   dateOfEvent?: FieldReference | z.infer<typeof EventFieldReference>
   placeOfEvent?: FieldReference
   title: TranslationConfig
@@ -60,7 +76,13 @@ export type EventConfigInput = Omit<
   | 'dateOfEvent'
   | 'placeOfEvent'
   | 'analytics'
+  | 'version'
+  | 'effectiveFrom'
+  | 'effectiveTo'
 > & {
+  version?: string
+  effectiveFrom?: string
+  effectiveTo?: string
   dateOfEvent?:
     | z.input<typeof FieldReference>
     | z.infer<typeof EventFieldReference>
@@ -83,6 +105,30 @@ const _EventConfigBase: z.ZodType<EventConfig, EventConfigInput> = z.object({
     .describe(
       'Machine-readable identifier of the event (e.g. "birth", "death").'
     ),
+  version: z
+    .string()
+    .optional()
+    .default('legacy')
+    .describe(
+      'Opaque identifier for this configuration snapshot, unique per `id` (e.g. "v1", "legacy-1985"). Defaults to "legacy" so pre-versioning configs keep parsing unchanged.'
+    ),
+  effectiveFrom: PlainDate.optional()
+    .default(() => PlainDate.parse('1970-01-01'))
+    .describe(
+      'Date this version starts governing new (or explicitly pinned) declarations. Defaults to the epoch so pre-versioning configs behave as an always-active legacy version.'
+    ),
+  effectiveTo: PlainDate.optional().describe(
+    'Date this version stops applying, for a closed historical/legacy window. Omit for the current, open-ended version.'
+  ),
+  supersedes: z
+    .string()
+    .optional()
+    .describe(
+      'The `version` this one replaces, for lineage/audit display only — not used in resolution.'
+    ),
+  versionLabel: TranslationConfig.optional().describe(
+    'Human-readable label for this version, e.g. "2027 Legal Update" or "Pre-1996 Paper Form".'
+  ),
   dateOfEvent: FieldReference.or(EventFieldReference)
     .optional()
     .describe(
@@ -152,6 +198,7 @@ export const EventConfig: z.ZodType<EventConfig, EventConfigInput> =
       validatePlaceOfEvent(event, ctx)
       validateActionFlags(event, ctx)
       validateActionOrder(event, ctx)
+      validateVersionWindow(event, ctx)
     })
     .meta({
       id: 'EventConfig',

@@ -33,7 +33,7 @@ import {
 } from '@client/v2-events/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { ROUTES } from '@client/v2-events/routes'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForEvent } from '@client/v2-events/features/events/useEventConfiguration'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useAllowedActionConfigurations } from '../../Actions/useAllowedActionConfigurations'
 import { ActionMenuItem } from '../../Actions/utils'
@@ -186,7 +186,7 @@ export function ActionMenu({
 
   const [modals, actionMenuItems] = useAllowedActionConfigurations(eventIndex)
 
-  const { eventConfiguration } = useEventConfiguration(eventIndex.type)
+  const { eventConfiguration } = useEventConfigurationForEvent(eventIndex)
 
   const assignedToOther =
     eventIndex.assignedTo && eventIndex.assignedTo !== auth.sub

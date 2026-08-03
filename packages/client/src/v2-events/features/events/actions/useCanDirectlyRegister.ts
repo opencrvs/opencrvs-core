@@ -22,7 +22,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
-import { useEventConfiguration } from '../useEventConfiguration'
+import { useEventConfigurationForEvent } from '../useEventConfiguration'
 
 /**
  * Logic to check whether direct register (declare + register) is possible.
@@ -32,7 +32,7 @@ import { useEventConfiguration } from '../useEventConfiguration'
 export function useCanDirectlyRegister(event: EventDocument) {
   const userDetails = useSelector(getUserDetails)
   const validatorContext = useValidatorContext()
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForEvent(event)
   const declaration = useEventFormData((state) => state.getFormValues())
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()

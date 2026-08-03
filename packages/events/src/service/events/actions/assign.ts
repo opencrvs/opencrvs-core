@@ -18,7 +18,7 @@ import {
   findLastAssignmentAction
 } from '@opencrvs/commons/events'
 import { TrpcUserContext } from '@events/context'
-import { getEventConfigurationById } from '@events/service/config/config'
+import { getEventConfigurationForEvent } from '@events/service/config/config'
 import { getEventById, processAction } from '@events/service/events/events'
 
 export async function assignRecord({
@@ -31,9 +31,9 @@ export async function assignRecord({
   input: AssignActionInput
 }) {
   const storedEvent = await getEventById(input.eventId)
-  const configuration = await getEventConfigurationById({
+  const configuration = await getEventConfigurationForEvent({
     token,
-    eventType: storedEvent.type
+    event: storedEvent
   })
   const lastAssignmentAction = findLastAssignmentAction(storedEvent.actions)
 

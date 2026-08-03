@@ -17,14 +17,16 @@ import {
   getCurrentEventState,
   getUUID,
   EventDocument,
-  getOrThrow,
   applyDraftToEventIndex,
   EventConfig,
   Draft
 } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
 import { useDrafts } from '../../drafts/useDrafts'
-import { useEventConfigurations } from '../useEventConfiguration'
+import {
+  resolveEventConfiguration,
+  useEventConfigurations
+} from '../useEventConfiguration'
 import { useGetEvent } from './procedures/get'
 import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
@@ -46,10 +48,7 @@ function getEventWithDraftOrThrow(
     throw new Error(`No event or draft found with id: ${id}`)
   }
 
-  const configuration = getOrThrow(
-    eventConfigs.find(({ id: cfgId }) => cfgId === event.type),
-    `Event configuration not found for ${event.type}`
-  )
+  const configuration = resolveEventConfiguration(eventConfigs, event)
 
   return { event, draft: maybeDraft, configuration }
 }

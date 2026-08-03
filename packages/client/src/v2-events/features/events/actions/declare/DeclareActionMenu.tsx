@@ -49,7 +49,7 @@ import { validationErrorsInActionFormExist } from '@client/v2-events/components/
 import { useCanDirectlyRegister } from '../useCanDirectlyRegister'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
-import { useEventConfiguration } from '../../useEventConfiguration'
+import { useEventConfigurationForEvent } from '../../useEventConfiguration'
 
 /**
  * Declaration actions contain actions available on the review page of the declare flow. This can include:
@@ -62,14 +62,13 @@ import { useEventConfiguration } from '../../useEventConfiguration'
  */
 function useDeclarationActions(event: EventDocument) {
   const intl = useIntl()
-  const eventType = event.type
   const drafts = useDrafts()
   const {
     closeActionView,
     deleteDeclaration,
     modal: deleteDeclarationModal
   } = useEventFormNavigation()
-  const { eventConfiguration } = useEventConfiguration(eventType)
+  const { eventConfiguration } = useEventConfigurationForEvent(event)
   const formConfig = getDeclaration(eventConfiguration)
   const validatorContext = useValidatorContext(event)
   const declaration = useEventFormData((state) => state.getFormValues())

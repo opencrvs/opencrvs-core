@@ -22,7 +22,7 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForEvent } from '@client/v2-events/features/events/useEventConfiguration'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { EditPageBanner } from './EditPageBanner'
 
@@ -37,9 +37,8 @@ export function Pages() {
   const event = events.getEvent.getFromCache(eventId)
 
   const validatorContext = useValidatorContext(event)
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const { eventConfiguration: configuration } =
+    useEventConfigurationForEvent(event)
   const declarationPages = getDeclarationPages(configuration)
 
   const currentPageId =

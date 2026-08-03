@@ -1252,6 +1252,8 @@ const TENNIS_CLUB_MEMBERSHIP_CERTIFICATE_COLLECTOR_FORM = defineActionForm({
 
 export const tennisClubMembershipEvent = defineConfig({
   id: Event.TENNIS_CLUB_MEMBERSHIP,
+  version: 'v2',
+  effectiveFrom: '2023-01-01',
   declaration: TENNIS_CLUB_DECLARATION_FORM,
   label: {
     defaultMessage: 'Tennis club membership application',
@@ -1647,6 +1649,162 @@ export const tennisClubMembershipEvent = defineConfig({
           }
         }
       ]
+    }
+  ]
+})
+
+const TENNIS_CLUB_LEGACY_DECLARATION_REVIEW = {
+  title: {
+    id: 'event.tennis-club-membership.legacy.action.declare.form.review.title',
+    defaultMessage:
+      '{applicant.name.firstname, select, __EMPTY__ {Member declaration} other {{applicant.name.surname, select, __EMPTY__ {Member declaration for {applicant.name.firstname}} other {Member declaration for {applicant.name.firstname} {applicant.name.surname}}}}}',
+    description: 'Title of the review page'
+  },
+  fields: [
+    {
+      id: 'review.comment',
+      type: FieldType.TEXTAREA,
+      label: {
+        defaultMessage: 'Comment',
+        id: 'event.tennis-club-membership.legacy.action.declare.form.review.comment.label',
+        description: 'Label for the comment field in the review section'
+      }
+    },
+    {
+      type: FieldType.SIGNATURE,
+      id: 'review.signature',
+      label: {
+        defaultMessage: 'Signature of informant',
+        id: 'event.tennis-club-membership.legacy.action.declare.form.review.signature.label',
+        description: 'Label for the signature field in the review section'
+      },
+      signaturePromptLabel: {
+        id: 'signature.upload.modal.title',
+        defaultMessage: 'Draw signature',
+        description: 'Title for the modal to draw signature'
+      }
+    }
+  ]
+}
+
+/**
+ * Before 2023, membership applications were a single field: the member's
+ * name. Registration duration, address, senior-pass assignment, ID/profile
+ * images and recommenders were all added later - none of that exists in
+ * this version. Only reachable by explicitly pinning a declaration to this
+ * version (e.g. for digitizing an old paper record); new declarations
+ * always resolve to whichever version is active today.
+ */
+export const tennisClubMembershipEventLegacy = defineConfig({
+  id: Event.TENNIS_CLUB_MEMBERSHIP,
+  version: 'legacy-simple',
+  effectiveTo: '2023-01-01',
+  versionLabel: {
+    id: 'event.tennis-club-membership.legacy.versionLabel',
+    defaultMessage: 'Pre-2023 membership application (name only)',
+    description: 'Label identifying this historical form version'
+  },
+  declaration: defineDeclarationForm({
+    label: {
+      id: 'event.tennis-club-membership.legacy.action.declare.form.label',
+      defaultMessage: 'Tennis club membership application',
+      description: 'This is what this form is referred as in the system'
+    },
+    pages: [
+      {
+        id: 'applicant',
+        type: PageTypes.enum.FORM,
+        title: {
+          id: 'event.tennis-club-membership.legacy.action.declare.form.section.who.title',
+          defaultMessage: 'Who is applying for the membership?',
+          description: 'This is the title of the section'
+        },
+        fields: [
+          {
+            id: 'applicant.name',
+            type: FieldType.NAME,
+            label: {
+              defaultMessage: 'Name of applicant',
+              description: 'This is the title for the name field',
+              id: 'event.tennis-club-membership.legacy.action.declare.form.section.who.field.name.label'
+            },
+            hideLabel: true,
+            required: true,
+            configuration: {
+              name: {
+                firstname: { required: true },
+                middlename: { required: false },
+                surname: { required: true }
+              },
+              maxLength: MAX_NAME_LENGTH
+            }
+          }
+        ]
+      }
+    ]
+  }),
+  label: {
+    defaultMessage: 'Tennis club membership application',
+    description: 'This is what this event is referred as in the system',
+    id: 'event.tennis-club-membership.label'
+  },
+  title: {
+    defaultMessage: '{applicant.name.firstname} {applicant.name.surname}',
+    description: 'This is the title of the summary',
+    id: 'event.tennis-club-membership.title'
+  },
+  fallbackTitle: {
+    id: 'event.tennis-club-membership.fallbackTitle',
+    defaultMessage: 'No name provided',
+    description:
+      'This is a fallback title if actual title resolves to empty string'
+  },
+  summary: {
+    fields: [
+      {
+        fieldId: 'applicant.name',
+        emptyValueMessage: {
+          defaultMessage: "Applicant's first name missing",
+          description:
+            "Shown when the applicant's first name is missing in summary",
+          id: 'event.tennis-club-membership.summary.field.applicant.firstname.empty'
+        },
+        label: {
+          defaultMessage: "Applicant's First Name",
+          description: "Label for the applicant's first name field",
+          id: 'event.tennis-club-membership.summary.field.applicant.firstname.label'
+        }
+      }
+    ]
+  },
+  actions: [
+    {
+      type: ActionType.READ,
+      label: {
+        id: 'event.tennis-club-membership.action.read.label',
+        defaultMessage: 'Read',
+        description: 'Title of the review page'
+      },
+      review: TENNIS_CLUB_LEGACY_DECLARATION_REVIEW
+    },
+    {
+      type: ActionType.DECLARE,
+      label: {
+        defaultMessage: 'Declare',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.tennis-club-membership.action.declare.label'
+      },
+      review: TENNIS_CLUB_LEGACY_DECLARATION_REVIEW
+    },
+    {
+      type: ActionType.REGISTER,
+      label: {
+        defaultMessage: 'Register',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.tennis-club-membership.action.register.label'
+      }
     }
   ]
 })

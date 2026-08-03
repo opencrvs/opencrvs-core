@@ -53,7 +53,12 @@ export async function bulkImportEvents(
     const eventActions = mapEventActions(actions)
 
     const createdEvent = await upsertEventWithActions(
-      { ...omit(event, 'type'), eventType, transactionId },
+      {
+        ...omit(event, 'type'),
+        eventType,
+        transactionId,
+        configVersion: event.configVersion ?? null
+      },
       eventActions
     )
 

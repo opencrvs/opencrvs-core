@@ -175,3 +175,64 @@ export function validateActionOrder(
     }
   }
 }
+
+export function validateVersionWindow(
+  event: EventConfig,
+  ctx: z.RefinementCtx<EventConfig>
+) {
+  if (event.effectiveTo && event.effectiveTo <= event.effectiveFrom) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `effectiveTo (${event.effectiveTo}) must be after effectiveFrom (${event.effectiveFrom}) for event '${event.id}' version '${event.version}'.`,
+      path: ['effectiveTo']
+    })
+  }
+}
+
+/**
+ * Validates a *set* of configuration versions for the same country-config
+ * response — checks that cannot be expressed by `EventConfig.parse` on a
+ * single object, since they depend on sibling versions:
+ *
+ * - `(id, version)` pairs are unique.
+ * - No two versions of the same `id` have overlapping `[effectiveFrom, effectiveTo)` windows.
+ *
+ * Run this once after parsing the full array returned by `/config/events`
+ * (both in country-config's own CI and in the events service's config sync).
+ */
+export function validateEventConfigVersions(configs: EventConfig[]): void {
+  const seen = new Set<string>()
+
+  for (const config of configs) {
+    const key = `${config.id}@${config.version}`
+    if (seen.has(key)) {
+      throw new Error(
+        `Duplicate event config version: id '${config.id}' has more than one entry for version '${config.version}'.`
+      )
+    }
+    seen.add(key)
+  }
+
+  const byId = new Map<string, EventConfig[]>()
+  for (const config of configs) {
+    byId.set(config.id, [...(byId.get(config.id) ?? []), config])
+  }
+
+  for (const [id, versions] of byId) {
+    const sorted = [...versions].sort((a, b) =>
+      a.effectiveFrom.localeCompare(b.effectiveFrom)
+    )
+
+    for (let i = 0; i < sorted.length - 1; i++) {
+      const current = sorted[i]
+      const next = sorted[i + 1]
+
+      const currentEnd = current.effectiveTo ?? next.effectiveFrom
+      if (currentEnd > next.effectiveFrom) {
+        throw new Error(
+          `Overlapping event config versions for '${id}': '${current.version}' (${current.effectiveFrom} - ${current.effectiveTo ?? 'open'}) overlaps '${next.version}' (starting ${next.effectiveFrom}).`
+        )
+      }
+    }
+  }
+}

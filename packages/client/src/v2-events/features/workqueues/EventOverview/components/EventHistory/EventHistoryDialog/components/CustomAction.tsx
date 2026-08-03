@@ -23,7 +23,7 @@ import {
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment } from '@opencrvs/components'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForEvent } from '@client/v2-events/features/events/useEventConfiguration'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { recordAnchorDate } from '@client/v2-events/utils'
 
@@ -70,7 +70,7 @@ export function CustomActionContent({
   validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForEvent(event)
   const originalAction =
     event.actions.find(
       (a): a is CustomAction => a.id === action.originalActionId

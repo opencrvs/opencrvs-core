@@ -38,7 +38,7 @@ import {
   isWriteAction
 } from '@opencrvs/commons/events'
 import { TrpcUserContext } from '@events/context'
-import { getEventConfigurationById } from '@events/service/config/config'
+import { getEventConfigurationForEvent } from '@events/service/config/config'
 import {
   cleanupUnreferencedFiles,
   deleteFile,
@@ -88,8 +88,8 @@ async function deleteEventAttachments(
   token: TokenWithBearer,
   event: EventDocument
 ) {
-  const configuration = await getEventConfigurationById({
-    eventType: event.type,
+  const configuration = await getEventConfigurationForEvent({
+    event,
     token
   })
 
@@ -124,8 +124,8 @@ export async function throwConflictIfActionNotAllowed(
   existingEvent?: EventDocument
 ) {
   const event = existingEvent ?? (await getEventById(eventId))
-  const eventConfiguration = await getEventConfigurationById({
-    eventType: event.type,
+  const eventConfiguration = await getEventConfigurationForEvent({
+    event,
     token
   })
 
@@ -210,7 +210,8 @@ export async function createEvent({
   eventInput,
   user,
   transactionId,
-  createdAtLocation
+  createdAtLocation,
+  config
 }: {
   eventInput: z.infer<typeof EventInput>
   user: TrpcUserContext
@@ -234,7 +235,10 @@ export async function createEvent({
     createdByRole:
       user.type === TokenUserType.enum.user ? user.role : undefined,
     createdBySignature: user.signature,
-    createdAtLocation: eventLocation
+    createdAtLocation: eventLocation,
+    // Permanent audit pin (AC #4): which form version governs this record.
+    // Never re-stamped by later actions/corrections.
+    configVersion: config.version
   })
 
   return event

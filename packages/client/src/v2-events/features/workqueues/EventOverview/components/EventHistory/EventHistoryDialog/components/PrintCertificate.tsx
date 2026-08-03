@@ -23,7 +23,7 @@ import {
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment } from '@opencrvs/components'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForEvent } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   isEmptyValue,
   Output
@@ -47,7 +47,7 @@ export function PrintCertificate({
   action: PrintCertificateAction
   validatorContext: ValidatorContext
 }) {
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForEvent(event)
   const formPages = getPrintCertificatePages(eventConfiguration)
   const intl = useIntl()
 

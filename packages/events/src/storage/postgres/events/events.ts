@@ -43,7 +43,7 @@ function toEventDocument(
   )
 
   return EventDocument.parse({
-    ...event,
+    ...dropNulls(event),
     type: eventType,
     actions: notNullActions
   })
@@ -241,7 +241,8 @@ async function getOrCreateEventInTrx(
       transactionId: input.transactionId,
       trackingId: input.trackingId,
       createdAt: input.createdAt,
-      updatedAt: input.updatedAt
+      updatedAt: input.updatedAt,
+      configVersion: input.configVersion
     })
     .onConflict((oc) => oc.columns(['transactionId', 'eventType']).doNothing())
     .execute()
@@ -282,7 +283,8 @@ async function getOrCreateEventAndAssignInTrx(
       transactionId: input.transactionId,
       trackingId: input.trackingId,
       createdAt: input.createdAt,
-      updatedAt: input.updatedAt
+      updatedAt: input.updatedAt,
+      configVersion: input.configVersion
     })
     .onConflict((oc) => oc.columns(['transactionId', 'eventType']).doNothing())
     .execute()
@@ -336,6 +338,49 @@ export const getOrCreateEvent = async (
   return db.transaction().execute(async (trx) => {
     return getOrCreateEventInTrx(input, trx)
   })
+}
+
+/**
+ * A page of events created before form versioning existed (`configVersion IS
+ * NULL`), restricted to types we can actually resolve a version for. Types
+ * with no current configuration at all are deliberately excluded from the
+ * WHERE clause (rather than filtered out after the fact) so the result set
+ * shrinks monotonically as the caller backfills it — otherwise a batch full
+ * of unconfigured-type rows would never make progress and the caller's
+ * paging loop would spin forever.
+ */
+export async function getEventsMissingConfigVersion(
+  configuredEventTypes: string[],
+  limit: number
+) {
+  if (configuredEventTypes.length === 0) {
+    return []
+  }
+
+  const db = getClient()
+  return db
+    .selectFrom('events')
+    .select(['id', 'eventType', 'createdAt'])
+    .where('configVersion', 'is', null)
+    .where('eventType', 'in', configuredEventTypes)
+    .limit(limit)
+    .execute()
+}
+
+export async function setConfigVersionForEvents(
+  eventIds: UUID[],
+  configVersion: string
+) {
+  if (eventIds.length === 0) {
+    return
+  }
+
+  const db = getClient()
+  await db
+    .updateTable('events')
+    .set({ configVersion })
+    .where('id', 'in', eventIds)
+    .execute()
 }
 
 export const getOrCreateEventAndAssign = async (

@@ -19,7 +19,7 @@ import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
 import { Frame, Button, Icon, AppBar } from '@opencrvs/components'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForEvent } from '@client/v2-events/features/events/useEventConfiguration'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
@@ -52,9 +52,8 @@ export function Onboarding() {
   const navigate = useNavigate()
   const intl = useIntl()
   const { closeActionView } = useEventFormNavigation()
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const { eventConfiguration: configuration } =
+    useEventConfigurationForEvent(event)
 
   const actionConfiguration = configuration.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION

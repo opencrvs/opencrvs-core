@@ -18,7 +18,16 @@ export const EventInput = z
     type: z.string(),
     createdAtLocation: UUID.nullish().describe(
       'Location where the event occurred. Required for system users.'
-    )
+    ),
+    configVersion: z
+      .string()
+      .optional()
+      .describe(
+        'Explicitly pin the declaration to a named form version, instead of ' +
+          'resolving the version active today. Used for digitizing legacy ' +
+          'records against the era-appropriate form (e.g. a "legacy-1985" ' +
+          'version), decoupled from the date of data entry.'
+      )
   })
   .meta({ default: { transactionId: uuidv4(), type: 'birth' } })
 

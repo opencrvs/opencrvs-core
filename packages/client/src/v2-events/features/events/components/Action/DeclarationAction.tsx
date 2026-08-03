@@ -37,7 +37,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
 import { useToastAndRedirect } from '@client/v2-events/features/events/useToastAndRedirect'
-import { useEventConfiguration } from '../../useEventConfiguration'
+import { useEventConfigurationForEvent } from '../../useEventConfiguration'
 import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
 import {
   AvailableActionTypes,
@@ -129,9 +129,8 @@ function DeclarationActionComponent({
   const { setLocalDraft, getLocalDraftOrDefault, getRemoteDraftByEventId } =
     useDrafts()
 
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const { eventConfiguration: configuration } =
+    useEventConfigurationForEvent(event)
 
   useActionGuard(actionType, event, configuration)
 

@@ -256,6 +256,7 @@ exports[`Adding actions > Event document contains all created actions 11`] = `
       "type": "READ",
     },
   ],
+  "configVersion": "legacy",
   "createdAt": "[sanitized]",
   "id": "[sanitized]",
   "trackingId": "[sanitized]",

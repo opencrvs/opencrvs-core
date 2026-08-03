@@ -51,7 +51,7 @@ import {
   ensureEventIndexed,
   processAction
 } from '@events/service/events/events'
-import { getEventConfigurationById } from '@events/service/config/config'
+import { getEventConfigurationForEvent } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
 import { getActionConfirmationToken } from '@events/service/auth'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
@@ -387,9 +387,9 @@ export function getDefaultActionProcedures(
         const { token, user, existingAction, duplicates } = ctx
         const { eventId } = input
         const event = ctx.event
-        const eventConfiguration = await getEventConfigurationById({
+        const eventConfiguration = await getEventConfigurationForEvent({
           token,
-          eventType: event.type
+          event
         })
 
         if (existingAction) {
@@ -446,9 +446,9 @@ export function getDefaultActionProcedures(
         const confirmationAction = event.actions.find(
           (a) => a.originalActionId === actionId
         )
-        const configuration = await getEventConfigurationById({
+        const configuration = await getEventConfigurationForEvent({
           token,
-          eventType: event.type
+          event
         })
 
         // Original action is not found
@@ -533,9 +533,9 @@ export function getDefaultActionProcedures(
           return getEventById(input.eventId)
         }
 
-        const configuration = await getEventConfigurationById({
+        const configuration = await getEventConfigurationForEvent({
           token: ctx.token,
-          eventType: event.type
+          event
         })
 
         return addAsyncRejectAction(

@@ -32,7 +32,7 @@ import {
   DividerVertical
 } from '@opencrvs/components'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForEvent } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ActionMenu } from '@client/v2-events/features/workqueues/EventOverview/components/ActionMenu'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -175,7 +175,7 @@ export function EventOverviewLayout({
   const { resolveAction } = useEventActionConfigurationResolver(event)
   const readActionStatus = resolveAction(ActionType.READ)
 
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForEvent(event)
   const eventIndexWithDraftApplied = draft
     ? applyDraftToEventIndex(event, draft, eventConfiguration)
     : event

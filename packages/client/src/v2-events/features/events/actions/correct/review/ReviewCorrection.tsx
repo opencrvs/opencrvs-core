@@ -45,7 +45,7 @@ import { useActionAnnotation } from '@client/v2-events/features/events/useAction
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { CorrectionDetails } from '@client/v2-events/features/events/actions/correct/request/Summary/CorrectionDetails'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
-import { useEventConfiguration } from '../../../useEventConfiguration'
+import { useEventConfigurationForEvent } from '../../../useEventConfiguration'
 
 const reviewCorrectionMessages = defineMessages({
   actionModalCancel: {
@@ -273,7 +273,7 @@ export function ReviewCorrection({
 
   const events = useEvents()
   const event = events.getEvent.getFromCache(eventId)
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForEvent(event)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { isActionAllowed } = useUserAllowedActions(eventIndex)
   const [modal, openModal] = useModal()

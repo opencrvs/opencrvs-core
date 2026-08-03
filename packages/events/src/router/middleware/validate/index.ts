@@ -52,7 +52,7 @@ import {
   getDeclarationFieldById
 } from '@opencrvs/commons/events'
 
-import { getEventConfigurationById } from '@events/service/config/config'
+import { getEventConfigurationForEvent } from '@events/service/config/config'
 import { RequestNotFoundError } from '@events/service/events/actions/correction'
 import { getEventById } from '@events/service/events/events'
 import { locationExists } from '@events/storage/postgres/administrative-hierarchy/locations'
@@ -423,8 +423,12 @@ export const validateAction: MiddlewareFunction<
   const actionType = input.type
 
   const event = await getEventById(input.eventId)
-  const eventConfig = await getEventConfigurationById({
-    eventType: event.type,
+  // Resolve the version this record is pinned to (Section 8 of the form-
+  // versioning design), not whatever's live today — so a correction made
+  // years after creation is still validated against the era-appropriate
+  // rules, and never demands data for fields that didn't exist yet.
+  const eventConfig = await getEventConfigurationForEvent({
+    event,
     token: ctx.token
   })
 

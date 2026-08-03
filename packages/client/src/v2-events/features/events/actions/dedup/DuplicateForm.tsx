@@ -31,7 +31,7 @@ import {
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { ROUTES } from '@client/v2-events/routes/routes'
-import { useEventConfiguration } from '../../useEventConfiguration'
+import { useEventConfigurationForEvent } from '../../useEventConfiguration'
 import { useEventTitle } from '../../useEvents/useEventTitle'
 import { useEvents } from '../../useEvents/useEvents'
 import { duplicateMessages } from './ReviewDuplicate'
@@ -60,9 +60,8 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
   const navigate = useNavigate()
   const { getEventTitle } = useEventTitle()
 
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    eventIndex.type
-  )
+  const { eventConfiguration: configuration } =
+    useEventConfigurationForEvent(eventIndex)
   const validatorContext = useValidatorContext()
 
   const [modal, openModal] = useModal()

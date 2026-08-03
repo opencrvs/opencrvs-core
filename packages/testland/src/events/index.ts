@@ -8,13 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { tennisClubMembershipEvent } from './tennis-club-membership'
+import { tennisClubMembershipEvent, tennisClubMembershipEventLegacy } from './tennis-club-membership'
 import { birthEvent } from './birth'
 import { deathEvent } from './death'
 import { adoptionEvent } from './adoption'
 
 export const eventConfigs = [
   tennisClubMembershipEvent,
+  tennisClubMembershipEventLegacy,
   birthEvent,
   deathEvent,
   adoptionEvent

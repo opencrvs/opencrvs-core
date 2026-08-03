@@ -17,13 +17,15 @@ import {
   EventDocument,
   mandatoryColumns,
   getCurrentEventState,
-  applyDraftToEventIndex,
-  getEventConfigById
+  applyDraftToEventIndex
 } from '@opencrvs/commons/client'
 
 import { ROUTES } from '@client/v2-events/routes'
 import { CoreWorkqueues, WORKQUEUE_DRAFT } from '@client/v2-events/utils'
-import { useEventConfigurations } from '../events/useEventConfiguration'
+import {
+  resolveEventConfiguration,
+  useEventConfigurations
+} from '../events/useEventConfiguration'
 import { SearchResultComponent } from '../events/Search/SearchResult/SearchResult'
 import { useDrafts } from '../drafts/useDrafts'
 import { useOutbox } from '../events/useEvents/outbox'
@@ -51,7 +53,7 @@ export function Draft() {
     .filter((event): event is EventDocument => !!event)
     .map((event) => {
       const draft = first(drafts.filter((d) => d.eventId === event.id))
-      const configuration = getEventConfigById(eventConfigs, event.type)
+      const configuration = resolveEventConfiguration(eventConfigs, event)
 
       const currentEventState = getCurrentEventState(event, configuration)
       return draft

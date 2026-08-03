@@ -58,6 +58,7 @@ exports[`Should add an ASSIGN action when last action is not ASSIGN 1`] = `
       "type": "ASSIGN",
     },
   ],
+  "configVersion": "legacy",
   "createdAt": "[sanitized]",
   "id": "[sanitized]",
   "trackingId": "[sanitized]",
