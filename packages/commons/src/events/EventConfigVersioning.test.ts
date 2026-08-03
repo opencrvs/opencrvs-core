@@ -20,7 +20,9 @@ import {
 } from './utils'
 import { PlainDate } from './PlainDate'
 
-const date = (value: string) => PlainDate.parse(value)
+function date(value: string) {
+  return PlainDate.parse(value)
+}
 
 describe('EventConfig versioning', () => {
   it('defaults version/effectiveFrom so pre-versioning configs keep parsing unchanged', () => {
@@ -36,7 +38,11 @@ describe('EventConfig versioning', () => {
       version: 'v2',
       effectiveFrom: '2027-01-01',
       effectiveTo: '2030-01-01',
-      versionLabel: { defaultMessage: '2027 Legal Update', id: 'v2.label', description: 'label' }
+      versionLabel: {
+        defaultMessage: '2027 Legal Update',
+        id: 'v2.label',
+        description: 'label'
+      }
     })
     expect(parsed.version).toBe('v2')
     expect(parsed.effectiveFrom).toBe('2027-01-01')
@@ -76,34 +82,64 @@ describe('EventConfig versioning', () => {
 
     it('resolves the version whose window covers the date, regardless of authoring order', () => {
       expect(
-        resolveVersionForDate(configs, tennisClubMembershipEvent.id, date('1992-06-01'))
+        resolveVersionForDate(
+          configs,
+          tennisClubMembershipEvent.id,
+          date('1992-06-01')
+        )
       ).toBe(legacy)
       expect(
-        resolveVersionForDate(configs, tennisClubMembershipEvent.id, date('2020-01-01'))
+        resolveVersionForDate(
+          configs,
+          tennisClubMembershipEvent.id,
+          date('2020-01-01')
+        )
       ).toBe(v1)
       expect(
-        resolveVersionForDate(configs, tennisClubMembershipEvent.id, date('2028-01-01'))
+        resolveVersionForDate(
+          configs,
+          tennisClubMembershipEvent.id,
+          date('2028-01-01')
+        )
       ).toBe(v2)
     })
 
     it('throws when no version is active for the date', () => {
       expect(() =>
-        resolveVersionForDate(configs, tennisClubMembershipEvent.id, date('1980-01-01'))
+        resolveVersionForDate(
+          configs,
+          tennisClubMembershipEvent.id,
+          date('1980-01-01')
+        )
       ).toThrow()
     })
 
     it('finds a version by explicit id, for digitization flows', () => {
       expect(
-        findEventConfigVersion(configs, tennisClubMembershipEvent.id, 'legacy-1990')
+        findEventConfigVersion(
+          configs,
+          tennisClubMembershipEvent.id,
+          'legacy-1990'
+        )
       ).toBe(legacy)
     })
   })
 
   describe('validateEventConfigVersions', () => {
     it('rejects duplicate (id, version) pairs', () => {
-      const v1 = { ...tennisClubMembershipEvent, version: 'v1', effectiveFrom: date('2015-01-01') } as unknown as EventConfig
-      const v1Again = { ...tennisClubMembershipEvent, version: 'v1', effectiveFrom: date('2020-01-01') } as unknown as EventConfig
-      expect(() => validateEventConfigVersions([v1, v1Again])).toThrow(/Duplicate/)
+      const v1 = {
+        ...tennisClubMembershipEvent,
+        version: 'v1',
+        effectiveFrom: date('2015-01-01')
+      } as unknown as EventConfig
+      const v1Again = {
+        ...tennisClubMembershipEvent,
+        version: 'v1',
+        effectiveFrom: date('2020-01-01')
+      } as unknown as EventConfig
+      expect(() => validateEventConfigVersions([v1, v1Again])).toThrow(
+        /Duplicate/
+      )
     })
 
     it('rejects overlapping windows for the same event type', () => {

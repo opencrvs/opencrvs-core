@@ -79,6 +79,10 @@ An integration's audit log can now be read through the `integrations.audit` endp
 
 A new `integration.audit.read` scope guards it; country configs must assign it to the relevant role(s) before the endpoint is reachable. The endpoint is closed to system clients entirely — an integration cannot read any audit log, including its own — and, because system clients have no office or administrative area, access is national and carries no jurisdiction options. [#11909](https://github.com/opencrvs/opencrvs-core/issues/11909)
 
+#### Form versioning with legal effective dates
+
+An event's form configuration can now have multiple versions, each with an `effectiveFrom`/`effectiveTo` window (plus `version`, `versionLabel`, and `supersedes` for lineage), instead of being a single, always-live definition — so a legal or policy change to a form no longer retroactively affects declarations already filed under the old rules. Each event is pinned to the version active at creation time (`EventDocument.configVersion`), and all later rendering, validation, and correction resolves against that pinned version rather than whatever's currently active. A new `defineNextVersion()` helper lets country configs author a new version as a diff of the previous one instead of duplicating the whole form. `EventInput` accepts an optional `configVersion` to explicitly pin a new declaration to a historical version — e.g. digitizing a legacy paper record under the rules that applied at the time, rather than today's. Existing configs are unaffected: omitting these fields keeps a config as a single, always-active version, matching current behavior exactly, and events created before this feature existed are backfilled with an explicit pin automatically the first time the events service starts up.
+
 ### Bug fixes
 
 - Keep a number field's postfix/unit label (e.g. `Kilograms (kg)` on Weight at birth) on a single line instead of wrapping onto a second row [#13216](https://github.com/opencrvs/opencrvs-core/issues/13216)

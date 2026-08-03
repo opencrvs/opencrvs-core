@@ -79,10 +79,20 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
       transactionId: newEvent.transactionId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      // Carries through whatever version was explicitly picked (e.g. for
-      // digitizing a legacy record) so config resolution during the
-      // optimistic window matches what the server will actually pin —
-      // otherwise it'd fall back to "active today" until onSuccess lands.
+      // Usually undefined: the "+New event" UI never sets configVersion, so
+      // this is a no-op for that flow. It only matters for a caller that
+      // explicitly pins a version on create (e.g. a digitization tool
+      // calling the create mutation directly with configVersion: 'v1').
+      // Between calling mutate() and the server's response in onSuccess,
+      // anything reading this event off the query cache — e.g.
+      // useEventConfigurationForEvent — sees this optimistic object, not the
+      // server's. If configVersion were left off here, that lookup would
+      // find it undefined and fall back to resolving "whatever's active
+      // today" instead of the version the caller actually asked for, so the
+      // event would briefly render/validate against the wrong form version
+      // until the real response replaces this cache entry. Copying it
+      // through keeps the optimistic object consistent with what the
+      // server will actually persist, closing that gap.
       configVersion: newEvent.configVersion,
       actions: [
         {

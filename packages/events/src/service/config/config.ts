@@ -48,7 +48,10 @@ function createTtlConfigCache<T>(
       return fetcher(token)
     }
 
-    if (value !== null && Date.now() - fetchedAt < env.EVENT_CONFIG_CACHE_TTL_MS) {
+    if (
+      value !== null &&
+      Date.now() - fetchedAt < env.EVENT_CONFIG_CACHE_TTL_MS
+    ) {
       return value
     }
 
@@ -123,31 +126,6 @@ async function findEventConfigurationById({
 }
 
 /**
- * @deprecated for anything touching an existing event — resolves to *some*
- * config version for `eventType` (whichever a naive `.find` hits first), not
- * necessarily the one that event was pinned to. Use
- * `getActiveEventConfiguration` when starting a new declaration, or
- * `getEventConfigurationForEvent` when acting on/rendering an existing one.
- * Kept for call sites that only care "does this event type exist at all"
- * (e.g. listing).
- */
-export async function getEventConfigurationById({
-  eventType,
-  token
-}: {
-  eventType: string
-  token: TokenWithBearer
-}) {
-  return getOrThrow(
-    await findEventConfigurationById({
-      eventType,
-      token
-    }),
-    `No configuration found for event type: ${eventType}`
-  )
-}
-
-/**
  * Resolves the form version currently in effect for `eventType` — the
  * version a brand-new, non-digitized declaration should be pinned to.
  */
@@ -201,7 +179,11 @@ export async function getEventConfigurationForEvent({
   const configurations = await getInMemoryEventConfigurations(token)
 
   if (event.configVersion) {
-    return findEventConfigVersion(configurations, event.type, event.configVersion)
+    return findEventConfigVersion(
+      configurations,
+      event.type,
+      event.configVersion
+    )
   }
 
   return resolveVersionForDate(
