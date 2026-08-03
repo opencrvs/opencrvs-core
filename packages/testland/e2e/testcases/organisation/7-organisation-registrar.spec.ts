@@ -32,7 +32,7 @@ test.describe.serial('7. Organisation Page', () => {
     })
     test('7.1.1 Verify Province -> District -> Health Facility(No Data)', async () => {
       await page.getByRole('button', { name: /Central/ }).click()
-      await page.getByRole('button', { name: /Ibombo/ }).click()
+      await page.getByRole('button', { name: /^Ibombo$/ }).click()
       await page.getByRole('button', { name: /Klow/ }).click()
 
       await expect(
@@ -65,7 +65,7 @@ test.describe.serial('7. Organisation Page', () => {
       await navigateToWorkqueue(page, 'Organisation')
       await page.getByRole('button', { name: /Organisation/ }).click()
       await page.getByRole('button', { name: /Central/ }).click()
-      await page.getByRole('button', { name: /Ibombo/ }).click()
+      await page.getByRole('button', { name: /^Ibombo$/ }).click()
 
       await page.getByRole('button', { name: /Ibombo District Office/ }).click()
 
@@ -75,7 +75,7 @@ test.describe.serial('7. Organisation Page', () => {
     })
 
     test('7.1.5 Verify Embassy Office', async () => {
-      await page.getByRole('button', { name: 'Organisation' }).click()
+      await page.getByTestId('navigation_organisation').click()
       await expect(
         await findOnOrganisationPage(page, 'French Embassy Office')
       ).toBeDisabled()

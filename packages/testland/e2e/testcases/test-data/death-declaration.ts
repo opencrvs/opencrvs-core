@@ -129,7 +129,14 @@ export async function createDeclaration(
   token: string,
   dec?: ((_: ActionUpdate) => Partial<ActionUpdate>) | Partial<ActionUpdate>,
   action: ActionType = ActionType.REGISTER,
-  placeOfDeathType?: 'DECEASED_USUAL_RESIDENCE' | 'HEALTH_FACILITY'
+  placeOfDeathType?: 'DECEASED_USUAL_RESIDENCE' | 'HEALTH_FACILITY',
+  /**
+   * Only honored for a system/integration token — the server resolves it
+   * from the user's own `primaryOfficeId` for a normal user token, ignoring
+   * this value entirely (see `buildAction`/`createEvent` in
+   * packages/events/src/service/events/events.ts).
+   */
+  createdAtLocation?: string
 ): Promise<CreateDeclarationResponse> {
   const declaration = await getDeclaration({
     partialDeclaration: dec,
@@ -141,7 +148,8 @@ export async function createDeclaration(
 
   const createResponse = await client.event.create.mutate({
     type: 'death',
-    transactionId: uuidv4()
+    transactionId: uuidv4(),
+    createdAtLocation
   })
 
   const eventId = createResponse.id as string
@@ -158,7 +166,8 @@ export async function createDeclaration(
       eventId: eventId,
       transactionId: uuidv4(),
       declaration,
-      annotation
+      annotation,
+      createdAtLocation
     })
 
     const declareAction = notifyRes.actions.find(
@@ -180,7 +189,8 @@ export async function createDeclaration(
     transactionId: uuidv4(),
     declaration,
     annotation,
-    keepAssignment: action !== ActionType.DECLARE
+    keepAssignment: action !== ActionType.DECLARE,
+    createdAtLocation
   })
 
   if (action === ActionType.DECLARE) {
@@ -199,7 +209,8 @@ export async function createDeclaration(
     eventId: eventId,
     transactionId: uuidv4(),
     declaration,
-    annotation
+    annotation,
+    createdAtLocation
   })
 
   const registerAction = registerRes.actions.find(

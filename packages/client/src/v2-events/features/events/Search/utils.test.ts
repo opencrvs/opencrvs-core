@@ -585,9 +585,30 @@ describe('withSearchLocationBehaviour', () => {
 
     expect(configOf(result)).toMatchObject({
       locationTypes: ['HEALTH_FACILITY'],
-      listHistoricalNames: true
+      listHistoricalNames: true,
+      activeOnly: false,
+      anchorToDateOfEvent: false
     })
-    expect(configOf(result)).not.toHaveProperty('activeOnly')
+  })
+
+  it('overrides activeOnly and anchorToDateOfEvent for a location field even when the declaration field set them true', () => {
+    const field = {
+      id: 'field',
+      type: FieldType.LOCATION,
+      label,
+      configuration: {
+        locationTypes: ['HEALTH_FACILITY'],
+        activeOnly: true,
+        anchorToDateOfEvent: true
+      }
+    } as FieldConfig
+
+    const result = withSearchLocationBehaviour(field)
+
+    expect(configOf(result)).toMatchObject({
+      activeOnly: false,
+      anchorToDateOfEvent: false
+    })
   })
 
   it('lists historical names and excludes inactive for an admin-structure field', () => {

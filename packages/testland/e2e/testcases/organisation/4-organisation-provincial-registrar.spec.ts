@@ -34,7 +34,7 @@ test.describe.serial('4. Organisation Page', () => {
     test.describe('4.1.1 My jurisdiction ', async () => {
       test('4.1.1.0 Verify Province -> District -> Health Facility', async () => {
         await page.getByRole('button', { name: /Central/ }).click()
-        await page.getByRole('button', { name: /Ibombo/ }).click()
+        await page.getByRole('button', { name: /^Ibombo$/ }).click()
         await page
           .getByRole('button', { name: /Ibombo District Hospital/ })
           .click()

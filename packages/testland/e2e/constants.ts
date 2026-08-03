@@ -63,6 +63,7 @@ export const CREDENTIALS = {
   REGISTRAR_VILLAGE: 'v.mweene',
   REGISTRAR_PUALULA: 'n.siame',
   REGISTRAR_GENERAL: 'c.lungu',
+  REGISTRAR_ISAMBA: 'j.banda',
   NATIONAL_SYSTEM_ADMIN: 'j.campbell',
   LOCAL_SYSTEM_ADMIN: 'e.mayuka',
   PERFORMANCE_MANAGER: 'm.musonda',

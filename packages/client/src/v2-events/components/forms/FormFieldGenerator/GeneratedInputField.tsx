@@ -269,7 +269,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
     return liveAnchorDate({
       dateOfEvent: eventConfig?.dateOfEvent,
       form: { ...validatorContext.baseFormState, ...ocrvsFullForm },
-      createdAt: validatorContext.event?.createdAt ?? todayISO()
+      createdAt: validatorContext.event?.document.createdAt ?? todayISO()
     })
   }
 
