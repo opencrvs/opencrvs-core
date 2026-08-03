@@ -17,8 +17,7 @@ import {
   FieldType,
   never,
   field,
-  user,
-  flag
+  user
 } from '@opencrvs/toolkit/events'
 import { or, not } from '@opencrvs/toolkit/conditionals'
 
@@ -102,7 +101,6 @@ export const father = defineFormPage({
         description: 'This is the label for the field',
         id: 'event.birth.action.declare.form.section.father.field.reason.label'
       },
-      secured: flag('sealed'),
       conditionals: [
         {
           type: ConditionalType.SHOW,
