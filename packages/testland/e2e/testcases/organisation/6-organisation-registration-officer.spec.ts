@@ -34,7 +34,7 @@ test.describe.serial('6. Organisation Page', () => {
     test('6.1.1 Verify team page member list of District Office', async () => {
       await page.getByRole('button', { name: /Organisation/ }).click()
       await page.getByRole('button', { name: /Central/ }).click()
-      await page.getByRole('button', { name: /Ibombo/ }).click()
+      await page.getByRole('button', { name: /^Ibombo$/ }).click()
 
       await page.getByRole('button', { name: /Ibombo District Office/ }).click()
 
@@ -49,7 +49,7 @@ test.describe.serial('6. Organisation Page', () => {
       }
 
       await page.getByRole('button', { name: /Central/ }).click()
-      await page.getByRole('button', { name: /Ibombo/ }).click()
+      await page.getByRole('button', { name: /^Ibombo$/ }).click()
 
       await expect(
         page.getByRole('button', { name: /Ibombo District Hospital/ })

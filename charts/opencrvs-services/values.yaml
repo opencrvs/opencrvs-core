@@ -216,7 +216,7 @@ otel:
   # Defaults to env.NODE_ENV
   # deployment_environment: production
   exporter_otlp_endpoint: ''
-  exporter_otlp_protocol: http/protobuf
+  exporter_otlp_protocol: grpc
 
 # OpenCRVS core image tag:
 # Deprecated: use platform.tag instead.
