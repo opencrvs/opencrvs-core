@@ -71,11 +71,13 @@ This section allows you to configure the postgres deployment within your infrast
 | backup.schedule.full | string | `0 1 * * 0` | Full backup schedule. Used when type=differential, note that value from `backup.schedule` is ignored |
 | `backup.schedule.differential` | string | `0 1 * * 1-6` | Differential backup schedule. Used when type=differential, note that value from `backup.schedule` is ignored |
 | backup.server_dir | string | `n/a` | Directory to store encrypted backup on backup server, if not defined `backup.backup_server_dir` is used |
+| backup.cronjob | boolean | `true` | Run backup as cronjob, setting to `false` allows to run one time job, e/g manual backup |
 | restore.{} | dict | `{}` | Restore configuration section, for more information please check `values.yaml` and **Restore section** in this README |
 | restore.enabled | string | `false` | Restore enabled or disabled, section has higher priority over global `restore` section |
 | restore.server_secret | string | `backup-server-ssh-credentials` | Name of the Kubernetes secret with backup server credentials, usually backup server is used for restore, thats why credentials are shared |
 | restore.encryption_secret | string | `restore-encryption-secret` | Name of the Kubernetes secret containing the backup encryption key |
 | restore.schedule | string | `0 3 * * *` | Restore cronjob schedule, if not defined then value from `restore.schedule` is used |
+| restore.cronjob | boolean | `true` | Run restore as cronjob, setting to `false` allows to run one time job, e/g manual restore, or disaster recovery scenario |
 
 ## Elasticsearch
 

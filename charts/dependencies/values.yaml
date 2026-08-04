@@ -87,13 +87,6 @@ postgres:
   backup:
     # Enable/Disable backup
     enabled: false
-
-    # Run backup jobs as cronjob
-    # Default: true
-    # If you need to run manual backup, then set this property to false
-    # and run helm template ... instead
-    cronjob: true
-
     # Backup implementation:
     # - dump: logical full backup using pg_dump (protocol-based, cross-version).
     # - differential: physical backup using pgBackRest (full/diff/incr/PITR).
@@ -132,12 +125,6 @@ postgres:
   restore:
     # Enable/Disable restore
     enabled: false
-
-    # Run backup jobs as cronjob
-    # Default: true
-    # If you need to run manual restore, then set this property to false
-    # and run helm template ... instead
-    cronjob: true
     # Restore type should be the same as backup type
     type: dump
     # See description within backup section
