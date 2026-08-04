@@ -173,6 +173,12 @@ const messagesToDefine = {
     defaultMessage: 'Informant Details (No PII)',
     description: 'Label for informant details no PII'
   },
+  apiIntegration: {
+    id: 'integrations.type.api',
+    defaultMessage: 'API integration',
+    description:
+      'Label for integration clients registered by the country configuration without a legacy system type'
+  },
   healthnotificationAlertDescription: {
     id: 'integrations.eventNotificationDescription',
     defaultMessage:

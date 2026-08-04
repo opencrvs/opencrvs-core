@@ -1,0 +1,37 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+
+approval_policy = "on-request"
+
+default_permissions = "opencrvs"
+
+[permissions.opencrvs]
+description = "OpenCRVS development — workspace write, full network, sensitive files blocked"
+extends = ":workspace"
+
+[permissions.opencrvs.filesystem]
+":minimal" = "read"
+
+[permissions.opencrvs.filesystem.":workspace_roots"]
+"." = "write"
+"**/.env" = "deny"
+"**/.env.*" = "deny"
+"**/.secrets" = "deny"
+"**/.secrets/**" = "deny"
+"**/*.pem" = "deny"
+"**/*.key" = "deny"
+"**/id_rsa" = "deny"
+"**/id_ed25519" = "deny"
+"**/wireguard" = "deny"
+"**/wireguard/**" = "deny"
+"**/wg*.conf" = "deny"
+"**/openvpn" = "deny"
+"**/openvpn/**" = "deny"
+"**/*.ovpn" = "deny"
+"**/vnc" = "deny"
+"**/vnc/**" = "deny"
+
+[permissions.opencrvs.network]
+enabled = true
+
+[permissions.opencrvs.network.domains]
+"*" = "allow"

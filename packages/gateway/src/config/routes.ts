@@ -121,6 +121,7 @@ export const getRoutes = () => {
     rateLimitedAuthProxy.verifySecurityAnswer,
     rateLimitedAuthProxy.sendUserName,
     rateLimitedAuthProxy.changePassword,
+    catchAllProxy.authInternal,
     // Catch-all is fail-open: it proxies any other /auth/* request with no rate
     // limiting. Hapi matches by specificity (literal paths beat `{suffix}`), so
     // any new auth endpoint needs its own rate-limited route added above.

@@ -18,6 +18,8 @@ import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
+  ActionDocument,
+  ActionStatus,
   ActionType,
   isActionConfigType,
   EventDocument,
@@ -184,7 +186,9 @@ function Integration({ action }: { action: EventHistoryActionDocument }) {
       <div>
         <Box />
       </div>
-      {name}
+      <Text color="primary" element="span" variant="bold14">
+        {name}
+      </Text>
     </SystemName>
   )
 }
@@ -205,6 +209,20 @@ function ActionCreator({ action }: { action: EventHistoryActionDocument }) {
     )
   }
   return <User action={action} />
+}
+
+function ActionRole({ action }: { action: EventHistoryActionDocument }) {
+  const intl = useIntl()
+  const role = action.createdByRole
+  const { getActionCreator } = useActionCreator()
+  const { type } = getActionCreator(action)
+
+  // Integrations have no role by design
+  if (type === 'system' || type === 'integration') {
+    return null
+  }
+
+  return <>{intl.formatMessage(messages.role, { role })}</>
 }
 
 function ActionLocation({ action }: { action: EventHistoryActionDocument }) {
@@ -234,7 +252,8 @@ function ActionLocation({ action }: { action: EventHistoryActionDocument }) {
         : undefined
   })
 
-  if (type === 'system') {
+  // Integrations have no office by design
+  if (type === 'system' || type === 'integration') {
     return null
   }
 
@@ -296,10 +315,23 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
     eventConfiguration
   )
 
-  const visibleHistoryWithClientSpecificActions =
-    historyWithClientSpecificActions.filter(
-      ({ type }) => type !== ActionType.CREATE
-    )
+  // Rejected action confirmations (e.g. an external ID system such as MOSIP
+  // rejecting a deferred registration) are excluded from the regular history
+  // extraction. Surface rejected registrations so the record does not appear
+  // to be waiting for external validation forever.
+  const rejectedRegistrations = fullEvent.actions.filter(
+    (a): a is ActionDocument =>
+      a.type === ActionType.REGISTER &&
+      a.status === ActionStatus.Rejected &&
+      Boolean(a.originalActionId)
+  )
+
+  const visibleHistoryWithClientSpecificActions = [
+    ...historyWithClientSpecificActions,
+    ...rejectedRegistrations
+  ]
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+    .filter(({ type }) => type !== ActionType.CREATE)
 
   const onHistoryRowClick = (
     action: EventHistoryActionDocument,
@@ -385,7 +417,10 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
           ? intl.formatMessage(actionConfig.auditHistoryLabel)
           : intl.formatMessage(eventHistoryStatusMessage, {
               action: getActionTypeForHistory(history, action),
-              status: action.status
+              status: action.status,
+              // Lets countries configure different wording for actions
+              // performed by an integration, e.g. "Registered and UIN created"
+              userType: action.createdByUserType
             })
 
       return {

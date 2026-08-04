@@ -39,6 +39,8 @@ export type FormWizardProps = PropsWithChildren<{
   onSubmit: () => void
   pageTitle: string
   showReviewButton?: boolean
+  /** Buttons rendered in the top right corner of the page header */
+  topActionButtons?: React.ReactElement[]
 }>
 
 export const FormWizard = ({
@@ -49,6 +51,7 @@ export const FormWizard = ({
   onNextPage,
   onPreviousPage,
   showReviewButton,
+  topActionButtons,
   continueButtonText = 'Continue'
 }: FormWizardProps & {
   continueButtonText?: string
@@ -66,7 +69,11 @@ export const FormWizard = ({
         )}
       </Frame.SectionFormBackAction>
       <Frame.Section>
-        <Content showTitleOnMobile={true} title={pageTitle}>
+        <Content
+          showTitleOnMobile={true}
+          title={pageTitle}
+          topActionButtons={topActionButtons}
+        >
           <Stack alignItems="stretch" direction="column" gap={16}>
             {children}
 

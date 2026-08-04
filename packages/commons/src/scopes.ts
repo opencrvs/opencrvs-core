@@ -73,7 +73,10 @@ const PlainScopeType = z.enum([
 
   // Scopes used exclusively by countryconfig integration token
   'record.confirm-registration',
-  'record.reject-registration'
+  'record.reject-registration',
+
+  // bootstrap: allows countryconfig to register integrations on startup
+  'integration.create'
 ])
 
 const scopeByEvent = z

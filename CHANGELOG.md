@@ -10,6 +10,30 @@
 
 - Re-enable ARM-based images in the Tiltfile so local developers can run OpenCRVS on Apple silicon. [#13285](https://github.com/opencrvs/opencrvs-core/pull/13285)
 
+## 1.9.16
+
+### New features
+
+- Third-party integrations (such as MOSIP) can now authenticate with their own client ID and secret instead of borrowing the requesting user's session. Integrations are registered on startup from the country configuration, so they keep working across service restarts and the audit trail attributes actions to the integration (e.g. "Registered — MOSIP") rather than to a person. Opt-in: configurations with no integrations are unaffected. [#12360](https://github.com/opencrvs/opencrvs-core/issues/12360)
+
+- Form pages can now show a "Clear" button that resets every field on the page to its default value after a confirmation dialog, and select fields can be cleared without picking another option. Opt in per page with `showClearButton: true`. Country configurations need the `buttons.clear`, `clearForm.title.clearFormConfirm` and `clearForm.desc.clearFormConfirm` translation keys. [#10135](https://github.com/opencrvs/opencrvs-core/issues/10135)
+
+### Improvements
+
+- Hardened the Content Security Policy served by the client and login apps, following a vulnerability scan. The login app no longer allows `unsafe-eval` or wildcard-domain scripts, both apps now send `frame-ancestors`, `base-uri` and `form-action`, `img-src` no longer permits plain-HTTP images, and PDF previews disable pdf.js code generation. The client still requires `unsafe-eval` to compile configuration at runtime; the reasoning is documented next to the policy in `packages/client/nginx.conf`. [#13246](https://github.com/opencrvs/opencrvs-core/issues/13246)
+
+  **Deployment notes:**
+
+  - Images served over plain HTTP are now blocked in both apps. Serve those assets over HTTPS.
+  - `CONTENT_SECURITY_POLICY_WILDCARD` defaults to `*.<domain>`, which trusts every subdomain. It is substituted verbatim, so an explicit space-separated origin list can be used instead; minimum sets are documented in `packages/client/nginx.conf` and `packages/login/nginx.conf`.
+  - Reverse-proxy TLS cipher suites are outside OpenCRVS core. Proxies without explicit TLS options often fall back to a TLS 1.2 list offering CBC suites with HMAC-SHA-1; restricting to AEAD suites satisfies guidance such as ANSSI-BP-035.
+
+### Bug fixes
+
+- Activating a user account now requires the caller to be the account owner. Previously any user holding `user.update` or `user.update[my-jurisdiction]` could set a pending user's password and security answers, allowing account takeover. Enforced in both the gateway and user management. [#13197](https://github.com/opencrvs/opencrvs-core/pull/13197)
+- Changing a password now requires the caller to be the account owner, and the current password is always required. Administrators still reset passwords through "Reset password", which is unchanged.
+- On mobile, uploading a file or signature no longer triggers the PIN re-lock screen. [#13124](https://github.com/opencrvs/opencrvs-core/issues/13124)
+
 ## 2.0.0 Release
 
 ### Upgrade guidance
@@ -152,7 +176,7 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - Reduce the amount of data sent to Elasticsearch by dropping unused and duplicate fields during Filebeat processing [#11232](https://github.com/opencrvs/opencrvs-core/issues/11232)
 - The app now recovers automatically when the network changes (e.g. Ethernet → WiFi) or become online -> offline -> online again during app initialisation is halfway. If connectivity drops while the app is still loading and is then restored, the app reloads itself to finish loading, instead of getting stuck on the "Installing application…" screen and requiring a manual refresh. [#12898](https://github.com/opencrvs/opencrvs-core/issues/12898)
 
-## 1.9.15 Release Candidate
+## 1.9.15
 
 ### Improvements
 
