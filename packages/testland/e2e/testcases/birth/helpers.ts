@@ -195,6 +195,7 @@ type BirthLocationInputs<P extends PlaceOfBirth> = P extends 'Other'
         country: string
         province: string
         district: string
+        village: string
         town: string
         residentialArea: string
         street: string
@@ -217,6 +218,7 @@ function generateBirthLocationInputs<P extends PlaceOfBirth>(
         country: 'Farajaland',
         province: 'Central',
         district: 'Ibombo',
+        village: 'Klow',
         town: faker.location.city(),
         residentialArea: faker.location.county(),
         street: faker.location.street(),
