@@ -28,7 +28,8 @@ import { CREDENTIALS, GATEWAY_HOST } from '../../constants'
 import {
   assertRecordInWorkqueue,
   fillDate,
-  formatV2ChildName
+  formatV2ChildName,
+  generateBirthInputs
 } from '../birth/helpers'
 import {
   ensureAssignedToUser,
@@ -40,65 +41,7 @@ import { createDeclaration, Declaration } from '../test-data/birth-declaration'
 import { openRecordByTitle } from '../print-certificate/birth/helpers'
 
 test('Basic Archival flow', async ({ page }) => {
-  const declaration = {
-    child: {
-      name: {
-        firstNames: faker.person.firstName('male'),
-        familyName: faker.person.lastName('male')
-      },
-      gender: 'Male',
-      birthDate: getRandomDate(0, 200)
-    },
-    attendantAtBirth: 'Physician',
-    birthType: 'Single',
-    weightAtBirth: 2.4,
-    placeOfBirth: 'Health Institution',
-    birthLocation: { facility: 'Klow Village Hospital' },
-    informantType: 'Mother',
-    informantEmail: faker.internet.email(),
-    mother: {
-      name: {
-        firstNames: faker.person.firstName('female'),
-        familyName: faker.person.lastName('female')
-      },
-      birthDate: getRandomDate(20, 200),
-      nationality: 'Farajaland',
-      identifier: {
-        id: faker.string.numeric(10),
-        type: 'National ID'
-      },
-      address: {
-        country: 'Farajaland',
-        province: 'Sulaka',
-        district: 'Irundu',
-        village: 'Xhosa',
-        town: faker.location.city(),
-        residentialArea: faker.location.county(),
-        street: faker.location.street(),
-        number: faker.location.buildingNumber(),
-        postcodeOrZip: faker.location.zipCode()
-      },
-      maritalStatus: 'Single',
-      levelOfEducation: 'No schooling'
-    },
-    father: {
-      name: {
-        firstNames: faker.person.firstName('male'),
-        familyName: faker.person.lastName('male')
-      },
-      birthDate: getRandomDate(22, 200),
-      nationality: 'Gabon',
-      identifier: {
-        id: faker.string.numeric(10),
-        type: 'National ID'
-      },
-      maritalStatus: 'Single',
-      levelOfEducation: 'No schooling',
-      address: {
-        sameAsMother: true
-      }
-    }
-  }
+  const declaration = generateBirthInputs(true)
   await test.step('Login as HO', async () => {
     await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
   })

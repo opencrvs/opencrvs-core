@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, type Page } from '@playwright/test'
-import { omit } from 'lodash'
-import { formatName, joinValuesWith } from '../../helpers'
+import { omit, merge } from 'lodash'
+import { formatName, getRandomDate, joinValuesWith } from '../../helpers'
 import { faker } from '@faker-js/faker'
 import { GATEWAY_HOST } from '../../constants'
 import { createClient } from '@opencrvs/toolkit/api'
@@ -185,4 +185,94 @@ export async function verifyTeamMembers(
       await expect(memberButton).toBeEnabled()
     }
   }
+}
+
+export function generateRequiredBirthInputs() {
+  return {
+    child: {
+      name: {
+        firstNames: faker.person.firstName('male'),
+        familyName: faker.person.lastName('male')
+      },
+      gender: 'Male',
+      birthDate: getRandomDate(0, 200)
+    },
+    placeOfBirth: 'Health Institution',
+    birthLocation: { facility: 'Klow Village Hospital' },
+    informantType: 'Mother',
+    informantEmail: faker.internet.email(),
+    mother: {
+      name: {
+        firstNames: faker.person.firstName('female'),
+        familyName: faker.person.lastName('female')
+      },
+      birthDate: getRandomDate(20, 200),
+      nationality: 'Farajaland',
+      identifier: {
+        id: faker.string.numeric(10),
+        type: 'National ID'
+      },
+      address: {
+        country: 'Farajaland',
+        province: 'Sulaka',
+        district: 'Irundu',
+        village: 'Xhosa'
+      }
+    },
+    father: {
+      name: {
+        firstNames: faker.person.firstName('male'),
+        familyName: faker.person.lastName('male')
+      },
+      birthDate: getRandomDate(22, 200),
+      nationality: 'Gabon',
+      identifier: {
+        id: faker.string.numeric(10),
+        type: 'National ID'
+      },
+      address: {
+        sameAsMother: true
+      }
+    }
+  }
+}
+
+function generateOptionalBirthInputs() {
+  return {
+    attendantAtBirth: 'Physician',
+    birthType: 'Single',
+    weightAtBirth: 2.4,
+    mother: {
+      address: {
+        town: faker.location.city(),
+        residentialArea: faker.location.county(),
+        street: faker.location.street(),
+        number: faker.location.buildingNumber(),
+        postcodeOrZip: faker.location.zipCode()
+      },
+      maritalStatus: 'Single',
+      levelOfEducation: 'No schooling'
+    },
+    father: {
+      maritalStatus: 'Single',
+      levelOfEducation: 'No schooling'
+    }
+  }
+}
+type RequiredBirthInputs = ReturnType<typeof generateRequiredBirthInputs>
+type OptionalBirthInputs = ReturnType<typeof generateOptionalBirthInputs>
+
+export function generateBirthInputs(
+  includeOptionalFields: true
+): RequiredBirthInputs & OptionalBirthInputs
+export function generateBirthInputs(
+  includeOptionalFields?: false
+): RequiredBirthInputs
+export function generateBirthInputs(
+  includeOptionalFields?: boolean
+): RequiredBirthInputs | (RequiredBirthInputs & OptionalBirthInputs) {
+  const requiredInputs = generateRequiredBirthInputs()
+  return includeOptionalFields
+    ? merge(requiredInputs, generateOptionalBirthInputs())
+    : requiredInputs
 }
