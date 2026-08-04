@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
+
 import { createPrng, generateUuid, TestUserRole } from './test.utils'
 import { SystemContext, UserContext } from '../users/User'
 import {
