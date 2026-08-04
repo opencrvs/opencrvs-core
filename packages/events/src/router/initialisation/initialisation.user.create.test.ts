@@ -37,9 +37,9 @@ test('Returns 403 after initialisation is completed', async () => {
   const client = createInitialisationTestClient()
   await expect(client.complete()).resolves.toBeUndefined()
 
-  await expect(
-    client.locations.set({ locations: locationPayload })
-  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+  await expect(client.locations.set(locationPayload)).rejects.toMatchObject(
+    new TRPCError({ code: 'UNAUTHORIZED' })
+  )
 })
 
 test('Returns 403 when accessed with user app token', async () => {
@@ -53,7 +53,7 @@ test('Returns 403 when accessed with user app token', async () => {
   })
   const client = createInitialisationTestClient(appToken)
 
-  await expect(client.locations.set({ locations: [] })).rejects.toMatchObject(
+  await expect(client.locations.set([])).rejects.toMatchObject(
     new TRPCError({ code: 'UNAUTHORIZED' })
   )
 })
@@ -69,9 +69,9 @@ test('Returns 403 when accessed with system app token', async () => {
 
   const client = createInitialisationTestClient(systemToken)
 
-  await expect(
-    client.locations.set({ locations: locationPayload })
-  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+  await expect(client.locations.set(locationPayload)).rejects.toMatchObject(
+    new TRPCError({ code: 'UNAUTHORIZED' })
+  )
 })
 
 test('Returns 403 when accessed with internal token using invalid subject', async () => {
@@ -83,9 +83,9 @@ test('Returns 403 when accessed with internal token using invalid subject', asyn
 
   const client = createInitialisationTestClient(internalToken)
 
-  await expect(
-    client.locations.set({ locations: locationPayload })
-  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+  await expect(client.locations.set(locationPayload)).rejects.toMatchObject(
+    new TRPCError({ code: 'UNAUTHORIZED' })
+  )
 })
 
 test('Allows user creation when with the right token', async () => {
@@ -94,7 +94,7 @@ test('Allows user creation when with the right token', async () => {
   const client = createInitialisationTestClient()
   const eventsDb = getClient()
 
-  await client.locations.set({ locations: locationPayload })
+  await client.locations.set(locationPayload)
   const location = await eventsDb
     .selectFrom('locations')
     .selectAll()
@@ -156,7 +156,7 @@ test('Throws error when creating user with existing email', async () => {
   const client = createInitialisationTestClient()
   const eventsDb = getClient()
 
-  await client.locations.set({ locations: locationPayload })
+  await client.locations.set(locationPayload)
   const location = await eventsDb
     .selectFrom('locations')
     .selectAll()
@@ -191,7 +191,7 @@ test('Throws error when creating user with existing mobile', async () => {
   const client = createInitialisationTestClient()
   const eventsDb = getClient()
 
-  await client.locations.set({ locations: locationPayload })
+  await client.locations.set(locationPayload)
   const location = await eventsDb
     .selectFrom('locations')
     .selectAll()
@@ -227,7 +227,7 @@ test('Creates user with active status when status is provided', async () => {
   const client = createInitialisationTestClient()
   const eventsDb = getClient()
 
-  await client.locations.set({ locations: locationPayload })
+  await client.locations.set(locationPayload)
   const location = await eventsDb
     .selectFrom('locations')
     .selectAll()
@@ -263,7 +263,7 @@ test('Throws error when creating user with invalid username', async () => {
   const client = createInitialisationTestClient()
   const eventsDb = getClient()
 
-  await client.locations.set({ locations: locationPayload })
+  await client.locations.set(locationPayload)
   const location = await eventsDb
     .selectFrom('locations')
     .selectAll()
@@ -352,7 +352,7 @@ test('Creates user with pending status when no status is provided', async () => 
   const client = createInitialisationTestClient()
   const eventsDb = getClient()
 
-  await client.locations.set({ locations: locationPayload })
+  await client.locations.set(locationPayload)
   const location = await eventsDb
     .selectFrom('locations')
     .selectAll()

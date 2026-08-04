@@ -26,13 +26,9 @@ export function setAdministrativeAreasRoute(
   procedure: typeof internalProcedure | typeof userAndSystemProcedure
 ) {
   return procedure
-    .input(
-      z.object({ administrativeAreas: z.array(AdministrativeArea).min(1) })
-    )
+    .input(z.array(AdministrativeArea).min(1))
     .output(z.void())
-    .mutation(async ({ input }) =>
-      setAdministrativeAreas(input.administrativeAreas)
-    )
+    .mutation(async ({ input }) => setAdministrativeAreas(input))
 }
 
 export const administrativeAreaRouter = router({
@@ -53,18 +49,8 @@ export const administrativeAreaRouter = router({
       })
     ),
   set: setAdministrativeAreasRoute(
-    userAndSystemProcedure
-      .meta({
-        openapi: {
-          summary: 'Bulk create or update administrative areas',
-          description:
-            'Upsert administrative areas by id for data seeding. Body is `{ "administrativeAreas": [...] }`. Existing administrative areas are matched by id: `parentId` is always overwritten with the supplied value, while `name`, `externalId` and `validUntil` are only overwritten when a non-null value is supplied. Requires the user.data-seeding or config.update-all scope.',
-          method: 'POST',
-          path: '/administrative-areas',
-          tags: ['Administrative areas'],
-          protect: true
-        }
-      })
-      .use(allowedWithAnyOfScopes(['user.data-seeding', 'config.update-all']))
+    userAndSystemProcedure.use(
+      allowedWithAnyOfScopes(['user.data-seeding', 'config.update-all'])
+    )
   )
 })

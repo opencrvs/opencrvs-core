@@ -53,10 +53,10 @@ export function setLocationsRoute(
   procedure: typeof internalProcedure | typeof userAndSystemProcedure
 ) {
   return procedure
-    .input(z.object({ locations: z.array(Location).min(1) }))
+    .input(z.array(Location).min(1))
     .output(z.void())
     .mutation(async ({ input }) => {
-      await setLocations(input.locations)
+      await setLocations(input)
     })
 }
 
@@ -74,19 +74,9 @@ export const locationRouter = router({
     })
   ),
   set: setLocationsRoute(
-    userAndSystemProcedure
-      .meta({
-        openapi: {
-          summary: 'Bulk create or update locations',
-          description:
-            'Upsert locations by id for data seeding. Body is `{ "locations": [...] }`. Existing locations are matched by id: `administrativeAreaId` and `locationType` are always overwritten with the supplied value, while `name`, `externalId` and `validUntil` are only overwritten when a non-null value is supplied. Requires the user.data-seeding or config.update-all scope.',
-          method: 'POST',
-          path: '/locations',
-          tags: ['Locations'],
-          protect: true
-        }
-      })
-      .use(allowedWithAnyOfScopes(['user.data-seeding', 'config.update-all']))
+    userAndSystemProcedure.use(
+      allowedWithAnyOfScopes(['user.data-seeding', 'config.update-all'])
+    )
   ),
   get: userAndSystemProcedure
     .input(z.object({ id: UUID }))

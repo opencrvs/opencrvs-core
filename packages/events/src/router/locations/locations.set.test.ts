@@ -24,7 +24,7 @@ test('prevents forbidden access if missing required scope', async () => {
   const registrarClient = createTestClient(user)
 
   await expect(
-    registrarClient.locations.set({ locations: [] })
+    registrarClient.locations.set([])
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
@@ -34,9 +34,7 @@ test('Allows national system admin to set locations', async () => {
 
   const locationRng = createPrng(846)
   await expect(
-    dataSeedingClient.locations.set({
-      locations: generator.locations.set(1, locationRng)
-    })
+    dataSeedingClient.locations.set(generator.locations.set(1, locationRng))
   ).resolves.toEqual(undefined)
 })
 
@@ -45,7 +43,7 @@ test('Prevents sending empty payload', async () => {
   const dataSeedingClient = createTestClient(user, [scope])
 
   await expect(
-    dataSeedingClient.locations.set({ locations: [] })
+    dataSeedingClient.locations.set([])
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
@@ -66,7 +64,7 @@ test('Creates single location', async () => {
     }
   ]
 
-  await dataSeedingClient.locations.set({ locations: locationPayload })
+  await dataSeedingClient.locations.set(locationPayload)
 
   const locations = await dataSeedingClient.locations.list()
 
@@ -92,10 +90,8 @@ test('Creates multiple locations under administrative area', async () => {
     rng
   )
 
-  await dataSeedingClient.administrativeAreas.set({
-    administrativeAreas: administrativeAreaPayload
-  })
-  await dataSeedingClient.locations.set({ locations: locationPayload })
+  await dataSeedingClient.administrativeAreas.set(administrativeAreaPayload)
+  await dataSeedingClient.locations.set(locationPayload)
 
   const locations = await dataSeedingClient.locations.list()
 
@@ -108,31 +104,27 @@ test('updates externalId on existing location when re-seeded with a value', asyn
 
   const locationId = generateUuid()
 
-  await dataSeedingClient.locations.set({
-    locations: [
-      {
-        id: locationId,
-        administrativeAreaId: null,
-        name: 'Location without external id',
-        validUntil: null,
-        locationType: 'CRVS_OFFICE',
-        externalId: null
-      }
-    ]
-  })
+  await dataSeedingClient.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Location without external id',
+      validUntil: null,
+      locationType: 'CRVS_OFFICE',
+      externalId: null
+    }
+  ])
 
-  await dataSeedingClient.locations.set({
-    locations: [
-      {
-        id: locationId,
-        administrativeAreaId: null,
-        name: 'Location without external id',
-        validUntil: null,
-        locationType: 'CRVS_OFFICE',
-        externalId: 'pcode123'
-      }
-    ]
-  })
+  await dataSeedingClient.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Location without external id',
+      validUntil: null,
+      locationType: 'CRVS_OFFICE',
+      externalId: 'pcode123'
+    }
+  ])
 
   const locations = await dataSeedingClient.locations.list()
   const updated = locations.find((l) => l.id === locationId)
@@ -148,7 +140,7 @@ test('seeding locations is additive, not destructive', async () => {
   const locationRng = createPrng(847)
   const initialPayload = generator.locations.set(5, locationRng)
 
-  await dataSeedingClient.locations.set({ locations: initialPayload })
+  await dataSeedingClient.locations.set(initialPayload)
 
   const locationAfterInitialSeed = await dataSeedingClient.locations.list()
   expect(locationAfterInitialSeed).toHaveLength(
@@ -158,9 +150,7 @@ test('seeding locations is additive, not destructive', async () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_removedLocation, ...remainingLocationsPayload] = initialPayload
 
-  await dataSeedingClient.locations.set({
-    locations: remainingLocationsPayload
-  })
+  await dataSeedingClient.locations.set(remainingLocationsPayload)
 
   const remainingLocationsAfterDeletion =
     await dataSeedingClient.locations.list()

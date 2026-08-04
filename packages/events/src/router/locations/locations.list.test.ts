@@ -35,7 +35,7 @@ test('Returns single location in right format', async () => {
     }
   ]
 
-  await client.locations.set({ locations: setLocationPayload })
+  await client.locations.set(setLocationPayload)
 
   const locations = await client.locations.list()
 
@@ -50,9 +50,7 @@ test('Returns multiple locations', async () => {
   const initialLocations = await client.locations.list()
 
   const locationRng = createPrng(845)
-  await client.locations.set({
-    locations: generator.locations.set(5, locationRng)
-  })
+  await client.locations.set(generator.locations.set(5, locationRng))
 
   const locations = await client.locations.list()
 
