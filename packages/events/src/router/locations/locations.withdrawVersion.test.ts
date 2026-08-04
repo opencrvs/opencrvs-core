@@ -138,6 +138,33 @@ test('rejects withdrawing a version whose effectiveFrom has already passed', asy
   expect(auditEntries).toHaveLength(0)
 })
 
+test('rejects withdrawing the only version a location has', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const created = await createLocation(client, {
+    name: 'Single Version Office',
+    externalId: 'withdraw-only-version-pcode',
+    effectiveFrom: '2099-01-01'
+  })
+
+  await expect(
+    client.locations.withdrawVersion({
+      id: created.id,
+      versionId: created.versions[0].versionId
+    })
+  ).rejects.toMatchObject({
+    code: 'CONFLICT',
+    message: expect.stringContaining('only one version')
+  })
+
+  const versionsInDb = await getVersionsFromDb(created.id)
+  expect(versionsInDb).toHaveLength(1)
+
+  const auditEntries = await getWithdrawAuditEntries()
+  expect(auditEntries).toHaveLength(0)
+})
+
 test('rejects withdrawing an already-effective INACTIVE version too — the check is date-based, not status-based', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [scope])
