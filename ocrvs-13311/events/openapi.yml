@@ -843,14 +843,15 @@ paths:
         "404": *a5
         "500": *a4
     post:
-      operationId: locations-set
-      summary: Bulk create or update locations
-      description: 'Upsert locations by id for data seeding. Body is `{ "locations":
-        [...] }`. Existing locations are matched by id: `administrativeAreaId`
-        and `locationType` are always overwritten with the supplied value, while
-        `name`, `externalId` and `validUntil` are only overwritten when a
-        non-null value is supplied. Requires the user.data-seeding or
-        config.update-all scope.'
+      operationId: locations-upsert
+      summary: Create or update a location
+      description: "Upsert a single location by id. Intended for adding or correcting
+        one location at a time (e.g. fixing a seeding error), not for bulk
+        seeding — use the tRPC `locations.set` mutation for that. Existing
+        locations are matched by id: `administrativeAreaId` and `locationType`
+        are always overwritten with the supplied value, while `name`,
+        `externalId` and `validUntil` are only overwritten when a non-null value
+        is supplied. Requires the user.data-seeding or config.update-all scope."
       tags:
         - Locations
       security:
@@ -863,46 +864,38 @@ paths:
             schema:
               type: object
               properties:
-                locations:
-                  minItems: 1
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        format: uuid
-                        pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                      name:
-                        type: string
-                      externalId:
-                        anyOf:
-                          - type: string
-                          - type: "null"
-                      administrativeAreaId:
-                        anyOf:
-                          - type: string
-                            format: uuid
-                            pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                          - type: "null"
-                      validUntil:
-                        anyOf:
-                          - type: string
-                            format: date-time
-                            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-                          - type: "null"
-                      locationType:
-                        anyOf:
-                          - type: string
-                          - type: "null"
-                    required:
-                      - id
-                      - name
-                      - administrativeAreaId
-                      - validUntil
-                      - locationType
+                id:
+                  type: string
+                  format: uuid
+                  pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                name:
+                  type: string
+                externalId:
+                  anyOf:
+                    - type: string
+                    - type: "null"
+                administrativeAreaId:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                    - type: "null"
+                validUntil:
+                  anyOf:
+                    - type: string
+                      format: date-time
+                      pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                    - type: "null"
+                locationType:
+                  anyOf:
+                    - type: string
+                    - type: "null"
               required:
-                - locations
+                - id
+                - name
+                - administrativeAreaId
+                - validUntil
+                - locationType
       responses:
         "200":
           description: Successful response
@@ -915,14 +908,15 @@ paths:
         "500": *a4
   /administrative-areas:
     post:
-      operationId: administrativeAreas-set
-      summary: Bulk create or update administrative areas
-      description: 'Upsert administrative areas by id for data seeding. Body is `{
-        "administrativeAreas": [...] }`. Existing administrative areas are
-        matched by id: `parentId` is always overwritten with the supplied value,
-        while `name`, `externalId` and `validUntil` are only overwritten when a
-        non-null value is supplied. Requires the user.data-seeding or
-        config.update-all scope.'
+      operationId: administrativeAreas-upsert
+      summary: Create or update an administrative area
+      description: "Upsert a single administrative area by id. Intended for adding or
+        correcting one administrative area at a time (e.g. fixing a seeding
+        error), not for bulk seeding — use the tRPC `administrativeAreas.set`
+        mutation for that. Existing administrative areas are matched by id:
+        `parentId` is always overwritten with the supplied value, while `name`,
+        `externalId` and `validUntil` are only overwritten when a non-null value
+        is supplied. Requires the user.data-seeding or config.update-all scope."
       tags:
         - Administrative areas
       security:
@@ -935,41 +929,33 @@ paths:
             schema:
               type: object
               properties:
-                administrativeAreas:
-                  minItems: 1
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        format: uuid
-                        pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                      name:
-                        type: string
-                      externalId:
-                        anyOf:
-                          - type: string
-                          - type: "null"
-                      parentId:
-                        anyOf:
-                          - type: string
-                            format: uuid
-                            pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                          - type: "null"
-                      validUntil:
-                        anyOf:
-                          - type: string
-                            format: date-time
-                            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-                          - type: "null"
-                    required:
-                      - id
-                      - name
-                      - parentId
-                      - validUntil
+                id:
+                  type: string
+                  format: uuid
+                  pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                name:
+                  type: string
+                externalId:
+                  anyOf:
+                    - type: string
+                    - type: "null"
+                parentId:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                    - type: "null"
+                validUntil:
+                  anyOf:
+                    - type: string
+                      format: date-time
+                      pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                    - type: "null"
               required:
-                - administrativeAreas
+                - id
+                - name
+                - parentId
+                - validUntil
       responses:
         "200":
           description: Successful response
