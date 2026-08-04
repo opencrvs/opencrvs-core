@@ -41,7 +41,7 @@ import { createDeclaration, Declaration } from '../test-data/birth-declaration'
 import { openRecordByTitle } from '../print-certificate/birth/helpers'
 
 test('Basic Archival flow', async ({ page }) => {
-  const declaration = generateBirthInputs(true)
+  const declaration = generateBirthInputs({ includeOptionalFields: true })
   await test.step('Login as HO', async () => {
     await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
   })

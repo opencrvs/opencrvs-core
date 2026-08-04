@@ -186,8 +186,55 @@ export async function verifyTeamMembers(
     }
   }
 }
+type PlaceOfBirth = 'Health Institution' | 'Other'
 
-export function generateRequiredBirthInputs() {
+type BirthLocationInputs<P extends PlaceOfBirth> = P extends 'Other'
+  ? {
+      placeOfBirth: 'Other'
+      birthLocation: {
+        country: string
+        province: string
+        district: string
+        town: string
+        residentialArea: string
+        street: string
+        number: string
+        postcodeOrZip: string
+      }
+    }
+  : {
+      placeOfBirth: 'Health Institution'
+      birthLocation: { facility: string }
+    }
+
+function generateBirthLocationInputs<P extends PlaceOfBirth>(
+  placeOfBirth: P
+): BirthLocationInputs<P> {
+  if (placeOfBirth === 'Other') {
+    return {
+      placeOfBirth: 'Other',
+      birthLocation: {
+        country: 'Farajaland',
+        province: 'Central',
+        district: 'Ibombo',
+        town: faker.location.city(),
+        residentialArea: faker.location.county(),
+        street: faker.location.street(),
+        number: faker.location.buildingNumber(),
+        postcodeOrZip: faker.location.zipCode()
+      }
+    } as BirthLocationInputs<P>
+  }
+
+  return {
+    placeOfBirth: 'Health Institution',
+    birthLocation: { facility: 'Klow Village Hospital' }
+  } as BirthLocationInputs<P>
+}
+
+function generateRequiredBirthInputs<
+  P extends PlaceOfBirth = 'Health Institution'
+>(placeOfBirth: P = 'Health Institution' as P) {
   return {
     child: {
       name: {
@@ -197,8 +244,7 @@ export function generateRequiredBirthInputs() {
       gender: 'Male',
       birthDate: getRandomDate(0, 200)
     },
-    placeOfBirth: 'Health Institution',
-    birthLocation: { facility: 'Klow Village Hospital' },
+    ...generateBirthLocationInputs(placeOfBirth),
     informantType: 'Mother',
     informantEmail: faker.internet.email(),
     mother: {
@@ -259,20 +305,39 @@ function generateOptionalBirthInputs() {
     }
   }
 }
-type RequiredBirthInputs = ReturnType<typeof generateRequiredBirthInputs>
+
+type RequiredBirthInputs<P extends PlaceOfBirth = 'Health Institution'> =
+  ReturnType<typeof generateRequiredBirthInputs<P>>
 type OptionalBirthInputs = ReturnType<typeof generateOptionalBirthInputs>
 
-export function generateBirthInputs(
+export function generateBirthInputs(options: {
   includeOptionalFields: true
-): RequiredBirthInputs & OptionalBirthInputs
-export function generateBirthInputs(
+  placeOfBirth?: 'Health Institution'
+}): RequiredBirthInputs<'Health Institution'> & OptionalBirthInputs
+
+export function generateBirthInputs(options: {
+  includeOptionalFields: true
+  placeOfBirth: 'Other'
+}): RequiredBirthInputs<'Other'> & OptionalBirthInputs
+
+export function generateBirthInputs(options?: {
   includeOptionalFields?: false
-): RequiredBirthInputs
-export function generateBirthInputs(
+  placeOfBirth?: 'Health Institution'
+}): RequiredBirthInputs<'Health Institution'>
+
+export function generateBirthInputs(options: {
+  includeOptionalFields?: false
+  placeOfBirth: 'Other'
+}): RequiredBirthInputs<'Other'>
+
+export function generateBirthInputs(options?: {
   includeOptionalFields?: boolean
-): RequiredBirthInputs | (RequiredBirthInputs & OptionalBirthInputs) {
-  const requiredInputs = generateRequiredBirthInputs()
-  return includeOptionalFields
+  placeOfBirth?: PlaceOfBirth
+}) {
+  const placeOfBirth = options?.placeOfBirth ?? 'Health Institution'
+  const requiredInputs = generateRequiredBirthInputs(placeOfBirth)
+
+  return options?.includeOptionalFields
     ? merge(requiredInputs, generateOptionalBirthInputs())
     : requiredInputs
 }

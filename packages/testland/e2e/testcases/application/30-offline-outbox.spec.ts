@@ -26,7 +26,7 @@ test.describe
   .serial('30: Validate user can send multiple complete and incomplete records offline', () => {
   let page: Page
 
-  const declaration = generateBirthInputs(true)
+  const declaration = generateBirthInputs({ includeOptionalFields: true })
 
   const partialDeclaration1 = {
     child: {

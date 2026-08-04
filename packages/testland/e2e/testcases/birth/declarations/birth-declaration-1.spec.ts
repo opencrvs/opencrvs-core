@@ -29,7 +29,7 @@ import { openRecordByTitle } from '../../print-certificate/birth/helpers'
 
 test.describe.serial('1. Birth declaration case - 1', () => {
   let page: Page
-  const declaration = generateBirthInputs(true)
+  const declaration = generateBirthInputs({ includeOptionalFields: true })
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage()
   })
