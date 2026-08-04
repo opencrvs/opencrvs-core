@@ -50,7 +50,7 @@ test.describe.serial('8. Validate declaration review page', () => {
     await page.close()
   })
 
-  test.describe('8.1 Hospital Official actions', async () => {
+  test.describe('8.1 Community leader actions', async () => {
     test.describe('8.1.0 Fill up birth registration form', async () => {
       test('8.1.0.1 Fill child details', async () => {
         await page.locator('#firstname').fill(declaration.child.name.firstNames)
