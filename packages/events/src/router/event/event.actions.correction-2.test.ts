@@ -216,7 +216,7 @@ describe('Overwriting parent field', () => {
       generator.event.create({ type: CHILD_ONBOARDING_EVENT })
     )
     await createIndex(
-      getEventIndexName(CHILD_ONBOARDING_EVENT),
+      getEventIndexName(CHILD_ONBOARDING_EVENT, 'legacy'),
       getDeclarationFields(modiedchildOnboardingEvent)
     )
 
@@ -360,7 +360,7 @@ describe('Search index should reflect corrected null informant fields', () => {
     )
 
     await createIndex(
-      getEventIndexName(CHILD_ONBOARDING_EVENT),
+      getEventIndexName(CHILD_ONBOARDING_EVENT, 'legacy'),
       getDeclarationFields(modifiedChildOnboardingEvent)
     )
 

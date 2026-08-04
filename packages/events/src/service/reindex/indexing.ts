@@ -22,7 +22,11 @@ export async function prepareTemporaryIndex(
   eventConfiguration: EventConfig,
   timestamp: number
 ) {
-  const tempIndexName = getTemporaryIndexName(eventConfiguration.id, timestamp)
+  const tempIndexName = getTemporaryIndexName(
+    eventConfiguration.id,
+    eventConfiguration.version,
+    timestamp
+  )
   const formFields = getDeclarationFields(eventConfiguration)
 
   logger.info(`Preparing temporary reindex index ${tempIndexName}`)
@@ -46,16 +50,17 @@ async function getIndicesBehindAlias(
 
 export async function finaliseReindexIndex(
   eventType: string,
+  configVersion: string,
   tempIndexName: string
 ) {
   const esClient = getOrCreateClient()
   const globalAliasName = getEventAliasName()
-  const writeAliasName = getEventIndexName(eventType)
+  const writeAliasName = getEventIndexName(eventType, configVersion)
 
   let currentLiveIndex: string | undefined
   try {
     const aliasInfo = await getIndicesBehindAlias(esClient, globalAliasName)
-    const eventIndexPrefix = getEventIndexName(eventType)
+    const eventIndexPrefix = getEventIndexName(eventType, configVersion)
     currentLiveIndex = aliasInfo.find((idx) => idx.startsWith(eventIndexPrefix))
   } catch {
     // Alias doesn't exist yet — this is the first reindex

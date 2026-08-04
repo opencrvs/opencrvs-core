@@ -42,12 +42,15 @@ async function resetESServer() {
   )
   const id = Date.now() + Math.random()
 
-  getEventIndexName.mockImplementation((type: string) => type + '_' + id)
+  getEventIndexName.mockImplementation(
+    (type: string, configVersion: string) =>
+      `${type}_${configVersion}_${id}`
+  )
   getEventAliasName.mockReturnValue('events_' + id)
   getReindexingStatusIndexName.mockReturnValue('reindexing_status_' + id)
   getTemporaryIndexName.mockImplementation(
-    (eventType: string, timestamp: number) => {
-      return `${getEventIndexName(eventType)}_${timestamp}`
+    (eventType: string, configVersion: string, timestamp: number) => {
+      return `${getEventIndexName(eventType, configVersion)}_${timestamp}`
     }
   )
 
@@ -76,7 +79,7 @@ async function resetESServer() {
 
   // Create concrete indices
   await createIndex(
-    getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+    getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy'),
     getDeclarationFields(tennisClubMembershipEvent)
   )
 }

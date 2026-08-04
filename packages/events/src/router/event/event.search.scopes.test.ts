@@ -687,7 +687,7 @@ test('placeOfEvent scope filters out results between locations and administrativ
     placeOfEventId: addressFieldId
   })
   await createIndex(
-    getEventIndexName('event-with-optional-address'),
+    getEventIndexName('event-with-optional-address', 'legacy'),
     getDeclarationFields(eventWithOptionalAddress)
   )
   mswServer.use(
@@ -891,7 +891,7 @@ test('For users in locations directly under country "administrativeArea" and "al
 
   // 3.1 Reindex doesn't refresh the index automatically, as it would block the event stream unnecessarily. We need to manually refresh the index to see the changes
   await esClient.indices.refresh({
-    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy')
   })
 
   // 4. Pick a user in location directly under country (no administrative area)

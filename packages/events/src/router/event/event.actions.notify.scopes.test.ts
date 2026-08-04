@@ -30,7 +30,7 @@ import { createIndex } from '@events/service/indexing/indexing'
 
 test('Check scopes against event.actions.notify', async () => {
   await createIndex(
-    getEventIndexName('tennis-club-membership_premium'),
+    getEventIndexName('tennis-club-membership_premium', 'legacy'),
     getDeclarationFields(tennisClubMembershipEvent)
   )
 

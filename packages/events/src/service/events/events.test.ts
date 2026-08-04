@@ -384,7 +384,7 @@ describe('processAction', () => {
 
       const esClient = getOrCreateClient()
       const body = await esClient.search({
-        index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+        index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy'),
         body: { query: { match_all: {} } }
       })
 
@@ -412,7 +412,7 @@ describe('processAction', () => {
 
       const esClient = getOrCreateClient()
       const body = await esClient.search({
-        index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+        index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy'),
         body: { query: { match_all: {} } }
       })
 

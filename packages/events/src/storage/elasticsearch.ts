@@ -31,14 +31,18 @@ export function getEventAliasName() {
   return env.ES_INDEX_PREFIX
 }
 
-export function getEventIndexName(eventType: string) {
-  return `${env.ES_INDEX_PREFIX}_${eventType}`
+export function getEventIndexName(eventType: string, configVersion: string) {
+  return `${env.ES_INDEX_PREFIX}_${eventType}_${configVersion}`
     .toLowerCase()
     .replaceAll('.', FIELD_ID_SEPARATOR)
 }
 
-export function getTemporaryIndexName(eventType: string, timestamp: number) {
-  return `${getEventIndexName(eventType)}_${timestamp}`
+export function getTemporaryIndexName(
+  eventType: string,
+  configVersion: string,
+  timestamp: number
+) {
+  return `${getEventIndexName(eventType, configVersion)}__${timestamp}`
 }
 
 export function getReindexingStatusIndexName() {

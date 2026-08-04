@@ -263,7 +263,7 @@ const multiFileConfig = {
 
 beforeEach(async () => {
   return createIndex(
-    getEventIndexName(multiFileConfig.id),
+    getEventIndexName(multiFileConfig.id, 'legacy'),
     getDeclarationFields(tennisClubMembershipEvent)
   )
 })

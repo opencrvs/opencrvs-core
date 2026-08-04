@@ -539,7 +539,7 @@ test('deduplication and annotation check is performed after declaration', async 
   })
 
   await esClient.update({
-    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy'),
     id: existingEventId,
     body: {
       doc: encodeEventIndex(existingEventIndex, tennisClubMembershipEvent),

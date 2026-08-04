@@ -233,7 +233,7 @@ export async function searchForDuplicates(
   }
 
   const result = await esClient.search<EncodedEventIndex>({
-    index: getEventIndexName(eventIndex.type),
+    index: getEventIndexName(eventIndex.type, eventConfig.version),
     query: {
       bool: {
         should: [esQuery],

@@ -32,7 +32,7 @@ import { EventNotFoundError } from '../../service/events/events'
 
 test('Check scopes against event.getDuplicates', async () => {
   await createIndex(
-    getEventIndexName('tennis-club-membership_premium'),
+    getEventIndexName('tennis-club-membership_premium', 'legacy'),
     getDeclarationFields(tennisClubMembershipEvent)
   )
   // 1. Setup test fixture with a known set of users, administrative areas, and events.

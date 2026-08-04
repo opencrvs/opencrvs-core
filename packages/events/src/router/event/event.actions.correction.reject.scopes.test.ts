@@ -35,7 +35,7 @@ test(
   { timeout: 90000 },
   async () => {
     await createIndex(
-      getEventIndexName('tennis-club-membership_premium'),
+      getEventIndexName('tennis-club-membership_premium', 'legacy'),
       getDeclarationFields(tennisClubMembershipEvent)
     )
 

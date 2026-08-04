@@ -59,7 +59,7 @@ test('records are not indexed when they are created', async () => {
 
   const esClient = getOrCreateClient()
   const body = await esClient.search({
-    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy'),
     body: {
       query: {
         match_all: {}
@@ -118,7 +118,7 @@ test('legalStatuses.NOTIFIED is indexed with full location hierarchy after a not
 
   // ES document must contain the full administrative hierarchy for NOTIFIED
   const esResponse = await esClient.search({
-    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy'),
     body: { query: { match_all: {} } }
   })
 
@@ -208,7 +208,7 @@ test('records are indexed with full location hierarchy', async () => {
 
   // --- Verify indexed ES document contains full hierarchy -------------------
   const searchResponse = await esClient.search({
-    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy'),
     body: { query: { match_all: {} } }
   })
 
@@ -1273,7 +1273,7 @@ describe('placeOfEvent location hierarchy handling', () => {
 
     // Verify: Elasticsearch document contains full location hierarchies
     const esSearchResponse = await esClient.search({
-      index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+      index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy'),
       body: { query: { match_all: {} } }
     })
 
@@ -1398,7 +1398,7 @@ describe('placeOfEvent location hierarchy handling', () => {
 
     // Step 2: Verify events are indexed correctly BEFORE reindexing
     const initialSearchResponse = await esClient.search({
-      index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+      index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy'),
       body: { query: { match_all: {} } }
     })
 
@@ -1469,12 +1469,12 @@ describe('placeOfEvent location hierarchy handling', () => {
 
     // Refresh index to make reindexed documents searchable
     await esClient.indices.refresh({
-      index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+      index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy')
     })
 
     // Step 5: Verify location hierarchy is preserved AFTER reindexing
     const reindexedSearchResponse = await esClient.search({
-      index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+      index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy'),
       body: { query: { match_all: {} } }
     })
 
@@ -1528,7 +1528,7 @@ describe('placeOfEvent location hierarchy handling', () => {
 
     // Step 2: Verify events are indexed correctly BEFORE reindexing
     const initialSearchResponse = await esClient.search({
-      index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+      index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy'),
       body: { query: { match_all: {} } }
     })
 
@@ -1600,7 +1600,7 @@ describe('placeOfEvent location hierarchy handling', () => {
 
     // Step 2: Verify events are indexed correctly BEFORE reindexing
     const initialSearchResponse = await esClient.search({
-      index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+      index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy'),
       body: { query: { match_all: {} } }
     })
 

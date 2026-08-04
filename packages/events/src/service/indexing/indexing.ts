@@ -369,7 +369,10 @@ export async function createIndex(
 
 export async function ensureIndexExists(eventConfiguration: EventConfig) {
   const esClient = getOrCreateClient()
-  const indexName = getEventIndexName(eventConfiguration.id)
+  const indexName = getEventIndexName(
+    eventConfiguration.id,
+    eventConfiguration.version
+  )
 
   const isAlreadyWriteAlias = await esClient.indices.existsAlias({
     name: indexName
@@ -421,7 +424,8 @@ export async function indexEventsInBulk(
         {
           index: {
             _index:
-              indexNameOverrides?.get(doc.type) ?? getEventIndexName(doc.type),
+              indexNameOverrides?.get(doc.type) ??
+              getEventIndexName(doc.type, config.version),
             _id: doc.id
           }
         },
@@ -464,7 +468,7 @@ export async function indexEvent(
   waitFor: boolean
 ) {
   const esClient = getOrCreateClient()
-  const indexName = getEventIndexName(event.type)
+  const indexName = getEventIndexName(event.type, config.version)
   const eventIndex = eventToEventIndex(event, config)
 
   const eventIndexWithAdministrativeHierarchy =

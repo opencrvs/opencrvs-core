@@ -246,11 +246,11 @@ test('reindexing indexes all events into Elasticsearch', async () => {
   // Reindex doesn't refresh the index automatically, as it would block the event stream unnecessarily
   // So we need to manually refresh the index to see the changes
   await esClient.indices.refresh({
-    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy')
   })
 
   const body = await esClient.search({
-    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy'),
     body: {
       query: {
         match_all: {}
@@ -271,11 +271,11 @@ test('reindexing twice', async () => {
   const esClient = getOrCreateClient()
 
   await esClient.indices.refresh({
-    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy')
   })
 
   const body = await esClient.search({
-    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy'),
     body: {
       query: {
         match_all: {}
@@ -295,7 +295,7 @@ test('reindexing twice', async () => {
 test('reindex given original concrete index is replaced by a timestamped index', async () => {
   const esClient = getOrCreateClient()
 
-  const liveIndexName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+  const liveIndexName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy')
 
   const indicesPointingToAlias = Object.keys(
     await esClient.indices.getAlias({
@@ -306,7 +306,7 @@ test('reindex given original concrete index is replaced by a timestamped index',
   expect(indicesPointingToAlias).toContain(liveIndexName)
 
   getTemporaryIndexName.mockImplementation(
-    (eventType, time) => `${eventType}__new__${time}`
+    (eventType, _configVersion, time) => `${eventType}__new__${time}`
   )
 
   await runReindex(reindexToken)
@@ -341,7 +341,7 @@ test('reindex given original concrete index is replaced by a timestamped index',
 test('reindex given first-reindex and concrete index conflicts with alias name - write alias created after removing original concrete index to avoid conflicts', async () => {
   const esClient = getOrCreateClient()
 
-  const writeAliasName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+  const writeAliasName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy')
 
   // Confirm we start with a bare concrete index (not yet an alias)
   const isConcreteBefore = await esClient.indices.exists({
@@ -468,7 +468,7 @@ test('reindex per-type write alias is re-pointed on every subsequent reindex', a
 
   await runReindex(reindexToken)
 
-  const writeAliasName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+  const writeAliasName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP, 'legacy')
   const aliasAfterFirst = await esClient.indices.getAlias({
     name: writeAliasName
   })

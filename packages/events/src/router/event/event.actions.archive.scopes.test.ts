@@ -31,7 +31,7 @@ import { getEventIndexName } from '@events/storage/elasticsearch'
 
 test('Check scopes against event.actions.archive', async () => {
   await createIndex(
-    getEventIndexName('tennis-club-membership_premium'),
+    getEventIndexName('tennis-club-membership_premium', 'legacy'),
     getDeclarationFields(tennisClubMembershipEvent)
   )
 

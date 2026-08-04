@@ -91,7 +91,7 @@ async function reindexSearch(
   const indexNameOverrides = new Map(
     configurations.map((config) => [
       config.id,
-      getTemporaryIndexName(config.id, timestamp)
+      getTemporaryIndexName(config.id, config.version, timestamp)
     ])
   )
 
@@ -215,7 +215,8 @@ export async function runReindex(token: TokenWithBearer) {
     configurations.map(async (config) =>
       finaliseReindexIndex(
         config.id,
-        getTemporaryIndexName(config.id, timestamp)
+        config.version,
+        getTemporaryIndexName(config.id, config.version, timestamp)
       )
     )
   )

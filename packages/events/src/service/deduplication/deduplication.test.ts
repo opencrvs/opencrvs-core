@@ -111,7 +111,7 @@ async function findDuplicates(eventComparison: Record<string, FieldValue[]>) {
   const id = getUUID()
 
   await esClient.update({
-    index: getEventIndexName(ChildOnboardingEvent.id),
+    index: getEventIndexName(ChildOnboardingEvent.id, ChildOnboardingEvent.version),
     id,
     body: {
       doc: encodeEventIndex(
@@ -143,7 +143,7 @@ async function findDuplicates(eventComparison: Record<string, FieldValue[]>) {
 
 beforeEach(async () => {
   return createIndex(
-    getEventIndexName(ChildOnboardingEvent.id),
+    getEventIndexName(ChildOnboardingEvent.id, ChildOnboardingEvent.version),
     getDeclarationFields(ChildOnboardingEvent)
   )
 })
@@ -347,7 +347,7 @@ describe('deduplication tests', () => {
     })
 
     await esClient.update({
-      index: getEventIndexName(ChildOnboardingEvent.id),
+      index: getEventIndexName(ChildOnboardingEvent.id, ChildOnboardingEvent.version),
       id: event.id,
       body: {
         doc: encodeEventIndex(event, ChildOnboardingEvent),
