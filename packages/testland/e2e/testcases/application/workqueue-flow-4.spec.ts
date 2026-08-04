@@ -30,7 +30,10 @@ import { openRecordByTitle } from '../print-certificate/birth/helpers'
 // HO Declares => RO Validates => Registrar Registers
 test.describe.serial('4. Workqueue flow - 4', () => {
   let page: Page
-  const declaration = generateBirthInputs()
+  const declaration = generateBirthInputs({
+    includeOptionalFields: false,
+    placeOfBirth: 'Other'
+  })
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage()
   })
@@ -39,9 +42,9 @@ test.describe.serial('4. Workqueue flow - 4', () => {
     await page.close()
   })
 
-  test.describe('4.1 Declare by HO', async () => {
+  test.describe('4.1 Declare by CL', async () => {
     test.beforeAll(async () => {
-      await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
+      await login(page, CREDENTIALS.COMMUNITY_LEADER)
       await page.click('#header-new-event')
       await page.getByLabel('Birth').click()
       await page.getByRole('button', { name: 'Continue' }).click()
@@ -64,10 +67,6 @@ test.describe.serial('4. Workqueue flow - 4', () => {
           exact: true
         })
         .click()
-      await page
-        .locator('#child____birthLocation')
-        .fill(declaration.birthLocation.facility.slice(0, 3))
-      await page.getByText(declaration.birthLocation.facility).click()
 
       await continueForm(page)
     })
@@ -178,8 +177,7 @@ test.describe.serial('4. Workqueue flow - 4', () => {
         name: formatName(declaration.child.name),
         workqueues: [
           { title: 'Assigned to you', exists: false },
-          { title: 'Recent', exists: true },
-          { title: 'Pending updates', exists: false }
+          { title: 'Recent', exists: true }
         ]
       })
     })
@@ -259,16 +257,15 @@ test.describe.serial('4. Workqueue flow - 4', () => {
     })
   })
 
-  test('4.4 HO can not see the validated record', async () => {
-    await login(page, CREDENTIALS.HOSPITAL_OFFICIAL, true)
+  test('4.4 CL can not see the validated record', async () => {
+    await login(page, CREDENTIALS.COMMUNITY_LEADER, true)
 
     await assertRecordInWorkqueue({
       page,
       name: formatName(declaration.child.name),
       workqueues: [
         { title: 'Assigned to you', exists: false },
-        { title: 'Recent', exists: false },
-        { title: 'Pending updates', exists: false }
+        { title: 'Recent', exists: false }
       ]
     })
   })
@@ -328,16 +325,15 @@ test.describe.serial('4. Workqueue flow - 4', () => {
     })
   })
 
-  test('4.6 HO can not see the registered record', async () => {
-    await login(page, CREDENTIALS.HOSPITAL_OFFICIAL, true)
+  test('4.6 CL can not see the registered record', async () => {
+    await login(page, CREDENTIALS.COMMUNITY_LEADER, true)
 
     await assertRecordInWorkqueue({
       page,
       name: formatName(declaration.child.name),
       workqueues: [
         { title: 'Assigned to you', exists: false },
-        { title: 'Recent', exists: false },
-        { title: 'Pending updates', exists: false }
+        { title: 'Recent', exists: false }
       ]
     })
   })
