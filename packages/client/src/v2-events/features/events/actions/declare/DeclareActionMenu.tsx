@@ -66,7 +66,7 @@ function useDeclarationActions(event: EventDocument) {
   } = useEventFormNavigation()
   const { eventConfiguration } = useEventConfiguration(eventType)
   const formConfig = getDeclaration(eventConfiguration)
-  const validatorContext = useValidatorContext()
+  const validatorContext = useValidatorContext(event)
   const declaration = useEventFormData((state) => state.getFormValues())
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
