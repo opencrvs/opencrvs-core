@@ -78,6 +78,24 @@ export const locationRouter = router({
       allowedWithAnyOfScopes(['user.data-seeding', 'config.update-all'])
     )
   ),
+  upsert: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'Create or update a location',
+        description:
+          'Upsert a single location by id. Intended for adding or correcting one location at a time (e.g. fixing a seeding error), not for bulk seeding — use the tRPC `locations.set` mutation for that. Existing locations are matched by id: `administrativeAreaId` and `locationType` are always overwritten with the supplied value, while `name`, `externalId` and `validUntil` are only overwritten when a non-null value is supplied. Requires the user.data-seeding or config.update-all scope.',
+        method: 'POST',
+        path: '/locations',
+        tags: ['Locations'],
+        protect: true
+      }
+    })
+    .use(allowedWithAnyOfScopes(['user.data-seeding', 'config.update-all']))
+    .input(Location)
+    .output(z.void())
+    .mutation(async ({ input }) => {
+      await setLocations([input])
+    }),
   get: userAndSystemProcedure
     .input(z.object({ id: UUID }))
     .output(Location)
