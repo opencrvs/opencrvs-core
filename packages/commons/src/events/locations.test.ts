@@ -35,6 +35,7 @@ describe('canAccessEventWithScope()', () => {
   const declaredEvent: Partial<EventIndexWithAdministrativeHierarchy> = {
     type: 'birth',
     createdBy: createdById,
+    createdAtLocation: [provinceUuid, districtUuid, officeUuid],
     placeOfEvent: [provinceUuid, districtUuid, officeUuid],
     legalStatuses: {
       DECLARED: {
@@ -81,6 +82,7 @@ describe('canAccessEventWithScope()', () => {
 
   const locationOptions = [
     { placeOfEvent: 'location' },
+    { createdIn: 'location' },
     { declaredIn: 'location' },
     { registeredIn: 'location' }
   ] satisfies RecordScopeV2['options'][]
@@ -252,6 +254,110 @@ describe('canAccessEventWithScope()', () => {
         )
       ).toBe(false)
     })
+
+    describe('createdIn', () => {
+      const undeclaredEvent: Partial<EventIndexWithAdministrativeHierarchy> = {
+        type: 'birth',
+        createdBy: createdById,
+        createdAtLocation: [provinceUuid, districtUuid, officeUuid],
+        placeOfEvent: [provinceUuid, districtUuid, officeUuid],
+        legalStatuses: {
+          DECLARED: undefined,
+          REGISTERED: undefined
+        }
+      }
+
+      const colleagueAtSameOffice = {
+        type: 'user',
+        id: generateUuid(rng),
+        primaryOfficeId: officeUuid,
+        administrativeAreaId: districtUuid,
+        role: TestUserRole.enum.FIELD_AGENT
+      } satisfies UserContext
+
+      test.each([
+        { createdIn: 'location' },
+        { createdIn: 'administrativeArea' }
+      ] satisfies RecordScopeV2['options'][])(
+        'grants access to an event that has not been declared yet with scope %j',
+        (options) => {
+          expect(
+            canAccessEventWithScope(
+              undeclaredEvent,
+              { type: 'record.read', options },
+              userContext
+            )
+          ).toBe(true)
+        }
+      )
+
+      test.each([
+        { declaredIn: 'location' },
+        { declaredIn: 'administrativeArea' },
+        { declaredBy: 'user' }
+      ] satisfies RecordScopeV2['options'][])(
+        'declared-based scope %j does not match an event that has not been declared yet',
+        (options) => {
+          expect(
+            canAccessEventWithScope(
+              undeclaredEvent,
+              { type: 'record.read', options },
+              userContext
+            )
+          ).toBe(false)
+        }
+      )
+
+      test('grants access to a colleague at the same office, unlike createdBy', () => {
+        expect(
+          canAccessEventWithScope(
+            undeclaredEvent,
+            { type: 'record.read', options: { createdIn: 'location' } },
+            colleagueAtSameOffice
+          )
+        ).toBe(true)
+
+        expect(
+          canAccessEventWithScope(
+            undeclaredEvent,
+            { type: 'record.read', options: { createdBy: 'user' } },
+            colleagueAtSameOffice
+          )
+        ).toBe(false)
+      })
+
+      test('is not reassigned when another office declares the event', () => {
+        const declaredByAnotherOffice: Partial<EventIndexWithAdministrativeHierarchy> =
+          {
+            ...undeclaredEvent,
+            legalStatuses: {
+              DECLARED: {
+                acceptedAt: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
+                createdBy: generateUuid(rng),
+                createdAtLocation: [generateUuid(rng)]
+              },
+              REGISTERED: undefined
+            }
+          }
+
+        expect(
+          canAccessEventWithScope(
+            declaredByAnotherOffice,
+            { type: 'record.read', options: { createdIn: 'location' } },
+            userContext
+          )
+        ).toBe(true)
+
+        expect(
+          canAccessEventWithScope(
+            declaredByAnotherOffice,
+            { type: 'record.read', options: { declaredIn: 'location' } },
+            userContext
+          )
+        ).toBe(false)
+      })
+    })
   })
 
   test('should not access event if user does not meet any of the scope options', () => {
@@ -268,6 +374,8 @@ describe('canAccessEventWithScope()', () => {
       { placeOfEvent: 'location' },
       { placeOfEvent: 'administrativeArea' },
       { createdBy: 'user' },
+      { createdIn: 'location' },
+      { createdIn: 'administrativeArea' },
       { declaredIn: 'location' },
       { declaredIn: 'administrativeArea' },
       { registeredIn: 'location' },
@@ -295,6 +403,7 @@ describe('canAccessEventWithScope()', () => {
     // so access can only be granted by the "no administrative area" branch.
     const eventInAnotherArea: Partial<EventIndexWithAdministrativeHierarchy> = {
       ...registeredEvent,
+      createdAtLocation: [generateUuid(rng)],
       placeOfEvent: [generateUuid(rng)],
       legalStatuses: {
         DECLARED: {
@@ -315,6 +424,7 @@ describe('canAccessEventWithScope()', () => {
 
     const adminAreaOptions = [
       { placeOfEvent: 'administrativeArea' },
+      { createdIn: 'administrativeArea' },
       { declaredIn: 'administrativeArea' },
       { registeredIn: 'administrativeArea' }
     ] satisfies RecordScopeV2['options'][]

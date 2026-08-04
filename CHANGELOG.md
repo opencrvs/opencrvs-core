@@ -5,6 +5,7 @@
 ### Improvements
 
 - Added `createdBy` as a config paramater to filter records created by the user [#13287](https://github.com/opencrvs/opencrvs-core/issues/13287)
+- Added `createdIn` as a config parameter to filter records by the office or administrative area they were created in. Unlike `declaredIn` it is populated before the record is declared, and it is never reassigned by a later declaration [#13287](https://github.com/opencrvs/opencrvs-core/issues/13287)
 
 ### Bug fixes
 
