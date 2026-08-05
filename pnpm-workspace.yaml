@@ -27,7 +27,7 @@ overrides:
   flatted: '3.4.2'
   picomatch: '2.3.2'
   underscore: '1.13.8'
-  '@remix-run/router': '1.23.2'
+  '@remix-run/router': '1.23.3'
   validator: '13.15.22'
   tar: '7.5.21'
   '@trpc/server': '11.8.0'
