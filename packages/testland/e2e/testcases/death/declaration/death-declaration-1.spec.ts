@@ -43,9 +43,9 @@ test.describe.serial('1. Death declaration case - 1', () => {
       numberOfDependants: 3,
       address: {
         country: 'Farajaland',
-        province: 'Sulaka',
-        district: 'Zobwe',
-        village: 'Chuma',
+        province: 'Central',
+        district: 'Ibombo',
+        village: 'Klow',
         town: faker.location.city(),
         residentialArea: faker.location.county(),
         street: faker.location.street(),
@@ -146,17 +146,7 @@ test.describe.serial('1. Death declaration case - 1', () => {
         .fill(declaration.deceased.numberOfDependants.toString())
 
       await page.locator('#province').click()
-      await page
-        .getByText(declaration.deceased.address.province, { exact: true })
-        .click()
-      await page.locator('#district').click()
-      await page
-        .getByText(declaration.deceased.address.district, { exact: true })
-        .click()
-      await page.locator('#village').click()
-      await page
-        .getByText(declaration.deceased.address.village, { exact: true })
-        .click()
+
       await page.locator('#town').fill(declaration.deceased.address.town)
       await page
         .locator('#residentialArea')
@@ -586,6 +576,7 @@ test.describe.serial('1. Death declaration case - 1', () => {
       ).toBeVisible()
     })
   })
+
   test.describe('1.2 Declaration Review by RO', async () => {
     test('1.2.1 Navigate to the declaration "Record" -tab', async () => {
       await login(page, CREDENTIALS.REGISTRATION_OFFICER)
