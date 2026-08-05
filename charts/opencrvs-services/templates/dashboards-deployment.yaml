@@ -51,6 +51,7 @@ spec:
       initContainers:
         - name: copy-assets
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.countryconfig) }}-assets
+          imagePullPolicy: {{ .Values.countryconfig.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           command:
             - sh
             - -c
@@ -63,6 +64,7 @@ spec:
       containers:
         - name: dashboards
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.dashboards) }}
+          imagePullPolicy: {{ .Values.dashboards.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           command: ["/assets/run.sh"]
           env:
             - name: METABASE_DATABASE_HOST

@@ -20,6 +20,7 @@ spec:
       containers:
         - name: data-seed
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.data_seed) }}
+          imagePullPolicy: {{ .Values.data_seed.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           env:
             - name: AUTH_HOST
               value: "http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040"
