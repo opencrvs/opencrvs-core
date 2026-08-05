@@ -63,8 +63,7 @@ minio:
   # Image used as client to run OpenCRVS configuration scripts
   image:
     repository: minio/mc
-    tag: "latest"
-
+    tag: 'latest'
 
 redis:
   host: redis-0.redis.opencrvs-deps-dev.svc.cluster.local

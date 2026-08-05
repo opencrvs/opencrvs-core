@@ -49,6 +49,7 @@ spec:
       containers:
         - name: login
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.login) }}
+          imagePullPolicy: {{ .Values.login.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           env:
           {{- if and
             (not (hasKey (.Values.login.env | default dict) "CONTENT_SECURITY_POLICY_WILDCARD"))
