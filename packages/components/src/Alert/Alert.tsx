@@ -10,74 +10,90 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { Check, Help, Cross, NotificationError, Notification } from '../icons'
-import { Spinner } from '../Spinner'
+import {
+  CheckCircle,
+  CircleNotch,
+  Info,
+  Warning,
+  WarningCircle
+} from '../Icon/all-icons'
 import { Button } from '../Button'
 import { Text } from '../Text'
-import { colors } from '../colors'
+import { Icon } from '../Icon'
 
 export type AlertType = 'success' | 'warning' | 'loading' | 'info' | 'error'
 
-const Container = styled.div<{
-  $type?: AlertType
-}>`
-  --color: ${({ $type, theme }) => `
-    ${$type === 'success' ? theme.colors.positive : ''}
-    ${$type === 'loading' ? theme.colors.primary : ''}
-    ${$type === 'info' ? theme.colors.teal : ''}
-    ${$type === 'error' ? theme.colors.negative : ''}
-    ${$type === 'warning' ? theme.colors.orange : ''}
-    ${$type === undefined ? theme.colors.positive : ''}
-  `};
+/**
+ * Each type carries a border and an icon in its feedback colour, over the
+ * palest tint of the same hue.
+ */
+const TONES = {
+  success: { line: 'positive', tint: 'greenLighter', Glyph: CheckCircle },
+  warning: { line: 'orange', tint: 'orangeLighter', Glyph: Warning },
+  error: { line: 'negative', tint: 'redLighter', Glyph: WarningCircle },
+  info: { line: 'teal', tint: 'tealLighter', Glyph: Info },
+  loading: { line: 'teal', tint: 'tealLighter', Glyph: CircleNotch }
+} as const
 
+const Container = styled.div<{ $type: AlertType }>`
   display: flex;
-  border-radius: 4px;
-  border: 1.5px solid var(--color);
-  border-left-width: 0px;
-  background: linear-gradient(
-    to right,
-    var(--color) 48px,
-    ${({ theme }) => theme.colors.white} 48px
-  );
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid ${({ theme, $type }) => theme.colors[TONES[$type].line]};
+  background: ${({ theme, $type }) => theme.colors[TONES[$type].tint]};
 `
 
-const IconContainer = styled.div`
+const IconContainer = styled.div<{ $type: AlertType }>`
+  flex: 0 0 auto;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 48px;
-  width: 48px;
-  color: ${({ theme }) => theme.colors.white};
+  color: ${({ theme, $type }) => theme.colors[TONES[$type].line]};
+`
+
+const Content = styled.div`
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
+const Title = styled.div<{ $type: AlertType }>`
+  ${({ theme }) => theme.fonts.bold14};
+  line-height: 130%;
+  color: ${({ theme, $type }) =>
+    $type === 'loading'
+      ? theme.colors.primary
+      : theme.colors[TONES[$type].line]};
+`
+
+const Message = styled.div`
+  ${({ theme }) => theme.fonts.reg14};
+  line-height: 150%;
+  color: ${({ theme }) => theme.colors.copy};
+`
+
+/**
+ * The action sits under the message rather than beside it, so a long message
+ * keeps the full width and a long label is not squeezed into a column.
+ */
+const Actions = styled.div`
+  display: flex;
+  margin-top: 4px;
+  margin-left: -8px;
 `
 
 const Close = styled(Button)`
-  color: var(--color) !important;
-  margin-top: 4px;
-  margin-right: 4px;
-`
-
-const ActionButton = styled(Button)`
-  margin-top: 8px;
-  margin-right: 8px;
-`
-
-const ButtonText = styled(Text)`
-  color: var(--color) !important;
-  padding: 0 4px;
-`
-
-const NotificationMessage = styled.div`
-  ${({ theme }) => theme.fonts.bold16};
-  color: var(--color);
-  position: relative;
-  padding: 12px 24px 12px 16px;
-  min-width: 160px;
-  max-width: calc(100% - 48px);
-  flex: 1;
+  flex: 0 0 auto;
+  margin: -8px -8px 0 0;
 `
 
 export interface IAlertProps extends React.HTMLAttributes<HTMLDivElement> {
   type: AlertType
+  /** A short statement of the situation, in the type's colour. */
+  title?: string
   onClose?: (event?: React.MouseEvent<HTMLButtonElement>) => void
   onActionClick?: (event?: React.MouseEvent<HTMLButtonElement>) => void
   actionText?: string
@@ -90,57 +106,53 @@ export interface IAlertProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 export const Alert = ({
   type,
+  title,
   onClose,
   onActionClick,
   actionText,
   children,
   customIcon,
   ...props
-}: IAlertProps) => (
-  <Container $type={type} {...props}>
-    <IconContainer>
-      {!customIcon ? (
-        <>
-          {type === 'success' && <Check />}
-          {type === 'warning' && <Help />}
-          {type === 'error' && <NotificationError />}
-          {type === 'info' && <Notification />}
-          {type === 'loading' && (
-            <Spinner
-              id="in-progress-floating-notification"
-              baseColor={colors.white}
-              size={20}
-            />
-          )}
-        </>
-      ) : (
-        <>{customIcon}</>
+}: IAlertProps) => {
+  const { Glyph } = TONES[type]
+
+  return (
+    <Container $type={type} {...props}>
+      <IconContainer $type={type}>
+        {customIcon ?? <Glyph size={24} />}
+      </IconContainer>
+
+      <Content>
+        {title && <Title $type={type}>{title}</Title>}
+        {children && <Message>{children}</Message>}
+        {onActionClick && (
+          <Actions>
+            <Button
+              data-testid={
+                props['data-testid'] && `${props['data-testid']}-action`
+              }
+              size="small"
+              type="tertiary"
+              onClick={onActionClick}
+            >
+              <Text element="span" variant="bold14">
+                {actionText}
+              </Text>
+            </Button>
+          </Actions>
+        )}
+      </Content>
+
+      {onClose && type !== 'loading' && (
+        <Close
+          data-testid={props['data-testid'] && `${props['data-testid']}-close`}
+          id={props.id + 'Cancel'}
+          type="icon"
+          onClick={onClose}
+        >
+          <Icon color="currentColor" name="X" size="small" />
+        </Close>
       )}
-    </IconContainer>
-
-    <NotificationMessage>{children}</NotificationMessage>
-
-    {onActionClick && (
-      <ActionButton
-        type="tertiary"
-        onClick={onActionClick}
-        data-testid={props['data-testid'] && `${props['data-testid']}-action`}
-      >
-        <ButtonText variant="bold14" element="span">
-          {actionText}
-        </ButtonText>
-      </ActionButton>
-    )}
-
-    {onClose && type !== 'loading' && (
-      <Close
-        type="icon"
-        id={props.id + 'Cancel'}
-        data-testid={props['data-testid'] && `${props['data-testid']}-close`}
-        onClick={onClose}
-      >
-        <Cross color="currentColor" />
-      </Close>
-    )}
-  </Container>
-)
+    </Container>
+  )
+}
