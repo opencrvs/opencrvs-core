@@ -33,6 +33,8 @@ export interface QaEntityConfig {
    * input alone can't express "no parent".
    */
   identityFields: Array<{ name: string; label: string; nullable?: boolean }>
+  /** The sibling QA page — e.g. locations links to administrative-areas. */
+  otherPage: { label: string; path: string }
 }
 
 const capitalize = (value: string) => value[0].toUpperCase() + value.slice(1)
@@ -144,6 +146,7 @@ export const renderQaToolPage = (config: QaEntityConfig) => `<!DOCTYPE html>
       <h1>${capitalize(config.pluralLabel)} QA tool</h1>
       <button type="button" id="guide-button" title="How to use this page">i</button>
     </div>
+    <p><a href="${config.otherPage.path}">Go to ${config.otherPage.label} →</a></p>
 
     <details open>
       <summary>Search ${config.pluralLabel}</summary>

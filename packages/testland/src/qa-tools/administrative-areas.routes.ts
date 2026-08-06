@@ -17,7 +17,8 @@ const ADMINISTRATIVE_AREAS_CONFIG: QaEntityConfig = {
   singularLabel: 'administrative area',
   idLabel: 'Administrative area id',
   basePath: 'administrative-areas',
-  identityFields: [{ name: 'parentId', label: 'Parent id', nullable: true }]
+  identityFields: [{ name: 'parentId', label: 'Parent id', nullable: true }],
+  otherPage: { label: 'locations', path: '/locations' }
 }
 
 export function getAdministrativeAreasQaRoutes(): Hapi.ServerRoute[] {

@@ -24,7 +24,8 @@ const LOCATIONS_CONFIG: QaEntityConfig = {
       nullable: true
     },
     { name: 'locationType', label: 'Location type' }
-  ]
+  ],
+  otherPage: { label: 'administrative areas', path: '/administrative-areas' }
 }
 
 export function getLocationsQaRoutes(): Hapi.ServerRoute[] {
