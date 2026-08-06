@@ -1361,7 +1361,7 @@ review.declare.incomplete.confirmModal.title,The title for review action modal w
 review.documents.zeroDocumentsTextForAnySection,Zero documents text,No supporting documents,Aucune pièce justificative
 review.error.unauthorized,The error message shown when a query fails,We are unable to display this page to you,Nous ne sommes pas en mesure de vous afficher cette page
 review.form.title,Review form label for update action,Review form,Formulaire de révision
-review.header.title.govtName,Header title that shows bgd govt name,Republic of Farajaland,République du Farajaland
+review.header.title.govtName,Header title that shows bgd govt name,Government of the Republic of Farajaland,Gouvernement de la République du Farajaland
 review.inputs.supportingDocuments,Section heading title for supporting documents,Supporting documents,Documents justificatifs
 review.register.confirmModal.title,The title for review action modal when registering,Register the {event}?,Enregistrer cet {event}?
 review.signature.clear,Label for button that clear signature input,Clear,Supprimer

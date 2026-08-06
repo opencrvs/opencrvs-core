@@ -42,7 +42,6 @@ const messagesToDefine = {
 const messages = defineMessages(messagesToDefine)
 
 const SearchParamContainer = styled.div`
-  margin: 16px 0px;
   display: flex;
   gap: 10px;
   flex-wrap: wrap;

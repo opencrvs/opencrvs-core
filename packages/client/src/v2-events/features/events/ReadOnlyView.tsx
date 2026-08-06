@@ -35,7 +35,10 @@ import { getAnnotationForActionType } from '@client/v2-events/features/events/co
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
-import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
+import {
+  Review as ReviewComponent,
+  recordTitleMessage
+} from '@client/v2-events/features/events/components/Review'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -46,6 +49,8 @@ import { useOnlineStatus } from '@client/utils'
 import { queryClient, useTRPC } from '@client/v2-events/trpc'
 
 import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
+import { useRecordVersions } from '@client/v2-events/features/events/useRecordVersions'
+import { RecordVersionMenu } from '@client/v2-events/features/events/components/RecordVersionMenu'
 import { removeCachedFiles } from '../files/cache'
 
 const messages = defineMessages({
@@ -84,19 +89,33 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
     event.type
   )
 
-  const eventStateWithDraft = useMemo(() => {
-    const eventState = getCurrentEventState(event, configuration)
+  const currentState = useMemo(
+    () => getCurrentEventState(event, configuration),
+    [event, configuration]
+  )
 
-    return draft
-      ? applyDraftToEventIndex(eventState, draft, configuration)
-      : eventState
-  }, [draft, event, configuration])
+  const { versions, selected, selectedState, isLatest, selectVersion } =
+    useRecordVersions({ event, configuration, currentState })
+
+  /*
+   * A draft is unsaved work on top of the current state, so it belongs to the
+   * newest version only. Applying it to a historical version would show data
+   * that never existed at that point.
+   */
+  const eventStateWithDraft = useMemo(
+    () =>
+      draft && isLatest
+        ? applyDraftToEventIndex(selectedState, draft, configuration)
+        : selectedState,
+    [draft, isLatest, selectedState, configuration]
+  )
 
   const assignmentStatus = getAssignmentStatus(
     eventStateWithDraft,
     authentication.sub
   )
 
+  const intl = useIntl()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const formConfig = getDeclaration(configuration)
@@ -149,6 +168,19 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
       readonlyMode
       anchor={recordAnchorDate(eventStateWithDraft)}
       annotation={annotation}
+      content={{
+        title: intl.formatMessage(recordTitleMessage),
+        actions: selected
+          ? [
+              <RecordVersionMenu
+                key="record-version"
+                selected={selected}
+                versions={versions}
+                onSelect={selectVersion}
+              />
+            ]
+          : []
+      }}
       form={eventStateWithDraft.declaration}
       formConfig={formConfig}
       reviewFields={fields}

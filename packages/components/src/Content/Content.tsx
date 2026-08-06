@@ -44,15 +44,9 @@ const Header = styled.div`
   display: flex;
   justify-content: center;
   flex-direction: column;
-  padding: 0 24px;
+  padding: 20px 32px;
+  gap: 16px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    border: 0;
-    padding: 0;
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin: 0;
-  }
 `
 const TopActionBar = styled.div`
   display: flex;
@@ -77,27 +71,14 @@ const Footer = styled.div`
 `
 const HeaderBottom = styled.div`
   display: flex;
-  padding: 0 0 24px;
   width: 100%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    padding: 24px;
-    border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 0 16px 16px;
-  }
 `
 const TopTabBar = styled.div`
   display: flex;
   gap: 28px;
   width: 100%;
-  margin: -24px 0;
   padding: 0;
   position: relative;
-  bottom: -1px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin: -16px 0;
-  }
 `
 const TopFilterBar = styled.div`
   display: flex;
@@ -109,8 +90,6 @@ const TopBar = styled.div<{ keepShowing?: boolean }>`
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  min-height: 64px;
-  padding: 12px 0;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     ${({ keepShowing }) => {
       return !keepShowing ? 'display:none;' : 'padding:16px;'
@@ -134,6 +113,22 @@ const BackButtonContainer = styled.div`
     display: none;
   }
 `
+const TitleBlock = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+`
+
+/**
+ * Sits under the title, inside the header. Distinct from `subtitle`, which
+ * renders in the body below the header's rule.
+ */
+const TitleSubtitle = styled.div`
+  ${({ theme }) => theme.fonts.reg14};
+  color: ${({ theme }) => theme.colors.supportingCopy};
+`
+
 const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
   display: flex;
   gap: 16px;
@@ -157,9 +152,9 @@ const Icon = styled.div`
 `
 
 const Contents = styled.div<{ noPadding?: boolean }>`
-  padding: ${(props) => (props.noPadding ? 0 : '24px')};
+  padding: ${(props) => (props.noPadding ? 0 : '32px')};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: ${(props) => (props.noPadding ? 0 : '16px')};
+    padding: ${(props) => (props.noPadding ? 0 : '24px')};
   }
 `
 
@@ -180,6 +175,7 @@ interface IProps {
   tabBarContent?: React.ReactNode
   filterContent?: React.ReactNode
   subtitle?: string | React.ReactNode
+  titleSubtitle?: string | React.ReactNode
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
   bottomActionDirection?: 'row' | 'column'
@@ -193,6 +189,7 @@ export const UnstyledContent = ({
   titleColor,
   showTitleOnMobile,
   topActionButtons,
+  titleSubtitle,
   tabBarContent,
   filterContent,
   noPadding,
@@ -205,11 +202,20 @@ export const UnstyledContent = ({
 }: IProps) => (
   <Container size={size} className={className}>
     <Header>
-      {(icon || title || topActionButtons) && (
+      {(icon || title || titleSubtitle || topActionButtons) && (
         <TopBar keepShowing={showTitleOnMobile}>
           <TitleContainer titleColor={titleColor}>
             {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
-            {title && <Title id={`content-name`}>{title}</Title>}
+            {(title || titleSubtitle) && (
+              <TitleBlock>
+                {title && <Title id={`content-name`}>{title}</Title>}
+                {titleSubtitle && (
+                  <TitleSubtitle id={`content-subtitle`}>
+                    {titleSubtitle}
+                  </TitleSubtitle>
+                )}
+              </TitleBlock>
+            )}
           </TitleContainer>
           {topActionButtons && <TopActionBar>{topActionButtons}</TopActionBar>}
         </TopBar>
