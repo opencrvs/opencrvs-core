@@ -95,7 +95,7 @@ test('withdraws a pending future version and writes an audit entry', async () =>
   })
 })
 
-test('rejects withdrawing a version whose effectiveFrom has already passed', async () => {
+test('rejects withdrawing an already-effective version that is also the only version — the only-version check wins', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [scope])
 
@@ -107,11 +107,13 @@ test('rejects withdrawing a version whose effectiveFrom has already passed', asy
   await expect(
     client.administrativeAreas.withdrawVersion({
       id: created.id,
+      // The initial (creation) element is already in effect — 2024-01-01 —
+      // but it is also the only version, and that check takes precedence.
       versionId: created.versions[0].versionId
     })
   ).rejects.toMatchObject({
     code: 'CONFLICT',
-    message: expect.stringContaining('already in effect')
+    message: expect.stringContaining('only one version')
   })
 })
 
