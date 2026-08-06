@@ -84,6 +84,7 @@ A new `integration.audit.read` scope guards it; country configs must assign it t
 - Keep a number field's postfix/unit label (e.g. `Kilograms (kg)` on Weight at birth) on a single line instead of wrapping onto a second row [#13216](https://github.com/opencrvs/opencrvs-core/issues/13216)
 - Bust the locally cached data when a user's office or role changes, so stale drafts and records from the previous office no longer appear after the change
 - Stop showing an empty `Comment` section in the record audit history for archived records. Archiving from the action menu never asked for a comment, so the section only ever displayed a `-` placeholder. Records archived through the "mark as duplicate" flow still show the comment that was entered there [#13265](https://github.com/opencrvs/opencrvs-core/issues/13265)
+- Keep a 24px gutter beside a `Content` card at every width, so the workqueue and other card pages no longer sit flush against the side navigation and the browser window on screens narrower than the card's maximum [#13391](https://github.com/opencrvs/opencrvs-core/issues/13391)
 
 ## 2.0.0
 
