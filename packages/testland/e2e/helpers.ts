@@ -267,7 +267,7 @@ export const uploadImageToSection = async ({
   buttonLocator: Locator
   sectionTitle: string
 }) => {
-  await sectionLocator.getByText('Select...').click()
+  await sectionLocator.getByText('Select', { exact: true }).click()
   await sectionLocator.getByText(sectionTitle, { exact: true }).click()
 
   await uploadImage(page, buttonLocator)

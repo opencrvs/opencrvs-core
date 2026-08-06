@@ -134,7 +134,7 @@ test.describe.serial('Issue Certified Copy', () => {
     })
 
     test('Click continue after selecting collector type and template type', async () => {
-      await page.getByText('Select...').click()
+      await page.getByText('Select', { exact: true }).click()
       const selectOptionsLabels = ['Mother', 'Father', 'Someone else']
 
       for (const label of selectOptionsLabels) {
