@@ -215,9 +215,14 @@ jobs:
         if: steps.check-scripts.outputs.skip != 'true'
         run: npx license-check-and-add check -f license-config.json
 
-      - name: Runs dependency installation
-        if: steps.check-scripts.outputs.skip != 'true'
+      - name: Runs dependency installation (default)
+        if: steps.check-scripts.outputs.skip != 'true' && matrix.package != 'packages/countryconfig-template'
         run: pnpm install --frozen-lockfile
+
+        # countryconfig-template is under packages/ while not being a package.
+      - name: Runs dependency installation (countryconfig-template)
+        if: steps.check-scripts.outputs.skip != 'true' && matrix.package == 'packages/countryconfig-template'
+        run: cd packages/countryconfig-template && pnpm install --no-frozen-lockfile --ignore-workspace
 
       # Nx computation cache. Written by exactly one job (build-deps,
       # develop pushes only) so restoring here can never feed back into

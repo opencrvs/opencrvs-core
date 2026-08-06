@@ -23,67 +23,23 @@ import {
 } from '../../helpers'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS } from '../../constants'
-import { fillDate } from './helpers'
+import { fillDate, generateBirthInputs } from './helpers'
 import { ensureAssignedToUser, selectAction } from '../../utils'
 import { openRecordByTitle } from '../print-certificate/birth/helpers'
 
 test.describe.serial('8. Validate declaration review page', () => {
   let page: Page
 
-  const declaration = {
-    child: {
-      name: {
-        firstNames: faker.person.firstName('male'),
-        familyName: faker.person.lastName('male')
-      },
-      gender: 'Male',
-      birthDate: getRandomDate(0, 200)
-    },
-    attendantAtBirth: 'Physician',
-    birthType: 'Single',
-    weightAtBirth: 2.4,
-    placeOfBirth: 'Health Institution',
-    birthLocation: 'Klow Village Hospital',
-    informantType: 'Mother',
-    informantEmail: faker.internet.email(),
-    mother: {
-      name: {
-        firstNames: faker.person.firstName('female'),
-        familyName: faker.person.lastName('female')
-      },
-      birthDate: getRandomDate(20, 200),
-      nationality: 'Farajaland',
-      identifier: {
-        id: faker.string.numeric(10),
-        type: 'National ID'
-      },
-      address: {
-        country: 'Farajaland',
-        province: 'Sulaka',
-        district: 'Irundu',
-        village: 'Xhosa'
-      }
-    },
-    father: {
-      name: {
-        firstNames: faker.person.firstName('male'),
-        familyName: faker.person.lastName('male')
-      },
-      birthDate: getRandomDate(22, 200),
-      nationality: 'Farajaland',
-      identifier: {
-        id: faker.string.numeric(10),
-        type: 'National ID'
-      },
-      address: 'Same as mother'
-    }
-  }
+  const declaration = generateBirthInputs({
+    includeOptionalFields: true,
+    placeOfBirth: 'Other'
+  })
 
   const comment = faker.lorem.sentence()
 
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage()
-    await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
+    await login(page, CREDENTIALS.COMMUNITY_LEADER)
     await page.click('#header-new-event')
     await page.getByLabel('Birth').click()
     await page.getByRole('button', { name: 'Continue' }).click()
@@ -94,7 +50,7 @@ test.describe.serial('8. Validate declaration review page', () => {
     await page.close()
   })
 
-  test.describe('8.1 Hospital Official actions', async () => {
+  test.describe('8.1 Community leader actions', async () => {
     test.describe('8.1.0 Fill up birth registration form', async () => {
       test('8.1.0.1 Fill child details', async () => {
         await page.locator('#firstname').fill(declaration.child.name.firstNames)
@@ -114,10 +70,6 @@ test.describe.serial('8. Validate declaration review page', () => {
             exact: true
           })
           .click()
-        await page
-          .locator('#child____birthLocation')
-          .fill(declaration.birthLocation.slice(0, 3))
-        await page.getByText(declaration.birthLocation).click()
 
         await page.locator('#child____attendantAtBirth').click()
         await page
@@ -200,6 +152,11 @@ test.describe.serial('8. Validate declaration review page', () => {
 
         await fillDate(page, declaration.father.birthDate)
 
+        await page.locator('#father____nationality').click()
+        await page
+          .getByText(declaration.father.nationality, { exact: true })
+          .click()
+
         await page.locator('#father____idType').click()
         await page
           .getByText(declaration.father.identifier.type, { exact: true })
@@ -266,10 +223,11 @@ test.describe.serial('8. Validate declaration review page', () => {
           'child.placeOfBirth',
           declaration.placeOfBirth
         )
+
         await expectRowValueWithChangeButton(
           page,
-          'child.birthLocation',
-          declaration.birthLocation
+          'child.birthLocation.other',
+          `${declaration.birthLocation.country}${declaration.birthLocation.province}${declaration.birthLocation.district}${declaration.birthLocation.village}`
         )
 
         /*
@@ -940,8 +898,8 @@ test.describe.serial('8. Validate declaration review page', () => {
       await expectRowValue(page, 'child.placeOfBirth', declaration.placeOfBirth)
       await expectRowValue(
         page,
-        'child.birthLocation',
-        declaration.birthLocation
+        'child.birthLocation.other',
+        `${declaration.birthLocation.country}${declaration.birthLocation.province}${declaration.birthLocation.district}${declaration.birthLocation.village}`
       )
 
       /*

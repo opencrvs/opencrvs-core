@@ -28,7 +28,7 @@ test.describe
   let eventId: string
 
   test.beforeAll(async ({ browser }) => {
-    const token = await getToken(CREDENTIALS.HOSPITAL_OFFICIAL)
+    const token = await getToken(CREDENTIALS.COMMUNITY_LEADER)
     const res = await createDeclaration(token, undefined, ActionType.DECLARE)
     declaration = res.declaration
     eventId = res.eventId

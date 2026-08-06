@@ -42,7 +42,7 @@ test.describe('Action menu options', () => {
     let declaration: Declaration
 
     test.beforeAll(async () => {
-      const token = await getToken(CREDENTIALS.HOSPITAL_OFFICIAL)
+      const token = await getToken(CREDENTIALS.COMMUNITY_LEADER)
       const res = await createDeclaration(token, undefined, ActionType.DECLARE)
       declaration = res.declaration
     })

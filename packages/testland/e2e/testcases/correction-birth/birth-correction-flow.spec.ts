@@ -350,8 +350,8 @@ test.describe.serial('Birth correction flow', () => {
     test('Enter the direct correction form to ensure form is reset', async () => {
       await selectAction(page, 'Correct')
 
-      await expect(page.locator('#requester____type')).toHaveText('Select...')
-      await expect(page.locator('#reason____option')).toHaveText('Select...')
+      await expect(page.locator('#requester____type')).toHaveText('Select')
+      await expect(page.locator('#reason____option')).toHaveText('Select')
       await page.getByTestId('exit-button')
     })
   })

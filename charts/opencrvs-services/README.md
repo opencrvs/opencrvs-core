@@ -307,6 +307,11 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <td>Defines the image pull secrets applied at Pod level for authenticating with private registries.</td>
         </tr>
         <tr>
+        <td>platform.imagePullPolicy</td>
+        <td>-</td>
+        <td>Default <code>imagePullPolicy</code> applied to all OpenCRVS service containers. Leave unset to use Kubernetes' own tag-based default (<code>IfNotPresent</code> for versioned tags, <code>Always</code> for <code>:latest</code>). Environments deploying a floating tag (e.g. <code>develop</code>) should set this to <code>Always</code>, otherwise nodes keep serving whatever image was first cached under that tag. Can be overridden at service level.</td>
+        </tr>
+        <tr>
             <th>Common Service properties</th>
             <th></th>
             <th>Properties listed below can be defined for any service</th>
@@ -335,6 +340,11 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <td>image.repository</td>
         <td>platform.repository</td>
         <td>Overrides the default repository defined in <code>platform.repository</code>.</td>
+        </tr>
+        <tr>
+        <td>image.pullPolicy</td>
+        <td>platform.imagePullPolicy</td>
+        <td>Overrides the default <code>imagePullPolicy</code> defined in <code>platform.imagePullPolicy</code> for this service only.</td>
         </tr>
         <tr>
             <td>hpa.enabled</td>

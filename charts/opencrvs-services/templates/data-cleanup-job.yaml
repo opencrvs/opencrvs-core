@@ -95,6 +95,7 @@ spec:
           {{- include "render-env-vars" (dict "service_name" "data_cleanup" "Values" .Values) }}
         - name: cleanup-elasticsearch
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.utilities) }}
+          imagePullPolicy: {{ .Values.utilities.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           command: ["/bin/sh", "-c"]
           args:
             - |
