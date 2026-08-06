@@ -20,7 +20,7 @@ import { openRecordByTitle } from '../print-certificate/birth/helpers'
 const testCases = [
   {
     credential: CREDENTIALS.HOSPITAL_OFFICIAL,
-    action: ActionType.DECLARE,
+    action: ActionType.NOTIFY,
     expectedAuditRole: 'Hospital Official'
   },
   {

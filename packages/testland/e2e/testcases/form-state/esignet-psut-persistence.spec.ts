@@ -73,9 +73,11 @@ async function fillChildDetails(page: Page) {
   await page.getByPlaceholder('yyyy').fill('2025')
 
   await page.locator('#child____placeOfBirth').click()
-  await page.getByText('Health Institution', { exact: true }).click()
-  await page.locator('#child____birthLocation').fill('Klow')
-  await page.getByText('Klow Village Hospital', { exact: true }).click()
+  await page
+    .getByText('Other', {
+      exact: true
+    })
+    .click()
 
   await page.locator('#child____attendantAtBirth').click()
   await page.getByText('Physician', { exact: true }).click()
@@ -100,7 +102,7 @@ test.describe('E-Signet PSUT persistence', () => {
   test('Declare birth with father E-Signet and confirm `sub` in backend payload', async () => {
     test.setTimeout(180_000)
 
-    await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
+    await login(page, CREDENTIALS.COMMUNITY_LEADER)
 
     const eventId = await openBirthDeclarationAndCaptureEventId(page)
 

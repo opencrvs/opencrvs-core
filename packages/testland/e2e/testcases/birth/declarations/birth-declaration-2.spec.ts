@@ -40,8 +40,13 @@ test.describe.serial('2. Birth declaration case - 2', () => {
     },
     attendantAtBirth: 'Nurse',
     birthType: 'Twin',
-    placeOfBirth: 'Health Institution',
-    birthLocation: { facility: 'Klow Village Hospital' },
+    placeOfBirth: 'Other',
+    birthLocation: {
+      country: 'Farajaland',
+      province: 'Central',
+      district: 'Ibombo',
+      village: 'Klow'
+    },
     informantType: 'Father',
     informantEmail: faker.internet.email(),
     mother: {
@@ -103,9 +108,9 @@ test.describe.serial('2. Birth declaration case - 2', () => {
     await page.close()
   })
 
-  test.describe('2.1 Declaration started by HO', async () => {
+  test.describe('2.1 Declaration started by CL', async () => {
     test.beforeAll(async () => {
-      await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
+      await login(page, CREDENTIALS.COMMUNITY_LEADER)
       await page.click('#header-new-event')
       await page.getByLabel('Birth').click()
       await page.getByRole('button', { name: 'Continue' }).click()
@@ -128,10 +133,6 @@ test.describe.serial('2. Birth declaration case - 2', () => {
           exact: true
         })
         .click()
-      await page
-        .locator('#child____birthLocation')
-        .fill(declaration.birthLocation.facility.slice(0, 3))
-      await page.getByText(declaration.birthLocation.facility).click()
 
       await page.locator('#child____attendantAtBirth').click()
       await page
@@ -336,9 +337,11 @@ test.describe.serial('2. Birth declaration case - 2', () => {
         declaration.placeOfBirth
       )
 
-      await expect(
-        page.getByTestId('row-value-child.birthLocation')
-      ).toHaveText('Klow Village Hospital, Klow, Ibombo, Central, Farajaland')
+      await expectRowValue(
+        page,
+        'child.birthLocation.other',
+        `${declaration.birthLocation.country}${declaration.birthLocation.province}${declaration.birthLocation.district}${declaration.birthLocation.village}`
+      )
 
       /*
        * Expected result: should include
@@ -512,7 +515,6 @@ test.describe.serial('2. Birth declaration case - 2', () => {
 
     test('2.1.6.1 Validate declare action not available before filling in signature and comment', async () => {
       await validateActionMenuButton(page, 'Declare', false)
-      await validateActionMenuButton(page, 'Notify', true)
     })
 
     test('2.1.7 Fill up informant comment & signature', async () => {
@@ -590,8 +592,8 @@ test.describe.serial('2. Birth declaration case - 2', () => {
        */
       await expectRowValue(
         page,
-        'child.birthLocation',
-        'Klow Village Hospital, Klow, Ibombo, Central, Farajaland'
+        'child.birthLocation.other',
+        `${declaration.birthLocation.country}${declaration.birthLocation.province}${declaration.birthLocation.district}${declaration.birthLocation.village}`
       )
       /*
        * Expected result: should include

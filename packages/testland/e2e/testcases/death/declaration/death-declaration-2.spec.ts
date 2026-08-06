@@ -58,8 +58,13 @@ test.describe.serial('2. Death declaration case - 2', () => {
       causeOfDeathEstablished: true,
       sourceCauseDeath: 'Lay reported',
       description: "T'was an accident sire",
-      placeOfDeath: 'Health Institution',
-      deathLocation: 'Klow Village Hospital'
+      placeOfDeath: 'Other',
+      deathLocationOther: {
+        country: 'Farajaland',
+        province: 'Central',
+        district: 'Ibombo',
+        village: 'Klow'
+      }
     },
     informant: {
       relation: 'Son',
@@ -112,7 +117,7 @@ test.describe.serial('2. Death declaration case - 2', () => {
 
   test.describe('2.1 Declaration started by HO', async () => {
     test.beforeAll(async () => {
-      await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
+      await login(page, CREDENTIALS.COMMUNITY_LEADER)
 
       await page.click('#header-new-event')
       await page.getByLabel('Death').click()
@@ -199,12 +204,6 @@ test.describe.serial('2. Death declaration case - 2', () => {
       await page
         .getByText(declaration.eventDetails.placeOfDeath, { exact: true })
         .click()
-
-      await page.locator('#eventDetails____deathLocation').fill('Klow Village')
-      await expect(
-        page.getByText(declaration.eventDetails.deathLocation)
-      ).toBeVisible()
-      await page.getByText(declaration.eventDetails.deathLocation).click()
 
       await continueForm(page)
     })
@@ -543,6 +542,12 @@ test.describe.serial('2. Death declaration case - 2', () => {
         page,
         'eventDetails.placeOfDeath',
         declaration.eventDetails.placeOfDeath
+      )
+
+      await expectRowValueWithChangeButton(
+        page,
+        'eventDetails.deathLocationOther',
+        `${declaration.eventDetails.deathLocationOther.country}${declaration.eventDetails.deathLocationOther.province}${declaration.eventDetails.deathLocationOther.district}${declaration.eventDetails.deathLocationOther.village}`
       )
 
       /*
