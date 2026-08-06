@@ -1,7 +1,19 @@
 packages:
-  - 'packages/*'
+  - 'packages/api-docs'
+  - 'packages/auth'
+  - 'packages/client'
+  - 'packages/commons'
+  - 'packages/components'
+  # - 'packages/countryconfig-template' Intentionally removed. Lerna reads pnpm-workspace.yaml but does not recognize negation. Hence explicit inclusion for all packages.
+  - 'packages/data-seeder'
+  - 'packages/documents'
+  - 'packages/events'
+  - 'packages/gateway'
+  - 'packages/login'
+  - 'packages/migration'
+  - 'packages/testland'
+  - 'packages/toolkit'
   - 'packages/toolkit/create-countryconfig'
-  - '!packages/countryconfig-template'
 
 # Ported from yarn `resolutions` (root package.json). `parent>child`
 # replaces yarn's `**/parent/child` nesting syntax.
