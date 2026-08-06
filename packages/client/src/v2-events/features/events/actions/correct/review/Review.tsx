@@ -21,7 +21,10 @@ import {
   getCurrentEventState,
   findPendingCorrectionAction
 } from '@opencrvs/commons/client'
-import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
+import {
+  Review as ReviewComponent,
+  recordTitleMessage
+} from '@client/v2-events/features/events/components/Review'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -89,6 +92,7 @@ export function Review() {
         isCorrection={true}
         isReviewCorrection={true}
         previousFormValues={formValuesBeforeCorrection}
+        content={{ title: intlWithData.formatMessage(recordTitleMessage) }}
         title={intlWithData.formatMessage(
           actionConfig.label,
           formValuesBeforeCorrection

@@ -95,6 +95,19 @@ const LeftColumn = styled.div`
 
 const DeclarationDataContainer = styled.div``
 
+/**
+ * The heading a review carries when it is showing the record itself rather
+ * than an action being taken on it — the Record tab, and the correction
+ * review, which shows the record with the correction applied.
+ */
+export const recordTitleMessage = defineMessages({
+  recordTitle: {
+    id: 'v2.event.record.title',
+    defaultMessage: 'Record',
+    description: 'Heading of the card that shows the record'
+  }
+}).recordTitle
+
 const reviewMessages = defineMessages({
   changeAllButton: {
     id: 'buttons.changeAll',

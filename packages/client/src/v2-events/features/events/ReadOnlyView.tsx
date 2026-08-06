@@ -35,7 +35,10 @@ import { getAnnotationForActionType } from '@client/v2-events/features/events/co
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
-import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
+import {
+  Review as ReviewComponent,
+  recordTitleMessage
+} from '@client/v2-events/features/events/components/Review'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -62,18 +65,12 @@ const messages = defineMessages({
       'This record has not been downloaded yet so it cannot be opened offline. Please reconnect to the internet to view it.',
     description:
       'Message shown on the Record page when the user is offline and the record has not been cached locally'
-  },
-  recordTitle: {
-    id: 'v2.event.record.title',
-    defaultMessage: 'Record',
-    description: 'Heading of the card on the Record tab'
   }
 })
 
 const OfflineMessageWrapper = styled.div`
   text-align: center;
 `
-
 
 function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   const events = useEvents()
@@ -172,7 +169,7 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
       anchor={recordAnchorDate(eventStateWithDraft)}
       annotation={annotation}
       content={{
-        title: intl.formatMessage(messages.recordTitle),
+        title: intl.formatMessage(recordTitleMessage),
         actions: selected
           ? [
               <RecordVersionMenu
