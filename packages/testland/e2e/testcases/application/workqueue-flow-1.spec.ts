@@ -22,7 +22,11 @@ import {
 } from '../../helpers'
 import { CREDENTIALS } from '../../constants'
 import { ensureAssignedToUser, selectAction } from '../../utils'
-import { assertRecordInWorkqueue, fillDate } from '../birth/helpers'
+import {
+  assertRecordInWorkqueue,
+  fillDate,
+  generateBirthInputs
+} from '../birth/helpers'
 import {
   getRowByTitle,
   openRecordByTitle
@@ -31,53 +35,7 @@ import {
 // HO Notifies => RO Validates => Registrar Registers => Registrar Prints
 test.describe.serial('1. Workqueue flow - 1', () => {
   let page: Page
-  const declaration = {
-    child: {
-      name: {
-        firstNames: faker.person.firstName('male'),
-        familyName: faker.person.lastName('male')
-      },
-      gender: 'Male',
-      birthDate: getRandomDate(0, 200)
-    },
-    placeOfBirth: 'Health Institution',
-    birthLocation: { facility: 'Klow Village Hospital' },
-    informantType: 'Mother',
-    informantEmail: faker.internet.email(),
-    mother: {
-      name: {
-        firstNames: faker.person.firstName('female'),
-        familyName: faker.person.lastName('female')
-      },
-      birthDate: getRandomDate(20, 200),
-      nationality: 'Farajaland',
-      identifier: {
-        id: faker.string.numeric(10),
-        type: 'National ID'
-      },
-      address: {
-        country: 'Farajaland',
-        province: 'Sulaka',
-        district: 'Irundu',
-        village: 'Xhosa'
-      }
-    },
-    father: {
-      name: {
-        firstNames: faker.person.firstName('male'),
-        familyName: faker.person.lastName('male')
-      },
-      birthDate: getRandomDate(22, 200),
-      nationality: 'Gabon',
-      identifier: {
-        id: faker.string.numeric(10),
-        type: 'National ID'
-      },
-      address: {
-        sameAsMother: true
-      }
-    }
-  }
+  const declaration = generateBirthInputs()
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage()
   })

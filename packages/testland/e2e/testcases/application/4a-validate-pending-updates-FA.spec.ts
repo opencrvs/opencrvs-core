@@ -17,7 +17,7 @@ import {
   formatName
 } from '../../helpers'
 import { CREDENTIALS } from '../../constants'
-import { notifyAndDeclare, Declaration } from '../test-data/birth-declaration'
+import { Declaration, createDeclaration } from '../test-data/birth-declaration'
 import { formatV2ChildName } from '../birth/helpers'
 import {
   ensureAssignedToUser,
@@ -30,6 +30,7 @@ import {
   openRecordByTitle
 } from '../print-certificate/birth/helpers'
 import { faker } from '@faker-js/faker'
+import { ActionType } from '@opencrvs/toolkit/events'
 
 test.describe.serial('4(a) Validate "Pending updates"-workqueue for HO', () => {
   let page: Page
@@ -39,7 +40,13 @@ test.describe.serial('4(a) Validate "Pending updates"-workqueue for HO', () => {
 
   test.beforeAll(async ({ browser }) => {
     const token = await getToken(CREDENTIALS.HOSPITAL_OFFICIAL)
-    const res = await notifyAndDeclare(token, 'HEALTH_FACILITY')
+    // @TODO: Create throwaway role for user that can notify and declare
+    const res = await createDeclaration(
+      token,
+      undefined,
+      ActionType.NOTIFY,
+      'HEALTH_FACILITY'
+    )
     declaration = res.declaration
     eventId = res.eventId
     formattedChildName = formatV2ChildName(declaration)
@@ -55,7 +62,7 @@ test.describe.serial('4(a) Validate "Pending updates"-workqueue for HO', () => {
   })
 
   test('4.0.2 Navigate to record audit', async () => {
-    await page.getByText('Pending validation').click()
+    await page.getByText('Notifications').click()
 
     await openRecordByTitle(page, formattedChildName)
   })
@@ -139,7 +146,7 @@ test.describe.serial('4(a) Validate "Pending updates"-workqueue for HO', () => {
 
     await page.getByRole('button', { name: 'Go to review' }).click()
 
-    await triggerDeclarationAction(page, 'Declare with edits')
+    await triggerDeclarationAction(page, 'Notify with edits')
 
     // Should redirect back to "Pending updates"-workqueue
     await expect(page.locator('#content-name')).toHaveText('Pending updates')
