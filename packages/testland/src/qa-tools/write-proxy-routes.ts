@@ -10,6 +10,23 @@
  */
 import * as Hapi from '@hapi/hapi'
 import { GATEWAY_URL } from '@countryconfig/constants'
+import { getQaToken } from './get-qa-token'
+
+/**
+ * Attaches a QA-tool-authenticated Authorization header to the outgoing
+ * proxy request, then proxies it. The browser sends no token at all — only
+ * NATIONAL_SYSTEM_ADMIN currently holds `location.edit`, so there is no
+ * other identity worth letting a QA tester pick.
+ */
+async function proxyWithQaToken(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit,
+  uri: string
+) {
+  const token = await getQaToken()
+  request.headers['authorization'] = `Bearer ${token}`
+  return h.proxy({ uri, passThrough: true })
+}
 
 /**
  * The search/create/update/withdraw proxy routes are identical in shape for
@@ -25,7 +42,7 @@ export function createEntityWriteRoutes(basePath: string): Hapi.ServerRoute[] {
     {
       method: 'GET',
       path: `/${basePath}/search`,
-      handler: (_request, h) => h.proxy({ uri: upstream, passThrough: true }),
+      handler: (request, h) => proxyWithQaToken(request, h, upstream),
       options: {
         auth: false,
         tags: ['qa-tool', basePath, 'proxy'],
@@ -35,7 +52,7 @@ export function createEntityWriteRoutes(basePath: string): Hapi.ServerRoute[] {
     {
       method: 'POST',
       path: `/${basePath}`,
-      handler: (_request, h) => h.proxy({ uri: upstream, passThrough: true }),
+      handler: (request, h) => proxyWithQaToken(request, h, upstream),
       options: {
         auth: false,
         payload: {
@@ -50,10 +67,7 @@ export function createEntityWriteRoutes(basePath: string): Hapi.ServerRoute[] {
       method: 'PUT',
       path: `/${basePath}/{id}`,
       handler: (request, h) =>
-        h.proxy({
-          uri: `${upstream}/${request.params.id}`,
-          passThrough: true
-        }),
+        proxyWithQaToken(request, h, `${upstream}/${request.params.id}`),
       options: {
         auth: false,
         payload: {
@@ -68,10 +82,11 @@ export function createEntityWriteRoutes(basePath: string): Hapi.ServerRoute[] {
       method: 'DELETE',
       path: `/${basePath}/{id}/versions/{versionId}`,
       handler: (request, h) =>
-        h.proxy({
-          uri: `${upstream}/${request.params.id}/versions/${request.params.versionId}`,
-          passThrough: true
-        }),
+        proxyWithQaToken(
+          request,
+          h,
+          `${upstream}/${request.params.id}/versions/${request.params.versionId}`
+        ),
       options: {
         auth: false,
         payload: {

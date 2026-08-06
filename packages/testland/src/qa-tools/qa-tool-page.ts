@@ -79,9 +79,6 @@ export const renderQaToolPage = (config: QaEntityConfig) => `<!DOCTYPE html>
       #search-results li { padding: 0.4rem; border: 1px solid #ddd; margin-bottom: 0.25rem; cursor: pointer; }
       #search-results li:hover { background: #f4f4f4; }
       #search-results li pre { margin: 0.5rem 0 0; }
-      .token-row { display: flex; gap: 0.5rem; }
-      .token-row input { flex: 1; font-size: 1.1rem; padding: 0.7rem; font-family: monospace; }
-      .token-row button { margin-top: 0; white-space: nowrap; }
       #confirm-modal-backdrop {
         display: none;
         position: fixed;
@@ -103,16 +100,6 @@ export const renderQaToolPage = (config: QaEntityConfig) => `<!DOCTYPE html>
   </head>
   <body>
     <h1>${capitalize(config.pluralLabel)} QA tool</h1>
-    <label for="token">Bearer token</label>
-    <div class="token-row">
-      <input
-        type="password"
-        id="token"
-        autocomplete="off"
-        placeholder="Paste a Bearer token"
-      />
-      <button type="button" id="token-toggle">Show</button>
-    </div>
 
     <details open>
       <summary>Search ${config.pluralLabel}</summary>
@@ -210,10 +197,6 @@ export const renderQaToolPage = (config: QaEntityConfig) => `<!DOCTYPE html>
           .map((field) => field.name)
       )}
 
-      function getToken() {
-        return document.getElementById('token').value.trim()
-      }
-
       // A checked "no value" toggle disables its paired input and forces
       // that field to null on submit — the schema requires the key present
       // (it's nullable, not optional), so an empty input alone can't say
@@ -227,17 +210,6 @@ export const renderQaToolPage = (config: QaEntityConfig) => `<!DOCTYPE html>
           if (checkbox.checked) input.value = ''
         })
       })
-
-      document
-        .getElementById('token-toggle')
-        .addEventListener('click', function () {
-          var tokenInput = document.getElementById('token')
-          var showing = tokenInput.type === 'text'
-          tokenInput.type = showing ? 'password' : 'text'
-          document.getElementById('token-toggle').textContent = showing
-            ? 'Show'
-            : 'Hide'
-        })
 
       function formToPayload(form, optionalFields) {
         var payload = {}
@@ -374,9 +346,7 @@ export const renderQaToolPage = (config: QaEntityConfig) => `<!DOCTYPE html>
           var resultsEl = document.getElementById('search-results')
           resultsEl.innerHTML = '<li>Loading...</li>'
           try {
-            var response = await fetch(basePath + '/search', {
-              headers: { Authorization: 'Bearer ' + getToken() }
-            })
+            var response = await fetch(basePath + '/search')
             var entities = await response.json()
             if (!response.ok) {
               resultsEl.innerHTML =
@@ -422,10 +392,7 @@ export const renderQaToolPage = (config: QaEntityConfig) => `<!DOCTYPE html>
         try {
           var response = await fetch(url, {
             method: method,
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: 'Bearer ' + getToken()
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: method === 'DELETE' ? undefined : JSON.stringify(payload)
           })
           var body = await response.text()
