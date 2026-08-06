@@ -851,7 +851,6 @@ components:
         - declaration
         - status
         - type
-        - content
     UnarchiveAction:
       type: object
       properties:
@@ -16343,7 +16342,6 @@ components:
         - declaration
         - status
         - type
-        - content
       additionalProperties: false
     UnarchiveActionOutput:
       type: object
