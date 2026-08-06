@@ -10,6 +10,7 @@ error.errorPhoneNumberNotFound,Error message for phone number not found,Phone nu
 error.networkError,The error that appears when there is no internet connection,Unable to connect to server,Impossible de se connecter au serveur
 error.required.password,New password required,Invalid password,Le nouveau mot de passe n'est pas valide
 label.error,Generic error message for invalid form nput,Invalid input,Entrée invalide
+login.somethingWentWrong,Error toast message for general errors,Something went wrong. Please try again,Une erreur s'est produite. Veuillez réessayer
 login.clearForm,,Clear form,Effacer le formulaire
 login.codeSubmissionError,The error that appears when the user entered sms code is unauthorised,Incorrect verification code. Please try again,"Désolé, ce code n'a pas fonctionné."
 login.fieldMissing,The error if user doesn't fill all the field,Enter your username and password,Nom d'utilisateur/mot de passe requis
