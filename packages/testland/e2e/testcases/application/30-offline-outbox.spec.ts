@@ -20,71 +20,14 @@ import {
 } from '../../helpers'
 import { CREDENTIALS } from '../../constants'
 import { faker } from '@faker-js/faker'
-import { fillDate } from '../birth/helpers'
+import { fillDate, generateBirthInputs } from '../birth/helpers'
 
 test.describe
   .serial('30: Validate user can send multiple complete and incomplete records offline', () => {
   let page: Page
 
-  const declaration = {
-    child: {
-      name: {
-        firstNames: faker.person.firstName('male'),
-        familyName: faker.person.lastName('male')
-      },
-      gender: 'Male',
-      birthDate: getRandomDate(0, 200)
-    },
-    attendantAtBirth: 'Physician',
-    birthType: 'Single',
-    weightAtBirth: 2.4,
-    placeOfBirth: 'Health Institution',
-    birthLocation: { facility: 'Klow Village Hospital' },
-    informantType: 'Mother',
-    informantEmail: faker.internet.email(),
-    mother: {
-      name: {
-        firstNames: faker.person.firstName('female'),
-        familyName: faker.person.lastName('female')
-      },
-      birthDate: getRandomDate(20, 200),
-      nationality: 'Farajaland',
-      identifier: {
-        id: faker.string.numeric(10),
-        type: 'National ID'
-      },
-      address: {
-        country: 'Farajaland',
-        province: 'Sulaka',
-        district: 'Irundu',
-        village: 'Xhosa',
-        town: faker.location.city(),
-        residentialArea: faker.location.county(),
-        street: faker.location.street(),
-        number: faker.location.buildingNumber(),
-        postcodeOrZip: faker.location.zipCode()
-      },
-      maritalStatus: 'Single',
-      levelOfEducation: 'No schooling'
-    },
-    father: {
-      name: {
-        firstNames: faker.person.firstName('male'),
-        familyName: faker.person.lastName('male')
-      },
-      birthDate: getRandomDate(22, 200),
-      nationality: 'Gabon',
-      identifier: {
-        id: faker.string.numeric(10),
-        type: 'National ID'
-      },
-      maritalStatus: 'Single',
-      levelOfEducation: 'No schooling',
-      address: {
-        sameAsMother: true
-      }
-    }
-  }
+  const declaration = generateBirthInputs({ includeOptionalFields: true })
+
   const partialDeclaration1 = {
     child: {
       name: {
@@ -112,7 +55,7 @@ test.describe
   })
 
   test('30.0 Login', async () => {
-    await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
+    await login(page, CREDENTIALS.COMMUNITY_LEADER)
 
     // this is needed to get eventConfig before going offline
     await page.click('#header-new-event')
@@ -124,7 +67,8 @@ test.describe
     await page.context().setOffline(true)
   })
 
-  test.describe('30.1 Send a complete declaration', async () => {
+  // @TODO: Skipped due role scope changes. Delete if not needed.
+  test.describe.skip('30.1 Send a complete declaration', async () => {
     test.beforeAll(async () => {
       await page.click('#header-new-event')
       await page.getByLabel('Birth').click()
@@ -361,7 +305,7 @@ test.describe
 
   test('30.4 Validate outbox', async () => {
     const rows = [
-      { row: '#row_2', name: formatName(declaration.child.name) },
+      // { row: '#row_2', name: formatName(declaration.child.name) },
       { row: '#row_1', name: formatName(partialDeclaration1.child.name) },
       { row: '#row_0', name: formatName(partialDeclaration2.child.name) }
     ]

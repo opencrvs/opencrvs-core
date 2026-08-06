@@ -492,6 +492,7 @@ export type UnassignWait =
   | { waitForUnassign: true; eventId: string }
 
 const actionTitleToApiCallMap = {
+  Archive: ['event.actions.archive'],
   Notify: ['event.actions.notify'],
   Declare: ['event.actions.declare'],
   Register: ['event.actions.register'],
@@ -591,6 +592,7 @@ export async function fillRegisterDialogRequiredFields(page: Page) {
 export async function triggerDeclarationAction(
   page: Page,
   action:
+    | 'Archive'
     | 'Notify'
     | 'Declare'
     | 'Register'

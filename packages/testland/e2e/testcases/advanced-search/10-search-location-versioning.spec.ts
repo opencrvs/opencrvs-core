@@ -161,7 +161,6 @@ test.describe.serial('Advanced search - inactive health facilities', () => {
       .locator('#child____birthLocation')
       .fill('Test Maternity Hospital')
     // The option is present despite the facility being inactive.
-    console.log({ birthFacility })
     await selectLocationOption(page, birthFacility.facilityName)
 
     // Advanced search requires at least 2 fields — status is the 2nd here,

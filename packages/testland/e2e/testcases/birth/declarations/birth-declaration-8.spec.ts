@@ -200,12 +200,10 @@ test.describe.serial('8. Birth declaration case - 8', () => {
       )
 
       /*
-       * Expected result: should require
+       * Expected result: should be absent. Required, but not visible to HO
        * - Mother's date of birth
        */
-      await expect(page.getByTestId('row-value-mother.dob')).toContainText(
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expect(page.getByTestId('row-value-mother.dob')).not.toBeVisible()
 
       /*
        * Expected result: should include
