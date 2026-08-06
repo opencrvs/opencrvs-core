@@ -65,6 +65,7 @@ const renderGuideItems = (config: QaEntityConfig): string => {
 
   const items = [
     `Search is a substring match over every ${config.pluralLabel} name/id — click a result to fill the Update and Withdraw blocks below with that ${config.singularLabel}'s id and version id.`,
+    `Leaving the search box empty and searching returns every ${config.singularLabel} there is, active and inactive alike — there's no pagination, so this can be a long list.`,
     `This page only covers ${config.pluralLabel} — locations and administrative areas each have their own page (<code>/locations</code>, <code>/administrative-areas</code>).`,
     `While you're editing Create, Update, or Withdraw, the other two are disabled until you finish or cancel — this stops fields from different operations getting mixed up.`,
     nullableFields.length > 0
