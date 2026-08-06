@@ -184,10 +184,14 @@ describe('getEventStateAtVersion', () => {
 
     expect(declareVersion).toBeDefined()
 
+    if (!declareVersion) {
+      throw new Error('the declaration version was not found')
+    }
+
     const atDeclare = getEventStateAtVersion(
       event,
       configuration,
-      declareVersion!.actionId
+      declareVersion.actionId
     )
 
     expect(atDeclare.declaration['applicant.email']).toBe(
@@ -238,17 +242,21 @@ describe('getEventStateAtVersion', () => {
       (a) => a.type === ActionType.APPROVE_CORRECTION
     )
 
-    expect(request).toBeDefined()
-    expect(approveAction).toBeDefined()
-    ;(approveAction as unknown as { requestId: string }).requestId = request!.id
+    if (!request || !approveAction) {
+      throw new Error('the correction actions were not generated')
+    }
+    ;(approveAction as unknown as { requestId: string }).requestId = request.id
 
     const approveVersion = getRecordVersions(event).find(
       (v) => v.actionType === ActionType.APPROVE_CORRECTION
     )
 
-    expect(approveVersion).toBeDefined()
+    if (!approveVersion) {
+      throw new Error('the approved correction is not a version')
+    }
+
     expect(
-      getEventStateAtVersion(event, configuration, approveVersion!.actionId)
+      getEventStateAtVersion(event, configuration, approveVersion.actionId)
         .declaration['applicant.email']
     ).toBe('corrected@example.com')
   })

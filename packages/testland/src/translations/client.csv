@@ -204,7 +204,6 @@ constants.gender,Gender label,Gender,Sexe
 constants.healthDivision,The description for HEALTH_DIVISION type,Health Division,Division de la santé
 constants.healthcareWorker,The description for Healthcare Worker type,Healthcare Worker,Travailleur de la santé
 constants.history,History heading,History,Histoire
-constants.history,History heading,History,Histoire
 constants.humanName,Formatted full name,{firstName} {middleName} {lastName},{firstName} {middleName} {lastName}
 constants.id,ID Label,ID,ID
 constants.informant,Informant Label,Informant,Informateur
@@ -869,7 +868,6 @@ event.death.custom.action.attest.field.comments.label,Label for the comments fie
 event.death.custom.action.attest.label,This is shown as the action name anywhere the user can trigger the action from,Attest,Attester
 event.death.custom.action.attest.supportingCopy,Supporting copy for the attest action,"Attesting confirms this death was reported at your health facility. Once attested, the notification proceeds to the registration office.","En attestant, vous confirmez que ce décès a été signalé dans votre établissement de santé. Une fois attesté, la notification est transmise au bureau d'enregistrement."
 event.death.custom.action.validate-declaration.label,This is shown as the action name anywhere the user can trigger the action from,Validate,Valider
-event.death.custom.action.validate-declaration.label,This is shown as the action name anywhere the user can trigger the action from,Validate,Valider
 event.death.label,This is what this event is referred as in the system,Death,Décès
 event.death.summary.eventDetails.date.empty,This is shown when there is no date of death information,No date of death,Aucune date de décès
 event.death.summary.eventDetails.deathLocation.empty,This is shown when there is no death location information,No place of death,Aucun lieu de décès
@@ -1457,7 +1455,6 @@ unlockApp.incorrectPin,The message displayed when a user enters an incorrect PIN
 unlockApp.lastTry,The message displayed before the 3rd attempt of an incorrect PIN,Last try,Dernier essai
 unlockApp.locked,The title displayed while creating a PIN,Your account has been locked. Please try again in 1 minute.,Votre compte a été verrouillé. Veuillez réessayer dans 1 minute.
 user.avatar,Aria label for user avatar button,User avatar,Avatar utilisateur
-user.avatar,Aria label for user avatar button,User avatar,Avatar utilisateur
 user.form.buttons.submit,Label for submit button of user creation form,Create user,Créer un utilisateur
 user.form.securityquestion.answer,,Answer,Répondre à
 user.form.securityquestion.description,,"From the drop down lists below, select questions that can be used later to confirm your identity should you forget your password.","Dans les listes déroulantes ci-dessous, sélectionnez des questions qui pourront être utilisées ultérieurement pour confirmer votre identité si vous oubliez votre mot de passe."
@@ -1551,6 +1548,29 @@ v2.event.death.action.declare.form.section.deceased.field.birthRecordSearch.labe
 v2.event.death.action.declare.form.section.deceased.field.birthRecordSearch.validation.invalid,Error message for invalid BRN search value,Invalid value: Must be alpha-numeric and 12 characters long,Valeur invalide : doit être alphanumérique et comporter 12 caractères
 v2.event.record.offline.description,Message shown on the Record page when the user is offline and the record has not been cached locally,This record has not been downloaded yet so it cannot be opened offline. Please reconnect to the internet to view it.,Cet enregistrement n’a pas encore été téléchargé et ne peut donc pas être ouvert hors ligne. Veuillez vous reconnecter à Internet pour le consulter.
 v2.event.record.offline.title,Title shown on the Record page when the user is offline,No connection,Pas de connexion
+v2.event.record.title,Heading of the card on the Record tab,Record,
+v2.event.record.version.about.declaration,"What the declaration form is, in the record version menu","The informant's signed statement, with supporting documents",
+v2.event.record.version.about.notification,"What the notification form is, in the record version menu","The first report of the event, from a health facility",
+v2.event.record.version.about.registration,"What the registration form is, in the record version menu",The legal record of the event,
+v2.event.record.version.by.corrected,Provenance of a corrected registration version,"{name, select, __UNKNOWN__ {Corrected {date}} other {Corrected {date} · {name}}}",
+v2.event.record.version.by.declared,Provenance of a declaration version,"{name, select, __UNKNOWN__ {Declared {date}} other {Declared {date} · {name}}}",
+v2.event.record.version.by.edited,Provenance of an edited declaration version,"{name, select, __UNKNOWN__ {Edited {date}} other {Edited {date} · {name}}}",
+v2.event.record.version.by.registered,Provenance of a registration version,"{name, select, __UNKNOWN__ {Registered {date}} other {Registered {date} · {name}}}",
+v2.event.record.version.by.sent,Provenance of a notification version,"{name, select, __UNKNOWN__ {Sent {date}} other {Sent {date} · {name}}}",
+v2.event.record.version.count,Summary line on a collapsed form: how many versions it holds and when it opened,"{count, plural, one {# version} other {# versions}} · {opened}",
+v2.event.record.version.form.declaration,Name of the declaration form in the record version menu,Declaration,
+v2.event.record.version.form.notification,Name of the notification form in the record version menu,Notification,
+v2.event.record.version.form.registration,Name of the registration form in the record version menu,Registration,
+v2.event.record.version.label.afterCorrection,A registration version between the first and the latest,After correction {number},
+v2.event.record.version.label.afterEdit,A declaration version between the first and the latest,After edit {number},
+v2.event.record.version.label.firstDeclared,The oldest version of the declaration form,As first declared,
+v2.event.record.version.label.firstNotified,The oldest version of the notification form,As first notified,
+v2.event.record.version.label.firstRegistered,The oldest version of the registration form,As first registered,
+v2.event.record.version.label.latest,"The newest version of a form, in the record version menu",Latest,
+v2.event.record.version.opened.declared,"When a declaration form opened, for the summary line",declared {date},
+v2.event.record.version.opened.notified,"When a notification form opened, for the summary line",sent {date},
+v2.event.record.version.opened.registered,"When a registration form opened, for the summary line",registered {date},
+v2.event.record.version.trigger,"Prefix on the record version selector, before the selected version",Version:,
 v2.suspense.offline.description,Message shown when a screen cannot load because the user is offline and the data has not been cached locally,"This content has not been downloaded yet, so it cannot be shown offline. It will load automatically once you are back online.",Ce contenu n’a pas encore été téléchargé et ne peut donc pas être affiché hors ligne. Il se chargera automatiquement une fois que vous serez de nouveau en ligne.
 v2.suspense.offline.title,Title shown on a loading screen when the user is offline,No connection,Pas de connexion
 validations.phoneNumberFormat,The error message that appears on phone numbers where the first two characters must be a 01 and length must be 11,Must be a valid 10 digit number that starts with 0(7|9),Doit être un nombre valide de  {num} chiffres qui commence par  {start}
@@ -1567,7 +1587,6 @@ views.idVerification.banner.authenticated.description,,"This identity has been s
 views.idVerification.banner.authenticated.resetConfirmation.description,,"By clicking ‘Continue,’ you’ll remove ID Authenticated status and unlock the fields for editing.","En cliquant sur «Continuer», vous supprimerez l'état authentifié de l'ID et déverrouillez les champs pour l'édition."
 views.idVerification.banner.authenticated.resetConfirmation.title,,Revoke authenticated ID?,Révoquer une pièce d'identité authentifiée?
 views.idVerification.banner.authenticated.title,,ID Authenticated,ID authentifié
-views.idVerification.banner.failed.description,,The identity data does not match an entry in Farajaland's National ID System,Les données d'identité ne correspondent pas à une entrée du système national d'identification du Farajaland.
 views.idVerification.banner.failed.description,,The identity data does not match an entry in Farajaland's National ID System,Les données d'identité ne correspondent pas à une entrée du système national d'identification du Farajaland.
 views.idVerification.banner.failed.resetConfirmation.description,,"By clicking ‘Continue,’ you’ll clear all information to it’s default state.","En cliquant sur «Continuer», vous effacerez toutes les informations de son état par défaut."
 views.idVerification.banner.failed.resetConfirmation.title,,Reset information?,Réinitialiser les informations?
