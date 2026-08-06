@@ -132,12 +132,12 @@ const Card = styled.div`
   }
 `
 
-const FormData = styled.div`
-  padding-top: 24px;
+const FormData = styled.div<{ $padded?: boolean }>`
+  ${({ $padded }) => ($padded === false ? '' : 'padding-top: 24px;')}
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 24px;
+    ${({ $padded }) => ($padded === false ? '' : 'padding: 24px;')}
   }
 `
 
@@ -268,6 +268,7 @@ function FormReview({
   onEdit,
   showPreviouslyMissingValuesAsChanged,
   readonlyMode,
+  paddedBody = true,
   isCorrection = false,
   isReviewCorrection = false,
   treatMissingValuesAsCleared = false,
@@ -279,6 +280,8 @@ function FormReview({
   previousForm: EventState
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   showPreviouslyMissingValuesAsChanged: boolean
+  /** False when the container already pads the body, as Content does. */
+  paddedBody?: boolean
   validatorContext: ValidatorContext
   readonlyMode?: boolean
   isCorrection?: boolean
@@ -294,7 +297,7 @@ function FormReview({
   )
 
   return (
-    <FormData>
+    <FormData $padded={paddedBody}>
       <ReviewContainter>
         {visiblePages.map((page) => {
           const fields = page.fields
@@ -559,6 +562,7 @@ function ReviewComponent({
         >
           <FormReview
             anchor={anchor}
+            paddedBody={content === undefined}
             form={form}
             formConfig={formConfig}
             isCorrection={isCorrection}
