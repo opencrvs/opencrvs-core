@@ -46,7 +46,7 @@ const VERSION_ACTION_TYPES: ActionType[] = [
   ActionType.APPROVE_CORRECTION
 ]
 
-export interface RecordVersion {
+export type RecordVersion = {
   actionId: UUID
   actionType: ActionType
   form: RecordForm

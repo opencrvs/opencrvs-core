@@ -310,7 +310,7 @@ function SelectLine({
   children
 }: {
   actionId: UUID
-  onSelect: (actionId: UUID) => void
+  onSelect: (id: UUID) => void
   selected: boolean
   indent?: boolean
   testId: string
@@ -353,7 +353,7 @@ function HeadLine({
   form: RecordForm
   selectable: boolean
   selected: boolean
-  onSelect: (actionId: UUID) => void
+  onSelect: (id: UUID) => void
   onToggle: () => void
   children: React.ReactNode
 }) {
@@ -382,7 +382,7 @@ function HeadLine({
 interface VersionMenuProps {
   versions: RecordVersion[]
   selected: RecordVersion
-  onSelect: (actionId: UUID) => void
+  onSelect: (id: UUID) => void
 }
 
 export function RecordVersionMenu({
@@ -457,7 +457,7 @@ export function RecordVersionMenu({
           type="tertiary"
         >
           {intl.formatMessage(messages.triggerLabel)}{' '}
-          {intl.formatMessage(FORM_NAME[selected.form])} ·{' '}
+          {intl.formatMessage(FORM_NAME[selected.form])} {'·'}{' '}
           {rowLabel(
             selected,
             versions.filter((v) => v.form === selected.form).length

@@ -92,14 +92,16 @@ describe('useRecordVersions', () => {
       (v) => v.form === RecordForm.DECLARATION && v.indexInForm === 0
     )
 
-    expect(declareVersion).toBeDefined()
+    if (!declareVersion) {
+      throw new Error('the declaration version was not found')
+    }
 
     const { result } = renderVersions(
       event,
-      `?version=${declareVersion!.actionId}`
+      `?version=${declareVersion.actionId}`
     )
 
-    expect(result.current.selected?.actionId).toBe(declareVersion!.actionId)
+    expect(result.current.selected?.actionId).toBe(declareVersion.actionId)
     expect(result.current.isLatest).toBe(false)
     expect(result.current.selectedState.declaration['applicant.email']).toBe(
       'original@example.com'

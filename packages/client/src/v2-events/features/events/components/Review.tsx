@@ -572,11 +572,11 @@ function ReviewComponent({
         >
           <FormReview
             anchor={anchor}
-            paddedBody={content === undefined}
             form={form}
             formConfig={formConfig}
             isCorrection={isCorrection}
             isReviewCorrection={isReviewCorrection}
+            paddedBody={content === undefined}
             previousForm={previousForm}
             readonlyMode={readonlyMode}
             showPreviouslyMissingValuesAsChanged={
