@@ -174,6 +174,7 @@ export const roles: Role[] = [
       { type: 'workqueue', options: { ids: ['assigned-to-you', 'recent', 'pending-feedback-registrar-general', 'potential-duplicate', 'registration-registrar-general'] } },
       { type: 'record.read' },
       { type: 'record.create' },
+      { type: 'record.edit' },
       { type: 'record.declare' },
       { type: 'record.reject' },
       { type: 'record.archive' },
