@@ -33,11 +33,15 @@ export type RecordForm = (typeof RecordForm)[keyof typeof RecordForm]
  * Accepted action types that open or amend one of the forms. Every other
  * accepted action still participates in the declaration fold — it just does not
  * get its own entry in the selector.
+ *
+ * EDIT is deliberately absent. Editing a record emits an EDIT immediately
+ * followed by a fresh DECLARE, so counting both would show two versions for
+ * one edit. The DECLARE is the version; the EDIT is how it was reached, and
+ * its data is already folded in by the time that DECLARE is reached.
  */
 const VERSION_ACTION_TYPES: ActionType[] = [
   ActionType.NOTIFY,
   ActionType.DECLARE,
-  ActionType.EDIT,
   ActionType.REGISTER,
   ActionType.APPROVE_CORRECTION
 ]

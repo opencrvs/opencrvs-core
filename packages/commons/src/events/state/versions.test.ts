@@ -45,13 +45,18 @@ describe('getRecordVersions', () => {
     expect(versions.map((v) => v.indexInForm)).toEqual([0, 0, 0])
   })
 
-  test('an edit between DECLARE and REGISTER belongs to the declaration', () => {
+  test('one edit yields one extra declaration version, not two', () => {
+    /*
+     * Editing emits EDIT then a fresh DECLARE — see the edit flow in
+     * features/events/actions/edit. One edit must read as one new version.
+     */
     const event = generateEventDocument({
       configuration,
       actions: [
         { type: ActionType.CREATE },
         { type: ActionType.DECLARE },
         { type: ActionType.EDIT },
+        { type: ActionType.DECLARE },
         { type: ActionType.REGISTER }
       ]
     })
@@ -62,7 +67,7 @@ describe('getRecordVersions', () => {
 
     expect(declarationVersions.map((v) => v.actionType)).toEqual([
       ActionType.DECLARE,
-      ActionType.EDIT
+      ActionType.DECLARE
     ])
     expect(declarationVersions.map((v) => v.indexInForm)).toEqual([0, 1])
     expect(declarationVersions.map((v) => v.isLatestOfForm)).toEqual([
@@ -71,7 +76,20 @@ describe('getRecordVersions', () => {
     ])
   })
 
-  test('an edit before DECLARE belongs to the notification', () => {
+  test('an EDIT on its own is not a version', () => {
+    const event = generateEventDocument({
+      configuration,
+      actions: [
+        { type: ActionType.CREATE },
+        { type: ActionType.DECLARE },
+        { type: ActionType.EDIT }
+      ]
+    })
+
+    expect(getRecordVersions(event)).toHaveLength(1)
+  })
+
+  test('actions before DECLARE belong to the notification', () => {
     const event = generateEventDocument({
       configuration,
       actions: [
@@ -86,7 +104,7 @@ describe('getRecordVersions', () => {
 
     expect(
       versions.filter((v) => v.form === RecordForm.NOTIFICATION)
-    ).toHaveLength(2)
+    ).toHaveLength(1)
     expect(
       versions.filter((v) => v.form === RecordForm.DECLARATION)
     ).toHaveLength(1)
@@ -151,12 +169,17 @@ describe('getEventStateAtVersion', () => {
         {
           type: ActionType.EDIT,
           declarationOverrides: { 'applicant.email': 'edited@example.com' }
+        },
+        {
+          type: ActionType.DECLARE,
+          declarationOverrides: { 'applicant.email': 'edited@example.com' }
         }
       ]
     })
 
+    // The first declaration, before the edit.
     const declareVersion = getRecordVersions(event).find(
-      (v) => v.actionType === ActionType.DECLARE
+      (v) => v.indexInForm === 0 && v.form === RecordForm.DECLARATION
     )
 
     expect(declareVersion).toBeDefined()
