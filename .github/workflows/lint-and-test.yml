@@ -119,9 +119,14 @@ jobs:
         if: steps.check-scripts.outputs.skip != 'true'
         run: npx license-check-and-add check -f license-config.json
 
-      - name: Runs dependency installation
-        if: steps.check-scripts.outputs.skip != 'true'
+      - name: Runs dependency installation (default)
+        if: steps.check-scripts.outputs.skip != 'true' && matrix.package != 'packages/countryconfig-template'
         run: pnpm install --frozen-lockfile
+
+        # countryconfig-template is under packages/ while not being a package.
+      - name: Runs dependency installation (countryconfig-template)
+        if: steps.check-scripts.outputs.skip != 'true' && matrix.package == 'packages/countryconfig-template'
+        run: pnpm install --no-frozen-lockfile --ignore-workspace
 
       - name: Extract dependencies for ${{ matrix.package }}
         if: steps.check-scripts.outputs.skip != 'true'
