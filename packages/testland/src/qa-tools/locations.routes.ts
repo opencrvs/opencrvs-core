@@ -18,7 +18,11 @@ const LOCATIONS_CONFIG: QaEntityConfig = {
   idLabel: 'Location id',
   basePath: 'locations',
   identityFields: [
-    { name: 'administrativeAreaId', label: 'Administrative area id' },
+    {
+      name: 'administrativeAreaId',
+      label: 'Administrative area id',
+      nullable: true
+    },
     { name: 'locationType', label: 'Location type' }
   ]
 }

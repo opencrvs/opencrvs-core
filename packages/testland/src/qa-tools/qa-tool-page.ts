@@ -25,8 +25,14 @@ export interface QaEntityConfig {
   idLabel: string
   /** REST path segment, e.g. "locations" or "administrative-areas". */
   basePath: string
-  /** Identity fields Create accepts and Update rejects, e.g. parentId. */
-  identityFields: Array<{ name: string; label: string }>
+  /**
+   * Identity fields Create accepts and Update rejects, e.g. parentId.
+   * `nullable: true` (e.g. parentId / administrativeAreaId) adds a "no
+   * value" checkbox that disables the input and forces the field to
+   * `null` on submit — the schema requires the key present, so an empty
+   * input alone can't express "no parent".
+   */
+  identityFields: Array<{ name: string; label: string; nullable?: boolean }>
 }
 
 const capitalize = (value: string) => value[0].toUpperCase() + value.slice(1)
@@ -38,7 +44,15 @@ const renderIdentityFieldInputs = (
     .map(
       (field) => `
         <label for="create-${field.name}">${field.label}</label>
-        <input id="create-${field.name}" name="${field.name}" />`
+        <input id="create-${field.name}" name="${field.name}" />${
+          field.nullable
+            ? `
+        <label class="null-toggle" for="create-${field.name}-null">
+          <input type="checkbox" id="create-${field.name}-null" />
+          No ${field.label.toLowerCase()} (set to null)
+        </label>`
+            : ''
+        }`
     )
     .join('')
 
@@ -58,6 +72,9 @@ export const renderQaToolPage = (config: QaEntityConfig) => `<!DOCTYPE html>
       button { margin-top: 1rem; padding: 0.5rem 1rem; }
       pre { background: #f4f4f4; padding: 1rem; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
       .field-error { color: #b00020; font-weight: bold; margin-top: 0.25rem; }
+      .null-toggle { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.35rem; font-weight: normal; font-size: 0.9em; }
+      .null-toggle input { width: auto; }
+      input:disabled { background: #eee; }
       #search-results { list-style: none; padding: 0; margin-top: 0.5rem; }
       #search-results li { padding: 0.4rem; border: 1px solid #ddd; margin-bottom: 0.25rem; cursor: pointer; }
       #search-results li:hover { background: #f4f4f4; }
@@ -187,10 +204,29 @@ export const renderQaToolPage = (config: QaEntityConfig) => `<!DOCTYPE html>
     <script>
       var basePath = '/${config.basePath}'
       var entityLabel = '${config.singularLabel}'
+      var nullableIdentityFieldNames = ${JSON.stringify(
+        config.identityFields
+          .filter((field) => field.nullable)
+          .map((field) => field.name)
+      )}
 
       function getToken() {
         return document.getElementById('token').value.trim()
       }
+
+      // A checked "no value" toggle disables its paired input and forces
+      // that field to null on submit — the schema requires the key present
+      // (it's nullable, not optional), so an empty input alone can't say
+      // "no parent".
+      nullableIdentityFieldNames.forEach(function (name) {
+        var checkbox = document.getElementById('create-' + name + '-null')
+        var input = document.getElementById('create-' + name)
+        if (!checkbox || !input) return
+        checkbox.addEventListener('change', function () {
+          input.disabled = checkbox.checked
+          if (checkbox.checked) input.value = ''
+        })
+      })
 
       document
         .getElementById('token-toggle')
@@ -419,6 +455,10 @@ export const renderQaToolPage = (config: QaEntityConfig) => `<!DOCTYPE html>
             'externalId',
             'effectiveFrom'
           ])
+          nullableIdentityFieldNames.forEach(function (name) {
+            var checkbox = document.getElementById('create-' + name + '-null')
+            if (checkbox && checkbox.checked) payload[name] = null
+          })
           var effectiveFromError = validateEffectiveFrom(payload.effectiveFrom)
           if (effectiveFromError) {
             showFieldError('create-effectiveFrom', effectiveFromError)
