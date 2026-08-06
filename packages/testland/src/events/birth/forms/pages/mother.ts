@@ -185,7 +185,8 @@ export const mother = defineFormPage({
             type: ConditionalType.SHOW,
             conditional: and(
               not(field('mother.dobUnknown').isEqualTo(true)),
-              requireMotherDetails
+              requireMotherDetails,
+              not(user.hasRole('HOSPITAL_CLERK'))
             )
           }
         ]

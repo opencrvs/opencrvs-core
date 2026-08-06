@@ -641,9 +641,6 @@ export function eventPayloadGenerator(
         declaration: {},
         annotation: {},
         eventId,
-        content: {
-          reason: `${ActionType.ARCHIVE}`
-        },
         ...input
       }),
       unarchive: (

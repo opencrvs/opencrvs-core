@@ -378,7 +378,7 @@ test.describe.serial('1. Birth event declaration', () => {
       test('1.8.2 Validate Supporting Document block', async () => {
         await page
           .locator('#documents____proofOfMother-form-input div')
-          .filter({ hasText: /^Select\.\.\.$/ })
+          .filter({ hasText: /^Select$/ })
           .nth(2)
           .click()
         await page.getByText('Birth Certificate', { exact: true }).click()

@@ -43,9 +43,9 @@ test.describe.serial('1. Death declaration case - 1', () => {
       numberOfDependants: 3,
       address: {
         country: 'Farajaland',
-        province: 'Sulaka',
-        district: 'Zobwe',
-        village: 'Chuma',
+        province: 'Central',
+        district: 'Ibombo',
+        village: 'Klow',
         town: faker.location.city(),
         residentialArea: faker.location.county(),
         street: faker.location.street(),
@@ -58,8 +58,7 @@ test.describe.serial('1. Death declaration case - 1', () => {
       date: getRandomDate(0, 20),
       causeOfDeathEstablished: true,
       sourceCauseDeath: 'Physician',
-      placeOfDeath: 'Health Institution',
-      deathLocation: 'Klow Village Hospital'
+      placeOfDeath: "Deceased's usual place of residence"
     },
     causeOfDeathDetails: {
       causeOfDeathA: {
@@ -115,7 +114,7 @@ test.describe.serial('1. Death declaration case - 1', () => {
 
   test.describe('1.1 Declaration started by HO', async () => {
     test.beforeAll(async () => {
-      await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
+      await login(page, CREDENTIALS.COMMUNITY_LEADER)
 
       await page.click('#header-new-event')
       await page.getByLabel('Death').click()
@@ -147,17 +146,7 @@ test.describe.serial('1. Death declaration case - 1', () => {
         .fill(declaration.deceased.numberOfDependants.toString())
 
       await page.locator('#province').click()
-      await page
-        .getByText(declaration.deceased.address.province, { exact: true })
-        .click()
-      await page.locator('#district').click()
-      await page
-        .getByText(declaration.deceased.address.district, { exact: true })
-        .click()
-      await page.locator('#village').click()
-      await page
-        .getByText(declaration.deceased.address.village, { exact: true })
-        .click()
+
       await page.locator('#town').fill(declaration.deceased.address.town)
       await page
         .locator('#residentialArea')
@@ -194,12 +183,6 @@ test.describe.serial('1. Death declaration case - 1', () => {
       await page
         .getByText(declaration.eventDetails.placeOfDeath, { exact: true })
         .click()
-
-      await page.locator('#eventDetails____deathLocation').fill('Klow Village')
-      await expect(
-        page.getByText(declaration.eventDetails.deathLocation)
-      ).toBeVisible()
-      await page.getByText(declaration.eventDetails.deathLocation).click()
 
       await continueForm(page)
     })
@@ -593,6 +576,7 @@ test.describe.serial('1. Death declaration case - 1', () => {
       ).toBeVisible()
     })
   })
+
   test.describe('1.2 Declaration Review by RO', async () => {
     test('1.2.1 Navigate to the declaration "Record" -tab', async () => {
       await login(page, CREDENTIALS.REGISTRATION_OFFICER)
