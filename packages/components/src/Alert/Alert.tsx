@@ -24,15 +24,39 @@ import { Icon } from '../Icon'
 export type AlertType = 'success' | 'warning' | 'loading' | 'info' | 'error'
 
 /**
- * Each type carries a border and an icon in its feedback colour, over the
- * palest tint of the same hue.
+ * Each type sits on the palest tint of its hue, outlined in the mid tone.
+ *
+ * The title and icon take the darkest tone rather than the mid one: the mid
+ * tones fail WCAG AA against their own tint — warning measures 2.14:1, info
+ * 2.87:1 — while the darkest clear it from 8.5:1 up. A border carries no text,
+ * so it keeps the mid tone.
  */
 const TONES = {
-  success: { line: 'positive', tint: 'greenLighter', Glyph: CheckCircle },
-  warning: { line: 'orange', tint: 'orangeLighter', Glyph: Warning },
-  error: { line: 'negative', tint: 'redLighter', Glyph: WarningCircle },
-  info: { line: 'teal', tint: 'tealLighter', Glyph: Info },
-  loading: { line: 'teal', tint: 'tealLighter', Glyph: CircleNotch }
+  success: {
+    line: 'positive',
+    ink: 'greenDarker',
+    tint: 'greenLighter',
+    Glyph: CheckCircle
+  },
+  warning: {
+    line: 'orange',
+    ink: 'orangeDarker',
+    tint: 'orangeLighter',
+    Glyph: Warning
+  },
+  error: {
+    line: 'negative',
+    ink: 'redDarker',
+    tint: 'redLighter',
+    Glyph: WarningCircle
+  },
+  info: { line: 'teal', ink: 'tealDarker', tint: 'tealLighter', Glyph: Info },
+  loading: {
+    line: 'teal',
+    ink: 'primary',
+    tint: 'tealLighter',
+    Glyph: CircleNotch
+  }
 } as const
 
 const Container = styled.div<{ $type: AlertType }>`
@@ -49,7 +73,7 @@ const Container = styled.div<{ $type: AlertType }>`
 const IconContainer = styled.div<{ $type: AlertType }>`
   flex: 0 0 auto;
   display: flex;
-  color: ${({ theme, $type }) => theme.colors[TONES[$type].line]};
+  color: ${({ theme, $type }) => theme.colors[TONES[$type].ink]};
 `
 
 const Content = styled.div`
