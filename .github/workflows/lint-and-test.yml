@@ -126,7 +126,7 @@ jobs:
         # countryconfig-template is under packages/ while not being a package.
       - name: Runs dependency installation (countryconfig-template)
         if: steps.check-scripts.outputs.skip != 'true' && matrix.package == 'packages/countryconfig-template'
-        run: pnpm install --no-frozen-lockfile --ignore-workspace
+        run: cd packages/countryconfig-template && pnpm install --no-frozen-lockfile --ignore-workspace
 
       - name: Extract dependencies for ${{ matrix.package }}
         if: steps.check-scripts.outputs.skip != 'true'
