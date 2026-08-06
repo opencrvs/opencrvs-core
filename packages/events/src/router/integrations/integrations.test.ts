@@ -58,6 +58,9 @@ describe('integrations', () => {
       expect(rows[0].secretHash).toBeTruthy()
       expect(rows[0].salt).toBeTruthy()
       expect(rows[0].shaSecret).toBeTruthy()
+      // A system caller — the startup bootstrap token — has no users(id)
+      // behind it, and created_by is a foreign key into users
+      expect(rows[0].createdBy).toBeNull()
     })
 
     test('writes an audit log entry', async () => {

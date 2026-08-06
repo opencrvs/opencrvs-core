@@ -12,7 +12,7 @@
 import { randomUUID } from 'crypto'
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
-import { EncodedScope, UUID } from '@opencrvs/commons'
+import { EncodedScope, TokenUserType, UUID } from '@opencrvs/commons'
 import {
   publicProcedure,
   router,
@@ -54,7 +54,9 @@ const ListIntegrationsOutput = z.array(
     scopes: z.array(z.string()),
     status: z.string(),
     createdAt: z.iso.datetime(),
-    createdBy: UUID
+    // Null for integrations registered from the country configuration on
+    // startup — those are created by a system token, not by a user
+    createdBy: UUID.nullable()
   })
 )
 
@@ -80,7 +82,7 @@ const GetIntegrationOutput = z.object({
   status: z.string(),
   shaSecret: z.string().nullable(),
   createdAt: z.string(),
-  createdBy: UUID
+  createdBy: UUID.nullable()
 })
 
 const ToggleStatusOutput = z.object({
@@ -120,7 +122,10 @@ export const integrationsRouter = router({
       const row = await createSystemClient({
         name: input.name,
         scopes: input.scopes,
-        createdBy: ctx.user.id,
+        // A system caller is the startup bootstrap token, which has no
+        // users(id) behind it to reference
+        createdBy:
+          ctx.user.type === TokenUserType.enum.system ? null : ctx.user.id,
         secretHash,
         salt,
         shaSecret,
