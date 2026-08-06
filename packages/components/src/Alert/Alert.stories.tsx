@@ -28,6 +28,15 @@ const meta: Meta<typeof Alert> = {
   },
   argTypes: {
     type: { control: 'radio', options: ['info', 'success', 'warning', 'error'] }
+  },
+  /*
+   * The actions addon injects a handler into every `on*` prop, which would
+   * otherwise give every story a close button and an unlabelled action.
+   * Stories that want either opt in.
+   */
+  args: {
+    onClose: undefined,
+    onActionClick: undefined
   }
 }
 
@@ -109,21 +118,6 @@ export const TitleOnly: Story = {
   args: {
     type: 'info',
     title: 'Notification — This is the only version'
-  }
-}
-
-/**
- * Copy runs long in other languages — German around 35% longer than English —
- * so the box grows rather than truncating.
- */
-export const LongMessage: Story = {
-  args: {
-    type: 'warning',
-    title: 'Eine Berichtigung dieser Registrierung wartet auf Genehmigung',
-    children:
-      'Beantragt von Felix Katongo • Bezirksstandesamt Ibombo am 22. Mai 2026. Die beantragten Änderungen sind erst nach ihrer Genehmigung Teil der Registrierung.',
-    actionText: 'Änderungsantrag prüfen',
-    onActionClick: () => undefined
   }
 }
 

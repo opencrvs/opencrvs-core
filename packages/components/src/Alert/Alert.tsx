@@ -87,7 +87,7 @@ export const Alert = ({
       <Content>
         {title && <Title>{title}</Title>}
         {children && <Message>{children}</Message>}
-        {onActionClick && (
+        {onActionClick && actionText && (
           <Actions>
             <Button
               data-testid={

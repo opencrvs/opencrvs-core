@@ -72,8 +72,7 @@ export const message = css`
  */
 export const actions = css`
   display: flex;
-  margin-top: 4px;
-  margin-left: -8px;
+  margin-top: 16px;
 `
 
 /* Pinned to the corner whatever the content does, and however tall it is. */
