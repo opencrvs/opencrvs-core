@@ -1232,6 +1232,100 @@ paths:
         "404": *a5
         "500": *a4
   /administrative-areas:
+    get:
+      operationId: administrativeAreas-list
+      summary: List administrative areas
+      description: Retrieve a list of administrative areas based on provided filters.
+      tags:
+        - Administrative areas
+      security:
+        - Authorization: []
+      parameters:
+        - in: query
+          name: isActive
+          schema:
+            type: boolean
+        - in: query
+          name: ids
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                    name:
+                      type: string
+                    externalId:
+                      anyOf:
+                        - type: string
+                        - type: "null"
+                    parentId:
+                      anyOf:
+                        - type: string
+                          format: uuid
+                          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                        - type: "null"
+                    status:
+                      type: string
+                      enum:
+                        - active
+                        - inactive
+                    versions:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          versionId:
+                            type: string
+                            format: uuid
+                            pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                          effectiveFrom:
+                            type: string
+                            format: date
+                            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+                          name:
+                            type: string
+                          externalId:
+                            anyOf:
+                              - type: string
+                              - type: "null"
+                          status:
+                            type: string
+                            enum:
+                              - active
+                              - inactive
+                        required:
+                          - versionId
+                          - effectiveFrom
+                          - name
+                          - status
+                        additionalProperties: false
+                  required:
+                    - id
+                    - name
+                    - parentId
+                    - status
+                    - versions
+                  additionalProperties: false
+        "400": *a1
+        "401": *a2
+        "403": *a3
+        "404": *a5
+        "500": *a4
     post:
       operationId: administrativeAreas-create
       summary: Create an administrative area
@@ -16104,7 +16198,6 @@ components:
         - declaration
         - status
         - type
-        - content
       additionalProperties: false
     UnarchiveAction:
       type: object
