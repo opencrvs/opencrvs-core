@@ -16,13 +16,13 @@ const scope = encodeScope({ type: 'location.edit' })
 
 async function createArea(
   client: ReturnType<typeof createTestClient>,
-  overrides: { name?: string; externalId?: string } = {}
+  overrides: { name?: string; externalId?: string; effectiveFrom?: string } = {}
 ) {
   return client.administrativeAreas.create({
     name: overrides.name ?? 'Original District',
     externalId: overrides.externalId ?? 'area-withdraw-test-pcode',
     parentId: null,
-    effectiveFrom: '2024-01-01',
+    effectiveFrom: overrides.effectiveFrom ?? '2024-01-01',
     status: 'active'
   })
 }
@@ -95,7 +95,7 @@ test('withdraws a pending future version and writes an audit entry', async () =>
   })
 })
 
-test('rejects withdrawing a version whose effectiveFrom has already passed', async () => {
+test('rejects withdrawing an already-effective version that is also the only version — the only-version check wins', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [scope])
 
@@ -107,12 +107,49 @@ test('rejects withdrawing a version whose effectiveFrom has already passed', asy
   await expect(
     client.administrativeAreas.withdrawVersion({
       id: created.id,
+      // The initial (creation) element is already in effect — 2024-01-01 —
+      // but it is also the only version, and that check takes precedence.
       versionId: created.versions[0].versionId
     })
   ).rejects.toMatchObject({
     code: 'CONFLICT',
-    message: expect.stringContaining('already in effect')
+    message: expect.stringContaining('only one version')
   })
+})
+
+test('rejects withdrawing the only version an administrative area has', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [scope])
+
+  const created = await createArea(client, {
+    name: 'Single Version District',
+    externalId: 'area-withdraw-only-version-pcode',
+    effectiveFrom: '2099-01-01'
+  })
+
+  await expect(
+    client.administrativeAreas.withdrawVersion({
+      id: created.id,
+      versionId: created.versions[0].versionId
+    })
+  ).rejects.toMatchObject({
+    code: 'CONFLICT',
+    message: expect.stringContaining('only one version')
+  })
+
+  const row = await getClient()
+    .selectFrom('administrativeAreas')
+    .select(['versions'])
+    .where('id', '=', created.id)
+    .executeTakeFirstOrThrow()
+  expect(row.versions).toHaveLength(1)
+
+  const auditEntries = await getClient()
+    .selectFrom('auditLog')
+    .selectAll()
+    .where('operation', '=', 'administrativeAreas.withdrawVersion')
+    .execute()
+  expect(auditEntries).toHaveLength(0)
 })
 
 test('rejects withdrawing an already-effective INACTIVE version too — the check is date-based, not status-based', async () => {

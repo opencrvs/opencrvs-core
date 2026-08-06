@@ -20,6 +20,27 @@ import { fetchClientAPI, NON_EXISTING_UUID } from './helpers'
 // file covers the administrative-area-specific wiring: parentId instead of
 // administrativeAreaId/locationType, and one representative case per verb.
 
+test.describe('GET /api/events/administrative-areas', () => {
+  let systemAdminToken: string
+
+  test.beforeAll(async () => {
+    systemAdminToken = await getToken(CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
+  })
+
+  test('HTTP 200 with administrative areas payload', async () => {
+    const response = await fetchClientAPI(
+      '/api/events/administrative-areas',
+      'GET',
+      systemAdminToken
+    )
+
+    expect(response.status).toBe(200)
+    const body = await response.json()
+    expect(Array.isArray(body)).toBe(true)
+    expect(body.length).toBeGreaterThan(0)
+  })
+})
+
 test.describe('Administrative area write API (/api/events/administrative-areas)', () => {
   let systemAdminToken: string
   let registrarToken: string
