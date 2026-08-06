@@ -12,9 +12,7 @@
 
 import React, { useState } from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
-import { useSelector } from 'react-redux'
 import styled from 'styled-components'
-import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import {
   Accordion,
@@ -45,7 +43,6 @@ import {
   PlainDate
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-import { getCountryLogoFile } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { buttonMessages } from '@client/i18n/messages'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
@@ -82,29 +79,7 @@ const Row = styled.div<{
     padding: 0;
   }
 `
-const HeaderContainer = styled.div`
-  padding: 16px 24px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-`
-const HeaderContent = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: left;
-  gap: 16px;
-  align-items: center;
-  ${({ theme }) => theme.fonts.h2}
-  color: ${({ theme }) => theme.colors.copy};
-`
 
-const TitleContainer = styled.div`
-  ${({ theme }) => theme.fonts.bold14}
-  color: ${({ theme }) => theme.colors.supportingCopy};
-  text-transform: uppercase;
-`
-const SubjectContainer = styled.div`
-  ${({ theme }) => theme.fonts.h2}
-  overflow-wrap: anywhere;
-`
 const RightColumn = styled.div`
   width: 40%;
   border-radius: 4px;
@@ -116,36 +91,6 @@ const LeftColumn = styled.div`
   flex-grow: 1;
   max-width: 840px;
   overflow: hidden;
-`
-
-const Card = styled.div`
-  border: 1px solid ${({ theme }) => theme.colors.grey300};
-  background: ${({ theme }) => theme.colors.white};
-  border-radius: 4px;
-  margin-bottom: 40px;
-  &:last-child {
-    margin-bottom: 200px;
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    border: 0;
-    margin: 0;
-  }
-`
-
-const FormData = styled.div<{ $padded?: boolean }>`
-  ${({ $padded }) => ($padded === false ? '' : 'padding-top: 24px;')}
-  background: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.copy};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ $padded }) => ($padded === false ? '' : 'padding: 24px;')}
-  }
-`
-
-const ReviewContainter = styled.div`
-  padding: 0px 32px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 0;
-  }
 `
 
 const DeclarationDataContainer = styled.div``
@@ -176,11 +121,6 @@ const reviewMessages = defineMessages({
     defaultMessage: 'A record will be created of any changes you make',
     description: 'The description for change modal'
   },
-  govtName: {
-    id: 'review.header.title.govtName',
-    defaultMessage: 'Government',
-    description: 'Header title that shows govt name'
-  },
   rejectModalSendForUpdate: {
     id: 'rejectModal.sendForUpdate',
     defaultMessage: 'Send For Update',
@@ -198,66 +138,6 @@ const reviewMessages = defineMessages({
   }
 })
 
-function ReviewHeader({ title }: { title: string }) {
-  const countryLogoFile = useSelector(getCountryLogoFile)
-  const intl = useIntl()
-
-  return (
-    <HeaderContainer>
-      <HeaderContent>
-        {countryLogoFile && <CountryLogo size="small" src={countryLogoFile} />}
-        <Stack
-          alignItems="flex-start"
-          direction="column"
-          gap={6}
-          justify-content="flex-start"
-        >
-          <TitleContainer id={`header_title`}>
-            {intl.formatMessage(reviewMessages.govtName)}
-          </TitleContainer>
-          <SubjectContainer id={`header_subject`}>{title}</SubjectContainer>
-        </Stack>
-      </HeaderContent>
-    </HeaderContainer>
-  )
-}
-
-/**
- * A declaration review draws its own card with the country logo. A screen that
- * is not a review — the Record tab — passes `contentTitle` and gets the
- * design-system Content instead, so its heading matches every other tab.
- */
-function CardOrContent({
-  contentTitle,
-  reviewTitle,
-  actions,
-  children
-}: {
-  contentTitle?: string
-  reviewTitle: string
-  actions?: React.ReactElement[]
-  children: React.ReactNode
-}) {
-  if (contentTitle === undefined) {
-    return (
-      <Card>
-        <ReviewHeader title={reviewTitle} />
-        {children}
-      </Card>
-    )
-  }
-
-  return (
-    <Content
-      size={ContentSize.LARGE}
-      title={contentTitle}
-      topActionButtons={actions}
-    >
-      {children}
-    </Content>
-  )
-}
-
 /**
  *  Renders review of form data, with the ability to edit the data.
  */
@@ -268,7 +148,6 @@ function FormReview({
   onEdit,
   showPreviouslyMissingValuesAsChanged,
   readonlyMode,
-  paddedBody = true,
   isCorrection = false,
   isReviewCorrection = false,
   treatMissingValuesAsCleared = false,
@@ -280,8 +159,6 @@ function FormReview({
   previousForm: EventState
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   showPreviouslyMissingValuesAsChanged: boolean
-  /** False when the container already pads the body, as Content does. */
-  paddedBody?: boolean
   validatorContext: ValidatorContext
   readonlyMode?: boolean
   isCorrection?: boolean
@@ -297,175 +174,167 @@ function FormReview({
   )
 
   return (
-    <FormData $padded={paddedBody}>
-      <ReviewContainter>
-        {visiblePages.map((page) => {
-          const fields = page.fields
-            .filter((field) =>
-              isFieldDisplayedOnReview(field, form, validatorContext)
-            )
-            .map((field) => {
-              const value = form[field.id]
-              const previousValue = previousForm[field.id]
-
-              const displayValue =
-                treatMissingValuesAsCleared &&
-                value === undefined &&
-                previousValue !== undefined
-                  ? null
-                  : value
-
-              // previousForm, formConfig are used to find previous values with the same label if required
-              const valueDisplay = (
-                <Output
-                  anchor={anchor}
-                  field={field}
-                  formConfig={formConfig}
-                  previousForm={previousForm}
-                  previousValue={previousValue}
-                  showPreviouslyMissingValuesAsChanged={
-                    showPreviouslyMissingValuesAsChanged
-                  }
-                  value={displayValue}
-                />
-              )
-
-              const errors = flattenFormState(
-                runFieldValidations({
-                  field,
-                  value: form[field.id],
-                  form,
-                  context: validatorContext
-                })
-              ).flatMap(([, errs]) => errs)
-
-              const errorDisplay =
-                errors.length > 0 ? (
-                  <ValidationError key={field.id}>
-                    {intl.formatMessage(errors[0].message)}
-                  </ValidationError>
-                ) : null
-
-              return { ...field, valueDisplay, errorDisplay }
-            })
-
-          // All interactive fields are shown in review, including optional fields with no value
-          // (empty optional fields render as a blank value cell). Only non-interactive display
-          // types (DIVIDER, PAGE_HEADER, etc.) are hidden. Value-based filtering happens only in
-          // certificate printing and correction summary — not here.
-          const displayedFields = fields.filter(
-            ({ type }) =>
-              !FieldTypesToHideInReview.some(
-                (typeToHide) => type === typeToHide
-              )
+    <>
+      {visiblePages.map((page) => {
+        const fields = page.fields
+          .filter((field) =>
+            isFieldDisplayedOnReview(field, form, validatorContext)
           )
+          .map((field) => {
+            const value = form[field.id]
+            const previousValue = previousForm[field.id]
 
-          if (displayedFields.length === 0) {
-            return <React.Fragment key={`Section_${page.id}`}></React.Fragment>
-          }
+            const displayValue =
+              treatMissingValuesAsCleared &&
+              value === undefined &&
+              previousValue !== undefined
+                ? null
+                : value
 
-          const hasCorrectableFields = displayedFields.some(
-            (field) => !field.uncorrectable
-          )
-
-          // If the page has any correctable fields, show the change all link
-          const showChangeAllLink =
-            !readonlyMode &&
-            (!isCorrection || hasCorrectableFields) &&
-            !isReviewCorrection
-
-          const hasMandatoryFields = page.fields.some(
-            (field) => !!field.required
-          )
-          const hasAnyCompletedField = page.fields.some(
-            (field) => form[field.id] != null && form[field.id] !== ''
-          )
-
-          return (
-            <DeclarationDataContainer
-              key={'Section_' + page.title.defaultMessage}
-            >
-              <Accordion
-                action={
-                  showChangeAllLink && (
-                    <Link
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onEdit({ pageId: page.id })
-                      }}
-                    >
-                      {intl.formatMessage(reviewMessages.changeAllButton)}
-                    </Link>
-                  )
+            // previousForm, formConfig are used to find previous values with the same label if required
+            const valueDisplay = (
+              <Output
+                anchor={anchor}
+                field={field}
+                formConfig={formConfig}
+                previousForm={previousForm}
+                previousValue={previousValue}
+                showPreviouslyMissingValuesAsChanged={
+                  showPreviouslyMissingValuesAsChanged
                 }
-                expand={hasMandatoryFields || hasAnyCompletedField}
-                label={intl.formatMessage(page.title)}
-                labelForHideAction="Hide"
-                labelForShowAction="Show"
-                name={'Accordion_' + page.id}
-              >
-                <ListReview id={'Section_' + page.id}>
-                  {displayedFields.map((field) => {
-                    const {
-                      id,
-                      type,
-                      label,
-                      errorDisplay,
-                      valueDisplay,
-                      uncorrectable
-                    } = field
-                    const shouldHideEditLink =
-                      readonlyMode ||
-                      (isCorrection && uncorrectable) ||
-                      isReviewCorrection
+                value={displayValue}
+              />
+            )
 
-                    const showSectionHeading = type === FieldType.HEADING
+            const errors = flattenFormState(
+              runFieldValidations({
+                field,
+                value: form[field.id],
+                form,
+                context: validatorContext
+              })
+            ).flatMap(([, errs]) => errs)
 
-                    return (
-                      <React.Fragment key={id}>
-                        {showSectionHeading ? (
-                          <ListReview.Header
-                            fontVariant={
-                              field.configuration.styles?.fontVariant
-                            }
-                            label={intl.formatMessage(label)}
-                            value={null}
-                          />
-                        ) : (
-                          <ListReview.Row
-                            actions={
-                              !shouldHideEditLink && (
-                                <Link
-                                  data-testid={`change-button-${id}`}
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    onEdit({
-                                      pageId: page.id,
-                                      fieldId: id
-                                    })
-                                  }}
-                                >
-                                  {intl.formatMessage(
-                                    reviewMessages.changeButton
-                                  )}
-                                </Link>
-                              )
-                            }
-                            id={id}
-                            label={intl.formatMessage(label)}
-                            value={errorDisplay || valueDisplay}
-                          />
-                        )}
-                      </React.Fragment>
-                    )
-                  })}
-                </ListReview>
-              </Accordion>
-            </DeclarationDataContainer>
-          )
-        })}
-      </ReviewContainter>
-    </FormData>
+            const errorDisplay =
+              errors.length > 0 ? (
+                <ValidationError key={field.id}>
+                  {intl.formatMessage(errors[0].message)}
+                </ValidationError>
+              ) : null
+
+            return { ...field, valueDisplay, errorDisplay }
+          })
+
+        // All interactive fields are shown in review, including optional fields with no value
+        // (empty optional fields render as a blank value cell). Only non-interactive display
+        // types (DIVIDER, PAGE_HEADER, etc.) are hidden. Value-based filtering happens only in
+        // certificate printing and correction summary — not here.
+        const displayedFields = fields.filter(
+          ({ type }) =>
+            !FieldTypesToHideInReview.some((typeToHide) => type === typeToHide)
+        )
+
+        if (displayedFields.length === 0) {
+          return <React.Fragment key={`Section_${page.id}`}></React.Fragment>
+        }
+
+        const hasCorrectableFields = displayedFields.some(
+          (field) => !field.uncorrectable
+        )
+
+        // If the page has any correctable fields, show the change all link
+        const showChangeAllLink =
+          !readonlyMode &&
+          (!isCorrection || hasCorrectableFields) &&
+          !isReviewCorrection
+
+        const hasMandatoryFields = page.fields.some((field) => !!field.required)
+        const hasAnyCompletedField = page.fields.some(
+          (field) => form[field.id] != null && form[field.id] !== ''
+        )
+
+        return (
+          <DeclarationDataContainer
+            key={'Section_' + page.title.defaultMessage}
+          >
+            <Accordion
+              action={
+                showChangeAllLink && (
+                  <Link
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onEdit({ pageId: page.id })
+                    }}
+                  >
+                    {intl.formatMessage(reviewMessages.changeAllButton)}
+                  </Link>
+                )
+              }
+              expand={hasMandatoryFields || hasAnyCompletedField}
+              label={intl.formatMessage(page.title)}
+              labelForHideAction="Hide"
+              labelForShowAction="Show"
+              name={'Accordion_' + page.id}
+            >
+              <ListReview id={'Section_' + page.id}>
+                {displayedFields.map((field) => {
+                  const {
+                    id,
+                    type,
+                    label,
+                    errorDisplay,
+                    valueDisplay,
+                    uncorrectable
+                  } = field
+                  const shouldHideEditLink =
+                    readonlyMode ||
+                    (isCorrection && uncorrectable) ||
+                    isReviewCorrection
+
+                  const showSectionHeading = type === FieldType.HEADING
+
+                  return (
+                    <React.Fragment key={id}>
+                      {showSectionHeading ? (
+                        <ListReview.Header
+                          fontVariant={field.configuration.styles?.fontVariant}
+                          label={intl.formatMessage(label)}
+                          value={null}
+                        />
+                      ) : (
+                        <ListReview.Row
+                          actions={
+                            !shouldHideEditLink && (
+                              <Link
+                                data-testid={`change-button-${id}`}
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  onEdit({
+                                    pageId: page.id,
+                                    fieldId: id
+                                  })
+                                }}
+                              >
+                                {intl.formatMessage(
+                                  reviewMessages.changeButton
+                                )}
+                              </Link>
+                            )
+                          }
+                          id={id}
+                          label={intl.formatMessage(label)}
+                          value={errorDisplay || valueDisplay}
+                        />
+                      )}
+                    </React.Fragment>
+                  )
+                })}
+              </ListReview>
+            </Accordion>
+          </DeclarationDataContainer>
+        )
+      })}
+    </>
   )
 }
 
@@ -495,9 +364,8 @@ function ReviewComponent({
   children?: React.ReactNode
   /**
    * Renders the left column as a design-system Content instead of the review
-   * card, for a screen that is not a declaration review — the Record tab —
-   * which needs a plain title and a header-action slot rather than the
-   * country logo.
+   * card, so a screen that is not a declaration review — the Record tab — gets
+   * a plain title and a header-action slot rather than the country logo.
    */
   content?: { title: string; actions?: React.ReactElement[] }
   formConfig: FormConfig
@@ -551,102 +419,113 @@ function ReviewComponent({
       )
     : []
 
+  /*
+   * The left column is one card. A declaration review draws it itself, with
+   * the country logo; a screen that is not a review — the Record tab — passes
+   * `content` and gets the design-system Content component instead, which is
+   * the same card with a plain title and a header-action slot.
+   *
+   * Both branches are written out rather than picked into a variable
+   * component: a component defined during render is a new type on every
+   * render, and React would unmount and remount the whole form under it.
+   */
+  const cardBody = (
+    <>
+      <FormReview
+        anchor={anchor}
+        form={form}
+        formConfig={formConfig}
+        isCorrection={isCorrection}
+        isReviewCorrection={isReviewCorrection}
+        previousForm={previousForm}
+        readonlyMode={readonlyMode}
+        showPreviouslyMissingValuesAsChanged={
+          showPreviouslyMissingValuesAsChanged
+        }
+        treatMissingValuesAsCleared={treatMissingValuesAsCleared}
+        validatorContext={validatorContext}
+        onEdit={onEdit}
+      />
+
+      {/* edit annotation fields  */}
+      {hasAnnotationFieldsToShow && onAnnotationChange && (
+        <DeclarationDataContainer>
+          <Accordion
+            expand={true}
+            label={intl.formatMessage(reviewMessages.annotationsTitle)}
+            labelForHideAction="Hide"
+            labelForShowAction="Show"
+            name="annotation"
+          >
+            <FormFieldGenerator
+              fields={reviewFields}
+              formTouched={touched}
+              formValues={annotation}
+              id={'review'}
+              readonlyMode={readonlyMode}
+              validatorContext={{
+                ...validatorContext,
+                baseFormState: form
+              }}
+              onFormChange={onAnnotationChange}
+              onTouchedChange={setTouched}
+            />
+          </Accordion>
+        </DeclarationDataContainer>
+      )}
+
+      {/* show annotation fields */}
+      {hasAnnotationFieldsToShow &&
+        readonlyMode &&
+        displayedAnnotationFields.length > 0 && (
+          <DeclarationDataContainer>
+            <Accordion
+              expand={true}
+              label={intl.formatMessage(reviewMessages.annotationsTitle)}
+              labelForHideAction="Hide"
+              labelForShowAction="Show"
+              name="annotation"
+            >
+              <ListReview id="annotation">
+                {displayedAnnotationFields.map((field) => (
+                  <ListReview.Row
+                    key={field.id}
+                    actions={null}
+                    id={field.id}
+                    label={intl.formatMessage(field.label)}
+                    value={
+                      <Output
+                        anchor={anchor}
+                        field={field}
+                        value={annotation[field.id]}
+                      />
+                    }
+                  />
+                ))}
+              </ListReview>
+            </Accordion>
+          </DeclarationDataContainer>
+        )}
+    </>
+  )
+
   return (
     <Row>
       <LeftColumn>
         {banner}
-        <CardOrContent
-          actions={content?.actions}
-          contentTitle={content?.title}
-          reviewTitle={title}
+        {/*
+          Every review sits in the design-system Content, so the Record tab and
+          the declaration reviews share one container. A screen that needs a
+          different heading or a header action passes `content`; otherwise the
+          declaration's own title is used.
+        */}
+        <Content
+          size={ContentSize.LARGE}
+          title={content?.title ?? title}
+          topActionButtons={content?.actions}
         >
-          <FormReview
-            anchor={anchor}
-            paddedBody={content === undefined}
-            form={form}
-            formConfig={formConfig}
-            isCorrection={isCorrection}
-            isReviewCorrection={isReviewCorrection}
-            previousForm={previousForm}
-            readonlyMode={readonlyMode}
-            showPreviouslyMissingValuesAsChanged={
-              showPreviouslyMissingValuesAsChanged
-            }
-            treatMissingValuesAsCleared={treatMissingValuesAsCleared}
-            validatorContext={validatorContext}
-            onEdit={onEdit}
-          />
-
-          {/* edit annotation fields  */}
-          {hasAnnotationFieldsToShow && onAnnotationChange && (
-            <FormData>
-              <ReviewContainter>
-                <DeclarationDataContainer>
-                  <Accordion
-                    expand={true}
-                    label={intl.formatMessage(reviewMessages.annotationsTitle)}
-                    labelForHideAction="Hide"
-                    labelForShowAction="Show"
-                    name="annotation"
-                  >
-                    <FormFieldGenerator
-                      fields={reviewFields}
-                      formTouched={touched}
-                      formValues={annotation}
-                      id={'review'}
-                      readonlyMode={readonlyMode}
-                      validatorContext={{
-                        ...validatorContext,
-                        baseFormState: form
-                      }}
-                      onFormChange={onAnnotationChange}
-                      onTouchedChange={setTouched}
-                    />
-                  </Accordion>
-                </DeclarationDataContainer>
-              </ReviewContainter>
-            </FormData>
-          )}
-
-          {/* show annotation fields */}
-          {hasAnnotationFieldsToShow &&
-            readonlyMode &&
-            displayedAnnotationFields.length > 0 && (
-              <FormData>
-                <ReviewContainter>
-                  <DeclarationDataContainer>
-                    <Accordion
-                      expand={true}
-                      label={intl.formatMessage(
-                        reviewMessages.annotationsTitle
-                      )}
-                      labelForHideAction="Hide"
-                      labelForShowAction="Show"
-                      name="annotation"
-                    >
-                      <ListReview id="annotation">
-                        {displayedAnnotationFields.map((field) => (
-                          <ListReview.Row
-                            key={field.id}
-                            actions={null}
-                            id={field.id}
-                            label={intl.formatMessage(field.label)}
-                            value={
-                              <Output
-                                anchor={anchor}
-                                field={field}
-                                value={annotation[field.id]}
-                              />
-                            }
-                          />
-                        ))}
-                      </ListReview>
-                    </Accordion>
-                  </DeclarationDataContainer>
-                </ReviewContainter>
-              </FormData>
-            )}
-        </CardOrContent>
+          {cardBody}
+        </Content>
         {children}
       </LeftColumn>
       {pageIdsWithFile.length > 0 && (
