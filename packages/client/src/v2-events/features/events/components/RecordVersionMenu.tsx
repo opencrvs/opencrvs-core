@@ -21,6 +21,7 @@ import {
 } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components/lib/Button'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
+import { useDropdown } from '@opencrvs/components/lib/Dropdown/DropdownContext'
 import {
   CaretDown,
   CaretUp,
@@ -206,6 +207,16 @@ const Menu = styled.div`
   flex-direction: column;
   gap: 8px;
   padding: 12px;
+  background: ${({ theme }) => theme.colors.background};
+  border-radius: 8px;
+  /*
+   * The popover is white and insets its children by 4px, which would leave a
+   * white ring around this tray. Pulling back over it lets the tray reach the
+   * popover's own edge.
+   */
+  margin: -4px;
+  /* The popover sets nowrap; these cards wrap onto two and three lines. */
+  white-space: normal;
 `
 
 const Card = styled.div<{ $holdsSelection?: boolean }>`
@@ -239,27 +250,28 @@ const Line = styled.div<{ $selected?: boolean; $indent?: boolean }>`
   }
 `
 
-const Badge = styled.div`
+const Badge = styled.div<{ $onTint?: boolean }>`
   flex: 0 0 auto;
   width: 36px;
   height: 36px;
   border-radius: 999px;
-  background: ${({ theme }) => theme.colors.grey100};
+  background: ${({ theme, $onTint }) =>
+    $onTint ? theme.colors.white : theme.colors.grey100};
   display: flex;
   align-items: center;
   justify-content: center;
 `
 
-const Texts = styled.div`
+const Texts = styled.div<{ $tight?: boolean }>`
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: ${({ $tight }) => ($tight ? '0' : '2px')};
   min-width: 0;
 `
 
 const Title = styled.span`
-  ${({ theme }) => theme.fonts.h4}
+  ${({ theme }) => theme.fonts.bold16}
   color: ${({ theme }) => theme.colors.copy};
 `
 
@@ -283,6 +295,89 @@ const Versions = styled.div`
   flex-direction: column;
   padding-bottom: 8px;
 `
+
+/**
+ * A line that chooses a version. Selecting dismisses the menu, which the
+ * design-system DropdownMenu.Item would normally do — this menu builds its own
+ * rows, so it closes the dropdown itself.
+ */
+function SelectLine({
+  actionId,
+  onSelect,
+  selected,
+  indent,
+  testId,
+  children
+}: {
+  actionId: UUID
+  onSelect: (actionId: UUID) => void
+  selected: boolean
+  indent?: boolean
+  testId: string
+  children: React.ReactNode
+}) {
+  const { closeDropdown } = useDropdown()
+
+  return (
+    <Line
+      $indent={indent}
+      $selected={selected}
+      as="button"
+      data-testid={testId}
+      type="button"
+      onClick={() => {
+        onSelect(actionId)
+        closeDropdown()
+      }}
+    >
+      {children}
+    </Line>
+  )
+}
+
+/**
+ * The head of a form card. A form with one version has nothing to expand, so
+ * its head selects that version and dismisses the menu; a form with several
+ * expands instead, leaving the menu open.
+ */
+function HeadLine({
+  actionId,
+  form,
+  selectable,
+  selected,
+  onSelect,
+  onToggle,
+  children
+}: {
+  actionId: UUID
+  form: RecordForm
+  selectable: boolean
+  selected: boolean
+  onSelect: (actionId: UUID) => void
+  onToggle: () => void
+  children: React.ReactNode
+}) {
+  const { closeDropdown } = useDropdown()
+
+  return (
+    <Line
+      $selected={selected}
+      as="button"
+      data-testid={`record-version-form-${form}`}
+      type="button"
+      onClick={() => {
+        if (!selectable) {
+          onToggle()
+          return
+        }
+        onSelect(actionId)
+        closeDropdown()
+      }}
+    >
+      {children}
+    </Line>
+  )
+}
 
 interface VersionMenuProps {
   versions: RecordVersion[]
@@ -380,16 +475,17 @@ export function RecordVersionMenu({
 
             return (
               <Card key={form} $holdsSelection={holdsSelection}>
-                <Line
-                  $selected={single && holdsSelection}
-                  as="button"
-                  data-testid={`record-version-form-${form}`}
-                  type="button"
-                  onClick={() =>
-                    single ? onSelect(items[0].actionId) : toggle(form)
-                  }
+                <HeadLine
+                  actionId={items[0].actionId}
+                  form={form}
+                  selectable={single}
+                  selected={single && holdsSelection}
+                  onSelect={onSelect}
+                  onToggle={() => toggle(form)}
                 >
-                  <Badge>{React.createElement(FORM_ICON[form], { size: 20 })}</Badge>
+                  <Badge $onTint={single && holdsSelection}>
+                    {React.createElement(FORM_ICON[form], { size: 20 })}
+                  </Badge>
                   <Texts>
                     <Title>{intl.formatMessage(FORM_NAME[form])}</Title>
                     <Sub>{intl.formatMessage(FORM_ABOUT[form])}</Sub>
@@ -410,28 +506,29 @@ export function RecordVersionMenu({
                   {!single &&
                     (isOpen ? <CaretUp size={16} /> : <CaretDown size={16} />)}
                   {single && holdsSelection && <Check size={20} />}
-                </Line>
+                </HeadLine>
 
                 {!single && isOpen && (
                   <Versions>
                     {items.map((version) => {
                       const isSelected = version.actionId === selected.actionId
                       return (
-                        <Line
+                        <SelectLine
                           key={version.actionId}
-                          $indent
-                          $selected={isSelected}
-                          as="button"
-                          data-testid={`record-version-option-${version.actionId}`}
-                          type="button"
-                          onClick={() => onSelect(version.actionId)}
+                          indent
+                          actionId={version.actionId}
+                          selected={isSelected}
+                          testId={`record-version-option-${version.actionId}`}
+                          onSelect={onSelect}
                         >
-                          <Texts>
-                            <RowTitle>{rowLabel(version, items.length)}</RowTitle>
+                          <Texts $tight>
+                            <RowTitle>
+                              {rowLabel(version, items.length)}
+                            </RowTitle>
                             <Sub>{provenance(version)}</Sub>
                           </Texts>
                           {isSelected && <Check size={20} />}
-                        </Line>
+                        </SelectLine>
                       )
                     })}
                   </Versions>
