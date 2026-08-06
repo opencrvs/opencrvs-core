@@ -47,7 +47,7 @@ import { queryClient, useTRPC } from '@client/v2-events/trpc'
 
 import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
 import { useRecordVersions } from '@client/v2-events/features/events/useRecordVersions'
-import { RecordVersionSelect } from '@client/v2-events/features/events/components/RecordVersionSelect'
+import { RecordVersionMenu } from '@client/v2-events/features/events/components/RecordVersionMenu'
 import { removeCachedFiles } from '../files/cache'
 
 const messages = defineMessages({
@@ -62,6 +62,11 @@ const messages = defineMessages({
       'This record has not been downloaded yet so it cannot be opened offline. Please reconnect to the internet to view it.',
     description:
       'Message shown on the Record page when the user is offline and the record has not been cached locally'
+  },
+  recordTitle: {
+    id: 'v2.event.record.title',
+    defaultMessage: 'Record',
+    description: 'Heading of the card on the Record tab'
   }
 })
 
@@ -69,11 +74,6 @@ const OfflineMessageWrapper = styled.div`
   text-align: center;
 `
 
-const VersionSelectRow = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 16px;
-`
 
 function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   const events = useEvents()
@@ -118,6 +118,7 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
     authentication.sub
   )
 
+  const intl = useIntl()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const formConfig = getDeclaration(configuration)
@@ -166,28 +167,30 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   const { title, fields } = actionConfiguration.review
 
   return (
-    <>
-      {selected && (
-        <VersionSelectRow>
-          <RecordVersionSelect
-            selected={selected}
-            versions={versions}
-            onSelect={selectVersion}
-          />
-        </VersionSelectRow>
-      )}
-      <ReviewComponent.Body
-        readonlyMode
-        anchor={recordAnchorDate(eventStateWithDraft)}
-        annotation={annotation}
-        form={eventStateWithDraft.declaration}
-        formConfig={formConfig}
-        reviewFields={fields}
-        title={formatMessage(title, eventStateWithDraft.declaration)}
-        validatorContext={validatorContext}
-        onEdit={noop}
-      />
-    </>
+    <ReviewComponent.Body
+      readonlyMode
+      anchor={recordAnchorDate(eventStateWithDraft)}
+      annotation={annotation}
+      content={{
+        title: intl.formatMessage(messages.recordTitle),
+        actions: selected
+          ? [
+              <RecordVersionMenu
+                key="record-version"
+                selected={selected}
+                versions={versions}
+                onSelect={selectVersion}
+              />
+            ]
+          : []
+      }}
+      form={eventStateWithDraft.declaration}
+      formConfig={formConfig}
+      reviewFields={fields}
+      title={formatMessage(title, eventStateWithDraft.declaration)}
+      validatorContext={validatorContext}
+      onEdit={noop}
+    />
   )
 }
 
