@@ -46,6 +46,8 @@ import { useOnlineStatus } from '@client/utils'
 import { queryClient, useTRPC } from '@client/v2-events/trpc'
 
 import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
+import { useRecordVersions } from '@client/v2-events/features/events/useRecordVersions'
+import { RecordVersionSelect } from '@client/v2-events/features/events/components/RecordVersionSelect'
 import { removeCachedFiles } from '../files/cache'
 
 const messages = defineMessages({
@@ -67,6 +69,12 @@ const OfflineMessageWrapper = styled.div`
   text-align: center;
 `
 
+const VersionSelectRow = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+`
+
 function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   const events = useEvents()
   const event = events.getEvent.useGetOrDownloadEvent(eventId)
@@ -84,13 +92,26 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
     event.type
   )
 
-  const eventStateWithDraft = useMemo(() => {
-    const eventState = getCurrentEventState(event, configuration)
+  const currentState = useMemo(
+    () => getCurrentEventState(event, configuration),
+    [event, configuration]
+  )
 
-    return draft
-      ? applyDraftToEventIndex(eventState, draft, configuration)
-      : eventState
-  }, [draft, event, configuration])
+  const { versions, selected, selectedState, isLatest, selectVersion } =
+    useRecordVersions({ event, configuration, currentState })
+
+  /*
+   * A draft is unsaved work on top of the current state, so it belongs to the
+   * newest version only. Applying it to a historical version would show data
+   * that never existed at that point.
+   */
+  const eventStateWithDraft = useMemo(
+    () =>
+      draft && isLatest
+        ? applyDraftToEventIndex(selectedState, draft, configuration)
+        : selectedState,
+    [draft, isLatest, selectedState, configuration]
+  )
 
   const assignmentStatus = getAssignmentStatus(
     eventStateWithDraft,
@@ -145,17 +166,28 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   const { title, fields } = actionConfiguration.review
 
   return (
-    <ReviewComponent.Body
-      readonlyMode
-      anchor={recordAnchorDate(eventStateWithDraft)}
-      annotation={annotation}
-      form={eventStateWithDraft.declaration}
-      formConfig={formConfig}
-      reviewFields={fields}
-      title={formatMessage(title, eventStateWithDraft.declaration)}
-      validatorContext={validatorContext}
-      onEdit={noop}
-    />
+    <>
+      {selected && (
+        <VersionSelectRow>
+          <RecordVersionSelect
+            selected={selected}
+            versions={versions}
+            onSelect={selectVersion}
+          />
+        </VersionSelectRow>
+      )}
+      <ReviewComponent.Body
+        readonlyMode
+        anchor={recordAnchorDate(eventStateWithDraft)}
+        annotation={annotation}
+        form={eventStateWithDraft.declaration}
+        formConfig={formConfig}
+        reviewFields={fields}
+        title={formatMessage(title, eventStateWithDraft.declaration)}
+        validatorContext={validatorContext}
+        onEdit={noop}
+      />
+    </>
   )
 }
 
