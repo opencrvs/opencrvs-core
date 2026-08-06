@@ -56,6 +56,34 @@ const renderIdentityFieldInputs = (
     )
     .join('')
 
+/** Plain-English usage notes shown in the "i" guide, worded for this entity. */
+const renderGuideItems = (config: QaEntityConfig): string => {
+  const nullableFields = config.identityFields.filter((f) => f.nullable)
+  const requiredIdentityFields = config.identityFields.filter(
+    (f) => !f.nullable
+  )
+
+  const items = [
+    `Search is a substring match over every ${config.pluralLabel} name/id — click a result to fill the Update and Withdraw blocks below with that ${config.singularLabel}'s id and version id.`,
+    `This page only covers ${config.pluralLabel} — locations and administrative areas each have their own page (<code>/locations</code>, <code>/administrative-areas</code>).`,
+    `While you're editing Create, Update, or Withdraw, the other two are disabled until you finish or cancel — this stops fields from different operations getting mixed up.`,
+    nullableFields.length > 0
+      ? `On Create, ${nullableFields.map((f) => f.label.toLowerCase()).join(' and ')} can be left null — check the box next to the field for a top-level ${config.singularLabel}, or leave it unchecked and type another ${config.singularLabel}'s id as the parent.`
+      : '',
+    requiredIdentityFields.length > 0
+      ? `${requiredIdentityFields.map((f) => f.label).join(', ')} ${requiredIdentityFields.length > 1 ? 'are' : 'is'} required on Create — there's no null option for ${requiredIdentityFields.length > 1 ? 'these' : 'it'}.`
+      : '',
+    `External id is optional — a unique code for the ${config.singularLabel}.`,
+    `Every Create/Update/Withdraw shows a confirmation popup with the exact payload before it's sent.`,
+    `Effective from must be <code>YYYY-MM-DD</code>; leave it blank to use the server default.`,
+    `Update appends a new version rather than editing in place — that's why it needs the last version id, to detect if the ${config.singularLabel} changed since you last looked.`,
+    `Withdraw only works on a version that hasn't taken effect yet — not one already active, and not the only version the ${config.singularLabel} has.`,
+    `This tool always acts as <code>NATIONAL_SYSTEM_ADMIN</code> — it can't show what happens for a user without the <code>location.edit</code> scope.`
+  ].filter(Boolean)
+
+  return items.map((item) => `<li>${item}</li>`).join('')
+}
+
 export const renderQaToolPage = (config: QaEntityConfig) => `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -79,7 +107,7 @@ export const renderQaToolPage = (config: QaEntityConfig) => `<!DOCTYPE html>
       #search-results li { padding: 0.4rem; border: 1px solid #ddd; margin-bottom: 0.25rem; cursor: pointer; }
       #search-results li:hover { background: #f4f4f4; }
       #search-results li pre { margin: 0.5rem 0 0; }
-      #confirm-modal-backdrop {
+      .modal-backdrop {
         display: none;
         position: fixed;
         inset: 0;
@@ -87,19 +115,34 @@ export const renderQaToolPage = (config: QaEntityConfig) => `<!DOCTYPE html>
         align-items: center;
         justify-content: center;
       }
-      #confirm-modal {
+      .modal-panel {
         background: white;
         padding: 1.5rem;
         max-width: 480px;
         width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
         border-radius: 4px;
       }
-      #confirm-modal pre { max-height: 240px; }
-      #confirm-modal .actions { display: flex; gap: 0.5rem; }
+      .modal-panel pre { max-height: 240px; }
+      .modal-panel .actions { display: flex; gap: 0.5rem; }
+      .modal-panel li { margin-bottom: 0.6rem; }
+      .title-row { display: flex; align-items: center; gap: 0.6rem; }
+      #guide-button {
+        margin-top: 0;
+        width: 1.8rem;
+        height: 1.8rem;
+        padding: 0;
+        border-radius: 50%;
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
-    <h1>${capitalize(config.pluralLabel)} QA tool</h1>
+    <div class="title-row">
+      <h1>${capitalize(config.pluralLabel)} QA tool</h1>
+      <button type="button" id="guide-button" title="How to use this page">i</button>
+    </div>
 
     <details open>
       <summary>Search ${config.pluralLabel}</summary>
@@ -177,13 +220,25 @@ export const renderQaToolPage = (config: QaEntityConfig) => `<!DOCTYPE html>
       </fieldset>
     </details>
 
-    <div id="confirm-modal-backdrop">
-      <div id="confirm-modal">
+    <div id="confirm-modal-backdrop" class="modal-backdrop">
+      <div class="modal-panel">
         <p id="confirm-modal-message"></p>
         <pre id="confirm-modal-payload"></pre>
         <div class="actions">
           <button type="button" id="confirm-modal-confirm">Confirm</button>
           <button type="button" id="confirm-modal-cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="guide-modal-backdrop" class="modal-backdrop">
+      <div class="modal-panel">
+        <h2>How to use this page</h2>
+        <ul>
+          ${renderGuideItems(config)}
+        </ul>
+        <div class="actions">
+          <button type="button" id="guide-modal-close">Close</button>
         </div>
       </div>
     </div>
@@ -289,6 +344,18 @@ export const renderQaToolPage = (config: QaEntityConfig) => `<!DOCTYPE html>
           cancelBtn.addEventListener('click', onCancel)
         })
       }
+
+      var guideBackdrop = document.getElementById('guide-modal-backdrop')
+      document
+        .getElementById('guide-button')
+        .addEventListener('click', function () {
+          guideBackdrop.style.display = 'flex'
+        })
+      document
+        .getElementById('guide-modal-close')
+        .addEventListener('click', function () {
+          guideBackdrop.style.display = 'none'
+        })
 
       // Only one of create/update/withdraw may be operated on at a time —
       // starting to fill one fully disables the other two, so a QA tester
