@@ -20,7 +20,9 @@ import {
 import AsyncSelect, { AsyncProps } from 'react-select/async'
 import { List, RowComponentProps } from 'react-window'
 import styled from 'styled-components'
+import { useIntl } from 'react-intl'
 import { Icon } from '@opencrvs/components/src/Icon'
+import { formMessages } from '@client/i18n/messages'
 import { Option } from '../../../utils'
 
 const ITEM_HEIGHT = 40
@@ -260,8 +262,10 @@ export function SearchableSelect<T = string>({
   error,
   touched,
   disabled,
+  placeholder,
   ['data-testid']: dataTestId
 }: SearchableSelectProps<T>) {
+  const intl = useIntl()
   // React-select provides their own filteringOptions method, but it doesn't work with large option sets and virtualization.
   const loadOptions = async (searchTerm: string) => {
     const term = searchTerm.toLowerCase()
@@ -287,6 +291,7 @@ export function SearchableSelect<T = string>({
       inputId={id}
       isDisabled={disabled}
       loadOptions={loadOptions}
+      placeholder={placeholder ?? intl.formatMessage(formMessages.select)}
       touched={touched}
       value={value}
       onBlur={onBlur}
