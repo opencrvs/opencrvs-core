@@ -12,7 +12,10 @@
 import { UUID } from '../../uuid'
 import { Action, ActionStatus } from '../ActionDocument'
 import { ActionType } from '../ActionType'
+import { EventConfig } from '../EventConfig'
 import { EventDocument } from '../EventDocument'
+import { EventIndex } from '../EventIndex'
+import { getCurrentEventState } from '.'
 
 /**
  * The three legally distinct forms a record can hold. A record has at most one
@@ -122,4 +125,30 @@ export function getRecordVersions(event: EventDocument): RecordVersion[] {
     ...version,
     isLatestOfForm: version.indexInForm === countByForm[version.form] - 1
   }))
+}
+
+/**
+ * @returns the event state as it stood immediately after the given action.
+ *
+ * The declaration is a fold over accepted actions, so a snapshot is that same
+ * fold over a chronological prefix. Actions that an APPROVE_CORRECTION or an
+ * Accepted-with-originalActionId action refers back to are always earlier than
+ * it, so they are always inside the prefix.
+ */
+export function getEventStateAtVersion(
+  event: EventDocument,
+  config: EventConfig,
+  actionId: UUID
+): EventIndex {
+  const sorted = sortActionsChronologically(event.actions)
+  const index = sorted.findIndex(({ id }) => id === actionId)
+
+  if (index === -1) {
+    throw new Error(`Event ${event.id} has no action ${actionId}`)
+  }
+
+  return getCurrentEventState(
+    { ...event, actions: sorted.slice(0, index + 1) },
+    config
+  )
 }

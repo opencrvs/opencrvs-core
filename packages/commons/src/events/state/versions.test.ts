@@ -12,7 +12,13 @@
 import { ActionType } from '../ActionType'
 import { generateEventDocument } from '../test.utils'
 import { tennisClubMembershipEvent } from '../../fixtures'
-import { getRecordVersions, RecordForm } from './versions'
+import { UUID } from '../../uuid'
+import { getCurrentEventState } from '.'
+import {
+  getEventStateAtVersion,
+  getRecordVersions,
+  RecordForm
+} from './versions'
 
 const configuration = tennisClubMembershipEvent
 
@@ -126,5 +132,116 @@ describe('getRecordVersions', () => {
       ActionType.DECLARE,
       ActionType.REGISTER
     ])
+  })
+})
+
+describe('getEventStateAtVersion', () => {
+  test('returns the declaration as it stood at that version, not the latest', () => {
+    // No REGISTER here: every generated declaration action carries a full
+    // default declaration, so a later one would merge its own default email
+    // over the edit and the control assertion below would be meaningless.
+    const event = generateEventDocument({
+      configuration,
+      actions: [
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.DECLARE,
+          declarationOverrides: { 'applicant.email': 'original@example.com' }
+        },
+        {
+          type: ActionType.EDIT,
+          declarationOverrides: { 'applicant.email': 'edited@example.com' }
+        }
+      ]
+    })
+
+    const declareVersion = getRecordVersions(event).find(
+      (v) => v.actionType === ActionType.DECLARE
+    )
+
+    expect(declareVersion).toBeDefined()
+
+    const atDeclare = getEventStateAtVersion(
+      event,
+      configuration,
+      declareVersion!.actionId
+    )
+
+    expect(atDeclare.declaration['applicant.email']).toBe(
+      'original@example.com'
+    )
+    expect(
+      getCurrentEventState(event, configuration).declaration['applicant.email']
+    ).toBe('edited@example.com')
+  })
+
+  test('the latest version matches getCurrentEventState', () => {
+    const event = generateEventDocument({
+      configuration,
+      actions: [
+        { type: ActionType.CREATE },
+        { type: ActionType.DECLARE },
+        { type: ActionType.REGISTER }
+      ]
+    })
+
+    const versions = getRecordVersions(event)
+    const latest = versions[versions.length - 1]
+
+    expect(
+      getEventStateAtVersion(event, configuration, latest.actionId).declaration
+    ).toEqual(getCurrentEventState(event, configuration).declaration)
+  })
+
+  test('an approved correction resolves its request from inside the prefix', () => {
+    const event = generateEventDocument({
+      configuration,
+      actions: [
+        { type: ActionType.CREATE },
+        { type: ActionType.DECLARE },
+        { type: ActionType.REGISTER },
+        {
+          type: ActionType.REQUEST_CORRECTION,
+          declarationOverrides: { 'applicant.email': 'corrected@example.com' }
+        },
+        { type: ActionType.APPROVE_CORRECTION }
+      ]
+    })
+
+    const request = event.actions.find(
+      (a) => a.type === ActionType.REQUEST_CORRECTION
+    )
+    const approveAction = event.actions.find(
+      (a) => a.type === ActionType.APPROVE_CORRECTION
+    )
+
+    expect(request).toBeDefined()
+    expect(approveAction).toBeDefined()
+    ;(approveAction as unknown as { requestId: string }).requestId = request!.id
+
+    const approveVersion = getRecordVersions(event).find(
+      (v) => v.actionType === ActionType.APPROVE_CORRECTION
+    )
+
+    expect(approveVersion).toBeDefined()
+    expect(
+      getEventStateAtVersion(event, configuration, approveVersion!.actionId)
+        .declaration['applicant.email']
+    ).toBe('corrected@example.com')
+  })
+
+  test('throws for an action id that is not on the event', () => {
+    const event = generateEventDocument({
+      configuration,
+      actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
+    })
+
+    expect(() =>
+      getEventStateAtVersion(
+        event,
+        configuration,
+        '00000000-0000-4000-8000-000000000000' as UUID
+      )
+    ).toThrow()
   })
 })
