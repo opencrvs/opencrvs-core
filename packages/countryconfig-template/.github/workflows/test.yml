@@ -26,7 +26,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Runs dependency installation
-        run: pnpm install
+        run: pnpm install --ignore-workspace
 
       - name: Compile
         run: pnpm test:compilation
