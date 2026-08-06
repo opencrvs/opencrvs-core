@@ -18,49 +18,34 @@ export const base = css`
   gap: 12px;
   padding: 16px;
   border-radius: 8px;
-  border: 1px solid var(--alert-line);
-  background: var(--alert-tint);
+  border: 1px solid var(--alert-color);
+  background: var(--alert-background);
 `
 
-/*
- * Each tone names three colours and nothing else. The icon and the title read
- * `--alert-ink`, so neither needs to know which type it is in.
- *
- * Ink is the dark tone rather than the mid one: the mid tones fail WCAG AA
- * against their own tint — warning measures 2.14:1, info 2.87:1. The border
- * keeps the mid tone, since it carries no text.
- */
 export const success = css`
-  --alert-line: ${({ theme }) => theme.colors.positive};
-  --alert-tint: ${({ theme }) => theme.colors.greenLighter};
-  --alert-ink: ${({ theme }) => theme.colors.greenDark};
+  --alert-color: ${({ theme }) => theme.colors.greenDark};
+  --alert-background: ${({ theme }) => theme.colors.greenLighter};
 `
 
 export const warning = css`
-  --alert-line: ${({ theme }) => theme.colors.orange};
-  --alert-tint: ${({ theme }) => theme.colors.orangeLighter};
-  --alert-ink: ${({ theme }) => theme.colors.orangeDark};
+  --alert-color: ${({ theme }) => theme.colors.orangeDark};
+  --alert-background: ${({ theme }) => theme.colors.orangeLighter};
 `
 
 export const error = css`
-  --alert-line: ${({ theme }) => theme.colors.negative};
-  --alert-tint: ${({ theme }) => theme.colors.redLighter};
-  --alert-ink: ${({ theme }) => theme.colors.redDark};
+  --alert-color: ${({ theme }) => theme.colors.redDark};
+  --alert-background: ${({ theme }) => theme.colors.redLighter};
 `
 
 export const info = css`
-  --alert-line: ${({ theme }) => theme.colors.primary};
-  --alert-tint: ${({ theme }) => theme.colors.primaryLighter};
-  --alert-ink: ${({ theme }) => theme.colors.primaryDark};
+  --alert-color: ${({ theme }) => theme.colors.primaryDark};
+  --alert-background: ${({ theme }) => theme.colors.primaryLighter};
 `
-
-/* Loading is an info alert that has not resolved yet, so it reads the same. */
-export const loading = info
 
 export const iconArea = css`
   flex: 0 0 auto;
   display: flex;
-  color: var(--alert-ink);
+  color: var(--alert-color);
 `
 
 export const content = css`
@@ -73,7 +58,7 @@ export const content = css`
 
 export const title = css`
   ${({ theme }) => theme.fonts.bold14};
-  color: var(--alert-ink);
+  color: var(--alert-color);
 `
 
 export const message = css`
@@ -91,7 +76,9 @@ export const actions = css`
   margin-left: -8px;
 `
 
+/* Pinned to the corner whatever the content does, and however tall it is. */
 export const close = css`
   flex: 0 0 auto;
-  margin: -8px -8px 0 0;
+  align-self: flex-start;
+  margin: -8px -8px 0 auto;
 `

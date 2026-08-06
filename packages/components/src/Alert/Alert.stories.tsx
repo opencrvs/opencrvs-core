@@ -8,95 +8,141 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ComponentStory, ComponentMeta } from '@storybook/react-vite'
+
+import React from 'react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Alert } from './Alert'
-import React, { useState } from 'react'
-import { Icon } from '../Icon'
 
-const Template: ComponentStory<typeof Alert> = (args) => {
-  return <Alert {...args} />
-}
-
-export default {
+const meta: Meta<typeof Alert> = {
   title: 'Data/Alert',
-  component: Alert
-} as ComponentMeta<typeof Alert>
-
-export const Success = Template.bind({})
-Success.args = {
-  type: 'success',
-  children: "Hello, I'm an alert to show a success message",
-  onClose: undefined
+  component: Alert,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Alert states a condition that persists — something true about the ' +
+          'record or the screen for as long as it is open. Use Toast instead ' +
+          'to confirm an action the user just took.'
+      }
+    }
+  },
+  argTypes: {
+    type: { control: 'radio', options: ['info', 'success', 'warning', 'error'] }
+  }
 }
 
-export const Warning = Template.bind({})
-Warning.args = {
-  type: 'warning',
-  children: "Hello, I'am an alert to show a warning message",
-  onClose: undefined
+export default meta
+
+type Story = StoryObj<typeof Alert>
+
+/**
+ * The title states the situation; the message says what follows from it. A
+ * title alone is enough when there is nothing to add.
+ */
+export const Info: Story = {
+  args: {
+    type: 'info',
+    title: 'Registration — You are viewing the latest version',
+    children:
+      'Corrected by Kennedy Mweene on 20 May 2026. First registered on 10 May 2026, and corrected twice since.'
+  }
 }
 
-export const Error = Template.bind({})
-Error.args = {
-  type: 'error',
-  children: "Hello, I'm an alert to show an error message",
-  onClose: undefined
+/** Something is true that the user should weigh before acting. */
+export const Warning: Story = {
+  args: {
+    type: 'warning',
+    title: 'Registration — You are viewing an earlier version',
+    children:
+      'Corrected by Kennedy Mweene on 14 May 2026. This is not the current registration.'
+  }
 }
 
-export const Info = Template.bind({})
-Info.args = {
-  type: 'info',
-  children: "Hello, I'm an alert to show an helpful message",
-  onClose: undefined
+/** Something is wrong, or a record is no longer valid. */
+export const Error: Story = {
+  args: {
+    type: 'error',
+    title: 'This record has been archived',
+    children:
+      'Archived by Kennedy Mweene on 12 May 2026. No action can be taken on it until it is reinstated.'
+  }
 }
 
-export const Loading = Template.bind({})
-Loading.args = {
-  type: 'loading',
-  children: "Hello, I'm an alert to show something is loading",
-  onClose: undefined
+/** An outcome worth confirming that persists on the screen. */
+export const Success: Story = {
+  args: {
+    type: 'success',
+    title: 'The correction was approved',
+    children:
+      'Approved by Jonathan Campbell on 3 June 2026. The changes are now part of the registration.'
+  }
 }
 
-export const CustomIcon = Template.bind({})
-CustomIcon.args = {
-  type: 'success',
-  children: "Hello, I'm an alert to show a custom icon",
-  onClose: undefined,
-  customIcon: <Icon name={'Medal'} />
+/**
+ * An action opens whatever needs a decision. It sits under the message so a
+ * long message keeps the full width and a long label is not squeezed.
+ */
+export const WithAction: Story = {
+  args: {
+    type: 'warning',
+    title: 'A correction to this registration is awaiting approval',
+    children:
+      'Requested by Felix Katongo on 22 May 2026. The requested changes are not part of the registration until they are approved.',
+    actionText: 'Review the correction request',
+    onActionClick: () => undefined
+  }
 }
 
-export const Dismissable = () => {
-  const [isVisible, setVisible] = useState(true)
+/** Dismissable where the alert is advice rather than a standing condition. */
+export const Dismissable: Story = {
+  args: {
+    type: 'info',
+    title: 'This record may be a duplicate',
+    children:
+      'Flagged on 8 May 2026 against two other records. It cannot be registered until the flag is resolved.',
+    onClose: () => undefined
+  }
+}
 
-  return (
-    isVisible && (
-      <Alert type="warning" onClose={() => setVisible(false)}>
-        Hello, I'm an alert that you can dismiss!
+/** A title on its own, where the message would only repeat it. */
+export const TitleOnly: Story = {
+  args: {
+    type: 'info',
+    title: 'Notification — This is the only version'
+  }
+}
+
+/**
+ * Copy runs long in other languages — German around 35% longer than English —
+ * so the box grows rather than truncating.
+ */
+export const LongMessage: Story = {
+  args: {
+    type: 'warning',
+    title: 'Eine Berichtigung dieser Registrierung wartet auf Genehmigung',
+    children:
+      'Beantragt von Felix Katongo • Bezirksstandesamt Ibombo am 22. Mai 2026. Die beantragten Änderungen sind erst nach ihrer Genehmigung Teil der Registrierung.',
+    actionText: 'Änderungsantrag prüfen',
+    onActionClick: () => undefined
+  }
+}
+
+/** Every type together, to compare weight and contrast at a glance. */
+export const AllTypes: Story = {
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <Alert title="Information" type="info">
+        The registration is the legal record of the event.
       </Alert>
-    )
-  )
-}
-
-export const WithAction = () => (
-  <Alert type="error" actionText="Retry" onActionClick={() => alert('Retried')}>
-    Hello, I'm an alert with an action button!
-  </Alert>
-)
-
-export const WithActionAndDismiss = () => {
-  const [isVisible, setVisible] = useState(true)
-  return (
-    isVisible && (
-      <Alert
-        type="warning"
-        onActionClick={() => alert('Reviewed')}
-        actionText="Review"
-        onClose={() => setVisible(false)}
-      >
-        Hi! I'm an alert with a action button and dismiss close button. I also
-        have a very long text within the toast. This illustrates how the toast
-        stretches when the content is lengthy.
+      <Alert title="Success" type="success">
+        The correction was approved and applied to the registration.
       </Alert>
-    )
+      <Alert title="Warning" type="warning">
+        This is not the current version of the registration.
+      </Alert>
+      <Alert title="Error" type="error">
+        This record has been archived and cannot be acted on.
+      </Alert>
+    </div>
   )
 }

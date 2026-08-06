@@ -10,27 +10,20 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import {
-  CheckCircle,
-  CircleNotch,
-  Info,
-  Warning,
-  WarningCircle
-} from '../Icon/all-icons'
+import { CheckCircle, Info, Warning, WarningCircle } from '../Icon/all-icons'
 import { Button } from '../Button'
 import { Text } from '../Text'
 import { Icon } from '../Icon'
 import * as styles from './Alert.styles'
 
-export type AlertType = 'success' | 'warning' | 'loading' | 'info' | 'error'
+export type AlertType = 'success' | 'warning' | 'info' | 'error'
 
 /** The glyph each type is recognised by. */
 const GLYPHS = {
   success: CheckCircle,
   warning: Warning,
   error: WarningCircle,
-  info: Info,
-  loading: CircleNotch
+  info: Info
 } satisfies Record<AlertType, unknown>
 
 const Container = styled.div<{ $type: AlertType }>`
@@ -40,7 +33,6 @@ const Container = styled.div<{ $type: AlertType }>`
   ${(props) => props.$type === 'warning' && styles.warning}
   ${(props) => props.$type === 'error' && styles.error}
   ${(props) => props.$type === 'info' && styles.info}
-  ${(props) => props.$type === 'loading' && styles.loading}
 `
 
 const IconContainer = styled.div`
@@ -102,7 +94,7 @@ export const Alert = ({
                 props['data-testid'] && `${props['data-testid']}-action`
               }
               size="small"
-              type="tertiary"
+              type="secondary"
               onClick={onActionClick}
             >
               <Text element="span" variant="bold14">
@@ -113,7 +105,7 @@ export const Alert = ({
         )}
       </Content>
 
-      {onClose && type !== 'loading' && (
+      {onClose && (
         <Close
           data-testid={props['data-testid'] && `${props['data-testid']}-close`}
           id={props.id + 'Cancel'}
