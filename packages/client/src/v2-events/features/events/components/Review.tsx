@@ -148,6 +148,13 @@ const ReviewContainter = styled.div<{ $padded?: boolean }>`
   }
 `
 
+const BodyBanner = styled.div`
+  padding: 24px 0 0;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 24px 24px 0;
+  }
+`
+
 const DeclarationDataContainer = styled.div``
 
 const reviewMessages = defineMessages({
@@ -509,6 +516,7 @@ function ReviewComponent({
   isReviewCorrection = false,
   treatMissingValuesAsCleared = false,
   banner,
+  bodyBanner,
   anchor,
   content
 }: {
@@ -520,6 +528,11 @@ function ReviewComponent({
    * country logo.
    */
   content?: { title: string; actions?: React.ReactElement[] }
+  /**
+   * Rendered inside the card, above the first section. `banner` sits above the
+   * card itself; this belongs to the body.
+   */
+  bodyBanner?: React.ReactNode
   formConfig: FormConfig
   form: EventState
   validatorContext: ValidatorContext
@@ -582,6 +595,7 @@ function ReviewComponent({
           contentTitle={content?.title}
           reviewTitle={title}
         >
+          {bodyBanner && <BodyBanner>{bodyBanner}</BodyBanner>}
           <FormReview
             anchor={anchor}
             form={form}
