@@ -269,7 +269,7 @@ export function RecordVersionAlert({
       <Sentences>
         {sentences.map((sentence, index) => (
           // Sentences are generated in a fixed order and never reordered.
-          // eslint-disable-next-line react/no-array-index-key
+           
           <span key={index}>{sentence}</span>
         ))}
       </Sentences>

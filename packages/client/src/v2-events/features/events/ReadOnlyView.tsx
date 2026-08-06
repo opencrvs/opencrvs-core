@@ -169,13 +169,13 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   return (
     <ReviewComponent.Body
       readonlyMode
-      anchor={recordAnchorDate(eventStateWithDraft)}
-      annotation={annotation}
       alert={
         selected ? (
           <RecordVersionAlert selected={selected} versions={versions} />
         ) : undefined
       }
+      anchor={recordAnchorDate(eventStateWithDraft)}
+      annotation={annotation}
       content={{
         title: intl.formatMessage(messages.recordTitle),
         actions: selected

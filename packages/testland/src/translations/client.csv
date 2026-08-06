@@ -1546,6 +1546,20 @@ v2.event.death.action.declare.form.section.deceased.field.birthRecordSearch.clea
 v2.event.death.action.declare.form.section.deceased.field.birthRecordSearch.indicators.ok,Indicator shown when a matching birth record is found,Birth record found,Acte de naissance trouvé
 v2.event.death.action.declare.form.section.deceased.field.birthRecordSearch.label,Label for the deceased birth record BRN search field,Search birth record by BRN,Rechercher l'acte de naissance par BRN
 v2.event.death.action.declare.form.section.deceased.field.birthRecordSearch.validation.invalid,Error message for invalid BRN search value,Invalid value: Must be alpha-numeric and 12 characters long,Valeur invalide : doit être alphanumérique et comporter 12 caractères
+v2.event.record.alert.by.corrected,Provenance of a corrected registration version,"{name, select, __UNKNOWN__ {Corrected on {date}.} other {Corrected by {name} on {date}.}}",
+v2.event.record.alert.by.declared,Provenance of a declaration version,"{name, select, __UNKNOWN__ {Declared on {date}.} other {Declared by {name} on {date}.}}",
+v2.event.record.alert.by.registered,Provenance of a registration version,"{name, select, __UNKNOWN__ {Registered on {date}.} other {Registered by {name} on {date}.}}",
+v2.event.record.alert.by.sent,Provenance of a notification version,"{name, select, __UNKNOWN__ {Sent on {date}.} other {Sent by {name} on {date}.}}",
+v2.event.record.alert.history.declaration,"Shown on a declaration that has been edited, naming when it opened",First declared on {date}.,
+v2.event.record.alert.history.registration,Shown on a registration that has been corrected,"{count, plural, =1 {First registered on {date}, and corrected once since.} =2 {First registered on {date}, and corrected twice since.} other {First registered on {date}, and corrected {count} times since.}}",
+v2.event.record.alert.record.declared,Shown when a later form exists — the record has been declared,The record was declared on {date}.,
+v2.event.record.alert.record.registered,Shown when a later form exists — the record has been registered,The record was registered on {date}.,
+v2.event.record.alert.registrationIsLegal,Shown alongside a declaration on a record that has been registered,The registration is the legal record of the event.,
+v2.event.record.alert.title,How the form name and the position statement are joined in the record alert title,{formName} — {statement},
+v2.event.record.alert.title.earlier,Record alert title on a version that is neither the oldest nor the newest,You are viewing an earlier version,
+v2.event.record.alert.title.latest,Record alert title on the newest of several versions,You are viewing the latest version,
+v2.event.record.alert.title.only,Record alert title when the form has a single version,This is the only version,
+v2.event.record.alert.title.original,Record alert title on the oldest of several versions,You are viewing the original version,
 v2.event.record.offline.description,Message shown on the Record page when the user is offline and the record has not been cached locally,This record has not been downloaded yet so it cannot be opened offline. Please reconnect to the internet to view it.,Cet enregistrement n’a pas encore été téléchargé et ne peut donc pas être ouvert hors ligne. Veuillez vous reconnecter à Internet pour le consulter.
 v2.event.record.offline.title,Title shown on the Record page when the user is offline,No connection,Pas de connexion
 v2.event.record.title,Heading of the card on the Record tab,Record,
