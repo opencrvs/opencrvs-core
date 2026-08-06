@@ -1,5 +1,18 @@
 packages:
-  - 'packages/*'
+  - 'packages/api-docs'
+  - 'packages/auth'
+  - 'packages/client'
+  - 'packages/commons'
+  - 'packages/components'
+  # - 'packages/countryconfig-template' Intentionally removed. Lerna reads pnpm-workspace.yaml but does not recognize negation. Hence explicit inclusion for all packages.
+  - 'packages/data-seeder'
+  - 'packages/documents'
+  - 'packages/events'
+  - 'packages/gateway'
+  - 'packages/login'
+  - 'packages/migration'
+  - 'packages/testland'
+  - 'packages/toolkit'
   - 'packages/toolkit/create-countryconfig'
 
 # Ported from yarn `resolutions` (root package.json). `parent>child`
@@ -27,7 +40,7 @@ overrides:
   flatted: '3.4.2'
   picomatch: '2.3.2'
   underscore: '1.13.8'
-  '@remix-run/router': '1.23.2'
+  '@remix-run/router': '1.23.3'
   validator: '13.15.22'
   tar: '7.5.21'
   '@trpc/server': '11.8.0'

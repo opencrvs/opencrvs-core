@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, type Page } from '@playwright/test'
-import { omit } from 'lodash'
-import { formatName, joinValuesWith } from '../../helpers'
+import { omit, merge } from 'lodash'
+import { formatName, getRandomDate, joinValuesWith } from '../../helpers'
 import { faker } from '@faker-js/faker'
 import { GATEWAY_HOST } from '../../constants'
 import { createClient } from '@opencrvs/toolkit/api'
@@ -185,4 +185,161 @@ export async function verifyTeamMembers(
       await expect(memberButton).toBeEnabled()
     }
   }
+}
+type PlaceOfBirth = 'Health Institution' | 'Other'
+
+type BirthLocationInputs<P extends PlaceOfBirth> = P extends 'Other'
+  ? {
+      placeOfBirth: 'Other'
+      birthLocation: {
+        country: string
+        province: string
+        district: string
+        village: string
+        town: string
+        residentialArea: string
+        street: string
+        number: string
+        postcodeOrZip: string
+      }
+    }
+  : {
+      placeOfBirth: 'Health Institution'
+      birthLocation: { facility: string }
+    }
+
+function generateBirthLocationInputs<P extends PlaceOfBirth>(
+  placeOfBirth: P
+): BirthLocationInputs<P> {
+  if (placeOfBirth === 'Other') {
+    return {
+      placeOfBirth: 'Other',
+      birthLocation: {
+        country: 'Farajaland',
+        province: 'Central',
+        district: 'Ibombo',
+        village: 'Klow',
+        town: faker.location.city(),
+        residentialArea: faker.location.county(),
+        street: faker.location.street(),
+        number: faker.location.buildingNumber(),
+        postcodeOrZip: faker.location.zipCode()
+      }
+    } as BirthLocationInputs<P>
+  }
+
+  return {
+    placeOfBirth: 'Health Institution',
+    birthLocation: { facility: 'Klow Village Hospital' }
+  } as BirthLocationInputs<P>
+}
+
+function generateRequiredBirthInputs<
+  P extends PlaceOfBirth = 'Health Institution'
+>(placeOfBirth: P = 'Health Institution' as P) {
+  return {
+    child: {
+      name: {
+        firstNames: faker.person.firstName('male'),
+        familyName: faker.person.lastName('male')
+      },
+      gender: 'Male',
+      birthDate: getRandomDate(0, 200)
+    },
+    ...generateBirthLocationInputs(placeOfBirth),
+    informantType: 'Mother',
+    informantEmail: faker.internet.email(),
+    mother: {
+      name: {
+        firstNames: faker.person.firstName('female'),
+        familyName: faker.person.lastName('female')
+      },
+      birthDate: getRandomDate(20, 200),
+      nationality: 'Farajaland',
+      identifier: {
+        id: faker.string.numeric(10),
+        type: 'National ID'
+      },
+      address: {
+        country: 'Farajaland',
+        province: 'Sulaka',
+        district: 'Irundu',
+        village: 'Xhosa'
+      }
+    },
+    father: {
+      name: {
+        firstNames: faker.person.firstName('male'),
+        familyName: faker.person.lastName('male')
+      },
+      birthDate: getRandomDate(22, 200),
+      nationality: 'Gabon',
+      identifier: {
+        id: faker.string.numeric(10),
+        type: 'National ID'
+      },
+      address: {
+        sameAsMother: true
+      }
+    }
+  }
+}
+
+function generateOptionalBirthInputs() {
+  return {
+    attendantAtBirth: 'Physician',
+    birthType: 'Single',
+    weightAtBirth: 2.4,
+    mother: {
+      address: {
+        town: faker.location.city(),
+        residentialArea: faker.location.county(),
+        street: faker.location.street(),
+        number: faker.location.buildingNumber(),
+        postcodeOrZip: faker.location.zipCode()
+      },
+      maritalStatus: 'Single',
+      levelOfEducation: 'No schooling'
+    },
+    father: {
+      maritalStatus: 'Single',
+      levelOfEducation: 'No schooling'
+    }
+  }
+}
+
+type RequiredBirthInputs<P extends PlaceOfBirth = 'Health Institution'> =
+  ReturnType<typeof generateRequiredBirthInputs<P>>
+type OptionalBirthInputs = ReturnType<typeof generateOptionalBirthInputs>
+
+export function generateBirthInputs(options: {
+  includeOptionalFields: true
+  placeOfBirth?: 'Health Institution'
+}): RequiredBirthInputs<'Health Institution'> & OptionalBirthInputs
+
+export function generateBirthInputs(options: {
+  includeOptionalFields: true
+  placeOfBirth: 'Other'
+}): RequiredBirthInputs<'Other'> & OptionalBirthInputs
+
+export function generateBirthInputs(options?: {
+  includeOptionalFields?: false
+  placeOfBirth?: 'Health Institution'
+}): RequiredBirthInputs<'Health Institution'>
+
+export function generateBirthInputs(options: {
+  includeOptionalFields?: false
+  placeOfBirth: 'Other'
+}): RequiredBirthInputs<'Other'>
+
+export function generateBirthInputs(options?: {
+  includeOptionalFields?: boolean
+  placeOfBirth?: PlaceOfBirth
+}) {
+  const placeOfBirth = options?.placeOfBirth ?? 'Health Institution'
+  const requiredInputs = generateRequiredBirthInputs(placeOfBirth)
+
+  return options?.includeOptionalFields
+    ? merge(requiredInputs, generateOptionalBirthInputs())
+    : requiredInputs
 }
