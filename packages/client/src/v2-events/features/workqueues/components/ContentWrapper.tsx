@@ -23,7 +23,10 @@ import { useOnlineStatus } from '@client/utils'
 
 const TabBarContainer = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
-  padding-left: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
 `
 
