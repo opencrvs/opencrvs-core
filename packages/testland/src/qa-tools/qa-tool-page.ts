@@ -134,7 +134,7 @@ export const renderQaToolPage = (config: QaEntityConfig) => `<!DOCTYPE html>
           <input id="create-name" name="name" required />${renderIdentityFieldInputs(
             config.identityFields
           )}
-          <label for="create-externalId">External id</label>
+          <label for="create-externalId">External id (optional)</label>
           <input id="create-externalId" name="externalId" />
           <label for="create-effectiveFrom">Effective from (ISO date, optional)</label>
           <input id="create-effectiveFrom" name="effectiveFrom" />
@@ -160,7 +160,7 @@ export const renderQaToolPage = (config: QaEntityConfig) => `<!DOCTYPE html>
           <input id="update-lastVersionId" name="lastVersionId" required />
           <label for="update-name">Name</label>
           <input id="update-name" name="name" required />
-          <label for="update-externalId">External id</label>
+          <label for="update-externalId">External id (optional)</label>
           <input id="update-externalId" name="externalId" />
           <label for="update-effectiveFrom">Effective from (ISO date, optional)</label>
           <input id="update-effectiveFrom" name="effectiveFrom" />
