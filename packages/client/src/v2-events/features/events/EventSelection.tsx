@@ -22,7 +22,11 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
-import { canUserCreateEvent } from '@opencrvs/commons/client'
+import {
+  canUserCreateEvent,
+  canUserDeclareEvent,
+  hasIndependentNotifyForm
+} from '@opencrvs/commons/client'
 import { SuspenseLoadingFallback } from '@client/v2-events/components/SuspenseLoadingFallback'
 import { ROUTES } from '@client/v2-events/routes'
 import { createTemporaryId } from '@client/v2-events/utils'
@@ -109,10 +113,21 @@ function EventSelector() {
     clearForm()
     clearAnnotation()
 
+    // When NOTIFY has its own independent form, it's a separate flow from
+    // DECLARE: send users who can only notify (not declare) there directly,
+    // instead of into the DECLARE flow they don't have permission for.
+    const shouldNotify =
+      hasIndependentNotifyForm(eventConfig) &&
+      !canUserDeclareEvent(scopes, eventType)
+
     navigate(
-      ROUTES.V2.EVENTS.DECLARE.buildPath({
-        eventId: transactionId
-      })
+      shouldNotify
+        ? ROUTES.V2.EVENTS.NOTIFY.buildPath({
+            eventId: transactionId
+          })
+        : ROUTES.V2.EVENTS.DECLARE.buildPath({
+            eventId: transactionId
+          })
     )
   }
 

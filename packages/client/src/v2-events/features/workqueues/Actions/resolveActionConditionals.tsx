@@ -22,6 +22,7 @@ import {
   getAssignmentStatus,
   getAvailableActionsForEvent,
   getOrThrow,
+  hasIndependentNotifyForm,
   isActionEnabled,
   isActionVisible,
   ITokenPayload,
@@ -68,7 +69,8 @@ function resolveInternalActionConditions({
   isDownloaded,
   assignmentStatus,
   isAssigning,
-  isDeclareDraftOpen
+  isDeclareDraftOpen,
+  isNotifyDraftOpen
 }: {
   assignmentStatus: AssignmentStatus
   actionType: WorkqueueActionType | ActionMenuActionType
@@ -76,6 +78,7 @@ function resolveInternalActionConditions({
   isDownloaded: boolean
   isAssigning: boolean
   isDeclareDraftOpen: boolean
+  isNotifyDraftOpen: boolean
 }): {
   enabled: boolean
   visible: boolean
@@ -110,6 +113,11 @@ function resolveInternalActionConditions({
         enabled: isDownloadedAndAssignedToUser || isDeclareDraftOpen,
         visible: true
       }
+    case ActionType.NOTIFY:
+      return {
+        enabled: isDownloadedAndAssignedToUser || isNotifyDraftOpen,
+        visible: true
+      }
     case ActionType.READ:
       return { enabled: true, visible: true }
     default:
@@ -126,6 +134,7 @@ export function resolveActionConditionals({
   event,
   actionType,
   isDeclareDraftOpen,
+  isNotifyDraftOpen,
   validatorContext,
   isActionAllowedForUser,
   eventConfiguration,
@@ -136,6 +145,7 @@ export function resolveActionConditionals({
   event: EventIndex
   actionType: WorkqueueActionType | ActionMenuActionType
   isDeclareDraftOpen: boolean
+  isNotifyDraftOpen: boolean
   validatorContext: ValidatorContext
   isActionAllowedForUser: (action: DisplayableAction) => boolean
   eventConfiguration: EventConfig
@@ -163,11 +173,14 @@ export function resolveActionConditionals({
 
   // 2. Check if the action is available for the event at all.
   const actionIsAvailableForEvent = allAvailableActions.includes(actionType)
+  const notifyIsIndependent = hasIndependentNotifyForm(eventConfiguration)
   // 3. Check if the user can perform it.
   // For DECLARE, also allow users with NOTIFY scope — they can enter the declare form
   // and submit as NOTIFY. Mirrors the same logic in DeclarationAction.tsx.
+  // This merge only applies when NOTIFY has no independent form of its own —
+  // otherwise NOTIFY is its own action, gated on its own scope.
   const actionIsAllowedForUser =
-    actionType === ActionType.DECLARE
+    actionType === ActionType.DECLARE && !notifyIsIndependent
       ? isActionAllowedForUser(ActionType.DECLARE) ||
         isActionAllowedForUser(ActionType.NOTIFY)
       : isActionAllowedForUser(actionType)
@@ -181,11 +194,23 @@ export function resolveActionConditionals({
     ? isActionEnabled(actionConfig, event, validatorContext)
     : true
 
+  // NOTIFY only gets its own menu entry when it has an independent form —
+  // otherwise it stays reachable only as the alternate submit choice on the
+  // DECLARE review page, as today.
+  const notifyMenuEntryAllowed =
+    actionType !== ActionType.NOTIFY || notifyIsIndependent
+
   // 5. Combine all the above to determine if the action should be enabled and visible as the base result.
   const baseEnabled =
-    actionIsAvailableForEvent && actionIsAllowedForUser && isEnabled
+    actionIsAvailableForEvent &&
+    actionIsAllowedForUser &&
+    isEnabled &&
+    notifyMenuEntryAllowed
   const baseVisible =
-    actionIsAvailableForEvent && actionIsAllowedForUser && isVisible
+    actionIsAvailableForEvent &&
+    actionIsAllowedForUser &&
+    isVisible &&
+    notifyMenuEntryAllowed
 
   // 6. Run hardcoded internal business rules.
   const internalConditions = resolveInternalActionConditions({
@@ -194,7 +219,8 @@ export function resolveActionConditionals({
     assignmentStatus,
     isDownloaded,
     isAssigning,
-    isDeclareDraftOpen
+    isDeclareDraftOpen,
+    isNotifyDraftOpen
   })
 
   return {

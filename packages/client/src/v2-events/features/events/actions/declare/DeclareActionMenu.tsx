@@ -21,6 +21,7 @@ import {
   getActionReview,
   getAvailableActionsForEvent,
   getActionConfig,
+  hasIndependentNotifyForm,
   isValidIcon
 } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
@@ -233,7 +234,11 @@ function useDeclarationActions(event: EventDocument) {
           : actionIcons[ActionType.DECLARE],
         label: actionLabels[ActionType.NOTIFY],
         onClick: async () => handleDeclaration(ActionType.NOTIFY),
+        // When NOTIFY has its own independent form, submitting the DECLARE
+        // form's in-progress data as a NOTIFY action no longer makes sense —
+        // NOTIFY is reached through its own dedicated flow instead.
         hidden:
+          hasIndependentNotifyForm(eventConfiguration) ||
           !availableActions.includes(ActionType.NOTIFY) ||
           !isActionAllowed(ActionType.NOTIFY)
       },

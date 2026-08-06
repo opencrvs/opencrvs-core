@@ -66,11 +66,16 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
         (draft) =>
           draft.action.type === ActionType.DECLARE && draft.eventId === event.id
       )
+      const isNotifyDraftOpen = drafts.some(
+        (draft) =>
+          draft.action.type === ActionType.NOTIFY && draft.eventId === event.id
+      )
 
       const { enabled, visible } = resolveActionConditionals({
         event,
         actionType,
         isDeclareDraftOpen,
+        isNotifyDraftOpen,
         validatorContext,
         isActionAllowedForUser,
         eventConfiguration,
@@ -145,6 +150,7 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
         event,
         actionType,
         isDeclareDraftOpen: false,
+        isNotifyDraftOpen: false,
         validatorContext,
         isActionAllowedForUser,
         eventConfiguration,

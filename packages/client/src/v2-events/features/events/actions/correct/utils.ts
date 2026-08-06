@@ -21,8 +21,10 @@ import {
   omitHiddenFields,
   getDeclarationFields,
   EventConfig,
+  ActionConfig,
   ActionDocument,
   FieldUpdateValue,
+  DeclarationReviewConfig,
   deepDropNulls
 } from '@opencrvs/commons/client'
 
@@ -139,7 +141,12 @@ export function getAnnotationComparisonForField(
 
 function getReviewForm(configuration: EventConfig) {
   return configuration.actions
-    .filter((action) => 'review' in action)
+    .filter(
+      (
+        action
+      ): action is Extract<ActionConfig, { review: DeclarationReviewConfig }> =>
+        'review' in action && action.review != null
+    )
     .map((action) => action.review)
 }
 

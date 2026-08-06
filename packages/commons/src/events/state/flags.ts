@@ -161,15 +161,6 @@ const INHERENT_FLAG_RULES: InherentFlagRule[] = [
     resetOn: [ActionType.APPROVE_CORRECTION, ActionType.REJECT_CORRECTION]
   },
   {
-    // INCOMPLETE mirrors the NOTIFIED status: set by NOTIFY, cleared by any
-    // other status-changing action (see getStatusFromActions). ARCHIVE/UNARCHIVE
-    // are deliberately excluded so the flag freezes across an archive/unarchive
-    // round trip and comes back exactly as it was.
-    flag: InherentFlags.INCOMPLETE,
-    setOn: [ActionType.NOTIFY],
-    resetOn: [ActionType.CREATE, ActionType.DECLARE, ActionType.REGISTER]
-  },
-  {
     flag: InherentFlags.REJECTED,
     setOn: [ActionType.REJECT],
     resetOn: [

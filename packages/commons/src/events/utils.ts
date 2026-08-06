@@ -51,7 +51,8 @@ import { getUUID, UUID } from '../uuid'
 import {
   ActionConfig,
   actionConfigTypes,
-  ActionConfigTypes
+  ActionConfigTypes,
+  DeclarationReviewConfig
 } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
@@ -83,6 +84,41 @@ export function getDeclarationPages(configuration: EventConfig) {
 
 export function getDeclaration(configuration: EventConfig) {
   return configuration.declaration
+}
+
+export function getNotifyActionConfig(eventConfiguration: EventConfig) {
+  return eventConfiguration.actions.find(
+    (a): a is Extract<ActionConfig, { type: typeof ActionType.NOTIFY }> =>
+      a.type === ActionType.NOTIFY
+  )
+}
+
+/**
+ * Whether the event config gives NOTIFY its own declaration form, making it
+ * independent from DECLARE rather than a fallback/incomplete version of it.
+ */
+export function hasIndependentNotifyForm(
+  eventConfiguration: EventConfig
+): boolean {
+  return getNotifyActionConfig(eventConfiguration)?.declaration != null
+}
+
+/**
+ * Returns the declaration form pages that should be used for the given
+ * action. NOTIFY uses its own declaration when configured, otherwise falls
+ * back to the shared declaration form used by DECLARE/EDIT/REGISTER.
+ */
+export function getDeclarationForAction(
+  eventConfiguration: EventConfig,
+  actionType: ActionType
+) {
+  if (actionType === ActionType.NOTIFY) {
+    return (
+      getNotifyActionConfig(eventConfiguration)?.declaration ??
+      eventConfiguration.declaration
+    )
+  }
+  return eventConfiguration.declaration
 }
 
 export function isActionConfigType(
@@ -202,7 +238,15 @@ function getAllAnnotationFields(config: EventConfig): FieldConfig[] {
 }
 
 export function getAllUniqueFields(eventConfig: EventConfig) {
-  return uniqBy(getDeclarationFields(eventConfig), (field) => field.id)
+  const notifyDeclaration = getNotifyActionConfig(eventConfig)?.declaration
+  const notifyOnlyFields = notifyDeclaration
+    ? notifyDeclaration.pages.flatMap(({ fields }) => fields)
+    : []
+
+  return uniqBy(
+    [...getDeclarationFields(eventConfig), ...notifyOnlyFields],
+    (field) => field.id
+  )
 }
 
 export function getDeclarationFieldById(
@@ -237,7 +281,18 @@ export const findRecordActionPages = (
 export function getActionReview(
   configuration: EventConfig,
   actionType: ActionType
-) {
+): DeclarationReviewConfig | undefined {
+  // NOTIFY falls back to DECLARE's review per field, not as a whole config:
+  // a NOTIFY entry that only configures dialog fields (no `review` of its
+  // own) should still inherit DECLARE's review, rather than getActionConfig
+  // finding the NOTIFY entry and stopping there.
+  if (actionType === ActionType.NOTIFY) {
+    return (
+      getNotifyActionConfig(configuration)?.review ??
+      getActionReview(configuration, ActionType.DECLARE)
+    )
+  }
+
   const actionConfig = getActionConfig({
     eventConfiguration: configuration,
     actionType
@@ -646,10 +701,7 @@ export function isWriteAction(actionType: ActionType): boolean {
  * @returns All the fields in the event configuration.
  */
 export const findAllFields = (config: EventConfig): FieldConfig[] => {
-  return flattenDeep([
-    ...getDeclarationFields(config),
-    ...getAllAnnotationFields(config)
-  ])
+  return flattenDeep([...getAllUniqueFields(config), ...getAllAnnotationFields(config)])
 }
 
 /**

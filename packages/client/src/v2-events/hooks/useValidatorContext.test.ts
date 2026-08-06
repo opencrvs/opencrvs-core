@@ -55,20 +55,20 @@ describe('resolveEventValidatorContext', () => {
    * `state.flags`, so an unresolved state silently evaluates as unflagged.
    */
   it('resolves flags from the action history', () => {
-    const notified = documentWithActions([ActionType.CREATE, ActionType.NOTIFY])
+    const editing = documentWithActions([ActionType.CREATE, ActionType.EDIT])
     const declared = documentWithActions([
       ActionType.CREATE,
-      ActionType.NOTIFY,
+      ActionType.EDIT,
       ActionType.DECLARE
     ])
 
     expect(
-      resolveEventValidatorContext(configs, notified)?.state.flags
-    ).toEqual(expect.arrayContaining([InherentFlags.INCOMPLETE]))
+      resolveEventValidatorContext(configs, editing)?.state.flags
+    ).toEqual(expect.arrayContaining([InherentFlags.EDIT_IN_PROGRESS]))
 
-    // DECLARE clears INCOMPLETE, so the same flag must not linger.
+    // DECLARE clears EDIT_IN_PROGRESS, so the same flag must not linger.
     expect(
       resolveEventValidatorContext(configs, declared)?.state.flags
-    ).not.toContain(InherentFlags.INCOMPLETE)
+    ).not.toContain(InherentFlags.EDIT_IN_PROGRESS)
   })
 })

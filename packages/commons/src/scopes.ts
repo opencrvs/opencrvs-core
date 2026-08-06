@@ -621,6 +621,33 @@ export function canUserCreateEvent(
 }
 
 /**
+ * Checks whether the user has the `record.declare` scope for the given event
+ * type. Used to decide which entry flow (DECLARE vs NOTIFY) to send a user
+ * into when creating a new event and NOTIFY has its own independent form.
+ */
+export function canUserDeclareEvent(
+  userScopes: EncodedScope[],
+  eventType: string
+) {
+  const scopes = getAcceptedScopesByType({
+    acceptedScopes: ['record.declare'],
+    scopes: userScopes
+  })
+
+  return scopes.some((scope) => {
+    if (
+      !('options' in scope) ||
+      !scope.options ||
+      !('event' in scope.options)
+    ) {
+      return true
+    }
+
+    return scope.options?.event?.includes(eventType)
+  })
+}
+
+/**
  * Helper for defining scopes for user roles. Should be used in country config.
  *
  * @param scopes Array of scopes in object format.

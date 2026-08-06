@@ -111,6 +111,7 @@ export const actionIcons: Record<
   [ActionType.MARK_AS_DUPLICATE]: 'Files',
   [ActionType.DELETE]: 'Trash',
   [ActionType.DECLARE]: 'PaperPlaneTilt',
+  [ActionType.NOTIFY]: 'PaperPlaneTilt',
   [ActionType.EDIT]: 'PencilLine',
   [ActionType.REJECT]: 'FileX',
   [ActionType.REGISTER]: 'PenNib',

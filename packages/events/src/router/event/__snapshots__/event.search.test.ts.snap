@@ -872,7 +872,6 @@ exports[`User with "location" scope only sees events created by system user to t
     "recommender.none": true,
   },
   "flags": [
-    "incomplete",
     "health-worker-notified",
   ],
   "id": "[sanitized]",

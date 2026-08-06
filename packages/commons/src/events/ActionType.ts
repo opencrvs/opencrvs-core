@@ -139,6 +139,7 @@ export const WorkqueueActionType = ActionTypes.extract([
   ActionType.READ,
   ActionType.DELETE,
   ActionType.DECLARE,
+  ActionType.NOTIFY,
   ActionType.REGISTER,
   ActionType.EDIT,
   ActionType.REJECT,

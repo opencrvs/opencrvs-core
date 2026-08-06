@@ -96,8 +96,8 @@ const eventConfig: DeepPartial<EventConfig> = {
     },
     {
       type: ActionType.CUSTOM,
-      customActionType: 'COMPLETE_NOTIFICATION',
-      flags: [{ id: InherentFlags.INCOMPLETE, operation: 'remove' }]
+      customActionType: 'CLEAR_REJECTION',
+      flags: [{ id: InherentFlags.REJECTED, operation: 'remove' }]
     },
     { type: ActionType.PRINT_CERTIFICATE, flags: [] },
     {
@@ -887,11 +887,11 @@ describe('resolveEventCustomFlags() – NOTIFY config isolation', () => {
 })
 
 describe('getEventFlags() – any inherent flag is clearable by action config', () => {
-  test('INCOMPLETE is present for a notified record', () => {
+  test('REJECTED is present for a rejected record', () => {
     const event: DeepPartial<EventDocument> = {
       actions: [
         {
-          type: ActionType.NOTIFY,
+          type: ActionType.REJECT,
           declaration: {},
           createdAt: formatISO(now),
           status: ActionStatus.Accepted
@@ -900,15 +900,13 @@ describe('getEventFlags() – any inherent flag is clearable by action config', 
     }
 
     // @ts-expect-error - allow partial event document and event config
-    expect(getEventFlags(event, eventConfig)).toContain(
-      InherentFlags.INCOMPLETE
-    )
+    expect(getEventFlags(event, eventConfig)).toContain(InherentFlags.REJECTED)
   })
 
-  test('INCOMPLETE survives an archive/unarchive round trip back to NOTIFIED', () => {
+  test('REJECTED survives an archive/unarchive round trip', () => {
     const event: DeepPartial<EventDocument> = {
       actions: [
-        ActionType.NOTIFY,
+        ActionType.REJECT,
         ActionType.ARCHIVE,
         ActionType.UNARCHIVE
       ].map((type, idx) => ({
@@ -920,12 +918,10 @@ describe('getEventFlags() – any inherent flag is clearable by action config', 
     }
 
     // @ts-expect-error - allow partial event document and event config
-    expect(getEventFlags(event, eventConfig)).toContain(
-      InherentFlags.INCOMPLETE
-    )
+    expect(getEventFlags(event, eventConfig)).toContain(InherentFlags.REJECTED)
   })
 
-  test('INCOMPLETE stays absent when a declared record is archived and unarchived', () => {
+  test('REJECTED stays absent when a declared record is archived and unarchived', () => {
     const event: DeepPartial<EventDocument> = {
       actions: [
         ActionType.DECLARE,
@@ -941,22 +937,22 @@ describe('getEventFlags() – any inherent flag is clearable by action config', 
 
     // @ts-expect-error - allow partial event document and event config
     expect(getEventFlags(event, eventConfig)).not.toContain(
-      InherentFlags.INCOMPLETE
+      InherentFlags.REJECTED
     )
   })
 
-  test('INCOMPLETE is cleared by a custom action whose config removes it', () => {
+  test('REJECTED is cleared by a custom action whose config removes it', () => {
     const event: DeepPartial<EventDocument> = {
       actions: [
         {
-          type: ActionType.NOTIFY,
+          type: ActionType.REJECT,
           declaration: {},
           createdAt: formatISO(subDays(now, 1)),
           status: ActionStatus.Accepted
         },
         {
           type: ActionType.CUSTOM,
-          customActionType: 'COMPLETE_NOTIFICATION',
+          customActionType: 'CLEAR_REJECTION',
           declaration: {},
           createdAt: formatISO(now),
           status: ActionStatus.Accepted
@@ -966,7 +962,7 @@ describe('getEventFlags() – any inherent flag is clearable by action config', 
 
     // @ts-expect-error - allow partial event document and event config
     expect(getEventFlags(event, eventConfig)).not.toContain(
-      InherentFlags.INCOMPLETE
+      InherentFlags.REJECTED
     )
   })
 })

@@ -12,7 +12,7 @@ import * as z from 'zod/v4'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 import { FieldConfig } from './FieldConfig'
-import { ActionFormConfig } from './FormConfig'
+import { ActionFormConfig, DeclarationFormConfig } from './FormConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
 import { ActionFlagConfig } from './Flag'
 import { ActionConditional } from './Conditional'
@@ -27,6 +27,8 @@ export const DeclarationReviewConfig = z
   .describe(
     'Configuration of the declaration review page for collecting event-related metadata.'
   )
+
+export type DeclarationReviewConfig = z.infer<typeof DeclarationReviewConfig>
 
 export const ActionConfigBase = z.object({
   label: TranslationConfig.describe('Human readable description of the action'),
@@ -79,6 +81,12 @@ const ReadActionConfig = ActionConfigBase.extend(
 const NotifyConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.NOTIFY),
+    declaration: DeclarationFormConfig.optional().describe(
+      'Independent declaration form for the notify action. When present, NOTIFY is rendered and validated using these pages instead of falling back to the shared declaration form, and its fields are validated per their own required configuration.'
+    ),
+    review: DeclarationReviewConfig.optional().describe(
+      'Configuration of the notify action review page. Falls back to the DeclareActionConfig review when absent.'
+    ),
     form: actionConfirmationForm
   }).shape
 )
@@ -290,12 +298,12 @@ export const ActionConfig = z
     NotifyConfig.meta({
       id: 'NotifyActionConfig',
       description:
-        'Configuration for the notify action. When present, NOTIFY uses this config independently from DECLARE. When absent, NOTIFY falls back to the DeclareActionConfig.'
+        'Configuration for the notify action. NOTIFY is independent from DECLARE: it can define its own declaration form and review page, validated on their own terms rather than treated as an incomplete declaration. Fields, declaration and review that are not configured here fall back to the DeclareActionConfig.'
     }),
     DeclareConfig.meta({
       id: 'DeclareActionConfig',
       description:
-        'Configuration for the declare action. Includes review-page fields. NOTIFY falls back to this config when no dedicated NotifyActionConfig is provided.'
+        'Configuration for the declare action. Includes review-page fields. NOTIFY falls back to this config for any of declaration, review or dialog fields that it does not configure independently.'
     }),
     DuplicateDetectedConfig.meta({
       id: 'DuplicateDetectedActionConfig',

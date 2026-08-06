@@ -76,6 +76,11 @@ export function useEventActionsOnClick(event: EventIndex) {
           return navigate(
             ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({ eventId }, { backTo })
           )
+        case ActionType.NOTIFY:
+          clearEphemeralFormState()
+          return navigate(
+            ROUTES.V2.EVENTS.NOTIFY.REVIEW.buildPath({ eventId }, { backTo })
+          )
         case ActionType.EDIT:
           clearEphemeralFormState()
           return navigate(

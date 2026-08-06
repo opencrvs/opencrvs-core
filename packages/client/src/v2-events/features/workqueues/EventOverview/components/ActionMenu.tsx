@@ -43,6 +43,7 @@ const DEFAULT_ACTION_ORDER = [
   ActionType.ASSIGN,
   ActionType.REGISTER,
   ActionType.DECLARE,
+  ActionType.NOTIFY,
   ActionType.EDIT,
   ActionType.REJECT,
   ActionType.ARCHIVE,

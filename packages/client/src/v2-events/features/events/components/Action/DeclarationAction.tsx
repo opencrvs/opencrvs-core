@@ -25,7 +25,8 @@ import {
   EventConfig,
   getAvailableActionsForEvent,
   getCurrentEventState,
-  applyDraftToEventIndex
+  applyDraftToEventIndex,
+  hasIndependentNotifyForm
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -93,10 +94,11 @@ function useActionGuard(
     )
   }
 
-  // In the declare flow, user is allowed if they have permission for either DECLARE or NOTIFY;
-  // otherwise strict permission by action type.
+  // In the declare flow, user is allowed if they have permission for either DECLARE or NOTIFY —
+  // unless NOTIFY has its own independent form, in which case it's guarded on its own terms
+  // via its own route rather than folded into the DECLARE flow.
   const isPermitted =
-    actionType === ActionType.DECLARE
+    actionType === ActionType.DECLARE && !hasIndependentNotifyForm(configuration)
       ? isActionAllowed(ActionType.DECLARE) ||
         isActionAllowed(ActionType.NOTIFY)
       : isActionAllowed(actionType)

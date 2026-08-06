@@ -37,6 +37,8 @@ import {
   getActionReviewFields,
   getCurrentEventState,
   getDeclaration,
+  getDeclarationForAction,
+  hasIndependentNotifyForm,
   getVisibleVerificationPageIds,
   isFieldVisible,
   isPageVisible,
@@ -293,22 +295,33 @@ function validateCustomAction({
 
 export function validateNotifyAction({
   eventConfig,
+  actionType = ActionType.NOTIFY,
   annotation = {},
   declaration = {},
   context
 }: {
   eventConfig: EventConfig
+  actionType?: typeof ActionType.NOTIFY | typeof ActionType.EDIT
   annotation?: ActionUpdate
   declaration: ActionUpdate
   context: ValidatorContext
 }) {
-  const declarationConfig = getDeclaration(eventConfig)
+  // The raw EDIT action (created internally by the editAndDeclare/editAndRegister/
+  // editAndNotify custom actions as an intermediate "Requested" step) is, like
+  // NOTIFY, inherently a partial update — it always keeps the shared declaration
+  // form and relaxed required-ness, regardless of whether NOTIFY has its own form.
+  const isNotify = actionType === ActionType.NOTIFY
+  const hasOwnForm = isNotify && hasIndependentNotifyForm(eventConfig)
+  const declarationConfig = getDeclarationForAction(eventConfig, actionType)
   const formFields = declarationConfig.pages.flatMap(({ fields }) =>
     fields.flatMap((field) => field)
   )
 
   const reviewFields = [
-    ...getActionReviewFields(eventConfig, ActionType.DECLARE),
+    ...getActionReviewFields(
+      eventConfig,
+      isNotify ? ActionType.NOTIFY : ActionType.DECLARE
+    ),
     ...getActionFormFields(eventConfig, ActionType.NOTIFY)
   ]
 
@@ -351,7 +364,7 @@ export function validateNotifyAction({
       }
 
       const fieldErrors = runStructuralValidations({
-        field: { ...field, required: false },
+        field: hasOwnForm ? field : { ...field, required: false },
         values: declaration,
         context,
         actionType: ActionType.NOTIFY
@@ -440,6 +453,7 @@ export const validateAction: MiddlewareFunction<
   if (actionType === ActionType.NOTIFY || actionType === ActionType.EDIT) {
     const errors = validateNotifyAction({
       eventConfig,
+      actionType,
       annotation: input.annotation,
       declaration: input.declaration,
       context

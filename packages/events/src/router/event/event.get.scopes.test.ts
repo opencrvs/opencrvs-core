@@ -210,19 +210,28 @@ test('Check flags scope option against event.get', async () => {
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    encodeScope({ type: 'record.notify', options: { event: [type] } })
+    encodeScope({ type: 'record.notify', options: { event: [type] } }),
+    encodeScope({ type: 'record.reject', options: { event: [type] } })
   ])
 
   const event = await createEvent(client, generator, [])
   await client.event.actions.notify.request(
     generator.event.actions.notify(event.id)
   )
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event.id, {
+      assignedTo: event.actions[0].createdBy
+    })
+  )
+  await client.event.actions.reject.request(
+    generator.event.actions.reject(event.id)
+  )
 
-  // The NOTIFY action adds the `incomplete` flag to the event.
+  // The REJECT action adds the `rejected` flag to the event.
   const clientRestrictedByFlags = createTestClient(user, [
     encodeScope({
       type: 'record.read',
-      options: { flags: { noneOf: [InherentFlags.INCOMPLETE] } }
+      options: { flags: { noneOf: [InherentFlags.REJECTED] } }
     })
   ])
 
@@ -233,7 +242,7 @@ test('Check flags scope option against event.get', async () => {
   const clientMatchingFlags = createTestClient(user, [
     encodeScope({
       type: 'record.read',
-      options: { flags: { anyOf: [InherentFlags.INCOMPLETE] } }
+      options: { flags: { anyOf: [InherentFlags.REJECTED] } }
     })
   ])
 
