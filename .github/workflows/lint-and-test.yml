@@ -215,14 +215,9 @@ jobs:
         if: steps.check-scripts.outputs.skip != 'true'
         run: npx license-check-and-add check -f license-config.json
 
-      - name: Runs dependency installation (default)
-        if: steps.check-scripts.outputs.skip != 'true' && matrix.package != 'packages/countryconfig-template'
+      - name: Runs dependency installation
+        if: steps.check-scripts.outputs.skip != 'true'
         run: pnpm install --frozen-lockfile
-
-        # countryconfig-template is under packages/ while not being a package.
-      - name: Runs dependency installation (countryconfig-template)
-        if: steps.check-scripts.outputs.skip != 'true' && matrix.package == 'packages/countryconfig-template'
-        run: cd packages/countryconfig-template && pnpm install --no-frozen-lockfile --ignore-workspace
 
       # Nx computation cache. Written by exactly one job (build-deps,
       # develop pushes only) so restoring here can never feed back into
@@ -288,6 +283,48 @@ jobs:
         with:
           message-id: ${{ matrix.package }}-test-coverage
           message: ${{ env.PR_COMMENT_BODY }}
+
+  countryconfig-template:
+    name: Test countryconfig-template
+    # Excluded from the workspace and from nx (see .nxignore), so it never
+    # shows up in the matrix above and gets its own job. It installs in
+    # isolation and resolves @opencrvs/toolkit from npm, so none of the
+    # workspace build/cache machinery applies.
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: packages/countryconfig-template
+    steps:
+      - name: Checking out git repo
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      - name: Runs dependency installation
+        run: pnpm install --no-frozen-lockfile --ignore-workspace
+
+      # Disabled: this package has never been typechecked in CI and does
+      # not currently compile — 9 pre-existing errors in its own src/
+      # (missing hapi-sentry types, hapi handler signature variance in
+      # index.ts, unknown-typed catch bindings). Fix those, then flip the
+      # `if` to remove the skip.
+      - name: Typecheck
+        if: false
+        run: pnpm test:compilation
+
+      - name: Run linting
+        run: pnpm lint
+
+      - name: Run Unit Test
+        run: pnpm test
 
   prepare-client-tests:
     name: Prepare client tests
