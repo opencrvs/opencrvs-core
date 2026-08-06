@@ -20,95 +20,46 @@ import {
 import { Button } from '../Button'
 import { Text } from '../Text'
 import { Icon } from '../Icon'
+import * as styles from './Alert.styles'
 
 export type AlertType = 'success' | 'warning' | 'loading' | 'info' | 'error'
 
-/**
- * Each type sits on the palest tint of its hue, outlined in the mid tone, with
- * its icon and title in the dark tone.
- *
- * The mid tones fail WCAG AA against their own tint — warning measures 2.14:1,
- * info 2.87:1 — so text and icon step down to `*Dark`. A border carries no
- * text, so it keeps the mid tone.
- */
-const TONES = {
-  success: {
-    line: 'positive',
-    ink: 'greenDark',
-    tint: 'greenLighter',
-    Glyph: CheckCircle
-  },
-  warning: {
-    line: 'orange',
-    ink: 'orangeDark',
-    tint: 'orangeLighter',
-    Glyph: Warning
-  },
-  error: {
-    line: 'negative',
-    ink: 'redDark',
-    tint: 'redLighter',
-    Glyph: WarningCircle
-  },
-  info: { line: 'teal', ink: 'tealDark', tint: 'tealLighter', Glyph: Info },
-  loading: {
-    line: 'teal',
-    ink: 'primary',
-    tint: 'tealLighter',
-    Glyph: CircleNotch
-  }
-} as const
+/** The glyph each type is recognised by. */
+const GLYPHS = {
+  success: CheckCircle,
+  warning: Warning,
+  error: WarningCircle,
+  info: Info,
+  loading: CircleNotch
+} satisfies Record<AlertType, unknown>
 
 const Container = styled.div<{ $type: AlertType }>`
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 16px;
-  border-radius: 8px;
-  border: 1px solid ${({ theme, $type }) => theme.colors[TONES[$type].line]};
-  background: ${({ theme, $type }) => theme.colors[TONES[$type].tint]};
+  ${styles.base}
+
+  ${(props) => props.$type === 'success' && styles.success}
+  ${(props) => props.$type === 'warning' && styles.warning}
+  ${(props) => props.$type === 'error' && styles.error}
+  ${(props) => props.$type === 'info' && styles.info}
+  ${(props) => props.$type === 'loading' && styles.loading}
 `
 
-const IconContainer = styled.div<{ $type: AlertType }>`
-  flex: 0 0 auto;
-  display: flex;
-  color: ${({ theme, $type }) => theme.colors[TONES[$type].ink]};
+const IconContainer = styled.div`
+  ${styles.iconArea}
 `
-
 const Content = styled.div`
-  flex: 1 1 auto;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  ${styles.content}
 `
-
-const Title = styled.div<{ $type: AlertType }>`
-  ${({ theme }) => theme.fonts.bold14};
-  line-height: 130%;
-  color: ${({ theme, $type }) => theme.colors[TONES[$type].ink]};
+const Title = styled.div`
+  ${styles.title}
 `
-
 const Message = styled.div`
-  ${({ theme }) => theme.fonts.reg14};
-  line-height: 150%;
-  color: ${({ theme }) => theme.colors.copy};
+  ${styles.message}
 `
-
-/**
- * The action sits under the message rather than beside it, so a long message
- * keeps the full width and a long label is not squeezed into a column.
- */
 const Actions = styled.div`
-  display: flex;
-  margin-top: 4px;
-  margin-left: -8px;
+  ${styles.actions}
 `
-
 const Close = styled(Button)`
-  flex: 0 0 auto;
-  margin: -8px -8px 0 0;
+  ${styles.close}
 `
 
 export interface IAlertProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -135,16 +86,14 @@ export const Alert = ({
   customIcon,
   ...props
 }: IAlertProps) => {
-  const { Glyph } = TONES[type]
+  const Glyph = GLYPHS[type]
 
   return (
     <Container $type={type} {...props}>
-      <IconContainer $type={type}>
-        {customIcon ?? <Glyph size={24} />}
-      </IconContainer>
+      <IconContainer>{customIcon ?? <Glyph size={24} />}</IconContainer>
 
       <Content>
-        {title && <Title $type={type}>{title}</Title>}
+        {title && <Title>{title}</Title>}
         {children && <Message>{children}</Message>}
         {onActionClick && (
           <Actions>
