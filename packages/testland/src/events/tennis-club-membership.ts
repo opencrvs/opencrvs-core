@@ -813,6 +813,82 @@ const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
   ]
 })
 
+/**
+ * Illustrative example of a NOTIFY-specific form, independent from
+ * TENNIS_CLUB_DECLARATION_FORM: a short form for notifying a membership
+ * application. `applicant.name`/`applicant.dob` intentionally reuse the same
+ * field ids as TENNIS_CLUB_DECLARATION_FORM's applicant page, so a registrar
+ * completing the full declaration later sees this data pre-filled.
+ */
+const TENNIS_CLUB_NOTIFY_REVIEW = {
+  title: {
+    id: 'event.tennis-club-membership.action.notify.form.review.title',
+    defaultMessage: 'Membership notification',
+    description: 'Title of the notify form to show in review page'
+  },
+  fields: [
+    {
+      id: 'notify.comment',
+      type: FieldType.TEXTAREA,
+      label: {
+        defaultMessage: 'Comment',
+        id: 'event.tennis-club-membership.action.notify.form.review.comment.label',
+        description: 'Label for the comment field in the review section'
+      }
+    }
+  ]
+}
+
+const TENNIS_CLUB_NOTIFY_FORM = defineDeclarationForm({
+  label: {
+    id: 'event.tennis-club-membership.action.notify.form.label',
+    defaultMessage: 'Tennis club membership notification',
+    description: 'This is what this form is referred as in the system'
+  },
+  pages: [
+    {
+      id: 'notification',
+      type: PageTypes.enum.FORM,
+      title: {
+        id: 'event.tennis-club-membership.action.notify.form.section.notification.title',
+        defaultMessage: 'Notify a membership application',
+        description: 'This is the title of the section'
+      },
+      fields: [
+        {
+          id: 'applicant.name',
+          type: FieldType.NAME,
+          label: {
+            defaultMessage: 'Name of applicant',
+            description: 'This is the title for the name field',
+            id: 'event.tennis-club-membership.action.declare.form.section.who.field.name.label'
+          },
+          hideLabel: true,
+          required: true,
+          configuration: {
+            name: {
+              firstname: { required: true },
+              middlename: { required: false },
+              surname: { required: true }
+            },
+            maxLength: MAX_NAME_LENGTH
+          }
+        },
+        {
+          id: 'applicant.dob',
+          type: FieldType.DATE,
+          required: true,
+          label: {
+            defaultMessage: "Applicant's date of birth",
+            description: 'This is the label for the field',
+            id: 'event.tennis-club-membership.action.declare.form.section.who.field.dob.label'
+          }
+        }
+      ]
+    }
+  ]
+})
+
 const TENNIS_CLUB_MEMBERSHIP_CERTIFICATE_COLLECTOR_FORM = defineActionForm({
   label: {
     id: 'event.tennis-club-membership.action.certificate.form.label',
@@ -1342,6 +1418,17 @@ export const tennisClubMembershipEvent = defineConfig({
         description: 'Title of the review page'
       },
       review: TENNIS_CLUB_DECLARATION_REVIEW
+    },
+    {
+      type: ActionType.NOTIFY,
+      label: {
+        defaultMessage: 'Notify',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.tennis-club-membership.action.notify.label'
+      },
+      declaration: TENNIS_CLUB_NOTIFY_FORM,
+      review: TENNIS_CLUB_NOTIFY_REVIEW
     },
     {
       type: ActionType.DECLARE,

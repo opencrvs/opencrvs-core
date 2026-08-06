@@ -17,20 +17,26 @@ import { useSelector } from 'react-redux'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import {
+  ActionType,
   canUserCreateEvent,
   canUserDeclareEvent,
+  canUserNotifyEvent,
+  EventConfig,
   hasIndependentNotifyForm
 } from '@opencrvs/commons/client'
 import { SuspenseLoadingFallback } from '@client/v2-events/components/SuspenseLoadingFallback'
 import { ROUTES } from '@client/v2-events/routes'
 import { createTemporaryId } from '@client/v2-events/utils'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { useModal } from '@client/v2-events/hooks/useModal'
+import { actionLabels } from '@client/v2-events/features/workqueues/Actions/utils'
 import { useEventConfigurations } from './useEventConfiguration'
 import { useEventFormData } from './useEventFormData'
 import { useEventFormNavigation } from './useEventFormNavigation'
@@ -62,6 +68,22 @@ const messages = defineMessages({
     defaultMessage: 'EXIT',
     description: 'Label for Exit button on EventTopBar',
     id: 'buttons.exit'
+  },
+  chooseActionTitle: {
+    defaultMessage: 'How would you like to proceed?',
+    description: 'Title of the modal asking whether to notify or declare',
+    id: 'register.selectVitalEvent.chooseAction.title'
+  },
+  chooseActionBody: {
+    defaultMessage:
+      'You can notify the {event} now with limited details, or go straight to a full declaration.',
+    description: 'Body text of the modal asking whether to notify or declare',
+    id: 'register.selectVitalEvent.chooseAction.body'
+  },
+  cancel: {
+    defaultMessage: 'Cancel',
+    description: 'Label for cancel button of the notify-or-declare modal',
+    id: 'register.selectVitalEvent.chooseAction.cancel'
   }
 })
 
@@ -73,6 +95,58 @@ const constantsMessages = defineMessages({
     id: 'constants.skipToMainContent'
   }
 })
+
+type NotifyOrDeclareChoice = typeof ActionType.NOTIFY | typeof ActionType.DECLARE
+
+/**
+ * Shown when a user has both DECLARE and NOTIFY permission for an event that
+ * gives NOTIFY its own independent form: since the two forms can differ,
+ * the user must pick which one they intend to fill in before seeing it.
+ */
+function NotifyOrDeclareModal({
+  eventConfig,
+  close
+}: {
+  eventConfig: EventConfig
+  close: (result: NotifyOrDeclareChoice | null) => void
+}) {
+  const intl = useIntl()
+
+  return (
+    <Dialog
+      isOpen
+      actions={[
+        <Button
+          key="cancel"
+          type="tertiary"
+          onClick={() => close(null)}
+        >
+          {intl.formatMessage(messages.cancel)}
+        </Button>,
+        <Button
+          key="notify"
+          type="secondary"
+          onClick={() => close(ActionType.NOTIFY)}
+        >
+          {intl.formatMessage(actionLabels[ActionType.NOTIFY])}
+        </Button>,
+        <Button
+          key="declare"
+          type="primary"
+          onClick={() => close(ActionType.DECLARE)}
+        >
+          {intl.formatMessage(actionLabels[ActionType.DECLARE])}
+        </Button>
+      ]}
+      title={intl.formatMessage(messages.chooseActionTitle)}
+      onClose={() => close(null)}
+    >
+      {intl.formatMessage(messages.chooseActionBody, {
+        event: intl.formatMessage(eventConfig.label)
+      })}
+    </Dialog>
+  )
+}
 
 function EventSelector() {
   const intl = useIntl()
@@ -86,16 +160,16 @@ function EventSelector() {
   const clearAnnotation = useActionAnnotation((state) => state.clear)
   const createEvent = events.createEvent()
   const user = useSelector(getUserDetails)
+  const [modal, openModal] = useModal()
 
   const allowedEventConfigurations = eventConfigurations.filter(({ id }) =>
     canUserCreateEvent(scopes, id)
   )
 
-  function handleContinue() {
+  async function handleContinue() {
     if (eventType === '') {
       return setNoEventSelectedError(true)
     }
-    const transactionId = createTemporaryId()
     const eventConfig = allowedEventConfigurations.find(
       ({ id }) => id === eventType
     )
@@ -104,6 +178,35 @@ function EventSelector() {
       throw new Error(`Configuration for event '${eventType}' not found`)
     }
 
+    // When NOTIFY has its own independent form, it's a separate flow from
+    // DECLARE, with a potentially different form. A user permitted to do
+    // either must choose their intent upfront; a user permitted to do only
+    // one of them is sent straight into that flow, as before.
+    let targetRoute: typeof ROUTES.V2.EVENTS.DECLARE | typeof ROUTES.V2.EVENTS.NOTIFY =
+      ROUTES.V2.EVENTS.DECLARE
+    if (hasIndependentNotifyForm(eventConfig)) {
+      const canDeclare = canUserDeclareEvent(scopes, eventType)
+      const canNotify = canUserNotifyEvent(scopes, eventType)
+
+      if (canDeclare && canNotify) {
+        const choice = await openModal<NotifyOrDeclareChoice | null>(
+          (close) => <NotifyOrDeclareModal close={close} eventConfig={eventConfig} />
+        )
+
+        if (!choice) {
+          return
+        }
+
+        targetRoute =
+          choice === ActionType.NOTIFY
+            ? ROUTES.V2.EVENTS.NOTIFY
+            : ROUTES.V2.EVENTS.DECLARE
+      } else if (canNotify && !canDeclare) {
+        targetRoute = ROUTES.V2.EVENTS.NOTIFY
+      }
+    }
+
+    const transactionId = createTemporaryId()
     createEvent.mutate({
       type: eventType,
       transactionId,
@@ -113,22 +216,7 @@ function EventSelector() {
     clearForm()
     clearAnnotation()
 
-    // When NOTIFY has its own independent form, it's a separate flow from
-    // DECLARE: send users who can only notify (not declare) there directly,
-    // instead of into the DECLARE flow they don't have permission for.
-    const shouldNotify =
-      hasIndependentNotifyForm(eventConfig) &&
-      !canUserDeclareEvent(scopes, eventType)
-
-    navigate(
-      shouldNotify
-        ? ROUTES.V2.EVENTS.NOTIFY.buildPath({
-            eventId: transactionId
-          })
-        : ROUTES.V2.EVENTS.DECLARE.buildPath({
-            eventId: transactionId
-          })
-    )
+    navigate(targetRoute.buildPath({ eventId: transactionId }))
   }
 
   return (
@@ -164,6 +252,7 @@ function EventSelector() {
           {intl.formatMessage(messages.continueButton)}
         </Button>
       </Stack>
+      {modal}
     </>
   )
 }

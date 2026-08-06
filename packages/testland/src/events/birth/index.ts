@@ -30,7 +30,6 @@ import {
   BIRTH_DECLARATION_FORM,
   BIRTH_DECLARATION_REVIEW
 } from './forms/declaration'
-import { BIRTH_NOTIFY_FORM, BIRTH_NOTIFY_REVIEW } from './forms/notify'
 import { advancedSearchBirth } from './advancedSearch'
 
 import { BIRTH_CERTIFICATE_COLLECTOR_FORM } from './forms/printForm'
@@ -375,12 +374,6 @@ export const birthEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.birth.action.notify.label'
       },
-      // NOTIFY has its own short form here, independent from
-      // BIRTH_DECLARATION_FORM. `child.name`/`child.gender` reuse the main
-      // declaration's field ids on purpose, so a registrar completing the
-      // full declaration afterwards sees this data pre-filled.
-      declaration: BIRTH_NOTIFY_FORM,
-      review: BIRTH_NOTIFY_REVIEW,
       form: [
         {
           id: 'comments',

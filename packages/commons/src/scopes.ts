@@ -592,18 +592,17 @@ export function hasScope(
 }
 
 /**
- * Checks if the given event type is allowed by the accepted scopes. If no specific event types are defined, it returns true.
- *
- * @param {Scope[]} userScopes - The scopes of the user.
- * @param {string} eventType - The event type to check for permission.
- * @returns {boolean} Returns true if the event type is allowed by the scope.
+ * Checks whether the user has a scope of the given type for the given event
+ * type. If the scope carries no event-specific restriction, it's treated as
+ * allowed for any event type.
  */
-export function canUserCreateEvent(
+function hasScopeForEventType(
   userScopes: EncodedScope[],
+  scopeType: ScopeType,
   eventType: string
 ) {
   const scopes = getAcceptedScopesByType({
-    acceptedScopes: ['record.create'],
+    acceptedScopes: [scopeType],
     scopes: userScopes
   })
 
@@ -621,6 +620,20 @@ export function canUserCreateEvent(
 }
 
 /**
+ * Checks if the given event type is allowed by the accepted scopes. If no specific event types are defined, it returns true.
+ *
+ * @param {Scope[]} userScopes - The scopes of the user.
+ * @param {string} eventType - The event type to check for permission.
+ * @returns {boolean} Returns true if the event type is allowed by the scope.
+ */
+export function canUserCreateEvent(
+  userScopes: EncodedScope[],
+  eventType: string
+) {
+  return hasScopeForEventType(userScopes, 'record.create', eventType)
+}
+
+/**
  * Checks whether the user has the `record.declare` scope for the given event
  * type. Used to decide which entry flow (DECLARE vs NOTIFY) to send a user
  * into when creating a new event and NOTIFY has its own independent form.
@@ -629,22 +642,20 @@ export function canUserDeclareEvent(
   userScopes: EncodedScope[],
   eventType: string
 ) {
-  const scopes = getAcceptedScopesByType({
-    acceptedScopes: ['record.declare'],
-    scopes: userScopes
-  })
+  return hasScopeForEventType(userScopes, 'record.declare', eventType)
+}
 
-  return scopes.some((scope) => {
-    if (
-      !('options' in scope) ||
-      !scope.options ||
-      !('event' in scope.options)
-    ) {
-      return true
-    }
-
-    return scope.options?.event?.includes(eventType)
-  })
+/**
+ * Checks whether the user has the `record.notify` scope for the given event
+ * type. Used alongside {@link canUserDeclareEvent} to decide which entry flow
+ * (DECLARE vs NOTIFY vs a choice between them) to send a user into when
+ * creating a new event and NOTIFY has its own independent form.
+ */
+export function canUserNotifyEvent(
+  userScopes: EncodedScope[],
+  eventType: string
+) {
+  return hasScopeForEventType(userScopes, 'record.notify', eventType)
 }
 
 /**
