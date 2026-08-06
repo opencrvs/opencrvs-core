@@ -316,18 +316,27 @@ export const Rejected: Story = {
   }
 }
 
+// #13265: archiving from the action menu collects no reason, so the dialog must
+// not render an empty `Comment` section. Only `MarkedAsDuplicate` below archives
+// with a reason attached.
 export const Archived: Story = {
+  name: 'Archived without a reason — no Comment section (regression: #13265)',
   args: {
     ...argbase,
     title: 'Archived',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
-      type: ActionType.ARCHIVE,
-      content: {
-        reason: 'Record archived'
-      }
+      type: ActionType.ARCHIVE
     }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    // Wait for the dialog to render before asserting on absence.
+    await expect(
+      canvas.findByText('Jhon Doe', { exact: false })
+    ).resolves.toBeInTheDocument()
+    await expect(canvas.queryByText('Comment')).not.toBeInTheDocument()
   }
 }
 
@@ -343,6 +352,13 @@ export const MarkedAsDuplicate: Story = {
         reason: 'Duplicate record found'
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.findByText('Comment')).resolves.toBeInTheDocument()
+    await expect(
+      canvas.findByText('Duplicate record found')
+    ).resolves.toBeInTheDocument()
   }
 }
 
