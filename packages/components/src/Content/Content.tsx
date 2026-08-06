@@ -44,15 +44,9 @@ const Header = styled.div`
   display: flex;
   justify-content: center;
   flex-direction: column;
-  padding: 20px, 32px;
+  padding: 20px 32px;
+  gap: 16px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    border: 0;
-    padding: 0;
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin: 0;
-  }
 `
 const TopActionBar = styled.div`
   display: flex;
@@ -77,27 +71,14 @@ const Footer = styled.div`
 `
 const HeaderBottom = styled.div`
   display: flex;
-  padding: 0 0 24px;
   width: 100%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    padding: 24px;
-    border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 0 16px 16px;
-  }
 `
 const TopTabBar = styled.div`
   display: flex;
   gap: 28px;
   width: 100%;
-  margin: -24px 0;
   padding: 0;
   position: relative;
-  bottom: -1px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin: -16px 0;
-  }
 `
 const TopFilterBar = styled.div`
   display: flex;
@@ -109,8 +90,6 @@ const TopBar = styled.div<{ keepShowing?: boolean }>`
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  min-height: 64px;
-  padding: 12px 0;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     ${({ keepShowing }) => {
       return !keepShowing ? 'display:none;' : 'padding:16px;'
@@ -196,11 +175,6 @@ interface IProps {
   tabBarContent?: React.ReactNode
   filterContent?: React.ReactNode
   subtitle?: string | React.ReactNode
-  /**
-   * A line under the title, within the header. Use for what the card belongs
-   * to — an issuing authority, say — rather than for body copy, which is what
-   * `subtitle` is for.
-   */
   titleSubtitle?: string | React.ReactNode
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
