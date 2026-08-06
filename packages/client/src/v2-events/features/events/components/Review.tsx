@@ -15,6 +15,7 @@ import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import {
   Accordion,
   Button,
@@ -222,6 +223,42 @@ function ReviewHeader({ title }: { title: string }) {
 }
 
 /**
+ * A declaration review draws its own card with the country logo. A screen that
+ * is not a review — the Record tab — passes `contentTitle` and gets the
+ * design-system Content instead, so its heading matches every other tab.
+ */
+function CardOrContent({
+  contentTitle,
+  reviewTitle,
+  actions,
+  children
+}: {
+  contentTitle?: string
+  reviewTitle: string
+  actions?: React.ReactElement[]
+  children: React.ReactNode
+}) {
+  if (contentTitle === undefined) {
+    return (
+      <Card>
+        <ReviewHeader title={reviewTitle} />
+        {children}
+      </Card>
+    )
+  }
+
+  return (
+    <Content
+      size={ContentSize.LARGE}
+      title={contentTitle}
+      topActionButtons={actions}
+    >
+      {children}
+    </Content>
+  )
+}
+
+/**
  *  Renders review of form data, with the ability to edit the data.
  */
 function FormReview({
@@ -382,7 +419,7 @@ function FormReview({
                     const showSectionHeading = type === FieldType.HEADING
 
                     return (
-                      <>
+                      <React.Fragment key={id}>
                         {showSectionHeading ? (
                           <ListReview.Header
                             fontVariant={
@@ -393,7 +430,6 @@ function FormReview({
                           />
                         ) : (
                           <ListReview.Row
-                            key={id}
                             actions={
                               !shouldHideEditLink && (
                                 <Link
@@ -417,7 +453,7 @@ function FormReview({
                             value={errorDisplay || valueDisplay}
                           />
                         )}
-                      </>
+                      </React.Fragment>
                     )
                   })}
                 </ListReview>
@@ -450,9 +486,17 @@ function ReviewComponent({
   isReviewCorrection = false,
   treatMissingValuesAsCleared = false,
   banner,
-  anchor
+  anchor,
+  content
 }: {
   children?: React.ReactNode
+  /**
+   * Renders the left column as a design-system Content instead of the review
+   * card, for a screen that is not a declaration review — the Record tab —
+   * which needs a plain title and a header-action slot rather than the
+   * country logo.
+   */
+  content?: { title: string; actions?: React.ReactElement[] }
   formConfig: FormConfig
   form: EventState
   validatorContext: ValidatorContext
@@ -508,8 +552,11 @@ function ReviewComponent({
     <Row>
       <LeftColumn>
         {banner}
-        <Card>
-          <ReviewHeader title={title} />
+        <CardOrContent
+          actions={content?.actions}
+          contentTitle={content?.title}
+          reviewTitle={title}
+        >
           <FormReview
             anchor={anchor}
             form={form}
@@ -595,7 +642,7 @@ function ReviewComponent({
                 </ReviewContainter>
               </FormData>
             )}
-        </Card>
+        </CardOrContent>
         {children}
       </LeftColumn>
       {pageIdsWithFile.length > 0 && (
