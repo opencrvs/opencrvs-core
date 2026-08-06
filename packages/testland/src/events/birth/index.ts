@@ -420,6 +420,13 @@ export const birthEvent = defineConfig({
       },
       flags: [
         {
+          /*
+           * A late birth needs a second pair of eyes before it can be
+           * registered — except when a Local Registrar declared it, since they
+           * already hold the authority the approval would grant. Without this
+           * exemption a registrar cannot register their own late declaration
+           * at all, which makes the whole path untestable in Testland.
+           */
           id: 'approval-required-for-late-registration',
           operation: 'add',
           conditional: and(
@@ -429,7 +436,8 @@ export const birthEvent = defineConfig({
                 .days(BIRTH_LATE_REGISTRATION_TARGET_DAYS)
                 .inPast()
             ),
-            field('child.dob').isBefore().now()
+            field('child.dob').isBefore().now(),
+            not(user.hasRole('LOCAL_REGISTRAR'))
           )
         },
         {
