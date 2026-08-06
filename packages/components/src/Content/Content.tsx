@@ -44,7 +44,7 @@ const Header = styled.div`
   display: flex;
   justify-content: center;
   flex-direction: column;
-  padding: 0 24px;
+  padding: 20px, 32px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     border: 0;
@@ -134,6 +134,22 @@ const BackButtonContainer = styled.div`
     display: none;
   }
 `
+const TitleBlock = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+`
+
+/**
+ * Sits under the title, inside the header. Distinct from `subtitle`, which
+ * renders in the body below the header's rule.
+ */
+const TitleSubtitle = styled.div`
+  ${({ theme }) => theme.fonts.reg14};
+  color: ${({ theme }) => theme.colors.supportingCopy};
+`
+
 const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
   display: flex;
   gap: 16px;
@@ -157,9 +173,9 @@ const Icon = styled.div`
 `
 
 const Contents = styled.div<{ noPadding?: boolean }>`
-  padding: ${(props) => (props.noPadding ? 0 : '24px')};
+  padding: ${(props) => (props.noPadding ? 0 : '32px')};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: ${(props) => (props.noPadding ? 0 : '16px')};
+    padding: ${(props) => (props.noPadding ? 0 : '24px')};
   }
 `
 
@@ -180,6 +196,12 @@ interface IProps {
   tabBarContent?: React.ReactNode
   filterContent?: React.ReactNode
   subtitle?: string | React.ReactNode
+  /**
+   * A line under the title, within the header. Use for what the card belongs
+   * to — an issuing authority, say — rather than for body copy, which is what
+   * `subtitle` is for.
+   */
+  titleSubtitle?: string | React.ReactNode
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
   bottomActionDirection?: 'row' | 'column'
@@ -193,6 +215,7 @@ export const UnstyledContent = ({
   titleColor,
   showTitleOnMobile,
   topActionButtons,
+  titleSubtitle,
   tabBarContent,
   filterContent,
   noPadding,
@@ -205,11 +228,20 @@ export const UnstyledContent = ({
 }: IProps) => (
   <Container size={size} className={className}>
     <Header>
-      {(icon || title || topActionButtons) && (
+      {(icon || title || titleSubtitle || topActionButtons) && (
         <TopBar keepShowing={showTitleOnMobile}>
           <TitleContainer titleColor={titleColor}>
             {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
-            {title && <Title id={`content-name`}>{title}</Title>}
+            {(title || titleSubtitle) && (
+              <TitleBlock>
+                {title && <Title id={`content-name`}>{title}</Title>}
+                {titleSubtitle && (
+                  <TitleSubtitle id={`content-subtitle`}>
+                    {titleSubtitle}
+                  </TitleSubtitle>
+                )}
+              </TitleBlock>
+            )}
           </TitleContainer>
           {topActionButtons && <TopActionBar>{topActionButtons}</TopActionBar>}
         </TopBar>

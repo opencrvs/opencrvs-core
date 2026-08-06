@@ -134,6 +134,11 @@ const reviewMessages = defineMessages({
     defaultMessage: 'A record will be created of any changes you make',
     description: 'The description for change modal'
   },
+  govtName: {
+    id: 'review.header.title.govtName',
+    defaultMessage: 'Government',
+    description: 'Header title that shows govt name'
+  },
   rejectModalSendForUpdate: {
     id: 'rejectModal.sendForUpdate',
     defaultMessage: 'Send For Update',
@@ -380,7 +385,11 @@ function ReviewComponent({
    * card, so a screen that is not a declaration review — the Record tab — gets
    * a plain title and a header-action slot rather than the country logo.
    */
-  content?: { title: string; actions?: React.ReactElement[] }
+  content?: {
+    title: string
+    subtitle?: string
+    actions?: React.ReactElement[]
+  }
   formConfig: FormConfig
   form: EventState
   validatorContext: ValidatorContext
@@ -535,6 +544,16 @@ function ReviewComponent({
         <Content
           size={ContentSize.LARGE}
           title={content?.title ?? title}
+          titleSubtitle={
+            /*
+             * A declaration review is issued by the state, so it names the
+             * authority under its title. A screen that supplies its own
+             * heading says what belongs there, or nothing.
+             */
+            content
+              ? content.subtitle
+              : intl.formatMessage(reviewMessages.govtName)
+          }
           topActionButtons={content?.actions}
         >
           {cardBody}
