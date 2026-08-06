@@ -247,8 +247,18 @@ function CardOrContent({
     )
   }
 
+  /*
+   * Content hides its whole top bar below lg unless told otherwise, and that
+   * bar carries the header actions as well as the title. A screen that puts a
+   * control up there needs it at every width.
+   */
   return (
     <Content
+      /*
+       * On a narrow screen the selected tab names the page, so the card's own
+       * title stays hidden — but a control in the header has to stay reachable.
+       */
+      showActionsOnMobile
       size={ContentSize.LARGE}
       title={contentTitle}
       topActionButtons={actions}
