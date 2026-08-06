@@ -171,7 +171,7 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
       readonlyMode
       anchor={recordAnchorDate(eventStateWithDraft)}
       annotation={annotation}
-      bodyBanner={
+      alert={
         selected ? (
           <RecordVersionAlert selected={selected} versions={versions} />
         ) : undefined

@@ -148,11 +148,12 @@ const ReviewContainter = styled.div<{ $padded?: boolean }>`
   }
 `
 
-const BodyBanner = styled.div`
-  padding: 24px 0 0;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 24px 24px 0;
-  }
+/*
+ * The container already pads the body on every side, so this only opens a gap
+ * between the alerts and the first section.
+ */
+const Alerts = styled.div`
+  padding-bottom: 24px;
 `
 
 const DeclarationDataContainer = styled.div``
@@ -516,7 +517,7 @@ function ReviewComponent({
   isReviewCorrection = false,
   treatMissingValuesAsCleared = false,
   banner,
-  bodyBanner,
+  alert,
   anchor,
   content
 }: {
@@ -529,10 +530,11 @@ function ReviewComponent({
    */
   content?: { title: string; actions?: React.ReactElement[] }
   /**
-   * Rendered inside the card, above the first section. `banner` sits above the
-   * card itself; this belongs to the body.
+   * Alerts shown inside the card, above the first section — they describe what
+   * the card is showing. `banner` is the panel above the card itself, which
+   * the duplicate comparison and the correction review use.
    */
-  bodyBanner?: React.ReactNode
+  alert?: React.ReactNode
   formConfig: FormConfig
   form: EventState
   validatorContext: ValidatorContext
@@ -595,7 +597,7 @@ function ReviewComponent({
           contentTitle={content?.title}
           reviewTitle={title}
         >
-          {bodyBanner && <BodyBanner>{bodyBanner}</BodyBanner>}
+          {alert && <Alerts>{alert}</Alerts>}
           <FormReview
             anchor={anchor}
             form={form}
