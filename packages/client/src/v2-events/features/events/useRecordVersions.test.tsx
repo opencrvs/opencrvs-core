@@ -46,7 +46,12 @@ function renderVersions(event: EventDocument, search = '') {
   )
 }
 
-/** Declaration edited once, then registered. Three versions across two forms. */
+/**
+ * Declared, edited once, then registered — three versions across two forms.
+ *
+ * Editing emits EDIT followed by a fresh DECLARE, which is what the client
+ * actually does; the EDIT itself is not a version.
+ */
 function editedThenRegistered() {
   return generateEventDocument({
     configuration,
@@ -58,6 +63,10 @@ function editedThenRegistered() {
       },
       {
         type: ActionType.EDIT,
+        declarationOverrides: { 'applicant.email': 'edited@example.com' }
+      },
+      {
+        type: ActionType.DECLARE,
         declarationOverrides: { 'applicant.email': 'edited@example.com' }
       },
       { type: ActionType.REGISTER }
@@ -80,7 +89,7 @@ describe('useRecordVersions', () => {
     const event = editedThenRegistered()
     const { result: withDefault } = renderVersions(event)
     const declareVersion = withDefault.current.versions.find(
-      (v) => v.actionType === ActionType.DECLARE
+      (v) => v.form === RecordForm.DECLARATION && v.indexInForm === 0
     )
 
     expect(declareVersion).toBeDefined()
