@@ -17,6 +17,7 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Table } from '@opencrvs/components/lib/Table'
+import { Text } from '@opencrvs/components/lib/Text'
 import {
   ActionDocument,
   ActionStatus,
@@ -209,20 +210,6 @@ function ActionCreator({ action }: { action: EventHistoryActionDocument }) {
     )
   }
   return <User action={action} />
-}
-
-function ActionRole({ action }: { action: EventHistoryActionDocument }) {
-  const intl = useIntl()
-  const role = action.createdByRole
-  const { getActionCreator } = useActionCreator()
-  const { type } = getActionCreator(action)
-
-  // Integrations have no role by design
-  if (type === 'system' || type === 'integration') {
-    return null
-  }
-
-  return <>{intl.formatMessage(messages.role, { role })}</>
 }
 
 function ActionLocation({ action }: { action: EventHistoryActionDocument }) {

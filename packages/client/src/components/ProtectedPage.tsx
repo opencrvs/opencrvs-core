@@ -34,7 +34,6 @@ import { RouteComponentProps, withRouter } from './WithRouterProps'
 import { getAuthenticated } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { shouldBypassLock } from '@client/utils/lockBypass'
-import { shouldBypassLock } from '@client/utils/lockBypass'
 export const SCREEN_LOCK = 'screenLock'
 
 type OwnProps = PropsWithChildren<{}>
@@ -120,7 +119,6 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
 
     const newState = { ...this.state }
 
-    if (!alreadyLocked && !lockShouldBeBypassed) {
     if (!alreadyLocked && !lockShouldBeBypassed) {
       newState.secured = false
       if (await this.getPIN()) {

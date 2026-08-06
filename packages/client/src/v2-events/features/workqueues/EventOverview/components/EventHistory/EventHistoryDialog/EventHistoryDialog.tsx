@@ -121,13 +121,6 @@ export function EventHistoryDialog({
 }) {
   const intl = useIntl()
   const history = getAcceptedActions(fullEvent)
-  const title = intl.formatMessage(eventHistoryStatusMessage, {
-    action: getActionTypeForHistory(history, action),
-    status: action.status,
-    // Lets countries configure different wording for actions performed by an
-    // integration, e.g. "Registered and UIN created"
-    userType: action.createdByUserType
-  })
 
   const comments = prepareComments(action)
   const reason = prepareReason(action)
