@@ -24,33 +24,33 @@ import { Icon } from '../Icon'
 export type AlertType = 'success' | 'warning' | 'loading' | 'info' | 'error'
 
 /**
- * Each type sits on the palest tint of its hue, outlined in the mid tone.
+ * Each type sits on the palest tint of its hue, outlined in the mid tone, with
+ * its icon and title in the dark tone.
  *
- * The title and icon take the darkest tone rather than the mid one: the mid
- * tones fail WCAG AA against their own tint — warning measures 2.14:1, info
- * 2.87:1 — while the darkest clear it from 8.5:1 up. A border carries no text,
- * so it keeps the mid tone.
+ * The mid tones fail WCAG AA against their own tint — warning measures 2.14:1,
+ * info 2.87:1 — so text and icon step down to `*Dark`. A border carries no
+ * text, so it keeps the mid tone.
  */
 const TONES = {
   success: {
     line: 'positive',
-    ink: 'greenDarker',
+    ink: 'greenDark',
     tint: 'greenLighter',
     Glyph: CheckCircle
   },
   warning: {
     line: 'orange',
-    ink: 'orangeDarker',
+    ink: 'orangeDark',
     tint: 'orangeLighter',
     Glyph: Warning
   },
   error: {
     line: 'negative',
-    ink: 'redDarker',
+    ink: 'redDark',
     tint: 'redLighter',
     Glyph: WarningCircle
   },
-  info: { line: 'teal', ink: 'tealDarker', tint: 'tealLighter', Glyph: Info },
+  info: { line: 'teal', ink: 'tealDark', tint: 'tealLighter', Glyph: Info },
   loading: {
     line: 'teal',
     ink: 'primary',
@@ -87,10 +87,7 @@ const Content = styled.div`
 const Title = styled.div<{ $type: AlertType }>`
   ${({ theme }) => theme.fonts.bold14};
   line-height: 130%;
-  color: ${({ theme, $type }) =>
-    $type === 'loading'
-      ? theme.colors.primary
-      : theme.colors[TONES[$type].line]};
+  color: ${({ theme, $type }) => theme.colors[TONES[$type].ink]};
 `
 
 const Message = styled.div`
