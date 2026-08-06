@@ -50,10 +50,15 @@ const messages = defineMessages({
 function prepareComments(history: ActionDocument) {
   const comments: { comment: string }[] = []
 
-  if (
-    history.type === ActionType.REJECT ||
-    history.type === ActionType.ARCHIVE
-  ) {
+  if (history.type === ActionType.REJECT) {
+    comments.push({ comment: history.content.reason })
+  }
+
+  /**
+   * Archiving does not collect a reason on its own, so there is nothing to show
+   * unless the record was archived through the "mark as duplicate" flow.
+   */
+  if (history.type === ActionType.ARCHIVE && history.content?.reason) {
     comments.push({ comment: history.content.reason })
   }
 
