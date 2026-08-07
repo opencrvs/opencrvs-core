@@ -14,7 +14,10 @@ import {
   getRetrievalStepInformation,
   rotateRetrievalStepNonce,
   storeRetrievalStepInformation,
-  RetrievalSteps
+  RetrievalSteps,
+  RETRIEVAL_FLOW_USER_NAME,
+  RETRIEVAL_FLOW_PASSWORD,
+  type RetrieveFlow
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import { unauthorized } from '@hapi/boom'
 
@@ -25,6 +28,7 @@ interface IVerifyRecoveryTokenPayload {
 interface IVerifyRecoveryTokenResponse {
   nonce: string
   securityQuestionKey: string
+  retrieveFlow: RetrieveFlow
 }
 
 /*
@@ -54,6 +58,17 @@ export default async function verifyRecoveryTokenHandler(
     throw unauthorized()
   }
 
+  /*
+   * A record with no retrieveFlow predates this field: the recovery link
+   * was emailed before this change deployed. We cannot safely guess which
+   * flow it belongs to, and the record expires within its original 1-hour
+   * TTL, so reject rather than default to either flow. The user can request
+   * a fresh link.
+   */
+  if (!retrievalStepInformation.retrieveFlow) {
+    throw unauthorized()
+  }
+
   const nonce = await rotateRetrievalStepNonce(token)
   await storeRetrievalStepInformation(
     nonce,
@@ -63,7 +78,8 @@ export default async function verifyRecoveryTokenHandler(
 
   return {
     nonce,
-    securityQuestionKey: retrievalStepInformation.securityQuestionKey
+    securityQuestionKey: retrievalStepInformation.securityQuestionKey,
+    retrieveFlow: retrievalStepInformation.retrieveFlow
   }
 }
 
@@ -73,5 +89,9 @@ export const requestSchema = Joi.object({
 
 export const responseSchema = Joi.object({
   nonce: Joi.string(),
-  securityQuestionKey: Joi.string()
+  securityQuestionKey: Joi.string(),
+  retrieveFlow: Joi.string().valid(
+    RETRIEVAL_FLOW_USER_NAME,
+    RETRIEVAL_FLOW_PASSWORD
+  )
 })

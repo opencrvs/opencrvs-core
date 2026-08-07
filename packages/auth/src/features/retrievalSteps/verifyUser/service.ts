@@ -17,6 +17,10 @@ import { env } from '@auth/environment'
 export const RETRIEVAL_FLOW_USER_NAME = 'username'
 export const RETRIEVAL_FLOW_PASSWORD = 'password'
 
+export type RetrieveFlow =
+  | typeof RETRIEVAL_FLOW_USER_NAME
+  | typeof RETRIEVAL_FLOW_PASSWORD
+
 export enum RetrievalSteps {
   WAITING_FOR_VERIFICATION = 'WAITING_FOR_VERIFICATION',
   NUMBER_VERIFIED = 'NUMBER_VERIFIED',
@@ -47,6 +51,17 @@ export interface IRetrievalStepInformation {
   securityQuestionKey: string
   scope: string[]
   status: RetrievalSteps
+  /**
+   * Which retrieval flow ('username' reminder or 'password' reset) this
+   * token belongs to. Decided once, server-side, at /verifyUser time, and
+   * carried on the record rather than the URL so a token holder cannot
+   * rewrite it to receive a flow they were never sent.
+   *
+   * Optional because records written before this field existed (recovery
+   * links already emailed pre-deploy) have no value here — callers reading
+   * the record must treat a missing value as "unknown flow", never guess.
+   */
+  retrieveFlow?: RetrieveFlow
 }
 export async function storeRetrievalStepInformation(
   nonce: string,

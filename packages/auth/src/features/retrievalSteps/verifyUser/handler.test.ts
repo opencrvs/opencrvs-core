@@ -70,6 +70,7 @@ describe('verifyUser handler', () => {
       const stored = await getRetrievalStepInformation('token-found-password')
       expect(stored.status).toBe(RetrievalSteps.WAITING_FOR_VERIFICATION)
       expect(stored.userId).toBe(foundUser.userId)
+      expect(stored.retrieveFlow).toBe('password')
 
       expect(mockedTriggerUserEventNotification).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -109,6 +110,9 @@ describe('verifyUser handler', () => {
           })
         })
       )
+
+      const stored = await getRetrievalStepInformation('token-found-username')
+      expect(stored.retrieveFlow).toBe('username')
     })
   })
 

@@ -52,7 +52,8 @@ describe('verifyUser service', () => {
         scope: ['demo'],
         mobile: '+8801711111111',
         email: undefined,
-        securityQuestionKey: 'dummyKey'
+        securityQuestionKey: 'dummyKey',
+        retrieveFlow: 'password'
       }
     )
 
@@ -60,7 +61,9 @@ describe('verifyUser service', () => {
 
     expect(newNonce).not.toBe('tok-2')
     await expect(getRetrievalStepInformation('tok-2')).rejects.toThrow()
-    expect((await getRetrievalStepInformation(newNonce)).userId).toBe('1')
+    const rotated = await getRetrievalStepInformation(newNonce)
+    expect(rotated.userId).toBe('1')
+    expect(rotated.retrieveFlow).toBe('password')
   })
 
   it('throws when rotating a token that does not exist', async () => {

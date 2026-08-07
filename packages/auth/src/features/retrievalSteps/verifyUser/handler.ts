@@ -41,6 +41,9 @@ export default async function verifyUserHandler(
   const payload = request.payload as IVerifyUserPayload
   const isUserNameRetrievalFlow =
     payload.retrieveFlow.toLowerCase() === RETRIEVAL_FLOW_USER_NAME
+  const retrieveFlow = isUserNameRetrievalFlow
+    ? RETRIEVAL_FLOW_USER_NAME
+    : RETRIEVAL_FLOW_PASSWORD
 
   try {
     const result = await verifyUser({
@@ -52,7 +55,7 @@ export default async function verifyUserHandler(
     await storeRetrievalStepInformation(
       token,
       RetrievalSteps.WAITING_FOR_VERIFICATION,
-      result
+      { ...result, retrieveFlow }
     )
 
     await triggerUserEventNotification({

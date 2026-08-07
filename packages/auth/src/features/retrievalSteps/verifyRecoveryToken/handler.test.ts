@@ -8,11 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import * as Hapi from '@hapi/hapi'
 import { AuthServer, createServer } from '@auth/server'
 import {
   storeRetrievalStepInformation,
-  RetrievalSteps
+  RetrievalSteps,
+  type RetrieveFlow
 } from '@auth/features/retrievalSteps/verifyUser/service'
+import verifyRecoveryTokenHandler from '@auth/features/retrievalSteps/verifyRecoveryToken/handler'
 
 const seedRecord = {
   userId: '1',
@@ -21,14 +24,33 @@ const seedRecord = {
   mobile: '+8801711111111',
   email: undefined,
   securityQuestionKey: 'dummyKey',
-  scope: ['demo']
+  scope: ['demo'],
+  retrieveFlow: 'password' as RetrieveFlow
 }
 
-async function seedWaitingForVerification(token: string) {
+async function seedWaitingForVerification(
+  token: string,
+  overrides: Partial<typeof seedRecord> = {}
+) {
   await storeRetrievalStepInformation(
     token,
     RetrievalSteps.WAITING_FOR_VERIFICATION,
-    seedRecord
+    { ...seedRecord, ...overrides }
+  )
+}
+
+/**
+ * Records written before the retrieveFlow field existed have no such
+ * property at all (not merely undefined) — simulate that faithfully rather
+ * than storing `retrieveFlow: undefined`, which JSON.stringify would also
+ * drop, but which is clearer to express explicitly for a legacy-record test.
+ */
+async function seedLegacyRecordMissingRetrieveFlow(token: string) {
+  const { retrieveFlow, ...legacyRecord } = seedRecord
+  await storeRetrievalStepInformation(
+    token,
+    RetrievalSteps.WAITING_FOR_VERIFICATION,
+    legacyRecord
   )
 }
 
@@ -54,6 +76,80 @@ describe('verifyRecoveryToken handler receives a request', () => {
     expect(body.securityQuestionKey).toBe('dummyKey')
     expect(body.nonce).toBeDefined()
     expect(body.nonce).not.toBe(token)
+  })
+
+  it('returns the retrieveFlow that was stored on the record', async () => {
+    const passwordToken = 'recovery-token-password-flow'
+    await seedWaitingForVerification(passwordToken, {
+      retrieveFlow: 'password'
+    })
+
+    const passwordRes = await server.server.inject({
+      method: 'POST',
+      url: '/verifyRecoveryToken',
+      payload: { token: passwordToken }
+    })
+    expect(JSON.parse(passwordRes.payload).retrieveFlow).toBe('password')
+
+    const usernameToken = 'recovery-token-username-flow'
+    await seedWaitingForVerification(usernameToken, {
+      retrieveFlow: 'username'
+    })
+
+    const usernameRes = await server.server.inject({
+      method: 'POST',
+      url: '/verifyRecoveryToken',
+      payload: { token: usernameToken }
+    })
+    expect(JSON.parse(usernameRes.payload).retrieveFlow).toBe('username')
+  })
+
+  it('does not accept a caller-supplied retrieveFlow — the request schema has no such field', async () => {
+    const token = 'recovery-token-injection-attempt'
+    await seedWaitingForVerification(token, { retrieveFlow: 'password' })
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/verifyRecoveryToken',
+      // An attacker holding a password-reset link tries to smuggle in the
+      // username flow to get a username they were never sent.
+      payload: { token, retrieveFlow: 'username' }
+    })
+
+    // Rejected at validation before the handler ever runs, so there is no
+    // path by which this field could reach — let alone override — the
+    // response.
+    expect(res.statusCode).toBe(400)
+  })
+
+  it('ignores a retrieveFlow smuggled directly onto the payload, bypassing HTTP validation', async () => {
+    const token = 'recovery-token-direct-injection-attempt'
+    await seedWaitingForVerification(token, { retrieveFlow: 'password' })
+
+    // Calls the handler directly so the Joi request-schema layer above
+    // cannot be credited for the result — this proves the handler code
+    // itself never reads a caller-supplied retrieveFlow off the payload.
+    const response = (await verifyRecoveryTokenHandler(
+      {
+        payload: { token, retrieveFlow: 'username' }
+      } as unknown as Hapi.Request,
+      {} as Hapi.ResponseToolkit
+    )) as { retrieveFlow: string }
+
+    expect(response.retrieveFlow).toBe('password')
+  })
+
+  it('rejects a legacy token whose record predates the retrieveFlow field', async () => {
+    const token = 'recovery-token-legacy-no-flow'
+    await seedLegacyRecordMissingRetrieveFlow(token)
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/verifyRecoveryToken',
+      payload: { token }
+    })
+
+    expect(res.statusCode).toBe(401)
   })
 
   it('rejects the same token used a second time', async () => {
