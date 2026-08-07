@@ -18,14 +18,6 @@ import { EventStatus } from '../EventMetadata'
 import { Flag, InherentFlags } from '../Flag'
 
 const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
-  /**
-   * A CREATED event is a draft: it is not indexed, so it is only reachable
-   * through its creator's drafts workqueue, and executing any action on it
-   * deletes its drafts. A custom action cannot change the status, so it would
-   * leave the event in CREATED with its declaration data destroyed — the draft
-   * would vanish from the workqueue with no way to find it again. Custom
-   * actions are therefore not available until the event has been declared.
-   */
   [EventStatus.enum.CREATED]: [
     ActionType.READ,
     ActionType.DECLARE,
