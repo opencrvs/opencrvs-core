@@ -421,6 +421,13 @@ export function canAccessEventWithScope(
   if (scopeUsesDeclaredOptions(scope)) {
     const { options } = scope
 
+    if (
+      options?.status &&
+      (!event.status || !options.status.includes(event.status))
+    ) {
+      return false
+    }
+
     if (options?.notifiedBy === UserFilter.enum.user) {
       if (event.legalStatuses?.NOTIFIED?.createdBy !== user.id) {
         return false

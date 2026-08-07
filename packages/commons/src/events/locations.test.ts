@@ -366,6 +366,60 @@ describe('canAccessEventWithScope()', () => {
     })
   })
 
+  describe('status option', () => {
+    test('should access event whose status is included in the filter', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...declaredEvent, status: 'DECLARED' },
+          {
+            type: 'record.edit',
+            options: { status: ['DECLARED'] }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event whose status is not included in the filter', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, status: 'REGISTERED' },
+          {
+            type: 'record.edit',
+            options: { status: ['DECLARED'] }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should not access event with an unknown status when the filter is set', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...declaredEvent, status: undefined },
+          {
+            type: 'record.edit',
+            options: { status: ['DECLARED'] }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access any status when the filter is not set', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, status: 'REGISTERED' },
+          {
+            type: 'record.edit',
+            options: {}
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+  })
+
   test('should not access event if user does not meet any of the scope options', () => {
     // Negative test cases to ensure we don't accidentally remove checks.
     const userFromAnotherOfficeContext = {
