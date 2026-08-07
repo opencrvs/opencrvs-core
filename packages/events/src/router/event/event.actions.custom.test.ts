@@ -188,7 +188,13 @@ describe('event.actions.custom', () => {
         type: 'record.read',
         options: { event: [TENNIS_CLUB_MEMBERSHIP] }
       }),
-      `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
+      encodeScope({
+        type: 'record.custom-action',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP],
+          customActionTypes: [CUSTOM_ACTION_TYPE]
+        }
+      })
     ])
 
     // The event is only created, never declared, so it stays in CREATED state.
