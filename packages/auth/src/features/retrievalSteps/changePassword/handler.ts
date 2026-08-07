@@ -17,7 +17,8 @@ import { changePassword } from '@auth/features/retrievalSteps/changePassword/ser
 import {
   getRetrievalStepInformation,
   RetrievalSteps,
-  deleteRetrievalStepInformation
+  deleteRetrievalStepInformation,
+  RETRIEVAL_FLOW_PASSWORD
 } from '@auth/features/retrievalSteps/verifyUser/service'
 
 interface IPayload {
@@ -36,7 +37,15 @@ export default async function changePasswordHandler(
     throw unauthorized()
   })
 
-  if (retrievalStepInformation.status !== RetrievalSteps.SECURITY_Q_VERIFIED) {
+  // Folded into one guard, one rejection shape: a record that is otherwise
+  // valid but was minted for the username-reminder flow must be rejected
+  // here exactly as an unverified one would be. Two branches with different
+  // rejection shapes for "wrong status" vs "wrong flow" is what caused a
+  // prior Critical on this feature — don't reintroduce that split.
+  if (
+    retrievalStepInformation.status !== RetrievalSteps.SECURITY_Q_VERIFIED ||
+    retrievalStepInformation.retrieveFlow !== RETRIEVAL_FLOW_PASSWORD
+  ) {
     return h.response().code(401)
   }
 

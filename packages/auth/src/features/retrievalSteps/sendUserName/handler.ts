@@ -16,7 +16,8 @@ import { unauthorized } from '@hapi/boom'
 import {
   getRetrievalStepInformation,
   RetrievalSteps,
-  deleteRetrievalStepInformation
+  deleteRetrievalStepInformation,
+  RETRIEVAL_FLOW_USER_NAME
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import { triggerUserEventNotification } from '@opencrvs/commons'
 import { env } from '@auth/environment'
@@ -37,7 +38,15 @@ export default async function sendUserNameHandler(
     throw unauthorized()
   })
 
-  if (retrievalStepInformation.status !== RetrievalSteps.SECURITY_Q_VERIFIED) {
+  // Folded into one guard, one rejection shape: a record that is otherwise
+  // valid but was minted for the password-reset flow must be rejected here
+  // exactly as an unverified one would be. Two branches with different
+  // rejection shapes for "wrong status" vs "wrong flow" is what caused a
+  // prior Critical on this feature — don't reintroduce that split.
+  if (
+    retrievalStepInformation.status !== RetrievalSteps.SECURITY_Q_VERIFIED ||
+    retrievalStepInformation.retrieveFlow !== RETRIEVAL_FLOW_USER_NAME
+  ) {
     return h.response().code(401)
   }
 

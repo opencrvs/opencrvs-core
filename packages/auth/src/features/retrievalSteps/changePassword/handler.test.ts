@@ -34,7 +34,8 @@ describe('password change', () => {
       username: 'fake_user_name',
       mobile: '123123123',
       securityQuestionKey: 'TEST_SECURITY_QUESTION_KEY',
-      scope: []
+      scope: [],
+      retrieveFlow: 'password'
     })
   })
 
@@ -89,7 +90,8 @@ describe('password change', () => {
           username: 'fake_user_name',
           mobile: '123123123',
           securityQuestionKey: 'TEST_SECURITY_QUESTION_KEY',
-          scope: []
+          scope: [],
+          retrieveFlow: 'password'
         }
       )
 
@@ -103,6 +105,63 @@ describe('password change', () => {
       })
 
       expect(res.statusCode).toBe(401)
+    })
+  })
+  describe('when the record was verified under the username-reminder flow', () => {
+    it('rejects with the same 401 shape as a wrong status, since a username-reminder link must not be usable to change a password', async () => {
+      await storeRetrievalStepInformation(
+        'username-flow-nonce',
+        RetrievalSteps.SECURITY_Q_VERIFIED,
+        {
+          userFullName: { firstname: 'Sadman', surname: 'Anik' },
+          userId: '123',
+          username: 'fake_user_name',
+          mobile: '123123123',
+          securityQuestionKey: 'TEST_SECURITY_QUESTION_KEY',
+          scope: [],
+          retrieveFlow: 'username'
+        }
+      )
+      // Same handler branch as the wrong-flow case above (status verified,
+      // but not the flow this handler requires) — used here only to prove
+      // the two rejections are byte-identical, i.e. genuinely the same
+      // branch rather than a lookalike one.
+      await storeRetrievalStepInformation(
+        'wrong-status-nonce',
+        RetrievalSteps.NUMBER_VERIFIED,
+        {
+          userFullName: { firstname: 'Sadman', surname: 'Anik' },
+          userId: '123',
+          username: 'fake_user_name',
+          mobile: '123123123',
+          securityQuestionKey: 'TEST_SECURITY_QUESTION_KEY',
+          scope: [],
+          retrieveFlow: 'password'
+        }
+      )
+
+      const wrongFlowRes = await server.server.inject({
+        method: 'POST',
+        url: '/changePassword',
+        payload: {
+          newPassword: 'newpass',
+          nonce: 'username-flow-nonce'
+        }
+      })
+
+      const wrongStatusRes = await server.server.inject({
+        method: 'POST',
+        url: '/changePassword',
+        payload: {
+          newPassword: 'newpass',
+          nonce: 'wrong-status-nonce'
+        }
+      })
+
+      expect(wrongFlowRes.statusCode).toBe(401)
+      expect(wrongFlowRes.statusCode).toBe(wrongStatusRes.statusCode)
+      expect(wrongFlowRes.payload).toBe(wrongStatusRes.payload)
+      expect(changePasswordSpy).not.toHaveBeenCalled()
     })
   })
 })

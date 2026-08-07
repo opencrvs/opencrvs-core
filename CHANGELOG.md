@@ -40,6 +40,7 @@ Archiving a NOTIFIED (incomplete) record used to clear `InherentFlags.INCOMPLETE
 - **Country configs must add two new notification templates, `password-reset-link` and `username-reminder-link`, before upgrading.** Without them the recovery notification cannot be sent, so account recovery fails closed for every user.
 - **`POST /auth/verifyNumber` has been removed**, together with its gateway route. A client running a login bundle built before this release posts to a route that no longer exists and loses account recovery until it updates.
 - **Recovery links are built from each country config's `LOGIN_URL`.** If that value is wrong for an environment, every recovery link emailed or texted in that environment 404s when clicked.
+- **Operators may want to drop stale `retrieval_step_*` Redis keys at deploy.** Records written by the pre-branch flow used `redis.set` with no expiry at all, so any left over from before this upgrade persist indefinitely rather than aging out with a TTL. They are rejected on use regardless (a legacy record has no `retrieveFlow`), so this is hygiene rather than a required step.
 
 [#12861](https://github.com/opencrvs/opencrvs-core/issues/12861)
 

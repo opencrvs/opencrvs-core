@@ -92,15 +92,35 @@ export async function deleteRetrievalStepInformation(nonce: string) {
  * Makes an emailed recovery token single-use: the record moves to a fresh
  * nonce and the token the user clicked stops working immediately, so a link
  * left in browser history or a mail archive is inert.
+ *
+ * The old key is claimed with GETDEL — a single atomic read-and-delete —
+ * rather than a separate get then del. Read-then-write-new-then-delete-old
+ * left a window where two concurrent callers could both read the old
+ * record before either deleted it, so both would rotate and two live
+ * nonces would exist for one emailed token. GETDEL closes that window: only
+ * one caller can ever win the old key, and a caller that loses the race
+ * gets `null` and fails closed rather than rotating a token someone else
+ * already claimed.
+ *
+ * `status` is the status to write on the new record, so the caller (e.g.
+ * verifyRecoveryToken) can land the rotated record directly at its target
+ * status in one write, instead of rotating into WAITING_FOR_VERIFICATION
+ * and then immediately overwriting it.
  */
-export async function rotateRetrievalStepNonce(oldNonce: string) {
-  const record = await getRetrievalStepInformation(oldNonce)
+export async function rotateRetrievalStepNonce(
+  oldNonce: string,
+  status: RetrievalSteps
+) {
+  const raw = await redis.getDel(`retrieval_step_${oldNonce}`)
+  if (raw === null) {
+    throw new Error('password/username retrieval step information not found')
+  }
+  const record: IRetrievalStepInformation = JSON.parse(raw)
   const newNonce = generateNonce()
   await redis.setEx(
     `retrieval_step_${newNonce}`,
     env.CONFIG_RECOVERY_LINK_EXPIRY_SECONDS,
-    JSON.stringify(record)
+    JSON.stringify({ ...record, status })
   )
-  await deleteRetrievalStepInformation(oldNonce)
   return newNonce
 }

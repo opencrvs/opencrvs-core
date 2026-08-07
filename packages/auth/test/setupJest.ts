@@ -32,6 +32,16 @@ const mock = {
       const keyExists = !!database[key]
       delete database[key]
       return keyExists ? 1 : 0
+    }),
+    // Mirrors real Redis GETDEL: atomically reads and removes the key in
+    // one step. The synchronous body (no await inside) is what makes the
+    // rotateRetrievalStepNonce race test meaningful under this in-memory
+    // mock — the read-and-delete for one caller fully completes before the
+    // next caller's call is even made.
+    getDel: jest.fn().mockImplementation(async (key) => {
+      const value = database[key] ?? null
+      delete database[key]
+      return value
     })
   }
 }
