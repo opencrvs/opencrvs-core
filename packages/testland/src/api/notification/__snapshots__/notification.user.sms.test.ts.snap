@@ -6,7 +6,7 @@ exports[`User notification - sms > change-email-address 1`] = `"{"messages":[{"d
 
 exports[`User notification - sms > change-phone-number 1`] = `"{"messages":[{"destinations":[{"recipient":"+15551234567"}],"from":"mock_sender","text":"Your OpenCRVS authentication code is: 123456"}]}"`;
 
-exports[`User notification - sms > password-reset-link 1`] = `"{"messages":[{"destinations":[{"recipient":"+15551234567"}],"from":"mock_sender","text":"Farajaland CRS: reset your password using this link. It expires in 1 hour. http://localhost:3020/recover?token&#x3D;recovery-token-password"}]}"`;
+exports[`User notification - sms > password-reset-link 1`] = `"{"messages":[{"destinations":[{"recipient":"+15551234567"}],"from":"mock_sender","text":"Farajaland CRS: reset your password using this link. It expires in 1 hour. http://localhost:3020/recover?token=recovery-token-password"}]}"`;
 
 exports[`User notification - sms > resend-invite 1`] = `"{"messages":[{"destinations":[{"recipient":"+15551234567"}],"from":"mock_sender","text":"Your OpenCRVS account invitation has been resent. Please login with your username: j.doe and temporary password: TempPass123!"}]}"`;
 
@@ -20,4 +20,4 @@ exports[`User notification - sms > user-updated 1`] = `"{"messages":[{"destinati
 
 exports[`User notification - sms > username-reminder 1`] = `"{"messages":[{"destinations":[{"recipient":"+15551234567"}],"from":"mock_sender","text":"Your username for OpenCRVS is: j.doe"}]}"`;
 
-exports[`User notification - sms > username-reminder-link 1`] = `"{"messages":[{"destinations":[{"recipient":"+15551234567"}],"from":"mock_sender","text":"Farajaland CRS: retrieve your username using this link. It expires in 1 hour. http://localhost:3020/recover?token&#x3D;recovery-token-username"}]}"`;
+exports[`User notification - sms > username-reminder-link 1`] = `"{"messages":[{"destinations":[{"recipient":"+15551234567"}],"from":"mock_sender","text":"Farajaland CRS: retrieve your username using this link. It expires in 1 hour. http://localhost:3020/recover?token=recovery-token-username"}]}"`;

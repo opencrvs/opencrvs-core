@@ -288,7 +288,7 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
     </p>
 
     <div style="margin-top: 32px; margin-bottom: 32px">
-      <a href="http://localhost:3020/recover?token&#x3D;recovery-token-password">Reset your password</a>
+      <a href="http://localhost:3020/recover?token=recovery-token-password">Reset your password</a>
     </div>
     <br />
     <p>
@@ -838,7 +838,7 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
     </p>
 
     <div style="margin-top: 32px; margin-bottom: 32px">
-      <a href="http://localhost:3020/recover?token&#x3D;recovery-token-username">Retrieve your username</a>
+      <a href="http://localhost:3020/recover?token=recovery-token-username">Retrieve your username</a>
     </div>
     <br />
     <p>
