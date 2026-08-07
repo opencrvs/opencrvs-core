@@ -383,7 +383,7 @@ function matchesFlagsFilter(
  *
  */
 export function canAccessEventWithScope(
-  event: Partial<EventIndexWithAdministrativeHierarchy>,
+  event: EventIndexWithAdministrativeHierarchy,
   scope: RecordScopeV2,
   user: UserContext | SystemContext,
   customActionType?: string
@@ -420,6 +420,13 @@ export function canAccessEventWithScope(
 
   if (scopeUsesDeclaredOptions(scope)) {
     const { options } = scope
+
+    if (
+      options?.status &&
+      (!event.status || !options.status.includes(event.status))
+    ) {
+      return false
+    }
 
     if (options?.notifiedBy === UserFilter.enum.user) {
       if (event.legalStatuses?.NOTIFIED?.createdBy !== user.id) {
@@ -601,7 +608,7 @@ export function canAccessOtherUserWithScopes({
  * One of the scopes must allow access for the event to be accessible.
  */
 export function userCanAccessEventWithScopes(
-  event: Partial<EventIndexWithAdministrativeHierarchy>,
+  event: EventIndexWithAdministrativeHierarchy,
   scopes: RecordScopeV2[],
   user: UserContext | SystemContext,
   customActionType?: string
