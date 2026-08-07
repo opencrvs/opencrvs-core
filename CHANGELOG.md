@@ -96,6 +96,7 @@ A new `integration.audit.read` scope guards it; country configs must assign it t
 - Bust the locally cached data when a user's office or role changes, so stale drafts and records from the previous office no longer appear after the change
 - Stop showing an empty `Comment` section in the record audit history for archived records. Archiving from the action menu never asked for a comment, so the section only ever displayed a `-` placeholder. Records archived through the "mark as duplicate" flow still show the comment that was entered there [#13265](https://github.com/opencrvs/opencrvs-core/issues/13265)
 - Stop `/auth/verifyUser` from revealing whether a submitted email or mobile number belongs to a registered account, and stop the username-reminder flow from returning the account's security-question key with no proof the caller controls the mailbox — see "Breaking changes" above for the required country-config migration [#12861](https://github.com/opencrvs/opencrvs-core/issues/12861)
+- Stop offering custom actions (e.g. `ESCALATE`) on a draft. Executing one deleted the draft while leaving the event undeclared, making the record impossible to find again [#13245](https://github.com/opencrvs/opencrvs-core/issues/13245)
 
 ## 2.0.0
 
