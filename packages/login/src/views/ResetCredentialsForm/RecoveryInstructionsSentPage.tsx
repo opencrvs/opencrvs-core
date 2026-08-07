@@ -9,25 +9,33 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Frame } from '@opencrvs/components/lib/Frame'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
+import { Stack } from '@opencrvs/components/lib/Stack'
 import { Text } from '@opencrvs/components/lib/Text'
+import { CountryLogo } from '@opencrvs/components/lib/icons'
+import {
+  Container,
+  LogoContainer
+} from '@login/views/ResetCredentialsForm/Commons'
 import React from 'react'
-import { injectIntl, WrappedComponentProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 import { constantsMessages } from '@login/i18n/messages/constants'
+import { selectCountryLogo } from '@login/login/selectors'
+import { IStoreState } from '@login/store'
 import { useLocation, useNavigate } from 'react-router-dom'
 import * as routes from '@login/navigation/routes'
+
+type Props = IntlShapeProps & { logo: string | undefined }
 
 /*
  * Terminal screen, shown whether or not the account exists. No resend button
  * on purpose: it would need a nonce the client never received, and offering
  * one would reintroduce the enumeration oracle. Users who got nothing restart.
  */
-const RecoveryInstructionsSentComponent = ({
-  intl
-}: WrappedComponentProps) => {
+const RecoveryInstructionsSentComponent = ({ intl, logo }: Props) => {
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -43,41 +51,50 @@ const RecoveryInstructionsSentComponent = ({
         constantsMessages.skipToMainContent
       )}
     >
-      <Content
-        size={ContentSize.SMALL}
-        title={intl.formatMessage(
-          notificationMethod === 'sms'
-            ? messages.recoveryInstructionsSentTitlePhone
-            : messages.recoveryInstructionsSentTitleEmail
-        )}
-        showTitleOnMobile
-        bottomActionButtons={[
-          <Button
-            key="1"
-            id="login-button"
-            type="primary"
-            size="large"
-            onClick={() => navigate(routes.STEP_ONE)}
-          >
-            {intl.formatMessage(messages.loginButtonLabel)}
-          </Button>
-        ]}
-      >
-        <Text
-          id="recovery-instructions-sent-body"
-          variant="reg16"
-          element="p"
-          color="grey500"
-        >
-          {intl.formatMessage(messages.recoveryInstructionsSentBody, {
-            forgottenItem
-          })}
-        </Text>
-      </Content>
+      <Frame.LayoutCentered>
+        <Container id="recovery-instructions-sent-page">
+          <Stack direction="column" alignItems="stretch" gap={24}>
+            <LogoContainer>
+              <CountryLogo src={logo} />
+            </LogoContainer>
+            <Stack direction="column" alignItems="center">
+              <Text variant="h2" element="h1" align="center">
+                {intl.formatMessage(
+                  notificationMethod === 'sms'
+                    ? messages.recoveryInstructionsSentTitlePhone
+                    : messages.recoveryInstructionsSentTitleEmail
+                )}
+              </Text>
+              <Text
+                id="recovery-instructions-sent-body"
+                variant="reg18"
+                element="p"
+                align="center"
+                color="grey500"
+              >
+                {intl.formatMessage(messages.recoveryInstructionsSentBody, {
+                  forgottenItem
+                })}
+              </Text>
+            </Stack>
+
+            <Button
+              type="primary"
+              size="large"
+              id="login-button"
+              onClick={() => navigate(routes.STEP_ONE)}
+            >
+              {intl.formatMessage(messages.loginButtonLabel)}
+            </Button>
+          </Stack>
+        </Container>
+      </Frame.LayoutCentered>
     </Frame>
   )
 }
 
-export const RecoveryInstructionsSent = injectIntl(
-  RecoveryInstructionsSentComponent
-)
+export const RecoveryInstructionsSent = connect((state: IStoreState) => {
+  return {
+    logo: selectCountryLogo(state)
+  }
+})(injectIntl(RecoveryInstructionsSentComponent))

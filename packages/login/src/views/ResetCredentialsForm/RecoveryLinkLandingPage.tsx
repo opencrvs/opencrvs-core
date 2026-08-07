@@ -10,17 +10,27 @@
  */
 import { authApi } from '@login/utils/authApi'
 import { Frame } from '@opencrvs/components/lib/Frame'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
-import { Link } from '@opencrvs/components/lib/Link'
+import { Button } from '@opencrvs/components/lib/Button'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { Stack } from '@opencrvs/components/lib/Stack'
 import { Text } from '@opencrvs/components/lib/Text'
+import { CountryLogo } from '@opencrvs/components/lib/icons'
+import {
+  Container,
+  LogoContainer
+} from '@login/views/ResetCredentialsForm/Commons'
 import React, { useEffect, useState } from 'react'
-import { injectIntl, WrappedComponentProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 import { constantsMessages } from '@login/i18n/messages/constants'
+import { selectCountryLogo } from '@login/login/selectors'
+import { IStoreState } from '@login/store'
 import { useLocation, useNavigate } from 'react-router-dom'
 import * as routes from '@login/navigation/routes'
+
+type Props = IntlShapeProps & { logo: string | undefined }
 
 /*
  * Landing page for the single-use recovery link. Exchanges the `token` query
@@ -34,7 +44,7 @@ import * as routes from '@login/navigation/routes'
  * Expired, already-used and bogus tokens all render identically, so failure
  * never reveals whether the account exists.
  */
-const RecoveryLinkLandingComponent = ({ intl }: WrappedComponentProps) => {
+const RecoveryLinkLandingComponent = ({ intl, logo }: Props) => {
   const location = useLocation()
   const navigate = useNavigate()
   const [failed, setFailed] = useState(false)
@@ -95,29 +105,44 @@ const RecoveryLinkLandingComponent = ({ intl }: WrappedComponentProps) => {
         constantsMessages.skipToMainContent
       )}
     >
-      <Content
-        size={ContentSize.SMALL}
-        title={intl.formatMessage(messages.recoveryLinkExpiredTitle)}
-        showTitleOnMobile
-      >
-        <Text
-          id="recovery-link-expired-body"
-          variant="reg16"
-          element="p"
-          color="grey500"
-        >
-          {intl.formatMessage(messages.recoveryLinkExpiredBody)}
-        </Text>
-        <Link
-          id="recovery-link-expired-restart"
-          font="bold16"
-          onClick={() => navigate(routes.FORGOTTEN_ITEM)}
-        >
-          {intl.formatMessage(messages.recoveryLinkExpiredLinkLabel)}
-        </Link>
-      </Content>
+      <Frame.LayoutCentered>
+        <Container id="recovery-link-expired-page">
+          <Stack direction="column" alignItems="stretch" gap={24}>
+            <LogoContainer>
+              <CountryLogo src={logo} />
+            </LogoContainer>
+            <Stack direction="column" alignItems="center">
+              <Text variant="h2" element="h1" align="center">
+                {intl.formatMessage(messages.recoveryLinkExpiredTitle)}
+              </Text>
+              <Text
+                id="recovery-link-expired-body"
+                variant="reg18"
+                element="p"
+                align="center"
+                color="grey500"
+              >
+                {intl.formatMessage(messages.recoveryLinkExpiredBody)}
+              </Text>
+            </Stack>
+
+            <Button
+              type="primary"
+              size="large"
+              id="recovery-link-expired-restart"
+              onClick={() => navigate(routes.FORGOTTEN_ITEM)}
+            >
+              {intl.formatMessage(messages.recoveryLinkExpiredLinkLabel)}
+            </Button>
+          </Stack>
+        </Container>
+      </Frame.LayoutCentered>
     </Frame>
   )
 }
 
-export const RecoveryLinkLanding = injectIntl(RecoveryLinkLandingComponent)
+export const RecoveryLinkLanding = connect((state: IStoreState) => {
+  return {
+    logo: selectCountryLogo(state)
+  }
+})(injectIntl(RecoveryLinkLandingComponent))
