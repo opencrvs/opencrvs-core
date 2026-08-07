@@ -37,6 +37,62 @@ export const getPublicKey = async (
   }
 };
 
+export const isDirectAuthConfigured = () =>
+  Boolean(env.OPENCRVS_CLIENT_ID && env.OPENCRVS_CLIENT_SECRET);
+
+/**
+ * Obtains a fresh record-specific confirmation token using this integration's
+ * own client credentials (client_credentials grant followed by an OAuth 2.0
+ * token exchange scoped to the event & action being confirmed).
+ *
+ * Compared to using the token stored at registration time, a fresh token
+ * survives OpenCRVS redeployments and attributes the confirmation to this
+ * integration in the record's audit trail.
+ */
+export const getConfirmationToken = async (
+  eventId: string,
+  actionId: string,
+): Promise<string> => {
+  const clientCredentialsParams = new URLSearchParams({
+    client_id: env.OPENCRVS_CLIENT_ID,
+    client_secret: env.OPENCRVS_CLIENT_SECRET,
+    grant_type: "client_credentials",
+  });
+  const clientCredentialsResponse = await fetch(
+    `${env.OPENCRVS_AUTH_URL}/token?${clientCredentialsParams}`,
+    { method: "POST" },
+  );
+  if (!clientCredentialsResponse.ok) {
+    throw new OpenCRVSError(
+      `client_credentials authentication failed: ${clientCredentialsResponse.status} ${await clientCredentialsResponse.text()}`,
+    );
+  }
+  const { access_token: systemToken } =
+    (await clientCredentialsResponse.json()) as { access_token: string };
+
+  const tokenExchangeParams = new URLSearchParams({
+    grant_type: "urn:opencrvs:oauth:grant-type:token-exchange",
+    subject_token: systemToken,
+    subject_token_type: "urn:ietf:params:oauth:token-type:access_token",
+    requested_token_type: "urn:opencrvs:oauth:token-type:single_record_token",
+    event_id: eventId,
+    action_id: actionId,
+  });
+  const tokenExchangeResponse = await fetch(
+    `${env.OPENCRVS_AUTH_URL}/token?${tokenExchangeParams}`,
+    { method: "POST" },
+  );
+  if (!tokenExchangeResponse.ok) {
+    throw new OpenCRVSError(
+      `Token exchange failed: ${tokenExchangeResponse.status} ${await tokenExchangeResponse.text()}`,
+    );
+  }
+  const { access_token: confirmationToken } =
+    (await tokenExchangeResponse.json()) as { access_token: string };
+
+  return confirmationToken;
+};
+
 export const confirmRegistration = (
   {
     eventId,

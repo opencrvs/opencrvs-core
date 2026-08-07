@@ -22,6 +22,18 @@ export const env = cleanEnv(process.env, {
     devDefault: "http://localhost:4040/.well-known",
     desc: "OpenCRVS public key URL. Used to verify JWT authenticity",
   }),
+  OPENCRVS_AUTH_URL: str({
+    devDefault: "http://localhost:4040",
+    desc: "OpenCRVS auth service URL. Used to obtain tokens with the integration's own client credentials",
+  }),
+  OPENCRVS_CLIENT_ID: str({
+    default: "",
+    desc: "Client ID of this integration's OpenCRVS system client. A National System Admin obtains it from the OpenCRVS Integrations page (Reveal keys). When set together with OPENCRVS_CLIENT_SECRET, registration confirmations authenticate with a freshly issued token instead of the one stored at registration time, so they survive OpenCRVS redeployments and are audited as this integration.",
+  }),
+  OPENCRVS_CLIENT_SECRET: str({
+    default: "",
+    desc: "Client secret of this integration's OpenCRVS system client. A National System Admin obtains it from the OpenCRVS Integrations page (Refresh secret).",
+  }),
 
   // MOSIP Auth manager
   MOSIP_AUTH_URL: str({
