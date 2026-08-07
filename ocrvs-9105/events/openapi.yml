@@ -3279,6 +3279,7 @@ components:
                                 - notifiedBy
                                 - declaredIn
                                 - declaredBy
+                                - status
                                 - registeredIn
                                 - registeredBy
                                 - flags
@@ -3557,6 +3558,7 @@ components:
                                 - notifiedBy
                                 - declaredIn
                                 - declaredBy
+                                - status
                                 - registeredIn
                                 - registeredBy
                                 - flags
@@ -4233,6 +4235,7 @@ components:
                             - notifiedBy
                             - declaredIn
                             - declaredBy
+                            - status
                             - registeredIn
                             - registeredBy
                             - flags
@@ -9381,6 +9384,7 @@ components:
                             - notifiedBy
                             - declaredIn
                             - declaredBy
+                            - status
                             - registeredIn
                             - registeredBy
                             - flags
@@ -9869,6 +9873,7 @@ components:
                             - notifiedBy
                             - declaredIn
                             - declaredBy
+                            - status
                             - registeredIn
                             - registeredBy
                             - flags
@@ -15036,6 +15041,7 @@ components:
                                   - notifiedBy
                                   - declaredIn
                                   - declaredBy
+                                  - status
                                   - registeredIn
                                   - registeredBy
                                   - flags
@@ -15350,6 +15356,7 @@ components:
                                   - notifiedBy
                                   - declaredIn
                                   - declaredBy
+                                  - status
                                   - registeredIn
                                   - registeredBy
                                   - flags
