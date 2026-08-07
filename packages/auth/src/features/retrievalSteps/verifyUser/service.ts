@@ -11,6 +11,8 @@
 import { redis } from '@auth/database'
 import { UserName } from '@opencrvs/commons'
 import { internalClient } from '@auth/features/authenticate/service'
+import { generateNonce } from '@auth/features/verifyCode/service'
+import { env } from '@auth/environment'
 
 export const RETRIEVAL_FLOW_USER_NAME = 'username'
 export const RETRIEVAL_FLOW_PASSWORD = 'password'
@@ -51,8 +53,9 @@ export async function storeRetrievalStepInformation(
   status: RetrievalSteps,
   retrievalStepInformation: Omit<IRetrievalStepInformation, 'status'>
 ) {
-  return redis.set(
+  return redis.setEx(
     `retrieval_step_${nonce}`,
+    env.CONFIG_RECOVERY_LINK_EXPIRY_SECONDS,
     JSON.stringify({ ...retrievalStepInformation, status })
   )
 }
@@ -68,4 +71,21 @@ export async function getRetrievalStepInformation(
 }
 export async function deleteRetrievalStepInformation(nonce: string) {
   await redis.del(`retrieval_step_${nonce}`)
+}
+
+/**
+ * Makes an emailed recovery token single-use: the record moves to a fresh
+ * nonce and the token the user clicked stops working immediately, so a link
+ * left in browser history or a mail archive is inert.
+ */
+export async function rotateRetrievalStepNonce(oldNonce: string) {
+  const record = await getRetrievalStepInformation(oldNonce)
+  const newNonce = generateNonce()
+  await redis.setEx(
+    `retrieval_step_${newNonce}`,
+    env.CONFIG_RECOVERY_LINK_EXPIRY_SECONDS,
+    JSON.stringify(record)
+  )
+  await deleteRetrievalStepInformation(oldNonce)
+  return newNonce
 }
