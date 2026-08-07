@@ -65,24 +65,18 @@ describe('rate-limited auth proxy', () => {
     }
   )
 
-  // verifyRecoveryToken exchanges the single-use token from the emailed
-  // recovery link — its payload carries `token`, not `nonce`, so it is kept
-  // out of the nonce-keyed table above.
-  it('proxies verifyRecoveryToken when the token key is present', () => {
+  // verifyRecoveryToken is deliberately NOT keyed on its payload's `token`
+  // field: that field is the secret being brute-forced, so keying on it
+  // would let every guess land in its own fresh Redis bucket and the cap
+  // would never fire (the original pentest finding this route closes). It
+  // is rate limited on a static key instead — a single shared bucket for
+  // the whole route — so it proxies regardless of what the payload
+  // contains, unlike the nonce-keyed routes above.
+  it('proxies verifyRecoveryToken without requiring any payload field, since it is rate limited on a static key rather than on the token', () => {
     const route = rateLimitedAuthProxy.verifyRecoveryToken
-    const result = route.handler(
-      ...makeArgs({ token: 'abc123' }, '/auth/verifyRecoveryToken')
-    )
+    const result = route.handler(...makeArgs({}, '/auth/verifyRecoveryToken'))
 
     expect(result).toBe('PROXIED')
-  })
-
-  it('throws on verifyRecoveryToken when the token key is missing (fails closed)', () => {
-    const route = rateLimitedAuthProxy.verifyRecoveryToken
-
-    expect(() =>
-      route.handler(...makeArgs({}, '/auth/verifyRecoveryToken'))
-    ).toThrow("Couldn't find the value for a rate limiting key in payload")
   })
 
   it('registers every rate-limited auth route before the catch-all is reachable', () => {

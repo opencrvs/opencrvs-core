@@ -146,13 +146,18 @@ export const rateLimitedAuthProxy = {
   },
   // Password/username retrieval flow. Exchanges the single-use token minted
   // by the emailed recovery link (see verifyUser) for a nonce and security
-  // question — keyed on that token, not a nonce, since none exists yet.
+  // question.
   verifyRecoveryToken: {
     method: 'POST',
     path: '/auth/verifyRecoveryToken',
     handler: rateLimitedRoute(
-      // Brute-force vector on the recovery token — the retrieval-flow twin of verifyCode.
-      { requestsPerMinute: 10, pathForKey: 'token' },
+      // Unlike verifyCode (keyed on nonce while guessing code), the secret
+      // here IS the key candidate — keying on `token` would let every guess
+      // land in its own fresh bucket, making the cap a no-op. The token has
+      // 128 bits of entropy, so brute force is infeasible regardless; this
+      // is a global cap on the route to bound Redis/auth load from an
+      // unauthenticated endpoint, not a per-secret throttle.
+      { requestsPerMinute: 60, staticKey: 'verify-recovery-token' },
       (_, h) =>
         h.proxy({
           uri: AUTH_URL + '/verifyRecoveryToken'
