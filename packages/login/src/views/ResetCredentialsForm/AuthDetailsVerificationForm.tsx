@@ -94,8 +94,15 @@ const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
       return
     }
 
+    /*
+     * /verifyUser always resolves 200 with an empty body, whether or not
+     * the account exists — that is the account-enumeration fix. The try
+     * and catch branches below are therefore identical on purpose: the UI
+     * must not offer any signal (different route, different message,
+     * different timing) that would let a caller tell the two cases apart.
+     */
     try {
-      const { nonce, securityQuestionKey } = await authApi.verifyUser({
+      await authApi.verifyUser({
         mobile:
           notificationMethod === 'sms'
             ? convertToMSISDN(phone, window.config.COUNTRY)
@@ -103,34 +110,9 @@ const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
         email: notificationMethod === 'email' ? email : undefined,
         retrieveFlow: forgottenItem
       })
-
-      if (securityQuestionKey) {
-        return navigate(routes.SECURITY_QUESTION, {
-          state: {
-            nonce,
-            securityQuestionKey,
-            forgottenItem
-          }
-        })
-      }
-
-      navigate(routes.RECOVERY_CODE_ENTRY, {
-        state: {
-          nonce,
-          mobile: phone,
-          email,
-          forgottenItem
-        }
-      })
-    } catch (err) {
-      setError(true)
-      setErrorMessage(
-        intl.formatMessage(
-          notificationMethod === 'sms'
-            ? messages.errorPhoneNumberNotFound
-            : messages.errorEmailAddressNotFound
-        )
-      )
+      navigate(routes.RECOVERY_LINK_SENT, { state: { forgottenItem } })
+    } catch {
+      navigate(routes.RECOVERY_LINK_SENT, { state: { forgottenItem } })
     }
   }
 

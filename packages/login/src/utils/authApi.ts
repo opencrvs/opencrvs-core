@@ -126,13 +126,12 @@ const authenticate = (data: IAuthenticationData) => {
 
 const resendAuthenticationCode = (
   nonce: string,
-  notificationEvent: NotificationEvent,
-  retrievalFlow = false
+  notificationEvent: NotificationEvent
 ) => {
   return request({
     url: '/api/auth/resendAuthenticationCode',
     method: 'POST',
-    data: { nonce, notificationEvent, retrievalFlow }
+    data: { nonce, notificationEvent }
   })
 }
 
@@ -144,20 +143,21 @@ const verifyCode = (data: ICodeVerifyData): Promise<IAuthenticateResponse> => {
   })
 }
 
-interface IUserVerifyResponse {
-  nonce: string
-  securityQuestionKey?: string
-}
-
 interface IUserVerificationDetails {
   mobile?: string
   email?: string
   retrieveFlow: string
 }
 
+/*
+ * Always resolves with an empty body, whether or not the account exists —
+ * this is the account-enumeration fix. The server emails/SMSes a single-use
+ * recovery link if (and only if) it found a matching account; the client
+ * has no way to tell, and must not try to.
+ */
 const verifyUser = (
   verificationDetails: IUserVerificationDetails
-): Promise<IUserVerifyResponse> => {
+): Promise<void> => {
   return request({
     url: '/api/auth/verifyUser',
     method: 'POST',
@@ -165,19 +165,24 @@ const verifyUser = (
   })
 }
 
-interface IVerifyNumberResponse {
+export interface IVerifyRecoveryTokenResponse {
   nonce: string
   securityQuestionKey: string
+  retrieveFlow: string
 }
 
-const verifyNumber = (
-  nonce: string,
-  code: string
-): Promise<IVerifyNumberResponse> => {
+/*
+ * Exchanges the single-use token from the recovery link for a nonce and
+ * the security question to ask next. Rotates the nonce server-side, so the
+ * emailed link is dead the moment it is redeemed.
+ */
+const verifyRecoveryToken = (
+  token: string
+): Promise<IVerifyRecoveryTokenResponse> => {
   return request({
-    url: '/api/auth/verifyNumber',
+    url: '/api/auth/verifyRecoveryToken',
     method: 'POST',
-    data: { nonce, code }
+    data: { token }
   })
 }
 
@@ -221,8 +226,8 @@ export const authApi = {
   authenticate,
   verifyCode,
   resendAuthenticationCode,
-  verifyNumber,
   verifyUser,
+  verifyRecoveryToken,
   verifySecurityAnswer,
   changePassword,
   sendUserName,
