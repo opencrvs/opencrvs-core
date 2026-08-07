@@ -144,3 +144,19 @@ export async function ensureFreshAccessToken(): Promise<void> {
 
   return inFlightRefresh
 }
+
+/**
+ * Unlike {@link ensureFreshAccessToken}, always mints a new access token
+ * regardless of whether the current one is still fresh. Used by the
+ * dev-only `window.__refreshToken` helper to pick up scope/role changes
+ * made server-side without waiting for the access token to near expiry.
+ */
+export async function forceRefreshAccessToken(): Promise<void> {
+  if (!inFlightRefresh) {
+    inFlightRefresh = performRefresh().finally(() => {
+      inFlightRefresh = null
+    })
+  }
+
+  return inFlightRefresh
+}

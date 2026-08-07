@@ -23,7 +23,6 @@ import { CREDENTIALS } from '../../../constants'
 import { assertRecordInWorkqueue, REQUIRED_VALIDATION_ERROR } from '../helpers'
 import { ensureAssignedToUser } from '../../../utils'
 import { openRecordByTitle } from '../../print-certificate/birth/helpers'
-import { title } from 'process'
 
 test.describe.serial('9. Birth declaration case - 9', () => {
   let page: Page
@@ -154,12 +153,10 @@ test.describe.serial('9. Birth declaration case - 9', () => {
       )
 
       /*
-       * Expected result: should require
+       * Expected result: should be absent. Required, but not visible to HO
        * - Mother's date of birth
        */
-      await expect(page.getByTestId('row-value-mother.dob')).toContainText(
-        REQUIRED_VALIDATION_ERROR
-      )
+      await expect(page.getByTestId('row-value-mother.dob')).not.toBeVisible()
 
       /*
        * Expected result: should require

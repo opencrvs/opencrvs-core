@@ -77,6 +77,7 @@ spec:
       containers:
         - name: countryconfig
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.countryconfig) | quote }}
+          imagePullPolicy: {{ .Values.countryconfig.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           env:
           {{- include "render-otel-env-vars" (dict "Values" .Values "Release" .Release) }}
             - name: CERT_PUBLIC_KEY_PATH

@@ -15,6 +15,7 @@ import { UUID } from './uuid'
 import { getScopes } from './authentication'
 import { Role } from './roles'
 import { ContainsFlags } from './events/Flag'
+import { EventStatus } from './events/EventStatus'
 
 export const JurisdictionFilter = z
   .enum(['administrativeArea', 'location', 'all'])
@@ -92,6 +93,16 @@ const scopeByEvent = z
   )
   .describe('Event type, e.g. birth, death')
 
+const scopeByStatus = z
+  // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
+  .preprocess(
+    (val) => (val === undefined ? undefined : [val].flat()),
+    z.array(EventStatus).optional()
+  )
+  .describe(
+    'Restricts the scope to records currently in one of these statuses.'
+  )
+
 const userRole = z
   // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
   .preprocess(
@@ -112,7 +123,8 @@ const scopeOptionsDeclaredOrNotified = scopeOptionsPlaceEvent
     notifiedIn: JurisdictionFilter.optional(),
     notifiedBy: UserFilter.optional(),
     declaredIn: JurisdictionFilter.optional(),
-    declaredBy: UserFilter.optional()
+    declaredBy: UserFilter.optional(),
+    status: scopeByStatus
   })
   .describe('Options applicable to actions that may take place after DECLARE')
 

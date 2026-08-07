@@ -396,6 +396,24 @@ describe('2.0 scopes', () => {
     })
   })
 
+  it('Supports status option for record.edit', () => {
+    const scopeWithStatus = encodeScope({
+      type: 'record.edit',
+      options: {
+        event: ['birth'],
+        status: ['DECLARED']
+      }
+    })
+
+    expect(decodeScope(scopeWithStatus)).toEqual({
+      type: 'record.edit',
+      options: {
+        event: ['birth'],
+        status: ['DECLARED']
+      }
+    })
+  })
+
   it('V1 record.registered.print-certified-copies with templates migrates to V2 with templates preserved', () => {
     const v1Scope =
       'record.registered.print-certified-copies[event=birth|death,templates=cert-1|cert-2]'

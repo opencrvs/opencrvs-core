@@ -52,6 +52,7 @@ spec:
       containers:
         - name: events
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.events) }}
+          imagePullPolicy: {{ .Values.events.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           env:
           {{- include "render-otel-env-vars" (dict "Values" .Values "Release" .Release) }}
             - name: AUTH_URL

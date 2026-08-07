@@ -52,6 +52,7 @@ spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.client) | nindent 6 }}
       containers:
         - image: {{ include "opencrvs.image" (dict "root" . "service" .Values.client) }}
+          imagePullPolicy: {{ .Values.client.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           name: client
           env:
           {{- if and

@@ -157,7 +157,11 @@ export type MarkNotDuplicateActionInput = z.infer<
 export const ArchiveActionInput = BaseActionInput.extend(
   z.object({
     type: z.literal(ActionType.ARCHIVE).default(ActionType.ARCHIVE),
-    content: ReasonContent
+    /**
+     * Archiving does not collect a reason on its own. Only the
+     * "mark as duplicate" flow archives with a reason attached.
+     */
+    content: ReasonContent.optional()
   }).shape
 )
 export type ArchiveActionInput = z.infer<typeof ArchiveActionInput>
