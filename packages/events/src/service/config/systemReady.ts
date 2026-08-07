@@ -20,7 +20,7 @@ const MAX_DELAY_MS = 30000
 /** A peer that accepts the connection but never answers must not hang the loop */
 const REQUEST_TIMEOUT_MS = 5000
 
-function delay(ms: number) {
+async function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 

@@ -25,7 +25,7 @@ function response(status: number) {
   return {
     ok: status >= 200 && status < 300,
     status,
-    text: async () => ''
+    text: async () => Promise.resolve('')
   } as unknown as Awaited<ReturnType<typeof fetch>>
 }
 
