@@ -19,7 +19,7 @@ import { describe, expect, it } from 'vitest'
  * @opencrvs/commons nor the client, which is also why it needs no 'unsafe-eval'.
  */
 const nginxConf = fs.readFileSync(
-  path.join(__dirname, '..', 'nginx.conf'),
+  path.join(__dirname, '..', 'nginx.template.conf'),
   'utf8'
 )
 
@@ -27,7 +27,9 @@ function getDirectives(conf: string): Record<string, string[]> {
   const header = conf.match(/add_header Content-Security-Policy "([^"]+)"/)?.[1]
 
   if (!header) {
-    throw new Error('No Content-Security-Policy header found in nginx.conf')
+    throw new Error(
+      'No Content-Security-Policy header found in nginx.template.conf'
+    )
   }
 
   return Object.fromEntries(
