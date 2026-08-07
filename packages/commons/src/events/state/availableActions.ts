@@ -22,8 +22,7 @@ const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
     ActionType.READ,
     ActionType.DECLARE,
     ActionType.NOTIFY,
-    ActionType.DELETE,
-    ActionType.CUSTOM
+    ActionType.DELETE
   ],
   [EventStatus.enum.NOTIFIED]: [
     ActionType.READ,
