@@ -206,6 +206,12 @@ const messagesToDefine = {
     defaultMessage: 'Login',
     description: 'Label used for login button'
   },
+  backToLoginButtonLabel: {
+    id: 'buttons.backToLogin',
+    defaultMessage: 'Back to login',
+    description:
+      'Label used to leave a screen that is waiting on an emailed link, where logging in is not yet possible'
+  },
   error: {
     id: 'label.error',
     defaultMessage: 'Invalid input',

@@ -1,4 +1,5 @@
 id,description,en,fr
+buttons.backToLogin,"Label used to leave a screen that is waiting on an emailed link, where logging in is not yet possible",Back to login,Retour à la connexion
 buttons.confirm,Label used for confirm button,Confirm,Confirmer
 buttons.continue,Label used for continue button,Continue,Continuer
 buttons.login,The title that appears in step one of the form,Login,Se connecter

@@ -84,7 +84,7 @@ const RecoveryInstructionsSentComponent = ({ intl, logo }: Props) => {
               id="login-button"
               onClick={() => navigate(routes.STEP_ONE)}
             >
-              {intl.formatMessage(messages.loginButtonLabel)}
+              {intl.formatMessage(messages.backToLoginButtonLabel)}
             </Button>
           </Stack>
         </Container>
