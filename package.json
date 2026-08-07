@@ -5,7 +5,8 @@
   "private": true,
   "os": [
     "darwin",
-    "linux"
+    "linux",
+    "win32"
   ],
   "engines": {
     "node": "22.x.x"
