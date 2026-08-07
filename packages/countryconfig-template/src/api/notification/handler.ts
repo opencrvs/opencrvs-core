@@ -283,6 +283,15 @@ function convertPayloadToVariable({
         temporaryPassword: payload.temporaryPassword
       }
 
+    case TriggerEvent.PASSWORD_RESET_LINK:
+    case TriggerEvent.USERNAME_REMINDER_LINK:
+      return {
+        firstname,
+        applicationName: applicationConfig.APPLICATION_NAME,
+        countryLogo: COUNTRY_LOGO_URL,
+        recoveryURL: `${LOGIN_URL}recover?token=${encodeURIComponent(payload.token)}`
+      }
+
     case TriggerEvent.RESEND_INVITE:
       return {
         firstname,
