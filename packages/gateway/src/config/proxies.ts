@@ -144,17 +144,18 @@ export const rateLimitedAuthProxy = {
       }
     }
   },
-  // Password/username retrieval flow. Every step keys on the nonce minted by
-  // verifyUser, so brute-force and SMS flooding are capped per retrieval attempt.
-  verifyNumber: {
+  // Password/username retrieval flow. Exchanges the single-use token minted
+  // by the emailed recovery link (see verifyUser) for a nonce and security
+  // question — keyed on that token, not a nonce, since none exists yet.
+  verifyRecoveryToken: {
     method: 'POST',
-    path: '/auth/verifyNumber',
+    path: '/auth/verifyRecoveryToken',
     handler: rateLimitedRoute(
-      // OTP brute-force vector — the retrieval-flow twin of verifyCode.
-      { requestsPerMinute: 10, pathForKey: 'nonce' },
+      // Brute-force vector on the recovery token — the retrieval-flow twin of verifyCode.
+      { requestsPerMinute: 10, pathForKey: 'token' },
       (_, h) =>
         h.proxy({
-          uri: AUTH_URL + '/verifyNumber'
+          uri: AUTH_URL + '/verifyRecoveryToken'
         })
     ),
     options: {

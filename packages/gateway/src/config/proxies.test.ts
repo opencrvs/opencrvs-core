@@ -39,7 +39,6 @@ describe('rate-limited auth proxy', () => {
   const nonceKeyedRoutes = [
     ['verifyCode', '/auth/verifyCode'],
     ['resendAuthenticationCode', '/auth/resendAuthenticationCode'],
-    ['verifyNumber', '/auth/verifyNumber'],
     ['verifySecurityAnswer', '/auth/verifySecurityAnswer'],
     ['sendUserName', '/auth/sendUserName'],
     ['changePassword', '/auth/changePassword']
@@ -66,6 +65,26 @@ describe('rate-limited auth proxy', () => {
     }
   )
 
+  // verifyRecoveryToken exchanges the single-use token from the emailed
+  // recovery link — its payload carries `token`, not `nonce`, so it is kept
+  // out of the nonce-keyed table above.
+  it('proxies verifyRecoveryToken when the token key is present', () => {
+    const route = rateLimitedAuthProxy.verifyRecoveryToken
+    const result = route.handler(
+      ...makeArgs({ token: 'abc123' }, '/auth/verifyRecoveryToken')
+    )
+
+    expect(result).toBe('PROXIED')
+  })
+
+  it('throws on verifyRecoveryToken when the token key is missing (fails closed)', () => {
+    const route = rateLimitedAuthProxy.verifyRecoveryToken
+
+    expect(() =>
+      route.handler(...makeArgs({}, '/auth/verifyRecoveryToken'))
+    ).toThrow("Couldn't find the value for a rate limiting key in payload")
+  })
+
   it('registers every rate-limited auth route before the catch-all is reachable', () => {
     const paths = getRoutes().map((route) => route.path)
 
@@ -74,6 +93,7 @@ describe('rate-limited auth proxy', () => {
     for (const [, path] of nonceKeyedRoutes) {
       expect(paths).toContain(path)
     }
+    expect(paths).toContain('/auth/verifyRecoveryToken')
     expect(paths).toContain('/auth/{suffix}')
   })
 })
