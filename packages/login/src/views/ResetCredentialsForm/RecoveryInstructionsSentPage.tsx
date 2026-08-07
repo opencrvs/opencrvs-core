@@ -21,11 +21,9 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import * as routes from '@login/navigation/routes'
 
 /*
- * Terminal screen shown after /verifyUser is called, no matter whether the
- * account exists. There is deliberately no resend button here: a resend
- * would need a nonce the client never received, and adding one would
- * reintroduce the account-enumeration oracle this flow exists to close.
- * If the user got nothing, they start over from the forgotten item form.
+ * Terminal screen, shown whether or not the account exists. No resend button
+ * on purpose: it would need a nonce the client never received, and offering
+ * one would reintroduce the enumeration oracle. Users who got nothing restart.
  */
 const RecoveryInstructionsSentComponent = ({
   intl

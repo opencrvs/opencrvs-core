@@ -138,22 +138,13 @@ export async function triggerUserEventNotification<T extends TriggerEvent>({
   )
 
   /*
-   * Every caller of this function has the same blind spot: some `await`
-   * the result and inspect `.ok` themselves, some don't, and at least one
-   * fire-and-forget caller (auth's verifyUser handler) never gets the
-   * chance to, by design. A non-2xx response — a 404 because a country
-   * config forgot to register a trigger route, a 500 from a broken
-   * template — must not vanish just because a particular caller didn't
-   * check. Centralizing the check here means every caller gets it for
-   * free, without changing what any of them see: the body is left
-   * untouched (no .json()/.text() call) so callers that read it
-   * themselves, e.g. the announcement worker, still can.
+   * Checked here rather than per caller: most callers never inspect `.ok`, and
+   * the fire-and-forget one cannot. A 404 from an unregistered trigger route
+   * would otherwise vanish silently. The body is left unread so callers that
+   * consume it still can.
    *
-   * Deliberately logs only the event name and status code. This function
-   * is reachable from an unauthenticated endpoint (verifyUser), so the
-   * recipient's email/mobile in `payload.recipient` must never end up in
-   * this log line — an attacker spraying identifiers must not be able to
-   * use it to harvest or confirm PII.
+   * Logs the event and status only — this is reachable from an unauthenticated
+   * endpoint, so the recipient must never reach the log.
    */
   if (!response.ok) {
     logger.error(

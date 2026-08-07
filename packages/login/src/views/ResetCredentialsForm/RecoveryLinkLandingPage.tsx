@@ -23,20 +23,16 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import * as routes from '@login/navigation/routes'
 
 /*
- * Landing page for the single-use recovery link emailed/texted by
- * /verifyUser. It exchanges the `token` query param for a nonce and
- * security question via /verifyRecoveryToken, then hands off to the
- * security question step exactly as the deleted 6-digit code entry step
- * used to.
+ * Landing page for the single-use recovery link. Exchanges the `token` query
+ * param for a nonce and security question, then hands off to the security
+ * question step.
  *
- * `forgottenItem` is read from the exchange response (`retrieveFlow`), not
- * from the URL: a flow carried in the URL would be attacker-controlled, and
- * whoever holds a password-reset link could edit it into a username
- * reminder and be sent a username they never requested.
+ * `forgottenItem` comes from the exchange response, never the URL — a flow in
+ * the URL is attacker-controlled, so a password-reset link could be edited
+ * into a username reminder.
  *
- * On failure the message must not reveal whether the underlying account
- * exists — an expired, already-used, or entirely bogus token all render
- * the same way.
+ * Expired, already-used and bogus tokens all render identically, so failure
+ * never reveals whether the account exists.
  */
 const RecoveryLinkLandingComponent = ({ intl }: WrappedComponentProps) => {
   const location = useLocation()
@@ -46,9 +42,7 @@ const RecoveryLinkLandingComponent = ({ intl }: WrappedComponentProps) => {
   useEffect(() => {
     const token = new URLSearchParams(location.search).get('token')
 
-    // Reset so a second link's exchange shows the spinner again rather than
-    // carrying over the first token's expired/failed message while the new
-    // exchange is in flight.
+    // A second link shows the spinner again rather than the first one's error.
     setFailed(false)
 
     const exchangeToken = async () => {
@@ -75,12 +69,8 @@ const RecoveryLinkLandingComponent = ({ intl }: WrappedComponentProps) => {
     }
 
     exchangeToken()
-    // Keyed on location.search rather than []: clicking a second recovery
-    // link while already on /recover updates the query string without
-    // remounting this component, so the effect must rerun to exchange the
-    // new token instead of leaving a stale spinner/expired-message on
-    // screen from the first token's outcome. (No StrictMode in this app,
-    // so there is no double-invoke concern here.)
+    // Keyed on location.search, not []: a second link updates the query string
+    // without remounting, so the effect must rerun to exchange the new token.
   }, [location.search])
 
   if (!failed) {

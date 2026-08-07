@@ -76,13 +76,8 @@ const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
     if (notificationMethod === 'sms' && (!phone || error)) {
       setError(true)
       setTouched(true)
-      /*
-       * Both branches are format-validation failures (empty, or not a valid
-       * phone number) — never "not found". /verifyUser always returns an
-       * empty 200 regardless of whether the account exists, so "not found"
-       * is not a state this UI can legitimately observe, and showing it
-       * here would hint at an oracle that no longer exists.
-       */
+      // Both branches are format failures, never "not found" — that is not a
+      // state this UI can observe now, and claiming it would hint at an oracle.
       setErrorMessage(intl.formatMessage(validationMessages.phoneNumberFormat))
       return
     }
@@ -93,13 +88,8 @@ const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
       return
     }
 
-    /*
-     * /verifyUser always resolves 200 with an empty body, whether or not
-     * the account exists — that is the account-enumeration fix. The try
-     * and catch branches below are therefore identical on purpose: the UI
-     * must not offer any signal (different route, different message,
-     * different timing) that would let a caller tell the two cases apart.
-     */
+    // /verifyUser answers 200 empty either way, so try and catch are identical
+    // on purpose: no route, message or timing may distinguish the two cases.
     try {
       await authApi.verifyUser({
         mobile:

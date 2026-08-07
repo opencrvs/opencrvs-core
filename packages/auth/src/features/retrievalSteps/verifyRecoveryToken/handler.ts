@@ -31,12 +31,9 @@ interface IVerifyRecoveryTokenResponse {
 }
 
 /*
- * Possession of the emailed token is the proof of mailbox control that a
- * typed 6-digit code used to provide, so exchanging it advances the
- * retrieval record exactly as the old code-entry step used to. Rotating the
- * nonce on exchange makes the token single-use: the URL the user clicked
- * stops working the moment it is redeemed, so a copy left in browser
- * history or a mail archive is inert.
+ * Holding the emailed token is the proof of mailbox control the old 6-digit
+ * code provided, so exchanging it advances the record the same way. Rotating
+ * the nonce makes it single-use — the clicked URL dies on redemption.
  */
 export default async function verifyRecoveryTokenHandler(
   request: Hapi.Request,
@@ -58,23 +55,17 @@ export default async function verifyRecoveryTokenHandler(
   }
 
   /*
-   * A record with no retrieveFlow predates this field: the recovery link
-   * was emailed before this change deployed. We cannot safely guess which
-   * flow it belongs to, so reject rather than default to either flow. These
-   * legacy records were written with `redis.set` and no expiry at all, so
-   * they persist indefinitely rather than dying with a TTL — operators
-   * should drop stale `retrieval_step_*` keys at deploy rather than rely on
-   * them expiring. The user can request a fresh link.
+   * No retrieveFlow means the link was emailed before this field existed.
+   * Guessing the flow could send the wrong thing, so reject and let the user
+   * request a fresh link. These legacy records were written without a TTL, so
+   * operators should drop stale `retrieval_step_*` keys at deploy.
    */
   if (!retrievalStepInformation.retrieveFlow) {
     throw unauthorized()
   }
 
-  // GETDEL inside rotateRetrievalStepNonce makes the claim atomic: if a
-  // second concurrent exchange of this same token already won the race and
-  // deleted the key, this throws and the loser fails closed with the same
-  // 401 shape as any other invalid token — not a 500 that would reveal a
-  // race happened.
+  // Rotation claims the key atomically; a concurrent exchange that loses the
+  // race throws here and fails closed with the same 401 as any invalid token.
   const nonce = await rotateRetrievalStepNonce(
     token,
     RetrievalSteps.NUMBER_VERIFIED

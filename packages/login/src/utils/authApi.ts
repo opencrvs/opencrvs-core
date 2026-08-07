@@ -150,10 +150,9 @@ interface IUserVerificationDetails {
 }
 
 /*
- * Always resolves with an empty body, whether or not the account exists —
- * this is the account-enumeration fix. The server emails/SMSes a single-use
- * recovery link if (and only if) it found a matching account; the client
- * has no way to tell, and must not try to.
+ * Always resolves with an empty body, account or not — the enumeration fix.
+ * The server emails a single-use link only if it found one; the client cannot
+ * tell, and must not try to.
  */
 const verifyUser = (
   verificationDetails: IUserVerificationDetails
@@ -172,9 +171,8 @@ export interface IVerifyRecoveryTokenResponse {
 }
 
 /*
- * Exchanges the single-use token from the recovery link for a nonce and
- * the security question to ask next. Rotates the nonce server-side, so the
- * emailed link is dead the moment it is redeemed.
+ * Exchanges the recovery link's single-use token for a nonce and the next
+ * security question. The server rotates the nonce, killing the emailed link.
  */
 const verifyRecoveryToken = (
   token: string

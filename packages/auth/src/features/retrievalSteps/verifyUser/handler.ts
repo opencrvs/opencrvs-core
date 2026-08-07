@@ -45,10 +45,8 @@ export default async function verifyUserHandler(
     ? RETRIEVAL_FLOW_USER_NAME
     : RETRIEVAL_FLOW_PASSWORD
 
-  // Signed on both the found and not-found paths, and before the try block,
-  // so this awaited work — not whether a user exists — is what the response
-  // timing reflects. It is only ever used on the found path, but signing it
-  // unconditionally keeps the two paths' awaited work identical.
+  // Signed unconditionally, before the try, so both paths await the same work
+  // and response timing cannot reveal whether the user exists.
   const authHeader = {
     Authorization: `Bearer ${await createToken(
       'auth',
@@ -73,16 +71,8 @@ export default async function verifyUserHandler(
       { ...result, retrieveFlow }
     )
 
-    /*
-     * Deliberately not awaited. countryconfig's notify() blocks on the
-     * actual SMTP/SMS send, which takes anywhere from hundreds of
-     * milliseconds to several seconds — awaiting it here would make the
-     * response latency itself an oracle: fast for an unknown identifier
-     * (one tRPC lookup), slow for a known one (lookup + sign + HTTP + mail
-     * send). The response must not depend on the dispatch outcome anyway,
-     * so there is nothing gained by waiting for it. Do not add the await
-     * back.
-     */
+    // Not awaited on purpose: countryconfig blocks on the SMTP/SMS send, so
+    // awaiting would make response latency an oracle. Do not add the await back.
     void triggerUserEventNotification({
       event: isUserNameRetrievalFlow
         ? TriggerEvent.USERNAME_REMINDER_LINK
@@ -99,14 +89,8 @@ export default async function verifyUserHandler(
       authHeader
     }).catch((err) => logger.error(err))
   } catch (err) {
-    /*
-     * Every failure — no such user, no security questions configured, events
-     * service down — is swallowed on purpose. The response must not vary
-     * with whether the account exists, and a 500 here would be exactly the
-     * oracle this endpoint exists to avoid. (Notification dispatch failure
-     * is handled separately above, since it is fire-and-forget and never
-     * reaches this catch.)
-     */
+    // Swallowed on purpose: no such user, no security questions, and events
+    // being down must all look alike. A 500 here would be the oracle itself.
     logger.error(err)
   }
 

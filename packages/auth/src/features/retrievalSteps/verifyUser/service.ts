@@ -52,14 +52,10 @@ export interface IRetrievalStepInformation {
   scope: string[]
   status: RetrievalSteps
   /**
-   * Which retrieval flow ('username' reminder or 'password' reset) this
-   * token belongs to. Decided once, server-side, at /verifyUser time, and
-   * carried on the record rather than the URL so a token holder cannot
-   * rewrite it to receive a flow they were never sent.
-   *
-   * Optional because records written before this field existed (recovery
-   * links already emailed pre-deploy) have no value here — callers reading
-   * the record must treat a missing value as "unknown flow", never guess.
+   * Decided server-side at /verifyUser time and kept off the URL, so a token
+   * holder cannot rewrite it into a flow they were never sent. Optional only
+   * because links emailed before this field existed lack it — treat a missing
+   * value as unknown, never guess.
    */
   retrieveFlow?: RetrieveFlow
 }
@@ -89,23 +85,14 @@ export async function deleteRetrievalStepInformation(nonce: string) {
 }
 
 /**
- * Makes an emailed recovery token single-use: the record moves to a fresh
- * nonce and the token the user clicked stops working immediately, so a link
- * left in browser history or a mail archive is inert.
+ * Makes an emailed token single-use: the record moves to a fresh nonce, so a
+ * link left in browser history or a mail archive is inert.
  *
- * The old key is claimed with GETDEL — a single atomic read-and-delete —
- * rather than a separate get then del. Read-then-write-new-then-delete-old
- * left a window where two concurrent callers could both read the old
- * record before either deleted it, so both would rotate and two live
- * nonces would exist for one emailed token. GETDEL closes that window: only
- * one caller can ever win the old key, and a caller that loses the race
- * gets `null` and fails closed rather than rotating a token someone else
- * already claimed.
+ * GETDEL claims the old key atomically. A separate get-then-delete let two
+ * concurrent callers both read it and both rotate, leaving two live nonces for
+ * one token; now the loser gets null and fails closed.
  *
- * `status` is the status to write on the new record, so the caller (e.g.
- * verifyRecoveryToken) can land the rotated record directly at its target
- * status in one write, instead of rotating into WAITING_FOR_VERIFICATION
- * and then immediately overwriting it.
+ * `status` lands the rotated record at its target in one write.
  */
 export async function rotateRetrievalStepNonce(
   oldNonce: string,
