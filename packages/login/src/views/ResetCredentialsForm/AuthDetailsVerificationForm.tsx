@@ -76,21 +76,20 @@ const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
     if (notificationMethod === 'sms' && (!phone || error)) {
       setError(true)
       setTouched(true)
-      setErrorMessage(
-        !phone
-          ? intl.formatMessage(validationMessages.phoneNumberFormat)
-          : intl.formatMessage(messages.errorPhoneNumberNotFound)
-      )
+      /*
+       * Both branches are format-validation failures (empty, or not a valid
+       * phone number) — never "not found". /verifyUser always returns an
+       * empty 200 regardless of whether the account exists, so "not found"
+       * is not a state this UI can legitimately observe, and showing it
+       * here would hint at an oracle that no longer exists.
+       */
+      setErrorMessage(intl.formatMessage(validationMessages.phoneNumberFormat))
       return
     }
     if (notificationMethod === 'email' && (!email || error)) {
       setError(true)
       setTouched(true)
-      setErrorMessage(
-        !email
-          ? intl.formatMessage(validationMessages.emailAddressFormat)
-          : intl.formatMessage(messages.errorEmailAddressNotFound)
-      )
+      setErrorMessage(intl.formatMessage(validationMessages.emailAddressFormat))
       return
     }
 

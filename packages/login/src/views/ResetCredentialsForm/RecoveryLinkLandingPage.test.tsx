@@ -141,4 +141,62 @@ describe('Recovery link landing page', () => {
       expect(router.state.location.pathname).toContain(routes.FORGOTTEN_ITEM)
     })
   })
+
+  describe('given a second recovery link is opened while already on this page', () => {
+    it('exchanges the new token instead of leaving the first token\'s stale outcome on screen', async () => {
+      server.use(
+        rest.post('/api/auth/verifyRecoveryToken', (req, res, ctx) => {
+          return res(ctx.status(401))
+        })
+      )
+
+      const testApp = await createTestApp({
+        initialEntries: [`${routes.RECOVERY_LINK_LANDING}?token=first-bad-token`]
+      })
+      app = testApp.app
+      router = testApp.router
+      app.update()
+
+      await flushPromises()
+      app.update()
+
+      // The first, invalid token has already rendered the expired message.
+      expect(app.text()).toContain('This link is no longer valid')
+
+      server.resetHandlers()
+      server.use(
+        rest.post('/api/auth/verifyRecoveryToken', (req, res, ctx) => {
+          return res(
+            ctx.json({
+              nonce: 'second-token-nonce',
+              securityQuestionKey: 'FAVORITE_MOVIE',
+              retrieveFlow: 'password'
+            })
+          )
+        })
+      )
+
+      // A second recovery link is opened — the query string changes, but
+      // since the route is the same, the component does not remount.
+      router.navigate(
+        `${routes.RECOVERY_LINK_LANDING}?token=second-good-token`
+      )
+      app.update()
+
+      await flushPromises()
+      app.update()
+      await waitFor(() =>
+        router.state.location.pathname.includes(routes.SECURITY_QUESTION)
+      )
+
+      expect(router.state.location.pathname).toContain(
+        routes.SECURITY_QUESTION
+      )
+      expect(router.state.location.state).toEqual({
+        nonce: 'second-token-nonce',
+        securityQuestionKey: 'FAVORITE_MOVIE',
+        forgottenItem: 'password'
+      })
+    })
+  })
 })

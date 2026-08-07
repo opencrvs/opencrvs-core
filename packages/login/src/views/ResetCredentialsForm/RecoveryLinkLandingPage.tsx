@@ -46,6 +46,11 @@ const RecoveryLinkLandingComponent = ({ intl }: WrappedComponentProps) => {
   useEffect(() => {
     const token = new URLSearchParams(location.search).get('token')
 
+    // Reset so a second link's exchange shows the spinner again rather than
+    // carrying over the first token's expired/failed message while the new
+    // exchange is in flight.
+    setFailed(false)
+
     const exchangeToken = async () => {
       if (!token) {
         setFailed(true)
@@ -69,9 +74,14 @@ const RecoveryLinkLandingComponent = ({ intl }: WrappedComponentProps) => {
       }
     }
 
-    // Only ever run once, against the token the page was loaded with.
     exchangeToken()
-  }, [])
+    // Keyed on location.search rather than []: clicking a second recovery
+    // link while already on /recover updates the query string without
+    // remounting this component, so the effect must rerun to exchange the
+    // new token instead of leaving a stale spinner/expired-message on
+    // screen from the first token's outcome. (No StrictMode in this app,
+    // so there is no double-invoke concern here.)
+  }, [location.search])
 
   if (!failed) {
     return (

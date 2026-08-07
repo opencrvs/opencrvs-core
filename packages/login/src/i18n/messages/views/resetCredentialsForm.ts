@@ -210,16 +210,6 @@ const messagesToDefine = {
     id: 'label.error',
     defaultMessage: 'Invalid input',
     description: 'Generic error message for invalid form nput'
-  },
-  errorPhoneNumberNotFound: {
-    id: 'error.errorPhoneNumberNotFound',
-    defaultMessage: 'Mobile phone number not found.',
-    description: 'Error message for phone number not found'
-  },
-  errorEmailAddressNotFound: {
-    id: 'error.errorEmailAddressNotFound',
-    defaultMessage: 'Email address not found.',
-    description: 'Error message for email address not found'
   }
 }
 

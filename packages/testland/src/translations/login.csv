@@ -5,8 +5,6 @@ buttons.login,The title that appears in step one of the form,Login,Se connecter
 constants.emailAddress,Label used for email address input field,Email address,Adresse e-mail
 constants.phoneNumber,Label used for phone number input field,Phone number,Numéro de téléphone
 constants.skipToMainContent,Label for a keyboard accessibility link which skips to the main content,Skip to main content,Passer au contenu principal
-error.errorEmailAddressNotFound,Error message for email address not found,Email address not found.,Adresse e-mail introuvable.
-error.errorPhoneNumberNotFound,Error message for phone number not found,Phone number not found,Numéro de téléphone mobile non trouvé.
 error.networkError,The error that appears when there is no internet connection,Unable to connect to server,Impossible de se connecter au serveur
 error.required.password,New password required,Invalid password,Le nouveau mot de passe n'est pas valide
 label.error,Generic error message for invalid form nput,Invalid input,Entrée invalide
