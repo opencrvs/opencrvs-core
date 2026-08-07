@@ -164,7 +164,7 @@ const verifyUser = (
   })
 }
 
-export interface IVerifyRecoveryTokenResponse {
+interface IVerifyRecoveryTokenResponse {
   nonce: string
   securityQuestionKey: string
   retrieveFlow: string
