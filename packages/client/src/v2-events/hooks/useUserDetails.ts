@@ -50,13 +50,14 @@ export function useUserDetails() {
     name: string
     role: string | undefined
   } => {
-    const role = formatUserRole(createdByRole, intl)
-
+    // Systems and integrations have no role by design. Resolving one anyway
+    // would render as "Unknown", since formatUserRole falls through to its
+    // `other` branch for an absent role.
     if (type === ActionType.DUPLICATE_DETECTED) {
       return {
         type: 'system',
         name: intl.formatMessage(messages.system),
-        role
+        role: undefined
       } as const
     }
 
@@ -66,9 +67,11 @@ export function useUserDetails() {
       return {
         type: 'integration',
         name: system.name,
-        role
+        role: undefined
       } as const
     }
+
+    const role = formatUserRole(createdByRole, intl)
 
     if (!user) {
       return {
