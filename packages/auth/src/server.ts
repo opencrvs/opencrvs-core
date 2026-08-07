@@ -42,8 +42,7 @@ import invalidateTokenHandler, {
   reqInvalidateTokenSchema
 } from '@auth/features/invalidateToken/handler'
 import verifyUserHandler, {
-  requestSchema as reqVerifyUserSchema,
-  responseSchema as resVerifyUserSchema
+  requestSchema as reqVerifyUserSchema
 } from '@auth/features/retrievalSteps/verifyUser/handler'
 import verifyNumberHandler, {
   requestSchema as reqVerifyNumberSchema,
@@ -306,7 +305,7 @@ export async function createServer() {
         payload: reqVerifyUserSchema
       },
       response: {
-        schema: resVerifyUserSchema
+        schema: false
       }
     }
   })

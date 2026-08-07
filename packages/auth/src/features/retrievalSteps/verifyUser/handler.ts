@@ -17,66 +17,79 @@ import {
   RETRIEVAL_FLOW_USER_NAME,
   RETRIEVAL_FLOW_PASSWORD
 } from '@auth/features/retrievalSteps/verifyUser/service'
-import { generateAndSendVerificationCode } from '@auth/features/authenticate/service'
+import { generateNonce } from '@auth/features/verifyCode/service'
+import { createToken } from '@auth/features/authenticate/service'
+import { JWT_ISSUER } from '@auth/constants'
+import { env } from '@auth/environment'
 import {
-  NotificationEvent,
-  generateNonce
-} from '@auth/features/verifyCode/service'
-import { unauthorized } from '@hapi/boom'
+  logger,
+  triggerUserEventNotification,
+  TriggerEvent,
+  TokenUserType
+} from '@opencrvs/commons'
+
 interface IVerifyUserPayload {
   mobile?: string
   email?: string
   retrieveFlow: string
 }
 
-interface IVerifyUserResponse {
-  nonce: string
-  securityQuestionKey?: string
-}
-
 export default async function verifyUserHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
-): Promise<IVerifyUserResponse> {
+) {
   const payload = request.payload as IVerifyUserPayload
-  let result
-  try {
-    result = await verifyUser({ mobile: payload.mobile, email: payload.email })
-  } catch (err) {
-    throw unauthorized()
-  }
-  const nonce = generateNonce()
   const isUserNameRetrievalFlow =
     payload.retrieveFlow.toLowerCase() === RETRIEVAL_FLOW_USER_NAME
 
-  await storeRetrievalStepInformation(
-    nonce,
-    isUserNameRetrievalFlow
-      ? RetrievalSteps.NUMBER_VERIFIED
-      : RetrievalSteps.WAITING_FOR_VERIFICATION,
-    result
-  )
+  try {
+    const result = await verifyUser({
+      mobile: payload.mobile,
+      email: payload.email
+    })
+    const token = generateNonce()
 
-  if (!isUserNameRetrievalFlow) {
-    const notificationEvent = NotificationEvent.PASSWORD_RESET
-
-    await generateAndSendVerificationCode(
-      nonce,
-      result.scope,
-      notificationEvent,
-      result.userFullName,
-      result.mobile,
-      result.email
+    await storeRetrievalStepInformation(
+      token,
+      RetrievalSteps.WAITING_FOR_VERIFICATION,
+      result
     )
+
+    await triggerUserEventNotification({
+      event: isUserNameRetrievalFlow
+        ? TriggerEvent.USERNAME_REMINDER_LINK
+        : TriggerEvent.PASSWORD_RESET_LINK,
+      payload: {
+        token,
+        recipient: {
+          name: result.userFullName,
+          mobile: result.mobile,
+          email: result.email
+        }
+      },
+      countryConfigUrl: env.COUNTRY_CONFIG_URL_INTERNAL,
+      authHeader: {
+        Authorization: `Bearer ${await createToken(
+          'auth',
+          [],
+          ['opencrvs:countryconfig-user'],
+          JWT_ISSUER,
+          undefined,
+          TokenUserType.enum.system
+        )}`
+      }
+    })
+  } catch (err) {
+    /*
+     * Every failure — no such user, no security questions configured, events
+     * service down, notification dispatch failed — is swallowed on purpose.
+     * The response must not vary with whether the account exists, and a 500
+     * here would be exactly the oracle this endpoint exists to avoid.
+     */
+    logger.error(err)
   }
 
-  const response: IVerifyUserResponse = {
-    nonce
-  }
-  if (isUserNameRetrievalFlow) {
-    response.securityQuestionKey = result.securityQuestionKey
-  }
-  return response
+  return h.response().code(200)
 }
 
 export const requestSchema = Joi.object({
@@ -85,9 +98,4 @@ export const requestSchema = Joi.object({
   retrieveFlow: Joi.string()
     .valid(RETRIEVAL_FLOW_USER_NAME, RETRIEVAL_FLOW_PASSWORD)
     .required()
-})
-
-export const responseSchema = Joi.object({
-  nonce: Joi.string().required(),
-  securityQuestionKey: Joi.string().optional()
 })
