@@ -44,10 +44,10 @@ import invalidateTokenHandler, {
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema
 } from '@auth/features/retrievalSteps/verifyUser/handler'
-import verifyNumberHandler, {
-  requestSchema as reqVerifyNumberSchema,
-  responseSchema as resVerifyNumberSchema
-} from '@auth/features/retrievalSteps/verifyNumber/handler'
+import verifyRecoveryTokenHandler, {
+  requestSchema as reqVerifyRecoveryTokenSchema,
+  responseSchema as resVerifyRecoveryTokenSchema
+} from '@auth/features/retrievalSteps/verifyRecoveryToken/handler'
 import verifySecurityQuestionHandler, {
   verifySecurityQuestionSchema,
   verifySecurityQuestionResSchema
@@ -310,24 +310,25 @@ export async function createServer() {
     }
   })
 
-  // curl -H 'Content-Type: application/json' -d '{ "mobile": "" }' http://localhost:4040/verifyUser
-
+  // curl -H 'Content-Type: application/json' -d '{ "token": "" }' http://localhost:4040/verifyRecoveryToken
   server.route({
     method: 'POST',
-    path: '/verifyNumber',
-    handler: verifyNumberHandler,
+    path: '/verifyRecoveryToken',
+    handler: verifyRecoveryTokenHandler,
     options: {
       tags: ['api'],
       description:
         'Second step of password or username retrieval steps.' +
-        'Check if provided verification code is valid or not.',
+        'Exchanges the token from an emailed/texted recovery link for a nonce.',
       notes:
-        'Verifies code for given nonce and returns a random security question for that user.',
+        'Verifies the recovery token, rotates it to a fresh single-use nonce, ' +
+        'and returns a random security question for that user. ' +
+        'Not to be confused with /verifyToken, which checks the invalid-token blocklist.',
       validate: {
-        payload: reqVerifyNumberSchema
+        payload: reqVerifyRecoveryTokenSchema
       },
       response: {
-        schema: resVerifyNumberSchema
+        schema: resVerifyRecoveryTokenSchema
       }
     }
   })
