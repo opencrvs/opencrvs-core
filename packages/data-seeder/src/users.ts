@@ -207,7 +207,7 @@ export function parseUsers(document: unknown): UserRead {
 }
 
 export async function readUsers(token: string): Promise<UserRead> {
-  const url = new URL('config/users', env.COUNTRY_CONFIG_HOST).toString()
+  const url = new URL('config/users', env.COUNTRY_CONFIG_URL).toString()
   const res = await fetch(url, {
     method: 'GET',
     headers: {

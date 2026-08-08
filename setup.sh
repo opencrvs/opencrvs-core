@@ -150,13 +150,6 @@ echo -e "\033[32m::::::::::::: Please enter your sudo password when prompted :::
 echo
 if [ -d "data" ] ; then sudo rm -r data ; fi
 openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem
-mkdir -p data/elasticsearch
-chmod 775 data/elasticsearch
-
-mkdir -p data/minio
-chmod 775 data/minio
-mkdir -p data/postgres
-chmod 775 data/postgres
 
 echo -e "\033[32m:::::::::::::::::::: Building OpenCRVS dependencies ::::::::::::::::::::\033[0m"
 echo

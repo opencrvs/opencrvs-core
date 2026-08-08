@@ -17,7 +17,7 @@ module.exports = defineConfig([
   { ignores: ['build/**/*', 'eslint*'] },
   ...baseConfig,
   {
-    files: ['./src/**/*.js'],
+    files: ['./src/**/*.js', './src/**/*.ts', './vitest.config.ts'],
     languageOptions: {
       sourceType: 'module'
     }

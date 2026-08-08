@@ -6,6 +6,7 @@ packages:
   - 'packages/components'
   # - 'packages/countryconfig-template' Intentionally removed. Lerna reads pnpm-workspace.yaml but does not recognize negation. Hence explicit inclusion for all packages.
   - 'packages/data-seeder'
+  - 'packages/dev-cli'
   - 'packages/documents'
   - 'packages/esignet-mock'
   - 'packages/events'
