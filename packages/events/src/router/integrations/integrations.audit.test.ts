@@ -42,7 +42,7 @@ async function captureError(promise: Promise<unknown>) {
   throw new Error('Expected the call to be refused, but it resolved')
 }
 
-function sleep(ms: number) {
+async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 

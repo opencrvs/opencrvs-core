@@ -1,0 +1,161 @@
+# Multiple local development environments on shared dependencies
+
+## Status
+
+accepted
+
+## Context
+
+Developers (and coding agents working in git worktrees) need to run several
+isolated OpenCRVS stacks on one machine at once — one per branch/worktree — so
+that parallel work does not clobber a shared database or fight over ports.
+Running N full sets of dependencies (Postgres, Elasticsearch, Redis, MinIO) per
+environment is too heavy. The production e2e setup
+(`opencrvs/e2e`) already solves the analogous problem in Kubernetes: many
+feature environments in one cluster, each a namespace, all sharing a single
+dependency instance with logical isolation inside each datastore. This ADR
+adapts that model to local host-based development (`pnpm dev`).
+
+## Decision
+
+**One shared dependency singleton; N per-environment sets of host node
+processes.** Isolation is logical, inside each shared datastore, keyed off an
+environment `name`.
+
+### Identity and addressing
+
+- An **environment** is identified by a `name` — the sanitized basename of the
+  git worktree directory. `--env <name>` overrides. The **primary** (non-linked)
+  checkout maps to **slot 0**, preserving today's behaviour exactly.
+- A machine-level **registry** (`~/.local/state/opencrvs/envs.json`) maps
+  `name → slot`, allocating the lowest free slot. Slots ≥ 6 are refused.
+- Host ports are derived: `port = base + slot * 10000`. Slot 0 leaves every port
+  at its current value. The highest base port (`documents`, `9050`) caps the
+  scheme at slot 5 (`9050 + 6*10000` overflows the 16-bit port range), giving
+  **6 concurrent environments (slots 0–5)**.
+
+### Per-environment isolation (all injected as env vars by `dev.sh`)
+
+| Dependency    | Isolation knob                      | Value                                                        |
+| ------------- | ----------------------------------- | ------------------------------------------------------------ |
+| Postgres      | one database, shared schemas within | `events_<name>` via `EVENTS_POSTGRES_URL` + `TARGET_DB`      |
+| Elasticsearch | index prefix                        | `ES_INDEX_PREFIX=events_<name>`                              |
+| Elasticsearch | reindexing-status index             | `ES_REINDEXING_STATUS_INDEX=events_<name>_reindexing_status` |
+| MinIO         | bucket                              | `MINIO_BUCKET=<name>--ocrvs`                                 |
+| Redis         | logical DB index                    | `REDIS_DB=<slot>` (0–15)                                     |
+
+- Elasticsearch isolation is **almost** just the index prefix: `packages/events`
+  derives every index name it uses from `ES_INDEX_PREFIX`, and that's the only
+  Elasticsearch-backed service in this codebase — the legacy search service a
+  second, `ocrvs`-named index once belonged to is gone (nothing remains under
+  `packages/search` but a stale `node_modules`). **Correction (found during
+  implementation):** there is one exception.
+  `getReindexingStatusIndexName()` in `packages/events/src/storage/elasticsearch.ts`
+  returns `env.ES_REINDEXING_STATUS_INDEX` verbatim (default `reindexing_status`)
+  rather than composing from the prefix, so the prefix alone would leave every
+  environment sharing one reindexing-status index. It is already env-driven, so
+  no service code changed — the resolver simply emits it per environment.
+
+### Two deliberate departures from the tables above
+
+Both were decided during implementation, where a literal reading of this ADR
+would have produced a broken or backward-incompatible stack:
+
+1. **The MinIO bucket keeps hyphens.** The `-` → `_` fold that makes a name safe
+   as a Postgres identifier produces an _invalid_ S3/MinIO bucket name —
+   underscores are not permitted. So `dbName` and `esPrefix` fold to `_`, while
+   the bucket folds to `-`: worktree `feature-a` yields database
+   `events_feature_a` but bucket `feature-a--ocrvs`. This matches the literal
+   `<name>--ocrvs` in the table above.
+2. **The default environment keeps today's identifiers.** The table's uniform
+   `events_<name>` would silently move the primary checkout onto a new empty
+   database, contradicting the spec's first user story ("exactly today's ports
+   and the `events` database"). So the primary (non-linked) worktree **with no
+   `--env` override** resolves to `events` / `events` / `ocrvs` / Redis `0` —
+   byte-for-byte today's behaviour, no re-seed. Every _named_ environment
+   (`--env <name>`, or any linked worktree) gets the derived identifiers. The
+   trigger is deliberately "is the default environment", not `slot === 0`, so
+   that `--env foo` in the primary checkout still gets its own data.
+
+- Postgres uses **one database per environment** holding the `app`, `analytics`,
+  and `reference_data` schemas (they are schemas, not separate databases).
+  Postgres **roles are shared** across environments and provisioned
+  idempotently (create-or-alter); isolation is the database boundary, not the
+  role.
+- **JWT signing keys are per environment**; each generates its own on first
+  `pnpm dev`. This was originally specified as machine-wide sharing, but
+  `.secrets/*` is gitignored and every service resolves its key as
+  `../../.secrets/*.pem` — relative to _its own_ worktree root — so a linked
+  worktree necessarily gets its own pair. Confirmed as intended rather than
+  papered over: each environment is internally consistent (its auth signs, its
+  gateway and events verify) and nothing cross-environment needs a shared key.
+  Environments cannot clobber each other's keys: `dev:secrets:gen` writes the
+  relative path `.secrets/private-key.pem`, and `dev.sh` has already `cd`'d to
+  its own worktree root, so each pair lands in its own directory. Separately,
+  `ensure_secrets` generates only when the pair is missing, which keeps an
+  environment's keys stable across its own restarts — the previous code
+  regenerated on every run, rotating the keypair out from under an open browser
+  session or a pinned external countryconfig.
+
+  One consequence to know: a countryconfig running **outside** these worktrees
+  and pinned to one checkout's `public-key.pem` will reject tokens minted by
+  another environment's auth. Point such a server at the environment it serves,
+  or use the bundled testland countryconfig, which resolves the key from its
+  own worktree automatically.
+
+### Dependency lifecycle
+
+- Dependencies run as a **detached singleton** under docker compose project
+  `-p opencrvs-deps`, backed by **docker named volumes** (not repo-relative bind
+  mounts). Every `pnpm dev` runs an idempotent `up -d`; no environment ever
+  stops them. Teardown is explicit (`deps:down`, or `down -v` to wipe).
+- `dev.sh`'s `docker stop $(docker ps -aq)` sweep and fixed-port preflight are
+  removed — both are hostile to running more than one stack.
+
+### Provisioning and cleanup
+
+- Per-environment Postgres provisioning lives as an **idempotent command in the
+  `migration` package** (reusable by CI): guarded `CREATE DATABASE events_<name>`
+  - shared roles, then migrations. `testland`'s `setup-analytics` /
+    `setup-reference-data` receive `TARGET_DB=events_<name>`. Elasticsearch indices
+    and the MinIO bucket are auto-created by services on boot.
+- `env:destroy <name>` drops the database, ES indices, bucket, and runs
+  `FLUSHDB` on the slot's Redis index, then frees the slot. Lazy GC frees slots
+  whose worktree directory no longer exists but **never silently drops data** —
+  it only warns. Because data is keyed by `name`, slot reuse never touches
+  another environment's data, and re-registering an old `name` resurfaces its
+  data.
+
+### Code that must change from hardcoded to env-driven
+
+- `packages/events` listen port `5555` → `EVENTS_PORT`.
+- `packages/client` and `packages/login` vite `--port` args.
+- `packages/client/vite.config.ts`: `server.proxy` targets (gateway `:7070`,
+  countryconfig `:3040`), the `loginRedirectPlugin` target (`:3020`), and
+  `server.port` — read from `process.env` (exported by `dev.sh`).
+- docker compose project / container names (currently `-p opencrvs`, and an
+  explicit `container_name: postgres`).
+
+## Considered alternatives
+
+- **Hostname routing** (local Traefik/Caddy, `<env>.localhost`) — mirrors e2e
+  1:1 and yields clean URLs, but adds a proxy in the dev loop and vite
+  host-header/HMR friction. Rejected: for worktree dev, a computed port block is
+  simpler and touches nothing in the request path.
+- **N full dependency instances per environment** — trivially isolated but too
+  resource-heavy. This is the thing the ADR exists to avoid.
+- **Per-environment Postgres roles / JWT keys** (as e2e does) — necessary in
+  Kubernetes because of secret-copying and `auth_mode: auto`, but pure overhead
+  on a single trusted local machine.
+
+## Consequences
+
+- Hard cap of 6 concurrent environments from the `slot * 10000` scheme. Raising
+  it means a denser port layout or hostname routing.
+- The dev client is **not** purely runtime-configured: in dev, API routing goes
+  through the vite proxy (build-time `process.env`). Login navigation is
+  same-origin (`/login`), redirected by the vite `loginRedirectPlugin` to the
+  env-driven login port — `window.config.LOGIN_URL` is unset by default and
+  not part of this contract.
+- Switching dependency storage from bind mounts to named volumes orphans any
+  existing `./data` directory once; environments re-seed.

@@ -10,8 +10,36 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-EVENTS_URL="${EVENTS_URL:-http://localhost:5555/}"
-AUTH_URL="${AUTH_URL:-http://localhost:4040/}"
+print_usage_and_exit () {
+  echo 'Usage: pnpm reindex [--env <name>]'
+  echo
+  echo "Rebuilds ONE environment's Elasticsearch indices from its database."
+  echo "With no --env, that is the environment this git worktree owns."
+  echo "Run 'pnpm env:list' to see which environments exist."
+  exit 1
+}
+
+DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)
+cd "$DIR"
+
+# Remembered before the contract is loaded so that an explicitly exported
+# EVENTS_URL / AUTH_URL still wins, as it did before this script resolved an
+# environment of its own.
+EVENTS_URL_OVERRIDE="${EVENTS_URL:-}"
+AUTH_URL_OVERRIDE="${AUTH_URL:-}"
+
+# Which environment's events and auth services to talk to. `packages/dev-cli`
+# owns the port arithmetic; this script only reads the resulting URLs.
+# See development-environment/environment.sh.
+source "$DIR/development-environment/environment.sh"
+opencrvs_env_load "$@" || print_usage_and_exit
+
+EVENTS_URL="${EVENTS_URL_OVERRIDE:-$EVENTS_URL}"
+AUTH_URL="${AUTH_URL_OVERRIDE:-$AUTH_URL}"
+
+echo "Reindexing environment ${OPENCRVS_ENV_NAME} (slot ${OPENCRVS_ENV_SLOT})"
+echo "  events  ${EVENTS_URL}"
+echo "  auth    ${AUTH_URL}"
 # How often (seconds) to poll the status endpoint
 POLL_INTERVAL="${POLL_INTERVAL:-10}"
 # Maximum number of poll iterations (~3 hours at the default interval)

@@ -51,7 +51,7 @@ export async function main() {
   }
   startAnnouncementWorker()
   startTelemetryWorker()
-  server().listen(5555)
+  server().listen(env.EVENTS_PORT)
 }
 
 // Execute when the file is run directly e.g. (ts-node -r tsconfig-paths/register src/index.ts)

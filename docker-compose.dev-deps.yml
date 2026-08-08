@@ -6,38 +6,49 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+# The dependency stack is a machine-wide singleton (docker compose project
+# `opencrvs-deps`), shared by every local environment. Storage therefore lives in
+# docker **named volumes** rather than repo-relative bind mounts, so it is
+# independent of which git worktree started it, and `down -v` is the single wipe
+# path. See docs/adr/0003-multiple-local-environments.md.
+volumes:
+  postgres:
+  elasticsearch:
+  minio:
+
 services:
   # For dependencies, expose ports locally for dev
   postgres:
     image: postgres:17.6
-    container_name: postgres
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
-      - ./packages/migration/src/migrations/postgres/0001_init.sql:/docker-entrypoint-initdb.d/0001_init.sql
+      # Per-environment databases (`events_<name>`), schemas and shared roles are
+      # created by the idempotent provisioning command
+      # (`pnpm --filter @opencrvs/migration provision`), not by an init hook.
+      - postgres:/var/lib/postgresql/data
 
   redis:
     ports:
-      - "6379:6379"
+      - '6379:6379'
 
   elasticsearch:
     ports:
-      - "9200:9200"
-      - "9300:9300"
+      - '9200:9200'
+      - '9300:9300'
     volumes:
-      - "./data/elasticsearch:/usr/share/elasticsearch/data"
+      - 'elasticsearch:/usr/share/elasticsearch/data'
     environment:
-      - "discovery.type=single-node"
+      - 'discovery.type=single-node'
       - "cluster.routing.allocation.disk.watermark.enable_for_single_data_node=\
         true"
-      - "cluster.routing.allocation.disk.threshold_enabled=false"
-      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+      - 'cluster.routing.allocation.disk.threshold_enabled=false'
+      - 'ES_JAVA_OPTS=-Xms1024m -Xmx1024m'
       - xpack.security.enabled=false # elasticsearch >8.x defaults to true
       # - http.port=9200
       # - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358
@@ -55,8 +66,8 @@ services:
       #    - elasticsearch
   minio:
     ports:
-      - "3535:3535"
-      - "3536:3536"
+      - '3535:3535'
+      - '3536:3536'
     volumes:
-      - "./data/minio:/data"
+      - 'minio:/data'
     command: server --address ":3535" --console-address ":3536" /data

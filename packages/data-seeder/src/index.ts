@@ -38,7 +38,7 @@ import {
 async function getToken(): Promise<string> {
   const authUrl = new URL(
     '/auth/authenticate-super-user',
-    env.GATEWAY_HOST
+    env.GATEWAY_URL
   ).toString()
   const res = await fetch(authUrl, {
     method: 'POST',
@@ -68,7 +68,7 @@ async function triggerSystemReady(token: string) {
   console.log('Triggering system ready')
   const systemReadyUrl = new URL(
     'triggers/system/ready',
-    env.COUNTRY_CONFIG_HOST
+    env.COUNTRY_CONFIG_URL
   ).toString()
 
   const res = await fetch(systemReadyUrl, {

@@ -29,7 +29,7 @@ Login with the connection string `postgres://<user>:<password>@localhost:5432/ev
 
 Unlike NoSQL databases, PostgreSQL **requires** writing migrations to create tables where data is written into. This structure is called a schema.
 
-Before migrations are run, the database is initialized using an [init script](../migration/src/migrations/postgres/0001_init.sql). This initialization is ran in the root `docker-compose.dev-deps.yml` file.
+Before migrations are run, the database, its schemas and the shared roles are created by the idempotent provisioning command in [@opencrvs/migration](/packages/migration/README.md): `pnpm --filter @opencrvs/migration provision --name <environment>`. That command also runs the migrations, so provisioning is the single entry point. `pnpm dev` invokes it automatically for the environment it starts.
 
 See [@opencrvs/migration](/packages/migration/README.md) for more information around the migrations. See the first migration to understand the format. If you run migrations, see `## Tests` to update the test migration file.
 
