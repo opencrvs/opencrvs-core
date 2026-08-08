@@ -10,8 +10,9 @@
     "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": ["node", "vitest/globals"]
   },
-  "include": ["src/**/*.js"],
+  "include": ["src/**/*.js", "src/**/*.ts", "vitest.config.ts"],
   "exclude": ["**/node_modules/**"]
 }
