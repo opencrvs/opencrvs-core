@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { cleanEnv, str, url, bool, num } from 'envalid'
+import { cleanEnv, str, url, bool, num, port } from 'envalid'
 
 /**
  * When defining variables aim to be consistent with existing values.
@@ -17,6 +17,10 @@ import { cleanEnv, str, url, bool, num } from 'envalid'
  */
 export const env = cleanEnv(process.env, {
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
+  EVENTS_PORT: port({
+    default: 5555,
+    desc: 'Port the events service listens on. Derived per local development environment (slot) so several stacks can run side by side; defaults to the historical fixed port.'
+  }),
   EVENTS_POSTGRES_URL: url({
     devDefault: 'postgres://events_app:app_password@localhost:5432/events'
   }),

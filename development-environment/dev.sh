@@ -9,6 +9,11 @@
 set -e
 DIR=$(cd "$(dirname "$0")"; pwd)
 
+# Everything below assumes the repository root: the docker compose `-f` paths in
+# the root package.json are relative to it, and `resolve` derives this
+# environment's identity from the enclosing git worktree.
+cd "$DIR/.."
+
 export LANGUAGES="en,fr"
 
 if [  -n "$(uname -a | grep Ubuntu)" ]; then
@@ -28,14 +33,18 @@ fi
 # so more experienced users can run the stack across different terminal windows.
 # --no-testland excludes the bundled testland countryconfig from the dev sweep,
 # for devs running against an external countryconfig checkout (two-terminal, unchanged).
+# --env <name> pins this environment's identity instead of deriving it from the
+# worktree directory name, so a stable name (and therefore a stable slot, port
+# block and database) survives renaming or recreating the directory.
 #
 ###
 dependencies=false
 services=false
+environmentName=""
 
-for arg in "$@"
+while [ $# -gt 0 ]
 do
-  case $arg in
+  case $1 in
     --only-dependencies)
       dependencies=true
       ;;
@@ -45,34 +54,166 @@ do
     --no-testland)
       export OTHER_LERNA_FLAGS="--ignore @opencrvs/testland"
       ;;
+    --env)
+      shift
+      if [ $# -eq 0 ]; then
+        echo "Option --env needs a value, for example: pnpm dev --env my-branch"
+        exit 1
+      fi
+      environmentName="$1"
+      ;;
+    --env=*)
+      environmentName="${1#--env=}"
+      ;;
     *)
       # Handle unknown option
-      echo "Unknown option: $arg"
+      echo "Unknown option: $1"
       exit 1
       ;;
   esac
+  shift
 done
 
-# List of directories
-dirs=(
-  "data/elasticsearch"
-  "data/minio"
-  "data/backups"
-  "data/postgres"
-  # mosip-api keeps its record-only tokens in SQLite. Its dev default path
-  # points here and better-sqlite3 will not create the directory itself.
-  "data/sqlite"
-)
+####
+#
+# SHARED DEPENDENCIES
+# Postgres, Elasticsearch, Redis and MinIO run as one machine-wide singleton
+# under the docker compose project `opencrvs-deps`, shared by every local
+# environment. Starting them is idempotent and no environment ever stops them —
+# teardown is explicit (`pnpm compose:down:deps`).
+# See docs/adr/0003-multiple-local-environments.md.
+#
+###
+function start_dependencies() {
+  echo
+  echo -e "\033[32m:::::::::: STARTING SHARED DEPENDENCIES ::::::::::\033[0m"
+  echo
+  echo "The dependencies are a machine-wide singleton shared by every OpenCRVS environment."
+  echo "They run detached and are left running when this session ends."
+  echo
+  pnpm run compose:deps:detached
+}
 
-for dir in "${dirs[@]}"; do
-  if [ ! -d "$dir" ]; then
-    echo "Creating $dir"
-    mkdir -p "$dir"
-    chmod 775 "$dir"
-  else
-    echo "$dir already exists"
+# None of the dependency compose services declares a healthcheck, so readiness
+# is probed explicitly rather than slept through. Postgres is probed over TCP
+# from inside the container, because the entrypoint's initdb phase listens on
+# the unix socket only — a socket probe would report ready too early.
+function postgres_ready() {
+  docker exec "${POSTGRES_CONTAINER:-opencrvs-deps-postgres-1}" \
+    pg_isready -h 127.0.0.1 -p 5432 -U postgres -q
+}
+
+function redis_ready() {
+  docker exec "${REDIS_CONTAINER:-opencrvs-deps-redis-1}" redis-cli ping | grep -q PONG
+}
+
+function elasticsearch_ready() {
+  curl -fsS "http://localhost:9200/_cluster/health"
+}
+
+function minio_ready() {
+  curl -fsS "http://localhost:3535/minio/health/live"
+}
+
+function wait_for() {
+  local label=$1
+  local probe=$2
+  local timeout=${DEPS_READY_TIMEOUT_SECONDS:-180}
+  local waited=0
+
+  printf "Waiting for %s " "$label"
+
+  until $probe >/dev/null 2>&1; do
+    if [ "$waited" -ge "$timeout" ]; then
+      echo
+      echo "Timed out after ${timeout}s waiting for $label to become ready."
+      echo "Inspect the shared dependencies with:"
+      echo "docker compose -p opencrvs-deps -f docker-compose.deps.yml -f docker-compose.dev-deps.yml ps"
+      exit 1
+    fi
+    printf "."
+    sleep 2
+    waited=$((waited + 2))
+  done
+
+  echo -e " \033[32mready\033[0m"
+}
+
+function wait_for_dependencies() {
+  echo
+  echo -e "\033[32m:::::::::: WAITING FOR SHARED DEPENDENCIES ::::::::::\033[0m"
+  echo
+  wait_for "Postgres" postgres_ready
+  wait_for "Redis" redis_ready
+  wait_for "Elasticsearch" elasticsearch_ready
+  wait_for "MinIO" minio_ready
+}
+
+####
+#
+# THIS ENVIRONMENT
+#
+###
+
+# The dependency singleton keeps its data in docker named volumes, so no bind
+# mount directories are needed for it. mosip-api is the one service that still
+# writes to the checkout: it keeps its record-only tokens in SQLite, and
+# better-sqlite3 will not create the directory itself.
+function ensure_service_data_dirs() {
+  mkdir -p data/sqlite
+}
+
+# JWT signing keys are shared machine-wide, so they are generated once and then
+# left alone. Regenerating them on every run would break any other environment
+# already running on this machine as soon as one of its services reloads.
+function ensure_secrets() {
+  mkdir -p .secrets
+
+  if [ ! -f .secrets/private-key.pem ] || [ ! -f .secrets/public-key.pem ]; then
+    pnpm dev:secrets:gen
   fi
-done
+}
+
+# `resolve` prints this environment's whole contract as `export VAR='value'`
+# lines on stdout (warnings go to stderr), so it is safe to eval. Sourcing it is
+# shared with every other script that needs the contract — see
+# development-environment/environment.sh.
+#
+# `pnpm dev` is the only caller that uses `resolve` rather than the read-only
+# `env:lookup`: it is the command that brings an environment into existence, so
+# it is the one allowed to allocate a slot and register the use.
+source "$DIR/environment.sh"
+
+function resolve_environment() {
+  OPENCRVS_ENV_ARG="$environmentName"
+  opencrvs_env_export_contract resolve || exit 1
+}
+
+function print_environment() {
+  echo
+  echo -e "\033[32m:::::::::: THIS ENVIRONMENT ::::::::::\033[0m"
+  echo
+  echo "  name             $OPENCRVS_ENV_NAME (slot $OPENCRVS_ENV_SLOT)"
+  echo "  database         $TARGET_DB"
+  echo "  search prefix    $ES_INDEX_PREFIX"
+  echo "  document bucket  $MINIO_BUCKET"
+  echo "  redis database   $REDIS_DB"
+  echo -e "  client           \033[32mhttp://localhost:$CLIENT_PORT\033[0m"
+  echo "  login            http://localhost:$LOGIN_PORT"
+  echo "  gateway          $GATEWAY_URL"
+  echo "  country config   $COUNTRY_CONFIG_URL"
+  echo
+}
+
+# Idempotent: creates the database, its schemas and the shared roles if they are
+# missing, then runs migrations. Re-running it on an existing environment is a
+# no-op, so every `pnpm dev` can go through it.
+function provision_environment() {
+  echo
+  echo -e "\033[32m:::::::::: PROVISIONING DATABASE $TARGET_DB ::::::::::\033[0m"
+  echo
+  pnpm --filter @opencrvs/migration provision --db "$TARGET_DB"
+}
 
 PROJECT_ROOT=$(cd "$DIR/.."; pwd)
 if [ ! -d "$PROJECT_ROOT/.secrets" ]; then
@@ -82,9 +223,18 @@ if [ ! -d "$PROJECT_ROOT/.secrets" ]; then
 fi
 
 if $dependencies; then
-  concurrently "pnpm run compose:deps"
+  start_dependencies
+  wait_for_dependencies
+  echo
+  echo "The shared dependencies are up. Start an environment's services with: pnpm dev --only-services"
   exit 0
 elif $services; then
+  wait_for_dependencies
+  ensure_secrets
+  ensure_service_data_dirs
+  resolve_environment
+  print_environment
+  provision_environment
   pnpm run start
   exit 0
 fi
@@ -111,32 +261,13 @@ then
     exit 0
 fi
 
-echo
-echo -e "\033[32m:::::::::: Stopping any currently running Docker containers ::::::::::\033[0m"
-echo
-if [[ $(docker ps -aq) ]] ; then
-  docker stop $(docker ps -aq)
-  sleep 5
-fi
-
-
-echo
-openCRVSPorts=( 3447 9200 6379 4444 3040 5050 2020 7070 1050 3030 3000 3020 2525 2021 3535 3536 9050 2024 20240 20260)
-for x in "${openCRVSPorts[@]}"
-do
-   :
-    if lsof -nP -iTCP:$x -sTCP:LISTEN -iUDP:$x >/dev/null; then
-      echo -e "OpenCRVS thinks that port: $x is in use by another application.\r"
-      echo "You need to find out which application is using this port and quit the application."
-      echo "You can find out the application by running:"
-      echo "lsof -nP -iTCP:$x -sTCP:LISTEN -iUDP:$x"
-      exit 1
-    else
-        echo -e "$x \033[32m port is available!\033[0m :)"
-    fi
-done
-
-
+start_dependencies
+wait_for_dependencies
+ensure_secrets
+ensure_service_data_dirs
+resolve_environment
+print_environment
+provision_environment
 
 echo
 echo -e "\033[32m:::::::::: STARTING OPENCRVS ::::::::::\033[0m"
@@ -145,8 +276,5 @@ echo "If you did not previously run our setup command, Docker is downloading Ela
 echo
 echo -e "\033[32m:::::::::: PLEASE WAIT for @opencrvs/client ::::::::::\033[0m"
 echo
-sleep 10
 
-pnpm dev:secrets:gen
-
-concurrently "pnpm run start" "pnpm run compose:deps"
+pnpm run start

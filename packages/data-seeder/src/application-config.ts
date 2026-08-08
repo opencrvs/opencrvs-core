@@ -71,7 +71,7 @@ export function parseApplicationConfig(
 }
 
 export async function readApplicationConfig(): Promise<ApplicationConfigRead> {
-  const url = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/application')
+  const url = joinUrl(env.COUNTRY_CONFIG_URL, 'config/application')
   const res = await fetch(url, {
     headers: { 'Content-Type': 'application/json' }
   })

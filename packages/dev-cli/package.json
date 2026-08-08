@@ -1,0 +1,41 @@
+{
+  "name": "@opencrvs/dev-cli",
+  "version": "2.1.0",
+  "description": "OpenCRVS local development environment resolver and CLI",
+  "license": "MPL-2.0",
+  "private": true,
+  "scripts": {
+    "dev-cli": "tsx src/cli.ts",
+    "resolve": "tsx src/cli.ts resolve",
+    "env:lookup": "tsx src/cli.ts lookup",
+    "env:indices": "tsx src/cli.ts indices",
+    "env:destroy": "tsx src/cli.ts destroy",
+    "env:list": "tsx src/cli.ts list",
+    "deps:down": "tsx src/cli.ts deps:down",
+    "test": "pnpm test:compilation && vitest run",
+    "test:watch": "vitest",
+    "test:compilation": "tsc --noEmit",
+    "lint": "eslint -c eslint.config.js --fix --max-warnings=0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@types/node": "^20.12.7",
+    "@typescript-eslint/eslint-plugin": "8.63.0",
+    "@typescript-eslint/parser": "8.63.0",
+    "eslint": "^9.23.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.2.5",
+    "globals": "^16.0.0",
+    "prettier": "3.5.3",
+    "tsx": "^4.15.7",
+    "typescript": "7.0.2",
+    "vitest": "^4.1.10"
+  },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "prettier --write",
+      "eslint -c eslint.config.js --fix"
+    ]
+  }
+}
