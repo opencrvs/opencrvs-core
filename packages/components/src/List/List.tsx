@@ -13,6 +13,7 @@ import styled from 'styled-components'
 import * as styles from './List.styles'
 import { ListColumns, ListContext } from './ListContext'
 import { Header, IListHeaderProps } from './components/Header'
+import { Heading } from './components/Heading'
 import { IListItemProps, Item, itemColumns } from './components/Item'
 
 const Table = styled.table`
@@ -61,7 +62,12 @@ export const List = ({ children, redactedLabel, ...props }: IListProps) => {
       element.type === Header
   )
 
-  const items = elements.filter(
+  /* Headings sit among the rows, in source order, so the body keeps both. */
+  const body = elements.filter(
+    (element) => element.type === Item || element.type === Heading
+  )
+
+  const items = body.filter(
     (element): element is React.ReactElement<IListItemProps> =>
       element.type === Item
   )
@@ -71,18 +77,20 @@ export const List = ({ children, redactedLabel, ...props }: IListProps) => {
    * row renders the same cells so that the columns line up, and the trailing
    * gutter stays reserved on rows that have no actions.
    */
-  const columns: ListColumns = items.map((item) => itemColumns(item.props)).reduce(
-    (all, item) => ({
-      start: all.start || item.start,
-      value2: all.value2 || item.value2,
-      actions: all.actions || item.actions
-    }),
-    {
-      start: false,
-      value2: header?.props.value2 !== undefined,
-      actions: false
-    }
-  )
+  const columns: ListColumns = items
+    .map((item) => itemColumns(item.props))
+    .reduce(
+      (all, item) => ({
+        start: all.start || item.start,
+        value2: all.value2 || item.value2,
+        actions: all.actions || item.actions
+      }),
+      {
+        start: false,
+        value2: header?.props.value2 !== undefined,
+        actions: false
+      }
+    )
 
   return (
     <ListContext.Provider value={{ columns, redactedLabel }}>
@@ -96,11 +104,12 @@ export const List = ({ children, redactedLabel, ...props }: IListProps) => {
         </colgroup>
 
         {header && <thead>{header}</thead>}
-        <tbody>{items}</tbody>
+        <tbody>{body}</tbody>
       </Table>
     </ListContext.Provider>
   )
 }
 
 List.Header = Header
+List.Heading = Heading
 List.Item = Item

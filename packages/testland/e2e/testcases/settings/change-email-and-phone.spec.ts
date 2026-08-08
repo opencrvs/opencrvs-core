@@ -97,8 +97,8 @@ test('Email and phone changed from settings are reflected in user details', asyn
     await adminPage.getByText('Edit details').click()
     await expect(adminPage.getByText('Confirm details')).toBeVisible()
 
-    await expect(adminPage.getByTestId('row-value-email')).toHaveText(newEmail)
-    await expect(adminPage.getByTestId('row-value-phoneNumber')).toHaveText(
+    await expect(adminPage.getByTestId('email-value')).toHaveText(newEmail)
+    await expect(adminPage.getByTestId('phoneNumber-value')).toHaveText(
       newPhoneNumber
     )
 

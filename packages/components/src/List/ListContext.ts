@@ -38,3 +38,7 @@ const DEFAULT: ListContextValue = {
 export const ListContext = createContext<ListContextValue>(DEFAULT)
 
 export const useListContext = () => useContext(ListContext)
+
+/** Label and first value are always present; the rest are optional. */
+export const columnCount = (columns: ListColumns) =>
+  2 + Number(columns.start) + Number(columns.value2) + Number(columns.actions)

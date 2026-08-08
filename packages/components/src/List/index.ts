@@ -11,3 +11,7 @@
 export * from './List'
 export type { IListItemProps } from './components/Item'
 export type { IListHeaderProps } from './components/Header'
+export type {
+  IListHeadingProps,
+  ListHeadingFontVariant
+} from './components/Heading'

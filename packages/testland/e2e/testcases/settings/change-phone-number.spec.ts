@@ -122,7 +122,7 @@ test('Phone number changed from settings is stored as entered', async ({
     await adminPage.getByText('Edit details').click()
     await expect(adminPage.getByText('Confirm details')).toBeVisible()
 
-    await expect(adminPage.getByTestId('row-value-phoneNumber')).toHaveText(
+    await expect(adminPage.getByTestId('phoneNumber-value')).toHaveText(
       newPhoneNumber
     )
 

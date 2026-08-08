@@ -114,6 +114,20 @@ export const actions = css`
   gap: 4px;
 `
 
+/*
+ * A break in the list rather than a row: no rule of its own, and enough space
+ * above it to separate it from the rows it follows.
+ */
+export const headingRow = css`
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+`
+
+export const headingCell = css`
+  color: ${({ theme }) => theme.colors.copy};
+  text-align: left;
+  padding: 24px 0 8px;
+`
+
 export const headerRow = css`
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
 

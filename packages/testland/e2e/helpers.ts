@@ -415,7 +415,7 @@ export async function expectRowValue(
   fieldName: string,
   assertionText: string
 ) {
-  await expect(page.getByTestId(`row-value-${fieldName}`)).toContainText(
+  await expect(page.getByTestId(`${fieldName}-value`)).toContainText(
     assertionText,
     { timeout: 30_000 }
   )
@@ -426,7 +426,7 @@ export async function expectRowValueWithChangeButton(
   fieldName: string,
   assertionText: string
 ) {
-  await expect(page.getByTestId(`row-value-${fieldName}`)).toContainText(
+  await expect(page.getByTestId(`${fieldName}-value`)).toContainText(
     assertionText
   )
 

@@ -27,8 +27,17 @@ export type Cell =
   | { kind: 'placeholder'; content: React.ReactNode }
   | { kind: 'empty' }
 
-const isEmpty = (value: React.ReactNode) =>
-  value === undefined || value === null || value === ''
+/**
+ * True for everything React renders as nothing. `false` matters most: a caller
+ * writing `actions={canEdit && <Link/>}` passes `false` when it cannot edit,
+ * and that must not reserve a column.
+ */
+export const rendersNothing = (node: React.ReactNode) =>
+  node === undefined ||
+  node === null ||
+  node === false ||
+  node === true ||
+  node === ''
 
 /**
  * Resolves one column to the single thing it renders. `redacted` wins over a
@@ -43,11 +52,11 @@ export function resolveCell({
     return { kind: 'redacted' }
   }
 
-  if (!isEmpty(value)) {
+  if (!rendersNothing(value)) {
     return { kind: 'value', content: value }
   }
 
-  if (!isEmpty(placeholder)) {
+  if (!rendersNothing(placeholder)) {
     return { kind: 'placeholder', content: placeholder }
   }
 

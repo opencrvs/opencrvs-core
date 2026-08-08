@@ -12,7 +12,7 @@ import React from 'react'
 import styled from 'styled-components'
 import * as styles from '../List.styles'
 import { useListContext } from '../ListContext'
-import { Cell, resolveCell, ValueColumn } from '../resolveCell'
+import { Cell, rendersNothing, resolveCell, ValueColumn } from '../resolveCell'
 
 const ItemRow = styled.tr`
   ${styles.row}
@@ -158,13 +158,13 @@ export const Item = ({
 export const itemColumns = (
   props: IListItemProps
 ): { start: boolean; value2: boolean; actions: boolean } => ({
-  start: props.start !== undefined,
+  start: !rendersNothing(props.start),
   value2: hasContent({
     value: props.value2,
     placeholder: props.placeholder2,
     redacted: props.redacted2
   }),
-  actions: props.actions !== undefined
+  actions: !rendersNothing(props.actions)
 })
 
 const hasContent = (column: ValueColumn) => resolveCell(column).kind !== 'empty'
