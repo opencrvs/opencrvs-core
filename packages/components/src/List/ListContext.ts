@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createContext, useContext } from 'react'
+import React, { createContext, useContext } from 'react'
 
 /**
  * Which optional columns the list has, derived once by `<List>` from its
@@ -22,8 +22,20 @@ export interface ListColumns {
   actions: boolean
 }
 
+/**
+ * What `<List.Header>` calls each value column, taken from the header the list
+ * already has. A row needs them when the list stacks: the header row is hidden
+ * there, so each value carries its own column's name instead of the caller
+ * repeating it on every row.
+ */
+export interface ListColumnNames {
+  value?: React.ReactNode
+  value2?: React.ReactNode
+}
+
 export interface ListContextValue {
   columns: ListColumns
+  columnNames: ListColumnNames
   /**
    * Accessible name for a redacted cell's bar — the only way a screen reader
    * can tell a withheld value from an absent one. Supplied translated by the
@@ -33,7 +45,8 @@ export interface ListContextValue {
 }
 
 const DEFAULT: ListContextValue = {
-  columns: { start: false, value: false, value2: false, actions: false }
+  columns: { start: false, value: false, value2: false, actions: false },
+  columnNames: {}
 }
 
 export const ListContext = createContext<ListContextValue>(DEFAULT)

@@ -42,6 +42,10 @@ const RedactionBar = styled.span`
   ${styles.redactionBar}
 `
 
+const ColumnName = styled.span`
+  ${styles.columnName}
+`
+
 const ActionsCell = styled.td`
   ${styles.actionsCell}
 `
@@ -109,8 +113,15 @@ export const Item = ({
   actions,
   ...props
 }: IListItemProps) => {
-  const { columns, redactedLabel } = useListContext()
+  const { columns, columnNames, redactedLabel } = useListContext()
   const testId = props['data-testid']
+
+  /*
+   * Only a row with two values is ambiguous once stacked — one value is named
+   * by the label above it, two are not. So the column name rides along only
+   * where it settles something.
+   */
+  const namesColumns = columns.value2
 
   return (
     <ItemRow id={id}>
@@ -126,6 +137,9 @@ export const Item = ({
           data-testclass={redacted ? 'redacted' : undefined}
           data-testid={testId && `${testId}-value`}
         >
+          {namesColumns && columnNames.value && (
+            <ColumnName>{columnNames.value}</ColumnName>
+          )}
           <Value
             cell={resolveCell({ value, placeholder, redacted })}
             redactedLabel={redactedLabel}
@@ -138,6 +152,9 @@ export const Item = ({
           data-testclass={redacted2 ? 'redacted' : undefined}
           data-testid={testId && `${testId}-value2`}
         >
+          {namesColumns && columnNames.value2 && (
+            <ColumnName>{columnNames.value2}</ColumnName>
+          )}
           <Value
             cell={resolveCell({
               value: value2,

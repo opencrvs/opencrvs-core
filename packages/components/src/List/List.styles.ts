@@ -75,9 +75,26 @@ export const valueCell = css`
   padding-right: 16px;
 
   ${stackedBelow(css`
-    display: block;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
     width: 100%;
     padding-top: 8px;
+  `)}
+`
+
+/*
+ * Which column a stacked value belongs to. Hidden while the list is a table,
+ * where the column header says it; shown once it stacks, because the header
+ * row is gone by then — and with it, for a screen reader, the cell's
+ * association with its column.
+ */
+export const columnName = css`
+  display: none;
+  color: ${({ theme }) => theme.colors.grey500};
+
+  ${stackedBelow(css`
+    display: inline;
   `)}
 `
 

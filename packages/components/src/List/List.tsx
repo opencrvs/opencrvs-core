@@ -94,8 +94,13 @@ export const List = ({ children, redactedLabel, ...props }: IListProps) => {
       }
     )
 
+  const columnNames = {
+    value: header?.props.value,
+    value2: header?.props.value2
+  }
+
   return (
-    <ListContext.Provider value={{ columns, redactedLabel }}>
+    <ListContext.Provider value={{ columns, columnNames, redactedLabel }}>
       <Table {...props}>
         <colgroup>
           {columns.start && <col width={styles.START_COLUMN_WIDTH} />}
