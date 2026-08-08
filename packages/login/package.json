@@ -46,7 +46,7 @@
     "webfontloader": "^1.6.28"
   },
   "scripts": {
-    "start": "vite --port=3020",
+    "start": "vite --port=${LOGIN_PORT:-3020}",
     "preview": "vite preview",
     "build": "NODE_OPTIONS=--max_old_space_size=8000 vite build",
     "gen:sw": "workbox generateSW --config workbox-config.js",

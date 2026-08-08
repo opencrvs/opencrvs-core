@@ -20,6 +20,24 @@ import { IncomingMessage, ServerResponse } from 'node:http'
 // https://github.com/cypress-io/cypress/issues/25397#issuecomment-1775454875
 dns.setDefaultResultOrder('ipv4first')
 
+/**
+ * Peer addresses are env-driven so that several local environments (git
+ * worktrees) can run side by side on one machine, each on its own port block.
+ * Every default below is the historical hardcoded value, so an unset
+ * environment behaves exactly as before.
+ */
+const withoutTrailingSlash = (url: string) => url.replace(/\/+$/, '')
+
+const GATEWAY_URL = withoutTrailingSlash(
+  process.env.GATEWAY_URL ?? 'http://localhost:7070'
+)
+const COUNTRY_CONFIG_URL = withoutTrailingSlash(
+  process.env.COUNTRY_CONFIG_URL ?? 'http://localhost:3040'
+)
+const CLIENT_APP_URL = withoutTrailingSlash(
+  process.env.CLIENT_APP_URL ?? 'http://localhost:3000'
+)
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, 'env')
@@ -30,7 +48,7 @@ export default defineConfig(({ mode }) => {
       server.middlewares.use((req, res, next) => {
         if (req.url?.startsWith('/register')) {
           const suffix = req.url.replace(/^\/register/, '') || '/'
-          res.writeHead(302, { Location: `http://localhost:3000${suffix}` })
+          res.writeHead(302, { Location: `${CLIENT_APP_URL}${suffix}` })
           res.end()
           return
         }
@@ -109,17 +127,17 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         '/api/countryconfig/': {
-          target: 'http://localhost:3040',
+          target: COUNTRY_CONFIG_URL,
           changeOrigin: true,
           rewrite: (path: string) => path.replace(/^\/api\/countryconfig/, '')
         },
         '/api/': {
-          target: 'http://localhost:7070',
+          target: GATEWAY_URL,
           changeOrigin: true,
           rewrite: (path: string) => path.replace(/^\/api/, '')
         },
         '/health/ready': {
-          target: 'http://localhost:3040',
+          target: COUNTRY_CONFIG_URL,
           changeOrigin: true,
           rewrite: (path: string) => path.replace(/^\/health\/ready/, '/ping'),
           configure: (proxy, _options) => {

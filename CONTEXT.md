@@ -42,6 +42,28 @@ _Avoid_: pre-seed validation, dry run (nothing is written even provisionally), v
 One of the users a seed creates, described by one record of the seed-data. Has no creator among the users — the seed brings the first ones into being — which is why username collisions matter differently here than for a user created by an administrator.
 _Avoid_: employee, seeded user, default user
 
+### Local environments
+
+**Environment**:
+An isolated instance of the OpenCRVS stack running on a developer machine — its own set of host node processes plus a logical slice of the shared dependencies. Identified by a `name`.
+_Avoid_: instance, stack (when you mean a single isolated env)
+
+**Name**:
+The identifier for an environment, derived from the git worktree directory basename (sanitized, `-` → `_`). Keys all per-environment data — database name, Elasticsearch index prefix, MinIO bucket.
+
+**Slot**:
+A small integer (0–5) assigned to an environment by the registry. Determines the host port block (`base + slot * 10000`) and the Redis logical DB index. Slot 0 is the primary worktree and matches historical single-environment ports.
+
+**Primary worktree**:
+The main (non-linked) git checkout. Always maps to slot 0, preserving the original `pnpm dev` behaviour and data.
+
+**Registry**:
+The machine-level file (`~/.local/state/opencrvs/envs.json`) mapping each environment `name` to its `slot`.
+
+**Dependency singleton**:
+The single shared set of backing services (Postgres, Elasticsearch, Redis, MinIO) that all local environments share, run under docker compose project `opencrvs-deps`. Contrast with the per-environment node processes.
+_Avoid_: deps stack, backend services
+
 ### Auditing
 
 **Client**:
