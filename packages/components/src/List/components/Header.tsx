@@ -42,7 +42,7 @@ export const Header = ({ id, label, value, value2 }: IListHeaderProps) => {
     <HeaderRow id={id}>
       {columns.start && <HeaderCell aria-hidden />}
       <HeaderCell scope="col">{label}</HeaderCell>
-      <HeaderCell scope="col">{value}</HeaderCell>
+      {columns.value && <HeaderCell scope="col">{value}</HeaderCell>}
       {columns.value2 && <HeaderCell scope="col">{value2}</HeaderCell>}
       {columns.actions && <HeaderCell aria-hidden />}
     </HeaderRow>

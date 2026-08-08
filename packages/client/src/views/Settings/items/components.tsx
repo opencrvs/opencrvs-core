@@ -8,17 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import * as React from 'react'
 import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { IListItemProps } from '@opencrvs/components/lib/List'
 
-export const LabelContainer = styled.span`
-  ${({ theme }) => theme.fonts.bold16}
-`
-
-export const ValueContainer = styled.span`
-  ${({ theme }) => theme.fonts.reg16}
-`
 export const DynamicHeightLinkButton = styled(LinkButton)`
   height: auto;
 `
@@ -29,7 +23,18 @@ export const Message = styled.div`
 export const Label = styled.label`
   margin-bottom: 8px;
 `
-export const TopAlignedListViewItemSimplified = styled(ListViewItemSimplified)`
-  align-items: start;
-  padding: 16px 0;
-`
+
+/**
+ * One setting, as returned by its hook.
+ *
+ * The row belongs in the settings list's table; the dialogs and toasts it opens
+ * do not, so the two travel separately and the page renders each in its place.
+ * Keeping them in one hook leaves the state that joins them — which dialog is
+ * open, which toast is showing — inside the setting it belongs to.
+ */
+export interface SettingsRow {
+  /** Identifies the setting, for the row's key and test id. */
+  id: string
+  item: IListItemProps
+  overlay?: React.ReactNode
+}

@@ -121,15 +121,17 @@ export const Item = ({
         {description && <Description>{description}</Description>}
       </LabelCell>
 
-      <ValueCell
-        data-testclass={redacted ? 'redacted' : undefined}
-        data-testid={testId && `${testId}-value`}
-      >
-        <Value
-          cell={resolveCell({ value, placeholder, redacted })}
-          redactedLabel={redactedLabel}
-        />
-      </ValueCell>
+      {columns.value && (
+        <ValueCell
+          data-testclass={redacted ? 'redacted' : undefined}
+          data-testid={testId && `${testId}-value`}
+        >
+          <Value
+            cell={resolveCell({ value, placeholder, redacted })}
+            redactedLabel={redactedLabel}
+          />
+        </ValueCell>
+      )}
 
       {columns.value2 && (
         <ValueCell
@@ -157,8 +159,13 @@ export const Item = ({
 /** The value columns this row occupies, read by `<List>` to size the table. */
 export const itemColumns = (
   props: IListItemProps
-): { start: boolean; value2: boolean; actions: boolean } => ({
+): { start: boolean; value: boolean; value2: boolean; actions: boolean } => ({
   start: !rendersNothing(props.start),
+  value: hasContent({
+    value: props.value,
+    placeholder: props.placeholder,
+    redacted: props.redacted
+  }),
   value2: hasContent({
     value: props.value2,
     placeholder: props.placeholder2,

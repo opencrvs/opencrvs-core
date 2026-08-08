@@ -82,11 +82,13 @@ export const List = ({ children, redactedLabel, ...props }: IListProps) => {
     .reduce(
       (all, item) => ({
         start: all.start || item.start,
+        value: all.value || item.value,
         value2: all.value2 || item.value2,
         actions: all.actions || item.actions
       }),
       {
         start: false,
+        value: header?.props.value !== undefined,
         value2: header?.props.value2 !== undefined,
         actions: false
       }
@@ -98,7 +100,7 @@ export const List = ({ children, redactedLabel, ...props }: IListProps) => {
         <colgroup>
           {columns.start && <col width={styles.START_COLUMN_WIDTH} />}
           <col />
-          <col />
+          {columns.value && <col />}
           {columns.value2 && <col />}
           {columns.actions && <col width={styles.ACTIONS_COLUMN_WIDTH} />}
         </colgroup>

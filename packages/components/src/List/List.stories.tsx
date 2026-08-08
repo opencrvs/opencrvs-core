@@ -61,7 +61,11 @@ export const WithHeader = () => (
     <List.Header label="Field" value="Input" />
     <List.Item actions={Change} label="First name(s)" value="Peter Jonathan" />
     <List.Item actions={Change} label="Last name" value="Jones" />
-    <List.Item actions={Change} label="Date of birth" value="12 February 2024" />
+    <List.Item
+      actions={Change}
+      label="Date of birth"
+      value="12 February 2024"
+    />
   </List>
 )
 
@@ -77,6 +81,19 @@ export const ValueStates = () => (
       placeholder="No registration number"
     />
     <List.Item label="National ID" redacted />
+  </List>
+)
+
+/**
+ * A list whose rows are only labels — a set of places to navigate into. No row
+ * carries a value, so there is no value column and the labels take the width
+ * rather than sitting against an empty half.
+ */
+export const LabelsOnly = () => (
+  <List>
+    <List.Item label={<Link>Ibombo District Office</Link>} />
+    <List.Item label={<Link>Ilanga District Office</Link>} />
+    <List.Item label={<Link>Itambo District Office</Link>} />
   </List>
 )
 
@@ -109,7 +126,11 @@ export const TwoValueColumns = () => (
  */
 export const Comparison = () => (
   <List redactedLabel="Hidden">
-    <List.Header label="Field" value="This record" value2="Possible duplicate" />
+    <List.Header
+      label="Field"
+      value="This record"
+      value2="Possible duplicate"
+    />
     <List.Item
       label="First name(s)"
       value="Peter Jonathan"
@@ -157,11 +178,7 @@ export const MappedRows = () => {
     <List>
       {fields.map((field) => (
         <React.Fragment key={field.id}>
-          <List.Item
-            actions={Change}
-            label={field.label}
-            value={field.value}
-          />
+          <List.Item actions={Change} label={field.label} value={field.value} />
         </React.Fragment>
       ))}
     </List>

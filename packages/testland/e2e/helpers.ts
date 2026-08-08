@@ -763,14 +763,25 @@ export async function findOnOrganisationPage(
     name: 'Previous page'
   })
 
-  while (!(await previousPageButton.isDisabled().catch(() => true))) {
+  /*
+   * Callers usually arrive here by clicking through from another page, and the
+   * probes below do not wait — so settle on the Organisation page first, or a
+   * list that has not rendered yet reads as "the target is not on it".
+   */
+  await expect(page.locator('#content-name')).toHaveText('Organisation')
+
+  /*
+   * count() before isEnabled(): a list that fits on one page renders no
+   * pagination at all, and isEnabled() would wait for a button never coming.
+   */
+  const canPage = async (button: Locator) =>
+    (await button.count()) > 0 && (await button.isEnabled())
+
+  while (await canPage(previousPageButton)) {
     await previousPageButton.click()
   }
 
-  while (
-    !(await target.isVisible()) &&
-    !(await nextPageButton.isDisabled().catch(() => true))
-  ) {
+  while (!(await target.isVisible()) && (await canPage(nextPageButton))) {
     await nextPageButton.click()
   }
 

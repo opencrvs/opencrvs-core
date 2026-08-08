@@ -17,6 +17,7 @@ import { createContext, useContext } from 'react'
  */
 export interface ListColumns {
   start: boolean
+  value: boolean
   value2: boolean
   actions: boolean
 }
@@ -32,13 +33,17 @@ export interface ListContextValue {
 }
 
 const DEFAULT: ListContextValue = {
-  columns: { start: false, value2: false, actions: false }
+  columns: { start: false, value: false, value2: false, actions: false }
 }
 
 export const ListContext = createContext<ListContextValue>(DEFAULT)
 
 export const useListContext = () => useContext(ListContext)
 
-/** Label and first value are always present; the rest are optional. */
+/** Only the label is always present; every other column is optional. */
 export const columnCount = (columns: ListColumns) =>
-  2 + Number(columns.start) + Number(columns.value2) + Number(columns.actions)
+  1 +
+  Number(columns.start) +
+  Number(columns.value) +
+  Number(columns.value2) +
+  Number(columns.actions)
