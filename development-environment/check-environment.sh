@@ -9,8 +9,9 @@
 #
 # Checks (and where it safely can, fixes) that this machine is ready to develop
 # OpenCRVS Core: a supported operating system, the required tooling (Docker,
-# Node, pnpm, tmux), Docker Compose, and a supported Node.js version. It also
-# enables Corepack so pnpm runs at the version pinned in package.json.
+# Node, pnpm, tmux), a reachable Docker daemon, Docker Compose, and a supported
+# Node.js version. It also enables Corepack so pnpm runs at the version pinned
+# in package.json.
 #
 # This is non-destructive: it does not build images, install dependencies, or
 # start the stack, so it is safe to run at any time. Because it may run before
@@ -240,6 +241,66 @@ do
         exit 1
     fi
 done
+
+###
+#
+# Check that this user can actually talk to the Docker daemon
+#
+# Finding `docker` on PATH says nothing about being allowed to use it: on Linux
+# a fresh install leaves /var/run/docker.sock owned by the `docker` group, and
+# the current user is not in that group until they are added and their session
+# is renewed. `pnpm dev` needs the daemon, so without this the first symptom is
+# a bare permission error from a compose command well into the run.
+#
+# Deliberately ordered before the Compose check below, which is answered by the
+# CLI alone and so cannot distinguish "no plugin" from "cannot reach daemon".
+# Reaching the daemon is the more fundamental of the two, and asking first is
+# what lets the permission case get an answer it can act on.
+#
+# This reports; it does not fix. Adding a user to a group needs sudo, and a
+# check that is safe to run at any time should not be changing group
+# membership.
+#
+###
+
+dockerDaemonError=$(docker info 2>&1 >/dev/null) || true
+
+if [ -n "$dockerDaemonError" ]; then
+    if echo "$dockerDaemonError" | grep -qi "permission denied"; then
+        echo "❌ Docker is installed, but this user is not allowed to use it."
+        echo "The Docker socket is readable only by the 'docker' group, and $USER is not in it."
+
+        if [ $OS == "UBUNTU" ]; then
+            echo "Add yourself to the group:"
+            echo
+            echo -e "  \033[32msudo usermod -aG docker $USER\033[0m"
+            echo
+            echo "Group membership is picked up when your session starts, so log out and"
+            echo "back in afterwards (or run 'newgrp docker' in this shell to test it now)."
+            echo "Full instructions: https://docs.docker.com/engine/install/linux-postinstall/"
+        else
+            echo "Please check your Docker Desktop installation:"
+            echo "https://docs.docker.com/desktop/mac/install/"
+        fi
+    else
+        echo "❌ Docker is installed, but its daemon is not reachable."
+        echo
+
+        if [ $OS == "UBUNTU" ]; then
+            echo "Start it with: sudo systemctl start docker"
+        else
+            echo "Start Docker Desktop and wait for it to report that it is running."
+        fi
+
+        echo
+        echo "Docker reported:"
+        echo "$dockerDaemonError"
+    fi
+
+    exit 1
+fi
+
+echo -e "The Docker daemon is \033[32mreachable!\033[0m :)"
 
 ###
 #
