@@ -161,9 +161,13 @@ than failing. They are made env-aware the same way, by sourcing
 **Correction (found during implementation):** the contract grew three keys this
 ADR did not anticipate, for services that are addressed but not started by
 `pnpm dev` (see ADR-0004): `METABASE_PORT`, `CLIENT_STORYBOOK_PORT` and
-`EVENTS_MIGRATOR_URL`. They obey the same `base + slot * 10000` arithmetic and
-live in `packages/dev-cli/src/env-contract.ts` with the rest, so a developer
-starting one of them by hand still gets their own environment's port.
+`EVENTS_MIGRATOR_URL`. `METABASE_PORT` and `CLIENT_STORYBOOK_PORT` obey the same
+`base + slot * 10000` arithmetic as every other port, so a developer starting
+one of those by hand still gets their own environment's. `EVENTS_MIGRATOR_URL`
+is not a port at all: it is the `events_migrator` connection to this
+environment's database, split from `EVENTS_POSTGRES_URL` because the migration
+runner and the application meant two different things by that one name. All
+three live in `packages/dev-cli/src/env-contract.ts` with the rest.
 
 ## Considered alternatives
 
