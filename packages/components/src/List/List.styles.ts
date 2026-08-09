@@ -54,6 +54,11 @@ export const rowGroup = css`
 export const row = css`
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
 
+  /* The rule separates two rows, so the last row has nothing to separate. */
+  &:last-child {
+    border-bottom: none;
+  }
+
   ${stackedBelow(css`
     display: grid;
     grid-template-columns: auto 1fr auto;
