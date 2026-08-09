@@ -34,71 +34,16 @@ export interface Verb {
   run(argv: string[]): number
 }
 
-/**
- * Parse `--flag value` and `--flag=value` pairs. Unknown flags are reported
- * rather than ignored, so a typo never silently resolves the wrong
- * environment.
- */
-export function parseFlags(
-  argv: string[],
-  known: string[]
-): Record<string, string> {
-  const flags: Record<string, string> = {}
-
-  for (let index = 0; index < argv.length; index++) {
-    const token = argv[index]
-
-    if (!token.startsWith('--')) {
-      throw new Error(`Unexpected argument "${token}".`)
-    }
-
-    const [name, inlineValue] = splitFlag(token)
-
-    if (!known.includes(name)) {
-      throw new Error(
-        `Unknown option "--${name}". Known options: ${known
-          .map((option) => `--${option}`)
-          .join(', ')}.`
-      )
-    }
-
-    if (inlineValue !== undefined) {
-      flags[name] = inlineValue
-      continue
-    }
-
-    const next = argv[index + 1]
-
-    if (next === undefined || next.startsWith('--')) {
-      throw new Error(`Option "--${name}" needs a value.`)
-    }
-
-    flags[name] = next
-    index++
-  }
-
-  return flags
-}
-
-function splitFlag(token: string): [string, string | undefined] {
-  const body = token.slice(2)
-  const equals = body.indexOf('=')
-
-  return equals === -1
-    ? [body, undefined]
-    : [body.slice(0, equals), body.slice(equals + 1)]
-}
-
 const resolveVerb: Verb = {
   summary:
     'Print this worktree’s environment as `export VAR=value` lines to source.',
   usage: 'resolve [--env <name>]',
   run(argv) {
-    const flags = parseFlags(argv, ['env'])
+    const { options } = parseArgs(argv, { valueFlags: ['env'] })
     const worktree = inspectWorktree()
 
     const { exports, warnings } = runResolve({
-      envOverride: flags.env,
+      envOverride: options.env,
       worktreePath: worktree.path,
       isPrimaryWorktree: worktree.isPrimary,
       registry: createRegistry()
@@ -119,11 +64,11 @@ const lookupVerb: Verb = {
     'Print an existing environment’s contract to source. Creates nothing.',
   usage: 'lookup [--env <name>]',
   run(argv) {
-    const flags = parseFlags(argv, ['env'])
+    const { options } = parseArgs(argv, { valueFlags: ['env'] })
     const worktree = inspectWorktree()
 
     const { exports } = runLookup({
-      envOverride: flags.env,
+      envOverride: options.env,
       worktreePath: worktree.path,
       isPrimaryWorktree: worktree.isPrimary,
       registry: createRegistry()
@@ -140,7 +85,7 @@ const indicesVerb: Verb = {
     'Filter the index names on stdin down to the ones this environment owns.',
   usage: 'indices [--env <name>]',
   run(argv) {
-    const flags = parseFlags(argv, ['env'])
+    const { options } = parseArgs(argv, { valueFlags: ['env'] })
     const registry = createRegistry()
     /*
      * The registry knows about slots, not about what exists. Postgres is asked
@@ -153,7 +98,7 @@ const indicesVerb: Verb = {
       // stderr, so the caller's `$(...)` still yields an empty selection.
       process.stderr.write(
         `${indexSelectionSkipReason(
-          flags.env ?? process.env.OPENCRVS_ENV_NAME ?? 'this environment',
+          options.env ?? process.env.OPENCRVS_ENV_NAME ?? 'this environment',
           discovery
         )}\n`
       )
@@ -161,7 +106,7 @@ const indicesVerb: Verb = {
 
     for (const index of selectEnvironmentIndices(
       readIndexNames(),
-      environmentIndexIdentity(flags.env, registry),
+      environmentIndexIdentity(options.env, registry),
       registry.read(),
       discovery
     )) {
