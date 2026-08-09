@@ -14,7 +14,7 @@ import { EnvironmentDescriptor } from './types'
  * Postgres connection coordinates. Host and port belong to the shared
  * dependency singleton and never move; only the database name is
  * per-environment. Roles are shared across environments by design (see
- * ADR-0001), so their credentials are the same fixed dev credentials the
+ * ADR-0003), so their credentials are the same fixed dev credentials the
  * services default to today.
  */
 const POSTGRES_HOST = 'localhost'
@@ -62,7 +62,7 @@ export function toEnvironmentVariables(
     OPENCRVS_ENV_NAME: descriptor.name,
     OPENCRVS_ENV_SLOT: String(descriptor.slot),
 
-    // Per-environment isolation knobs (ADR-0001).
+    // Per-environment isolation knobs (ADR-0003).
     TARGET_DB: descriptor.dbName,
     EVENTS_POSTGRES_URL: postgresUrl('app', descriptor.dbName),
     /*

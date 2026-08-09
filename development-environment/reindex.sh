@@ -22,11 +22,21 @@ print_usage_and_exit () {
 DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)
 cd "$DIR"
 
-# Remembered before the contract is loaded so that an explicitly exported
-# EVENTS_URL / AUTH_URL still wins, as it did before this script resolved an
-# environment of its own.
-EVENTS_URL_OVERRIDE="${EVENTS_URL:-}"
-AUTH_URL_OVERRIDE="${AUTH_URL:-}"
+# Remembered before the contract is loaded so that a hand-exported EVENTS_URL /
+# AUTH_URL still wins, as it did before this script resolved an environment of
+# its own — but only when it really is hand-exported. Once a contract is in the
+# environment (inside `pnpm dev`'s process tree, or after an `env:lookup` eval)
+# EVENTS_URL is the *inherited environment's* URL and is indistinguishable from
+# a deliberate override; treating it as one is how `--env other` ended up
+# announcing one environment and reindexing another. The presence of the
+# contract's identity variables is what tells the two cases apart.
+if [ -n "${OPENCRVS_ENV_NAME:-}" ] && [ -n "${OPENCRVS_ENV_SLOT:-}" ]; then
+  EVENTS_URL_OVERRIDE=""
+  AUTH_URL_OVERRIDE=""
+else
+  EVENTS_URL_OVERRIDE="${EVENTS_URL:-}"
+  AUTH_URL_OVERRIDE="${AUTH_URL:-}"
+fi
 
 # Which environment's events and auth services to talk to. `packages/dev-cli`
 # owns the port arithmetic; this script only reads the resulting URLs.
@@ -34,12 +44,23 @@ AUTH_URL_OVERRIDE="${AUTH_URL:-}"
 source "$DIR/development-environment/environment.sh"
 opencrvs_env_load "$@" || print_usage_and_exit
 
+# An explicit `--env <name>` names the environment to act on and nothing may
+# outrank it, so that the banner below can never disagree with the URLs curl
+# is given.
+if [ -n "${OPENCRVS_ENV_ARG:-}" ]; then
+  EVENTS_URL_OVERRIDE=""
+  AUTH_URL_OVERRIDE=""
+fi
+
 EVENTS_URL="${EVENTS_URL_OVERRIDE:-$EVENTS_URL}"
 AUTH_URL="${AUTH_URL_OVERRIDE:-$AUTH_URL}"
 
 echo "Reindexing environment ${OPENCRVS_ENV_NAME} (slot ${OPENCRVS_ENV_SLOT})"
 echo "  events  ${EVENTS_URL}"
 echo "  auth    ${AUTH_URL}"
+if [ -n "${EVENTS_URL_OVERRIDE:-}" ] || [ -n "${AUTH_URL_OVERRIDE:-}" ]; then
+  echo "  (URLs taken from the environment, not from that environment's contract)"
+fi
 # How often (seconds) to poll the status endpoint
 POLL_INTERVAL="${POLL_INTERVAL:-10}"
 # Maximum number of poll iterations (~3 hours at the default interval)
