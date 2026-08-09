@@ -8,7 +8,7 @@
   "scripts": {
     "start": "./run-migrations.sh",
     "revert": "./revert-migrations.sh",
-    "rollback:events": "node-pg-migrate down --config-file node-pg-migrate.json",
+    "rollback:events": "DATABASE_URL=${EVENTS_MIGRATOR_URL:-postgres://events_migrator:migrator_password@localhost:5432/events} node-pg-migrate down --config-file node-pg-migrate.json",
     "migrate:events": "./run-migrations.sh",
     "start:prod": "NODE_ENV=production ./run-migrations.sh",
     "provision": "node ./src/provision.js",
