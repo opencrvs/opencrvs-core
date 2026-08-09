@@ -12,8 +12,6 @@ import React from 'react'
 import { Meta } from '@storybook/react-vite'
 import { List } from './index'
 import { Link } from '../Link'
-import { Pill } from '../Pill'
-import { Avatar } from '../Avatar'
 
 export default {
   title: 'Data/List',
@@ -143,27 +141,6 @@ export const Comparison = () => (
       value="12 February 2024"
     />
     <List.Item label="National ID" redacted redacted2 />
-  </List>
-)
-
-/** A leading slot for an avatar or an icon, and a second line under the label. */
-export const StartSlotAndDescription = () => (
-  <List>
-    <List.Header label="User" value="Role" />
-    <List.Item
-      actions={Change}
-      description="jane.doe@example.org"
-      label="Jane Doe"
-      start={<Avatar name="Jane Doe" />}
-      value={<Pill label="Active" size="small" type="active" />}
-    />
-    <List.Item
-      actions={Change}
-      description="k.mweene@example.org"
-      label="Kennedy Mweene"
-      start={<Avatar name="Kennedy Mweene" />}
-      value={<Pill label="Pending" size="small" type="pending" />}
-    />
   </List>
 )
 
