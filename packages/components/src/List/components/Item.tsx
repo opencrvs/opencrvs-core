@@ -72,6 +72,11 @@ export interface IListItemProps {
   start?: React.ReactNode
   /** Trailing slot, right-aligned. */
   actions?: React.ReactNode
+  /**
+   * Names the row. Each cell it renders takes the same name with its own
+   * suffix — `-label`, `-value`, `-value2`, `-actions` — so a test addresses a
+   * cell by what it holds rather than by counting columns.
+   */
   'data-testid'?: string
 }
 
@@ -124,10 +129,10 @@ export const Item = ({
   const namesColumns = columns.value2
 
   return (
-    <ItemRow id={id}>
+    <ItemRow data-testid={testId} id={id}>
       {columns.start && <StartCell>{start}</StartCell>}
 
-      <LabelCell data-testid={testId && `${testId}-key`} scope="row">
+      <LabelCell data-testid={testId && `${testId}-label`} scope="row">
         {label}
         {description && <Description>{description}</Description>}
       </LabelCell>
@@ -167,7 +172,9 @@ export const Item = ({
       )}
 
       {columns.actions && (
-        <ActionsCell>{actions && <Actions>{actions}</Actions>}</ActionsCell>
+        <ActionsCell data-testid={testId && `${testId}-actions`}>
+          {actions && <Actions>{actions}</Actions>}
+        </ActionsCell>
       )}
     </ItemRow>
   )

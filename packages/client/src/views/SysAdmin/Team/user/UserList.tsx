@@ -505,6 +505,7 @@ function UserListComponent({ userDetails }: UserListProps) {
 
         return {
           id: user.id,
+          'data-testid': user.id,
           start: (
             <Link
               onClick={() =>

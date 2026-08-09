@@ -49,11 +49,12 @@ test.describe.serial('1. Team Page -1', () => {
       await expect(rows).toHaveCount(team.length)
 
       for (let i = 0; i < team.length; i++) {
+        // Each row is keyed by user id, so its cells are addressed by what they
+        // hold rather than by their position among the columns.
         const row = rows.nth(i)
-        // The name is the row's header cell; the avatar leads the data cells.
-        await expect(row.locator('th')).toHaveText(team[i].name)
-        await expect(row.locator('td').nth(1)).toHaveText(team[i].role)
-        await expect(row.locator('td').nth(2)).toHaveText('Active')
+        await expect(row.getByTestId(/-label$/)).toHaveText(team[i].name)
+        await expect(row.getByTestId(/-value$/)).toHaveText(team[i].role)
+        await expect(row.getByTestId(/-actions$/)).toHaveText('Active')
       }
     })
   })
