@@ -35,6 +35,7 @@ Archiving a NOTIFIED (incomplete) record used to clear `InherentFlags.INCOMPLETE
 
 ### Improvements
 
+- User avatars are now drawn by OpenCRVS itself rather than fetched from the third-party service `ui-avatars.com`. Previously each avatar sent the user's full name to that service and showed nothing at all offline; initials are now rendered locally, so avatars work offline and no user's name leaves the country's deployment [#3769](https://github.com/opencrvs/opencrvs-core/issues/3769)
 - Private docker image registry support for Dependencies helm chart [#13090](https://github.com/opencrvs/opencrvs-core/issues/13090)
 - Added infrastructure management script to toolkit [#12941](https://github.com/opencrvs/opencrvs-core/issues/12941)
 - Moved Ansible inventory files into environment-specific folders so each environment is self-contained and portable [#13181](https://github.com/opencrvs/opencrvs-core/pull/13181)

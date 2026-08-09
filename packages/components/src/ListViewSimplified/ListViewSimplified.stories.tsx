@@ -15,7 +15,7 @@ import {
 } from './ListViewSimplified'
 import React from 'react'
 import { ToggleMenu } from '../ToggleMenu'
-import { AvatarSmall, AvatarLarge } from '../icons'
+import { Avatar } from '../Avatar'
 import { Icon } from '../Icon'
 import { Pill } from '../Pill'
 import styled from 'styled-components'
@@ -110,7 +110,7 @@ Default.args = {
       <ListViewItemSimplified label="Label 4" actions={toggleMenu} />
       <ListViewItemSimplified
         label={<TopAlignedLabel>Label 5</TopAlignedLabel>}
-        value={<AvatarLarge />}
+        value={<Avatar size="xl" />}
         actions={
           <TopAlignedActions>
             {linkButton}
@@ -127,7 +127,7 @@ WithAvatar.args = {
   children: (
     <>
       <ListViewItemSimplified
-        image={<AvatarSmall />}
+        image={<Avatar size="sm" />}
         label="Name of user"
         value="Value 1"
         actions={
@@ -138,19 +138,19 @@ WithAvatar.args = {
         }
       />
       <ListViewItemSimplified
-        image={<AvatarSmall />}
+        image={<Avatar size="sm" />}
         label="A very long label to show what happens when text overflows"
         value="A very long value to show what happens when text overflows"
         actions={linkButton}
       />
       <ListViewItemSimplified
-        image={<AvatarSmall />}
+        image={<Avatar size="sm" />}
         label="Name of user"
         value="Value 3"
         actions={toggleMenu}
       />
       <ListViewItemSimplified
-        image={<AvatarSmall />}
+        image={<Avatar size="sm" />}
         label="Name of user"
         value="Value 4"
         actions={
@@ -161,7 +161,7 @@ WithAvatar.args = {
         }
       />
       <ListViewItemSimplified
-        image={<AvatarSmall />}
+        image={<Avatar size="sm" />}
         label="Name of user"
         value="Value 5"
         actions={toggleMenu}

@@ -72,7 +72,7 @@ export function ProfileImage() {
         }
         value={
           <ValueContainer>
-            <Avatar avatar={userDetails?.avatar} name={englishName} />
+            <Avatar name={englishName} size="lg" src={userDetails?.avatar} />
           </ValueContainer>
         }
         actions={

@@ -15,7 +15,7 @@ import { Text } from '../Text'
 import { Pill } from '../Pill'
 import { ToggleMenu } from '../ToggleMenu'
 import { Icon } from '../Icon'
-import { AvatarSmall } from '../icons'
+import { Avatar } from '../Avatar'
 
 export default {
   title: 'Data/List User',
@@ -50,7 +50,7 @@ export const Default = () => (
       valueHeader="ROLE"
       rows={[
         {
-          avatar: <AvatarSmall />,
+          avatar: <Avatar size="sm" />,
           label: (
             <Link element="button" font="bold16">
               Michael Jones
@@ -65,7 +65,7 @@ export const Default = () => (
           actions: [UserMenu]
         },
         {
-          avatar: <AvatarSmall />,
+          avatar: <Avatar size="sm" />,
           label: (
             <Link element="button" font="bold16">
               Michael Jones
@@ -80,7 +80,7 @@ export const Default = () => (
           actions: [UserMenu]
         },
         {
-          avatar: <AvatarSmall />,
+          avatar: <Avatar size="sm" />,
           label: (
             <Link element="button" font="bold16">
               Craig David

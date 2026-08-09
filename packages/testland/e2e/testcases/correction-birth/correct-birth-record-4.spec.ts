@@ -930,8 +930,7 @@ test.describe.serial('Correct record - 4', () => {
     const date = await correctionRequestedRow.locator('span').nth(1).innerText()
 
     const requester = await correctionRequestedRow
-      .locator('span')
-      .nth(2)
+      .getByTestId('user-name')
       .innerText()
 
     /*

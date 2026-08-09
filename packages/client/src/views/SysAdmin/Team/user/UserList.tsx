@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { AvatarSmall } from '@client/components/Avatar'
+import { Avatar } from '@client/components/Avatar'
 import { LoadingIndicator } from '@client/components/LoadingIndicator'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { usePermissions } from '@client/hooks/useAuthorization'
@@ -506,6 +506,10 @@ function UserListComponent({ userDetails }: UserListProps) {
         return {
           image: (
             <Link
+              aria-label={intl.formatMessage({
+                id: 'user.avatar',
+                defaultMessage: 'User avatar'
+              })}
               onClick={() =>
                 navigate(
                   ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
@@ -515,7 +519,7 @@ function UserListComponent({ userDetails }: UserListProps) {
               }
               disabled={!canReadUser(userForPermissions)}
             >
-              <AvatarSmall name={name} avatar={avatar || undefined} />
+              <Avatar aria-hidden name={name} size="sm" src={avatar} />
             </Link>
           ),
           label: (
