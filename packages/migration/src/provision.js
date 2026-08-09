@@ -376,7 +376,7 @@ function runMigrations({ database, adminUrl, roles, env }) {
         stdio: 'inherit',
         env: {
           ...env,
-          EVENTS_POSTGRES_URL: migratorUrl,
+          EVENTS_MIGRATOR_URL: migratorUrl,
           EVENTS_DB_USER: app.name
         }
       }

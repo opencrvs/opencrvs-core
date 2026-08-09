@@ -10,7 +10,12 @@
 
 set -e # fail if any of the commands fails
 
-: "${EVENTS_POSTGRES_URL:=postgres://events_migrator:migrator_password@localhost:5432/events}"
+# Migrations need DDL rights on schema `app`, which only `events_migrator`
+# holds — `events_app` is granted USAGE and never CREATE. So this script has its
+# own connection name, distinct from the application's EVENTS_POSTGRES_URL.
+# EVENTS_POSTGRES_URL stays in the chain for deployed environments that still
+# set only the old name.
+: "${EVENTS_MIGRATOR_URL:=${EVENTS_POSTGRES_URL:-postgres://events_migrator:migrator_password@localhost:5432/events}}"
 
 SCRIPT_PATH=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
@@ -78,5 +83,5 @@ export EVENTS_DB_USER="${EVENTS_DB_USER:-events_app}"
 # Run events migrations
 run_pg_migrations \
   "$SCRIPT_PATH/src/migrations/events" \
-  "$EVENTS_POSTGRES_URL" \
+  "$EVENTS_MIGRATOR_URL" \
   "app"

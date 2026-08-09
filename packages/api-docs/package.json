@@ -4,7 +4,7 @@
   "description": "OpenCRVS API documentation",
   "license": "MPL-2.0",
   "scripts": {
-    "start": "pnpm build && serve -p 3003 build",
+    "start": "pnpm build && serve -p ${API_DOCS_PORT:-3003} build",
     "build": "bash build.sh"
   },
   "private": true,
