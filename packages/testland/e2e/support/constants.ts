@@ -41,10 +41,19 @@ export const GATEWAY_HOST = isLocal
   ? localAddress(process.env.GATEWAY_URL, 'http://localhost:7070')
   : SCHEME + '://gateway.' + DOMAIN
 
-export const METABASE_URL =
-  process.env.NODE_ENV === 'development'
-    ? 'http://localhost:4444'
-    : SCHEME + '://metabase.' + DOMAIN
+/*
+ * Metabase is started by hand (`pnpm --filter @opencrvs/testland metabase`),
+ * not by the `pnpm dev` sweep, so the contract carries its port rather than a
+ * ready-made URL. Everything else about it matches its four neighbours above.
+ */
+const metabasePort = process.env.METABASE_PORT
+
+export const METABASE_URL = isLocal
+  ? localAddress(
+      metabasePort ? `http://localhost:${metabasePort}` : undefined,
+      'http://localhost:4444'
+    )
+  : SCHEME + '://metabase.' + DOMAIN
 
 export const METABASE_EMAIL =
   process.env.NODE_ENV === 'development'
