@@ -1,0 +1,11 @@
+# Storybook and api-docs leave the dev stack, and the fresh-machine bootstrap is retired
+
+`pnpm dev` starts the services an OpenCRVS environment needs to register a vital event. The components storybook, the client storybook and `packages/api-docs` are not among them: nothing in the running stack calls them, they are documentation surfaces a developer opens deliberately, and with N environments per machine (ADR-0003) each one paid for three extra watchers and three more ports it would never visit. They are started on demand instead — still env-aware, since their ports remain in the environment contract (`STORYBOOK_PORT`, `CLIENT_STORYBOOK_PORT`, `API_DOCS_PORT`), so starting one by hand in a linked worktree does not collide with the primary checkout's.
+
+`setup.sh` — the one-shot fresh-machine bootstrap — is deleted rather than repaired, along with `summary.sh`, `verify-dev-stack-running.sh` and `setup-countryconfig.sh`, which were reachable only from it. It could not produce a working stack: it `sudo rm -r data` (a bind-mount directory replaced by named volumes), waited on `tcp:27017` and `tcp:3447` (services this repo no longer has), ran `pnpm start` rather than `pnpm dev` so no environment was ever resolved and no database ever provisioned, and chained into a countryconfig setup still using `yarn` against `master`. `pnpm dev` now does the whole bootstrap itself — shared dependencies, secrets, database provisioning, migrations — so there is nothing left for a separate install path to add. `development-environment/check-environment.sh` is kept: it checks a machine's tooling, which `pnpm dev` does not.
+
+## Consequences
+
+- A developer wanting a component gallery or the API reference runs its package script; it is no longer waiting for them after `pnpm dev`, and `pnpm open` no longer opens a storybook tab.
+- The fresh-machine path is `bash development-environment/check-environment.sh`, then `pnpm dev`, then `pnpm seed:dev`. Any onboarding material outside this repository still saying `bash setup.sh` is now wrong; `setup.sh`'s orphaned `$CI == "true"` early exit hints that such a caller may exist somewhere unseen.
+- Writing a real fresh-machine bootstrap against today's architecture remains open. It would be a new piece of work, not a revival of this one.
