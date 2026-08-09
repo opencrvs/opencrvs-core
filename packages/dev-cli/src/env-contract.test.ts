@@ -29,6 +29,8 @@ describe('toEnvironmentVariables', () => {
       TARGET_DB: 'events',
       EVENTS_POSTGRES_URL:
         'postgres://events_app:app_password@localhost:5432/events',
+      EVENTS_MIGRATOR_URL:
+        'postgres://events_migrator:migrator_password@localhost:5432/events',
       ANALYTICS_DATABASE_URL:
         'postgres://events_analytics:analytics_password@localhost:5432/events',
       REFERENCE_DATA_DATABASE_URL:
@@ -47,7 +49,9 @@ describe('toEnvironmentVariables', () => {
       EVENTS_PORT: '5555',
       DOCUMENTS_PORT: '9050',
       STORYBOOK_PORT: '6060',
+      CLIENT_STORYBOOK_PORT: '6006',
       API_DOCS_PORT: '3003',
+      METABASE_PORT: '4444',
 
       CLIENT_APP_URL: 'http://localhost:3000/',
       LOGIN_URL: 'http://localhost:3020/',
@@ -86,6 +90,56 @@ describe('toEnvironmentVariables', () => {
       'events_feature_a_reindexing_status'
     )
     expect(vars.MINIO_BUCKET).toBe('feature-a--ocrvs')
+  })
+
+  it('shifts the manually-launched tool ports too, so two worktrees can each run one', () => {
+    const descriptor = resolveEnvironment({
+      name: 'feature-a',
+      worktreePath: '/home/dev/wt/feature-a',
+      isPrimaryWorktree: false,
+      isDefaultEnvironment: false,
+      registry: {
+        opencrvs_core: { slot: 0, worktreePath: '/p', lastUsedAt: 'x' }
+      }
+    })
+
+    const vars = toEnvironmentVariables(descriptor)
+
+    expect(vars.STORYBOOK_PORT).toBe('16060')
+    expect(vars.CLIENT_STORYBOOK_PORT).toBe('16006')
+    expect(vars.API_DOCS_PORT).toBe('13003')
+    expect(vars.METABASE_PORT).toBe('14444')
+  })
+
+  describe('EVENTS_MIGRATOR_URL', () => {
+    it('connects as the migrator role, never as the application role', () => {
+      const vars = toEnvironmentVariables(primary)
+
+      expect(vars.EVENTS_MIGRATOR_URL).toContain('events_migrator:')
+      expect(vars.EVENTS_MIGRATOR_URL).not.toContain('events_app')
+      expect(vars.EVENTS_MIGRATOR_URL).not.toBe(vars.EVENTS_POSTGRES_URL)
+    })
+
+    it('points at the same database as the application URL, so migrations land where the services read', () => {
+      const descriptor = resolveEnvironment({
+        name: 'feature-a',
+        worktreePath: '/home/dev/wt/feature-a',
+        isPrimaryWorktree: false,
+        isDefaultEnvironment: false,
+        registry: {
+          opencrvs_core: { slot: 0, worktreePath: '/p', lastUsedAt: 'x' }
+        }
+      })
+
+      const vars = toEnvironmentVariables(descriptor)
+
+      expect(vars.EVENTS_MIGRATOR_URL).toBe(
+        'postgres://events_migrator:migrator_password@localhost:5432/events_feature_a'
+      )
+      expect(new URL(vars.EVENTS_MIGRATOR_URL).pathname).toBe(
+        new URL(vars.EVENTS_POSTGRES_URL).pathname
+      )
+    })
   })
 })
 
