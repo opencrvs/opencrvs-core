@@ -16,7 +16,7 @@
     "test": "vitest",
     "test:compilation": "tsc --noEmit",
     "lint": "eslint -c eslint.config.js",
-    "setup-analytics": "docker exec -i -e POSTGRES_HOST=localhost -e POSTGRES_PORT=5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e ANALYTICS_POSTGRES_USER=events_analytics -e ANALYTICS_POSTGRES_PASSWORD=analytics_password postgres bash -s < ./assets/postgres/setup-analytics.sh",
+    "setup-analytics": "docker exec -i -e POSTGRES_HOST=localhost -e POSTGRES_PORT=5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e ANALYTICS_POSTGRES_USER=events_analytics -e ANALYTICS_POSTGRES_PASSWORD=analytics_password -e TARGET_DB ${POSTGRES_CONTAINER:-opencrvs-deps-postgres-1} bash -s < ./assets/postgres/setup-analytics.sh",
     "db:clear:all": "bash assets/clear-all-data-dev.sh && pnpm setup-analytics",
     "start": "pnpm setup-analytics && cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon --watch src --exec tsx src/index.ts",
     "start:prod": "tsx src/index.ts",
