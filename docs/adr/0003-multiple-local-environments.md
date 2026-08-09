@@ -136,6 +136,35 @@ would have produced a broken or backward-incompatible stack:
 - docker compose project / container names (currently `-p opencrvs`, and an
   explicit `container_name: postgres`).
 
+**Correction (found during implementation):** the list above is the service
+code, but it is not all of it. The repository's *developer* scripts hardcode
+the same ports, and from a linked worktree they act on the primary
+environment's stack while looking like they acted on yours — which is worse
+than failing. They are made env-aware the same way, by sourcing
+`development-environment/environment.sh`:
+
+- `pnpm db:clear:all`, `pnpm seed:dev`, `pnpm reindex` — each takes `--env
+<name>` and prints the identifiers it is about to act on.
+- `pnpm debug <service>` (`debug-service-in-chrome.sh`) — its fixed
+  `service:port` table becomes `AUTH_PORT`, `EVENTS_PORT`, `GATEWAY_PORT`,
+  `COUNTRY_CONFIG_PORT`, `DOCUMENTS_PORT`. **The inspector port is deliberately
+  *not* per-environment.** `SIGUSR1` opens Node's inspector on its own default
+  `9229`, which is not derived from this contract, so only one environment can
+  be attached at a time; the script says so rather than pretending otherwise.
+  Making it per-environment would mean threading `--inspect-port` through
+  `NODE_OPTIONS`, which several package `start` scripts *assign* rather than
+  append, so an exported value is clobbered — a change to a shared mechanism
+  for a workflow that is inherently one-window-one-target.
+- `pnpm open` — was two fixed tabs (components storybook on `6060`, login on
+  `3020`); becomes the calling environment's client and nothing else.
+
+**Correction (found during implementation):** the contract grew three keys this
+ADR did not anticipate, for services that are addressed but not started by
+`pnpm dev` (see ADR-0004): `METABASE_PORT`, `CLIENT_STORYBOOK_PORT` and
+`EVENTS_MIGRATOR_URL`. They obey the same `base + slot * 10000` arithmetic and
+live in `packages/dev-cli/src/env-contract.ts` with the rest, so a developer
+starting one of them by hand still gets their own environment's port.
+
 ## Considered alternatives
 
 - **Hostname routing** (local Traefik/Caddy, `<env>.localhost`) — mirrors e2e
