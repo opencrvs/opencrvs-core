@@ -10,12 +10,13 @@
  */
 import { describe, expect, it } from 'vitest'
 import { DestroyPlan, planDestroy, PlanDestroyInput } from './destroy'
-import { DestroyServices, runDestroy } from './destroy-command'
+import { BucketRemoval, DestroyServices, runDestroy } from './destroy-command'
 import {
   createDockerDestroyServices,
-  discoverEnvironmentsFromPostgres
+  discoverEnvironmentsFromPostgres,
+  isMissingBucket
 } from './destroy-services'
-import { CommandSpec } from './exec'
+import { CommandOutcome, CommandSpec } from './exec'
 import { Registry } from './registry'
 import { RegistrySnapshot } from './types'
 
@@ -41,7 +42,10 @@ const registry = snapshot({
  * The operation log is the assertion surface: it is the only place the question
  * "what would this actually delete?" can be answered without containers.
  */
-function recordingServices(indices: string[] = []) {
+function recordingServices(
+  indices: string[] = [],
+  bucketRemoval: BucketRemoval = 'removed'
+) {
   const operations: string[] = []
 
   const services: DestroyServices = {
@@ -57,6 +61,7 @@ function recordingServices(indices: string[] = []) {
     },
     removeBucket(bucket) {
       operations.push(`removeBucket ${bucket}`)
+      return bucketRemoval
     },
     flushRedisDb(db) {
       operations.push(`flushRedisDb ${db}`)
@@ -232,6 +237,34 @@ describe('runDestroy', () => {
 
     expect(operations).not.toContain('releaseRegistryEntry feature_a')
   })
+
+  it('does not claim to have removed a bucket that was never there', () => {
+    const { services } = recordingServices([], 'absent')
+    const lines: string[] = []
+
+    const outcome = runDestroy({
+      plan: planFor({ name: 'feature-a', snapshot: registry }),
+      services,
+      out: (message) => lines.push(message)
+    })
+
+    expect(lines).toContain('  no bucket feature-a--ocrvs to remove')
+    expect(lines).not.toContain('  removed bucket feature-a--ocrvs')
+    expect(outcome.removedBucket).toBeUndefined()
+    // "There was no bucket" is still a complete destroy: the slot is freed.
+    expect(outcome.releasedRegistryEntry).toBe(true)
+  })
+
+  it('reports the bucket as removed only when one actually was', () => {
+    const { services } = recordingServices()
+
+    const outcome = runDestroy({
+      plan: planFor({ name: 'feature-a', snapshot: registry }),
+      services
+    })
+
+    expect(outcome.removedBucket).toBe('feature-a--ocrvs')
+  })
 })
 
 describe('createDockerDestroyServices', () => {
@@ -244,7 +277,7 @@ describe('createDockerDestroyServices', () => {
     release: () => ({})
   } as unknown as Registry
 
-  function capturing(stdout = '') {
+  function capturing(stdout = '', outcome?: Partial<CommandOutcome>) {
     const specs: CommandSpec[] = []
 
     const services = createDockerDestroyServices({
@@ -252,7 +285,7 @@ describe('createDockerDestroyServices', () => {
       environment: {},
       run: (spec) => {
         specs.push(spec)
-        return { status: 0, stdout, stderr: '' }
+        return { status: 0, stdout, stderr: '', ...outcome }
       }
     })
 
@@ -282,14 +315,59 @@ describe('createDockerDestroyServices', () => {
     ])
   })
 
-  it('treats a missing bucket as success, so destroy stays idempotent', () => {
+  it('reports a bucket it removed', () => {
     const { services, specs } = capturing()
 
-    services.removeBucket('feature-a--ocrvs')
-
-    expect(specs[0].allowFailure).toBe(true)
+    expect(services.removeBucket('feature-a--ocrvs')).toBe('removed')
     expect(specs[0].args).toContain('deps/feature-a--ocrvs')
   })
+
+  it('treats a missing bucket as success, so destroy stays idempotent', () => {
+    // What `mc rb` prints when the bucket is not there: the S3 `NoSuchBucket`
+    // message, rendered by `mc`, on a non-zero exit.
+    const { services, specs } = capturing('', {
+      status: 1,
+      stderr:
+        'mc: <ERROR> Unable to validate target `deps/feature-a--ocrvs`. ' +
+        'The specified bucket does not exist.\n'
+    })
+
+    expect(services.removeBucket('feature-a--ocrvs')).toBe('absent')
+    // Non-zero has to reach this adapter for it to tell the two cases apart.
+    expect(specs[0].allowFailure).toBe(true)
+  })
+
+  it.each([
+    [
+      'MinIO unreachable',
+      'mc: <ERROR> Unable to validate target `deps/feature-a--ocrvs`. ' +
+        'Get "http://localhost:3535/feature-a--ocrvs/": dial tcp ' +
+        '127.0.0.1:3535: connect: connection refused'
+    ],
+    [
+      'the credentials are rejected',
+      'mc: <ERROR> Unable to remove bucket `deps/feature-a--ocrvs`. ' +
+        'Access Denied.'
+    ],
+    [
+      'the dependency stack is not running',
+      'Error response from daemon: No such container: opencrvs-deps-minio-1'
+    ]
+  ])(
+    'raises rather than reporting success when %s',
+    (_case: string, stderr: string) => {
+      const { services } = capturing('', { status: 1, stderr })
+
+      expect(() => services.removeBucket('feature-a--ocrvs')).toThrow(
+        /Could not remove the MinIO bucket "feature-a--ocrvs"/
+      )
+      // The message has to say the data survived, because the developer's next
+      // move — believing the environment is gone — is the dangerous one.
+      expect(() => services.removeBucket('feature-a--ocrvs')).toThrow(
+        /slot was not freed/
+      )
+    }
+  )
 
   it('flushes only the named logical database', () => {
     const { services, specs } = capturing()
@@ -298,6 +376,35 @@ describe('createDockerDestroyServices', () => {
 
     expect(specs[0].args).toContain('opencrvs-deps-redis-1')
     expect(specs[0].args.slice(-3)).toEqual(['-n', '3', 'FLUSHDB'])
+  })
+})
+
+describe('isMissingBucket', () => {
+  it('recognises the message mc renders for a bucket that is not there', () => {
+    expect(
+      isMissingBucket(
+        'mc: <ERROR> Unable to validate target `deps/gone--ocrvs`. ' +
+          'The specified bucket does not exist.'
+      )
+    ).toBe(true)
+  })
+
+  it('recognises the raw S3 error code, which is what --json output carries', () => {
+    expect(
+      isMissingBucket(
+        '{"status":"error","error":{"cause":{"error":{"Code":"NoSuchBucket"}}}}'
+      )
+    ).toBe(true)
+  })
+
+  it.each([
+    'dial tcp 127.0.0.1:3535: connect: connection refused',
+    'mc: <ERROR> Unable to remove bucket `deps/x--ocrvs`. Access Denied.',
+    'Error response from daemon: No such container: opencrvs-deps-minio-1',
+    'The Access Key Id you provided does not exist in our records.',
+    ''
+  ])('does not mistake %j for a missing bucket', (output) => {
+    expect(isMissingBucket(output)).toBe(false)
   })
 })
 

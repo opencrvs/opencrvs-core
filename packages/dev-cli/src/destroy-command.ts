@@ -11,6 +11,17 @@
 import { DestroyPlan, selectIndicesToDelete } from './destroy'
 
 /**
+ * What removing a bucket actually did.
+ *
+ * `absent` is the idempotent case — an environment that never uploaded a
+ * document never had a bucket — and is deliberately *not* spelled the same as
+ * `removed`: reporting "removed bucket X" when nothing was removed is how a
+ * failure gets mistaken for a success. Anything that is neither is an error and
+ * throws, so the registry entry is never released over surviving data.
+ */
+export type BucketRemoval = 'removed' | 'absent'
+
+/**
  * The four services an environment owns data in, plus the registry, expressed
  * as the smallest set of operations `env:destroy` needs from them.
  *
@@ -26,8 +37,11 @@ export interface DestroyServices {
   listIndices(): string[]
   /** Delete one index. Called only for indices the plan positively claims. */
   deleteIndex(index: string): void
-  /** Remove the environment's MinIO bucket and its contents, if it exists. */
-  removeBucket(bucket: string): void
+  /**
+   * Remove the environment's MinIO bucket and its contents. Reports whether
+   * there was one; throws if there was and it could not be removed.
+   */
+  removeBucket(bucket: string): BucketRemoval
   /** `FLUSHDB` against one Redis logical database. */
   flushRedisDb(db: number): void
   /** Remove the environment's registry entry, freeing its slot. */
@@ -49,6 +63,7 @@ export interface DestroyOutcome {
   refused: boolean
   droppedDatabase?: string
   deletedIndices: string[]
+  /** Set only when a bucket was actually removed, not when there was none. */
   removedBucket?: string
   flushedRedisDb?: number
   releasedRegistryEntry: boolean
@@ -114,8 +129,13 @@ export function runDestroy(input: RunDestroyInput): DestroyOutcome {
     out('  no Elasticsearch indices belonged to this environment')
   }
 
-  services.removeBucket(plan.identifiers.bucket)
-  out(`  removed bucket ${plan.identifiers.bucket}`)
+  const bucketRemoval = services.removeBucket(plan.identifiers.bucket)
+
+  out(
+    bucketRemoval === 'removed'
+      ? `  removed bucket ${plan.identifiers.bucket}`
+      : `  no bucket ${plan.identifiers.bucket} to remove`
+  )
 
   if (plan.redisDb !== undefined) {
     services.flushRedisDb(plan.redisDb)
@@ -133,7 +153,8 @@ export function runDestroy(input: RunDestroyInput): DestroyOutcome {
     refused: false,
     droppedDatabase: plan.identifiers.dbName,
     deletedIndices: indices,
-    removedBucket: plan.identifiers.bucket,
+    removedBucket:
+      bucketRemoval === 'removed' ? plan.identifiers.bucket : undefined,
     flushedRedisDb: plan.redisDb,
     releasedRegistryEntry: plan.releaseRegistryEntry,
     exitCode: 0
