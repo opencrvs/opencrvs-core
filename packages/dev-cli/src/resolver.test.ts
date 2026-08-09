@@ -38,8 +38,10 @@ const AT = '2026-01-01T00:00:00.000Z'
  * - countryConfig 3040     packages/testland/src/environment.ts
  * - events 5555            packages/events/src/index.ts (`server().listen`)
  * - documents 9050         packages/documents/src/constants.ts
- * - storybook 6060         packages/components/package.json (`start`)
+ * - storybook 6060         packages/components/package.json (`storybook`)
+ * - clientStorybook 6006   packages/client/package.json (`storybook`)
  * - apiDocs 3003           packages/api-docs/package.json (`start`)
+ * - metabase 4444          packages/testland/assets/metabase/run-dev.sh
  */
 const TODAYS_PORTS = {
   client: 3000,
@@ -50,7 +52,9 @@ const TODAYS_PORTS = {
   events: 5555,
   documents: 9050,
   storybook: 6060,
-  apiDocs: 3003
+  clientStorybook: 6006,
+  apiDocs: 3003,
+  metabase: 4444
 }
 
 function entry(slot: number, worktreePath: string) {
@@ -168,7 +172,9 @@ describe('resolveEnvironment: linked worktrees', () => {
       events: 15555,
       documents: 19050,
       storybook: 16060,
-      apiDocs: 13003
+      clientStorybook: 16006,
+      apiDocs: 13003,
+      metabase: 14444
     })
 
     for (const [service, port] of Object.entries(descriptor.ports)) {

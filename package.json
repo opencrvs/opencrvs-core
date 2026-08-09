@@ -13,7 +13,7 @@
   "packageManager": "pnpm@10.34.5",
   "scripts": {
     "postinstall": "node development-environment/link-ts6-api.js",
-    "start": "lerna run build --scope @opencrvs/toolkit --scope @opencrvs/mosip --include-dependencies && lerna run build --scope @opencrvs/components && lerna run --stream --concurrency 99 $OTHER_LERNA_FLAGS --ignore @opencrvs/countryconfig-template start",
+    "start": "lerna run build --scope @opencrvs/toolkit --scope @opencrvs/mosip --include-dependencies && lerna run build --scope @opencrvs/components && lerna run --stream --concurrency 99 $OTHER_LERNA_FLAGS --ignore @opencrvs/countryconfig-template --ignore @opencrvs/migration --ignore @opencrvs/api-docs start",
     "start:prod": "pnpm build && lerna run --stream --concurrency 99 --ignore @opencrvs/components --ignore @opencrvs/countryconfig-template $OTHER_LERNA_FLAGS start:prod",
     "dev": "bash development-environment/dev.sh",
     "check:environment": "bash development-environment/check-environment.sh",

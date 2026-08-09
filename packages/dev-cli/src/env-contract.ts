@@ -22,6 +22,13 @@ const POSTGRES_PORT = 5432
 
 const POSTGRES_ROLES = {
   app: { user: 'events_app', password: 'app_password' },
+  /*
+   * Owns schema `app` and is the only role allowed to change its shape. Kept
+   * strictly apart from `app` in the contract because the two names used to
+   * collide on `EVENTS_POSTGRES_URL`, which made the migration runner connect
+   * as `events_app` — a role holding USAGE, never CREATE, on schema `app`.
+   */
+  migrator: { user: 'events_migrator', password: 'migrator_password' },
   analytics: { user: 'events_analytics', password: 'analytics_password' },
   referenceData: {
     user: 'events_reference_data',
@@ -58,6 +65,12 @@ export function toEnvironmentVariables(
     // Per-environment isolation knobs (ADR-0001).
     TARGET_DB: descriptor.dbName,
     EVENTS_POSTGRES_URL: postgresUrl('app', descriptor.dbName),
+    /*
+     * The migration connection, distinct from the application one above:
+     * `run-migrations.sh` / `revert-migrations.sh` need DDL rights on schema
+     * `app`, which only `events_migrator` has.
+     */
+    EVENTS_MIGRATOR_URL: postgresUrl('migrator', descriptor.dbName),
     ANALYTICS_DATABASE_URL: postgresUrl('analytics', descriptor.dbName),
     REFERENCE_DATA_DATABASE_URL: postgresUrl(
       'referenceData',
@@ -87,8 +100,14 @@ export function toEnvironmentVariables(
     COUNTRY_CONFIG_PORT: String(ports.countryConfig),
     EVENTS_PORT: String(ports.events),
     DOCUMENTS_PORT: String(ports.documents),
+    /*
+     * Ports for tools launched by hand rather than by the `pnpm dev` sweep.
+     * They are still slot-shifted so two worktrees can each run one.
+     */
     STORYBOOK_PORT: String(ports.storybook),
+    CLIENT_STORYBOOK_PORT: String(ports.clientStorybook),
     API_DOCS_PORT: String(ports.apiDocs),
+    METABASE_PORT: String(ports.metabase),
 
     // Peer addresses.
     CLIENT_APP_URL: urls.client,
