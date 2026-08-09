@@ -70,7 +70,10 @@ export OPENCRVS_METABASE_DB_PASS=${OPENCRVS_METABASE_DB_PASS:-""}
 export OPENCRVS_METABASE_DB_AUTH_DB=${OPENCRVS_METABASE_DB_AUTH_DB:-""}
 
 export OPENCRVS_METABASE_MAP_NAME=${OPENCRVS_METABASE_MAP_NAME:-"Full country"}
-export OPENCRVS_METABASE_MAP_URL=${OPENCRVS_METABASE_MAP_URL:-"http://localhost:3040/content/map.geojson"}
+# The map is served by countryconfig, so it must come from this environment's
+# own countryconfig port rather than the default environment's. 3040 is the
+# default environment's port.
+export OPENCRVS_METABASE_MAP_URL=${OPENCRVS_METABASE_MAP_URL:-"http://localhost:${COUNTRY_CONFIG_PORT:-3040}/content/map.geojson"}
 export OPENCRVS_METABASE_MAP_REGION_KEY=${OPENCRVS_METABASE_MAP_REGION_KEY:-"State"}
 export OPENCRVS_METABASE_MAP_REGION_NAME=${OPENCRVS_METABASE_MAP_REGION_NAME:-"State"}
 export OPENCRVS_METABASE_ADMIN_EMAIL=${OPENCRVS_METABASE_ADMIN_EMAIL:-"user@opencrvs.org"}
