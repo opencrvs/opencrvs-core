@@ -103,7 +103,7 @@ export const description = css`
 export const valueCell = css`
   ${cell}
   ${({ theme }) => theme.fonts.reg16};
-  color: ${({ theme }) => theme.colors.supportingCopy};
+  color: ${({ theme }) => theme.colors.copy};
   padding-right: 16px;
 
   ${stackedBelow(css`
