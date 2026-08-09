@@ -28,7 +28,7 @@ export interface ListColumns {
  * there, so each value carries its own column's name instead of the caller
  * repeating it on every row.
  */
-export interface ListColumnNames {
+interface ListColumnNames {
   value?: React.ReactNode
   value2?: React.ReactNode
 }
