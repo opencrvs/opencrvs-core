@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { DestroyServices } from './destroy-command'
+import { BucketRemoval, DestroyServices } from './destroy-command'
 import { EnvironmentDiscovery, environmentNamesFromDatabases } from './destroy'
-import { CommandRunner, runCommand } from './exec'
+import { CommandRunner, describe, runCommand } from './exec'
 import { Registry } from './registry'
 
 /**
@@ -200,16 +200,13 @@ export function createDockerDestroyServices(
       })
     },
 
-    removeBucket(bucket) {
+    removeBucket(bucket): BucketRemoval {
       /*
        * Credentials travel in `MC_HOST_<alias>` rather than an `mc alias set`
        * call, so nothing is written to the container's config and the secret
        * never appears in an argv a `docker inspect` or `ps` would show.
-       *
-       * A missing bucket is success: `env:destroy` is idempotent, and an
-       * environment that never uploaded a document never had a bucket.
        */
-      run({
+      const spec = {
         command: 'docker',
         args: [
           'exec',
@@ -221,8 +218,36 @@ export function createDockerDestroyServices(
           '--force',
           `${MC_ALIAS}/${bucket}`
         ],
+        /*
+         * Non-zero is inspected here rather than thrown by the runner, because
+         * exactly one non-zero case — "there was no bucket" — is a success for
+         * this verb. Every other one must reach the caller. See below.
+         */
         allowFailure: true
-      })
+      }
+
+      const outcome = run(spec)
+
+      if (outcome.status === 0) {
+        return 'removed'
+      }
+
+      if (isMissingBucket(outcome.stderr, outcome.stdout)) {
+        return 'absent'
+      }
+
+      throw new Error(
+        `Could not remove the MinIO bucket "${bucket}": \`${describe(spec)}\` ` +
+          `exited ${outcome.status}.\n` +
+          `${[outcome.stderr, outcome.stdout]
+            .map((stream) => stream.trim())
+            .filter((stream) => stream !== '')
+            .join('\n')}\n` +
+          'The environment still owns its data, so nothing further was ' +
+          'removed and its slot was not freed. Check that the dependency ' +
+          'stack is up (`pnpm dev` or `docker compose -p opencrvs-deps up ' +
+          '-d`) and re-run.'
+      )
     },
 
     flushRedisDb(db) {
@@ -243,6 +268,36 @@ export function createDockerDestroyServices(
       options.registry.release(name)
     }
   }
+}
+
+/**
+ * The one `mc rb` failure `env:destroy` is allowed to treat as success.
+ *
+ * `mc` exits non-zero for a bucket that is not there *and* for MinIO being
+ * unreachable, the credentials being wrong, the container not existing, or the
+ * removal being denied — so the exit code alone cannot tell idempotency from a
+ * genuine failure, and a blanket `allowFailure` reports every one of them as
+ * "removed bucket X" while the data survives and the slot is freed.
+ *
+ * Two signatures, because `mc` renders the same underlying S3 error two ways:
+ *
+ * - `mc: <ERROR> Unable to validate target 'deps/x--ocrvs'. The specified
+ *   bucket does not exist.` — the human-readable rendering, which is the S3
+ *   `NoSuchBucket` error's `Message` verbatim.
+ * - `NoSuchBucket` — the S3 error *code*, which is what surfaces in `--json`
+ *   output and in some `mc` versions' plain rendering.
+ *
+ * Deliberately narrow: an unmatched failure throws, which is the safe way to be
+ * wrong. "Connection refused", "No such container" and "Access Denied" all miss
+ * both patterns.
+ */
+export function isMissingBucket(...streams: string[]): boolean {
+  const output = streams.join('\n')
+
+  return (
+    /\bNoSuchBucket\b/.test(output) ||
+    /(bucket|specified)[^\n]*does not exist/i.test(output)
+  )
 }
 
 /**

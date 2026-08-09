@@ -278,6 +278,106 @@ describe('resolveEnvironment: stability', () => {
   })
 })
 
+describe('resolveEnvironment: slot uniqueness after lazy GC', () => {
+  it('does not hand a name back the slot a live environment took over while it was stale', () => {
+    // 1. `feature-a` holds slot 1.
+    const registry: RegistrySnapshot = {
+      ...primaryRegistered,
+      feature_a: entry(1, '/home/dev/wt/feature-a')
+    }
+
+    // 2. Its worktree is deleted, so lazy GC stops its claim on slot 1, and
+    //    `feature-b` is allocated it.
+    const b = resolveEnvironment({
+      name: 'feature-b',
+      worktreePath: '/home/dev/wt/feature-b',
+      isPrimaryWorktree: false,
+      isDefaultEnvironment: false,
+      registry,
+      staleNames: ['feature_a']
+    })
+
+    expect(b.slot).toBe(1)
+    registry.feature_b = entry(b.slot, b.worktreePath)
+
+    // 3. The worktree is recreated, so `feature-a` is no longer stale and
+    //    resolves again — against a registry where slot 1 is now taken.
+    const a = resolveEnvironment({
+      name: 'feature-a',
+      worktreePath: '/home/dev/wt/feature-a',
+      isPrimaryWorktree: false,
+      isDefaultEnvironment: false,
+      registry
+    })
+
+    // 4. Two live environments must never share a slot: same port block, same
+    //    REDIS_DB.
+    expect(a.slot).not.toBe(b.slot)
+    expect(a.slot).toBe(2)
+    expect(a.redisDb).not.toBe(b.redisDb)
+    expect(a.ports.documents).not.toBe(b.ports.documents)
+  })
+
+  it('still returns a re-registered name its own data, because data follows the name not the slot', () => {
+    const a = resolveEnvironment({
+      name: 'feature-a',
+      worktreePath: '/home/dev/wt/feature-a',
+      isPrimaryWorktree: false,
+      isDefaultEnvironment: false,
+      registry: {
+        ...primaryRegistered,
+        // `feature-a`'s recorded slot, taken over by a live neighbour.
+        feature_a: entry(1, '/home/dev/wt/feature-a'),
+        feature_b: entry(1, '/home/dev/wt/feature-b')
+      }
+    })
+
+    expect(a.slot).not.toBe(1)
+    expect(a.dbName).toBe('events_feature_a')
+    expect(a.esPrefix).toBe('events_feature_a')
+    expect(a.esReindexingStatusIndex).toBe('events_feature_a_reindexing_status')
+    expect(a.bucket).toBe('feature-a--ocrvs')
+  })
+
+  it('keeps the recorded slot when the environment that borrowed it is itself now stale', () => {
+    const descriptor = resolveEnvironment({
+      name: 'feature-a',
+      worktreePath: '/home/dev/wt/feature-a',
+      isPrimaryWorktree: false,
+      isDefaultEnvironment: false,
+      registry: {
+        ...primaryRegistered,
+        feature_a: entry(1, '/home/dev/wt/feature-a'),
+        feature_b: entry(1, '/home/dev/wt/feature-b')
+      },
+      staleNames: ['feature_b']
+    })
+
+    expect(descriptor.slot).toBe(1)
+  })
+
+  it('refuses rather than doubling up when the recorded slot is taken and none is free', () => {
+    const resolve = () =>
+      resolveEnvironment({
+        name: 'feature-a',
+        worktreePath: '/home/dev/wt/feature-a',
+        isPrimaryWorktree: false,
+        isDefaultEnvironment: false,
+        registry: {
+          ...primaryRegistered,
+          feature_a: entry(1, '/home/dev/wt/feature-a'),
+          env_1: entry(1, '/home/dev/wt/1'),
+          env_2: entry(2, '/home/dev/wt/2'),
+          env_3: entry(3, '/home/dev/wt/3'),
+          env_4: entry(4, '/home/dev/wt/4'),
+          env_5: entry(5, '/home/dev/wt/5')
+        }
+      })
+
+    expect(resolve).toThrow(SlotAllocationError)
+  })
+})
+
 describe('resolveEnvironment: derived identifiers', () => {
   it('uses the `_` form for Postgres/Elasticsearch and the `-` form for the bucket', () => {
     const descriptor = resolveEnvironment({
