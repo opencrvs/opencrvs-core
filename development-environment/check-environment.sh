@@ -18,7 +18,7 @@
 #
 #   bash development-environment/check-environment.sh
 #
-# setup.sh sources this file to run the same checks before its one-time setup.
+# It is also safe to source from another script that wants the same checks.
 
 set -e
 
@@ -289,12 +289,15 @@ echo
 echo -e "\033[32m::::::::::::::::: ✅ Your OpenCRVS environment looks good! :::::::::::::::::\033[0m"
 echo
 
-# When run directly (not sourced by setup.sh), point the developer at next steps.
+# When run directly (not sourced), point the developer at next steps. `pnpm dev`
+# is the whole bootstrap: it starts the shared dependencies, provisions this
+# environment's database and runs the stack. See
+# docs/adr/0004-storybook-api-docs-and-bootstrap-leave-the-dev-stack.md.
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   echo "You're ready to go. Start the development stack with:"
   echo
   echo -e "  \033[32mpnpm dev\033[0m"
   echo
-  echo "For a full first-time setup (builds images, seeds data) run: bash setup.sh"
+  echo "Then seed it with data: pnpm seed:dev"
   echo
 fi
