@@ -50,10 +50,11 @@ export const Heading = ({
   const { columns } = useListContext()
 
   return (
-    <HeadingRow id={id}>
+    <HeadingRow id={id} role="row">
       <HeadingCell
         $fontVariant={fontVariant}
         colSpan={columnCount(columns)}
+        role="columnheader"
         scope="colgroup"
       >
         {label}

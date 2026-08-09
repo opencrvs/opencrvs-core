@@ -16,8 +16,22 @@ import { Header, IListHeaderProps } from './components/Header'
 import { Heading } from './components/Heading'
 import { IListItemProps, Item, itemColumns } from './components/Item'
 
+/*
+ * The roles below are the ones these elements already have. They are stated
+ * because stacking changes `display`, and a table element that is no longer
+ * displayed as one loses the role it was carrying — taking the row and column
+ * association with it, which on a list of values is the whole meaning.
+ */
 const Table = styled.table`
   ${styles.table}
+`
+
+const RowGroup = styled.tbody`
+  ${styles.rowGroup}
+`
+
+const HeadGroup = styled.thead`
+  ${styles.rowGroup}
 `
 
 export interface IListProps
@@ -101,7 +115,7 @@ export const List = ({ children, redactedLabel, ...props }: IListProps) => {
 
   return (
     <ListContext.Provider value={{ columns, columnNames, redactedLabel }}>
-      <Table {...props}>
+      <Table {...props} role="table">
         <colgroup>
           {columns.start && <col width={styles.START_COLUMN_WIDTH} />}
           <col />
@@ -110,8 +124,8 @@ export const List = ({ children, redactedLabel, ...props }: IListProps) => {
           {columns.actions && <col width={styles.ACTIONS_COLUMN_WIDTH} />}
         </colgroup>
 
-        {header && <thead>{header}</thead>}
-        <tbody>{body}</tbody>
+        {header && <HeadGroup role="rowgroup">{header}</HeadGroup>}
+        <RowGroup role="rowgroup">{body}</RowGroup>
       </Table>
     </ListContext.Provider>
   )

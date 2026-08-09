@@ -27,14 +27,39 @@ const stackedBelow = (styles: ReturnType<typeof css>) => css`
   }
 `
 
+/*
+ * Stacking takes the table apart, so it has to come apart all the way: a row
+ * left as a table-row among block children makes the browser invent the cells
+ * back, and the layout that falls out is the browser's, not ours.
+ */
 export const table = css`
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
+
+  ${stackedBelow(css`
+    display: block;
+  `)}
 `
 
+export const rowGroup = css`
+  ${stackedBelow(css`
+    display: block;
+  `)}
+`
+
+/*
+ * Stacked, the row places its own cells: the leading slot and the actions keep
+ * the edges, and the label and its values stack up the middle.
+ */
 export const row = css`
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+
+  ${stackedBelow(css`
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: start;
+  `)}
 `
 
 export const cell = css`
@@ -47,6 +72,12 @@ export const cell = css`
 export const startCell = css`
   ${cell}
   padding-right: 12px;
+
+  ${stackedBelow(css`
+    display: block;
+    grid-column: 1;
+    grid-row: 1;
+  `)}
 `
 
 export const labelCell = css`
@@ -59,6 +90,8 @@ export const labelCell = css`
     display: block;
     width: 100%;
     padding-bottom: 0;
+    grid-column: 2;
+    grid-row: 1;
   `)}
 `
 
@@ -80,6 +113,7 @@ export const valueCell = css`
     gap: 16px;
     width: 100%;
     padding-top: 8px;
+    grid-column: 2;
   `)}
 `
 
@@ -120,7 +154,9 @@ export const actionsCell = css`
   text-align: right;
 
   ${stackedBelow(css`
-    vertical-align: top;
+    display: block;
+    grid-column: 3;
+    grid-row: 1;
   `)}
 `
 
@@ -137,12 +173,20 @@ export const actions = css`
  */
 export const headingRow = css`
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+
+  ${stackedBelow(css`
+    display: block;
+  `)}
 `
 
 export const headingCell = css`
   color: ${({ theme }) => theme.colors.copy};
   text-align: left;
   padding: 24px 0 8px;
+
+  ${stackedBelow(css`
+    display: block;
+  `)}
 `
 
 export const headerRow = css`

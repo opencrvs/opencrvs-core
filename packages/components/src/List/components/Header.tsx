@@ -39,11 +39,21 @@ export const Header = ({ id, label, value, value2 }: IListHeaderProps) => {
   const { columns } = useListContext()
 
   return (
-    <HeaderRow id={id}>
+    <HeaderRow id={id} role="row">
       {columns.start && <HeaderCell aria-hidden />}
-      <HeaderCell scope="col">{label}</HeaderCell>
-      {columns.value && <HeaderCell scope="col">{value}</HeaderCell>}
-      {columns.value2 && <HeaderCell scope="col">{value2}</HeaderCell>}
+      <HeaderCell role="columnheader" scope="col">
+        {label}
+      </HeaderCell>
+      {columns.value && (
+        <HeaderCell role="columnheader" scope="col">
+          {value}
+        </HeaderCell>
+      )}
+      {columns.value2 && (
+        <HeaderCell role="columnheader" scope="col">
+          {value2}
+        </HeaderCell>
+      )}
       {columns.actions && <HeaderCell aria-hidden />}
     </HeaderRow>
   )

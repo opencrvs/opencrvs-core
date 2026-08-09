@@ -129,10 +129,14 @@ export const Item = ({
   const namesColumns = columns.value2
 
   return (
-    <ItemRow data-testid={testId} id={id}>
-      {columns.start && <StartCell>{start}</StartCell>}
+    <ItemRow data-testid={testId} id={id} role="row">
+      {columns.start && <StartCell role="cell">{start}</StartCell>}
 
-      <LabelCell data-testid={testId && `${testId}-label`} scope="row">
+      <LabelCell
+        data-testid={testId && `${testId}-label`}
+        role="rowheader"
+        scope="row"
+      >
         {label}
         {description && <Description>{description}</Description>}
       </LabelCell>
@@ -141,6 +145,7 @@ export const Item = ({
         <ValueCell
           data-testclass={redacted ? 'redacted' : undefined}
           data-testid={testId && `${testId}-value`}
+          role="cell"
         >
           {namesColumns && columnNames.value && (
             <ColumnName>{columnNames.value}</ColumnName>
@@ -156,6 +161,7 @@ export const Item = ({
         <ValueCell
           data-testclass={redacted2 ? 'redacted' : undefined}
           data-testid={testId && `${testId}-value2`}
+          role="cell"
         >
           {namesColumns && columnNames.value2 && (
             <ColumnName>{columnNames.value2}</ColumnName>
@@ -172,7 +178,7 @@ export const Item = ({
       )}
 
       {columns.actions && (
-        <ActionsCell data-testid={testId && `${testId}-actions`}>
+        <ActionsCell data-testid={testId && `${testId}-actions`} role="cell">
           {actions && <Actions>{actions}</Actions>}
         </ActionsCell>
       )}
