@@ -45,8 +45,8 @@ _Avoid_: employee, seeded user, default user
 ### Local environments
 
 **Environment**:
-An isolated instance of the OpenCRVS stack running on a developer machine — its own set of host node processes plus a logical slice of the shared dependencies. Identified by a `name`.
-_Avoid_: instance, stack (when you mean a single isolated env)
+An isolated run of OpenCRVS on a developer machine — its own set of host node processes plus a logical slice of the shared dependencies. Identified by a `name`.
+_Avoid_: instance; stack, or an environment's stack, as a name for one of these. "Stack" stays correct for a set of services generically ("the dev stack", "start the stack") — it is wrong only when it stands in for one environment.
 
 **Name**:
 The identifier for an environment, derived from the git worktree directory basename (sanitized, `-` → `_`). Keys all per-environment data — database name, Elasticsearch index prefix, MinIO bucket.
@@ -62,7 +62,7 @@ The machine-level file (`~/.local/state/opencrvs/envs.json`) mapping each enviro
 
 **Dependency singleton**:
 The single shared set of backing services (Postgres, Elasticsearch, Redis, MinIO) that all local environments share, run under docker compose project `opencrvs-deps`. Contrast with the per-environment node processes.
-_Avoid_: deps stack, backend services
+_Avoid_: deps stack, dependency stack, backend services. "Singleton" is the load-bearing word — there is exactly one per machine, and calling it a stack invites the reader to assume one per environment.
 
 ### Auditing
 
