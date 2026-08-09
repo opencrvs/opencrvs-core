@@ -25,12 +25,9 @@ export const Label = styled.label`
 `
 
 /**
- * One setting, as returned by its hook.
- *
- * The row belongs in the settings list's table; the dialogs and toasts it opens
- * do not, so the two travel separately and the page renders each in its place.
- * Keeping them in one hook leaves the state that joins them — which dialog is
- * open, which toast is showing — inside the setting it belongs to.
+ * One setting, as returned by its hook. The row goes in the list's table and the
+ * overlay does not, so they travel separately and the state that joins them
+ * stays in the hook.
  */
 export interface SettingsRow {
   /** Identifies the setting, for the row's key and test id. */

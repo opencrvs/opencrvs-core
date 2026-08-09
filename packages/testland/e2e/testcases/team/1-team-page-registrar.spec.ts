@@ -49,8 +49,6 @@ test.describe.serial('1. Team Page -1', () => {
       await expect(rows).toHaveCount(team.length)
 
       for (let i = 0; i < team.length; i++) {
-        // Each row is keyed by user id, so its cells are addressed by what they
-        // hold rather than by their position among the columns.
         const row = rows.nth(i)
         await expect(row.getByTestId(/-label$/)).toHaveText(team[i].name)
         await expect(row.getByTestId(/-value$/)).toHaveText(team[i].role)

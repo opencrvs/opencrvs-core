@@ -36,11 +36,6 @@ const settingsTitle = {
 function SettingsPageComponent() {
   const intl = useIntl()
 
-  /*
-   * Each setting owns the state joining its row to the dialog that changes it,
-   * so the two arrive together and are rendered apart: the row inside the
-   * list's table, the dialog outside it.
-   */
   const settings = [
     useName(),
     usePhoneNumber(),

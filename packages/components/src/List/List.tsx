@@ -17,10 +17,9 @@ import { Heading } from './components/Heading'
 import { IListItemProps, Item, itemColumns } from './components/Item'
 
 /*
- * The roles below are the ones these elements already have. They are stated
- * because stacking changes `display`, and a table element that is no longer
- * displayed as one loses the role it was carrying — taking the row and column
- * association with it, which on a list of values is the whole meaning.
+ * The roles are the ones these elements already have. Stating them keeps the
+ * row and column association when `display` changes, which some engines
+ * otherwise drop.
  */
 const Table = styled.table`
   ${styles.table}

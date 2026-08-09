@@ -121,11 +121,7 @@ export const Item = ({
   const { columns, columnNames, redactedLabel } = useListContext()
   const testId = props['data-testid']
 
-  /*
-   * Only a row with two values is ambiguous once stacked — one value is named
-   * by the label above it, two are not. So the column name rides along only
-   * where it settles something.
-   */
+  /* Stacked, one value is named by its label; two are not. */
   const namesColumns = columns.value2
 
   return (

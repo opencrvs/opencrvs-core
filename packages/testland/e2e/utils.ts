@@ -147,10 +147,7 @@ export async function ensureAssignedToUser(
 ) {
   const userFullName = usernameToFullNameMap[username]
 
-  /*
-   * The cell, not anything inside it: a value renders as bare text, and only a
-   * placeholder or a redaction bar brings an element of its own.
-   */
+  /* A value renders as bare text; only a placeholder or bar adds an element. */
   const assignedTo = page.getByTestId('assignedTo-value')
 
   // Wait for the value to actually render before deciding

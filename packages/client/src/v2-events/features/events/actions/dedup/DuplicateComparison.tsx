@@ -405,11 +405,6 @@ export function DuplicateComparison({
                     {sections.title}
                   </Text>
                   <List key={`comparison-${index}`}>
-                    {/*
-                     * The tracking ids name the columns once. Each row's values
-                     * carry them again only where the list stacks and the
-                     * column headers are gone.
-                     */}
                     <List.Header
                       value={
                         <Text color="negative" element="span" variant="reg16">

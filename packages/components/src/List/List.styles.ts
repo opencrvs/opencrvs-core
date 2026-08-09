@@ -28,9 +28,8 @@ const stackedBelow = (styles: ReturnType<typeof css>) => css`
 `
 
 /*
- * Stacking takes the table apart, so it has to come apart all the way: a row
- * left as a table-row among block children makes the browser invent the cells
- * back, and the layout that falls out is the browser's, not ours.
+ * Every table box changes together. A table-row left among block children makes
+ * the browser generate anonymous cells around them.
  */
 export const table = css`
   width: 100%;

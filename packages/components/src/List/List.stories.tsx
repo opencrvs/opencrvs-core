@@ -45,7 +45,7 @@ const Change = (
   </Link>
 )
 
-/** A record's fields — the shape `Summary` covers today. */
+/** A record's fields. */
 export const Default = () => (
   <List>
     <List.Item label="Event" value="Birth" />
@@ -122,13 +122,8 @@ export const TwoValueColumns = () => (
 
 /**
  * The same field for two records. Each column resolves independently, so an
- * empty column says so rather than rendering blank.
- *
- * Narrow the viewport and the column headers go, taking with them — for a
- * screen reader too, since the stacked cells are no longer table cells — which
- * record each value came from. So a two-value row repeats its column's name
- * beside each value once stacked. A one-value row does not: its label already
- * says what it is.
+ * empty column says so rather than rendering blank. Narrow the viewport to see
+ * each value take its column's name.
  */
 export const Comparison = () => (
   <List redactedLabel="Hidden">
