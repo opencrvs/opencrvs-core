@@ -287,11 +287,11 @@ export function EventSummary({
               key={field.id}
               data-testid={field.id}
               label={intl.formatMessage(field.label)}
-              redacted={field.secured && hideSecuredFields}
               placeholder={
                 field.emptyValueMessage &&
                 intl.formatMessage(field.emptyValueMessage)
               }
+              redacted={field.secured && hideSecuredFields}
               value={field.value}
             />
           ))}
