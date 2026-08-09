@@ -277,20 +277,17 @@ function urlsForPorts(ports: ServicePorts): ServiceUrls {
   }
 }
 
-function allocateSlot(name: string, input: ResolveEnvironmentInput): number {
-  const existing = input.registry[name]
-
-  // Stability first: a name keeps the slot it was given, so restarting an
-  // environment (or re-registering a name whose worktree was deleted) always
-  // lands back on the same ports and the same data.
-  if (existing) {
-    return existing.slot
-  }
-
-  if (input.isPrimaryWorktree) {
-    return PRIMARY_SLOT
-  }
-
+/**
+ * Which slot each *live* environment other than `name` currently holds.
+ *
+ * Stale entries — those whose worktree directory has disappeared — are left
+ * out, which is what makes lazy GC free their slots. Their registry entries and
+ * their data are untouched; only the claim on the slot lapses.
+ */
+function liveSlotHolders(
+  name: string,
+  input: ResolveEnvironmentInput
+): Map<number, string> {
   const stale = new Set(input.staleNames ?? [])
   const holders = new Map<number, string>()
 
@@ -301,6 +298,41 @@ function allocateSlot(name: string, input: ResolveEnvironmentInput): number {
     if (!holders.has(entry.slot)) {
       holders.set(entry.slot, otherName)
     }
+  }
+
+  return holders
+}
+
+function allocateSlot(name: string, input: ResolveEnvironmentInput): number {
+  const existing = input.registry[name]
+  const holders = liveSlotHolders(name, input)
+
+  /*
+   * Stability, but never at the cost of uniqueness.
+   *
+   * A name keeps the slot it was given, so restarting an environment lands
+   * back on the same ports — *unless* another live environment has since taken
+   * that slot over. That is reachable: lazy GC frees the slot of an
+   * environment whose worktree was deleted, a new environment is allocated it,
+   * and then the deleted worktree is recreated. Handing the old name its
+   * recorded slot back would put two live environments on one port block and
+   * one `REDIS_DB`, which is precisely what slots exist to prevent.
+   *
+   * Reallocating costs nothing that matters: every piece of an environment's
+   * data — `dbName`, `esPrefix`, `esReindexingStatusIndex`, `bucket` — is
+   * derived from the *name*, not the slot, so a re-registered name still comes
+   * back to its own database, indices and bucket (story 18). Only `REDIS_DB`
+   * and the port block follow the slot, and Redis holds caches and token
+   * invalidation, not data worth resurrecting. The converse — keeping the slot
+   * and sharing it — would hand the new occupant of the slot our Redis DB,
+   * which is exactly the "leftover data" story 17 rules out.
+   */
+  if (existing && !holders.has(existing.slot)) {
+    return existing.slot
+  }
+
+  if (input.isPrimaryWorktree) {
+    return PRIMARY_SLOT
   }
 
   for (let slot = PRIMARY_SLOT + 1; slot <= MAX_SLOT; slot++) {
