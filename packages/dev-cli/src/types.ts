@@ -16,17 +16,23 @@
  *
  * Each base is taken from the code that actually binds or addresses it:
  *
- * | service       | base | source of truth                                       |
- * | ------------- | ---- | ----------------------------------------------------- |
- * | client        | 3000 | packages/client/package.json `vite --port=3000`        |
- * | login         | 3020 | packages/login/package.json `vite --port=3020`         |
- * | gateway       | 7070 | packages/gateway/src/environment.ts `PORT`             |
- * | auth          | 4040 | packages/auth/src/environment.ts `AUTH_PORT`           |
- * | countryConfig | 3040 | packages/testland/src/environment.ts `COUNTRY_CONFIG_PORT` |
- * | events        | 5555 | packages/events/src/index.ts `server().listen(5555)`   |
- * | documents     | 9050 | packages/documents/src/constants.ts `DOCUMENTS_PORT`   |
- * | storybook     | 6060 | packages/components/package.json `start`               |
- * | apiDocs       | 3003 | packages/api-docs/package.json `start`                 |
+ * | service         | base | source of truth                                     |
+ * | --------------- | ---- | --------------------------------------------------- |
+ * | client          | 3000 | packages/client/package.json `vite --port=3000`      |
+ * | login           | 3020 | packages/login/package.json `vite --port=3020`       |
+ * | gateway         | 7070 | packages/gateway/src/environment.ts `PORT`           |
+ * | auth            | 4040 | packages/auth/src/environment.ts `AUTH_PORT`         |
+ * | countryConfig   | 3040 | packages/testland/src/environment.ts `COUNTRY_CONFIG_PORT` |
+ * | events          | 5555 | packages/events/src/index.ts `server().listen(5555)` |
+ * | documents       | 9050 | packages/documents/src/constants.ts `DOCUMENTS_PORT` |
+ * | storybook       | 6060 | packages/components/package.json `storybook`         |
+ * | clientStorybook | 6006 | packages/client/package.json `storybook`             |
+ * | apiDocs         | 3003 | packages/api-docs/package.json `start`               |
+ * | metabase        | 4444 | packages/testland/assets/metabase/run-dev.sh `MB_JETTY_PORT` |
+ *
+ * `storybook`, `clientStorybook`, `apiDocs` and `metabase` are not part of the
+ * `pnpm dev` sweep — they are launched by hand — but they are slot-shifted all
+ * the same so two worktrees can each run one without a port collision.
  *
  * Dependency ports (Postgres 5432, Elasticsearch 9200, Redis 6379, MinIO
  * 3535/3536) are deliberately absent: dependencies are a machine-wide
@@ -41,7 +47,9 @@ export const BASE_PORTS = {
   events: 5555,
   documents: 9050,
   storybook: 6060,
-  apiDocs: 3003
+  clientStorybook: 6006,
+  apiDocs: 3003,
+  metabase: 4444
 } as const
 
 export type ServiceName = keyof typeof BASE_PORTS
