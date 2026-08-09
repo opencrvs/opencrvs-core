@@ -350,7 +350,7 @@ describe('createDockerDestroyServices', () => {
         'Access Denied.'
     ],
     [
-      'the dependency stack is not running',
+      'the dependency singleton is not running',
       'Error response from daemon: No such container: opencrvs-deps-minio-1'
     ]
   ])(
