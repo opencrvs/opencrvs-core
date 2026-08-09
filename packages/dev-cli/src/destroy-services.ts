@@ -14,9 +14,9 @@ import { CommandRunner, describe, runCommand } from './exec'
 import { Registry } from './registry'
 
 /**
- * Containers of the shared dependency stack, named by docker compose from the
- * project name `opencrvs-deps` (see `docker-compose.dev-deps.yml`). Overridable
- * so an unusual local setup is not locked out, matching the
+ * Containers of the shared dependency singleton, named by docker compose from
+ * the project name `opencrvs-deps` (see `docker-compose.dev-deps.yml`).
+ * Overridable so an unusual local setup is not locked out, matching the
  * `${POSTGRES_CONTAINER:-...}` escape hatch `clear-all-data.sh` already offers.
  */
 export const DEPS_CONTAINERS = {
@@ -30,7 +30,7 @@ export type DepsContainers = Record<keyof typeof DEPS_CONTAINERS, string>
 
 /**
  * Ports *inside* the containers. These are not the host ports and are never
- * slot-shifted: the dependency stack is a machine-wide singleton, so every
+ * slot-shifted: the dependencies are a machine-wide singleton, so every
  * environment's data lives in the same four services.
  */
 const ELASTICSEARCH_INTERNAL_PORT = 9200
