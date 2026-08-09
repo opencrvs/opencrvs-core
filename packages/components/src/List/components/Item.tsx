@@ -14,8 +14,9 @@ import * as styles from '../List.styles'
 import { useListContext } from '../ListContext'
 import { Cell, rendersNothing, resolveCell, ValueColumn } from '../resolveCell'
 
-const ItemRow = styled.tr`
+const ItemRow = styled.tr<{ $centered: boolean }>`
   ${styles.row}
+  ${({ $centered }) => $centered && styles.rowCentered}
 `
 
 const StartCell = styled.td`
@@ -125,7 +126,7 @@ export const Item = ({
   const namesColumns = columns.value2
 
   return (
-    <ItemRow data-testid={testId} id={id} role="row">
+    <ItemRow $centered={columns.start} data-testid={testId} id={id} role="row">
       {columns.start && <StartCell role="cell">{start}</StartCell>}
 
       <LabelCell

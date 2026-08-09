@@ -66,6 +66,22 @@ export const row = css`
   `)}
 `
 
+/*
+ * A leading slot holds a fixed-height object — an avatar, an icon — and the row
+ * reads as one thing standing beside it. So its cells centre on that object
+ * instead of each starting at the top.
+ */
+export const rowCentered = css`
+  > th,
+  > td {
+    vertical-align: middle;
+  }
+
+  ${stackedBelow(css`
+    align-items: center;
+  `)}
+`
+
 const cell = css`
   padding: 16px 0;
   vertical-align: top;
