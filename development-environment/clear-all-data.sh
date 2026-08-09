@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -7,7 +8,6 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
-#!/usr/bin/env bash
 set -euo pipefail
 
 print_usage_and_exit () {
@@ -35,7 +35,7 @@ cd "$DIR"
 source "$DIR/development-environment/environment.sh"
 opencrvs_env_load "$@" || print_usage_and_exit
 
-# Containers of the shared dependency stack, which runs as the docker compose
+# Containers of the shared dependency singleton, which runs as the docker compose
 # project `opencrvs-deps` (see docs/adr/0003-multiple-local-environments.md).
 POSTGRES_CONTAINER="${POSTGRES_CONTAINER:-opencrvs-deps-postgres-1}"
 MINIO_CONTAINER="${MINIO_CONTAINER:-opencrvs-deps-minio-1}"
