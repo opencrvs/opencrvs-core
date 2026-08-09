@@ -61,7 +61,7 @@ export const row = css`
   `)}
 `
 
-export const cell = css`
+const cell = css`
   padding: 16px 0;
   vertical-align: top;
   text-align: left;
