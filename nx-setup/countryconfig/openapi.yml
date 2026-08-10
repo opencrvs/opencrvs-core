@@ -851,7 +851,6 @@ components:
         - declaration
         - status
         - type
-        - content
     UnarchiveAction:
       type: object
       properties:
@@ -3055,6 +3054,7 @@ components:
                                 - notifiedBy
                                 - declaredIn
                                 - declaredBy
+                                - status
                                 - registeredIn
                                 - registeredBy
                                 - flags
@@ -3333,6 +3333,7 @@ components:
                                 - notifiedBy
                                 - declaredIn
                                 - declaredBy
+                                - status
                                 - registeredIn
                                 - registeredBy
                                 - flags
@@ -4009,6 +4010,7 @@ components:
                             - notifiedBy
                             - declaredIn
                             - declaredBy
+                            - status
                             - registeredIn
                             - registeredBy
                             - flags
@@ -9157,6 +9159,7 @@ components:
                             - notifiedBy
                             - declaredIn
                             - declaredBy
+                            - status
                             - registeredIn
                             - registeredBy
                             - flags
@@ -9645,6 +9648,7 @@ components:
                             - notifiedBy
                             - declaredIn
                             - declaredBy
+                            - status
                             - registeredIn
                             - registeredBy
                             - flags
@@ -15160,6 +15164,7 @@ components:
                                   - notifiedBy
                                   - declaredIn
                                   - declaredBy
+                                  - status
                                   - registeredIn
                                   - registeredBy
                                   - flags
@@ -15474,6 +15479,7 @@ components:
                                   - notifiedBy
                                   - declaredIn
                                   - declaredBy
+                                  - status
                                   - registeredIn
                                   - registeredBy
                                   - flags
@@ -16322,7 +16328,6 @@ components:
         - declaration
         - status
         - type
-        - content
       additionalProperties: false
     UnarchiveActionOutput:
       type: object
