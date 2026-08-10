@@ -8,7 +8,10 @@
     "build": "bash build.sh"
   },
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "@opencrvs/commons": "workspace:*",
+    "@opencrvs/events": "workspace:*"
+  },
   "devDependencies": {
     "serve": "^14.2.4"
   }

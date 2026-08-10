@@ -11,3 +11,5 @@ RUN apk add --no-cache \
       rsync \
       kubectl \
       grep
+
+COPY packages/utilities/scripts/ /usr/local/bin/

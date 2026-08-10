@@ -104,6 +104,7 @@ export async function getAdoptionSealingIntegrationCredentials() {
       { err: error },
       'Failed to provision the adoption sealing integration. Adoption registrations will not be able to seal the original birth record until this is resolved.'
     )
+    return undefined
   }
 }
 
