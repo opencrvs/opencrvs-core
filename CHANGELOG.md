@@ -53,6 +53,10 @@ Locations and administrative areas can now be created, renamed, recoded, and ina
 
 Added `notifiedIn` and `notifiedBy` scope options for record scopes (`record.read`, `record.edit`, `record.search`, etc.), mirroring the existing `declaredIn`/`declaredBy` and `registeredIn`/`registeredBy` patterns — enables role configurations to restrict access based on where or by whom an event was notified. [#11875](https://github.com/opencrvs/opencrvs-core/issues/11875)
 
+#### Status-based scope filtering
+
+Added a `status` scope option for record scopes (`record.edit`, `record.reject`, `record.archive`, `record.search`, etc.) — e.g. `{ type: 'record.edit', options: { status: ['DECLARED'] } }` restricts the scope to records currently in one of the given `EventStatus` values.
+
 #### `APPROVE_CORRECTION` / `REJECT_CORRECTION` no longer inherit `REQUEST_CORRECTION`'s config
 
 `getActionConfig()` used to alias `APPROVE_CORRECTION` and `REJECT_CORRECTION` to whatever was configured on `REQUEST_CORRECTION` (label, flags, conditionals). Each now resolves to its own independent config. If your country config relies on `REQUEST_CORRECTION`'s `conditionals` or `flags` also applying to approve/reject, add explicit `APPROVE_CORRECTION`/`REJECT_CORRECTION` entries with the same values.
@@ -83,6 +87,8 @@ A new `integration.audit.read` scope guards it; country configs must assign it t
 
 - Keep a number field's postfix/unit label (e.g. `Kilograms (kg)` on Weight at birth) on a single line instead of wrapping onto a second row [#13216](https://github.com/opencrvs/opencrvs-core/issues/13216)
 - Bust the locally cached data when a user's office or role changes, so stale drafts and records from the previous office no longer appear after the change
+- Stop showing an empty `Comment` section in the record audit history for archived records. Archiving from the action menu never asked for a comment, so the section only ever displayed a `-` placeholder. Records archived through the "mark as duplicate" flow still show the comment that was entered there [#13265](https://github.com/opencrvs/opencrvs-core/issues/13265)
+- Stop offering custom actions (e.g. `ESCALATE`) on a draft. Executing one deleted the draft while leaving the event undeclared, making the record impossible to find again [#13245](https://github.com/opencrvs/opencrvs-core/issues/13245)
 
 ## 2.0.0
 

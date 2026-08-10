@@ -69,6 +69,17 @@ const messagesToDefine: IStepOneFormMessages = {
     description:
       'The error that appears when the user entered details are forbidden'
   },
+  tooManyLoginAttemptError: {
+    id: 'login.tooManyLoginAttemptError',
+    defaultMessage:
+      'Too many login attempts. You can try again after one minute.',
+    description: 'Error shown when login attempt is limited by the system'
+  },
+  somethingWentWrong: {
+    id: 'login.somethingWentWrong',
+    defaultMessage: 'Something went wrong. Please try again.',
+    description: 'Error toast message for general errors'
+  },
   optionalLabel: {
     id: 'login.optionalLabel',
     defaultMessage: 'Optional',
