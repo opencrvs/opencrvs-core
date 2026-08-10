@@ -418,3 +418,4 @@ playwright-cli show --annotate
 * **Tracing** [references/tracing.md](references/tracing.md)
 * **Video recording** [references/video-recording.md](references/video-recording.md)
 * **Inspecting element attributes** [references/element-attributes.md](references/element-attributes.md)
+* **Driving offline-first SPAs (controlled inputs, lazy chunks, stale refs)** [references/spa-quirks.md](references/spa-quirks.md)
