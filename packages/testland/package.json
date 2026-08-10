@@ -17,7 +17,7 @@
     "e2e": "NODE_OPTIONS=--dns-result-order=ipv4first pnpm playwright test --ui",
     "e2e-dev": "NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first pnpm playwright test --ui",
     "precommit": "lint-staged",
-    "test": "NO_MOSIP=false vitest --exclude e2e --silent --passWithNoTests",
+    "test": "NO_MOSIP=false vitest run --exclude e2e --silent --passWithNoTests",
     "test:watch": "NO_MOSIP=false vitest",
     "test:compilation": "tsc --noEmit --resolveJsonModule",
     "lint": "eslint -c eslint.config.js",
