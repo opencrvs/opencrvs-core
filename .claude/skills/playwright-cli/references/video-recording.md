@@ -128,6 +128,80 @@ Embrace creativity, overlays are powerful.
 | `disposable.dispose()` | Remove a sticky overlay added without duration |
 | `page.screencast.hideOverlays()` / `page.screencast.showOverlays()` | Temporarily hide/show all overlays |
 
+## Paced walkthroughs for a reviewer
+
+A recording meant for a human to *follow* — a reviewer checking a behaviour — has
+two requirements the automation itself does not: no dead air, and a pace slow
+enough to read.
+
+**Drive the whole recording from one shell invocation.** Every round trip
+between the model and the shell lands in the video as a freeze — the recorder
+keeps running while nothing happens on screen. A script that mints the state it
+needs, writes its segments, and records them without handing control back is the
+single biggest quality difference:
+
+```bash
+#!/bin/bash
+set -e
+
+# 1. set up whatever the flow needs, capturing values the segments interpolate
+STATE=$(./mint-fixture.sh)
+
+# 2. write one segment file per logical step
+cat > /tmp/seg1.js <<'EOF'
+async (page) => {
+  await page.goto('https://example.com')
+  await page.waitForTimeout(1800)
+  await page.getByRole('button', { name: 'Start' }).click()
+  await page.waitForTimeout(1400)
+}
+EOF
+
+cat > /tmp/seg2.js <<EOF
+async (page) => {
+  await page.goto('https://example.com/step/$STATE')
+  await page.getByText('Confirmed').waitFor()
+  await page.waitForTimeout(3200)
+}
+EOF
+
+# 3. record: overlay once, then alternate chapter card and segment
+playwright-cli goto https://example.com >/dev/null
+playwright-cli video-start walkthrough.webm >/dev/null
+playwright-cli video-show-actions --duration=900 --position=top-right >/dev/null
+
+playwright-cli video-chapter "1. Where the user starts" \
+  --description="One sentence a reviewer needs before watching" \
+  --duration=3600 >/dev/null
+playwright-cli run-code --filename=/tmp/seg1.js >/dev/null
+
+playwright-cli video-chapter "2. What the change does" --duration=3600 >/dev/null
+playwright-cli run-code --filename=/tmp/seg2.js >/dev/null
+
+playwright-cli video-stop >/dev/null
+```
+
+Generating the segments from the same script is what lets a captured value (an
+id, a token, a URL) reach the page code without a round trip.
+
+### Pacing that reads well
+
+| Moment | Duration |
+|---|---|
+| Chapter card | `3600` — long enough to read a title plus a description |
+| After an ordinary click | `1400`–`1800` |
+| On the frame that proves the point | `3200`–`3800` |
+| Per-character typing delay | `70`–`120` via `pressSequentially` |
+
+Wait on the app, not the clock, for **correctness** — `getByText(...).waitFor()`,
+`waitForURL(...)` — then add an explicit `waitForTimeout` purely for
+**legibility**. A timeout standing in for a real wait makes the recording flaky;
+a timeout after one makes it watchable.
+
+Keep one segment per chapter. When they map 1:1 the chapter titles become the
+video's table of contents, and re-recording one section does not disturb the
+rest.
+
 ## Tracing vs Video
 
 | Feature | Video | Tracing |
