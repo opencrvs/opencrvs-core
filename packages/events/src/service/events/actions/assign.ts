@@ -10,6 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
+import { last } from 'lodash'
 import { TokenWithBearer } from '@opencrvs/commons'
 import {
   ActionStatus,
@@ -46,11 +47,16 @@ export async function assignRecord({
     })
   }
 
-  return processAction(input, {
+  const event = await processAction(input, {
     eventId: storedEvent.id,
     user,
     token,
     status: ActionStatus.Accepted,
     configuration
   })
+
+  return {
+    ...event,
+    actions: last(event.actions)
+  }
 }
