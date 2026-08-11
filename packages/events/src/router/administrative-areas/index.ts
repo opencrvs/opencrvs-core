@@ -52,5 +52,23 @@ export const administrativeAreaRouter = router({
     userAndSystemProcedure.use(
       allowedWithAnyOfScopes(['user.data-seeding', 'config.update-all'])
     )
-  )
+  ),
+  upsert: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'Create or update an administrative area',
+        description:
+          'Upsert a single administrative area by id. Intended for adding or correcting one administrative area at a time (e.g. fixing a seeding error), not for bulk seeding — use the tRPC `administrativeAreas.set` mutation for that. Existing administrative areas are matched by id: `parentId` is always overwritten with the supplied value, while `name`, `externalId` and `validUntil` are only overwritten when a non-null value is supplied. Requires the user.data-seeding or config.update-all scope.',
+        method: 'POST',
+        path: '/administrative-areas',
+        tags: ['Administrative areas'],
+        protect: true
+      }
+    })
+    .use(allowedWithAnyOfScopes(['user.data-seeding', 'config.update-all']))
+    .input(AdministrativeArea)
+    .output(z.void())
+    .mutation(async ({ input }) => {
+      await setAdministrativeAreas([input])
+    })
 })
