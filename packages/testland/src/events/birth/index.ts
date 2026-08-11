@@ -1268,7 +1268,7 @@ export const birthEvent = defineConfig({
       conditionals: [
         {
           type: ConditionalType.SHOW,
-          conditional: not(flag('sealed'))
+          conditional: and(status('REGISTERED'), not(flag('sealed')))
         }
       ],
       flags: [{ id: 'sealed', operation: 'add' }],
