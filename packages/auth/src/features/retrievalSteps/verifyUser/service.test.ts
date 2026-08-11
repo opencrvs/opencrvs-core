@@ -12,6 +12,7 @@ import {
   storeRetrievalStepInformation,
   getRetrievalStepInformation,
   rotateRetrievalStepNonce,
+  padRecoveryResponse,
   RetrievalSteps
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import { redis } from '@auth/database'
@@ -117,5 +118,26 @@ describe('verifyUser service', () => {
     const winningNonce = (winners[0] as PromiseFulfilledResult<string>).value
     const winningRecord = await getRetrievalStepInformation(winningNonce)
     expect(winningRecord.status).toBe(RetrievalSteps.NUMBER_VERIFIED)
+  })
+
+  describe('padRecoveryResponse', () => {
+    it('waits out the remaining floor when the work finished early', async () => {
+      const startedAt = Date.now()
+      await padRecoveryResponse(startedAt, 120)
+
+      expect(Date.now() - startedAt).toBeGreaterThanOrEqual(120)
+    })
+
+    it('returns without waiting once the floor has already passed', async () => {
+      // A request slower than the floor must not be padded a second time —
+      // that would stack the delay on exactly the requests already suffering.
+      const startedAt = Date.now() - 5000
+      const calledAt = Date.now()
+
+      await padRecoveryResponse(startedAt, 120)
+
+      // Only the jitter tail may remain, never another floor's worth.
+      expect(Date.now() - calledAt).toBeLessThan(120)
+    })
   })
 })

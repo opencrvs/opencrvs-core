@@ -13,7 +13,8 @@ import * as verifyUserService from '@auth/features/retrievalSteps/verifyUser/ser
 import * as codeService from '@auth/features/verifyCode/service'
 import {
   getRetrievalStepInformation,
-  RetrievalSteps
+  RetrievalSteps,
+  RECOVERY_RESPONSE_FLOOR_MS
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import { triggerUserEventNotification } from '@opencrvs/commons'
 
@@ -192,5 +193,30 @@ describe('verifyUser handler', () => {
     expect(found.statusCode).toBe(missing.statusCode)
     expect(found.payload).toBe(missing.payload)
     expect(found.headers['content-type']).toBe(missing.headers['content-type'])
+  })
+
+  it('holds a request that fails immediately for as long as one that succeeds', async () => {
+    /*
+     * The case a body-only comparison misses: a dependency that rejects before
+     * doing any work — the events service being down — would otherwise answer
+     * far sooner than a real lookup and time the account into existence.
+     * `padRecoveryResponse` is what both durations are pinned to, so assert
+     * against its floor rather than against each other, which would be flaky.
+     */
+    jest
+      .spyOn(verifyUserService, 'verifyUser')
+      .mockRejectedValue(new Error('events unreachable'))
+
+    const startedAt = Date.now()
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/verifyUser',
+      payload: { email: 'x@y.co', retrieveFlow: 'password' }
+    })
+
+    expect(res.statusCode).toBe(200)
+    expect(Date.now() - startedAt).toBeGreaterThanOrEqual(
+      RECOVERY_RESPONSE_FLOOR_MS
+    )
   })
 })

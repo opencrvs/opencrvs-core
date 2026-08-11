@@ -13,6 +13,7 @@ import * as Joi from 'joi'
 import {
   verifyUser,
   storeRetrievalStepInformation,
+  padRecoveryResponse,
   RetrievalSteps,
   RETRIEVAL_FLOW_USER_NAME,
   RETRIEVAL_FLOW_PASSWORD
@@ -45,18 +46,7 @@ export default async function verifyUserHandler(
     ? RETRIEVAL_FLOW_USER_NAME
     : RETRIEVAL_FLOW_PASSWORD
 
-  // Signed unconditionally, before the try, so both paths await the same work
-  // and response timing cannot reveal whether the user exists.
-  const authHeader = {
-    Authorization: `Bearer ${await createToken(
-      'auth',
-      [],
-      ['opencrvs:countryconfig-user'],
-      JWT_ISSUER,
-      undefined,
-      TokenUserType.enum.system
-    )}`
-  }
+  const startedAt = Date.now()
 
   try {
     const result = await verifyUser({
@@ -64,6 +54,17 @@ export default async function verifyUserHandler(
       email: payload.email
     })
     const token = generateNonce()
+
+    const authHeader = {
+      Authorization: `Bearer ${await createToken(
+        'auth',
+        [],
+        ['opencrvs:countryconfig-user'],
+        JWT_ISSUER,
+        undefined,
+        TokenUserType.enum.system
+      )}`
+    }
 
     await storeRetrievalStepInformation(
       token,
@@ -93,6 +94,11 @@ export default async function verifyUserHandler(
     // being down must all look alike. A 500 here would be the oracle itself.
     logger.error(err)
   }
+
+  // Every response leaves at the same time whether the work above succeeded,
+  // failed late, or failed immediately. The bodies are already identical; this
+  // is what stops the duration from saying which happened.
+  await padRecoveryResponse(startedAt)
 
   return h.response().code(200)
 }
