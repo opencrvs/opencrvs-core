@@ -20,13 +20,27 @@ _Avoid_: version history, pre-built history, timeline, audit trail
 **Identity row**:
 The permanent, unversioned part of a location or administrative area: its UUID, its parent reference, and its location type. Records reference identity, never versions; the parent chain is fixed for life in 2.1.
 
-**Seeding**:
-Establishing the administrative hierarchy from the country config's declaration, during system initialisation only. Retryable while initialisation is incomplete — a repeated seed is authoritative and replaces what the previous attempt wrote — and refused once initialisation is marked complete.
-_Avoid_: importing, re-seeding (nothing seeds a live system; later changes are edits)
-
 **Withdrawal**:
 Removing a not-yet-effective version from a history, so it never takes effect. Distinct from inactivation, which is a version whose status is `inactive` — an inactivated location stays on the timeline. A version whose `effectiveFrom` has passed cannot be withdrawn.
 _Avoid_: deletion, cancellation, revocation
+
+### Seeding
+
+**Seeding**:
+Establishing a system's starting state from the country config's seed-data, during system initialisation only — both the administrative hierarchy and the initial users. Refused once initialisation is marked complete.
+_Avoid_: importing, re-seeding (nothing seeds a live system; later changes are edits)
+
+**Seed-data**:
+What the country config states the seeded state should be, served over HTTP for the seed to consume. The authority on which offices and roles exist, ahead of anything being written.
+_Avoid_: declaration (that is a submitted record of a vital event, an unrelated concept), source data, fixtures
+
+**Pre-flight validation**:
+Checking a whole set of seed-data for validity before any part of it is written, so that rejected seed-data leaves no trace. Distinct from the per-record validation the write path performs on each individual create, which pre-flight validation reduces to a safety net rather than replaces.
+_Avoid_: pre-seed validation, dry run (nothing is written even provisionally), verification
+
+**Initial user**:
+One of the users a seed creates, described by one record of the seed-data. Has no creator among the users — the seed brings the first ones into being — which is why username collisions matter differently here than for a user created by an administrator.
+_Avoid_: employee, seeded user, default user
 
 ### Auditing
 
