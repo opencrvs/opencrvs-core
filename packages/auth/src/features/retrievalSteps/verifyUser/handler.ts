@@ -15,6 +15,7 @@ import {
   storeRetrievalStepInformation,
   padRecoveryResponse,
   RetrievalSteps,
+  RetrieveFlow,
   RETRIEVAL_FLOW_USER_NAME,
   RETRIEVAL_FLOW_PASSWORD
 } from '@auth/features/retrievalSteps/verifyUser/service'
@@ -107,6 +108,6 @@ export const requestSchema = Joi.object({
   mobile: Joi.string(),
   email: Joi.string().email(),
   retrieveFlow: Joi.string()
-    .valid(RETRIEVAL_FLOW_USER_NAME, RETRIEVAL_FLOW_PASSWORD)
+    .valid(...RetrieveFlow.options)
     .required()
 })

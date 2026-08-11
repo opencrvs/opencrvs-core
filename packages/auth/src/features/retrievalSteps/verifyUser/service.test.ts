@@ -42,6 +42,68 @@ describe('verifyUser service', () => {
     expect(redis.set).not.toHaveBeenCalled()
   })
 
+  describe('reading a record back', () => {
+    it('rejects a stored record whose status is not one this code knows', async () => {
+      // What a rolling deploy looks like: a record written by a version that
+      // had a status this one does not. Without validation it would flow on as
+      // a half-typed object and only fail at whichever guard read `status`.
+      await redis.setEx(
+        'retrieval_step_tok-unknown-status',
+        60,
+        JSON.stringify({
+          userId: '1',
+          username: 'fake_user_name',
+          userFullName: { firstname: 'Kennedy', surname: 'Mweene' },
+          scope: ['demo'],
+          securityQuestionKey: 'dummyKey',
+          status: 'PHONE_VERIFIED_IN_SOME_OLD_RELEASE',
+          retrieveFlow: 'password'
+        })
+      )
+
+      await expect(
+        getRetrievalStepInformation('tok-unknown-status')
+      ).rejects.toThrow()
+    })
+
+    it('rejects a stored record missing a field the flow depends on', async () => {
+      await redis.setEx(
+        'retrieval_step_tok-no-question',
+        60,
+        JSON.stringify({
+          userId: '1',
+          username: 'fake_user_name',
+          userFullName: { firstname: 'Kennedy', surname: 'Mweene' },
+          scope: ['demo'],
+          status: RetrievalSteps.WAITING_FOR_VERIFICATION
+        })
+      )
+
+      await expect(
+        getRetrievalStepInformation('tok-no-question')
+      ).rejects.toThrow()
+    })
+
+    it('still accepts a record with no retrieveFlow, which is how links emailed before that field look', async () => {
+      await redis.setEx(
+        'retrieval_step_tok-legacy',
+        60,
+        JSON.stringify({
+          userId: '1',
+          username: 'fake_user_name',
+          userFullName: { firstname: 'Kennedy', surname: 'Mweene' },
+          scope: ['demo'],
+          securityQuestionKey: 'dummyKey',
+          status: RetrievalSteps.WAITING_FOR_VERIFICATION
+        })
+      )
+
+      const record = await getRetrievalStepInformation('tok-legacy')
+
+      expect(record.retrieveFlow).toBeUndefined()
+    })
+  })
+
   it('rotates the nonce, preserving the record, killing the old key, and writing the target status', async () => {
     await storeRetrievalStepInformation(
       'tok-2',

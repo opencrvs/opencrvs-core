@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as crypto from 'crypto'
+import * as z from 'zod/v4'
 import { redis } from '@auth/database'
 import { logger, UserName } from '@opencrvs/commons'
 import { internalClient } from '@auth/features/authenticate/service'
@@ -18,9 +19,12 @@ import { env } from '@auth/environment'
 export const RETRIEVAL_FLOW_USER_NAME = 'username'
 export const RETRIEVAL_FLOW_PASSWORD = 'password'
 
-export type RetrieveFlow =
-  | typeof RETRIEVAL_FLOW_USER_NAME
-  | typeof RETRIEVAL_FLOW_PASSWORD
+export const RetrieveFlow = z.enum([
+  RETRIEVAL_FLOW_USER_NAME,
+  RETRIEVAL_FLOW_PASSWORD
+])
+
+export type RetrieveFlow = z.infer<typeof RetrieveFlow>
 
 export enum RetrievalSteps {
   WAITING_FOR_VERIFICATION = 'WAITING_FOR_VERIFICATION',
@@ -43,23 +47,25 @@ export async function verifyUser(input: { mobile?: string; email?: string }) {
   }
 }
 
-export interface IRetrievalStepInformation {
-  userId: string
-  username: string
-  userFullName: UserName
-  mobile?: string
-  email?: string
-  securityQuestionKey: string
-  scope: string[]
-  status: RetrievalSteps
+export const RetrievalStepInformation = z.object({
+  userId: z.string(),
+  username: z.string(),
+  userFullName: UserName,
+  mobile: z.string().optional(),
+  email: z.string().optional(),
+  securityQuestionKey: z.string(),
+  scope: z.array(z.string()),
+  status: z.enum(RetrievalSteps),
   /**
    * Decided server-side at /verifyUser time and kept off the URL, so a token
    * holder cannot rewrite it into a flow they were never sent. Optional only
    * because links emailed before this field existed lack it — treat a missing
    * value as unknown, never guess.
    */
-  retrieveFlow?: RetrieveFlow
-}
+  retrieveFlow: RetrieveFlow.optional()
+})
+
+export type IRetrievalStepInformation = z.infer<typeof RetrievalStepInformation>
 export async function storeRetrievalStepInformation(
   nonce: string,
   status: RetrievalSteps,
@@ -74,12 +80,12 @@ export async function storeRetrievalStepInformation(
 
 export async function getRetrievalStepInformation(
   nonce: string
-): Promise<IRetrievalStepInformation & { status: RetrievalSteps }> {
+): Promise<IRetrievalStepInformation> {
   const record = await redis.get(`retrieval_step_${nonce}`)
   if (record === null) {
     throw new Error('password/username retrieval step information not found')
   }
-  return JSON.parse(record)
+  return RetrievalStepInformation.parse(JSON.parse(record))
 }
 export async function deleteRetrievalStepInformation(nonce: string) {
   await redis.del(`retrieval_step_${nonce}`)
