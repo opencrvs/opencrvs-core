@@ -15,7 +15,7 @@ set -e
 common_config(){
 apt update -q
 apt upgrade -y -q
-apt install -y -q pgbackrest openssh-client
+apt install -y -q pgbackrest=2.59.0-1.pgdg13+1 openssh-client
 # Common configuration for backup and restore
 # Temporal directory required for pushing WAL files
 echo "Create pgbackrest temp directory with correct permissions"
