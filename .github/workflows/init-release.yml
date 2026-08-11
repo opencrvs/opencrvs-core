@@ -94,6 +94,13 @@ jobs:
 
           git checkout -b "release/${{ inputs.version }}"
 
+          # Every chart and values.yaml edit below interpolates $VERSION. It was
+          # previously never assigned, so the chart version/appVersion were set
+          # to a bare "v" and the image tags in values.yaml were blanked, which
+          # then tripped the version check in publish-charts.yml and had to be
+          # repaired by hand on each release.
+          VERSION="${{ inputs.version }}"
+
           # Bump all workspace package.json files and the root in one command.
           npx lerna exec 'npm version ${{ inputs.version }} --no-git-tag-version --allow-same-version'
           npm version ${{ inputs.version }} --no-git-tag-version --allow-same-version
@@ -113,6 +120,15 @@ jobs:
           }
           ' charts/opencrvs-services/values.yaml
           rm charts/opencrvs-services/values.yaml.bak
+          # The MOSIP services live in core as packages/{mosip-api,mosip-mock,
+          # esignet-mock} and are published by the same image matrix, so their
+          # tags track the core version. This file carries no comments, so yq is
+          # safe here unlike for opencrvs-services above.
+          yq -i "
+            .mosip_api.image.tag = \"$VERSION\" |
+            .mosip_mock.image.tag = \"$VERSION\" |
+            .esignet_mock.image.tag = \"$VERSION\"
+          " charts/opencrvs-mosip/values.yaml
 
           git add .
           git commit -m "chore: update version to ${{ inputs.version }}"

@@ -4,7 +4,7 @@ ingress:
 mosip_mock:
   enabled: true
   image:
-    repository: ghcr.io/opencrvs/mosip-mock
+    repository: ghcr.io/opencrvs/ocrvs-mosip-mock
     tag: 2.0.0
   env:
     FOO: bar
@@ -20,7 +20,7 @@ mosip_mock:
 esignet_mock:
   enabled: true
   image:
-    repository: ghcr.io/opencrvs/esignet-mock
+    repository: ghcr.io/opencrvs/ocrvs-esignet-mock
     tag: 2.0.0
   env:
     OIDP_CLIENT_PRIVATE_KEY_PATH: /certs/esignet-jwk.txt
@@ -28,7 +28,7 @@ esignet_mock:
 mosip_api:
   enabled: true
   image:
-    repository: ghcr.io/opencrvs/mosip-api
+    repository: ghcr.io/opencrvs/ocrvs-mosip-api
     tag: 2.0.0
   env:
     LOCALE: en
