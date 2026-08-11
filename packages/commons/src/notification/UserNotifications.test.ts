@@ -67,8 +67,14 @@ describe('triggerUserEventNotification', () => {
     expect(errorSpy).toHaveBeenCalledTimes(1)
 
     const loggedMessage = errorSpy.mock.calls[0][0] as string
-    expect(loggedMessage).toContain('username-reminder-link')
-    expect(loggedMessage).toContain('404')
+
+    expect(loggedMessage).toMatchInlineSnapshot(
+      `"triggerUserEventNotification: dispatch failed for event "username-reminder-link" with status 404"`
+    )
+
+    // Kept alongside the snapshot on purpose. An updated snapshot is easy to
+    // accept without reading; these two say outright that the recipient must
+    // never reach the log, since this runs on an unauthenticated path.
     expect(loggedMessage).not.toContain(recipient.email)
     expect(loggedMessage).not.toContain(recipient.mobile)
   })

@@ -73,7 +73,7 @@ describe('verifyRecoveryToken handler receives a request', () => {
 
     expect(res.statusCode).toBe(200)
     const body = JSON.parse(res.payload)
-    expect(body.securityQuestionKey).toBe('dummyKey')
+    expect(body.securityQuestionKey).toBe(seedRecord.securityQuestionKey)
     expect(body.nonce).toBeDefined()
     expect(body.nonce).not.toBe(token)
   })
@@ -101,7 +101,16 @@ describe('verifyRecoveryToken handler receives a request', () => {
       url: '/verifyRecoveryToken',
       payload: { token: usernameToken }
     })
-    expect(JSON.parse(usernameRes.payload).retrieveFlow).toBe('username')
+
+    // The username flow gets the same exchange as the password flow — a
+    // rotated nonce and the security question — not a lesser response.
+    const usernameBody = JSON.parse(usernameRes.payload)
+    expect(usernameBody.retrieveFlow).toBe('username')
+    expect(usernameBody.securityQuestionKey).toBe(
+      seedRecord.securityQuestionKey
+    )
+    expect(usernameBody.nonce).toBeDefined()
+    expect(usernameBody.nonce).not.toBe(usernameToken)
   })
 
   it('does not accept a caller-supplied retrieveFlow — the request schema has no such field', async () => {
@@ -122,13 +131,19 @@ describe('verifyRecoveryToken handler receives a request', () => {
     expect(res.statusCode).toBe(400)
   })
 
-  it('ignores a retrieveFlow smuggled directly onto the payload, bypassing HTTP validation', async () => {
+  it('answers with the stored flow, not a smuggled one, when the handler is called past HTTP validation', async () => {
     const token = 'recovery-token-direct-injection-attempt'
     await seedWaitingForVerification(token, { retrieveFlow: 'password' })
 
-    // Calls the handler directly so the Joi request-schema layer above
-    // cannot be credited for the result — this proves the handler code
-    // itself never reads a caller-supplied retrieveFlow off the payload.
+    /*
+     * Deliberately not a rejection test. The previous case covers the reject:
+     * Joi answers 400 when `retrieveFlow` appears in the body over HTTP. This
+     * one bypasses Joi by calling the handler function directly, so the schema
+     * cannot be credited, and checks the weaker but more important property —
+     * that the handler reads the flow from the stored record and never from
+     * the payload. If it ever read the payload instead, the holder of a
+     * password-reset link would receive the username flow here.
+     */
     const response = (await verifyRecoveryTokenHandler(
       {
         payload: { token, retrieveFlow: 'username' }
@@ -137,6 +152,7 @@ describe('verifyRecoveryToken handler receives a request', () => {
     )) as { retrieveFlow: string }
 
     expect(response.retrieveFlow).toBe('password')
+    expect(response.retrieveFlow).not.toBe('username')
   })
 
   it('rejects a legacy token whose record predates the retrieveFlow field', async () => {
