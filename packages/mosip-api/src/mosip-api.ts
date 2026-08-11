@@ -42,7 +42,9 @@ function throwIfMosipReportedError(body: unknown, context: string) {
   const { data } = MosipErrorEnvelope.safeParse(body);
 
   if (data?.errors?.length) {
-    throw new Error(`Error in ${context}, response: ${data.errors[0]?.message}`);
+    throw new Error(
+      `Error in ${context}, response: ${data.errors[0]?.message}`,
+    );
   }
 }
 

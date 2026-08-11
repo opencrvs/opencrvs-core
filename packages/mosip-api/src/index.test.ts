@@ -35,7 +35,11 @@ const createJwtPayload = () => ({
 });
 
 const createPacketRequests: Array<{
-  request: { schemaJson: string; process: string; fields: Record<string, unknown> };
+  request: {
+    schemaJson: string;
+    process: string;
+    fields: Record<string, unknown>;
+  };
 }> = [];
 
 const mswServer = setupServer(
@@ -174,39 +178,48 @@ test("validates JWTs", async (t) => {
     );
   });
 
-  await t.test("should accept correction updates and send CRVS_UPDATE process", async () => {
-    createPacketRequests.length = 0;
+  await t.test(
+    "should accept correction updates and send CRVS_UPDATE process",
+    async () => {
+      createPacketRequests.length = 0;
 
-    const response = await fastify.inject({
-      method: "POST",
-      url: "/events/update-biographics",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${createValidJwt()}`,
-      },
-      body: JSON.stringify({
-        trackingId: "tracking-id-correction",
-        notification: {
-          recipientFullName: "Jane Doe",
-          recipientEmail: "jane@example.com",
-          recipientPhone: "+1555000114",
+      const response = await fastify.inject({
+        method: "POST",
+        url: "/events/update-biographics",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${createValidJwt()}`,
         },
-        requestFields: {
-          VID: "8031687218",
-          fullName: "Infant Updated",
-          dateOfBirth: "2024-01-01",
-          gender: "male",
-        },
-        metaInfo: {},
-        audit: {},
-      }),
-    });
+        body: JSON.stringify({
+          trackingId: "tracking-id-correction",
+          notification: {
+            recipientFullName: "Jane Doe",
+            recipientEmail: "jane@example.com",
+            recipientPhone: "+1555000114",
+          },
+          requestFields: {
+            VID: "8031687218",
+            fullName: "Infant Updated",
+            dateOfBirth: "2024-01-01",
+            gender: "male",
+          },
+          metaInfo: {},
+          audit: {},
+        }),
+      });
 
-    assert.strictEqual(response.statusCode, 202);
-    assert.strictEqual(createPacketRequests.length, 1);
-    assert.strictEqual(createPacketRequests[0]?.request?.process, "CRVS_UPDATE");
-    assert.strictEqual(createPacketRequests[0]?.request?.fields?.VID, "8031687218");
-  });
+      assert.strictEqual(response.statusCode, 202);
+      assert.strictEqual(createPacketRequests.length, 1);
+      assert.strictEqual(
+        createPacketRequests[0]?.request?.process,
+        "CRVS_UPDATE",
+      );
+      assert.strictEqual(
+        createPacketRequests[0]?.request?.fields?.VID,
+        "8031687218",
+      );
+    },
+  );
 
   await fastify.close();
   database.close();

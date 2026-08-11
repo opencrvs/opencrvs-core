@@ -87,9 +87,13 @@ export const RegistrationEventResponseSchema = z.record(
 
 export type BirthRequestFields = z.infer<typeof BirthRequestFieldsSchema>;
 export type DeathRequestFields = z.infer<typeof DeathRequestFieldsSchema>;
-export type CorrectionRequestFields = z.infer<typeof CorrectionRequestFieldsSchema>;
+export type CorrectionRequestFields = z.infer<
+  typeof CorrectionRequestFieldsSchema
+>;
 export type MosipInteropPayload = z.infer<typeof MosipInteropPayloadSchema>;
-export type MosipCorrectionPayload = z.infer<typeof MosipCorrectionPayloadSchema>;
+export type MosipCorrectionPayload = z.infer<
+  typeof MosipCorrectionPayloadSchema
+>;
 export type VerifyNidPayload = z.infer<typeof VerifyNidPayloadSchema>;
 export type VerifyNidResponse = z.infer<typeof VerifyNidResponseSchema>;
 
