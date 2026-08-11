@@ -1,15 +1,18 @@
-FROM node:23.9.0-bookworm-slim
-
-ENV NODE_ENV=production
-WORKDIR /usr/src/app
-
-COPY package.json package.json
-COPY yarn.lock yarn.lock
-RUN yarn install --production --frozen-lockfile && yarn cache clean
-COPY src/ src/
-
-RUN chown -R node:node /usr/src/app
+ARG  BRANCH=develop
+FROM ghcr.io/opencrvs/ocrvs-base:${BRANCH}
 
 USER node
 
-CMD ["yarn", "start"]
+WORKDIR /app/packages/esignet-mock
+COPY --chown=node:node packages/esignet-mock/*.json /app/packages/esignet-mock/
+RUN pnpm install --frozen-lockfile
+
+# src/mock-identities.json is a symlink into packages/mosip-api/docs. The build
+# context is the repository root, so the target has to be copied for the
+# symlink to resolve inside the image.
+COPY --chown=node:node packages/mosip-api/docs/mock-identities.json /app/packages/mosip-api/docs/mock-identities.json
+COPY --chown=node:node packages/esignet-mock /app/packages/esignet-mock
+
+EXPOSE 20260
+
+CMD [ "pnpm", "start:prod" ]
