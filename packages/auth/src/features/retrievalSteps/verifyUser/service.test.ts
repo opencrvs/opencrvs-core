@@ -92,8 +92,13 @@ describe('verifyUser service', () => {
       }
     )
 
-    // Simulate two concurrent exchanges of the same emailed token racing
-    // each other to claim it.
+    /*
+     * Two concurrent exchanges of the same emailed token, racing to claim it.
+     * The in-memory `getDel` in test/setupJest.ts reads and deletes in one
+     * synchronous body, so it grants the key to exactly one caller the way the
+     * real command does. A mock that awaited between the read and the delete
+     * would let both callers win and this test would stop meaning anything.
+     */
     const [first, second] = await Promise.allSettled([
       rotateRetrievalStepNonce('tok-race', RetrievalSteps.NUMBER_VERIFIED),
       rotateRetrievalStepNonce('tok-race', RetrievalSteps.NUMBER_VERIFIED)
