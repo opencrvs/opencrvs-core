@@ -89,7 +89,7 @@ export async function unassignRecord({
   })
 
   const lastAction = getOrThrow(
-    last(event.actions),
+    last(eventWithUnassign.actions),
     'Event did not have any actions. This should never happen.'
   )
   return {
