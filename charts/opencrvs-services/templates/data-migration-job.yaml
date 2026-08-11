@@ -21,6 +21,7 @@ spec:
       containers:
         - name: migration
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.data_migration) }}
+          imagePullPolicy: {{ .Values.data_migration.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           env:
             - name: SUPER_USER_PASSWORD
               valueFrom:

@@ -19,6 +19,8 @@ import * as Sentry from '@sentry/react'
 import { BrowserTracing } from '@sentry/tracing'
 import { createBrowserRouter } from 'react-router-dom'
 import WebFont from 'webfontloader'
+import { checkAuthComplete } from '@client/profile/profileActions'
+import { forceRefreshAccessToken, getToken } from '@client/utils/authUtils'
 import { App, routesConfig } from './App'
 import { APPLICATION_VERSION } from './utils/constants'
 
@@ -57,6 +59,15 @@ function userReconnectedToast() {
 }
 
 window.addEventListener('online', userReconnectedToast)
+
+if (import.meta.env.DEV) {
+  window.__refreshToken = async () => {
+    await forceRefreshAccessToken()
+    store.dispatch(checkAuthComplete(getToken()))
+    // eslint-disable-next-line no-console
+    console.info('[dev] Token refreshed.')
+  }
+}
 
 const container = document.getElementById('root')
 const root = createRoot(container!)

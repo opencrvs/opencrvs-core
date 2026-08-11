@@ -267,7 +267,7 @@ export const uploadImageToSection = async ({
   buttonLocator: Locator
   sectionTitle: string
 }) => {
-  await sectionLocator.getByText('Select...').click()
+  await sectionLocator.getByText('Select', { exact: true }).click()
   await sectionLocator.getByText(sectionTitle, { exact: true }).click()
 
   await uploadImage(page, buttonLocator)
@@ -492,6 +492,7 @@ export type UnassignWait =
   | { waitForUnassign: true; eventId: string }
 
 const actionTitleToApiCallMap = {
+  Archive: ['event.actions.archive'],
   Notify: ['event.actions.notify'],
   Declare: ['event.actions.declare'],
   Register: ['event.actions.register'],
@@ -591,6 +592,7 @@ export async function fillRegisterDialogRequiredFields(page: Page) {
 export async function triggerDeclarationAction(
   page: Page,
   action:
+    | 'Archive'
     | 'Notify'
     | 'Declare'
     | 'Register'

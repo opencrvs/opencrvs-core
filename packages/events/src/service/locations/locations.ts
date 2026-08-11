@@ -486,6 +486,10 @@ export interface WithdrawnVersion {
  * Withdraws a pending (future-dated) version element by `versionId`.
  *
  * - unknown id, or no element with that `versionId` → NOT_FOUND
+ * - it is the only version the row has → CONFLICT (a row must always keep
+ *   at least one version; the `versions` column is non-empty by DB
+ *   constraint, so removing the last element would otherwise fail as an
+ *   unhandled NOT NULL violation instead of a clean API error)
  * - the element's `effectiveFrom` is today or in the past (no longer
  *   pending — it may already be in effect) → CONFLICT
  */
@@ -506,6 +510,13 @@ export async function withdrawVersionChecked({
     throw new TRPCError({
       code: 'NOT_FOUND',
       message: `${entityLabel} with id ${payload.id} has no version ${payload.versionId}`
+    })
+  }
+
+  if (versions.length === 1) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: `${entityLabel} with id ${payload.id} has only one version — withdrawing it would leave none`
     })
   }
 

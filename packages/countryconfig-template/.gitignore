@@ -1,0 +1,31 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# dependencies
+node_modules
+package-lock.json
+
+# production
+build
+
+
+# NOTE: Only for OpenCRVS Core Team:
+# Sparce checkout from OpenCRVS core
+# Folder introduced in OpenCRVS v2.0 to allow pushing changes to helm charts
+.opencrvs-core-charts
+
+# misc
+.DS_Store
+.env
+*.log
+.secrets/*
+# But, keep the .gitignore so the folder is created
+!.secrets/.gitignore
+.idea
+data
+
+.history
+
+*.tar.gz
+.secrets
+.env*
+notebooks

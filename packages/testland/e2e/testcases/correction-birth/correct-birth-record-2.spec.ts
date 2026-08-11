@@ -140,7 +140,7 @@ test.describe.serial('Correct record - 2', () => {
     await expect(page.getByRole('button', { name: 'Cancel' })).toBeVisible()
     await page.getByRole('button', { name: 'Confirm' }).click()
 
-    await page.getByText('Select...').click()
+    await page.getByText('Select', { exact: true }).click()
     await page.getByText('Affidavit', { exact: true }).click()
     await uploadImage(
       page,
