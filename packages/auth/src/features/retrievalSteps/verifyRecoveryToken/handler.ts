@@ -66,10 +66,7 @@ export default async function verifyRecoveryTokenHandler(
 
   // Rotation claims the key atomically; a concurrent exchange that loses the
   // race throws here and fails closed with the same 401 as any invalid token.
-  const nonce = await rotateRetrievalStepNonce(
-    token,
-    RetrievalSteps.NUMBER_VERIFIED
-  ).catch(() => {
+  const nonce = await rotateRetrievalStepNonce(token).catch(() => {
     throw unauthorized()
   })
 

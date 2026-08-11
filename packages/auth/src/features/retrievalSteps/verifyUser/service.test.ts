@@ -58,10 +58,7 @@ describe('verifyUser service', () => {
       }
     )
 
-    const newNonce = await rotateRetrievalStepNonce(
-      'tok-2',
-      RetrievalSteps.NUMBER_VERIFIED
-    )
+    const newNonce = await rotateRetrievalStepNonce('tok-2')
 
     expect(newNonce).not.toBe('tok-2')
     await expect(getRetrievalStepInformation('tok-2')).rejects.toThrow()
@@ -72,9 +69,7 @@ describe('verifyUser service', () => {
   })
 
   it('throws when rotating a token that does not exist', async () => {
-    await expect(
-      rotateRetrievalStepNonce('never-stored', RetrievalSteps.NUMBER_VERIFIED)
-    ).rejects.toThrow()
+    await expect(rotateRetrievalStepNonce('never-stored')).rejects.toThrow()
   })
 
   it('claims the old key atomically: a second rotation of the same nonce fails closed rather than producing two live nonces', async () => {
@@ -101,8 +96,8 @@ describe('verifyUser service', () => {
      * would let both callers win and this test would stop meaning anything.
      */
     const [first, second] = await Promise.allSettled([
-      rotateRetrievalStepNonce('tok-race', RetrievalSteps.NUMBER_VERIFIED),
-      rotateRetrievalStepNonce('tok-race', RetrievalSteps.NUMBER_VERIFIED)
+      rotateRetrievalStepNonce('tok-race'),
+      rotateRetrievalStepNonce('tok-race')
     ])
 
     const outcomes = [first, second]

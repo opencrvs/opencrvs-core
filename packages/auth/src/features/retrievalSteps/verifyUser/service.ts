@@ -144,13 +144,8 @@ export async function padRecoveryResponse(
  * GETDEL claims the old key atomically. A separate get-then-delete let two
  * concurrent callers both read it and both rotate, leaving two live nonces for
  * one token; now the loser gets null and fails closed.
- *
- * `status` lands the rotated record at its target in one write.
  */
-export async function rotateRetrievalStepNonce(
-  oldNonce: string,
-  status: RetrievalSteps
-) {
+export async function rotateRetrievalStepNonce(oldNonce: string) {
   const raw = await redis.getDel(`retrieval_step_${oldNonce}`)
   if (raw === null) {
     throw new Error('password/username retrieval step information not found')
@@ -160,7 +155,7 @@ export async function rotateRetrievalStepNonce(
   await redis.setEx(
     `retrieval_step_${newNonce}`,
     env.CONFIG_RECOVERY_LINK_EXPIRY_SECONDS,
-    JSON.stringify({ ...record, status })
+    JSON.stringify({ ...record, status: RetrievalSteps.NUMBER_VERIFIED })
   )
   return newNonce
 }
