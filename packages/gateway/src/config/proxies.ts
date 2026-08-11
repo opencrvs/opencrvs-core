@@ -150,10 +150,14 @@ export const rateLimitedAuthProxy = {
     method: 'POST',
     path: '/auth/verifyRecoveryToken',
     handler: rateLimitedRoute(
-      // Static, not keyed on `token`: here the secret IS the key candidate, so
-      // per-token buckets would make the cap a no-op. Brute force is infeasible
-      // at 128 bits anyway — this bounds load from an unauthenticated route.
-      { requestsPerMinute: 60, staticKey: 'verify-recovery-token' },
+      // Keyed on the token, the same shape as `authenticate` keying on the
+      // username it is given: one bucket per link, so hammering a single
+      // recovery link is capped and no caller can spend another's budget.
+      //
+      // This does not bound token guessing — each guess lands in a fresh
+      // bucket — but a 128-bit token is infeasible to guess with or without a
+      // cap, and single use is enforced by `getDel` in auth.
+      { requestsPerMinute: 10, pathForKey: 'token' },
       (_, h) =>
         h.proxy({
           uri: AUTH_URL + '/verifyRecoveryToken'
