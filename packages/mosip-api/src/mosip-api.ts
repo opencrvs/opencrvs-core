@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { env } from "./constants";
 import MOSIPAuthenticator from "@mosip/ida-auth-sdk";
 import { schemaJson as defaultSchemaJson } from "./types/idSchemaJson";
@@ -12,6 +13,26 @@ export class MOSIPError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "MOSIPError";
+  }
+}
+
+/*
+ * MOSIP answers a successful HTTP status even when the operation failed, putting
+ * the failure in an `errors` array in the body. Response.json() is typed as
+ * unknown, so the envelope is validated rather than cast.
+ */
+const MosipErrorEnvelope = z.object({
+  errors: z
+    .array(z.object({ message: z.string().optional() }))
+    .nullish()
+    .optional(),
+});
+
+function throwIfMosipReportedError(body: unknown, context: string) {
+  const { data } = MosipErrorEnvelope.safeParse(body);
+
+  if (data?.errors?.length) {
+    throw new Error(`Error in ${context}, response: ${data.errors[0]?.message}`);
   }
 }
 
@@ -188,13 +209,10 @@ export const postBirthRecord = async ({
     );
   }
 
-  const processPacketResponseJson = await processPacketResponse.json();
-
-  if (processPacketResponseJson?.errors?.length > 0) {
-    throw new Error(
-      `Error in processing packet, response: ${await processPacketResponseJson?.errors[0]?.message}`,
-    );
-  }
+  throwIfMosipReportedError(
+    await processPacketResponse.json(),
+    "processing packet",
+  );
 };
 
 export const postDeathRecord = async ({
@@ -302,13 +320,10 @@ export const postDeathRecord = async ({
     );
   }
 
-  const processPacketResponseJson = await processPacketResponse.json();
-
-  if (processPacketResponseJson?.errors?.length > 0) {
-    throw new Error(
-      `Error in processing packet, response: ${await processPacketResponseJson?.errors[0]?.message}`,
-    );
-  }
+  throwIfMosipReportedError(
+    await processPacketResponse.json(),
+    "processing packet",
+  );
 };
 
 export const postDemographicUpdateRecord = async ({
@@ -409,13 +424,10 @@ export const postDemographicUpdateRecord = async ({
     );
   }
 
-  const processPacketResponseJson = await processPacketResponse.json();
-
-  if (processPacketResponseJson?.errors?.length > 0) {
-    throw new Error(
-      `Error in processing packet, response: ${await processPacketResponseJson?.errors[0]?.message}`,
-    );
-  }
+  throwIfMosipReportedError(
+    await processPacketResponse.json(),
+    "processing packet",
+  );
 };
 
 export const verifyNid = async ({

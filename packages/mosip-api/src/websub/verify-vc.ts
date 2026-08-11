@@ -68,7 +68,13 @@ export const verifyCredentialOrThrow = async (
   }
 
   const res = await fetch(verificationMethod);
-  const { publicKeyPem } = await res.json();
+  /*
+   * Response.json() is typed as unknown, and this key is what the credential's
+   * signature is checked against, so the shape is validated rather than cast.
+   */
+  const { publicKeyPem } = z
+    .object({ publicKeyPem: z.string() })
+    .parse(await res.json());
   const key = await importSPKI(publicKeyPem, "PS256");
 
   const [encodedHeader, , encodedSignature] = jws.split(".");

@@ -6,6 +6,8 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "declaration": true,
-    "outDir": "./build"
-  }
+    "outDir": "./build",
+    "rootDir": "./src"
+  },
+  "include": ["src/**/*.ts"]
 }

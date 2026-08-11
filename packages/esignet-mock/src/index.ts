@@ -6,7 +6,7 @@ import fastifyStatic from "@fastify/static";
 import formbody from "@fastify/formbody";
 import * as jose from "jose";
 import { readFileSync } from "node:fs";
-import identities from "./mock-identities.json" assert { type: "json" };
+import identities from "./mock-identities.json" with { type: "json" };
 
 const app = Fastify({ logger: true });
 

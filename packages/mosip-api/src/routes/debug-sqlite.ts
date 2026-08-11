@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { getAllTransactions, getTransactionAndDiscard } from "../database";
-import { SCOPES } from "@opencrvs/toolkit/scopes";
+import { EncodedScope, hasScope } from "@opencrvs/toolkit/scopes";
 import { TokenPayload } from "./websub-credential-issued";
 import { decode } from "jsonwebtoken";
 
@@ -13,12 +13,15 @@ interface AuthenticatedUser {
  *
  * Rationale:
  * - Users with this scope would be able to see record UUID's and registration numbers in the UI anyway.
+ *
+ * NOTE: this check was `SCOPES.SEARCH_BIRTH && SCOPES.SEARCH_DEATH` while this
+ * service tracked a v1.9 toolkit. Those per-event search scopes do not exist in
+ * the v2 scope model — search collapsed into a single `record.search` carrying
+ * event options — so the conjunction has no direct equivalent. A holder of
+ * `record.search[event=birth]` alone now passes where they previously would not.
  */
-const isAllowedToSearch = (scope: string[]) => {
-  return (
-    scope.includes(SCOPES.SEARCH_BIRTH) && scope.includes(SCOPES.SEARCH_DEATH)
-  );
-};
+const isAllowedToSearch = (scope: string[]) =>
+  hasScope(scope as EncodedScope[], "record.search");
 
 /**
  * Allow deleting transactions for users that have `record.reject-registration` scope.
@@ -27,7 +30,7 @@ const isAllowedToSearch = (scope: string[]) => {
  * - This should be accompanied with a `client.event.actions.register.reject` call via Postman which requires this scope.
  */
 const isAllowedToDelete = (scope: string[]) =>
-  scope.includes(SCOPES.RECORD_REJECT_REGISTRATION);
+  hasScope(scope as EncodedScope[], "record.reject-registration");
 
 export const getAllTransactionsHandler = async (
   request: FastifyRequest,

@@ -87,7 +87,7 @@ export const env = cleanEnv(process.env, {
   ESIGNET_TOKEN_URL: url({ devDefault: "http://localhost:20260/oauth/token" }),
   OPENID_PROVIDER_CLAIMS: str({ devDefault: undefined }),
   OIDP_CLIENT_PRIVATE_KEY_PATH: str({
-    devDefault: join(__dirname, "../../../certs/esignet-jwk.txt"),
+    devDefault: join(__dirname, "../certs/esignet-jwk.txt"),
   }),
 
   // NOTE: Following files and credentials are generally created by MOSIP and their assistance.
@@ -106,16 +106,16 @@ export const env = cleanEnv(process.env, {
 
   // MOSIP Crypto encrypt
   ENCRYPT_CERT_PATH: str({
-    devDefault: join(__dirname, "../../../certs/ida-partner.crt"),
+    devDefault: join(__dirname, "../certs/ida-partner.crt"),
   }),
   DECRYPT_P12_FILE_PATH: str({
-    devDefault: join(__dirname, "../../../certs/keystore.p12"),
+    devDefault: join(__dirname, "../certs/keystore.p12"),
   }),
   DECRYPT_P12_FILE_PASSWORD: str({ devDefault: "mosip123" }),
 
   // MOSIP Crypto signature
   SIGN_P12_FILE_PATH: str({
-    devDefault: join(__dirname, "../../../certs/keystore.p12"),
+    devDefault: join(__dirname, "../certs/keystore.p12"),
   }),
   SIGN_P12_FILE_PASSWORD: str({ devDefault: "mosip123" }),
 

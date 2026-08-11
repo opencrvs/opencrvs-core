@@ -1,5 +1,5 @@
 import { RouteHandlerMethod } from "fastify";
-import identities from "../mock-identities.json" assert { type: "json" };
+import identities from "../mock-identities.json" with { type: "json" };
 import { decryptAuthData } from "./crypto";
 import { PRIVATE_KEY } from "../constants";
 
