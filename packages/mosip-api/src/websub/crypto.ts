@@ -20,6 +20,9 @@ import { MOSIPVerifiableCredential } from "./verify-vc";
  * @param password - The password for decrypting the PKCS#12 file.
  * @returns An object containing the private key and certificate in PEM format.
  */
+/**
+ * @knipignore Used within this module. A separate implementation in ida-auth-sdk/crypto/extract-pkcs12.ts is what mosip-authenticator imports.
+ */
 export const extractKeysFromPkcs12 = (
   fileContents: string,
   password: string,

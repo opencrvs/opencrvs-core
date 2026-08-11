@@ -13,6 +13,9 @@ import * as jose from "jose";
 import { base64Encode, padBase64 } from "./utils";
 import forge from "node-forge";
 
+/**
+ * @knipignore Used within this module; kept exported as part of the crypto helper surface.
+ */
 export const getPemCertificateThumbprint = (pemCertificate: string) => {
   const fingerprint = new crypto.X509Certificate(pemCertificate).fingerprint256; // In "node:crypto", this gives the SHA-256 fingerprint as a hexadecimal string
   return Buffer.from(fingerprint.replace(/:/g, ""), "hex");

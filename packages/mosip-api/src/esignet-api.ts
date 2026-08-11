@@ -23,6 +23,9 @@ import crypto from "node:crypto";
 const OIDP_CLIENT_PRIVATE_KEY = fs
   .readFileSync(env.OIDP_CLIENT_PRIVATE_KEY_PATH)
   .toString();
+/**
+ * @knipignore Looked up by the env-driven LOCALE below rather than imported.
+ */
 export const locales: Record<string, Locale> = { en: enGB, fr };
 
 type OIDPUserAddress = {

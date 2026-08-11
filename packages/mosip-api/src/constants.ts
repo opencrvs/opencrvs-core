@@ -151,5 +151,8 @@ export const env = cleanEnv(process.env, {
   }),
 });
 
+/**
+ * @knipignore Feeds the verifiable-credential allowlist check in routes/websub-credential-issued.ts, which is currently commented out pending a canonicalization fix. Kept so re-enabling that check needs no new plumbing.
+ */
 export const MOSIP_VERIFIABLE_CREDENTIAL_ALLOWED_URLS =
   env.MOSIP_VERIFIABLE_CREDENTIAL_ALLOWLIST.split(",");

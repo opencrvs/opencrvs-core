@@ -35,6 +35,9 @@ const DeathSubject = z.object({
   vcVer: z.literal("VC-V1"),
 });
 
+/**
+ * @knipignore Public counterpart to BirthSubject in this module's credential types.
+ */
 export type DeathSubject = z.infer<typeof DeathSubject>;
 
 export const MOSIPVerifiableCredential = z.object({
@@ -60,6 +63,9 @@ export const MOSIPVerifiableCredential = z.object({
   issuer: z.string().url(),
 });
 
+/**
+ * @knipignore Narrows a credential subject; retained for callers of the websub verifier.
+ */
 export const isBirthSubject = (
   subject: z.infer<typeof BirthSubject> | z.infer<typeof DeathSubject>,
 ): subject is z.infer<typeof BirthSubject> => {

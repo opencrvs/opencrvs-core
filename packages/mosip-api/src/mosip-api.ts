@@ -19,6 +19,9 @@ import {
   MosipInteropPayload,
 } from "@opencrvs/mosip/api";
 
+/**
+ * @knipignore Thrown by this module; exported so callers can narrow on it.
+ */
 export class MOSIPError extends Error {
   constructor(message: string) {
     super(message);
