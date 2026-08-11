@@ -8,18 +8,21 @@
     "./api": "./build/api.js"
   },
   "typings": "build/index.d.ts",
+  "engines": {
+    "node": "22.x.x"
+  },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test:compilation": "tsc --noEmit"
   },
   "dependencies": {
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@opencrvs/toolkit": "1.9.12-rc.1b9bbf4",
+    "@opencrvs/toolkit": "workspace:*",
     "@types/hapi__hapi": "^20.0.0",
     "@types/node-fetch": "^2.6.11",
-    "node-fetch": "2.6.7",
-    "typescript": "^5.6.3"
+    "node-fetch": "2.6.7"
   },
   "peerDependencies": {
     "node-fetch": "2.6.7"

@@ -2,20 +2,25 @@
   "name": "@opencrvs/mosip-api",
   "version": "2.0.1",
   "license": "MPL-2.0",
+  "engines": {
+    "node": "22.x.x"
+  },
   "scripts": {
-    "dev": "NODE_ENV=development tsx watch --env-file-if-exists=../../.env src/index.ts",
-    "start": "NODE_ENV=production tsx src/index.ts",
-    "pretest": "yarn workspace @opencrvs/mosip run build",
-    "test": "NODE_ENV=development tsx --test"
+    "start": "NODE_ENV=development tsx watch --env-file-if-exists=../../.env src/index.ts",
+    "start:prod": "NODE_ENV=production tsx src/index.ts",
+    "pretest": "mkdir -p certs && cp -n docs/example-certs/* certs/ || true",
+    "test": "NODE_ENV=development tsx --test",
+    "test:compilation": "tsc --noEmit",
+    "lint": "eslint -c eslint.config.mjs"
   },
   "dependencies": {
-    "@opencrvs/mosip": "2.0.0-rc.2",
+    "@opencrvs/mosip": "workspace:*",
     "@fastify/cors": "^10.1.0",
     "@fastify/formbody": "^8.0.1",
     "@fastify/jwt": "^9.0.4",
     "@fastify/swagger": "^9.5.1",
     "@fastify/swagger-ui": "^5.1.0",
-    "@opencrvs/toolkit": "1.9.10-rc.9afdb31",
+    "@opencrvs/toolkit": "workspace:*",
     "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^22.8.2",
     "@types/node-forge": "^1.3.11",
@@ -32,7 +37,6 @@
     "node-forge": "^1.3.1",
     "openapi-types": "^12.1.3",
     "tsx": "^4.19.2",
-    "typescript": "^5.6.3",
     "zod": "^4.1.12"
   },
   "devDependencies": {
@@ -42,7 +46,6 @@
     "eslint": "^9.13.0",
     "msw": "^2.7.3",
     "pino-pretty": "^11.3.0",
-    "typescript": "^5.6.3",
     "typescript-eslint": "^8.12.1"
   }
 }
