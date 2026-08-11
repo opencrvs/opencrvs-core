@@ -7,7 +7,6 @@
   "scripts": {
     "seed": "NODE_OPTIONS=--dns-result-order=ipv4first tsx src/index.ts",
     "test:compilation": "tsc --noEmit",
-    "test": "pnpm test:compilation",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0"
   },
   "devDependencies": {
