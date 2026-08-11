@@ -32,8 +32,9 @@ type Props = IntlShapeProps & { logo: string | undefined }
 
 /*
  * Terminal screen, shown whether or not the account exists. No resend button
- * on purpose: it would need a nonce the client never received, and offering
- * one would reintroduce the enumeration oracle. Users who got nothing restart.
+ * on purpose: resending needs a nonce, this screen never received one, and a
+ * button that worked for real accounts while failing for the rest would tell
+ * the visitor which they had typed. Anyone who got no mail starts over.
  */
 const RecoveryInstructionsSentComponent = ({ intl, logo }: Props) => {
   const location = useLocation()

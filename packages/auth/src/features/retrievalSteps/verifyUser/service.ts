@@ -95,8 +95,8 @@ export async function deleteRetrievalStepInformation(nonce: string) {
  * Duration every /verifyUser response is held to. Has to stay above the
  * slowest real path — a user lookup plus a Redis write — or the padding stops
  * hiding anything, which `padRecoveryResponse` warns about when it happens.
- * Not configurable on purpose: a deployment that lowered it would silently
- * reopen the timing oracle.
+ * Not configurable on purpose: lowering it would make it possible to determine if
+ * an account exists based on the response time.
  */
 export const RECOVERY_RESPONSE_FLOOR_MS = 500
 
@@ -144,12 +144,15 @@ export async function padRecoveryResponse(
 }
 
 /**
- * Makes an emailed token single-use: the record moves to a fresh nonce, so a
- * link left in browser history or a mail archive is inert.
+ * Exchanges an emailed token for a fresh nonce and deletes the old key, so the
+ * link that went out in the mail works exactly once. A copy left in browser
+ * history or a mail archive does nothing afterwards.
  *
- * GETDEL claims the old key atomically. A separate get-then-delete let two
- * concurrent callers both read it and both rotate, leaving two live nonces for
- * one token; now the loser gets null and fails closed.
+ * The read and the delete have to be the same Redis command. Done as a read
+ * followed by a delete, two requests arriving together would both read the
+ * record and both write a new nonce, and one emailed link would hand out two
+ * recovery sessions. GETDEL gives the record to one caller; the other gets
+ * null and is rejected.
  */
 export async function rotateRetrievalStepNonce(oldNonce: string) {
   const raw = await redis.getDel(`retrieval_step_${oldNonce}`)

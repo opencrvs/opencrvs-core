@@ -73,8 +73,10 @@ export default async function verifyUserHandler(
       { ...result, retrieveFlow }
     )
 
-    // Not awaited on purpose: countryconfig blocks on the SMTP/SMS send, so
-    // awaiting would make response latency an oracle. Do not add the await back.
+    // Not awaited on purpose. countryconfig waits for the SMTP or SMS send,
+    // which takes some time and only happens for an address that has an
+    // account. Awaiting it would make it possible to determine if an account
+    // exists based on the response time.
     void triggerUserEventNotification({
       event: isUserNameRetrievalFlow
         ? TriggerEvent.USERNAME_REMINDER_LINK
@@ -92,7 +94,9 @@ export default async function verifyUserHandler(
     }).catch((err) => logger.error(err))
   } catch (err) {
     // Swallowed on purpose: no such user, no security questions, and events
-    // being down must all look alike. A 500 here would be the oracle itself.
+    // being down all have to look the same from outside. A 500 for one of them
+    // and a 200 for another is exactly the difference this endpoint exists to
+    // remove.
     logger.error(err)
   }
 

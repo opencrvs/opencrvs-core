@@ -37,9 +37,12 @@ export default async function changePasswordHandler(
     throw unauthorized()
   })
 
-  // One guard, one rejection shape: a username-reminder record must be
-  // rejected exactly as an unverified one. Splitting these into two branches
-  // with different shapes caused a prior Critical here — don't reintroduce it.
+  /*
+   * Two conditions, one rejection, deliberately. A record that never got past
+   * the security question and a record belonging to the username-reminder flow
+   * both have to be refused here, and they have to be refused the same way:
+   * whoever is calling must not be able to tell which of the two they hit.
+   */
   if (
     retrievalStepInformation.status !== RetrievalSteps.SECURITY_Q_VERIFIED ||
     retrievalStepInformation.retrieveFlow !== RETRIEVAL_FLOW_PASSWORD

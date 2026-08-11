@@ -76,8 +76,8 @@ const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
     if (notificationMethod === 'sms' && (!phone || error)) {
       setError(true)
       setTouched(true)
-      // Both branches are format failures, never "not found" — that is not a
-      // state this UI can observe now, and claiming it would hint at an oracle.
+      // Do not let callers know if an account with the provided phone
+      // number does not exist
       setErrorMessage(intl.formatMessage(validationMessages.phoneNumberFormat))
       return
     }
