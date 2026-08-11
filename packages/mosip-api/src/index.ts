@@ -267,8 +267,8 @@ async function run() {
     env.SQLITE_DATABASE_PATH,
   );
 
-  wasCreated && app.log.info("SQLite token storage created");
-  wasConnected && app.log.info("SQLite token storage connected");
+  if (wasCreated) app.log.info("SQLite token storage created");
+  if (wasConnected) app.log.info("SQLite token storage connected");
 
   await app.ready();
   await app.listen({

@@ -10,8 +10,8 @@
  */
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
-import { env } from "../constants";
-import test, { it } from "node:test";
+
+import { it } from "node:test";
 import {
   MOSIPVerifiableCredential,
   verifyCredentialOrThrow,

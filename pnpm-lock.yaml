@@ -42,7 +42,7 @@ overrides:
   react-signature-canvas>react: 18.3.1
   react-signature-canvas>react-dom: 18.3.1
 
-pnpmfileChecksum: sha256-SSvyUBAmM669fzJ0vU83kAQk6xUd3tzijGhzSvPV1ZE=
+pnpmfileChecksum: sha256-uVRNEam6EZHpCJE79qSW3ag3JlDBH8TnI5u4uRtWP/A=
 
 patchedDependencies:
   pdfmake@0.2.7:
@@ -2040,13 +2040,13 @@ importers:
         version: 9.23.0
       msw:
         specifier: ^2.7.3
-        version: 2.7.3(@types/node@22.20.1)(typescript@7.0.2)
+        version: 2.7.3(@types/node@22.20.1)(typescript@6.0.3)
       pino-pretty:
         specifier: ^11.3.0
         version: 11.3.0
       typescript-eslint:
         specifier: ^8.12.1
-        version: 8.67.0(eslint@9.23.0)(typescript@7.0.2)
+        version: 8.67.0(eslint@9.23.0)
 
   packages/mosip-mock:
     dependencies:
@@ -17901,7 +17901,6 @@ packages:
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
-      typescript: '>=4.8.4 <6.1.0'
 
   typescript@5.9.3:
     resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
@@ -29896,7 +29895,7 @@ snapshots:
   extract-pg-schema@5.8.1(@electric-sql/pglite@0.4.4):
     dependencies:
       knex: 3.1.0(pg@8.17.2)
-      knex-pglite: 0.12.1(@electric-sql/pglite@0.4.4)(knex@3.1.0(pg@8.17.2))
+      knex-pglite: 0.12.1(@electric-sql/pglite@0.4.4)(knex@3.1.0(pg@8.22.0))
       pg: 8.17.2
       pg-query-emscripten: 5.1.0
       ramda: 0.31.3
@@ -31922,7 +31921,7 @@ snapshots:
       jest-environment-jsdom: 26.6.2
       jest-environment-node: 26.6.2
       jest-get-type: 26.3.0
-      jest-jasmine2: 26.6.3
+      jest-jasmine2: 26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2))
       jest-regex-util: 26.0.0
       jest-resolve: 26.6.2
       jest-util: 26.6.2
@@ -32329,7 +32328,7 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
-  jest-jasmine2@26.6.3:
+  jest-jasmine2@26.6.3(ts-node@10.9.1(@swc/core@1.15.43)(@types/node@20.19.43)(typescript@7.0.2)):
     dependencies:
       '@babel/traverse': 7.29.8
       '@jest/environment': 26.6.2
@@ -32350,7 +32349,11 @@ snapshots:
       pretty-format: 26.6.2
       throat: 5.0.0
     transitivePeerDependencies:
+      - bufferutil
+      - canvas
       - supports-color
+      - ts-node
+      - utf-8-validate
 
   jest-junit@16.0.0:
     dependencies:
@@ -33242,7 +33245,7 @@ snapshots:
 
   klona@2.0.6: {}
 
-  knex-pglite@0.12.1(@electric-sql/pglite@0.4.4)(knex@3.1.0(pg@8.17.2)):
+  knex-pglite@0.12.1(@electric-sql/pglite@0.4.4)(knex@3.1.0(pg@8.22.0)):
     dependencies:
       '@electric-sql/pglite': 0.4.4
       knex: 3.1.0(pg@8.17.2)
@@ -34192,7 +34195,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  msw@2.7.3(@types/node@22.20.1)(typescript@7.0.2):
+  msw@2.7.3(@types/node@22.20.1)(typescript@6.0.3):
     dependencies:
       '@bundled-es-modules/cookie': 2.0.1
       '@bundled-es-modules/statuses': 1.0.1
@@ -34213,7 +34216,7 @@ snapshots:
       type-fest: 4.30.0
       yargs: 17.7.2
     optionalDependencies:
-      typescript: 7.0.2
+      typescript: 6.0.3
     transitivePeerDependencies:
       - '@types/node'
 
@@ -38934,14 +38937,14 @@ snapshots:
 
   typedarray@0.0.6: {}
 
-  typescript-eslint@8.67.0(eslint@9.23.0)(typescript@7.0.2):
+  typescript-eslint@8.67.0(eslint@9.23.0):
     dependencies:
       '@typescript-eslint/eslint-plugin': 8.67.0(@typescript-eslint/parser@8.67.0(eslint@9.23.0))(eslint@9.23.0)
       '@typescript-eslint/parser': 8.67.0(eslint@9.23.0)
       '@typescript-eslint/typescript-estree': 8.67.0
       '@typescript-eslint/utils': 8.67.0(eslint@9.23.0)
       eslint: 9.23.0
-      typescript: 7.0.2
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 

@@ -1,44 +1,58 @@
 # OpenCRVS API for MOSIP
 
-This repository provides an mediator/API layer that facilitates communication between OpenCRVS and MOSIP, enabling secure identity integration. Refer to [OpenCRVS documentation](https://documentation.opencrvs.org/technology/interoperability/national-id-client) for installation and deployment instructions.
+A mediator/API layer that facilitates communication between OpenCRVS and MOSIP,
+enabling secure identity integration. Refer to the
+[OpenCRVS documentation](https://documentation.opencrvs.org/technology/interoperability/national-id-client)
+for installation and deployment instructions.
 
-## Prerequisites
+This package was developed in the separate `opencrvs/mosip` repository and moved
+into core, together with:
 
-- Node.js (see [`.nvmrc`](./.nvmrc) for version)
-- Yarn (Node.js package manager)
+- [`packages/mosip`](../mosip) — `@opencrvs/mosip`, the country-config-facing
+  library, published to npm at core's version
+- [`packages/mosip-mock`](../mosip-mock) — mock MOSIP server
+- [`packages/esignet-mock`](../esignet-mock) — mock e-Signet server
+
+All three services are deployed by the `charts/opencrvs-mosip` Helm chart, and
+their images are published by core's service matrix as `ocrvs-mosip-api`,
+`ocrvs-mosip-mock` and `ocrvs-esignet-mock`.
 
 ## Development
 
+Dependencies come from the workspace install at the repository root, so there is
+no separate install step. Tasks run through nx (see the root `CLAUDE.md`).
+
 ```sh
-# copy demo certs to gitignored location
-cp -n docs/example-certs/* certs/
+# copy demo certs to their gitignored location
+cp -n packages/mosip-api/docs/example-certs/* packages/mosip-api/certs/
 
-# install dependencies
-yarn install
+# run the tests (seeds the certs above automatically via pretest)
+nx run @opencrvs/mosip-api:test
 
-# create sqlite data directory
-mkdir -p data/sqlite
+# start the mediator in watch mode
+nx run @opencrvs/mosip-api:start
 
-# start the mosip-api and all the mocked servers
-yarn dev
-
-# optionally...
-# use a `.env` file at repository root for custom config
-touch .env
-yarn dev
-
-# only run the main server without mocks
-yarn workspace @opencrvs/mosip-api run dev
-
-# bump package.json versions
-yarn set-version 1.7.0-alpha.16
+# start the mock servers alongside it, in separate shells
+nx run @opencrvs/mosip-mock:start
+nx run @opencrvs/esignet-mock:start
 ```
 
-This project uses a **SQLite** database to store the record-specific tokens that OpenCRVS Core uses to allow editing the records. See [`./packages/mosip-api/src/database.ts`](./packages/mosip-api/src/database.ts) for more information.
+Use a `.env` file at the repository root to override local config; `start` reads
+it if present.
 
-The **environment variables** the server uses can be found at [`./packages/mosip-api/src/constants.ts`](./packages/mosip-api/src/constants.ts). Create a `.env` file in the root of the repository, if you want to override the local values.
+Versions are bumped for every package at once by the release workflow, so there
+is no per-package version command.
 
-The **identities** for E-Signet and IDA Auth mocks are found at [`./docs/mock-identities.json`](./docs/mock-identities.json).
+This service uses a **SQLite** database to store the record-specific tokens that
+OpenCRVS Core uses to allow editing records. See
+[`src/database.ts`](./src/database.ts) for more information.
+
+The **environment variables** the server uses can be found in
+[`src/constants.ts`](./src/constants.ts).
+
+The **identities** for the e-Signet and IDA Auth mocks are in
+[`docs/mock-identities.json`](./docs/mock-identities.json), which both mock
+packages symlink to.
 
 ## API documentation (Swagger)
 
@@ -50,8 +64,10 @@ The OpenAPI JSON spec is available at:
 
 - `http://localhost:2024/documentation/json`
 
-Most API routes require a JWT. In Swagger UI, click **Authorize** and paste your token as:
+Most API routes require a JWT. In Swagger UI, click **Authorize** and paste your
+token as:
 
 - `Bearer <your-jwt-token>`
 
-Use an **OpenCRVS Core access token** (JWT issued by the auth service and verifiable with the Core public key configured in this service).
+Use an **OpenCRVS Core access token** (JWT issued by the auth service and
+verifiable with the Core public key configured in this service).

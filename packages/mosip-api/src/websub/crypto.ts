@@ -11,7 +11,6 @@
 import { asn1, pkcs12, pki, md } from "node-forge";
 import { env } from "../constants";
 import fs from "node:fs";
-import { z } from "zod";
 import crypto from "node:crypto";
 import { MOSIPVerifiableCredential } from "./verify-vc";
 

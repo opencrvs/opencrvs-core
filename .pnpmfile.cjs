@@ -28,6 +28,9 @@
 const TS6 = 'npm:typescript@6.0.3'
 
 const TS6_API_CONSUMERS = new Set([
+  // The umbrella package, used by packages/mosip-api's flat config. Core's own
+  // packages depend on the scoped packages below directly.
+  'typescript-eslint',
   '@typescript-eslint/parser',
   '@typescript-eslint/eslint-plugin',
   '@typescript-eslint/type-utils',

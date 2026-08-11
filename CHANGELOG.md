@@ -33,6 +33,28 @@ InfluxDB, the InfluxDB Helm resources (StatefulSet, backup/restore/cleanup jobs)
 
 Archiving a NOTIFIED (incomplete) record used to clear `InherentFlags.INCOMPLETE` as a side effect. Since `UNARCHIVE` restores the record to its pre-archive status without amending flags, `ARCHIVE` is now consistent with it by default: the flag freezes across an archive/unarchive round trip and comes back exactly as it was. Country configs can still add/remove flags on either action explicitly via configuration. [#12782](https://github.com/opencrvs/opencrvs-core/issues/12782)
 
+#### The MOSIP integration now ships with core — image names and `@opencrvs/mosip` versioning change
+
+The MOSIP integration used to be released from its own `opencrvs/mosip` repository, on its own schedule. It now lives in core as `packages/mosip-api`, `packages/mosip`, `packages/mosip-mock` and `packages/esignet-mock`, and is released with every core release. This removes a circular release dependency: the integration was pinned to an `@opencrvs/toolkit` release candidate published by core, while core's reference country config depended on `@opencrvs/mosip` from npm.
+
+**What you need to do if you deploy the MOSIP integration:**
+
+1. **Docker image names have changed.** They are now published by core's image matrix under the `ocrvs-` prefix, and tagged with the core version:
+
+   | Before | After |
+   | --- | --- |
+   | `ghcr.io/opencrvs/mosip-api` | `ghcr.io/opencrvs/ocrvs-mosip-api` |
+   | `ghcr.io/opencrvs/mosip-mock` | `ghcr.io/opencrvs/ocrvs-mosip-mock` |
+   | `ghcr.io/opencrvs/esignet-mock` | `ghcr.io/opencrvs/ocrvs-esignet-mock` |
+
+   If you use the `opencrvs-mosip` Helm chart with its default values, this is handled for you — the chart's image tags now bump with the release instead of being set by hand. If you override `mosip_api.image.repository` or the mock equivalents, update them. The old images remain in place, so existing pinned deployments keep working until you migrate.
+
+2. **`@opencrvs/mosip` now follows core's version.** It previously versioned independently (latest `2.0.0`). Country configs pinning it should move to core's version. There are no API changes in this release — only the version numbering and the fact that it is now built against the matching toolkit rather than a pinned release candidate.
+
+3. **The `opencrvs/mosip` repository is archived.** Open issues and pull requests should move to `opencrvs/opencrvs-core`.
+
+For the integration's own release history prior to this move, see [`packages/mosip-api/CHANGELOG.md`](https://github.com/opencrvs/opencrvs-core/blob/develop/packages/mosip-api/CHANGELOG.md).
+
 ### Improvements
 
 - Private docker image registry support for Dependencies helm chart [#13090](https://github.com/opencrvs/opencrvs-core/issues/13090)
