@@ -18,6 +18,7 @@ import {
   Draft,
   EventConfig,
   EventDocument,
+  EventDocumentOnlyLastAction,
   EventIndex,
   findLastAssignmentAction,
   getCurrentEventState,
@@ -307,15 +308,23 @@ export async function deleteLocalEvent(updatedEvent: EventDocument) {
   return refetchAllSearchQueries()
 }
 
-export async function onAssign(updatedEvent: EventDocument) {
-  setEventData(updatedEvent.id, updatedEvent)
+export async function onAssign(updatedEvent: EventDocumentOnlyLastAction) {
   await invalidateWorkqueues()
+  await refetchSearchQuery(updatedEvent.id)
 
   const lastAssignment = findLastAssignmentAction(updatedEvent.actions)
+  const localEvent = findLocalEventDocument(updatedEvent.id)
+
+  const localActions = localEvent?.actions ?? []
 
   if (!lastAssignment) {
     return
   }
+
+  setEventData(updatedEvent.id, {
+    ...updatedEvent,
+    actions: localActions.concat(updatedEvent.actions)
+  })
 }
 
 export async function refetchDraftsList() {
@@ -324,8 +333,19 @@ export async function refetchDraftsList() {
   })
 }
 
-export async function cleanUpOnUnassign(updatedEvent: EventDocument) {
-  await deleteEventData(updatedEvent)
-  updateLocalEventIndex(updatedEvent.id, updatedEvent)
+export async function cleanUpOnUnassign(
+  updatedEvent: EventDocumentOnlyLastAction
+) {
+  const localEvent = findLocalEventDocument(updatedEvent.id)
+  const localActions = localEvent?.actions ?? []
+
+  const updatedEventWithActions = {
+    ...updatedEvent,
+    actions: localActions.concat(updatedEvent.actions)
+  }
+
+  await deleteEventData(updatedEventWithActions)
+
+  updateLocalEventIndex(updatedEventWithActions.id, updatedEventWithActions)
   await invalidateWorkqueues()
 }

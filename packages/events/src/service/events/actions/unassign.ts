@@ -11,7 +11,11 @@
 
 import { TRPCError } from '@trpc/server'
 import { last } from 'lodash'
-import { getAcceptedScopesFromToken, TokenWithBearer } from '@opencrvs/commons'
+import {
+  getAcceptedScopesFromToken,
+  getOrThrow,
+  TokenWithBearer
+} from '@opencrvs/commons'
 import {
   ActionStatus,
   ActionType,
@@ -84,8 +88,12 @@ export async function unassignRecord({
     configuration
   })
 
+  const lastAction = getOrThrow(
+    last(event.actions),
+    'Event did not have any actions. This should never happen.'
+  )
   return {
     ...eventWithUnassign,
-    actions: last(eventWithUnassign.actions)
+    actions: [lastAction]
   }
 }
