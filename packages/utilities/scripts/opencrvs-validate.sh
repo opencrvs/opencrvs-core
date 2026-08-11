@@ -528,7 +528,7 @@ EOF
 
 check_events_service_status() {
   local check_name="Events service status"
-  local url="https://events.${DOMAIN}/health/ready"
+  local url="http://events:5555/health/ready"
   local response_file
   local curl_output
   local curl_status
@@ -690,7 +690,6 @@ configure_public_domains() {
     "login.$DOMAIN"
     "register.$DOMAIN"
     "countryconfig.$DOMAIN"
-    "events.$DOMAIN"
     "metabase.$DOMAIN"
     "$minio_url"
   )
