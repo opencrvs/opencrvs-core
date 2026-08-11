@@ -88,8 +88,9 @@ const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
       return
     }
 
-    // /verifyUser answers 200 empty either way, so try and catch are identical
-    // on purpose: no route, message or timing may distinguish the two cases.
+    // /verifyUser answers 200 empty either way, so the navigation is in
+    // `finally` on purpose: no route, message or timing may distinguish a known
+    // address from an unknown one. A failure must not surface to the user here.
     try {
       await authApi.verifyUser({
         mobile:
@@ -99,8 +100,10 @@ const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
         email: notificationMethod === 'email' ? email : undefined,
         retrieveFlow: forgottenItem
       })
-      navigate(routes.RECOVERY_LINK_SENT, { state: { forgottenItem } })
     } catch {
+      // Swallowed, not rethrown: an unhandled rejection here would be one more
+      // thing that behaves differently depending on the address entered.
+    } finally {
       navigate(routes.RECOVERY_LINK_SENT, { state: { forgottenItem } })
     }
   }
