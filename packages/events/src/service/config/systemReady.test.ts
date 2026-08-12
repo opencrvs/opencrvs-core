@@ -61,6 +61,29 @@ describe('triggerSystemReady', () => {
     expect(options?.timeout).toBeGreaterThan(0)
   })
 
+  test('bounds the bootstrap token request too', async () => {
+    mockFetch.mockResolvedValue(response(200))
+
+    await runWithoutWaiting(triggerSystemReady())
+
+    // The loop can only retry a call that fails. Auth and events start
+    // concurrently, and an unbounded token request parks every attempt on the
+    // first one forever — silently, since nothing is logged until an attempt
+    // settles. That leaves integrations unregistered with no trace anywhere.
+    expect(mockGetToken).toHaveBeenCalledWith(expect.any(Number))
+    expect(mockGetToken.mock.calls[0][0]).toBeGreaterThan(0)
+  })
+
+  test('retries when minting the bootstrap token fails', async () => {
+    mockGetToken.mockRejectedValueOnce(new Error('ETIMEDOUT'))
+    mockFetch.mockResolvedValue(response(200))
+
+    await runWithoutWaiting(triggerSystemReady())
+
+    expect(mockGetToken).toHaveBeenCalledTimes(2)
+    expect(mockFetch).toHaveBeenCalledTimes(1)
+  })
+
   test('retries until the country config is listening', async () => {
     // Events and the country config start concurrently, so the first attempts
     // routinely hit a closed port

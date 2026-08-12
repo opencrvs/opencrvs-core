@@ -17,7 +17,12 @@ import { getIntegrationCreatorToken } from '@events/service/auth'
 const MAX_ATTEMPTS = 10
 const INITIAL_DELAY_MS = 1000
 const MAX_DELAY_MS = 30000
-/** A peer that accepts the connection but never answers must not hang the loop */
+/**
+ * A peer that accepts the connection but never answers must not hang the loop.
+ * This bounds every request an attempt makes, not just the trigger itself: an
+ * unbounded call anywhere in `attemptSystemReady` stalls the retry loop on its
+ * first attempt, and nothing is logged until an attempt settles.
+ */
 const REQUEST_TIMEOUT_MS = 5000
 
 async function delay(ms: number) {
@@ -27,7 +32,7 @@ async function delay(ms: number) {
 async function attemptSystemReady() {
   // The bootstrap token lives 60 seconds, which is shorter than the retry
   // window, so it is minted per attempt rather than once up front
-  const bootstrapToken = await getIntegrationCreatorToken()
+  const bootstrapToken = await getIntegrationCreatorToken(REQUEST_TIMEOUT_MS)
   const res = await fetch(
     new URL('/triggers/system/ready', env.COUNTRY_CONFIG_URL).toString(),
     {
