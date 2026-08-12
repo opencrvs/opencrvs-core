@@ -128,6 +128,7 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
     )
   }
   const updatedEventIndex = getCurrentEventState(updatedEvent, config)
+
   // Update the local event index with the updated event
   setEventSearchQuery(updatedEventIndex)
 
@@ -337,15 +338,20 @@ export async function cleanUpOnUnassign(
   updatedEvent: EventDocumentOnlyLastAction
 ) {
   const localEvent = findLocalEventDocument(updatedEvent.id)
-  const localActions = localEvent?.actions ?? []
 
-  const updatedEventWithActions = {
-    ...updatedEvent,
-    actions: localActions.concat(updatedEvent.actions)
+  // If unassign is performed when it's assigned someone else, user does not necessarily have the event.get cached.
+  if (!localEvent) {
+    // Assuming unassign needs to be done online, we'll just refetch the query.
+    await refetchSearchQuery(updatedEvent.id)
+  } else {
+    const updatedEventWithActions = {
+      ...updatedEvent,
+      actions: localEvent.actions.concat(updatedEvent.actions)
+    }
+
+    await deleteEventData(updatedEventWithActions)
+
+    updateLocalEventIndex(updatedEventWithActions.id, updatedEventWithActions)
   }
-
-  await deleteEventData(updatedEventWithActions)
-
-  updateLocalEventIndex(updatedEventWithActions.id, updatedEventWithActions)
   await invalidateWorkqueues()
 }
