@@ -126,13 +126,12 @@ const authenticate = (data: IAuthenticationData) => {
 
 const resendAuthenticationCode = (
   nonce: string,
-  notificationEvent: NotificationEvent,
-  retrievalFlow = false
+  notificationEvent: NotificationEvent
 ) => {
   return request({
     url: '/api/auth/resendAuthenticationCode',
     method: 'POST',
-    data: { nonce, notificationEvent, retrievalFlow }
+    data: { nonce, notificationEvent }
   })
 }
 
@@ -144,20 +143,20 @@ const verifyCode = (data: ICodeVerifyData): Promise<IAuthenticateResponse> => {
   })
 }
 
-interface IUserVerifyResponse {
-  nonce: string
-  securityQuestionKey?: string
-}
-
 interface IUserVerificationDetails {
   mobile?: string
   email?: string
   retrieveFlow: string
 }
 
+/*
+ * Always resolves with an empty body, account or not — the enumeration fix.
+ * The server emails a single-use link only if it found one; the client cannot
+ * tell, and must not try to.
+ */
 const verifyUser = (
   verificationDetails: IUserVerificationDetails
-): Promise<IUserVerifyResponse> => {
+): Promise<void> => {
   return request({
     url: '/api/auth/verifyUser',
     method: 'POST',
@@ -165,19 +164,23 @@ const verifyUser = (
   })
 }
 
-interface IVerifyNumberResponse {
+interface IVerifyRecoveryTokenResponse {
   nonce: string
   securityQuestionKey: string
+  retrieveFlow: string
 }
 
-const verifyNumber = (
-  nonce: string,
-  code: string
-): Promise<IVerifyNumberResponse> => {
+/*
+ * Exchanges the recovery link's single-use token for a nonce and the next
+ * security question. The server rotates the nonce, killing the emailed link.
+ */
+const verifyRecoveryToken = (
+  token: string
+): Promise<IVerifyRecoveryTokenResponse> => {
   return request({
-    url: '/api/auth/verifyNumber',
+    url: '/api/auth/verifyRecoveryToken',
     method: 'POST',
-    data: { nonce, code }
+    data: { token }
   })
 }
 
@@ -221,8 +224,8 @@ export const authApi = {
   authenticate,
   verifyCode,
   resendAuthenticationCode,
-  verifyNumber,
   verifyUser,
+  verifyRecoveryToken,
   verifySecurityAnswer,
   changePassword,
   sendUserName,

@@ -66,6 +66,26 @@ export default function getUserNotificationRoutes(): ServerRoute<ReqRefDefaults>
     },
     {
       method: 'POST',
+      path: '/triggers/user/password-reset-link',
+      handler: makeNotificationHandler('password-reset-link'),
+      options: {
+        auth: false,
+        tags: ['api'],
+        description: 'Handles notification for password reset recovery link'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/triggers/user/username-reminder-link',
+      handler: makeNotificationHandler('username-reminder-link'),
+      options: {
+        auth: false,
+        tags: ['api'],
+        description: 'Handles notification for username reminder recovery link'
+      }
+    },
+    {
+      method: 'POST',
       path: '/triggers/user/resend-invite',
       handler: makeNotificationHandler('resend-invite'),
       options: {
