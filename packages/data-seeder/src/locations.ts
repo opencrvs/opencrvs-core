@@ -14,7 +14,8 @@ import { z } from 'zod'
 import { raise } from './utils'
 import { fromZodError } from 'zod-validation-error'
 import { getUUID, LocationVersion } from '@opencrvs/commons'
-import { createInitialisationClient } from './index'
+import { createInitialisationClient } from './initialisation-client'
+import { formatUnwrittenFailure } from './seed-failure'
 
 const RawLocationVersionSchema = z.object({
   effectiveFrom: z.string().optional(),
@@ -40,38 +41,6 @@ const CountryConfigLocationResponse = z.object({
   administrativeAreas: z.array(RawAdministrativeAreaSchema)
 })
 
-function validateAdminStructure(
-  locations: z.output<
-    typeof CountryConfigLocationResponse
-  >['administrativeAreas']
-) {
-  const locationsMap = new Map(
-    locations.map((loc) => {
-      return [loc.id, loc]
-    })
-  )
-
-  // Create a map of parent-child relationships
-  const locationNodeMap = new Map(
-    locations.map((loc) => [
-      loc.id,
-      { id: loc.id, children: new Array<string>() }
-    ])
-  )
-  // this is the root location
-  locationNodeMap.set('0', { id: '0', children: [] })
-
-  locations.forEach((loc) => {
-    const parent = locationNodeMap.get(loc.partOf.split('/')[1])
-    if (!parent) {
-      raise(`Parent location "${loc.partOf}" not found for ${loc.name}`)
-    }
-    parent.children.push(loc.id)
-  })
-
-  return locationsMap
-}
-
 /**
  * Builds a seedable `versions` history from the country config's raw version
  * rows: assigns each element a fresh `versionId` and defaults an empty
@@ -95,11 +64,15 @@ function buildSeededVersions(
   }))
 }
 
-async function getLocations() {
+/** The administrative hierarchy, fetched and parsed but neither written nor
+ * structurally checked here; the entry point validates the whole set of
+ * seed-data first. Returns the parsed seed-data alongside the rows to write,
+ * because the transform below discards the `partOf` the validator needs. */
+export async function getLocations() {
   const url = new URL('config/locations', env.COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url)
   if (!res.ok) {
-    raise(`Expected to get the locations from ${url}`)
+    raise(formatUnwrittenFailure(`Expected to get the locations from ${url}`))
   }
 
   const parsedResponse = CountryConfigLocationResponse.safeParse(
@@ -107,28 +80,15 @@ async function getLocations() {
   )
   if (!parsedResponse.success) {
     raise(
-      fromZodError(parsedResponse.error, {
-        prefix: `Error validating locations data returned from ${url}`
-      })
+      formatUnwrittenFailure(
+        fromZodError(parsedResponse.error, {
+          prefix: `Error validating locations data returned from ${url}`
+        }).message
+      )
     )
   }
 
   const { administrativeAreas, locations } = parsedResponse.data
-
-  const administrativeAreaMap = validateAdminStructure(administrativeAreas)
-
-  const NULL_ADMINISTRATIVE_AREA_ID = '0'
-  locations.forEach((location) => {
-    const administrativeAreaId = location.partOf.split('/')[1]
-    if (
-      !administrativeAreaMap.get(administrativeAreaId) &&
-      administrativeAreaId !== NULL_ADMINISTRATIVE_AREA_ID
-    ) {
-      raise(
-        `Parent location "${location.partOf}" not found for ${location.name}`
-      )
-    }
-  })
 
   const administrativeHierarchyIdMap = new Map(
     administrativeAreas.map(({ id }) => [id, getUUID()])
@@ -137,6 +97,9 @@ async function getLocations() {
   const locationIdMap = new Map(locations.map(({ id }) => [id, getUUID()]))
 
   return {
+    // For the validator: the ids here are the country config's own, which is
+    // what an office reference and a node's `partOf` are written in terms of.
+    seedData: parsedResponse.data,
     administrativeAreas: administrativeAreas.map((a) => ({
       id: administrativeHierarchyIdMap.get(a.id)!,
       name: a.name,
@@ -157,9 +120,12 @@ async function getLocations() {
   }
 }
 
-export async function seedLocations(token: string) {
-  const { administrativeAreas, locations } = await getLocations()
+export type SeedLocations = Awaited<ReturnType<typeof getLocations>>
 
+export async function seedLocations(
+  token: string,
+  { administrativeAreas, locations }: SeedLocations
+) {
   const client = createInitialisationClient(token)
 
   await client.administrativeAreas.set.mutate(administrativeAreas)

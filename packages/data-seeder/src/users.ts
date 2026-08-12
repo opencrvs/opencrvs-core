@@ -16,61 +16,66 @@ import { raise } from './utils'
 import {
   decodeScope,
   EventConfig,
-  hasScope,
   joinUrl,
   parseConfigurableScope,
   EncodedScope,
   CreateUserInputInternal
 } from '@opencrvs/commons'
 import { fromZodError } from 'zod-validation-error'
-import { createInitialisationClient } from './index'
+import { createInitialisationClient } from './initialisation-client'
+import { officeExternalId } from './office-external-id'
+import {
+  PartialSeedError,
+  describeInitialUserFailure,
+  formatInitialUserFailure,
+  formatUnwrittenFailure
+} from './seed-failure'
+import { SeedData, SeedDataRole, SeedDataUser } from './validate-seed-data'
 
-const RoleSchema = (eventIds: string[]) =>
-  z.array(
-    z.object({
-      id: z.string(),
-      label: z.object({
-        defaultMessage: z.string(),
-        description: z.string(),
-        id: z.string()
-      }),
-      scopes: z.array(
-        EncodedScope.superRefine((scope, ctx) => {
-          const parsedConfigurableScope = parseConfigurableScope(scope)
-          const parsedV2Scopes = decodeScope(scope)
+const RoleRecordSchema = (eventIds: string[]) =>
+  z.object({
+    id: z.string(),
+    label: z.object({
+      defaultMessage: z.string(),
+      description: z.string(),
+      id: z.string()
+    }),
+    scopes: z.array(
+      EncodedScope.superRefine((scope, ctx) => {
+        const parsedConfigurableScope = parseConfigurableScope(scope)
+        const parsedV2Scopes = decodeScope(scope)
 
-          if (!parsedConfigurableScope && !parsedV2Scopes) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `Invalid scope: "${scope}"`
-            })
+        if (!parsedConfigurableScope && !parsedV2Scopes) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Invalid scope: "${scope}"`
+          })
+          return
+        }
+
+        if (parsedV2Scopes?.type) {
+          if (!('options' in parsedV2Scopes)) {
             return
           }
 
-          if (parsedV2Scopes?.type) {
-            if (!('options' in parsedV2Scopes)) {
-              return
-            }
+          const options = parsedV2Scopes.options
 
-            const options = parsedV2Scopes.options
+          if (options && 'event' in options && Array.isArray(options.event)) {
+            const invalidEventIds = options.event.filter(
+              (id) => !eventIds.includes(id)
+            )
 
-            if (options && 'event' in options && Array.isArray(options.event)) {
-              const invalidEventIds = options.event.filter(
-                (id) => !eventIds.includes(id)
-              )
-
-              if (invalidEventIds.length > 0) {
-                ctx.addIssue({
-                  code: z.ZodIssueCode.custom,
-                  message: `Scope "${scope}" contains invalid event IDs: ${invalidEventIds.join(', ')}`
-                })
-              }
+            if (invalidEventIds.length > 0) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: `Scope "${scope}" contains invalid event IDs: ${invalidEventIds.join(', ')}`
+              })
             }
           }
-        })
-      )
-    })
-  )
+        }
+      })
+    )
+  })
 
 const WithoutContact = z.object({
   primaryOfficeId: z.string(),
@@ -81,25 +86,115 @@ const WithoutContact = z.object({
   password: z.string()
 })
 
-const UserSchema = z.array(
-  WithoutContact.extend({
-    mobile: z.string(),
-    email: z.string().email().optional()
-  })
-    .or(
-      WithoutContact.extend({
-        email: z.string().email(),
-        mobile: z.string().optional()
-      })
-    )
-    .transform(({ familyName, givenNames, ...user }) => ({
-      ...user,
-      firstname: givenNames,
-      surname: familyName
-    }))
-)
+const UserRecordSchema = WithoutContact.extend({
+  mobile: z.string(),
+  email: z.string().email().optional()
+})
+  .or(
+    WithoutContact.extend({
+      email: z.string().email(),
+      mobile: z.string().optional()
+    })
+  )
+  .transform(({ familyName, givenNames, ...user }) => ({
+    ...user,
+    firstname: givenNames,
+    surname: familyName
+  }))
 
-async function getUsers(token: string) {
+/** Parsing a list and parsing its elements are separate steps, so that one bad
+ * element does not take the whole document down with it. */
+const ListSchema = z.array(z.unknown())
+
+export type SeedUsers = z.output<typeof UserRecordSchema>[]
+
+type UserSeedData = Omit<
+  SeedData,
+  'administrativeAreas' | 'locations' | 'PHONE_NUMBER_PATTERN'
+>
+
+/** As text, not as the error: a `ZodError` reaching `console.error` prints as
+ * a stack trace, where the report needs one line. */
+function describeParseFailure(error: z.ZodError): string {
+  return fromZodError(error, { prefix: null }).message
+}
+
+/** A field read back off a record that did not parse. Nothing else about such
+ * a record can be trusted. */
+function readString(record: unknown, field: string): string | undefined {
+  if (typeof record !== 'object' || record === null) {
+    return undefined
+  }
+
+  const value = (record as Record<string, unknown>)[field]
+
+  return typeof value === 'string' ? value : undefined
+}
+
+/** Named one by one rather than spread, so that renaming a field on the schema
+ * without telling the validator is a compile error rather than a check that
+ * silently stops finding anything. Also keeps the password out of seed-data. */
+function readParsed(user: SeedUsers[number]): SeedDataUser {
+  return {
+    username: user.username,
+    email: user.email,
+    mobile: user.mobile,
+    primaryOfficeId: user.primaryOfficeId,
+    role: user.role
+  }
+}
+
+/** A record that did not parse keeps its place in `seedData`, so the records
+ * after it keep the positions the report will name them by, and is left out of
+ * `users`, which is what would be written. */
+function parseRecords(records: unknown[]): {
+  users: SeedUsers
+  seedData: SeedDataUser[]
+} {
+  const users: SeedUsers = []
+  const seedData: SeedDataUser[] = []
+
+  for (const record of records) {
+    const parsed = UserRecordSchema.safeParse(record)
+
+    if (parsed.success) {
+      users.push(parsed.data)
+      seedData.push(readParsed(parsed.data))
+      continue
+    }
+
+    seedData.push({
+      username: readString(record, 'username'),
+      role: readString(record, 'role'),
+      malformed: describeParseFailure(parsed.error)
+    })
+  }
+
+  return { users, seedData }
+}
+
+function parseRoles(roles: unknown[], eventIds: string[]): SeedDataRole[] {
+  const schema = RoleRecordSchema(eventIds)
+
+  return roles.map((role) => {
+    const parsed = schema.safeParse(role)
+
+    return parsed.success
+      ? { id: parsed.data.id, scopes: parsed.data.scopes }
+      : {
+          id: readString(role, 'id'),
+          scopes: [],
+          malformed: describeParseFailure(parsed.error)
+        }
+  })
+}
+
+/** The initial users and the roles, fetched and parsed but not written and
+ * nothing about them judged here; the validator answers everything in one
+ * report. A failing *fetch* is still fatal: there is nothing to report on. */
+export async function getUsers(
+  token: string
+): Promise<{ users: SeedUsers; seedData: UserSeedData }> {
   const url = new URL('config/users', env.COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url, {
     method: 'GET',
@@ -110,20 +205,11 @@ async function getUsers(token: string) {
   })
 
   if (!res.ok) {
-    raise(`Expected to get the users from ${url}`)
+    raise(formatUnwrittenFailure(`Expected to get the users from ${url}`))
   }
 
-  const parsedUsers = UserSchema.safeParse(await res.json())
-
-  if (!parsedUsers.success) {
-    raise(
-      fromZodError(parsedUsers.error, {
-        prefix: `Error validating users metadata returned from ${url}`
-      })
-    )
-  }
-
-  const userRoles = parsedUsers.data.map((user) => user.role)
+  const userList = ListSchema.safeParse(await res.json())
+  const records = parseRecords(userList.success ? userList.data : [])
 
   const rolesUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/roles')
   const eventsUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/events')
@@ -139,59 +225,34 @@ async function getUsers(token: string) {
   ])
 
   if (!rolesResponse.ok) {
-    raise(`Error fetching roles: ${rolesResponse.status}`)
+    raise(
+      formatUnwrittenFailure(`Error fetching roles: ${rolesResponse.status}`)
+    )
   }
 
   if (!eventsResponse.ok) {
-    raise(`Error fetching events: ${eventsResponse.status}`)
+    raise(
+      formatUnwrittenFailure(`Error fetching events: ${eventsResponse.status}`)
+    )
   }
 
   const eventsConfig = (await eventsResponse.json()) as EventConfig[]
   const eventIds = eventsConfig.map((event) => event.id)
-  const rolesRes = await rolesResponse.json()
-  const parsedRoles = RoleSchema(eventIds).safeParse(rolesRes)
+  const roleList = ListSchema.safeParse(await rolesResponse.json())
 
-  if (!parsedRoles.success) {
-    raise(
-      `Validation failed for roles returned from ${rolesUrl}:\n${parsedRoles.error.toString()}`
-    )
-  }
-
-  const allRoles = parsedRoles.data
-  let isConfigUpdateAllScopeAvailable = false
-
-  for (const userRole of userRoles) {
-    const currRole = allRoles.find((role) => role.id === userRole)
-    if (!currRole) {
-      raise(`Role with id ${userRole} is not found in roles.ts file`)
-    }
-
-    if (hasScope(currRole.scopes, 'config.update-all')) {
-      isConfigUpdateAllScopeAvailable = true
+  return {
+    users: records.users,
+    seedData: {
+      users: records.seedData,
+      roles: roleList.success ? parseRoles(roleList.data, eventIds) : [],
+      malformedUserList: userList.success
+        ? undefined
+        : describeParseFailure(userList.error),
+      malformedRoleList: roleList.success
+        ? undefined
+        : describeParseFailure(roleList.error)
     }
   }
-
-  const seen = new Set<string>()
-  const duplicates: string[] = []
-
-  for (const role of allRoles) {
-    if (seen.has(role.id)) {
-      duplicates.push(role.id)
-    } else {
-      seen.add(role.id)
-    }
-  }
-
-  if (duplicates.length > 0) {
-    raise(`Duplicate role ids found: ${duplicates.join(', ')}`)
-  }
-
-  if (!isConfigUpdateAllScopeAvailable) {
-    raise(
-      `At least one user with 'type=config.update-all' scope must be created`
-    )
-  }
-  return parsedUsers.data
 }
 
 async function userAlreadyExists(
@@ -215,10 +276,13 @@ async function createUser(token: string, userPayload: CreateUserInputInternal) {
   return client.users.create.mutate(userPayload)
 }
 
-export async function seedUsers(token: string) {
-  const rawUsers = await getUsers(token)
+/** Validation has already passed, so a failure here lands with earlier users
+ * in the database. Each record is attempted inside a handler because this is
+ * the one place that knows both which record it is and how far the run got. */
+export async function seedUsers(token: string, users: SeedUsers) {
+  let created = 0
 
-  for (const userMetadata of rawUsers) {
+  for (const [index, userMetadata] of users.entries()) {
     const {
       firstname,
       surname,
@@ -227,33 +291,56 @@ export async function seedUsers(token: string) {
       ...user
     } = userMetadata
 
-    if (await userAlreadyExists(token, username)) {
-      // eslint-disable-next-line no-console
-      console.log(
-        `User with the username "${username}" already exists. Skipping user "${username}"`
+    try {
+      if (await userAlreadyExists(token, username)) {
+        // eslint-disable-next-line no-console
+        console.log(
+          `User with the username "${username}" already exists. Skipping user "${username}"`
+        )
+        continue
+      }
+
+      const externalId = officeExternalId(officeIdentifier)
+
+      const client = createInitialisationClient(token)
+
+      const [primaryOffice] = await client.locations.list.query({
+        externalId
+      })
+
+      if (!primaryOffice) {
+        // Validation proved this office is declared, so a miss here is a bug
+        // in the seeder, not something an operator can act on.
+        throw new Error(
+          `Office "${externalId}" passed validation but is not in the database`
+        )
+      }
+
+      const userPayload = {
+        ...user,
+        name: {
+          firstname,
+          surname
+        },
+        ...(env.ACTIVATE_USERS && { status: 'active' as const }),
+        primaryOfficeId: primaryOffice.id,
+        username
+      }
+
+      await createUser(token, userPayload)
+    } catch (error) {
+      throw new PartialSeedError(
+        formatInitialUserFailure({
+          // 1-based, matching how the validator identifies a record.
+          record: { position: index + 1, username },
+          reason: describeInitialUserFailure(error, user),
+          // Skipped users are not counted; they were not created.
+          created,
+          total: users.length
+        })
       )
-      continue
     }
 
-    const externalId = officeIdentifier.split('_').at(-1)
-
-    const client = createInitialisationClient(token)
-
-    const [primaryOffice] = await client.locations.list.query({
-      externalId
-    })
-
-    const userPayload = {
-      ...user,
-      name: {
-        firstname,
-        surname
-      },
-      ...(env.ACTIVATE_USERS && { status: 'active' as const }),
-      primaryOfficeId: primaryOffice.id,
-      username
-    }
-
-    await createUser(token, userPayload)
+    created = created + 1
   }
 }
