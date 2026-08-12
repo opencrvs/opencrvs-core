@@ -8,8 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { FORGOTTEN_ITEMS } from '@login/login/actions'
-import { storage } from '@login/storage'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -20,33 +18,32 @@ import {
   Container,
   LogoContainer
 } from '@login/views/ResetCredentialsForm/Commons'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
-
+import { constantsMessages } from '@login/i18n/messages/constants'
 import { selectCountryLogo } from '@login/login/selectors'
 import { IStoreState } from '@login/store'
-import { constantsMessages } from '@login/i18n/messages/constants'
 import { useLocation, useNavigate } from 'react-router-dom'
 import * as routes from '@login/navigation/routes'
 
 type Props = IntlShapeProps & { logo: string | undefined }
 
-const ResetCredentialsSuccessView = (props: Props) => {
-  const { logo, intl } = props
+/*
+ * Terminal screen, shown whether or not the account exists. No resend button
+ * on purpose: resending needs a nonce, this screen never received one, and a
+ * button that worked for real accounts while failing for the rest would tell
+ * the visitor which they had typed. Anyone who got no mail starts over.
+ */
+const RecoveryInstructionsSentComponent = ({ intl, logo }: Props) => {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const { forgottenItem } = location.state
+  const forgottenItem =
+    location.state?.forgottenItem || sessionStorage.getItem('forgottenItem')
 
-  const removeUserDetails = async () => {
-    await storage.removeItem('USER_DETAILS')
-  }
-
-  useEffect(() => {
-    removeUserDetails()
-  }, [])
+  const notificationMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
 
   return (
     <Frame
@@ -56,36 +53,29 @@ const ResetCredentialsSuccessView = (props: Props) => {
       )}
     >
       <Frame.LayoutCentered>
-        <Container id="reset-credentials-success-page">
+        <Container id="recovery-instructions-sent-page">
           <Stack direction="column" alignItems="stretch" gap={24}>
             <LogoContainer>
               <CountryLogo src={logo} />
             </LogoContainer>
             <Stack direction="column" alignItems="center">
-              <Text
-                variant="h2"
-                element="h1"
-                align="center"
-                id="authenticating-label"
-              >
-                {intl.formatMessage(messages.successPageTitle, {
-                  forgottenItem
-                })}
+              <Text variant="h2" element="h1" align="center">
+                {intl.formatMessage(
+                  notificationMethod === 'sms'
+                    ? messages.recoveryInstructionsSentTitlePhone
+                    : messages.recoveryInstructionsSentTitleEmail
+                )}
               </Text>
               <Text
+                id="recovery-instructions-sent-body"
                 variant="reg18"
                 element="p"
                 align="center"
                 color="grey500"
-                id="authenticating-label"
               >
-                {window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
-                  ? intl.formatMessage(messages.successPageSubtitlePhone, {
-                      forgottenItem
-                    })
-                  : intl.formatMessage(messages.successPageSubtitleEmail, {
-                      forgottenItem
-                    })}
+                {intl.formatMessage(messages.recoveryInstructionsSentBody, {
+                  forgottenItem
+                })}
               </Text>
             </Stack>
 
@@ -95,7 +85,7 @@ const ResetCredentialsSuccessView = (props: Props) => {
               id="login-button"
               onClick={() => navigate(routes.STEP_ONE)}
             >
-              {intl.formatMessage(messages.loginButtonLabel)}
+              {intl.formatMessage(messages.backToLoginButtonLabel)}
             </Button>
           </Stack>
         </Container>
@@ -104,8 +94,8 @@ const ResetCredentialsSuccessView = (props: Props) => {
   )
 }
 
-export const ResetCredentialsSuccessPage = connect((state: IStoreState) => {
+export const RecoveryInstructionsSent = connect((state: IStoreState) => {
   return {
     logo: selectCountryLogo(state)
   }
-})(injectIntl(ResetCredentialsSuccessView))
+})(injectIntl(RecoveryInstructionsSentComponent))

@@ -33,6 +33,17 @@ InfluxDB, the InfluxDB Helm resources (StatefulSet, backup/restore/cleanup jobs)
 
 Archiving a NOTIFIED (incomplete) record used to clear `InherentFlags.INCOMPLETE` as a side effect. Since `UNARCHIVE` restores the record to its pre-archive status without amending flags, `ARCHIVE` is now consistent with it by default: the flag freezes across an archive/unarchive round trip and comes back exactly as it was. Country configs can still add/remove flags on either action explicitly via configuration. [#12782](https://github.com/opencrvs/opencrvs-core/issues/12782)
 
+#### `/auth/verifyUser` no longer reveals account existence; `/auth/verifyNumber` removed
+
+`POST /auth/verifyUser` was an unauthenticated account-enumeration oracle: `401` for an unknown email/mobile, `200` for a known one, and on the username-reminder flow it returned the user's security-question key with no proof the caller controlled the mailbox. It now always returns an empty `200` and, only when the identifier matches an account, emails or texts a time-limited, single-use recovery link instead of any account data.
+
+- **Country configs must add two new notification templates, `password-reset-link` and `username-reminder-link`, before upgrading.** Without them the recovery notification cannot be sent, so account recovery fails closed for every user.
+- **`POST /auth/verifyNumber` has been removed**, together with its gateway route. A client running a login bundle built before this release posts to a route that no longer exists and loses account recovery until it updates.
+- **Recovery links are built from each country config's `LOGIN_URL`.** If that value is wrong for an environment, every recovery link emailed or texted in that environment 404s when clicked.
+- **Operators may want to drop stale `retrieval_step_*` Redis keys at deploy.** Records written by the pre-branch flow used `redis.set` with no expiry at all, so any left over from before this upgrade persist indefinitely rather than aging out with a TTL. They are rejected on use regardless (a legacy record has no `retrieveFlow`), so this is hygiene rather than a required step.
+
+[#12861](https://github.com/opencrvs/opencrvs-core/issues/12861)
+
 ### Improvements
 
 - Private docker image registry support for Dependencies helm chart [#13090](https://github.com/opencrvs/opencrvs-core/issues/13090)
@@ -90,6 +101,7 @@ A new `integration.audit.read` scope guards it; country configs must assign it t
 - Keep a number field's postfix/unit label (e.g. `Kilograms (kg)` on Weight at birth) on a single line instead of wrapping onto a second row [#13216](https://github.com/opencrvs/opencrvs-core/issues/13216)
 - Bust the locally cached data when a user's office or role changes, so stale drafts and records from the previous office no longer appear after the change
 - Stop showing an empty `Comment` section in the record audit history for archived records. Archiving from the action menu never asked for a comment, so the section only ever displayed a `-` placeholder. Records archived through the "mark as duplicate" flow still show the comment that was entered there [#13265](https://github.com/opencrvs/opencrvs-core/issues/13265)
+- Stop `/auth/verifyUser` from revealing whether a submitted email or mobile number belongs to a registered account, and stop the username-reminder flow from returning the account's security-question key with no proof the caller controls the mailbox — see "Breaking changes" above for the required country-config migration [#12861](https://github.com/opencrvs/opencrvs-core/issues/12861)
 - Stop offering custom actions (e.g. `ESCALATE`) on a draft. Executing one deleted the draft while leaving the event undeclared, making the record impossible to find again [#13245](https://github.com/opencrvs/opencrvs-core/issues/13245)
 
 ## 2.0.0
