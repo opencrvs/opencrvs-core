@@ -14,7 +14,8 @@ import { z } from 'zod'
 import { raise } from './utils'
 import { fromZodError } from 'zod-validation-error'
 import { getUUID, LocationVersion } from '@opencrvs/commons'
-import { createInitialisationClient } from './index'
+import { createInitialisationClient } from './initialisation-client'
+import { formatUnwrittenFailure } from './seed-failure'
 
 const RawLocationVersionSchema = z.object({
   effectiveFrom: z.string().optional(),
@@ -40,38 +41,6 @@ const CountryConfigLocationResponse = z.object({
   administrativeAreas: z.array(RawAdministrativeAreaSchema)
 })
 
-function validateAdminStructure(
-  locations: z.output<
-    typeof CountryConfigLocationResponse
-  >['administrativeAreas']
-) {
-  const locationsMap = new Map(
-    locations.map((loc) => {
-      return [loc.id, loc]
-    })
-  )
-
-  // Create a map of parent-child relationships
-  const locationNodeMap = new Map(
-    locations.map((loc) => [
-      loc.id,
-      { id: loc.id, children: new Array<string>() }
-    ])
-  )
-  // this is the root location
-  locationNodeMap.set('0', { id: '0', children: [] })
-
-  locations.forEach((loc) => {
-    const parent = locationNodeMap.get(loc.partOf.split('/')[1])
-    if (!parent) {
-      raise(`Parent location "${loc.partOf}" not found for ${loc.name}`)
-    }
-    parent.children.push(loc.id)
-  })
-
-  return locationsMap
-}
-
 /**
  * Builds a seedable `versions` history from the country config's raw version
  * rows: assigns each element a fresh `versionId` and defaults an empty
@@ -95,11 +64,30 @@ function buildSeededVersions(
   }))
 }
 
-async function getLocations() {
+/**
+ * The administrative hierarchy the country config states, fetched and parsed
+ * but not written, and neither structurally checked here. Fetching is separate
+ * from writing so that the entry point can validate the whole set of seed-data
+ * — users included — before any of it reaches the database, and in particular
+ * before the hierarchy is written. See `./validate-seed-data.ts`.
+ *
+ * The structural checks that used to abort the run from here — that every
+ * node's `partOf` names an administrative area that exists — moved to the
+ * validator, so that a broken hierarchy and a bad user record appear in one
+ * report instead of the operator meeting them one run at a time. This function
+ * therefore returns the parsed seed-data alongside the rows to write: the
+ * validator resolves each user's office against it, and the transform below
+ * discards the `partOf` it would need to do so.
+ *
+ * Nothing here writes, so every failure it reports ends `nothing was seeded`:
+ * the operator's database is still clean and there is nothing to clear. See
+ * `./seed-failure.ts` for the other side of that line.
+ */
+export async function getLocations() {
   const url = new URL('config/locations', env.COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url)
   if (!res.ok) {
-    raise(`Expected to get the locations from ${url}`)
+    raise(formatUnwrittenFailure(`Expected to get the locations from ${url}`))
   }
 
   const parsedResponse = CountryConfigLocationResponse.safeParse(
@@ -107,28 +95,15 @@ async function getLocations() {
   )
   if (!parsedResponse.success) {
     raise(
-      fromZodError(parsedResponse.error, {
-        prefix: `Error validating locations data returned from ${url}`
-      })
+      formatUnwrittenFailure(
+        fromZodError(parsedResponse.error, {
+          prefix: `Error validating locations data returned from ${url}`
+        }).message
+      )
     )
   }
 
   const { administrativeAreas, locations } = parsedResponse.data
-
-  const administrativeAreaMap = validateAdminStructure(administrativeAreas)
-
-  const NULL_ADMINISTRATIVE_AREA_ID = '0'
-  locations.forEach((location) => {
-    const administrativeAreaId = location.partOf.split('/')[1]
-    if (
-      !administrativeAreaMap.get(administrativeAreaId) &&
-      administrativeAreaId !== NULL_ADMINISTRATIVE_AREA_ID
-    ) {
-      raise(
-        `Parent location "${location.partOf}" not found for ${location.name}`
-      )
-    }
-  })
 
   const administrativeHierarchyIdMap = new Map(
     administrativeAreas.map(({ id }) => [id, getUUID()])
@@ -137,6 +112,12 @@ async function getLocations() {
   const locationIdMap = new Map(locations.map(({ id }) => [id, getUUID()]))
 
   return {
+    /**
+     * The hierarchy as the country config states it, for the validator: the
+     * ids here are the country config's own, which is what a user's office
+     * reference and a node's `partOf` are written in terms of.
+     */
+    seedData: parsedResponse.data,
     administrativeAreas: administrativeAreas.map((a) => ({
       id: administrativeHierarchyIdMap.get(a.id)!,
       name: a.name,
@@ -157,9 +138,16 @@ async function getLocations() {
   }
 }
 
-export async function seedLocations(token: string) {
-  const { administrativeAreas, locations } = await getLocations()
+/**
+ * The administrative hierarchy of a set of seed-data, parsed and ready to be
+ * written.
+ */
+export type SeedLocations = Awaited<ReturnType<typeof getLocations>>
 
+export async function seedLocations(
+  token: string,
+  { administrativeAreas, locations }: SeedLocations
+) {
   const client = createInitialisationClient(token)
 
   await client.administrativeAreas.set.mutate(administrativeAreas)
