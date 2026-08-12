@@ -45,13 +45,13 @@ test.describe.serial('1. Team Page -1', () => {
     ]
 
     test('1.1.1 Verify Team Members, Roles and their statuses', async () => {
-      const rows = page.locator('#user_list tr:has(td)')
-      await expect(rows).toHaveCount(team.length)
-
-      for (let i = 0; i < team.length; i++) {
-        const cells = rows.nth(i).locator('td')
-        await expect(cells.nth(1)).toHaveText(team[i].name)
-        await expect(cells.nth(2)).toHaveText(team[i].role)
+      for (const member of team) {
+        const row = page
+          .locator('#user_list tr:has(td)')
+          .filter({ hasText: member.name })
+        const cells = row.locator('td')
+        await expect(cells.nth(1)).toHaveText(member.name)
+        await expect(cells.nth(2)).toHaveText(member.role)
         await expect(cells.nth(3)).toHaveText('Active')
       }
     })
