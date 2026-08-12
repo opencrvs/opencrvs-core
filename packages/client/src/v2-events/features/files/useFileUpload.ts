@@ -107,7 +107,7 @@ async function deleteFile({ filename }: { filename: string }): Promise<void> {
   return
 }
 
-export const UPLOAD_MUTATION_KEY = 'uploadFile'
+const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
 async function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
