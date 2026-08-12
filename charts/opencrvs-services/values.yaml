@@ -414,6 +414,21 @@ data_seed:
     # six zeros as a 2-Factor auth code. Always set to false in production and staging.
     ACTIVATE_USERS: 'false'
 
+validation:
+  enabled: false
+  timeout_seconds: 5
+  active_deadline_seconds: 300
+  cert_endpoint: 'https://traefik.traefik.svc.cluster.local'
+  monitoring_enabled: false
+  allow_insecure_https: false
+  smtp_secret_name: smtp-config
+  preflight:
+    enabled: true
+    hook_weight: '0'
+  postdeploy:
+    enabled: true
+    hook_weight: '5'
+
 on_restore_cronjob:
   enabled: false
   schedule: '0 3 * * *'

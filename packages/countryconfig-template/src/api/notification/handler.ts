@@ -134,8 +134,7 @@ async function sendUserNotification<T extends TriggerEvent>(
 export interface NotificationParams {
   event: UserEventVariablePair['event'] | InformantEventVariablePair['event']
   variable:
-    | UserEventVariablePair['variable']
-    | InformantEventVariablePair['variable']
+    UserEventVariablePair['variable'] | InformantEventVariablePair['variable']
   recipient: Recipient
   deliveryMethod: string
 }
@@ -282,6 +281,22 @@ function convertPayloadToVariable({
         firstname,
         temporaryPassword: payload.temporaryPassword
       }
+
+    case TriggerEvent.PASSWORD_RESET_LINK:
+    case TriggerEvent.USERNAME_REMINDER_LINK: {
+      const recoveryURL = new URL(
+        'recover',
+        LOGIN_URL.endsWith('/') ? LOGIN_URL : `${LOGIN_URL}/`
+      )
+      recoveryURL.searchParams.set('token', payload.token)
+
+      return {
+        firstname,
+        applicationName: applicationConfig.APPLICATION_NAME,
+        countryLogo: COUNTRY_LOGO_URL,
+        recoveryURL: recoveryURL.toString()
+      }
+    }
 
     case TriggerEvent.RESEND_INVITE:
       return {

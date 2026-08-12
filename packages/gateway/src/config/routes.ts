@@ -117,7 +117,7 @@ export const getRoutes = () => {
     rateLimitedAuthProxy.verifyUser,
     rateLimitedAuthProxy.verifyCode,
     rateLimitedAuthProxy.resendAuthenticationCode,
-    rateLimitedAuthProxy.verifyNumber,
+    rateLimitedAuthProxy.verifyRecoveryToken,
     rateLimitedAuthProxy.verifySecurityAnswer,
     rateLimitedAuthProxy.sendUserName,
     rateLimitedAuthProxy.changePassword,
