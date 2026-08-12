@@ -1,33 +1,4 @@
 ---
-apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
-metadata:
-  name: events-route
-spec:
-  entryPoints:
-  {{- if or .Values.ingress.ssl_enabled .Values.ingress.tls_resolver }}
-    - websecure
-  {{- end }}
-  {{- if or .Values.ingress.tls_resolver (not .Values.ingress.ssl_enabled) }}
-    - web
-  {{- end }}
-  routes:
-  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "events" "Values" .Values) }}`)'
-    kind: Rule
-    services:
-    - name: events
-      namespace: {{ .Release.Namespace }}
-      port: {{ .Values.events.port }}
-    middlewares:
-      - name: sts-and-basic-response-headers
-  {{- if .Values.ingress.tls_resolver }}
-  tls:
-    certResolver: {{ .Values.ingress.tls_resolver }}
-  {{- else if .Values.ingress.tls_secret_name }}
-  tls:
-    secretName: {{ .Values.ingress.tls_secret_name }}
-  {{- end }}
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -52,11 +23,9 @@ spec:
       containers:
         - name: events
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.events) }}
+          imagePullPolicy: {{ .Values.events.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           env:
-            - name: APN_NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
+          {{- include "render-otel-env-vars" (dict "Values" .Values "Release" .Release) }}
             - name: AUTH_URL
               value: "http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040"
             - name: CERT_PUBLIC_KEY_PATH

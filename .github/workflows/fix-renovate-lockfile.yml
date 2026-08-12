@@ -54,12 +54,12 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ github.ref_name }}
-          # GH_TOKEN (a PAT — same secret auto-pr-to-release.yml uses to push
-          # and open PRs) is persisted as the push credential so the fix-up
-          # commit RE-TRIGGERS downstream workflows (lint-and-test etc.)
-          # against the corrected lockfile. Pushes made with the default
-          # GITHUB_TOKEN do not trigger further workflow runs.
-          token: ${{ secrets.GH_TOKEN }}
+          # A dedicated PAT (fine-grained, Contents:write on this repo) is
+          # persisted as the push credential so the fix-up commit RE-TRIGGERS
+          # downstream workflows (lint-and-test etc.) against the corrected
+          # lockfile. Pushes made with the default GITHUB_TOKEN do not trigger
+          # further workflow runs.
+          token: ${{ secrets.RENOVATE_LOCKFILE_TOKEN }}
 
       - name: Setup pnpm
         # No `version:` — action-setup reads `packageManager` from package.json

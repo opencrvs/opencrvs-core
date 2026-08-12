@@ -1,0 +1,127 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+############################################################
+# What common Tiltfile does?:
+# - Traefik deployment
+# - Group resources by label on UI: http://localhost:10350/
+
+########################################################
+# Load extensions for namespace and helm operations
+load('ext://namespace', 'namespace_create', 'namespace_inject')
+load('ext://helm_resource', 'helm_resource', 'helm_repo')
+
+
+secret_settings(disable_scrub=True)
+########################################################
+# Traefik Deployment
+print("🚀 Deploying traefik...")
+namespace_create('traefik')
+traefik_tilt_label = '5.Traefik'
+# Install Traefik GW
+helm_repo('traefik-repo', 'https://traefik.github.io/charts', labels=[traefik_tilt_label])
+helm_resource(
+    'traefik',
+    'traefik-repo/traefik',
+    namespace='traefik',
+    resource_deps=['traefik-repo'],
+    flags=[
+        '--version=39.0.0',
+        '--values=./examples/traefik/values.yaml',
+        '--create-namespace',
+    ],
+)
+
+# OpenCRVS application has traefik CRDs IngressRoute
+# and Middleware, so we need to add traefik as dependency
+# to all workloads that use them
+traefik_deps = [
+  'client',
+  'countryconfig',
+  'events',
+  'gateway',
+  'login',
+  'minio'
+]
+k8s_resource("traefik", labels=[traefik_tilt_label])
+# Add labels to traefik resources
+traefik_ingress_objects = ["{}-route:ingressroute".format(dep) for dep in traefik_deps]
+traefik_middleware_objects = ["sts-and-basic-response-headers:middleware", "enable-compression:middleware", "block-internal-routes:middleware"]
+k8s_resource(
+  objects=traefik_ingress_objects,
+  new_name='traefik-ingress-routes',
+  resource_deps=['traefik'],
+  labels=[traefik_tilt_label]
+)
+k8s_resource(
+  objects=traefik_middleware_objects,
+  new_name='traefik-middleware',
+  resource_deps=['traefik'],
+  labels=[traefik_tilt_label]
+)
+
+######################################################
+# Add labels to resources to OpenCRVS services
+tilt_label = '4.Dependencies'
+dependencies = [
+  'elasticsearch',
+  'mongodb',
+  'minio',
+  'redis',
+  'postgres',
+  # 'postgres-on-deploy',
+  # FIXME: both resources are present only if security is enabled
+  # 'elasticsearch-on-deploy',
+  # 'mongo-on-deploy',
+]
+
+for workload in dependencies:
+  k8s_resource(workload, labels=[tilt_label])
+
+######################################################
+# Add labels to resources to OpenCRVS services
+tilt_label = '1.OpenCRVS'
+
+opensrvs_predeploy_jobs = [
+  'postgres-on-deploy',
+  # FIXME: works only if security is enabled
+  # 'mongo-on-deploy',
+  # 'elasticsearch-on-deploy',
+  'data-migration',
+  'data-migration-analytics',
+  'data-migration-legacy',
+]
+
+opensrvs_services = [
+  'auth',
+  'client',
+  'countryconfig',
+  'documents',
+  'events',
+  'gateway',
+  'login'
+]
+
+opensrvs_postdeploy_jobs = [
+  'elasticsearch-reindex',
+]
+
+job_label = '3.Jobs'
+previous_jobs = []
+for job in opensrvs_predeploy_jobs:
+  if previous_jobs:
+    k8s_resource(job, labels=[job_label], resource_deps=dependencies + previous_jobs)
+  else:
+    k8s_resource(job, labels=[job_label], resource_deps=dependencies + previous_jobs)
+  previous_jobs.append(job)
+
+for workload in opensrvs_services:
+  k8s_resource(workload, labels=[tilt_label], resource_deps=dependencies + opensrvs_predeploy_jobs)
+for job in opensrvs_postdeploy_jobs:
+  k8s_resource(job, labels=[job_label], resource_deps=opensrvs_services)

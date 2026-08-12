@@ -15,6 +15,7 @@ export const ERROR_CODE_FIELD_MISSING = 500
 export const ERROR_CODE_INVALID_CREDENTIALS = 401
 export const ERROR_CODE_FORBIDDEN_CREDENTIALS = 403
 export const ERROR_CODE_PHONE_NUMBER_VALIDATE = 503
+export const ERROR_CODE_RATE_LIMIT = 429
 
 export interface ITokenPayload {
   subject: string

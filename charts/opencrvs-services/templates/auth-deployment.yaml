@@ -21,12 +21,10 @@ spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.auth) | nindent 6 }}
       containers:
         - image: {{ include "opencrvs.image" (dict "root" . "service" .Values.auth) }}
+          imagePullPolicy: {{ .Values.auth.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           name: auth
           env:
-            - name: APN_NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
+          {{- include "render-otel-env-vars" (dict "Values" .Values "Release" .Release) }}
             - name: REDIS_HOST
               value: {{ .Values.redis.host | quote }}
           {{- if eq .Values.redis.auth_mode "use_secret" }}

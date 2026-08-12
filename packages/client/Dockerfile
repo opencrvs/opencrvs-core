@@ -22,7 +22,17 @@ WORKDIR /app/packages/client
 COPY --chown=node:node packages/client /app/packages/client
 RUN pnpm install --frozen-lockfile && pnpm build
 
-FROM nginxinc/nginx-unprivileged:1.28-alpine
+FROM nginxinc/nginx-unprivileged:1.28-alpine-otel
+
+USER root
+RUN sed -i '1iload_module modules/ngx_otel_module.so;' /etc/nginx/nginx.conf
+USER nginx
+
+ENV OTEL_NGINX_TRACE=off
+ENV OTEL_NGINX_EXPORTER_ENDPOINT=127.0.0.1:4317
+ENV OTEL_NGINX_SERVICE_NAME=opencrvs_client
+ENV OTEL_NGINX_SERVICE_NAMESPACE=opencrvs
+ENV OTEL_NGINX_DEPLOYMENT_ENVIRONMENT=production
 
 COPY --from=0 --chown=nginx:nginx /app/packages/client/build/ /usr/share/nginx/html/
 

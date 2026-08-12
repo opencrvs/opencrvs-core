@@ -59,12 +59,17 @@ processors:
             event.Put("log.level", levelName);
           }
         }
-  # Process nginx events to set log level based on HTTP status code
+  # Process HTTP access events to set log level based on HTTP status code
   - script:
       lang: javascript
       source: >
         function process(event) {
-          var status = parseInt(event.Get("http.response.status_code"), 10);
+          var status =
+            event.Get("http.response.status_code") ||
+            event.Get("DownstreamStatus") ||
+            event.Get("OriginStatus");
+
+          status = parseInt(status, 10);
 
           if (isNaN(status)) {
             return;
@@ -79,6 +84,7 @@ processors:
   # - message field contains not parsed JSON:
   #   - nodejs (alls core services): Set message field to msg if present
   #   - nginx (client, login): Set message field from url.original
+  #   - traefik access logs: Set message from access log fields
   # - Kubernetes correlation: host.name to pod name, container.name,
   #   service.name, service.environment, and orchestrator info
   - script:
@@ -124,6 +130,26 @@ processors:
               }
               event.Put("log.level", level);
             }
+          }
+
+          var requestMethod = event.Get("RequestMethod");
+          var requestPath = event.Get("RequestPath");
+          var downstreamStatus = event.Get("DownstreamStatus");
+          var originStatus = event.Get("OriginStatus");
+          var status = downstreamStatus !== null ? downstreamStatus : originStatus;
+
+          if (requestMethod !== null && requestPath !== null) {
+            var requestScheme = event.Get("RequestScheme");
+            var requestHost = event.Get("RequestHost");
+            var requestUrl =
+              requestScheme !== null && requestHost !== null
+                ? requestScheme + "://" + requestHost + requestPath
+                : requestPath;
+
+            event.Put(
+              "message",
+              requestMethod + " " + requestUrl + " " + (status !== null ? status : "-")
+            );
           }
         }
   - drop_fields:

@@ -11,6 +11,7 @@
 import React from 'react'
 import { SelectField, SelectOption } from '@opencrvs/commons/client'
 import { Select as SelectComponent } from '@opencrvs/components'
+import { formMessages } from '@client/i18n/messages'
 import { useIntlWithFormData } from '@client/v2-events/messages/utils'
 import { StringifierContext } from './RegisteredField'
 
@@ -56,6 +57,7 @@ function SelectInput({
       data-testid={props['data-testid'] || `select__${props.id}`}
       noOptionsMessage={formattedNoOptionsMessage}
       options={formattedOptions}
+      placeholder={props.placeholder ?? intl.formatMessage(formMessages.select)}
       value={inputValue}
     />
   )

@@ -15,6 +15,7 @@ import { UUID } from './uuid'
 import { getScopes } from './authentication'
 import { Role } from './roles'
 import { ContainsFlags } from './events/Flag'
+import { EventStatus } from './events/EventStatus'
 
 export const JurisdictionFilter = z
   .enum(['administrativeArea', 'location', 'all'])
@@ -62,6 +63,11 @@ const PlainScopeType = z.enum([
   'record.reindex',
   'user.data-seeding',
   'integration.create',
+  // Reading an integration's audit log. Deliberately separate from
+  // 'integration.create' so read-only oversight can be granted on its own, and
+  // deliberately option-less: system clients have no office and no
+  // administrative area, so jurisdiction options would have nothing to bind to.
+  'integration.audit.read',
   'record.import',
   'config.update-all',
   'location.edit',
@@ -87,6 +93,16 @@ const scopeByEvent = z
   )
   .describe('Event type, e.g. birth, death')
 
+const scopeByStatus = z
+  // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
+  .preprocess(
+    (val) => (val === undefined ? undefined : [val].flat()),
+    z.array(EventStatus).optional()
+  )
+  .describe(
+    'Restricts the scope to records currently in one of these statuses.'
+  )
+
 const userRole = z
   // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
   .preprocess(
@@ -107,7 +123,8 @@ const scopeOptionsDeclaredOrNotified = scopeOptionsPlaceEvent
     notifiedIn: JurisdictionFilter.optional(),
     notifiedBy: UserFilter.optional(),
     declaredIn: JurisdictionFilter.optional(),
-    declaredBy: UserFilter.optional()
+    declaredBy: UserFilter.optional(),
+    status: scopeByStatus
   })
   .describe('Options applicable to actions that may take place after DECLARE')
 

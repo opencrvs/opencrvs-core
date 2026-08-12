@@ -168,22 +168,14 @@ export function buildClientFunctionContext(input: {
   locations?: Location[]
   adminLevelIds?: string[]
 }): ClientFunctionContext {
-  const flags =
-    input.validatorContext?.event && input.validatorContext?.eventConfig
-      ? getCurrentEventState(
-          input.validatorContext?.event,
-          input.validatorContext?.eventConfig
-        )?.flags
-      : []
-
   return {
     $form: input.form,
-    $flags: flags,
+    $flags: input.validatorContext?.event?.state.flags ?? [],
     $now: todayISO(),
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     $online: isOnline(),
     $user: input.validatorContext?.user,
-    $event: input.validatorContext?.event,
+    $event: input.validatorContext?.event?.document,
     $leafAdminStructureLocationIds:
       input.validatorContext?.leafAdminStructureLocationIds ?? [],
     user: input.systemVariables?.user,
@@ -505,12 +497,23 @@ export function isFieldSecured(
   return validate(field.secured as JSONSchema, clientFunctionContext)
 }
 
+export type EventValidatorContext = {
+  document: EventDocument
+  state: EventIndex
+}
+
+export function getEventValidatorContext(
+  document: EventDocument,
+  config: EventConfig
+): EventValidatorContext {
+  return { document, state: getCurrentEventState(document, config) }
+}
+
 export type ValidatorContext = {
   user?: ITokenPayload
   leafAdminStructureLocationIds?: Array<{ id: UUID }>
-  event?: EventDocument
-  eventConfig?: EventConfig
   baseFormState?: EventState
+  event?: EventValidatorContext
 }
 
 function isFieldConditionMet(

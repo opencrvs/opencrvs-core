@@ -50,7 +50,7 @@ test('Resetting password from user list should update the users status to pendin
   await test.step('Go to user list page', async () => {
     await login(page, CREDENTIALS.LOCAL_SYSTEM_ADMIN)
     await page.getByRole('button', { name: 'Central' }).click()
-    await page.getByRole('button', { name: 'Ibombo' }).click()
+    await page.getByRole('button', { name: 'Ibombo', exact: true }).click()
     await page.getByRole('button', { name: 'Quanza' }).click()
     await page.getByRole('button', { name: 'Quanza Village Office' }).click()
     await expect(page.locator('#content-name')).toHaveText(

@@ -38,6 +38,8 @@ Custom actions are non-core actions that are defined only in the country configu
 
 All custom actions are configurable.
 
+Custom actions are not available while an event is still in `CREATED` state, i.e. a draft. A draft is not indexed and is only reachable through its creator's drafts workqueue, and executing any action on an event deletes its drafts — so a custom action, which cannot change the status, would leave the event in `CREATED` with its declaration data destroyed and no way to find it again. The action is hidden in the client and rejected with HTTP 409 by the backend.
+
 <!-- TODO: add screenshot of custom action dialog here -->
 
 ## Action configurations

@@ -1,0 +1,25 @@
+{{- if and .Values.validation.enabled .Values.validation.preflight.enabled }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "0"
+  labels:
+    app: validate-predeploy
+  name: validate-predeploy
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: {{ .Values.validation.active_deadline_seconds }}
+  template:
+    metadata:
+      labels:
+        app: validate-predeploy
+        helm.sh/revision: {{ .Release.Revision | quote }}
+    spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.utilities) | nindent 6 }}
+      containers:
+        {{- include "opencrvs-validate.containerSpec" (dict "root" . "mode" "predeploy") | nindent 8 }}
+      restartPolicy: "Never"
+{{- end }}

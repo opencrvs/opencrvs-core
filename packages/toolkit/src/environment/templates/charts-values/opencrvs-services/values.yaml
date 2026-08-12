@@ -21,12 +21,13 @@ hpa:
   enabled: false
 
 env:
-  APN_SERVICE_URL: "http://apm-server.opencrvs-deps-{{env}}.svc.cluster.local:8200"
   MINIO_BUCKET: ocrvs
   OPENCRVS_ENVIRONMENT: {{opencrvs_environment}}
 
-influxdb:
-  host: influxdb-0.influxdb.opencrvs-deps-{{env}}.svc.cluster.local
+otel:
+  enabled: true
+  deployment_environment: {{env}}
+  exporter_otlp_endpoint: "opentelemetry-collector.opencrvs-deps-{{env}}.svc.cluster.local:4317"
 
 elasticsearch:
   auth_mode: auto

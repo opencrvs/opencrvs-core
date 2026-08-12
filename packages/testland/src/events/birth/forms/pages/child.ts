@@ -21,8 +21,7 @@ import {
   field,
   user,
   never,
-  SelectOption,
-  flag
+  SelectOption
 } from '@opencrvs/toolkit/events'
 import { not } from '@opencrvs/toolkit/conditionals'
 
@@ -260,7 +259,6 @@ export const child = defineFormPage({
       analytics: true,
       type: FieldType.SELECT,
       required: true,
-      secured: flag('sealed'),
       label: {
         defaultMessage: 'Sex',
         description: 'This is the label for the field',
@@ -294,7 +292,6 @@ export const child = defineFormPage({
       id: 'child.reason',
       type: FieldType.TEXT,
       required: true,
-      secured: flag('sealed'),
       label: {
         defaultMessage: 'Reason for delayed registration',
         description: 'This is the label for the field',
@@ -356,7 +353,9 @@ export const child = defineFormPage({
         locationTypes: ['HEALTH_FACILITY'],
         allowedLocations: user.jurisdiction(
           user.scope('record.create').attribute('placeOfEvent')
-        )
+        ),
+        anchorToDateOfEvent: true,
+        activeOnly: true
       }
     },
     {
@@ -405,7 +404,9 @@ export const child = defineFormPage({
         streetAddressForm: defaultStreetAddressConfiguration,
         allowedLocations: user.jurisdiction(
           user.scope('record.create').attribute('placeOfEvent')
-        )
+        ),
+        anchorToDateOfEvent: true,
+        activeOnly: true
       }
     },
     {
@@ -453,14 +454,15 @@ export const child = defineFormPage({
         streetAddressForm: defaultStreetAddressConfiguration,
         allowedLocations: user.jurisdiction(
           user.scope('record.create').attribute('placeOfEvent')
-        )
+        ),
+        anchorToDateOfEvent: true,
+        activeOnly: true
       }
     },
     {
       id: 'child.birthLocationId',
       type: FieldType.ALPHA_HIDDEN,
       required: false,
-      secured: flag('sealed'),
       label: {
         defaultMessage: 'Health Institution',
         description: 'This is the label for the field',
@@ -488,7 +490,6 @@ export const child = defineFormPage({
       type: FieldType.SELECT,
       analytics: true,
       required: false,
-      secured: flag('sealed'),
       label: {
         defaultMessage: 'Attendant at birth',
         description: 'This is the label for the field',
@@ -501,7 +502,6 @@ export const child = defineFormPage({
       analytics: true,
       type: FieldType.SELECT,
       required: false,
-      secured: flag('sealed'),
       label: {
         defaultMessage: 'Type of birth',
         description: 'This is the label for the field',
@@ -514,7 +514,6 @@ export const child = defineFormPage({
       analytics: true,
       type: FieldType.NUMBER,
       required: false,
-      secured: flag('sealed'),
       label: {
         defaultMessage: 'Weight at birth',
         description: 'This is the label for the field',

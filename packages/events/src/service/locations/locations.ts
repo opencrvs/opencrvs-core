@@ -46,12 +46,20 @@ export function isUniqueViolation(error: unknown) {
 export async function setLocations(locations: SetLocationPayload[]) {
   await locationsRepo.setLocations(
     locations.map(
-      ({ id, name, administrativeAreaId, locationType, externalId }) => ({
+      ({
         id,
         name,
         administrativeAreaId,
         locationType,
-        externalId
+        externalId,
+        versions
+      }) => ({
+        id,
+        name,
+        administrativeAreaId,
+        locationType,
+        externalId,
+        versions
       })
     )
   )
@@ -115,10 +123,12 @@ export async function createLocation(
 
     if (existing) {
       const [initialVersion] = existing.versions
-      // externalId is compared against the initial version, not the legacy
-      // column — create deliberately leaves the column NULL.
+      // name and externalId are compared against the initial version, never
+      // the legacy flat columns: create leaves external_id NULL, and a seeded
+      // row's flat name holds the version in effect today, which is not the
+      // initial version's name once the row carries a multi-element history.
       const matchesPayload =
-        existing.name === resolved.name &&
+        initialVersion.name === resolved.name &&
         (initialVersion.externalId ?? null) === resolved.externalId &&
         existing.administrativeAreaId === resolved.administrativeAreaId &&
         existing.locationType === resolved.locationType &&
@@ -303,7 +313,7 @@ function assertLatestVersionToken(
   }
 }
 
-/** History is append-only: no splicing new versions into the past. */
+/** Updates only append: no splicing new versions into the past. */
 function assertForwardOnly(
   newVersion: LocationVersion,
   last: LocationVersion
@@ -377,7 +387,7 @@ async function assertExternalIdAvailable({
  *    `lastVersionId` is legitimately stale.
  * 3. `lastVersionId` not the latest element → CONFLICT (stale token)
  * 4. `effectiveFrom` not strictly after the latest element →
- *    UNPROCESSABLE_CONTENT (history is append-only, no past splices)
+ *    UNPROCESSABLE_CONTENT (updates only append, no past splices)
  * 5. a recode (`externalId` change) colliding with another entity actively
  *    holding the code on or after `effectiveFrom` → CONFLICT
  */
@@ -476,6 +486,10 @@ export interface WithdrawnVersion {
  * Withdraws a pending (future-dated) version element by `versionId`.
  *
  * - unknown id, or no element with that `versionId` → NOT_FOUND
+ * - it is the only version the row has → CONFLICT (a row must always keep
+ *   at least one version; the `versions` column is non-empty by DB
+ *   constraint, so removing the last element would otherwise fail as an
+ *   unhandled NOT NULL violation instead of a clean API error)
  * - the element's `effectiveFrom` is today or in the past (no longer
  *   pending — it may already be in effect) → CONFLICT
  */
@@ -496,6 +510,13 @@ export async function withdrawVersionChecked({
     throw new TRPCError({
       code: 'NOT_FOUND',
       message: `${entityLabel} with id ${payload.id} has no version ${payload.versionId}`
+    })
+  }
+
+  if (versions.length === 1) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: `${entityLabel} with id ${payload.id} has only one version — withdrawing it would leave none`
     })
   }
 

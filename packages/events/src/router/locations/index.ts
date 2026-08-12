@@ -129,7 +129,7 @@ export const locationRouter = router({
       openapi: {
         summary: 'Update a location',
         description:
-          'Append a new version to a location (rename, recode or inactivate). Prior versions are never modified.',
+          'Append a new version to a location (rename, recode or inactivate). This endpoint only ever appends: it never modifies or removes an existing version. To drop a version that has not taken effect yet, use the withdraw endpoint instead.',
         method: 'PUT',
         path: '/locations/{id}',
         tags: ['Locations'],

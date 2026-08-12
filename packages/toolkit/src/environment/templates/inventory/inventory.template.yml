@@ -13,10 +13,8 @@ all:
     # - If you are behind VPN, use private IP address
     # - If your server is exposed (not recommeded), use public IP address
     # - If you would like to run kubectl commands from the remote server, leave this field empty
-    # kube_api_endpoint: ''
-
+    # kube_api_host: ''
     # IMPORTANT: If master VM has multiple ethernet interfaces, put private IP address at kube_api_host
-    # kube_api_host: 10.10.10.10
     kube_api_host: {{kube_api_host}}
 
     # Default ansible provision user, keep as is

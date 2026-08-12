@@ -2,6 +2,7 @@
 - name: elasticsearch-reindex
   command: ["sh", "-c", "/data-assets/reindex.sh"]
   image: {{ include "opencrvs.image" (dict "root" . "service" .Values.utilities) }}
+  imagePullPolicy: {{ .Values.utilities.image.pullPolicy | default .Values.platform.imagePullPolicy }}
   env:
     - name: AUTH_URL
       value: "http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040"
@@ -14,6 +15,7 @@
 {{- define "elasticsearch-reindex.initContainerSpec" -}}
 - name: copy-assets
   image: {{ include "opencrvs.image" (dict "root" . "service" .Values.countryconfig) }}-assets
+  imagePullPolicy: {{ .Values.countryconfig.image.pullPolicy | default .Values.platform.imagePullPolicy }}
   command:
     - sh
     - -c

@@ -9,16 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { generateUuid } from './test.utils'
+import { generateUuid, locationVersion } from './test.utils'
 import {
   CreateLocationPayload,
   UpdateAdministrativeAreaPayload,
   UpdateLocationPayload
 } from './locationPayloads'
+import { SetAdministrativeAreaPayload, SetLocationPayload } from './locations'
+import { UUID } from '../uuid'
 
 describe('location write payloads', () => {
   const locationId = generateUuid(() => 0.91)
   const lastVersionId = generateUuid(() => 0.92)
+  const areaId = generateUuid(() => 0.94)
 
   it('CreateLocationPayload defaults status to active and accepts a plain-date effectiveFrom', () => {
     const parsed = CreateLocationPayload.parse({
@@ -91,6 +94,107 @@ describe('location write payloads', () => {
     })
 
     expect(result.success).toBe(false)
+  })
+
+  describe.each([
+    {
+      label: 'SetLocationPayload',
+      identity: {
+        id: locationId,
+        name: 'Ilanga Office',
+        externalId: 'ilanga-office-pcode',
+        administrativeAreaId: null,
+        locationType: 'CRVS_OFFICE'
+      },
+      safeParse: (payload: unknown) => SetLocationPayload.safeParse(payload)
+    },
+    {
+      label: 'SetAdministrativeAreaPayload',
+      identity: {
+        id: areaId,
+        name: 'Ilanga District',
+        externalId: 'ilanga-district-pcode',
+        parentId: null
+      },
+      safeParse: (payload: unknown) =>
+        SetAdministrativeAreaPayload.safeParse(payload)
+    }
+  ])('$label versions', ({ identity, safeParse }) => {
+    const versionA = generateUuid(() => 0.2)
+    const versionB = generateUuid(() => 0.4)
+
+    const version = (versionId: UUID, effectiveFrom: string) =>
+      locationVersion({
+        versionId,
+        effectiveFrom,
+        name: identity.name,
+        externalId: identity.externalId
+      })
+
+    it('accepts a payload with no versions', () => {
+      const result = safeParse(identity)
+
+      expect(result.success).toBe(true)
+      expect(result.data?.versions).toBeUndefined()
+    })
+
+    it('accepts a strictly ascending multi-element history', () => {
+      const result = safeParse({
+        ...identity,
+        versions: [
+          version(versionA, '0001-01-01'),
+          version(versionB, '2019-04-02')
+        ]
+      })
+
+      expect(result.success).toBe(true)
+      expect(result.data?.versions).toHaveLength(2)
+    })
+
+    it('rejects an empty history', () => {
+      const result = safeParse({
+        ...identity,
+        versions: []
+      })
+
+      expect(result.success).toBe(false)
+    })
+
+    it('rejects a descending history', () => {
+      const result = safeParse({
+        ...identity,
+        versions: [
+          version(versionA, '2019-04-02'),
+          version(versionB, '0001-01-01')
+        ]
+      })
+
+      expect(result.success).toBe(false)
+    })
+
+    it('rejects two versions sharing an effectiveFrom', () => {
+      const result = safeParse({
+        ...identity,
+        versions: [
+          version(versionA, '2019-04-02'),
+          version(versionB, '2019-04-02')
+        ]
+      })
+
+      expect(result.success).toBe(false)
+    })
+
+    it('rejects a repeated versionId, which would make lastVersionId ambiguous', () => {
+      const result = safeParse({
+        ...identity,
+        versions: [
+          version(versionA, '0001-01-01'),
+          version(versionA, '2019-04-02')
+        ]
+      })
+
+      expect(result.success).toBe(false)
+    })
   })
 
   it('UpdateAdministrativeAreaPayload rejects parentId', () => {

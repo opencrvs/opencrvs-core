@@ -12,14 +12,20 @@
 import { randomUUID } from 'crypto'
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
+import { NoResultError } from 'kysely'
 import { EncodedScope, UUID } from '@opencrvs/commons'
+import { AuditLogEntrySchema } from '@opencrvs/commons/events'
 import {
   publicProcedure,
   router,
-  userAndSystemProcedure
+  userAndSystemProcedure,
+  userOnlyProcedure
 } from '@events/router/trpc'
 import { allowedWithAnyOfScopes } from '@events/router/middleware'
-import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
+import {
+  queryClientAuditLog,
+  writeAuditLog
+} from '@events/storage/postgres/events/auditLog'
 import {
   createSystemClient,
   getSystemClientById,
@@ -98,6 +104,63 @@ const RefreshSecretOutput = z.object({
   clientId: z.string(),
   clientSecret: z.string()
 })
+
+/**
+ * Reading one integration's audit log.
+ *
+ * Pagination is bounded, unlike the sibling `user.audit.list` — nonsense page
+ * sizes are rejected at the validation edge instead of reaching the database.
+ *
+ * Time bounds require a full instant. A bare calendar date is refused rather
+ * than normalised, because "end of that day" needs a timezone the server
+ * cannot infer; an offset such as `+02:00` is an unambiguous instant and is
+ * accepted. There is no operation-exclusion filter: no use case for one.
+ */
+const IntegrationAuditInput = z.object({
+  id: UUID,
+  skip: z.number().int().min(0).optional().default(0),
+  count: z.number().int().min(1).max(100).optional().default(10),
+  timeStart: z.iso.datetime({ offset: true }).optional(),
+  timeEnd: z.iso.datetime({ offset: true }).optional()
+})
+
+/**
+ * Entries are validated against the audit entry union so a client can
+ * discriminate on the operation. Deliberately strict: an unmodelled row fails
+ * the whole page rather than being dropped silently. For a compliance artefact
+ * a visible failure beats a silent gap — do not add a permissive fallback.
+ */
+const IntegrationAuditOutput = z.object({
+  results: z.array(AuditLogEntrySchema),
+  total: z.number()
+})
+
+class SystemClientNotFoundError extends TRPCError {
+  constructor(id: string) {
+    super({
+      code: 'NOT_FOUND',
+      message: `System client not found with ID: ${id}`
+    })
+  }
+}
+
+/**
+ * Get a system client by ID. Throws tRPC HTTP 404 if it does not exist.
+ *
+ * `getSystemClientById` throws Kysely's `NoResultError`, and the service has no
+ * global mapping from that to a 404, so unhandled it surfaces as a 500. Same
+ * shape as `getEventById` in `service/events/events.ts`.
+ */
+async function requireSystemClientById(id: UUID) {
+  try {
+    return await getSystemClientById(id)
+  } catch (error) {
+    if (error instanceof NoResultError) {
+      throw new SystemClientNotFoundError(id)
+    }
+    throw error
+  }
+}
 
 export const integrationsRouter = router({
   create: userAndSystemProcedure
@@ -280,5 +343,60 @@ export const integrationsRouter = router({
       })
 
       return { clientId: input.id, clientSecret }
+    }),
+
+  /**
+   * Reads what a single system client actually did, newest first.
+   *
+   * tRPC-only on purpose: no `openapi` meta, so this is not a documented REST
+   * route. There is no external consumer, because the endpoint is closed to
+   * machine callers — hence `userOnlyProcedure`. Audit review is human
+   * oversight over machines: a compromised integration credential must not be
+   * usable to survey what any integration has been doing, not even its own.
+   *
+   * No jurisdiction filter, and that is a property of the domain rather than a
+   * shortcut: system clients have no office and no administrative area, so
+   * there is nothing for the access-level machinery to match against.
+   * Integrations are national. See
+   * docs/adr/0001-system-client-audit-log-access.md.
+   */
+  audit: userOnlyProcedure
+    .input(IntegrationAuditInput)
+    .output(IntegrationAuditOutput)
+    .use(allowedWithAnyOfScopes(['integration.audit.read']))
+    .query(async ({ input }) => {
+      /*
+       * This looks like a redundant existence check before a query that filters
+       * on the same id anyway. It is load-bearing security. `audit_log
+       * .client_id` is untyped text with no foreign key, shared by users and
+       * system clients alike, so a read keyed only on that column cannot tell
+       * the two apart. Without this, a holder of `integration.audit.read` could
+       * pass any *user's* id and read that user's entire audit log — logins,
+       * password changes, contact changes — without holding the scope that
+       * governs user audit access at all.
+       *
+       * Filtering on `clientType` is not a substitute: the anonymous
+       * username-reminder path writes user-keyed rows with `clientType:
+       * 'system'`, so a client-type predicate still leaks them.
+       *
+       * See docs/adr/0001-system-client-audit-log-access.md before changing
+       * this.
+       */
+      await requireSystemClientById(input.id)
+
+      const { results, total } = await queryClientAuditLog({
+        clientId: input.id,
+        skip: input.skip,
+        count: input.count,
+        timeStart: input.timeStart,
+        timeEnd: input.timeEnd,
+        // This endpoint has no operation-exclusion filter.
+        excludeOperations: []
+      })
+
+      return {
+        results: results.map((r) => AuditLogEntrySchema.parse(r)),
+        total
+      }
     })
 })

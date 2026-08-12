@@ -29,11 +29,8 @@ import { useGetEvent } from './procedures/get'
 import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
 import { useDeleteEvent } from './procedures/delete'
-import {
-  useEventAction,
-  useEventCustomAction,
-  useIsMutating
-} from './procedures/actions/action'
+import { useEventAction, useIsMutating } from './procedures/actions/action'
+import { useEventCustomAction } from './procedures/actions/customAction'
 import { useGetEventCountsByWorkqueue } from './procedures/count'
 import { findLocalEventDocument, findLocalEventIndex } from './api'
 import { QueryOptions } from './procedures/utils'
