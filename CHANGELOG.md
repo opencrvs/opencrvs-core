@@ -43,6 +43,7 @@ Archiving a NOTIFIED (incomplete) record used to clear `InherentFlags.INCOMPLETE
 - Updates Kubernetes node networking and firewall configuration for multi-node clusters with private node communication [#353](https://github.com/opencrvs/infrastructure/pull/353)
 - Enable OpenTelemetry for Traefik and NGINX [#10685](https://github.com/opencrvs/opencrvs-core/issues/10685)
 - Reduce the amount of data sent to Elasticsearch by dropping unused and duplicate fields during Metricbeat processing [#10978](https://github.com/opencrvs/opencrvs-core/issues/10978)
+- Remove direct calls to events service [#13399](https://github.com/opencrvs/opencrvs-core/issues/13399)
 
 ### New features
 

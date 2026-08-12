@@ -276,7 +276,6 @@ export function SearchableSelect<T = string>({
 
   return (
     <StyledAsyncSelect
-      cacheOptions
       isSearchable
       classNamePrefix="react-select"
       components={{
