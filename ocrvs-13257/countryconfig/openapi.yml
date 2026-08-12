@@ -851,7 +851,6 @@ components:
         - declaration
         - status
         - type
-        - content
     UnarchiveAction:
       type: object
       properties:
@@ -3032,6 +3031,7 @@ components:
                                 - record.reindex
                                 - user.data-seeding
                                 - integration.create
+                                - integration.audit.read
                                 - record.import
                                 - config.update-all
                                 - location.edit
@@ -3054,6 +3054,7 @@ components:
                                 - notifiedBy
                                 - declaredIn
                                 - declaredBy
+                                - status
                                 - registeredIn
                                 - registeredBy
                                 - flags
@@ -3067,6 +3068,12 @@ components:
                   required:
                     - $jurisdiction
                   additionalProperties: false
+                listHistoricalNames:
+                  type: boolean
+                activeOnly:
+                  type: boolean
+                anchorToDateOfEvent:
+                  type: boolean
               additionalProperties: false
           required:
             - id
@@ -3303,6 +3310,7 @@ components:
                                 - record.reindex
                                 - user.data-seeding
                                 - integration.create
+                                - integration.audit.read
                                 - record.import
                                 - config.update-all
                                 - location.edit
@@ -3325,6 +3333,7 @@ components:
                                 - notifiedBy
                                 - declaredIn
                                 - declaredBy
+                                - status
                                 - registeredIn
                                 - registeredBy
                                 - flags
@@ -3338,6 +3347,12 @@ components:
                   required:
                     - $jurisdiction
                   additionalProperties: false
+                listHistoricalNames:
+                  type: boolean
+                activeOnly:
+                  type: boolean
+                anchorToDateOfEvent:
+                  type: boolean
               additionalProperties: false
           required:
             - id
@@ -3972,6 +3987,7 @@ components:
                             - record.reindex
                             - user.data-seeding
                             - integration.create
+                            - integration.audit.read
                             - record.import
                             - config.update-all
                             - location.edit
@@ -3994,6 +4010,7 @@ components:
                             - notifiedBy
                             - declaredIn
                             - declaredBy
+                            - status
                             - registeredIn
                             - registeredBy
                             - flags
@@ -4007,6 +4024,24 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
+            listHistoricalNames:
+              description: List every historical name a location has had as a separate,
+                selectable option. Propagated to the embedded admin-area
+                selectors.
+              type: boolean
+            activeOnly:
+              description: Offer only admin areas that are active at the resolved anchor date
+                (today, or the date of event when anchorToDateOfEvent is set);
+                inactive or not-yet-effective versions are excluded. Propagated
+                to the embedded admin-area selectors.
+              type: boolean
+            anchorToDateOfEvent:
+              description: Resolve selectable/displayed versions against the event's date of
+                event (falling back to the record's creation date when empty)
+                instead of today. Does not by itself exclude inactive versions;
+                combine with activeOnly for that. Propagated to the embedded
+                admin-area selectors.
+              type: boolean
           additionalProperties: false
         defaultValue:
           anyOf:
@@ -9101,6 +9136,7 @@ components:
                             - record.reindex
                             - user.data-seeding
                             - integration.create
+                            - integration.audit.read
                             - record.import
                             - config.update-all
                             - location.edit
@@ -9123,6 +9159,7 @@ components:
                             - notifiedBy
                             - declaredIn
                             - declaredBy
+                            - status
                             - registeredIn
                             - registeredBy
                             - flags
@@ -9136,6 +9173,21 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
+            listHistoricalNames:
+              description: List every historical name a location has had as a separate,
+                selectable option.
+              type: boolean
+            activeOnly:
+              description: Offer only locations that are active at the resolved anchor date
+                (today, or the date of event when anchorToDateOfEvent is set);
+                inactive or not-yet-effective versions are excluded.
+              type: boolean
+            anchorToDateOfEvent:
+              description: Resolve selectable/displayed versions against the event's date of
+                event (falling back to the record's creation date when empty)
+                instead of today. Does not by itself exclude inactive versions;
+                combine with activeOnly for that.
+              type: boolean
           required:
             - type
           additionalProperties: false
@@ -9573,6 +9625,7 @@ components:
                             - record.reindex
                             - user.data-seeding
                             - integration.create
+                            - integration.audit.read
                             - record.import
                             - config.update-all
                             - location.edit
@@ -9595,6 +9648,7 @@ components:
                             - notifiedBy
                             - declaredIn
                             - declaredBy
+                            - status
                             - registeredIn
                             - registeredBy
                             - flags
@@ -9608,6 +9662,21 @@ components:
               required:
                 - $jurisdiction
               additionalProperties: false
+            listHistoricalNames:
+              description: List every historical name a location has had as a separate,
+                selectable option.
+              type: boolean
+            activeOnly:
+              description: Offer only locations that are active at the resolved anchor date
+                (today, or the date of event when anchorToDateOfEvent is set);
+                inactive or not-yet-effective versions are excluded.
+              type: boolean
+            anchorToDateOfEvent:
+              description: Resolve selectable/displayed versions against the event's date of
+                event (falling back to the record's creation date when empty)
+                instead of today. Does not by itself exclude inactive versions;
+                combine with activeOnly for that.
+              type: boolean
           additionalProperties: false
       required:
         - id
@@ -15072,6 +15141,7 @@ components:
                                   - record.reindex
                                   - user.data-seeding
                                   - integration.create
+                                  - integration.audit.read
                                   - record.import
                                   - config.update-all
                                   - location.edit
@@ -15094,6 +15164,7 @@ components:
                                   - notifiedBy
                                   - declaredIn
                                   - declaredBy
+                                  - status
                                   - registeredIn
                                   - registeredBy
                                   - flags
@@ -15385,6 +15456,7 @@ components:
                                   - record.reindex
                                   - user.data-seeding
                                   - integration.create
+                                  - integration.audit.read
                                   - record.import
                                   - config.update-all
                                   - location.edit
@@ -15407,6 +15479,7 @@ components:
                                   - notifiedBy
                                   - declaredIn
                                   - declaredBy
+                                  - status
                                   - registeredIn
                                   - registeredBy
                                   - flags
@@ -16255,7 +16328,6 @@ components:
         - declaration
         - status
         - type
-        - content
       additionalProperties: false
     UnarchiveActionOutput:
       type: object
