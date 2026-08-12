@@ -15,8 +15,10 @@ import { FileFieldValue, FileFieldWithOptionValue } from './CompositeFieldValue'
 import { EventDocument } from './EventDocument'
 import { uniq } from 'lodash'
 
-export function getFilePathsFromEvent(event: EventDocument): DocumentPath[] {
-  const filepaths = event.actions
+export function getFilePathsFromActions(
+  actions: ActionDocument[]
+): DocumentPath[] {
+  const filepaths = actions
     .filter(
       (action): action is ActionDocument =>
         action.status !== ActionStatus.Rejected
@@ -45,4 +47,8 @@ export function getFilePathsFromEvent(event: EventDocument): DocumentPath[] {
       return actionFilePaths
     })
   return uniq(filepaths)
+}
+
+export function getFilePathsFromEvent(event: EventDocument): DocumentPath[] {
+  return getFilePathsFromActions(event.actions as ActionDocument[])
 }

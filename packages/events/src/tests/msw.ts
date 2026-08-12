@@ -114,6 +114,15 @@ const handlers = [
   http.get(`${env.DOCUMENTS_URL}/list-files/:eventId*`, () => {
     return HttpResponse.json([])
   }),
+  // event.file.presigned-url.test.ts
+  http.get(`${env.DOCUMENTS_URL}/presigned-url/:filePath*`, (info) => {
+    const { filePath } = info.params
+    const path = Array.isArray(filePath) ? filePath.join('/') : filePath
+
+    return HttpResponse.json({
+      presignedURL: `http://localhost:3535/ocrvs/${path}?X-Amz-Signature=signed`
+    })
+  }),
   http.post(
     `${env.COUNTRY_CONFIG_URL}/trigger/events/:event/actions/:action`,
     (ctx) => {

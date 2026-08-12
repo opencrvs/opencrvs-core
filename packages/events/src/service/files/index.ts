@@ -74,6 +74,28 @@ export async function listFiles(path: string, token: string) {
   return res.json() as Promise<DocumentPath[]>
 }
 
+export async function getPresignedUrl(path: DocumentPath, token: string) {
+  const res = await fetch(
+    new URL(joinUrlPaths('/presigned-url', path), env.DOCUMENTS_URL),
+    {
+      method: 'GET',
+      headers: {
+        Authorization: token
+      }
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(
+      `Failed to create a presigned url for ${path}: ${res.status} ${res.statusText}`
+    )
+  }
+
+  const { presignedURL } = (await res.json()) as { presignedURL: string }
+
+  return presignedURL
+}
+
 export async function cleanupUnreferencedFiles(
   event: EventDocument,
   token: string

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FullDocumentPath } from './documents'
+import { eventIdFromDocumentPath, FullDocumentPath } from './documents'
 describe('FullDocumentPath', () => {
   it('should transform a path without slash prefix to have slash prefix', () => {
     const result = FullDocumentPath.parse(
@@ -23,5 +23,37 @@ describe('FullDocumentPath', () => {
       '/ocrvs/8ce96e03-3ab8-4f3f-bb0e-b89d42e9a7ac.png'
     )
     expect(result).toBe('/ocrvs/8ce96e03-3ab8-4f3f-bb0e-b89d42e9a7ac.png')
+  })
+})
+
+describe('eventIdFromDocumentPath', () => {
+  const eventId = '8ce96e03-3ab8-4f3f-bb0e-b89d42e9a7ac'
+
+  it('reads the event id out of a record attachment path', () => {
+    expect(eventIdFromDocumentPath(`events/${eventId}/photo.png`)).toBe(eventId)
+  })
+
+  it('tolerates a leading slash', () => {
+    expect(eventIdFromDocumentPath(`/events/${eventId}/photo.png`)).toBe(
+      eventId
+    )
+  })
+
+  it('returns null for user files, which belong to no event', () => {
+    expect(eventIdFromDocumentPath(`users/${eventId}/signature.png`)).toBeNull()
+  })
+
+  it('returns null for the flat keys left behind by v1', () => {
+    expect(eventIdFromDocumentPath(`${eventId}.png`)).toBeNull()
+  })
+
+  /*
+   * Otherwise a path like `events/../../secret.png` would be handed to an
+   * authorization check that has no event to check against.
+   */
+  it('returns null when the second segment is not an event id', () => {
+    expect(eventIdFromDocumentPath('events/..%2F..%2Fsecret.png')).toBeNull()
+    expect(eventIdFromDocumentPath('events/')).toBeNull()
+    expect(eventIdFromDocumentPath('events')).toBeNull()
   })
 })

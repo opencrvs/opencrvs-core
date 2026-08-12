@@ -8,7 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { DOCUMENTS_URL } from '@gateway/constants'
+import { DOCUMENTS_URL, EVENTS_URL } from '@gateway/constants'
+import { eventIdFromDocumentPath } from '@opencrvs/commons'
 import {
   configHandler,
   publicConfigHandler
@@ -60,6 +61,25 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/presigned-url/{filePath*}',
       handler: async (req, h) => {
+        const eventId = eventIdFromDocumentPath(req.params.filePath)
+
+        /*
+         * documents-service signs any path it is given, so a file belonging to
+         * a record is presigned through events instead, which is the only
+         * service that can tell whether the caller may read that record.
+         * Everything else — user avatars and signatures, and the flat keys left
+         * behind by v1 — has no record to check against and is unchanged.
+         */
+        if (eventId) {
+          const uri = new URL(
+            `events/${eventId}/files/presigned-url`,
+            EVENTS_URL
+          )
+          uri.searchParams.set('path', req.params.filePath)
+
+          return h.proxy({ uri: uri.toString(), passThrough: true })
+        }
+
         return h.proxy({
           uri: `${DOCUMENTS_URL}/presigned-url/${req.params.filePath}`,
           passThrough: true

@@ -28,9 +28,12 @@ import {
   ACTION_SCOPE_MAP,
   MarkAsDuplicateActionInput,
   MarkNotDuplicateActionInput,
-  ActionDocument
+  ActionDocument,
+  getFilePathsFromEvent,
+  getFilePathsFromActions
 } from '@opencrvs/commons/events'
-import { UserContext } from '@opencrvs/commons'
+import { UserContext, DocumentPath } from '@opencrvs/commons'
+import { TRPCError } from '@trpc/server'
 import * as middleware from '@events/router/middleware'
 import {
   EventIdParam,
@@ -65,7 +68,10 @@ import {
 } from '@events/service/reindex/status'
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
-import { cleanupUnreferencedFiles } from '@events/service/files'
+import {
+  cleanupUnreferencedFiles,
+  getPresignedUrl
+} from '@events/service/files'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import { getDuplicateEvents } from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
@@ -241,6 +247,62 @@ export const eventRouter = router({
 
       return updatedEvent
     }),
+  file: router({
+    /*
+     * Presigned URLs are the only way a document is ever read, so this is where
+     * read access to a record's attachments is decided. documents-service signs
+     * whatever path it is handed and cannot tell which record a file belongs
+     * to, so the caller has to be shown to have read access to the event, and
+     * the file has to actually belong to that event — otherwise holding any
+     * readable event id would presign any document in the bucket.
+     *
+     * @see https://github.com/opencrvs/opencrvs-core/issues/12962
+     */
+    presignedUrl: userAndSystemProcedure
+      .meta({
+        openapi: {
+          summary: 'Create a presigned URL for a file attached to an event',
+          method: 'GET',
+          path: '/events/{eventId}/files/presigned-url',
+          tags: ['Events'],
+          protect: true
+        }
+      })
+      .input(EventIdParam.extend({ path: DocumentPath }))
+      .output(z.object({ presignedURL: z.string() }))
+      .use(middleware.canAccessEventWithScopes(['record.read']))
+      .query(async ({ input, ctx }) => {
+        const event = await getEventById(input.eventId)
+
+        /*
+         * A file attached while drafting is not on the event yet, but the
+         * author still has to be able to see it — on a reload, or on another
+         * device where the local cache is cold. Only the caller's own drafts
+         * count, and drafts are already scoped to their creator.
+         */
+        const drafts = await getDraftsByUserId(ctx.user.id)
+        const draftedFiles = getFilePathsFromActions(
+          drafts
+            .filter((draft) => draft.eventId === input.eventId)
+            .map((draft) => draft.action as ActionDocument)
+        )
+
+        const readableFiles = [...getFilePathsFromEvent(event), ...draftedFiles]
+
+        if (!readableFiles.includes(input.path)) {
+          /*
+           * Not FORBIDDEN: whether a given path exists is not something a
+           * caller without access to it should be able to learn.
+           */
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'File is not attached to this event'
+          })
+        }
+
+        return { presignedURL: await getPresignedUrl(input.path, ctx.token) }
+      })
+  }),
   getDuplicates: userOnlyProcedure
     .use(middleware.canAccessEventWithScopes(['record.review-duplicates']))
     .input(EventIdParam)

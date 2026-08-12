@@ -10,6 +10,7 @@
  */
 
 import * as z from 'zod/v4'
+import { UUID } from './uuid'
 
 export const MINIO_REGEX =
   /^https?:\/\/[^\/]+(.*)?\/[^\/?]+\.(jpg|png|jpeg|pdf|svg)(\?.*)?$/i
@@ -57,3 +58,21 @@ export const toDocumentPath = (path: FullDocumentPath): DocumentPath => {
   return path.split('/').slice(2).join('/') as DocumentPath
 }
 
+/**
+ * Files attached to a record are stored as `events/{eventId}/{filename}`, which
+ * is what lets access to them be decided from the path alone.
+ *
+ * @returns the event id, or null for paths that belong to no event — user
+ * avatars and signatures under `users/`, and the flat keys left behind by v1.
+ */
+export const eventIdFromDocumentPath = (
+  path: DocumentPath | string
+): UUID | null => {
+  const [prefix, eventId] = path.replace(/^\//, '').split('/')
+
+  if (prefix !== 'events') {
+    return null
+  }
+
+  return UUID.safeParse(eventId).data ?? null
+}
