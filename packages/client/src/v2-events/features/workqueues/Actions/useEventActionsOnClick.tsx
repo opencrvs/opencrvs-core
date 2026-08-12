@@ -10,7 +10,7 @@
  */
 import { useNavigate } from 'react-router-dom'
 import React, { useCallback } from 'react'
-import { useIntl } from 'react-intl'
+
 import {
   ActionType,
   EventIndex,
@@ -170,6 +170,7 @@ export function useEventActionsOnClick(event: EventIndex) {
  *
  */
 export function useAssignmentActions(event: EventIndex) {
+  console.log('useAssignmentActions', event)
   const maybeAuth = useAuthentication()
   const authentication = getOrThrow(
     maybeAuth,
@@ -183,7 +184,7 @@ export function useAssignmentActions(event: EventIndex) {
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
   const isDownloadedAndAssignedToUser =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
-  const intl = useIntl()
+
   const { getUsers } = useUsers()
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
