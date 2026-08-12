@@ -37,7 +37,10 @@ export function useCustomActionConfigs(event: EventIndex): {
   customActionConfigs: ActionMenuItem[]
 } {
   const scopes = useSelector(getScope)
-  const validatorContext = useValidatorContext()
+  const { useFindEventFromCache } = useEvents().getEvent
+  const cachedEvent = useFindEventFromCache(event.id)
+  const isDownloaded = Boolean(cachedEvent.data)
+  const validatorContext = useValidatorContext(cachedEvent.data)
   const { canAccessEventWithScopes } = useCanAccessEventWithScopes(event.id, [
     'record.custom-action'
   ])
@@ -52,8 +55,6 @@ export function useCustomActionConfigs(event: EventIndex): {
     event.id,
     eventConfiguration
   )
-  const { useFindEventFromCache } = useEvents().getEvent
-  const isDownloaded = Boolean(useFindEventFromCache(event.id).data)
   const assignmentStatus = getAssignmentStatus(event, userId)
 
   const isDownloadedAndAssignedToUser =
