@@ -12,12 +12,18 @@ import { uniq, isString, get, mergeWith } from 'lodash'
 import { v4 as uuid } from 'uuid'
 import {
   ActionDocument,
+  EventConfig,
   EventIndex,
+  EventState,
   WorkqueueConfigWithoutQuery,
+  isFieldReference,
   joinValues,
+  LocationVersion,
+  PlainDate,
+  toPlainDate,
   UUID,
   UserOrSystem,
-  AdministrativeArea,
+  ClientAdministrativeArea,
   ActionType,
   flattenEntries,
   EventMetadataDateFieldId,
@@ -25,7 +31,9 @@ import {
   decodeScope,
   RecordScopeTypeV2,
   EncodedScope,
-  getAdministrativeAreaHierarchy
+  getAdministrativeAreaHierarchy,
+  resolveVersion,
+  ZodDate
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name']) {
@@ -34,6 +42,25 @@ export function getUsersFullName(name: UserOrSystem['name']) {
   }
 
   return joinValues([name.firstname, name.surname])
+}
+
+/**
+ * Builds advanced-search filter options for a set of locations: one row per
+ * distinct name the location has ever carried (across all its versions), so a
+ * record saved under an outdated name stays findable. Rows are in version order
+ * and every row resolves to the same location id. Ordinary forms list a single
+ * current-name option instead of calling this.
+ */
+export function buildHistoricalLocationNameOptions<
+  T extends { id: UUID; versions: LocationVersion[] }
+>(items: T[]): { value: UUID; label: string }[] {
+  return items.flatMap((item) => {
+    const distinctNames = [
+      ...new Set(item.versions.map((version) => version.name))
+    ]
+
+    return distinctNames.map((name) => ({ value: item.id, label: name }))
+  })
 }
 
 /** Utility to get all keys from union */
@@ -97,6 +124,61 @@ export function convertDateFieldsToUnixTimestamps(
 }
 
 export type RequireKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
+
+/**
+ * The record anchor — the date at which a record's declaration fields resolve
+ * their locations: its date of event, falling back to the record's creation
+ * date. `dateOfEvent` is already the plain-date result of `resolveDateOfEvent`;
+ * `createdAt` is a datetime, so its date portion is taken.
+ */
+export function recordAnchorDate(eventState: {
+  dateOfEvent?: string | null
+  createdAt: string
+}): PlainDate {
+  return toPlainDate(eventState.dateOfEvent ?? eventState.createdAt)
+}
+
+/**
+ * Same anchor as {@link recordAnchorDate}, computed while a declaration is
+ * still being filled in: the event's date-of-event field read off the
+ * in-progress form values (there is no persisted record yet to resolve it
+ * from), falling back to the record's creation date when that field is
+ * empty or not yet configured.
+ */
+export function liveAnchorDate({
+  dateOfEvent,
+  form,
+  createdAt
+}: {
+  dateOfEvent?: EventConfig['dateOfEvent']
+  form: EventState
+  createdAt: string
+}): PlainDate {
+  const fieldValue =
+    dateOfEvent && isFieldReference(dateOfEvent)
+      ? form[dateOfEvent.$$field]
+      : undefined
+
+  const parsedDate = ZodDate.safeParse(fieldValue)
+
+  return recordAnchorDate({
+    dateOfEvent: parsedDate.success ? parsedDate.data : undefined,
+    createdAt
+  })
+}
+
+/**
+ * The name a cached location or administrative area carried at `anchor`,
+ * resolved from its version history — or an empty string when the entity is
+ * absent. Centralises the missing-entity guard so present-tense surfaces
+ * don't each hand-roll their own.
+ */
+export function resolveLocationName(
+  entity: { versions: LocationVersion[] } | undefined,
+  anchor: PlainDate
+): string {
+  return entity ? resolveVersion(entity.versions, anchor).name : ''
+}
 
 export function isTemporaryId(id: string) {
   return id.startsWith('tmp-')
@@ -190,17 +272,34 @@ export function mergeWithoutNullsOrUndefined<T>(
   })
 }
 
-type OutputMode = 'withIds' | 'withNames'
-
 /*
-  Function to traverse the administrative level hierarchy from an arbitrary / leaf point
+  Function to traverse the administrative level hierarchy from an arbitrary / leaf point, returning ids.
 */
 export function getAdminLevelHierarchy(
   administrativeAreaId: string | undefined | null,
-  administrativeAreas: Map<UUID, AdministrativeArea>,
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>,
   adminStructure: string[],
-  outputMode: OutputMode = 'withIds'
-) {
+  outputMode?: 'withIds'
+): Partial<Record<string, string>>
+/*
+  Same traversal, but returning each level's name as resolved at `anchor`.
+  A separate overload (rather than an optional param) so a `withNames` call
+  cannot compile without stating its anchor.
+*/
+export function getAdminLevelHierarchy(
+  administrativeAreaId: string | undefined | null,
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>,
+  adminStructure: string[],
+  outputMode: 'withNames',
+  anchor: PlainDate
+): Partial<Record<string, string>>
+export function getAdminLevelHierarchy(
+  administrativeAreaId: string | undefined | null,
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>,
+  adminStructure: string[],
+  outputMode: 'withIds' | 'withNames' = 'withIds',
+  anchor?: PlainDate
+): Partial<Record<string, string>> {
   // Reverse so root is first, leaf is last
   const collectedLocations = getAdministrativeAreaHierarchy(
     administrativeAreaId,
@@ -216,7 +315,8 @@ export function getAdminLevelHierarchy(
   ) {
     hierarchy[adminStructure[i]] =
       outputMode === 'withNames'
-        ? collectedLocations[i].name
+        ? resolveVersion(collectedLocations[i].versions, anchor as PlainDate)
+            .name
         : collectedLocations[i].id
   }
 

@@ -5,12 +5,10 @@ Helm chart does deployment of OpenCRVS dependencies including monitoring stack. 
 > NOTE: See [values.yaml](values.yaml) for exact versions
 
 - Datastores:
-  - MongoDB
   - Postgres
   - Elasticsearch
   - Redis
   - MinIO
-  - InfluxDB
 - Observability (Monitoring and Logging):
   - Kibana
   - Logstash
@@ -37,29 +35,14 @@ Any particular service within this helm chart can be disabled by setting `<servi
 | ingress.tls_secret_name | string | ` `            | Secret with custom SSL Certificate for IngressRoute, check traefik documentation for details. Otherwise default Traefik SSL Certificate will be used.                                          |
 | timezone                | string | ` `            | Time zone for a backup and restore CronJobs, by default local time zone is used from server                                                                                                    |
 | storage_type            | string | `pvc`          | Kubernetes storage type, available options are `pvc` or `host_path`. More information are at [Storage Configuration](#storage-configuration)                                                   |
+| platform.imagePullSecrets | list | `[]`         | Pod-level image pull secrets applied to all workloads in this chart. Use this when images are stored in private registries.                                                                    |
 | node_selector           | dict   | `{}`           | Label selector for datastore nodes, usually used to keep data persistent                                                                                                                       |
 | monitoring.enabled      | bool   | `false`        | Enable or disable monitoring, see [Monitoring](#monitoring)                                                                                                                                    |
 | priority_class.enabled  | bool   | `false`        | Enable or disable priority class for datastores. Enabling this option will avoid unnecessary pod eviction.                                                                                     |
 | backup.enabled          | bool   | `true`         | Enable or disable data backup. Please check [Backup configuration](#backup-configuration) for more options. Usually this option is enabled on Production environment                           |
 | restore.enabled         | bool   | `true`         | Enable or disable data restore. Please check [Restore configuration](#restore-configuration) for more options. Usually this option is enabled on Staging environment                           |
-
-## MongoDB
-
-MongoDB configuration section for Helm values.yaml
-
-This section allows you to configure the deployment of MongoDB within your infrastructure.
-| Parameter | Type | Default | Description |
-|--------------------------|---------|----|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| enabled | bool | true | Enable or disable the MongoDB deployment. |
-| version | string | 4.4 | Specify the MongoDB Docker image version to use. See: https://hub.docker.com/_/mongo |
-| use_default_credentials | bool | true | If true, deploys MongoDB without authentication. If false, custom databases and users are created as specified below. |
-| data_storage_size | string | 1Gi | Persistent volume claim size for MongoDB data volume |
-| storage_type | string | `pvc` | Kubernetes storage type, available options are `pvc` or `host_path`. More information are at [Storage Configuration](#storage-configuration) |
-| host_data_path | string | `/data/mongo` | Path to persistent data on VM (host) |
-| node_selector | dict | `{}` | Label selector for datastore nodes, usually used to keep data persistent |
-| backup_schedule | string | `n/a` | Backup cronjob schedule, if not defined then values from `backup.schedule` is used |
-| backup_server_dir | string | `n/a` | Directory to store encrypted backup on backup server, if not defined `backup.backup_server_dir` is used |
-
+| utilities.image.repository | string | `ghcr.io/opencrvs/ocrvs-utilities` | Shared utilities image repository used by helper jobs and init containers.                                                                                     |
+| utilities.image.tag     | string | `v2.1.0`       | Shared utilities image tag used by helper jobs and init containers.                                                                                                                            |
 ## Postgres
 
 Postgres configuration section for Helm values.yaml
@@ -68,12 +51,14 @@ This section allows you to configure the postgres deployment within your infrast
 | Parameter | Type | Default | Description |
 |--------------------------|---------|----|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | enabled | bool | true | Enable or disable the Postgres deployment. |
+| image.repository | string | `chumaky/postgres_mongo_fdw` | Postgres Docker image repository. |
+| image.tag | string | `17.6_fdw5.5.2` | Postgres Docker image tag. |
 | use_default_credentials | bool | true | If true, deploys Postgres with default user/password: postgres/postgres |
-| storage_type | string | `n/a` | Kubernetes storage type, available options are `pvc` or `host_path`. More information are at [Storage Configuration](#storage-configuration) |
+| storage_type | string | `global storage_type` | Optional Postgres-specific override for the Kubernetes storage type. Available options are `pvc` or `host_path`. If not set, the global `storage_type` value is used. |
 | pvc.storage_class | string | `n/a` | StorageClass name used for dynamic volume provisioning |
 | pvc.storage_size | string | 10Gi | Persistent volume claim size for Postgres data volume |
 | pvc.access_mode | string | ReadWriteOnce | Kubernetes PVC access mode |
-| host_data_path | string | `/data/postgres` | Path to persistent data on VM (host) |
+| host_data_path | string | `/data/postgres` | Path to persistent data on the host when `storage_type` is `host_path`. |
 | node_selector | dict | `{}` | Label selector for datastore nodes, usually used to keep data persistent |
 | backup.{} | dict | `{}` | Backup configuration section, for more information please check `values.yaml` and **Backup section** in this README |
 | backup.enabled | string | `false` | Backup enabled or disabled, section has higher priority over global `backup` section |
@@ -86,11 +71,13 @@ This section allows you to configure the postgres deployment within your infrast
 | backup.schedule.full | string | `0 1 * * 0` | Full backup schedule. Used when type=differential, note that value from `backup.schedule` is ignored |
 | `backup.schedule.differential` | string | `0 1 * * 1-6` | Differential backup schedule. Used when type=differential, note that value from `backup.schedule` is ignored |
 | backup.server_dir | string | `n/a` | Directory to store encrypted backup on backup server, if not defined `backup.backup_server_dir` is used |
+| backup.cronjob | boolean | `true` | Run backup as cronjob, setting to `false` allows to run one time job, e/g manual backup |
 | restore.{} | dict | `{}` | Restore configuration section, for more information please check `values.yaml` and **Restore section** in this README |
 | restore.enabled | string | `false` | Restore enabled or disabled, section has higher priority over global `restore` section |
 | restore.server_secret | string | `backup-server-ssh-credentials` | Name of the Kubernetes secret with backup server credentials, usually backup server is used for restore, thats why credentials are shared |
 | restore.encryption_secret | string | `restore-encryption-secret` | Name of the Kubernetes secret containing the backup encryption key |
 | restore.schedule | string | `0 3 * * *` | Restore cronjob schedule, if not defined then value from `restore.schedule` is used |
+| restore.cronjob | boolean | `true` | Run restore as cronjob, setting to `false` allows to run one time job, e/g manual restore, or disaster recovery scenario |
 
 ## Elasticsearch
 
@@ -98,13 +85,15 @@ This section allows you to configure the deployment and authentication settings 
 
 | Key                     | Type    | Example               | Description                                                                                                                                  |
 | ----------------------- | ------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| image.repository        | string  | `docker.elastic.co/elasticsearch/elasticsearch` | Elasticsearch Docker image repository.                                                                                 |
+| image.tag               | string  | `8.19.15`            | Elasticsearch Docker image tag.                                                                                                               |
 | enabled                 | boolean | true                  | Enable or disable the Elasticsearch deployment.                                                                                              |
 | use_default_credentials | boolean | true                  | Deploy Elasticsearch without enabled authentication.                                                                                         |
-| storage_type            | string  | `pvc`                 | Kubernetes storage type, available options are `pvc` or `host_path`. More information are at [Storage Configuration](#storage-configuration) |
+| storage_type            | string  | `global storage_type` | Optional Elasticsearch-specific override for the Kubernetes storage type. Available options are `pvc` or `host_path`. If not set, the global `storage_type` value is used. |
 | pvc.storage_class       | string  | `n/a`                 | StorageClass name used for dynamic volume provisioning                                                                                       |
 | pvc.storage_size        | string  | 10Gi                  | Persistent volume claim size for Postgres data volume                                                                                        |
 | pvc.access_mode         | string  | ReadWriteOnce         | Kubernetes PVC access mode                                                                                                                   |
-| host_data_path          | string  | `/data/elasticsearch` | Path to persistent data on VM (host)                                                                                                         |
+| host_data_path          | string  | `/data/elasticsearch` | Path to persistent data on the host when `storage_type` is `host_path`.                                                                     |
 | node_selector           | dict    | `{}`                  | Label selector for datastore nodes, usually used to keep data persistent                                                                     |
 
 ## MinIO
@@ -114,12 +103,14 @@ This section allows you to configure the deployment and authentication settings 
 | Key                     | Type   | Default value                   | Description                                                                                                                                  |
 | ----------------------- | ------ | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | enabled                 | bool   | true                            | Enable or disable minio service                                                                                                              |
+| image.repository        | string | `quay.io/minio/minio`           | MinIO Docker image repository.                                                                                                               |
+| image.tag               | string | `RELEASE.2025-06-13T11-33-47Z`  | MinIO Docker image tag.                                                                                                                      |
 | use_default_credentials | bool   | true                            | Default credentials for MinIO are username `minioadmin` and password `minioadmin`.                                                           |
-| storage_type            | string | `pvc`                           | Kubernetes storage type, available options are `pvc` or `host_path`. More information are at [Storage Configuration](#storage-configuration) |
+| storage_type            | string | `global storage_type`           | Optional MinIO-specific override for the Kubernetes storage type. Available options are `pvc` or `host_path`. If not set, the global `storage_type` value is used. |
 | pvc.storage_class       | string | `n/a`                           | StorageClass name used for dynamic volume provisioning                                                                                       |
 | pvc.storage_size        | string | 10Gi                            | Persistent volume claim size for Postgres data volume                                                                                        |
 | pvc.access_mode         | string | ReadWriteOnce                   | Kubernetes PVC access mode                                                                                                                   |
-| host_data_path          | string | `/data/minio`                   | Path to persistent data on VM (host)                                                                                                         |
+| host_data_path          | string | `/data/minio`                   | Path to persistent data on the host when `storage_type` is `host_path`.                                                                      |
 | node_selector           | dict   | `{}`                            | Label selector for datastore nodes, usually used to keep data persistent                                                                     |
 | backup.{}               | dict   | `{}`                            | Backup configuration section, for more information please check `values.yaml` and **Backup section** in this README                          |
 | backup.enabled          | string | `false`                         | Backup enabled or disabled, section has higher priority over global `backup` section                                                         |
@@ -242,16 +233,43 @@ If you need any specific configuration for ACL (read-only, command limit, etc) p
 
 More details about ACL support can be found at https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/
 
-## InfluxDB
+## Air-Gap Installation
 
-| Key               | Type    | Example | Description                                           |
-| ----------------- | ------- | ------- | ----------------------------------------------------- |
-| enabled           | boolean | true    | Enable or disable the Elasticsearch deployment.       |
-| data_storage_size | string  | 5Gi     | Persistent volume claim size for InfluxDB data volume |
+Some backup and restore jobs install required utilities at runtime with `apk` or `apt-get` when they are missing from the base image. In air-gap environments this installation step will fail because package repositories are not reachable.
+
+To support installation without internet connectivity, build custom images from the default datastore images and preinstall the required packages.
+
+### Postgres image
+
+Start from the default Postgres image and add:
+
+- `openssh-client`
+- `rsync`
+- `pgbackrest`
+
+### MinIO image
+
+Start from the default MinIO image and add:
+
+- `bash`
+- `curl`
+- `openssl`
+- `openssh`
+- `jq`
+- `rsync`
+- `minio-client`
+- `coreutils`
+
+After publishing the custom images, point the chart to them through:
+
+- `postgres.image.repository`
+- `postgres.image.tag`
+- `minio.image.repository`
+- `minio.image.tag`
 
 ## Storage Configuration
 
-This chart supports flexible data persistence for **Elasticsearch, MongoDB, Postgres, MinIO, and InfluxDB**.  
+This chart supports flexible data persistence for **Elasticsearch, Postgres, and MinIO**.  
 You control persistence using the `storage_type` option, which can be set **globally** (`storage_type`) or per datastore (e.g. `elasticsearch.storage_type`).
 
 - **`storage_type`**, available options:
@@ -470,10 +488,8 @@ The dependencies chart includes a built-in backup feature that supports automate
 Supported datastores:
 
 - Elasticsearch
-- MongoDB
 - PostgreSQL
 - MinIO
-- InfluxDB
 
 Each datastore has its own backup job, configured as a Kubernetes `CronJob`.
 Backup settings are defined in the `backup` section of the chart values.

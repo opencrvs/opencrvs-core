@@ -14,6 +14,8 @@ import * as qs from 'qs'
 import { UUID } from './uuid'
 import { getScopes } from './authentication'
 import { Role } from './roles'
+import { ContainsFlags } from './events/Flag'
+import { EventStatus } from './events/EventStatus'
 
 export const JurisdictionFilter = z
   .enum(['administrativeArea', 'location', 'all'])
@@ -31,7 +33,7 @@ export type UserFilter = z.infer<typeof UserFilter>
  * The different types of scopes that can be used to control access to records. Each type has different options that can be used to further filter the records that the scope applies to.
  * When adding new scope types, they should be added to the appropriate section based on the options they require.
  *
- * @see scopeOptionsPlaceEvent @see scopeOptionsDeclared @see scopeOptionsFull
+ * @see scopeOptionsPlaceEvent @see scopeOptionsDeclaredOrNotified @see scopeOptionsFull
  */
 export const RecordScopeTypeV2 = z.enum([
   'record.search',
@@ -42,6 +44,7 @@ export const RecordScopeTypeV2 = z.enum([
   'record.edit',
   'record.reject',
   'record.archive',
+  'record.unarchive',
   'record.review-duplicates',
   'record.register',
   'record.print-certified-copies',
@@ -60,8 +63,14 @@ const PlainScopeType = z.enum([
   'record.reindex',
   'user.data-seeding',
   'integration.create',
+  // Reading an integration's audit log. Deliberately separate from
+  // 'integration.create' so read-only oversight can be granted on its own, and
+  // deliberately option-less: system clients have no office and no
+  // administrative area, so jurisdiction options would have nothing to bind to.
+  'integration.audit.read',
   'record.import',
   'config.update-all',
+  'location.edit',
   'attachment.upload',
   'profile.electronic-signature',
   'user.read-only-my-audit',
@@ -84,6 +93,16 @@ const scopeByEvent = z
   )
   .describe('Event type, e.g. birth, death')
 
+const scopeByStatus = z
+  // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
+  .preprocess(
+    (val) => (val === undefined ? undefined : [val].flat()),
+    z.array(EventStatus).optional()
+  )
+  .describe(
+    'Restricts the scope to records currently in one of these statuses.'
+  )
+
 const userRole = z
   // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
   .preprocess(
@@ -99,17 +118,21 @@ const scopeOptionsPlaceEvent = z
   })
   .describe('Options applicable to all record scopes.')
 
-const scopeOptionsDeclared = scopeOptionsPlaceEvent
+const scopeOptionsDeclaredOrNotified = scopeOptionsPlaceEvent
   .extend({
+    notifiedIn: JurisdictionFilter.optional(),
+    notifiedBy: UserFilter.optional(),
     declaredIn: JurisdictionFilter.optional(),
-    declaredBy: UserFilter.optional()
+    declaredBy: UserFilter.optional(),
+    status: scopeByStatus
   })
   .describe('Options applicable to actions that may take place after DECLARE')
 
-const AllRecordScopeOptions = scopeOptionsDeclared
+const AllRecordScopeOptions = scopeOptionsDeclaredOrNotified
   .extend({
     registeredIn: JurisdictionFilter.optional(),
-    registeredBy: UserFilter.optional()
+    registeredBy: UserFilter.optional(),
+    flags: ContainsFlags.optional()
   })
   .describe(
     'Options applicable to actions that may take place after REGISTER, with full filtering capabilities.'
@@ -164,6 +187,8 @@ const ResolvedScopeOptionsPlaceEvent = z
   )
 
 const ResolvedScopeOptionsDeclared = ResolvedScopeOptionsPlaceEvent.extend({
+  notifiedIn: UUID.nullish(),
+  notifiedBy: z.string().optional(),
   declaredIn: UUID.nullish(),
   declaredBy: z.string().optional()
 }).describe(
@@ -172,7 +197,8 @@ const ResolvedScopeOptionsDeclared = ResolvedScopeOptionsPlaceEvent.extend({
 
 const ResolvedScopeOptionsFull = ResolvedScopeOptionsDeclared.extend({
   registeredIn: UUID.nullish(),
-  registeredBy: z.string().optional()
+  registeredBy: z.string().optional(),
+  flags: ContainsFlags.optional()
 }).describe(
   'Resolved options applicable to actions that may take place after REGISTER, with full filtering capabilities and location/user IDs instead of filters.'
 )
@@ -187,6 +213,7 @@ export const ScopesWithDeclaredOptions = RecordScopeTypeV2.extract([
   'record.edit',
   'record.reject',
   'record.archive',
+  'record.unarchive',
   'record.review-duplicates',
   'record.register'
 ])
@@ -219,7 +246,7 @@ export const RecordScopeV2 = z
     }),
     z.object({
       type: ScopesWithDeclaredOptions,
-      options: scopeOptionsDeclared.optional()
+      options: scopeOptionsDeclaredOrNotified.optional()
     }),
     z.object({
       type: ScopesWithFullOptions,
@@ -390,6 +417,7 @@ export const encodeScope = (scope: Scope): EncodedScope => {
 
   return qs.stringify(flattened, {
     arrayFormat: 'comma',
+    commaRoundTrip: true,
     allowDots: true,
     addQueryPrefix: false,
     encode: false
@@ -428,8 +456,9 @@ export const decodeScope = (encodedScope: EncodedScope) => {
 const DEFAULT_SCOPE_OPTIONS: Partial<AllScopeOptions> = {
   placeOfEvent: JurisdictionFilter.enum.all,
   accessLevel: JurisdictionFilter.enum.all,
-  registeredIn: JurisdictionFilter.enum.all,
-  declaredIn: JurisdictionFilter.enum.all
+  notifiedIn: JurisdictionFilter.enum.all,
+  declaredIn: JurisdictionFilter.enum.all,
+  registeredIn: JurisdictionFilter.enum.all
 }
 
 /**

@@ -9,9 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import type { Decorator } from '@storybook/react'
+import type { Decorator } from '@storybook/react-vite'
 import {
+  EventConfig,
   EventDocument,
+  getEventValidatorContext,
   getOrThrow,
   getTokenPayload,
   TestUserRole,
@@ -59,8 +61,8 @@ export const withValidatorContext: Decorator = (Story, context) => {
 }
 export function getTestValidatorContext(
   userRole?: TestUserRole,
-  event?: EventDocument
-) {
+  eventWithConfig?: { event: EventDocument; eventConfig: EventConfig }
+): ValidatorContext {
   let token
 
   if (userRole === TestUserRole.enum.FIELD_AGENT) {
@@ -86,9 +88,15 @@ export function getTestValidatorContext(
     V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
   )
 
+  if (!eventWithConfig) {
+    return { user, leafAdminStructureLocationIds }
+  }
+
+  const { event, eventConfig } = eventWithConfig
+
   return {
     user,
     leafAdminStructureLocationIds,
-    event
+    event: getEventValidatorContext(event, eventConfig)
   }
 }

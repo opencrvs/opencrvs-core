@@ -1,0 +1,69 @@
+packages:
+  - 'packages/api-docs'
+  - 'packages/auth'
+  - 'packages/client'
+  - 'packages/commons'
+  - 'packages/components'
+  # - 'packages/countryconfig-template' Intentionally removed. Lerna reads pnpm-workspace.yaml but does not recognize negation. Hence explicit inclusion for all packages.
+  - 'packages/data-seeder'
+  - 'packages/documents'
+  - 'packages/events'
+  - 'packages/gateway'
+  - 'packages/login'
+  - 'packages/migration'
+  - 'packages/testland'
+  - 'packages/toolkit'
+  - 'packages/toolkit/create-countryconfig'
+
+# Ported from yarn `resolutions` (root package.json). `parent>child`
+# replaces yarn's `**/parent/child` nesting syntax.
+overrides:
+  playwright: '1.61.1'
+  playwright-core: '1.61.1'
+  '@playwright/test': '1.61.1'
+  '@types/react': '18.3.1'
+  fast-xml-parser: '4.5.6'
+  lodash: '^4.18.1'
+  lodash-es: '^4.18.1'
+  axios: '1.18.0'
+  form-data: '4.0.6'
+  sha.js: '2.4.12'
+  handlebars: '4.7.9'
+  js-yaml: '4.3.0'
+  h3: '1.15.6'
+  defu: '6.1.5'
+  msgpackr: '1.11.0'
+  ws: '8.21.0'
+  rollup: '4.59.0'
+  'express>path-to-regexp': '0.1.13'
+  cross-spawn: '7.0.6'
+  flatted: '3.4.2'
+  picomatch: '2.3.2'
+  underscore: '1.13.8'
+  '@remix-run/router': '1.23.3'
+  validator: '13.15.22'
+  tar: '7.5.21'
+  '@trpc/server': '11.8.0'
+  'node-gyp>glob': '10.5.0'
+  'cacache>glob': '10.5.0'
+  'read-package-json>glob': '10.5.0'
+  'lerna>minimatch': '3.1.5'
+  '@lerna/create>minimatch': '3.1.5'
+  'nx>minimatch': '9.0.9'
+  '@nx/devkit>minimatch': '9.0.9'
+  jws: '3.2.3'
+  'react-signature-canvas>react': '18.3.1'
+  'react-signature-canvas>react-dom': '18.3.1'
+
+# Replaces patch-package (patches/ dir); diff paths are package-root-relative.
+patchedDependencies:
+  pdfmake@0.2.7: patches/pdfmake@0.2.7.patch
+
+# Dependency (not workspace) build scripts pnpm is allowed to run.
+# pnpm blocks all by default and warns about ignored ones on install;
+# everything not listed here (core-js ads, scarf analytics, optional
+# native accelerators) is deliberately left blocked.
+onlyBuiltDependencies:
+  - '@swc/core'
+  - esbuild
+  - nx

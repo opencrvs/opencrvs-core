@@ -20,29 +20,35 @@ import {
   Button,
   Link,
   ListReview,
-  ResponsiveModal,
+  Dialog,
   Stack,
   Text,
   TextArea
 } from '@opencrvs/components'
 import {
+  EventConfig,
   EventState,
   FieldConfig,
   FieldType,
+  FieldUpdateValue,
   FormConfig,
   isFieldDisplayedOnReview,
   isPageVisible,
+  omitHiddenFields,
   runFieldValidations,
   FieldTypesToHideInReview,
   ValidatorContext,
   flattenFormState,
   IndexMap,
-  FormState
+  FormState,
+  PlainDate
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { buttonMessages } from '@client/i18n/messages'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useDialogFormState } from '@client/v2-events/hooks/useDialogFormState'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 import { TranslationTextWithFormatModifier } from './TranslationTextWithFormatModifier'
@@ -228,7 +234,8 @@ function FormReview({
   isCorrection = false,
   isReviewCorrection = false,
   treatMissingValuesAsCleared = false,
-  validatorContext
+  validatorContext,
+  anchor
 }: {
   formConfig: FormConfig
   form: EventState
@@ -240,6 +247,8 @@ function FormReview({
   isCorrection?: boolean
   isReviewCorrection?: boolean
   treatMissingValuesAsCleared?: boolean
+  /** The record anchor — declaration fields are per-fact but share one record-wide anchor. */
+  anchor: PlainDate
 }) {
   const intl = useIntl()
 
@@ -269,6 +278,7 @@ function FormReview({
               // previousForm, formConfig are used to find previous values with the same label if required
               const valueDisplay = (
                 <Output
+                  anchor={anchor}
                   field={field}
                   formConfig={formConfig}
                   previousForm={previousForm}
@@ -439,7 +449,8 @@ function ReviewComponent({
   isCorrection = false,
   isReviewCorrection = false,
   treatMissingValuesAsCleared = false,
-  banner
+  banner,
+  anchor
 }: {
   children?: React.ReactNode
   formConfig: FormConfig
@@ -464,6 +475,8 @@ function ReviewComponent({
   isReviewCorrection?: boolean
   treatMissingValuesAsCleared?: boolean
   banner?: React.ReactNode
+  /** The record anchor — date of event, falling back to the record's creation date. */
+  anchor: PlainDate
 }) {
   const intl = useIntl()
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
@@ -498,6 +511,7 @@ function ReviewComponent({
         <Card>
           <ReviewHeader title={title} />
           <FormReview
+            anchor={anchor}
             form={form}
             formConfig={formConfig}
             isCorrection={isCorrection}
@@ -568,6 +582,7 @@ function ReviewComponent({
                             label={intl.formatMessage(field.label)}
                             value={
                               <Output
+                                anchor={anchor}
                                 field={field}
                                 value={annotation[field.id]}
                               />
@@ -605,9 +620,8 @@ function EditModal({
 }) {
   const intl = useIntl()
   return (
-    <ResponsiveModal
-      autoHeight
-      showHeaderBorder
+    <Dialog
+      isOpen
       actions={[
         <Button
           key="cancel_edit"
@@ -632,10 +646,8 @@ function EditModal({
           )}
         </Button>
       ]}
-      handleClose={() => close(null)}
-      responsive={false}
-      show={true}
       title={intl.formatMessage(copy?.title || reviewMessages.changeModalTitle)}
+      onClose={() => close(null)}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
@@ -644,31 +656,54 @@ function EditModal({
           )}
         </Text>
       </Stack>
-    </ResponsiveModal>
+    </Dialog>
   )
+}
+
+export interface AcceptActionModalResult {
+  values: Record<string, FieldUpdateValue>
 }
 
 function AcceptActionModal({
   copy,
   close,
   action,
-  eventType
+  eventType,
+  fields = [],
+  eventConfiguration,
+  declaration
 }: {
   copy: {
     onConfirm: MessageDescriptor
     title: MessageDescriptor
     supportingCopy?: MessageDescriptor
   }
-  close: (result: boolean | null) => void
+  close: (result: AcceptActionModalResult | null) => void
   action: string
   eventType: string
+  fields?: FieldConfig[]
+  eventConfiguration: EventConfig
+  declaration: EventState
 }) {
   const intl = useIntl()
+  const validatorContext = useValidatorContext()
+  const dialogForm = useDialogFormState()
+  const modalValues = dialogForm.formValues
+
+  const errorsOnField = fields.flatMap((field) =>
+    flattenFormState(
+      runFieldValidations({
+        field,
+        form: modalValues,
+        value: modalValues[field.id],
+        context: validatorContext
+      })
+    ).flatMap(([, errs]) => errs)
+  )
 
   return (
-    <ResponsiveModal
-      autoHeight
-      show
+    <Dialog
+      isOpen
       actions={[
         <Button
           key={'cancel_' + action}
@@ -682,21 +717,24 @@ function AcceptActionModal({
         </Button>,
         <Button
           key={'confirm_' + action}
+          disabled={errorsOnField.length > 0}
           id={'confirm_' + action}
           type="primary"
           onClick={() => {
-            close(true)
+            close({
+              values: omitHiddenFields(fields, modalValues, validatorContext)
+            })
           }}
         >
           {intl.formatMessage(copy.onConfirm)}
         </Button>
       ]}
-      handleClose={() => close(null)}
-      showHeaderBorder={!!copy.supportingCopy}
       title={intl.formatMessage(copy.title, { event: eventType })}
+      variant="large"
       width={600}
+      onClose={() => close(null)}
     >
-      <Stack>
+      <Stack alignItems="left" direction="column" gap={16}>
         {copy.supportingCopy && (
           <TranslationTextWithFormatModifier
             color="supportingCopy"
@@ -705,20 +743,55 @@ function AcceptActionModal({
             variant="reg16"
           />
         )}
+        {fields.length > 0 && (
+          <FormFieldGenerator
+            {...dialogForm}
+            eventConfig={eventConfiguration}
+            fields={fields}
+            id={`accept-action-modal-form-${action}`}
+            validatorContext={{
+              ...validatorContext,
+              baseFormState: declaration
+            }}
+          />
+        )}
       </Stack>
-    </ResponsiveModal>
+    </Dialog>
   )
+}
+
+export interface RejectActionModalResult {
+  reason: string
+  values: Record<string, FieldUpdateValue>
 }
 
 function RejectActionModal({
   close,
-  supportingCopy
+  supportingCopy,
+  fields = [],
+  eventConfiguration
 }: {
-  close: (result: string | null) => void
+  close: (result: RejectActionModalResult | null) => void
   supportingCopy?: MessageDescriptor
+  fields?: FieldConfig[]
+  eventConfiguration: EventConfig
 }) {
   const [message, setMessage] = useState<string>('')
+  const dialogForm = useDialogFormState()
+  const modalValues = dialogForm.formValues
   const intl = useIntl()
+  const validatorContext = useValidatorContext()
+
+  const errorsOnField = fields.flatMap((field) =>
+    flattenFormState(
+      runFieldValidations({
+        field,
+        form: modalValues,
+        value: modalValues[field.id],
+        context: validatorContext
+      })
+    ).flatMap(([, errs]) => errs)
+  )
 
   const actions = [
     <Button
@@ -733,11 +806,14 @@ function RejectActionModal({
     </Button>,
     <Button
       key="confirm_reject_with_update"
-      disabled={!message}
+      disabled={!message || errorsOnField.length > 0}
       id="confirm_reject_with_update"
       type="negative"
       onClick={() => {
-        close(message)
+        close({
+          reason: message,
+          values: omitHiddenFields(fields, modalValues, validatorContext)
+        })
       }}
     >
       {intl.formatMessage(reviewMessages.rejectModalSendForUpdate)}
@@ -745,14 +821,14 @@ function RejectActionModal({
   ]
 
   return (
-    <ResponsiveModal
-      showHeaderBorder
+    <Dialog
+      isOpen
       actions={actions}
-      handleClose={() => close(null)}
       id="reject-modal"
-      show={true}
       title={intl.formatMessage(reviewMessages.rejectModalTitle)}
+      variant="large"
       width={700}
+      onClose={() => close(null)}
     >
       <Stack alignItems="left" direction="column">
         <Text color="grey500" element="p" variant="reg16">
@@ -764,8 +840,17 @@ function RejectActionModal({
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
+        {fields.length > 0 && (
+          <FormFieldGenerator
+            {...dialogForm}
+            eventConfig={eventConfiguration}
+            fields={fields}
+            id="reject-action-modal-form"
+            validatorContext={validatorContext}
+          />
+        )}
       </Stack>
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 

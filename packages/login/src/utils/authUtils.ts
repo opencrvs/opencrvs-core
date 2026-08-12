@@ -15,6 +15,7 @@ export const ERROR_CODE_FIELD_MISSING = 500
 export const ERROR_CODE_INVALID_CREDENTIALS = 401
 export const ERROR_CODE_FORBIDDEN_CREDENTIALS = 403
 export const ERROR_CODE_PHONE_NUMBER_VALIDATE = 503
+export const ERROR_CODE_RATE_LIMIT = 429
 
 export interface ITokenPayload {
   subject: string
@@ -36,30 +37,4 @@ export const getTokenPayload = (token: string) => {
   }
 
   return decoded
-}
-
-export function maskEmail(email: string) {
-  const parts = email.split('@')
-  const username = parts[0]
-  const domain = parts[1]
-
-  const maskedUsername = maskString(username, 6)
-  const maskedDomain =
-    maskString(domain.split('.')[0]) + '.' + maskString(domain.split('.')[1])
-
-  return maskedUsername + '@' + maskedDomain
-}
-
-export function maskString(s: string, limit = 5) {
-  const maskPercentage = s.length > 30 ? 0.7 : 0.6
-  const emailLength = s.length || 0
-  const unmaskedEmailLength =
-    emailLength - Math.ceil(maskPercentage * emailLength)
-  const startFrom = Math.ceil(unmaskedEmailLength / 2)
-  const endBefore = unmaskedEmailLength - startFrom
-  const maskedEmail = s.replace(
-    s.slice(startFrom, emailLength - endBefore),
-    '*'.repeat(Math.min(emailLength - startFrom - endBefore, limit))
-  )
-  return maskedEmail
 }

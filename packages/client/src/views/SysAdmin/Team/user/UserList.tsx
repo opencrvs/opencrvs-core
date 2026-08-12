@@ -27,11 +27,11 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { ROUTES } from '@client/v2-events/routes'
-import { getUsersFullName } from '@client/v2-events/utils'
+import { getUsersFullName, resolveLocationName } from '@client/v2-events/utils'
 import { getAddressNameV2, UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useUserFormState } from '@client/views/SysAdmin/Team/user/userEditor/useUserFormState'
-import { Location, User, UUID } from '@opencrvs/commons/client'
+import { ClientLocation, todayISO, User, UUID } from '@opencrvs/commons/client'
 import { Link } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
@@ -45,7 +45,7 @@ import { NoWifi } from '@opencrvs/components/lib/icons'
 import { ListUser } from '@opencrvs/components/lib/ListUser'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Pill } from '@opencrvs/components/lib/Pill'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { Toast } from '@opencrvs/components/lib/Toast'
@@ -61,7 +61,7 @@ import { useOnlineStatus } from '../../../../utils'
 import { useAdministrativeAreas } from '../../../../v2-events/hooks/useAdministrativeAreas'
 import { UserActivationModal } from './UserActivationModal'
 
-const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
+const USERS_PER_PAGE = 10
 const DEFAULT_PAGE_NUMBER = 1
 
 const UserTable = styled(BodyContent)`
@@ -263,7 +263,7 @@ function UserListComponent({ userDetails }: UserListProps) {
 
   const parsedId = UUID.safeParse(locationId)
 
-  const searchedLocation: Location | undefined = parsedId.success
+  const searchedLocation: ClientLocation | undefined = parsedId.success
     ? locations.get(parsedId.data)
     : undefined
 
@@ -282,13 +282,7 @@ function UserListComponent({ userDetails }: UserListProps) {
     isLoading,
     error
   } = searchUsers.useQuery(
-    {
-      primaryOfficeId: locationId,
-      count: DEFAULT_FIELD_AGENT_LIST_SIZE,
-      skip: (currentPageNumber - 1) * DEFAULT_FIELD_AGENT_LIST_SIZE,
-      sortBy: 'firstname',
-      sortOrder: 'asc'
-    },
+    { primaryOfficeId: locationId, sortBy: 'firstname', sortOrder: 'asc' },
     { enabled: !!locationId }
   )
 
@@ -619,7 +613,15 @@ function UserListComponent({ userDetails }: UserListProps) {
       userDetails: UserDetails | null
     }) {
       const totalData = users.length
-      const userContent = generateUserContents(users, locationId, userDetails)
+      const paginatedUsers = users.slice(
+        (currentPageNumber - 1) * USERS_PER_PAGE,
+        currentPageNumber * USERS_PER_PAGE
+      )
+      const userContent = generateUserContents(
+        paginatedUsers,
+        locationId,
+        userDetails
+      )
 
       return (
         <UserTable id="user_list">
@@ -639,10 +641,10 @@ function UserListComponent({ userDetails }: UserListProps) {
               valueHeader={intl.formatMessage(constantsMessages.labelRole)}
             />
           )}
-          {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
+          {totalData > USERS_PER_PAGE && (
             <Pagination
               currentPage={currentPageNumber}
-              totalPages={Math.ceil(totalData / DEFAULT_FIELD_AGENT_LIST_SIZE)}
+              totalPages={Math.ceil(totalData / USERS_PER_PAGE)}
               onPageChange={(currentPage: number) =>
                 setCurrentPageNumber(currentPage)
               }
@@ -662,10 +664,10 @@ function UserListComponent({ userDetails }: UserListProps) {
               }}
             />
           )}
-          <ResponsiveModal
+          <Dialog
             id="username-reminder-modal"
-            show={toggleUsernameReminder.modalVisible}
-            handleClose={() => toggleUsernameReminderModal()}
+            isOpen={toggleUsernameReminder.modalVisible}
+            onClose={() => toggleUsernameReminderModal()}
             title={intl.formatMessage(
               messages.sendUsernameReminderInviteModalTitle
             )}
@@ -692,8 +694,6 @@ function UserListComponent({ userDetails }: UserListProps) {
                 {intl.formatMessage(buttonMessages.send)}
               </Button>
             ]}
-            responsive={false}
-            autoHeight={true}
           >
             {intl.formatMessage(
               messages.sendUsernameReminderInviteModalMessage,
@@ -705,11 +705,11 @@ function UserListComponent({ userDetails }: UserListProps) {
                 deliveryMethod
               }
             )}
-          </ResponsiveModal>
-          <ResponsiveModal
+          </Dialog>
+          <Dialog
             id="user-reset-password-modal"
-            show={toggleResetPassword.modalVisible}
-            handleClose={() => toggleUserResetPasswordModal()}
+            isOpen={toggleResetPassword.modalVisible}
+            onClose={() => toggleUserResetPasswordModal()}
             title={intl.formatMessage(messages.resetUserPasswordModalTitle)}
             actions={[
               <Button
@@ -734,8 +734,6 @@ function UserListComponent({ userDetails }: UserListProps) {
                 {intl.formatMessage(buttonMessages.send)}
               </Button>
             ]}
-            responsive={false}
-            autoHeight={true}
           >
             {intl.formatMessage(messages.resetUserPasswordModalMessage, {
               deliveryMethod,
@@ -744,7 +742,7 @@ function UserListComponent({ userDetails }: UserListProps) {
                   ? toggleResetPassword.selectedUser?.mobile
                   : toggleResetPassword.selectedUser?.email
             })}
-          </ResponsiveModal>
+          </Dialog>
         </UserTable>
       )
     },
@@ -786,7 +784,7 @@ function UserListComponent({ userDetails }: UserListProps) {
         <Content
           title={
             !isLoading && !error
-              ? searchedLocation?.name || ''
+              ? resolveLocationName(searchedLocation, todayISO())
               : intl.formatMessage(headerMessages.teamTitle)
           }
           size={ContentSize.NORMAL}
@@ -805,7 +803,9 @@ function UserListComponent({ userDetails }: UserListProps) {
             </Loading>
           ) : searchResults ? (
             <>
-              <Header id="header">{searchedLocation?.name || ''}</Header>
+              <Header id="header">
+                {resolveLocationName(searchedLocation, todayISO())}
+              </Header>
               <MobileActionBar>{LocationButton(locationId)}</MobileActionBar>
               <LocationInfo>
                 {searchedLocation && (

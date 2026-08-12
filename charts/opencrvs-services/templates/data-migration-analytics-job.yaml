@@ -18,6 +18,7 @@ spec:
       initContainers:
         - name: copy-assets
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.countryconfig) }}-assets
+          imagePullPolicy: {{ .Values.countryconfig.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           command:
             - sh
             - -c
@@ -44,7 +45,7 @@ spec:
                 echo "Running ${script}"
                 "${script}"
               done
-          image: {{ .Values.postgres.image }}
+          image: {{ include "opencrvs.imageReference" .Values.postgres }}
           env:
             - name: POSTGRES_HOST
               value: {{ .Values.postgres.host }}

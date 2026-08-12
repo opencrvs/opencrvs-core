@@ -8,11 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Meta, StoryObj } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { expect, within, userEvent } from '@storybook/test'
+import { expect, within, userEvent } from 'storybook/test'
 import {
   tennisClubMembershipEvent,
   generateEventDraftDocument,
@@ -22,7 +22,10 @@ import {
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
-import { tennisClubMembershipEventDocument } from '../../events/fixtures'
+import {
+  tennisClubMembershipEventDocument,
+  tennisClubMembershipEventWithArchiveAndUnarchive
+} from '../../events/fixtures'
 import { EventOverviewIndex } from './EventOverview'
 
 const meta: Meta<typeof EventOverviewIndex> = {
@@ -146,5 +149,34 @@ export const WithConfigurableSummaryFieldHavingEventMetadataValue: Story = {
 
       await expect(await canvas.findByText('Logged out')).toBeInTheDocument()
     })
+  }
+}
+
+export const ArchiveAndUnarchiveShowInAuditHistory: Story = {
+  parameters: {
+    offline: {
+      events: [tennisClubMembershipEventWithArchiveAndUnarchive]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
+        eventId: tennisClubMembershipEventWithArchiveAndUnarchive.id
+      })
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Archive and unarchive actions show correct labels in Audit history',
+      async () => {
+        await userEvent.click(
+          await canvas.findByRole('button', { name: 'Audit' })
+        )
+
+        await expect(await canvas.findByText('Archived')).toBeInTheDocument()
+        await expect(await canvas.findByText('Unarchived')).toBeInTheDocument()
+      }
+    )
   }
 }

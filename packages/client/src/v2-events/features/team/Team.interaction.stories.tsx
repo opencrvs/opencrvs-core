@@ -8,11 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
-import { userEvent, within } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect, userEvent, within } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { TestUserRole } from '@opencrvs/commons/client'
+import { TestUserRole, User, UUID } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { routesConfig } from '@client/v2-events/routes'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
@@ -27,6 +27,22 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 const generator = testDataGenerator()
 const felix = generator.user.registrationAgent().v2
 const kennedy = generator.user.localRegistrar().v2
+
+// UserList shows USERS_PER_PAGE (10) users per page. Build 15 users in a single
+// office so the list spans two pages and the pagination controls appear.
+const USERS_PER_PAGE = 10
+const manyUsers: User[] = Array.from({ length: 15 }, (_, index) => {
+  const n = index + 1
+  return {
+    ...felix,
+    id: `11111111-1111-4111-8111-${String(n).padStart(12, '0')}` as UUID,
+    name: {
+      firstname: 'Agent',
+      surname: `Number ${String(n).padStart(2, '0')}`
+    },
+    primaryOfficeId: felix.primaryOfficeId
+  }
+})
 
 const mockRoles = [
   { id: TestUserRole.enum.REGISTRATION_AGENT, scopes: [] },
@@ -45,9 +61,7 @@ function findMenuTriggerForUser(
   const profileLinks = Array.from(
     container.querySelectorAll<HTMLButtonElement>('#profile-link')
   )
-  const nameCell = profileLinks.find(
-    (el) => el.textContent?.trim() === userName
-  )
+  const nameCell = profileLinks.find((el) => el.textContent.trim() === userName)
   if (!nameCell) {
     throw new Error(`User row not found for: ${userName}`)
   }
@@ -461,6 +475,62 @@ export const ToggleUserActivation: Story = {
       )
 
       await canvas.findAllByText('Active')
+    })
+  }
+}
+
+export const Pagination: Story = {
+  parameters: {
+    msw: {
+      handlers: {
+        user: [
+          tRPCMsw.user.search.query(() => manyUsers),
+          // The logged-in user is fetched via user.get for permission checks, so
+          // this handler must stay even though the list itself uses user.search.
+          tRPCMsw.user.get.query(
+            (id) =>
+              manyUsers.find((u) => u.id === id) ??
+              generator.user.nationalSystemAdmin().v2
+          ),
+          tRPCMsw.user.roles.list.query(() => mockRoles)
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Page 1 shows the first 10 users', async () => {
+      await canvas.findByText('Agent Number 01', { selector: '#profile-link' })
+      await canvas.findByText('Agent Number 10', { selector: '#profile-link' })
+      // The 11th user belongs to page 2 and must not be rendered yet.
+      await expect(
+        canvas.queryByText('Agent Number 11', { selector: '#profile-link' })
+      ).toBeNull()
+    })
+
+    await step('Navigate to page 2', async () => {
+      // The pagination bar is duplicated for desktop/mobile layouts, so click
+      // the first matching page-2 button.
+      const [pageTwoButton] = await canvas.findAllByRole('button', {
+        name: '2'
+      })
+      await userEvent.click(pageTwoButton)
+    })
+
+    await step('Page 2 shows the remaining users', async () => {
+      await canvas.findByText('Agent Number 11', { selector: '#profile-link' })
+      await canvas.findByText('Agent Number 15', { selector: '#profile-link' })
+      // Page 1 users are no longer rendered.
+      await expect(
+        canvas.queryByText('Agent Number 01', { selector: '#profile-link' })
+      ).toBeNull()
+      // Sanity check: exactly the 5 remaining users are shown on page 2.
+      await expect(
+        canvas.getAllByText(/^Agent Number \d\d$/, {
+          selector: '#profile-link'
+        })
+      ).toHaveLength(15 - USERS_PER_PAGE)
     })
   }
 }

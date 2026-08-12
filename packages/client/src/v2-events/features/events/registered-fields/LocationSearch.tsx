@@ -12,19 +12,26 @@ import React, { useMemo } from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import {
+  ClientAdministrativeArea,
+  ClientLocation,
   FieldPropsWithoutReferenceValue,
-  Location,
   UUID,
   joinValues,
-  AdministrativeArea,
   JurisdictionFilter,
-  resolveJurisdictionReference
+  isSelectableAtAnchor,
+  resolveJurisdictionReference,
+  resolveVersion,
+  PlainDate
 } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
+import { useClearStaleSelectionOnAnchorChange } from '@client/v2-events/hooks/useClearStaleSelectionOnAnchorChange'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
-import { getAdminLevelHierarchy } from '@client/v2-events/utils'
+import {
+  buildHistoricalLocationNameOptions,
+  getAdminLevelHierarchy
+} from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { SearchableSelect } from '@client/v2-events/components/forms/inputs/SearchableSelect'
@@ -46,13 +53,13 @@ export function filterLocationsByJurisdiction({
   locationTypes,
   jurisdictionFilter
 }: {
-  locations: Map<UUID, Location>
-  administrativeAreas: Map<UUID, AdministrativeArea>
+  locations: Map<UUID, ClientLocation>
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
   userLocationId: string | undefined
   locationTypes?: string[]
   jurisdictionFilter?: JurisdictionFilter
-}): Location[] {
-  const matchesType = (location: Location) =>
+}): ClientLocation[] {
+  const matchesType = (location: ClientLocation) =>
     location.locationType &&
     (locationTypes ? locationTypes.includes(location.locationType) : true)
 
@@ -128,6 +135,7 @@ function LocationSearchInput({
   onBlur,
   id,
   eventType,
+  anchor,
   ...props
 }: FieldPropsWithoutReferenceValue<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
   onChange: (val: string | undefined) => void
@@ -137,6 +145,7 @@ function LocationSearchInput({
   disabled?: boolean
   id: string
   eventType?: string
+  anchor: PlainDate
 }) {
   const token = useSelector(getToken)
   const jurisdictionFilter = resolveJurisdictionReference(
@@ -147,9 +156,44 @@ function LocationSearchInput({
 
   const locations = useAvailableLocations(locationTypes, jurisdictionFilter)
 
+  const anchorToDateOfEvent = Boolean(props.configuration?.anchorToDateOfEvent)
+
+  const { getLocations: getLocationsForStaleCheck } = useLocations()
+  const allLocations = getLocationsForStaleCheck.useSuspenseQuery()
+  useClearStaleSelectionOnAnchorChange({
+    enabled: anchorToDateOfEvent,
+    value,
+    anchor,
+    entities: allLocations,
+    onClear: () => onChange(undefined)
+  })
+
+  // `activeOnly` alone controls whether inactive/not-yet-effective locations
+  // are dropped from the list; `anchorToDateOfEvent` only changes which date
+  // `anchor` is resolved against (event date vs today) — the two are
+  // orthogonal, so a field must opt into both to anchor-and-exclude.
+  const activeOnly = Boolean(props.configuration?.activeOnly)
+
+  const selectableLocations = useMemo(
+    () =>
+      activeOnly
+        ? locations.filter((l) => isSelectableAtAnchor(l.versions, anchor))
+        : locations,
+    [locations, anchor, activeOnly]
+  )
+
+  // When the field config opts in (advanced search sets this), list every
+  // historical name so records saved under an outdated name stay findable.
+  // Otherwise show a single current-name option, resolved at the field's anchor.
   const options = useMemo(
-    () => locations.map((l) => ({ value: l.id, label: l.name })),
-    [locations]
+    () =>
+      props.configuration?.listHistoricalNames
+        ? buildHistoricalLocationNameOptions(selectableLocations)
+        : selectableLocations.map((l) => ({
+            value: l.id,
+            label: resolveVersion(l.versions, anchor).name
+          })),
+    [selectableLocations, props.configuration?.listHistoricalNames, anchor]
   )
 
   const selectedOption =
@@ -173,12 +217,19 @@ function toCertificateVariables(
   value: Stringifiable | undefined | null,
   context: {
     intl: IntlShape
-    locations: Map<UUID, Location>
-    administrativeAreas: Map<UUID, AdministrativeArea>
+    locations: Map<UUID, ClientLocation>
+    administrativeAreas: Map<UUID, ClientAdministrativeArea>
+    anchor: PlainDate
     adminLevels?: AdminStructureItem[]
   }
 ) {
-  const { intl, locations, administrativeAreas, adminLevels = [] } = context
+  const {
+    intl,
+    locations,
+    administrativeAreas,
+    anchor,
+    adminLevels = []
+  } = context
   const appConfigAdminLevels = adminLevels.map((level) => level.id)
 
   if (!value) {
@@ -196,29 +247,40 @@ function toCertificateVariables(
   })
 
   const locationId = UUID.safeParse(value.toString()).data
-  const location = locationId
+  const locationEntity = locationId
     ? (locations.get(locationId) ?? administrativeAreas.get(locationId))
     : undefined
+  const resolvedLocation = locationEntity
+    ? resolveVersion(locationEntity.versions, anchor)
+    : undefined
 
-  const parentAdministrativeAreaId =
-    (location as Location | undefined)?.administrativeAreaId ??
-    (location as AdministrativeArea | undefined)?.parentId
+  const parentAdministrativeAreaId = locationId
+    ? (locations.get(locationId)?.administrativeAreaId ??
+      administrativeAreas.get(locationId)?.parentId)
+    : undefined
 
   const adminLevelHierarchy = getAdminLevelHierarchy(
     parentAdministrativeAreaId,
     administrativeAreas,
     appConfigAdminLevels,
-    'withNames'
+    'withNames',
+    anchor
   )
 
   return {
-    name: location?.name || '',
+    name: resolvedLocation?.name || '',
     ...adminLevelHierarchy,
     country
   }
 }
 
-function LocationSearchOutput({ value }: { value: Stringifiable }) {
+function LocationSearchOutput({
+  value,
+  anchor
+}: {
+  value: Stringifiable
+  anchor: PlainDate
+}) {
   const intl = useIntl()
   const { getLocations } = useLocations()
   const { getAdministrativeAreas } = useAdministrativeAreas()
@@ -233,6 +295,7 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
     intl,
     locations,
     administrativeAreas,
+    anchor,
     adminLevels
   })
   const { name, country } = certificateVars

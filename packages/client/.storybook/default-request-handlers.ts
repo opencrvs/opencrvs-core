@@ -293,7 +293,7 @@ export const handlers = {
               scopes: [
                 'user.create:all',
                 'user.read:all',
-                'user.update:all',
+                'user.edit',
                 'organisation.read-locations:all',
                 'performance.read',
                 'performance.read-dashboards',
@@ -777,7 +777,7 @@ export const handlers = {
               scopes: [
                 'user.create:all',
                 'user.read:all',
-                'user.update:all',
+                'user.edit',
                 'organisation.read-locations:all',
                 'performance.read',
                 'performance.read-dashboards',

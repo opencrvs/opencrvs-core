@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
 import { createPrng, generateUuid, TestUserRole } from './test.utils'
 import { SystemContext, UserContext } from '../users/User'
 import {
@@ -32,10 +33,44 @@ describe('canAccessEventWithScope()', () => {
   const officeUuid = generateUuid(rng)
   const createdById = generateUuid(rng)
 
-  const declaredEvent: Partial<EventIndexWithAdministrativeHierarchy> = {
+  const notifiedEvent = {
     type: 'birth',
+    id: generateUuid(rng),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    createdBy: generateUuid(rng),
+    status: 'NOTIFIED' as const,
+    trackingId: generateUuid(rng),
+    declaration: {},
+    flags: [],
+    potentialDuplicates: [],
     placeOfEvent: [provinceUuid, districtUuid, officeUuid],
     legalStatuses: {
+      NOTIFIED: {
+        acceptedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        createdBy: createdById,
+        createdAtLocation: [provinceUuid, districtUuid, officeUuid]
+      },
+      DECLARED: undefined,
+      REGISTERED: undefined
+    }
+  } satisfies EventIndexWithAdministrativeHierarchy
+
+  const declaredEvent = {
+    id: generateUuid(rng),
+    type: 'birth',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    createdBy: generateUuid(rng),
+    status: 'DECLARED' as const,
+    trackingId: generateUuid(rng),
+    declaration: {},
+    flags: [],
+    potentialDuplicates: [],
+    placeOfEvent: [provinceUuid, districtUuid, officeUuid],
+    legalStatuses: {
+      NOTIFIED: undefined,
       DECLARED: {
         acceptedAt: new Date().toISOString(),
         createdAt: new Date().toISOString(),
@@ -44,11 +79,12 @@ describe('canAccessEventWithScope()', () => {
       },
       REGISTERED: undefined
     }
-  }
+  } satisfies EventIndexWithAdministrativeHierarchy
 
-  const registeredEvent: Partial<EventIndexWithAdministrativeHierarchy> = {
+  const registeredEvent = {
     ...declaredEvent,
     legalStatuses: {
+      NOTIFIED: undefined,
       DECLARED: {
         acceptedAt: new Date().toISOString(),
         createdAt: new Date().toISOString(),
@@ -63,7 +99,7 @@ describe('canAccessEventWithScope()', () => {
         createdAtLocation: [provinceUuid, districtUuid, officeUuid]
       }
     }
-  }
+  } satisfies EventIndexWithAdministrativeHierarchy
 
   const systemContext = {
     type: 'system',
@@ -92,6 +128,11 @@ describe('canAccessEventWithScope()', () => {
   const registeredOnlyOptions = [
     { registeredIn: 'location' },
     { registeredBy: 'user' }
+  ] satisfies RecordScopeV2['options'][]
+
+  const notifiedOnlyOptions = [
+    { notifiedIn: 'location' },
+    { notifiedBy: 'user' }
   ] satisfies RecordScopeV2['options'][]
 
   const eventOptions = [
@@ -140,6 +181,29 @@ describe('canAccessEventWithScope()', () => {
           canAccessEventWithScope(
             declaredEvent,
             { type: 'record.print-certified-copies', options },
+            systemContext
+          )
+        ).toBe(false)
+      }
+    )
+
+    test('should access notified event with notifiedBy:user scope', () => {
+      expect(
+        canAccessEventWithScope(
+          notifiedEvent,
+          { type: 'record.edit', options: { notifiedBy: 'user' } },
+          systemContext
+        )
+      ).toBe(true)
+    })
+
+    test.each(notifiedOnlyOptions)(
+      'should not access an unnotified event with notified scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            declaredEvent,
+            { type: 'record.edit', options },
             systemContext
           )
         ).toBe(false)
@@ -200,6 +264,32 @@ describe('canAccessEventWithScope()', () => {
       }
     )
 
+    test.each(notifiedOnlyOptions)(
+      'should access notified event with notified scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            notifiedEvent,
+            { type: 'record.edit', options },
+            userContext
+          )
+        ).toBe(true)
+      }
+    )
+
+    test.each(notifiedOnlyOptions)(
+      'should not access an unnotified event with notified scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            declaredEvent,
+            { type: 'record.edit', options },
+            userContext
+          )
+        ).toBe(false)
+      }
+    )
+
     test.each(eventOptions)(
       'should access event with event type-based scope %j',
       (options) => {
@@ -212,6 +302,127 @@ describe('canAccessEventWithScope()', () => {
         ).toBe(true)
       }
     )
+  })
+
+  describe('flags option', () => {
+    test('should not access event with a "noneOf" flag it carries', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['sealed'] },
+          {
+            type: 'record.read',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access event without a "noneOf" flag it does not carry', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: [] },
+          {
+            type: 'record.read',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should access event carrying one of the "anyOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete'] },
+          {
+            type: 'record.read',
+            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event carrying none of the "anyOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: [] },
+          {
+            type: 'record.read',
+            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access event carrying all of the "allOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete', 'rejected'] },
+          {
+            type: 'record.read',
+            options: { flags: { allOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event missing one of the "allOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete'] },
+          {
+            type: 'record.read',
+            options: { flags: { allOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+  })
+
+  describe('status option', () => {
+    test('should access event whose status is included in the filter', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...declaredEvent, status: 'DECLARED' },
+          {
+            type: 'record.edit',
+            options: { status: ['DECLARED'] }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event whose status is not included in the filter', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, status: 'REGISTERED' },
+          {
+            type: 'record.edit',
+            options: { status: ['DECLARED'] }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access any status when the filter is not set', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, status: 'REGISTERED' },
+          {
+            type: 'record.edit',
+            options: {}
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
   })
 
   test('should not access event if user does not meet any of the scope options', () => {
@@ -227,6 +438,9 @@ describe('canAccessEventWithScope()', () => {
     const singleOptions = [
       { placeOfEvent: 'location' },
       { placeOfEvent: 'administrativeArea' },
+      { notifiedIn: 'location' },
+      { notifiedIn: 'administrativeArea' },
+      { notifiedBy: 'user' },
       { declaredIn: 'location' },
       { declaredIn: 'administrativeArea' },
       { registeredIn: 'location' },
@@ -252,10 +466,16 @@ describe('canAccessEventWithScope()', () => {
   describe('User without an administrative area', () => {
     // The event is in a different administrative area than the user's office,
     // so access can only be granted by the "no administrative area" branch.
-    const eventInAnotherArea: Partial<EventIndexWithAdministrativeHierarchy> = {
+    const eventInAnotherArea = {
       ...registeredEvent,
       placeOfEvent: [generateUuid(rng)],
       legalStatuses: {
+        NOTIFIED: {
+          acceptedAt: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          createdBy: generateUuid(rng),
+          createdAtLocation: [generateUuid(rng)]
+        },
         DECLARED: {
           acceptedAt: new Date().toISOString(),
           createdAt: new Date().toISOString(),
@@ -270,10 +490,11 @@ describe('canAccessEventWithScope()', () => {
           createdAtLocation: [generateUuid(rng)]
         }
       }
-    }
+    } satisfies EventIndexWithAdministrativeHierarchy
 
     const adminAreaOptions = [
       { placeOfEvent: 'administrativeArea' },
+      { notifiedIn: 'administrativeArea' },
       { declaredIn: 'administrativeArea' },
       { registeredIn: 'administrativeArea' }
     ] satisfies RecordScopeV2['options'][]
@@ -396,12 +617,30 @@ describe('canAccessOtherUserWithScopes()', () => {
   })
 })
 
+function mockVersionFields(id: UUID, name: string) {
+  return {
+    status: 'active' as const,
+    versions: [
+      {
+        versionId: id,
+        effectiveFrom: '0001-01-01',
+        name,
+        externalId: null,
+        status: 'active' as const
+      }
+    ]
+  }
+}
+
 const province: AdministrativeArea = {
   id: 'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa' as UUID,
   name: 'Province',
   externalId: null,
   parentId: null,
-  validUntil: null
+  ...mockVersionFields(
+    'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa' as UUID,
+    'Province'
+  )
 }
 
 const district: AdministrativeArea = {
@@ -409,7 +648,10 @@ const district: AdministrativeArea = {
   name: 'District',
   externalId: null,
   parentId: province.id,
-  validUntil: null
+  ...mockVersionFields(
+    'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb' as UUID,
+    'District'
+  )
 }
 
 const office: Location = {
@@ -417,8 +659,11 @@ const office: Location = {
   name: 'District Office',
   externalId: null,
   administrativeAreaId: district.id,
-  validUntil: null,
-  locationType: 'CRVS_OFFICE'
+  locationType: 'CRVS_OFFICE',
+  ...mockVersionFields(
+    'cccccccc-cccc-4ccc-cccc-cccccccccccc' as UUID,
+    'District Office'
+  )
 }
 
 const officeWithoutArea: Location = {
@@ -426,8 +671,11 @@ const officeWithoutArea: Location = {
   name: 'Standalone Office',
   externalId: null,
   administrativeAreaId: null,
-  validUntil: null,
-  locationType: 'CRVS_OFFICE'
+  locationType: 'CRVS_OFFICE',
+  ...mockVersionFields(
+    'dddddddd-dddd-4ddd-dddd-dddddddddddd' as UUID,
+    'Standalone Office'
+  )
 }
 
 function buildMaps() {

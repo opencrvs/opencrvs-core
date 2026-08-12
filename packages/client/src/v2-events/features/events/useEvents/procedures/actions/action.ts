@@ -9,25 +9,24 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { MutationKey, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type {
   DecorateMutationProcedure,
   inferInput
 } from '@trpc/tanstack-react-query'
-import { toast } from 'react-hot-toast'
 import { TRPCClientError } from '@trpc/client'
 import { useSyncExternalStore } from 'react'
 import {
   ActionType,
   ActionStatus,
   EventDocument,
-  omitHiddenAnnotationFields,
+  getActionAnnotationFields,
+  getActionFormFields,
+  omitHiddenFields,
   deepDropNulls,
-  EventState,
   getCurrentEventState,
-  isPotentialDuplicate
+  getEventValidatorContext
 } from '@opencrvs/commons/client'
-import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   cleanUpOnUnassign,
@@ -42,61 +41,21 @@ import { updateEventOptimistically } from '@client/v2-events/features/events/use
 import {
   createEventActionMutationFn,
   MutationType,
-  setMutationDefaults,
-  waitUntilEventIsCreated
+  setMutationDefaults
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
 import {
   AppRouter,
   queryClient,
   trpcOptionsProxy
 } from '@client/v2-events/trpc'
-import { ToastKey } from '@client/v2-events/routes/Toaster'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
-import { showToast } from '../../../useToastAndRedirect'
-
-function showToastOnDuplicateDetected(event: EventDocument) {
-  showToast({
-    message: {
-      defaultMessage:
-        '{trackingId} is a potential duplicate. Record is ready for review.',
-      id: 'event.declaration.potentialDuplicateDetected',
-      description:
-        'Notification for potential duplicate declaration. Shown when a potential duplicate is detected after declaring an event.'
-    },
-    toastType: 'error',
-    toastId: `duplicate-detected-${event.trackingId}`,
-    messageOpts: { trackingId: event.trackingId }
-  })
-}
-
-function deleteLocalEventAndToastOnDuplicate(event: EventDocument) {
-  void deleteLocalEvent(event)
-
-  if (isPotentialDuplicate(event.actions)) {
-    showToastOnDuplicateDetected(event)
-  }
-}
-
-function retryUnlessConflict(
-  _failureCount: number,
-  error: TRPCClientError<AppRouter>
-) {
-  if (_failureCount === 10) {
-    toast.error(ToastKey.SOMETHING_WENT_WRONG)
-  }
-  return error.data?.httpStatus !== 409
-}
-
-function retryDelay(attemptIndex: number) {
-  return Math.max(10000, 1000 * 2 ** attemptIndex)
-}
-
-function errorToastOnConflict(error: TRPCClientError<AppRouter>) {
-  if (error.data?.httpStatus === 409) {
-    toast.error(ToastKey.NOT_ASSIGNED_ERROR)
-  }
-}
+import {
+  deleteLocalEventAndToastOnDuplicate,
+  errorToastOnConflict,
+  retryDelay,
+  retryUnlessConflict
+} from '@client/v2-events/features/events/useEvents/procedures/actions/mutationHandlers'
 
 setMutationDefaults(trpcOptionsProxy.event.actions.custom.request, {
   mutationFn: createEventActionMutationFn(
@@ -178,6 +137,17 @@ setMutationDefaults(trpcOptionsProxy.event.actions.archive.request, {
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.ARCHIVE }
+})
+
+setMutationDefaults(trpcOptionsProxy.event.actions.unarchive.request, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.unarchive.request
+  ),
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: deleteLocalEvent,
+  onError: errorToastOnConflict,
+  meta: { actionType: ActionType.UNARCHIVE }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate.request, {
@@ -273,97 +243,6 @@ setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markNotDuplicate, {
   meta: { actionType: ActionType.MARK_AS_NOT_DUPLICATE }
 })
 
-type CustomMutationKeys = keyof typeof customApi
-
-const customMutationKeys = {
-  registerOnDeclare: [['registerOnDeclare']],
-  editAndRegister: [['editAndRegister']],
-  editAndDeclare: [['editAndDeclare']],
-  editAndNotify: [['editAndNotify']],
-  archiveOnDuplicate: [['archiveOnDuplicate']],
-  makeCorrectionOnRequest: [['makeCorrectionOnRequest']]
-} satisfies Record<CustomMutationKeys, MutationKey>
-
-interface CustomMutationTypes {
-  registerOnDeclare: customApi.CustomMutationParams
-  editAndRegister: customApi.EditRequestParams
-  editAndDeclare: customApi.EditRequestParams
-  editAndNotify: customApi.EditRequestParams
-  archiveOnDuplicate: customApi.ArchiveOnDuplicateParams
-  makeCorrectionOnRequest: customApi.CorrectionRequestParams
-}
-
-queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
-  mutationFn: waitUntilEventIsCreated(customApi.registerOnDeclare),
-  retry: retryUnlessConflict,
-  retryDelay,
-  onSuccess: deleteLocalEventAndToastOnDuplicate,
-  onError: errorToastOnConflict,
-  meta: { actionType: ActionType.DECLARE }
-})
-
-queryClient.setMutationDefaults(customMutationKeys.editAndRegister, {
-  mutationFn: customApi.editAndRegister,
-  retry: retryUnlessConflict,
-  retryDelay,
-  onSuccess: deleteLocalEventAndToastOnDuplicate,
-  onError: errorToastOnConflict,
-  meta: { actionType: ActionType.REGISTER }
-})
-
-queryClient.setMutationDefaults(customMutationKeys.editAndDeclare, {
-  mutationFn: customApi.editAndDeclare,
-  retry: retryUnlessConflict,
-  retryDelay,
-  onSuccess: deleteLocalEventAndToastOnDuplicate,
-  onError: errorToastOnConflict,
-  meta: { actionType: ActionType.DECLARE }
-})
-
-queryClient.setMutationDefaults(customMutationKeys.editAndNotify, {
-  mutationFn: customApi.editAndNotify,
-  retry: retryUnlessConflict,
-  retryDelay,
-  onSuccess: deleteLocalEvent,
-  onError: errorToastOnConflict,
-  meta: { actionType: ActionType.DECLARE }
-})
-
-queryClient.setMutationDefaults(customMutationKeys.archiveOnDuplicate, {
-  mutationFn: customApi.archiveOnDuplicate,
-  retry: retryUnlessConflict,
-  retryDelay,
-  onSuccess: deleteLocalEvent,
-  onError: errorToastOnConflict,
-  meta: { actionType: ActionType.MARK_AS_DUPLICATE }
-})
-
-queryClient.setMutationDefaults(customMutationKeys.makeCorrectionOnRequest, {
-  mutationFn: customApi.makeCorrectionOnRequest,
-  retry: retryUnlessConflict,
-  retryDelay,
-  onSuccess: deleteLocalEvent,
-  onError: errorToastOnConflict,
-  meta: { actionType: ActionType.APPROVE_CORRECTION },
-  onMutate: (variables) => {
-    // Since the 'makeCorrectionOnRequest' requires two actions (REQUEST_CORRECTION and APPROVE_CORRECTION),
-    // we need to update the event optimistically with both actions.
-    const optimisticAction = updateEventOptimistically(
-      ActionType.REQUEST_CORRECTION
-    )(variables)
-
-    if (!optimisticAction) {
-      return
-    }
-
-    // For the APPROVE_CORRECTION action, we need to pass the id of the REQUEST_CORRECTION action as 'requestId', so that the actions are properly matched.
-    updateEventOptimistically(ActionType.APPROVE_CORRECTION)({
-      ...variables,
-      requestId: optimisticAction.id
-    })
-  }
-})
-
 /**
  * A custom hook that wraps a tRPC mutation procedure for event actions.
  *
@@ -443,16 +322,31 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       ? getCurrentEventState(localFullEvent, eventConfiguration).declaration
       : {}
 
-    const annotation = actionConfiguration
-      ? deepDropNulls(
-          omitHiddenAnnotationFields(
-            actionConfiguration,
-            originalDeclaration,
-            restParams.annotation,
-            {}
+    const annotationFields = [
+      ...(actionConfiguration
+        ? getActionAnnotationFields(actionConfiguration)
+        : []),
+      // NOTIFY dialog fields come from the NOTIFY config itself; the DECLARE
+      // fallback above only covers review fields.
+      ...(actionType === ActionType.NOTIFY
+        ? getActionFormFields(eventConfiguration, ActionType.NOTIFY)
+        : [])
+    ]
+
+    // Action types with no config entry at all (ASSIGN, UNASSIGN, duplicate
+    // and correction actions, ...) get their annotation cleared, as before.
+    // Types with a config entry keep pass-through semantics even with zero
+    // configured fields — EDIT's annotation carries review-page values.
+    const annotation =
+      actionConfiguration || annotationFields.length > 0
+        ? deepDropNulls(
+            omitHiddenFields(annotationFields, restParams.annotation ?? {}, {
+              baseFormState: originalDeclaration
+            })
           )
-        )
-      : {}
+        : {}
+
+    const localEventDocument = findLocalEventDocument(eventId)
 
     return {
       ...restParams,
@@ -463,7 +357,9 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
         declarationDiff: params.declaration,
         validatorContext: {
           ...validatorContext,
-          event: findLocalEventDocument(eventId)
+          event:
+            localEventDocument &&
+            getEventValidatorContext(localEventDocument, eventConfiguration)
         }
       }),
       annotation
@@ -481,70 +377,6 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       options?: Parameters<typeof useMutation>[0]
     ) => mutation.mutateAsync(getMutationPayload(params), options),
     isPending: mutation.isPending
-  }
-}
-
-export function useEventCustomAction<T extends CustomMutationKeys>(
-  mutationName: T
-) {
-  const eventConfigurations = useEventConfigurations()
-
-  const validatorContext = useValidatorContext()
-  const mutationKey = customMutationKeys[mutationName]
-  const mutation = useMutation({
-    mutationKey,
-    ...queryClient.getMutationDefaults(mutationKey)
-  })
-
-  return {
-    mutate: (params: Omit<CustomMutationTypes[T], 'eventConfiguration'>) => {
-      const localEvent = findLocalEventDocument(params.eventId)
-
-      const eventConfiguration = eventConfigurations.find(
-        (event) => event.id === localEvent?.type
-      )
-
-      if (!eventConfiguration) {
-        throw new Error('Event configuration not found')
-      }
-
-      // Edit and direct-correction actions need the registered declaration as
-      // the original so cleared fields in the diff are emitted as `null`. Use
-      // the locally cached full event when `event` is not in params.
-      const needsOriginalDeclaration =
-        mutationName === 'editAndDeclare' ||
-        mutationName === 'editAndRegister' ||
-        mutationName === 'editAndNotify' ||
-        mutationName === 'makeCorrectionOnRequest'
-
-      let originalDeclaration: EventState = {}
-      if ('event' in params) {
-        originalDeclaration = getCurrentEventState(
-          /*
-           * typescript is somehow unable to infer the type of params.event to
-           * be EventDocument
-           */
-          params.event as EventDocument,
-          eventConfiguration
-        ).declaration
-      } else if (needsOriginalDeclaration && localEvent) {
-        originalDeclaration = getCurrentEventState(
-          localEvent,
-          eventConfiguration
-        ).declaration
-      }
-
-      return mutation.mutate({
-        ...params,
-        eventConfiguration,
-        declaration: getCleanedDeclarationDiff({
-          eventConfiguration,
-          originalDeclaration,
-          declarationDiff: params.declaration,
-          validatorContext: { ...validatorContext, event: localEvent }
-        })
-      })
-    }
   }
 }
 

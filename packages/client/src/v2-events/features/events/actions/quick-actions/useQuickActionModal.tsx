@@ -12,14 +12,14 @@ import React from 'react'
 import { MessageDescriptor, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
-import { Dialog } from '@opencrvs/components'
 import {
-  DangerButton,
-  PrimaryButton,
-  TertiaryButton
-} from '@opencrvs/components/lib/buttons'
-import { Icon, IconProps } from '@opencrvs/components/src/Icon'
-import { Stack } from '@opencrvs/components/lib/Stack'
+  Stack,
+  Button,
+  Icon,
+  IconProps,
+  Dialog,
+  ButtonType
+} from '@opencrvs/components'
 import {
   ActionType,
   CustomActionConfig,
@@ -39,6 +39,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { buttonMessages } from '@client/i18n/messages'
 import { ROUTES } from '@client/v2-events/routes'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { useDialogFormState } from '@client/v2-events/hooks/useDialogFormState'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
 import { TranslationTextWithFormatModifier } from '../../components/TranslationTextWithFormatModifier'
@@ -46,16 +47,18 @@ import { useModal } from '../../../../hooks/useModal'
 import { actionLabels } from '../../../workqueues/Actions/utils'
 import { register } from './register'
 import { archive } from './archive'
+import { unarchive } from './unarchive'
 
 const quickActions = {
   [ActionType.REGISTER]: register,
-  [ActionType.ARCHIVE]: archive
+  [ActionType.ARCHIVE]: archive,
+  [ActionType.UNARCHIVE]: unarchive
 } as const satisfies Partial<Record<ActionType, QuickActionConfig>>
 
 interface ModalConfig {
   label?: MessageDescriptor
   supportingCopy?: MessageDescriptor
-  confirmButtonType?: 'primary' | 'danger'
+  confirmButtonType?: ButtonType
   confirmButtonLabel?: MessageDescriptor
   fields?: FieldConfig[]
   actionType?: keyof typeof quickActions
@@ -68,12 +71,14 @@ export interface QuickActionConfig {
     eventId,
     actions,
     customActions,
-    isActionAllowed
+    isActionAllowed,
+    formValues
   }: {
     eventId: UUID
     actions: ReturnType<typeof useEvents>['actions']
     customActions: ReturnType<typeof useEvents>['customActions']
     isActionAllowed: (action: ActionType) => boolean
+    formValues: Record<string, FieldUpdateValue>
   }) => void | Promise<void>
 }
 
@@ -86,7 +91,8 @@ interface ModalResult {
 
 const DefaultIcons = {
   [ActionType.REGISTER]: 'PencilLine',
-  [ActionType.ARCHIVE]: 'Archive'
+  [ActionType.ARCHIVE]: 'Archive',
+  [ActionType.UNARCHIVE]: 'ArchiveTray'
 } as const
 
 function QuickActionModal({
@@ -103,21 +109,10 @@ function QuickActionModal({
   const intl = useIntl()
   const validatorContext = useValidatorContext()
   const { getEvent } = useEvents()
-  const [modalValues, setModalValues] = React.useState<
-    Record<string, FieldUpdateValue>
-  >({})
+  const dialogForm = useDialogFormState()
+  const modalValues = dialogForm.formValues
   const eventDocument = getEvent.useGetOrDownloadEvent(eventId)
   const event = getCurrentEventState(eventDocument, eventConfiguration)
-
-  const ConfirmButton =
-    config.confirmButtonType === 'danger' ? DangerButton : PrimaryButton
-
-  const handleChange = (values: Record<string, FieldUpdateValue>) => {
-    setModalValues((prev) => ({
-      ...prev,
-      ...values
-    }))
-  }
 
   const errorsOnField = (config.fields ?? []).flatMap((field) =>
     flattenFormState(
@@ -143,24 +138,27 @@ function QuickActionModal({
   return (
     <Dialog
       actions={[
-        <TertiaryButton
+        <Button
           key="cancel"
           id="cancel-btn"
+          size="large"
+          type="tertiary"
           onClick={() => close({ result: false })}
         >
           {intl.formatMessage(buttonMessages.cancel)}
-        </TertiaryButton>,
-        <ConfirmButton
+        </Button>,
+        <Button
           key="confirm"
-          bg={'primaryBlue'}
           disabled={errorsOnField.length > 0}
           id="confirm-btn"
+          size="large"
+          type={config.confirmButtonType ?? 'primary'}
           onClick={confirm}
         >
           {intl.formatMessage(
             config.confirmButtonLabel || buttonMessages.confirm
           )}
-        </ConfirmButton>
+        </Button>
       ]}
       id={`quick-action-modal-${config.label.id}`}
       isOpen={true}
@@ -190,6 +188,7 @@ function QuickActionModal({
           />
         )}
         <FormFieldGenerator
+          {...dialogForm}
           eventConfig={eventConfiguration}
           fields={config.fields ?? []}
           id={'quick-action-modal-form'}
@@ -198,7 +197,6 @@ function QuickActionModal({
             ...validatorContext,
             baseFormState: event.declaration
           }}
-          onFormChange={handleChange}
         />
       </Stack>
     </Dialog>
@@ -223,7 +221,7 @@ export function useQuickActionModal(
     const actionConfig = getActionConfig({ actionType, eventConfiguration })
     const supportingCopy = actionConfig?.supportingCopy
 
-    const { result } = await openModal<ModalResult>((close) => (
+    const { result, values } = await openModal<ModalResult>((close) => (
       <QuickActionModal
         close={close}
         config={{
@@ -231,6 +229,10 @@ export function useQuickActionModal(
           actionType,
           icon: isValidIcon(actionConfig?.icon) ? actionConfig.icon : undefined,
           supportingCopy,
+          fields:
+            actionConfig && 'form' in actionConfig
+              ? actionConfig.form
+              : undefined,
           ...config.modal
         }}
         eventConfiguration={eventConfiguration}
@@ -246,7 +248,8 @@ export function useQuickActionModal(
         eventId: eventIndex.id,
         actions,
         customActions,
-        isActionAllowed
+        isActionAllowed,
+        formValues: values ?? {}
       })
 
       if (backTo) {

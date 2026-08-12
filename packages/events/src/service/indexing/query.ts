@@ -10,6 +10,7 @@
  */
 import { type estypes } from '@elastic/elasticsearch'
 import {
+  ContainsFlags,
   EventConfig,
   FieldType,
   getAllUniqueFields,
@@ -154,6 +155,32 @@ function typedKeys<T extends object>(obj: T): (keyof T)[] {
   return Object.keys(obj) as (keyof T)[]
 }
 
+/** Translates a `ContainsFlags` rule set into the equivalent Elasticsearch query clauses. */
+function buildFlagsQuery(
+  flags: ContainsFlags
+): estypes.QueryDslQueryContainer[] {
+  const must: estypes.QueryDslQueryContainer[] = []
+
+  if (flags.anyOf) {
+    must.push({ terms: { flags: flags.anyOf } })
+  }
+  if (flags.noneOf) {
+    must.push({
+      bool: {
+        must_not: {
+          terms: { flags: flags.noneOf }
+        },
+        should: undefined
+      }
+    })
+  }
+  if (flags.allOf) {
+    must.push(...flags.allOf.map((flag) => ({ term: { flags: flag } })))
+  }
+
+  return must
+}
+
 function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
   const must: estypes.QueryDslQueryContainer[] = []
 
@@ -235,20 +262,7 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
       }
 
       case 'flags': {
-        const value = clause[key]
-        if (value.anyOf) {
-          must.push({ terms: { flags: value.anyOf } })
-        }
-        if (value.noneOf) {
-          must.push({
-            bool: {
-              must_not: {
-                terms: { flags: value.noneOf }
-              },
-              should: undefined
-            }
-          })
-        }
+        must.push(...buildFlagsQuery(clause[key]))
         break
       }
       default:
@@ -360,6 +374,21 @@ export function withJurisdictionFilters({
               term: { placeOfEvent: value }
             })
             break
+
+          case 'notifiedIn':
+            must.push({
+              term: {
+                'legalStatuses.NOTIFIED.createdAtLocation': value
+              }
+            })
+            break
+
+          case 'notifiedBy':
+            must.push({
+              term: { 'legalStatuses.NOTIFIED.createdBy': value }
+            })
+            break
+
           case 'declaredIn':
             must.push({
               term: {
@@ -390,12 +419,84 @@ export function withJurisdictionFilters({
             })
             break
 
+          case 'flags':
+            // Handled separately by `withFlagsFilter`.
+            break
+
           default:
             throw new Error(`Unsupported filter property: ${filterProperty}`)
         }
       }
 
       // If this scope had no active filters, ignore it
+      if (!must.length) {
+        return null
+      }
+
+      return {
+        bool: {
+          must
+        }
+      }
+    })
+    .filter((q) => q !== null)
+
+  if (!scopeQueries.length) {
+    return {
+      bool: {
+        must: [query],
+        should: undefined
+      }
+    }
+  }
+
+  return {
+    bool: {
+      must: [query],
+      filter: {
+        bool: {
+          should: scopeQueries,
+          minimum_should_match: 1
+        }
+      }
+    }
+  } as estypes.QueryDslQueryContainer
+}
+
+/**
+ * Adds flag filters to the query for any scope that declares a `flags`
+ * option (`anyOf`/`noneOf`/`allOf`), e.g. a scope restricting access to
+ * records that aren't flagged as `sealed`.
+ *
+ * Scopes with no `flags` option are unrestricted with respect to flags and
+ * don't contribute a clause here. As with `withJurisdictionFilters`, when at
+ * least one scope does restrict on flags, the record must satisfy at least
+ * one such scope's flag rules.
+ *
+ * @param query The original query to modify.
+ * @param scopesV2 The filters indicating which flags to include/exclude.
+ * @returns The modified query with flag filters.
+ */
+export function withFlagsFilter({
+  query,
+  scopesV2
+}: {
+  query: estypes.QueryDslQueryContainer
+  scopesV2: ResolvedRecordScopeV2[]
+}): estypes.QueryDslQueryContainer {
+  const scopeQueries = scopesV2
+    .map((scope) => {
+      // Only options for scopes with full filtering capabilities (e.g. `record.read`)
+      // include `flags` — other scope option shapes simply don't have it.
+      const options = scope.options as { flags?: ContainsFlags } | undefined
+      const flags = options?.flags
+
+      if (!flags) {
+        return null
+      }
+
+      const must = buildFlagsQuery(flags)
+
       if (!must.length) {
         return null
       }

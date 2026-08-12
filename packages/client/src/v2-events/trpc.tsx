@@ -30,7 +30,7 @@ import { partition } from 'lodash'
 import React from 'react'
 import superjson from 'superjson'
 import { getUUID } from '@opencrvs/commons/client'
-import { getToken } from '@client/utils/authUtils'
+import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
 import { CACHE_VERSION } from '@client/utils/constants'
 import { storage } from '@client/storage'
 
@@ -50,7 +50,8 @@ function getTrpcClient() {
         httpLink({
           url: '/api/events',
           transformer: superjson,
-          headers() {
+          async headers() {
+            await ensureFreshAccessToken()
             return {
               authorization: `Bearer ${getToken()}`
             }
@@ -68,7 +69,8 @@ function getTrpcClient() {
         url: '/api/events',
         transformer: superjson,
         methodOverride: 'POST',
-        headers() {
+        async headers() {
+          await ensureFreshAccessToken()
           return {
             authorization: `Bearer ${getToken()}`
           }
@@ -185,18 +187,25 @@ export const trpcOptionsProxy = createTRPCOptionsProxy({
 
 export function TRPCProvider({
   children,
+  waitForClientRestored = true,
+  storeIdentifier = `DEFAULT_IDENTIFIER_FOR_TESTS_ONLY__THIS_SHOULD_NEVER_SHOW_OUTSIDE_STORYBOOK_${getUUID()}`,
+  userCacheKey
+}: {
+  children: React.ReactNode
+  /**
+   * In cases where multiple Storybooks are running against the same origin, when run in parallel, they may interfere with each other
+   * When tests are fast. Generate UUID to isolate storage for each Storybook instance. App uses userId for this purpose.
+   */
+  storeIdentifier?: string
   /*
    * Should never be "false" outside test environments where we might want to get access
    * to the query client before the client is restored from the persisted storage.
    */
-  waitForClientRestored = true,
-  // In cases where multiple Storybooks are running against the same origin, when run in parallel, they may interfere with each other
-  // When tests are fast. Generate UUID to isolate storage for each Storybook instance. App uses userId for this purpose.
-  storeIdentifier = `DEFAULT_IDENTIFIER_FOR_TESTS_ONLY__THIS_SHOULD_NEVER_SHOW_OUTSIDE_STORYBOOK_${getUUID()}`
-}: {
-  children: React.ReactNode
-  storeIdentifier?: string
   waitForClientRestored?: boolean
+  /**
+   * A signature of the user's current access (e.g. office + role). We want to bust the cache when the user's access rights change.
+   */
+  userCacheKey?: string
 }) {
   const [queriesRestored, setQueriesRestored] = React.useState(false)
 
@@ -205,7 +214,7 @@ export function TRPCProvider({
       client={queryClient}
       persistOptions={{
         persister: createIDBPersister(storeIdentifier),
-        buster: `persisted-indexed-db-v${CACHE_VERSION}`,
+        buster: `persisted-indexed-db-v${CACHE_VERSION}-${userCacheKey}`,
         maxAge: Infinity,
         dehydrateOptions: {
           shouldDehydrateQuery: (query) => {

@@ -11,7 +11,7 @@
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import format from 'date-fns/format'
-import { ResponsiveModal, Stack, Table } from '@opencrvs/components'
+import { Dialog, Stack, Table } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
   ActionDocument,
@@ -22,7 +22,6 @@ import {
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { joinValues } from '@opencrvs/commons/client'
-import { EventHistoryActionDocument } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { ActionTypeSpecificContent } from './components'
 
 const messages = defineMessages({
@@ -48,20 +47,25 @@ const messages = defineMessages({
   }
 })
 
-function prepareComments(history: EventHistoryActionDocument) {
+function prepareComments(history: ActionDocument) {
   const comments: { comment: string }[] = []
 
-  if (
-    history.type === ActionType.REJECT ||
-    history.type === ActionType.ARCHIVE
-  ) {
+  if (history.type === ActionType.REJECT) {
+    comments.push({ comment: history.content.reason })
+  }
+
+  /**
+   * Archiving does not collect a reason on its own, so there is nothing to show
+   * unless the record was archived through the "mark as duplicate" flow.
+   */
+  if (history.type === ActionType.ARCHIVE && history.content?.reason) {
     comments.push({ comment: history.content.reason })
   }
 
   return comments
 }
 
-function prepareReason(history: EventHistoryActionDocument) {
+function prepareReason(history: ActionDocument) {
   const reason: { message?: string } = {}
 
   if (history.type === ActionType.REJECT_CORRECTION) {
@@ -72,7 +76,7 @@ function prepareReason(history: EventHistoryActionDocument) {
 }
 
 function prepareDuplicateOf(
-  history: EventHistoryActionDocument,
+  history: ActionDocument,
   fullHistory: ActionDocument[]
 ): string | null {
   if (history.type !== ActionType.MARK_AS_DUPLICATE) {
@@ -106,7 +110,7 @@ export function EventHistoryDialog({
   validatorContext,
   title
 }: {
-  action: EventHistoryActionDocument
+  action: ActionDocument
   userName: string
   close: () => void
   fullEvent: EventDocument
@@ -120,15 +124,14 @@ export function EventHistoryDialog({
   const duplicateOf = prepareDuplicateOf(action, history)
 
   return (
-    <ResponsiveModal
-      autoHeight
+    <Dialog
+      isOpen
       actions={[]}
-      handleClose={close}
       id="event-history-modal"
-      responsive={true}
-      show={true}
       title={title}
+      variant="large"
       width={1024}
+      onClose={close}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg19">
@@ -192,6 +195,6 @@ export function EventHistoryDialog({
         fullEvent={fullEvent}
         validatorContext={validatorContext}
       />
-    </ResponsiveModal>
+    </Dialog>
   )
 }

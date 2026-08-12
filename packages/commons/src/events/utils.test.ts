@@ -15,9 +15,13 @@ import { UUID } from '../uuid'
 import { cloneDeep, difference } from 'lodash'
 import { Action, ActionDocument, ActionStatus } from './ActionDocument'
 import { EventDocument } from './EventDocument'
+import { EventConfig } from './EventConfig'
 import { ActionType } from './ActionType'
 import {
   findLastAssignmentAction,
+  getActionAnnotationFields,
+  getActionConfig,
+  getActionFormFields,
   getCompleteActionAnnotation,
   getCompleteActionContent,
   getDeclaration,
@@ -932,5 +936,215 @@ describe('getCompleteActionContent', () => {
     const result = getCompleteActionContent(baseEvent, action)
 
     expect(result).toBeUndefined()
+  })
+})
+
+describe('getActionConfig() – NOTIFY fallback and isolation', () => {
+  const configWithoutNotify = {
+    actions: [
+      {
+        type: ActionType.DECLARE,
+        label: { id: 'declare', defaultMessage: 'Declare', description: '' }
+      }
+    ]
+  }
+
+  const configWithNotify = {
+    actions: [
+      {
+        type: ActionType.NOTIFY,
+        label: { id: 'notify', defaultMessage: 'Notify', description: '' }
+      },
+      {
+        type: ActionType.DECLARE,
+        label: { id: 'declare', defaultMessage: 'Declare', description: '' }
+      }
+    ]
+  }
+
+  const configWithoutEither = { actions: [] }
+
+  it('falls back to DECLARE config when no NOTIFY config is present', () => {
+    const result = getActionConfig({
+      eventConfiguration: configWithoutNotify as unknown as EventConfig,
+      actionType: ActionType.NOTIFY
+    })
+    expect(result?.type).toBe(ActionType.DECLARE)
+  })
+
+  it('returns NOTIFY config when present', () => {
+    const result = getActionConfig({
+      eventConfiguration: configWithNotify as unknown as EventConfig,
+      actionType: ActionType.NOTIFY
+    })
+    expect(result?.type).toBe(ActionType.NOTIFY)
+  })
+
+  it('returns DECLARE config independently when NOTIFY config is also present', () => {
+    const result = getActionConfig({
+      eventConfiguration: configWithNotify as unknown as EventConfig,
+      actionType: ActionType.DECLARE
+    })
+    expect(result?.type).toBe(ActionType.DECLARE)
+  })
+
+  it('returns undefined when neither NOTIFY nor DECLARE config exists', () => {
+    const result = getActionConfig({
+      eventConfiguration: configWithoutEither as unknown as EventConfig,
+      actionType: ActionType.NOTIFY
+    })
+    expect(result).toBeUndefined()
+  })
+})
+
+describe('getActionConfig(): correction actions resolve independently', () => {
+  const configWithAllCorrectionActions = {
+    actions: [
+      {
+        type: ActionType.REQUEST_CORRECTION,
+        label: {
+          id: 'request-correction',
+          defaultMessage: 'Request correction',
+          description: ''
+        },
+        correctionForm: { pages: [] }
+      },
+      {
+        type: ActionType.APPROVE_CORRECTION,
+        label: {
+          id: 'approve-correction',
+          defaultMessage: 'Approve correction',
+          description: ''
+        }
+      },
+      {
+        type: ActionType.REJECT_CORRECTION,
+        label: {
+          id: 'reject-correction',
+          defaultMessage: 'Reject correction',
+          description: ''
+        }
+      }
+    ]
+  }
+
+  const configWithOnlyRequestCorrection = {
+    actions: [
+      {
+        type: ActionType.REQUEST_CORRECTION,
+        label: {
+          id: 'request-correction',
+          defaultMessage: 'Request correction',
+          description: ''
+        },
+        correctionForm: { pages: [] }
+      }
+    ]
+  }
+
+  it('returns its own config for APPROVE_CORRECTION when present', () => {
+    const result = getActionConfig({
+      eventConfiguration:
+        configWithAllCorrectionActions as unknown as EventConfig,
+      actionType: ActionType.APPROVE_CORRECTION
+    })
+    expect(result?.type).toBe(ActionType.APPROVE_CORRECTION)
+  })
+
+  it('returns its own config for REJECT_CORRECTION when present', () => {
+    const result = getActionConfig({
+      eventConfiguration:
+        configWithAllCorrectionActions as unknown as EventConfig,
+      actionType: ActionType.REJECT_CORRECTION
+    })
+    expect(result?.type).toBe(ActionType.REJECT_CORRECTION)
+  })
+
+  it('no longer aliases APPROVE_CORRECTION to REQUEST_CORRECTION when APPROVE_CORRECTION is absent', () => {
+    const result = getActionConfig({
+      eventConfiguration:
+        configWithOnlyRequestCorrection as unknown as EventConfig,
+      actionType: ActionType.APPROVE_CORRECTION
+    })
+    expect(result).toBeUndefined()
+  })
+
+  it('no longer aliases REJECT_CORRECTION to REQUEST_CORRECTION when REJECT_CORRECTION is absent', () => {
+    const result = getActionConfig({
+      eventConfiguration:
+        configWithOnlyRequestCorrection as unknown as EventConfig,
+      actionType: ActionType.REJECT_CORRECTION
+    })
+    expect(result).toBeUndefined()
+  })
+})
+
+describe('getActionFormFields()', () => {
+  const commentsField = {
+    id: 'register.dialog.comments',
+    type: FieldType.TEXTAREA,
+    required: true,
+    label: generateTranslationConfig('Comments')
+  }
+
+  const configWithRegisterForm = {
+    ...tennisClubMembershipEvent,
+    actions: tennisClubMembershipEvent.actions.map((action) =>
+      action.type === ActionType.REGISTER
+        ? { ...action, form: [commentsField] }
+        : action
+    )
+  }
+
+  it('returns the form fields configured for the action', () => {
+    expect(
+      getActionFormFields(configWithRegisterForm, ActionType.REGISTER)
+    ).toEqual([commentsField])
+  })
+
+  it('returns an empty array when the action has no form configured', () => {
+    expect(
+      getActionFormFields(tennisClubMembershipEvent, ActionType.REGISTER)
+    ).toEqual([])
+  })
+
+  it('does not fall back to DECLARE config for NOTIFY dialog fields', () => {
+    const configWithDeclareForm = {
+      ...tennisClubMembershipEvent,
+      actions: tennisClubMembershipEvent.actions.map((action) =>
+        action.type === ActionType.DECLARE
+          ? { ...action, form: [commentsField] }
+          : action
+      )
+    }
+
+    expect(
+      getActionFormFields(configWithDeclareForm, ActionType.NOTIFY)
+    ).toEqual([])
+  })
+})
+
+describe('getActionAnnotationFields() with dialog form', () => {
+  it('returns review fields and dialog form fields for DECLARE', () => {
+    const declareAction = tennisClubMembershipEvent.actions.find(
+      (action) => action.type === ActionType.DECLARE
+    )
+
+    if (!declareAction || declareAction.type !== ActionType.DECLARE) {
+      throw new Error('DECLARE action not found in fixture')
+    }
+
+    const dialogField = {
+      id: 'declare.dialog.comments',
+      type: FieldType.TEXTAREA,
+      label: generateTranslationConfig('Comments')
+    }
+
+    const fields = getActionAnnotationFields({
+      ...declareAction,
+      form: [dialogField]
+    })
+
+    expect(fields).toEqual([...declareAction.review.fields, dialogField])
   })
 })

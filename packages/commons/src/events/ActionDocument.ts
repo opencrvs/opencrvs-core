@@ -15,6 +15,9 @@ import { ActionType, ConfirmableActions } from './ActionType'
 import { UUID } from '../uuid'
 import { TokenUserType } from '../authentication'
 import { DocumentPath } from '../documents'
+import { ActionStatus } from './ActionStatus'
+
+export { ActionStatus } from './ActionStatus'
 
 /**
  * ActionUpdate is a record of a specific action that updated data fields.
@@ -35,14 +38,6 @@ export const EventState = z
     'Aggregate representation of event data after all actions have been applied, with all updates consolidated and null values removed.'
   )
 export type EventState = z.infer<typeof EventState>
-
-export const ActionStatus = {
-  Requested: 'Requested',
-  Accepted: 'Accepted',
-  Rejected: 'Rejected'
-} as const
-
-export type ActionStatus = keyof typeof ActionStatus
 
 export const ActionBase = z.object({
   id: UUID.describe('Unique identifier of the action.'),
@@ -179,7 +174,17 @@ const MarkAsDuplicateAction = ActionBase.extend(
 const ArchiveAction = ActionBase.extend(
   z.object({
     type: z.literal(ActionType.ARCHIVE),
-    content: ReasonContent
+    /**
+     * Archiving does not collect a reason on its own. Only the
+     * "mark as duplicate" flow archives with a reason attached.
+     */
+    content: ReasonContent.optional()
+  }).shape
+)
+
+const UnarchiveAction = ActionBase.extend(
+  z.object({
+    type: z.literal(ActionType.UNARCHIVE)
   }).shape
 )
 
@@ -198,9 +203,12 @@ const NotifiedAction = ActionBase.extend(
 const EditAction = ActionBase.extend(
   z.object({
     type: z.literal(ActionType.EDIT),
-    content: z.object({
-      comment: z.string().describe('Comment for the edit action.').optional()
-    })
+    /** @deprecated New Edit-actions should no longer contain content. This is kept for old 2.0 edits. */
+    content: z
+      .object({
+        comment: z.string().describe('Comment for the edit action.').optional()
+      })
+      .optional()
   }).shape
 )
 export type EditAction = z.infer<typeof EditAction>
@@ -270,6 +278,7 @@ export const ActionDocument = z
     MarkNotDuplicateAction.meta({ id: 'MarkNotDuplicateAction' }),
     MarkAsDuplicateAction.meta({ id: 'MarkAsDuplicateAction' }),
     ArchiveAction.meta({ id: 'ArchiveAction' }),
+    UnarchiveAction.meta({ id: 'UnarchiveAction' }),
     NotifiedAction.meta({ id: 'NotifiedAction' }),
     RegisterAction.meta({ id: 'RegisterAction' }),
     DeclareAction.meta({ id: 'DeclareAction' }),

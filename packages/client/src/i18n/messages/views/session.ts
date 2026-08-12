@@ -12,15 +12,9 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface ISessionMessages
   extends Record<string | number | symbol, MessageDescriptor> {
-  sessionExpireTxt: MessageDescriptor
 }
 
 const messagesToDefine: ISessionMessages = {
-  sessionExpireTxt: {
-    id: 'misc.session.expired',
-    defaultMessage: 'Your session has expired. Please login again.',
-    description: 'SessionExpire modal confirmation text'
-  }
 }
 
 export const messages: ISessionMessages = defineMessages(messagesToDefine)

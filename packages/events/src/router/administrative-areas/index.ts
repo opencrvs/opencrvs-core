@@ -10,15 +10,27 @@
  */
 
 import * as z from 'zod/v4'
-import { AdministrativeArea, UUID } from '@opencrvs/commons'
+import {
+  AdministrativeArea,
+  CreateAdministrativeAreaPayload,
+  SetAdministrativeAreaPayload,
+  UpdateAdministrativeAreaPayload,
+  UUID,
+  WithdrawAdministrativeAreaVersionPayload
+} from '@opencrvs/commons'
 import {
   internalProcedure,
   router,
   userAndSystemProcedure
 } from '@events/router/trpc'
+import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
+import { diffLocationVersions } from '@events/service/locations/locations'
 import {
+  createAdministrativeArea,
   getAdministrativeAreas,
-  setAdministrativeAreas
+  setAdministrativeAreas,
+  updateAdministrativeArea,
+  withdrawAdministrativeAreaVersion
 } from '../../service/administrative-areas'
 import { allowedWithAnyOfScopes } from '../middleware'
 
@@ -26,13 +38,24 @@ export function setAdministrativeAreasRoute(
   procedure: typeof internalProcedure | typeof userAndSystemProcedure
 ) {
   return procedure
-    .input(z.array(AdministrativeArea).min(1))
+    .input(z.array(SetAdministrativeAreaPayload).min(1))
     .output(z.void())
     .mutation(async ({ input }) => setAdministrativeAreas(input))
 }
 
 export const administrativeAreaRouter = router({
   list: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'List administrative areas',
+        description:
+          'Retrieve a list of administrative areas based on provided filters.',
+        method: 'GET',
+        path: '/administrative-areas',
+        tags: ['Administrative areas'],
+        protect: true
+      }
+    })
     .input(
       z
         .object({
@@ -48,9 +71,124 @@ export const administrativeAreaRouter = router({
         ids: input?.ids
       })
     ),
-  set: setAdministrativeAreasRoute(
-    userAndSystemProcedure.use(
-      allowedWithAnyOfScopes(['user.data-seeding', 'config.update-all'])
-    )
-  )
+  create: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'Create an administrative area',
+        description:
+          'Create a new administrative area with a single initial version.',
+        method: 'POST',
+        path: '/administrative-areas',
+        tags: ['Administrative areas'],
+        protect: true
+      }
+    })
+    .use(allowedWithAnyOfScopes(['location.edit']))
+    .input(CreateAdministrativeAreaPayload)
+    .output(AdministrativeArea)
+    .mutation(async ({ input, ctx }) => {
+      const { administrativeArea, created } =
+        await createAdministrativeArea(input)
+
+      if (created) {
+        const [initialVersion] = administrativeArea.versions
+
+        await writeAuditLog({
+          clientId: ctx.user.id,
+          clientType: ctx.user.type,
+          operation: 'administrativeAreas.create',
+          requestData: {
+            id: administrativeArea.id,
+            versionId: initialVersion.versionId,
+            name: initialVersion.name,
+            externalId: initialVersion.externalId ?? null,
+            parentId: administrativeArea.parentId,
+            effectiveFrom: initialVersion.effectiveFrom,
+            status: initialVersion.status
+          }
+        })
+      }
+
+      return administrativeArea
+    }),
+  update: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'Update an administrative area',
+        description:
+          'Append a new version to an administrative area (rename, recode or inactivate). This endpoint only ever appends: it never modifies or removes an existing version. To drop a version that has not taken effect yet, use the withdraw endpoint instead.',
+        method: 'PUT',
+        path: '/administrative-areas/{id}',
+        tags: ['Administrative areas'],
+        protect: true
+      }
+    })
+    .use(allowedWithAnyOfScopes(['location.edit']))
+    .input(UpdateAdministrativeAreaPayload)
+    .output(AdministrativeArea)
+    .mutation(async ({ input, ctx }) => {
+      const { administrativeArea, outcome } =
+        await updateAdministrativeArea(input)
+
+      // An idempotent replay appends nothing and must not be audited twice.
+      if (outcome.appended) {
+        const { previousVersion, newVersion } = outcome
+
+        await writeAuditLog({
+          clientId: ctx.user.id,
+          clientType: ctx.user.type,
+          operation: 'administrativeAreas.update',
+          requestData: {
+            id: administrativeArea.id,
+            versionId: newVersion.versionId,
+            name: newVersion.name,
+            externalId: newVersion.externalId ?? null,
+            status: newVersion.status,
+            effectiveFrom: newVersion.effectiveFrom,
+            lastVersionId: input.lastVersionId
+          },
+          responseSummary: {
+            previousVersionId: previousVersion.versionId,
+            versionId: newVersion.versionId,
+            changed: diffLocationVersions(previousVersion, newVersion)
+          }
+        })
+      }
+
+      return administrativeArea
+    }),
+  withdrawVersion: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'Withdraw a pending administrative area version',
+        description:
+          'Removes a not-yet-effective (future-dated) version from an administrative area. A version whose effectiveFrom has already passed cannot be withdrawn.',
+        method: 'DELETE',
+        path: '/administrative-areas/{id}/versions/{versionId}',
+        tags: ['Administrative areas'],
+        protect: true
+      }
+    })
+    .use(allowedWithAnyOfScopes(['location.edit']))
+    .input(WithdrawAdministrativeAreaVersionPayload)
+    .output(AdministrativeArea)
+    .mutation(async ({ input, ctx }) => {
+      const { administrativeArea, withdrawnVersion } =
+        await withdrawAdministrativeAreaVersion(input)
+
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'administrativeAreas.withdrawVersion',
+        requestData: { id: input.id, versionId: input.versionId },
+        responseSummary: {
+          effectiveFrom: withdrawnVersion.effectiveFrom,
+          name: withdrawnVersion.name,
+          externalId: withdrawnVersion.externalId ?? null,
+          status: withdrawnVersion.status
+        }
+      })
+
+      return administrativeArea
+    })
 })

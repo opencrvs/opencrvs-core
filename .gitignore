@@ -11,17 +11,14 @@ coverage
 build
 
 # misc
-.claude
-CLAUDE.md
-.claude-working/
-.claude
-CLAUDE.md
+CLAUDE.local.md
 .DS_Store
 .env*
 *.log
 .secrets/*
 .wireit/*
 .wireit
+.nx
 
 # gitignore graphql schema due to it often being accidentally edited
 packages/gateway/src/graphql/schema.d.ts
@@ -43,3 +40,5 @@ deploy_key
 
 # local markdown files
 *.local.md
+# swc plugin cache
+.swc/

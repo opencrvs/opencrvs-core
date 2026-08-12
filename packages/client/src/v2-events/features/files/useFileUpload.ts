@@ -17,9 +17,10 @@ import {
   joinUrlPaths,
   joinValues
 } from '@opencrvs/commons/client'
-import { getToken } from '@client/utils/authUtils'
+import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
 import { fetchFileFromUrl } from '@client/utils/imageUtils'
 import { cacheFile, removeCached } from '@client/v2-events/cache'
+import { resolveTemporaryIdInPath } from '@client/v2-events/features/events/useEvents/temporary-id'
 import { queryClient } from '@client/v2-events/trpc'
 
 interface UploadFileParams {
@@ -36,10 +37,16 @@ async function uploadFile({
   path,
   meta
 }: UploadFileParams): Promise<{ url: string }> {
+  await ensureFreshAccessToken()
   const formData = new FormData()
   formData.append('file', file)
   formData.append('transactionId', meta.transactionId)
-  formData.append('path', path)
+  /*
+   * The path is derived from the event id, which is still temporary when the file is
+   * attached before the event has synced (e.g. offline). Actions referring to the file
+   * are sent with the canonical id, so the file must be stored under it, too.
+   */
+  formData.append('path', resolveTemporaryIdInPath(path))
 
   const response = await fetch('/api/upload', {
     method: 'POST',
@@ -64,7 +71,15 @@ async function uploadFile({
  *
  */
 async function deleteFile({ filename }: { filename: string }): Promise<void> {
-  const response = await fetch('/api/files/' + filename, {
+  await ensureFreshAccessToken()
+  /*
+   * The path is derived from the event id, which is still temporary when the file is
+   * attached before the event has synced (e.g. offline). Actions referring to the file
+   * are sent with the canonical id, so the file must be stored under it, too.
+   */
+  const filePath = resolveTemporaryIdInPath(filename)
+
+  const response = await fetch('/api/files/' + filePath, {
     method: 'DELETE',
     headers: {
       Authorization: `Bearer ${getToken()}`
@@ -96,6 +111,7 @@ const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
 async function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
+  await ensureFreshAccessToken()
   const url = joinUrlPaths('/api/presigned-url', filePath)
 
   const response = await fetch(url, {

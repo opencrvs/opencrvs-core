@@ -1,18 +1,18 @@
 {
   "name": "@opencrvs/auth",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "OpenCRVS authentication service",
   "license": "MPL-2.0",
   "private": true,
   "scripts": {
-    "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
-    "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
-    "test": "yarn test:compilation && jest --coverage --silent --noStackTrace",
+    "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon --exec tsx src/index.ts",
+    "start:prod": "TS_NODE_BASEURL=./build/dist node -r tsconfig-paths/register build/dist/src/index.js",
+    "test": "jest --coverage --silent --noStackTrace",
     "test:watch": "jest --watch",
-    "open:cov": "yarn test && opener coverage/index.html",
+    "open:cov": "pnpm test && opener coverage/index.html",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
-    "generate-test-token": "NODE_PATH=. ts-node resources/generate-test-token",
-    "request-token": "NODE_PATH=. ts-node resources/request-token",
+    "generate-test-token": "tsx resources/generate-test-token.ts",
+    "request-token": "tsx resources/request-token.ts",
     "test:compilation": "tsc --noEmit",
     "build": "tsc",
     "build:clean": "rm -rf build"
@@ -20,9 +20,9 @@
   "dependencies": {
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^21.0.0",
-    "@opencrvs/commons": "^2.0.0",
-    "@opencrvs/events": "^2.0.0",
-    "@trpc/client": "^11.0.0-rc.532",
+    "@opencrvs/commons": "workspace:*",
+    "@opencrvs/events": "workspace:*",
+    "@trpc/client": "11.4.3",
     "app-module-path": "^2.2.0",
     "dotenv": "^6.1.0",
     "envalid": "^8.0.0",
@@ -34,21 +34,22 @@
     "jsonwebtoken": "^9.0.0",
     "node-fetch": "^2.6.7",
     "pino": "^7.0.0",
-    "redis": "^4.7.0",
+    "redis": "^6.1.0",
     "superjson": "1.9.0-0",
     "tsconfig-paths": "^3.13.0"
   },
   "devDependencies": {
+    "@swc-contrib/mut-cjs-exports": "^14.15.0",
+    "@swc/core": "^1.15.43",
+    "@swc/jest": "^0.2.39",
     "@types/command-line-args": "^5.0.0",
     "@types/command-line-usage": "^5.0.1",
     "@types/dotenv": "^6.1.0",
-    "@types/fhir": "^0.0.30",
-    "@types/hapi__hapi": "^20.0.0",
     "@types/jest": "^26.0.14",
     "@types/jsonwebtoken": "^9.0.0",
     "@types/node-fetch": "^2.5.12",
-    "@typescript-eslint/eslint-plugin": "8.28.0",
-    "@typescript-eslint/parser": "^8.28.0",
+    "@typescript-eslint/eslint-plugin": "8.63.0",
+    "@typescript-eslint/parser": "8.63.0",
     "command-line-args": "^6.0.0",
     "command-line-usage": "^5.0.5",
     "cross-env": "^7.0.0",
@@ -60,9 +61,7 @@
     "jest-fetch-mock": "^2.1.2",
     "nodemon": "^3.0.0",
     "prettier": "3.5.3",
-    "ts-jest": "29.2.5",
-    "ts-node": "^6.1.1",
-    "typescript": "5.6.3"
+    "tsx": "^4.15.7"
   },
   "lint-staged": {
     "src/**/*.ts": [
@@ -72,7 +71,21 @@
   },
   "jest": {
     "transform": {
-      "^.+\\.tsx?$": "ts-jest"
+      "^.+\\.tsx?$": [
+        "@swc/jest",
+        {
+          "jsc": {
+            "experimental": {
+              "plugins": [
+                [
+                  "@swc-contrib/mut-cjs-exports",
+                  {}
+                ]
+              ]
+            }
+          }
+        }
+      ]
     },
     "coverageReporters": [
       "json",

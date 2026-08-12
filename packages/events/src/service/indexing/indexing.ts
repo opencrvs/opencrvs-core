@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
+
 import { estypes } from '@elastic/elasticsearch'
 import * as z from 'zod/v4'
 import {
@@ -57,6 +59,7 @@ import {
 } from './utils'
 import {
   buildElasticQueryFromSearchPayload,
+  withFlagsFilter,
   withJurisdictionFilters
 } from './query'
 
@@ -301,6 +304,20 @@ export async function createIndex(
           legalStatuses: {
             type: 'object',
             properties: {
+              [EventStatus.enum.NOTIFIED]: {
+                type: 'object',
+                properties: {
+                  createdAt: { type: 'date' },
+                  createdBy: { type: 'keyword' },
+                  createdByUserType: { type: 'keyword' },
+                  createdAtLocation: { type: 'keyword' },
+                  createdByRole: { type: 'keyword' },
+                  acceptedAt: { type: 'date' }
+                } satisfies Record<
+                  keyof ActionCreationMetadata,
+                  estypes.MappingProperty
+                >
+              },
               [EventStatus.enum.DECLARED]: {
                 type: 'object',
                 properties: {
@@ -478,8 +495,11 @@ export async function findRecordsByQuery({
     resolveRecordActionScopeToIds(scope, user)
   )
 
-  const esQuery = withJurisdictionFilters({
-    query: await buildElasticQueryFromSearchPayload(query, eventConfigs),
+  const esQuery = withFlagsFilter({
+    query: withJurisdictionFilters({
+      query: await buildElasticQueryFromSearchPayload(query, eventConfigs),
+      scopesV2: resolvedScopes
+    }),
     scopesV2: resolvedScopes
   })
 
@@ -558,8 +578,11 @@ export async function getEventCount({
   )
 
   const filteredQueries = (await Promise.all(esQueries)).map((query) =>
-    withJurisdictionFilters({
-      query,
+    withFlagsFilter({
+      query: withJurisdictionFilters({
+        query,
+        scopesV2: resolvedScopes
+      }),
       scopesV2: resolvedScopes
     })
   )

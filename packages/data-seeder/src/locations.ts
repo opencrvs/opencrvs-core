@@ -13,25 +13,38 @@ import { env } from './environment'
 import { z } from 'zod'
 import { raise } from './utils'
 import { fromZodError } from 'zod-validation-error'
-import { getUUID } from '@opencrvs/commons'
+import { getUUID, LocationVersion } from '@opencrvs/commons'
 import { createInitialisationClient } from './index'
 
-const RawLocationSchema =
-  z.object({
-    id: z.string(),
-    name: z.string(),
-    partOf: z.string(),
-    locationType: z.string()
-  })
+const RawLocationVersionSchema = z.object({
+  effectiveFrom: z.string().optional(),
+  name: z.string(),
+  externalId: z.string().optional(),
+  status: z.enum(['active', 'inactive'])
+})
 
-const RawAdministrativeAreaSchema = RawLocationSchema.omit({ locationType: true })
+const RawLocationSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  partOf: z.string(),
+  locationType: z.string(),
+  versions: z.array(RawLocationVersionSchema).optional()
+})
+
+const RawAdministrativeAreaSchema = RawLocationSchema.omit({
+  locationType: true
+})
 
 const CountryConfigLocationResponse = z.object({
   locations: z.array(RawLocationSchema),
   administrativeAreas: z.array(RawAdministrativeAreaSchema)
 })
 
-function validateAdminStructure(locations: z.output<typeof CountryConfigLocationResponse>['administrativeAreas']) {
+function validateAdminStructure(
+  locations: z.output<
+    typeof CountryConfigLocationResponse
+  >['administrativeAreas']
+) {
   const locationsMap = new Map(
     locations.map((loc) => {
       return [loc.id, loc]
@@ -59,6 +72,29 @@ function validateAdminStructure(locations: z.output<typeof CountryConfigLocation
   return locationsMap
 }
 
+/**
+ * Builds a seedable `versions` history from the country config's raw version
+ * rows: assigns each element a fresh `versionId` and defaults an empty
+ * `effectiveFrom` to the beginning-of-time sentinel, since the `set`
+ * mutation's schema requires every element to carry both, unlike the raw
+ * wire format.
+ */
+function buildSeededVersions(
+  rawVersions: z.output<typeof RawLocationVersionSchema>[] | undefined
+): LocationVersion[] | undefined {
+  if (!rawVersions) {
+    return undefined
+  }
+
+  return rawVersions.map((version) => ({
+    versionId: getUUID(),
+    effectiveFrom: version.effectiveFrom || '0001-01-01',
+    name: version.name,
+    externalId: version.externalId ?? null,
+    status: version.status
+  }))
+}
+
 async function getLocations() {
   const url = new URL('config/locations', env.COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url)
@@ -66,7 +102,9 @@ async function getLocations() {
     raise(`Expected to get the locations from ${url}`)
   }
 
-  const parsedResponse = CountryConfigLocationResponse.safeParse(await res.json())
+  const parsedResponse = CountryConfigLocationResponse.safeParse(
+    await res.json()
+  )
   if (!parsedResponse.success) {
     raise(
       fromZodError(parsedResponse.error, {
@@ -75,7 +113,7 @@ async function getLocations() {
     )
   }
 
-  const {administrativeAreas, locations} = parsedResponse.data
+  const { administrativeAreas, locations } = parsedResponse.data
 
   const administrativeAreaMap = validateAdminStructure(administrativeAreas)
 
@@ -96,9 +134,7 @@ async function getLocations() {
     administrativeAreas.map(({ id }) => [id, getUUID()])
   )
 
-  const locationIdMap = new Map(
-    locations.map(({ id }) => [id, getUUID()])
-  )
+  const locationIdMap = new Map(locations.map(({ id }) => [id, getUUID()]))
 
   return {
     administrativeAreas: administrativeAreas.map((a) => ({
@@ -107,7 +143,7 @@ async function getLocations() {
       parentId:
         administrativeHierarchyIdMap.get(a.partOf.split('/')[1]) || null,
       externalId: a.id,
-      validUntil: null
+      versions: buildSeededVersions(a.versions)
     })),
     locations: locations.map((loc) => ({
       id: locationIdMap.get(loc.id)!,
@@ -116,7 +152,7 @@ async function getLocations() {
         administrativeHierarchyIdMap.get(loc.partOf.split('/')[1]) || null,
       locationType: loc.locationType,
       externalId: loc.id,
-      validUntil: null
+      versions: buildSeededVersions(loc.versions)
     }))
   }
 }

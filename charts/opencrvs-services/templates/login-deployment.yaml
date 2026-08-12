@@ -49,6 +49,7 @@ spec:
       containers:
         - name: login
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.login) }}
+          imagePullPolicy: {{ .Values.login.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           env:
           {{- if and
             (not (hasKey (.Values.login.env | default dict) "CONTENT_SECURITY_POLICY_WILDCARD"))
@@ -66,6 +67,7 @@ spec:
             - name: GATEWAY_URL_INTERNAL
               value: http://gateway.{{ .Release.Namespace }}.svc.cluster.local:7070
           {{- include "render-env-vars" (dict "service_name" "login" "Values" .Values) }}
+          {{- include "render-nginx-otel-env-vars" (dict "service_name" "opencrvs_login" "Values" .Values "Release" .Release) }}
           {{- include "resources-helper" (dict "service_name" "login" "Values" .Values) | indent 10 }}
           {{- include "probes-helper" (dict "service_name" "login" "Values" .Values) | indent 10 }}
           ports:

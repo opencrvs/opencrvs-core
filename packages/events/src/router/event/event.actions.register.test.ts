@@ -265,7 +265,6 @@ describe('Request and confirmation flow', () => {
         () => {
           registrationNumber = generateRegistrationNumber(prng)
           const responseBody = status === 200 ? { registrationNumber } : {}
-          // @ts-expect-error - "For some reason the msw types here complain about the status, even though this is correct"
           return HttpResponse.json(responseBody, { status })
         }
       )
@@ -370,7 +369,6 @@ describe('Request and confirmation flow', () => {
           () => {
             return HttpResponse.json(
               { registrationNumber: 1234567890 }, // Registration number is not a string as it should be
-              // @ts-expect-error - "For some reason the msw types here complain about the status, even though this is correct"
               { status: 200 }
             )
           }
@@ -593,6 +591,7 @@ describe('Request and confirmation flow', () => {
       test('should successfully accept a previously requested action', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
           encodeScope({ type: 'record.create' }),
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })
@@ -745,6 +744,7 @@ describe('Request and confirmation flow', () => {
       test('allows accepting a registration request with the same exchanged event and action id', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
           encodeScope({ type: 'record.create' }),
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })
@@ -816,6 +816,7 @@ describe('Request and confirmation flow', () => {
       test('does not allow accepting a registration request with different exchanged event and action id', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
           encodeScope({ type: 'record.create' }),
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })
@@ -906,6 +907,7 @@ describe('Request and confirmation flow', () => {
       test('should not be able to reject the action if action is already accepted', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
           encodeScope({ type: 'record.create' }),
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })
@@ -965,6 +967,7 @@ describe('Request and confirmation flow', () => {
       test('should be able to call reject multiple times, without creating duplicate reject actions', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
           encodeScope({ type: 'record.create' }),
           encodeScope({ type: 'record.declare' }),
           encodeScope({ type: 'record.register' })

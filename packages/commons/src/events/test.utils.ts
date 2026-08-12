@@ -35,6 +35,7 @@ import {
   RejectCorrectionActionInput,
   RejectDeclarationActionInput,
   RequestCorrectionActionInput,
+  UnarchiveActionInput,
   UnassignActionInput
 } from './ActionInput'
 import { ActionType, DeclarationUpdateActions } from './ActionType'
@@ -55,7 +56,11 @@ import {
 import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
-import { Location, AdministrativeArea } from './locations'
+import {
+  LocationVersion,
+  SetLocationPayload,
+  SetAdministrativeAreaPayload
+} from './locations'
 import { EventStatus } from './EventMetadata'
 import { defineWorkqueues, WorkqueueConfig } from './WorkqueueConfig'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
@@ -164,6 +169,26 @@ export function generateRandomSignature(rng: () => number): DocumentPath {
 }
 
 /**
+ * Builds one element of a location / administrative area `versions` history.
+ * Every field is defaulted so a call names only what its assertion is about —
+ * an `effectiveFrom`, a `name`, or an explicit `versionId` when the test needs
+ * to control version identity.
+ */
+export function locationVersion(
+  overrides: Partial<LocationVersion> = {},
+  rng?: () => number
+): LocationVersion {
+  return {
+    versionId: generateUuid(rng),
+    effectiveFrom: '0001-01-01',
+    name: 'Location name',
+    externalId: null,
+    status: 'active',
+    ...overrides
+  }
+}
+
+/**
  * Quick-and-dirty mock data generator for event actions.
  */
 function mapFieldTypeToMockValue(
@@ -174,8 +199,8 @@ function mapFieldTypeToMockValue(
    * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
    */
   administrativeHierarchy?: {
-    administrativeAreas: AdministrativeArea[]
-    locations: Location[]
+    administrativeAreas: SetAdministrativeAreaPayload[]
+    locations: SetLocationPayload[]
   }
 ): FieldValue {
   const leafLevelAdministrativeAreas =
@@ -312,8 +337,8 @@ export function fieldConfigsToActionPayload(
    * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
    */
   administrativeHierarchy?: {
-    administrativeAreas: AdministrativeArea[]
-    locations: Location[]
+    administrativeAreas: SetAdministrativeAreaPayload[]
+    locations: SetLocationPayload[]
   }
 ): ActionUpdate {
   return fields.reduce(
@@ -339,8 +364,8 @@ export function generateActionDeclarationInput(
    * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
    */
   administrativeHierarchy?: {
-    administrativeAreas: AdministrativeArea[]
-    locations: Location[]
+    administrativeAreas: SetAdministrativeAreaPayload[]
+    locations: SetLocationPayload[]
   }
 ): ActionUpdate {
   const parsed = DeclarationUpdateActions.safeParse(action)
@@ -570,7 +595,6 @@ export function eventPayloadGenerator(
         > = {}
       ) => ({
         type: ActionType.EDIT,
-        content: { comment: 'Test comment' },
         transactionId: input.transactionId ?? getUUID(),
         declaration:
           input.declaration ??
@@ -617,9 +641,22 @@ export function eventPayloadGenerator(
         declaration: {},
         annotation: {},
         eventId,
-        content: {
-          reason: `${ActionType.ARCHIVE}`
-        },
+        ...input
+      }),
+      unarchive: (
+        eventId: string,
+        input: Partial<
+          Pick<
+            UnarchiveActionInput,
+            'transactionId' | 'declaration' | 'keepAssignment'
+          >
+        > = {}
+      ) => ({
+        type: ActionType.UNARCHIVE,
+        transactionId: input.transactionId ?? getUUID(),
+        declaration: {},
+        annotation: {},
+        eventId,
         ...input
       }),
       reject: (
@@ -882,6 +919,7 @@ export function generateActionDocument<T extends ActionType>({
     case ActionType.NOTIFY:
     case ActionType.REGISTER:
     case ActionType.REQUEST_CORRECTION:
+    case ActionType.UNARCHIVE:
       return { ...actionBase, type: action }
     case ActionType.EDIT:
       return {

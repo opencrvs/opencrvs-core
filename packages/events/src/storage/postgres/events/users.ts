@@ -23,6 +23,24 @@ export interface SecurityQuestion {
   answerHash: string
 }
 
+/**
+ * Returns only id, role, and status for the given user id.
+ *
+ * System clients live in a separate `systemClients` table, so passing a system
+ * client id here will always return undefined — they are excluded by
+ * construction, not by any runtime type-check.
+ */
+export async function getUserRoleAndStatus(
+  id: UUID
+): Promise<{ id: string; role: string; status: string } | undefined> {
+  const db = getClient()
+  return db
+    .selectFrom('users')
+    .select(['id', 'role', 'status'])
+    .where('id', '=', id)
+    .executeTakeFirst()
+}
+
 export async function getUserByMobileOrEmail(
   params: { mobile: string } | { email: string }
 ) {
@@ -281,11 +299,17 @@ function buildSearchUsersBaseQuery(
 }
 
 export async function searchUsersWithInput(input: SearchUsersPayload) {
-  return buildSearchUsersBaseQuery(input)
-    .orderBy(sortColumn[input.sortBy], input.sortOrder)
-    .limit(input.count)
-    .offset(input.skip)
-    .execute()
+  let query = buildSearchUsersBaseQuery(input).orderBy(
+    sortColumn[input.sortBy],
+    input.sortOrder
+  )
+  if (input.count !== undefined) {
+    query = query.limit(input.count)
+  }
+  if (input.skip) {
+    query = query.offset(input.skip)
+  }
+  return query.execute()
 }
 
 export async function searchAllUsersWithInput(

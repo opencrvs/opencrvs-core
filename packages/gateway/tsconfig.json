@@ -1,10 +1,9 @@
 {
   "compilerOptions": {
     "skipLibCheck": true,
-    "baseUrl": "./src",
     "paths": {
-      "@gateway/*": ["./*"],
-      "@events/*": ["../../events/src/*"]
+      "@gateway/*": ["./src/*"],
+      "@events/*": ["../events/src/*"]
     },
     "target": "es6",
     "module": "node16",
@@ -20,9 +19,9 @@
     "strictNullChecks": true,
     "allowSyntheticDefaultImports": true,
     "noUnusedLocals": true,
-    "types": ["fhir", "jest"],
+    "types": ["jest"],
     "esModuleInterop": true
   },
-  "include": ["src/**/*.ts", "typings"],
+  "include": ["src/**/*.ts", "typings", "test/setupJest.ts"],
   "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]
 }

@@ -176,11 +176,11 @@ const BaseField = z
         'Conditions determining when the field is shown or enabled. By default, the field is always shown and enabled.'
       ),
     secured: z
-      .boolean()
+      .union([z.boolean(), Conditional])
       .default(false)
       .optional()
       .describe(
-        'Indicates whether the field is secured. Secured fields are not indexed for search and are only visible when explicitly assigned.'
+        "Indicates whether the field is secured, either always (boolean) or conditionally, evaluated against the event (a JSONSchema conditional, e.g. flag('sealed')). Secured fields are not indexed for search and are only visible when explicitly assigned."
       ),
     placeholder: TranslationConfig.optional(),
     validation: z
@@ -794,7 +794,25 @@ const AdministrativeAreaField = BaseField.extend({
     .object({
       partOf: FieldReference.optional().describe('Parent location'),
       type: AdministrativeAreas,
-      allowedLocations: AllowedLocations
+      allowedLocations: AllowedLocations,
+      listHistoricalNames: z
+        .boolean()
+        .optional()
+        .describe(
+          'List every historical name a location has had as a separate, selectable option.'
+        ),
+      activeOnly: z
+        .boolean()
+        .optional()
+        .describe(
+          'Offer only locations that are active at the resolved anchor date (today, or the date of event when anchorToDateOfEvent is set); inactive or not-yet-effective versions are excluded.'
+        ),
+      anchorToDateOfEvent: z
+        .boolean()
+        .optional()
+        .describe(
+          "Resolve selectable/displayed versions against the event's date of event (falling back to the record's creation date when empty) instead of today. Does not by itself exclude inactive versions; combine with activeOnly for that."
+        )
     })
     .describe('Administrative area options')
 }).meta({
@@ -815,7 +833,25 @@ const LocationInput = BaseField.extend({
         .array(z.string())
         .optional()
         .describe('Types of the locations that are available for selection.'),
-      allowedLocations: AllowedLocations
+      allowedLocations: AllowedLocations,
+      listHistoricalNames: z
+        .boolean()
+        .optional()
+        .describe(
+          'List every historical name a location has had as a separate, selectable option.'
+        ),
+      activeOnly: z
+        .boolean()
+        .optional()
+        .describe(
+          'Offer only locations that are active at the resolved anchor date (today, or the date of event when anchorToDateOfEvent is set); inactive or not-yet-effective versions are excluded.'
+        ),
+      anchorToDateOfEvent: z
+        .boolean()
+        .optional()
+        .describe(
+          "Resolve selectable/displayed versions against the event's date of event (falling back to the record's creation date when empty) instead of today. Does not by itself exclude inactive versions; combine with activeOnly for that."
+        )
     })
     .optional()
 }).meta({
@@ -860,7 +896,14 @@ export type FileUploadWithOptions = z.infer<typeof FileUploadWithOptions>
 const Facility = BaseField.extend({
   type: z.literal(FieldType.FACILITY),
   defaultValue: NonEmptyTextValue.or(ComputedDefaultValue).optional(),
-  configuration: z.object({ allowedLocations: AllowedLocations }).optional()
+  configuration: z
+    .object({
+      allowedLocations: AllowedLocations,
+      listHistoricalNames: z.boolean().optional(),
+      activeOnly: z.boolean().optional(),
+      anchorToDateOfEvent: z.boolean().optional()
+    })
+    .optional()
 }).describe('Input field for a facility')
 
 export type Facility = z.infer<typeof Facility>
@@ -871,7 +914,14 @@ export type Facility = z.infer<typeof Facility>
 const Office = BaseField.extend({
   type: z.literal(FieldType.OFFICE),
   defaultValue: NonEmptyTextValue.or(ComputedDefaultValue).optional(),
-  configuration: z.object({ allowedLocations: AllowedLocations }).optional()
+  configuration: z
+    .object({
+      allowedLocations: AllowedLocations,
+      listHistoricalNames: z.boolean().optional(),
+      activeOnly: z.boolean().optional(),
+      anchorToDateOfEvent: z.boolean().optional()
+    })
+    .optional()
 }).describe('Input field for an office')
 
 export type Office = z.infer<typeof Office>
@@ -920,7 +970,25 @@ const Address = BaseField.extend({
           })
         )
         .optional(),
-      allowedLocations: AllowedLocations
+      allowedLocations: AllowedLocations,
+      listHistoricalNames: z
+        .boolean()
+        .optional()
+        .describe(
+          'List every historical name a location has had as a separate, selectable option. Propagated to the embedded admin-area selectors.'
+        ),
+      activeOnly: z
+        .boolean()
+        .optional()
+        .describe(
+          'Offer only admin areas that are active at the resolved anchor date (today, or the date of event when anchorToDateOfEvent is set); inactive or not-yet-effective versions are excluded. Propagated to the embedded admin-area selectors.'
+        ),
+      anchorToDateOfEvent: z
+        .boolean()
+        .optional()
+        .describe(
+          "Resolve selectable/displayed versions against the event's date of event (falling back to the record's creation date when empty) instead of today. Does not by itself exclude inactive versions; combine with activeOnly for that. Propagated to the embedded admin-area selectors."
+        )
     })
     .optional(),
   defaultValue: DefaultAddressFieldValue.or(ComputedDefaultValue).optional()

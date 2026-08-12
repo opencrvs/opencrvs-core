@@ -15,7 +15,7 @@ import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   ActionType,
   AddressType,
-  AdministrativeArea,
+  SetAdministrativeAreaPayload,
   createPrng,
   EventConfig,
   EventDocument,
@@ -26,7 +26,7 @@ import {
   FieldType,
   generateActionDeclarationInput,
   generateUuid,
-  Location,
+  SetLocationPayload,
   QueryType,
   TENNIS_CLUB_MEMBERSHIP,
   TestUserRole,
@@ -70,6 +70,84 @@ test('records are not indexed when they are created', async () => {
   expect(body.hits.hits).toHaveLength(0)
 })
 
+test('legalStatuses.NOTIFIED is indexed with full location hierarchy after a notify action', async () => {
+  const { user, generator, seed } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({
+      type: 'record.search',
+      options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+    })
+  ])
+  const esClient = getOrCreateClient()
+
+  const locationRng = createPrng(843)
+
+  const parentAdministrativeArea = {
+    ...generator.administrativeAreas.set(1, locationRng)[0],
+    name: 'Administrative Area'
+  }
+  const childAdministrativeArea = {
+    externalId: null,
+    name: 'Child Administrative Area',
+    id: user.administrativeAreaId as UUID,
+    parentId: parentAdministrativeArea.id
+  }
+  const childLocation = {
+    ...generator.locations.set(1, locationRng)[0],
+    id: user.primaryOfficeId,
+    administrativeAreaId: childAdministrativeArea.id,
+    name: 'Child location',
+    locationType: 'CRVS_OFFICE'
+  } satisfies SetLocationPayload
+
+  await seed.administrativeAreas([
+    parentAdministrativeArea,
+    childAdministrativeArea
+  ])
+  await seed.locations([childLocation])
+
+  const createdEvent = await client.event.create(
+    generator.event.create({ type: TENNIS_CLUB_MEMBERSHIP })
+  )
+
+  await client.event.actions.notify.request(
+    generator.event.actions.notify(createdEvent.id)
+  )
+
+  // ES document must contain the full administrative hierarchy for NOTIFIED
+  const esResponse = await esClient.search({
+    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+    body: { query: { match_all: {} } }
+  })
+
+  expect(esResponse.hits.hits).toHaveLength(1)
+  expect(esResponse.hits.hits[0]._source).toMatchObject({
+    id: createdEvent.id,
+    status: 'NOTIFIED',
+    legalStatuses: {
+      NOTIFIED: {
+        createdAtLocation: [
+          parentAdministrativeArea.id,
+          childAdministrativeArea.id,
+          childLocation.id
+        ]
+      }
+    }
+  })
+
+  // Search API must return only the leaf-level location (no hierarchy)
+  const { results } = await client.event.search({
+    query: { type: 'and', clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }] }
+  })
+
+  expect(results).toHaveLength(1)
+  expect(results[0].legalStatuses.NOTIFIED?.createdAtLocation).toEqual(
+    childLocation.id
+  )
+})
+
 test('records are indexed with full location hierarchy', async () => {
   const { user, generator, seed } = await setupTestCase()
 
@@ -92,7 +170,6 @@ test('records are indexed with full location hierarchy', async () => {
   }
 
   const childAdministrativeArea = {
-    validUntil: null,
     externalId: null,
     name: 'Child Administrative Area',
     id: user.administrativeAreaId as UUID,
@@ -105,7 +182,7 @@ test('records are indexed with full location hierarchy', async () => {
     administrativeAreaId: childAdministrativeArea.id,
     name: 'Child location',
     locationType: 'CRVS_OFFICE'
-  } satisfies Location
+  } satisfies SetLocationPayload
 
   await seed.administrativeAreas([
     parentAdministrativeArea,
@@ -277,6 +354,30 @@ const anyOfStatusPayload: QueryType = {
   ]
 }
 
+const allOfFlagsPayload: QueryType = {
+  type: 'and',
+  clauses: [
+    {
+      flags: {
+        allOf: ['validated', 'approval-required-for-late-registration']
+      }
+    }
+  ]
+}
+
+const combinedFlagsPayload: QueryType = {
+  type: 'and',
+  clauses: [
+    {
+      flags: {
+        anyOf: ['approval-required-for-late-registration'],
+        noneOf: ['potential-duplicate'],
+        allOf: ['validated', 'approval-required-for-late-registration']
+      }
+    }
+  ]
+}
+
 const fullAndPayload: QueryType = {
   type: 'and',
   clauses: [
@@ -435,6 +536,62 @@ describe('test buildElasticQueryFromSearchPayload', () => {
           {
             bool: {
               must: [{ terms: { status: ['REGISTERED', 'DECLARED'] } }],
+              should: undefined
+            }
+          }
+        ],
+        should: undefined
+      }
+    })
+  })
+
+  test('builds query with allOf flags', async () => {
+    const result = await buildElasticQueryFromSearchPayload(allOfFlagsPayload, [
+      tennisClubMembershipEvent
+    ])
+    expect(result).toEqual({
+      bool: {
+        must: [
+          {
+            bool: {
+              must: [
+                { term: { flags: 'validated' } },
+                { term: { flags: 'approval-required-for-late-registration' } }
+              ],
+              should: undefined
+            }
+          }
+        ],
+        should: undefined
+      }
+    })
+  })
+
+  test('builds query with anyOf, noneOf and allOf flags combined', async () => {
+    const result = await buildElasticQueryFromSearchPayload(
+      combinedFlagsPayload,
+      [tennisClubMembershipEvent]
+    )
+    expect(result).toEqual({
+      bool: {
+        must: [
+          {
+            bool: {
+              must: [
+                {
+                  terms: { flags: ['approval-required-for-late-registration'] }
+                },
+                {
+                  bool: {
+                    must_not: {
+                      terms: { flags: ['potential-duplicate'] }
+                    },
+                    should: undefined
+                  }
+                },
+                { term: { flags: 'validated' } },
+                { term: { flags: 'approval-required-for-late-registration' } }
+              ],
               should: undefined
             }
           }
@@ -921,9 +1078,9 @@ describe('placeOfEvent location hierarchy handling', () => {
   let declarationWithHomeAddress: EventState
   let generator: Awaited<ReturnType<typeof setupTestCase>>['generator']
   let seed: Awaited<ReturnType<typeof setupTestCase>>['seed']
-  let grandParentAdministrativeArea: AdministrativeArea
-  let parentAdministrativeArea: AdministrativeArea
-  let childOffice: Location
+  let grandParentAdministrativeArea: SetAdministrativeAreaPayload
+  let parentAdministrativeArea: SetAdministrativeAreaPayload
+  let childOffice: SetLocationPayload
   let modifiedEventConfig: EventConfig
   beforeEach(async () => {
     // Setup: Generate location IDs upfront

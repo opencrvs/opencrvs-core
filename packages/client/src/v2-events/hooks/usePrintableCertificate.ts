@@ -14,7 +14,8 @@ import { cloneDeep } from 'lodash'
 import {
   ActionDocument,
   ActionType,
-  AdministrativeArea,
+  ClientAdministrativeArea,
+  ClientLocation,
   CertificateTemplateConfig,
   EventConfig,
   EventDocument,
@@ -24,7 +25,6 @@ import {
   getCurrentEventState,
   isMinioUrl,
   LanguageConfig,
-  Location,
   PrintCertificateAction,
   UserOrSystemSummary,
   UUID
@@ -75,8 +75,8 @@ export const usePrintableCertificate = ({
 }: {
   event: EventDocument
   config: EventConfig
-  locations: Map<UUID, Location>
-  administrativeAreas: Map<UUID, AdministrativeArea>
+  locations: Map<UUID, ClientLocation>
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
   users: UserOrSystemSummary[]
   certificateConfig?: CertificateTemplateConfig
   language?: LanguageConfig

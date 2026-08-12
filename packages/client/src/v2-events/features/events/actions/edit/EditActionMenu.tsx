@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState } from 'react'
+import React from 'react'
 import { useIntl, MessageDescriptor } from 'react-intl'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import styled from 'styled-components'
@@ -22,19 +22,22 @@ import {
   getCurrentEventState,
   EventStatus,
   getActionConfig,
-  getAcceptedActions
+  getAcceptedActions,
+  getActionFormFields,
+  runFieldValidations,
+  flattenFormState,
+  omitHiddenFields,
+  FieldConfig,
+  FieldUpdateValue,
+  EventState,
+  EventConfig,
+  isActionEnabled
 } from '@opencrvs/commons/client'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
-import {
-  Icon,
-  ResponsiveModal,
-  Button,
-  Stack,
-  Text,
-  TextArea
-} from '@opencrvs/components'
+import { Icon, Dialog, Stack, Button } from '@opencrvs/components'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { useDialogFormState } from '@client/v2-events/hooks/useDialogFormState'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { messages as actionMessages } from '@client/i18n/messages/views/action'
 import { ROUTES } from '@client/v2-events/routes'
@@ -93,30 +96,43 @@ const messages = {
 
 interface EditActionModalResult {
   confirmed: boolean
-  comment?: string
+  values?: Record<string, FieldUpdateValue>
 }
-
-const CommentLabel = styled(Text)`
-  padding: 16px 0 4px 0;
-`
 
 function EditActionModal({
   title,
   supportingCopy,
-  close
+  close,
+  fields = [],
+  eventConfiguration,
+  declaration
 }: {
   title: MessageDescriptor
   supportingCopy?: MessageDescriptor
   close: (result: EditActionModalResult) => void
+  fields?: FieldConfig[]
+  eventConfiguration: EventConfig
+  declaration: EventState
 }) {
   const intl = useIntl()
-  const [comment, setComment] = useState('')
+  const validatorContext = useValidatorContext()
+  const dialogForm = useDialogFormState()
+  const modalValues = dialogForm.formValues
+
+  const errorsOnField = fields.flatMap((field) =>
+    flattenFormState(
+      runFieldValidations({
+        field,
+        form: modalValues,
+        value: modalValues[field.id],
+        context: validatorContext
+      })
+    ).flatMap(([, errs]) => errs)
+  )
 
   return (
-    <ResponsiveModal
-      autoHeight
-      show
-      showHeaderBorder
+    <Dialog
+      isOpen
       actions={[
         <Button
           key={'cancel_edit'}
@@ -128,16 +144,23 @@ function EditActionModal({
         </Button>,
         <Button
           key={'confirm_edit'}
+          disabled={errorsOnField.length > 0}
           id={'confirm_edit'}
           type="primary"
-          onClick={() => close({ confirmed: true, comment })}
+          onClick={() =>
+            close({
+              confirmed: true,
+              values: omitHiddenFields(fields, modalValues, validatorContext)
+            })
+          }
         >
           {intl.formatMessage(messages.confirm)}
         </Button>
       ]}
-      handleClose={() => close({ confirmed: false })}
       title={intl.formatMessage(title)}
+      variant="large"
       width={800}
+      onClose={() => close({ confirmed: false })}
     >
       {supportingCopy && (
         <Stack>
@@ -149,15 +172,16 @@ function EditActionModal({
           />
         </Stack>
       )}
-      <CommentLabel element="h3" variant="bold16">
-        {intl.formatMessage(commentLabel)}
-      </CommentLabel>
-      <TextArea
-        data-testid="edit-comment"
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-      />
-    </ResponsiveModal>
+      {fields.length > 0 && (
+        <FormFieldGenerator
+          {...dialogForm}
+          eventConfig={eventConfiguration}
+          fields={fields}
+          id="edit-action-modal-form"
+          validatorContext={{ ...validatorContext, baseFormState: declaration }}
+        />
+      )}
+    </Dialog>
   )
 }
 
@@ -174,7 +198,7 @@ function useEditActions(event: EventDocument) {
   const events = useEvents()
   const formConfig = getDeclaration(eventConfiguration)
   const declaration = useEventFormData((state) => state.getFormValues())
-  const validatorContext = useValidatorContext()
+  const validatorContext = useValidatorContext(event)
   const reviewConfig = getActionReview(eventConfiguration, ActionType.DECLARE)
 
   const formFields = formConfig.pages.flatMap((page) => page.fields)
@@ -216,6 +240,14 @@ function useEditActions(event: EventDocument) {
     actionType: ActionType.EDIT
   })
 
+  // Ensure that the target action (Notify, Declare, Register) conditions are met
+  const isTargetActionEnabled = (actionType: ActionType) => {
+    const targetConfig = getActionConfig({ eventConfiguration, actionType })
+    return targetConfig
+      ? isActionEnabled(targetConfig, eventIndex, validatorContext)
+      : true
+  }
+
   const hasValidationErrors = validationErrorsInActionFormExist({
     formConfig,
     form: declaration,
@@ -236,11 +268,17 @@ function useEditActions(event: EventDocument) {
         icon: actionIcons[ActionType.EDIT],
         label: messages.editAndRegisterLabel,
         onClick: async () => {
-          const { confirmed, comment } = await openModal<EditActionModalResult>(
+          const { confirmed, values } = await openModal<EditActionModalResult>(
             (close) => {
               return (
                 <EditActionModal
                   close={close}
+                  declaration={declaration}
+                  eventConfiguration={eventConfiguration}
+                  fields={getActionFormFields(
+                    eventConfiguration,
+                    ActionType.REGISTER
+                  )}
                   supportingCopy={dialogCopy?.register}
                   title={messages.editAndRegisterLabel}
                 />
@@ -254,7 +292,7 @@ function useEditActions(event: EventDocument) {
               transactionId: getUUID(),
               declaration: declarationDiff,
               annotation,
-              content: { comment }
+              targetActionAnnotation: values
             })
 
             closeActionView(backTo)
@@ -268,11 +306,17 @@ function useEditActions(event: EventDocument) {
         icon: actionIcons[ActionType.EDIT],
         label: messages.editAndDeclareLabel,
         onClick: async () => {
-          const { confirmed, comment } = await openModal<EditActionModalResult>(
+          const { confirmed, values } = await openModal<EditActionModalResult>(
             (close) => {
               return (
                 <EditActionModal
                   close={close}
+                  declaration={declaration}
+                  eventConfiguration={eventConfiguration}
+                  fields={getActionFormFields(
+                    eventConfiguration,
+                    ActionType.DECLARE
+                  )}
                   supportingCopy={dialogCopy?.declare}
                   title={messages.editAndDeclareLabel}
                 />
@@ -286,24 +330,33 @@ function useEditActions(event: EventDocument) {
               transactionId: getUUID(),
               declaration: declarationDiff,
               annotation,
-              content: { comment }
+              targetActionAnnotation: values
             })
 
             closeActionView(backTo)
           }
         },
-        disabled: hasValidationErrors || !anyValuesHaveChanged,
+        disabled:
+          hasValidationErrors ||
+          !anyValuesHaveChanged ||
+          !isTargetActionEnabled(ActionType.DECLARE),
         hidden: !isActionAllowed(ActionType.DECLARE)
       },
       {
         icon: actionIcons[ActionType.EDIT],
         label: messages.editAndNotifyLabel,
         onClick: async () => {
-          const { confirmed, comment } = await openModal<EditActionModalResult>(
+          const { confirmed, values } = await openModal<EditActionModalResult>(
             (close) => {
               return (
                 <EditActionModal
                   close={close}
+                  declaration={declaration}
+                  eventConfiguration={eventConfiguration}
+                  fields={getActionFormFields(
+                    eventConfiguration,
+                    ActionType.NOTIFY
+                  )}
                   supportingCopy={dialogCopy?.notify}
                   title={messages.editAndNotifyLabel}
                 />
@@ -317,13 +370,14 @@ function useEditActions(event: EventDocument) {
               transactionId: getUUID(),
               declaration: declarationDiff,
               annotation,
-              content: { comment }
+              targetActionAnnotation: values
             })
 
             closeActionView(backTo)
           }
         },
-        disabled: !anyValuesHaveChanged,
+        disabled:
+          !anyValuesHaveChanged || !isTargetActionEnabled(ActionType.NOTIFY),
         hidden:
           !isActionAllowed(ActionType.NOTIFY) ||
           eventIndex.status !== EventStatus.enum.NOTIFIED
@@ -351,13 +405,13 @@ export function EditActionMenu({ event }: { event: EventDocument }) {
     <>
       <DropdownMenu id="action">
         <DropdownMenu.Trigger asChild>
-          <PrimaryButton
+          <Button
             data-testid="action-dropdownMenu"
-            icon={() => <CaretDown />}
             size="medium"
+            type="primary"
           >
-            {intl.formatMessage(actionMessages.action)}
-          </PrimaryButton>
+            {intl.formatMessage(actionMessages.action)} <CaretDown />
+          </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
           {actions.map(({ onClick, icon, label, disabled }, index) => (

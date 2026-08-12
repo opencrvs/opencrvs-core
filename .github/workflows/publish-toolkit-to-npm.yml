@@ -6,6 +6,7 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+#
 name: Publish toolkit to NPM registry
 on:
   workflow_dispatch:
@@ -15,10 +16,8 @@ on:
         default: develop
         required: true
   push:
-    branches:
-      - '**'
-  release:
-    types: [published]
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*' # Matches v1.2.3, v1.2.3-beta, v1.2.3-rc.1
 
 permissions:
   id-token: write
@@ -26,10 +25,13 @@ permissions:
 
 jobs:
   publish:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
@@ -39,7 +41,7 @@ jobs:
           package-manager-cache: false
 
       - name: Update npm for OIDC trusted publishing
-        run: npm install -g npm@latest
+        run: npm install -g npm@11
 
       - name: Check if version exists on npm
         id: check-version
@@ -71,12 +73,12 @@ jobs:
 
       - name: Install dependencies
         if: steps.check-version.outputs.version-exists == 'false'
-        run: yarn install
+        run: pnpm install --frozen-lockfile
         working-directory: packages/toolkit
 
       - name: Build
         if: steps.check-version.outputs.version-exists == 'false'
-        run: yarn build:all
+        run: pnpm build:all
         working-directory: packages/toolkit
 
       - name: Update package.json version

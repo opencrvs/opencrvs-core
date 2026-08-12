@@ -14,10 +14,12 @@ spec:
       labels:
         app: elasticsearch-on-deploy
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.utilities) | nindent 6 }}
       containers:
         - name: elasticsearch-on-deploy
           command: ["/scripts/setup.sh"]
-          image: "bash"
+          image: {{ include "opencrvs.image" (dict "root" . "service" .Values.utilities) }}
+          imagePullPolicy: {{ .Values.utilities.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           env:
             - name: ELASTICSEARCH_HOST
               value: {{ .Values.elasticsearch.host }}

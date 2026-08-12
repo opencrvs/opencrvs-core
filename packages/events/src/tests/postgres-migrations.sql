@@ -3,8 +3,8 @@
 --
 
 
--- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
--- Dumped by pg_dump version 17.6 (Debian 17.6-1.pgdg13+1)
+-- Dumped from database version 17.6 (Debian 17.6-2.pgdg13+1)
+-- Dumped by pg_dump version 17.6 (Debian 17.6-2.pgdg13+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -68,7 +68,9 @@ CREATE TABLE app.administrative_areas (
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     deleted_at timestamp with time zone,
     valid_until timestamp with time zone,
-    external_id text
+    external_id text,
+    versions jsonb NOT NULL,
+    CONSTRAINT administrative_areas_versions_nonempty CHECK (((jsonb_typeof(versions) = 'array'::text) AND (jsonb_array_length(versions) >= 1)))
 );
 
 
@@ -287,7 +289,9 @@ CREATE TABLE app.locations (
     location_type text,
     valid_until timestamp with time zone,
     administrative_area_id uuid,
-    external_id text
+    external_id text,
+    versions jsonb NOT NULL,
+    CONSTRAINT locations_versions_nonempty CHECK (((jsonb_typeof(versions) = 'array'::text) AND (jsonb_array_length(versions) >= 1)))
 );
 
 
@@ -337,7 +341,7 @@ CREATE TABLE app.system_clients (
     legacy_id text,
     name text NOT NULL,
     scopes jsonb DEFAULT '[]'::jsonb NOT NULL,
-    created_by text NOT NULL,
+    created_by uuid NOT NULL,
     secret_hash text NOT NULL,
     salt text NOT NULL,
     sha_secret text NOT NULL,
@@ -762,6 +766,14 @@ ALTER TABLE ONLY app.event_actions
 
 ALTER TABLE ONLY app.event_actions
     ADD CONSTRAINT event_actions_original_action_id_fkey FOREIGN KEY (original_action_id) REFERENCES app.event_actions(id);
+
+
+--
+-- Name: system_clients fk_system_clients_created_by; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.system_clients
+    ADD CONSTRAINT fk_system_clients_created_by FOREIGN KEY (created_by) REFERENCES app.users(id);
 
 
 --

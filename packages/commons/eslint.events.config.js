@@ -21,9 +21,6 @@ module.exports = defineConfig([
         projectService: true
       }
     },
-    plugins: {
-      import: require('eslint-plugin-import')
-    },
     settings: {
       'import/resolver': {
         typescript: {

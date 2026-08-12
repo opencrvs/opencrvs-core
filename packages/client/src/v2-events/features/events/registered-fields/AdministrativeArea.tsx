@@ -12,11 +12,15 @@ import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import {
   AdministrativeAreaField,
+  ClientLocation,
   getAdministrativeAreaHierarchy,
+  isSelectableAtAnchor,
   JurisdictionFilter,
-  Location,
   resolveJurisdictionReference,
-  UUID
+  resolveVersion,
+  todayISO,
+  UUID,
+  PlainDate
 } from '@opencrvs/commons/client'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
@@ -28,7 +32,12 @@ import {
   SearchableSelectProps
 } from '@client/v2-events/components/forms/inputs/SearchableSelect'
 import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
+import { useClearStaleSelectionOnAnchorChange } from '@client/v2-events/hooks/useClearStaleSelectionOnAnchorChange'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
+import {
+  buildHistoricalLocationNameOptions,
+  resolveLocationName
+} from '@client/v2-events/utils'
 import { LocationSearch } from './LocationSearch'
 
 /**
@@ -72,7 +81,9 @@ function useUserAdministrativeAreaHierarchy() {
  */
 function useAvailableAdministrativeAreas(
   parentId?: string | null,
-  jurisdictionFilter?: JurisdictionFilter
+  jurisdictionFilter?: JurisdictionFilter,
+  excludeInactive = false,
+  anchor: PlainDate = todayISO()
 ) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
@@ -80,13 +91,25 @@ function useAvailableAdministrativeAreas(
 
   const options = React.useMemo(() => {
     return [...administrativeAreas.values()].filter((administrativeArea) => {
+      // In advanced search, address (admin-structure) filters offer only
+      // currently-valid areas; when anchored to the event's date (#13143),
+      // fields anchored to it offer only areas that existed and were active
+      // as at that date. Either way, inactivated/not-yet-effective areas are
+      // excluded; other fields keep listing everything, unchanged.
+      if (
+        excludeInactive &&
+        !isSelectableAtAnchor(administrativeArea.versions, anchor)
+      ) {
+        return false
+      }
+
       if (parentId === undefined) {
         return true
       }
 
       return administrativeArea.parentId === parentId
     })
-  }, [administrativeAreas, parentId])
+  }, [administrativeAreas, parentId, excludeInactive, anchor])
 
   // When jurisdictionFilter is not "all", restrict options to the user's own area hierarchy.
   // e.g. a LOCAL_REGISTRAR sees only their province/district; a COMMUNITY_LEADER sees only their province/district/village.
@@ -114,6 +137,7 @@ interface AdministrativeAreaInputProps
   partOf: string | null
   onChange: (val: string | null) => void
   value?: string | null
+  anchor: PlainDate
 }
 
 function AdministrativeAreaInput({
@@ -122,6 +146,7 @@ function AdministrativeAreaInput({
   value,
   partOf,
   onChange,
+  anchor,
   ...inputProps
 }: AdministrativeAreaInputProps) {
   const token = useSelector(getToken)
@@ -131,14 +156,44 @@ function AdministrativeAreaInput({
     eventType
   )
 
+  // `activeOnly` alone controls whether inactive/not-yet-effective areas are
+  // dropped from the list; `anchorToDateOfEvent` only changes which date is
+  // used to resolve `anchor` (event date vs today) — the two are orthogonal.
+  const excludeInactive = Boolean(configuration.activeOnly)
+
   const administrativeAreas = useAvailableAdministrativeAreas(
     partOf,
-    jurisdictionFilter
+    jurisdictionFilter,
+    excludeInactive,
+    anchor
   )
 
+  // Only for fields anchored to the event's date, not advanced search's
+  // `activeOnly` filter.
+  const { getAdministrativeAreas: getAdministrativeAreasForStaleCheck } =
+    useAdministrativeAreas()
+  const allAdministrativeAreas =
+    getAdministrativeAreasForStaleCheck.useSuspenseQuery()
+  useClearStaleSelectionOnAnchorChange({
+    enabled: Boolean(configuration.anchorToDateOfEvent),
+    value,
+    anchor,
+    entities: allAdministrativeAreas,
+    onClear: () => onChange(null)
+  })
+
+  // When the field config opts in (advanced search sets this), list every
+  // historical name so records saved under an outdated name stay findable.
+  // Otherwise show a single current-name option, resolved at the field's anchor.
   const options = useMemo(
-    () => administrativeAreas.map((o) => ({ label: o.name, value: o.id })),
-    [administrativeAreas]
+    () =>
+      configuration.listHistoricalNames
+        ? buildHistoricalLocationNameOptions(administrativeAreas)
+        : administrativeAreas.map((o) => ({
+            label: resolveLocationName(o, anchor),
+            value: o.id
+          })),
+    [administrativeAreas, configuration.listHistoricalNames, anchor]
   )
 
   const selectedLocation = useMemo(
@@ -164,27 +219,39 @@ function AdministrativeAreaInput({
 }
 
 function AdministrativeAreaOutput({
-  value
+  value,
+  anchor
 }: {
   value: Stringifiable | undefined
+  anchor: PlainDate
 }) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
   const administrativeAreaId = UUID.safeParse(value?.toString()).data
 
-  const administrativeArea =
-    administrativeAreaId && administrativeAreas.get(administrativeAreaId)
+  const resolved =
+    administrativeAreaId &&
+    resolveVersion(
+      administrativeAreas.get(administrativeAreaId)?.versions ?? [],
+      anchor
+    )
 
-  return administrativeArea?.name ?? ''
+  return resolved ? resolved.name : ''
 }
 
-function stringify(value: string, context: { locations: Map<UUID, Location> }) {
+function stringify(
+  value: string,
+  context: { locations: Map<UUID, ClientLocation>; anchor: PlainDate }
+) {
   const locationId = UUID.safeParse(value).data
   const location = locationId && context.locations.get(locationId)
 
-  const name = location?.name
-  return name ?? EMPTY_TOKEN
+  if (!location) {
+    return EMPTY_TOKEN
+  }
+
+  return resolveVersion(location.versions, context.anchor).name
 }
 
 function isAdministrativeAreaEmpty(value: Stringifiable) {

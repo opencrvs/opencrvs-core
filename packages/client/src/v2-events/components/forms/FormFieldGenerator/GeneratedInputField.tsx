@@ -79,7 +79,8 @@ import {
   isHiddenFieldType,
   isImageViewFieldType,
   isAutocompleteFieldType,
-  isUserRoleFieldType
+  isUserRoleFieldType,
+  todayISO
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -125,6 +126,7 @@ import { NumberWithUnit } from '@client/v2-events/features/events/registered-fie
 import { Custom } from '@client/v2-events/features/events/registered-fields/Custom'
 import { Hidden } from '@client/v2-events/features/events/registered-fields/Hidden'
 import { Autocomplete } from '@client/v2-events/features/events/registered-fields/Autocomplete'
+import { liveAnchorDate } from '@client/v2-events/utils'
 import {
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
@@ -249,6 +251,26 @@ export const GeneratedInputField = <T extends FieldConfig>(
 
   function handleBlur<E>(_: React.FocusEvent<E>) {
     onBlur(name)
+  }
+
+  /**
+   * The date a location field resolves its options against. Fields that opt
+   * in via `anchorToDateOfEvent` anchor to the event's date-of-event field
+   * (read live off the form being filled in, falling back to the record's
+   * creation date); all others keep resolving against today, unchanged.
+   */
+  function resolveLocationAnchor(configuration?: {
+    anchorToDateOfEvent?: boolean
+  }) {
+    if (!configuration?.anchorToDateOfEvent) {
+      return todayISO()
+    }
+
+    return liveAnchorDate({
+      dateOfEvent: eventConfig?.dateOfEvent,
+      form: { ...validatorContext.baseFormState, ...ocrvsFullForm },
+      createdAt: validatorContext.event?.document.createdAt ?? todayISO()
+    })
   }
 
   const inputProps = {
@@ -616,6 +638,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
         <Address.Input
           config={field.config}
           disabled={disabled}
+          eventConfig={eventConfig}
           id={field.config.id}
           name={name}
           touched={groupTouched}
@@ -734,6 +757,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <InputField {...inputFieldProps} htmlFor={name}>
         <AdministrativeArea.Input
           {...inputProps}
+          anchor={resolveLocationAnchor(field.config.configuration)}
           configuration={field.config.configuration}
           eventType={eventConfig?.id}
           partOf={typeof partOf === 'string' ? partOf : null}
@@ -748,6 +772,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <InputField {...inputFieldProps}>
         <LocationSearch.Input
           {...field.config}
+          anchor={resolveLocationAnchor(field.config.configuration)}
           disabled={disabled}
           eventType={eventConfig?.id}
           locationTypes={field.config.configuration?.locationTypes}
@@ -764,6 +789,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <InputField {...inputFieldProps}>
         <LocationSearch.Input
           {...field.config}
+          anchor={todayISO()}
           disabled={disabled}
           eventType={eventConfig?.id}
           locationTypes={['CRVS_OFFICE']}
@@ -780,6 +806,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <InputField {...inputFieldProps}>
         <LocationSearch.Input
           {...field.config}
+          anchor={todayISO()}
           disabled={disabled}
           eventType={eventConfig?.id}
           locationTypes={['CRVS_OFFICE']}

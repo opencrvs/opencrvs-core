@@ -92,7 +92,9 @@ export function isActionConfigType(
   return actionConfigTypes.has(type as any)
 }
 
-// @TODO: refactor this function to return typed ActionConfig depending on given actionType. Perhaps this function should also throw an error if the action config is not found.
+// @TODO: see if we can make this function generic so it returns a typed ActionConfig based on the given actionType (e.g. `Extract<ActionConfig, { type: T }>`),
+// instead of the current wide `ActionConfig | undefined`. Note NOTIFY's fallback to DECLARE needs special-casing in the return type, since it can resolve to a DeclareConfig.
+// Perhaps this function should also throw an error if the action config is not found.
 export function getActionConfig({
   eventConfiguration,
   actionType,
@@ -102,23 +104,18 @@ export function getActionConfig({
   actionType: DisplayableAction
   customActionType?: string
 }): ActionConfig | undefined {
+  // Notify uses its own config when present, otherwise falls back to declare
+  if (actionType === ActionType.NOTIFY) {
+    return (
+      eventConfiguration.actions.find((a) => a.type === ActionType.NOTIFY) ??
+      eventConfiguration.actions.find((a) => a.type === ActionType.DECLARE)
+    )
+  }
+
   return eventConfiguration.actions.find((a) => {
     // We can have multiple custom actions configured, we specify the custom action with 'customActionType'
     if (a.type === ActionType.CUSTOM && customActionType) {
       return a.customActionType === customActionType
-    }
-
-    // Notify uses the declare action config
-    if (actionType === ActionType.NOTIFY) {
-      return a.type === ActionType.DECLARE
-    }
-
-    // For correction approval/rejection, we use the correction request action config
-    if (
-      actionType === ActionType.APPROVE_CORRECTION ||
-      actionType === ActionType.REJECT_CORRECTION
-    ) {
-      return a.type === ActionType.REQUEST_CORRECTION
     }
 
     return a.type === actionType
@@ -135,7 +132,34 @@ export function getCustomActionFields(
     actionType: ActionType.CUSTOM
   })
 
-  if (!actionConfig || !('form' in actionConfig)) {
+  if (!actionConfig || actionConfig.type !== ActionType.CUSTOM) {
+    return []
+  }
+
+  return actionConfig.form
+}
+
+/**
+ * Returns the fields configured for an action's confirmation dialog.
+ *
+ * Unlike review fields and supporting copy, NOTIFY does NOT fall back to the
+ * DECLARE config here: dialog fields always come from the action's own
+ * configuration entry.
+ */
+export function getActionFormFields(
+  eventConfiguration: EventConfig,
+  actionType: ActionType,
+  customActionType?: string
+): FieldConfig[] {
+  const actionConfig = eventConfiguration.actions.find((a) => {
+    if (a.type === ActionType.CUSTOM && customActionType) {
+      return a.customActionType === customActionType
+    }
+
+    return a.type === actionType
+  })
+
+  if (!actionConfig || !('form' in actionConfig) || actionConfig.form == null) {
     return []
   }
 
@@ -162,15 +186,15 @@ export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
     return actionConfig.printForm.pages.flatMap(({ fields }) => fields)
   }
 
-  if (actionConfig.type === ActionType.CUSTOM) {
-    return actionConfig.form
-  }
+  const reviewFields =
+    'review' in actionConfig && actionConfig.review != null
+      ? actionConfig.review.fields
+      : []
 
-  if ('review' in actionConfig) {
-    return actionConfig.review.fields
-  }
+  const formFields =
+    'form' in actionConfig && actionConfig.form != null ? actionConfig.form : []
 
-  return []
+  return [...reviewFields, ...formFields]
 }
 
 function getAllAnnotationFields(config: EventConfig): FieldConfig[] {

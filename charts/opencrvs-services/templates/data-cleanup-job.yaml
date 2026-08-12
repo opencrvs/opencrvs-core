@@ -12,46 +12,10 @@ spec:
       labels:
         app: data-cleanup
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.postgres) | nindent 6 }}
       containers:
-        - name: cleanup-mongo
-          image: "mongo:4.4"
-          command: ["/bin/bash", "-c"]
-          args:
-            - |
-              echo "Running mongo cleanup script..."
-              DATABASES=(
-                {{- range $.Values.mongodb.databases }}
-                  {{ .db }}
-                {{- end }}
-              )
-              if [ ! -z ${MONGODB_ADMIN_USER+x} ] && [ ! -z ${MONGODB_ADMIN_PASSWORD+x} ]; then
-                AUTH="--username $MONGODB_ADMIN_USER --password $MONGODB_ADMIN_PASSWORD --authenticationDatabase admin";
-              else
-                AUTH="";
-              fi
-              for DB in "${DATABASES[@]}"; do
-                echo "Dropping database: $DB"
-                mongo $AUTH --host $MONGO_HOST --eval "db.getSiblingDB('$DB').dropDatabase()"
-              done
-              echo "Cleanup complete!"
-          env:
-            - name: MONGO_HOST
-              value: {{ .Values.mongodb.host }}
-          {{- if or (eq .Values.mongodb.auth_mode "auto") (eq .Values.mongodb.auth_mode "use_secret") }}
-            - name: MONGODB_ADMIN_USER
-              valueFrom:
-                secretKeyRef:
-                  key: MONGODB_ADMIN_USER
-                  name: {{ .Values.mongodb.admin_user_secret_name }}
-            - name: MONGODB_ADMIN_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  key: MONGODB_ADMIN_PASSWORD
-                  name: {{ .Values.mongodb.admin_user_secret_name }}
-          {{- end }}
-          {{- include "render-env-vars" (dict "service_name" "data_cleanup" "Values" .Values) }}
         - name: cleanup-postgres
-          image: {{ .Values.postgres.image }}
+          image: {{ include "opencrvs.imageReference" .Values.postgres }}
           command: ["/bin/bash", "-c"]
           args:
             - |
@@ -100,12 +64,12 @@ spec:
                   name: {{ .Values.postgres.users_secret }}
                   key: EVENTS_MIGRATOR_POSTGRES_USER
         - name: cleanup-minio
-          image: "minio/mc"
+          image: {{ include "opencrvs.imageReference" .Values.minio }}
           command: ["/bin/bash", "-c"]
           args:
             - |
               MINIO_BUCKET=${MINIO_BUCKET:-ocrvs}
-              echo "Running mongo cleanup script..."
+              echo "Running minio cleanup script..."
               mc alias set myminio http://$MINIO_HOST:$MINIO_PORT ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD:-minioadmin}
               mc rm --recursive --force myminio/$MINIO_BUCKET
               mc rb myminio/$MINIO_BUCKET
@@ -130,7 +94,8 @@ spec:
           {{- end }}
           {{- include "render-env-vars" (dict "service_name" "data_cleanup" "Values" .Values) }}
         - name: cleanup-elasticsearch
-          image: "appropriate/curl"
+          image: {{ include "opencrvs.image" (dict "root" . "service" .Values.utilities) }}
+          imagePullPolicy: {{ .Values.utilities.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           command: ["/bin/sh", "-c"]
           args:
             - |
@@ -143,7 +108,7 @@ spec:
               for index in $indices; do
                 for approved in $approved_words; do
                   case "$index" in
-                    "$approved"*) 
+                    "$approved"*)
                       echo "Delete index $index..."
                       curl -sS -XDELETE "http://$ELASTICSEARCH_HOST/$index"
                       break
@@ -162,21 +127,6 @@ spec:
                   key: SEARCH_ELASTIC_HOST
                   name: {{ .Values.elasticsearch.urls_secret }}
           {{- end }}
-          {{- include "render-env-vars" (dict "service_name" "data_cleanup" "Values" .Values) }}
-        - name: cleanup-influxdb
-          image: "appropriate/curl"
-          command: ["/bin/sh", "-c"]
-          args:
-            - |
-              echo "Running elasticsearch cleanup script..."
-              curl -X POST http://$HOST:$PORT/query?db=$DB --data-urlencode "q=DROP SERIES FROM /.*/"
-          env:
-            - name: HOST
-              value: {{ .Values.influxdb.host }}
-            - name: PORT
-              value: {{ .Values.influxdb.port | quote }}
-            - name: DB
-              value: {{ .Values.influxdb.db }}
           {{- include "render-env-vars" (dict "service_name" "data_cleanup" "Values" .Values) }}
       restartPolicy: "OnFailure"
 {{- end }}

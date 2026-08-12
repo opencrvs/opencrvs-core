@@ -35,7 +35,7 @@ const StyledCode = styled.code`
   background: ${({ theme }) => theme.colors.grey100};
 `
 
-export interface TranslationTextWithFormatModifierProps
+interface TranslationTextWithFormatModifierProps
   extends Omit<ComponentProps<typeof Text>, 'children'> {
   message: MessageDescriptor
 }
@@ -78,7 +78,7 @@ export function TranslationTextWithFormatModifier({
           kbd: (chunks: React.ReactNode[]) => <StyledKbd>{chunks}</StyledKbd>, // keyboard input e.g. <kbd>Ctrl+S</kbd>
           q: (chunks: React.ReactNode[]) => <q>{chunks}</q>, // inline quotation with browser quote marks
           br: () => <br />, // line break — use <br></br> not <br/> (react-intl ignores self-closing)
-           
+
           tab: () => <span style={{ display: 'inline-block', width: '2em' }} /> // indent — use <tab></tab>
         }) as React.ReactNode
       }

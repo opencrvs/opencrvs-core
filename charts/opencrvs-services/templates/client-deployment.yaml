@@ -52,6 +52,7 @@ spec:
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.client) | nindent 6 }}
       containers:
         - image: {{ include "opencrvs.image" (dict "root" . "service" .Values.client) }}
+          imagePullPolicy: {{ .Values.client.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           name: client
           env:
           {{- if and
@@ -72,6 +73,7 @@ spec:
             - name: COUNTRY_CONFIG_URL
               value: {{ include "render-external-url" (dict "service_name" "countryconfig" "Values" .Values) }}
           {{- include "render-env-vars" (dict "service_name" "client" "Values" .Values) }}
+          {{- include "render-nginx-otel-env-vars" (dict "service_name" "opencrvs_client" "Values" .Values "Release" .Release) }}
           {{- include "resources-helper" (dict "service_name" "client" "Values" .Values) | indent 10 }}
           {{- include "probes-helper" (dict "service_name" "client" "Values" .Values) | indent 10 }}
           ports:

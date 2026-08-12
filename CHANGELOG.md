@@ -1,8 +1,100 @@
 # Changelog
 
+## 2.1.0 Release Candidate
+
+### Upgrade guidance
+
+#### MongoDB fully removed — countries upgrading from 1.9.x must go through v2.0.0
+
+**Upgrading from v2.0.0 → 2.1.0: nothing to do.** Your data was already migrated from MongoDB to PostgreSQL during the v2.0.0 upgrade, and this release simply deletes the now-unused MongoDB code.
+
+**Upgrading from 1.9.x: you cannot skip straight to 2.1.0.** You must first upgrade to **v2.0.0**, which performs the one-time migration of MongoDB collections into PostgreSQL, and only then upgrade to 2.1.0. This release deletes the migration tooling (the legacy-data migration, its `mongo_fdw` SQL, and the `data-migration-legacy` Helm job/dependency chart/Swarm compose service), so v2.0.0 is the only release that can migrate your data.
+
+How the migration runs during the v2.0.0 upgrade:
+
+- **Helm/Kubernetes deployments**: automatically, as a `pre-install,pre-upgrade` hook (`data_migration_legacy.enabled: true` by default) on `helm upgrade`. If you disabled `data_migration_legacy`, re-enable it while on v2.0.0 before going to 2.1.0.
+- **Docker Swarm deployments** (Countryconfig/Farajaland `docker-compose.deploy.yml`): also automatically — `deploy.sh` runs `docker stack deploy --prune -c ...`, which creates and runs the `legacy-data-migration` service the first time you deploy v2.0.0. If that service was pruned/removed before it ran, restore it from the v2.0.0 tag and run it manually while still on v2.0.0.
+
+### Breaking changes
+
+#### `validUntil` removed from location APIs
+
+The `Location` and `AdministrativeArea` wire models no longer include `validUntil`. Active/inactive state is now carried by each entity's `versions[]` array (see location versioning, [#6691](https://github.com/opencrvs/opencrvs-core/issues/6691)) and the resolved top-level `status` field. Consumers that read `validUntil` should derive end-of-validity from the `effectiveFrom` of the next version element instead.
+
+#### MongoDB removed
+
+MongoDB, the `mongodb`/`mongoose` dependencies, the MongoDB Helm resources and dependency chart, and all MongoDB references in compose files, dev scripts, and CI have been removed. See "Upgrade guidance" above for the required upgrade path.
+
+#### InfluxDB removed
+
+InfluxDB, the InfluxDB Helm resources (StatefulSet, backup/restore/cleanup jobs), Docker services, and the one-time user-audit InfluxDB→Postgres migration have all been removed. No replacement is needed.
+
+#### `ARCHIVE` no longer clears the `INCOMPLETE` flag
+
+Archiving a NOTIFIED (incomplete) record used to clear `InherentFlags.INCOMPLETE` as a side effect. Since `UNARCHIVE` restores the record to its pre-archive status without amending flags, `ARCHIVE` is now consistent with it by default: the flag freezes across an archive/unarchive round trip and comes back exactly as it was. Country configs can still add/remove flags on either action explicitly via configuration. [#12782](https://github.com/opencrvs/opencrvs-core/issues/12782)
+
+### Improvements
+
+- Private docker image registry support for Dependencies helm chart [#13090](https://github.com/opencrvs/opencrvs-core/issues/13090)
+- Added infrastructure management script to toolkit [#12941](https://github.com/opencrvs/opencrvs-core/issues/12941)
+- Moved Ansible inventory files into environment-specific folders so each environment is self-contained and portable [#13181](https://github.com/opencrvs/opencrvs-core/pull/13181)
+- Replace Elastic APM tracing with OpenTelemetry [#12304](https://github.com/opencrvs/opencrvs-core/issues/12304)
+- Advanced search keeps records at renamed or inactivated offices, facilities and admin areas findable — filters list historical names and, for offices/facilities, inactivated locations [#13146](https://github.com/opencrvs/opencrvs-core/issues/13146)
+- Updates Kubernetes node networking and firewall configuration for multi-node clusters with private node communication [#353](https://github.com/opencrvs/infrastructure/pull/353)
+- Enable OpenTelemetry for Traefik and NGINX [#10685](https://github.com/opencrvs/opencrvs-core/issues/10685)
+- Reduce the amount of data sent to Elasticsearch by dropping unused and duplicate fields during Metricbeat processing [#10978](https://github.com/opencrvs/opencrvs-core/issues/10978)
+- Remove direct calls to events service [#13399](https://github.com/opencrvs/opencrvs-core/issues/13399)
+
+### New features
+
+#### Location and administrative area write API
+
+Locations and administrative areas can now be created, renamed, recoded, and inactivated via `create`, `update`, and `withdrawVersion` endpoints — each change appends an effective-dated element to the entity's `versions[]` array rather than overwriting state; prior versions are never modified (see location versioning, [#6691](https://github.com/opencrvs/opencrvs-core/issues/6691)). A new `location.edit` scope guards these endpoints; country configs must assign it to the relevant role(s). All changes are recorded in the audit log.
+
+#### Notification-based scope filtering
+
+Added `notifiedIn` and `notifiedBy` scope options for record scopes (`record.read`, `record.edit`, `record.search`, etc.), mirroring the existing `declaredIn`/`declaredBy` and `registeredIn`/`registeredBy` patterns — enables role configurations to restrict access based on where or by whom an event was notified. [#11875](https://github.com/opencrvs/opencrvs-core/issues/11875)
+
+#### Status-based scope filtering
+
+Added a `status` scope option for record scopes (`record.edit`, `record.reject`, `record.archive`, `record.search`, etc.) — e.g. `{ type: 'record.edit', options: { status: ['DECLARED'] } }` restricts the scope to records currently in one of the given `EventStatus` values.
+
+#### `APPROVE_CORRECTION` / `REJECT_CORRECTION` no longer inherit `REQUEST_CORRECTION`'s config
+
+`getActionConfig()` used to alias `APPROVE_CORRECTION` and `REJECT_CORRECTION` to whatever was configured on `REQUEST_CORRECTION` (label, flags, conditionals). Each now resolves to its own independent config. If your country config relies on `REQUEST_CORRECTION`'s `conditionals` or `flags` also applying to approve/reject, add explicit `APPROVE_CORRECTION`/`REJECT_CORRECTION` entries with the same values.
+
+#### All core actions are independently configurable
+
+`DELETE`, `ASSIGN`, `UNASSIGN`, `MARK_AS_DUPLICATE`, `MARK_AS_NOT_DUPLICATE`, `APPROVE_CORRECTION`, `REJECT_CORRECTION`, and `DUPLICATE_DETECTED` can now be configured in `ActionConfig`, supporting `label`, `icon`, and `conditionals` (and `flags`, except on `ASSIGN`/`UNASSIGN`, which are meta actions excluded from flag resolution). See [ACTIONS.md](/ACTIONS.md).
+
+#### Configurable form fields on core action confirmation dialogs
+
+The core `NOTIFY`, `DECLARE`, `REGISTER`, `ARCHIVE` and `REJECT` actions now accept an optional `form: FieldConfig[]` in the country configuration, matching the shape already used by custom actions. Configured fields are rendered on the action's confirmation dialog at every entry point (direct actions, quick actions, and "with edits" variants — a combined action such as direct registration shows only the final action's fields). Submitted values are stored in the action's `annotation` and displayed in the record's audit history. Mandatory fields disable the dialog's primary button until completed. [#11305](https://github.com/opencrvs/opencrvs-core/issues/11305)
+
+#### `listHistoricalNames` / `activeOnly` location field config options
+
+`LOCATION`, `ADMINISTRATIVE_AREA`, and `ADDRESS` field configs accept two optional booleans: `listHistoricalNames` lists every name a location has ever had (across its `versions[]`) as a separate, selectable option — so records saved under an outdated name stay findable — and `activeOnly` offers only currently-active locations, excluding inactivated ones. Advanced search sets these itself for its location/address filters (offices and health institutions list all names and keep inactive entries; address filters list all names but drop inactive admin structures), so no country configuration is required for that behaviour; they are documented here as a new, optional part of the field config schema. [#13146](https://github.com/opencrvs/opencrvs-core/issues/13146)
+
+#### `anchorToDateOfEvent` location field config option
+
+`LOCATION`, `ADMINISTRATIVE_AREA`, and `ADDRESS` field configs accept an optional boolean, `anchorToDateOfEvent`, which resolves the field's displayed/selectable versions against the event's date-of-event instead of today (falling back to the record's creation date when that field is empty). It does not by itself exclude inactive versions — combine with `activeOnly` for that; when both are set, `activeOnly`'s active/inactive check is evaluated at the event-date anchor rather than today, so a location that has since become inactive can still be selected for a historical record, and one not yet active as at the event's date is excluded even if it's active today. A selection is automatically cleared if the date-of-event later changes such that it resolves to a different version than before. [#13143](https://github.com/opencrvs/opencrvs-core/issues/13143)
+
+#### Integration audit log retrieval
+
+An integration's audit log can now be read through the `integrations.audit` endpoint which returns a paginated, newest-first list of the operations a single system client performed. The endpoint returns what the client itself did; an integration's lifecycle (who created, disabled or re-keyed it) stays in the audit logs of the administrators who performed those actions.
+
+A new `integration.audit.read` scope guards it; country configs must assign it to the relevant role(s) before the endpoint is reachable. The endpoint is closed to system clients entirely — an integration cannot read any audit log, including its own — and, because system clients have no office or administrative area, access is national and carries no jurisdiction options. [#11909](https://github.com/opencrvs/opencrvs-core/issues/11909)
+
+### Bug fixes
+
+- Keep a number field's postfix/unit label (e.g. `Kilograms (kg)` on Weight at birth) on a single line instead of wrapping onto a second row [#13216](https://github.com/opencrvs/opencrvs-core/issues/13216)
+- Bust the locally cached data when a user's office or role changes, so stale drafts and records from the previous office no longer appear after the change
+- Stop showing an empty `Comment` section in the record audit history for archived records. Archiving from the action menu never asked for a comment, so the section only ever displayed a `-` placeholder. Records archived through the "mark as duplicate" flow still show the comment that was entered there [#13265](https://github.com/opencrvs/opencrvs-core/issues/13265)
+- Stop offering custom actions (e.g. `ESCALATE`) on a draft. Executing one deleted the draft while leaving the event undeclared, making the record impossible to find again [#13245](https://github.com/opencrvs/opencrvs-core/issues/13245)
+
 ## 2.0.1 Release Candidate
 
-## 2.0.0 Release Candidate
+## 2.0.0
 
 ### Upgrade guidance
 
@@ -22,7 +114,7 @@ The `scheduler` package and its Docker service have been removed. The service ra
 
 - **Removed following endpoints from gateway:**
   | Path | Method |
-  |--------------------|--------|
+  | ----------------- | ------ |
   | `/location` | `*` |
   | `/location/{id}` | `*` |
   | `/locations` | `GET` |
@@ -144,7 +236,7 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - Reduce the amount of data sent to Elasticsearch by dropping unused and duplicate fields during Filebeat processing [#11232](https://github.com/opencrvs/opencrvs-core/issues/11232)
 - The app now recovers automatically when the network changes (e.g. Ethernet → WiFi) or become online -> offline -> online again during app initialisation is halfway. If connectivity drops while the app is still loading and is then restored, the app reloads itself to finish loading, instead of getting stuck on the "Installing application…" screen and requiring a manual refresh. [#12898](https://github.com/opencrvs/opencrvs-core/issues/12898)
 
-## 1.9.15 Release Candidate
+## 1.9.15
 
 ### Improvements
 
@@ -1205,9 +1297,9 @@ To see Events V2 in action, check out the example configurations in the **countr
 - **Check your Metabase map file.** For Metabase configuration, we renamed `farajaland-map.geojson` to `map.geojson` to not tie implementations into example country naming conventions.
 - **Feature flags** In order to make application config settings more readable, we re-organised `src/api/application/application-config-default.ts` with a clear feature flag block like so. These are then used across the front and back end of the application to control configurable functionality. New feature flags DEATH_REGISTRATION allow you to optionally run off death registration if your country doesnt want to run its first pilot including death and PRINT_DECLARATION (see New Features) have been added.
   `FEATURES: {
-  DEATH_REGISTRATION: true,
-  MARRIAGE_REGISTRATION: false,
-  ...
+DEATH_REGISTRATION: true,
+MARRIAGE_REGISTRATION: false,
+...
 } `
 - **Improve rendering of addresses in review page where addresses match** When entering father's address details, some countries make use of a checkbox which says "Address is the same as the mothers. " which, when selected, makes the mother's address and fathers address the same. The checkbox has a programatic value of "Yes" or "No". As a result on the review page, the value "Yes" was displayed which didn't make grammatical sense as a response. We decided to use a custom label: "Same as mother's", which is what was asked on the form. This requires some code changes in the src/form/addresses/index.ts file to pull in the `hideInPreview` prop which will hide the value "Yes" on the review page and replace with a content managed label. Associated bug [#5086](https://github.com/opencrvs/opencrvs-core/issues/5086)
 

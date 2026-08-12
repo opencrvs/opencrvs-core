@@ -8,7 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { runUpgrade } from './migrations/v2.0'
+/* eslint-disable no-console */
+import { runUpgrade } from './migrations/v2.1'
+import {
+  runEnvironmentInit,
+  runEnvironmentSwarmToK8s,
+  runEnvironmentUpdateWorkflows,
+  runEnvironmentUpgrade,
+  runEnvironmentUsers
+} from './environment'
 
 const args = process.argv.slice(2)
 
@@ -16,7 +24,7 @@ const USAGE = `
 Usage: opencrvs <command>
 
 Commands:
-  environment init       Initialise a new environment
+  environment            Manage deployment environments
   upgrade                Upgrade an existing environment
   check-translations     Check translation files for completeness
 
@@ -59,7 +67,7 @@ function main() {
   }
 }
 
-function handleEnvironment() {
+async function handleEnvironment() {
   const subcommand = args[1]
 
   if (!subcommand || subcommand === '--help' || subcommand === '-h') {
@@ -68,7 +76,11 @@ function handleEnvironment() {
 Usage: opencrvs environment <subcommand>
 
 Subcommands:
-  init    Initialise a new environment
+  init              Initialise a new environment
+  upgrade           Upgrade existing environment configuration
+  update-workflows  Update workflow environment options
+  users             Manage environment users
+  swarm-to-k8s      Migrate Docker Swarm configuration to Kubernetes
     `.trim()
     )
     process.exit(0)
@@ -76,13 +88,39 @@ Subcommands:
 
   switch (subcommand) {
     case 'init':
-      console.log('Initialising environment...')
-      console.warn('This command is not implemented yet!')
-      process.exit(1)
-      break
+      return runEnvironmentCommand('initialisation', runEnvironmentInit)
+    case 'upgrade':
+      return runEnvironmentCommand('environment upgrade', runEnvironmentUpgrade)
+    case 'update-workflows':
+      return runEnvironmentCommand(
+        'workflow update',
+        runEnvironmentUpdateWorkflows
+      )
+    case 'users':
+      return runEnvironmentCommand('user management', runEnvironmentUsers)
+    case 'swarm-to-k8s':
+      return runEnvironmentCommand(
+        'Swarm to Kubernetes migration',
+        runEnvironmentSwarmToK8s
+      )
     default:
       console.error(`Unknown subcommand: environment ${subcommand}`)
       process.exit(1)
+  }
+}
+
+async function runEnvironmentCommand(
+  operation: string,
+  command: () => Promise<void>
+) {
+  try {
+    await command()
+  } catch (error) {
+    console.error(
+      `Environment ${operation} failed:`,
+      error instanceof Error ? error.message : error
+    )
+    process.exit(1)
   }
 }
 

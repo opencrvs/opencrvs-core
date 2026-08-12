@@ -9,19 +9,28 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import {
+  defineMessages,
+  MessageDescriptor,
+  WrappedComponentProps as IntlShapeProps,
+  injectIntl
+} from 'react-intl'
 import {
   formMessages as messages,
   buttonMessages,
-  userMessages
+  constantsMessages
 } from '@client/i18n/messages'
 import styled from 'styled-components'
-import { InputError } from '@opencrvs/components/lib/InputField'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
-import { Select } from '@opencrvs/components/lib/Select'
+import {
+  Icon,
+  InputError,
+  TextInput,
+  Select,
+  Frame,
+  AppBar,
+  Button
+} from '@opencrvs/components'
 import { find, at } from 'lodash'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { Button } from '@opencrvs/components/lib/Button'
 import {
   ProtectedAccoutStep,
   IProtectedAccountSetupData,
@@ -29,15 +38,67 @@ import {
 } from '@client/components/ProtectedAccount'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 
-enum QUESTION_KEYS {
-  BIRTH_TOWN,
-  HIGH_SCHOOL,
-  MOTHER_NAME,
-  FAVORITE_TEACHER,
-  FAVORITE_MOVIE,
-  FAVORITE_SONG,
-  FAVORITE_FOOD,
-  FIRST_CHILD_NAME
+export const SECURITY_QUESTION_KEYS = [
+  'BIRTH_TOWN',
+  'HIGH_SCHOOL',
+  'MOTHER_NAME',
+  'FAVORITE_TEACHER',
+  'FAVORITE_MOVIE',
+  'FAVORITE_SONG',
+  'FAVORITE_FOOD',
+  'FIRST_CHILD_NAME'
+] as const
+
+export type SecurityQuestionKey = (typeof SECURITY_QUESTION_KEYS)[number]
+
+export const securityQuestionMessages: Record<
+  SecurityQuestionKey,
+  MessageDescriptor
+> = defineMessages({
+  BIRTH_TOWN: {
+    defaultMessage: 'What city were you born in?',
+    description: 'The description for BIRTH_TOWN key',
+    id: 'userSetup.securityQuestions.birthTown'
+  },
+  HIGH_SCHOOL: {
+    defaultMessage: 'What is the name of your high school?',
+    description: 'The description for HIGH_SCHOOL key',
+    id: 'userSetup.securityQuestions.hightSchool'
+  },
+  MOTHER_NAME: {
+    defaultMessage: "What is your mother's name?",
+    description: 'The description for MOTHER_NAME key',
+    id: 'userSetup.securityQuestions.motherName'
+  },
+  FAVORITE_TEACHER: {
+    defaultMessage: 'What is the name of your favorite school teacher?',
+    description: 'The description for FAVORITE_TEACHER key',
+    id: 'userSetup.securityQuestions.favoriteTeacher'
+  },
+  FAVORITE_MOVIE: {
+    defaultMessage: 'What is your favorite movie?',
+    description: 'The description for FAVORITE_MOVIE key',
+    id: 'userSetup.securityQuestions.favoriteMovie'
+  },
+  FAVORITE_SONG: {
+    defaultMessage: 'What is your favorite song?',
+    description: 'The description for FAVORITE_SONG key',
+    id: 'userSetup.securityQuestions.favoriteSong'
+  },
+  FAVORITE_FOOD: {
+    defaultMessage: 'What is your favorite food?',
+    description: 'The description for FAVORITE_FOOD key',
+    id: 'userSetup.securityQuestions.favoriteFood'
+  },
+  FIRST_CHILD_NAME: {
+    defaultMessage: "What is your first child's name?",
+    description: 'The description for FIRST_CHILD_NAME key',
+    id: 'userSetup.securityQuestions.firstChildName'
+  }
+})
+
+export function isSecurityQuestionKey(key: string): key is SecurityQuestionKey {
+  return (SECURITY_QUESTION_KEYS as readonly string[]).includes(key)
 }
 
 const EMPTY_VALUE = ''
@@ -115,18 +176,10 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
   }
 
   getQuestionList = (): IQuestion[] => {
-    const questionKeys = Object.keys(QUESTION_KEYS)
-    questionKeys.splice(0, questionKeys.length / 2)
-    const result: IQuestion[] = []
-
-    questionKeys.forEach((value: string) => {
-      result.push({
-        value,
-        label: this.props.intl.formatMessage(userMessages[value])
-      })
-    })
-
-    return result
+    return SECURITY_QUESTION_KEYS.map((value) => ({
+      value,
+      label: this.props.intl.formatMessage(securityQuestionMessages[value])
+    }))
   }
 
   prepareQuestionnaire = (): IQuestionnaire[] => {
@@ -322,17 +375,43 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { intl } = this.props
+    const { intl, goToStep, setupData } = this.props
+    const title = intl.formatMessage(messages.userFormSecurityQuestionsTitle)
     return (
-      <ActionPageLight
-        hideBackground
-        goBack={() => {
-          this.props.goToStep(
-            ProtectedAccoutStep.PASSWORD,
-            this.props.setupData
-          )
-        }}
-        title={intl.formatMessage(messages.userFormSecurityQuestionsTitle)}
+      <Frame
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
+        header={
+          <AppBar
+            desktopLeft={
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={() =>
+                  goToStep(ProtectedAccoutStep.PASSWORD, setupData)
+                }
+              >
+                <Icon name="ArrowLeft" />
+              </Button>
+            }
+            mobileLeft={
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={() =>
+                  goToStep(ProtectedAccoutStep.PASSWORD, setupData)
+                }
+              >
+                <Icon name="ArrowLeft" />
+              </Button>
+            }
+            desktopTitle={title}
+            mobileTitle={title}
+          />
+        }
       >
         <Content
           size={ContentSize.SMALL}
@@ -344,7 +423,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
         >
           {this.showQuestionnaire()}
         </Content>
-      </ActionPageLight>
+      </Frame>
     )
   }
 }

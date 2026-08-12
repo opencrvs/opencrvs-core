@@ -14,7 +14,7 @@ on:
       - develop
       - main
     tags:
-      - "*"
+      - '*'
   workflow_call:
     inputs:
       branch_tag_name:
@@ -61,7 +61,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: ${{ (inputs.build_arm == true && fromJSON('["ubuntu-24.04", "ubuntu-24.04-arm"]')) || fromJSON('["ubuntu-24.04"]') }}
+        runner: ${{ (inputs.build_arm == true && fromJSON('["ubuntu-26.04", "ubuntu-26.04-arm"]')) || fromJSON('["ubuntu-26.04"]') }}
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v6
@@ -79,7 +79,10 @@ jobs:
         env:
           BRANCH: ${{ inputs.branch_tag_name || github.ref_name }}
         run: |
-          export VERSION=`git log -1 --pretty=format:%h`
+          # Exactly 7 chars: %h length floats with the clone's object count,
+          # and deploy-to-feature-environment.yml cuts the head sha to 7 when
+          # it dispatches the e2e workflow — the tags must line up.
+          export VERSION=$(git rev-parse HEAD | cut -c1-7)
           echo "Pushing version $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
@@ -90,7 +93,7 @@ jobs:
       - name: Set architecture label
         id: arch_label
         run: |
-          if [[ "${{ matrix.runner }}" == "ubuntu-24.04-arm" ]]; then
+          if [[ "${{ matrix.runner }}" == "ubuntu-26.04-arm" ]]; then
             echo "arch=-arm64" >> $GITHUB_OUTPUT
           else
             echo "arch=-amd64" >> $GITHUB_OUTPUT
@@ -98,7 +101,8 @@ jobs:
       - name: Get list of services
         id: get-services
         run: |
-          services=$(grep "^  [^ ]" docker-compose.yml | grep -v base | grep -v '#' | awk -F: '{print $1}' | sed -e 's/^ *//')
+          # Exclude countryconfig-template from the list of services to build, since it is not a deployable service.
+          services=$(find packages -name Dockerfile | cut -f2 -d\/ | grep -v '^countryconfig-template$')
           services_json=$(echo $services | tr '\n' ',' | sed 's/,$//' | jq -R 'split(" ")' | tr -d '\n')
           # Set the list of service names as an output variable
           echo "services=$services_json" >> $GITHUB_OUTPUT
@@ -132,7 +136,7 @@ jobs:
 
   merge-manifest:
     needs: [base]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v4
@@ -161,8 +165,8 @@ jobs:
       fail-fast: false
       matrix:
         runner: ${{
-          (inputs.build_arm == true && fromJSON('["ubuntu-24.04", "ubuntu-24.04-arm"]')) ||
-          fromJSON('["ubuntu-24.04"]')
+          (inputs.build_arm == true && fromJSON('["ubuntu-26.04", "ubuntu-26.04-arm"]')) ||
+          fromJSON('["ubuntu-26.04"]')
           }}
         service: ${{ fromJSON(needs.base.outputs.services) }}
     runs-on: ${{ matrix.runner }}
@@ -170,7 +174,7 @@ jobs:
       - uses: actions/checkout@v6
         if: github.event_name == 'workflow_dispatch'
         with:
-          ref: "${{ github.event.inputs.branch_tag_name }}"
+          ref: '${{ github.event.inputs.branch_tag_name }}'
 
       - uses: actions/checkout@v6
         if: github.event_name == 'push' || github.event_name == 'pull_request'
@@ -187,7 +191,7 @@ jobs:
       - name: Set architecture label
         id: arch_label
         run: |
-          if [[ "${{ matrix.runner }}" == "ubuntu-24.04-arm" ]]; then
+          if [[ "${{ matrix.runner }}" == "ubuntu-26.04-arm" ]]; then
             echo "arch=-arm64" >> $GITHUB_OUTPUT
           else
             echo "arch=-amd64" >> $GITHUB_OUTPUT
@@ -213,13 +217,13 @@ jobs:
             cache-to: type=inline
 
   merge-services-manifest:
-    needs: [base, build]
+    needs: [base, build, merge-testland-assets-manifest]
     if: always()
     strategy:
       fail-fast: false
       matrix:
         service: ${{ fromJSON(needs.base.outputs.services) }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v4
@@ -246,9 +250,129 @@ jobs:
             docker manifest push ${REPO_PREFIX}-${{ matrix.service }}:$TAG
           done
 
+  # The service matrix above only builds packages/<service>/Dockerfile, so the
+  # testland companion assets image (postgres/metabase/reindex assets) needs its
+  # own step. Published as ghcr.io/opencrvs/ocrvs-testland:<tag>-assets to match
+  # the chart's `{{ opencrvs.image countryconfig }}-assets` reference. Context is
+  # packages/testland because Dockerfile.assets COPYs testland-relative paths.
+  testland-assets:
+    needs: [base]
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: ${{
+          (inputs.build_arm == true && fromJSON('["ubuntu-26.04", "ubuntu-26.04-arm"]')) ||
+          fromJSON('["ubuntu-26.04"]')
+          }}
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v6
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          ref: '${{ github.event.inputs.branch_tag_name }}'
+
+      - uses: actions/checkout@v6
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PUBLISH_TOKEN }}
+
+      - name: Set architecture label
+        id: arch_label
+        run: |
+          if [[ "${{ matrix.runner }}" == "ubuntu-26.04-arm" ]]; then
+            echo "arch=-arm64" >> $GITHUB_OUTPUT
+          else
+            echo "arch=-amd64" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push testland assets image
+        uses: Wandalen/wretry.action@v3.8.0
+        with:
+          attempt_limit: 3
+          action: docker/build-push-action@v6
+          with: |
+            file: packages/testland/Dockerfile.assets
+            provenance: false
+            push: true
+            context: packages/testland
+            tags: |
+              ghcr.io/opencrvs/ocrvs-testland:${{ needs.base.outputs.version }}${{ steps.arch_label.outputs.arch }}-assets
+              ghcr.io/opencrvs/ocrvs-testland:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}-assets
+            cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-testland:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}-assets
+            cache-to: type=inline
+
+  countryconfig-template-build-test:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v6
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          ref: '${{ github.event.inputs.branch_tag_name }}'
+
+      - uses: actions/checkout@v6
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Build countryconfig-template (without publishing)
+        uses: Wandalen/wretry.action@v3.8.0
+        with:
+          attempt_limit: 3
+          action: docker/build-push-action@v6
+          with: |
+            file: packages/countryconfig-template/Dockerfile
+            context: packages/countryconfig-template
+            push: false
+
+      - name: Build countryconfig-template assets (without publishing)
+        uses: Wandalen/wretry.action@v3.8.0
+        with:
+          attempt_limit: 3
+          action: docker/build-push-action@v6
+          with: |
+            file: packages/countryconfig-template/Dockerfile.assets
+            context: packages/countryconfig-template
+            push: false
+
+  merge-testland-assets-manifest:
+    needs: [base, testland-assets]
+    if: always()
+    runs-on: ubuntu-26.04
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PUBLISH_TOKEN }}
+
+      - name: Create and push multi-arch manifest
+        env:
+          BUILD_ARM: ${{ inputs.build_arm == true }}
+        run: |
+          REPO="ghcr.io/opencrvs/ocrvs-testland"
+
+          for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
+            if [[ "$BUILD_ARM" == "true" ]]; then
+              MANIFEST_LIST="$REPO:$TAG-amd64-assets $REPO:$TAG-arm64-assets"
+            else
+              MANIFEST_LIST="$REPO:$TAG-amd64-assets"
+            fi
+            echo "[🔁 pushing ] $REPO:$TAG-assets"
+            docker manifest create $REPO:$TAG-assets $MANIFEST_LIST
+            docker manifest push $REPO:$TAG-assets
+          done
+
   security-scans-pr:
     needs: [build, base]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     if: >
       github.event_name == 'pull_request' && (github.event.pull_request.base.ref == 'develop' || github.event.pull_request.base.ref == 'main') && !inputs.skip_security_check
     strategy:
@@ -264,21 +388,21 @@ jobs:
       - name: Gather Trivy output from base branch image
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: "ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ github.event.pull_request.base.ref }}"
+          image-ref: 'ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ github.event.pull_request.base.ref }}'
           trivy-config: trivy.yaml
           trivyignores: .trivyignore.yaml
-          format: "sarif"
-          output: "./trivy-results-base.sarif"
-          exit-code: "0"
+          format: 'sarif'
+          output: './trivy-results-base.sarif'
+          exit-code: '0'
       - name: Gather Trivy output from newly build image
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: "ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}"
+          image-ref: 'ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
           trivy-config: trivy.yaml
           trivyignores: .trivyignore.yaml
-          format: "sarif"
-          output: "./trivy-results-branch.sarif"
-          exit-code: "0"
+          format: 'sarif'
+          output: './trivy-results-branch.sarif'
+          exit-code: '0'
       - name: Remove lines that are always expected to be different
         run: |
           jq '.runs |= map(del(.originalUriBaseIds, .properties))' ${{ github.workspace }}/trivy-results-base.sarif > ${{ github.workspace }}/trivy-results-base.sarif
@@ -289,7 +413,7 @@ jobs:
 
   security-scans-develop:
     needs: [build, base]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     if: ${{ (needs.base.outputs.branch == 'develop' || inputs.publish_release) && !inputs.skip_security_check }}
     strategy:
       fail-fast: false
@@ -305,6 +429,33 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: "ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}"
+          image-ref: 'ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
           trivy-config: trivy.yaml
           trivyignores: .trivyignore.yaml
+
+  # Testland's single-instance e2e environment redeploys and re-tests on every
+  # develop push. Dispatched only after the image manifests are pushed, so the
+  # tags the e2e deploy pulls are guaranteed to exist (a standalone push-
+  # triggered workflow would race this build).
+  trigger-e2e:
+    name: Trigger E2E in Testland development environment
+    needs:
+      [base, build, merge-services-manifest, merge-testland-assets-manifest]
+    if: success() && github.event_name == 'push' && github.ref_name == 'develop'
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.TESTLAND_WORKFLOW_TOKEN }}
+          script: |
+            const result = await github.rest.repos.createDispatchEvent({
+              owner: 'opencrvs',
+              repo: 'opencrvs-testland-infrastructure',
+              event_type: 'run_e2e',
+              client_payload: {
+                actor: '${{ github.actor }}',
+                'core-image-tag': '${{ needs.base.outputs.version }}',
+                'core-branch': 'develop'
+              }
+            })
+            console.log(result);

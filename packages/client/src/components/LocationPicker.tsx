@@ -24,7 +24,6 @@ import { CircleButton } from '@opencrvs/components/lib/buttons'
 import { colors } from '@opencrvs/components/lib/colors'
 import {
   PickerButton,
-  ContentWrapper,
   ModalContainer as CommonModalContainer,
   ModalHeader,
   TitleContent,
@@ -32,7 +31,10 @@ import {
 } from '@client/components/DateRangePicker'
 import styled from 'styled-components'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { AdministrativeArea, Location } from '@opencrvs/commons/client'
+import {
+  ClientAdministrativeArea,
+  ClientLocation
+} from '@opencrvs/commons/client'
 import { useAdministrativeAreas } from '../v2-events/hooks/useAdministrativeAreas'
 import { useIntl } from 'react-intl'
 
@@ -43,7 +45,9 @@ interface LocationPickerProps {
   selectedLocationId?: string
   disabled?: boolean
   onChangeLocation: (locationId: string) => void
-  locationFilter?: (location: Location | AdministrativeArea) => boolean
+  locationFilter?: (
+    location: ClientLocation | ClientAdministrativeArea
+  ) => boolean
 }
 
 const ModalContainer = styled(CommonModalContainer)`
@@ -149,15 +153,14 @@ export function LocationPicker({
         id="location-range-picker-action"
         onClick={() => setModalVisible(true)}
         disabled={disabled}
+        type="secondary"
       >
-        <ContentWrapper>
-          <span>
-            {(selectedSearchedLocation &&
-              selectedSearchedLocation.displayLabel) ||
-              ''}
-          </span>
-          <MapPin color={disabled ? colors.grey200 : undefined} />
-        </ContentWrapper>
+        <span>
+          {(selectedSearchedLocation &&
+            selectedSearchedLocation.displayLabel) ||
+            ''}
+        </span>
+        <MapPin color={disabled ? colors.grey200 : undefined} />
       </PickerButton>
       {modalVisible && (
         <>

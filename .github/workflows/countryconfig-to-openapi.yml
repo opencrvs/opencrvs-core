@@ -13,13 +13,16 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v6
         with:
           fetch-depth: 1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -31,10 +34,9 @@ jobs:
         with:
           timeout_minutes: 10
           max_attempts: 3
-          command: yarn install --frozen-lockfile
+          command: pnpm install --frozen-lockfile
       - name: Generate OpenAPI
-        run: bash build.sh
-        working-directory: packages/api-docs
+        run: pnpm nx run @opencrvs/api-docs:build
 
       - name: Deploy to GitHub Pages
         working-directory: packages/api-docs

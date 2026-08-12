@@ -33,6 +33,7 @@ import {
   deepMerge,
   errorMessages,
   findRecordActionPages,
+  getActionFormFields,
   getActionReviewFields,
   getCurrentEventState,
   getDeclaration,
@@ -207,9 +208,17 @@ function validateDeclarationUpdateAction({
 
   const declarationActionParse = DeclarationActions.safeParse(actionType)
 
-  // 6. Validate against action review fields, if applicable
+  // 6. Validate against action review fields and dialog form fields, if applicable.
+  // Dialog form fields are validated with `required` relaxed: combined flows
+  // (e.g. declare+register) only collect the final action's dialog fields, so
+  // intermediate actions legitimately arrive without their own.
   const reviewFields = declarationActionParse.success
-    ? getActionReviewFields(eventConfig, declarationActionParse.data)
+    ? [
+        ...getActionReviewFields(eventConfig, declarationActionParse.data),
+        ...getActionFormFields(eventConfig, declarationActionParse.data).map(
+          (formField) => ({ ...formField, required: false })
+        )
+      ]
     : []
 
   const visibleAnnotationFields = omitHiddenFields(
@@ -248,9 +257,10 @@ function validateActionAnnotation({
     context
   )
 
-  const formFields = pages.flatMap(({ fields }) =>
-    fields.flatMap((field) => field)
-  )
+  const formFields = [
+    ...pages.flatMap(({ fields }) => fields.flatMap((field) => field)),
+    ...getActionFormFields(eventConfig, actionType)
+  ]
 
   const errors = [
     ...getFieldErrors(formFields, annotation, {
@@ -297,7 +307,10 @@ export function validateNotifyAction({
     fields.flatMap((field) => field)
   )
 
-  const reviewFields = getActionReviewFields(eventConfig, ActionType.DECLARE)
+  const reviewFields = [
+    ...getActionReviewFields(eventConfig, ActionType.DECLARE),
+    ...getActionFormFields(eventConfig, ActionType.NOTIFY)
+  ]
 
   const annotationErrors = Object.entries(annotation).flatMap(
     ([key, value]) => {
@@ -415,9 +428,14 @@ export const validateAction: MiddlewareFunction<
     token: ctx.token
   })
 
-  const context = { ...(await getValidatorContext(ctx.token)), event }
+  const eventState = getCurrentEventState(event, eventConfig)
 
-  const declaration = getCurrentEventState(event, eventConfig).declaration
+  const context = await getValidatorContext({
+    token: ctx.token,
+    event: { document: event, state: eventState }
+  })
+
+  const declaration = eventState.declaration
 
   if (actionType === ActionType.NOTIFY || actionType === ActionType.EDIT) {
     const errors = validateNotifyAction({

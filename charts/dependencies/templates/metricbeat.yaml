@@ -15,10 +15,11 @@ spec:
       labels:
         app: metricbeat
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.metricbeat) | nindent 6 }}
       serviceAccountName: metricbeat
       initContainers:
         - name: wait-kibana
-          image: curlimages/curl
+          image: {{ include "opencrvs.imageReference" .Values.utilities }}
           command: ["sh", "-c"]
           args:
             - |
@@ -31,7 +32,7 @@ spec:
               exit 1
       containers:
         - name: metricbeat
-          image: {{ .Values.metricbeat.image }}
+          image: {{ include "opencrvs.imageReference" .Values.metricbeat }}
           securityContext:
             runAsUser: 0
             privileged: true

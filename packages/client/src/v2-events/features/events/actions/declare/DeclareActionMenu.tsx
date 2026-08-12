@@ -17,11 +17,13 @@ import {
   getDeclaration,
   EventDocument,
   getCurrentEventState,
+  getActionFormFields,
   getActionReview,
   getAvailableActionsForEvent,
-  getActionConfig
+  getActionConfig,
+  isValidIcon
 } from '@opencrvs/commons/client'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { Icon } from '@opencrvs/components'
@@ -38,7 +40,10 @@ import {
   actionLabels
 } from '@client/v2-events/features/workqueues/Actions/utils'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
-import { Review } from '@client/v2-events/features/events/components/Review'
+import {
+  AcceptActionModalResult,
+  Review
+} from '@client/v2-events/features/events/components/Review'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useCanDirectlyRegister } from '../useCanDirectlyRegister'
@@ -66,7 +71,7 @@ function useDeclarationActions(event: EventDocument) {
   } = useEventFormNavigation()
   const { eventConfiguration } = useEventConfiguration(eventType)
   const formConfig = getDeclaration(eventConfiguration)
-  const validatorContext = useValidatorContext()
+  const validatorContext = useValidatorContext(event)
   const declaration = useEventFormData((state) => state.getFormValues())
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
@@ -81,38 +86,69 @@ function useDeclarationActions(event: EventDocument) {
     actionType: ActionType.DECLARE
   })
 
+  const notifyActionConfig = getActionConfig({
+    eventConfiguration,
+    actionType: ActionType.NOTIFY
+  })
+
   const dialogCopy =
     actionConfig && 'dialogCopy' in actionConfig
       ? actionConfig.dialogCopy
       : null
 
+  const eventId = event.id
+
   const actions = {
     [ActionType.NOTIFY]: {
-      mutate: events.actions.notify.mutate,
-      supportingCopy: dialogCopy?.notify,
+      supportingCopy: notifyActionConfig?.supportingCopy ?? dialogCopy?.notify,
+      fields: getActionFormFields(eventConfiguration, ActionType.NOTIFY),
       title: {
         id: 'review.declare.incomplete.confirmModal.title',
         defaultMessage: 'Notify the {event}?',
         description: 'The title for review action modal when declaring'
-      }
+      },
+      onConfirm: (values: AcceptActionModalResult['values']) =>
+        events.actions.notify.mutate({
+          eventId,
+          declaration,
+          annotation: { ...annotation, ...values },
+          transactionId: uuid()
+        })
     },
     [ActionType.DECLARE]: {
-      mutate: events.actions.declare.mutate,
       supportingCopy: dialogCopy?.declare,
+      fields: getActionFormFields(eventConfiguration, ActionType.DECLARE),
       title: {
         id: 'review.declare.confirmModal.title',
         defaultMessage: 'Declare the {event}?',
         description: 'The title for review action modal when declaring'
-      }
+      },
+      onConfirm: (values: AcceptActionModalResult['values']) =>
+        events.actions.declare.mutate({
+          eventId,
+          declaration,
+          annotation: { ...annotation, ...values },
+          transactionId: uuid()
+        })
     },
     [ActionType.REGISTER]: {
-      mutate: events.customActions.registerOnDeclare.mutate,
       supportingCopy: dialogCopy?.register,
+      // Combined declare+register shows only REGISTER's dialog fields
+      fields: getActionFormFields(eventConfiguration, ActionType.REGISTER),
       title: {
         id: 'review.register.confirmModal.title',
         defaultMessage: 'Register the {event}?',
         description: 'The title for review action modal when registering'
-      }
+      },
+      // Combined flow: dialog values belong to the final REGISTER action only
+      onConfirm: (values: AcceptActionModalResult['values']) =>
+        events.customActions.registerOnDeclare.mutate({
+          eventId,
+          declaration,
+          annotation,
+          targetActionAnnotation: values,
+          transactionId: uuid()
+        })
     }
   }
 
@@ -138,7 +174,6 @@ function useDeclarationActions(event: EventDocument) {
 
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { isActionAllowed } = useUserAllowedActions(eventIndex)
-  const eventId = event.id
 
   const onDelete = useCallback(async () => {
     await deleteDeclaration(eventId, backTo)
@@ -147,28 +182,28 @@ function useDeclarationActions(event: EventDocument) {
   async function handleDeclaration(actionType: keyof typeof actions) {
     const action = actions[actionType]
 
-    const confirmedDeclaration = await openModal<boolean | null>((close) => {
-      return (
-        <Review.ActionModal.Accept
-          action="Declare"
-          close={close}
-          copy={{
-            supportingCopy: action.supportingCopy,
-            title: action.title,
-            onConfirm: actionLabels[actionType]
-          }}
-          eventType={intl.formatMessage(eventConfiguration.label)}
-        />
-      )
-    })
+    const modalResult = await openModal<AcceptActionModalResult | null>(
+      (close) => {
+        return (
+          <Review.ActionModal.Accept
+            action="Declare"
+            close={close}
+            copy={{
+              supportingCopy: action.supportingCopy,
+              title: action.title,
+              onConfirm: actionLabels[actionType]
+            }}
+            declaration={declaration}
+            eventConfiguration={eventConfiguration}
+            eventType={intl.formatMessage(eventConfiguration.label)}
+            fields={action.fields}
+          />
+        )
+      }
+    )
 
-    if (confirmedDeclaration) {
-      action.mutate({
-        eventId,
-        declaration,
-        annotation,
-        transactionId: uuid()
-      })
+    if (modalResult) {
+      action.onConfirm(modalResult.values)
       return closeActionView(backTo)
     }
   }
@@ -193,7 +228,9 @@ function useDeclarationActions(event: EventDocument) {
         disabled: hasValidationErrors
       },
       {
-        icon: actionIcons[ActionType.DECLARE],
+        icon: isValidIcon(notifyActionConfig?.icon)
+          ? notifyActionConfig.icon
+          : actionIcons[ActionType.DECLARE],
         label: actionLabels[ActionType.NOTIFY],
         onClick: async () => handleDeclaration(ActionType.NOTIFY),
         hidden:
@@ -232,13 +269,13 @@ export function DeclareActionMenu({ event }: { event: EventDocument }) {
     <>
       <DropdownMenu id="action">
         <DropdownMenu.Trigger asChild>
-          <PrimaryButton
+          <Button
             data-testid="action-dropdownMenu"
-            icon={() => <CaretDown />}
             size="medium"
+            type="primary"
           >
-            {intl.formatMessage(messages.action)}
-          </PrimaryButton>
+            {intl.formatMessage(messages.action)} <CaretDown />
+          </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
           {actions.map(({ onClick, icon, label, disabled }, index) => (

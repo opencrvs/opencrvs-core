@@ -17,14 +17,17 @@ import {
   areConditionsMet,
   getMixedPath,
   EventIndex,
-  EventDocument
+  EventDocument,
+  isFieldSecured,
+  FieldValue
 } from '@opencrvs/commons/client'
-import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { recordAnchorDate } from '@client/v2-events/utils'
 import { convertDateFieldsToUnixTimestamps } from '@client/v2-events/utils'
 import { useFlagLabelsString } from '@client/v2-events/messages/flags'
+import { InfoBox } from './InfoBox'
 
 const messages = {
   assignedTo: {
@@ -133,9 +136,22 @@ export function EventSummary({
   const { summary, label: eventLabelMessage } = eventConfiguration
   const declarationFields = getDeclarationFields(eventConfiguration)
   const securedFields = declarationFields
-    .filter(({ secured }) => secured)
+    .filter((declarationField) =>
+      isFieldSecured(declarationField, eventIndex, validationContext)
+    )
     .map(({ id }) => id)
 
+  const visibleBanners = (summary.banners ?? []).filter(
+    (banner) =>
+      !banner.conditionals ||
+      banner.conditionals.length === 0 ||
+      areConditionsMet(
+        banner.conditionals,
+        event,
+        validationContext,
+        eventIndex
+      )
+  )
   const configuredFields = summary.fields.map((field) => {
     if (
       field.conditionals &&
@@ -162,9 +178,10 @@ export function EventSummary({
         // If a custom label is configured, use it. Otherwise, by default, use the label from the original form field.
         label: field.label ?? config.label,
         emptyValueMessage: field.emptyValueMessage,
-        secured: config.secured ?? false,
+        secured: isFieldSecured(config, eventIndex, validationContext),
         value: (
           <Output
+            anchor={recordAnchorDate(eventIndex)}
             eventConfig={eventConfiguration}
             field={config}
             value={value}
@@ -197,6 +214,19 @@ export function EventSummary({
 
   return (
     <>
+      {visibleBanners.map((banner, index) => (
+        <InfoBox
+          key={index}
+          background={banner.background}
+          data-testid={`summary-info-box-${index}`}
+          description={
+            banner.description && intl.formatMessage(banner.description)
+          }
+          heading={intl.formatMessage(banner.heading)}
+          icon={banner.icon}
+          type={banner.type}
+        />
+      ))}
       <Summary id="summary">
         <Summary.Row
           key="assignedTo"

@@ -8,12 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineConfig, loadEnv } from 'vite'
+import { createRequire } from 'node:module'
+import { loadEnv } from 'vite'
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { VitePWA } from 'vite-plugin-pwa'
 import dns from 'node:dns'
-import { IncomingMessage, ServerResponse } from 'node:http'
+
+// Vite 8 loads the config as ESM, where `require` is not defined globally.
+const require = createRequire(import.meta.url)
 
 // fixes issue where Cypress was not able to resolve Vite's localhost
 // https://github.com/cypress-io/cypress/issues/25397#issuecomment-1775454875
@@ -65,7 +69,7 @@ export default defineConfig(({ mode }) => {
       strategies: 'injectManifest',
       injectManifest: {
         globDirectory: 'build/',
-        globPatterns: ['**/*.{json,ico,ttf,html,js,map}'],
+        globPatterns: ['**/*.{json,ico,ttf,html,js}'],
         globIgnores: ['**/config.js'],
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
         swDest: 'build/src-sw.js'
@@ -100,7 +104,8 @@ export default defineConfig(({ mode }) => {
         plugins: [noTreeshakingForEvalPlugin()]
       },
       commonjsOptions: {
-        transformMixedEsModules: true
+        transformMixedEsModules: true,
+        defaultIsModuleExports: true
       },
       sourcemap: true
     },
@@ -109,24 +114,17 @@ export default defineConfig(({ mode }) => {
         crypto: require.resolve('crypto-js'),
         '@opencrvs/commons/build/dist/authentication':
           '@opencrvs/commons/authentication'
-      }
+      },
+      /*
+       * react-signature-canvas ships a UMD build that must share the app's
+React instance. Without dedupe, Vite 8 can bundle a second React copy.
+       */
+      dedupe: ['react', 'react-dom']
     },
     plugins: [
       loginRedirectPlugin(),
       htmlPlugin(),
-      react({
-        babel: {
-          plugins: [
-            [
-              'babel-plugin-styled-components',
-              {
-                displayName: true,
-                fileName: false
-              }
-            ]
-          ]
-        }
-      }),
+      react(),
       tsconfigPaths({
         projects: ['./tsconfig.build.json']
       }),
@@ -134,7 +132,7 @@ export default defineConfig(({ mode }) => {
     ],
     test: {
       environment: 'jsdom',
-      setupFiles: './src/setupTests.ts',
+      setupFiles: ['./src/setupConfig.ts', './src/setupTests.ts'],
       testTimeout: 60000,
       hookTimeout: 60000,
       globals: true
@@ -154,11 +152,6 @@ export default defineConfig(({ mode }) => {
           target: 'http://localhost:3040',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/countryconfig/, '')
-        },
-        '/api/auth/': {
-          target: 'http://localhost:4040',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/auth/, '')
         },
         '/api/': {
           target: 'http://localhost:7070',
@@ -200,29 +193,22 @@ export default defineConfig(({ mode }) => {
               }
             })
 
-            proxy.on(
-              'error',
-              (
-                _err: Error,
-                req: IncomingMessage,
-                res: ServerResponse<IncomingMessage>
-              ) => {
-                if (req.url === '/health/ready') {
-                  res.writeHead(500, { 'Content-Type': 'application/json' })
-                  res.end(
-                    JSON.stringify({
-                      status: 'error',
-                      checks: {
-                        countryconfig: {
-                          status: 'error',
-                          error: 'Country config service unavailable'
-                        }
+            proxy.on('error', (_err, req, res) => {
+              if (req.url === '/health/ready' && 'writeHead' in res) {
+                res.writeHead(500, { 'Content-Type': 'application/json' })
+                res.end(
+                  JSON.stringify({
+                    status: 'error',
+                    checks: {
+                      countryconfig: {
+                        status: 'error',
+                        error: 'Country config service unavailable'
                       }
-                    })
-                  )
-                }
+                    }
+                  })
+                )
               }
-            )
+            })
           }
         }
       }

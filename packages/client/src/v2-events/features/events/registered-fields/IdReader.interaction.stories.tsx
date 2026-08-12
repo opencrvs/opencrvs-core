@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Decorator, Meta, StoryObj } from '@storybook/react'
-import { expect, waitFor } from '@storybook/test'
+import { Decorator, Meta, StoryObj } from '@storybook/react-vite'
+import { expect, waitFor } from 'storybook/test'
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import { http, HttpResponse } from 'msw'
 import { useNavigate } from 'react-router-dom'
-import { within, userEvent } from '@storybook/testing-library'
+import { within, userEvent } from 'storybook/test'
 import { noop } from 'lodash'
 import {
   and,

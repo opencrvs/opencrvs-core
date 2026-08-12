@@ -1,0 +1,78 @@
+##################################################################################
+# GENERATED FILE — DO NOT EDIT
+#
+# This file is managed by `opencrvs environment init` and may be overwritten.
+# Put all custom Helm values in values.override.yaml, preserving the same YAML
+# hierarchy used here. To remove a generated section, set its top-level key to
+# null in values.override.yaml.
+##################################################################################
+
+########################################################################################
+# Initial configuration file for OpenCRVS installation
+########################################################################################
+# Some properties are not defined in this file and should be provided as key/value at
+# installation time:
+# - hostname: valid DNS name for opencrvs
+# - countryconfig.image.name: Countryconfig image repository
+# - countryconfig.image.tag: Countryconfig image tag
+environment_type: {{environment_type}}
+
+hpa:
+  enabled: false
+
+env:
+  MINIO_BUCKET: ocrvs
+  OPENCRVS_ENVIRONMENT: {{opencrvs_environment}}
+
+otel:
+  enabled: true
+  deployment_environment: {{env}}
+  exporter_otlp_endpoint: "opentelemetry-collector.opencrvs-deps-{{env}}.svc.cluster.local:4317"
+
+elasticsearch:
+  auth_mode: auto
+  host: elasticsearch.opencrvs-deps-{{env}}.svc.cluster.local
+
+minio:
+  auth_mode: use_secret
+  host: minio-0.minio.opencrvs-deps-{{env}}.svc.cluster.local
+
+redis:
+  auth_mode: use_secret
+  host: redis-0.redis.opencrvs-deps-{{env}}.svc.cluster.local
+
+postgres:
+  auth_mode: auto
+  host: postgres-0.postgres.opencrvs-deps-{{env}}.svc.cluster.local
+
+platform:
+  imagePullSecrets:
+    # Default value for credentials created while yarn environment:init
+    - name: dockerhub-credentials
+
+
+auth:
+  env:
+    TWO_FA_ENABLED: {{two_fa_enabled}}
+
+events:
+  env:
+    TWO_FA_ENABLED: {{two_fa_enabled}}
+
+countryconfig:
+  secrets:
+    smtp-config:
+      - ALERT_EMAIL
+      - SENDER_EMAIL_ADDRESS
+      - SMTP_HOST
+      - SMTP_PASSWORD
+      - SMTP_PORT
+      - SMTP_SECURE
+      - SMTP_USERNAME
+
+dashboards:
+  use_default_credentials: false
+  enabled: true
+
+on_restore_cronjob:
+  enabled: {{restore_enabled}}

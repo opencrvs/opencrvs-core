@@ -330,6 +330,7 @@ export const eventRouter = router({
     edit: router(getDefaultActionProcedures(ActionType.EDIT)),
     reject: router(getDefaultActionProcedures(ActionType.REJECT)),
     archive: router(getDefaultActionProcedures(ActionType.ARCHIVE)),
+    unarchive: router(getDefaultActionProcedures(ActionType.UNARCHIVE)),
     register: router(getDefaultActionProcedures(ActionType.REGISTER)),
     printCertificate: router(
       getDefaultActionProcedures(ActionType.PRINT_CERTIFICATE)
@@ -338,6 +339,7 @@ export const eventRouter = router({
     assignment: router({
       assign: userOnlyProcedure
         .input(AssignActionInput)
+        .use(middleware.canAccessEventWithScopes(['record.read']))
         .use(middleware.validateAction)
         .mutation(async ({ ctx, input }) => {
           const { user, token } = ctx

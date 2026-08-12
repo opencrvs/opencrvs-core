@@ -1,6 +1,15 @@
 {
   "ignore": [
     "**/*.@(editorconfig|md|log|lock|patch|prettierrc|gitignore|eslintignore|stylelintrc|csv|gz|geojson|woff2|woff|xml|yarnrc|yarn-integrity|ttf|map|pdf|snap|dockerignore|jsonc|idea|env|info|key|pub|cjs|sql)",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    ".nxignore",
+    "packages/testland/reqs-gathering-templates",
+    "packages/countryconfig-template/pnpm-lock.yaml",
+    "packages/countryconfig-template/.nvmrc",
+    "packages/countryconfig-template/.tiltignore",
+    "packages/countryconfig-template/Tiltfile",
+    "packages/countryconfig-template/.husky",
     ".husky",
     "**/*.ipynb",
     "**/.wireit",
@@ -32,10 +41,7 @@
     "**/*Dockerfile*",
     "**/packages/components/lib",
     "**/packages/*/build",
-    "packages/gateway/src/graphql/schema.d.ts",
-    "packages/gateway/src/graphql/schema.graphql",
     "packages/client/index.html",
-    "packages/client/src/tests/schema.graphql",
     "packages/login/index.html",
     "packages/components/**/*.mdx",
     "packages/components/.storybook/preview.jsx",
@@ -50,6 +56,7 @@
     "packages/toolkit/.npmignore",
     "packages/toolkit/tsconfig.tsbuildinfo",
     "packages/toolkit/create-countryconfig/index.js",
+    "packages/toolkit/src/environment/templates/**",
     "packages/commons/src/events/EventConfig.mermaid",
     "packages/commons/src/events/EventUpdateFlow.mermaid",
     "packages/events/src/storage/postgres/events/schema/**/*.ts",
@@ -62,7 +69,7 @@
   ],
   "license": "license-header.txt",
   "licenseFormats": {
-    "sh|yml|yaml|toml|conf|txt|dotfile|graphql": {
+    "sh|yml|yaml|toml|conf|txt|dotfile|tilt|ps1": {
       "eachLine": {
         "prepend": "# "
       }

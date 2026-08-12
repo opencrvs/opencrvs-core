@@ -38,7 +38,7 @@ import {
   Content,
   Frame,
   Icon,
-  ResponsiveModal,
+  Dialog,
   Spinner,
   Stack,
   Toast
@@ -269,7 +269,8 @@ export function Review() {
 
   const handlePrint = async () => {
     const confirmed = await openModal<boolean>((close) => (
-      <ResponsiveModal
+      <Dialog
+        isOpen
         actions={[
           <Button
             key="close-modal"
@@ -291,14 +292,12 @@ export function Review() {
             {intl.formatMessage(messages.print)}
           </Button>
         ]}
-        contentHeight={100}
-        handleClose={() => close(false)}
         id="confirm-print-modal"
-        show={true}
         title={intl.formatMessage(messages.printAndIssueModalTitle)}
+        onClose={() => close(false)}
       >
         {intl.formatMessage(messages.printAndIssueModalBody)}
-      </ResponsiveModal>
+      </Dialog>
     ))
 
     /**
