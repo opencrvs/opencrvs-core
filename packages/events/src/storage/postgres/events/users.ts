@@ -256,24 +256,32 @@ function buildSearchUsersBaseQuery(
       'locations.administrativeAreaId'
     ])
 
+  /*
+   * Email, mobile and username match exactly. Every duplicate and existence
+   * check on the user routes funnels through this builder, and each of them
+   * wants "is this exact value already in use?" — a substring match reported
+   * `a@x.com` as a duplicate of `ba@x.com` and made the data seed job skip
+   * `j.campbell` because `j.campbell2` existed.
+   *
+   * Emails and usernames are lowercase in storage — emails are lowercased on
+   * write, usernames are constrained to lowercase by their validation pattern —
+   * so lowercasing the input keeps matching case-insensitive in effect. Mobile
+   * numbers are stored verbatim by design, so they compare as given.
+   */
   if (input.username) {
     query = query.where(
       'userCredentials.username',
-      'ilike',
-      `%${input.username.toLowerCase()}%`
+      '=',
+      input.username.toLowerCase()
     )
   }
 
   if (input.mobile) {
-    query = query.where('users.mobile', 'ilike', `%${input.mobile}%`)
+    query = query.where('users.mobile', '=', input.mobile)
   }
 
   if (input.email) {
-    query = query.where(
-      'users.email',
-      'ilike',
-      `%${input.email.toLowerCase()}%`
-    )
+    query = query.where('users.email', '=', input.email.toLowerCase())
   }
 
   if (input.status) {

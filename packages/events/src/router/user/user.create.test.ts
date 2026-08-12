@@ -15,6 +15,7 @@ import { encodeScope, getUUID } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
 import { setupHierarchyWithUsers } from '@events/tests/generators'
+import { updateUserById } from '@events/storage/postgres/events/users'
 
 test('Throws error when user does not have the right scope', async () => {
   const { user } = await setupTestCase()
@@ -166,6 +167,91 @@ test('Throws error when creating user with existing email', async () => {
 
   await expect(client.user.create(userPayload1)).resolves.toBeDefined()
   await expect(client.user.create(userPayload2)).rejects.toThrowError(
+    new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
+  )
+})
+
+test('Allows creating a user whose email is a substring of an existing email', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.create'
+    })
+  ])
+
+  await expect(
+    client.user.create({
+      email: 'ba@x.com',
+      role: 'admin',
+      name: { firstname: 'given1', surname: 'family1' },
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).resolves.toBeDefined()
+
+  // 'a@x.com' is a substring of 'ba@x.com' but a different address
+  await expect(
+    client.user.create({
+      email: 'a@x.com',
+      role: 'admin',
+      name: { firstname: 'given2', surname: 'family2' },
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).resolves.toBeDefined()
+})
+
+test('Allows creating a user whose mobile is a substring of an existing mobile', async () => {
+  const { user, users } = await setupTestCase()
+  const [, secondUser] = users
+
+  // Mobile numbers are stored verbatim, so the same number written in
+  // international format is a different user by design — and it contains the
+  // local format as a substring.
+  await updateUserById(secondUser.id, { mobile: '+8801712345678' })
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.create'
+    })
+  ])
+
+  await expect(
+    client.user.create({
+      email: 'local-format@opencrvs.org',
+      mobile: '01712345678',
+      role: 'admin',
+      name: { firstname: 'given', surname: 'family' },
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).resolves.toBeDefined()
+})
+
+test('Throws error when creating user with an existing email in different case', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'user.create'
+    })
+  ])
+
+  await expect(
+    client.user.create({
+      email: 'casing+123@opencrvs.org',
+      role: 'admin',
+      name: { firstname: 'given1', surname: 'family1' },
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).resolves.toBeDefined()
+
+  await expect(
+    client.user.create({
+      email: 'CASING+123@OPENCRVS.ORG',
+      role: 'admin',
+      name: { firstname: 'given2', surname: 'family2' },
+      primaryOfficeId: user.primaryOfficeId
+    })
+  ).rejects.toThrowError(
     new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
   )
 })

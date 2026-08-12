@@ -10,6 +10,7 @@
  */
 
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { updateUserById } from '@events/storage/postgres/events/users'
 
 // TWO_FA_ENABLED is false in the test environment, so the verification
 // code is always the default one
@@ -89,6 +90,47 @@ describe('user.changePhone', () => {
         verifyCode: '999999'
       })
     ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
+  })
+
+  test("allows a phone number that is only a substring of another user's", async () => {
+    const { user, users } = await setupTestCase()
+    const [, secondUser] = users
+
+    // Mobile numbers are stored verbatim, so the same number in international
+    // format belongs to a different user and merely contains the local format.
+    await updateUserById(secondUser.id, { mobile: '+8801711111111' })
+
+    const client = createTestClient(user)
+    const nonce = await requestPhoneChange(client)
+
+    await client.user.changePhone({
+      userId: user.id,
+      phoneNumber: '01711111111',
+      nonce,
+      verifyCode: VERIFY_CODE
+    })
+
+    const updatedUser = await client.user.get(user.id)
+    expect(updatedUser).toMatchObject({ mobile: '01711111111' })
+  })
+
+  test('rejects a phone number another user already has', async () => {
+    const { user, users } = await setupTestCase()
+    const [, secondUser] = users
+
+    await updateUserById(secondUser.id, { mobile: '01711111111' })
+
+    const client = createTestClient(user)
+    const nonce = await requestPhoneChange(client)
+
+    await expect(
+      client.user.changePhone({
+        userId: user.id,
+        phoneNumber: '01711111111',
+        nonce,
+        verifyCode: VERIFY_CODE
+      })
+    ).rejects.toMatchObject({ code: 'CONFLICT' })
   })
 
   test("cannot change another user's phone number", async () => {

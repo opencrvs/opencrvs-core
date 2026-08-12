@@ -98,6 +98,18 @@ describe('user.requestPhoneChange', () => {
       ).rejects.toMatchObject({ code: 'CONFLICT' })
     })
 
+    test("does not throw CONFLICT when the requested phone number is only a substring of another user's", async () => {
+      const { users } = await setupTestCase()
+      const adminClient = createTestClient(users[0], [USER_EDIT_SCOPE])
+      await adminClient.user.update({ id: users[0].id, mobile: PHONE_NUMBER })
+
+      // '1711111111' is a substring of '01711111111' but a different number
+      const client2 = createTestClient(users[1])
+      await expect(
+        client2.user.requestPhoneChange({ phoneNumber: '1711111111' })
+      ).resolves.toHaveProperty('nonce')
+    })
+
     test('does not throw CONFLICT when the phone number belongs to the requesting user', async () => {
       const { users } = await setupTestCase()
       const adminClient = createTestClient(users[0], [USER_EDIT_SCOPE])
