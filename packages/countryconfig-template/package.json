@@ -64,7 +64,7 @@
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.0.1",
     "@hapi/inert": "^6.0.3",
-    "@opencrvs/toolkit": "2.1.0-rc.50fdb5f",
+    "@opencrvs/toolkit": "2.1.0-rc.f29a266",
     "@types/chalk": "^2.2.0",
     "@types/csv2json": "^1.4.0",
     "@typescript/api": "npm:typescript@6.0.3",

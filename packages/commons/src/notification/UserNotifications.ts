@@ -11,6 +11,7 @@
 
 import { joinUrl } from '../url'
 import { NameFieldValue } from '../events'
+import { logger } from '../logger'
 import * as z from 'zod/v4'
 
 export const TriggerEvent = {
@@ -19,6 +20,8 @@ export const TriggerEvent = {
   USERNAME_REMINDER: 'username-reminder',
   RESET_PASSWORD: 'reset-password',
   RESET_PASSWORD_BY_ADMIN: 'reset-password-by-admin',
+  PASSWORD_RESET_LINK: 'password-reset-link',
+  USERNAME_REMINDER_LINK: 'username-reminder-link',
   RESEND_INVITE: 'resend-invite',
   TWO_FA: '2fa',
   ALL_USER_NOTIFICATION: 'all-user-notification',
@@ -65,6 +68,12 @@ export const TriggerPayload = {
       name: NameFieldValue,
       role: z.string()
     })
+  }),
+  [TriggerEvent.PASSWORD_RESET_LINK]: BasePayload.extend({
+    token: z.string()
+  }),
+  [TriggerEvent.USERNAME_REMINDER_LINK]: BasePayload.extend({
+    token: z.string()
   }),
   [TriggerEvent.RESEND_INVITE]: BasePayload.extend({
     username: z.string(),
@@ -116,14 +125,34 @@ export async function triggerUserEventNotification<T extends TriggerEvent>({
   countryConfigUrl: string
   authHeader?: { Authorization: string }
 }): Promise<Response> {
-  return await fetch(joinUrl(countryConfigUrl, `triggers/user/${event}`), {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
+  const response = await fetch(
+    joinUrl(countryConfigUrl, `triggers/user/${event}`),
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeader
+      }
     }
-  })
+  )
+
+  /*
+   * Checked here rather than per caller: most callers never inspect `.ok`, and
+   * the fire-and-forget one cannot. A 404 from an unregistered trigger route
+   * would otherwise vanish silently. The body is left unread so callers that
+   * consume it still can.
+   *
+   * Logs the event and status only — this is reachable from an unauthenticated
+   * endpoint, so the recipient must never reach the log.
+   */
+  if (!response.ok) {
+    logger.error(
+      `triggerUserEventNotification: dispatch failed for event "${event}" with status ${response.status}`
+    )
+  }
+
+  return response
 }
 
 export function parseUserEventTrigger<T extends TriggerEvent>(
