@@ -345,6 +345,7 @@ export const eventRouter = router({
         .mutation(async ({ ctx, input }) => {
           const { user, token } = ctx
           const result = await assignRecord({ input, user, token })
+
           await writeAuditLog({
             clientId: user.id,
             clientType: user.type,

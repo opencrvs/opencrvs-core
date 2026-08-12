@@ -40,7 +40,10 @@ export async function assignRecord({
 
   if (lastAssignmentAction?.type === ActionType.ASSIGN) {
     if (lastAssignmentAction.assignedTo === input.assignedTo) {
-      return storedEvent
+      return {
+        ...storedEvent,
+        actions: []
+      }
     }
     throw new TRPCError({
       code: 'CONFLICT'
