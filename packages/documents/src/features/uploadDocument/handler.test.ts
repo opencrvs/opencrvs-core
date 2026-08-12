@@ -21,12 +21,14 @@ jest.mock('../../minio/client', () => {
     __esModule: true,
     minioClient: {
       putObject: (...args: unknown[]) => minioPutMock(...args),
-      statObject: (...args: unknown[]) => {
-        minioStatMock(...args)
-        return true
-      }
+      statObject: (...args: unknown[]) => minioStatMock(...args)
     }
   }
+})
+
+/** What Minio throws when the object is not in the bucket. */
+const objectNotFound = Object.assign(new Error('Not found'), {
+  code: 'NotFound'
 })
 
 describe('fileExistsHandler', () => {
@@ -40,7 +42,7 @@ describe('fileExistsHandler', () => {
 
   beforeEach(async () => {
     minioPutMock.mockClear()
-    minioStatMock.mockClear()
+    minioStatMock.mockReset().mockReturnValue({ metaData: {} })
     server = await createServer()
   })
 
@@ -172,7 +174,8 @@ describe('fileUploadHandler', () => {
 
   beforeEach(async () => {
     minioPutMock.mockClear()
-    minioStatMock.mockClear()
+    // By default the key is free, which is the ordinary case for a new upload.
+    minioStatMock.mockReset().mockRejectedValue(objectNotFound)
     server = await createServer()
   })
 
@@ -251,6 +254,45 @@ describe('fileUploadHandler', () => {
     expect(filename).toBe(`${transactionId}.txt`)
 
     expect(res.statusCode).toBe(200)
+  })
+
+  const uploadTo = (transactionId: string) => {
+    const body =
+      `--${boundary}${CRLF}` +
+      createFormProperty('transactionId', transactionId) +
+      `--${boundary}${CRLF}` +
+      createFormProperty('file', 'test upload', 'file') +
+      `--${boundary}--${CRLF}`
+
+    return server.server.inject({
+      method: 'POST',
+      url: '/files',
+      payload: Buffer.from(body, 'utf8'),
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${boundary}`,
+        authorization: `Bearer ${token}`
+      }
+    })
+  }
+
+  it('refuses to replace a file uploaded by someone else', async () => {
+    minioStatMock.mockResolvedValue({
+      metaData: { 'created-by': 'another-user' }
+    })
+
+    const res = await uploadTo('transaction-3')
+
+    expect(res.statusCode).toBe(403)
+    expect(minioPutMock).not.toHaveBeenCalled()
+  })
+
+  it('lets the original uploader replace their own file', async () => {
+    minioStatMock.mockResolvedValue({ metaData: { 'created-by': '123123' } })
+
+    const res = await uploadTo('transaction-4')
+
+    expect(res.statusCode).toBe(200)
+    expect(minioPutMock).toHaveBeenCalled()
   })
 })
 
