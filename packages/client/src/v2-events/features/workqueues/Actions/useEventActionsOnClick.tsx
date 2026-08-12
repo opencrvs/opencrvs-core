@@ -170,7 +170,6 @@ export function useEventActionsOnClick(event: EventIndex) {
  *
  */
 export function useAssignmentActions(event: EventIndex) {
-  console.log('useAssignmentActions', event)
   const maybeAuth = useAuthentication()
   const authentication = getOrThrow(
     maybeAuth,
