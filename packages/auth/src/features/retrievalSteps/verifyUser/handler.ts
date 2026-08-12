@@ -13,81 +13,105 @@ import * as Joi from 'joi'
 import {
   verifyUser,
   storeRetrievalStepInformation,
+  padRecoveryResponse,
   RetrievalSteps,
+  RetrieveFlow,
   RETRIEVAL_FLOW_USER_NAME,
   RETRIEVAL_FLOW_PASSWORD
 } from '@auth/features/retrievalSteps/verifyUser/service'
-import { generateAndSendVerificationCode } from '@auth/features/authenticate/service'
+import { generateNonce } from '@auth/features/verifyCode/service'
+import { createToken } from '@auth/features/authenticate/service'
+import { JWT_ISSUER } from '@auth/constants'
+import { env } from '@auth/environment'
 import {
-  NotificationEvent,
-  generateNonce
-} from '@auth/features/verifyCode/service'
-import { unauthorized } from '@hapi/boom'
+  logger,
+  triggerUserEventNotification,
+  TriggerEvent,
+  TokenUserType
+} from '@opencrvs/commons'
+
 interface IVerifyUserPayload {
   mobile?: string
   email?: string
   retrieveFlow: string
 }
 
-interface IVerifyUserResponse {
-  nonce: string
-  securityQuestionKey?: string
-}
-
 export default async function verifyUserHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
-): Promise<IVerifyUserResponse> {
+) {
   const payload = request.payload as IVerifyUserPayload
-  let result
-  try {
-    result = await verifyUser({ mobile: payload.mobile, email: payload.email })
-  } catch (err) {
-    throw unauthorized()
-  }
-  const nonce = generateNonce()
   const isUserNameRetrievalFlow =
     payload.retrieveFlow.toLowerCase() === RETRIEVAL_FLOW_USER_NAME
+  const retrieveFlow = isUserNameRetrievalFlow
+    ? RETRIEVAL_FLOW_USER_NAME
+    : RETRIEVAL_FLOW_PASSWORD
 
-  await storeRetrievalStepInformation(
-    nonce,
-    isUserNameRetrievalFlow
-      ? RetrievalSteps.NUMBER_VERIFIED
-      : RetrievalSteps.WAITING_FOR_VERIFICATION,
-    result
-  )
+  const startedAt = Date.now()
 
-  if (!isUserNameRetrievalFlow) {
-    const notificationEvent = NotificationEvent.PASSWORD_RESET
+  try {
+    const result = await verifyUser({
+      mobile: payload.mobile,
+      email: payload.email
+    })
+    const token = generateNonce()
 
-    await generateAndSendVerificationCode(
-      nonce,
-      result.scope,
-      notificationEvent,
-      result.userFullName,
-      result.mobile,
-      result.email
+    const authHeader = {
+      Authorization: `Bearer ${await createToken(
+        'auth',
+        [],
+        ['opencrvs:countryconfig-user'],
+        JWT_ISSUER,
+        undefined,
+        TokenUserType.enum.system
+      )}`
+    }
+
+    await storeRetrievalStepInformation(
+      token,
+      RetrievalSteps.WAITING_FOR_VERIFICATION,
+      { ...result, retrieveFlow }
     )
+
+    // Not awaited on purpose. countryconfig waits for the SMTP or SMS send,
+    // which takes some time and only happens for an address that has an
+    // account. Awaiting it would make it possible to determine if an account
+    // exists based on the response time.
+    void triggerUserEventNotification({
+      event: isUserNameRetrievalFlow
+        ? TriggerEvent.USERNAME_REMINDER_LINK
+        : TriggerEvent.PASSWORD_RESET_LINK,
+      payload: {
+        token,
+        recipient: {
+          name: result.userFullName,
+          mobile: result.mobile,
+          email: result.email
+        }
+      },
+      countryConfigUrl: env.COUNTRY_CONFIG_URL_INTERNAL,
+      authHeader
+    }).catch((err) => logger.error(err))
+  } catch (err) {
+    // Swallowed on purpose: no such user, no security questions, and events
+    // being down all have to look the same from outside. A 500 for one of them
+    // and a 200 for another is exactly the difference this endpoint exists to
+    // remove.
+    logger.error(err)
   }
 
-  const response: IVerifyUserResponse = {
-    nonce
-  }
-  if (isUserNameRetrievalFlow) {
-    response.securityQuestionKey = result.securityQuestionKey
-  }
-  return response
+  // Every response leaves at the same time whether the work above succeeded,
+  // failed late, or failed immediately. The bodies are already identical; this
+  // is what stops the duration from saying which happened.
+  await padRecoveryResponse(startedAt)
+
+  return h.response().code(200)
 }
 
 export const requestSchema = Joi.object({
   mobile: Joi.string(),
   email: Joi.string().email(),
   retrieveFlow: Joi.string()
-    .valid(RETRIEVAL_FLOW_USER_NAME, RETRIEVAL_FLOW_PASSWORD)
+    .valid(...RetrieveFlow.options)
     .required()
-})
-
-export const responseSchema = Joi.object({
-  nonce: Joi.string().required(),
-  securityQuestionKey: Joi.string().optional()
 })

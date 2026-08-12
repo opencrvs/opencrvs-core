@@ -48,13 +48,10 @@ const server = setupServer(
       })
     )
   }),
+  // /verifyUser always returns 200 with an empty body, whether or not the
+  // account exists. See auth/features/retrievalSteps/verifyUser/handler.ts.
   rest.post('/api/auth/verifyUser', (req, res, ctx) => {
-    return res(
-      ctx.json({
-        nonce: 'KkcVYTRVC6usF7Vjdi3FSw==',
-        securityQuestionKey: 'FAVORITE_MOVIE'
-      })
-    )
+    return res(ctx.status(200))
   })
 )
 
@@ -181,74 +178,56 @@ describe('Test phone number verification form', () => {
       expect(app.find('#phone-number_error').hostNodes()).toHaveLength(0)
     })
 
-    it('continue button will redirect to SECURITY_QUESTION route', async () => {
-      app
-        .find('#phone-number-input')
-        .hostNodes()
-        .simulate('change', { target: { value: '01755555155' } })
-      app.find('#continue').hostNodes().simulate('submit')
-      await flushPromises()
-      await waitFor(() =>
-        router.state.location.pathname.includes(routes.SECURITY_QUESTION)
-      )
-      expect(router.state.location.pathname).toContain(routes.SECURITY_QUESTION)
-    })
-    it('continue button will redirect to RECOVERY_CODE_ENTRY route', async () => {
-      //change verifyUser api response
+    it('continue button redirects to RECOVERY_LINK_SENT when the account exists', async () => {
       server.use(
-        rest.post(`/api/auth/verifyUser`, (req, res, ctx) => {
-          return res(
-            ctx.status(200),
-            ctx.json({
-              nonce: 'KkcVYTRVC6usF7Vjdi3FSw=='
-            })
-          )
+        rest.post('/api/auth/verifyUser', (req, res, ctx) => {
+          return res(ctx.status(200))
         })
       )
+
       app
         .find('#phone-number-input')
         .hostNodes()
         .simulate('change', { target: { value: '01755555155' } })
-      app.update()
       app.find('#continue').hostNodes().simulate('submit')
       await flushPromises()
-      app.update()
       await waitFor(() =>
-        router.state.location.pathname.includes(routes.RECOVERY_CODE_ENTRY)
+        router.state.location.pathname.includes(routes.RECOVERY_LINK_SENT)
       )
       expect(router.state.location.pathname).toContain(
-        routes.RECOVERY_CODE_ENTRY
+        routes.RECOVERY_LINK_SENT
+      )
+      expect(router.state.location.pathname).not.toContain(
+        routes.SECURITY_QUESTION
       )
     })
-  })
 
-  describe('Valid phone number, invalid submission', () => {
-    it('should show error message if number is not found', async () => {
-      //change verifyUser api response
+    it('continue button redirects to the identical RECOVERY_LINK_SENT screen when the account does not exist', async () => {
+      // The endpoint never reveals whether the account exists: a failing
+      // request must lead to exactly the same screen as a successful one.
       server.use(
-        rest.post(`/api/auth/verifyUser`, (req, res, ctx) => {
-          return res(
-            ctx.status(401),
-            ctx.json({ message: 'Internal Server Error' })
-          )
+        rest.post('/api/auth/verifyUser', (req, res, ctx) => {
+          return res(ctx.status(401))
         })
       )
 
-      router.navigate(routes.PHONE_NUMBER_VERIFICATION, {
-        state: {
-          forgottenItem: FORGOTTEN_ITEMS.USERNAME
-        }
-      })
-
-      app.update()
       app
         .find('#phone-number-input')
         .hostNodes()
         .simulate('change', { target: { value: '01755555155' } })
-      app.find('#continue').hostNodes().simulate('submit')
-      await waitFor(() => !!app.find('#phone-number_error').hostNodes())
       app.update()
-      expect(app.find('#phone-number_error')).toBeTruthy()
+      app.find('#continue').hostNodes().simulate('submit')
+      await flushPromises()
+      app.update()
+      await waitFor(() =>
+        router.state.location.pathname.includes(routes.RECOVERY_LINK_SENT)
+      )
+      expect(router.state.location.pathname).toContain(
+        routes.RECOVERY_LINK_SENT
+      )
+      expect(router.state.location.pathname).not.toContain(
+        routes.SECURITY_QUESTION
+      )
     })
   })
 })
