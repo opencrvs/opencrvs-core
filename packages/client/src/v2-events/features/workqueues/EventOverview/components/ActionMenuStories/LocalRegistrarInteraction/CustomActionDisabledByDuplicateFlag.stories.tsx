@@ -189,9 +189,10 @@ export const ApproveActionStateTransitions: StoryObj = {
 
             return EventDocumentOnlyLastAction.parse({
               ...currentDoc,
-              actions: assignAction
+              actions: [assignAction]
             })
           }),
+
           tRPCMsw.event.actions.duplicate.markNotDuplicate.mutation(() => {
             currentDoc = eventAssignedNoFlag
             return eventAssignedNoFlag

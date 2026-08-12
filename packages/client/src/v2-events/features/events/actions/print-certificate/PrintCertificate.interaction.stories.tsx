@@ -566,10 +566,12 @@ export const RedirectAfterPrint: Story = {
           tRPCMsw.event.actions.assignment.unassign.mutation(() => {
             return EventDocumentOnlyLastAction.parse({
               ...eventDocument,
-              actions: generateActionDocument({
-                configuration: tennisClubMembershipEvent,
-                action: ActionType.UNASSIGN
-              })
+              actions: [
+                generateActionDocument({
+                  configuration: tennisClubMembershipEvent,
+                  action: ActionType.UNASSIGN
+                })
+              ]
             })
           }),
           tRPCMsw.event.actions.printCertificate.request.mutation(() => {
