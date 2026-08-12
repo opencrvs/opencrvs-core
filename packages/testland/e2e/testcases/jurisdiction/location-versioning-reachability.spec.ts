@@ -145,7 +145,7 @@ async function loginAsProvisionedUser(page: Page, username: string) {
   await page.goto(CLIENT_URL)
 }
 
-test.describe.serial('Jurisdiction & routing under location versioning', () => {
+test.describe('Jurisdiction & routing under location versioning', () => {
   let systemAdminToken: string
   let ibomboAreaId: string
   let openPages: Page[] = []

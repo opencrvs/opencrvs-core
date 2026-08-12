@@ -680,7 +680,7 @@ export async function loginWithNewUser(page: Page, username: string) {
   await page.click('#login-mobile-submit')
 
   await expect(page.getByText('Welcome to Farajaland CRS')).toBeVisible({
-    timeout: 30000
+    timeout: 60000 // 30s wasn't always enough under CI load.
   })
 
   await page.getByRole('button', { name: 'Start' }).click()
