@@ -31,17 +31,7 @@ export async function ensureDefaultMinioBucket() {
     return
   }
 
-  try {
-    await minioClient.makeBucket(MINIO_BUCKET, MINIO_BUCKET_REGION)
-  } catch (error) {
-    /*
-     * Another replica can create the bucket between the check above and this
-     * call. Losing that race is not an error, anything else is.
-     */
-    if (!(await minioClient.bucketExists(MINIO_BUCKET))) {
-      throw error
-    }
-  }
+  await minioClient.makeBucket(MINIO_BUCKET, MINIO_BUCKET_REGION)
 }
 
 /**

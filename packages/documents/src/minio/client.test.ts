@@ -58,20 +58,7 @@ describe('ensureDefaultMinioBucket', () => {
     expect(mockClient.makeBucket).not.toHaveBeenCalled()
   })
 
-  it('tolerates another replica winning the creation race', async () => {
-    mockClient.bucketExists
-      .mockResolvedValueOnce(false)
-      .mockResolvedValueOnce(true)
-    mockClient.makeBucket.mockRejectedValue(
-      Object.assign(new Error('bucket exists'), {
-        code: 'BucketAlreadyOwnedByYou'
-      })
-    )
-
-    await expect(ensureDefaultMinioBucket()).resolves.toBeUndefined()
-  })
-
-  it('rethrows when the bucket genuinely could not be created', async () => {
+  it('fails when the bucket could not be created', async () => {
     mockClient.bucketExists.mockResolvedValue(false)
     mockClient.makeBucket.mockRejectedValue(new Error('minio is unreachable'))
 
