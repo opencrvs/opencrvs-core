@@ -807,6 +807,50 @@ describe('withJurisdictionFilters', () => {
     })
   })
 
+  test('maps createdIn to a createdAtLocation term', () => {
+    const result = withJurisdictionFilters({
+      query: baseQuery,
+      scopesV2: [
+        {
+          type: 'record.search',
+          options: {
+            event: ['birth'],
+            createdIn: 'office-123' as UUID
+          }
+        }
+      ]
+    })
+
+    expect(result).toEqual({
+      bool: {
+        must: [baseQuery],
+        filter: {
+          bool: {
+            should: [
+              {
+                bool: {
+                  must: [
+                    {
+                      terms: {
+                        type: ['birth']
+                      }
+                    },
+                    {
+                      term: {
+                        createdAtLocation: 'office-123'
+                      }
+                    }
+                  ]
+                }
+              }
+            ],
+            minimum_should_match: 1
+          }
+        }
+      }
+    })
+  })
+
   test('returns filtered query if multiple events are marked with different jurisdiction access', () => {
     const result = withJurisdictionFilters({
       query: baseQuery,
