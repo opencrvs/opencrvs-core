@@ -107,21 +107,21 @@ test.describe.serial('1. Create and update user -1', () => {
       await page.locator('#sub-page-header-munu-button-dropdownMenu').click()
       await page.getByText('Edit details').click()
 
-      await expect(page.getByTestId('row-value-primaryOfficeId')).toHaveText(
+      await expect(page.getByTestId('primaryOfficeId-value')).toHaveText(
         'Zimbi Village Office, Zimbi, Isamba, Central, Farajaland'
       )
-      await expect(page.getByTestId('row-value-name')).toHaveText(fullname)
-      await expect(page.getByTestId('row-value-phoneNumber')).toHaveText(
+      await expect(page.getByTestId('name-value')).toHaveText(fullname)
+      await expect(page.getByTestId('phoneNumber-value')).toHaveText(
         userinfo.phone
       )
-      await expect(page.getByTestId('row-value-email')).toHaveText(
+      await expect(page.getByTestId('email-value')).toHaveText(
         userinfo.email
       )
-      await expect(page.getByTestId('row-value-fullHonorificName')).toHaveText(
+      await expect(page.getByTestId('fullHonorificName-value')).toHaveText(
         fullname
       )
-      await expect(page.getByTestId('row-value-role')).toHaveText(userinfo.role)
-      await expect(page.getByTestId('row-value-device')).toHaveText(
+      await expect(page.getByTestId('role-value')).toHaveText(userinfo.role)
+      await expect(page.getByTestId('device-value')).toHaveText(
         userinfo.device
       )
     })
@@ -147,25 +147,25 @@ test.describe.serial('1. Create and update user -1', () => {
       await page.locator('#sub-page-header-munu-button-dropdownMenu').click()
       await page.getByText('Edit details').click()
 
-      await expect(page.getByTestId('row-value-primaryOfficeId')).toHaveText(
+      await expect(page.getByTestId('primaryOfficeId-value')).toHaveText(
         'Zimbi Village Office, Zimbi, Isamba, Central, Farajaland'
       )
-      await expect(page.getByTestId('row-value-name')).toHaveText(
+      await expect(page.getByTestId('name-value')).toHaveText(
         updatedFullname
       )
-      await expect(page.getByTestId('row-value-phoneNumber')).toHaveText(
+      await expect(page.getByTestId('phoneNumber-value')).toHaveText(
         updatedUserInfo.phone
       )
-      await expect(page.getByTestId('row-value-email')).toHaveText(
+      await expect(page.getByTestId('email-value')).toHaveText(
         updatedUserInfo.email
       )
-      await expect(page.getByTestId('row-value-fullHonorificName')).toHaveText(
+      await expect(page.getByTestId('fullHonorificName-value')).toHaveText(
         updatedFullname
       )
-      await expect(page.getByTestId('row-value-role')).toHaveText(
+      await expect(page.getByTestId('role-value')).toHaveText(
         updatedUserInfo.role
       )
-      await expect(page.getByTestId('row-value-device')).toHaveText(
+      await expect(page.getByTestId('device-value')).toHaveText(
         updatedUserInfo.device
       )
     })
