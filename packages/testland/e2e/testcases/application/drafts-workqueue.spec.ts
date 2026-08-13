@@ -13,7 +13,10 @@ import { expect, test, type Page } from '@playwright/test'
 import { formatName, login, triggerDeclarationAction } from '../../helpers'
 import { CREDENTIALS } from '../../constants'
 import { faker } from '@faker-js/faker'
-import { getRowByTitle } from '../print-certificate/birth/helpers'
+import {
+  clickWorkqueueActionByTitle,
+  getRowByTitle
+} from '../print-certificate/birth/helpers'
 
 test.describe.serial('1: Validate my draft tab', () => {
   let page: Page
@@ -21,6 +24,7 @@ test.describe.serial('1: Validate my draft tab', () => {
     firstNames: faker.person.firstName('male'),
     familyName: faker.person.lastName('male')
   }
+
   const formattedName = formatName(name)
 
   test.beforeAll(async ({ browser }) => {
@@ -52,6 +56,7 @@ test.describe.serial('1: Validate my draft tab', () => {
     const draftResponse = page.waitForResponse(
       (res) => res.url().includes('event.draft.create') && res.ok()
     )
+
     await page.getByRole('button', { name: 'Save & Exit' }).click()
     await page.getByRole('button', { name: 'Confirm' }).click()
 
@@ -65,8 +70,8 @@ test.describe.serial('1: Validate my draft tab', () => {
   })
 
   test('1.4 Record has "Update" -CTA', async () => {
-    const row = getRowByTitle(page, formattedName)
-    await row.getByRole('button', { name: 'Update' }).click()
+    await clickWorkqueueActionByTitle(page, formattedName, 'Update')
+
     await expect(page.getByTestId('row-value-child.name')).toHaveText(
       formattedName
     )
